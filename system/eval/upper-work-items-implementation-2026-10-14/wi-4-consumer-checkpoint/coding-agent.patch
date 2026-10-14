@@ -1,0 +1,3337 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index f6dba36..06c6485 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -42,6 +42,7 @@ jobs:
+           python plugin/scripts/tests/test_go_oracle_driver.py
+           python plugin/scripts/tests/test_fix_selection.py
+           python plugin/scripts/tests/test_suspect_labels.py
++          python plugin/scripts/tests/test_timing_investigation.py
+ 
+   # jira-gateway-mcp Go binary: must build and pass its unit tests.
+   go-jira-gateway:
+diff --git a/bench/timing/README.md b/bench/timing/README.md
+new file mode 100644
+index 0000000..2b27570
+--- /dev/null
++++ b/bench/timing/README.md
+@@ -0,0 +1,23 @@
++# Native timing consumer probe
++
++Opt-in execution through the existing public ChainBench composition owner and
++`timing_investigation.py`. Requires a clean source-pinned ChainBench CLI and Go
++1.26.9. Use a new output directory:
++
++```sh
++python3 bench/timing/probe.py --chainbench "$CHAINBENCH_BIN" --output /tmp/new-timing-evidence
++```
++
++The probe builds and bundles two actual clean Git revisions of an owned Go RPC
++program. The first reads before a concurrent commit; the second waits for that
++commit. It executes60 reproduction trials and60 paired before/after trials,
++normal controls, explicit delays, native report verification, consumer bindings
++and owned cleanup. The source accepts the Stablenet launch/config shape solely
++as a controlled protocol fixture. It is not blockchain consensus or production
++validity. Actual go-stablenet four-validator composition is tested separately.
++
++Evidence includes the fixture Git bundle, actual binary source metadata,
++immutable phase plans, stdout/stderr and native reports under the ticket
++workspace. `oracle-validity-report.json` at the end contains only the actual
++source coordinates and NOT_EXECUTED, never a fabricated oracle PASS. The full
++oracle and candidate-selection gates are still required for ticket completion.
+diff --git a/bench/timing/node.go.txt b/bench/timing/node.go.txt
+new file mode 100644
+index 0000000..fb422d9
+--- /dev/null
++++ b/bench/timing/node.go.txt
+@@ -0,0 +1,50 @@
++package main
++
++// Controlled RPC timing fixture. It accepts the existing launch/config shape,
++// not blockchain consensus. No production validity is asserted by this fixture.
++import (
++ "context"
++ "encoding/json"
++ "fmt"
++ "net/http"
++ "os"
++ "os/signal"
++ "regexp"
++ "strconv"
++ "strings"
++ "sync"
++ "sync/atomic"
++ "syscall"
++ "time"
++)
++const fixed = false
++const activation = "0x0000000000000000000000000000000000000001"
++func main(){
++ for _,a:=range os.Args[1:]{if a=="init"{return}}
++ config:="";for i,a:=range os.Args[1:]{if a=="--config"&&i+2<len(os.Args){config=os.Args[i+2]}}
++ raw,e:=os.ReadFile(config);if e!=nil{panic(e)}
++ match:=regexp.MustCompile(`(?m)^\s*HTTPPort\s*=\s*([0-9]+)`).FindSubmatch(raw);if len(match)!=2{panic("owned HTTP port unavailable")};port,e:=strconv.Atoi(string(match[1]));if e!=nil{panic(e)}
++ var once sync.Once;var ready atomic.Bool;committed:=make(chan struct{})
++ server:=&http.Server{Addr:fmt.Sprintf("127.0.0.1:%d",port),ReadHeaderTimeout:time.Second,Handler:http.HandlerFunc(func(w http.ResponseWriter,r *http.Request){
++  var q struct{ID any;Method string;Params []json.RawMessage};if json.NewDecoder(r.Body).Decode(&q)!=nil{http.Error(w,"bad request",400);return}
++  var result any
++  switch q.Method{
++  case "eth_chainId":result="0x205b"
++  case "eth_blockNumber":result=fmt.Sprintf("0x%x",time.Now().UnixMilli()/500)
++  case "net_peerCount":result="0x3"
++  case "eth_syncing":result=false
++  case "eth_getBlockByNumber":result=map[string]any{"hash":"0x"+strings.Repeat("0",64)}
++  case "eth_getBalance":
++   var address string;if len(q.Params)>0{_ = json.Unmarshal(q.Params[0],&address)}
++   if address==activation{once.Do(func(){go func(){time.Sleep(300*time.Millisecond);ready.Store(true);close(committed)}()});result="0x0"}else{
++    if fixed{select{case <-committed:case <-r.Context().Done():return}}
++    result="0x0";if ready.Load(){result="0x1"}
++   }
++  default:_ = json.NewEncoder(w).Encode(map[string]any{"jsonrpc":"2.0","id":q.ID,"error":map[string]any{"code":-32601,"message":"unsupported controlled fixture method"}});return
++  }
++  _ = json.NewEncoder(w).Encode(map[string]any{"jsonrpc":"2.0","id":q.ID,"result":result})
++ })}
++ done:=make(chan error,1);go func(){done<-server.ListenAndServe()}()
++ stop:=make(chan os.Signal,1);signal.Notify(stop,syscall.SIGTERM,syscall.SIGINT)
++ select{case e:=<-done:if e!=http.ErrServerClosed{panic(e)};case <-stop:ctx,cancel:=context.WithTimeout(context.Background(),time.Second);defer cancel();_ = server.Shutdown(ctx)}
++}
+diff --git a/bench/timing/probe.py b/bench/timing/probe.py
+new file mode 100644
+index 0000000..143e4e7
+--- /dev/null
++++ b/bench/timing/probe.py
+@@ -0,0 +1,59 @@
++#!/usr/bin/env python3
++"""Opt-in real public composition + timing consumer, never production acceptance."""
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++SCRIPTS=Path(__file__).resolve().parents[2]/'plugin/scripts';sys.path.insert(0,str(SCRIPTS))
++import timing_investigation as timing
++
++def run(args,cwd):
++ return subprocess.run(args,cwd=cwd,capture_output=True,check=True).stdout.decode().strip()
++def main():
++ parser=argparse.ArgumentParser();parser.add_argument('--chainbench',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
++ require=lambda value,message:timing.require(value,message)
++ require(not args.output.exists(),'new output directory required');root=args.output.resolve();root.mkdir(parents=True)
++ source=root/'source';source.mkdir();(source/'go.mod').write_text('module example.invalid/owned-timing-fixture\n\ngo 1.26.9\n')
++ original=Path(__file__).with_name('node.go.txt').read_text();(source/'main.go').write_text(original)
++ run(['git','init','-q'],source);run(['git','config','commit.gpgsign','false'],source)
++ def commit(subject):
++  run(['git','add','go.mod','main.go'],source);run(['git','-c','user.name=Owned timing fixture','-c','user.email=fixture@example.invalid','commit','-qm',subject],source);return run(['git','rev-parse','HEAD'],source)
++ before=commit('test: expose reads before the concurrent commit');before_bin=root/'before';run(['go','build','-buildvcs=true','-o',str(before_bin),'.'],source)
++ (source/'main.go').write_text(original.replace('const fixed = false','const fixed = true'));after=commit('fix: wait for the committed value');after_bin=root/'after';run(['go','build','-buildvcs=true','-o',str(after_bin),'.'],source)
++ run(['git','bundle','create',str(root/'fixture.bundle'),'HEAD'],source)
++ for name,ref in [('before',before),('after',after)]:
++  (root/(name+'.commit.txt')).write_text(run(['git','cat-file','commit',ref],source));(root/(name+'.buildinfo.txt')).write_text(run(['go','version','-m',str(root/name)],source))
++ case={'schemaVersion':'1','id':'owned-timing','chain':{'name':'stablenet','binary':'pinned'},'topology':{'bp':1},'steps':[{'read':{'source':'balanceAt','on':'node1','address':'0x0000000000000000000000000000000000000001'}},{'read':{'source':'chainId','on':'node1'}}],'assertions':[{'assert':'balanceAt','on':'node1','address':'0x0000000000000000000000000000000000000002','compare':'Equal','expected':'1'},{'assert':'chainId','on':'node1','compare':'Equal','expected':'8283'}]}
++ workspace=root/'.coding-agent/tickets/timing';workspace.mkdir(parents=True)
++ state={'ticket_id':'timing','ticket_type':'bugfix','current_state':'ANALYSIS','states':{'ANALYSIS':{'investigation_kind':'timing','status':'in_progress'},'EVALUATION':{'cycle':1}}};state_path=workspace/'state.json';state_path.write_bytes(timing.encode(state))
++ base={'schema_version':1,'id':'owned-timing','mode':'reproduction','symptom':'controlled concurrent read before commit; no consensus claim','assertion_id':'owned-timing/assert/0','seed':'owned-paired-v1','before':{'commit':before},'after':None,'repetitions':60,'min_completed':60,'min_symptom_failures':3,'max_failure_rate':.05,'trial_timeout_seconds':30,'total_timeout_seconds':600,'owned_node_ids':['node1'],'normal_assertion_ids':['owned-timing/assert/1'],'injection':{'kind':'delay','target':'node1','step':'owned-timing/step/1','min_delay_ms':0,'max_delay_ms':3},'resume':None}
++ summaries=[]
++ for phase in ['analysis','evaluation']:
++  print('starting '+phase+' owned native trials',flush=True)
++  plan=json.loads(json.dumps(base))
++  if phase=='evaluation':plan['mode']='comparison';plan['after']={'commit':after};state['current_state']='EVALUATION'
++  state_path.write_bytes(timing.encode(state))
++  # The existing composition layout contains node IPC paths; keep its root short.
++  directory=Path(tempfile.mkdtemp(prefix='w4t-',dir='/tmp'));directory.rmdir()
++  proposal={'plan':plan,'case':case,'binary_by_commit':{before:str(before_bin),after:str(after_bin)},'artifact_root':str(directory)}
++  input_path=root/(phase+'-proposal.json');input_path.write_bytes(timing.encode(proposal))
++  plan_sha=timing.freeze(workspace,phase,'timing',input_path,args.chainbench)
++  state['states'].setdefault(phase.upper(),{}).update({'timing_plan_sha256':plan_sha});state_path.write_bytes(timing.encode(state))
++  result=timing.execute(workspace,phase);files=timing.paths(workspace,phase)
++  state['states'][phase.upper()]['timing_result_sha256']=timing.sha(files['result'].read_bytes());state_path.write_bytes(timing.encode(state))
++  _,report,_=timing.verify_artifact(workspace,phase)
++  require(all(t['cleanup_ok']for t in report['trials']),'owned cleanup unresolved')
++  expected='REPRODUCED'if phase=='analysis'else'OBSERVED_RATE_BOUND_MET';require(result['verdict']==expected,'native timing result did not meet frozen conditions: '+result['verdict'])
++  timing.state_check(workspace,state,phase)
++  summaries.append({'phase':phase,'verdict':result['verdict'],'before':report['before'],'after':report.get('after'),'cleanup_ok':True,'acceptance':result['acceptance']})
++  print('verified '+phase+': '+result['verdict'],flush=True)
++ # These are actual before/after source coordinates, not a fabricated V1 PASS.
++ # The full oracle gate is intentionally not bypassed or claimed complete.
++ (workspace/'oracle-validity-report.json').write_bytes(timing.encode({'base_commit':before,'head_commit':after,'mechanical_verdict':'NOT_EXECUTED'}))
++ timing.state_check(workspace,state,'evaluation',True)
++ (root/'summary.json').write_bytes(timing.encode({'schema_version':1,'scope':'actual owned Go RPC fixture with public composition and consumer; not blockchain consensus or full oracle acceptance','before_commit':before,'after_commit':after,'phases':summaries,'full_oracle_acceptance':'not_recorded','fixture_bundle_sha256':timing.sha((root/'fixture.bundle').read_bytes())}))
++ print(json.dumps({'output':str(root),'timing_phases_verified':len(summaries),'whole_completion':'not_recorded'}),flush=True)
++if __name__=='__main__':main()
+diff --git a/contract/agent-mcp.schema.json b/contract/agent-mcp.schema.json
+index 12e4e1f..17667b3 100644
+--- a/contract/agent-mcp.schema.json
++++ b/contract/agent-mcp.schema.json
+@@ -1393,6 +1393,321 @@
+               "network"
+             ]
+           }
++        },
++        "chainbench_experiment": {
++          "owner": "chainbench",
++          "wire_name": "chainbench_experiment",
++          "description": "Execute one frozen bounded timing/fault/observation experiment. Requires plan, exact DSL case, source-pinned binaries and a new artifact_root. Comparison/reproduction own fresh composed networks; observation is read-only against observe_workspace. Returns factual denominators and uncertainty, never cause acceptance.",
++          "input": {
++            "additionalProperties": false,
++            "properties": {
++              "input": {
++                "additionalProperties": false,
++                "properties": {
++                  "artifact_root": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "assets_sha256": {
++                    "additionalProperties": {
++                      "pattern": "^[0-9a-f]{64}$",
++                      "type": "string"
++                    },
++                    "type": "object"
++                  },
++                  "binary_by_commit": {
++                    "additionalProperties": {
++                      "maxLength": 4096,
++                      "minLength": 1,
++                      "type": "string"
++                    },
++                    "maxProperties": 2,
++                    "propertyNames": {
++                      "pattern": "^[0-9a-f]{40}$",
++                      "type": "string"
++                    },
++                    "type": "object"
++                  },
++                  "case": {
++                    "description": "Complete existing v1 or v2 DSL; driver pin hashes canonical JSON using interpreter value semantics.",
++                    "type": "object"
++                  },
++                  "observe_composition_sha256": {
++                    "pattern": "^[0-9a-f]{64}$",
++                    "type": "string"
++                  },
++                  "observe_workspace": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "plan": {
++                    "additionalProperties": false,
++                    "properties": {
++                      "after": {
++                        "anyOf": [
++                          {
++                            "additionalProperties": false,
++                            "properties": {
++                              "binary_sha256": {
++                                "pattern": "^[0-9a-f]{64}$",
++                                "type": "string"
++                              },
++                              "commit": {
++                                "pattern": "^[0-9a-f]{40}$",
++                                "type": "string"
++                              },
++                              "driver_sha256": {
++                                "pattern": "^[0-9a-f]{64}$",
++                                "type": "string"
++                              },
++                              "environment_sha256": {
++                                "pattern": "^[0-9a-f]{64}$",
++                                "type": "string"
++                              }
++                            },
++                            "required": [
++                              "commit",
++                              "binary_sha256",
++                              "driver_sha256",
++                              "environment_sha256"
++                            ],
++                            "type": "object"
++                          },
++                          {
++                            "type": "null"
++                          }
++                        ]
++                      },
++                      "assertion_id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "before": {
++                        "additionalProperties": false,
++                        "properties": {
++                          "binary_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "commit": {
++                            "pattern": "^[0-9a-f]{40}$",
++                            "type": "string"
++                          },
++                          "driver_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "environment_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          }
++                        },
++                        "required": [
++                          "commit",
++                          "binary_sha256",
++                          "driver_sha256",
++                          "environment_sha256"
++                        ],
++                        "type": "object"
++                      },
++                      "id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "injection": {
++                        "anyOf": [
++                          {
++                            "additionalProperties": false,
++                            "properties": {
++                              "kind": {
++                                "enum": [
++                                  "delay",
++                                  "restart",
++                                  "partition"
++                                ],
++                                "type": "string"
++                              },
++                              "max_delay_ms": {
++                                "maximum": 60000,
++                                "minimum": 0,
++                                "type": "integer"
++                              },
++                              "min_delay_ms": {
++                                "maximum": 60000,
++                                "minimum": 0,
++                                "type": "integer"
++                              },
++                              "step": {
++                                "maxLength": 128,
++                                "minLength": 1,
++                                "type": "string"
++                              },
++                              "target": {
++                                "maxLength": 128,
++                                "minLength": 1,
++                                "type": "string"
++                              }
++                            },
++                            "required": [
++                              "kind",
++                              "target",
++                              "step",
++                              "min_delay_ms",
++                              "max_delay_ms"
++                            ],
++                            "type": "object"
++                          },
++                          {
++                            "type": "null"
++                          }
++                        ]
++                      },
++                      "max_failure_rate": {
++                        "exclusiveMaximum": 1,
++                        "exclusiveMinimum": 0,
++                        "type": "number"
++                      },
++                      "min_completed": {
++                        "maximum": 1000,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "min_symptom_failures": {
++                        "maximum": 1000,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "mode": {
++                        "enum": [
++                          "reproduction",
++                          "comparison",
++                          "observation"
++                        ],
++                        "type": "string"
++                      },
++                      "normal_assertion_ids": {
++                        "items": {
++                          "maxLength": 128,
++                          "minLength": 1,
++                          "type": "string"
++                        },
++                        "maxItems": 16,
++                        "minItems": 1,
++                        "type": "array",
++                        "uniqueItems": true
++                      },
++                      "owned_node_ids": {
++                        "items": {
++                          "maxLength": 128,
++                          "minLength": 1,
++                          "type": "string"
++                        },
++                        "maxItems": 32,
++                        "minItems": 0,
++                        "type": "array",
++                        "uniqueItems": true
++                      },
++                      "repetitions": {
++                        "maximum": 1000,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "resume": {
++                        "anyOf": [
++                          {
++                            "additionalProperties": false,
++                            "properties": {
++                              "assertion_id": {
++                                "maxLength": 128,
++                                "minLength": 1,
++                                "type": "string"
++                              },
++                              "event": {
++                                "maxLength": 128,
++                                "minLength": 1,
++                                "type": "string"
++                              },
++                              "window_seconds": {
++                                "maximum": 3600,
++                                "minimum": 1,
++                                "type": "integer"
++                              }
++                            },
++                            "required": [
++                              "event",
++                              "assertion_id",
++                              "window_seconds"
++                            ],
++                            "type": "object"
++                          },
++                          {
++                            "type": "null"
++                          }
++                        ]
++                      },
++                      "schema_version": {
++                        "const": 1,
++                        "type": "integer"
++                      },
++                      "seed": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "symptom": {
++                        "maxLength": 4096,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "total_timeout_seconds": {
++                        "maximum": 7200,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "trial_timeout_seconds": {
++                        "maximum": 300,
++                        "minimum": 1,
++                        "type": "integer"
++                      }
++                    },
++                    "required": [
++                      "schema_version",
++                      "id",
++                      "mode",
++                      "symptom",
++                      "assertion_id",
++                      "seed",
++                      "before",
++                      "repetitions",
++                      "min_completed",
++                      "min_symptom_failures",
++                      "max_failure_rate",
++                      "trial_timeout_seconds",
++                      "total_timeout_seconds",
++                      "owned_node_ids",
++                      "normal_assertion_ids"
++                    ],
++                    "type": "object"
++                  }
++                },
++                "required": [
++                  "plan",
++                  "case",
++                  "binary_by_commit",
++                  "artifact_root"
++                ],
++                "type": "object"
++              }
++            },
++            "required": [
++              "input"
++            ],
++            "type": "object"
++          }
+         }
+       }
+     },
+diff --git a/plugin/agents/analyzer.md b/plugin/agents/analyzer.md
+index bcb5e79..9c10c24 100644
+--- a/plugin/agents/analyzer.md
++++ b/plugin/agents/analyzer.md
+@@ -11,6 +11,7 @@ description: |
+   Handles "fresh", "bugfix" (incl. EVALUATION_FAIL re-entry), and "code_review".
+   Does NOT design or plan the fix, and does NOT modify production code.
+ tools:
++  - mcp__plugin_coding-agent_chainbench__chainbench_experiment
+   - Read
+   - Write
+   - Edit
+@@ -59,6 +60,7 @@ tools:
+   - mcp__plugin_coding-agent_chainbench__chainbench_failure_context
+   - mcp__plugin_coding-agent_chainbench__chainbench_events_get
+ skills:
++  - timing-investigation
+   - oracle-validity
+   - suspect-labeling
+   - state-machine
+@@ -70,6 +72,14 @@ skills:
+   - investigative-probe
+ ---
+ 
++For timing/nondeterministic/fault symptoms, use the `timing-investigation` skill
++and frozen `chainbench_experiment` input. Retain the exact phase plan/result SHA
++and controlled normal/reproduction/defense/observation branches. The timing route
++uses the current public CLI/MCP, not the historical init/start/test-run recipe.
++Unreproduced or inconclusive results remain in ANALYSIS; RECURRED only resumes
++diagnosis. Timing evaluation must also pass the existing independent-oracle and
++fix-selection gates before completion.
++
+ # Analyzer Agent
+ 
+ For bugfix investigation apply `suspect-labeling`: bounded iterative factual
+diff --git a/plugin/agents/evaluator.md b/plugin/agents/evaluator.md
+index acbe2d0..74b6fe8 100644
+--- a/plugin/agents/evaluator.md
++++ b/plugin/agents/evaluator.md
+@@ -6,6 +6,7 @@ description: |
+   unit test (+ -race), lint & format, security scan, ChainBench integration.
+   Produces test-report.md and writes failure_log entries on failure.
+ tools:
++  - mcp__plugin_coding-agent_chainbench__chainbench_experiment
+   - Read
+   - Write
+   - Edit
+@@ -26,6 +27,14 @@ skills:
+   - reproduce-first
+ ---
+ 
++For timing/nondeterministic/fault symptoms, use the `timing-investigation` skill
++and frozen `chainbench_experiment` input. Retain the exact phase plan/result SHA
++and controlled normal/reproduction/defense/observation branches. The timing route
++uses the current public CLI/MCP, not the historical init/start/test-run recipe.
++Unreproduced or inconclusive results remain in ANALYSIS; RECURRED only resumes
++diagnosis. Timing evaluation must also pass the existing independent-oracle and
++fix-selection gates before completion.
++
+ # Evaluator Agent
+ 
+ The Evaluator verifies the Implementer's branch. It runs every stage
+diff --git a/plugin/agents/planner.md b/plugin/agents/planner.md
+index 4108016..32864ef 100644
+--- a/plugin/agents/planner.md
++++ b/plugin/agents/planner.md
+@@ -41,6 +41,11 @@ Before bugfix planning, read `suspect-labels.json` and validate it with
+ `scripts/suspect_labels.py --check`. Preserve null signals and provenance;
+ separate candidate hypotheses from reproduced cause acceptance.
+ 
++For a timing/observation bugfix, run `timing_investigation.py --workspace
++"{workspace_dir}" --phase analysis --check-state` before planning. The analysis
++receipt must be REPRODUCED and tied to the frozen oracle baseline. Observation
++recurrence or absent reproduction grants no planning/completion exception.
++
+ The Planner is the deep-thinking phase of the pipeline. It produces
+ documented decisions; it does not modify production code.
+ 
+diff --git a/plugin/contracts/chainbench-tools.schema.json b/plugin/contracts/chainbench-tools.schema.json
+new file mode 100644
+index 0000000..4bc3849
+--- /dev/null
++++ b/plugin/contracts/chainbench-tools.schema.json
+@@ -0,0 +1,2178 @@
++{
++  "schema_version": 1,
++  "source_commit": "348a6ec5fb9aec5b5966ce768a622be4e5296db4",
++  "compatibility_scope": "current full registered input schemas; new timing route supported; historical non-timing agent recipes are not certified compatible",
++  "providers": {
++    "chainbench": {
++      "server": "chainbench",
++      "namespace": "chainbench_",
++      "tools": {
++        "chainbench_chains": {
++          "wire_name": "chainbench_chains",
++          "input": {
++            "properties": {},
++            "type": "object"
++          }
++        },
++        "chainbench_faucet": {
++          "wire_name": "chainbench_faucet",
++          "input": {
++            "properties": {
++              "amount": {
++                "type": "string"
++              },
++              "chain": {
++                "type": "string"
++              },
++              "from_key": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              },
++              "to": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc",
++              "from_key",
++              "to",
++              "amount"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_verify": {
++          "wire_name": "chainbench_verify",
++          "input": {
++            "properties": {
++              "chain": {
++                "type": "string"
++              },
++              "rpc": {
++                "items": {
++                  "type": "string"
++                },
++                "type": "array"
++              }
++            },
++            "required": [
++              "rpc"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_run": {
++          "wire_name": "chainbench_run",
++          "input": {
++            "properties": {
++              "allServers": {
++                "description": "compose mode: spread the network across every server in the set",
++                "type": "boolean"
++              },
++              "artifactRoot": {
++                "type": "string"
++              },
++              "attach": {
++                "description": "the network in dataDir is already up: run against it, with the capabilities its composition advertised, instead of composing again",
++                "type": "boolean"
++              },
++              "binary": {
++                "type": "string"
++              },
++              "binaryFor": {
++                "additionalProperties": {
++                  "type": "string"
++                },
++                "description": "declared binary name to accepted executable path",
++                "type": "object"
++              },
++              "bp": {
++                "description": "bp node count, overriding what the specs declare",
++                "type": "integer"
++              },
++              "chain": {
++                "type": "string"
++              },
++              "dataDir": {
++                "type": "string"
++              },
++              "docker": {
++                "type": "boolean"
++              },
++              "keepUp": {
++                "description": "compose mode: leave the network running after the tests so it can be driven with follow-on rpc/tx/attach calls (default: stop it)",
++                "type": "boolean"
++              },
++              "keysDir": {
++                "type": "string"
++              },
++              "networkId": {
++                "type": "integer"
++              },
++              "noNodeControl": {
++                "description": "attach without granting node control",
++                "type": "boolean"
++              },
++              "plan": {
++                "description": "resolve the composed network without running it",
++                "type": "boolean"
++              },
++              "readOnlyKeys": {
++                "type": "boolean"
++              },
++              "rpc": {
++                "items": {
++                  "type": "string"
++                },
++                "type": "array"
++              },
++              "server": {
++                "description": "compose mode: server name within the server set",
++                "type": "string"
++              },
++              "serverLogins": {
++                "type": "string"
++              },
++              "serverSet": {
++                "description": "compose mode: server-set file selecting where the nodes run",
++                "type": "string"
++              },
++              "spec": {
++                "type": "string"
++              },
++              "specs": {
++                "items": {
++                  "type": "string"
++                },
++                "type": "array"
++              },
++              "suite": {
++                "description": "run or plan several cases as one suite on one network; otherwise sequence definitions",
++                "type": "boolean"
++              },
++              "waitBlocks": {
++                "type": "integer"
++              },
++              "workspaceConfig": {
++                "type": "string"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_file_upload": {
++          "wire_name": "chainbench_file_upload",
++          "input": {
++            "properties": {
++              "docker": {
++                "type": "boolean"
++              },
++              "forceUpload": {
++                "type": "boolean"
++              },
++              "localPaths": {
++                "items": {
++                  "type": "string"
++                },
++                "minItems": 1,
++                "type": "array"
++              },
++              "mode": {
++                "description": "octal permission such as 0755; empty preserves source mode",
++                "type": "string"
++              },
++              "purpose": {
++                "enum": [
++                  "bin",
++                  "binaries",
++                  "genesis",
++                  "configs",
++                  "keystore",
++                  "keyrings"
++                ],
++                "type": "string"
++              },
++              "remote": {
++                "type": "string"
++              },
++              "server": {
++                "type": "string"
++              },
++              "serverLogins": {
++                "type": "string"
++              },
++              "serverSet": {
++                "type": "string"
++              },
++              "sha256": {
++                "type": "string"
++              },
++              "workspaceConfig": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "localPaths",
++              "workspaceConfig"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_test_list": {
++          "wire_name": "chainbench_test_list",
++          "input": {
++            "properties": {
++              "dir": {
++                "description": "directory to walk for test cases",
++                "type": "string"
++              }
++            },
++            "required": [
++              "dir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_experiment": {
++          "wire_name": "chainbench_experiment",
++          "input": {
++            "additionalProperties": false,
++            "properties": {
++              "input": {
++                "additionalProperties": false,
++                "properties": {
++                  "artifact_root": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "assets_sha256": {
++                    "additionalProperties": {
++                      "pattern": "^[0-9a-f]{64}$",
++                      "type": "string"
++                    },
++                    "type": "object"
++                  },
++                  "binary_by_commit": {
++                    "additionalProperties": {
++                      "maxLength": 4096,
++                      "minLength": 1,
++                      "type": "string"
++                    },
++                    "maxProperties": 2,
++                    "propertyNames": {
++                      "pattern": "^[0-9a-f]{40}$",
++                      "type": "string"
++                    },
++                    "type": "object"
++                  },
++                  "case": {
++                    "description": "Complete existing v1 or v2 DSL; driver pin hashes canonical JSON using interpreter value semantics.",
++                    "type": "object"
++                  },
++                  "observe_composition_sha256": {
++                    "pattern": "^[0-9a-f]{64}$",
++                    "type": "string"
++                  },
++                  "observe_workspace": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "plan": {
++                    "additionalProperties": false,
++                    "properties": {
++                      "after": {
++                        "anyOf": [
++                          {
++                            "additionalProperties": false,
++                            "properties": {
++                              "binary_sha256": {
++                                "pattern": "^[0-9a-f]{64}$",
++                                "type": "string"
++                              },
++                              "commit": {
++                                "pattern": "^[0-9a-f]{40}$",
++                                "type": "string"
++                              },
++                              "driver_sha256": {
++                                "pattern": "^[0-9a-f]{64}$",
++                                "type": "string"
++                              },
++                              "environment_sha256": {
++                                "pattern": "^[0-9a-f]{64}$",
++                                "type": "string"
++                              }
++                            },
++                            "required": [
++                              "commit",
++                              "binary_sha256",
++                              "driver_sha256",
++                              "environment_sha256"
++                            ],
++                            "type": "object"
++                          },
++                          {
++                            "type": "null"
++                          }
++                        ]
++                      },
++                      "assertion_id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "before": {
++                        "additionalProperties": false,
++                        "properties": {
++                          "binary_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "commit": {
++                            "pattern": "^[0-9a-f]{40}$",
++                            "type": "string"
++                          },
++                          "driver_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "environment_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          }
++                        },
++                        "required": [
++                          "commit",
++                          "binary_sha256",
++                          "driver_sha256",
++                          "environment_sha256"
++                        ],
++                        "type": "object"
++                      },
++                      "id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "injection": {
++                        "anyOf": [
++                          {
++                            "additionalProperties": false,
++                            "properties": {
++                              "kind": {
++                                "enum": [
++                                  "delay",
++                                  "restart",
++                                  "partition"
++                                ],
++                                "type": "string"
++                              },
++                              "max_delay_ms": {
++                                "maximum": 60000,
++                                "minimum": 0,
++                                "type": "integer"
++                              },
++                              "min_delay_ms": {
++                                "maximum": 60000,
++                                "minimum": 0,
++                                "type": "integer"
++                              },
++                              "step": {
++                                "maxLength": 128,
++                                "minLength": 1,
++                                "type": "string"
++                              },
++                              "target": {
++                                "maxLength": 128,
++                                "minLength": 1,
++                                "type": "string"
++                              }
++                            },
++                            "required": [
++                              "kind",
++                              "target",
++                              "step",
++                              "min_delay_ms",
++                              "max_delay_ms"
++                            ],
++                            "type": "object"
++                          },
++                          {
++                            "type": "null"
++                          }
++                        ]
++                      },
++                      "max_failure_rate": {
++                        "exclusiveMaximum": 1,
++                        "exclusiveMinimum": 0,
++                        "type": "number"
++                      },
++                      "min_completed": {
++                        "maximum": 1000,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "min_symptom_failures": {
++                        "maximum": 1000,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "mode": {
++                        "enum": [
++                          "reproduction",
++                          "comparison",
++                          "observation"
++                        ],
++                        "type": "string"
++                      },
++                      "normal_assertion_ids": {
++                        "items": {
++                          "maxLength": 128,
++                          "minLength": 1,
++                          "type": "string"
++                        },
++                        "maxItems": 16,
++                        "minItems": 1,
++                        "type": "array",
++                        "uniqueItems": true
++                      },
++                      "owned_node_ids": {
++                        "items": {
++                          "maxLength": 128,
++                          "minLength": 1,
++                          "type": "string"
++                        },
++                        "maxItems": 32,
++                        "minItems": 0,
++                        "type": "array",
++                        "uniqueItems": true
++                      },
++                      "repetitions": {
++                        "maximum": 1000,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "resume": {
++                        "anyOf": [
++                          {
++                            "additionalProperties": false,
++                            "properties": {
++                              "assertion_id": {
++                                "maxLength": 128,
++                                "minLength": 1,
++                                "type": "string"
++                              },
++                              "event": {
++                                "maxLength": 128,
++                                "minLength": 1,
++                                "type": "string"
++                              },
++                              "window_seconds": {
++                                "maximum": 3600,
++                                "minimum": 1,
++                                "type": "integer"
++                              }
++                            },
++                            "required": [
++                              "event",
++                              "assertion_id",
++                              "window_seconds"
++                            ],
++                            "type": "object"
++                          },
++                          {
++                            "type": "null"
++                          }
++                        ]
++                      },
++                      "schema_version": {
++                        "const": 1,
++                        "type": "integer"
++                      },
++                      "seed": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "symptom": {
++                        "maxLength": 4096,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "total_timeout_seconds": {
++                        "maximum": 7200,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "trial_timeout_seconds": {
++                        "maximum": 300,
++                        "minimum": 1,
++                        "type": "integer"
++                      }
++                    },
++                    "required": [
++                      "schema_version",
++                      "id",
++                      "mode",
++                      "symptom",
++                      "assertion_id",
++                      "seed",
++                      "before",
++                      "repetitions",
++                      "min_completed",
++                      "min_symptom_failures",
++                      "max_failure_rate",
++                      "trial_timeout_seconds",
++                      "total_timeout_seconds",
++                      "owned_node_ids",
++                      "normal_assertion_ids"
++                    ],
++                    "type": "object"
++                  }
++                },
++                "required": [
++                  "plan",
++                  "case",
++                  "binary_by_commit",
++                  "artifact_root"
++                ],
++                "type": "object"
++              }
++            },
++            "required": [
++              "input"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_hardfork": {
++          "wire_name": "chainbench_hardfork",
++          "input": {
++            "properties": {
++              "block": {
++                "type": "integer"
++              },
++              "execute": {
++                "type": "boolean"
++              },
++              "toBinary": {
++                "type": "string"
++              },
++              "toChain": {
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace of the running from-chain",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir",
++              "toChain"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_validate": {
++          "wire_name": "chainbench_validate",
++          "input": {
++            "properties": {
++              "chain": {
++                "type": "string"
++              },
++              "spec": {
++                "type": "string"
++              },
++              "specs": {
++                "items": {
++                  "type": "string"
++                },
++                "type": "array"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_consensus": {
++          "wire_name": "chainbench_consensus",
++          "input": {
++            "properties": {
++              "chain": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "chain",
++              "rpc"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_node_rpc": {
++          "wire_name": "chainbench_node_rpc",
++          "input": {
++            "properties": {
++              "method": {
++                "type": "string"
++              },
++              "params": {
++                "type": "array"
++              },
++              "rpc": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc",
++              "method"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_node_stop": {
++          "wire_name": "chainbench_node_stop",
++          "input": {
++            "properties": {
++              "index": {
++                "description": "1-based node index to act on",
++                "type": "integer"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_node_start": {
++          "wire_name": "chainbench_node_start",
++          "input": {
++            "properties": {
++              "index": {
++                "description": "1-based node index to act on",
++                "type": "integer"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_node_swap": {
++          "wire_name": "chainbench_node_swap",
++          "input": {
++            "properties": {
++              "args": {
++                "description": "flags appended to the node's command line",
++                "items": {
++                  "type": "string"
++                },
++                "type": "array"
++              },
++              "binary": {
++                "description": "binary to relaunch on (empty keeps the current one)",
++                "type": "string"
++              },
++              "config": {
++                "description": "key=value config overrides applied before relaunch",
++                "items": {
++                  "type": "string"
++                },
++                "type": "array"
++              },
++              "genesisOverlay": {
++                "description": "genesis JSON fragment merged into this node's genesis",
++                "type": "string"
++              },
++              "index": {
++                "description": "1-based node index to swap",
++                "type": "integer"
++              },
++              "purpose": {
++                "description": "name recorded for the config fixture (config-<purpose>)",
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_node_reset": {
++          "wire_name": "chainbench_node_reset",
++          "input": {
++            "properties": {
++              "index": {
++                "description": "1-based node index to act on",
++                "type": "integer"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_report": {
++          "wire_name": "chainbench_report",
++          "input": {
++            "properties": {
++              "all": {
++                "type": "boolean"
++              },
++              "workspaceDir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_status": {
++          "wire_name": "chainbench_status",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_txpool": {
++          "wire_name": "chainbench_txpool",
++          "input": {
++            "properties": {
++              "rpc": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_log": {
++          "wire_name": "chainbench_log",
++          "input": {
++            "properties": {
++              "level": {
++                "type": "string"
++              },
++              "limit": {
++                "type": "integer"
++              },
++              "node": {
++                "type": "integer"
++              },
++              "pattern": {
++                "type": "string"
++              },
++              "regexp": {
++                "type": "boolean"
++              },
++              "workspaceDir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_account_state": {
++          "wire_name": "chainbench_account_state",
++          "input": {
++            "properties": {
++              "address": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc",
++              "address"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_contract_call": {
++          "wire_name": "chainbench_contract_call",
++          "input": {
++            "properties": {
++              "data": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              },
++              "to": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc",
++              "to"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_tx_wait": {
++          "wire_name": "chainbench_tx_wait",
++          "input": {
++            "properties": {
++              "hash": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              },
++              "timeout_seconds": {
++                "type": "integer"
++              }
++            },
++            "required": [
++              "rpc",
++              "hash"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_tx_send": {
++          "wire_name": "chainbench_tx_send",
++          "input": {
++            "properties": {
++              "chain": {
++                "type": "string"
++              },
++              "data": {
++                "type": "string"
++              },
++              "from_key": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              },
++              "to": {
++                "type": "string"
++              },
++              "value": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc",
++              "from_key",
++              "to"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_contract_deploy": {
++          "wire_name": "chainbench_contract_deploy",
++          "input": {
++            "properties": {
++              "bytecode": {
++                "type": "string"
++              },
++              "chain": {
++                "type": "string"
++              },
++              "from_key": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              },
++              "value": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc",
++              "from_key",
++              "bytecode"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_network_attach": {
++          "wire_name": "chainbench_network_attach",
++          "input": {
++            "properties": {
++              "auth": {
++                "type": "object"
++              },
++              "name": {
++                "type": "string"
++              },
++              "override": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              },
++              "state_dir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "name",
++              "rpc",
++              "state_dir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_network_list": {
++          "wire_name": "chainbench_network_list",
++          "input": {
++            "properties": {
++              "state_dir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "state_dir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_network_info": {
++          "wire_name": "chainbench_network_info",
++          "input": {
++            "properties": {
++              "name": {
++                "type": "string"
++              },
++              "state_dir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "name",
++              "state_dir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_network_detach": {
++          "wire_name": "chainbench_network_detach",
++          "input": {
++            "properties": {
++              "name": {
++                "type": "string"
++              },
++              "state_dir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "name",
++              "state_dir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_remote_rpc": {
++          "wire_name": "chainbench_remote_rpc",
++          "input": {
++            "properties": {
++              "method": {
++                "type": "string"
++              },
++              "name": {
++                "type": "string"
++              },
++              "node": {
++                "type": "integer"
++              },
++              "params": {
++                "type": "array"
++              },
++              "state_dir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "name",
++              "state_dir",
++              "method"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_consensus_status": {
++          "wire_name": "chainbench_consensus_status",
++          "input": {
++            "properties": {
++              "chain": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "chain",
++              "rpc"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_consensus_health": {
++          "wire_name": "chainbench_consensus_health",
++          "input": {
++            "properties": {
++              "rpc": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_consensus_block_info": {
++          "wire_name": "chainbench_consensus_block_info",
++          "input": {
++            "properties": {
++              "block": {
++                "type": "string"
++              },
++              "rpc": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_log_timeline": {
++          "wire_name": "chainbench_log_timeline",
++          "input": {
++            "properties": {
++              "level": {
++                "type": "string"
++              },
++              "limit": {
++                "type": "integer"
++              },
++              "node": {
++                "type": "integer"
++              },
++              "pattern": {
++                "type": "string"
++              },
++              "regexp": {
++                "type": "boolean"
++              },
++              "workspaceDir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_network_peers": {
++          "wire_name": "chainbench_network_peers",
++          "input": {
++            "properties": {
++              "rpc": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_new": {
++          "wire_name": "chainbench_chain_new",
++          "input": {
++            "properties": {
++              "binary": {
++                "description": "node binary path (may also be set at start)",
++                "type": "string"
++              },
++              "chain": {
++                "description": "chain id (stablenet|wbft|wemix)",
++                "type": "string"
++              },
++              "docker": {
++                "description": "servers are local docker containers: translate this tool's dials via the localmap next to the server set",
++                "type": "boolean"
++              },
++              "keys": {
++                "description": "key set directory (default presets/keys)",
++                "type": "string"
++              },
++              "remoteHost": {
++                "description": "legacy: SSH host for a remote data plane (prefer target)",
++                "type": "string"
++              },
++              "remotePort": {
++                "description": "legacy: SSH port (prefer target)",
++                "type": "number"
++              },
++              "remoteUser": {
++                "description": "legacy: SSH user (prefer target)",
++                "type": "string"
++              },
++              "target": {
++                "description": "data plane as one path: /local/path | user@host:/path | ssh://user@host:port/path",
++                "type": "string"
++              },
++              "targetDir": {
++                "description": "legacy: data root ON the target (prefer target)",
++                "type": "string"
++              },
++              "workspaceConfig": {
++                "description": "environment file owning the target dataRoot and its purpose directories",
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir",
++              "chain"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_up": {
++          "wire_name": "chainbench_chain_up",
++          "input": {
++            "properties": {
++              "allServers": {
++                "type": "boolean"
++              },
++              "binary": {
++                "type": "string"
++              },
++              "bp": {
++                "description": "bp (block-producing) node count",
++                "type": "integer"
++              },
++              "chain": {
++                "type": "string"
++              },
++              "chainPreset": {
++                "description": "chain-preset file; defines layout and scoped options",
++                "type": "string"
++              },
++              "docker": {
++                "type": "boolean"
++              },
++              "en": {
++                "description": "en (endpoint, non-producing) node count",
++                "type": "integer"
++              },
++              "endpointSyncMode": {
++                "type": "string"
++              },
++              "keysDir": {
++                "type": "string"
++              },
++              "keysSource": {
++                "type": "string"
++              },
++              "peering": {
++                "description": "mesh (default) | proxied (bp <-> pn <-> en)",
++                "type": "string"
++              },
++              "plan": {
++                "description": "resolve chainPreset without composing nodes",
++                "type": "boolean"
++              },
++              "pn": {
++                "description": "pn (proxy-tier) node count; a family with no proxy tier refuses it",
++                "type": "integer"
++              },
++              "server": {
++                "type": "string"
++              },
++              "serverLogins": {
++                "description": "private run logins apart from the server set recorded by the network",
++                "type": "string"
++              },
++              "serverSet": {
++                "type": "string"
++              },
++              "stage": {
++                "enum": [
++                  "deploy",
++                  "init",
++                  "start"
++                ],
++                "type": "string"
++              },
++              "workspaceConfig": {
++                "description": "environment file owning the target dataRoot and its purpose directories",
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_status": {
++          "wire_name": "chainbench_chain_status",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_observe": {
++          "wire_name": "chainbench_chain_observe",
++          "input": {
++            "properties": {
++              "serverLogins": {
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_show": {
++          "wire_name": "chainbench_chain_show",
++          "input": {
++            "properties": {
++              "addr": {
++                "description": "select by an address as a log line prints it (host:port)",
++                "type": "string"
++              },
++              "host": {
++                "description": "select every node on an address",
++                "type": "string"
++              },
++              "label": {
++                "description": "select by identity (node7) or role alias (en2)",
++                "type": "string"
++              },
++              "node": {
++                "description": "select by identity (1-based node number)",
++                "type": "number"
++              },
++              "port": {
++                "description": "select whichever node listens on a port (p2p, etcd, http, ws, auth, metrics)",
++                "type": "number"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_resource_pool": {
++          "wire_name": "chainbench_resource_pool",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "description": "workspace to count used slots from (optional)",
++                "type": "string"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_resource_plan": {
++          "wire_name": "chainbench_resource_plan",
++          "input": {
++            "properties": {
++              "all_servers": {
++                "description": "spread across every server in the server set",
++                "type": "boolean"
++              },
++              "bp": {
++                "description": "bp (block-producing) node count (default 4)",
++                "type": "number"
++              },
++              "chain": {
++                "description": "chain id (stablenet|wbft|wemix); default stablenet",
++                "type": "string"
++              },
++              "en": {
++                "description": "en (endpoint, non-producing) node count",
++                "type": "number"
++              },
++              "server": {
++                "description": "server to place nodes on, by name from the server set",
++                "type": "string"
++              },
++              "serverSet": {
++                "description": "server-set file (default: server-set.yaml when present)",
++                "type": "string"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_resource_inspect": {
++          "wire_name": "chainbench_resource_inspect",
++          "input": {
++            "properties": {
++              "request": {
++                "description": "Typed resource observation: target {dataRoot,server,host,user,port}, inspect, exists/checksums/regular/executable path arrays, process {pid,binary,args,dataDir,configPath}, log {path,offset,limit}; serverSet and docker are optional.",
++                "type": "object"
++              },
++              "serverLogins": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "request"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_resource_access": {
++          "wire_name": "chainbench_resource_access",
++          "input": {
++            "properties": {
++              "dataRoot": {
++                "type": "string"
++              },
++              "server": {
++                "type": "string"
++              },
++              "serverLogins": {
++                "type": "string"
++              },
++              "serverSet": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "serverSet",
++              "server",
++              "dataRoot"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_keys": {
++          "wire_name": "chainbench_chain_keys",
++          "input": {
++            "properties": {
++              "nodes": {
++                "description": "identities the set must cover (default: allocated node count)",
++                "type": "number"
++              },
++              "source": {
++                "description": "keyPreset (default) | generate",
++                "type": "string"
++              },
++              "validators": {
++                "description": "identities joining the validator set (generate; 0 = all)",
++                "type": "number"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_place": {
++          "wire_name": "chainbench_chain_place",
++          "input": {
++            "properties": {
++              "bp": {
++                "description": "bp (block-producing) node count (default 4)",
++                "type": "number"
++              },
++              "en": {
++                "description": "en (endpoint, non-producing) node count",
++                "type": "number"
++              },
++              "peering": {
++                "description": "peer graph: mesh (default, every node dials every other) or proxied (bp <-> pn <-> en; endpoints never dial a producer)",
++                "enum": [
++                  "mesh",
++                  "proxied"
++                ],
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_genesis": {
++          "wire_name": "chainbench_chain_genesis",
++          "input": {
++            "properties": {
++              "chainId": {
++                "description": "override the manifest chain id (0 = manifest)",
++                "type": "number"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_config": {
++          "wire_name": "chainbench_chain_config",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_build": {
++          "wire_name": "chainbench_chain_build",
++          "input": {
++            "properties": {
++              "set": {
++                "description": "high-precedence launch knobs key=value (bare key for booleans)",
++                "items": {
++                  "type": "string"
++                },
++                "type": "array"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_deploy": {
++          "wire_name": "chainbench_chain_deploy",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_init": {
++          "wire_name": "chainbench_chain_init",
++          "input": {
++            "properties": {
++              "binary": {
++                "description": "node binary path (default: the workspace's)",
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_start": {
++          "wire_name": "chainbench_chain_start",
++          "input": {
++            "properties": {
++              "binary": {
++                "description": "node binary path (default: the workspace's)",
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_stop": {
++          "wire_name": "chainbench_chain_stop",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_restart": {
++          "wire_name": "chainbench_chain_restart",
++          "input": {
++            "properties": {
++              "node": {
++                "description": "node index (1-based)",
++                "type": "number"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_resume": {
++          "wire_name": "chainbench_chain_resume",
++          "input": {
++            "properties": {
++              "binary": {
++                "description": "node binary path (default: the one the workspace recorded)",
++                "type": "string"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_rm": {
++          "wire_name": "chainbench_chain_rm",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_logs": {
++          "wire_name": "chainbench_chain_logs",
++          "input": {
++            "properties": {
++              "lines": {
++                "description": "lines from the end (default 50)",
++                "type": "number"
++              },
++              "node": {
++                "description": "node index (1-based)",
++                "type": "number"
++              },
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_chain_health": {
++          "wire_name": "chainbench_chain_health",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "description": "workspace directory (where the composition is set up)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_network_topology": {
++          "wire_name": "chainbench_network_topology",
++          "input": {
++            "properties": {
++              "name": {
++                "type": "string"
++              },
++              "state_dir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "name",
++              "state_dir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_keyring_new": {
++          "wire_name": "chainbench_keyring_new",
++          "input": {
++            "properties": {
++              "balance": {
++                "description": "genesis balance per identity, 0x-hex wei",
++                "type": "string"
++              },
++              "count": {
++                "description": "how many identities to create",
++                "type": "number"
++              },
++              "docker": {
++                "description": "the server is a local docker container: translate dials via the localmap next to the server set",
++                "type": "boolean"
++              },
++              "keyringDir": {
++                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
++                "type": "string"
++              },
++              "password": {
++                "description": "password for the generated keystores (default 1)",
++                "type": "string"
++              },
++              "serverSet": {
++                "description": "server-set file for srv:// paths (which servers exist and how to reach them)",
++                "type": "string"
++              },
++              "validators": {
++                "description": "how many join the validator set; omit for all on new and none on add, 0 to declare none",
++                "type": "number"
++              },
++              "withBls": {
++                "description": "also derive BLS material (required for stablenet and wbft)",
++                "type": "boolean"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_keyring_add": {
++          "wire_name": "chainbench_keyring_add",
++          "input": {
++            "properties": {
++              "balance": {
++                "description": "genesis balance per identity, 0x-hex wei",
++                "type": "string"
++              },
++              "count": {
++                "description": "how many identities to create",
++                "type": "number"
++              },
++              "docker": {
++                "description": "the server is a local docker container: translate dials via the localmap next to the server set",
++                "type": "boolean"
++              },
++              "keyringDir": {
++                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
++                "type": "string"
++              },
++              "password": {
++                "description": "password for the generated keystores (default 1)",
++                "type": "string"
++              },
++              "serverSet": {
++                "description": "server-set file for srv:// paths (which servers exist and how to reach them)",
++                "type": "string"
++              },
++              "validators": {
++                "description": "how many join the validator set; omit for all on new and none on add, 0 to declare none",
++                "type": "number"
++              },
++              "withBls": {
++                "description": "also derive BLS material (required for stablenet and wbft)",
++                "type": "boolean"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_keyring_list": {
++          "wire_name": "chainbench_keyring_list",
++          "input": {
++            "properties": {
++              "docker": {
++                "description": "the server is a local docker container: translate dials via the localmap next to the server set",
++                "type": "boolean"
++              },
++              "keyringDir": {
++                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
++                "type": "string"
++              },
++              "serverSet": {
++                "description": "server-set file for srv:// paths (which servers exist and how to reach them)",
++                "type": "string"
++              },
++              "verify": {
++                "description": "re-derive every identity from its own key and fail on a mismatch",
++                "type": "boolean"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_keyring_show": {
++          "wire_name": "chainbench_keyring_show",
++          "input": {
++            "properties": {
++              "docker": {
++                "description": "the server is a local docker container: translate dials via the localmap next to the server set",
++                "type": "boolean"
++              },
++              "keyringDir": {
++                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
++                "type": "string"
++              },
++              "name": {
++                "description": "identity label, e.g. node1",
++                "type": "string"
++              },
++              "serverSet": {
++                "description": "server-set file for srv:// paths (which servers exist and how to reach them)",
++                "type": "string"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_keyring_import": {
++          "wire_name": "chainbench_keyring_import",
++          "input": {
++            "properties": {
++              "docker": {
++                "description": "the server is a local docker container: translate this dial via the localmap next to the server set",
++                "type": "boolean"
++              },
++              "expectAddress": {
++                "description": "refuse the import unless the key derives exactly this address",
++                "type": "string"
++              },
++              "from": {
++                "description": "key file path: /local/path | srv://<server>/path | [user@]host:path | ssh://user@host:port/path",
++                "type": "string"
++              },
++              "fromRing": {
++                "description": "clone a whole ring instead of one key (same path syntax as keyringDir); labels and the validator declaration are copied, every entry verified against the source index",
++                "type": "string"
++              },
++              "hdAccount": {
++                "description": "BIP-44 account index for mnemonic",
++                "type": "number"
++              },
++              "hdChange": {
++                "description": "BIP-44 change level for mnemonic (0 external, 1 internal)",
++                "type": "number"
++              },
++              "hdCoinType": {
++                "description": "BIP-44 coin type for mnemonic (default 60)",
++                "type": "number"
++              },
++              "hdIndex": {
++                "description": "BIP-44 address index for mnemonic",
++                "type": "number"
++              },
++              "keyringDir": {
++                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
++                "type": "string"
++              },
++              "mnemonic": {
++                "description": "derive the key from a BIP-39 mnemonic (alternative to from)",
++                "type": "string"
++              },
++              "name": {
++                "description": "label to store the identity under",
++                "type": "string"
++              },
++              "passphrase": {
++                "description": "optional BIP-39 passphrase (with mnemonic)",
++                "type": "string"
++              },
++              "password": {
++                "description": "password for a keystore named by from",
++                "type": "string"
++              },
++              "privateKey": {
++                "description": "import a key the caller already holds (0x-hex; alternative to from and mnemonic)",
++                "type": "string"
++              },
++              "serverSet": {
++                "description": "server-set file for an srv:// source",
++                "type": "string"
++              },
++              "withBls": {
++                "description": "also derive BLS material",
++                "type": "boolean"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "chainbench_stop": {
++          "wire_name": "chainbench_stop",
++          "input": {
++            "properties": {
++              "workspaceDir": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "workspaceDir"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.common.chains.hardforks": {
++          "wire_name": "chainbench.v1.common.chains.hardforks",
++          "input": {
++            "properties": {
++              "chain": {
++                "description": "chain id",
++                "type": "string"
++              }
++            },
++            "required": [
++              "chain"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.common.chains.info": {
++          "wire_name": "chainbench.v1.common.chains.info",
++          "input": {
++            "properties": {
++              "chain": {
++                "description": "chain id (stablenet|wbft|wemix)",
++                "type": "string"
++              }
++            },
++            "required": [
++              "chain"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.common.chains.list": {
++          "wire_name": "chainbench.v1.common.chains.list",
++          "input": {
++            "properties": {},
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.approve_proposal": {
++          "wire_name": "chainbench.v1.stablenet.governance.approve_proposal",
++          "input": {
++            "properties": {
++              "id": {
++                "description": "proposal id, decimal",
++                "type": "string"
++              }
++            },
++            "required": [
++              "id"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.cancel_proposal": {
++          "wire_name": "chainbench.v1.stablenet.governance.cancel_proposal",
++          "input": {
++            "properties": {
++              "id": {
++                "description": "proposal id, decimal",
++                "type": "string"
++              }
++            },
++            "required": [
++              "id"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.claim_burn_refund": {
++          "wire_name": "chainbench.v1.stablenet.governance.claim_burn_refund",
++          "input": {
++            "properties": {},
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.disapprove_proposal": {
++          "wire_name": "chainbench.v1.stablenet.governance.disapprove_proposal",
++          "input": {
++            "properties": {
++              "id": {
++                "description": "proposal id, decimal",
++                "type": "string"
++              }
++            },
++            "required": [
++              "id"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.execute_proposal": {
++          "wire_name": "chainbench.v1.stablenet.governance.execute_proposal",
++          "input": {
++            "properties": {
++              "id": {
++                "description": "proposal id, decimal",
++                "type": "string"
++              }
++            },
++            "required": [
++              "id"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.proposal_status": {
++          "wire_name": "chainbench.v1.stablenet.governance.proposal_status",
++          "input": {
++            "properties": {
++              "id": {
++                "description": "proposal id, decimal",
++                "type": "string"
++              },
++              "rpc": {
++                "description": "node RPC URL",
++                "type": "string"
++              }
++            },
++            "required": [
++              "rpc",
++              "id"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.proposals": {
++          "wire_name": "chainbench.v1.stablenet.governance.proposals",
++          "input": {
++            "properties": {
++              "id": {
++                "description": "proposal id, decimal",
++                "type": "string"
++              }
++            },
++            "required": [
++              "id"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.propose_add_member": {
++          "wire_name": "chainbench.v1.stablenet.governance.propose_add_member",
++          "input": {
++            "properties": {
++              "member": {
++                "description": "0x-address of the new member",
++                "type": "string"
++              },
++              "new_quorum": {
++                "description": "new quorum, decimal",
++                "type": "string"
++              }
++            },
++            "required": [
++              "member",
++              "new_quorum"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.propose_burn": {
++          "wire_name": "chainbench.v1.stablenet.governance.propose_burn",
++          "input": {
++            "properties": {
++              "amount": {
++                "description": "amount, decimal wei",
++                "type": "string"
++              },
++              "from": {
++                "description": "0x-address to burn from",
++                "type": "string"
++              },
++              "memo": {
++                "type": "string"
++              },
++              "reference_id": {
++                "type": "string"
++              },
++              "timestamp": {
++                "description": "proof timestamp, decimal",
++                "type": "string"
++              },
++              "withdrawal_id": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "from",
++              "amount",
++              "timestamp"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.stablenet.governance.propose_mint": {
++          "wire_name": "chainbench.v1.stablenet.governance.propose_mint",
++          "input": {
++            "properties": {
++              "amount": {
++                "description": "amount, decimal wei",
++                "type": "string"
++              },
++              "bank_reference": {
++                "type": "string"
++              },
++              "beneficiary": {
++                "description": "0x-address to receive minted coin",
++                "type": "string"
++              },
++              "deposit_id": {
++                "type": "string"
++              },
++              "memo": {
++                "type": "string"
++              },
++              "timestamp": {
++                "description": "proof timestamp, decimal",
++                "type": "string"
++              }
++            },
++            "required": [
++              "beneficiary",
++              "amount",
++              "timestamp"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench.v1.wemix.bootstrap.plan": {
++          "wire_name": "chainbench.v1.wemix.bootstrap.plan",
++          "input": {
++            "properties": {},
++            "type": "object"
++          }
++        },
++        "chainbench.capabilities": {
++          "wire_name": "chainbench.capabilities",
++          "input": {
++            "properties": {
++              "chain": {
++                "description": "chain id to scope to",
++                "type": "string"
++              }
++            },
++            "type": "object"
++          }
++        }
++      }
++    }
++  }
++}
+diff --git a/plugin/hooks/hooks.json b/plugin/hooks/hooks.json
+index af5bc46..ade9501 100644
+--- a/plugin/hooks/hooks.json
++++ b/plugin/hooks/hooks.json
+@@ -50,6 +50,11 @@
+             "type": "command",
+             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/suspect-labeling-guard.py\"",
+             "timeout": 10
++          },
++          {
++            "type": "command",
++            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/timing-investigation-guard.py\"",
++            "timeout": 45
+           }
+         ]
+       },
+diff --git a/plugin/hooks/timing-investigation-guard.py b/plugin/hooks/timing-investigation-guard.py
+new file mode 100644
+index 0000000..50cc847
+--- /dev/null
++++ b/plugin/hooks/timing-investigation-guard.py
+@@ -0,0 +1,56 @@
++#!/usr/bin/env python3
++"""Freeze timing artifacts and block unverified timing pipeline transitions."""
++import importlib.util
++import json
++import os
++from pathlib import Path
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++sys.path.insert(0,str(ROOT/'scripts'))
++from timing_investigation import generation, state_check
++spec=importlib.util.spec_from_file_location('completion_guard',ROOT/'hooks/completion-guard.py');helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
++
++def main():
++ try:data=json.load(sys.stdin)
++ except (ValueError,TypeError):return 0
++ if not isinstance(data,dict)or data.get('tool_name')not in ('Write','Edit'):return 0
++ inputs=data.get('tool_input')
++ if not isinstance(inputs,dict)or not isinstance(inputs.get('file_path'),str):return 0
++ path=Path(inputs['file_path']);path=path if path.is_absolute()else Path(data.get('cwd')or os.getcwd())/path
++ is_state=path.name=='state.json'
++ is_plan=path.name in ('timing-analysis-plan.json','timing-analysis-input.json','timing-evaluation-plan.json','timing-evaluation-input.json') and path.parent.parent.name=='timing'
++ if not is_state and not is_plan:return 0
++ workspace=path.parent if is_state else path.parent.parent.parent
++ recognizable='.coding-agent'in workspace.parts and 'tickets'in workspace.parts
++ try:
++  state=json.loads((workspace/'state.json').read_text())
++  if not recognizable and not (isinstance(state,dict)and state.get('ticket_id')):return 0
++  analysis=state.get('states',{}).get('ANALYSIS',{})
++  existing=analysis.get('investigation_kind')in ('timing','observation')
++  if is_plan:
++   if path.exists():raise ValueError('timing phase inputs are immutable; retain old generation and return to analysis for a bounded new cycle')
++   return 0
++  old=path.read_text();proposed=json.loads(helper.proposed_content(data,old))
++  if not isinstance(proposed,dict):raise ValueError('pipeline state must remain object')
++  next_analysis=proposed.get('states',{}).get('ANALYSIS',{})
++  active=next_analysis.get('investigation_kind')in ('timing','observation')
++  if existing and (not active or proposed.get('ticket_type')!='bugfix'):raise ValueError('cannot erase timing investigation requirements')
++  if not active or proposed.get('ticket_type')!='bugfix':return 0
++  cycle=generation(proposed);old_cycle=generation(state)
++  if cycle!=old_cycle:
++   if cycle!=old_cycle+1 or proposed.get('current_state')!='ANALYSIS':raise ValueError('new timing generation requires the next bounded cycle in analysis')
++  elif proposed.get('current_state')!='ANALYSIS':
++   for phase in ('ANALYSIS','EVALUATION'):
++    before=state.get('states',{}).get(phase,{})
++    after=proposed.get('states',{}).get(phase,{})
++    for key in ('timing_plan_sha256','timing_result_sha256'):
++     if before.get(key)and before.get(key)!=after.get(key):raise ValueError('cannot rewrite frozen timing bindings outside analysis')
++  target=proposed.get('current_state')
++  if next_analysis.get('status')=='completed' or target in ('PLANNING','DESIGN','IMPLEMENTATION','EVALUATION','COMPLETION','COMPLETED'):
++   state_check(workspace,proposed,'analysis')
++  if target in ('COMPLETION','COMPLETED'):
++   state_check(workspace,proposed,'evaluation',True)
++ except Exception as exc:
++  if recognizable or 'state'in locals()and isinstance(state,dict)and state.get('ticket_id'):helper.deny('Timing investigation blocked: '+str(exc))
++ return 0
++if __name__=='__main__':raise SystemExit(main())
+diff --git a/plugin/scripts/oracle_gate.py b/plugin/scripts/oracle_gate.py
+index 8d3795c..3bc57c3 100644
+--- a/plugin/scripts/oracle_gate.py
++++ b/plugin/scripts/oracle_gate.py
+@@ -425,6 +425,9 @@ def completion_check(workspace: Path, state: dict, repo: Path | None = None) ->
+     if implementation.get("reproduction_commit") != report.get("base_commit"):
+         raise GateError("reproduction commit and oracle RED source disagree")
+     verify_report(report, plan_path, workspace, repo or Path(report["repo_root"]))
++    if analysis.get("investigation_kind") in ("timing","observation") or (workspace/"timing").exists():
++        from timing_investigation import completion_check as timing_completion_check
++        timing_completion_check(workspace,state)
+ 
+ 
+ def main() -> int:
+diff --git a/plugin/scripts/tests/test_timing_investigation.py b/plugin/scripts/tests/test_timing_investigation.py
+new file mode 100644
+index 0000000..4b5c7b0
+--- /dev/null
++++ b/plugin/scripts/tests/test_timing_investigation.py
+@@ -0,0 +1,148 @@
++import copy
++import json
++import os
++import signal
++import threading
++import time
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++from unittest.mock import patch
++SCRIPTS=Path(__file__).resolve().parents[1];sys.path.insert(0,str(SCRIPTS))
++import timing_investigation as timing
++
++def report(mode='comparison',verdict='OBSERVED_RATE_BOUND_MET'):
++ counts={'planned':60,'attempted':60,'completed':60,'symptom_failures':60,'control_failures':0,'infrastructure_errors':0,'missing':0,'failure_rate':1,'upper_failure_rate_95':1}
++ after={**counts,'symptom_failures':0,'failure_rate':0,'upper_failure_rate_95':.04870291331}
++ return {'schema_version':1,'plan':{'mode':mode,'before':{'commit':'1'*40},'after':{'commit':'2'*40}if mode=='comparison'else None,'injection':None,'resume':None},'before':counts,'after':after if mode=='comparison'else None,'verdict':verdict,'resume_requested':mode=='observation'and verdict=='RECURRED','acceptance':'not_recorded'}
++
++class TimingTests(unittest.TestCase):
++ def setUp(self):
++  self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup);self.workspace=Path(self.temp.name)
++  self.state={'ticket_id':'fixture','ticket_type':'bugfix','current_state':'EVALUATION','states':{'ANALYSIS':{'investigation_kind':'timing'},'EVALUATION':{'cycle':1}}}
++  (self.workspace/'state.json').write_bytes(timing.encode(self.state))
++ def fixture(self,phase='evaluation',verdict='OBSERVED_RATE_BOUND_MET'):
++  files=timing.paths(self.workspace,phase);files['plan'].parent.mkdir(parents=True,exist_ok=True)
++  value=report('comparison'if phase=='evaluation'else'reproduction',verdict)
++  identity={'binary':'/trusted/chainbench','binary_sha256':'a'*64,'source_commit':'b'*40}
++  input_value={'plan':value['plan']}
++  input_raw=timing.encode(input_value);plan={'schema_version':1,'ticket_id':'fixture','phase':phase,'generation':1,'runner_sha256':timing.RUNNER_SHA256,'provider':identity,'working_directory':str(self.workspace),'input_sha256':timing.sha(input_raw),'input':input_value,'acceptance':'not_recorded'}
++  files['input'].write_bytes(input_raw);files['plan'].write_bytes(timing.encode(plan));stdout=timing.encode(value);files['report'].write_bytes(stdout);files['stdout'].write_bytes(stdout);files['stderr'].write_bytes(b'')
++  receipt={'schema_version':1,'ticket_id':'fixture','phase':phase,'provider':identity,'plan_sha256':timing.sha(files['plan'].read_bytes()),'input_sha256':plan['input_sha256'],'command':[identity['binary'],'experiment','--input',str(files['input'].resolve())],'cwd':str(self.workspace),'exit_code':1 if verdict=='ERROR'else 0,'stdout_sha256':timing.sha(stdout),'stderr_sha256':timing.sha(b'')};files['receipt'].write_bytes(timing.encode(receipt))
++  native=b'PASS: receipts and accounting; independent acceptance not recorded\n'
++  result={'schema_version':1,'ticket_id':'fixture','phase':phase,'provider':identity,'plan_sha256':timing.sha(files['plan'].read_bytes()),'report_sha256':timing.sha(stdout),'receipt_sha256':timing.sha(files['receipt'].read_bytes()),'branches':timing.branches(value),'verdict':verdict,'resume_requested':value['resume_requested'],'native_verifier_stdout_sha256':timing.sha(native),'acceptance':'not_recorded'};files['result'].write_bytes(timing.encode(result))
++  self.state['states'][phase.upper()].update({'timing_plan_sha256':timing.sha(files['plan'].read_bytes()),'timing_result_sha256':timing.sha(files['result'].read_bytes())});(self.workspace/'state.json').write_bytes(timing.encode(self.state))
++  return files,value
++ def checked(self,phase='evaluation'):
++  # Unit tests isolate the consumer boundary; actual Go verifier/execution is
++  # exercised separately by the source-bound public integration probe.
++  with patch.object(timing,'check_provider'),patch.object(timing,'verify_native',return_value=subprocess.CompletedProcess([],0,b'PASS: receipts and accounting; independent acceptance not recorded\n',b'')):
++   return timing.verify_artifact(self.workspace,phase)
++ def test_verified_provider_decisions_do_not_grant_acceptance(self):
++  self.fixture();result,_,_=self.checked();self.assertEqual(result['acceptance'],'not_recorded');self.assertEqual(result['branches']['normal']['status'],'PASS')
++ def test_infrastructure_and_small_samples_remain_unconfirmed(self):
++  for v in ['ERROR','INCONCLUSIVE','AWAITING_OBSERVATION','RATE_BOUND_NOT_MET']:
++   with self.subTest(v=v):
++    r=report(verdict=v);self.assertNotEqual(timing.branches(r)['defense']['status'],'OBSERVED_RATE_BOUND_MET')
++ def test_observation_event_only_requests_diagnosis_resume(self):
++  r=report('observation','RECURRED');b=timing.branches(r);self.assertEqual(b['reproduction']['status'],'NOT_RUN');self.assertTrue(b['observation']['resume_requested'])
++ def test_changed_raw_inputs_reports_commands_and_judgments_are_rejected(self):
++  files,_=self.fixture();snapshots={k:p.read_bytes()for k,p in files.items()if p.exists()}
++  for kind in ['input','report','receipt','stdout','result']:
++   with self.subTest(kind=kind):
++    for k,raw in snapshots.items():files[k].write_bytes(raw)
++    if kind=='stdout':files[kind].write_bytes(b'changed')
++    else:
++     value=json.loads(files[kind].read_bytes())
++     if kind=='input':value['plan']['before']['commit']='3'*40
++     elif kind=='report':value['before']['completed']=999
++     elif kind=='receipt':value['command']=['invented']
++     else:value['branches']['normal']['status']='invented'
++     files[kind].write_bytes(timing.encode(value))
++    with self.assertRaises(timing.Invalid):self.checked()
++ def test_acceptance_claim_is_rejected_even_with_other_fields_unchanged(self):
++  files,_=self.fixture();r=json.loads(files['result'].read_bytes());r['acceptance']='accepted';files['result'].write_bytes(timing.encode(r))
++  with self.assertRaises(timing.Invalid):self.checked()
++ def test_runner_drift_and_missing_receipts_fail_closed(self):
++  files,_=self.fixture();p=json.loads(files['plan'].read_bytes());p['runner_sha256']='0'*64;files['plan'].write_bytes(timing.encode(p))
++  with self.assertRaises(timing.Invalid):self.checked()
++  files['receipt'].unlink()
++  with self.assertRaises((timing.Invalid,OSError)):self.checked()
++ def test_duplicate_json_fields_and_nonfinite_values_are_rejected(self):
++  p=self.workspace/'bad.json'
++  for raw in ['{"id":1,"id":2}','{"rate":NaN}']:
++   p.write_text(raw)
++   with self.assertRaises(timing.Invalid):timing.read(p)
++ def test_generation_uses_bounded_evaluation_cycle(self):
++  for cycle in [0,4,True,'1']:
++   s=copy.deepcopy(self.state);s['states']['EVALUATION']['cycle']=cycle
++   with self.assertRaises(timing.Invalid):timing.generation(s)
++ def test_state_bindings_cannot_claim_a_different_result(self):
++  self.fixture();self.state['states']['EVALUATION']['timing_result_sha256']='0'*64
++  with patch.object(timing,'check_provider'),patch.object(timing,'verify_native',return_value=subprocess.CompletedProcess([],0,b'PASS: receipts and accounting; independent acceptance not recorded\n',b'')):
++   with self.assertRaises(timing.Invalid):timing.state_check(self.workspace,self.state,'evaluation')
++ def test_unreproduced_and_observation_receipts_cannot_enter_planning(self):
++  files,value=self.fixture('analysis','AWAITING_OBSERVATION')
++  with patch.object(timing,'check_provider'),patch.object(timing,'verify_native',return_value=subprocess.CompletedProcess([],0,b'PASS: receipts and accounting; independent acceptance not recorded\n',b'')):
++   with self.assertRaises(timing.Invalid):timing.state_check(self.workspace,self.state,'analysis')
++ def test_completion_requires_current_oracle_sources(self):
++  self.fixture();(self.workspace/'oracle-validity-report.json').write_bytes(timing.encode({'base_commit':'9'*40,'head_commit':'2'*40}))
++  with patch.object(timing,'check_provider'),patch.object(timing,'verify_native',return_value=subprocess.CompletedProcess([],0,b'PASS: receipts and accounting; independent acceptance not recorded\n',b'')):
++   with self.assertRaises(timing.Invalid):timing.state_check(self.workspace,self.state,'evaluation',True)
++ def test_native_verifier_failure_and_provider_drift_are_not_accepted(self):
++  self.fixture()
++  with patch.object(timing,'check_provider',side_effect=timing.Invalid('actual executable changed')):
++   with self.assertRaises(timing.Invalid):timing.verify_artifact(self.workspace,'evaluation')
++  with patch.object(timing,'check_provider'),patch.object(timing,'verify_native',side_effect=timing.Invalid('raw accounting failed')):
++   with self.assertRaises(timing.Invalid):timing.verify_artifact(self.workspace,'evaluation')
++ def test_existing_phase_evidence_cannot_be_overwritten(self):
++  self.fixture()
++  with self.assertRaises(timing.Invalid):timing.freeze(self.workspace,'evaluation','fixture',self.workspace/'unused.json',Path('/trusted/chainbench'))
++
++ def test_partial_normal_coverage_is_not_a_pass(self):
++  r=report();r['before']['completed']=1;r['before']['missing']=59
++  self.assertEqual(timing.branches(r)['normal']['status'],'INCONCLUSIVE')
++ def test_current_full_nested_provider_contract_and_drift(self):
++  contract=json.loads((SCRIPTS.parent/'contracts/chainbench-tools.schema.json').read_text())
++  tools=[{'name':name,'inputSchema':tool['input']}for name,tool in contract['providers']['chainbench']['tools'].items()]
++  self.assertEqual(timing.check_contract({'result':{'tools':tools}}),79)
++  wrong=copy.deepcopy(tools)
++  tool=next(t for t in wrong if t['name']=='chainbench_experiment')
++  tool['inputSchema']['properties']['input']['properties']['plan']['properties']['repetitions']['type']='string'
++  with self.assertRaises(timing.Invalid):timing.check_contract({'tools':wrong})
++  with self.assertRaises(timing.Invalid):timing.check_contract({'tools':tools[:-1]})
++  tool=json.loads((SCRIPTS.parents[1]/'contract/agent-mcp.schema.json').read_text())['providers']['chainbench']['tools']['chainbench_experiment']
++  self.assertEqual(tool['input'],contract['providers']['chainbench']['tools']['chainbench_experiment']['input'])
++ def test_actual_hook_blocks_removed_kind_invalid_cycles_and_plan_rewrite(self):
++  self.state['current_state']='ANALYSIS';(self.workspace/'state.json').write_bytes(timing.encode(self.state))
++  self.fixture('analysis','REPRODUCED')
++  proposed=copy.deepcopy(self.state);proposed['states']['ANALYSIS'].pop('investigation_kind')
++  data={'tool_name':'Write','tool_input':{'file_path':str(self.workspace/'state.json'),'content':json.dumps(proposed)},'cwd':str(self.workspace)}
++  hook=SCRIPTS.parent/'hooks/timing-investigation-guard.py'
++  result=subprocess.run([sys.executable,str(hook)],input=json.dumps(data),text=True,capture_output=True,check=True)
++  self.assertEqual(json.loads(result.stdout)['hookSpecificOutput']['permissionDecision'],'deny')
++  proposed=copy.deepcopy(self.state);proposed['states']['EVALUATION']['cycle']=4;data['tool_input']['content']=json.dumps(proposed)
++  result=subprocess.run([sys.executable,str(hook)],input=json.dumps(data),text=True,capture_output=True,check=True)
++  self.assertEqual(json.loads(result.stdout)['hookSpecificOutput']['permissionDecision'],'deny')
++  data['tool_input']={'file_path':str(timing.paths(self.workspace,'analysis')['plan']),'content':'{}'}
++  result=subprocess.run([sys.executable,str(hook)],input=json.dumps(data),text=True,capture_output=True,check=True)
++  self.assertEqual(json.loads(result.stdout)['hookSpecificOutput']['permissionDecision'],'deny')
++ def test_completion_cli_does_not_ignore_directly_removed_timing_classification(self):
++  (self.workspace/'timing').mkdir();self.state['states']['ANALYSIS'].pop('investigation_kind')
++  with self.assertRaises(timing.Invalid):timing.completion_check(self.workspace,self.state)
++
++ def test_controller_cancellation_waits_for_owned_cleanup_instead_of_killing_it(self):
++  controller=self.workspace/'controller.py';marker=self.workspace/'cleanup-finished';ready=self.workspace/'ready'
++  controller.write_text("import signal,time,sys\nfrom pathlib import Path\ndef stop(*args):\n time.sleep(.1);Path(sys.argv[1]).write_text('cleaned');print('owned cleanup finished',flush=True);sys.exit(130)\nsignal.signal(signal.SIGINT,stop)\nPath(sys.argv[2]).write_text('ready')\ndeadline=time.monotonic()+5\nwhile time.monotonic()<deadline:time.sleep(.01)\n")
++  def interrupt_ready():
++   for _ in range(1000):
++    if ready.exists():os.kill(os.getpid(),signal.SIGTERM);return
++    time.sleep(.005)
++  timer=threading.Thread(target=interrupt_ready);timer.start()
++  try:result,cancel=timing.run_controller([sys.executable,str(controller),str(marker),str(ready)],str(self.workspace))
++  finally:timer.join()
++  self.assertEqual(result.returncode,130);self.assertEqual(cancel,signal.SIGTERM);self.assertEqual(marker.read_text(),'cleaned')
++  self.assertTrue(timing.valid_exit(result.returncode,'ERROR',cancel));self.assertFalse(timing.valid_exit(result.returncode,'OBSERVED_RATE_BOUND_MET',cancel))
++if __name__=='__main__':unittest.main()
+diff --git a/plugin/scripts/timing_investigation.py b/plugin/scripts/timing_investigation.py
+new file mode 100644
+index 0000000..50f0ebb
+--- /dev/null
++++ b/plugin/scripts/timing_investigation.py
+@@ -0,0 +1,227 @@
++#!/usr/bin/env python3
++"""Freeze and execute bounded ChainBench investigations; never grant cause acceptance.
++
++ChainBench owns statistics, actual node controls and cleanup. This consumer binds
++its public execution/report verifier to the ticket and phase. Like the other
++pipeline hooks, this is a consistency gate, not a sandbox against manual edits.
++"""
++from __future__ import annotations
++import argparse
++import hashlib
++import json
++import os
++import signal
++from pathlib import Path
++import subprocess
++import sys
++
++class Invalid(ValueError): pass
++PHASES={'analysis','evaluation'}
++RUNNER_SHA256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
++LIMIT=256*1024*1024
++
++def require(ok,message):
++    if not ok: raise Invalid(message)
++def sha(raw):return hashlib.sha256(raw).hexdigest()
++def encode(value):return (json.dumps(value,ensure_ascii=False,allow_nan=False,indent=2)+'\n').encode()
++def read(path,limit=LIMIT):
++    require(path.stat().st_size<=limit,'artifact exceeds byte budget')
++    raw=path.read_bytes()
++    def pairs(items):
++        out={}
++        for k,v in items:
++            require(k not in out,'duplicate JSON field: '+k);out[k]=v
++        return out
++    value=json.loads(raw,object_pairs_hook=pairs,parse_constant=lambda v:(_ for _ in ()).throw(Invalid('nonfinite JSON')))
++    require(isinstance(value,dict),'artifact must be an object')
++    return raw,value
++
++def generation(state):
++    value=state.get('states',{}).get('EVALUATION',{}).get('cycle',1)
++    require(type(value) is int and 1<=value<=3,'investigation generation must be the bounded evaluation cycle (1..3)')
++    return value
++
++def paths(workspace,phase,cycle=None):
++    require(phase in PHASES,'unsupported investigation phase')
++    cycle=generation(read(workspace/'state.json')[1]) if cycle is None else cycle
++    require(type(cycle) is int and 1<=cycle<=3,'invalid investigation generation')
++    directory=workspace/'timing'/str(cycle)
++    return {name:directory/f'timing-{phase}-{name}.{suffix}' for name,suffix in [('plan','json'),('input','json'),('report','json'),('receipt','json'),('stdout','txt'),('stderr','txt'),('result','json')]}
++def write_new(path,raw):
++    descriptor=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
++    with os.fdopen(descriptor,'wb') as out:out.write(raw)
++def provider_identity(binary):
++    binary=binary.resolve()
++    require(binary.is_file(),'ChainBench executable unavailable')
++    info=subprocess.run(['go','version','-m',str(binary)],capture_output=True,check=True,timeout=20).stdout.decode()
++    settings={line.strip().split('=',1)[0].split()[-1]:line.strip().split('=',1)[1] for line in info.splitlines() if '\tbuild\t' in line and '=' in line}
++    commit=settings.get('vcs.revision','')
++    require(len(commit)==40 and all(c in '0123456789abcdef' for c in commit) and settings.get('vcs.modified')=='false','ChainBench must be built from an exact clean source commit')
++    return {'binary':str(binary),'binary_sha256':sha(binary.read_bytes()),'source_commit':commit}
++
++def check_provider(identity):
++    require(provider_identity(Path(identity['binary']))==identity,'ChainBench executable/source pin changed')
++
++def freeze(workspace,phase,ticket,input_path,binary):
++    files=paths(workspace,phase);require(workspace.is_dir(),'existing ticket workspace required')
++    require(ticket and isinstance(ticket,str),'ticket identity required')
++    require(not any(p.exists() for p in files.values()),'phase artifacts already exist; create a fresh investigation workspace/generation, do not overwrite evidence')
++    raw,_=read(input_path,256_000)
++    state=read(workspace/'state.json')[1]
++    require(state.get('ticket_id')==ticket and state.get('ticket_type')=='bugfix','bugfix ticket identity required')
++    require(state.get('states',{}).get('ANALYSIS',{}).get('investigation_kind')in ('timing','observation'),'explicit timing/observation classification required before freezing')
++    require(state.get('current_state')==phase.upper(),'freeze must occur in its declared analysis/evaluation phase')
++    identity=provider_identity(binary)
++    prepared=subprocess.run([identity['binary'],'experiment','prepare','--input',str(input_path.resolve())],capture_output=True,check=True,cwd=Path.cwd())
++    value=json.loads(prepared.stdout)
++    require(value['plan']['mode'] in ({'reproduction','observation'} if phase=='analysis' else {'comparison'}),'phase does not match frozen experiment mode')
++    if phase=='evaluation': require(value['plan']['repetitions']>=30 and value['plan']['min_completed']>=30,'comparison needs the frozen inference denominator')
++    files['input'].parent.mkdir(parents=True,exist_ok=True)
++    write_new(files['input'],prepared.stdout)
++    plan={'schema_version':1,'ticket_id':ticket,'phase':phase,'generation':generation(state),'runner_sha256':RUNNER_SHA256,'provider':identity,'working_directory':str(Path.cwd().resolve()),'input_sha256':sha(prepared.stdout),'proposed_input_sha256':sha(raw),'input':value,'acceptance':'not_recorded'}
++    write_new(files['plan'],encode(plan))
++    return sha(files['plan'].read_bytes())
++
++def checked_plan(workspace,phase,cycle=None):
++    files=paths(workspace,phase,cycle);raw,p=read(files['plan'],1024*1024)
++    require(p.get('schema_version')==1 and p.get('phase')==phase and p.get('ticket_id') and p.get('acceptance')=='not_recorded','wrong investigation plan')
++    require(p.get('generation')==int(files['plan'].parent.name),'investigation generation mismatch')
++    require(p.get('runner_sha256')==RUNNER_SHA256,'investigation runner changed; old evidence is not current verification')
++    inraw,value=read(files['input'],256_000)
++    require(sha(inraw)==p['input_sha256'] and value==p['input'],'frozen experiment input changed')
++    require(value['plan']['mode'] in ({'reproduction','observation'} if phase=='analysis' else {'comparison'}),'investigation mode changed')
++    check_provider(p['provider'])
++    return files,raw,p
++
++def verify_native(provider,report_path):
++    result=subprocess.run([provider['binary'],'experiment','verify','--report',str(report_path.resolve())],capture_output=True,timeout=30)
++    require(result.returncode==0 and result.stdout.startswith(b'PASS: receipts and accounting;'),'ChainBench raw receipt/accounting verification failed: '+result.stderr.decode(errors='replace')[:1024])
++    return result
++
++def same_plan(actual,wanted):
++    wanted=dict(wanted)
++    for key in ('after','injection','resume'):wanted.setdefault(key,None)
++    return actual==wanted
++
++def branches(report):
++    """Project verified provider decisions; never recompute a statistical model."""
++    before=report['before'];after=report.get('after');mode=report['plan']['mode'];v=report['verdict']
++    cohorts=[before]+([after]if after is not None else [])
++    controls='ERROR' if any(c['control_failures']or c['infrastructure_errors']for c in cohorts) else 'PASS' if all(c['completed']==c['planned']and c['missing']==0 for c in cohorts) else 'INCONCLUSIVE'
++    reproduced='REPRODUCED' if v in ('REPRODUCED','OBSERVED_RATE_BOUND_MET','RATE_BOUND_NOT_MET') else 'INCONCLUSIVE' if v=='INCONCLUSIVE' else 'AWAITING_OBSERVATION' if v=='AWAITING_OBSERVATION' else 'ERROR'
++    return {'normal':{'status':controls,'origin':'same-trial designated normal control assertions'},'reproduction':{'status':reproduced if mode!='observation' else 'NOT_RUN','before':before},'defense':{'status':v if mode=='comparison' else 'NOT_RUN','after':after},'observation':{'status':v if mode=='observation' else 'REQUIRED' if reproduced=='AWAITING_OBSERVATION' else 'NOT_RUN','resume_requested':report['resume_requested']}}
++
++def run_controller(command,cwd):
++    # Isolate the controller from terminal process-group signals. Forward one
++    # cancellation and let its independent owned cleanup finish; never SIGKILL
++    # a node controller because communicate/KeyboardInterrupt was interrupted.
++    process=subprocess.Popen(command,cwd=cwd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
++    interrupted=[];previous={}
++    def cancel(signum,_frame):
++        if not interrupted:
++            interrupted.append(signum)
++            if process.poll() is None:process.send_signal(signal.SIGINT)
++    try:
++        for signum in (signal.SIGINT,signal.SIGTERM):previous[signum]=signal.signal(signum,cancel)
++        try:stdout,stderr=process.communicate()
++        except BaseException:
++            cancel(signal.SIGINT,None)
++            process.communicate()
++            raise
++    finally:
++        for signum,handler in previous.items():signal.signal(signum,handler)
++    return subprocess.CompletedProcess(command,process.returncode,stdout,stderr),interrupted[0]if interrupted else None
++
++def valid_exit(code,verdict,cancel_signal):
++    return code==0 if verdict!='ERROR'else code==1 or code==130 and cancel_signal in (signal.SIGINT,signal.SIGTERM)
++
++def execute(workspace,phase):
++    files,planraw,p=checked_plan(workspace,phase)
++    require(not any(files[k].exists() for k in ('report','receipt','stdout','stderr','result')),'a trial receipt already exists; do not replace it with a rerun')
++    cmd=[p['provider']['binary'],'experiment','--input',str(files['input'].resolve())]
++    # The native total/trial budgets and independent cleanup own cancellation.
++    # A Python subprocess timeout would kill the controller and leak its nodes.
++    run,cancel_signal=run_controller(cmd,p['working_directory'])
++    write_new(files['stdout'],run.stdout);write_new(files['stderr'],run.stderr)
++    receipt={'schema_version':1,'ticket_id':p['ticket_id'],'phase':phase,'plan_sha256':sha(planraw),'input_sha256':p['input_sha256'],'provider':p['provider'],'command':cmd,'cwd':p['working_directory'],'exit_code':run.returncode,'cancel_signal':cancel_signal,'stdout_sha256':sha(run.stdout),'stderr_sha256':sha(run.stderr)}
++    write_new(files['receipt'],encode(receipt))
++    require(len(run.stdout)<=LIMIT,'report exceeds byte budget')
++    report=json.loads(run.stdout)
++    require(isinstance(report,dict) and report.get('acceptance')=='not_recorded','provider did not return a factual report')
++    require(same_plan(report['plan'],p['input']['plan']),'provider used a different plan')
++    require(valid_exit(run.returncode,report['verdict'],cancel_signal),'provider exit/status disagree')
++    write_new(files['report'],run.stdout)
++    native=verify_native(p['provider'],files['report'])
++    result={'schema_version':1,'ticket_id':p['ticket_id'],'phase':phase,'plan_sha256':sha(planraw),'report_sha256':sha(run.stdout),'receipt_sha256':sha(files['receipt'].read_bytes()),'provider':p['provider'],'branches':branches(report),'verdict':report['verdict'],'resume_requested':report['resume_requested'],'native_verifier_stdout_sha256':sha(native.stdout),'acceptance':'not_recorded'}
++    write_new(files['result'],encode(result))
++    return result
++
++def verify_artifact(workspace,phase,cycle=None):
++    files,planraw,p=checked_plan(workspace,phase,cycle)
++    raw,result=read(files['result']);report_raw,report=read(files['report']);receipt_raw,receipt=read(files['receipt'])
++    require(result.get('schema_version')==1 and result.get('ticket_id')==p['ticket_id'] and result.get('phase')==phase and result.get('acceptance')=='not_recorded','wrong result identity or cause acceptance')
++    require(result.get('plan_sha256')==sha(planraw) and result.get('report_sha256')==sha(report_raw) and result.get('receipt_sha256')==sha(receipt_raw),'result does not bind raw inputs/receipts')
++    require(result.get('provider')==p['provider'] and receipt.get('provider')==p['provider'] and receipt.get('plan_sha256')==sha(planraw) and receipt.get('input_sha256')==p['input_sha256'] and receipt.get('ticket_id')==p['ticket_id'] and receipt.get('phase')==phase,'execution context mismatch')
++    require(receipt.get('command')==[p['provider']['binary'],'experiment','--input',str(files['input'].resolve())] and receipt.get('cwd')==p['working_directory'],'execution command/context changed')
++    stdout=files['stdout'].read_bytes();stderr=files['stderr'].read_bytes()
++    require(receipt.get('stdout_sha256')==sha(stdout) and receipt.get('stderr_sha256')==sha(stderr) and stdout==report_raw,'execution receipt changed')
++    require(same_plan(report['plan'],p['input']['plan']) and report.get('acceptance')=='not_recorded','report uses different frozen conditions')
++    require(valid_exit(receipt.get('exit_code'),report['verdict'],receipt.get('cancel_signal')),'process error cannot become a passed investigation')
++    native=verify_native(p['provider'],files['report'])
++    require(result.get('branches')==branches(report) and result.get('verdict')==report['verdict'] and result.get('resume_requested')==report['resume_requested'] and result.get('native_verifier_stdout_sha256')==sha(native.stdout),'investigation judgment differs from verified provider evidence')
++    return result,report,p
++
++def state_check(workspace,state,phase,completion=False):
++    cycle=generation(state)
++    result,report,plan=verify_artifact(workspace,phase,cycle)
++    require(state.get('ticket_id')==plan['ticket_id'],'ticket changed')
++    stage=state.get('states',{}).get(phase.upper(),{})
++    files=paths(workspace,phase,cycle)
++    require(stage.get('timing_plan_sha256')==sha(files['plan'].read_bytes()) and stage.get('timing_result_sha256')==sha(files['result'].read_bytes()),'state must bind exact frozen timing plan and validated result')
++    if phase=='analysis':
++        require(result['verdict']=='REPRODUCED','timing diagnosis is not reproduced; remain in analysis/observation')
++        oracle_plan=workspace/'oracle-validity-plan.json'
++        if oracle_plan.exists():require(read(oracle_plan)[1]['base_ref']==report['plan']['before']['commit'],'timing and oracle source baseline disagree')
++    else:
++        require(result['verdict']=='OBSERVED_RATE_BOUND_MET','timing defense is not verified; cannot complete')
++        if completion:
++            oracle_report=read(workspace/'oracle-validity-report.json')[1]
++            require(report['plan']['before']['commit']==oracle_report['base_commit'] and report['plan']['after']['commit']==oracle_report['head_commit'],'timing and current oracle subjects disagree')
++    return result
++
++def completion_check(workspace,state):
++    analysis=state.get('states',{}).get('ANALYSIS',{})
++    if state.get('ticket_type')=='bugfix' and (analysis.get('investigation_kind') in ('timing','observation') or (workspace/'timing').exists()):
++        require(analysis.get('investigation_kind') in ('timing','observation'),'cannot remove timing classification while retained investigation evidence exists')
++        state_check(workspace,state,'analysis')
++        state_check(workspace,state,'evaluation',True)
++
++def check_contract(value,contract_path=None):
++    contract_path=contract_path or Path(__file__).resolve().parents[1]/'contracts/chainbench-tools.schema.json'
++    contract=read(contract_path)[1]['providers']['chainbench']['tools']
++    tools=value.get('result',{}).get('tools',[]) if isinstance(value,dict) and 'result' in value else value.get('tools',[]) if isinstance(value,dict) else value
++    require(isinstance(tools,list),'actual tools/list response required')
++    observed={t.get('name'):t.get('inputSchema') for t in tools if isinstance(t,dict)}
++    require(len(observed)==len(tools) and set(observed)==set(contract),'registered ChainBench tools differ from bundled contract')
++    def semantics(v):
++        if isinstance(v,dict):return {k:semantics(x) for k,x in v.items() if k not in ('description','title','$schema')}
++        if isinstance(v,list):return [semantics(x) for x in v]
++        return v
++    for name,want in contract.items():require(semantics(observed[name])==semantics(want['input']),'nested input contract differs: '+name)
++    return len(contract)
++
++def main():
++    parser=argparse.ArgumentParser();parser.add_argument('--workspace',type=Path);parser.add_argument('--phase',choices=sorted(PHASES),default='analysis');action=parser.add_mutually_exclusive_group(required=True);action.add_argument('--check-contract',type=Path);action.add_argument('--freeze',type=Path);action.add_argument('--execute',action='store_true');action.add_argument('--check',action='store_true');action.add_argument('--check-state',action='store_true');parser.add_argument('--chainbench',type=Path);parser.add_argument('--ticket-id');args=parser.parse_args()
++    if args.check_contract:
++        print(json.dumps({'contract':'PASS','tools':check_contract(read(args.check_contract)[1])}));return
++    require(args.workspace is not None,'--workspace is required');workspace=args.workspace.resolve()
++    if args.freeze:
++        require(args.chainbench is not None,'--chainbench is required to freeze');print(json.dumps({'plan_sha256':freeze(workspace,args.phase,args.ticket_id,args.freeze,args.chainbench),'acceptance':'not_recorded'}));return
++    if args.execute:result=execute(workspace,args.phase)
++    elif args.check:result=verify_artifact(workspace,args.phase)[0]
++    else:result=state_check(workspace,read(workspace/'state.json')[1],args.phase,args.phase=='evaluation')
++    print(json.dumps({'verdict':result['verdict'],'resume_requested':result['resume_requested'],'acceptance':'not_recorded'}))
++if __name__=='__main__':
++    try:main()
++    except (Invalid,OSError,ValueError,KeyError,TypeError,subprocess.SubprocessError) as exc:
++        print(json.dumps({'status':'ERROR','reason':str(exc),'acceptance':'not_recorded'}));raise SystemExit(2)
+diff --git a/plugin/skills/state-machine/SKILL.md b/plugin/skills/state-machine/SKILL.md
+index 60a5f57..b450fea 100644
+--- a/plugin/skills/state-machine/SKILL.md
++++ b/plugin/skills/state-machine/SKILL.md
+@@ -507,3 +507,23 @@ observations and absent or mismatched bindings at subsequent state writes.
+ An actual failed label-tool receipt is recorded as unavailable, never as an
+ empty successful candidate set. This observation artifact neither confirms
+ root cause nor relaxes the existing reproduction/oracle/selection gates.
++
++
++## Timing investigation bindings
++
++For nondeterministic/fault investigation, use the timing-investigation skill and
++set states.ANALYSIS.investigation_kind=timing/observation before freezing. Each
++phase carries timing_plan_sha256 and timing_result_sha256 for immutable artifacts
++under timing/{states.EVALUATION.cycle}/ (cycle1..3). The Write/Edit hook blocks
++PLANNING without reproduced analysis evidence and COMPLETION without a verified
++paired defense bound matching current oracle source commits. Removing the kind,
++changing frozen bindings outside diagnosis or skipping the bounded cycle is
++rejected. The oracle completion CLI checks the same artifact boundary, including
++retained timing artifacts whose classification was removed by a direct edit.
++
++AWAITING_OBSERVATION/INCONCLUSIVE/ERROR remain in ANALYSIS; do not set its status
++completed or reproduction_confirmed=true. An actual RECURRED monitor event requests
++ANALYSIS resume with a fresh bounded generation, not fix acceptance. Infrastructure,
++normal-control, injection and cleanup failures are separate factual branches.
++Statistics and node ownership remain ChainBench's responsibility. Existing primary/
++independent oracle, candidate-selection and verification gates still apply.
+diff --git a/plugin/skills/timing-investigation/SKILL.md b/plugin/skills/timing-investigation/SKILL.md
+new file mode 100644
+index 0000000..d0fda9a
+--- /dev/null
++++ b/plugin/skills/timing-investigation/SKILL.md
+@@ -0,0 +1,74 @@
++---
++name: timing-investigation
++description: "Freeze bounded timing/fault investigations, retain factual ChainBench receipts, and keep unreproduced symptoms in observation rather than accepting a fix."
++type: skill
++---
++
++# Timing evidence before diagnosis or completion
++
++Use this route for nondeterministic/ordering/fault symptoms. Set
++`states.ANALYSIS.investigation_kind` to `timing` (or `observation`) before freezing
++any trial. Keep the primary/independent oracle and fix-selection gates; these
++receipts do not replace them or grant cause acceptance.
++
++1. Read source coordinates and requirements. Freeze the complete public
++   ChainBench input: before/after clean Go binaries and immutable commits,
++   whole DSL, normal controls, designated symptom assertion, environment and
++   external file hashes, deterministic seed/schedules, repetition and time
++   budgets, explicit injection step/target and fresh owned artifact root.
++   Every usable trial contains its own normal-control branch. Comparison uses
++   paired schedules for reproduction before and defense after. Statistical
++   acceptance is the provider's observed bound, never an impossibility claim.
++2. Use `chainbench_experiment` with the real nested input schema, exposed as
++   `mcp__plugin_coding-agent_chainbench__chainbench_experiment`. The bundled
++   `contracts/chainbench-tools.schema.json` captures current tools/list inputs.
++   Compare the actual server contract using `--check-contract` before assuming
++   compatibility. Legacy init/start/test-run recipes describe another surface;
++   do not guess or silently call those names for this timing route.
++3. The bundled runner can execute the same app path through the pinned public
++   CLI. Freeze while current_state is ANALYSIS/EVALUATION respectively and
++   record the emitted plan SHA in that phase BEFORE execution. Analysis permits
++   reproduction/observation; evaluation requires comparison with >=30 planned
++   and minimum-completed samples. Plan and result names are under
++   `timing/{states.EVALUATION.cycle}/`, with cycle1..3. Never overwrite a phase.
++
++```sh
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/timing_investigation.py" --workspace "{workspace_dir}" --phase analysis --freeze proposal.json --chainbench "$CHAINBENCH_BIN" --ticket-id "{ticket_id}"
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/timing_investigation.py" --workspace "{workspace_dir}" --phase analysis --execute
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/timing_investigation.py" --workspace "{workspace_dir}" --phase analysis --check
++```
++
++The state-bound automated route uses the runner CLI. A direct MCP diagnostic
++call does not fabricate that CLI execution receipt; never reuse its artifact
++root for a second run. Keep the direct tool response as separate evidence.
++
++4. The runner writes immutable proposed/prepared pins, controller stdout/stderr,
++   execution command/exit receipt, raw report and projected normal/reproduction/
++   defense/observation branches. It re-runs ChainBench's raw receipt/accounting
++   verifier; it does not duplicate graph or statistics computations. Bind the
++   exact result file SHA to `states.<PHASE>.timing_result_sha256`, then use
++   `--check-state`. Verify remains read-only; execute may allocate and inject
++   only fresh trial-owned nodes as authorized by the frozen input.
++5. Infrastructure error, failed control/injection/cleanup, missing trials and
++   small samples cannot confirm reproduction or repair. `AWAITING_OBSERVATION`
++   stays in ANALYSIS with reproduction_confirmed=false; do not plan a speculative
++   fix or mark analysis completed. A read-only observer freezes an actual existing
++   composition digest and approved RPC predicate, has no node control/keyring,
++   and samples only during its bounded window. `RECURRED` requests diagnosis
++   resume; it does not itself confirm a root cause or pass a defense gate.
++The consumer forwards one interruption to the isolated native controller and
++waits for its independent cleanup. Cancellation never becomes a successful
++defense. It does not use a Python timeout to kill the node controller.
++
++6. A new bounded generation must return to ANALYSIS and increment the existing
++   evaluation cycle by exactly one, retaining old files. Return to a reproduced
++   investigation before PLANNING. An exhausted cycle requires an explicit new
++   scope, not an unlimited silent retry. Unavailable or incompatible servers
++   remain an explicit blocked/unavailable investigation; no invented success.
++7. Evaluation freezes a comparison with the same oracle baseline and current
++   candidate source. Complete only when the provider reports
++   `OBSERVED_RATE_BOUND_MET`, the normal controls/cleanup pass, current source
++   matches the primary/independent oracle evidence, and all existing oracle,
++   candidate-selection and regression gates also pass. The state Write/Edit
++   hook and oracle completion CLI both validate these bindings. They do not
++   sandbox direct shell/manual edits or provide independent human acceptance.

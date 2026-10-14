@@ -262,3 +262,26 @@ bounded 조사·provider contract·완료 gate 연결, 실제 fault/timeout/주�
 cleanup 반례와 최종 통합 source replay다. remote/mixed-binary 운영 수용과
 독립 production 판단을 이번 controlled 검증으로 완료 처리하지 않는다.
 전체 남은 순서는 WI-4→WI-1→WI-2→WI-C→WI-6→WI-SP다.
+
+
+## WI-4 소비자 연결 중간 검증
+
+coding-agent `e834ccc4687e1c30bd7d879d5f0e6f899c53369a`에 불변 phase 계획·
+input·실행 명령/exit·원자료·native verifier·결과의 결속과 bounded cycle1..3을
+구현했다. Write/Edit hook과 oracle completion CLI가 미재현·관찰·오류·증거
+변조·분류 제거·출처 불일치의 다음 단계/완료 전이를 거부한다. 통계 계산과
+node 정리는 기존 ChainBench를 사용하며, 기존 oracle/선택 gate를 유지한다.
+79개 현행 등록 도구의 nested input snapshot과 새 timing 경로를 연결했다.
+
+실제 go-stablenet4-validator 소표본 실행은 INCONCLUSIVE를 유지하고 원자료
+검증 후 PLANNING을 거부했다. 실제 public composition의 owned Go RPC
+동시성 fixture는 재현60회·전/후60쌍 60/60→0/60, upper bound0.0487,
+trial180개 cleanup PASS다. fixture source bundle/binary와 원자료를
+[중간 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-4-consumer-checkpoint/README.md)에
+보존한다. 이 프로토콜 fixture는 blockchain consensus나 독립 원인 수용이 아니다.
+전체 plugin114개·timing18개·bench 회귀와 tool-name lint PASS다.
+
+WI-4의 실제 native fault/timeout/부분 완료/주입 오류/cleanup 반례,
+parent 종료 감시·실제 signal cleanup, 최종 통합 commit replay/host alias가
+남아 implementation_verified=false다. 독립 production 수용도 미기록이다.
+현재 구현 검증3/9, 남은 순서 WI-4→WI-1→WI-2→WI-C→WI-6→WI-SP를 유지한다.
