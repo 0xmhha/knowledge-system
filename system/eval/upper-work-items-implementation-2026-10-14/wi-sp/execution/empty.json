@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "no_annotations",
+  "reason": "",
+  "snapshot_sha256": "d1cdb1196f0839d61181c0cfbc630c3fb035e2836fc1776d46b76b0ce18c05b0",
+  "symbol": {
+    "node_id": "29e489991dc428cc",
+    "canonical_id": "example.invalid/annotation-fixture.Empty",
+    "file": "logic.go",
+    "indexed_commit": "4efdbb447587efb032ac38efb1b9fd9ce45125e5",
+    "source_sha256": {
+      "status": "retained_blob",
+      "value": "0d66e01f1b60680090a5306449aefc55b7180cd66c1b2bfa3adb85abc117703d"
+    },
+    "metadata_sha256": "16b6c1ef6c79597024ab65b0a9f654b3b1a67b39eac56b3d30420bb849450de8"
+  },
+  "annotations": [],
+  "more": false,
+  "max_annotations": 32,
+  "timeout_ms": 1000,
+  "safety_verdict": "unknown",
+  "automatic_rules": "separate_opt_in_rule_candidates_not_executed",
+  "limitations": [
+    "Manual tags are operator assertions, not verified vulnerabilities or policy compliance; empty tags do not prove safety",
+    "YAML bytes, real row, version, reviewer, review time and approval were not retained; identity/signature trust unsupported",
+    "SQL bounds row count; synchronous legacy node/blob reads and row bytes are not hard process memory or preemptive time bounds",
+    "Legacy merged descriptions cannot reliably separate remediation or severity",
+    "Final rechecks are not a database snapshot transaction and cannot detect changes reverted between reads"
+  ],
+  "elapsed_micros": 362
+}

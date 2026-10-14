@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "snapshot_sha256": "76185eaef4d2ae9c712bbef20936eaa117ef8d6d283faefba833d3c5d0e864a6",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "acc6ddbe60b41e86",
+      "canonical_id": "example.invalid/rule-fixture.Sanitizer",
+      "file": "cases.go",
+      "commit": "4352829da228fe6e6d031c701eb3b4e3e7049b6a",
+      "sha256": "10f5c067f58e3792e3ec4a86c07a143134f6ed9d0efa650209f8730b0b8d84a9",
+      "language": "go",
+      "start_line": 49,
+      "start_byte": 1207,
+      "bytes": 94,
+      "snapshot_sha256": "76185eaef4d2ae9c712bbef20936eaa117ef8d6d283faefba833d3c5d0e864a6",
+      "function_name": "Sanitizer"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "partial",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0",
+          "b0/n1"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 1251,
+          "end_byte": 1272,
+          "start_line": 49,
+          "end_line": 49
+        },
+        "text": "name := sanitize(cmd)",
+        "synthetic": false
+      },
+      {
+        "id": "b0/n1",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 1274,
+          "end_byte": 1299,
+          "start_line": 49,
+          "end_line": 49
+        },
+        "text": "return exec.Command(name)",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 1207,
+          "end_byte": 1243,
+          "start_line": 49,
+          "end_line": 49
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v1222"
+      },
+      {
+        "from": "b0/n0",
+        "to": "b0/n1",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v1251"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "isolated_type_info_partial",
+        "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+      },
+      {
+        "code": "opaque_call",
+        "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+        "location": {
+          "start_byte": 1259,
+          "end_byte": 1272,
+          "start_line": 49,
+          "end_line": 49
+        }
+      },
+      {
+        "code": "opaque_call",
+        "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+        "location": {
+          "start_byte": 1281,
+          "end_byte": 1299,
+          "start_line": 49,
+          "end_line": 49
+        }
+      },
+      {
+        "code": "external_value_unknown",
+        "message": "Value read has no local lexical definition; no source edge is invented",
+        "location": {
+          "start_byte": 1281,
+          "end_byte": 1285,
+          "start_line": 49,
+          "end_line": 49
+        }
+      }
+    ],
+    "truncated": false,
+    "elapsed_micros": 51,
+    "variables": [
+      {
+        "id": "v1222",
+        "name": "cmd",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 1222,
+          "end_byte": 1225,
+          "start_line": 49,
+          "end_line": 49
+        }
+      },
+      {
+        "id": "v1251",
+        "name": "name",
+        "kind": "local",
+        "declaration": {
+          "start_byte": 1251,
+          "end_byte": 1255,
+          "start_line": 49,
+          "end_line": 49
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/definition/v1251/1251",
+        "node": "b0/n0",
+        "variable": "v1251",
+        "role": "definition",
+        "location": {
+          "start_byte": 1251,
+          "end_byte": 1255,
+          "start_line": 49,
+          "end_line": 49
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n0/use/v1222/1268",
+        "node": "b0/n0",
+        "variable": "v1222",
+        "role": "use",
+        "location": {
+          "start_byte": 1268,
+          "end_byte": 1271,
+          "start_line": 49,
+          "end_line": 49
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n1/use/v1251/1294",
+        "node": "b0/n1",
+        "variable": "v1251",
+        "role": "use",
+        "location": {
+          "start_byte": 1294,
+          "end_byte": 1298,
+          "start_line": 49,
+          "end_line": 49
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v1222/1222",
+        "node": "entry",
+        "variable": "v1222",
+        "role": "definition",
+        "location": {
+          "start_byte": 1222,
+          "end_byte": 1225,
+          "start_line": 49,
+          "end_line": 49
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "entry/definition/v1222/1222",
+        "use": "b0/n0/use/v1222/1268",
+        "variable": "v1222",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "b0/n0/definition/v1251/1251",
+        "use": "b0/n1/use/v1251/1294",
+        "variable": "v1251",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 6,
+    "facts_peak": 18,
+    "rules": {
+      "pack_id": "go-local-review",
+      "pack_version": "1.0.0",
+      "pack_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
+      "engine_version": "2",
+      "origin": "automatic",
+      "status": "matched_bounded",
+      "limits": {
+        "max_candidates": 64,
+        "max_flow_steps": 4096
+      },
+      "flow_steps": 42,
+      "candidates": [
+        {
+          "id": "60eb04cfe722e54a39c031e6b041a2fc500665926831b7b13187b20e9d25ff7e",
+          "rule_id": "parameter-command-name",
+          "origin": "automatic",
+          "source_occurrence": "entry/definition/v1222/1222",
+          "source_location": {
+            "start_byte": 1222,
+            "end_byte": 1225,
+            "start_line": 49,
+            "end_line": 49
+          },
+          "sink_occurrence": "b0/n1/use/v1251/1294",
+          "sink_location": {
+            "start_byte": 1294,
+            "end_byte": 1298,
+            "start_line": 49,
+            "end_line": 49
+          },
+          "path": [
+            "entry",
+            "b0/n0",
+            "b0/n1"
+          ],
+          "conditions": [],
+          "certainty": "lexical_may_reach",
+          "target_resolution": "syntax_only_unverified",
+          "sanitizer": "not_proven"
+        }
+      ],
+      "limitations": [
+        "empty_candidates_do_not_establish_safety",
+        "syntax_targets_unresolved",
+        "parameters_not_proven_attacker_controlled",
+        "lexical_may_reach_not_path_feasibility",
+        "sanitizers_and_opaque_call_effects_not_proven",
+        "aliases_closures_fields_and_indirect_sinks_unsupported"
+      ]
+    }
+  },
+  "elapsed_micros": 391
+}

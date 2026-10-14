@@ -1,0 +1,13 @@
+security_patterns:
+  - id: manual-boundary
+    name: Operator boundary review
+    category: review
+    severity: high
+    description: Manual risk hypothesis, not a confirmed vulnerability
+    remediation: Review input assumptions before editing
+    matches: [fixture.Seed]
+  - id: manual-overflow
+    name: Arithmetic review
+    severity: low
+    description: Manual arithmetic hypothesis
+    matches: [fixture.Seed]

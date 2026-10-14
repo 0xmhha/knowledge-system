@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "status": "analyzed_bounded",
+  "snapshot_sha256": "d1cdb1196f0839d61181c0cfbc630c3fb035e2836fc1776d46b76b0ce18c05b0",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "0a014f39bd4b265c",
+      "canonical_id": "example.invalid/annotation-fixture.Seed",
+      "file": "logic.go",
+      "commit": "4efdbb447587efb032ac38efb1b9fd9ce45125e5",
+      "sha256": "8aaf03dcaa1a3a7733489993621d54fec3ae8514a0c614c9e0f18c0452584a12",
+      "language": "go",
+      "start_line": 3,
+      "start_byte": 17,
+      "bytes": 38,
+      "snapshot_sha256": "d1cdb1196f0839d61181c0cfbc630c3fb035e2836fc1776d46b76b0ce18c05b0",
+      "function_name": "Seed"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "analyzed_bounded",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 41,
+          "end_byte": 53,
+          "start_line": 3,
+          "end_line": 3
+        },
+        "text": "return x + 1",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 17,
+          "end_byte": 37,
+          "start_line": 3,
+          "end_line": 3
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v27"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "elapsed_micros": 91,
+    "variables": [
+      {
+        "id": "v27",
+        "name": "x",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 27,
+          "end_byte": 28,
+          "start_line": 3,
+          "end_line": 3
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/use/v27/48",
+        "node": "b0/n0",
+        "variable": "v27",
+        "role": "use",
+        "location": {
+          "start_byte": 48,
+          "end_byte": 49,
+          "start_line": 3,
+          "end_line": 3
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v27/27",
+        "node": "entry",
+        "variable": "v27",
+        "role": "definition",
+        "location": {
+          "start_byte": 27,
+          "end_byte": 28,
+          "start_line": 3,
+          "end_line": 3
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "entry/definition/v27/27",
+        "use": "b0/n0/use/v27/48",
+        "variable": "v27",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 6,
+    "facts_peak": 14,
+    "rules": {
+      "pack_id": "go-local-review",
+      "pack_version": "1.0.0",
+      "pack_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
+      "engine_version": "2",
+      "origin": "automatic",
+      "status": "matched_bounded",
+      "limits": {
+        "max_candidates": 64,
+        "max_flow_steps": 4096
+      },
+      "flow_steps": 18,
+      "candidates": [],
+      "limitations": [
+        "empty_candidates_do_not_establish_safety",
+        "syntax_targets_unresolved",
+        "parameters_not_proven_attacker_controlled",
+        "lexical_may_reach_not_path_feasibility",
+        "sanitizers_and_opaque_call_effects_not_proven",
+        "aliases_closures_fields_and_indirect_sinks_unsupported"
+      ]
+    }
+  },
+  "elapsed_micros": 427
+}

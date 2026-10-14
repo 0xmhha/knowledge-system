@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "status": "annotations_found",
+  "reason": "",
+  "snapshot_sha256": "d1cdb1196f0839d61181c0cfbc630c3fb035e2836fc1776d46b76b0ce18c05b0",
+  "symbol": {
+    "node_id": "0a014f39bd4b265c",
+    "canonical_id": "example.invalid/annotation-fixture.Seed",
+    "file": "logic.go",
+    "indexed_commit": "4efdbb447587efb032ac38efb1b9fd9ce45125e5",
+    "source_sha256": {
+      "status": "retained_blob",
+      "value": "8aaf03dcaa1a3a7733489993621d54fec3ae8514a0c614c9e0f18c0452584a12"
+    },
+    "metadata_sha256": "0d5d67a2df82a8a0a2860f65f1b3085d52184159f2eb589a2def9ff25a412658"
+  },
+  "annotations": [
+    {
+      "id": "policy:fork-review",
+      "kind": "Policy",
+      "name": "Fork review",
+      "category": "consensus",
+      "related_symbol_id": "0a014f39bd4b265c",
+      "explanation": {
+        "status": "retained_operator_value",
+        "value": "Preserve fork activation behavior"
+      },
+      "modification_hint": {
+        "status": "retained_operator_value",
+        "value": ""
+      },
+      "severity": {
+        "status": "retained_operator_value",
+        "value": ""
+      },
+      "provenance": {
+        "origin": "operator_curated_metadata",
+        "source_path": "/private/tmp/ks-sp-committed-execution/source/policy.yaml",
+        "source_sha256": {
+          "status": "unknown",
+          "value": ""
+        },
+        "source_line": {
+          "status": "unknown",
+          "value": ""
+        },
+        "version": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewer": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewed_at": {
+          "status": "unknown",
+          "value": ""
+        },
+        "approval": {
+          "status": "unknown",
+          "value": ""
+        },
+        "identity_trust": "not_authenticated",
+        "metadata_sha256": "8fd74ca8bb4c0e78ac9a0f63b583fc79c656d977a7bb96c0b3f87aa4740a4f8b"
+      }
+    },
+    {
+      "id": "security:manual-boundary",
+      "kind": "SecurityPattern",
+      "name": "Operator boundary review",
+      "category": "review",
+      "related_symbol_id": "0a014f39bd4b265c",
+      "explanation": {
+        "status": "retained_operator_value",
+        "value": "Manual risk hypothesis, not a confirmed vulnerability"
+      },
+      "modification_hint": {
+        "status": "retained_operator_value",
+        "value": "Review input assumptions before editing"
+      },
+      "severity": {
+        "status": "retained_operator_value",
+        "value": "high"
+      },
+      "provenance": {
+        "origin": "operator_curated_metadata",
+        "source_path": "/private/tmp/ks-sp-committed-execution/source/security.yaml",
+        "source_sha256": {
+          "status": "unknown",
+          "value": ""
+        },
+        "source_line": {
+          "status": "unknown",
+          "value": ""
+        },
+        "version": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewer": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewed_at": {
+          "status": "unknown",
+          "value": ""
+        },
+        "approval": {
+          "status": "unknown",
+          "value": ""
+        },
+        "identity_trust": "not_authenticated",
+        "metadata_sha256": "00def5bf34cf3c6c4bc2d3ea5f45f9be57513dd57af122a28aac4cda6aebb97b"
+      }
+    },
+    {
+      "id": "security:manual-overflow",
+      "kind": "SecurityPattern",
+      "name": "Arithmetic review",
+      "category": "",
+      "related_symbol_id": "0a014f39bd4b265c",
+      "explanation": {
+        "status": "retained_operator_value",
+        "value": "Manual arithmetic hypothesis"
+      },
+      "modification_hint": {
+        "status": "retained_operator_value",
+        "value": ""
+      },
+      "severity": {
+        "status": "retained_operator_value",
+        "value": "low"
+      },
+      "provenance": {
+        "origin": "operator_curated_metadata",
+        "source_path": "/private/tmp/ks-sp-committed-execution/source/security.yaml",
+        "source_sha256": {
+          "status": "unknown",
+          "value": ""
+        },
+        "source_line": {
+          "status": "unknown",
+          "value": ""
+        },
+        "version": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewer": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewed_at": {
+          "status": "unknown",
+          "value": ""
+        },
+        "approval": {
+          "status": "unknown",
+          "value": ""
+        },
+        "identity_trust": "not_authenticated",
+        "metadata_sha256": "d10e160ef985c3e3bf69ac86a1cd66008b712bff77ab0fccc7926c61201da01a"
+      }
+    }
+  ],
+  "more": false,
+  "max_annotations": 32,
+  "timeout_ms": 1000,
+  "safety_verdict": "unknown",
+  "automatic_rules": "separate_opt_in_rule_candidates_not_executed",
+  "limitations": [
+    "Manual tags are operator assertions, not verified vulnerabilities or policy compliance; empty tags do not prove safety",
+    "YAML bytes, real row, version, reviewer, review time and approval were not retained; identity/signature trust unsupported",
+    "SQL bounds row count; synchronous legacy node/blob reads and row bytes are not hard process memory or preemptive time bounds",
+    "Legacy merged descriptions cannot reliably separate remediation or severity",
+    "Final rechecks are not a database snapshot transaction and cannot detect changes reverted between reads"
+  ],
+  "elapsed_micros": 786
+}

@@ -1,0 +1,1331 @@
+diff --git a/docs/DOCUMENTATION-CATALOG.json b/docs/DOCUMENTATION-CATALOG.json
+index b7e9d479..d60d210d 100644
+--- a/docs/DOCUMENTATION-CATALOG.json
++++ b/docs/DOCUMENTATION-CATALOG.json
+@@ -1363,6 +1363,16 @@
+     "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-dimension/review-report.md": {
+       "role": "frozen_evidence",
+       "source_paths": []
++    },
++    "docs/graph/POLICY-SECURITY.md": {
++      "role": "reference",
++      "source_paths": [
++        "pkg/graph/annotations",
++        "pkg/graph/policy",
++        "pkg/graph/security",
++        "internal/system/mcp/annotations.go",
++        "internal/system/ckgclient/annotations.go"
++      ]
+     }
+   }
+ }
+diff --git a/docs/graph/ARCHITECTURE.md b/docs/graph/ARCHITECTURE.md
+index 2e546598..fb010d21 100644
+--- a/docs/graph/ARCHITECTURE.md
++++ b/docs/graph/ARCHITECTURE.md
+@@ -25,3 +25,5 @@ The twelve graph MCP registrations include symbol/callers/callees/subgraph/text/
+ Consumer engines use `pkg/graph` rather than importing graph implementation internals. New fields must round-trip through readers/writers and supported old stores. A cache schema change and a public manifest compatibility change are distinct decisions. [Verification checklist](./VERIFICATION-CHECKLIST.md) covers surface and negative-path testing; [purpose](./VISION.md) defines the responsibility boundary.
+ 
+ Current graph support does not establish independent coding-agent answer quality, external benchmark completion, or whole-program CFG/PDG precision. The on-demand Go layer has explicit scalar/normal-exit, type/import, alias/effect and cost boundaries; follow-ups remain in [remaining work](../REMAINING-WORK.md).
++
++CKS exposes33 tools, including the read-only [policy/security annotation query](./POLICY-SECURITY.md). CKG remains12 tools; this query reuses the retained graph through CKS.
+diff --git a/docs/graph/POLICY-SECURITY.md b/docs/graph/POLICY-SECURITY.md
+new file mode 100644
+index 00000000..a88b0faf
+--- /dev/null
++++ b/docs/graph/POLICY-SECURITY.md
+@@ -0,0 +1,62 @@
++# Retained policy and security annotations
++
++CKS `context.policy_security` reads annotations for one exact code symbol from
++its retained graph. Resolve a symbol first, then supply exactly one `node_id`
++or `canonical_id`. Optional `expected_commit`, `expected_source_sha256` and
++`expected_snapshot_sha256` reject mismatches; commit and blob pins describe the
++indexed code, not the original annotation document.
++
++```json
++{"node_id":"selected-graph-node-id","max_annotations":32,"timeout_ms":1000}
++```
++
++Defaults are32 annotations and1000ms. Caps are128 and5000ms. Only outgoing
++`governed_by` and `has_security_pattern` edges are fetched using SQL LIMIT+1.
++The result includes the selected symbol, retained blob/metadata and manifest
++hashes, annotation explanations, modification hints, categories and severity,
++manual provenance, limits and elapsed time. A truncated page is `partial` with
++`more=true` and `reason=max_annotations`. Unsupported bounded backends return
++`unavailable`; they never fetch an unlimited neighborhood and slice afterward.
++
++Fresh policy/security loaders store separate description/remediation/severity
++fields in the existing node attrs payload. This avoids guessing a remediation
++boundary from prose containing the word Remediation. Older graphs keep their
++merged explanation; remediation and severity remain `unknown`. Empty retained
++operator fields are explicit empty values, distinct from fields never retained.
++
++The current loaders do not retain YAML bytes, actual row, document version,
++reviewer, review time or approval. Those provenance fields return `unknown`,
++even when the legacy node has placeholder line1 or an indexed Go commit.
++`metadata_sha256` hashes the retained graph node; it is not an original YAML
++hash. The source path is an operator-provided overlay path, potentially absolute;
++it provides no reviewer identity or signed approval proof. Private `.claude`
++and log source boundaries remain excluded, as do ambiguous history records.
++
++Manual annotations have `origin=operator_curated_metadata`. They are operator
++assertions, not authenticated judgments or confirmed vulnerabilities. The
++existing `context.rule_candidates` tool is a separate opt-in automatic Go
++review query. `policy_security` does not execute that detector or merge its
++results. Agent reasoning is also separate. `no_annotations` and `not_found`
++are distinct; neither proves policy compliance or safety. `safety_verdict`
++always remains `unknown`.
++
++Manifest, selected node/blob, returned annotation metadata, fetched edge page
++and truncation flag are rechecked before returning. Detected drift clears all
++symbol and annotation results. These checks do not provide a database snapshot
++transaction or detect changes that revert between reads. Cooperative deadlines
++and SQL row caps do not bound individual retained row/blob bytes, forcefully
++interrupt synchronous legacy methods, or guarantee process memory limits.
++
++The tool uses the existing stdio/HTTP server and HTTP peer-IP/CIDR ACL. Its
++readOnlyHint is descriptive metadata, not authentication. HTTP ACL uses the
++direct peer and ignores spoofed X-Forwarded-For; reviewer identity verification
++and signed annotation trust remain unsupported. Unit HTTP transport tests cover
++rejection before tool invocation; the owned public evaluator separately covers
++real stdio index/query/EOF execution.
++
++`scripts/eval-policy-security.py` compiles and race-tests an owned Go corpus,
++indexes policy and security overlays, checks typed fields and unknown provenance,
++manual/automatic separation, positive/untagged/missing/canonical results, caps,
++stale pins and invalid input. It then deletes live Go and overlay files and
++requires identical retained results. Raw protocol, source bundle and receipts
++provide implementation evidence; independent production acceptance is separate.
+diff --git a/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md b/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
+index 918b7e48..7610da1b 100644
+--- a/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
++++ b/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
+@@ -598,3 +598,20 @@ optimality의 한계와 independent not_recorded를 유지한다. 현재8/9.
+ reviewer/manual-rule origin/unknown, bounded 조회·기존 HTTP/권한/읽기 경계,
+ 소비자 도구 계약·양성/음성/빈 태그/상한/stale/거부 공개 실행·회귀 근거.
+ 설계는 위 계약에 고정했고 실제 WI-SP 기능은 아직 구현/완료하지 않았다.
++
++### WI-SP 실행 계약: context.policy_security
++
++CKS 한 도구에서 exact node/canonical ID의 outgoing governed_by 및
++has_security_pattern만 조회한다. 기본32/최대128 annotation, 기본1초/최대5초
++협력적 deadline, SQL LIMIT+1, 최종 manifest/seed/blob/tag/edge/more 재검증을
++적용한다. 자동 분석은 기존 rule_candidates의 별도 opt-in 표면을 안내하며
++이번 도구가 실행/혼합하지 않는다. 빈 결과는 no_annotations, 안전 판정은 unknown.
++새 loader는 description/remediation/severity를 typed annotation payload로
++보존하고 SQLite/PG 공통 attrs round-trip을 검증한다. 기존 graph의 merged
++DocComment는 explanation으로 유지하고 hint/severity 분리는 unknown이다.
++원문 bytes/실제 행/버전/reviewer/review time/approval은 수집되지 않아 unknown.
++metadata SHA는 retained node bytes의 해시이며 YAML 원문 SHA가 아니다.
++annotation path는 원래 overlay path 그대로일 수 있으므로 private 경계 검사
++후 반환한다. 사용자 인증/서명 검증은 미지원; 기존 HTTP ACL만 적용한다.
++row 수는 SQL로 제한하며 blob/row byte 크기와 오래된 동기 Reader는 hard
++process-memory/강제 deadline 보장을 제공하지 않음을 명시한다.
+diff --git a/internal/graph/persist/node_attrs.go b/internal/graph/persist/node_attrs.go
+index 993f9b5b..a227c222 100644
+--- a/internal/graph/persist/node_attrs.go
++++ b/internal/graph/persist/node_attrs.go
+@@ -22,19 +22,20 @@ import (
+ // own SQLite column. Tags match the JSON tags on types.Node so
+ // downstream tooling can deserialise the column directly.
+ type nodeAttrs struct {
+-	SlotIndex                     int      `json:"slot_index,omitempty"`
+-	HasAssembly                   bool     `json:"has_assembly,omitempty"`
+-	HasLowLevelCall               bool     `json:"has_low_level_call,omitempty"`
+-	HasValueTransfer              bool     `json:"has_value_transfer,omitempty"`
+-	YulBuiltins                   []string `json:"yul_builtins,omitempty"`
+-	IsFunctionTyped               bool     `json:"is_function_typed,omitempty"`
+-	HasFunctionTypedVar           bool     `json:"has_function_typed_var,omitempty"`
+-	HasFunctionPointerCall        bool     `json:"has_function_pointer_call,omitempty"`
+-	HasExternalCall               bool     `json:"has_external_call,omitempty"`
+-	HasInheritanceMROFallback     bool     `json:"has_inheritance_mro_fallback,omitempty"`
+-	HasFunctionPointerPropagation bool     `json:"has_function_pointer_propagation,omitempty"`
+-	HasSelfReentrantCall          bool     `json:"has_self_reentrant_call,omitempty"`
+-	HasSelfDelegatecallDead       bool     `json:"has_self_delegatecall_dead,omitempty"`
++	Annotation                    *types.AnnotationPayload `json:"annotation,omitempty"`
++	SlotIndex                     int                      `json:"slot_index,omitempty"`
++	HasAssembly                   bool                     `json:"has_assembly,omitempty"`
++	HasLowLevelCall               bool                     `json:"has_low_level_call,omitempty"`
++	HasValueTransfer              bool                     `json:"has_value_transfer,omitempty"`
++	YulBuiltins                   []string                 `json:"yul_builtins,omitempty"`
++	IsFunctionTyped               bool                     `json:"is_function_typed,omitempty"`
++	HasFunctionTypedVar           bool                     `json:"has_function_typed_var,omitempty"`
++	HasFunctionPointerCall        bool                     `json:"has_function_pointer_call,omitempty"`
++	HasExternalCall               bool                     `json:"has_external_call,omitempty"`
++	HasInheritanceMROFallback     bool                     `json:"has_inheritance_mro_fallback,omitempty"`
++	HasFunctionPointerPropagation bool                     `json:"has_function_pointer_propagation,omitempty"`
++	HasSelfReentrantCall          bool                     `json:"has_self_reentrant_call,omitempty"`
++	HasSelfDelegatecallDead       bool                     `json:"has_self_delegatecall_dead,omitempty"`
+ }
+ 
+ // marshalNodeAttrs serialises a Node's marker surface into the
+@@ -43,6 +44,7 @@ type nodeAttrs struct {
+ // minimal for the common case where a node has no markers.
+ func marshalNodeAttrs(n *types.Node) string {
+ 	a := nodeAttrs{
++		Annotation:                    n.Annotation,
+ 		SlotIndex:                     n.SlotIndex,
+ 		HasAssembly:                   n.HasAssembly,
+ 		HasLowLevelCall:               n.HasLowLevelCall,
+@@ -78,6 +80,7 @@ func unmarshalNodeAttrs(blob string, n *types.Node) {
+ 	if err := json.Unmarshal([]byte(blob), &a); err != nil {
+ 		return
+ 	}
++	n.Annotation = a.Annotation
+ 	n.SlotIndex = a.SlotIndex
+ 	n.HasAssembly = a.HasAssembly
+ 	n.HasLowLevelCall = a.HasLowLevelCall
+@@ -94,7 +97,7 @@ func unmarshalNodeAttrs(blob string, n *types.Node) {
+ }
+ 
+ func isZeroAttrs(a nodeAttrs) bool {
+-	return a.SlotIndex == 0 &&
++	return a.Annotation == nil && a.SlotIndex == 0 &&
+ 		!a.HasAssembly &&
+ 		!a.HasLowLevelCall &&
+ 		!a.HasValueTransfer &&
+diff --git a/internal/system/ckgclient/annotations.go b/internal/system/ckgclient/annotations.go
+new file mode 100644
+index 00000000..eba48abc
+--- /dev/null
++++ b/internal/system/ckgclient/annotations.go
+@@ -0,0 +1,20 @@
++package ckgclient
++
++import (
++	"context"
++	"github.com/0xmhha/knowledge-system/pkg/graph/annotations"
++	"github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers"
++)
++
++// AnnotationClient is optional; older backends explicitly report unavailable.
++type AnnotationClient interface {
++	PolicySecurity(context.Context, annotations.Input) (annotations.Result, error)
++}
++
++func (r *Real) PolicySecurity(ctx context.Context, q annotations.Input) (annotations.Result, error) {
++	reader, ok := r.s.(*realStoreReader)
++	if !ok || r.closed {
++		return annotations.Result{SchemaVersion: 1, Status: "unavailable", Annotations: []annotations.Annotation{}, SafetyVerdict: "unknown", AutomaticRules: "separate_opt_in_rule_candidates_not_executed", Limitations: []string{"retained annotation backend unavailable"}}, nil
++	}
++	return annotations.Query(ctx, mcphandlers.NewLLMSafeReader(reader.r), q)
++}
+diff --git a/internal/system/mcp/annotations.go b/internal/system/mcp/annotations.go
+new file mode 100644
+index 00000000..f3840eca
+--- /dev/null
++++ b/internal/system/mcp/annotations.go
+@@ -0,0 +1,42 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
++	"github.com/0xmhha/knowledge-system/pkg/graph/annotations"
++	mcpgo "github.com/mark3labs/mcp-go/mcp"
++	mcpserver "github.com/mark3labs/mcp-go/server"
++)
++
++var ToolNamePolicySecurity = toolName("context.policy_security")
++
++func registerPolicySecurity(s *mcpserver.MCPServer, d Deps) {
++	text := func(max int) map[string]any {
++		return map[string]any{"type": "string", "minLength": 1, "maxLength": max}
++	}
++	pin := func() map[string]any { return map[string]any{"type": "string", "pattern": "^[0-9a-f]{64}$"} }
++	raw, _ := json.Marshal(map[string]any{"type": "object", "additionalProperties": false, "oneOf": []any{map[string]any{"required": []string{"node_id"}, "not": map[string]any{"required": []string{"canonical_id"}}}, map[string]any{"required": []string{"canonical_id"}, "not": map[string]any{"required": []string{"node_id"}}}}, "properties": map[string]any{"node_id": text(128), "canonical_id": text(512), "expected_commit": map[string]any{"type": "string", "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"}, "expected_source_sha256": pin(), "expected_snapshot_sha256": pin(), "max_annotations": map[string]any{"type": "integer", "minimum": 1, "maximum": 128}, "timeout_ms": map[string]any{"type": "integer", "minimum": 1, "maximum": 5000}}})
++	tool := mcpgo.NewTool(ToolNamePolicySecurity, mcpgo.WithReadOnlyHintAnnotation(true), mcpgo.WithOutputSchema[annotations.Result](), mcpgo.WithDescription("Bounded retained policy/security annotations for one exact code symbol. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass."))
++	tool.InputSchema = mcpgo.ToolInputSchema{}
++	tool.RawInputSchema = raw
++	s.AddTool(tool, func(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
++		raw, e := json.Marshal(req.GetRawArguments())
++		if e != nil {
++			return nil, e
++		}
++		q, e := annotations.Decode(raw)
++		if e != nil {
++			return nil, e
++		}
++		backend, ok := d.CKG.(ckgclient.AnnotationClient)
++		if !ok {
++			return mcpgo.NewToolResultStructuredOnly(annotations.Result{SchemaVersion: 1, Status: "unavailable", Annotations: []annotations.Annotation{}, SafetyVerdict: "unknown", AutomaticRules: "separate_opt_in_rule_candidates_not_executed", Limitations: []string{"retained annotation backend unsupported"}}), nil
++		}
++		result, e := backend.PolicySecurity(ctx, q)
++		if e != nil {
++			return nil, e
++		}
++		return mcpgo.NewToolResultStructuredOnly(result), nil
++	})
++}
+diff --git a/internal/system/mcp/annotations_test.go b/internal/system/mcp/annotations_test.go
+new file mode 100644
+index 00000000..117f7c5e
+--- /dev/null
++++ b/internal/system/mcp/annotations_test.go
+@@ -0,0 +1,104 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
++	"github.com/0xmhha/knowledge-system/pkg/graph/annotations"
++	mcpgo "github.com/mark3labs/mcp-go/mcp"
++	mcpserver "github.com/mark3labs/mcp-go/server"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++)
++
++type annotationFake struct {
++	ckgclient.Client
++	calls int
++	input annotations.Input
++}
++
++func (f *annotationFake) PolicySecurity(_ context.Context, q annotations.Input) (annotations.Result, error) {
++	f.calls++
++	f.input = q
++	return annotations.Result{SchemaVersion: 1, Status: "no_annotations", Annotations: []annotations.Annotation{}, SafetyVerdict: "unknown", AutomaticRules: "separate_opt_in_rule_candidates_not_executed", Limitations: []string{}}, nil
++}
++func TestPolicySecurityPublicContractLegacyAndStrictRuntime(t *testing.T) {
++	f := newFixture(t, nil)
++	backend := &annotationFake{Client: f.deps.CKG}
++	f.deps.CKG = backend
++	s := mcpserver.NewMCPServer("fixture", "1", mcpserver.WithOutputSchemaValidation())
++	if e := Register(s, f.deps); e != nil {
++		t.Fatal(e)
++	}
++	request := []byte(`{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"` + ToolNamePolicySecurity + `","arguments":{"node_id":"exact","max_annotations":2}}}`)
++	raw, _ := json.Marshal(s.HandleMessage(context.Background(), request))
++	if !strings.Contains(string(raw), `"safety_verdict":"unknown"`) || backend.calls != 1 || backend.input.MaxAnnotations != 2 {
++		t.Fatal(string(raw))
++	}
++	for _, input := range []string{`{"node_id":"a","node_id":"b"}`, `{"node_id":null}`, `{"node_id":"a","max_annotations":1.5}`, `{"node_id":"a","max_annotations":0}`, `{"node_id":"a","unknown":1}`} {
++		req := mcpgo.CallToolRequest{}
++		req.Params.RawArguments = json.RawMessage(input)
++		if _, e := s.GetTool(ToolNamePolicySecurity).Handler(context.Background(), req); e == nil {
++			t.Fatal(input)
++		}
++	}
++	legacy := newFixture(t, nil)
++	other := mcpserver.NewMCPServer("legacy", "1")
++	if e := Register(other, legacy.deps); e != nil {
++		t.Fatal(e)
++	}
++	raw, _ = json.Marshal(other.HandleMessage(context.Background(), request))
++	if !strings.Contains(string(raw), `"status":"unavailable"`) {
++		t.Fatal(string(raw))
++	}
++}
++func TestPolicySecurityHTTPACLRejectsBeforeToolAndIgnoresForwardedIP(t *testing.T) {
++	f := newFixture(t, nil)
++	backend := &annotationFake{Client: f.deps.CKG}
++	f.deps.CKG = backend
++	s, e := build(f.deps)
++	if e != nil {
++		t.Fatal(e)
++	}
++	allow, e := clientACL(HTTPPolicy{AllowRemote: true, AllowedCIDRs: []string{"192.168.1.0/24"}})
++	if e != nil {
++		t.Fatal(e)
++	}
++	h := aclMiddleware(mcpserver.NewStreamableHTTPServer(s), allow)
++	for _, peer := range []string{"203.0.113.9:5555", "192.168.2.1:5555", "invalid-peer"} {
++		req := httptest.NewRequest(http.MethodPost, "http://localhost/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"`+ToolNamePolicySecurity+`","arguments":{"node_id":"exact"}}}`))
++		req.RemoteAddr = peer
++		req.Header.Set("Content-Type", "application/json")
++		req.Header.Set("Accept", "application/json, text/event-stream")
++		req.Header.Set("X-Forwarded-For", "127.0.0.1")
++		w := httptest.NewRecorder()
++		h.ServeHTTP(w, req)
++		if w.Code != http.StatusForbidden || backend.calls != 0 {
++			t.Fatal(peer, w.Code, backend.calls)
++		}
++	}
++	// Loopback reaches the HTTP handler, independent of readOnlyHint metadata.
++	req := httptest.NewRequest(http.MethodPost, "http://localhost/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"fixture","version":"1"}}}`))
++	req.RemoteAddr = "127.0.0.1:5555"
++	req.Header.Set("Content-Type", "application/json")
++	req.Header.Set("Accept", "application/json, text/event-stream")
++	w := httptest.NewRecorder()
++	h.ServeHTTP(w, req)
++	if w.Code != http.StatusOK {
++		t.Fatal(w.Code, w.Body.String())
++	}
++	req = httptest.NewRequest(http.MethodPost, "http://localhost/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"`+ToolNamePolicySecurity+`","arguments":{"node_id":"exact"}}}`))
++	req.RemoteAddr = "127.0.0.1:5555"
++	req.Header.Set("Content-Type", "application/json")
++	req.Header.Set("Accept", "application/json, text/event-stream")
++	req.Header.Set("Mcp-Session-Id", w.Header().Get("Mcp-Session-Id"))
++	w = httptest.NewRecorder()
++	h.ServeHTTP(w, req)
++	if w.Code != http.StatusOK || backend.calls != 1 || !strings.Contains(w.Body.String(), `"safety_verdict":"unknown"`) {
++		t.Fatal(w.Code, w.Body.String(), backend.calls)
++	}
++	t.Log("HTTP policy_security invocation: loopback allowed; unlisted CIDR/public/invalid peer denied before backend; forwarded loopback cannot bypass ACL")
++
++}
+diff --git a/internal/system/mcp/output_schema_test.go b/internal/system/mcp/output_schema_test.go
+index eb3304db..89a03749 100644
+--- a/internal/system/mcp/output_schema_test.go
++++ b/internal/system/mcp/output_schema_test.go
+@@ -102,6 +102,7 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
+ 		ToolNameGetInvariantEnforcement:  {"inv_id", "statement", "enforced_at"},
+ 		ToolNameGetSubgraph:              {"seed", "nodes", "edges"},
+ 		ToolNameValueDependencies:        {"schema_version", "status", "analysis", "elapsed_micros"},
++		ToolNamePolicySecurity:           {"schema_version", "status", "symbol", "annotations", "safety_verdict", "automatic_rules"},
+ 		ToolNameValueDependencyExpansion: {"schema_version", "graph", "curated_flow"},
+ 		ToolNameRuleCandidates:           {"schema_version", "status", "analysis", "elapsed_micros"},
+ 		ToolNameReviewFunction:           {"seed", "code", "history", "tests", "available", "limits"},
+diff --git a/internal/system/mcp/schema_export_test.go b/internal/system/mcp/schema_export_test.go
+index 97237909..2653b7ba 100644
+--- a/internal/system/mcp/schema_export_test.go
++++ b/internal/system/mcp/schema_export_test.go
+@@ -21,7 +21,17 @@ func TestExportToolContract(t *testing.T) {
+ 	}
+ 	tools := map[string]any{}
+ 	for name, registered := range srv.ListTools() {
+-		tools[name] = map[string]any{"description": registered.Tool.Description, "input": registered.Tool.InputSchema}
++		wire, e := json.Marshal(registered.Tool)
++		if e != nil {
++			t.Fatal(e)
++		}
++		var definition struct {
++			Input json.RawMessage `json:"inputSchema"`
++		}
++		if e = json.Unmarshal(wire, &definition); e != nil {
++			t.Fatal(e)
++		}
++		tools[name] = map[string]any{"description": registered.Tool.Description, "input": definition.Input}
+ 	}
+ 	raw, e := json.MarshalIndent(map[string]any{"tools": tools}, "", "  ")
+ 	if e != nil {
+diff --git a/internal/system/mcp/server.go b/internal/system/mcp/server.go
+index 71be6956..9ae768d6 100644
+--- a/internal/system/mcp/server.go
++++ b/internal/system/mcp/server.go
+@@ -149,6 +149,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
+ 	registerReviewFunction(s, d)
+ 	registerValueAnalysis(s, d)
+ 	registerValueDependencyExpansion(s, d)
++	registerPolicySecurity(s, d)
+ 	registerImpactAnalysis(s, d)
+ 	registerConcurrencyImpact(s, d)
+ 	registerChangeHistory(s, d)
+diff --git a/internal/system/mcp/testdata/agent-mcp.schema.json b/internal/system/mcp/testdata/agent-mcp.schema.json
+index 0476e21e..0605a731 100644
+--- a/internal/system/mcp/testdata/agent-mcp.schema.json
++++ b/internal/system/mcp/testdata/agent-mcp.schema.json
+@@ -106,7 +106,7 @@
+             "type": "number"
+           },
+           "exclude_tests": {
+-            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+             "type": "boolean"
+           },
+           "max_total": {
+@@ -133,7 +133,7 @@
+             "type": "number"
+           },
+           "exclude_tests": {
+-            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+             "type": "boolean"
+           },
+           "max_total": {
+@@ -177,7 +177,7 @@
+       "input": {
+         "properties": {
+           "exclude_tests": {
+-            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+             "type": "boolean"
+           },
+           "kinds": {
+@@ -246,7 +246,7 @@
+       "input": {
+         "properties": {
+           "intent": {
+-            "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++            "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+             "type": "string"
+           },
+           "prompt": {
+@@ -325,7 +325,7 @@
+             "type": "number"
+           },
+           "exclude_tests": {
+-            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+             "type": "boolean"
+           },
+           "max_total": {
+@@ -618,11 +618,11 @@
+       "input": {
+         "properties": {
+           "exclude_tests": {
+-            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+             "type": "boolean"
+           },
+           "expand": {
+-            "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++            "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+             "type": "boolean"
+           },
+           "k": {
+@@ -653,11 +653,11 @@
+       "input": {
+         "properties": {
+           "exclude_tests": {
+-            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++            "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+             "type": "boolean"
+           },
+           "expand": {
+-            "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++            "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+             "type": "boolean"
+           },
+           "k": {
+@@ -1104,6 +1104,69 @@
+         ],
+         "type": "object"
+       }
++    },
++    "cks.context.policy_security": {
++      "description": "Bounded retained policy/security annotations for one exact code symbol. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass.",
++      "input": {
++        "additionalProperties": false,
++        "oneOf": [
++          {
++            "not": {
++              "required": [
++                "canonical_id"
++              ]
++            },
++            "required": [
++              "node_id"
++            ]
++          },
++          {
++            "not": {
++              "required": [
++                "node_id"
++              ]
++            },
++            "required": [
++              "canonical_id"
++            ]
++          }
++        ],
++        "properties": {
++          "canonical_id": {
++            "maxLength": 512,
++            "minLength": 1,
++            "type": "string"
++          },
++          "expected_commit": {
++            "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++            "type": "string"
++          },
++          "expected_snapshot_sha256": {
++            "pattern": "^[0-9a-f]{64}$",
++            "type": "string"
++          },
++          "expected_source_sha256": {
++            "pattern": "^[0-9a-f]{64}$",
++            "type": "string"
++          },
++          "max_annotations": {
++            "maximum": 128,
++            "minimum": 1,
++            "type": "integer"
++          },
++          "node_id": {
++            "maxLength": 128,
++            "minLength": 1,
++            "type": "string"
++          },
++          "timeout_ms": {
++            "maximum": 5000,
++            "minimum": 1,
++            "type": "integer"
++          }
++        },
++        "type": "object"
++      }
+     }
+   }
+ }
+diff --git a/pkg/graph/annotations/query.go b/pkg/graph/annotations/query.go
+new file mode 100644
+index 00000000..ea8efc85
+--- /dev/null
++++ b/pkg/graph/annotations/query.go
+@@ -0,0 +1,345 @@
++// Package annotations provides bounded, retained operator metadata queries.
++package annotations
++
++import (
++	"bytes"
++	"context"
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"fmt"
++	"io"
++	"path"
++	"reflect"
++	"strings"
++	"time"
++
++	"github.com/0xmhha/knowledge-system/pkg/graph/store"
++	"github.com/0xmhha/knowledge-system/pkg/graph/types"
++	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
++)
++
++type Input struct {
++	NodeID                 string `json:"node_id,omitempty"`
++	CanonicalID            string `json:"canonical_id,omitempty"`
++	ExpectedCommit         string `json:"expected_commit,omitempty"`
++	ExpectedSourceSHA256   string `json:"expected_source_sha256,omitempty"`
++	ExpectedSnapshotSHA256 string `json:"expected_snapshot_sha256,omitempty"`
++	MaxAnnotations         int    `json:"max_annotations,omitempty"`
++	TimeoutMS              int    `json:"timeout_ms,omitempty"`
++}
++type KnownText struct {
++	Status string `json:"status"`
++	Value  string `json:"value"`
++}
++type Provenance struct {
++	Origin         string    `json:"origin"`
++	SourcePath     string    `json:"source_path"`
++	SourceSHA256   KnownText `json:"source_sha256"`
++	SourceLine     KnownText `json:"source_line"`
++	Version        KnownText `json:"version"`
++	Reviewer       KnownText `json:"reviewer"`
++	ReviewedAt     KnownText `json:"reviewed_at"`
++	Approval       KnownText `json:"approval"`
++	IdentityTrust  string    `json:"identity_trust"`
++	MetadataSHA256 string    `json:"metadata_sha256"`
++}
++type Annotation struct {
++	ID               string     `json:"id"`
++	Kind             string     `json:"kind"`
++	Name             string     `json:"name"`
++	Category         string     `json:"category"`
++	RelatedSymbolID  string     `json:"related_symbol_id"`
++	Explanation      KnownText  `json:"explanation"`
++	ModificationHint KnownText  `json:"modification_hint"`
++	Severity         KnownText  `json:"severity"`
++	Provenance       Provenance `json:"provenance"`
++}
++type Symbol struct {
++	NodeID         string    `json:"node_id"`
++	CanonicalID    string    `json:"canonical_id"`
++	File           string    `json:"file"`
++	IndexedCommit  string    `json:"indexed_commit"`
++	SourceSHA256   KnownText `json:"source_sha256"`
++	MetadataSHA256 string    `json:"metadata_sha256"`
++}
++type Result struct {
++	SchemaVersion  int          `json:"schema_version"`
++	Status         string       `json:"status"`
++	Reason         string       `json:"reason"`
++	SnapshotSHA256 string       `json:"snapshot_sha256"`
++	Symbol         *Symbol      `json:"symbol"`
++	Annotations    []Annotation `json:"annotations"`
++	More           bool         `json:"more"`
++	MaxAnnotations int          `json:"max_annotations"`
++	TimeoutMS      int          `json:"timeout_ms"`
++	SafetyVerdict  string       `json:"safety_verdict"`
++	AutomaticRules string       `json:"automatic_rules"`
++	Limitations    []string     `json:"limitations"`
++	ElapsedMicros  int64        `json:"elapsed_micros"`
++}
++
++func digest(raw []byte) string { h := sha256.Sum256(raw); return hex.EncodeToString(h[:]) }
++func metadata(v any) string    { raw, _ := json.Marshal(v); return digest(raw) }
++func unknown() KnownText       { return KnownText{Status: "unknown"} }
++func known(s string) KnownText { return KnownText{Status: "retained_operator_value", Value: s} }
++func (q Input) validate() error {
++	fields := map[string]string{}
++	for k, v := range map[string]string{"node_id": q.NodeID, "canonical_id": q.CanonicalID, "expected_commit": q.ExpectedCommit, "expected_source_sha256": q.ExpectedSourceSHA256, "expected_snapshot_sha256": q.ExpectedSnapshotSHA256} {
++		if v != "" {
++			fields[k] = v
++		}
++	}
++	raw, _ := json.Marshal(fields)
++	if _, e := valueflow.DecodeQueryInput(raw); e != nil {
++		return e
++	}
++	if q.MaxAnnotations < 0 || q.MaxAnnotations > 128 || q.TimeoutMS < 0 || q.TimeoutMS > 5000 {
++		return fmt.Errorf("annotation limits outside caps")
++	}
++	return nil
++}
++
++// Decode rejects duplicate/null/unknown fields as well as schema type bypasses.
++func Decode(raw []byte) (Input, error) {
++	var q Input
++	if len(raw) > 8192 {
++		return q, fmt.Errorf("input exceeds8KiB")
++	}
++	// Reuse the strict object/token boundary, substituting only our numeric caps
++	// for the already validated local-analysis limits object.
++	var fields map[string]json.RawMessage
++	if e := json.Unmarshal(raw, &fields); e != nil {
++		return q, e
++	}
++	for _, key := range []string{"max_annotations", "timeout_ms"} {
++		if v, ok := fields[key]; ok {
++			var n int
++			if e := json.Unmarshal(v, &n); e != nil || n < 1 {
++				return q, fmt.Errorf("explicit limits must be positive integers")
++			}
++			delete(fields, key)
++		}
++	}
++	// The original document must also reject duplicate keys. Scan tokens directly.
++	d := json.NewDecoder(bytes.NewReader(raw))
++	t, e := d.Token()
++	if e != nil || t != json.Delim('{') {
++		return q, fmt.Errorf("object required")
++	}
++	seen := map[string]bool{}
++	for d.More() {
++		k, e := d.Token()
++		if e != nil {
++			return q, e
++		}
++		key, ok := k.(string)
++		if !ok || seen[key] {
++			return q, fmt.Errorf("duplicate field")
++		}
++		seen[key] = true
++		var v json.RawMessage
++		if e = d.Decode(&v); e != nil {
++			return q, e
++		}
++		if bytes.Equal(bytes.TrimSpace(v), []byte("null")) {
++			return q, fmt.Errorf("null field")
++		}
++	}
++	rest, _ := json.Marshal(fields)
++	if _, e = valueflow.DecodeQueryInput(rest); e != nil {
++		return q, e
++	}
++	d = json.NewDecoder(bytes.NewReader(raw))
++	d.DisallowUnknownFields()
++	if e = d.Decode(&q); e != nil {
++		return q, e
++	}
++	// valueflow's document boundary rejects trailing input through this check.
++	var extra any
++	if d.Decode(&extra) != io.EOF {
++		return q, fmt.Errorf("one document required")
++	}
++	if e = q.validate(); e != nil {
++		return q, e
++	}
++	return q, nil
++}
++func private(file string, relative bool) bool {
++	file = strings.ReplaceAll(file, "\\", "/")
++	if relative && (path.IsAbs(file) || path.Clean(file) != file || file == "." || file == "") {
++		return true
++	}
++	for i, part := range strings.Split(file, "/") {
++		if part == ".." || part == ".claude" || part == "logs" && (i == 0 || !relative) {
++			return true
++		}
++	}
++	return false
++}
++
++// Query never reads a live source/YAML file or executes a rule detector.
++func Query(ctx context.Context, r store.Reader, q Input) (out Result, err error) {
++	start := time.Now()
++	defer func() { out.ElapsedMicros = time.Since(start).Microseconds() }()
++	out = Result{SchemaVersion: 1, Status: "unavailable", Annotations: []Annotation{}, SafetyVerdict: "unknown", AutomaticRules: "separate_opt_in_rule_candidates_not_executed", Limitations: []string{"Manual tags are operator assertions, not verified vulnerabilities or policy compliance; empty tags do not prove safety", "YAML bytes, real row, version, reviewer, review time and approval were not retained; identity/signature trust unsupported", "SQL bounds row count; synchronous legacy node/blob reads and row bytes are not hard process memory or preemptive time bounds", "Legacy merged descriptions cannot reliably separate remediation or severity", "Final rechecks are not a database snapshot transaction and cannot detect changes reverted between reads"}}
++	if e := q.validate(); e != nil {
++		return out, e
++	}
++	if r == nil || ctx == nil {
++		return out, fmt.Errorf("retained reader and context required")
++	}
++	if q.MaxAnnotations == 0 {
++		q.MaxAnnotations = 32
++	}
++	if q.TimeoutMS == 0 {
++		q.TimeoutMS = 1000
++	}
++	out.MaxAnnotations = q.MaxAnnotations
++	out.TimeoutMS = q.TimeoutMS
++	ctx, cancel := context.WithTimeout(ctx, time.Duration(q.TimeoutMS)*time.Millisecond)
++	defer cancel()
++	finish := func(status, why string) (Result, error) {
++		out.Status = status
++		out.Reason = why
++		out.Symbol = nil
++		out.Annotations = []Annotation{}
++		out.More = false
++		return out, nil
++	}
++	if ctx.Err() != nil {
++		return finish("budget_exhausted", "deadline ended")
++	}
++	m, e := r.GetManifest()
++	if e != nil {
++		return finish("unavailable", "manifest unavailable")
++	}
++	out.SnapshotSHA256 = metadata(m)
++	if q.ExpectedCommit != "" && q.ExpectedCommit != m.SrcCommit || q.ExpectedSnapshotSHA256 != "" && q.ExpectedSnapshotSHA256 != out.SnapshotSHA256 {
++		return finish("source_mismatch", "expected retained snapshot differs")
++	}
++	var seed types.Node
++	if q.NodeID != "" {
++		nodes, e := r.NodesByIDs([]string{q.NodeID})
++		if e != nil {
++			return finish("unavailable", "symbol unavailable")
++		}
++		if len(nodes) == 0 {
++			return finish("not_found", "exact symbol missing")
++		}
++		if len(nodes) != 1 || nodes[0].ID != q.NodeID {
++			return finish("source_mismatch", "exact symbol differs")
++		}
++		seed = nodes[0]
++	} else {
++		n, found, e := r.FindByCanonicalID(q.CanonicalID)
++		if e != nil {
++			return finish("unavailable", "canonical lookup unavailable")
++		}
++		if !found {
++			return finish("not_found", "canonical symbol missing")
++		}
++		if n.CanonicalID != q.CanonicalID {
++			return finish("source_mismatch", "canonical identity differs")
++		}
++		seed = n
++	}
++	if seed.Type == types.NodePolicy || seed.Type == types.NodeSecurityPattern || seed.Type == types.NodeCommit || seed.Type == types.NodeHunk || private(seed.FilePath, true) {
++		return finish("unsupported", "code symbol with public relative source required")
++	}
++	blob, e := r.GetBlob(seed.ID)
++	missingBlob := store.IsMissingRow(e)
++	if e != nil && !missingBlob {
++		return finish("unavailable", "retained source lookup failed")
++	}
++	source := unknown()
++	if len(blob) > 0 {
++		source = KnownText{Status: "retained_blob", Value: digest(blob)}
++	}
++	if q.ExpectedSourceSHA256 != "" && (source.Status == "unknown" || source.Value != q.ExpectedSourceSHA256) {
++		return finish("source_mismatch", "expected retained blob differs")
++	}
++	bounded, ok := r.(store.BoundedEdgeReader)
++	if !ok {
++		return finish("unavailable", "bounded edge reader unsupported")
++	}
++	page := store.EdgePageInput{NodeID: seed.ID, Direction: "outgoing", Types: []string{string(types.EdgeGovernedBy), string(types.EdgeHasSecurityPattern)}, Limit: q.MaxAnnotations}
++	edges, more, e := bounded.IncidentEdges(ctx, page)
++	if ctx.Err() != nil {
++		return finish("budget_exhausted", "annotation page deadline ended")
++	}
++	if e != nil {
++		return finish("unavailable", "bounded annotation page unavailable")
++	}
++	if len(edges) > q.MaxAnnotations {
++		return finish("unavailable", "reader exceeded page cap")
++	}
++	out.Symbol = &Symbol{NodeID: seed.ID, CanonicalID: seed.CanonicalID, File: seed.FilePath, IndexedCommit: m.SrcCommit, SourceSHA256: source, MetadataSHA256: metadata(seed)}
++	retained := []types.Node{}
++	for _, edge := range edges {
++		if ctx.Err() != nil {
++			return finish("budget_exhausted", "deadline ended")
++		}
++		if edge.Src != seed.ID || (edge.Type != types.EdgeGovernedBy && edge.Type != types.EdgeHasSecurityPattern) {
++			return finish("source_mismatch", "unexpected relation")
++		}
++		nodes, e := r.NodesByIDs([]string{edge.Dst})
++		if e != nil || len(nodes) != 1 || nodes[0].ID != edge.Dst {
++			return finish("unavailable", "annotation target unavailable")
++		}
++		n := nodes[0]
++		if edge.Type == types.EdgeGovernedBy && n.Type != types.NodePolicy || edge.Type == types.EdgeHasSecurityPattern && n.Type != types.NodeSecurityPattern {
++			return finish("source_mismatch", "relation target type differs")
++		}
++		if private(n.FilePath, false) || private(edge.FilePath, false) {
++			return finish("unsupported", "private annotation source excluded")
++		}
++		retained = append(retained, n)
++		a := Annotation{ID: n.ID, Kind: string(n.Type), Name: n.Name, Category: n.SubKind, RelatedSymbolID: seed.ID, Explanation: known(n.DocComment), ModificationHint: unknown(), Severity: unknown(), Provenance: Provenance{Origin: "operator_curated_metadata", SourcePath: n.FilePath, SourceSHA256: unknown(), SourceLine: unknown(), Version: unknown(), Reviewer: unknown(), ReviewedAt: unknown(), Approval: unknown(), IdentityTrust: "not_authenticated", MetadataSHA256: metadata(n)}}
++		if n.Annotation != nil {
++			a.Explanation = known(n.Annotation.Description)
++			a.ModificationHint = known(n.Annotation.Remediation)
++			a.Severity = known(n.Annotation.Severity)
++		}
++		out.Annotations = append(out.Annotations, a)
++	}
++	// Reject mixed snapshots, including consulted metadata and page truncation flag.
++	after, e := r.GetManifest()
++	if e != nil || metadata(after) != out.SnapshotSHA256 {
++		return finish("snapshot_changed", "manifest changed")
++	}
++	seeds, e := r.NodesByIDs([]string{seed.ID})
++	if e != nil || len(seeds) != 1 || metadata(seeds[0]) != metadata(seed) {
++		return finish("snapshot_changed", "symbol changed")
++	}
++	again, e := r.GetBlob(seed.ID)
++	if (e != nil && !store.IsMissingRow(e)) || missingBlob != store.IsMissingRow(e) || !bytes.Equal(blob, again) {
++		return finish("snapshot_changed", "blob changed")
++	}
++	for _, n := range retained {
++		nodes, e := r.NodesByIDs([]string{n.ID})
++		if e != nil || len(nodes) != 1 || metadata(nodes[0]) != metadata(n) {
++			return finish("snapshot_changed", "annotation changed")
++		}
++	}
++	againEdges, againMore, e := bounded.IncidentEdges(ctx, page)
++	if ctx.Err() != nil {
++		return finish("budget_exhausted", "annotation recheck deadline ended")
++	}
++	if e != nil || more != againMore || !reflect.DeepEqual(edges, againEdges) {
++		return finish("snapshot_changed", "annotation page changed")
++	}
++	if ctx.Err() != nil {
++		return finish("budget_exhausted", "deadline ended")
++	}
++	out.More = more
++	out.Status = "annotations_found"
++	if len(out.Annotations) == 0 {
++		out.Status = "no_annotations"
++	}
++	if more {
++		out.Status = "partial"
++		out.Reason = "max_annotations"
++	}
++	return out, nil
++}
+diff --git a/pkg/graph/annotations/query_test.go b/pkg/graph/annotations/query_test.go
+new file mode 100644
+index 00000000..e274f4fb
+--- /dev/null
++++ b/pkg/graph/annotations/query_test.go
+@@ -0,0 +1,240 @@
++package annotations
++
++import (
++	"context"
++	"github.com/0xmhha/knowledge-system/internal/graph/persist"
++	"github.com/0xmhha/knowledge-system/pkg/graph/policy"
++	"github.com/0xmhha/knowledge-system/pkg/graph/security"
++	"github.com/0xmhha/knowledge-system/pkg/graph/store"
++	"github.com/0xmhha/knowledge-system/pkg/graph/types"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++func fixture(t *testing.T) persist.Store {
++	t.Helper()
++	s, e := persist.Open(filepath.Join(t.TempDir(), "g.db"))
++	if e != nil {
++		t.Fatal(e)
++	}
++	t.Cleanup(func() { _ = s.Close() })
++	if e = s.Migrate(); e != nil {
++		t.Fatal(e)
++	}
++	nodes := []types.Node{{ID: "seed", Type: types.NodeFunction, Name: "Seed", QualifiedName: "p.Seed", FilePath: "p.go", Language: "go", StartLine: 1, EndLine: 1, Confidence: types.ConfExtracted}, {ID: "empty", Type: types.NodeFunction, Name: "Empty", QualifiedName: "p.Empty", FilePath: "p.go", Language: "go", StartLine: 1, EndLine: 1, Confidence: types.ConfExtracted}, {ID: "private", Type: types.NodeFunction, FilePath: ".claude/notes.go"}}
++	p := policy.Resolve(&policy.File{Policies: []policy.Entry{{ID: "manual", Name: "Fork", Description: "retain consensus", Governs: []string{"p.Seed"}}}}, nodes, "policy.yaml")
++	sec := security.Resolve(&security.File{SecurityPatterns: []security.Entry{{ID: "risk", Name: "Operator risk", Severity: "high", Description: "double\n\nRemediation: inside description", Remediation: "review call boundary", Matches: []string{"p.Seed"}}}}, nodes, "security.yaml")
++	nodes = append(nodes, p.Nodes...)
++	nodes = append(nodes, sec.Nodes...)
++	if e = s.InsertNodes(nodes); e != nil {
++		t.Fatal(e)
++	}
++	if e = s.InsertEdges(append(p.Edges, sec.Edges...)); e != nil {
++		t.Fatal(e)
++	}
++	if e = s.InsertBlobs(map[string][]byte{"seed": []byte("func Seed() {}")}); e != nil {
++		t.Fatal(e)
++	}
++	if e = s.SetManifest(persist.Manifest{SchemaVersion: "1.24", SrcCommit: strings.Repeat("a", 40)}); e != nil {
++		t.Fatal(e)
++	}
++	return s
++}
++func TestTypedRoundTripUnknownProvenanceAndEmptySafety(t *testing.T) {
++	s := fixture(t)
++	out, e := Query(context.Background(), s, Input{NodeID: "seed"})
++	if e != nil || out.Status != "annotations_found" || len(out.Annotations) != 2 {
++		t.Fatal(out, e)
++	}
++	for _, a := range out.Annotations {
++		if a.Provenance.Origin != "operator_curated_metadata" || a.Provenance.SourceLine.Status != "unknown" || a.Provenance.SourceSHA256.Status != "unknown" || a.Provenance.Version.Status != "unknown" || a.Provenance.Reviewer.Status != "unknown" || a.Provenance.Approval.Status != "unknown" {
++			t.Fatal(a)
++		}
++		if a.Kind == string(types.NodeSecurityPattern) && (a.Explanation.Value != "double\n\nRemediation: inside description" || a.ModificationHint.Value != "review call boundary" || a.Severity.Value != "high") {
++			t.Fatal("typed data lost or merged parser invented", a)
++		}
++	}
++	empty, e := Query(context.Background(), s, Input{NodeID: "empty"})
++	if e != nil || empty.Status != "no_annotations" || empty.SafetyVerdict != "unknown" {
++		t.Fatal(empty, e)
++	}
++
++	legacy := &metadataDrift{Reader: s, bounded: s.(store.BoundedEdgeReader), mode: "legacy", counts: map[string]int{}}
++	out, e = Query(context.Background(), legacy, Input{NodeID: "seed"})
++	if e != nil || len(out.Annotations) != 2 {
++		t.Fatal(out, e)
++	}
++	seen := false
++	for _, a := range out.Annotations {
++		if a.Kind == string(types.NodeSecurityPattern) {
++			seen = true
++			if a.ModificationHint.Status != "unknown" || a.Severity.Status != "unknown" || !strings.Contains(a.Explanation.Value, "review call boundary") {
++				t.Fatal("legacy hint guessed or prose dropped", a)
++			}
++		}
++	}
++	if !seen {
++		t.Fatal("legacy relation missing")
++	}
++
++}
++func TestCapsPinsUnsupportedPrivateAndCancellation(t *testing.T) {
++	s := fixture(t)
++	for _, c := range []struct {
++		q      Input
++		status string
++	}{{Input{NodeID: "seed", MaxAnnotations: 1}, "partial"}, {Input{NodeID: "missing"}, "not_found"}, {Input{NodeID: "private"}, "unsupported"}, {Input{NodeID: "seed", ExpectedSourceSHA256: strings.Repeat("0", 64)}, "source_mismatch"}, {Input{NodeID: "seed", ExpectedSnapshotSHA256: strings.Repeat("0", 64)}, "source_mismatch"}} {
++		out, e := Query(context.Background(), s, c.q)
++		if e != nil || out.Status != c.status {
++			t.Fatal(out, e)
++		}
++	}
++	out, e := Query(context.Background(), struct{ store.Reader }{s}, Input{NodeID: "seed"})
++	if e != nil || out.Status != "unavailable" {
++		t.Fatal(out, e)
++	}
++	ctx, cancel := context.WithCancel(context.Background())
++	cancel()
++	out, e = Query(ctx, s, Input{NodeID: "seed"})
++	if e != nil || out.Status != "budget_exhausted" {
++		t.Fatal(out, e)
++	}
++}
++
++type drift struct {
++	store.Reader
++	bounded store.BoundedEdgeReader
++	reads   int
++	mode    string
++}
++
++func (r *drift) IncidentEdges(ctx context.Context, q store.EdgePageInput) ([]types.Edge, bool, error) {
++	edges, more, e := r.bounded.IncidentEdges(ctx, q)
++	r.reads++
++	if r.reads == 2 {
++		if r.mode == "more" {
++			more = !more
++		} else {
++			edges[0].FilePath = "changed.yaml"
++		}
++	}
++	return edges, more, e
++}
++func TestFinalPageAndMoreDriftClearAllData(t *testing.T) {
++	for _, mode := range []string{"more", "edge"} {
++		s := fixture(t)
++		r := &drift{Reader: s, bounded: s.(store.BoundedEdgeReader), mode: mode}
++		out, e := Query(context.Background(), r, Input{NodeID: "seed"})
++		if e != nil || out.Status != "snapshot_changed" || out.Symbol != nil || len(out.Annotations) != 0 {
++			t.Fatal(out, e)
++		}
++	}
++}
++func TestStrictDecoder(t *testing.T) {
++	if _, e := Decode([]byte(`{"node_id":"a","max_annotations":1}`)); e != nil {
++		t.Fatal(e)
++	}
++	for _, raw := range []string{`{}`, `[]`, `{"node_id":"a","node_id":"b"}`, `{"node_id":null}`, `{"node_id":"a","max_annotations":0}`, `{"node_id":"a","max_annotations":1.5}`, `{"node_id":"a","max_annotations":129}`, `{"node_id":"a","limits":{}}`, `{"node_id":"a","canonical_id":"b"}`, `{"node_id":"a"} garbage`, `{"node_id":"a","unknown":1}`} {
++		if _, e := Decode([]byte(raw)); e == nil {
++			t.Fatal(raw)
++		}
++	}
++}
++
++type metadataDrift struct {
++	store.Reader
++	bounded store.BoundedEdgeReader
++	mode    string
++	counts  map[string]int
++}
++
++func (r *metadataDrift) IncidentEdges(ctx context.Context, q store.EdgePageInput) ([]types.Edge, bool, error) {
++	return r.bounded.IncidentEdges(ctx, q)
++}
++func (r *metadataDrift) GetManifest() (persist.Manifest, error) {
++	m, e := r.Reader.GetManifest()
++	r.counts["manifest"]++
++	if r.mode == "manifest" && r.counts["manifest"] > 1 {
++		m.SrcCommit = strings.Repeat("b", 40)
++	}
++	return m, e
++}
++func (r *metadataDrift) GetBlob(id string) ([]byte, error) {
++	b, e := r.Reader.GetBlob(id)
++	r.counts["blob"]++
++	if r.mode == "blob" && r.counts["blob"] > 1 {
++		b = []byte("changed")
++	}
++	return b, e
++}
++func (r *metadataDrift) NodesByIDs(ids []string) ([]types.Node, error) {
++	n, e := r.Reader.NodesByIDs(ids)
++	if len(n) == 1 && ids[0] == "security:risk" {
++		if r.mode == "legacy" {
++			n[0].Annotation = nil
++		}
++		if r.mode == "private" {
++			n[0].FilePath = "/owned/.claude/security.yaml"
++		}
++		if r.mode == "type" {
++			n[0].Type = types.NodeFunction
++		}
++	}
++	r.counts[ids[0]]++
++	if r.counts[ids[0]] > 1 && (r.mode == "seed" && ids[0] == "seed" || r.mode == "annotation" && ids[0] == "security:risk") {
++		n[0].DocComment = "changed"
++	}
++	return n, e
++}
++func TestFinalManifestBlobSeedAndTagDriftClearAllData(t *testing.T) {
++	for _, mode := range []string{"manifest", "blob", "seed", "annotation"} {
++		s := fixture(t)
++		r := &metadataDrift{Reader: s, bounded: s.(store.BoundedEdgeReader), mode: mode, counts: map[string]int{}}
++		out, e := Query(context.Background(), r, Input{NodeID: "seed"})
++		if e != nil || out.Status != "snapshot_changed" || out.Symbol != nil || len(out.Annotations) != 0 {
++			t.Fatal(mode, out, e)
++		}
++	}
++}
++func TestPrivateAnnotationAndWrongRelationTargetFailClosed(t *testing.T) {
++	for _, mode := range []string{"private", "type"} {
++		s := fixture(t)
++		r := &metadataDrift{Reader: s, bounded: s.(store.BoundedEdgeReader), mode: mode, counts: map[string]int{}}
++		want := "unsupported"
++		if mode == "type" {
++			want = "source_mismatch"
++		}
++		out, e := Query(context.Background(), r, Input{NodeID: "seed"})
++		if e != nil || out.Status != want || len(out.Annotations) != 0 || out.Symbol != nil {
++			t.Fatal(mode, out, e)
++		}
++	}
++}
++
++type deadlineReader struct {
++	store.Reader
++	bounded   store.BoundedEdgeReader
++	cancel    context.CancelFunc
++	on, reads int
++}
++
++func (r *deadlineReader) IncidentEdges(ctx context.Context, q store.EdgePageInput) ([]types.Edge, bool, error) {
++	r.reads++
++	if r.reads == r.on {
++		r.cancel()
++	}
++	return r.bounded.IncidentEdges(ctx, q)
++}
++func TestPageAndRecheckDeadlineClearResults(t *testing.T) {
++	for _, on := range []int{1, 2} {
++		s := fixture(t)
++		ctx, cancel := context.WithCancel(context.Background())
++		r := &deadlineReader{Reader: s, bounded: s.(store.BoundedEdgeReader), cancel: cancel, on: on}
++		out, e := Query(ctx, r, Input{NodeID: "seed"})
++		cancel()
++		if e != nil || out.Status != "budget_exhausted" || out.Symbol != nil || len(out.Annotations) != 0 {
++			t.Fatal(on, out, e)
++		}
++	}
++}
+diff --git a/pkg/graph/policy/policy.go b/pkg/graph/policy/policy.go
+index 80225232..15fe0852 100644
+--- a/pkg/graph/policy/policy.go
++++ b/pkg/graph/policy/policy.go
+@@ -163,6 +163,7 @@ func Resolve(f *File, codeNodes []types.Node, policyFilePath string) ResolveResu
+ 			DocComment:    e.Description,
+ 			SubKind:       e.Category,
+ 			Confidence:    types.ConfExtracted,
++			Annotation:    &types.AnnotationPayload{Description: e.Description},
+ 		}
+ 		out.Nodes = append(out.Nodes, policyNode)
+ 
+diff --git a/pkg/graph/security/security.go b/pkg/graph/security/security.go
+index 80790f05..8c61701f 100644
+--- a/pkg/graph/security/security.go
++++ b/pkg/graph/security/security.go
+@@ -186,6 +186,7 @@ func Resolve(f *File, codeNodes []types.Node, yamlPath string) ResolveResult {
+ 			DocComment:    buildDocComment(e),
+ 			SubKind:       e.Category,
+ 			Confidence:    types.ConfExtracted,
++			Annotation:    &types.AnnotationPayload{Description: e.Description, Remediation: e.Remediation, Severity: e.Severity},
+ 		}
+ 		out.Nodes = append(out.Nodes, patternNode)
+ 
+diff --git a/pkg/graph/store/missing.go b/pkg/graph/store/missing.go
+new file mode 100644
+index 00000000..8a2cfd9b
+--- /dev/null
++++ b/pkg/graph/store/missing.go
+@@ -0,0 +1,13 @@
++package store
++
++import (
++	"database/sql"
++	"errors"
++	"github.com/jackc/pgx/v5"
++)
++
++// IsMissingRow identifies an absent optional retained row for both backends.
++// Other storage failures must remain unavailable, never empty/safe results.
++func IsMissingRow(err error) bool {
++	return errors.Is(err, sql.ErrNoRows) || errors.Is(err, pgx.ErrNoRows)
++}
+diff --git a/pkg/graph/types/node.go b/pkg/graph/types/node.go
+index cc80a1a0..cd677597 100644
+--- a/pkg/graph/types/node.go
++++ b/pkg/graph/types/node.go
+@@ -1,11 +1,20 @@
+ package types
+ 
++// AnnotationPayload preserves operator fields without guessing from merged text.
++// It does not authenticate the author or retain the original YAML document.
++type AnnotationPayload struct {
++	Description string `json:"description"`
++	Remediation string `json:"remediation"`
++	Severity    string `json:"severity"`
++}
++
+ // Node mirrors the SQLite nodes row plus runtime fields (spec §5.3).
+ type Node struct {
+-	ID            string   `json:"id"             validate:"required,len=16"`
+-	Type          NodeType `json:"type"           validate:"required"`
+-	Name          string   `json:"name"           validate:"required"`
+-	QualifiedName string   `json:"qualified_name" validate:"required"`
++	Annotation    *AnnotationPayload `json:"annotation,omitempty"`
++	ID            string             `json:"id"             validate:"required,len=16"`
++	Type          NodeType           `json:"type"           validate:"required"`
++	Name          string             `json:"name"           validate:"required"`
++	QualifiedName string             `json:"qualified_name" validate:"required"`
+ 	// CanonicalID is the globally-unique, import-path-qualified identity of the
+ 	// symbol (e.g. "github.com/ethereum/go-ethereum/core/vm.(*EVM).Call"),
+ 	// receiver- and signature-aware, used for exact resolution. QualifiedName
+diff --git a/scripts/eval-policy-security.py b/scripts/eval-policy-security.py
+new file mode 100644
+index 00000000..e0a1069c
+--- /dev/null
++++ b/scripts/eval-policy-security.py
+@@ -0,0 +1,78 @@
++#!/usr/bin/env python3
++"""Compiled owned Go corpus with retained policy/security overlays -> public CKS.
++
++No real commands execute. The evaluator preserves actual wire traffic, controls,
++and original source even after deleting live source/overlays to forbid fallback.
++"""
++from pathlib import Path
++import argparse, importlib.util, json, subprocess, time, sys
++ROOT = Path(__file__).resolve().parents[1]
++spec = importlib.util.spec_from_file_location('value_probe', ROOT/'scripts/eval-value-dependencies.py')
++p = importlib.util.module_from_spec(spec); spec.loader.exec_module(p)
++SOURCE = 'package fixture\nfunc Seed(x int) int {return x+1}\nfunc Empty(x int) int {return x*2}\n'
++TEST = 'package fixture\nimport "testing"\nfunc TestFixture(t *testing.T){if Seed(3)!=4||Empty(3)!=6{t.Fatal("fixture")}}\n'
++POLICY = '''policies:
++  - id: fork-review
++    name: Fork review
++    category: consensus
++    description: Preserve fork activation behavior
++    governs: [fixture.Seed]
++'''
++SECURITY = '''security_patterns:
++  - id: manual-boundary
++    name: Operator boundary review
++    category: review
++    severity: high
++    description: Manual risk hypothesis, not a confirmed vulnerability
++    remediation: Review input assumptions before editing
++    matches: [fixture.Seed]
++  - id: manual-overflow
++    name: Arithmetic review
++    severity: low
++    description: Manual arithmetic hypothesis
++    matches: [fixture.Seed]
++'''
++def main():
++ ap=argparse.ArgumentParser()
++ for flag in ('binary','cks-binary','plugin-root','out'):ap.add_argument('--'+flag,type=Path,required=True)
++ args=ap.parse_args();root=args.out.resolve();p.require(not root.exists(),'fresh owned root required');root.mkdir();repo=root/'source';repo.mkdir()
++ def run(label,cmd,cwd=repo):
++  before=time.monotonic();r=subprocess.run(cmd,cwd=cwd,capture_output=True,timeout=150)
++  (root/(label+'.stdout.txt')).write_bytes(r.stdout);(root/(label+'.stderr.txt')).write_bytes(r.stderr);(root/(label+'.receipt.json')).write_bytes(p.encode({'command':cmd,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-before}));p.require(r.returncode==0,'failed '+label);return r.stdout.decode().strip()
++ for name,text in {'go.mod':'module example.invalid/annotation-fixture\n\ngo 1.26.9\n','logic.go':SOURCE,'logic_test.go':TEST,'policy.yaml':POLICY,'security.yaml':SECURITY}.items():(repo/name).write_text(text)
++ run('format',['gofmt','-w','logic.go','logic_test.go']);run('git-init',['git','init','-q']);run('git-add',['git','add','.']);run('git-commit',['git','-c','user.name=Owned annotation fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','test: capture operator annotation and untagged controls']);commit=run('git-head',['git','rev-parse','HEAD']);run('fixture-race',['go','test','-race','-count=1','./...']);run('fixture-vet',['go','vet','./...']);run('fixture-bundle',['git','bundle','create',str(root/'fixture.bundle'),'HEAD'])
++ original=root/'original-source';original.mkdir()
++ for name in ('logic.go','logic_test.go','go.mod','policy.yaml','security.yaml'):(original/(name+'.txt')).write_bytes((repo/name).read_bytes())
++ graph=root/'graph';run('index',[str(args.binary.resolve()),'build','--src',str(repo),'--out',str(graph),'--lang','go','--policy-file',str(repo/'policy.yaml'),'--security-pattern-file',str(repo/'security.yaml')],root)
++ ckgroot=root/'ckg';ckgroot.mkdir();ckg=p.Client(args.binary.resolve(),graph,ckgroot);found={}
++ try:
++  ckg.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-annotation-selection','version':'1'}})
++  for name in ('Seed','Empty'):
++   nodes=ckg.tool('find_symbol',{'name':name,'exact':False,'include_blobs':True})['nodes'];p.require(len(nodes)==1,'ambiguous selection');found[name]=nodes[0]
++ finally:ckg.close()
++ cksroot=root/'cks';cksroot.mkdir();sanitize=cksroot/'sanitization_rules.yaml';sanitize.write_bytes((ROOT/'system/policies/sanitization_rules.yaml').read_bytes());config=cksroot/'cks.yaml';config.write_text('version: 1\nname: owned-policy-security\nbackends:\n  ckg:\n    path: '+str(graph/'graph.db')+'\n  ckv:\n    provider: mock\nlisten:\n  transport: stdio\nlogging:\n  level: error\nsanitize:\n  rules_path: '+str(sanitize)+'\n  default_action: drop\n  fail_closed_on_unknown_rule: true\n')
++ client=p.Client(None,None,cksroot,command=[str(args.cks_binary.resolve()),'mcp','--config',str(config)],namespace='cks.context.');checks=[]
++ def save(name,value):(root/(name+'.json')).write_bytes(p.encode(value));return value
++ try:
++  client.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-annotation-evaluator','version':'1'}});tools=client.request('tools/list')['result']['tools'];save('tools',tools);sys.path.insert(0,str(args.plugin_root.resolve()/'scripts'));import suspect_labels
++  count=suspect_labels.check_contract(tools,args.plugin_root.resolve()/'contracts/cks-tools.schema.json');p.require(count==33,'consumer contract drift');tool=next(t for t in tools if t['name']=='cks.context.policy_security');p.require(tool['annotations']['readOnlyHint']is True,'read-only missing');checks.append('actual33 registered tools and exact consumer input contract')
++  seed=found['Seed'];query={'node_id':seed['id'],'expected_commit':commit,'expected_source_sha256':p.sha(seed['source'].encode())};out=save('annotations',client.tool('policy_security',query));p.require(out['status']=='annotations_found'and len(out['annotations'])==3 and not out['more'],'annotation relation loss');p.require(all(a['related_symbol_id']==seed['id']for a in out['annotations']),'mixed symbol');checks.append('positive policy and two security relations pinned to selected symbol')
++  byid={a['id']:a for a in out['annotations']};a=byid['security:manual-boundary'];p.require(a['explanation']['value']=='Manual risk hypothesis, not a confirmed vulnerability'and a['modification_hint']['value']=='Review input assumptions before editing'and a['severity']['value']=='high','typed fields lost');checks.append('exact typed description remediation severity persistence')
++  for a in out['annotations']:
++   prov=a['provenance'];p.require(prov['origin']=='operator_curated_metadata'and prov['identity_trust']=='not_authenticated','manual identity elevated');p.require(all(prov[k]['status']=='unknown'and prov[k]['value']==''for k in ('source_sha256','source_line','version','reviewer','reviewed_at','approval')),'invented original provenance');p.require(len(prov['metadata_sha256'])==64,'metadata hash missing')
++  checks.append('source row YAML hash version reviewer time approval unknown, separate graph metadata hash')
++  p.require(out['safety_verdict']=='unknown'and out['automatic_rules']=='separate_opt_in_rule_candidates_not_executed','manual tags promoted to verdict');rules=save('rules-separate',client.tool('rule_candidates',{'rule_pack':'go-local-review@1.0.0','function':query}));p.require(rules['analysis']['rules']['candidates']==[],'manual tags mixed with automatic local rule results');checks.append('manual tags and opt-in automatic rules remain distinct without safety verdict')
++  empty=save('empty',client.tool('policy_security',{'node_id':found['Empty']['id']}));p.require(empty['status']=='no_annotations'and empty['annotations']==[]and empty['safety_verdict']=='unknown','empty implies safe');checks.append('untagged negative does not imply safety')
++  missing=save('missing',client.tool('policy_security',{'node_id':'missing'}));p.require(missing['status']=='not_found'and not missing['annotations'],'missing fabricated');checks.append('not-found distinct from empty annotations')
++  canonical=seed.get('canonical_id');p.require(canonical,'exact canonical identity not indexed');same=save('canonical',client.tool('policy_security',{'canonical_id':canonical}));p.require(same['annotations']==out['annotations'],'canonical/node mismatch');checks.append('exact canonical identity parity')
++  cap=save('cap',client.tool('policy_security',{**query,'max_annotations':1}));p.require(cap['status']=='partial'and cap['more']and len(cap['annotations'])==1 and cap['reason']=='max_annotations','hidden cap');checks.append('actual SQL row cap and partial/more reason')
++  for key in ('expected_commit','expected_source_sha256','expected_snapshot_sha256'):
++   wrong='0'* (40 if key=='expected_commit'else 64);bad=save('stale-'+key,client.tool('policy_security',{**query,key:wrong}));p.require(bad['status']=='source_mismatch'and bad['symbol']is None and not bad['annotations'],'stale data leaked');checks.append(key+' mismatch refusal')
++  for label,argsbad in [('zero',{**query,'max_annotations':0}),('fraction',{**query,'max_annotations':1.5}),('overcap',{**query,'max_annotations':129}),('unknown',{**query,'invented':True}),('dual',{**query,'canonical_id':canonical}),('null',{'node_id':None})]:
++   bad=save('input-'+label,client.request('tools/call',{'name':'cks.context.policy_security','arguments':argsbad}));p.require('error'in bad or bad.get('result',{}).get('isError'),'input bypass '+label)
++  checks.append('six actual runtime input refusals')
++  for name in ('logic.go','policy.yaml','security.yaml'):(repo/name).unlink()
++  again=save('after-deletion',client.tool('policy_security',{**query,'expected_snapshot_sha256':out['snapshot_sha256']}));p.require(again['annotations']==out['annotations']and again['symbol']==out['symbol'],'live file fallback');checks.append('identical retained results after source and both overlays deleted')
++ finally:client.close()
++ summary={'schema_version':1,'fixture_commit':commit,'checks':checks,'cks_tools':count,'ckg_exit':ckg.proc.returncode,'cks_exit':client.proc.returncode,'cks_requests':client.id,'binary_sha256':p.sha(args.binary.read_bytes()),'cks_binary_sha256':p.sha(args.cks_binary.read_bytes()),'independent_acceptance':'not_recorded','http_scope':'middleware and existing CIDR tests separately; stdio fixture does not authenticate a reviewer'};(root/'summary.json').write_bytes(p.encode(summary));print(json.dumps({'out':str(root),'checks':len(checks),'mcp_exit':client.proc.returncode}))
++if __name__=='__main__':main()
+diff --git a/scripts/eval-value-expansion.py b/scripts/eval-value-expansion.py
+index 31d915fd..7adfe3a4 100644
+--- a/scripts/eval-value-expansion.py
++++ b/scripts/eval-value-expansion.py
+@@ -35,7 +35,7 @@ def main():
+  cksroot=root/'cks';cksroot.mkdir();policy=cksroot/'sanitization_rules.yaml';policy.write_bytes((ROOT/'system/policies/sanitization_rules.yaml').read_bytes());config=cksroot/'cks.yaml';config.write_text('version: 1\nname: owned-value-expansion\nbackends:\n  ckg:\n    path: '+str(graph/'graph.db')+'\n  ckv:\n    provider: mock\nlisten:\n  transport: stdio\nlogging:\n  level: error\nsanitize:\n  rules_path: '+str(policy)+'\n  default_action: drop\n  fail_closed_on_unknown_rule: true\n')
+  client=p.Client(None,None,cksroot,command=[str(args.cks_binary.resolve()),'mcp','--config',str(config)],namespace='cks.context.');checks=[]
+  try:
+-  client.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-expansion-evaluator','version':'1'}});tools=client.request('tools/list')['result']['tools'];(cksroot/'tools.json').write_bytes(p.encode(tools));sys_path=args.plugin_root.resolve()/'scripts';import sys;sys.path.insert(0,str(sys_path));import suspect_labels;count=suspect_labels.check_contract(tools,args.plugin_root.resolve()/'contracts/cks-tools.schema.json');p.require(count==32,'consumer contract drift')
++  client.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-expansion-evaluator','version':'1'}});tools=client.request('tools/list')['result']['tools'];(cksroot/'tools.json').write_bytes(p.encode(tools));sys_path=args.plugin_root.resolve()/'scripts';import sys;sys.path.insert(0,str(sys_path));import suspect_labels;count=suspect_labels.check_contract(tools,args.plugin_root.resolve()/'contracts/cks-tools.schema.json');p.require(count==33,'consumer contract drift')
+   selected=found['Seed'];query={'node_id':selected['id'],'expected_commit':commit,'expected_source_sha256':p.sha(selected['source'].encode())};baseline=client.tool('value_dependencies',query);(root/'baseline.json').write_bytes(p.encode(baseline));expanded=client.tool('value_dependency_expansion',{'function':query,'limits':{'max_functions':8,'max_hops':3}});(root/'expanded.json').write_bytes(p.encode(expanded));result=expanded['graph'];p.require(result['status']=='expanded_bounded','bounded expansion incomplete: '+str(result['stop_reasons']));functions=result['functions'];ids=[f['result']['analysis']['source']['node_id']for f in functions];p.require(len(ids)==len(set(ids))==5 and result['deduplicated']>=1,'cycle/dedup or function counts wrong');p.require(all(f['result']['snapshot_sha256']==result['snapshot_sha256']for f in functions),'mixed snapshots');checks.append('unique source-pinned local analyses with cycle dedup')
+   p.require(all(h['origin']=='retained_call_graph'and h['argument_mapping']=='not_computed'for h in result['hops']),'call hop promoted to computed value transfer');p.require(expanded['curated_flow']['status']=='separate_not_joined'and expanded['curated_flow']['source_association']=='not_verified','curated operator data promoted to computed dependence');checks.append('call/value/control/curated provenance separation')
+   relevant={found[n]['id']for n in ('Seed','Cycle','Transform','Normalize')};baseline_ids={baseline['analysis']['source']['node_id']};chosen=set(ids);metrics={'fixture_relevant_symbols':4,'baseline_returned':len(baseline_ids),'baseline_recall':len(baseline_ids&relevant)/4,'expanded_returned':len(chosen),'expanded_recall':len(chosen&relevant)/4,'expanded_noise':len(chosen-relevant),'expanded_precision':len(chosen&relevant)/len(chosen),'baseline_elapsed_micros':baseline['elapsed_micros'],'expanded_elapsed_micros':result['elapsed_micros'],'scope':'independently compiled source relevance labels for this6-function fixture only; no whole-program optimality'};p.require(metrics['baseline_recall']==.25 and metrics['expanded_recall']==1 and metrics['expanded_noise']==1,'independent recall/noise denominator mismatch');checks.append('independent relevance recall noise cost comparison')

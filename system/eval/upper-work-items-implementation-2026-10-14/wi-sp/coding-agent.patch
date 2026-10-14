@@ -1,0 +1,311 @@
+diff --git a/contract/agent-mcp.schema.json b/contract/agent-mcp.schema.json
+index f598eaf..83ee6d6 100644
+--- a/contract/agent-mcp.schema.json
++++ b/contract/agent-mcp.schema.json
+@@ -154,7 +154,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -183,7 +183,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -231,7 +231,7 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "kinds": {
+@@ -306,7 +306,7 @@
+           "input": {
+             "properties": {
+               "intent": {
+-                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+                 "type": "string"
+               },
+               "prompt": {
+@@ -391,7 +391,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -694,11 +694,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -731,11 +731,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -1206,6 +1206,71 @@
+             ],
+             "type": "object"
+           }
++        },
++        "cks_context_policy_security": {
++          "owner": "cks",
++          "wire_name": "cks.context.policy_security",
++          "description": "Bounded retained policy/security annotations for one exact code symbol. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass.",
++          "input": {
++            "additionalProperties": false,
++            "oneOf": [
++              {
++                "not": {
++                  "required": [
++                    "canonical_id"
++                  ]
++                },
++                "required": [
++                  "node_id"
++                ]
++              },
++              {
++                "not": {
++                  "required": [
++                    "node_id"
++                  ]
++                },
++                "required": [
++                  "canonical_id"
++                ]
++              }
++            ],
++            "properties": {
++              "canonical_id": {
++                "maxLength": 512,
++                "minLength": 1,
++                "type": "string"
++              },
++              "expected_commit": {
++                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++                "type": "string"
++              },
++              "expected_snapshot_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "expected_source_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "max_annotations": {
++                "maximum": 128,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "node_id": {
++                "maxLength": 128,
++                "minLength": 1,
++                "type": "string"
++              },
++              "timeout_ms": {
++                "maximum": 5000,
++                "minimum": 1,
++                "type": "integer"
++              }
++            },
++            "type": "object"
++          }
+         }
+       }
+     },
+diff --git a/plugin/contracts/cks-tools.schema.json b/plugin/contracts/cks-tools.schema.json
+index 0acca20..3c70f8e 100644
+--- a/plugin/contracts/cks-tools.schema.json
++++ b/plugin/contracts/cks-tools.schema.json
+@@ -117,7 +117,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -146,7 +146,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -194,7 +194,7 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "kinds": {
+@@ -269,7 +269,7 @@
+           "input": {
+             "properties": {
+               "intent": {
+-                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+                 "type": "string"
+               },
+               "prompt": {
+@@ -354,7 +354,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -657,11 +657,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -694,11 +694,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -1169,6 +1169,71 @@
+             ],
+             "type": "object"
+           }
++        },
++        "cks_context_policy_security": {
++          "owner": "cks",
++          "wire_name": "cks.context.policy_security",
++          "description": "Bounded retained policy/security annotations for one exact code symbol. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass.",
++          "input": {
++            "additionalProperties": false,
++            "oneOf": [
++              {
++                "not": {
++                  "required": [
++                    "canonical_id"
++                  ]
++                },
++                "required": [
++                  "node_id"
++                ]
++              },
++              {
++                "not": {
++                  "required": [
++                    "node_id"
++                  ]
++                },
++                "required": [
++                  "canonical_id"
++                ]
++              }
++            ],
++            "properties": {
++              "canonical_id": {
++                "maxLength": 512,
++                "minLength": 1,
++                "type": "string"
++              },
++              "expected_commit": {
++                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++                "type": "string"
++              },
++              "expected_snapshot_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "expected_source_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "max_annotations": {
++                "maximum": 128,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "node_id": {
++                "maxLength": 128,
++                "minLength": 1,
++                "type": "string"
++              },
++              "timeout_ms": {
++                "maximum": 5000,
++                "minimum": 1,
++                "type": "integer"
++              }
++            },
++            "type": "object"
++          }
+         }
+       }
+     }
+diff --git a/plugin/scripts/tests/test_suspect_labels.py b/plugin/scripts/tests/test_suspect_labels.py
+index d3d4bdd..c37012b 100644
+--- a/plugin/scripts/tests/test_suspect_labels.py
++++ b/plugin/scripts/tests/test_suspect_labels.py
+@@ -60,7 +60,7 @@ class LabelsTests(unittest.TestCase):
+  def test_contract_schema_semantics_and_alias_collision(self):
+   contract=json.loads((ROOT/'contracts/cks-tools.schema.json').read_text())
+   tools=[{'name':v['wire_name'],'inputSchema':v['input']} for v in contract['providers']['cks']['tools'].values()]
+-  self.assertEqual(labels.check_contract(tools),32)
++  self.assertEqual(labels.check_contract(tools),33)
+   wrong=copy.deepcopy(tools);wrong[0]['inputSchema']['properties']['symptom']={'type':'array'}
+   with self.assertRaises(labels.Invalid):labels.check_contract(wrong)
+   with self.assertRaises(labels.Invalid):labels.check_contract(tools[:-1])

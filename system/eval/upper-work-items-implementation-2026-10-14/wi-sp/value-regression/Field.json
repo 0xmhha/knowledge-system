@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "snapshot_sha256": "184d0ea65f019afceb5e7330715d40dc7630a586e4ba8d370ab0a835b27bc343",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "61df09c0e369a076",
+      "canonical_id": "example.invalid/value-fixture/a.Field",
+      "file": "a/flow.go",
+      "commit": "872b474d19cdf75b1dbe0ef887d451542fe9568e",
+      "sha256": "1e0a6af768bcb51e08288aaa36d670c1c26fbcdb160e7fcc9c405d42c56b5fd6",
+      "language": "go",
+      "start_line": 22,
+      "start_byte": 285,
+      "bytes": 67,
+      "snapshot_sha256": "184d0ea65f019afceb5e7330715d40dc7630a586e4ba8d370ab0a835b27bc343",
+      "function_name": "Field"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "partial",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0",
+          "b0/n1"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 319,
+          "end_byte": 332,
+          "start_line": 22,
+          "end_line": 22
+        },
+        "text": "box.Value = x",
+        "synthetic": false
+      },
+      {
+        "id": "b0/n1",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 334,
+          "end_byte": 350,
+          "start_line": 22,
+          "end_line": 22
+        },
+        "text": "return box.Value",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 285,
+          "end_byte": 316,
+          "start_line": 22,
+          "end_line": 22
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v306"
+      },
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "address_dependence",
+        "certainty": "may_reach",
+        "variable": "v296"
+      },
+      {
+        "from": "entry",
+        "to": "b0/n1",
+        "kind": "address_dependence",
+        "certainty": "may_reach",
+        "variable": "v296"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "isolated_type_info_partial",
+        "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+      },
+      {
+        "code": "memory_write_untracked",
+        "message": "Indirect writes do not kill or define scalar container variables",
+        "location": {
+          "start_byte": 319,
+          "end_byte": 328,
+          "start_line": 22,
+          "end_line": 22
+        }
+      },
+      {
+        "code": "field_read_untracked",
+        "message": "Field memory/type/alias relationships are not proven from a function blob",
+        "location": {
+          "start_byte": 319,
+          "end_byte": 328,
+          "start_line": 22,
+          "end_line": 22
+        }
+      },
+      {
+        "code": "field_read_untracked",
+        "message": "Field memory/type/alias relationships are not proven from a function blob",
+        "location": {
+          "start_byte": 341,
+          "end_byte": 350,
+          "start_line": 22,
+          "end_line": 22
+        }
+      }
+    ],
+    "truncated": false,
+    "elapsed_micros": 41,
+    "variables": [
+      {
+        "id": "v296",
+        "name": "box",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 296,
+          "end_byte": 299,
+          "start_line": 22,
+          "end_line": 22
+        }
+      },
+      {
+        "id": "v306",
+        "name": "x",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 306,
+          "end_byte": 307,
+          "start_line": 22,
+          "end_line": 22
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/address/v296/319",
+        "node": "b0/n0",
+        "variable": "v296",
+        "role": "address",
+        "location": {
+          "start_byte": 319,
+          "end_byte": 322,
+          "start_line": 22,
+          "end_line": 22
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n0/use/v306/331",
+        "node": "b0/n0",
+        "variable": "v306",
+        "role": "use",
+        "location": {
+          "start_byte": 331,
+          "end_byte": 332,
+          "start_line": 22,
+          "end_line": 22
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n1/address/v296/341",
+        "node": "b0/n1",
+        "variable": "v296",
+        "role": "address",
+        "location": {
+          "start_byte": 341,
+          "end_byte": 344,
+          "start_line": 22,
+          "end_line": 22
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v296/296",
+        "node": "entry",
+        "variable": "v296",
+        "role": "definition",
+        "location": {
+          "start_byte": 296,
+          "end_byte": 299,
+          "start_line": 22,
+          "end_line": 22
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v306/306",
+        "node": "entry",
+        "variable": "v306",
+        "role": "definition",
+        "location": {
+          "start_byte": 306,
+          "end_byte": 307,
+          "start_line": 22,
+          "end_line": 22
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "entry/definition/v306/306",
+        "use": "b0/n0/use/v306/331",
+        "variable": "v306",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "entry/definition/v296/296",
+        "use": "b0/n0/address/v296/319",
+        "variable": "v296",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "entry/definition/v296/296",
+        "use": "b0/n1/address/v296/341",
+        "variable": "v296",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 6,
+    "facts_peak": 20
+  },
+  "elapsed_micros": 307
+}
