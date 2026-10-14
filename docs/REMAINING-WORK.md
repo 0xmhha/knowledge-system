@@ -1,3 +1,5 @@
+현재 진행: 사용자 요청에 따라 [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 WI-V1→V2→3→4→1→2→C→6→SP를 순차 구현한다. WI-V1 진행 중, 나머지8개 대기. 이번 구현 순서는 WI-5를 포함하지 않는다.
+
 추가 요청 완료: [서버 종료 보완 SD-01–04](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md)4/4 완료. 원인 재현·구현·실측2세션·EOF/SIGTERM·커밋 SHA/진행 원장 검증 PASS. 이전 두 종료 오류는 보존했다. 이 요청의 남은 작업0개·다음 작업없음.
 
 # 남은 전체 작업

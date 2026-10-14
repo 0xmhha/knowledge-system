@@ -9,6 +9,7 @@ These entry points describe the current repository. Source files, registered too
 | Understand architecture and purpose | [architecture](./ARCHITECTURE.md), [purpose and scope](./spec-driven/PURPOSE-AND-SCOPE.md), [graph purpose](./graph/VISION.md) |
 | Follow the active dataset comparison | [go-stablenet dataset comparison](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md) |
 | Audit the upper work items | [upper work-item audit](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md) |
+| Implement the upper work items | [implementation specification and progress](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md) |
 | Find all remaining work | [remaining work](./REMAINING-WORK.md) |
 | Resume development and verify completion | [current handoff](./spec-driven/CURRENT-HANDOFF.md), [execution specification](./spec-driven/REFACTORING-EXECUTION-SPEC.md), [progress ledger](./spec-driven/REFACTORING-PROGRESS.json) |
 | Query code and meaning over MCP | [system](../system/README.md), [ontology](../system/docs/ontology-mcp.md), [tool mapping](../system/docs/coding-agent-mcp-mapping.md) |

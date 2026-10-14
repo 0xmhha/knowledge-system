@@ -1,0 +1,63 @@
+{
+  "scope": "actual Go source/CLI/hook execution; no live Claude host/chain/human acceptance",
+  "base_commit": "dd96262f2cde398763001ca5d5eb982781ad71c4",
+  "head_commit": "b3f2bd7582edf07391161a29606c4059d6f50da2",
+  "real_oracle_executions": 16,
+  "cli": "{\"mechanical_verdict\": \"PASS\", \"checks\": 16}",
+  "completion_check": "{\"completion_gate\": \"PASS\"}",
+  "valid_completion_hook": "allowed",
+  "invalid_report_hook": {
+    "hookSpecificOutput": {
+      "hookEventName": "PreToolUse",
+      "permissionDecision": "deny",
+      "permissionDecisionReason": "Bugfix completion blocked: state does not bind the generated oracle report"
+    }
+  },
+  "original_checkout_unchanged": true,
+  "independent_human_acceptance": "not_recorded",
+  "runtime": "go version go1.26.9 darwin/arm64",
+  "fixture_stage_executions": [
+    {
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "ok  \texample.test/oracle\t1.406s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "gofmt",
+        "-l",
+        "."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}
