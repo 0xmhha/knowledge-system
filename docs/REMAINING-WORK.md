@@ -1,4 +1,6 @@
-현재 진행: [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 요청 범위에서 구현·명시 범위 검증 **5/9** 완료이며 WI-2를 진행한다. 남은 전체 구현 순서는 **WI-2 → WI-C → WI-6 → WI-SP**다. production/독립 전체 수용은 별도 미판정이며 WI-5는 이번 순서에 포함하지 않는다.
+현재 진행: [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 요청 범위에서 구현·명시 범위 검증 **6/9** 완료이며 WI-C를 진행한다. 남은 전체 구현 순서는 **WI-C → WI-6 → WI-SP**다. production/독립 전체 수용은 별도 미판정이며 WI-5는 이번 순서에 포함하지 않는다.
+
+WI-2 초기 Go pack·CKG/CKS 공개 후보 분석은 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-2/README.md)으로 고정했다.23개 실제 사례·39개 공개 검증·기존15개 회귀와 전체 build/test/fmt/lint PASS, 오탐2/미탐4와 한계·독립 수용 미판정은 유지한다.
 
 WI-4 원래 모드9 완료 근거는 [관찰 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/README.md), WI-1 Go 값/제어 의존과 공개 질의는 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-1/README.md)에 보존했다. 소스337300b0 clean binary로15개 실제 compile/race→index→MCP 검증과 source/hash/unknown/bound/refusal/EOF 검증 PASS, 증거6332da9d·현재1617개 source/dependency SHA 확인. 다음은 opt-in 결정론 Go 규칙 후보와 수동 annotation 공존이다.
 

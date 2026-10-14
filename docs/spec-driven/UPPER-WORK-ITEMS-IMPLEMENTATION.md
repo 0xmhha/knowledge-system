@@ -19,8 +19,8 @@
 | 3 | WI-3 | coding-agent+CKS | 구현·명시 범위 검증 | 독립 수용 미판정 |
 | 4 | WI-4 | coding-agent+ChainBench | 원래 모드9 포함 구현·명시 범위 실행 검증·증거 커밋 | production/독립 수용 미판정 |
 | 5 | WI-1 | CKG | bounded Go 구현·공개 실행 검증·증거 커밋 | production/독립 수용 미판정 |
-| 6 | WI-2 | CKG/CKS | 설계·구현 진행 | 미완료/미수용 |
-| 7 | WI-C | coding-agent | 대기 | 미완료/미수용 |
+| 6 | WI-2 | CKG/CKS | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
+| 7 | WI-C | coding-agent | 설계·구현 진행 | 미완료/미수용 |
 | 8 | WI-6 | CKS | 대기 | 미완료/미수용 |
 | 9 | WI-SP | CKS+CKG | 대기 | 미완료/미수용 |
 
@@ -93,7 +93,7 @@
 
 각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
 
-현재: 구현·명시 범위 실행 검증5/9, WI-2 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-2 opt-in Go 규칙 후보 분석. 남은 이번 구현 범위: WI-2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+현재: 구현·명시 범위 실행 검증6/9, WI-C 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-C 구조화 깊은 리뷰. 남은 이번 구현 범위: WI-C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
 ## WI-V1 검증 기록
 
@@ -435,3 +435,25 @@ closure에서 미탐을 보인다. `syntax_only_unverified`/`not_proven` 및 한
 한다. 최종 source-bound 실행·전체 회귀·Git 근거 패킷 확인 전까지 WI-2는
 `in_progress`, 검증 완료 수는5/9로 유지한다. 다음은 동일 범위 최종 검증과
 근거 고정이며, 이후 WI-C→WI-6→WI-SP 순서다.
+
+### WI-2 최종 검증과 WI-C 시작
+
+WI-2 구현을 검증된 초기 Go pack 범위로 완료 기록한다. source2e1e7791 clean
+CKG/CKS 바이너리의23개 compiled/race fixture·39개 실제 공개 MCP 검증과
+기존 값 의존15개 공개 실행 회귀를 통과했다. EOF는 양쪽0이며 수동 YAML과
+전체 persisted graph는 불변이다. 전체 build/test·영향 범위 race·fmt/vet·
+pinned v2.14 lint·boundary/docs PASS. [최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-2/README.md)154개
+산출물·1626개 source/dependency·5개 승인 입력은 evidence3f0bb039의 Git 객체와
+현재 파일 모두 SHA 검증했다.7개 요구 범위가 실제 근거에 연결된다.
+
+소표본 review-condition TP10/TN7/FP2/FN4, precision10/12·recall10/14를 기록한다.
+이는 exploit/취약점 정확도 또는 전체 코드 안전 판정이 아니다. selector 대상·
+sanitizer·alias·실행 가능성·package/interprocedural 의미는 명시된 한계를 유지한다.
+전체/production/사람 수용은 미판정이다. 현재6/9, 다음WI-C, 남은WI-C→WI-6→WI-SP.
+
+WI-C는 기존 PR 피드백 반영 명령과 함수 내부 심층 리뷰를 혼동하지 않는다.
+출처 핀·함수 리뷰/값/규칙의 실제 도구 응답을 묶은 typed artifact, 계산/추론
+근거와 unknown, 순서/상태/guard/exception/complexity/resource/I/O, 우선순위와
+tradeoff를 검증 가능한 계약으로 고정하고 coding-agent 리뷰 경로에 연결한다.
+MCP 소비자 계약을 새 CKS 도구에 맞춰 갱신하며 완료 전에 실제 source-bound
+fixture·validator·경로·수용 연결·회귀 근거를 요구한다.
