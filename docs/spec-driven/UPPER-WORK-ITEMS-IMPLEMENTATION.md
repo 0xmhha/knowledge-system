@@ -17,8 +17,8 @@
 | 1 | WI-V1 | coding-agent | 구현·controlled 실행/반례 검증 완료·증거 커밋 | 실제 host/체인·독립 수용 보류 |
 | 2 | WI-V2 | coding-agent | 구현·실제 Go/모델/반례 검증 완료·증거 커밋 | 독립 사람/production 최적성 미수용 |
 | 3 | WI-3 | coding-agent+CKS | 구현·명시 범위 검증 | 독립 수용 미판정 |
-| 4 | WI-4 | coding-agent+ChainBench | 공개 경로·관찰 검증, agent 통합 진행 | 미완료/미수용 |
-| 5 | WI-1 | CKG | 대기 | 미완료/미수용 |
+| 4 | WI-4 | coding-agent+ChainBench | 원래 모드9 포함 구현·명시 범위 실행 검증·증거 커밋 | production/독립 수용 미판정 |
+| 5 | WI-1 | CKG | 설계·구현 진행 | 미완료/미수용 |
 | 6 | WI-2 | CKG/CKS | 대기 | 미완료/미수용 |
 | 7 | WI-C | coding-agent | 대기 | 미완료/미수용 |
 | 8 | WI-6 | CKS | 대기 | 미완료/미수용 |
@@ -93,7 +93,7 @@
 
 각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
 
-현재: 구현·명시 범위 실행 검증3/9, WI-4 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-4 반복·주입·관찰. 남은 이번 구현 범위: WI-4/1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+현재: 구현·명시 범위 실행 검증4/9, WI-1 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-1 Go 값 의존 분석. 남은 이번 구현 범위: WI-1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
 ## WI-V1 검증 기록
 
@@ -310,3 +310,65 @@ bench 회귀·tool lint PASS. 첫 race의 live process table churn/unknown 결�
 삽입 위치/patch·source·event/schema/기록 출처·behavior/race 대조와 실제
 로그 기반 재발/재개가 남았으므로 WI-4는 in_progress/검증3/9다.
 다음은 이 원래 경로의 구현이며 이후 WI-1→WI-2→WI-C→WI-6→WI-SP가 남는다.
+
+
+## WI-4 원래 범위 완료 검증
+
+[mode9 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/README.md)를
+`15876da9`에 고정하고112개 산출물과31개 변경 owner source SHA를 Git object로
+확인했다. 기존 중간 packet의 미완료 표시는 그 당시 상태로 보존한다.
+
+- [x] 기존 고정 schedule/분모·60회 재현과60개 전후 쌍·정상 제어·통계 상한·실제7개 fault/timeout/cancellation/cleanup 반례 및 parent-death 수정 근거 보존.
+- [x] 원래 모드9: 별도 base/probe 커밋·제한된 Go 관찰 AST diff·event/site/schema/hash·실제 정상/race·build/vet 제어. AST 일치와 시험 통과를 timing neutrality로 승격하지 않음.
+- [x] 커밋 source 기준 실제 소유 RPC 노드3회 미재현(INCONCLUSIVE), 로그2초 대기, 다음 창 재발(RECURRED). 공개 stdio MCP prepare/observe와 raw report verifier 실행.
+- [x] 실제 hook의 다음 bounded ANALYSIS 허용·PLANNING/분류 삭제/cycle 초과/증거 overwrite 거부, 실제 소유 노드 stopped 확인.
+- [x] 관찰 종료 직전 read deadline 반례 수정·정상 deadline/실제 오류/미확립 source 차단 시험. 이전 실패와 정리 근거 유지.
+- [x] ChainBench 전체 race(순차 package)·vet·pinned lint와 이후 변경 affected race/architecture/lint·clean build. Plugin126개와 최종 timing31개, bench15개·hooks·실제81개 tool schema 계약 검증.
+- [ ] 독립 production 수용·블록체인 합의 결함의 원인 수용·모든 경로의 의미/타이밍 중립성 증명. 이번 구현 완료로 자동 승인하지 않음.
+
+Owner commit은 coding-agent `72c262981dfb9ccfb9f3b49eb5a9af054bc4d52a`,
+ChainBench `df464d4b97fde4ab308c5c422024dc80518e5956`이다. 로컬 복구
+커밋이며 push/PR/merge는 수행하지 않았다.
+
+## WI-1 착수 설계와 완료 조건
+
+CKG의 저장된 함수 blob에서 on-demand 분석하고 공개 `pkg/graph` 계산을
+MCP·후속 CKS가 공유한다. 현재 live checkout 원문과 저장된 snapshot을 혼합하지
+않는다. 대상 node ID/canonical identity·manifest source commit·blob SHA·원문
+byte/line과 지원 범위를 반환한다. 함수 blob만 있는 경우 package 타입/alias
+정보가 부족함을 표시하며, 없는 정보로 확실한 연결을 만들지 않는다.
+
+초기 Go CFG는 이미 고정된 golang.org/x/tools의 cfg를 사용한다. 단순 AST 순서를
+CFG라고 부르지 않는다. 도달 불가 블록과 실제 successor·조건/루프/return을
+구분하고, 선언·재정의 kill·분기 join·loop fixed point의 reaching definitions와
+lexical def-use를 계산한다. Field/alias/call/closure·동적 dispatch·reflect의
+불확실성은 별도 진단과 보수적 edge로 남긴다. Post-dominator control dependence는
+정상 exit에 도달하는 지원 범위에서만 계산하며, 비종료 경로는 unknown이다.
+
+source bytes·statement/node/edge·fixed-point iteration·시간 상한을 사전 고정한다.
+상한 초과는 partial/budget_exhausted이며 빈 graph를 안전으로 해석하지 않는다.
+Go 이외 언어는 unsupported다. WI-2 룰·WI-6 확장·WI-C 리뷰·WI-SP 태그가
+이 결과를 재사용하며 calls/curated-flow와 계산된 값/제어 관계를 혼합하지 않는다.
+
+- [ ] Typed schema/capability·source pin·bounded CFG와 공개 계산 API.
+- [ ] Lexical def-use/redefinition/branch join/loop·field/call uncertainty.
+- [ ] Control/data dependence와 nontermination/unsupported diagnostics.
+- [ ] 공개 CKG MCP 입력/출력·tools/list·ambiguous/missing/stale source 처리.
+- [ ] 독립 expected fixture·원문 위치·상한/비용·실제 index→MCP 실행.
+- [ ] build/test/race/fmt/lint·새 primary source binding·근거 커밋 후 완료 체크.
+
+### WI-1 진행: 제한된 CFG kernel
+
+`pkg/graph/valueflow`에 보존된 단일 함수 blob만 입력으로 받는 CFG API를
+작성했다. byte SHA·node/canonical identity·source commit·원문 line/byte를
+유지하고, Go cfg의 successor와 도달 불가 블록을 반환한다. 고정 상한은
+source256KiB·AST4096·block256·node1024·edge4096·iteration128·시간1000ms다.
+상한을 늘리는 입력은 거부하고 부족/초과/취소/미지원은 명시한다.
+
+독립 예상 branch/join·loop back-edge·도달 불가 코드·실제 원문 slice·implicit
+return 위치와 cap/cancel/미지원/opaque effect 시험이 통과했다. 첫 branch label
+구현이 block 생성 원인을 조건식으로 잘못 해석한 실패를 보존하고, 실제 마지막
+조건식에 결속하도록 수정했다. 이 단계는 CFG kernel이며 def-use/data/control
+계산과 공개 MCP는 `not_computed`다. status를 partial로 반환하고 WI-1 완료
+체크는 유지하지 않는다. 다음은 lexical reaching-definitions·재정의 kill·합류/
+loop fixed-point와 제어 의존, 이후 source-bound 공개 질의다.
