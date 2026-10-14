@@ -1,0 +1,39 @@
+package p
+
+type Box struct{ Value int }
+
+func Same(v int) int { return v + 1 }
+func Branch(a, b int, flag bool) int {
+	y := a
+	if flag {
+		y = b
+	}
+	return y
+}
+func Kill(a, b int) int { y := a; y = b; return y }
+func Loop(x int) int {
+	y := 0
+	for x > 0 {
+		x--
+		y = x
+	}
+	return y
+}
+func Field(box *Box, x int) int { box.Value = x; return box.Value }
+func Named(flag bool) (out int) {
+	if flag {
+		out = 1
+	}
+	return
+}
+func Closure(x int) int { f := func() { x = 9 }; _ = f; return x }
+func Nonexit(flag bool) {
+	if flag {
+		for {
+		}
+	}
+}
+func Const() int                  { const value = 3; return value }
+func Pointer(pointer *int) *int   { copy := pointer; return copy }
+func (box *Box) Scalar(x int) int { y := x; return y }
+func Generic[T any](input T) T    { copy := input; return copy }

@@ -1,0 +1,20 @@
+..E............
+======================================================================
+ERROR: test_delivery_hash_hook_cli_and_diagrams (test_deep_review.DeepReviewTests.test_delivery_hash_hook_cli_and_diagrams)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-upper-wi-coding-agent/plugin/scripts/tests/test_deep_review.py", line 77, in test_delivery_hash_hook_cli_and_diagrams
+    workspace,state=self.make_workspace(root);review.verify_workspace(workspace);self.assertEqual(self.hook(workspace,state),'')
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-upper-wi-coding-agent/plugin/scripts/deep_review.py", line 161, in verify_workspace
+    text=(workspace/'review-report.md').read_text();require(text==markdown(report),'review delivery report differs from typed artifact')
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-upper-wi-coding-agent/plugin/scripts/deep_review.py", line 25, in require
+    if not condition:raise Invalid(message)
+                     ^^^^^^^^^^^^^^^^^^^^^^
+deep_review.Invalid: review delivery report differs from typed artifact
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.599s
+
+FAILED (errors=1)

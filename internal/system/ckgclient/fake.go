@@ -14,6 +14,8 @@ import (
 // All calls are recorded on Fake.Calls; tests can assert what was invoked
 // (counts, arguments) without injecting a mocking framework.
 type Fake struct {
+	SymbolIdentities  map[string]SymbolIdentity
+	SymbolIdentityErr error
 	// BM25Hits is returned by BM25Search on success.
 	BM25Hits []contract.Hit
 	BM25Err  error
@@ -60,6 +62,19 @@ type Fake struct {
 	Calls FakeCalls
 
 	closed bool
+}
+
+func (f *Fake) ResolveCitation(ctx context.Context, c contract.Citation) (SymbolIdentity, error) {
+	if err := ctx.Err(); err != nil {
+		return SymbolIdentity{}, err
+	}
+	if f.SymbolIdentityErr != nil {
+		return SymbolIdentity{}, f.SymbolIdentityErr
+	}
+	if found, ok := f.SymbolIdentities[c.String()]; ok {
+		return found, nil
+	}
+	return SymbolIdentity{}, ErrSeedUnresolved
 }
 
 // FakeCalls records the methods invoked on a Fake and their arguments.

@@ -1,0 +1,20 @@
+source-only AST and actual base/probe normal/race controls PASS
+actual owned repeated attempt INCONCLUSIVE; no planning permitted
+actual source-bound window 1 AWAITING_OBSERVATION; resume_target=None
+actual source-bound window 2 RECURRED; resume_target=ANALYSIS
+Traceback (most recent call last):
+  File "/private/tmp/ks-upper-wi-coding-agent/bench/timing/log_probe.py", line 114, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/private/tmp/ks-upper-wi-coding-agent/bench/timing/log_probe.py", line 86, in main
+    prepare=subprocess.run([str(a.mcp.resolve())],input=mcp_request('chainbench_prepare_log_observation',mcp_proposal),capture_output=True,check=True,timeout=30);(root/'mcp-prepare-response.json').write_bytes(prepare.stdout);prepared=mcp_value(prepare.stdout)
+                                                                                                                                                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-upper-wi-coding-agent/bench/timing/log_probe.py", line 84, in mcp_value
+    reply=json.loads(raw);timing.require(not reply['result']['isError'],'public MCP error: '+reply['result']['content'][0]['text']);return json.loads(reply['result']['content'][0]['text'])
+          ^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/json/decoder.py", line 340, in decode
+    raise JSONDecodeError("Extra data", s, end)
+json.decoder.JSONDecodeError: Extra data: line 2 column 1 (char 76)

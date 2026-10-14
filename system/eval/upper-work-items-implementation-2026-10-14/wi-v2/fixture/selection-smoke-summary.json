@@ -1,0 +1,213 @@
+{
+  "scope": "actual Go proposal materialization, oracle/metric/regression execution, selection/check/guards",
+  "panel_origin": "fixture",
+  "independent_human_acceptance": "not_recorded",
+  "cli_exit": 0,
+  "decision": {
+    "status": "SELECTED",
+    "selected_candidate": "loop",
+    "selected_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+    "selected_tree": "3c7cfc8ff567f9c079b492f0bce42591e96b45c3",
+    "reason": "hard-eligible, unanimous preference and sole observed Pareto candidate",
+    "axes_used": [
+      "changed_lines",
+      "allocations"
+    ],
+    "rejections": {
+      "literal": "oracle/regression/execution hard condition failed"
+    }
+  },
+  "original_source_unchanged": true,
+  "original_head_unchanged": true,
+  "selection_check": "PASS",
+  "applied_tree_check": "PASS",
+  "final_current_head_oracle": "PASS",
+  "both_completion_guards": "allowed",
+  "fixture_stage_executions": [
+    {
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "ok  \texample.test/oracle\t1.403s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "gofmt",
+        "-l",
+        "."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "panel_executions": [
+    {
+      "role": "correctness",
+      "kind": "fixture",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "correctness",
+        "role": "correctness",
+        "preferred_candidate": "loop",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155",
+              "1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96",
+              "210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf",
+              "4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1",
+              "be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44",
+              "a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a",
+              "c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873",
+              "386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221",
+              "cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263",
+              "4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "role": "maintainability",
+      "kind": "fixture",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "maintainability",
+        "role": "maintainability",
+        "preferred_candidate": "loop",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155",
+              "1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96",
+              "210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf",
+              "4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1",
+              "be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44",
+              "a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a",
+              "c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873",
+              "386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221",
+              "cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263",
+              "4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "role": "regression",
+      "kind": "fixture",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "regression",
+        "role": "regression",
+        "preferred_candidate": "loop",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155",
+              "1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96",
+              "210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf",
+              "4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1",
+              "be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44",
+              "a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a",
+              "c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873",
+              "386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221",
+              "cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263",
+              "4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "ticket_id": "control",
+  "phase": "analysis",
+  "generation": 1,
+  "runner_sha256": "6cf9c74948499f9cc37b7271425168dba9bc7654dfcf626f877af77bf53778c6",
+  "provider": {
+    "binary": "/private/tmp/ks-wi4-public-chainbench",
+    "binary_sha256": "3b87bf4cdea20a978e3140174b8f3ccb0b805315e65d43863b48a7438b6ad7c4",
+    "source_commit": "5f6483864a4a6a91f32ff02d532275039c72db80"
+  },
+  "working_directory": "/private/tmp/ks-upper-wi-coding-agent",
+  "input_sha256": "1b1dffb8fbef47cc48203cb7143999720af712dccb9c454728f21df55d3ba8db",
+  "proposed_input_sha256": "d909e5027d021f028be1ed11f3f1ad44b410efa4b5841dfbb6c68ed144678b98",
+  "input": {
+    "plan": {
+      "schema_version": 1,
+      "id": "cancel",
+      "mode": "reproduction",
+      "symptom": "controlled concurrent read before commit; no consensus claim",
+      "assertion_id": "owned-timing/assert/0",
+      "seed": "owned-paired-v1",
+      "before": {
+        "commit": "01a3ce43d2c13e09217f991bac695ee0c5bc6a07",
+        "binary_sha256": "d3e6510a3eb7e4ff85a1e72f48246386d856081ac8084c92259179b4e6f12a20",
+        "driver_sha256": "70b4807ffcad24951c883908c24b21b1f75f4056401b366d357b2cd010074a83",
+        "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+      },
+      "after": null,
+      "repetitions": 3,
+      "min_completed": 3,
+      "min_symptom_failures": 1,
+      "max_failure_rate": 0.05,
+      "trial_timeout_seconds": 30,
+      "total_timeout_seconds": 45,
+      "owned_node_ids": [
+        "node1"
+      ],
+      "normal_assertion_ids": [
+        "owned-timing/assert/1"
+      ],
+      "injection": {
+        "kind": "delay",
+        "target": "node1",
+        "step": "owned-timing/step/1",
+        "min_delay_ms": 20000,
+        "max_delay_ms": 20000
+      },
+      "resume": null
+    },
+    "case": {
+      "schemaVersion": "1",
+      "id": "owned-timing",
+      "chain": {
+        "name": "stablenet",
+        "binary": "pinned"
+      },
+      "topology": {
+        "bp": 1
+      },
+      "steps": [
+        {
+          "read": {
+            "source": "balanceAt",
+            "on": "node1",
+            "address": "0x0000000000000000000000000000000000000001"
+          }
+        },
+        {
+          "read": {
+            "source": "chainId",
+            "on": "node1"
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "assert": "balanceAt",
+          "on": "node1",
+          "address": "0x0000000000000000000000000000000000000002",
+          "compare": "Equal",
+          "expected": "1"
+        },
+        {
+          "assert": "chainId",
+          "on": "node1",
+          "compare": "Equal",
+          "expected": "8283"
+        }
+      ]
+    },
+    "binary_by_commit": {
+      "01a3ce43d2c13e09217f991bac695ee0c5bc6a07": "/private/tmp/ks-wi4-native-consumer-replay/before",
+      "5846aff1f4c2cd6f80d1ddae5e2eb9ded490f7b5": "/private/tmp/ks-wi4-native-consumer-replay/after"
+    },
+    "artifact_root": "/tmp/w4f-n70eqr2u"
+  },
+  "acceptance": "not_recorded"
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "item": "WI-V1",
+  "implementation_scope": "frozen oracle runner, Go assertion adapter, evaluator/state transition and Write/Edit guard",
+  "owner_repository": "0xmhha/coding-agent",
+  "base_commit": "3a66d91f6486077edc0f09d00c5549e40dd55081",
+  "source_commit": "5fd101e682b5d0286dbcd27fcd2b4a266bb7bc50",
+  "source_files_sha256": {
+    ".github/workflows/ci.yml": "0f49d9582bc47526a4747baf5f20e33be80ab7de062c879763ad57605078f66a",
+    "README.md": "5cc8b901455afcda136a1c553b1c4547deacd3a0582be6418099ddbb49f2dcc2",
+    "bench/oracle-validity/smoke.py": "114e0f122697561d8103b8e9d51d19fbbff37a1c4117aaae72234ba70ca134bb",
+    "plugin/agents/analyzer.md": "440a12612eeedf54c9a947ad57c8c9c3b7389ea713e0574f1e8ba7be4e3af405",
+    "plugin/agents/evaluator.md": "305f499afa8c6004fd814d67d7a4949b2df6bca6a48f97e9a3b1e910784b1136",
+    "plugin/agents/implementer.md": "87c9f9d41302ebb0c87b944ea8baf99e67bed180be20dbd1901c7597a9443fa3",
+    "plugin/agents/orchestrator.md": "b36643a78fc52fde90b68b694254790dc9e283b9e049cf798a25f1df037a988b",
+    "plugin/agents/planner.md": "8ec3080d03b016274a1ba400afd4654d45e206f834083572b853681606ea4add",
+    "plugin/hooks/completion-guard.py": "8babef537d4c8ac68d7a52e98dfe0b77e3373299d7f55ac8377dd550ea0ba2c7",
+    "plugin/hooks/hooks.json": "7ed09c4dabafb871f828c90a69536652cb403decd2ff773448b93bdd7dcfb0bd",
+    "plugin/scripts/go_oracle_driver.py": "3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb",
+    "plugin/scripts/oracle_gate.py": "b08eb89441f220c0a64d6fd08c897499db13095d9f997dff7b8332c6469d744b",
+    "plugin/scripts/tests/test_go_oracle_driver.py": "0a9bffbca12ce25ad39a4f00b91146c63690c55fa12a7594bd502e72fa4e8050",
+    "plugin/scripts/tests/test_oracle_gate.py": "66ca2a56d7e4569bdbf0c4a91dea44f22e2b82f5a5727530e6b60adf5b63611d",
+    "plugin/skills/oracle-validity/SKILL.md": "e28dd80c3b316813a49cbfbd15c746e55230602fc3f2a3c393b4133206521369",
+    "plugin/skills/reproduce-first/SKILL.md": "ac0c9e852dc4a117dfcc3cf47d10f5b14be15e880b1e76351a4ef2c5069b5e04",
+    "plugin/skills/state-machine/SKILL.md": "9f1e223c56797c6f9f6c767f071a6d0098f8923e180edb8a244ff0d54a2ac977"
+  },
+  "recovery_patch": "coding-agent.patch",
+  "source_checkout": "/private/tmp/ks-upper-wi-coding-agent",
+  "verified_execution": {
+    "plugin_tests_passed": 63,
+    "oracle_tests": 23,
+    "go_adapter_tests": 7,
+    "existing_plugin_tests": 33,
+    "bench_tests_passed": 15,
+    "hooks": "ALL PASS",
+    "jira_go_build": "PASS",
+    "jira_go_tests": "PASS",
+    "go_oracle_runs": 16,
+    "fixture_build_race_vet_fmt": "PASS",
+    "documentation_contract_tests": 23,
+    "live_documents_checked": 109
+  },
+  "limits": {
+    "live_claude_host": "not executed",
+    "production_chain": "not executed; required e2e without an executable adapter is blocked",
+    "independent_human_acceptance": "not_recorded",
+    "other_verification_stage_statuses": "validated as evaluator inputs; oracle gate does not rerun every unrelated scanner"
+  },
+  "next_item": "WI-V2",
+  "source_tree": "a6fce9c9776e86bb54506502db08aa5ea8b0cc0b",
+  "recovery_commit_object": "coding-agent-commit.raw"
+}

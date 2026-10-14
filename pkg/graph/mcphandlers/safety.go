@@ -1,6 +1,7 @@
 package mcphandlers
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
@@ -196,4 +197,31 @@ func isAmbiguousMeta(n types.Node) bool {
 		return false
 	}
 	return n.Type == types.NodeHunk || n.Type == types.NodeCommit
+}
+
+// IncidentEdges preserves the history boundary for optional bounded readers.
+// Filtering can return fewer rows; more is conservative, never false complete.
+func (s *llmSafeReader) IncidentEdges(ctx context.Context, q store.EdgePageInput) ([]types.Edge, bool, error) {
+	bounded, ok := s.Reader.(store.BoundedEdgeReader)
+	if !ok {
+		return nil, false, store.ErrBoundedEdgesUnsupported
+	}
+	edges, more, e := bounded.IncidentEdges(ctx, q)
+	if e != nil {
+		return nil, false, e
+	}
+	ids := map[string]bool{}
+	for _, edge := range edges {
+		ids[edge.Src] = true
+		ids[edge.Dst] = true
+	}
+	selected := make([]string, 0, len(ids))
+	for id := range ids {
+		selected = append(selected, id)
+	}
+	nodes, e := s.NodesByIDs(selected)
+	if e != nil {
+		return nil, false, e
+	}
+	return filterLLMSafeEdges(edges, nodeIDSet(nodes)), more, nil
 }

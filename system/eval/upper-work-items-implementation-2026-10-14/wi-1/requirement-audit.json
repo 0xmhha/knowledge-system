@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "implementation_scope_verified": true,
+  "independent_acceptance": "not_recorded",
+  "requirements": {
+    "retained Go CFG/def-use/data/control": {
+      "evidence": [
+        "pkg/graph/valueflow",
+        "checks/ks-wi1-full-affected-race-fixed.log",
+        "execution/Branch.json",
+        "execution/Loop.json"
+      ],
+      "scope": "Go isolated function; package/memory/interprocedural unknown explicitly retained"
+    },
+    "declaration/redefinition/join/loop/return": {
+      "evidence": [
+        "pkg/graph/valueflow/dependence_test.go",
+        "execution/Kill.json",
+        "execution/Branch.json",
+        "execution/Loop.json",
+        "execution/Named.json",
+        "execution/Const.json"
+      ],
+      "scope": "typed lexical objects, simultaneous RHS, strong scalar kill, fixed points, zero values, compile-time source and source citations"
+    },
+    "field/call/alias/closure/reflection/dynamic uncertainty": {
+      "evidence": [
+        "execution/Field.json",
+        "execution/Pointer.json",
+        "execution/Closure.json",
+        "execution/Generic.json",
+        "pkg/graph/valueflow/dependence.go"
+      ],
+      "scope": "diagnostics, address/reference/aggregate/unknown binding distinctions; no memory/alias/exception proof"
+    },
+    "original location/source/revision/function identity": {
+      "evidence": [
+        "execution/summary.json",
+        "execution/mcp.stdout.jsonl",
+        "pkg/graph/valueflow/query_test.go"
+      ],
+      "scope": "actual node/blob/commit/snapshot/name/byte/line pins with re-read drift refusal and retained result after live deletion"
+    },
+    "size/truncation/cost/capability": {
+      "evidence": [
+        "pkg/graph/valueflow/cfg_test.go",
+        "pkg/graph/valueflow/dependence_test.go",
+        "execution/mcp.stdout.jsonl"
+      ],
+      "scope": "source/AST/block/node/edge/iteration/reserved fact/time caps; unsupported and budget remain incomplete; measured cost not hard real-time guarantee"
+    },
+    "public query and schema": {
+      "evidence": [
+        "execution/tools.json",
+        "execution/mcp.stdout.jsonl",
+        "pkg/graph/mcphandlers/valueflow_test.go"
+      ],
+      "scope": "actual namespaced stdio11 registered tools, readonly annotation, runtime input/output positive/negative validation"
+    },
+    "same name/multi-file/partial/cost fixtures": {
+      "evidence": [
+        "execution/summary.json",
+        "execution/Same-a-flow.go.json",
+        "execution/Same-b-flow.go.json",
+        "pkg/graph/valueflow/dependence_test.go"
+      ],
+      "scope": "compiled/race-tested owned fixture, separate node IDs,15 actual checks and independent expected relations"
+    },
+    "build/test/fmt/lint/source binding": {
+      "evidence": [
+        "checks/ks-wi1-full-test-fixed.log",
+        "checks/ks-wi1-full-affected-race-fixed.log",
+        "checks/ks-wi1-full-build-fixed.log",
+        "checks/ks-wi1-full-lint-fixed.log",
+        "binaries/buildinfo.txt"
+      ],
+      "scope": "full primary test/build/lint incl fmt/vet/boundaries/docs, related parser/MCP/system race, committed clean-source replay"
+    }
+  }
+}

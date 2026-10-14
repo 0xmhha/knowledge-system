@@ -83,6 +83,7 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
 	// The properties each response is recognisable by: the json tags on the
 	// type its handler constructs.
 	want := map[string][]string{
+		ToolNameLabelSuspects:            {"schema_version", "snapshot", "coordinates", "candidates", "partial", "budget"},
 		ToolNameSemanticLookupTerm:       {"state", "reason"},
 		ToolNameSemanticGetConcept:       {"state", "reason"},
 		ToolNameSemanticTraceRequirement: {"state", "reason"},
@@ -100,6 +101,10 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
 		ToolNameGetForTaskV2:             {"format_version", "coordinates", "query", "citations", "evidence_state", "metadata"},
 		ToolNameGetInvariantEnforcement:  {"inv_id", "statement", "enforced_at"},
 		ToolNameGetSubgraph:              {"seed", "nodes", "edges"},
+		ToolNameValueDependencies:        {"schema_version", "status", "analysis", "elapsed_micros"},
+		ToolNamePolicySecurity:           {"schema_version", "status", "symbol", "annotations", "safety_verdict", "automatic_rules"},
+		ToolNameValueDependencyExpansion: {"schema_version", "graph", "curated_flow"},
+		ToolNameRuleCandidates:           {"schema_version", "status", "analysis", "elapsed_micros"},
 		ToolNameReviewFunction:           {"seed", "code", "history", "tests", "available", "limits"},
 		ToolNameImpactAnalysis:           {"seed", "result"},
 		ToolNameSearchText:               {"query", "hits"},

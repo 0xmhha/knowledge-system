@@ -1,0 +1,1887 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 06c6485..81e506b 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -43,6 +43,7 @@ jobs:
+           python plugin/scripts/tests/test_fix_selection.py
+           python plugin/scripts/tests/test_suspect_labels.py
+           python plugin/scripts/tests/test_timing_investigation.py
++          python plugin/scripts/tests/test_timing_log_observation.py
+ 
+   # jira-gateway-mcp Go binary: must build and pass its unit tests.
+   go-jira-gateway:
+@@ -71,6 +72,10 @@ jobs:
+       - uses: actions/setup-go@v5
+         with:
+           go-version: "1.26.9"
++      - name: Observation-only Go source and normal/race controls
++        run: |
++          go test -race plugin/tools/timing-log-guard/main.go plugin/tools/timing-log-guard/main_test.go
++          python plugin/scripts/tests/test_timing_instrumentation.py
+       - name: Real Go oracle and completion gate execution
+         run: python bench/oracle-validity/smoke.py --out "$RUNNER_TEMP/oracle-evidence"
+       - name: Real Go candidate selection with explicit fixture opinions
+diff --git a/bench/timing/log_probe.py b/bench/timing/log_probe.py
+new file mode 100644
+index 0000000..a9777af
+--- /dev/null
++++ b/bench/timing/log_probe.py
+@@ -0,0 +1,114 @@
++#!/usr/bin/env python3
++"""Actual owner-backed mode-9 fixture: no blockchain consensus acceptance."""
++import argparse
++import json
++import os
++from pathlib import Path
++import signal
++import subprocess
++import sys
++import tempfile
++import time
++import urllib.request
++SCRIPTS=Path(__file__).resolve().parents[2]/'plugin/scripts';sys.path.insert(0,str(SCRIPTS))
++import timing_investigation as timing
++import timing_instrumentation as trace
++import timing_log_observation as logs
++
++def run(command,cwd=None):return subprocess.run(command,cwd=cwd,capture_output=True,check=True,timeout=60).stdout.decode().strip()
++def rpc(url,method,params):
++ raw=timing.encode({'jsonrpc':'2.0','id':1,'method':method,'params':params})
++ return json.loads(urllib.request.urlopen(urllib.request.Request(url,data=raw,headers={'Content-Type':'application/json'}),timeout=5).read())['result']
++
++def main():
++ parser=argparse.ArgumentParser();parser.add_argument('--chainbench',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--mcp',type=Path,required=True);a=parser.parse_args();timing.require(not a.output.exists(),'new evidence root required');root=a.output.resolve();root.mkdir();source=root/'source';source.mkdir()
++ (source/'go.mod').write_text('module example.invalid/owned-log-fixture\n\ngo 1.26.9\n')
++ original=Path(__file__).with_name('node.go.txt').read_text().replace('result="0x0";if ready.Load(){result="0x1"}','observedReady := ready.Load()\n    result="0x0";if observedReady{result="0x1"}')
++ (source/'main.go').write_text(original)
++ (source/'main_test.go').write_text('''package main
++import("bytes";"context";"encoding/json";"fmt";"net";"net/http";"os";"os/exec";"path/filepath";"syscall";"testing";"time")
++func TestMain(m *testing.M){if os.Getenv("KS_OWNED_FIXTURE_CHILD")=="1"{main();return};os.Exit(m.Run())}
++func TestReadBeforeAndAfterActualCommit(t *testing.T){
++ listener,e:=net.Listen("tcp","127.0.0.1:0");if e!=nil{t.Fatal(e)};port:=listener.Addr().(*net.TCPAddr).Port;_ = listener.Close()
++ dir:=t.TempDir();config:=filepath.Join(dir,"config");if e=os.WriteFile(config,[]byte(fmt.Sprintf("HTTPPort = %d\\n",port)),0600);e!=nil{t.Fatal(e)}
++ cmd:=exec.Command(os.Args[0],"--config",config);cmd.Env=append(os.Environ(),"KS_OWNED_FIXTURE_CHILD=1");var stderr bytes.Buffer;cmd.Stderr=&stderr;if e=cmd.Start();e!=nil{t.Fatal(e)}
++ defer func(){_ = cmd.Process.Signal(syscall.SIGTERM);if e:=cmd.Wait();e!=nil{t.Errorf("owned child exit: %v %s",e,stderr.String())}}()
++ url:=fmt.Sprintf("http://127.0.0.1:%d",port);client:=http.Client{Timeout:time.Second}
++ query:=func(address string)(string,error){body,_:=json.Marshal(map[string]any{"jsonrpc":"2.0","id":1,"method":"eth_getBalance","params":[]any{address,"latest"}});req,_:=http.NewRequestWithContext(context.Background(),"POST",url,bytes.NewReader(body));resp,e:=client.Do(req);if e!=nil{return "",e};defer func(){_ = resp.Body.Close()}();var out struct{Result string};e=json.NewDecoder(resp.Body).Decode(&out);return out.Result,e}
++ deadline:=time.Now().Add(5*time.Second);var value string
++ for time.Now().Before(deadline){value,e=query("0x0000000000000000000000000000000000000002");if e==nil{break};time.Sleep(10*time.Millisecond)}
++ if e!=nil||value!="0x0"{t.Fatalf("pre-commit read=%s %v",value,e)}
++ if _,e=query(activation);e!=nil{t.Fatal(e)};time.Sleep(450*time.Millisecond)
++ value,e=query("0x0000000000000000000000000000000000000002");if e!=nil||value!="0x1"{t.Fatalf("post-commit read=%s %v",value,e)}
++}
++''')
++ run(['gofmt','-w','main.go','main_test.go'],source);run(['git','init','-q'],source);run(['git','config','commit.gpgsign','false'],source)
++ def commit(subject):
++  run(['git','add','.'],source);run(['git','-c','user.name=Owned log fixture','-c','user.email=fixture@example.invalid','commit','-qm',subject],source);return run(['git','rev-parse','HEAD'],source)
++ base=commit('test: retain concurrent read behavior and normal controls');base_bin=root/'base-node';run(['go','build','-buildvcs=true','-o',str(base_bin),'.'],source)
++ observed=(source/'main.go').read_text().replace('import (','import (\nksobserve "log"',1)
++ # Read already-sampled local scalar only: no new calls or shared field reads.
++ point='observedReady := ready.Load()'
++ observation='ksobserve.Printf(`KS_TIMING_V1 {"schema_version":1,"probe_id":"read-probe","event":"read-before-commit","site":"main/read","symptom":%t,"values":{"ready":%t}}`, !observedReady, observedReady)'
++ observed=observed.replace(point,point+'\n'+observation,1);(source/'main.go').write_text(observed);run(['gofmt','-w','main.go'],source);probe=commit('test: observe sampled readiness without changing read logic');probe_bin=root/'probe-node';run(['go','build','-buildvcs=true','-o',str(probe_bin),'.'],source);run(['git','bundle','create',str(root/'fixture.bundle'),'HEAD'],source)
++ workspace=root/'.coding-agent/tickets/read-probe';workspace.mkdir(parents=True)
++ state={'ticket_id':'read-probe','ticket_type':'bugfix','current_state':'ANALYSIS','states':{'ANALYSIS':{'investigation_kind':'observation','status':'in_progress','reproduction_confirmed':False},'EVALUATION':{'cycle':1}}}
++ def save():(workspace/'state.json').write_bytes(timing.encode(state))
++ save();trace_sha=trace.freeze(source,workspace,base,probe,'read-probe');controls=trace.control_evidence(workspace);timing.require(controls['status']=='PASS','normal/race controls failed');trace.verify_controls(workspace);print('source-only AST and actual base/probe normal/race controls PASS',flush=True)
++ # Reproduction attempt uses an explicit delayed schedule that sees no failure.
++ case={'schemaVersion':'1','id':'unreproduced-read','chain':{'name':'stablenet','binary':'pinned'},'topology':{'bp':1},'steps':[{'read':{'source':'balanceAt','on':'node1','address':'0x0000000000000000000000000000000000000001'}},{'read':{'source':'chainId','on':'node1'}}],'assertions':[{'assert':'balanceAt','on':'node1','address':'0x0000000000000000000000000000000000000002','compare':'Equal','expected':'1'},{'assert':'chainId','on':'node1','compare':'Equal','expected':'8283'}]}
++ artifact=Path(tempfile.mkdtemp(prefix='w4lu-',dir='/tmp'));artifact.rmdir()
++ proposal={'plan':{'schema_version':1,'id':'unreproduced-read','mode':'reproduction','symptom':'read before concurrent commit; no consensus claim','assertion_id':'unreproduced-read/assert/0','seed':'late-schedule','before':{'commit':base},'after':None,'repetitions':3,'min_completed':3,'min_symptom_failures':1,'max_failure_rate':.05,'trial_timeout_seconds':30,'total_timeout_seconds':120,'owned_node_ids':['node1'],'normal_assertion_ids':['unreproduced-read/assert/1'],'injection':{'kind':'delay','target':'node1','step':'unreproduced-read/step/1','min_delay_ms':500,'max_delay_ms':500},'resume':None},'case':case,'binary_by_commit':{base:str(base_bin)},'artifact_root':str(artifact)}
++ proposed=root/'unreproduced-proposal.json';proposed.write_bytes(timing.encode(proposal));state['states']['ANALYSIS']['timing_plan_sha256']=timing.freeze(workspace,'analysis','read-probe',proposed,a.chainbench);save();result=timing.execute(workspace,'analysis');state['states']['ANALYSIS']['timing_result_sha256']=timing.sha(timing.paths(workspace,'analysis')['result'].read_bytes());save();timing.require(result['verdict']=='INCONCLUSIVE','initial result must remain unreproduced');print('actual owned repeated attempt INCONCLUSIVE; no planning permitted',flush=True)
++ composition=Path(tempfile.mkdtemp(prefix='w4log-',dir='/tmp'));composition.rmdir();cli=str(a.chainbench.resolve());started=False
++ try:
++  launch=run([cli,'chain','up','--chain','stablenet','--workspace-dir',str(composition),'--binary',str(probe_bin),'--bp','1','--keys-source','generate','--keys',str(composition/'keys'),'--json']);(root/'owned-chain-up.json').write_text(launch+'\n');started=True
++  record=json.loads((composition/'chain-record.json').read_text());node=record['nodes'][0];url='http://127.0.0.1:'+str(node['http'])
++  for window in(1,2):
++   out=root/('window-'+str(window));rawproposal=root/('log-proposal-'+str(window)+'.json')
++   value={'plan':{'schema_version':1,'id':'owned-log-window-'+str(window),'source':{'commit':probe},'probe_id':'read-probe','instrumentation_sha256':trace_sha,'event':'read-before-commit','sites':['main/read'],'window_seconds':2,'poll_ms':100,'max_bytes':65536,'max_events':32,'anchors':[{'node':1}]},'workspace':str(composition),'binary':str(probe_bin),'artifact_root':str(out)};rawproposal.write_bytes(timing.encode(value))
++   plan_sha=logs.freeze(workspace,window,rawproposal,a.chainbench);state['states']['ANALYSIS'].update({'log_observation_window':window,'log_observation_plan_sha256':plan_sha});state['states']['ANALYSIS'].pop('log_observation_result_sha256',None);save()
++   process=subprocess.Popen([sys.executable,str(SCRIPTS/'timing_log_observation.py'),'--workspace',str(workspace),'--window',str(window),'--execute'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
++   try:
++    if window==2:
++     deadline=time.monotonic()+10
++     while not(out/'log-input.json').exists()and process.poll()is None and time.monotonic()<deadline:time.sleep(.02)
++     timing.require((out/'log-input.json').exists(),'native observer did not start');timing.require(rpc(url,'eth_getBalance',['0x0000000000000000000000000000000000000002','latest'])=='0x0','controlled read not before commit')
++    stdout,stderr=process.communicate(timeout=20);(root/('window-'+str(window)+'-consumer.stdout.txt')).write_bytes(stdout);(root/('window-'+str(window)+'-consumer.stderr.txt')).write_bytes(stderr);timing.require(process.returncode==0,'consumer failed: '+stderr.decode()+stdout.decode())
++   finally:
++    if process.poll()is None:process.send_signal(signal.SIGTERM);process.communicate(timeout=20)
++   files=logs.paths(workspace,window);state['states']['ANALYSIS']['log_observation_result_sha256']=timing.sha(files['result'].read_bytes());save();checked=logs.state_check(workspace,state);expected='AWAITING_OBSERVATION'if window==1 else'RECURRED';timing.require(checked['verdict']==expected,'unexpected log observation');print('actual source-bound window '+str(window)+' '+expected+'; resume_target='+str(checked['resume_target']),flush=True)
++  # Also exercise the two actual stdio MCP tools on the same recorded owner.
++  def mcp_request(name,input_value):return (json.dumps({'jsonrpc':'2.0','id':1,'method':'tools/call','params':{'name':name,'arguments':{'input':input_value}}},separators=(',',':'))+'\n').encode()
++  def mcp_value(raw):
++   reply=json.loads(raw);timing.require(not reply['result']['isError'],'public MCP error: '+reply['result']['content'][0]['text']);return json.loads(reply['result']['content'][0]['text'])
++  mcp_proposal=json.loads(rawproposal.read_text());mcp_proposal['artifact_root']=str(root/'mcp-log-events')
++  prepare=subprocess.run([str(a.mcp.resolve())],input=mcp_request('chainbench_prepare_log_observation',mcp_proposal),capture_output=True,check=True,timeout=30);(root/'mcp-prepare-response.json').write_bytes(prepare.stdout);prepared=mcp_value(prepare.stdout)
++  process=subprocess.Popen([str(a.mcp.resolve())],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
++  try:
++   process.stdin.write(mcp_request('chainbench_observe_logs',prepared));process.stdin.flush();deadline=time.monotonic()+10
++   while not(root/'mcp-log-events/log-input.json').exists()and process.poll()is None and time.monotonic()<deadline:time.sleep(.02)
++   timing.require((root/'mcp-log-events/log-input.json').exists(),'public MCP observer did not start');rpc(url,'eth_getBalance',['0x0000000000000000000000000000000000000002','latest'])
++   stdout,stderr=process.communicate(timeout=20);(root/'mcp-observe-response.json').write_bytes(stdout);(root/'mcp-observe-stderr.txt').write_bytes(stderr);timing.require(process.returncode==0,'MCP process failed');mcp_report=mcp_value(stdout);timing.require(mcp_report['verdict']=='RECURRED'and mcp_report['resume_requested'],'MCP did not retain actual log recurrence');run([cli,'experiment','observe-logs','verify','--report',str(root/'mcp-log-events/log-report.json')]);print('actual stdio MCP prepare + log recurrence + native report verification PASS',flush=True)
++  finally:
++   if process.poll()is None:process.terminate();process.communicate(timeout=20)
++  # The real hook rejects using recurrence as a planning/completion gate.
++  denied=dict(state);denied=json.loads(json.dumps(state));denied['current_state']='PLANNING';data={'tool_name':'Write','cwd':str(workspace),'tool_input':{'file_path':str(workspace/'state.json'),'content':json.dumps(denied)}}
++  response=subprocess.run([sys.executable,str(SCRIPTS.parent/'hooks/timing-investigation-guard.py')],input=timing.encode(data),capture_output=True,check=True);(root/'planning-hook.json').write_bytes(response.stdout);timing.require(json.loads(response.stdout)['hookSpecificOutput']['permissionDecision']=='deny','recurrence incorrectly allowed planning')
++  reentry=json.loads(json.dumps(state));reentry['states']['EVALUATION']['cycle']=2
++  for phase in('ANALYSIS','EVALUATION'):
++   for key in('timing_plan_sha256','timing_result_sha256','log_observation_plan_sha256','log_observation_result_sha256','log_observation_window'):reentry['states'][phase].pop(key,None)
++  data['tool_input']['content']=json.dumps(reentry);reply=subprocess.run([sys.executable,str(SCRIPTS.parent/'hooks/timing-investigation-guard.py')],input=timing.encode(data),capture_output=True,check=True);(root/'analysis-reentry-hook.stdout.txt').write_bytes(reply.stdout);timing.require(not reply.stdout,'verified recurrence should permit next bounded ANALYSIS')
++  for name,proposed in(('erase-kind',json.loads(json.dumps(state))),('exhausted-cycle',json.loads(json.dumps(state)))):
++   if name=='erase-kind':proposed['states']['ANALYSIS'].pop('investigation_kind')
++   else:proposed['states']['EVALUATION']['cycle']=4
++   data['tool_input']['content']=json.dumps(proposed);reply=subprocess.run([sys.executable,str(SCRIPTS.parent/'hooks/timing-investigation-guard.py')],input=timing.encode(data),capture_output=True,check=True);(root/(name+'-hook.json')).write_bytes(reply.stdout);timing.require(json.loads(reply.stdout)['hookSpecificOutput']['permissionDecision']=='deny','invalid observation transition permitted')
++  data['tool_input']={'file_path':str(logs.paths(workspace,2)['result']),'content':'{}'};reply=subprocess.run([sys.executable,str(SCRIPTS.parent/'hooks/timing-investigation-guard.py')],input=timing.encode(data),capture_output=True,check=True);(root/'immutable-log-hook.json').write_bytes(reply.stdout);timing.require(json.loads(reply.stdout)['hookSpecificOutput']['permissionDecision']=='deny','retained log overwrite permitted')
++
++ finally:
++  if started:
++   stop=subprocess.run([cli,'chain','stop','--workspace-dir',str(composition)],capture_output=True,timeout=30);(root/'owned-stop.stdout.txt').write_bytes(stop.stdout);(root/'owned-stop.stderr.txt').write_bytes(stop.stderr);timing.require(stop.returncode==0,'owned cleanup failed')
++   observed=run([cli,'chain','observe','--workspace-dir',str(composition),'--json']);(root/'owned-stopped-observation.json').write_text(observed+'\n');timing.require('"stopped"'in observed and '"running"'not in observed,'owned node still live')
++ (root/'summary.json').write_bytes(timing.encode({'schema_version':1,'base_commit':base,'probe_commit':probe,'instrumentation_sha256':trace_sha,'normal_race_controls':'PASS','initial_reproduction':'INCONCLUSIVE','log_windows':['AWAITING_OBSERVATION','RECURRED'],'resume_target':'ANALYSIS','mcp_prepare_observe':'PASS','planning':'DENIED','owned_cleanup':'PASS','scope':'owned Go RPC fixture, not blockchain consensus; no timing-neutrality or fix acceptance','acceptance':'not_recorded'}))
++ print(json.dumps({'output':str(root),'mode9_controlled_execution':'PASS','acceptance':'not_recorded'}),flush=True)
++if __name__=='__main__':main()
+diff --git a/contract/agent-mcp.schema.json b/contract/agent-mcp.schema.json
+index 17667b3..21e0772 100644
+--- a/contract/agent-mcp.schema.json
++++ b/contract/agent-mcp.schema.json
+@@ -154,7 +154,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -183,7 +183,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -231,7 +231,7 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "kinds": {
+@@ -306,7 +306,7 @@
+           "input": {
+             "properties": {
+               "intent": {
+-                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+                 "type": "string"
+               },
+               "prompt": {
+@@ -391,7 +391,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -578,11 +578,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -615,11 +615,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -1708,6 +1708,339 @@
+             ],
+             "type": "object"
+           }
++        },
++        "chainbench_observe_logs": {
++          "wire_name": "chainbench_observe_logs",
++          "input": {
++            "additionalProperties": false,
++            "properties": {
++              "input": {
++                "additionalProperties": false,
++                "properties": {
++                  "artifact_root": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "binary": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "plan": {
++                    "additionalProperties": false,
++                    "properties": {
++                      "anchors": {
++                        "items": {
++                          "additionalProperties": false,
++                          "properties": {
++                            "id": {
++                              "minimum": 1,
++                              "type": "integer"
++                            },
++                            "initial": {
++                              "contentEncoding": "base64",
++                              "maxLength": 87384,
++                              "type": "string"
++                            },
++                            "node": {
++                              "maximum": 32,
++                              "minimum": 1,
++                              "type": "integer"
++                            }
++                          },
++                          "required": [
++                            "node"
++                          ],
++                          "type": "object"
++                        },
++                        "maxItems": 8,
++                        "minItems": 1,
++                        "type": "array"
++                      },
++                      "event": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "instrumentation_sha256": {
++                        "pattern": "^[0-9a-f]{64}$",
++                        "type": "string"
++                      },
++                      "max_bytes": {
++                        "maximum": 65536,
++                        "minimum": 4096,
++                        "type": "integer"
++                      },
++                      "max_events": {
++                        "maximum": 256,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "poll_ms": {
++                        "maximum": 5000,
++                        "minimum": 50,
++                        "type": "integer"
++                      },
++                      "probe_id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "schema_version": {
++                        "const": 1,
++                        "type": "integer"
++                      },
++                      "sites": {
++                        "items": {
++                          "maxLength": 256,
++                          "minLength": 1,
++                          "type": "string"
++                        },
++                        "maxItems": 32,
++                        "minItems": 1,
++                        "type": "array",
++                        "uniqueItems": true
++                      },
++                      "source": {
++                        "additionalProperties": false,
++                        "properties": {
++                          "binary_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "commit": {
++                            "pattern": "^[0-9a-f]{40}$",
++                            "type": "string"
++                          },
++                          "driver_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "environment_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          }
++                        },
++                        "required": [
++                          "commit",
++                          "binary_sha256",
++                          "driver_sha256",
++                          "environment_sha256"
++                        ],
++                        "type": "object"
++                      },
++                      "window_seconds": {
++                        "maximum": 3600,
++                        "minimum": 1,
++                        "type": "integer"
++                      }
++                    },
++                    "required": [
++                      "schema_version",
++                      "id",
++                      "source",
++                      "probe_id",
++                      "instrumentation_sha256",
++                      "event",
++                      "sites",
++                      "window_seconds",
++                      "poll_ms",
++                      "max_bytes",
++                      "max_events",
++                      "anchors"
++                    ],
++                    "type": "object"
++                  },
++                  "workspace": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  }
++                },
++                "required": [
++                  "plan",
++                  "workspace",
++                  "binary"
++                ],
++                "type": "object"
++              }
++            },
++            "required": [
++              "input"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_prepare_log_observation": {
++          "wire_name": "chainbench_prepare_log_observation",
++          "input": {
++            "additionalProperties": false,
++            "properties": {
++              "input": {
++                "additionalProperties": false,
++                "properties": {
++                  "artifact_root": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "binary": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "plan": {
++                    "additionalProperties": false,
++                    "properties": {
++                      "anchors": {
++                        "items": {
++                          "additionalProperties": false,
++                          "properties": {
++                            "id": {
++                              "minimum": 1,
++                              "type": "integer"
++                            },
++                            "initial": {
++                              "contentEncoding": "base64",
++                              "maxLength": 87384,
++                              "type": "string"
++                            },
++                            "node": {
++                              "maximum": 32,
++                              "minimum": 1,
++                              "type": "integer"
++                            }
++                          },
++                          "required": [
++                            "node"
++                          ],
++                          "type": "object"
++                        },
++                        "maxItems": 8,
++                        "minItems": 1,
++                        "type": "array"
++                      },
++                      "event": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "instrumentation_sha256": {
++                        "pattern": "^[0-9a-f]{64}$",
++                        "type": "string"
++                      },
++                      "max_bytes": {
++                        "maximum": 65536,
++                        "minimum": 4096,
++                        "type": "integer"
++                      },
++                      "max_events": {
++                        "maximum": 256,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "poll_ms": {
++                        "maximum": 5000,
++                        "minimum": 50,
++                        "type": "integer"
++                      },
++                      "probe_id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "schema_version": {
++                        "const": 1,
++                        "type": "integer"
++                      },
++                      "sites": {
++                        "items": {
++                          "maxLength": 256,
++                          "minLength": 1,
++                          "type": "string"
++                        },
++                        "maxItems": 32,
++                        "minItems": 1,
++                        "type": "array",
++                        "uniqueItems": true
++                      },
++                      "source": {
++                        "additionalProperties": false,
++                        "properties": {
++                          "binary_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "commit": {
++                            "pattern": "^[0-9a-f]{40}$",
++                            "type": "string"
++                          },
++                          "driver_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "environment_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          }
++                        },
++                        "required": [
++                          "commit"
++                        ],
++                        "type": "object"
++                      },
++                      "window_seconds": {
++                        "maximum": 3600,
++                        "minimum": 1,
++                        "type": "integer"
++                      }
++                    },
++                    "required": [
++                      "schema_version",
++                      "id",
++                      "source",
++                      "probe_id",
++                      "instrumentation_sha256",
++                      "event",
++                      "sites",
++                      "window_seconds",
++                      "poll_ms",
++                      "max_bytes",
++                      "max_events",
++                      "anchors"
++                    ],
++                    "type": "object"
++                  },
++                  "workspace": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  }
++                },
++                "required": [
++                  "plan",
++                  "workspace",
++                  "binary"
++                ],
++                "type": "object"
++              }
++            },
++            "required": [
++              "input"
++            ],
++            "type": "object"
++          }
+         }
+       }
+     },
+diff --git a/plugin/agents/analyzer.md b/plugin/agents/analyzer.md
+index 9c10c24..f982939 100644
+--- a/plugin/agents/analyzer.md
++++ b/plugin/agents/analyzer.md
+@@ -12,6 +12,8 @@ description: |
+   Does NOT design or plan the fix, and does NOT modify production code.
+ tools:
+   - mcp__plugin_coding-agent_chainbench__chainbench_experiment
++  - mcp__plugin_coding-agent_chainbench__chainbench_prepare_log_observation
++  - mcp__plugin_coding-agent_chainbench__chainbench_observe_logs
+   - Read
+   - Write
+   - Edit
+@@ -76,6 +78,14 @@ For timing/nondeterministic/fault symptoms, use the `timing-investigation` skill
+ and frozen `chainbench_experiment` input. Retain the exact phase plan/result SHA
+ and controlled normal/reproduction/defense/observation branches. The timing route
+ uses the current public CLI/MCP, not the historical init/start/test-run recipe.
++For unreproduced mode 9, retain a separate immutable observation-only Go probe
++commit, freeze it with timing_instrumentation.py and execute its normal/race
++controls before timing_log_observation.py. Only read existing local scalar
++observations; never insert extra calls/guards/field reads or change environment
++files. Standard logger I/O can perturb timing; never claim neutrality. Use the
++new prepare/observe log tools for source-bound complete-line windows. This
++retained mode-9 route takes precedence over the temporary scratch/restart loop
++in §5c, which is only the separate already-reproduced diagnosis route.
+ Unreproduced or inconclusive results remain in ANALYSIS; RECURRED only resumes
+ diagnosis. Timing evaluation must also pass the existing independent-oracle and
+ fix-selection gates before completion.
+diff --git a/plugin/contracts/chainbench-tools.schema.json b/plugin/contracts/chainbench-tools.schema.json
+index 4bc3849..cc3bee0 100644
+--- a/plugin/contracts/chainbench-tools.schema.json
++++ b/plugin/contracts/chainbench-tools.schema.json
+@@ -1,6 +1,6 @@
+ {
+   "schema_version": 1,
+-  "source_commit": "348a6ec5fb9aec5b5966ce768a622be4e5296db4",
++  "source_commit": "b893ceb5853360b5e156e499b2f0caf2a315f8d1",
+   "compatibility_scope": "current full registered input schemas; new timing route supported; historical non-timing agent recipes are not certified compatible",
+   "providers": {
+     "chainbench": {
+@@ -548,6 +548,339 @@
+             "type": "object"
+           }
+         },
++        "chainbench_observe_logs": {
++          "wire_name": "chainbench_observe_logs",
++          "input": {
++            "additionalProperties": false,
++            "properties": {
++              "input": {
++                "additionalProperties": false,
++                "properties": {
++                  "artifact_root": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "binary": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "plan": {
++                    "additionalProperties": false,
++                    "properties": {
++                      "anchors": {
++                        "items": {
++                          "additionalProperties": false,
++                          "properties": {
++                            "id": {
++                              "minimum": 1,
++                              "type": "integer"
++                            },
++                            "initial": {
++                              "contentEncoding": "base64",
++                              "maxLength": 87384,
++                              "type": "string"
++                            },
++                            "node": {
++                              "maximum": 32,
++                              "minimum": 1,
++                              "type": "integer"
++                            }
++                          },
++                          "required": [
++                            "node"
++                          ],
++                          "type": "object"
++                        },
++                        "maxItems": 8,
++                        "minItems": 1,
++                        "type": "array"
++                      },
++                      "event": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "instrumentation_sha256": {
++                        "pattern": "^[0-9a-f]{64}$",
++                        "type": "string"
++                      },
++                      "max_bytes": {
++                        "maximum": 65536,
++                        "minimum": 4096,
++                        "type": "integer"
++                      },
++                      "max_events": {
++                        "maximum": 256,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "poll_ms": {
++                        "maximum": 5000,
++                        "minimum": 50,
++                        "type": "integer"
++                      },
++                      "probe_id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "schema_version": {
++                        "const": 1,
++                        "type": "integer"
++                      },
++                      "sites": {
++                        "items": {
++                          "maxLength": 256,
++                          "minLength": 1,
++                          "type": "string"
++                        },
++                        "maxItems": 32,
++                        "minItems": 1,
++                        "type": "array",
++                        "uniqueItems": true
++                      },
++                      "source": {
++                        "additionalProperties": false,
++                        "properties": {
++                          "binary_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "commit": {
++                            "pattern": "^[0-9a-f]{40}$",
++                            "type": "string"
++                          },
++                          "driver_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "environment_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          }
++                        },
++                        "required": [
++                          "commit",
++                          "binary_sha256",
++                          "driver_sha256",
++                          "environment_sha256"
++                        ],
++                        "type": "object"
++                      },
++                      "window_seconds": {
++                        "maximum": 3600,
++                        "minimum": 1,
++                        "type": "integer"
++                      }
++                    },
++                    "required": [
++                      "schema_version",
++                      "id",
++                      "source",
++                      "probe_id",
++                      "instrumentation_sha256",
++                      "event",
++                      "sites",
++                      "window_seconds",
++                      "poll_ms",
++                      "max_bytes",
++                      "max_events",
++                      "anchors"
++                    ],
++                    "type": "object"
++                  },
++                  "workspace": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  }
++                },
++                "required": [
++                  "plan",
++                  "workspace",
++                  "binary"
++                ],
++                "type": "object"
++              }
++            },
++            "required": [
++              "input"
++            ],
++            "type": "object"
++          }
++        },
++        "chainbench_prepare_log_observation": {
++          "wire_name": "chainbench_prepare_log_observation",
++          "input": {
++            "additionalProperties": false,
++            "properties": {
++              "input": {
++                "additionalProperties": false,
++                "properties": {
++                  "artifact_root": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "binary": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "plan": {
++                    "additionalProperties": false,
++                    "properties": {
++                      "anchors": {
++                        "items": {
++                          "additionalProperties": false,
++                          "properties": {
++                            "id": {
++                              "minimum": 1,
++                              "type": "integer"
++                            },
++                            "initial": {
++                              "contentEncoding": "base64",
++                              "maxLength": 87384,
++                              "type": "string"
++                            },
++                            "node": {
++                              "maximum": 32,
++                              "minimum": 1,
++                              "type": "integer"
++                            }
++                          },
++                          "required": [
++                            "node"
++                          ],
++                          "type": "object"
++                        },
++                        "maxItems": 8,
++                        "minItems": 1,
++                        "type": "array"
++                      },
++                      "event": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "instrumentation_sha256": {
++                        "pattern": "^[0-9a-f]{64}$",
++                        "type": "string"
++                      },
++                      "max_bytes": {
++                        "maximum": 65536,
++                        "minimum": 4096,
++                        "type": "integer"
++                      },
++                      "max_events": {
++                        "maximum": 256,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "poll_ms": {
++                        "maximum": 5000,
++                        "minimum": 50,
++                        "type": "integer"
++                      },
++                      "probe_id": {
++                        "maxLength": 128,
++                        "minLength": 1,
++                        "type": "string"
++                      },
++                      "schema_version": {
++                        "const": 1,
++                        "type": "integer"
++                      },
++                      "sites": {
++                        "items": {
++                          "maxLength": 256,
++                          "minLength": 1,
++                          "type": "string"
++                        },
++                        "maxItems": 32,
++                        "minItems": 1,
++                        "type": "array",
++                        "uniqueItems": true
++                      },
++                      "source": {
++                        "additionalProperties": false,
++                        "properties": {
++                          "binary_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "commit": {
++                            "pattern": "^[0-9a-f]{40}$",
++                            "type": "string"
++                          },
++                          "driver_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          },
++                          "environment_sha256": {
++                            "pattern": "^[0-9a-f]{64}$",
++                            "type": "string"
++                          }
++                        },
++                        "required": [
++                          "commit"
++                        ],
++                        "type": "object"
++                      },
++                      "window_seconds": {
++                        "maximum": 3600,
++                        "minimum": 1,
++                        "type": "integer"
++                      }
++                    },
++                    "required": [
++                      "schema_version",
++                      "id",
++                      "source",
++                      "probe_id",
++                      "instrumentation_sha256",
++                      "event",
++                      "sites",
++                      "window_seconds",
++                      "poll_ms",
++                      "max_bytes",
++                      "max_events",
++                      "anchors"
++                    ],
++                    "type": "object"
++                  },
++                  "workspace": {
++                    "maxLength": 4096,
++                    "minLength": 1,
++                    "type": "string"
++                  }
++                },
++                "required": [
++                  "plan",
++                  "workspace",
++                  "binary"
++                ],
++                "type": "object"
++              }
++            },
++            "required": [
++              "input"
++            ],
++            "type": "object"
++          }
++        },
+         "chainbench_hardfork": {
+           "wire_name": "chainbench_hardfork",
+           "input": {
+diff --git a/plugin/hooks/timing-investigation-guard.py b/plugin/hooks/timing-investigation-guard.py
+index 50cc847..46ad620 100644
+--- a/plugin/hooks/timing-investigation-guard.py
++++ b/plugin/hooks/timing-investigation-guard.py
+@@ -18,6 +18,8 @@ def main():
+  if not isinstance(inputs,dict)or not isinstance(inputs.get('file_path'),str):return 0
+  path=Path(inputs['file_path']);path=path if path.is_absolute()else Path(data.get('cwd')or os.getcwd())/path
+  is_state=path.name=='state.json'
++ is_log=('/timing/'in str(path)and '/logs/'in str(path))or path.name=='timing-instrumentation-plan.json'
++ if is_log and path.exists():helper.deny('Retained observation source/inputs/evidence are immutable; use the next bounded window/generation');return 0
+  is_plan=path.name in ('timing-analysis-plan.json','timing-analysis-input.json','timing-evaluation-plan.json','timing-evaluation-input.json') and path.parent.parent.name=='timing'
+  if not is_state and not is_plan:return 0
+  workspace=path.parent if is_state else path.parent.parent.parent
+@@ -37,15 +39,27 @@ def main():
+   if existing and (not active or proposed.get('ticket_type')!='bugfix'):raise ValueError('cannot erase timing investigation requirements')
+   if not active or proposed.get('ticket_type')!='bugfix':return 0
+   cycle=generation(proposed);old_cycle=generation(state)
++  if analysis.get('log_observation_result_sha256'):
++   from timing_log_observation import state_check as log_state_check
++   previous=log_state_check(workspace,state)
++   if cycle!=old_cycle and previous['verdict']!='RECURRED':raise ValueError('log-driven analysis resume requires a verified recurrence')
++   if cycle==old_cycle:
++    for key in ('log_observation_window','log_observation_plan_sha256','log_observation_result_sha256'):
++     if analysis.get(key)!=next_analysis.get(key):
++      new_window=next_analysis.get('log_observation_window')
++      if previous['verdict']!='AWAITING_OBSERVATION' or new_window!=analysis.get('log_observation_window')+1 or proposed.get('current_state')!='ANALYSIS':raise ValueError('cannot erase/replace retained log binding; only next bounded awaiting window')
+   if cycle!=old_cycle:
+    if cycle!=old_cycle+1 or proposed.get('current_state')!='ANALYSIS':raise ValueError('new timing generation requires the next bounded cycle in analysis')
+   elif proposed.get('current_state')!='ANALYSIS':
+    for phase in ('ANALYSIS','EVALUATION'):
+     before=state.get('states',{}).get(phase,{})
+     after=proposed.get('states',{}).get(phase,{})
+-    for key in ('timing_plan_sha256','timing_result_sha256'):
++    for key in ('timing_plan_sha256','timing_result_sha256','log_observation_plan_sha256','log_observation_result_sha256'):
+      if before.get(key)and before.get(key)!=after.get(key):raise ValueError('cannot rewrite frozen timing bindings outside analysis')
+   target=proposed.get('current_state')
++  if next_analysis.get('log_observation_result_sha256') and cycle==old_cycle:
++   from timing_log_observation import state_check as log_state_check
++   log_state_check(workspace,proposed)
+   if next_analysis.get('status')=='completed' or target in ('PLANNING','DESIGN','IMPLEMENTATION','EVALUATION','COMPLETION','COMPLETED'):
+    state_check(workspace,proposed,'analysis')
+   if target in ('COMPLETION','COMPLETED'):
+diff --git a/plugin/scripts/tests/test_timing_instrumentation.py b/plugin/scripts/tests/test_timing_instrumentation.py
+new file mode 100644
+index 0000000..60268ea
+--- /dev/null
++++ b/plugin/scripts/tests/test_timing_instrumentation.py
+@@ -0,0 +1,35 @@
++import json
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++SCRIPTS=Path(__file__).resolve().parents[1];sys.path.insert(0,str(SCRIPTS))
++import timing_instrumentation as trace
++BASE='package p\nfunc Read(ready bool,value int) int { if ready { return value };return 0 }\n'
++AFTER='package p\nimport ksobserve "log"\nfunc Read(ready bool,value int) int { ksobserve.Printf("KS_TIMING_V1 {\\\"schema_version\\\":1,\\\"probe_id\\\":\\\"probe\\\",\\\"event\\\":\\\"read\\\",\\\"site\\\":\\\"Read/before\\\",\\\"symptom\\\":%t,\\\"values\\\":{\\\"value\\\":%d}}",!ready,value);if ready { return value };return 0 }\n'
++class InstrumentationTests(unittest.TestCase):
++ def setUp(self):
++  self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name);self.repo=self.root/'repo';self.repo.mkdir();self.workspace=self.root/'workspace';self.workspace.mkdir()
++  self.git('init','-q');self.git('config','commit.gpgsign','false');(self.repo/'go.mod').write_text('module example.invalid/trace\n\ngo 1.26.9\n');(self.repo/'a_test.go').write_text('package p\nimport \"testing\"\nfunc TestReadContract(t *testing.T){if Read(false,4)!=0||Read(true,4)!=4{t.Fatal(\"read semantics\")}}\n');(self.repo/'a.go').write_text(BASE);self.git('add','.');self.commit('test: capture original read semantics');self.base=self.git('rev-parse','HEAD');(self.repo/'a.go').write_text(AFTER);self.git('add','a.go');self.commit('test: add structured observation');self.probe=self.git('rev-parse','HEAD')
++ def git(self,*args):return subprocess.check_output(['git','-C',str(self.repo),*args]).decode().strip()
++ def commit(self,subject):return self.git('-c','user.name=Owned trace fixture','-c','user.email=fixture@example.invalid','commit','-qm',subject)
++ def test_actual_go_ast_source_guard_and_immutable_plan(self):
++  digest=trace.freeze(self.repo,self.workspace,self.base,self.probe,'probe');p,found=trace.verify(self.workspace);self.assertEqual(digest,found);self.assertEqual(p['semantic_controls'],'not_executed');self.assertEqual(p['acceptance'],'not_recorded')
++  with self.assertRaises(trace.Invalid):trace.freeze(self.repo,self.workspace,self.base,self.probe,'probe')
++  value=json.loads((self.workspace/'timing-instrumentation-plan.json').read_text());value['semantic_controls']='PASS';(self.workspace/'timing-instrumentation-plan.json').write_text(json.dumps(value))
++  with self.assertRaises(trace.Invalid):trace.verify(self.workspace)
++ def test_real_normal_race_build_vet_controls_and_raw_tamper(self):
++  trace.freeze(self.repo,self.workspace,self.base,self.probe,'probe');value=trace.control_evidence(self.workspace);self.assertEqual(value['status'],'PASS',value['errors']);trace.verify_controls(self.workspace)
++  raw=self.workspace/'timing-instrumentation-controls/base-normal.stdout.txt';raw.write_text('{}\n')
++  with self.assertRaises(trace.Invalid):trace.verify_controls(self.workspace)
++ def test_control_claim_cannot_replace_missing_execution(self):
++  trace.freeze(self.repo,self.workspace,self.base,self.probe,'probe')
++  with self.assertRaises(OSError):trace.verify_controls(self.workspace)
++ def test_guard_change_and_non_go_change_do_not_become_observation(self):
++  (self.repo/'a.go').write_text(AFTER.replace('if ready','if !ready'));self.git('add','a.go');self.commit('test: alter branch instead of observing');modified=self.git('rev-parse','HEAD')
++  with self.assertRaises(trace.Invalid):trace.freeze(self.repo,self.workspace,self.base,modified,'probe')
++  helper=self.workspace/'timing-log-guard';helper.unlink()
++  (self.repo/'a.go').write_text(AFTER);(self.repo/'config.json').write_text('{}');self.git('add','.');self.commit('test: change environment beside a trace');modified=self.git('rev-parse','HEAD')
++  with self.assertRaises(trace.Invalid):trace.freeze(self.repo,self.workspace,self.base,modified,'probe')
++if __name__=='__main__':unittest.main()
+diff --git a/plugin/scripts/tests/test_timing_investigation.py b/plugin/scripts/tests/test_timing_investigation.py
+index d987c75..9902fc7 100644
+--- a/plugin/scripts/tests/test_timing_investigation.py
++++ b/plugin/scripts/tests/test_timing_investigation.py
+@@ -107,7 +107,7 @@ class TimingTests(unittest.TestCase):
+  def test_current_full_nested_provider_contract_and_drift(self):
+   contract=json.loads((SCRIPTS.parent/'contracts/chainbench-tools.schema.json').read_text())
+   tools=[{'name':name,'inputSchema':tool['input']}for name,tool in contract['providers']['chainbench']['tools'].items()]
+-  self.assertEqual(timing.check_contract({'result':{'tools':tools}}),79)
++  self.assertEqual(timing.check_contract({'result':{'tools':tools}}),81)
+   wrong=copy.deepcopy(tools)
+   tool=next(t for t in wrong if t['name']=='chainbench_experiment')
+   tool['inputSchema']['properties']['input']['properties']['plan']['properties']['repetitions']['type']='string'
+diff --git a/plugin/scripts/tests/test_timing_log_observation.py b/plugin/scripts/tests/test_timing_log_observation.py
+new file mode 100644
+index 0000000..6878690
+--- /dev/null
++++ b/plugin/scripts/tests/test_timing_log_observation.py
+@@ -0,0 +1,61 @@
++import copy
++import json
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++from unittest.mock import patch
++SCRIPTS=Path(__file__).resolve().parents[1];sys.path.insert(0,str(SCRIPTS))
++import timing_log_observation as logs
++import timing_investigation as timing
++
++class LogObservationTests(unittest.TestCase):
++ def setUp(self):
++  self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.workspace=Path(self.tmp.name)/'.coding-agent/tickets/trace';self.workspace.mkdir(parents=True)
++  self.state={'ticket_id':'trace','ticket_type':'bugfix','current_state':'ANALYSIS','states':{'ANALYSIS':{'investigation_kind':'observation','status':'in_progress','reproduction_confirmed':False,'log_observation_window':1},'EVALUATION':{'cycle':1}}};self.save_state()
++ def save_state(self):(self.workspace/'state.json').write_bytes(timing.encode(self.state))
++ def fixture(self,verdict='RECURRED'):
++  files=logs.paths(self.workspace,1);files['plan'].parent.mkdir(parents=True)
++  report={'plan':{'source':{'commit':'1'*40}},'verdict':verdict,'resume_requested':verdict=='RECURRED','acceptance':'not_recorded'}
++  plan={'ticket_id':'trace','provider':{'binary':'/pinned/chainbench'},'input':{'plan':report['plan']}}
++  files['plan'].write_bytes(timing.encode(plan));report_raw=timing.encode(report);files['report'].write_bytes(report_raw);files['stdout'].write_bytes(report_raw);files['stderr'].write_bytes(b'')
++  receipt={'command':['/pinned/chainbench','experiment','observe-logs','--input',str(files['input'].resolve())],'plan_sha256':timing.sha(files['plan'].read_bytes()),'controller_parent_watch':True,'exit_code':0,'cancel_signal':None,'stdout_sha256':timing.sha(report_raw),'stderr_sha256':timing.sha(b'')};files['receipt'].write_bytes(timing.encode(receipt))
++  value={'schema_version':1,'ticket_id':'trace','plan_sha256':timing.sha(files['plan'].read_bytes()),'report_sha256':timing.sha(report_raw),'receipt_sha256':timing.sha(files['receipt'].read_bytes()),'native_verifier_stdout_sha256':timing.sha(b'PASS\n'),'verdict':verdict,'resume_requested':report['resume_requested'],'resume_target':'ANALYSIS'if report['resume_requested']else None,'reproduction_confirmed':False,'acceptance':'not_recorded'};files['result'].write_bytes(timing.encode(value))
++  self.state['states']['ANALYSIS'].update({'log_observation_plan_sha256':value['plan_sha256'],'log_observation_result_sha256':timing.sha(files['result'].read_bytes())});self.save_state()
++  self.files=files;self.plan=plan
++ def checked(self,state=None):
++  with patch.object(logs,'frozen',return_value=(self.files,self.files['plan'].read_bytes(),self.plan)),patch.object(logs,'verify_native',return_value=subprocess.CompletedProcess([],0,b'PASS\n',b'')):
++   return logs.state_check(self.workspace,state or self.state)
++ def test_actual_report_projection_only_requests_analysis(self):
++  self.fixture();result=self.checked();self.assertEqual(result['resume_target'],'ANALYSIS');self.assertFalse(result['reproduction_confirmed'])
++ def test_observation_cannot_plan_complete_or_confirm_reproduction(self):
++  self.fixture()
++  for key,value in(('current_state','PLANNING'),('current_state','COMPLETION'),('status','completed'),('reproduction_confirmed',True)):
++   state=copy.deepcopy(self.state)
++   if key=='current_state':state[key]=value
++   else:state['states']['ANALYSIS'][key]=value
++   with self.assertRaises(timing.Invalid):self.checked(state)
++ def test_source_receipt_raw_and_resume_claim_tampering(self):
++  for target in('report','receipt','result','stdout','stderr'):
++   with self.subTest(target=target):
++    if hasattr(self,'files'):
++     import shutil;shutil.rmtree(self.files['plan'].parent)
++    self.fixture();self.files[target].write_bytes(b'{}\n')
++    with self.assertRaises((timing.Invalid,KeyError)):self.checked()
++ def test_awaiting_window_never_requests_analysis_resume(self):
++  self.fixture('AWAITING_OBSERVATION');result=self.checked();self.assertFalse(result['resume_requested']);self.assertIsNone(result['resume_target'])
++ def test_window_and_generation_boundaries(self):
++  for window in(0,4,True,'1'):
++   with self.assertRaises(timing.Invalid):logs.paths(self.workspace,window)
++  self.state['states']['EVALUATION']['cycle']=4;self.save_state()
++  with self.assertRaises(timing.Invalid):logs.paths(self.workspace,1)
++ def test_actual_hook_cannot_overwrite_retained_log_evidence(self):
++  self.fixture();data={'tool_name':'Write','cwd':str(self.workspace),'tool_input':{'file_path':str(self.files['result']),'content':'{}'}}
++  reply=subprocess.run([sys.executable,str(SCRIPTS.parent/'hooks/timing-investigation-guard.py')],input=timing.encode(data),capture_output=True,check=True)
++  self.assertEqual(json.loads(reply.stdout)['hookSpecificOutput']['permissionDecision'],'deny')
++ def test_deleted_provider_verification_cannot_pass_consumer(self):
++  self.fixture()
++  with patch.object(logs,'frozen',return_value=(self.files,self.files['plan'].read_bytes(),self.plan)),patch.object(logs,'verify_native',side_effect=timing.Invalid('native verifier rejected')):
++   with self.assertRaises(timing.Invalid):logs.state_check(self.workspace,self.state)
++if __name__=='__main__':unittest.main()
+diff --git a/plugin/scripts/timing_instrumentation.py b/plugin/scripts/timing_instrumentation.py
+new file mode 100644
+index 0000000..01fc82c
+--- /dev/null
++++ b/plugin/scripts/timing_instrumentation.py
+@@ -0,0 +1,132 @@
++#!/usr/bin/env python3
++"""Freeze observation-only Go source instrumentation without granting fix acceptance."""
++from __future__ import annotations
++import argparse
++import json
++from pathlib import Path
++import subprocess
++import os
++import tempfile
++import sys
++from timing_investigation import Invalid,require,sha,encode,read,write_new
++ROOT=Path(__file__).resolve().parents[1]
++HELPER=ROOT/'tools/timing-log-guard/main.go'
++RUNNER_SHA256=sha(Path(__file__).read_bytes())
++
++def git(repo,*args):return subprocess.run(['git','-C',str(repo),*args],capture_output=True,check=True).stdout
++
++def verify_sources(repo,base,probe,probe_id,helper):
++ for ref in (base,probe):
++  require(len(ref)==40 and all(c in '0123456789abcdef'for c in ref),'immutable source commits required')
++  require(git(repo,'rev-parse',ref+'^{commit}').decode().strip()==ref,'source commit unavailable')
++ changes=git(repo,'diff','--name-status',base,probe).decode().splitlines();require(0<len(changes)<=8,'instrumentation file budget1..8')
++ proof=[]
++ for line in changes:
++  status,path=line.split('\t',1)
++  require(status=='M'and path.endswith('.go')and not path.startswith(('/','.claude/','logs/'))and '..'not in path.split('/'),'instrumentation may modify only existing Go files')
++  before=git(repo,'show',base+':'+path);after=git(repo,'show',probe+':'+path);require(len(before)<=1<<20 and len(after)<=1<<20,'source byte budget exceeded')
++  result=subprocess.run([str(helper)],input=encode({'before':before.decode(),'after':after.decode(),'probe_id':probe_id}),capture_output=True)
++  require(result.returncode==0,'observation-only source guard rejected '+path+': '+result.stdout.decode(errors='replace')[:1024])
++  value=json.loads(result.stdout);require(value['status']=='PASS','instrumentation AST not verified')
++  proof.append({'file':path,'before_sha256':sha(before),'after_sha256':sha(after),'guard_result':value,'guard_stdout_sha256':sha(result.stdout)})
++ return proof
++
++def freeze(repo,workspace,base,probe,probe_id):
++ require(workspace.is_dir(),'existing owned workspace required')
++ plan=workspace/'timing-instrumentation-plan.json';require(not plan.exists(),'instrumentation plan already frozen')
++ helper=workspace/'timing-log-guard';require(not helper.exists(),'helper path already allocated')
++ built=subprocess.run(['go','build','-o',str(helper),str(HELPER)],capture_output=True,check=True)
++ proof=verify_sources(repo,base,probe,probe_id,helper)
++ value={'schema_version':1,'probe_id':probe_id,'repo_root':str(repo.resolve()),'base_commit':base,'probe_commit':probe,'runner_sha256':RUNNER_SHA256,'helper_source_sha256':sha(HELPER.read_bytes()),'helper_binary_sha256':sha(helper.read_bytes()),'source_diff_sha256':sha(git(repo,'diff','--binary',base,probe)),'files':proof,'semantic_controls':'not_executed','timing_neutrality':'not_proven','acceptance':'not_recorded'}
++ write_new(plan,encode(value));return sha(plan.read_bytes())
++
++def verify(workspace):
++ raw,p=read(workspace/'timing-instrumentation-plan.json');helper=workspace/'timing-log-guard'
++ require(p.get('schema_version')==1 and p.get('acceptance')=='not_recorded','instrumentation cannot grant fix acceptance')
++ require(p.get('runner_sha256')==RUNNER_SHA256 and p.get('helper_source_sha256')==sha(HELPER.read_bytes())and p.get('helper_binary_sha256')==sha(helper.read_bytes()),'instrumentation verifier changed')
++ repo=Path(p['repo_root']);proof=verify_sources(repo,p['base_commit'],p['probe_commit'],p['probe_id'],helper)
++ require(proof==p['files']and p['source_diff_sha256']==sha(git(repo,'diff','--binary',p['base_commit'],p['probe_commit'])),'instrumentation source/proof changed')
++ require(p['semantic_controls']=='not_executed'and p['timing_neutrality']=='not_proven','AST proof was falsely promoted to behavior/timing acceptance')
++ return p,sha(raw)
++
++CONTROL_COMMANDS = (
++ ('normal',['go','test','-count=1','-json','./...']),
++ ('race',['go','test','-race','-count=1','-json','./...']),
++ ('vet',['go','vet','./...']),
++ ('build',['go','build','./...']),
++)
++
++def source_snapshot(repo,ref,directory):
++ entries=git(repo,'ls-tree','-rz',ref).split(b'\0');count=0;size=0
++ for entry in entries:
++  if not entry:continue
++  metadata,path=entry.split(b'\t',1);path=path.decode();mode,kind,_=metadata.decode().split()
++  if path.split('/')[0]in('.claude','logs'):continue
++  require(kind=='blob'and mode in('100644','100755'),'source controls do not follow symlinks/submodules')
++  require(not path.startswith('/')and '..'not in path.split('/'),'invalid snapshot path')
++  content=git(repo,'show',ref+':'+path);count+=1;size+=len(content)
++  require(count<=512 and size<=8*1024*1024,'bounded controls require at most512 files/8MiB')
++  target=directory/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(content)
++  if mode=='100755':target.chmod(0o700)
++
++def test_ids(raw):
++ passed=[];failed=False
++ for line in raw.splitlines():
++  value=json.loads(line)
++  if value.get('Action')=='fail':failed=True
++  if value.get('Action')=='pass'and value.get('Test'):passed.append([value['Package'],value['Test']])
++ require(not failed and len(passed)>0,'normal/race controls need actual named passing tests')
++ return sorted(passed)
++
++def control_evidence(workspace):
++ p,digest=verify(workspace);root=workspace/'timing-instrumentation-controls'
++ require(not root.exists(),'control evidence already allocated; never overwrite')
++ root.mkdir(mode=0o700);trials=[];errors=[]
++ toolchain=subprocess.run(['go','version'],capture_output=True,check=True,timeout=20).stdout.decode().strip()
++ for label,ref in(('base',p['base_commit']),('probe',p['probe_commit'])):
++  with tempfile.TemporaryDirectory(prefix='ks-trace-control-')as temporary:
++   snapshot=Path(temporary);source_snapshot(Path(p['repo_root']),ref,snapshot)
++   for name,command in CONTROL_COMMANDS:
++    try:
++     result=subprocess.run(command,cwd=snapshot,capture_output=True,timeout=60)
++     stdout,stderr,code=result.stdout,result.stderr,result.returncode
++    except subprocess.TimeoutExpired as error:
++     stdout,stderr,code=error.stdout or b'',error.stderr or b'',None
++    out=root/(label+'-'+name+'.stdout.txt');err=root/(label+'-'+name+'.stderr.txt');write_new(out,stdout);write_new(err,stderr)
++    ids=[]
++    try:
++     require(code==0,'control command failed or timed out')
++     if name in('normal','race'):ids=test_ids(stdout)
++     status='PASS'
++    except (Invalid,ValueError)as error:status='ERROR';errors.append(label+'/'+name+': '+str(error))
++    trials.append({'source':label,'commit':ref,'kind':name,'command':command,'exit_code':code,'stdout':out.name,'stdout_sha256':sha(stdout),'stderr':err.name,'stderr_sha256':sha(stderr),'test_ids':ids,'status':status})
++ for name in('normal','race'):
++  pair=[trial for trial in trials if trial['kind']==name]
++  if pair[0]['test_ids']!=pair[1]['test_ids']:errors.append(name+': source test coverage changed')
++ value={'schema_version':1,'plan_sha256':digest,'runner_sha256':RUNNER_SHA256,'toolchain':toolchain,'trials':trials,'status':'ERROR'if errors else'PASS','errors':errors,'scope':'same frozen normal/race suite, build and vet at both source snapshots; no timing-neutrality proof','timing_neutrality':'not_proven','acceptance':'not_recorded'}
++ write_new(root/'report.json',encode(value));return value
++
++def verify_controls(workspace):
++ p,digest=verify(workspace);root=workspace/'timing-instrumentation-controls';raw,value=read(root/'report.json')
++ require(value.get('schema_version')==1 and value.get('plan_sha256')==digest and value.get('runner_sha256')==RUNNER_SHA256,'instrumentation controls/source binding changed')
++ require(value.get('status')=='PASS'and value.get('errors')==[]and value.get('timing_neutrality')=='not_proven'and value.get('acceptance')=='not_recorded','controls do not grant timing/fix acceptance')
++ expected=[(label,ref,name,command)for label,ref in(('base',p['base_commit']),('probe',p['probe_commit']))for name,command in CONTROL_COMMANDS]
++ require(len(value['trials'])==len(expected),'control trials missing')
++ for trial,(label,ref,name,command)in zip(value['trials'],expected):
++  require((trial['source'],trial['commit'],trial['kind'],trial['command'])==(label,ref,name,command)and trial['status']=='PASS'and trial['exit_code']==0,'control command/source/result differs')
++  for stream in('stdout','stderr'):
++   path=root/(label+'-'+name+'.'+stream+'.txt');require(trial[stream]==path.name and sha(path.read_bytes())==trial[stream+'_sha256'],'control raw evidence changed')
++  require(trial['test_ids']==(test_ids((root/trial['stdout']).read_bytes())if name in('normal','race')else[]),'control test set differs')
++ for name in('normal','race'):
++  pair=[trial for trial in value['trials']if trial['kind']==name];require(pair[0]['test_ids']==pair[1]['test_ids'],'base/probe coverage differs')
++ return value,sha(raw)
++
++def main():
++ parser=argparse.ArgumentParser();parser.add_argument('--workspace',type=Path,required=True);parser.add_argument('--repo',type=Path);parser.add_argument('--base');parser.add_argument('--probe');parser.add_argument('--probe-id');parser.add_argument('--check',action='store_true');parser.add_argument('--controls',action='store_true');a=parser.parse_args()
++ if a.controls:
++  value,digest=verify_controls(a.workspace)if a.check else(control_evidence(a.workspace),None);print(json.dumps({'controls':value['status'],'report_sha256':digest,'acceptance':'not_recorded'}));require(value['status']=='PASS','instrumentation controls failed');return
++ if a.check:p,digest=verify(a.workspace);print(json.dumps({'source_guard':'PASS','plan_sha256':digest,'semantic_controls':p['semantic_controls'],'acceptance':'not_recorded'}));return
++ require(a.repo and a.base and a.probe and a.probe_id,'repo/base/probe/probe-id required');print(json.dumps({'plan_sha256':freeze(a.repo.resolve(),a.workspace.resolve(),a.base,a.probe,a.probe_id),'semantic_controls':'not_executed','acceptance':'not_recorded'}))
++if __name__=='__main__':
++ try:main()
++ except (Invalid,OSError,ValueError,KeyError,TypeError,subprocess.SubprocessError)as e:print(json.dumps({'status':'ERROR','reason':str(e),'acceptance':'not_recorded'}));raise SystemExit(2)
+diff --git a/plugin/scripts/timing_log_observation.py b/plugin/scripts/timing_log_observation.py
+new file mode 100644
+index 0000000..c0833f8
+--- /dev/null
++++ b/plugin/scripts/timing_log_observation.py
+@@ -0,0 +1,101 @@
++#!/usr/bin/env python3
++"""Retain mode-9 source instrumentation and factual source-bound log windows.
++
++A recurrence re-enters analysis. It never permits planning or repair completion.
++The existing repeated reproduction and oracle gates still govern those steps.
++"""
++from pathlib import Path
++import argparse
++import json
++import subprocess
++import sys
++import timing_investigation as timing
++import timing_instrumentation as instrumentation
++from timing_investigation import require,sha,encode,read,write_new,Invalid
++RUNNER_SHA256=sha(Path(__file__).read_bytes())
++
++def paths(workspace,window):
++ require(type(window)is int and 1<=window<=3,'log windows bounded1..3 per generation')
++ cycle=timing.generation(read(workspace/'state.json')[1]);directory=workspace/'timing'/str(cycle)/'logs'/str(window)
++ return {key:directory/(key+'.'+suffix)for key,suffix in(('plan','json'),('input','json'),('report','json'),('receipt','json'),('result','json'),('stdout','txt'),('stderr','txt'))}
++
++def scope(workspace):
++ state=read(workspace/'state.json')[1];analysis=state.get('states',{}).get('ANALYSIS',{})
++ require(state.get('ticket_type')=='bugfix'and state.get('current_state')=='ANALYSIS'and analysis.get('investigation_kind')in('timing','observation'),'log observation belongs to explicit bugfix analysis')
++ result,report,plan=timing.verify_artifact(workspace,'analysis');require(result['verdict']in('INCONCLUSIVE','AWAITING_OBSERVATION'),'only unreproduced investigation enters observation-only mode')
++ timing.require(analysis.get('timing_plan_sha256')==sha(timing.paths(workspace,'analysis')['plan'].read_bytes())and analysis.get('timing_result_sha256')==sha(timing.paths(workspace,'analysis')['result'].read_bytes()),'state must retain original unreproduced investigation')
++ trace,trace_sha=instrumentation.verify(workspace);controls,controls_sha=instrumentation.verify_controls(workspace)
++ require(report['plan']['before']['commit']==trace['base_commit'],'observation instrumentation must preserve original investigation source baseline')
++ return state,trace,trace_sha,controls_sha
++
++def freeze(workspace,window,proposal,binary):
++ state,trace,trace_sha,controls_sha=scope(workspace);files=paths(workspace,window)
++ require(not any(p.exists()for p in files.values()),'log evidence already frozen; never overwrite')
++ if window>1:
++  old=verify(workspace,window-1)[0];require(old['verdict']=='AWAITING_OBSERVATION','only a finished awaiting window can extend bounded observation')
++ _,value=read(proposal,1<<20);plan=value['plan']
++ require(plan['source']['commit']==trace['probe_commit']and plan['probe_id']==trace['probe_id']and plan['instrumentation_sha256']==trace_sha,'log proposal not bound to retained source instrumentation')
++ sites={s['site']for file in trace['files']for s in file['guard_result']['sites']}
++ require(set(plan['sites'])<=sites and len(plan['sites'])>0,'observation uses unfrozen instrumentation site')
++ require(any(s['event']==plan['event']for file in trace['files']for s in file['guard_result']['sites']),'observation event not inserted by source proof')
++ provider=timing.provider_identity(binary)
++ prepared=subprocess.run([provider['binary'],'experiment','observe-logs','prepare','--input',str(proposal.resolve())],capture_output=True,check=True,timeout=30)
++ input_value=json.loads(prepared.stdout);require(input_value['plan']['source']['commit']==trace['probe_commit'],'provider prepared another source')
++ files['plan'].parent.mkdir(parents=True,exist_ok=True);write_new(files['input'],prepared.stdout)
++ value={'schema_version':1,'ticket_id':state['ticket_id'],'generation':timing.generation(state),'window':window,'runner_sha256':RUNNER_SHA256,'instrumentation_plan_sha256':trace_sha,'controls_sha256':controls_sha,'provider':provider,'input':input_value,'input_sha256':sha(prepared.stdout),'acceptance':'not_recorded'}
++ write_new(files['plan'],encode(value));return sha(files['plan'].read_bytes())
++
++def frozen(workspace,window):
++ files=paths(workspace,window);raw,plan=read(files['plan'],1<<20);input_raw,value=read(files['input'],1<<20)
++ trace,trace_sha=instrumentation.verify(workspace);_,controls_sha=instrumentation.verify_controls(workspace)
++ require(plan['schema_version']==1 and plan['runner_sha256']==RUNNER_SHA256 and plan['window']==window and plan['generation']==timing.generation(read(workspace/'state.json')[1])and plan['acceptance']=='not_recorded','log plan identity changed')
++ require(plan['instrumentation_plan_sha256']==trace_sha and plan['controls_sha256']==controls_sha and plan['input']==value and plan['input_sha256']==sha(input_raw),'log source/control/input bindings changed')
++ require(value['plan']['source']['commit']==trace['probe_commit']and value['plan']['instrumentation_sha256']==trace_sha,'retained instrumentation source changed')
++ sites={site['site']for file in trace['files']for site in file['guard_result']['sites']}
++ require(value['plan']['probe_id']==trace['probe_id']and set(value['plan']['sites'])<=sites and len(value['plan']['sites'])>0,'retained instrumentation event/site scope changed')
++ require(any(site['event']==value['plan']['event']for file in trace['files']for site in file['guard_result']['sites']),'retained event not inserted by source proof')
++ timing.check_provider(plan['provider']);return files,raw,plan
++
++def verify_native(provider,path):
++ result=subprocess.run([provider['binary'],'experiment','observe-logs','verify','--report',str(path.resolve())],capture_output=True,timeout=30)
++ require(result.returncode==0 and result.stdout==b'PASS\n','native raw log verification failed');return result
++
++def execute(workspace,window):
++ state,_,_,_=scope(workspace);files,plan_raw,plan=frozen(workspace,window)
++ require(state['states']['ANALYSIS'].get('log_observation_window')==window and state['states']['ANALYSIS'].get('log_observation_plan_sha256')==sha(plan_raw),'bind exact observation window/plan to state before execution')
++ require(not any(files[k].exists()for k in('report','receipt','result','stdout','stderr')),'log execution evidence already exists')
++ command=[plan['provider']['binary'],'experiment','observe-logs','--input',str(files['input'].resolve())]
++ result,cancel=timing.run_controller(command,str(workspace));write_new(files['stdout'],result.stdout);write_new(files['stderr'],result.stderr)
++ receipt={'command':command,'exit_code':result.returncode,'cancel_signal':cancel,'controller_parent_watch':True,'stdout_sha256':sha(result.stdout),'stderr_sha256':sha(result.stderr),'plan_sha256':sha(plan_raw)};write_new(files['receipt'],encode(receipt));report=json.loads(result.stdout)
++ require(timing.valid_exit(result.returncode,report['verdict'],cancel),'log exit/status disagree')
++ require(report['plan']==plan['input']['plan']and report['acceptance']=='not_recorded','log report uses another frozen source/condition')
++ write_new(files['report'],result.stdout);native=verify_native(plan['provider'],files['report'])
++ value={'schema_version':1,'ticket_id':plan['ticket_id'],'plan_sha256':sha(plan_raw),'report_sha256':sha(result.stdout),'receipt_sha256':sha(files['receipt'].read_bytes()),'native_verifier_stdout_sha256':sha(native.stdout),'verdict':report['verdict'],'resume_requested':report['resume_requested'],'resume_target':'ANALYSIS'if report['resume_requested']else None,'reproduction_confirmed':False,'acceptance':'not_recorded'}
++ write_new(files['result'],encode(value));return value
++
++def verify(workspace,window):
++ files,plan_raw,plan=frozen(workspace,window);raw,result=read(files['result']);report_raw,report=read(files['report']);receipt_raw,receipt=read(files['receipt'])
++ require(result.get('schema_version')==1 and result.get('ticket_id')==plan['ticket_id']and result.get('plan_sha256')==sha(plan_raw)and result.get('report_sha256')==sha(report_raw)and result.get('receipt_sha256')==sha(receipt_raw),'log result source/raw receipt changed')
++ require(receipt['command']==[plan['provider']['binary'],'experiment','observe-logs','--input',str(files['input'].resolve())]and receipt['plan_sha256']==sha(plan_raw)and receipt['controller_parent_watch']is True,'log execution command changed')
++ require(files['stdout'].read_bytes()==report_raw and receipt['stdout_sha256']==sha(report_raw)and receipt['stderr_sha256']==sha(files['stderr'].read_bytes()),'raw log execution changed')
++ require(timing.valid_exit(receipt['exit_code'],report['verdict'],receipt['cancel_signal'])and report['plan']==plan['input']['plan']and report['acceptance']=='not_recorded','log execution/source mismatch')
++ native=verify_native(plan['provider'],files['report']);require(result['native_verifier_stdout_sha256']==sha(native.stdout),'log verifier result changed')
++ require(result['verdict']==report['verdict']and result['resume_requested']==report['resume_requested']and result['resume_target']==('ANALYSIS'if report['resume_requested']else None)and result['reproduction_confirmed']is False and result['acceptance']=='not_recorded','observation was promoted to reproduction/fix acceptance')
++ return result,report
++
++def state_check(workspace,state):
++ stage=state.get('states',{}).get('ANALYSIS',{});window=stage.get('log_observation_window');require(type(window)is int,'bound observation window required');files=paths(workspace,window);result,report=verify(workspace,window)
++ require(state.get('ticket_id')==read(files['plan'])[1]['ticket_id']and stage.get('log_observation_plan_sha256')==sha(files['plan'].read_bytes())and stage.get('log_observation_result_sha256')==sha(files['result'].read_bytes()),'state log binding changed')
++ require(not stage.get('reproduction_confirmed')and stage.get('status')!='completed'and state.get('current_state')=='ANALYSIS','log evidence only awaits or resumes analysis; repeated reproduction required before planning')
++ return result
++
++def main():
++ parser=argparse.ArgumentParser();parser.add_argument('--workspace',type=Path,required=True);parser.add_argument('--window',type=int,required=True);parser.add_argument('--freeze',type=Path);parser.add_argument('--chainbench',type=Path);parser.add_argument('--execute',action='store_true');parser.add_argument('--check-state',action='store_true');args=parser.parse_args()
++ if args.freeze:require(args.chainbench,'pinned provider required');result={'plan_sha256':freeze(args.workspace,args.window,args.freeze,args.chainbench)}
++ elif args.execute:result=execute(args.workspace,args.window)
++ elif args.check_state:result=state_check(args.workspace,read(args.workspace/'state.json')[1])
++ else:result=verify(args.workspace,args.window)[0]
++ print(json.dumps(result))
++if __name__=='__main__':
++ try:main()
++ except (Invalid,OSError,ValueError,KeyError,TypeError,subprocess.SubprocessError)as error:print(json.dumps({'status':'ERROR','reason':str(error),'acceptance':'not_recorded'}));raise SystemExit(2)
+diff --git a/plugin/skills/state-machine/SKILL.md b/plugin/skills/state-machine/SKILL.md
+index b450fea..66f6f2b 100644
+--- a/plugin/skills/state-machine/SKILL.md
++++ b/plugin/skills/state-machine/SKILL.md
+@@ -527,3 +527,14 @@ ANALYSIS resume with a fresh bounded generation, not fix acceptance. Infrastruct
+ normal-control, injection and cleanup failures are separate factual branches.
+ Statistics and node ownership remain ChainBench's responsibility. Existing primary/
+ independent oracle, candidate-selection and verification gates still apply.
++
++
++Mode-9 retained code instrumentation is frozen separately from a repair.
++`timing_instrumentation.py --controls --check` validates actual base/probe
++normal/race suite, build/vet receipts. `timing_log_observation.py` pins source,
++event/sites and existing owner log cursors, with at most3 windows per generation.
++ANALYSIS carries log_observation_window, log_observation_plan_sha256 and
++log_observation_result_sha256. AWAITING remains analysis; RECURRED only requests a
++fresh bounded ANALYSIS generation. Erasing classification or promoting log
++recurrence to reproduced/planning/completed is denied. Source/event/raw files
++remain immutable. Timing neutrality and fix acceptance are not inferred.
+diff --git a/plugin/skills/timing-investigation/SKILL.md b/plugin/skills/timing-investigation/SKILL.md
+index 240dc74..6dd5e4a 100644
+--- a/plugin/skills/timing-investigation/SKILL.md
++++ b/plugin/skills/timing-investigation/SKILL.md
+@@ -73,3 +73,45 @@ defense. It does not use a Python timeout to kill the node controller.
+    candidate-selection and regression gates also pass. The state Write/Edit
+    hook and oracle completion CLI both validate these bindings. They do not
+    sandbox direct shell/manual edits or provide independent human acceptance.
++
++
++## Unreproduced mode 9: retained source observation
++
++External RPC polling does not replace observation-only code logs. Retain base
++and probe commits in the subject repository; the probe adds only structured
++`ksobserve "log"` standalone Printf statements reading existing local scalars.
++The Go AST guard removes those calls/import and requires the remaining AST to
++match. Calls, field reads, arithmetic, changed guards/returns/environment and
++ambiguous JSON formats are rejected. It does not prove semantic independence or
++timing neutrality: logging costs can change the schedule.
++
++```sh
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/timing_instrumentation.py" --workspace "{workspace_dir}" --repo "{repo_root}" --base "$BASE_COMMIT" --probe "$PROBE_COMMIT" --probe-id "$PROBE_ID"
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/timing_instrumentation.py" --workspace "{workspace_dir}" --controls
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/timing_instrumentation.py" --workspace "{workspace_dir}" --controls --check
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/timing_log_observation.py" --workspace "{workspace_dir}" --window 1 --freeze log-proposal.json --chainbench "$CHAINBENCH_BIN"
++```
++
++The source guard and actual base/probe normal/race suites, build and vet must
++pass. Missing tests/timeout/changed raw receipts remain errors. Original analysis
++must retain an INCONCLUSIVE/AWAITING result pinned to the base commit. Pin the
++probe binary, instrumentation plan SHA, inserted event/sites, actual composition
++and current complete-line cursors. Public tools are
++`mcp__plugin_coding-agent_chainbench__chainbench_prepare_log_observation` and
++`mcp__plugin_coding-agent_chainbench__chainbench_observe_logs`. Preparation reads
++only. Observation writes fresh evidence files, with no network node control.
++
++Bind `states.ANALYSIS.log_observation_window` and
++`log_observation_plan_sha256` before `--execute`; bind
++`log_observation_result_sha256` afterwards and run `--check-state`.
++There are at most3 retained windows per existing bounded evaluation generation.
++AWAITING permits the next window. RECURRED resumes ANALYSIS with a new bounded
++cycle; it cannot confirm reproduction/root cause or permit planning/completion.
++Retain all old source/log evidence. The new reproduction uses the original
++functional baseline or a separately reviewed source transition, never relabels
++instrumentation as the fix. Do not silently restart/repair production nodes to
++install the probe; use the explicitly owned composition lifecycle. Malformed,
++rotated/truncated/rewritten/over-budget logs and changed runtime/source pins are
++ERROR, never recurrence. Logs may contain observed values: do not log keys or
++private personal settings/history. The timing, dual-oracle and candidate gates
++still apply to any eventual repair.
+diff --git a/plugin/tools/timing-log-guard/main.go b/plugin/tools/timing-log-guard/main.go
+new file mode 100644
+index 0000000..b81e503
+--- /dev/null
++++ b/plugin/tools/timing-log-guard/main.go
+@@ -0,0 +1,387 @@
++// Command timing-log-guard verifies that a Go instrumentation diff adds only
++// standalone structured standard-log calls with side-effect-free arguments.
++// AST equivalence is a mechanical control, not proof of timing neutrality.
++package main
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"fmt"
++	"go/ast"
++	"go/parser"
++	"go/token"
++	"io"
++	"os"
++	"reflect"
++	"strconv"
++	"strings"
++)
++
++type input struct {
++	Before  string `json:"before"`
++	After   string `json:"after"`
++	ProbeID string `json:"probe_id"`
++}
++type location struct {
++	Event        string `json:"event"`
++	Site         string `json:"site"`
++	Symbol       string `json:"symbol"`
++	Line         int    `json:"line"`
++	FormatSHA256 string `json:"format_sha256"`
++}
++type result struct {
++	SchemaVersion     int        `json:"schema_version"`
++	Status            string     `json:"status"`
++	Reason            string     `json:"reason,omitempty"`
++	Sites             []location `json:"sites"`
++	BaselineASTSHA256 string     `json:"baseline_ast_sha256,omitempty"`
++}
++
++const alias = "ksobserve"
++const prefix = "KS_TIMING_V1 "
++
++func main() {
++	out, err := checkInput(os.Stdin)
++	if err != nil {
++		out = result{SchemaVersion: 1, Status: "ERROR", Reason: err.Error(), Sites: []location{}}
++	}
++	_ = json.NewEncoder(os.Stdout).Encode(out)
++	if err != nil {
++		os.Exit(2)
++	}
++}
++func checkInput(reader io.Reader) (result, error) {
++	raw, e := io.ReadAll(io.LimitReader(reader, 3*1024*1024+1))
++	if e != nil {
++		return result{}, e
++	}
++	if len(raw) > 3*1024*1024 {
++		return result{}, fmt.Errorf("input byte budget exceeded")
++	}
++	decoder := json.NewDecoder(bytes.NewReader(raw))
++	decoder.DisallowUnknownFields()
++	var in input
++	if e = decoder.Decode(&in); e != nil {
++		return result{}, e
++	}
++	if e = decoder.Decode(new(any)); e != io.EOF {
++		return result{}, fmt.Errorf("one input document required")
++	}
++	if len(in.Before) > 1<<20 || len(in.After) > 1<<20 || len(in.ProbeID) == 0 || len(in.ProbeID) > 128 {
++		return result{}, fmt.Errorf("invalid source/probe bounds")
++	}
++	fs := token.NewFileSet()
++	before, e := parser.ParseFile(fs, "before.go", in.Before, parser.SkipObjectResolution)
++	if e != nil {
++		return result{}, e
++	}
++	fsAfter := token.NewFileSet()
++	after, e := parser.ParseFile(fsAfter, "after.go", in.After, parser.SkipObjectResolution)
++	if e != nil {
++		return result{}, e
++	}
++	reserved := false
++	ast.Inspect(before, func(n ast.Node) bool {
++		if id, ok := n.(*ast.Ident); ok && id.Name == alias {
++			reserved = true
++		}
++		return true
++	})
++	if reserved {
++		return result{}, fmt.Errorf("reserved logger name already used in baseline")
++	}
++	count := 0
++	imports := after.Imports[:0]
++	for _, spec := range after.Imports {
++		if spec.Name != nil && spec.Name.Name == alias {
++			path, _ := strconv.Unquote(spec.Path.Value)
++			if path != "log" {
++				return result{}, fmt.Errorf("logger must be the standard log package")
++			}
++			count++
++		} else {
++			imports = append(imports, spec)
++		}
++	}
++	after.Imports = imports
++	if count != 1 {
++		return result{}, fmt.Errorf("exactly one reserved standard-log import required")
++	}
++	decls := after.Decls[:0]
++	for _, decl := range after.Decls {
++		if gen, ok := decl.(*ast.GenDecl); ok && gen.Tok == token.IMPORT {
++			specs := gen.Specs[:0]
++			for _, spec := range gen.Specs {
++				v := spec.(*ast.ImportSpec)
++				if v.Name == nil || v.Name.Name != alias {
++					specs = append(specs, spec)
++				}
++			}
++			gen.Specs = specs
++			if len(specs) == 0 {
++				continue
++			}
++		}
++		decls = append(decls, decl)
++	}
++	after.Decls = decls
++	sites := []location{}
++	for _, decl := range after.Decls {
++		fn, ok := decl.(*ast.FuncDecl)
++		if !ok || fn.Body == nil {
++			continue
++		}
++		var walkErr error
++		ast.Inspect(fn.Body, func(n ast.Node) bool {
++			if walkErr != nil {
++				return false
++			}
++			block, ok := n.(*ast.BlockStmt)
++			if !ok {
++				return true
++			}
++			statements := block.List[:0]
++			for _, stmt := range block.List {
++				expr, ok := stmt.(*ast.ExprStmt)
++				if !ok {
++					statements = append(statements, stmt)
++					continue
++				}
++				call, ok := expr.X.(*ast.CallExpr)
++				if !ok {
++					statements = append(statements, stmt)
++					continue
++				}
++				sel, ok := call.Fun.(*ast.SelectorExpr)
++				if !ok {
++					statements = append(statements, stmt)
++					continue
++				}
++				id, ok := sel.X.(*ast.Ident)
++				if !ok || id.Name != alias {
++					statements = append(statements, stmt)
++					continue
++				}
++				site, e := traceCall(call, in.ProbeID)
++				if e != nil {
++					walkErr = e
++					return false
++				}
++				site.Line = fsAfter.Position(stmt.Pos()).Line
++				site.Symbol = fn.Name.Name
++				sites = append(sites, site)
++			}
++			block.List = statements
++			return true
++		})
++		if walkErr != nil {
++			return result{}, walkErr
++		}
++	}
++	if len(sites) == 0 || len(sites) > 32 {
++		return result{}, fmt.Errorf("instrumentation site budget 1..32 required")
++	}
++	left, _ := json.Marshal(normalize(reflect.ValueOf(before)))
++	right, _ := json.Marshal(normalize(reflect.ValueOf(after)))
++	if !bytes.Equal(left, right) {
++		return result{}, fmt.Errorf("non-observation syntax changed after removing approved trace calls")
++	}
++	hash := sha256.Sum256(left)
++	return result{SchemaVersion: 1, Status: "PASS", Sites: sites, BaselineASTSHA256: hex.EncodeToString(hash[:])}, nil
++}
++func pure(e ast.Expr) bool {
++	switch v := e.(type) {
++	case *ast.BasicLit:
++		return true
++	case *ast.Ident:
++		return v.Name != alias
++	case *ast.SelectorExpr:
++		return false // Field reads can dereference pointers or race with writes.
++	case *ast.ParenExpr:
++		return pure(v.X)
++	case *ast.BinaryExpr:
++		switch v.Op {
++		case token.EQL, token.NEQ, token.LSS, token.LEQ, token.GTR, token.GEQ, token.LAND, token.LOR:
++			return pure(v.X) && pure(v.Y)
++		}
++		return false // Arithmetic may panic or alter evaluation costs.
++	case *ast.UnaryExpr:
++		return v.Op == token.NOT && pure(v.X)
++	}
++	return false
++}
++func traceCall(c *ast.CallExpr, probe string) (location, error) {
++	fail := func() (location, error) {
++		return location{}, fmt.Errorf("trace must be a standalone ksobserve.Printf with a bounded structured literal and pure arguments")
++	}
++	if c.Fun.(*ast.SelectorExpr).Sel.Name != "Printf" || len(c.Args) < 1 || len(c.Args) > 17 || c.Ellipsis.IsValid() {
++		return fail()
++	}
++	lit, ok := c.Args[0].(*ast.BasicLit)
++	if !ok || lit.Kind != token.STRING {
++		return fail()
++	}
++	format, e := strconv.Unquote(lit.Value)
++	if e != nil || !strings.HasPrefix(format, prefix) || len(format) > 2048 {
++		return fail()
++	}
++	expanded := strings.TrimPrefix(format, prefix)
++	args := 0
++	var b strings.Builder
++	for i := 0; i < len(expanded); i++ {
++		if expanded[i] != '%' {
++			b.WriteByte(expanded[i])
++			continue
++		}
++		i++
++		if i == len(expanded) {
++			return fail()
++		}
++		switch expanded[i] {
++		case '%':
++			b.WriteByte('%')
++		case 't':
++			b.WriteString("false")
++			args++
++		case 'd':
++			b.WriteByte('0')
++			args++
++		case 'q':
++			b.WriteString(`""`)
++			args++
++		default:
++			return fail()
++		}
++	}
++	if args != len(c.Args)-1 {
++		return fail()
++	}
++	for _, arg := range c.Args[1:] {
++		if !pure(arg) {
++			return fail()
++		}
++	}
++	if strictObject([]byte(b.String())) != nil {
++		return fail()
++	}
++	var fields map[string]json.RawMessage
++	if json.Unmarshal([]byte(b.String()), &fields) != nil {
++		return fail()
++	}
++	for _, key := range []string{"schema_version", "probe_id", "event", "site", "symptom", "values"} {
++		if len(fields[key]) == 0 || bytes.Equal(fields[key], []byte("null")) {
++			return fail()
++		}
++	}
++	var event struct {
++		SchemaVersion int            `json:"schema_version"`
++		ProbeID       string         `json:"probe_id"`
++		Event         string         `json:"event"`
++		Site          string         `json:"site"`
++		Symptom       bool           `json:"symptom"`
++		Values        map[string]any `json:"values"`
++	}
++	d := json.NewDecoder(strings.NewReader(b.String()))
++	d.DisallowUnknownFields()
++	if d.Decode(&event) != nil || event.SchemaVersion != 1 || event.ProbeID != probe || event.Event == "" || len(event.Event) > 128 || event.Site == "" || len(event.Site) > 256 || event.Values == nil || len(event.Values) > 16 {
++		return fail()
++	}
++	if d.Decode(new(any)) != io.EOF {
++		return fail()
++	}
++	hash := sha256.Sum256([]byte(format))
++	return location{Event: event.Event, Site: event.Site, FormatSHA256: hex.EncodeToString(hash[:])}, nil
++}
++
++// Ignore source positions/comments and parser bookkeeping, preserving every
++// operational AST field, declaration, expression, import and statement order.
++func normalize(v reflect.Value) any {
++	if !v.IsValid() {
++		return nil
++	}
++	if v.Type() == reflect.TypeFor[token.Pos]() {
++		return nil
++	}
++	switch v.Kind() {
++	case reflect.Interface, reflect.Pointer:
++		if v.IsNil() {
++			return nil
++		}
++		return normalize(v.Elem())
++	case reflect.Struct:
++		out := map[string]any{"$type": v.Type().String()}
++		for i := 0; i < v.NumField(); i++ {
++			name := v.Type().Field(i).Name
++			if name == "Doc" || name == "Comment" || name == "Comments" || name == "Scope" || name == "Obj" || name == "Unresolved" || v.Field(i).Type() == reflect.TypeFor[token.Pos]() {
++				continue
++			}
++			out[name] = normalize(v.Field(i))
++		}
++		return out
++	case reflect.Slice:
++		out := []any{}
++		for i := 0; i < v.Len(); i++ {
++			out = append(out, normalize(v.Index(i)))
++		}
++		return out
++	default:
++		return v.Interface()
++	}
++}
++
++// Reject ambiguous duplicate fields, including nested values; never silently
++// accept the last JSON value as the frozen format's meaning.
++func strictObject(raw []byte) error {
++	d := json.NewDecoder(bytes.NewReader(raw))
++	var walk func(int) error
++	walk = func(depth int) error {
++		if depth > 16 {
++			return fmt.Errorf("JSON nesting budget exceeded")
++		}
++		value, err := d.Token()
++		if err != nil {
++			return err
++		}
++		delimiter, ok := value.(json.Delim)
++		if !ok {
++			return nil
++		}
++		switch delimiter {
++		case '{':
++			seen := map[string]bool{}
++			for d.More() {
++				key, err := d.Token()
++				if err != nil {
++					return err
++				}
++				name, ok := key.(string)
++				if !ok || seen[name] {
++					return fmt.Errorf("duplicate JSON key")
++				}
++				seen[name] = true
++				if err = walk(depth + 1); err != nil {
++					return err
++				}
++			}
++		case '[':
++			for d.More() {
++				if err = walk(depth + 1); err != nil {
++					return err
++				}
++			}
++		default:
++			return fmt.Errorf("unexpected JSON delimiter")
++		}
++		_, err = d.Token()
++		return err
++	}
++	if err := walk(0); err != nil {
++		return err
++	}
++	if _, err := d.Token(); err != io.EOF {
++		return fmt.Errorf("one JSON document required")
++	}
++	return nil
++}
+diff --git a/plugin/tools/timing-log-guard/main_test.go b/plugin/tools/timing-log-guard/main_test.go
+new file mode 100644
+index 0000000..21b7ac7
+--- /dev/null
++++ b/plugin/tools/timing-log-guard/main_test.go
+@@ -0,0 +1,71 @@
++package main
++
++import (
++	"encoding/json"
++	"strings"
++	"testing"
++)
++
++const baseline = `package p
++func Read(ready bool, value int) int {
++ if ready { return value }
++ return 0
++}`
++const instrumented = `package p
++import ksobserve "log"
++func Read(ready bool, value int) int {
++ ksobserve.Printf("KS_TIMING_V1 {\"schema_version\":1,\"probe_id\":\"probe\",\"event\":\"read\",\"site\":\"Read/before\",\"symptom\":%t,\"values\":{\"value\":%d}}", !ready, value)
++ if ready { return value }
++ return 0
++}`
++
++func verify(t *testing.T, before, after string) (result, error) {
++	t.Helper()
++	raw, _ := json.Marshal(input{Before: before, After: after, ProbeID: "probe"})
++	return checkInput(strings.NewReader(string(raw)))
++}
++func TestObservationCallPreservesOperationalAST(t *testing.T) {
++	out, e := verify(t, baseline, instrumented)
++	if e != nil || out.Status != "PASS" || len(out.Sites) != 1 || out.Sites[0].Symbol != "Read" || out.BaselineASTSHA256 == "" {
++		t.Fatal(out, e)
++	}
++}
++func TestFunctionalEditsAndUnsafeExpressionsAreNotInstrumentation(t *testing.T) {
++	cases := map[string]string{
++		"division":          strings.Replace(instrumented, "!ready, value)", "!ready, value/0)", 1),
++		"field_read":        strings.Replace(instrumented, "!ready, value)", "!ready, owner.value)", 1),
++		"missing_symptom":   strings.Replace(instrumented, `\"symptom\":%t,`, "", 1),
++		"null_symptom":      strings.Replace(instrumented, `\"symptom\":%t`, `\"symptom\":null`, 1),
++		"duplicate_symptom": strings.Replace(instrumented, `\"symptom\":%t`, `\"symptom\":false,\"symptom\":%t`, 1),
++		"duplicate_value":   strings.Replace(instrumented, `\"value\":%d`, `\"value\":0,\"value\":%d`, 1),
++		"guard":             strings.Replace(instrumented, "if ready", "if !ready", 1),
++		"value":             strings.Replace(instrumented, "return value", "return value+1", 1),
++		"call_arg":          strings.Replace(instrumented, "!ready, value)", "!ready, mutate())", 1),
++		"nested_log":        strings.Replace(instrumented, "ksobserve.Printf(", "go ksobserve.Printf(", 1),
++		"wrong_logger":      strings.Replace(instrumented, `ksobserve "log"`, `ksobserve "example.org/log"`, 1),
++		"wrong_probe":       strings.Replace(instrumented, `\"probe\"`, `\"other\"`, 1),
++		"extra_import":      strings.Replace(instrumented, `import ksobserve "log"`, `import ksobserve "log"; import "fmt"`, 1),
++		"missing_json":      strings.Replace(instrumented, "KS_TIMING_V1 {", "not-structured {", 1),
++		"raw_format":        strings.Replace(instrumented, "%t", "%v", 1),
++	}
++	for name, after := range cases {
++		t.Run(name, func(t *testing.T) {
++			if _, e := verify(t, baseline, after); e == nil {
++				t.Fatal("behavior/source change accepted")
++			}
++		})
++	}
++}
++func TestExistingReservedIdentifierCannotShadowTheLogger(t *testing.T) {
++	before := strings.Replace(baseline, "ready bool", "ksobserve bool", 1)
++	if _, e := verify(t, before, instrumented); e == nil {
++		t.Fatal("reserved baseline identifier accepted")
++	}
++}
++func TestSitesInsideNestedBlocksAndCommentsFormatting(t *testing.T) {
++	after := strings.Replace(instrumented, "if ready { return value }", "if ready {\n ksobserve.Printf(\"KS_TIMING_V1 {\\\"schema_version\\\":1,\\\"probe_id\\\":\\\"probe\\\",\\\"event\\\":\\\"branch\\\",\\\"site\\\":\\\"Read/branch\\\",\\\"symptom\\\":false,\\\"values\\\":{}}\")\n return value }", 1)
++	out, e := verify(t, "// baseline\n"+baseline, "// observe only\n"+after)
++	if e != nil || len(out.Sites) != 2 {
++		t.Fatal(out, e)
++	}
++}

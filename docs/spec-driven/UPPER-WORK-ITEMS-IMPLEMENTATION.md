@@ -1,0 +1,657 @@
+# 상위 WI 구현 명세와 진행 원장
+
+2026-10-14 사용자가 WI-V1부터 WI-SP까지 구현 진행을 요청했다. [재감사](./UPPER-WORK-ITEMS-AUDIT.md)는 입력 근거로 고정하고, 이 문서를 구현 진행의 현재 기준으로 사용한다. WI-5는 이번 순서에 포함하지 않는다. 기존 승인·시험·소표본의 한계를 구현 성공으로 덮어쓰지 않는다.
+
+현재 요청 구현 **9/9 완료**. 다음 구현과 남은 전체 요청 구현은 **없음**이다. 독립 사람/production/전체 수용은 구현 검증과 별도이며 미판정 상태를 유지한다.
+
+## 목적과 상태 규칙
+
+버그수정의 오라클·수정 선택·진단·비결정 재현을 먼저 연결하고, CKG 값 의존·규칙 분석을 기반으로 깊은 리뷰와 CKS 확장·정책/보안 질의를 제공한다. 그래프 계산은 CKG, 객관 신호 합성은 CKS, 판단과 절차는 coding-agent가 담당한다. 동일 계산을 에이전트 스크립트에 복제하지 않는다.
+
+각 항목은 명세→구현→의미 있는 반례/회귀→실제 공개 경로 실행→근거 고정→작업표 갱신 순으로 진행한다. 구현·시험 완료와 독립 사람 수용을 분리한다. 사람의 수용을 자동 생성하거나 미실행을 PASS로 기록하지 않는다. 부분 지원은 capability·상한·불확실성으로 공개하며, 전체 언어/프로젝트/운영 품질로 일반화하지 않는다.
+
+외부 변경도 이번 요청 범위에 포함한다. coding-agent는 감사한 임시 checkout의 작업 브랜치를 사용하며 커밋·패치/복구 자료를 이 저장소에 고정한다. ChainBench는 기존 개발자의 checkout을 유지하고 필요하면 격리 checkout을 만든다. 실제 시험은 이번 실행이 만든 데이터·노드만 대상으로 한다. 개인 `.claude/`와 개인 `logs/`는 입력에서 제외한다. 푸시·공개·태그·머지는 이 구현 요청으로 자동 수행하지 않는다.
+
+## 진행표
+
+| 순서 | ID | 담당 | 구현·검증 상태 | 전체 목표/독립 수용 |
+|---|---|---|---|---|
+| 1 | WI-V1 | coding-agent | 구현·controlled 실행/반례 검증 완료·증거 커밋 | 실제 host/체인·독립 수용 보류 |
+| 2 | WI-V2 | coding-agent | 구현·실제 Go/모델/반례 검증 완료·증거 커밋 | 독립 사람/production 최적성 미수용 |
+| 3 | WI-3 | coding-agent+CKS | 구현·명시 범위 검증 | 독립 수용 미판정 |
+| 4 | WI-4 | coding-agent+ChainBench | 원래 모드9 포함 구현·명시 범위 실행 검증·증거 커밋 | production/독립 수용 미판정 |
+| 5 | WI-1 | CKG | bounded Go 구현·공개 실행 검증·증거 커밋 | production/독립 수용 미판정 |
+| 6 | WI-2 | CKG/CKS | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
+| 7 | WI-C | coding-agent | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
+| 8 | WI-6 | CKS | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
+| 9 | WI-SP | CKS+CKG | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
+
+## 항목별 계약과 필요한 검증
+
+### WI-V1: 오라클 타당성과 완료 차단
+
+- 증상 ID·수용 조건·별도 도출 근거·primary/independent 실행 파일·정상 사례·mutation 계획을 수정 전 커밋에 동결한다. 재현의 RED와 수정의 GREEN을 같은 파일·같은 조건으로 실측한다.
+- 독립 오라클은 primary의 기대값/헬퍼를 재사용하지 않고 요구 조건에서 별도 계산한다. 파일이 다르다는 기계 검사는 의미적 독립성의 사람 검토를 대신하지 않는다.
+- 두 오라클의 base RED/head GREEN, 정상 사례 base/head GREEN, 증상 재도입 및 과적합 반례를 실행한다. 증상 재도입은 두 오라클, 과적합은 최소 독립 오라클이 검출해야 한다.
+- 명시된 assertion 실패만 RED다. 빌드 실패·timeout·잘못된 JSON·다른 증상·시그널 종료·누락은 실행 오류이며 통과/재현으로 인정하지 않는다.
+- commit·오라클·계획·원자료 hash와 실행 command/case/status를 묶는다. 변경/누락/현재 commit 불일치·검사 FAIL/미실행은 완료 전이를 차단한다. 과적합·base GREEN은 WARN으로 통과시키지 않는다.
+- CLI 실행과 plugin 평가/상태 전이/Write·Edit guard를 연결한다. host hook은 외부 shell·사람의 직접 수정까지 막는 보안 sandbox로 주장하지 않는다.
+- 실제 소형 코드 결함에서 미수정/수정·mutation/정상 제어를 실행하고 false-done 차단을 확인한다. production 체인·LLM 독립 reviewer 수용은 별도 실측 상태로 남긴다.
+
+### WI-V2: 수정 후보와 선택 패널
+
+- 같은 증상/오라클 기준의 최소2개 후보. 후보별 root cause·diff/source pin·범위·회귀·오라클·비용/성능/복잡도·트레이드오프·근거.
+- 사전 동결한 평가축과 hard 조건, 분리된 correctness/regression/maintainability 관점, 판단 출처·반대 의견·선택/기각/동률/전부 기각·판정 불가의 typed 출력.
+- 적격 후보만 비교한다. 미실행 지표·자기 주장만으로 수치 우위나 ‘최선’을 선언하지 않는다. 설계→구현 전이에 선택 근거를 요구한다.
+- 서로 다른 실행 결과·회귀·비용, 우열 없음·합의 없음·전부 부적격·기준 변경·증상 불일치 반례와 실제 후보 실행.
+
+### WI-3: 제한된 의심 후보와 객관 신호
+
+- 소비자 입력 schema와 실제 MCP schema를 맞추고 전 입력 type/required 계약을 검증한다. 호스트 namespace 정규화는 실제 연결 또는 미검증 상태로 공개한다.
+- seed와 후보 상한·distance/relation·impact·recency·concurrency·retrieval rank/source/score·policy/security/dataflow 신호를 합성한다. 신호별 provenance, 미지원/미확보 null·이유, LLM 증상 판단을 분리한다.
+- 반복 확장은 후보/깊이/예산 상한·누락/중단 이유를 유지한다. 없는 신호를 안전/0으로 해석하지 않는다.
+- 소스/스냅샷 혼합·동명 symbol·누락 backend·상한·신호 출처·없는 tag 반례 및 MCP 호출→소비자 후보 산출물 실행.
+
+### WI-4: 반복·주입·관찰
+
+- 실행 전 seed/schedule·반복 분모·증상 failure 조건·전/후 기준·time budget·소유 노드·cleanup을 고정한다. 인프라 실패와 증상 실패를 구분한다.
+- 명시 timing/fault 주입, 정상/재현/방어/관찰 분기. 미재현은 원인 미확정·관찰 대기이며 완료한 수정으로 승격하지 않는다.
+- 모니터의 structured event/trigger·환경 pin·재개 조건, 통계 부족의 inconclusive와 기존 ChainBench 주입/monitor 연결.
+- 원래 master workplan §2.2의 모드9는 미재현 시 observation-only 코드 로그 삽입과 재발 대기를 요구한다. 외부 RPC polling만으로 이를 대체하지 않는다. 삽입 위치/patch·source revision·로그 event/schema/기록 출처·환경·bounded window/재개 조건을 고정하고, 기능 변경과 별도 검증·race/정상 사례·로그 변조/미재발/재발 반례를 확인한다.
+- 실제 반복 결과·timeout/부분 완료·주입 실패·cleanup·재발 이벤트 반례. 기존 또는 외부 노드를 정지하지 않는다.
+
+### WI-1: Go 값 의존 분석
+
+- 첫 생산 경로는 Go 함수의 bounded on-demand CFG/def-use/control/data dependence다. CKG에서 한 번 계산하고 재사용한다. TS/Sol과 미지원 Go constructs를 명시한다.
+- 선언/재할당·branch join·loop·return·field·call의 원문 위치/조건·확실/보수적/미지원 구분. alias/closure/반사/동적 호출을 증명된 연결로 만들지 않는다.
+- source/revision/function·node/edge kind·최대 크기·truncation·계산 비용·capability 출력과 공개 질의.
+- 실제 값 전달·kill/redefinition·분기/루프·제어 의존·동명/다중 파일·부분 지원·상한·비용 fixture 검증. AST statement 개수를 CFG 정확도로 대체하지 않는다.
+
+### WI-2: 결정론 타입/규칙과 취약점 후보
+
+- WI-1 위에 버전된 rule/source/sink·흐름 경로·조건·sanitizer/불확실성·위치/출처·수동/자동 생성 구분을 둔다. 분석 후보는 검증된 취약점 판정과 구분한다.
+- opt-in 최소 Go rule pack과 지원 범위·정확도/비용/상한을 명시한다. 미지원/unknown은 안전으로 반환하지 않는다.
+- 룰별 실제 양성·음성·sanitized·branch/alias/외부 호출·오탐/미탐·수동 annotation 공존·상한 테스트와 공개 실행.
+
+### WI-C: 구조화 깊은 리뷰
+
+- source pin·entry→sequence/module view·data/state·guard/exception·complexity/resource/I/O·priority/tradeoff를 typed artifact로 고정한다. 원문 근거와 추론·unknown을 분리한다.
+- CKS 함수/값 의존/규칙 도구를 조합한다. 추론 diagram edge와 계산된 edge를 구분하고 누락 capability를 공개한다.
+- 리뷰 모드 경로·보고서 validator·수용 조건 연결. 실제 fixture의 상태·가드 누락·자원/비용·우선순위 상충과 산출물 검증.
+
+### WI-6: 값 의존 확장
+
+- CKG dependency 결과를 CKS가 조합한다. calls·curated flow와 data/control dependence 관계를 구분한다.
+- seed/candidate/hop/계산 예산·cycle/dedup·불확실/미지원·중단 이유·출처를 유지한다.
+- 독립 답안이 있는 fixture의 recall/noise/cost를 비교하고 결과 분모를 기록한다. 작은 표본을 전체 최적성으로 승격하지 않는다.
+
+### WI-SP: 정책·보안 태그 질의
+
+- CKG 수동 annotation 간접 공개는 유지하고 CKS에서 typed policy/security 질의·관련 symbol·원문 위치·rule/manual origin·검토 provenance·unknown/not-found를 제공한다.
+- 원문/검토자·버전·권한 경계를 명시하고 지원하지 않는 trust/auth 기능을 자동 주장하지 않는다. 실제 기존 HTTP/권한 정책과 모순되는 별도 우회 표면을 만들지 않는다.
+- 등록 tools/list·입력/출력·소비자 계약을 갱신한다. 양성/음성·빈 태그·조건/권한 거부·출처·설명/수정 힌트 반환·LLM 판단 분리의 공개 MCP 실행.
+
+## 체크와 증거
+
+각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
+
+현재: 구현·명시 범위 실행 검증8/9, WI-SP 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-SP 정책·보안 태그 질의. 남은 이번 구현 범위: WI-SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+
+## WI-V1 검증 기록
+
+coding-agent 로컬 커밋 `5fd101e682b5d0286dbcd27fcd2b4a266bb7bc50`에 실행기·Go adapter·평가/상태 전이·Write/Edit guard와 CI 경로를 구현했다. [검증 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-v1/)에는 소스 patch/commit 원자료, fixture Git bundle, 계획·원자료 hash·실제 CLI report가 있다. 임시 checkout을 잃어도 patch와 source hash로 복구할 수 있다.
+
+- plugin63개(새 oracle 반례23·Go adapter7·기존33), 기존 bench15개, 기존 hooks ALL PASS.
+- 실제 Go fixture의 build/race/vet/fmt PASS. dual oracle16회 실행, 기본/정상/증상 재도입/과적합 결과 PASS. 잘못된 report hash는 완료 hook에서 deny.
+- 무효 base GREEN·다른 assertion·compile/panic/timeout·source 변경·raw report 변조·stale commit·부족한 다른 gate·필수 e2e SKIP를 차단했다.
+- 검사는 actual subject의 committed snapshots에 한정한다. separate derivation/method는 확인한 fixture 구조이며 의미적 독립성·사람 수용·전 입력 정확도는 자동 증명하지 않는다.
+- 실제 Claude host·production chain·독립 사람 수용은 미실행이다. 필수 e2e에 실행 가능한 adapter가 없으면 완료를 차단한다. 이 연결의 실제 실행은 WI-4에서도 추적한다.
+
+증거 커밋 `e040fc288a5fb438d35c77ab5281eb7aefce9a68`의 packet을 Git object에서 재검증한 후 구현 완료 상태를 기록했다. [기계 판독 진행 원장](./UPPER-WORK-ITEMS-PROGRESS.json)은 evidence revision·manifest SHA·owner commit과 미수용 범위를 분리한다. 다음은 WI-V2다.
+
+## WI-V2 세부 계약: 다음 구현
+
+후보 생성은 Planner가 같은 증상·동결된 수용 조건에서 최소2개의 실제 수정안을 작성하는 단계다. 패널은 correctness/regression/maintainability 관점을 분리하고 근거 파일·판정·반대 의견을 기록한다. 런타임 검증기는 후보별 commit/oracle·실행된 metric의 근거를 검증하고 hard 부적격을 배제한다. 패널/지표의 자기 주장이나 단순 weighted sum을 최선의 증명으로 취급하지 않는다.
+
+- 후보마다 같은 frozen plan과 source baseline을 유지하고 source commit·diff·V1 실행 보고서를 결속한다.
+- 비교축/방향/단위/필수 여부·예산·패널 역할·합의 규칙을 후보 선택 전에 동결한다.
+- 측정되지 않은 값은 unknown이다. 부적격·불일치·동률·패널 disagreement·모두 기각은 selection 보류/기각을 반환한다.
+- 선택된 commit과 근거는 DESIGN→IMPLEMENTATION/EVALUATION 경로에 연결하고, 실제 구현/HEAD가 선택과 달라지면 재평가한다.
+- 다음 시험은 실제 같은 증상을 고치는2개 후보와 literal overfit/회귀 후보의 실행 비교, 근거 변조·기준 drift·동률·전부 기각 반례다.
+
+### WI-V2 실행 schema와 연결 계약
+
+selection specification은 schema_version1, source_base_ref, oracle_plan(작업공간 상대 경로), oracle_sources(필요 시 작업공간의 frozen 파일), criteria(고정된 축/방향/단위/필수 여부), regression_driver, metric_drivers, judges(정확성·회귀·유지보수 역할), candidates(최소2개 실제 변경 제안·rationale·mutation 계획)를 가진다. `oracle_sources`는 테스트/오라클/수용 조건에 한정한다. source_base_ref의 생산 코드를 변경해 RED를 만드는 carrier는 허용하지 않는다.
+
+실행기는 별도 Git index와 commit-tree로 RED carrier와 후보 커밋을 만들며 원래 branch/index/소스는 유지한다. V1은 명시한 후보 commit에서 trial receipt를 생성한다. trial receipt는 최종 현재 HEAD의 완료 receipt로 사용할 수 없다. 각 후보는 같은 수용 조건/정상 제어/오라클·미수정 생산 소스에 결속된다.
+
+회귀/metric command는 frozen adapter에서 실행하며 assertion/실행 오류·unknown을 구분한다. 변경 줄 수는 Git diff 실측값이다. 선택은 hard 적격성→패널 승인→관측된 축의 Pareto 우위 순이다. 우열 없음/필수 값 미측정/패널 충돌/모두 기각은 보류·동률·기각이며 임의 첫 후보로 진행하지 않는다. 판단은 관측된 후보·축의 범위로 한정한다.
+
+패널 command는 실제 source diff·V1/회귀/metric 원자료의 hash를 입력으로 받고 역할별 typed 의견과 이유·근거 인용을 반환한다. fixture 패널과 실제 모델/사람의 의견을 구분한다. model/human 자기 표시만으로 독립 수용을 생성하지 않는다. 모델 host 검증은 실제 command 실행 원자료를 남긴다.
+
+DESIGN→IMPLEMENTATION에는 생성·평가·선택 보고서가 필요하고, 실제 적용은 선택된 tree와 일치해야 한다. 이전 V1의 첫 RED carrier 생성은 이 연결에서는 DESIGN의 trial 준비가 앞당겨 수행한다. Implementer는 그 carrier를 새로 만들거나 base를 merge-base로 바꾸지 않는다. 최종 HEAD에서 V1을 다시 실행하며 후보 선택·코드 변경 시 재평가한다.
+
+## WI-V2 실행 검증 진행
+
+실행기는 production checkout/index를 변경하지 않고 신규 테스트/오라클만 담은 RED carrier와 2개 이상 실제 후보 commit을 만든다. V1의 명시 후보 ref 시험은 trial scope이며 최종 HEAD 완료 receipt로 사용할 수 없다. frozen 회귀/metric adapters·role별 adapter hash와 원자료 hash를 검증하고, 현재 적용 tree가 선택 tree와 다르면 차단한다.
+
+새 후보 반례19개를 포함한 plugin82개, 기존 bench15개와 hooks ALL PASS를 확인했다. 최종 모델 원자료와 소스를 커밋하기 전에는 구현 완료 체크하지 않는다.
+
+실제 Go fixture에서 loop/copy/literal3개의 후보를 실행했다. loop/copy는 동일 오라클·회귀를 통과했고, literal은 FAIL이다. loop는 변경7줄·allocation0/call, copy는8줄·1/call이다. fixture 의견임을 명시한 실행에서 선택·실제 적용·final HEAD V1·양쪽 guard가 통과했다. 실제 모델의 정확성/회귀/유지보수3세션도 이 판정을 수행했으며 첫 실행의 원자료는 model-initial로 보존했다. 이후 실행 오류 후보의 부적격 처리 대신 전체 보류 정책을 보강했으므로 최종 소스 모델 실행을 다시 고정한다.
+
+수치/실행 근거와 모델 의견은 구분한다. 같은 모델의 역할별 세션이며 독립 사람 수용·production 프로젝트의 최적성은 자동 생성하지 않는다. 테스트 범위와 실제 모델 adapter invocation은 packet에 구분하여 기록한다.
+
+### WI-V2 최종 증거 고정
+
+coding-agent 로컬 커밋 `068d3c3f2340a89317ca1cbb11f5bf1d30f620b1`. [WI-V2 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-v2/)에 source patch/commit object·3개 후보 Git bundle·측정/원자료·모델 receipt·최종 HEAD report를 보존했다. 최종 원자료와 현재 source SHA가 일치함을 확인했다.
+
+- plugin82개, 새 선택 반례19개, 기존 bench15개, hooks ALL PASS.
+- 실제 모델3별도 세션(정확성/회귀/유지보수)이 loop를 선호했다. provider가 보고한 모델 label은 claude-opus-5-5이며 사용자 구성 기본값을 사용했다. 이를 독립 사람 수용으로 기록하지 않는다.
+- 후보3개·오라클48회와 선택된 실제 HEAD의16회, 총64회 실행. literal 과적합은 oracle/regression FAIL로 기각. loop/copy는 둘 다 PASS, 관측된 변경7/8줄·할당0/1회에서 loop가 우위였다.
+- 실제 선택 check·적용 tree check·final HEAD V1·양쪽 completion guard·build/race/vet/fmt PASS. 시험 중 원 checkout/HEAD/index는 유지됐고 적용은 owned fixture에서만 수행했다.
+- 최종 선택은 명시한 후보/축/작업부하에 한정된다. 실제 production 코드의 전 후보 최적성·독립 사람 수용·설치된 전체 plugin host 흐름은 미판정이다.
+
+증거 커밋 `8ec6bb1f20dcd74cdcdf91fdd937ba0e8fbba388`의 모든 packet SHA를 Git object로 확인한 뒤 구현 완료 상태를 기록했다. 다음은 WI-3다.
+
+## WI-3 다음 구현의 책임 경계
+
+원 계약의 v1 흐름을 유지한다: LLM의 증상 가설·walk·판단과 CKS 객관 신호를 분리한다. 우선 소비자/실제 등록 schema의 모든 input type/required/이름을 맞추고 명시 host 정규화 검증을 둔다. 신호 합성은 CKS에서 재사용하며 graph 계산은 CKG에 둔다.
+
+seed는 symbol/위치/텍스트를 지원하고 후보·depth·backend 호출/시간 예산을 고정한다. cheap distance/relations/retrieval을 먼저 얻고 소수 후보에 impact/recency/concurrency를 채운다. 신호별 source/revision·가용/오류/미지원·null를 명시한다. 후보를 원인으로 판정하는 자동 점수는 만들지 않는다. 반복 확장과 dedup/중단 이유를 같은 schema로 반환한다. Security/dataflow 신호는 WI-1/2/SP 연결 전까지 미지원 null을 유지하고, 이후 실제 provider에 연결한다.
+
+### WI-3 진행 기록: 신호와 소비자 연결
+
+구현 진행 중이며 완료 표시는 유지하지 않는다. CKS factual label endpoint,
+한 단계 BFS 거리 계산, 선언 symbol/site 식별, seed 기준 영향·동시성,
+예산과 null·provenance, 보관 source/hash 검증을 추가했다. 전체29개 입력
+schema를 비교하는 provider/consumer 계약과 coding-agent 설치 패키지의
+schema 사본, 반복 산출물 validator 및 분석 handoff SHA gate를 연결했다.
+
+실제 합성 Go 소스→SQLite 인덱스→stdio MCP→소비자 산출물에서
+Leaf/Middle/Top 거리0/1/2와 반복 확장을 확인했다. 한 줄 함수와 ReturnStmt의
+동일 span 오인도 이 실행에서 발견해 수정했다. Claude Code의 실제 HTTP
+호스트가 `mcp__cks__cks_context_label_suspects`로 정규화해 읽기 전용 도구를
+호출하고 동일 관찰값을 수신했다. 이 검증은 소유한 합성 소스에 한정되며
+실제 대상 저장소의 원인 판정·운영 수용을 대신하지 않는다.
+
+전체 build/test/race/fmt/lint 및 최종 commit-bound 실행 증거를 확인하고
+증거를 먼저 커밋한 뒤 구현 검증 상태를 갱신한다. 다음은 WI-4다.
+
+
+## WI-3 구현 검증과 남은 수용 범위
+
+CKS `63a7411742426839244948743dd02b902df350aa`와 coding-agent
+`b9290af1982b55693a5f49bbc9fad5dc2cbb76af`를 로컬 커밋했다.
+증거 커밋 `fd56be6f637135fdf673cd28766701fee970c467`의29개 산출물과1607개 source binding을
+Git 객체에서 모두 재검증한 다음에만 원장을 implemented로 갱신했다.
+기존 승인 입력5개와 역사 수용 기록은 유지한다. build/test/race/fmt/vet/lint,
+boundaries/documentation PASS, 전체 Go119개 시험 package와 plugin96개 test PASS.
+
+실제 Go 인덱스→MCP→소비자2회/3후보/26호출, null·출처·확장·정지 기록,
+정확한 플러그인 prefix의 실제 Claude HTTP 호출 PASS. 생성한 시험 서버는
+EOF/SIGTERM으로 정상 종료했다. [증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-3/README.md)를
+source commit과 SHA로 고정했으며 개인 설정/기록은 지식 입력으로 쓰지 않는다.
+
+실제 production target의 model-backed text seed, 설치된 전체 bugfix role
+흐름과 독립 수용·원인 판정은 미기록이다. 이 명시 범위 구현 검증을 전체
+목표 완료로 바꾸지 않는다. Security/dataflow 연결은 후속 담당 항목에 남긴다.
+
+## WI-4 착수: 기존 primitive와 새 계약
+
+기존 ChainBench `662fff77382eb031df687d371a8bc8f63cad581f`에는
+stop/start/restart·partition/heal의 DSL action과 node readiness monitor가
+있다. 아직 frozen seed/schedule·반복 분모·증상/인프라 실패 구분을 가진
+agent 조사 산출물의 통합 증거로 취급하지 않는다. 기존 개발 checkout을
+변경하지 않고 별도 checkout에서 구현한다.
+
+실행 전에 source/environment·정상/재현/방어/관찰 분기·seed/schedule·
+반복수/시간·실패 조건·소유 node와 cleanup을 동결한다. 반복이 부족하거나
+증상이 미재현이면 inconclusive/awaiting_observation이고 수정 완료가 아니다.
+실패 주입이 실행됐다는 receipt와 실제 증상 receipt를 분리하며, monitor의
+structured event/trigger로 후속 재개 조건을 기록한다. 소유하지 않은 node의
+중지·reset은 실행 대상에 넣지 않는다. 다음은 이 contract의 typed 모델과
+기존 DSL/monitor adapter, 실제 반복·timeout·cleanup·재발 반례다.
+
+
+WI-4 중간 보존: ChainBench `b67f8bf92bc3cd13aa06e3e081e7e3214bb76bb7`에서 typed plan과
+SHA256 기반 반복 스케줄 및 거부 조건 시험이 PASS다. checkpoint는
+`system/eval/upper-work-items-implementation-2026-10-14/wi-4-checkpoint/checkpoint.json`이다.
+반복 실행·소유 노드 확인/cleanup·DSL/monitor·통계 분모·실제 재현/재발 및
+전체 회귀는 아직 남았으므로 WI-4의 implementation_verified는 false다.
+다음은 실제 반복 실행기와 기존 primitive adapter이며 전체 목표는 active다.
+
+
+WI-4 반복 실행기 중간 보존: ChainBench `eebc18fffb02a831ff62af9845f565e470680322`.
+소스/binary/DSL pin·동일 스케줄 전/후 비교, 증상/정상 대조/인프라/정리
+오류 분리, 소표본 inconclusive와 95% binomial 상한을 구현했다. 기존 DSL에는
+요청별 주입 hook과 assertion 평가 오류·위치 ID 기록을 연결했다.
+실제 소유 Go RPC node의 전/후60회씩 실행은 60/60→0/60 증상 실패,
+수정 후 실패율 상한0.0487029133, 생성 node120/120 cleanup PASS다.
+첫 DSL 이름 불일치의120개 실행 오류는 별도 보존했으며 증상 실패로
+집계하지 않았다. build·단위/race/vet·엔진/어휘/세션 회귀 PASS.
+
+이 기록은 controlled 시험 프로그램의 중간 증거이며 공개 경로·실제
+composition adapter·모니터 window/재개 event·원자료 검증·agent gate·
+실행 반례와 전체 최종 회귀/commit-bound replay가 아직 남았다.
+`system/eval/upper-work-items-implementation-2026-10-14/wi-4-runner-checkpoint/checkpoint.json`
+에서 복구 가능하며 WI-4 implementation_verified=false를 유지한다.
+
+
+## WI-4 공개 경로·관찰·원자료 중간 검증
+
+ChainBench `348a6ec5fb9aec5b5966ce768a622be4e5296db4`를 로컬 커밋했다.
+기존 구성 소유자와 registered DSL을 통해 공개 CLI/MCP에서 새 시험
+네트워크를 구성·확인·정리한다. 실제 node machine의 실행 파일·genesis·
+config checksum과 process argv를 검증하며 관찰은 frozen 실제 구성 pin을
+대조한다. 관찰에는 keyring·node control·readiness 재시작을 전달하지 않는다.
+정해진 window의 RPC sampling, 지정 assertion 재발 event와 resume 요청,
+원자 저장한 raw receipt·분모·판정의 공개 verifier를 제공한다.
+
+깨끗한 커밋의 공개 MCP로 실제4-validator go-stablenet trial을 실행했다.
+정상 대조와 지정 거짓 predicate·cleanup PASS, 표본1회이므로 INCONCLUSIVE다.
+읽기 전용1초 관찰은2회 poll 후 AWAITING_OBSERVATION, 지정 거짓 predicate는
+RECURRED로 재개 요청했다. 두 경우 실제 소유 구성 기록 unchanged이고 별도
+fixture 종료 후4개 node 모두 stopped다. 최초1-validator genesis quorum 실패와
+5초 readiness 실패는 커밋 전 infrastructure error로 보존해 증상 실패와 분리했다.
+
+같은 source에서 controlled concurrent Go node 전/후60회와120개 cleanup을
+재실행하고 raw report verification을 통과했다. 전체 build/test/race와
+fmt/vet/고정 lint PASS. [중간 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-4-public-checkpoint/README.md)의
+source/recovery와 raw 산출물을 보존했다. generated fixture의 별도 Git object와
+binary archive는 이 packet의 복구 범위에 포함하지 않는다.
+
+WI-4는 아직 in_progress/implementation_verified=false다. 다음은 coding-agent의
+bounded 조사·provider contract·완료 gate 연결, 실제 fault/timeout/주입 오류/
+cleanup 반례와 최종 통합 source replay다. remote/mixed-binary 운영 수용과
+독립 production 판단을 이번 controlled 검증으로 완료 처리하지 않는다.
+전체 남은 순서는 WI-4→WI-1→WI-2→WI-C→WI-6→WI-SP다.
+
+
+## WI-4 소비자 연결 중간 검증
+
+coding-agent `e834ccc4687e1c30bd7d879d5f0e6f899c53369a`에 불변 phase 계획·
+input·실행 명령/exit·원자료·native verifier·결과의 결속과 bounded cycle1..3을
+구현했다. Write/Edit hook과 oracle completion CLI가 미재현·관찰·오류·증거
+변조·분류 제거·출처 불일치의 다음 단계/완료 전이를 거부한다. 통계 계산과
+node 정리는 기존 ChainBench를 사용하며, 기존 oracle/선택 gate를 유지한다.
+79개 현행 등록 도구의 nested input snapshot과 새 timing 경로를 연결했다.
+
+실제 go-stablenet4-validator 소표본 실행은 INCONCLUSIVE를 유지하고 원자료
+검증 후 PLANNING을 거부했다. 실제 public composition의 owned Go RPC
+동시성 fixture는 재현60회·전/후60쌍 60/60→0/60, upper bound0.0487,
+trial180개 cleanup PASS다. fixture source bundle/binary와 원자료를
+[중간 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-4-consumer-checkpoint/README.md)에
+보존한다. 이 프로토콜 fixture는 blockchain consensus나 독립 원인 수용이 아니다.
+전체 plugin114개·timing18개·bench 회귀와 tool-name lint PASS다.
+
+WI-4의 실제 native fault/timeout/부분 완료/주입 오류/cleanup 반례,
+parent 종료 감시·실제 signal cleanup, 최종 통합 commit replay/host alias가
+남아 implementation_verified=false다. 독립 production 수용도 미기록이다.
+현재 구현 검증3/9, 남은 순서 WI-4→WI-1→WI-2→WI-C→WI-6→WI-SP를 유지한다.
+
+
+## WI-4 실제 종료·반례 검증과 원래 범위 대조
+
+coding-agent `18aca435c4f8c9e17378ad40f60c76f09ee7bc7a`, ChainBench
+`5f6483864a4a6a91f32ff02d532275039c72db80`를 로컬 커밋했다.
+부모 사망 시 닫힌 표준 pipe에 쓰다 SIGPIPE로 cancellation/cleanup이 중단되는
+실제 실패를 subprocess RED→race GREEN으로 수정했다. consumer의 parent watch와
+직접 취소 forwarding을 유지하고 실제 부모 강제 종료·raw report 저장·node 정리를
+확인했다. 7개 실제 fault/timeout/부분 분모/cancel/parent-death/cleanup refusal
+및 복구 반례를 [실행 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-4/README.md)에
+보존한다. 거부된 cleanup은 실패를 유지하며 해당 trial 뒤 실행을 중단했다.
+
+깨끗한 source의 public composition180개 trial 정리, 재현60회/전후60쌍
+60/60→0/60·upper bound0.0487, 전체 ChainBench 검사와 plugin116·timing20·
+bench 회귀·tool lint PASS. 첫 race의 live process table churn/unknown 결과는
+보존했고 제품 ownership 판정을 완화하지 않은 동일 source 재검사가 PASS다.
+실제 Claude host의 정확한 MCP alias 호출과 실제 unknown-field 거부도 확인했다.
+
+원래 master workplan §2.2 대조에서 모드9 observation-only 코드 로그 삽입·
+재발 대기를 확인했다. 현재 read-only RPC 관찰만으로 이 기준을 대체하지 않는다.
+삽입 위치/patch·source·event/schema/기록 출처·behavior/race 대조와 실제
+로그 기반 재발/재개가 남았으므로 WI-4는 in_progress/검증3/9다.
+다음은 이 원래 경로의 구현이며 이후 WI-1→WI-2→WI-C→WI-6→WI-SP가 남는다.
+
+
+## WI-4 원래 범위 완료 검증
+
+[mode9 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/README.md)를
+`15876da9`에 고정하고112개 산출물과31개 변경 owner source SHA를 Git object로
+확인했다. 기존 중간 packet의 미완료 표시는 그 당시 상태로 보존한다.
+
+- [x] 기존 고정 schedule/분모·60회 재현과60개 전후 쌍·정상 제어·통계 상한·실제7개 fault/timeout/cancellation/cleanup 반례 및 parent-death 수정 근거 보존.
+- [x] 원래 모드9: 별도 base/probe 커밋·제한된 Go 관찰 AST diff·event/site/schema/hash·실제 정상/race·build/vet 제어. AST 일치와 시험 통과를 timing neutrality로 승격하지 않음.
+- [x] 커밋 source 기준 실제 소유 RPC 노드3회 미재현(INCONCLUSIVE), 로그2초 대기, 다음 창 재발(RECURRED). 공개 stdio MCP prepare/observe와 raw report verifier 실행.
+- [x] 실제 hook의 다음 bounded ANALYSIS 허용·PLANNING/분류 삭제/cycle 초과/증거 overwrite 거부, 실제 소유 노드 stopped 확인.
+- [x] 관찰 종료 직전 read deadline 반례 수정·정상 deadline/실제 오류/미확립 source 차단 시험. 이전 실패와 정리 근거 유지.
+- [x] ChainBench 전체 race(순차 package)·vet·pinned lint와 이후 변경 affected race/architecture/lint·clean build. Plugin126개와 최종 timing31개, bench15개·hooks·실제81개 tool schema 계약 검증.
+- [ ] 독립 production 수용·블록체인 합의 결함의 원인 수용·모든 경로의 의미/타이밍 중립성 증명. 이번 구현 완료로 자동 승인하지 않음.
+
+Owner commit은 coding-agent `72c262981dfb9ccfb9f3b49eb5a9af054bc4d52a`,
+ChainBench `df464d4b97fde4ab308c5c422024dc80518e5956`이다. 로컬 복구
+커밋이며 push/PR/merge는 수행하지 않았다.
+
+## WI-1 착수 설계와 완료 조건
+
+CKG의 저장된 함수 blob에서 on-demand 분석하고 공개 `pkg/graph` 계산을
+MCP·후속 CKS가 공유한다. 현재 live checkout 원문과 저장된 snapshot을 혼합하지
+않는다. 대상 node ID/canonical identity·manifest source commit·blob SHA·원문
+byte/line과 지원 범위를 반환한다. 함수 blob만 있는 경우 package 타입/alias
+정보가 부족함을 표시하며, 없는 정보로 확실한 연결을 만들지 않는다.
+
+초기 Go CFG는 이미 고정된 golang.org/x/tools의 cfg를 사용한다. 단순 AST 순서를
+CFG라고 부르지 않는다. 도달 불가 블록과 실제 successor·조건/루프/return을
+구분하고, 선언·재정의 kill·분기 join·loop fixed point의 reaching definitions와
+lexical def-use를 계산한다. Field/alias/call/closure·동적 dispatch·reflect의
+불확실성은 별도 진단과 보수적 edge로 남긴다. Post-dominator control dependence는
+정상 exit에 도달하는 지원 범위에서만 계산하며, 비종료 경로는 unknown이다.
+
+source bytes·statement/node/edge·fixed-point iteration·시간 상한을 사전 고정한다.
+상한 초과는 partial/budget_exhausted이며 빈 graph를 안전으로 해석하지 않는다.
+Go 이외 언어는 unsupported다. WI-2 룰·WI-6 확장·WI-C 리뷰·WI-SP 태그가
+이 결과를 재사용하며 calls/curated-flow와 계산된 값/제어 관계를 혼합하지 않는다.
+
+- [x] Typed schema/capability·source pin·bounded CFG와 공개 계산 API.
+- [x] Lexical def-use/redefinition/branch join/loop·field/call uncertainty.
+- [x] Control/data dependence와 nontermination/unsupported diagnostics.
+- [x] 공개 CKG MCP 입력/출력·tools/list·ambiguous/missing/stale source 처리.
+- [x] 독립 expected fixture·원문 위치·상한/비용·실제 index→MCP 실행.
+- [x] build/test/race/fmt/lint·새 primary source binding·근거 커밋 후 완료 체크.
+
+### WI-1 진행: 제한된 CFG kernel
+
+`pkg/graph/valueflow`에 보존된 단일 함수 blob만 입력으로 받는 CFG API를
+작성했다. byte SHA·node/canonical identity·source commit·원문 line/byte를
+유지하고, Go cfg의 successor와 도달 불가 블록을 반환한다. 고정 상한은
+source256KiB·AST4096·block256·node1024·edge4096·iteration128·시간1000ms다.
+상한을 늘리는 입력은 거부하고 부족/초과/취소/미지원은 명시한다.
+
+독립 예상 branch/join·loop back-edge·도달 불가 코드·실제 원문 slice·implicit
+return 위치와 cap/cancel/미지원/opaque effect 시험이 통과했다. 첫 branch label
+구현이 block 생성 원인을 조건식으로 잘못 해석한 실패를 보존하고, 실제 마지막
+조건식에 결속하도록 수정했다. 이 단계는 CFG kernel이며 def-use/data/control
+계산과 공개 MCP는 `not_computed`다. status를 partial로 반환하고 WI-1 완료
+체크는 유지하지 않는다. 다음은 lexical reaching-definitions·재정의 kill·합류/
+loop fixed-point와 제어 의존, 이후 source-bound 공개 질의다.
+
+CFG kernel 검증 소스 커밋7a7f1320과 [중간 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-1-cfg-checkpoint/README.md)를 d6c24421에 보존했다. 현재1609개 primary source/dependency SHA를 Git object로 확인했다. 이 source binding 갱신은 기존 수용 조건을 바꾸거나 WI-1을 완료로 표시하지 않는다.
+
+
+### WI-1 진행: 값/제어 의존과 공개 질의
+
+현재 def-use/reaching definitions·강한 재정의 kill·분기 합류·loop fixed point·
+normal-exit postdominator control dependence를 공유 API에 구현했다. Go 타입
+바인딩으로 lexical identity를 계산하고, 누락 package 타입은 partial이다.
+상수는 compile-time source node(block=-1), 참조/aggregate/generic unknown은
+별도 관계다. `value_dependencies` CKG MCP 입력/출력 schema와 실제 runtime
+검사를 등록했다. source/blob/manifest/node를 재확인하고 live file은 읽지 않는다.
+
+독립 관계·원문·상한·drift·schema 반례와 실제 compile/race→index→namespaced
+stdio MCP의 첫11개 검증이 통과했다. 포인터/field/closure/비종료는 unknown을
+유지하고 SDK output schema의 실제 음성 제어도 확인한다. 최종 code commit
+replay·전체 regression·새 source binding·원래 범위 audit 전에 완료 체크하지 않는다.
+[지원 범위와 공개 API](../graph/VALUE-DEPENDENCIES.md)를 기준으로 검증한다.
+
+
+## WI-1 최종 검증과 다음 단계
+
+소스337300b0의 clean VCS 바이너리로 compile/race→index→namespaced stdio MCP
+15개 검증/31요청/실제11개 tools·EOF exit0을 재실행했다. [최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-1/README.md)을6332da9d에 커밋하고74개 산출물/1617개 source·dependency SHA와 원래8개 요구 범위의 근거 존재를 확인했다. Go 핵심35개 새/확장 시험과 전체 primary test/build·관련 race·fmt/vet/pinned2.14.0 lint·경계/문서 검사 PASS다.
+
+신뢰할 수 없는 전체 package 타입/field memory/alias/call/closure/generic/비종료는
+명시된 partial/unknown으로 남긴다. 초기 AST 객체/lint·상수 source·output schema
+실패와 수정 근거를 보존했다. 부정 source/schema·bound를 안전/완료로 승격하지
+않는다. 이는 bounded Go 구현 완료이며 production/독립 전체 수용은 미판정이다.
+
+### WI-2 설계: opt-in 결정론 후보와 수동 annotation 공존
+
+기존 policy/security YAML overlay는 사람/운영자 입력으로 유지한다. 자동 규칙은
+별도 query artifact의 candidate이며 검증된 취약점·사람 승인·정책 태그로 쓰지
+않는다. CKG에서 WI-1의 동일 분석/핀을 한 번 계산해 재사용하고 CKS는 이 결과를
+합성한다. read-only opt-in rule pack의 ID/version/digest·실행 engine version·
+source/sink 조건/위치·흐름 경로·sanitizer/guard/외부 target resolution unknown·
+상한/중단 이유·자동/수동 origin을 반환한다.
+
+첫 pack은 Go 함수의 제한된 scalar source→sink 및 ignored-error 후보를
+대상으로 한다. selector 이름 일치는 외부 call의 실제 의미/취약점 증명이 아니다.
+분기 조건·불완전 flow·alias·동적 dispatch·sanitizer는 지원 범위에서 판정하거나
+unknown으로 남긴다. Positive/negative/sanitized/branch/alias/외부 target/오탐/
+미탐·manual overlay coexistence fixture와 실제 index→MCP 실행을 요구한다.
+기존 태그를 overwrite하지 않고 default-off를 유지하며 version/규칙/소스가
+바뀌면 근거를 다시 계산한다. 구체 pack과 공개 query schema를 먼저 고정한다.
+
+### WI-2 구현 중간 확인
+
+[고정 계약](../graph/GO-RULE-CANDIDATES.md)의 `go-local-review@1.0.0`을
+명시적으로 선택하는 CKG/CKS `rule_candidates`와 CKS `value_dependencies`
+공개 경로를 추가했다. CKS는 동일 CKG 엔진·입출력 스키마를 사용하며 별도
+분석/판정은 하지 않는다. AST/타입/CFG/def-use를 한 번 계산하고 변수 사용
+위치에서 정의와 대응 RHS를 역추적한다. 분기/loop·강한 kill·shadow·병렬/복합
+대입·오류 폐기·수동 YAML 공존을 확인한다. source/snapshot drift를 거부하며
+pack/version/hash·원문 위치·경로·제어 조건·상한·중단 이유를 보존한다.
+
+실제 소표본은 정화 helper 및 동명 selector에서 오탐, import 별칭·pointer·
+closure에서 미탐을 보인다. `syntax_only_unverified`/`not_proven` 및 한계 목록을
+출력하며 빈 후보를 안전으로 바꾸지 않는다. 모든 manual YAML/graph를 읽기만
+한다. 최종 source-bound 실행·전체 회귀·Git 근거 패킷 확인 전까지 WI-2는
+`in_progress`, 검증 완료 수는5/9로 유지한다. 다음은 동일 범위 최종 검증과
+근거 고정이며, 이후 WI-C→WI-6→WI-SP 순서다.
+
+### WI-2 최종 검증과 WI-C 시작
+
+WI-2 구현을 검증된 초기 Go pack 범위로 완료 기록한다. source2e1e7791 clean
+CKG/CKS 바이너리의23개 compiled/race fixture·39개 실제 공개 MCP 검증과
+기존 값 의존15개 공개 실행 회귀를 통과했다. EOF는 양쪽0이며 수동 YAML과
+전체 persisted graph는 불변이다. 전체 build/test·영향 범위 race·fmt/vet·
+pinned v2.14 lint·boundary/docs PASS. [최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-2/README.md)154개
+산출물·1626개 source/dependency·5개 승인 입력은 evidence3f0bb039의 Git 객체와
+현재 파일 모두 SHA 검증했다.7개 요구 범위가 실제 근거에 연결된다.
+
+소표본 review-condition TP10/TN7/FP2/FN4, precision10/12·recall10/14를 기록한다.
+이는 exploit/취약점 정확도 또는 전체 코드 안전 판정이 아니다. selector 대상·
+sanitizer·alias·실행 가능성·package/interprocedural 의미는 명시된 한계를 유지한다.
+전체/production/사람 수용은 미판정이다. 현재6/9, 다음WI-C, 남은WI-C→WI-6→WI-SP.
+
+WI-C는 기존 PR 피드백 반영 명령과 함수 내부 심층 리뷰를 혼동하지 않는다.
+출처 핀·함수 리뷰/값/규칙의 실제 도구 응답을 묶은 typed artifact, 계산/추론
+근거와 unknown, 순서/상태/guard/exception/complexity/resource/I/O, 우선순위와
+tradeoff를 검증 가능한 계약으로 고정하고 coding-agent 리뷰 경로에 연결한다.
+MCP 소비자 계약을 새 CKS 도구에 맞춰 갱신하며 완료 전에 실제 source-bound
+fixture·validator·경로·수용 연결·회귀 근거를 요구한다.
+
+### WI-C 고정 구현 계약: 보고서 전달과 사람 수용 분리
+
+현재 coding-agent analyzer의 `code_review` 경로는 light 상황 분석 뒤
+review-report.md를 만들고 종료한다. Orchestrator의 review_only 흐름은
+ANALYSIS→PLANNING→COMPLETION인데 analyzer는 직접 terminal을 지시한다.
+이 불일치를 해소하고 ANALYSIS의 typed 심층 자료→PLANNING의 검토 보고서→
+COMPLETION의 전달 검증 순서를 유지한다. PR 피드백 반영 `/review`는 별도다.
+
+1. 입력은 명시된 검토 대상/기준/규칙 pack, exact retained symbol identity와
+   commit/blob/snapshot 핀이다. 실제 CKS `review_function`과 `rule_candidates`
+   응답을 SHA로 묶는다. 규칙 응답에 포함된 value/control 결과를 재사용하여
+   소비자가 CFG나 규칙을 다시 만들지 않는다. 미지원 pack/backend면 실제
+   실패/미지원 응답을 기록하며 빈 안전 판정으로 대체하지 않는다.
+2. `deep-review.json`은 출처·도구 요청/응답·모듈/시퀀스·data/state·guard/exception·
+   complexity/resource/I/O·priority/tradeoff·검토 기준 연결·unknown·수용 상태를
+   닫힌 구조로 보존한다. 계산된 CFG/def-use/규칙과 agent 추론/제안은 출처를
+   분리하며, 추론에는 원문 근거와 가정이 필요하다. 수동 태그/LLM 판단을
+   계산된 취약점으로 바꾸지 않는다. 미검토/미지원 부분은 명시적 unknown이다.
+3. source order의 호출 목록은 실제 실행 trace가 아니다. sequence/module
+   diagram에는 관찰된 문법·계산된 로컬 연결·추론한 interprocedural 연결을
+   각각 표시하고, 조건/경로 실행 가능성·동적 target·alias/state·exception·
+   측정 없는 성능/자원 수치의 한계를 유지한다. AST 개수로 O(n)이나 안전을
+   판정하지 않는다. 누락 guard 및 우선순위 제안은 reasoning으로 표기한다.
+4. 기존 `review_function` 응답은 seed ID/path/line은 제공하지만 snapshot/blob
+   핀은 제공하지 않는다. 다른 응답의 핀을 자동 상속해 atomic 일치를 주장하지
+   않는다. identity/원문 위치를 대조하고 그 응답의 snapshot association을
+   unknown으로 표시한다. 계산된 value/규칙의 immutable 핀은 보존한다.
+5. 분석 완료·planning 진입·review_only 종료는 정확한 검증 artifact/report SHA에
+   연결한다. type 변경·필수 section 삭제·다른 source·잘못된 계산 edge·
+   unsupported를 safe로 바꾸기·근거 변경/삭제·미검증 종료를 거부한다. hook
+   경계 밖 직접 편집에는 같은 CLI verifier를 제공한다. 사람 수용은 별도이며
+   artifact의 구조 검사/보고서 전달만으로 `accepted`를 기록하지 않는다.
+6. 소비자 C1 입력 계약을 현재 CKS31개 tools/list에 맞춰 갱신한다. 실제
+   owned compiled Go fixture의 상태 변경/guard 누락/분기·loop·외부 호출·
+   resource/I/O 추론/안정성-속도 상충 자료, 공개 MCP→artifact→hook→보고서
+   경로 및 음성 tamper controls를 실행한다. 산출물·source/runner·비용·한계·
+   조건별 결과를 커밋 근거로 고정한 뒤에만 WI-C 완료를 체크한다.
+
+현 단계는 기존 경로와 실제 공개 함수 리뷰 응답 확인/계약 고정까지다.
+validator·도구 소비자 갱신·analyzer/orchestrator/hook·실제 artifact 실행은 아직
+구현하지 않았으며 WI-C는 미완료다. 현재6/9, 다음은 WI-C validator와 소비자
+계약/경로 구현이며, 남은 전체 작업은WI-C→WI-6→WI-SP다.
+
+### WI-C 최종 검증과 WI-6 시작
+
+책임 저장소 coding-agent45d9bc8b의 typed 심층 부분 리뷰·원문/계산/추론/unknown·
+6개 필수 reasoning dimension·CFG sequence/module membership view·검토 기준/
+우선순위·분석/보고서 SHA 완료 게이트를 검증했다. CKS31 실제 계약/Go compile·
+race 사례→공개 도구→artifact→hook/CLI16개 검사,9개 변조/우회 거부,142개
+plugin 테스트와 기존 standalone 훅·126개 도구 이름 참조 검사 PASS. 구조적
+리뷰의 자체 snapshot/blob 핀 부재·진짜 runtime trace/interprocedural modules·
+메모리/alias/가드 실행 가능성·외부 target·미측정 비용·LLM/사람 품질은 unknown
+또는 independent not_recorded다. 보고서 전달을 취약점 확인/사람 수용으로
+승격하지 않는다.
+
+primary3a12951 clean 바이너리 전체 build/test/race/fmt/vet/pinned lint/boundary/
+docs와 기존 rule39/value15 실제 회귀 PASS. range의 empty control block에는
+engine2가 structural_block_unlocated를 반환하고 원문 좌표를 생략한다.
+[최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-c/README.md)의300개
+산출물·1627개 primary source/dependency·13개 owner 변경·5개 승인 입력을
+증거c56d491c의 Git 객체/현재 파일로 검증했다. 현재7/9, 다음WI-6, 남은WI-6→WI-SP.
+
+WI-6은 여러 함수의 local value/control 결과를 CKS가 합성한다. call hop과
+curated flow는 계산된 interprocedural 값 전달로 바꾸지 않는다. exact seed·
+candidate/function/hop/총 계산 예산·cycle/dedup·snapshot/source·중단 이유를
+보존하며, Store의 무제한 neighborhood를 가져온 뒤 자르는 방식으로 예산을
+주장하지 않는다. bounded 저장소 조회 경계를 먼저 구현하고, 독립 정답
+fixture의 recall/noise/cost 분모와 실제 공개 도구 실행으로 검증한 뒤 완료를
+체크한다.
+
+### WI-6 구현 중간 확인
+
+`store.BoundedEdgeReader`의 선택적 `IncidentEdges`는 SQL limit+취소 context를
+적용한다. SQLite와 PostgreSQL query를 매개변수화하고, 기존 safe reader의
+ambiguous history 경계도 유지한다. `valueflow.Expand`는 동일 retained snapshot
+안에서 함수별 계산을 한 번씩 수행하고 call-hop/지역 의존을 분리하며
+cycle/dedup·seed/candidate/function/hop·총 node/edge/fact/time 예산을 보존한다.
+최종 metadata/blob/edge 및 more 표식 변화를 재검증한다. legacy reader는
+partial/unavailable이며 무제한 neighborhood fallback은 하지 않는다.
+
+CKS read-only `value_dependency_expansion`와 실제32 tools/list/C1 계약을
+추가했다. Curated flow는 기존 get_flow의 operator metadata로 별도 조회하며,
+확장 endpoint가 자동 조회하거나 source/dataset join·계산된 interprocedural
+값 전달을 주장하지 않는다. schema는 separate_not_joined/not_verified를
+반환한다. 이 지원 범위와 미지원/unknown은 공개 문서에 고정한다.
+
+독립 compiled/race Go6함수 fixture12개 실제 MCP 검사에서 관련4함수 기준
+baseline1/4→확장4/4, noise1/반환5와 비용을 기록했다. cycle·상한·입력/stale
+거부·원문 삭제 후 유지도 통과했다. 전체 회귀·커밋 기준 clean 실행·Git
+근거 확인 전까지 WI-6는 in_progress, 현재7/9를 유지한다. 남은WI-6→WI-SP.
+
+### WI-SP 고정 설계: 기존 retained annotation과 보안 경계
+
+다음 작업은 CKS의 read-only typed policy/security 질의다. exact selected symbol과
+retained snapshot을 기준으로 bounded governed_by/has_security_pattern 조회를
+사용하고 실제 관련 symbol·설명·수정 hint·manual/rule origin·unknown/not-found·
+기준 source/metadata SHA와 조회 상한/중단을 반환한다. 이름으로 source를
+혼합하거나 live YAML/source를 query에서 읽지 않는다.
+
+현 legacy loader는 YAML의 설명/위험/적용 symbol을 graph node로 보존하지만,
+실제 YAML 행·문서 버전·검토자·검토 시간·승인 상태와 원문 bytes는 모두 저장하지
+않는다. line1 기본값이나 현재 Go commit을 annotation 원문의 검토/버전 핀으로
+승격하지 않는다. 해당 provenance는 unknown으로 노출하고 필요한 원문/검토
+metadata를 지원할 때만 typed 검증과 writer/reader round-trip을 추가한다.
+manual annotation은 위험 후보/운영자 입력이며 자동 규칙 후보나 LLM 판단과
+분리한다. 빈 태그는 안전/정책 적합 판정이 아니다.
+
+기존 MCP 등록과 HTTP 접근/CIDR 정책 안에서만 노출한다. readOnlyHint는
+authorization 증명이 아니며 사용자/검토자 인증·서명 trust 기능은 미지원으로
+표시한다. private source와 ambiguous history 경계를 우회하지 않는다.
+양성/음성·빈 태그·규칙/수동 구분·설명/hint·source/version/reviewer unknown·
+조건/권한 거부·도구 등록/소비자 계약·source 변조/상한의 실제 공개 실행과
+회귀 근거를 확인한 후에만 WI-SP 완료를 체크한다.
+
+### WI-6 최종 검증과 마지막 WI-SP
+
+WI-6를 명시된 bounded local-context 범위로 완료 기록한다. primary3b0c7521
+clean 바이너리와 consumer4e65eefc의 실제32 도구/C1 계약, compiled/race6함수
+fixture12 공개 검사, cycle/dedup·입력/stale·function/candidate/node/edge/fact
+상한·원문 삭제 후 retained 조회 PASS. 독립 관련4함수 분모에서 baseline1/4,
+확장4/4+noise1/반환5와 cost를 기록한다. 전체 build/test·5패키지 race·fmt/
+vet/pinned lint/boundary/docs,142개 consumer 테스트·126 도구 참조와 기존
+review16/rule39/value15 공개 회귀 PASS.
+
+[최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-6/README.md)344개
+산출물·1635개 primary source/dependency·3개 consumer 변경·5개 승인 입력은
+증거fcdea20f의 Git 객체와 현재 source로 확인했다. SQL limit/context는 조회
+메모리화 이전에 적용하고 ambiguous history 경계는 유지한다. 조회한
+manifest/node/blob/edge/more의 최종 변화도 거부한다. PostgreSQL은 query-shape/
+compile 검증이며 새로운 live 실행을 주장하지 않는다.
+
+call hop은 argument_mapping=not_computed, 지역 값/제어와 다른 출처다. curated
+flow는 기존 get_flow에 별도로 남고 자동 조회/검증된 dataset join을 하지
+않는다. source/data/control·memory/alias/외부 effects·실행 가능성·cost/global
+optimality의 한계와 independent not_recorded를 유지한다. 현재8/9.
+
+다음/남은 전체 구현은 WI-SP다: typed policy/security 공개 질의, source/version/
+reviewer/manual-rule origin/unknown, bounded 조회·기존 HTTP/권한/읽기 경계,
+소비자 도구 계약·양성/음성/빈 태그/상한/stale/거부 공개 실행·회귀 근거.
+설계는 위 계약에 고정했고 실제 WI-SP 기능은 아직 구현/완료하지 않았다.
+
+### WI-SP 실행 계약: context.policy_security
+
+CKS 한 도구에서 exact node/canonical ID의 outgoing governed_by 및
+has_security_pattern만 조회한다. 기본32/최대128 annotation, 기본1초/최대5초
+협력적 deadline, SQL LIMIT+1, 최종 manifest/seed/blob/tag/edge/more 재검증을
+적용한다. 자동 분석은 기존 rule_candidates의 별도 opt-in 표면을 안내하며
+이번 도구가 실행/혼합하지 않는다. 빈 결과는 no_annotations, 안전 판정은 unknown.
+새 loader는 description/remediation/severity를 typed annotation payload로
+보존하고 SQLite/PG 공통 attrs round-trip을 검증한다. 기존 graph의 merged
+DocComment는 explanation으로 유지하고 hint/severity 분리는 unknown이다.
+원문 bytes/실제 행/버전/reviewer/review time/approval은 수집되지 않아 unknown.
+metadata SHA는 retained node bytes의 해시이며 YAML 원문 SHA가 아니다.
+annotation path는 원래 overlay path 그대로일 수 있으므로 private 경계 검사
+후 반환한다. 사용자 인증/서명 검증은 미지원; 기존 HTTP ACL만 적용한다.
+row 수는 SQL로 제한하며 blob/row byte 크기와 오래된 동기 Reader는 hard
+process-memory/강제 deadline 보장을 제공하지 않음을 명시한다.
+
+### WI-SP 최종 검증과 요청 구현 9/9 종료
+
+CKS read-only `context.policy_security`를 구현하고33개 도구/C1 소비자 계약을
+동기화했다. exact code symbol의 bounded outgoing governance/security page,
+selected code blob/commit/manifest와 graph metadata SHA, typed explanation/
+remediation/severity, 수동 origin과 불확실성을 반환한다. 원문 YAML bytes/실제
+행/version/reviewer/time/approval은 저장되지 않아 unknown이며 line1/Go commit을
+원문 증명으로 승격하지 않는다. legacy merged 설명은 유지하고 분리 불가능한
+hint/severity는 unknown이다. 자동 rule_candidates는 별도 opt-in이며 이 도구가
+실행/혼합하지 않는다. 빈 태그와 수동 위험 후보는 안전/정책 적합 판정이 아니다.
+
+기본32/최대128 SQL LIMIT+1, 기본1초/최대5초 협력적 timeout, stale pin 거부,
+최종 manifest/seed/blob/tag/edge/more 변화와 deadline에서 결과 초기화,
+private/ambiguous history 경계와 기존 HTTP/CIDR 접근 정책을 검증했다. HTTP
+handler는 loopback 도구 호출을 허용하고 public/unlisted CIDR/잘못된 peer 및
+forwarded-header 위조를 backend 호출 전에 거부한다. readOnlyHint는 권한 증명,
+reviewer 인증/서명 기능이 아니며 hard bytes/memory·강제 deadline·DB snapshot
+transaction/변경 후 되돌림 감지를 주장하지 않는다. 새 live PostgreSQL 검증은
+수행하지 않았고 typed attrs codec은 두 backend가 공유한다.
+
+primary9aff96b6/consumerfdb4d51 clean binary의 compiled/race corpus 실제14개
+검사,33 tools/C1, Go/YAML 삭제 후 동일 retained 결과, 두 서버 EOF0 PASS.
+전체 build/test·변경 경로 race·fmt/vet/pinned lint/boundary/docs,142 consumer
+테스트·standalone hooks·126 도구 참조, 기존 expansion12/review16/rule39/value15
+공개 회귀 PASS. 초기 오류는 historical_not_completion_evidence로 별도 보존한다.
+
+[최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-sp/README.md)의
+417 산출물·1644 primary source/dependency·3 consumer 변경·5 승인 입력은 증거
+e10f12b1의 Git 객체와 현재 source/복구 bundle로 검증했다(2069 연결). 이전8개
+manifest와1084 산출물도 기록된 Git revision 기준으로 재확인했다(1092 연결).
+이 검사는 새 production/체인 실행이나 사람 수용을 생성하지 않는다.
+
+요청한 WI-V1/V2/3/4/1/2/C/6/SP 구현은9/9 완료다. 현재 다음 구현 없음,
+남은 전체 요청 구현0개. 명시된 부분 지원과 unknown/오탐·미탐은 API/근거에
+유지하며 독립 production/사람/전체 목표 수용은 not_recorded다. 완료 원장은
+[진행 JSON](./UPPER-WORK-ITEMS-PROGRESS.json), 현재 API는
+[정책/보안 질의](../graph/POLICY-SECURITY.md)를 따른다.

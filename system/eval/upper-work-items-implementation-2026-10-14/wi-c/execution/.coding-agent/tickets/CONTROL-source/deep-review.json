@@ -1,0 +1,1110 @@
+{
+  "computed": {
+    "automatic_rule_candidates": [
+      {
+        "certainty": "lexical_may_reach",
+        "conditions": [],
+        "id": "0749b9f2ec8a0e8478204936112e2759c30617931c2a653f41c2ceccd0a56860",
+        "origin": "automatic",
+        "path": [
+          "entry",
+          "b5/n0"
+        ],
+        "rule_id": "parameter-command-name",
+        "sanitizer": "not_proven",
+        "sink_location": {
+          "end_byte": 396,
+          "end_line": 21,
+          "start_byte": 389,
+          "start_line": 21
+        },
+        "sink_occurrence": "b5/n0/use/v181/389",
+        "source_location": {
+          "end_byte": 188,
+          "end_line": 12,
+          "start_byte": 181,
+          "start_line": 12
+        },
+        "source_occurrence": "entry/definition/v181/181",
+        "target_resolution": "syntax_only_unverified"
+      }
+    ],
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostics": [
+      {
+        "code": "isolated_type_info_partial",
+        "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+      },
+      {
+        "code": "short_circuit_unsupported",
+        "location": {
+          "end_byte": 342,
+          "end_line": 18,
+          "start_byte": 323,
+          "start_line": 18
+        },
+        "message": "CFG does not model short-circuit expression edges"
+      },
+      {
+        "code": "opaque_call",
+        "location": {
+          "end_byte": 397,
+          "end_line": 21,
+          "start_byte": 376,
+          "start_line": 21
+        },
+        "message": "Isolated function source has no interprocedural effects or abnormal-exit proof"
+      },
+      {
+        "code": "range_binding_unsupported",
+        "location": {
+          "end_byte": 299,
+          "end_line": 16,
+          "start_byte": 249,
+          "start_line": 14
+        },
+        "message": "Range iteration bindings are not modeled as proven scalar assignments"
+      },
+      {
+        "code": "reference_alias_unknown",
+        "location": {
+          "end_byte": 277,
+          "end_line": 14,
+          "start_byte": 271,
+          "start_line": 14
+        },
+        "message": "Reference binding flow does not establish memory alias/effect semantics"
+      },
+      {
+        "code": "external_value_unknown",
+        "location": {
+          "end_byte": 261,
+          "end_line": 14,
+          "start_byte": 256,
+          "start_line": 14
+        },
+        "message": "Value read has no local lexical definition; no source edge is invented"
+      },
+      {
+        "code": "memory_write_untracked",
+        "location": {
+          "end_byte": 310,
+          "end_line": 17,
+          "start_byte": 301,
+          "start_line": 17
+        },
+        "message": "Indirect writes do not kill or define scalar container variables"
+      },
+      {
+        "code": "field_read_untracked",
+        "location": {
+          "end_byte": 310,
+          "end_line": 17,
+          "start_byte": 301,
+          "start_line": 17
+        },
+        "message": "Field memory/type/alias relationships are not proven from a function blob"
+      },
+      {
+        "code": "external_value_unknown",
+        "location": {
+          "end_byte": 380,
+          "end_line": 21,
+          "start_byte": 376,
+          "start_line": 21
+        },
+        "message": "Value read has no local lexical definition; no source edge is invented"
+      },
+      {
+        "code": "reaching_definition_unknown",
+        "location": {
+          "end_byte": 296,
+          "end_line": 15,
+          "start_byte": 282,
+          "start_line": 15
+        },
+        "message": "No reachable local definition; missing value source remains unknown"
+      }
+    ],
+    "module": {
+      "file": "logic.go",
+      "interprocedural_edges": "unknown",
+      "kind": "retained_file_membership",
+      "symbol": "c7b299f57164a5df"
+    },
+    "origin": "graph_computation",
+    "sequence": {
+      "edges": [
+        {
+          "certainty": "structural",
+          "from": "b0",
+          "kind": "cfg",
+          "to": "b1"
+        },
+        {
+          "certainty": "conservative",
+          "condition": "branch_0",
+          "from": "b1",
+          "kind": "cfg",
+          "to": "b2"
+        },
+        {
+          "certainty": "conservative",
+          "condition": "branch_1",
+          "from": "b1",
+          "kind": "cfg",
+          "to": "b3"
+        },
+        {
+          "certainty": "structural",
+          "from": "b2",
+          "kind": "cfg",
+          "to": "b1"
+        },
+        {
+          "certainty": "conservative",
+          "condition": "true",
+          "from": "b3",
+          "kind": "cfg",
+          "to": "b4"
+        },
+        {
+          "certainty": "conservative",
+          "condition": "false",
+          "from": "b3",
+          "kind": "cfg",
+          "to": "b5"
+        },
+        {
+          "certainty": "structural",
+          "from": "b4",
+          "kind": "cfg",
+          "to": "b5"
+        }
+      ],
+      "kind": "bounded_cfg_not_execution_trace"
+    },
+    "value_control": {
+      "def_use": [
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "entry/definition/v197/197",
+          "use": "b0/n1/reference/v197/271",
+          "variable": "v197"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "b0/n0/definition/v237/237",
+          "use": "b2/n0/use/v237/282",
+          "variable": "v237"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "b2/n0/definition/v237/282",
+          "use": "b2/n0/use/v237/282",
+          "variable": "v237"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "b0/n0/definition/v237/237",
+          "use": "b3/n0/use/v237/313",
+          "variable": "v237"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "b2/n0/definition/v237/282",
+          "use": "b3/n0/use/v237/313",
+          "variable": "v237"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "entry/definition/v171/171",
+          "use": "b3/n0/address/v171/301",
+          "variable": "v171"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "entry/definition/v211/211",
+          "use": "b3/n1/use/v211/323",
+          "variable": "v211"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "b0/n0/definition/v237/237",
+          "use": "b3/n1/use/v237/333",
+          "variable": "v237"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "b2/n0/definition/v237/282",
+          "use": "b3/n1/use/v237/333",
+          "variable": "v237"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "b4/n0/definition/v181/347",
+          "use": "b5/n0/use/v181/389",
+          "variable": "v181"
+        },
+        {
+          "certainty": "lexical_may_reach",
+          "definition": "entry/definition/v181/181",
+          "use": "b5/n0/use/v181/389",
+          "variable": "v181"
+        }
+      ],
+      "edges": [
+        {
+          "certainty": "structural",
+          "from": "b0",
+          "kind": "cfg",
+          "to": "b1"
+        },
+        {
+          "certainty": "conservative",
+          "condition": "branch_0",
+          "from": "b1",
+          "kind": "cfg",
+          "to": "b2"
+        },
+        {
+          "certainty": "conservative",
+          "condition": "branch_1",
+          "from": "b1",
+          "kind": "cfg",
+          "to": "b3"
+        },
+        {
+          "certainty": "structural",
+          "from": "b2",
+          "kind": "cfg",
+          "to": "b1"
+        },
+        {
+          "certainty": "conservative",
+          "condition": "true",
+          "from": "b3",
+          "kind": "cfg",
+          "to": "b4"
+        },
+        {
+          "certainty": "conservative",
+          "condition": "false",
+          "from": "b3",
+          "kind": "cfg",
+          "to": "b5"
+        },
+        {
+          "certainty": "structural",
+          "from": "b4",
+          "kind": "cfg",
+          "to": "b5"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "entry",
+          "kind": "reference_dependence",
+          "to": "b0/n1",
+          "variable": "v197"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "b0/n0",
+          "kind": "data_dependence",
+          "to": "b2/n0",
+          "variable": "v237"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "b2/n0",
+          "kind": "data_dependence",
+          "to": "b2/n0",
+          "variable": "v237"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "b0/n0",
+          "kind": "data_dependence",
+          "to": "b3/n0",
+          "variable": "v237"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "b2/n0",
+          "kind": "data_dependence",
+          "to": "b3/n0",
+          "variable": "v237"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "entry",
+          "kind": "address_dependence",
+          "to": "b3/n0",
+          "variable": "v171"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "entry",
+          "kind": "data_dependence",
+          "to": "b3/n1",
+          "variable": "v211"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "b0/n0",
+          "kind": "data_dependence",
+          "to": "b3/n1",
+          "variable": "v237"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "b2/n0",
+          "kind": "data_dependence",
+          "to": "b3/n1",
+          "variable": "v237"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "b4/n0",
+          "kind": "data_dependence",
+          "to": "b5/n0",
+          "variable": "v181"
+        },
+        {
+          "certainty": "may_reach",
+          "from": "entry",
+          "kind": "data_dependence",
+          "to": "b5/n0",
+          "variable": "v181"
+        },
+        {
+          "certainty": "normal_exit_structural",
+          "condition": "branch_0",
+          "from": "b1",
+          "kind": "control_dependence",
+          "to": "b1"
+        },
+        {
+          "certainty": "normal_exit_structural",
+          "condition": "branch_0",
+          "from": "b1",
+          "kind": "control_dependence",
+          "to": "b2/n0"
+        },
+        {
+          "certainty": "normal_exit_structural",
+          "condition": "true",
+          "from": "b3/n1",
+          "kind": "control_dependence",
+          "to": "b4/n0"
+        }
+      ],
+      "nodes": [
+        {
+          "block": 0,
+          "id": "b0/n0",
+          "kind": "AssignStmt",
+          "location": {
+            "end_byte": 247,
+            "end_line": 13,
+            "start_byte": 237,
+            "start_line": 13
+          },
+          "synthetic": false,
+          "text": "total := 0"
+        },
+        {
+          "block": 0,
+          "id": "b0/n1",
+          "kind": "Ident",
+          "location": {
+            "end_byte": 277,
+            "end_line": 14,
+            "start_byte": 271,
+            "start_line": 14
+          },
+          "synthetic": false,
+          "text": "values"
+        },
+        {
+          "block": 0,
+          "id": "b0/n2",
+          "kind": "Ident",
+          "location": {
+            "end_byte": 254,
+            "end_line": 14,
+            "start_byte": 253,
+            "start_line": 14
+          },
+          "synthetic": false,
+          "text": "_"
+        },
+        {
+          "block": 0,
+          "id": "b0/n3",
+          "kind": "Ident",
+          "location": {
+            "end_byte": 261,
+            "end_line": 14,
+            "start_byte": 256,
+            "start_line": 14
+          },
+          "synthetic": false,
+          "text": "value"
+        },
+        {
+          "block": 2,
+          "id": "b2/n0",
+          "kind": "AssignStmt",
+          "location": {
+            "end_byte": 296,
+            "end_line": 15,
+            "start_byte": 282,
+            "start_line": 15
+          },
+          "synthetic": false,
+          "text": "total += value"
+        },
+        {
+          "block": 3,
+          "id": "b3/n0",
+          "kind": "AssignStmt",
+          "location": {
+            "end_byte": 318,
+            "end_line": 17,
+            "start_byte": 301,
+            "start_line": 17
+          },
+          "synthetic": false,
+          "text": "box.Total = total"
+        },
+        {
+          "block": 3,
+          "id": "b3/n1",
+          "kind": "BinaryExpr",
+          "location": {
+            "end_byte": 342,
+            "end_line": 18,
+            "start_byte": 323,
+            "start_line": 18
+          },
+          "synthetic": false,
+          "text": "strict && total < 0"
+        },
+        {
+          "block": 4,
+          "id": "b4/n0",
+          "kind": "AssignStmt",
+          "location": {
+            "end_byte": 364,
+            "end_line": 19,
+            "start_byte": 347,
+            "start_line": 19
+          },
+          "synthetic": false,
+          "text": "command = \"fixed\""
+        },
+        {
+          "block": 5,
+          "id": "b5/n0",
+          "kind": "ReturnStmt",
+          "location": {
+            "end_byte": 397,
+            "end_line": 21,
+            "start_byte": 369,
+            "start_line": 21
+          },
+          "synthetic": false,
+          "text": "return exec.Command(command)"
+        },
+        {
+          "block": 0,
+          "id": "entry",
+          "kind": "entry",
+          "location": {
+            "end_byte": 233,
+            "end_line": 12,
+            "start_byte": 158,
+            "start_line": 12
+          },
+          "synthetic": true,
+          "text": ""
+        }
+      ],
+      "occurrences": [
+        {
+          "id": "b0/n0/definition/v237/237",
+          "location": {
+            "end_byte": 242,
+            "end_line": 13,
+            "start_byte": 237,
+            "start_line": 13
+          },
+          "node": "b0/n0",
+          "reachable": true,
+          "role": "definition",
+          "variable": "v237"
+        },
+        {
+          "id": "b0/n1/reference/v197/271",
+          "location": {
+            "end_byte": 277,
+            "end_line": 14,
+            "start_byte": 271,
+            "start_line": 14
+          },
+          "node": "b0/n1",
+          "reachable": true,
+          "role": "reference",
+          "variable": "v197"
+        },
+        {
+          "id": "b2/n0/definition/v237/282",
+          "location": {
+            "end_byte": 287,
+            "end_line": 15,
+            "start_byte": 282,
+            "start_line": 15
+          },
+          "node": "b2/n0",
+          "reachable": true,
+          "role": "definition",
+          "variable": "v237"
+        },
+        {
+          "id": "b2/n0/use/v237/282",
+          "location": {
+            "end_byte": 287,
+            "end_line": 15,
+            "start_byte": 282,
+            "start_line": 15
+          },
+          "node": "b2/n0",
+          "reachable": true,
+          "role": "use",
+          "variable": "v237"
+        },
+        {
+          "id": "b2/n0/use/v256/291",
+          "location": {
+            "end_byte": 296,
+            "end_line": 15,
+            "start_byte": 291,
+            "start_line": 15
+          },
+          "node": "b2/n0",
+          "reachable": true,
+          "role": "use",
+          "variable": "v256"
+        },
+        {
+          "id": "b3/n0/address/v171/301",
+          "location": {
+            "end_byte": 304,
+            "end_line": 17,
+            "start_byte": 301,
+            "start_line": 17
+          },
+          "node": "b3/n0",
+          "reachable": true,
+          "role": "address",
+          "variable": "v171"
+        },
+        {
+          "id": "b3/n0/use/v237/313",
+          "location": {
+            "end_byte": 318,
+            "end_line": 17,
+            "start_byte": 313,
+            "start_line": 17
+          },
+          "node": "b3/n0",
+          "reachable": true,
+          "role": "use",
+          "variable": "v237"
+        },
+        {
+          "id": "b3/n1/use/v211/323",
+          "location": {
+            "end_byte": 329,
+            "end_line": 18,
+            "start_byte": 323,
+            "start_line": 18
+          },
+          "node": "b3/n1",
+          "reachable": true,
+          "role": "use",
+          "variable": "v211"
+        },
+        {
+          "id": "b3/n1/use/v237/333",
+          "location": {
+            "end_byte": 338,
+            "end_line": 18,
+            "start_byte": 333,
+            "start_line": 18
+          },
+          "node": "b3/n1",
+          "reachable": true,
+          "role": "use",
+          "variable": "v237"
+        },
+        {
+          "id": "b4/n0/definition/v181/347",
+          "location": {
+            "end_byte": 354,
+            "end_line": 19,
+            "start_byte": 347,
+            "start_line": 19
+          },
+          "node": "b4/n0",
+          "reachable": true,
+          "role": "definition",
+          "variable": "v181"
+        },
+        {
+          "id": "b5/n0/use/v181/389",
+          "location": {
+            "end_byte": 396,
+            "end_line": 21,
+            "start_byte": 389,
+            "start_line": 21
+          },
+          "node": "b5/n0",
+          "reachable": true,
+          "role": "use",
+          "variable": "v181"
+        },
+        {
+          "id": "entry/definition/v171/171",
+          "location": {
+            "end_byte": 174,
+            "end_line": 12,
+            "start_byte": 171,
+            "start_line": 12
+          },
+          "node": "entry",
+          "reachable": true,
+          "role": "definition",
+          "variable": "v171"
+        },
+        {
+          "id": "entry/definition/v181/181",
+          "location": {
+            "end_byte": 188,
+            "end_line": 12,
+            "start_byte": 181,
+            "start_line": 12
+          },
+          "node": "entry",
+          "reachable": true,
+          "role": "definition",
+          "variable": "v181"
+        },
+        {
+          "id": "entry/definition/v197/197",
+          "location": {
+            "end_byte": 203,
+            "end_line": 12,
+            "start_byte": 197,
+            "start_line": 12
+          },
+          "node": "entry",
+          "reachable": true,
+          "role": "definition",
+          "variable": "v197"
+        },
+        {
+          "id": "entry/definition/v211/211",
+          "location": {
+            "end_byte": 217,
+            "end_line": 12,
+            "start_byte": 211,
+            "start_line": 12
+          },
+          "node": "entry",
+          "reachable": true,
+          "role": "definition",
+          "variable": "v211"
+        }
+      ],
+      "variables": [
+        {
+          "declaration": {
+            "end_byte": 174,
+            "end_line": 12,
+            "start_byte": 171,
+            "start_line": 12
+          },
+          "id": "v171",
+          "kind": "parameter",
+          "name": "box"
+        },
+        {
+          "declaration": {
+            "end_byte": 188,
+            "end_line": 12,
+            "start_byte": 181,
+            "start_line": 12
+          },
+          "id": "v181",
+          "kind": "parameter",
+          "name": "command"
+        },
+        {
+          "declaration": {
+            "end_byte": 203,
+            "end_line": 12,
+            "start_byte": 197,
+            "start_line": 12
+          },
+          "id": "v197",
+          "kind": "parameter",
+          "name": "values"
+        },
+        {
+          "declaration": {
+            "end_byte": 217,
+            "end_line": 12,
+            "start_byte": 211,
+            "start_line": 12
+          },
+          "id": "v211",
+          "kind": "parameter",
+          "name": "strict"
+        },
+        {
+          "declaration": {
+            "end_byte": 242,
+            "end_line": 13,
+            "start_byte": 237,
+            "start_line": 13
+          },
+          "id": "v237",
+          "kind": "local",
+          "name": "total"
+        },
+        {
+          "declaration": {
+            "end_byte": 261,
+            "end_line": 14,
+            "start_byte": 256,
+            "start_line": 14
+          },
+          "id": "v256",
+          "kind": "range_unknown",
+          "name": "value"
+        }
+      ]
+    }
+  },
+  "evidence_sha256": "5f8f9d171253394986e23cf8a97b11c51b7393b26602f117d7db1f9ae696725b",
+  "independent_acceptance": "not_recorded",
+  "limitations": [
+    "graph rule/value computation is bounded, not whole-program safety",
+    "structural review lacks its own immutable snapshot/blob pin; no atomic cross-call proof",
+    "source/CFG order is not a runtime call trace",
+    "agent findings, complexity/resources/I/O and priorities are reasoning, not measured facts",
+    "local receipt hashes do not authenticate MCP transport or grant reviewer acceptance"
+  ],
+  "reasoning": {
+    "criteria": [
+      {
+        "id": "data_state",
+        "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+        "requirement": "Review data_state",
+        "section": "data_state",
+        "status": "covered"
+      },
+      {
+        "id": "guards_exceptions",
+        "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+        "requirement": "Review guards_exceptions",
+        "section": "guards_exceptions",
+        "status": "covered"
+      },
+      {
+        "id": "complexity",
+        "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+        "requirement": "Review complexity",
+        "section": "complexity",
+        "status": "covered"
+      },
+      {
+        "id": "resources",
+        "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+        "requirement": "Review resources",
+        "section": "resources",
+        "status": "covered"
+      },
+      {
+        "id": "io",
+        "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+        "requirement": "Review io",
+        "section": "io",
+        "status": "covered"
+      },
+      {
+        "id": "priority_tradeoffs",
+        "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+        "requirement": "Review priority_tradeoffs",
+        "section": "priority_tradeoffs",
+        "status": "covered"
+      }
+    ],
+    "findings": [
+      {
+        "assumptions": [
+          "Command selection is a review concern in the fixture"
+        ],
+        "category": "guard",
+        "claim": "Review the unrestricted command-name path under the intended caller policy",
+        "evidence_nodes": [
+          "b5/n0"
+        ],
+        "id": "guard-scope",
+        "origin": "agent_reasoning",
+        "priority": "high",
+        "rule_candidates": [
+          "0749b9f2ec8a0e8478204936112e2759c30617931c2a653f41c2ceccd0a56860"
+        ],
+        "state": "review_candidate",
+        "suggestion": "Clarify allowed commands and strict=false callers before changing the guard",
+        "unknowns": [
+          "No exploit or whole-program access-control gap is established"
+        ]
+      },
+      {
+        "assumptions": [
+          "State stability is more important than unmeasured speed"
+        ],
+        "category": "tradeoff",
+        "claim": "State ownership/guard correctness should be reviewed before optimizing the accumulation loop",
+        "evidence_nodes": [
+          "b3/n0",
+          "b0/n1"
+        ],
+        "id": "state-priority",
+        "origin": "agent_reasoning",
+        "priority": "medium",
+        "rule_candidates": [],
+        "state": "review_candidate",
+        "suggestion": "Document ownership and compatibility conditions, then measure external costs separately",
+        "unknowns": [
+          "No production concurrency contract or benchmark supplied"
+        ]
+      }
+    ],
+    "sections": {
+      "complexity": {
+        "assumptions": [
+          "Each range iteration has bounded integer addition; all arithmetic cost assumptions are local"
+        ],
+        "claim": "The source loop suggests O(len(values)) local traversal excluding external construction work",
+        "evidence_nodes": [
+          "b0/n1"
+        ],
+        "origin": "agent_reasoning",
+        "status": "inferred",
+        "unknowns": [
+          "Range binding/value semantics and external API complexity are not proven or measured"
+        ]
+      },
+      "data_state": {
+        "assumptions": [
+          "Box has the fixture Total field"
+        ],
+        "claim": "The retained syntax writes the accumulated total into box.Total",
+        "evidence_nodes": [
+          "b3/n0"
+        ],
+        "origin": "agent_reasoning",
+        "status": "inferred",
+        "unknowns": [
+          "Memory/alias/concurrent effect and range value dependencies are not proven by the graph"
+        ]
+      },
+      "guards_exceptions": {
+        "assumptions": [
+          "Fixture strict flag is intended to control the negative-total guard"
+        ],
+        "claim": "Strict negative totals replace the command, while other paths may retain the parameter",
+        "evidence_nodes": [
+          "b5/n0"
+        ],
+        "origin": "agent_reasoning",
+        "status": "inferred",
+        "unknowns": [
+          "Local rule paths do not prove all caller authorization, target resolution or exception behavior"
+        ]
+      },
+      "io": {
+        "assumptions": [
+          "This selector refers to the intended standard library API"
+        ],
+        "claim": "The source constructs a command; process execution is outside this function view",
+        "evidence_nodes": [
+          "b5/n0"
+        ],
+        "origin": "agent_reasoning",
+        "status": "inferred",
+        "unknowns": [
+          "Target/import resolution and command lookup/environment I/O are unverified"
+        ]
+      },
+      "priority_tradeoffs": {
+        "assumptions": [
+          "Review goal prioritizes stable behavior and controlled state changes"
+        ],
+        "claim": "Prioritize intended command-name restrictions and state ownership before loop optimization; stricter guards can reduce compatibility",
+        "evidence_nodes": [
+          "b3/n0",
+          "b5/n0"
+        ],
+        "origin": "agent_reasoning",
+        "status": "inferred",
+        "unknowns": [
+          "Caller requirements, threat context and measured throughput are unavailable"
+        ]
+      },
+      "resources": {
+        "assumptions": [
+          "Only the source local storage is assessed"
+        ],
+        "claim": "The local total has bounded scalar storage; resource cost of the constructed command is not established",
+        "evidence_nodes": [
+          "b3/n0",
+          "b5/n0"
+        ],
+        "origin": "agent_reasoning",
+        "status": "inferred",
+        "unknowns": [
+          "Input ownership, external allocations and memory use have no runtime measurements"
+        ]
+      }
+    }
+  },
+  "schema_version": 1,
+  "source": {
+    "bytes": 241,
+    "canonical_id": "example.invalid/deep-fixture.Process",
+    "commit": "0e9d9ef667cf2d4d5780c15a29ea7b53da1d5baa",
+    "file": "logic.go",
+    "function_name": "Process",
+    "language": "go",
+    "node_id": "c7b299f57164a5df",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "snapshot_sha256": "7dc9121b95d68404d3dbdfb106a76486c56c2a79c7a4d939d2b0ee0c8ae15ade",
+    "start_byte": 158,
+    "start_line": 12
+  },
+  "status": "structured_partial_review",
+  "structural_review": {
+    "origin": "graph_record",
+    "response": {
+      "available": [
+        "history: 1 commits and 0 PRs changed this function; diffs and related past changes: cks.context.change_history",
+        "tests: 1 test functions call it; cks.context.find_callers lists them (it includes tests unless exclude_tests=true)"
+      ],
+      "code": {
+        "acquires_locks": null,
+        "call_sites": [
+          {
+            "line": 21,
+            "text": "exec.Command(command)"
+          }
+        ],
+        "call_sites_total": 1,
+        "callees": null,
+        "caller_paths": null,
+        "caller_walk_truncated": false,
+        "callers": null,
+        "cancellation_paths": null,
+        "control": {
+          "IfStmt": 1,
+          "LoopStmt": 1
+        },
+        "entry_points": 0,
+        "goroutines": null,
+        "instantiates": null,
+        "interface_implementers": {},
+        "recvs_from": null,
+        "releases_locks": null,
+        "return_statements": 1,
+        "sends_to": null,
+        "signature": "func Process(box *Box, command string, values []int, strict bool) *exec.Cmd",
+        "timeout_paths": null,
+        "uses_types": [
+          {
+            "end_line": 5,
+            "file_path": "logic.go",
+            "id": "f1f0d01a74c47916",
+            "qualified_name": "fixture.Box",
+            "start_line": 5,
+            "type": "Struct"
+          }
+        ],
+        "via_interfaces": null,
+        "writes_fields": [
+          {
+            "end_line": 5,
+            "file_path": "logic.go",
+            "id": "f0a7ca5f02f3a2e9",
+            "qualified_name": "fixture.Box.Total",
+            "start_line": 5,
+            "type": "Field"
+          }
+        ]
+      },
+      "history": {
+        "commits": [
+          {
+            "sha": "0e9d9ef667cf2d4d5780c15a29ea7b53da1d5baa",
+            "subject": "test: capture state guard and priority review conditions",
+            "time": 1791972086
+          }
+        ],
+        "commits_total": 1,
+        "prs": []
+      },
+      "limits": [
+        "calls through function values, callbacks, reflection and generated code have no graph edges and do not appear in callers or callees",
+        "a channel send or receive is listed, but the goroutine on the other end is not resolved",
+        "history covers the commits the index walked per file (a bounded recent window), not the whole repository history"
+      ],
+      "seed": {
+        "end_line": 22,
+        "file_path": "logic.go",
+        "id": "c7b299f57164a5df",
+        "qualified_name": "fixture.Process",
+        "start_line": 12,
+        "type": "Function"
+      },
+      "tests": {
+        "callers": [
+          {
+            "end_line": 20,
+            "file_path": "logic_test.go",
+            "id": "3a56c9465401b70c",
+            "qualified_name": "fixture.TestIndependentStateAndGuard",
+            "start_line": 5,
+            "type": "Function"
+          }
+        ],
+        "callers_total": 1
+      }
+    },
+    "snapshot_association": "identity_only_unverified_snapshot"
+  },
+  "ticket_id": "DEEP-REVIEW-FIXTURE"
+}

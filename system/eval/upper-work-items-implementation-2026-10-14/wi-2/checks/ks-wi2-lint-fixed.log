@@ -1,0 +1,18 @@
+go vet ./...
+go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.14.0 run --timeout 15m ./...
+0 issues.
+engine boundaries: OK
+go build  -o bin/ckg ./cmd/graph
+go build  -o bin/ckv ./cmd/vector
+go build  -o bin/cks ./cmd/cks
+....................
+----------------------------------------------------------------------
+Ran 20 tests in 0.041s
+
+OK
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.026s
+
+OK
+documentation: OK (111 live documents)

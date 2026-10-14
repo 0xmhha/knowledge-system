@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "snapshot_sha256": "3bec81416331e0321e90b3bfac0d13ed7fc31fcc701b958238b968a7de53f365",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "aeeb5d072275bce6",
+      "canonical_id": "example.invalid/value-fixture/a.Generic",
+      "file": "a/flow.go",
+      "commit": "40b76a53a78cda475fc2261fee28d30016419de8",
+      "sha256": "f637fb23ed71b46b4184b41c495d9add084b4fe3863c0cb159b7eb6dd6230557",
+      "language": "go",
+      "start_line": 39,
+      "start_byte": 732,
+      "bytes": 64,
+      "snapshot_sha256": "3bec81416331e0321e90b3bfac0d13ed7fc31fcc701b958238b968a7de53f365",
+      "function_name": "Generic"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "partial",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0",
+          "b0/n1"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 768,
+          "end_byte": 781,
+          "start_line": 39,
+          "end_line": 39
+        },
+        "text": "copy := input",
+        "synthetic": false
+      },
+      {
+        "id": "b0/n1",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 783,
+          "end_byte": 794,
+          "start_line": 39,
+          "end_line": 39
+        },
+        "text": "return copy",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 732,
+          "end_byte": 762,
+          "start_line": 39,
+          "end_line": 39
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "unknown_dependence",
+        "certainty": "may_reach",
+        "variable": "v752"
+      },
+      {
+        "from": "b0/n0",
+        "to": "b0/n1",
+        "kind": "unknown_dependence",
+        "certainty": "may_reach",
+        "variable": "v768"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "generic_value_kind_unknown",
+        "message": "Uninstantiated type parameter value kind remains unknown",
+        "location": {
+          "start_byte": 776,
+          "end_byte": 781,
+          "start_line": 39,
+          "end_line": 39
+        }
+      },
+      {
+        "code": "generic_value_kind_unknown",
+        "message": "Uninstantiated type parameter value kind remains unknown",
+        "location": {
+          "start_byte": 790,
+          "end_byte": 794,
+          "start_line": 39,
+          "end_line": 39
+        }
+      }
+    ],
+    "truncated": false,
+    "elapsed_micros": 23,
+    "variables": [
+      {
+        "id": "v752",
+        "name": "input",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 752,
+          "end_byte": 757,
+          "start_line": 39,
+          "end_line": 39
+        }
+      },
+      {
+        "id": "v768",
+        "name": "copy",
+        "kind": "local",
+        "declaration": {
+          "start_byte": 768,
+          "end_byte": 772,
+          "start_line": 39,
+          "end_line": 39
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/definition/v768/768",
+        "node": "b0/n0",
+        "variable": "v768",
+        "role": "definition",
+        "location": {
+          "start_byte": 768,
+          "end_byte": 772,
+          "start_line": 39,
+          "end_line": 39
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n0/unknown_value/v752/776",
+        "node": "b0/n0",
+        "variable": "v752",
+        "role": "unknown_value",
+        "location": {
+          "start_byte": 776,
+          "end_byte": 781,
+          "start_line": 39,
+          "end_line": 39
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n1/unknown_value/v768/790",
+        "node": "b0/n1",
+        "variable": "v768",
+        "role": "unknown_value",
+        "location": {
+          "start_byte": 790,
+          "end_byte": 794,
+          "start_line": 39,
+          "end_line": 39
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v752/752",
+        "node": "entry",
+        "variable": "v752",
+        "role": "definition",
+        "location": {
+          "start_byte": 752,
+          "end_byte": 757,
+          "start_line": 39,
+          "end_line": 39
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "entry/definition/v752/752",
+        "use": "b0/n0/unknown_value/v752/776",
+        "variable": "v752",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "b0/n0/definition/v768/768",
+        "use": "b0/n1/unknown_value/v768/790",
+        "variable": "v768",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 6,
+    "facts_peak": 18
+  },
+  "elapsed_micros": 249
+}

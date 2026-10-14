@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "plan": {
+    "schema_version": 1,
+    "id": "restart",
+    "mode": "reproduction",
+    "symptom": "controlled concurrent read before commit; no consensus claim",
+    "assertion_id": "owned-timing/assert/0",
+    "seed": "owned-paired-v1",
+    "before": {
+      "commit": "01a3ce43d2c13e09217f991bac695ee0c5bc6a07",
+      "binary_sha256": "d3e6510a3eb7e4ff85a1e72f48246386d856081ac8084c92259179b4e6f12a20",
+      "driver_sha256": "308f65ad46d113857bbe0971b93fc7e6c059f859c074e8c47ed3d60f84e242b7",
+      "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+    },
+    "after": null,
+    "repetitions": 1,
+    "min_completed": 1,
+    "min_symptom_failures": 1,
+    "max_failure_rate": 0.05,
+    "trial_timeout_seconds": 15,
+    "total_timeout_seconds": 30,
+    "owned_node_ids": [
+      "node1"
+    ],
+    "normal_assertion_ids": [
+      "owned-timing/assert/1"
+    ],
+    "injection": {
+      "kind": "restart",
+      "target": "node1",
+      "step": "owned-timing/step/0",
+      "min_delay_ms": 0,
+      "max_delay_ms": 3
+    },
+    "resume": null
+  },
+  "plan_sha256": "edd48e7364cc5aeadce871c15e0c731c98521b90afcd402a59abe66799d406fe",
+  "trials": [
+    {
+      "cohort": "before",
+      "source": {
+        "commit": "01a3ce43d2c13e09217f991bac695ee0c5bc6a07",
+        "binary_sha256": "d3e6510a3eb7e4ff85a1e72f48246386d856081ac8084c92259179b4e6f12a20",
+        "driver_sha256": "308f65ad46d113857bbe0971b93fc7e6c059f859c074e8c47ed3d60f84e242b7",
+        "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+      },
+      "schedule": {
+        "trial": 1,
+        "seed": "24c699ab18a6b6bdad50023560b9c20966be6e61f13051a6a592e36d20b7e4b7",
+        "delay_ms": 1
+      },
+      "identity": {
+        "runtime_sha256": "fe9cf274d55a0ee940099e1cb8bfe1b6e3d7ab6f1ee484d78775283e00c1cd0d",
+        "source": {
+          "commit": "01a3ce43d2c13e09217f991bac695ee0c5bc6a07",
+          "binary_sha256": "d3e6510a3eb7e4ff85a1e72f48246386d856081ac8084c92259179b4e6f12a20",
+          "driver_sha256": "308f65ad46d113857bbe0971b93fc7e6c059f859c074e8c47ed3d60f84e242b7",
+          "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+        },
+        "lease_id": "trial-373861126",
+        "owned_node_ids": [
+          "node1"
+        ],
+        "read_only": false
+      },
+      "observation": {
+        "receipts": [
+          {
+            "kind": "injection",
+            "sha256": "761822703fb38d67c448f0b5b672dccc7568feace304553955950f8ca1e9d42e",
+            "body": {
+              "Injection": {
+                "kind": "restart",
+                "target": "node1",
+                "step": "owned-timing/step/0",
+                "delay_ms": 1,
+                "executed": true,
+                "receipt_sha256": ""
+              },
+              "Schedule": {
+                "trial": 1,
+                "seed": "24c699ab18a6b6bdad50023560b9c20966be6e61f13051a6a592e36d20b7e4b7",
+                "delay_ms": 1
+              },
+              "Lease": "trial-373861126"
+            }
+          },
+          {
+            "kind": "assertion",
+            "sha256": "460281e00c058889dd0be2f27beaddef7cb305b8fb6d1717e6efcf924c7d8977",
+            "body": {
+              "ID": "owned-timing/assert/0",
+              "Source": "node1: actual=0 expected=1",
+              "On": "",
+              "Assert": "balanceAt",
+              "Expected": "1",
+              "Actual": "0",
+              "Pass": false,
+              "Provenance": {
+                "address": "0x0000000000000000000000000000000000000002",
+                "assert": "balanceAt",
+                "compare": "Equal",
+                "expected": "1",
+                "on": "node1"
+              }
+            }
+          },
+          {
+            "kind": "assertion",
+            "sha256": "5eb35e8dc62d07a91c4c130cb4e460340a3c6f15864b1057407bdabc8beea966",
+            "body": {
+              "ID": "owned-timing/assert/1",
+              "Source": "",
+              "On": "",
+              "Assert": "chainId",
+              "Expected": "8283",
+              "Actual": "8283",
+              "Pass": true,
+              "Provenance": {
+                "assert": "chainId",
+                "compare": "Equal",
+                "expected": "8283",
+                "on": "node1"
+              }
+            }
+          }
+        ],
+        "polls": 1,
+        "symptom": {
+          "id": "owned-timing/assert/0",
+          "pass": false,
+          "receipt_sha256": "460281e00c058889dd0be2f27beaddef7cb305b8fb6d1717e6efcf924c7d8977"
+        },
+        "controls": [
+          {
+            "id": "owned-timing/assert/1",
+            "pass": true,
+            "receipt_sha256": "5eb35e8dc62d07a91c4c130cb4e460340a3c6f15864b1057407bdabc8beea966"
+          }
+        ],
+        "injection": {
+          "kind": "restart",
+          "target": "node1",
+          "step": "owned-timing/step/0",
+          "delay_ms": 1,
+          "executed": true,
+          "receipt_sha256": "761822703fb38d67c448f0b5b672dccc7568feace304553955950f8ca1e9d42e"
+        },
+        "events": []
+      },
+      "outcome": "SYMPTOM_FAIL",
+      "cleanup_ok": true,
+      "started_at": "2026-10-14T05:10:52.766463Z",
+      "finished_at": "2026-10-14T05:10:55.696615Z"
+    }
+  ],
+  "before": {
+    "planned": 1,
+    "attempted": 1,
+    "completed": 1,
+    "symptom_failures": 1,
+    "control_failures": 0,
+    "infrastructure_errors": 0,
+    "missing": 0,
+    "failure_rate": 1,
+    "upper_failure_rate_95": 1
+  },
+  "after": null,
+  "verdict": "INCONCLUSIVE",
+  "stop_reason": "planned_trials_finished",
+  "resume_requested": false,
+  "acceptance": "not_recorded"
+}

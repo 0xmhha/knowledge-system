@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "status": "analyzed_bounded",
+  "snapshot_sha256": "dce0fd380e88cb120c0b55ffef474a9bf2a5c5c4239b50c1bf330e6018be6833",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "527228aa895c4128",
+      "canonical_id": "example.invalid/value-fixture/a.Const",
+      "file": "a/flow.go",
+      "commit": "f511632b1b85a9a001c4b2381d2416322c9b9a53",
+      "sha256": "83ac5edba209f021a12177d395d1f6ec8523fc33ee816089c9e6831b19aa1576",
+      "language": "go",
+      "start_line": 36,
+      "start_byte": 542,
+      "bytes": 67,
+      "snapshot_sha256": "dce0fd380e88cb120c0b55ffef474a9bf2a5c5c4239b50c1bf330e6018be6833",
+      "function_name": "Const"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "analyzed_bounded",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 595,
+          "end_byte": 607,
+          "start_line": 36,
+          "end_line": 36
+        },
+        "text": "return value",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 542,
+          "end_byte": 558,
+          "start_line": 36,
+          "end_line": 36
+        },
+        "text": "",
+        "synthetic": true
+      },
+      {
+        "id": "constant/584",
+        "block": -1,
+        "kind": "compile_time_constant",
+        "location": {
+          "start_byte": 584,
+          "end_byte": 593,
+          "start_line": 36,
+          "end_line": 36
+        },
+        "text": "value = 3",
+        "synthetic": false
+      }
+    ],
+    "edges": [
+      {
+        "from": "constant/584",
+        "to": "b0/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v584"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "elapsed_micros": 22,
+    "variables": [
+      {
+        "id": "v584",
+        "name": "value",
+        "kind": "constant",
+        "declaration": {
+          "start_byte": 584,
+          "end_byte": 589,
+          "start_line": 36,
+          "end_line": 36
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/use/v584/602",
+        "node": "b0/n0",
+        "variable": "v584",
+        "role": "use",
+        "location": {
+          "start_byte": 602,
+          "end_byte": 607,
+          "start_line": 36,
+          "end_line": 36
+        },
+        "reachable": true
+      },
+      {
+        "id": "constant/584/constant_definition/v584/584",
+        "node": "constant/584",
+        "variable": "v584",
+        "role": "constant_definition",
+        "location": {
+          "start_byte": 584,
+          "end_byte": 589,
+          "start_line": 36,
+          "end_line": 36
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "constant/584/constant_definition/v584/584",
+        "use": "b0/n0/use/v584/602",
+        "variable": "v584",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 6,
+    "facts_peak": 14
+  },
+  "elapsed_micros": 251
+}

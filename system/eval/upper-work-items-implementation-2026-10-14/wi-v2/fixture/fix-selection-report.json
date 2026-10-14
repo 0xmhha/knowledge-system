@@ -1,0 +1,2545 @@
+{
+  "schema_version": 1,
+  "runner_sha256": "97b29240e8da36a4983e3a881da3f04e463eaa1eebbb7ad170e8858a1b405a2b",
+  "oracle_runner_sha256": "76d4ca4d0f93e37576a057bd28b6e5f4040db227d9c4ab4b9ede5c023392c6c4",
+  "repo_root": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject",
+  "spec_sha256": "393941e61f352dde8e2d19f927db6e5fc2a00f5db6f97e5799b313f6197b9efe",
+  "oracle_template_sha256": "560cb0211986809d489d54d85c6190fb60d4663dde1c1e27db0815b71d2123b1",
+  "source_base_commit": "3b32990ba115372f98daf2c3473f3cb2bb664bba",
+  "oracle_base_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+  "symptom_id": "ledger-total",
+  "candidates": [
+    {
+      "id": "loop",
+      "rationale": "recompute every credit at its producer with a constant-space loop",
+      "commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+      "tree": "3c7cfc8ff567f9c079b492f0bce42591e96b45c3",
+      "diff": "diff --git a/ledger.go b/ledger.go\nindex e362ff2..b155337 100644\n--- a/ledger.go\n+++ b/ledger.go\n@@ -1,8 +1,9 @@\n package ledger\n \n func Balance(entries []int) int {\n-\tif len(entries) == 0 {\n-\t\treturn 0\n+\ttotal := 0\n+\tfor _, credit := range entries {\n+\t\ttotal += credit\n \t}\n-\treturn entries[len(entries)-1]\n+\treturn total\n }\n",
+      "diff_sha256": "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155",
+      "oracle_plan": {
+        "schema_version": 1,
+        "tier": "simulation",
+        "base_ref": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+        "symptom_id": "ledger-total",
+        "symptom_case": "symptom",
+        "controls": [
+          "empty",
+          "single"
+        ],
+        "ticket_file": "ticket.json",
+        "ticket_sha256": "07bf024cb2a0ece86925537011c6d8b8d512952b4e16c9f5231af7a8af0eaa51",
+        "requirement_file": "acceptance.json",
+        "independent_derivation_file": "derivation.md",
+        "frozen_files": {
+          "primary_test.go": "eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e",
+          "independent_test.go": "2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b",
+          "metric_test.go": "299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10",
+          "oracles/go_oracle_driver.py": "3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb",
+          "oracles/selection_driver.py": "fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb",
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2",
+          "go.mod": "596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb"
+        },
+        "oracles": [
+          {
+            "id": "primary",
+            "role": "primary",
+            "assertion_id": "ticket_balance",
+            "files": [
+              "primary_test.go"
+            ],
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ]
+          },
+          {
+            "id": "independent",
+            "role": "independent",
+            "assertion_id": "conservation",
+            "files": [
+              "independent_test.go"
+            ],
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ]
+          }
+        ],
+        "mutants": [
+          {
+            "id": "lost-credit",
+            "kind": "reintroduce_symptom",
+            "patches": [
+              {
+                "path": "ledger.go",
+                "before": "total += credit",
+                "after": "total = credit"
+              }
+            ]
+          },
+          {
+            "id": "literal-overfit",
+            "kind": "overfit",
+            "patches": [
+              {
+                "path": "ledger.go",
+                "before": "return total",
+                "after": "return 42"
+              }
+            ]
+          }
+        ],
+        "timeout_seconds": 120,
+        "max_total_seconds": 600
+      },
+      "oracle_report": {
+        "schema_version": 1,
+        "mechanical_verdict": "PASS",
+        "repo_root": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject",
+        "base_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+        "head_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+        "plan_sha256": "e056929128bbda50d27e5bc858cbdac90b4596ff8a7e4d35662ad6975662019a",
+        "runner_sha256": "76d4ca4d0f93e37576a057bd28b6e5f4040db227d9c4ab4b9ede5c023392c6c4",
+        "symptom_id": "ledger-total",
+        "frozen_files": {
+          "primary_test.go": "eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e",
+          "independent_test.go": "2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b",
+          "metric_test.go": "299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10",
+          "oracles/go_oracle_driver.py": "3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb",
+          "oracles/selection_driver.py": "fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb",
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2",
+          "go.mod": "596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb"
+        },
+        "tier": "simulation",
+        "execution_scope": "candidate_trial",
+        "runs": [
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 1433,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:45:56.876728+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:45:57.299005+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:45:57.299038+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.299061+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 30 expected 42\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.299077+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.29908+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:45:57.299084+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.299504+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.422s\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.299518+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.423}\n",
+            "stdout_sha256": "5762ae85844aaca3d3b2e190cb173aa8ce911f454b6484c0d4d96322f0be009d",
+            "stderr_sha256": "14feeae406a0cd35422d3e82b10c2e109b84a984dfde929bb1ce09c5c929ab91",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 527,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:45:57.68549+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:45:57.889954+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:45:57.890002+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.890024+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder -12\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.890034+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.890037+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:45:57.89004+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.890398+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.205s\\n\"}\n{\"Time\":\"2026-10-14T09:45:57.890416+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.205}\n",
+            "stdout_sha256": "e047f9987533a86610ab305a7b5b39fe3fa5ad993024970fc10b3270ca62146b",
+            "stderr_sha256": "d5f4d14ef3d047f23b1a9a271b03cdce22d1fee57c1f71a44826d1e4868da5ae",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 676,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:45:58.349778+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:45:58.542456+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:45:58.542496+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:45:58.542526+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:45:58.542536+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:45:58.542539+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:45:58.542902+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.193s\\n\"}\n{\"Time\":\"2026-10-14T09:45:58.542911+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.193}\n",
+            "stdout_sha256": "18988def738436d97a4f15be0d275ec5c672a62ccd4cd0716d5683687ea78ff4",
+            "stderr_sha256": "8c400efe3847e319383e351a101ea93791e373103062b6c1f21b78630eb2c202",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 695,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:45:58.854733+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:45:59.059417+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:45:59.059459+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:45:59.059495+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:45:59.059501+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:45:59.059504+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:45:59.059865+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.205s\\n\"}\n{\"Time\":\"2026-10-14T09:45:59.059875+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.205}\n",
+            "stdout_sha256": "f36fb6404ce46e57ad756f8020809e1fcb791780f2ea3d3da8f7754ebd0ec855",
+            "stderr_sha256": "a8b882fb6c865f82f41b4ff812bde8498c877019cb6bb8426ec2f3f2af78613f",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 525,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:45:59.574413+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:45:59.769573+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:45:59.769622+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:45:59.769647+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:45:59.76965+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:45:59.769652+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:45:59.770059+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.195s\\n\"}\n{\"Time\":\"2026-10-14T09:45:59.770069+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.196}\n",
+            "stdout_sha256": "24a714289181a43eb4ff835b69d7573fd22b454be95794eec135f047cbceea67",
+            "stderr_sha256": "6c1edbef26f097935e4690ee2b139546d3bd27179255981c4b758a78db91280f",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 689,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:00.278151+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:00.46769+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:00.467735+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:00.467764+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:00.467769+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:00.467771+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:00.468232+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.190s\\n\"}\n{\"Time\":\"2026-10-14T09:46:00.468256+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.19}\n",
+            "stdout_sha256": "5f5802c6aaa72b5f21a69a38838eb236c643e2d33789bfcb392663ad5dd0a653",
+            "stderr_sha256": "cf86ba7267874bed99f95fa8f81eb614230f6feb2e587431aebbe2daa70f6bb6",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 780,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:00.855302+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:01.259148+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:01.259203+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:01.259229+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:01.259231+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:01.259234+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:01.259618+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.404s\\n\"}\n{\"Time\":\"2026-10-14T09:46:01.259636+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.404}\n",
+            "stdout_sha256": "ec7c7ae878f4c4e3f0de0c53bd4456dc5f4680c8cbba4293f3ca5aedaefa2b82",
+            "stderr_sha256": "bb48d5044df28a7e8692f361d9ed18f0560ff3d84ccd6c6b2911e4e55578990c",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 522,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:01.605222+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:01.808284+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:01.808337+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:01.808359+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:01.808366+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:01.80837+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:01.808715+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.203s\\n\"}\n{\"Time\":\"2026-10-14T09:46:01.808726+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.204}\n",
+            "stdout_sha256": "81a549081924d75a2b35019978ea7ff2653b5291ac14f5391d3a627a2d5d96ee",
+            "stderr_sha256": "3bb378a9877bf61a6024c58a57542489d7c94fa3c491f1d18b57b76c3f18ce07",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 761,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:02.352644+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:02.545823+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:02.545881+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:02.545906+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:02.545909+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:02.545912+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:02.546212+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.193s\\n\"}\n{\"Time\":\"2026-10-14T09:46:02.546222+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.194}\n",
+            "stdout_sha256": "39e03c15aac3a498cb70d6b54bb627a79723c4cab5f7d1c0fb4ba6aff56d138c",
+            "stderr_sha256": "12046d8a0ee9990b84f6addfca5854bd392ebfbe08e8db242b06e08bd4bb21df",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 681,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:02.864922+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:03.078419+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:03.078453+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:03.078482+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:03.078486+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:03.078489+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:03.078802+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.214s\\n\"}\n{\"Time\":\"2026-10-14T09:46:03.078817+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.214}\n",
+            "stdout_sha256": "3308af07d72ee5d9214fa134850043df65c8c0e5b048aac09aee0437420a8d2b",
+            "stderr_sha256": "612215ac3605c7895e5d8162213ecf7ff29ec0ba6665113e8ee9b8631d54a80b",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 530,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:03.555492+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:03.75649+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:03.756531+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:03.756562+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:03.756564+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:03.75657+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:03.756953+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.201s\\n\"}\n{\"Time\":\"2026-10-14T09:46:03.756962+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.201}\n",
+            "stdout_sha256": "666862a599bfa3dba61a23d9f6bf59572c8d36fcc27ec5bdfa8943b3ae19ad6b",
+            "stderr_sha256": "bf94af12e7ad7b350ef569b9d10ab8fe266de43f4746b368551fe8783600cacb",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 700,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:04.255852+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:04.452726+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:04.452793+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:04.452821+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:04.452828+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:04.452833+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:04.453251+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.197s\\n\"}\n{\"Time\":\"2026-10-14T09:46:04.453266+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.197}\n",
+            "stdout_sha256": "8d72ec806e0aa6cb0f3e94bea171cc254a2d4af083a654766e0be46207def41d",
+            "stderr_sha256": "b16e565b88e01f740aeee779932770d784ddd7d88df033164da8d79418292342",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:lost-credit",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 765,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:04.87482+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:05.237465+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:05.237522+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.237539+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 30 expected 42\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.237552+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.237554+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:05.237558+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.23792+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.363s\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.237933+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.363}\n",
+            "stdout_sha256": "2b2efa0cf2fc00b96838eee4bb4a7eebd7c03f4b7312021fd5578167cff7985f",
+            "stderr_sha256": "da366f924cfd9460f5c5472c825c54d3b03fea04ce979708dd1812babd6375ce",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:lost-credit",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 621,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:05.676627+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:05.875382+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:05.875462+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.875505+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder -12\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.875516+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.875521+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:05.875524+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.875884+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.199s\\n\"}\n{\"Time\":\"2026-10-14T09:46:05.875904+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.199}\n",
+            "stdout_sha256": "3cbcffc0c63a5277f75c96bf8770f948a71c458c45e48cdc8c6320a6c4f7f8fc",
+            "stderr_sha256": "18e9cdc3fdd816d59689926f9a7c34b80f7d183b7dc2e920e82d1d3540e85775",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:literal-overfit",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 830,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:06.518586+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:06.877839+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:06.877888+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:06.87791+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:06.877926+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:06.877929+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:06.878258+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.359s\\n\"}\n{\"Time\":\"2026-10-14T09:46:06.87827+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.36}\n",
+            "stdout_sha256": "ec7c7ae878f4c4e3f0de0c53bd4456dc5f4680c8cbba4293f3ca5aedaefa2b82",
+            "stderr_sha256": "5d400c2f37f77c91588143c7521c3229b8636ac954be8c5d7f0176b05bfe367d",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:literal-overfit",
+            "subject_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 694,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:07.394571+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:07.588141+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:07.588203+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:07.588223+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder 25\\n\"}\n{\"Time\":\"2026-10-14T09:46:07.588233+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:07.588237+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:07.58824+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:07.588615+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.194s\\n\"}\n{\"Time\":\"2026-10-14T09:46:07.58863+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.194}\n",
+            "stdout_sha256": "3cbcffc0c63a5277f75c96bf8770f948a71c458c45e48cdc8c6320a6c4f7f8fc",
+            "stderr_sha256": "d21628864a52599b3116255c8ab0bcb0a4a3827727fc32e05d27ff9d8fc33fb4",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          }
+        ],
+        "checks": [
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost-credit",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost-credit",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:literal-overfit",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "ASSERTION",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:literal-overfit",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          }
+        ],
+        "independent_human_acceptance": "not_recorded",
+        "limits": [
+          "Separate drivers and derivation do not prove semantic independence without review.",
+          "Finite controls/mutants do not prove correctness for every input."
+        ]
+      },
+      "oracle_plan_bytes": "{\n  \"schema_version\": 1,\n  \"tier\": \"simulation\",\n  \"base_ref\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\",\n  \"symptom_id\": \"ledger-total\",\n  \"symptom_case\": \"symptom\",\n  \"controls\": [\n    \"empty\",\n    \"single\"\n  ],\n  \"ticket_file\": \"ticket.json\",\n  \"ticket_sha256\": \"07bf024cb2a0ece86925537011c6d8b8d512952b4e16c9f5231af7a8af0eaa51\",\n  \"requirement_file\": \"acceptance.json\",\n  \"independent_derivation_file\": \"derivation.md\",\n  \"frozen_files\": {\n    \"primary_test.go\": \"eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e\",\n    \"independent_test.go\": \"2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b\",\n    \"metric_test.go\": \"299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10\",\n    \"oracles/go_oracle_driver.py\": \"3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb\",\n    \"oracles/selection_driver.py\": \"fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb\",\n    \"acceptance.json\": \"5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7\",\n    \"derivation.md\": \"69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2\",\n    \"go.mod\": \"596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb\"\n  },\n  \"oracles\": [\n    {\n      \"id\": \"primary\",\n      \"role\": \"primary\",\n      \"assertion_id\": \"ticket_balance\",\n      \"files\": [\n        \"primary_test.go\"\n      ],\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/go_oracle_driver.py\",\n        \"--package\",\n        \".\",\n        \"--test\",\n        \"TestPrimary\",\n        \"--assertion-id\",\n        \"ticket_balance\"\n      ]\n    },\n    {\n      \"id\": \"independent\",\n      \"role\": \"independent\",\n      \"assertion_id\": \"conservation\",\n      \"files\": [\n        \"independent_test.go\"\n      ],\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/go_oracle_driver.py\",\n        \"--package\",\n        \".\",\n        \"--test\",\n        \"TestIndependent\",\n        \"--assertion-id\",\n        \"conservation\"\n      ]\n    }\n  ],\n  \"mutants\": [\n    {\n      \"id\": \"lost-credit\",\n      \"kind\": \"reintroduce_symptom\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.go\",\n          \"before\": \"total += credit\",\n          \"after\": \"total = credit\"\n        }\n      ]\n    },\n    {\n      \"id\": \"literal-overfit\",\n      \"kind\": \"overfit\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.go\",\n          \"before\": \"return total\",\n          \"after\": \"return 42\"\n        }\n      ]\n    }\n  ],\n  \"timeout_seconds\": 120,\n  \"max_total_seconds\": 600\n}\n",
+      "metrics": {
+        "changed_lines": {
+          "value": 7,
+          "unit": "lines",
+          "origin": "Git diff --numstat"
+        },
+        "allocations": {
+          "value": 0.0,
+          "unit": "allocations/call",
+          "origin": "executed frozen adapter",
+          "driver_source": "oracles/selection_driver.py",
+          "receipt_sha256": "7d213d642516a6483d08a3b5052b0da93f63001aba026478fa9c53840ac42c81"
+        }
+      },
+      "drivers": [
+        {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            "oracles/selection_driver.py",
+            "regression"
+          ],
+          "exit_code": 0,
+          "timed_out": false,
+          "launch_error": null,
+          "stdout": "{\"schema_version\": 1, \"candidate_id\": \"loop\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"status\": \"PASS\"}\n",
+          "stderr": "{\"Time\":\"2026-10-14T09:46:08.546093+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:08.895711+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:08.895761+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:08.895803+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:08.895809+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:08.895811+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:08.895813+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:08.895814+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:08.895815+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:08.895817+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:08.896196+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.350s\\n\"}\n{\"Time\":\"2026-10-14T09:46:08.896214+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.35}\n",
+          "stdout_sha256": "1c4089f469f62d3d40dce726692fb7c487789cb88e2d50f1aa9c6dcdb7842654",
+          "stderr_sha256": "dafa5829f2e3603ef79514a024022e0177a9695dc5e6254e4eb24f9c83e48f0c",
+          "duration_ms": 680,
+          "kind": "regression",
+          "source_file": "oracles/selection_driver.py"
+        },
+        {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            "oracles/selection_driver.py",
+            "metrics"
+          ],
+          "exit_code": 0,
+          "timed_out": false,
+          "launch_error": null,
+          "stdout": "{\"schema_version\": 1, \"candidate_id\": \"loop\", \"subject_commit\": \"16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af\", \"metrics\": {\"allocations\": {\"value\": 0.0, \"unit\": \"allocations/call\"}}}\n",
+          "stderr": "{\"Time\":\"2026-10-14T09:46:09.370991+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:09.570783+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\"}\n{\"Time\":\"2026-10-14T09:46:09.570839+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"=== RUN   TestAllocationMetric\\n\"}\n{\"Time\":\"2026-10-14T09:46:09.570945+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"SELECTION_METRIC_ALLOCATIONS=0.000000\\n\"}\n{\"Time\":\"2026-10-14T09:46:09.570963+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"--- PASS: TestAllocationMetric (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:09.570965+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:09.57097+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:09.571456+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.200s\\n\"}\n{\"Time\":\"2026-10-14T09:46:09.571466+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.2}\n",
+          "stdout_sha256": "7d213d642516a6483d08a3b5052b0da93f63001aba026478fa9c53840ac42c81",
+          "stderr_sha256": "cb3ccc8cb5800c0883a3986709d3a4e9af855605e75512b946d2655ee93927b6",
+          "duration_ms": 682,
+          "kind": "metrics",
+          "source_file": "oracles/selection_driver.py"
+        }
+      ],
+      "regression": "PASS",
+      "hard_eligible": true,
+      "evidence_sha256": [
+        "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155",
+        "1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96",
+        "210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf",
+        "4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5"
+      ]
+    },
+    {
+      "id": "copy",
+      "rationale": "snapshot credits before recomputing the same total, paying an extra allocation",
+      "commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+      "tree": "bfc57be06473c1e5fb3e6546711e16c7c90d33e8",
+      "diff": "diff --git a/ledger.go b/ledger.go\nindex e362ff2..6c0e791 100644\n--- a/ledger.go\n+++ b/ledger.go\n@@ -1,8 +1,10 @@\n package ledger\n \n func Balance(entries []int) int {\n-\tif len(entries) == 0 {\n-\t\treturn 0\n+\tcopied := append([]int(nil), entries...)\n+\ttotal := 0\n+\tfor _, credit := range copied {\n+\t\ttotal += credit\n \t}\n-\treturn entries[len(entries)-1]\n+\treturn total\n }\n",
+      "diff_sha256": "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1",
+      "oracle_plan": {
+        "schema_version": 1,
+        "tier": "simulation",
+        "base_ref": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+        "symptom_id": "ledger-total",
+        "symptom_case": "symptom",
+        "controls": [
+          "empty",
+          "single"
+        ],
+        "ticket_file": "ticket.json",
+        "ticket_sha256": "07bf024cb2a0ece86925537011c6d8b8d512952b4e16c9f5231af7a8af0eaa51",
+        "requirement_file": "acceptance.json",
+        "independent_derivation_file": "derivation.md",
+        "frozen_files": {
+          "primary_test.go": "eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e",
+          "independent_test.go": "2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b",
+          "metric_test.go": "299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10",
+          "oracles/go_oracle_driver.py": "3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb",
+          "oracles/selection_driver.py": "fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb",
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2",
+          "go.mod": "596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb"
+        },
+        "oracles": [
+          {
+            "id": "primary",
+            "role": "primary",
+            "assertion_id": "ticket_balance",
+            "files": [
+              "primary_test.go"
+            ],
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ]
+          },
+          {
+            "id": "independent",
+            "role": "independent",
+            "assertion_id": "conservation",
+            "files": [
+              "independent_test.go"
+            ],
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ]
+          }
+        ],
+        "mutants": [
+          {
+            "id": "lost-credit",
+            "kind": "reintroduce_symptom",
+            "patches": [
+              {
+                "path": "ledger.go",
+                "before": "total += credit",
+                "after": "total = credit"
+              }
+            ]
+          },
+          {
+            "id": "literal-overfit",
+            "kind": "overfit",
+            "patches": [
+              {
+                "path": "ledger.go",
+                "before": "return total",
+                "after": "return 42"
+              }
+            ]
+          }
+        ],
+        "timeout_seconds": 120,
+        "max_total_seconds": 600
+      },
+      "oracle_report": {
+        "schema_version": 1,
+        "mechanical_verdict": "PASS",
+        "repo_root": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject",
+        "base_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+        "head_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+        "plan_sha256": "e056929128bbda50d27e5bc858cbdac90b4596ff8a7e4d35662ad6975662019a",
+        "runner_sha256": "76d4ca4d0f93e37576a057bd28b6e5f4040db227d9c4ab4b9ede5c023392c6c4",
+        "symptom_id": "ledger-total",
+        "frozen_files": {
+          "primary_test.go": "eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e",
+          "independent_test.go": "2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b",
+          "metric_test.go": "299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10",
+          "oracles/go_oracle_driver.py": "3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb",
+          "oracles/selection_driver.py": "fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb",
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2",
+          "go.mod": "596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb"
+        },
+        "tier": "simulation",
+        "execution_scope": "candidate_trial",
+        "runs": [
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 752,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:10.580945+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:10.946523+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:10.94658+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:10.946599+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 30 expected 42\\n\"}\n{\"Time\":\"2026-10-14T09:46:10.946615+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:10.946617+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:10.94662+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:10.946993+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.366s\\n\"}\n{\"Time\":\"2026-10-14T09:46:10.947005+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.366}\n",
+            "stdout_sha256": "5762ae85844aaca3d3b2e190cb173aa8ce911f454b6484c0d4d96322f0be009d",
+            "stderr_sha256": "bf8c53a5689d3b0c447358761056c61a9f1c010cc7fb352b8cd398db098bd9d9",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 613,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:11.39077+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:11.586912+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:11.586953+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:11.586978+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder -12\\n\"}\n{\"Time\":\"2026-10-14T09:46:11.586993+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:11.586997+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:11.586999+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:11.587394+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.196s\\n\"}\n{\"Time\":\"2026-10-14T09:46:11.587403+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.197}\n",
+            "stdout_sha256": "e047f9987533a86610ab305a7b5b39fe3fa5ad993024970fc10b3270ca62146b",
+            "stderr_sha256": "e5fd15186297c7fd737977064b1e96857fffefc8c37625c4d9192a9b8fd6216e",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 646,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:11.88701+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:12.087275+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:12.087311+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:12.087341+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:12.087344+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:12.087349+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:12.087677+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.200s\\n\"}\n{\"Time\":\"2026-10-14T09:46:12.087686+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.201}\n",
+            "stdout_sha256": "18988def738436d97a4f15be0d275ec5c672a62ccd4cd0716d5683687ea78ff4",
+            "stderr_sha256": "52e59fcd99b10fbd033e90de9941f94af9bf762a43ff5c3b825a948b3f396436",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 522,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:12.539171+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:12.733923+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:12.733982+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:12.734009+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:12.734015+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:12.734017+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:12.734344+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.195s\\n\"}\n{\"Time\":\"2026-10-14T09:46:12.734354+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.195}\n",
+            "stdout_sha256": "f36fb6404ce46e57ad756f8020809e1fcb791780f2ea3d3da8f7754ebd0ec855",
+            "stderr_sha256": "05100b0c5878fc33cc50330a837f4d469a939cd8977aab1b68cac4c2d9835541",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 551,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:13.099742+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:13.297233+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:13.297278+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:13.297298+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:13.297304+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:13.297307+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:13.297625+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.198s\\n\"}\n{\"Time\":\"2026-10-14T09:46:13.29764+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.198}\n",
+            "stdout_sha256": "24a714289181a43eb4ff835b69d7573fd22b454be95794eec135f047cbceea67",
+            "stderr_sha256": "d46db627c81da28c864f10ecafa240e53504dfd480ed3f471a335278d2b465cd",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 531,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:13.619698+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:13.82113+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:13.821188+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:13.821209+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:13.821216+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:13.821219+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:13.821544+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.202s\\n\"}\n{\"Time\":\"2026-10-14T09:46:13.82156+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.202}\n",
+            "stdout_sha256": "5f5802c6aaa72b5f21a69a38838eb236c643e2d33789bfcb392663ad5dd0a653",
+            "stderr_sha256": "b261c70b2433111e3ef0e067c5148e9ec7f445ec78c6ef016a8695a3df320e2c",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 885,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:14.396185+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:14.75392+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:14.753981+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:14.753997+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:14.754001+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:14.754005+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:14.754384+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.358s\\n\"}\n{\"Time\":\"2026-10-14T09:46:14.754393+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.358}\n",
+            "stdout_sha256": "0d4575e8e586a6531755bf714116a4c6dd01478af969e17d0e6720be5a648c28",
+            "stderr_sha256": "dcd7f8946f0fd3a8d17ca7771359e4909afa6627a25ff60cb1d4de2951cf478d",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 529,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:15.114462+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:15.308674+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:15.308723+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:15.308745+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:15.308752+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:15.308755+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:15.309317+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.195s\\n\"}\n{\"Time\":\"2026-10-14T09:46:15.309333+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.195}\n",
+            "stdout_sha256": "37734d843f80adaa9ada9f34131d6167596d20362983b32d1ecbf2c6eb0f6c92",
+            "stderr_sha256": "0ba20fa9c2045634c8ff40ce50ef65d34ff1fd067059a21d76ad420c0b54e87c",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 565,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:15.630458+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:15.83447+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:15.834522+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:15.83455+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:15.834556+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:15.834559+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:15.834898+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.204s\\n\"}\n{\"Time\":\"2026-10-14T09:46:15.83491+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.204}\n",
+            "stdout_sha256": "5a7289cd2652f11d2428900cb0b375c646787b654378169653c9fdc7e8cbfb6f",
+            "stderr_sha256": "23ac024e860429f721a1a034d02db207f7e03a652632f21fd141cac98d2a6088",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 698,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:16.379701+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:16.572933+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:16.572967+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:16.572989+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:16.572999+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:16.573002+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:16.573372+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.193s\\n\"}\n{\"Time\":\"2026-10-14T09:46:16.573386+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.194}\n",
+            "stdout_sha256": "c15cde9896fd45c2672ce7f5599e0a6a834322abd7e1a3373985ea98de743284",
+            "stderr_sha256": "16943115f55a428e38caf567dec374dea941f56bf6381eeda741ced4bf7c21ac",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 687,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:16.867163+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:17.084164+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:17.084222+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:17.084247+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:17.08425+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:17.084252+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:17.08454+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.217s\\n\"}\n{\"Time\":\"2026-10-14T09:46:17.084551+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.217}\n",
+            "stdout_sha256": "dc68bd6b147f345ce2d2edfedca7485d6dc3e8dd2130dd664db88ec38c9d8960",
+            "stderr_sha256": "5949ea01fad9be069d4443f7582daf8ada89c6b7ac1b4f1ac96253e0b68e4ddb",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 499,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:17.562423+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:17.7544+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:17.754458+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:17.754466+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:17.75447+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:17.754473+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:17.755086+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.192s\\n\"}\n{\"Time\":\"2026-10-14T09:46:17.755096+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.193}\n",
+            "stdout_sha256": "c7723bd529e088bd7b2a6c5c67fb556a833abecf17d1071c2608ce27456d18b5",
+            "stderr_sha256": "47f173d5b86d4649aec0bcc6983a71e68b62b1bee88a254ff3ad04c67b802bfe",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:lost-credit",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 930,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:18.383038+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:18.744374+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:18.744426+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:18.744453+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 30 expected 42\\n\"}\n{\"Time\":\"2026-10-14T09:46:18.744461+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:18.744463+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:18.744465+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:18.744923+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.362s\\n\"}\n{\"Time\":\"2026-10-14T09:46:18.74494+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.362}\n",
+            "stdout_sha256": "3bfd43d146b1374670e20a4a32fd666bc9a28781d4b18cdf65cf6e35ff9c46b9",
+            "stderr_sha256": "b98cb52ebc162ae4c9033c2a88441bd0b374eaf74be86c4770c8e2b2c9b842c9",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:lost-credit",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 577,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:19.092474+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:19.285437+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:19.285478+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:19.285499+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder -12\\n\"}\n{\"Time\":\"2026-10-14T09:46:19.28553+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:19.285542+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:19.285545+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:19.286043+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.193s\\n\"}\n{\"Time\":\"2026-10-14T09:46:19.286058+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.194}\n",
+            "stdout_sha256": "17c7e9e1e544378538e7afec11cda093c5d815a420c49220fd1dba4ee98420bb",
+            "stderr_sha256": "0adecc54ce44db33488c61a969763b7b814311d8e52a819cfb25ec01c001350f",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:literal-overfit",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 891,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:19.701366+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:20.100977+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:20.101008+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.101035+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.101037+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:20.101042+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.101342+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.400s\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.101351+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.4}\n",
+            "stdout_sha256": "0d4575e8e586a6531755bf714116a4c6dd01478af969e17d0e6720be5a648c28",
+            "stderr_sha256": "7047d7ee4c00d35f0f6833490024dc6ff4d377e13d0dfa437c69c74510ac9062",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:literal-overfit",
+            "subject_commit": "3a421766053e6b0b05c82e223a81a22f178c8d85",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 510,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:20.565408+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:20.760171+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:20.760218+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.760237+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder 25\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.760249+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.760255+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:20.760258+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.760693+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.195s\\n\"}\n{\"Time\":\"2026-10-14T09:46:20.760702+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.195}\n",
+            "stdout_sha256": "17c7e9e1e544378538e7afec11cda093c5d815a420c49220fd1dba4ee98420bb",
+            "stderr_sha256": "cfa69a9b506128912433caa38c5c298aa2ec2b93f13039abdbcc5e61b8479f7b",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          }
+        ],
+        "checks": [
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost-credit",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost-credit",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:literal-overfit",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "ASSERTION",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:literal-overfit",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          }
+        ],
+        "independent_human_acceptance": "not_recorded",
+        "limits": [
+          "Separate drivers and derivation do not prove semantic independence without review.",
+          "Finite controls/mutants do not prove correctness for every input."
+        ]
+      },
+      "oracle_plan_bytes": "{\n  \"schema_version\": 1,\n  \"tier\": \"simulation\",\n  \"base_ref\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\",\n  \"symptom_id\": \"ledger-total\",\n  \"symptom_case\": \"symptom\",\n  \"controls\": [\n    \"empty\",\n    \"single\"\n  ],\n  \"ticket_file\": \"ticket.json\",\n  \"ticket_sha256\": \"07bf024cb2a0ece86925537011c6d8b8d512952b4e16c9f5231af7a8af0eaa51\",\n  \"requirement_file\": \"acceptance.json\",\n  \"independent_derivation_file\": \"derivation.md\",\n  \"frozen_files\": {\n    \"primary_test.go\": \"eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e\",\n    \"independent_test.go\": \"2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b\",\n    \"metric_test.go\": \"299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10\",\n    \"oracles/go_oracle_driver.py\": \"3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb\",\n    \"oracles/selection_driver.py\": \"fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb\",\n    \"acceptance.json\": \"5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7\",\n    \"derivation.md\": \"69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2\",\n    \"go.mod\": \"596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb\"\n  },\n  \"oracles\": [\n    {\n      \"id\": \"primary\",\n      \"role\": \"primary\",\n      \"assertion_id\": \"ticket_balance\",\n      \"files\": [\n        \"primary_test.go\"\n      ],\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/go_oracle_driver.py\",\n        \"--package\",\n        \".\",\n        \"--test\",\n        \"TestPrimary\",\n        \"--assertion-id\",\n        \"ticket_balance\"\n      ]\n    },\n    {\n      \"id\": \"independent\",\n      \"role\": \"independent\",\n      \"assertion_id\": \"conservation\",\n      \"files\": [\n        \"independent_test.go\"\n      ],\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/go_oracle_driver.py\",\n        \"--package\",\n        \".\",\n        \"--test\",\n        \"TestIndependent\",\n        \"--assertion-id\",\n        \"conservation\"\n      ]\n    }\n  ],\n  \"mutants\": [\n    {\n      \"id\": \"lost-credit\",\n      \"kind\": \"reintroduce_symptom\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.go\",\n          \"before\": \"total += credit\",\n          \"after\": \"total = credit\"\n        }\n      ]\n    },\n    {\n      \"id\": \"literal-overfit\",\n      \"kind\": \"overfit\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.go\",\n          \"before\": \"return total\",\n          \"after\": \"return 42\"\n        }\n      ]\n    }\n  ],\n  \"timeout_seconds\": 120,\n  \"max_total_seconds\": 600\n}\n",
+      "metrics": {
+        "changed_lines": {
+          "value": 8,
+          "unit": "lines",
+          "origin": "Git diff --numstat"
+        },
+        "allocations": {
+          "value": 1.0,
+          "unit": "allocations/call",
+          "origin": "executed frozen adapter",
+          "driver_source": "oracles/selection_driver.py",
+          "receipt_sha256": "2513d1c1fe428a4a18482f6fdeba4dd957e1766ad56c6c82f426d8eb96cc64ee"
+        }
+      },
+      "drivers": [
+        {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            "oracles/selection_driver.py",
+            "regression"
+          ],
+          "exit_code": 0,
+          "timed_out": false,
+          "launch_error": null,
+          "stdout": "{\"schema_version\": 1, \"candidate_id\": \"copy\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"status\": \"PASS\"}\n",
+          "stderr": "{\"Time\":\"2026-10-14T09:46:21.546769+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:21.905731+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:21.905776+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:21.905807+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:21.90582+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:21.905824+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:21.905826+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:21.905827+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:21.905829+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:21.905831+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:21.906179+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.359s\\n\"}\n{\"Time\":\"2026-10-14T09:46:21.906195+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.359}\n",
+          "stdout_sha256": "72cdb4e328fdcb5e5bf0bac8ecd199dc755187566ef449060e4949a50fb5d617",
+          "stderr_sha256": "713152569be5b169eeff206773a971a9c07e80088f5bf449becbddf11997ba2f",
+          "duration_ms": 690,
+          "kind": "regression",
+          "source_file": "oracles/selection_driver.py"
+        },
+        {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            "oracles/selection_driver.py",
+            "metrics"
+          ],
+          "exit_code": 0,
+          "timed_out": false,
+          "launch_error": null,
+          "stdout": "{\"schema_version\": 1, \"candidate_id\": \"copy\", \"subject_commit\": \"3a421766053e6b0b05c82e223a81a22f178c8d85\", \"metrics\": {\"allocations\": {\"value\": 1.0, \"unit\": \"allocations/call\"}}}\n",
+          "stderr": "{\"Time\":\"2026-10-14T09:46:22.373101+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:22.566782+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\"}\n{\"Time\":\"2026-10-14T09:46:22.566817+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"=== RUN   TestAllocationMetric\\n\"}\n{\"Time\":\"2026-10-14T09:46:22.567116+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"SELECTION_METRIC_ALLOCATIONS=1.000000\\n\"}\n{\"Time\":\"2026-10-14T09:46:22.567131+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"--- PASS: TestAllocationMetric (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:22.567135+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:22.567137+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:22.5677+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.194s\\n\"}\n{\"Time\":\"2026-10-14T09:46:22.567708+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.195}\n",
+          "stdout_sha256": "2513d1c1fe428a4a18482f6fdeba4dd957e1766ad56c6c82f426d8eb96cc64ee",
+          "stderr_sha256": "f7bee105b772157c27c996098c05c83ff14bad79995ddfd87b5e682aa76cfdba",
+          "duration_ms": 632,
+          "kind": "metrics",
+          "source_file": "oracles/selection_driver.py"
+        }
+      ],
+      "regression": "PASS",
+      "hard_eligible": true,
+      "evidence_sha256": [
+        "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1",
+        "be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44",
+        "a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a",
+        "c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043"
+      ]
+    },
+    {
+      "id": "literal",
+      "rationale": "tempting symptom masking: return only the primary example total",
+      "commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+      "tree": "541d8bae983e8bbefb8b39aa3f320b511c414d2f",
+      "diff": "diff --git a/ledger.go b/ledger.go\nindex e362ff2..5c66d2e 100644\n--- a/ledger.go\n+++ b/ledger.go\n@@ -1,8 +1,3 @@\n package ledger\n \n-func Balance(entries []int) int {\n-\tif len(entries) == 0 {\n-\t\treturn 0\n-\t}\n-\treturn entries[len(entries)-1]\n-}\n+func Balance(entries []int) int { return 42 }\n",
+      "diff_sha256": "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873",
+      "oracle_plan": {
+        "schema_version": 1,
+        "tier": "simulation",
+        "base_ref": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+        "symptom_id": "ledger-total",
+        "symptom_case": "symptom",
+        "controls": [
+          "empty",
+          "single"
+        ],
+        "ticket_file": "ticket.json",
+        "ticket_sha256": "07bf024cb2a0ece86925537011c6d8b8d512952b4e16c9f5231af7a8af0eaa51",
+        "requirement_file": "acceptance.json",
+        "independent_derivation_file": "derivation.md",
+        "frozen_files": {
+          "primary_test.go": "eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e",
+          "independent_test.go": "2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b",
+          "metric_test.go": "299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10",
+          "oracles/go_oracle_driver.py": "3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb",
+          "oracles/selection_driver.py": "fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb",
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2",
+          "go.mod": "596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb"
+        },
+        "oracles": [
+          {
+            "id": "primary",
+            "role": "primary",
+            "assertion_id": "ticket_balance",
+            "files": [
+              "primary_test.go"
+            ],
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ]
+          },
+          {
+            "id": "independent",
+            "role": "independent",
+            "assertion_id": "conservation",
+            "files": [
+              "independent_test.go"
+            ],
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ]
+          }
+        ],
+        "mutants": [
+          {
+            "id": "lost-credit",
+            "kind": "reintroduce_symptom",
+            "patches": [
+              {
+                "path": "ledger.go",
+                "before": "return 42",
+                "after": "return entries[len(entries)-1]"
+              }
+            ]
+          },
+          {
+            "id": "literal-overfit",
+            "kind": "overfit",
+            "patches": [
+              {
+                "path": "ledger.go",
+                "before": "return 42",
+                "after": "return 41"
+              }
+            ]
+          }
+        ],
+        "timeout_seconds": 120,
+        "max_total_seconds": 600
+      },
+      "oracle_report": {
+        "schema_version": 1,
+        "mechanical_verdict": "FAIL",
+        "repo_root": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject",
+        "base_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+        "head_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+        "plan_sha256": "6a438dbd4f0375ca628b4c9589977717a3100b11702c019a52edb053da692ca2",
+        "runner_sha256": "76d4ca4d0f93e37576a057bd28b6e5f4040db227d9c4ab4b9ede5c023392c6c4",
+        "symptom_id": "ledger-total",
+        "frozen_files": {
+          "primary_test.go": "eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e",
+          "independent_test.go": "2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b",
+          "metric_test.go": "299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10",
+          "oracles/go_oracle_driver.py": "3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb",
+          "oracles/selection_driver.py": "fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb",
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2",
+          "go.mod": "596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb"
+        },
+        "tier": "simulation",
+        "execution_scope": "candidate_trial",
+        "runs": [
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 942,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:23.49637+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:23.878708+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:23.878758+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:23.878807+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 30 expected 42\\n\"}\n{\"Time\":\"2026-10-14T09:46:23.878824+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:23.87883+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:23.878836+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:23.879811+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.383s\\n\"}\n{\"Time\":\"2026-10-14T09:46:23.879842+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.383}\n",
+            "stdout_sha256": "5762ae85844aaca3d3b2e190cb173aa8ce911f454b6484c0d4d96322f0be009d",
+            "stderr_sha256": "2e43c75c90c350badfab5cd8d2eaae5bf9c061be89871f4439e40669ae4c2539",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 684,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:24.357074+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:24.572753+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:24.572818+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:24.572841+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder -12\\n\"}\n{\"Time\":\"2026-10-14T09:46:24.57285+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:24.572862+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:24.572865+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:24.573249+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.216s\\n\"}\n{\"Time\":\"2026-10-14T09:46:24.573261+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.216}\n",
+            "stdout_sha256": "e047f9987533a86610ab305a7b5b39fe3fa5ad993024970fc10b3270ca62146b",
+            "stderr_sha256": "aea45600db74e6fa5a2561e2a310dfc6bbcd1d78a8dfa4d92cf748742e076c17",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 690,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:24.895423+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:25.13783+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:25.13789+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:25.137916+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:25.137918+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:25.137921+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:25.138323+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.243s\\n\"}\n{\"Time\":\"2026-10-14T09:46:25.138341+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.243}\n",
+            "stdout_sha256": "18988def738436d97a4f15be0d275ec5c672a62ccd4cd0716d5683687ea78ff4",
+            "stderr_sha256": "d25241eaa38ec184e24d40e16203e918f8336d406f2927ca59233da3eea6e62b",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 582,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:25.582234+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:25.798009+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:25.798052+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:25.798097+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:25.798104+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:25.798107+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:25.798664+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.216s\\n\"}\n{\"Time\":\"2026-10-14T09:46:25.798675+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.216}\n",
+            "stdout_sha256": "f36fb6404ce46e57ad756f8020809e1fcb791780f2ea3d3da8f7754ebd0ec855",
+            "stderr_sha256": "7355f44bf4e0b7a94c6fad69d06758b485cdcbfd30520d61216e3a8b3feaed64",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 759,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:26.370269+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:26.611815+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:26.611889+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:26.611961+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:26.611967+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:26.611972+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:26.612748+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.242s\\n\"}\n{\"Time\":\"2026-10-14T09:46:26.612771+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.243}\n",
+            "stdout_sha256": "24a714289181a43eb4ff835b69d7573fd22b454be95794eec135f047cbceea67",
+            "stderr_sha256": "124e02785a7bb2c9ec67a302bf8d6f75c67cdaaeab2b12180687fdf9a9a3786c",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "5fb9244e8a9c7e2b1c64cdc018048340f4313f63",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 673,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:26.924965+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:27.184887+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:27.184957+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:27.184992+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- PASS: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:27.184998+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:27.185001+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:27.185394+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.260s\\n\"}\n{\"Time\":\"2026-10-14T09:46:27.185405+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.26}\n",
+            "stdout_sha256": "5f5802c6aaa72b5f21a69a38838eb236c643e2d33789bfcb392663ad5dd0a653",
+            "stderr_sha256": "80012dd82fb5512a0901c1c34b9b34188edd6949ca35851940f9a19b78a564cc",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 942,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"pass\", \"go_exit_code\": 0, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:27.668214+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:28.062092+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:28.062154+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.062186+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.062188+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:28.062191+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.062489+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.394s\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.062499+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.394}\n",
+            "stdout_sha256": "a52f7e05184803977027e3c64817174a9959861306336a225ff46c5eae07ed1d",
+            "stderr_sha256": "600301e5515d086c25946e40c3baf1e2645df40aa030c7256fa284dc99ce56d5",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 527,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:28.568182+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:28.769088+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:28.769125+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.769142+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder 25\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.769152+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.769159+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:28.769161+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.76951+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.201s\\n\"}\n{\"Time\":\"2026-10-14T09:46:28.769522+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.201}\n",
+            "stdout_sha256": "6040607da626ea9c7c6ddfbf4ad95463344e7661001880eeeeedbf51fb39530e",
+            "stderr_sha256": "845728b28df4de3ebf11dd81233845f7f50c0752ed20992ec7e7f1797c78a511",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 672,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:29.265107+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:29.483223+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:29.483286+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.483308+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 42 expected 0\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.483322+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.483325+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:29.483327+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.483681+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.218s\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.483698+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.219}\n",
+            "stdout_sha256": "514ce527ac935bc8c0dfb130f3ff21f835b3fc041b3cebc378499519a4f833ed",
+            "stderr_sha256": "eff321ec71f092aa752e2abbb89d8a7513b5a4d082ee946d139ceca11843058e",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 752,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:29.784778+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:29.994496+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:29.994534+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.994558+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder 42\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.99457+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.994574+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:29.994576+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.994918+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.210s\\n\"}\n{\"Time\":\"2026-10-14T09:46:29.994928+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.21}\n",
+            "stdout_sha256": "7515ba8746a047398f98a4573ac5028af2b5eae9680e50a14f1d0e72429eb824",
+            "stderr_sha256": "a8023d10b4bf3e8b55175465820232ea249ae59124915625fad9175399144f5f",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 525,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:30.53499+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:30.729057+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:30.729092+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:30.729117+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 42 expected 8\\n\"}\n{\"Time\":\"2026-10-14T09:46:30.729125+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:30.729126+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:30.72913+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:30.729443+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.194s\\n\"}\n{\"Time\":\"2026-10-14T09:46:30.729455+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.194}\n",
+            "stdout_sha256": "9560af3dfe2459c6ab883ab18616ef57524565f7ae83e6da2e8613f647663e3a",
+            "stderr_sha256": "21dc27adcf63ed410053f307cfa92e47b2d82b0edfd8316a9142b61c333ab01d",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 527,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:31.100935+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:31.290434+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:31.290484+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:31.290506+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder 34\\n\"}\n{\"Time\":\"2026-10-14T09:46:31.290512+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:31.290516+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:31.290519+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:31.290979+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.190s\\n\"}\n{\"Time\":\"2026-10-14T09:46:31.29099+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.19}\n",
+            "stdout_sha256": "c862d76f9b7b4edb740e41b592d9d5928cbe8f8a25be76df892a757c7664e65f",
+            "stderr_sha256": "ab5f37df9abdbb013b892b23a881150e47c6faa2a420485312f0964b204de2c5",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:lost-credit",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 946,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:31.710043+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:32.094062+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:32.09412+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.094137+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 30 expected 42\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.094151+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.094153+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:32.094156+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.094488+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.384s\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.094502+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.384}\n",
+            "stdout_sha256": "e3c96e75c88bd62cafbc2cfc205016bdc61cf0f3d9274764752242ec855632da",
+            "stderr_sha256": "a28f0e048c7c37820533aad105768b321c0481f07df2171c2f0fab2ef57146c5",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:lost-credit",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 519,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:32.598413+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:32.798931+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:32.798967+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.798991+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder -12\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.799052+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.799059+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:32.799061+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.799499+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.201s\\n\"}\n{\"Time\":\"2026-10-14T09:46:32.799516+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.201}\n",
+            "stdout_sha256": "6040607da626ea9c7c6ddfbf4ad95463344e7661001880eeeeedbf51fb39530e",
+            "stderr_sha256": "5e1df587366df6648c513b12e805fdf1d4f98745a85efa4a99d739ec6b971869",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:literal-overfit",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestPrimary",
+              "--assertion-id",
+              "ticket_balance"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 917,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:33.414793+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:33.772108+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:33.772158+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:33.772176+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"    primary_test.go:24: ORACLE_ASSERTION[ticket_balance]: got 41 expected 42\\n\"}\n{\"Time\":\"2026-10-14T09:46:33.772201+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- FAIL: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:33.772203+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:33.772206+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:33.772558+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.358s\\n\"}\n{\"Time\":\"2026-10-14T09:46:33.772572+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.358}\n",
+            "stdout_sha256": "e3c96e75c88bd62cafbc2cfc205016bdc61cf0f3d9274764752242ec855632da",
+            "stderr_sha256": "c929689eabc44f85b179156ba759d491396159175e5983e40db78c5f08a987f7",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:literal-overfit",
+            "subject_commit": "98a696d98d58275d601d33a8affe4d5a9dbc37b7",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/go_oracle_driver.py",
+              "--package",
+              ".",
+              "--test",
+              "TestIndependent",
+              "--assertion-id",
+              "conservation"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 576,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"outcome\": \"symptom_fail\", \"go_exit_code\": 1, \"runtime\": \"go version go1.26.9 darwin/arm64\"}\n",
+            "stderr": "{\"Time\":\"2026-10-14T09:46:34.09956+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:34.326945+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:34.327001+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:34.327023+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder -1\\n\"}\n{\"Time\":\"2026-10-14T09:46:34.327047+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:34.327053+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:34.327055+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:34.327403+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.228s\\n\"}\n{\"Time\":\"2026-10-14T09:46:34.32742+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.228}\n",
+            "stdout_sha256": "6040607da626ea9c7c6ddfbf4ad95463344e7661001880eeeeedbf51fb39530e",
+            "stderr_sha256": "f8da9d29f792476fa4f240f6c551d52e821fe45e906deeeae7e550722ce55e3a",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          }
+        ],
+        "checks": [
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": false
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": false
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": false
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": false
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": false
+          },
+          {
+            "variant": "mutant:lost-credit",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost-credit",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:literal-overfit",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "ASSERTION",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:literal-overfit",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          }
+        ],
+        "independent_human_acceptance": "not_recorded",
+        "limits": [
+          "Separate drivers and derivation do not prove semantic independence without review.",
+          "Finite controls/mutants do not prove correctness for every input."
+        ]
+      },
+      "oracle_plan_bytes": "{\n  \"schema_version\": 1,\n  \"tier\": \"simulation\",\n  \"base_ref\": \"5fb9244e8a9c7e2b1c64cdc018048340f4313f63\",\n  \"symptom_id\": \"ledger-total\",\n  \"symptom_case\": \"symptom\",\n  \"controls\": [\n    \"empty\",\n    \"single\"\n  ],\n  \"ticket_file\": \"ticket.json\",\n  \"ticket_sha256\": \"07bf024cb2a0ece86925537011c6d8b8d512952b4e16c9f5231af7a8af0eaa51\",\n  \"requirement_file\": \"acceptance.json\",\n  \"independent_derivation_file\": \"derivation.md\",\n  \"frozen_files\": {\n    \"primary_test.go\": \"eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e\",\n    \"independent_test.go\": \"2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b\",\n    \"metric_test.go\": \"299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10\",\n    \"oracles/go_oracle_driver.py\": \"3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb\",\n    \"oracles/selection_driver.py\": \"fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb\",\n    \"acceptance.json\": \"5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7\",\n    \"derivation.md\": \"69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2\",\n    \"go.mod\": \"596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb\"\n  },\n  \"oracles\": [\n    {\n      \"id\": \"primary\",\n      \"role\": \"primary\",\n      \"assertion_id\": \"ticket_balance\",\n      \"files\": [\n        \"primary_test.go\"\n      ],\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/go_oracle_driver.py\",\n        \"--package\",\n        \".\",\n        \"--test\",\n        \"TestPrimary\",\n        \"--assertion-id\",\n        \"ticket_balance\"\n      ]\n    },\n    {\n      \"id\": \"independent\",\n      \"role\": \"independent\",\n      \"assertion_id\": \"conservation\",\n      \"files\": [\n        \"independent_test.go\"\n      ],\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/go_oracle_driver.py\",\n        \"--package\",\n        \".\",\n        \"--test\",\n        \"TestIndependent\",\n        \"--assertion-id\",\n        \"conservation\"\n      ]\n    }\n  ],\n  \"mutants\": [\n    {\n      \"id\": \"lost-credit\",\n      \"kind\": \"reintroduce_symptom\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.go\",\n          \"before\": \"return 42\",\n          \"after\": \"return entries[len(entries)-1]\"\n        }\n      ]\n    },\n    {\n      \"id\": \"literal-overfit\",\n      \"kind\": \"overfit\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.go\",\n          \"before\": \"return 42\",\n          \"after\": \"return 41\"\n        }\n      ]\n    }\n  ],\n  \"timeout_seconds\": 120,\n  \"max_total_seconds\": 600\n}\n",
+      "metrics": {
+        "changed_lines": {
+          "value": 7,
+          "unit": "lines",
+          "origin": "Git diff --numstat"
+        },
+        "allocations": {
+          "value": 0.0,
+          "unit": "allocations/call",
+          "origin": "executed frozen adapter",
+          "driver_source": "oracles/selection_driver.py",
+          "receipt_sha256": "ddc0d79f70074855e4c7d6c549964b3562a014c352da53dc3d226ed8f3058d76"
+        }
+      },
+      "drivers": [
+        {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            "oracles/selection_driver.py",
+            "regression"
+          ],
+          "exit_code": 0,
+          "timed_out": false,
+          "launch_error": null,
+          "stdout": "{\"schema_version\": 1, \"candidate_id\": \"literal\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"status\": \"FAIL\"}\n",
+          "stderr": "{\"Time\":\"2026-10-14T09:46:35.126518+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:35.497994+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\"}\n{\"Time\":\"2026-10-14T09:46:35.498068+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"=== RUN   TestIndependent\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.498098+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"    independent_test.go:26: ORACLE_ASSERTION[conservation]: remainder 25\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.498123+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Output\":\"--- FAIL: TestIndependent (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.498127+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Test\":\"TestIndependent\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:35.49813+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\"}\n{\"Time\":\"2026-10-14T09:46:35.498132+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"=== RUN   TestPrimary\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.498134+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Output\":\"--- PASS: TestPrimary (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.498135+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestPrimary\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:35.498137+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.498549+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"FAIL\\texample.test/oracle\\t0.372s\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.498562+09:00\",\"Action\":\"fail\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.372}\n",
+          "stdout_sha256": "3facb598867e31bc66a74246bb895784fe6590b24080e0f1e47a58725ba12d02",
+          "stderr_sha256": "1aa4e19e3413df9c84f3bec212359bea6341e39977108db87122b75f4a944d15",
+          "duration_ms": 740,
+          "kind": "regression",
+          "source_file": "oracles/selection_driver.py"
+        },
+        {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            "oracles/selection_driver.py",
+            "metrics"
+          ],
+          "exit_code": 0,
+          "timed_out": false,
+          "launch_error": null,
+          "stdout": "{\"schema_version\": 1, \"candidate_id\": \"literal\", \"subject_commit\": \"98a696d98d58275d601d33a8affe4d5a9dbc37b7\", \"metrics\": {\"allocations\": {\"value\": 0.0, \"unit\": \"allocations/call\"}}}\n",
+          "stderr": "{\"Time\":\"2026-10-14T09:46:35.768885+09:00\",\"Action\":\"start\",\"Package\":\"example.test/oracle\"}\n{\"Time\":\"2026-10-14T09:46:35.96579+09:00\",\"Action\":\"run\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\"}\n{\"Time\":\"2026-10-14T09:46:35.965826+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"=== RUN   TestAllocationMetric\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.965878+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"SELECTION_METRIC_ALLOCATIONS=0.000000\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.965885+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Output\":\"--- PASS: TestAllocationMetric (0.00s)\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.965887+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Test\":\"TestAllocationMetric\",\"Elapsed\":0}\n{\"Time\":\"2026-10-14T09:46:35.965891+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.966306+09:00\",\"Action\":\"output\",\"Package\":\"example.test/oracle\",\"Output\":\"ok  \\texample.test/oracle\\t0.197s\\n\"}\n{\"Time\":\"2026-10-14T09:46:35.966314+09:00\",\"Action\":\"pass\",\"Package\":\"example.test/oracle\",\"Elapsed\":0.197}\n",
+          "stdout_sha256": "ddc0d79f70074855e4c7d6c549964b3562a014c352da53dc3d226ed8f3058d76",
+          "stderr_sha256": "bbdc413535d75da77231a53fb4f9f67cfbdba5bdb514e5bbd2d08220c17d8622",
+          "duration_ms": 571,
+          "kind": "metrics",
+          "source_file": "oracles/selection_driver.py"
+        }
+      ],
+      "regression": "FAIL",
+      "hard_eligible": false,
+      "evidence_sha256": [
+        "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873",
+        "386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221",
+        "cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263",
+        "4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271"
+      ]
+    }
+  ],
+  "panel": [
+    {
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "launch_error": null,
+      "stdout": "{\"schema_version\": 1, \"judge_id\": \"correctness\", \"role\": \"correctness\", \"preferred_candidate\": \"loop\", \"votes\": [{\"candidate_id\": \"loop\", \"verdict\": \"accept\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155\", \"1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96\", \"210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf\", \"4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5\"]}, {\"candidate_id\": \"copy\", \"verdict\": \"accept\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1\", \"be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44\", \"a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a\", \"c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043\"]}, {\"candidate_id\": \"literal\", \"verdict\": \"reject\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873\", \"386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221\", \"cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263\", \"4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271\"]}]}\n",
+      "stderr": "",
+      "stdout_sha256": "3326926ed508ca7329df15cc3136430f1516382b7838e1960d1ad06a97e7b542",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "duration_ms": 101,
+      "judge_id": "correctness",
+      "role": "correctness",
+      "kind": "fixture",
+      "adapter_sha256": "919ab4816a69ebb26c05ba5b12d0be29571ff45653aee50e3b2e946dc76cd823",
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "correctness",
+        "role": "correctness",
+        "preferred_candidate": "loop",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155",
+              "1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96",
+              "210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf",
+              "4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1",
+              "be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44",
+              "a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a",
+              "c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873",
+              "386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221",
+              "cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263",
+              "4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "launch_error": null,
+      "stdout": "{\"schema_version\": 1, \"judge_id\": \"maintainability\", \"role\": \"maintainability\", \"preferred_candidate\": \"loop\", \"votes\": [{\"candidate_id\": \"loop\", \"verdict\": \"accept\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155\", \"1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96\", \"210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf\", \"4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5\"]}, {\"candidate_id\": \"copy\", \"verdict\": \"accept\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1\", \"be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44\", \"a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a\", \"c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043\"]}, {\"candidate_id\": \"literal\", \"verdict\": \"reject\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873\", \"386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221\", \"cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263\", \"4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271\"]}]}\n",
+      "stderr": "",
+      "stdout_sha256": "7f3ba941acf4877da9c8d52f6853d985ec73ace9bfc02955f61338ac413bb055",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "duration_ms": 87,
+      "judge_id": "maintainability",
+      "role": "maintainability",
+      "kind": "fixture",
+      "adapter_sha256": "919ab4816a69ebb26c05ba5b12d0be29571ff45653aee50e3b2e946dc76cd823",
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "maintainability",
+        "role": "maintainability",
+        "preferred_candidate": "loop",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155",
+              "1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96",
+              "210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf",
+              "4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1",
+              "be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44",
+              "a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a",
+              "c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873",
+              "386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221",
+              "cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263",
+              "4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "launch_error": null,
+      "stdout": "{\"schema_version\": 1, \"judge_id\": \"regression\", \"role\": \"regression\", \"preferred_candidate\": \"loop\", \"votes\": [{\"candidate_id\": \"loop\", \"verdict\": \"accept\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155\", \"1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96\", \"210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf\", \"4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5\"]}, {\"candidate_id\": \"copy\", \"verdict\": \"accept\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1\", \"be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44\", \"a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a\", \"c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043\"]}, {\"candidate_id\": \"literal\", \"verdict\": \"reject\", \"reason\": \"fixture opinion; not actual model or human review\", \"evidence_sha256\": [\"a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873\", \"386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221\", \"cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263\", \"4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271\"]}]}\n",
+      "stderr": "",
+      "stdout_sha256": "2863dcf5be77ae54ed2d330d6258528fb74b50e150645948d9c0f2239df46cc6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "duration_ms": 50,
+      "judge_id": "regression",
+      "role": "regression",
+      "kind": "fixture",
+      "adapter_sha256": "919ab4816a69ebb26c05ba5b12d0be29571ff45653aee50e3b2e946dc76cd823",
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "regression",
+        "role": "regression",
+        "preferred_candidate": "loop",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155",
+              "1ec6b0139a4054cf6456eb6ae8ac58ee78520580354d547769725d2cc2ce7d96",
+              "210b0512524397f9899ac6f0983bad96912acf4f48ed43cd3d5f89ed183f0fcf",
+              "4525661ab9946d641ba9fdec1f6984c4772637f49eb8c658031c4c5ff4cf82b5"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1",
+              "be6408fc6c5632ec96215c931dce5ce408455ddb8cdad8fe2587adff1f738c44",
+              "a7701c1f81a406b4366487a843ad5df72f1f61b20a214e26a2bb96120912202a",
+              "c787cd8ac90ff109a7186adab3d066a788272bbd7bcbb3d1821518c53f21d043"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "fixture opinion; not actual model or human review",
+            "evidence_sha256": [
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873",
+              "386fd8034fba1a0d6a89a77d2e145a1b7629cbeebff7af1bd9aaae6d4df50221",
+              "cea27c8e0d2996de45f055260e5446f3e13d5bcf8d36eaab5acfc67bf5532263",
+              "4763b898684d33f045337a5956608cf65d98421cc130e04a6e22554229173271"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "decision": {
+    "status": "SELECTED",
+    "selected_candidate": "loop",
+    "selected_commit": "16a29c96e7ae1ba3a2d4e5e2ec8d52b6919458af",
+    "selected_tree": "3c7cfc8ff567f9c079b492f0bce42591e96b45c3",
+    "reason": "hard-eligible, unanimous preference and sole observed Pareto candidate",
+    "axes_used": [
+      "changed_lines",
+      "allocations"
+    ],
+    "rejections": {
+      "literal": "oracle/regression/execution hard condition failed"
+    }
+  },
+  "independent_human_acceptance": "not_recorded",
+  "scope": "observed proposals/axes plus role-separated opinions; not a proof of the globally best possible fix"
+}

@@ -107,6 +107,7 @@ type SearchFilter struct {
 // Health is the result of a Client.Health() call. Reports backend state
 // (reachability + version pins), not call-specific metrics.
 type Health struct {
+	ProjectID, DatasetID, SnapshotID, SourceMode string
 	// Reachable is true when the ckv index itself is loaded and responding.
 	// This is the "index identity" signal — it says nothing about whether
 	// the embedding model behind the index is alive (see ModelReachable).

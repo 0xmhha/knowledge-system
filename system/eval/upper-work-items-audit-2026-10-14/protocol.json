@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "scope": "audit of upper ten work items, not feature implementation or independent acceptance",
+  "input_documents_sha256": {
+    "/Users/kevin/work/github/0xmhha/auto-coding/seminar/12-master-workplan.md": "40a7fe812209148f1b6327337adc6632d662d3d8abd12499ba2eba49ff6aad56",
+    "/Users/kevin/work/github/0xmhha/auto-coding/seminar/07-cks-codingagent-improvements.md": "fb517e508e698fa80552880f1e01d5194f16e49c71009f72a0e53e7db140cdbc",
+    "/Users/kevin/work/github/0xmhha/auto-coding/seminar/11-symptom-suspect-labeling-contract.md": "ac37198ed8ee4018ce96cb2c720fd0336b6e2c28a35b123bc8085cba70d56012",
+    "/Users/kevin/work/github/0xmhha/auto-coding/seminar/10-learning-direction.md": "fe28a416b789ce50d8ec3b4371f0b6ac0c0fa1b357c3b761c0c2cecabf7b93f5"
+  },
+  "repositories": {
+    "knowledge-system": {
+      "path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+      "revision": "220925c89e5f88cbb32fc7f97410d57ee3df958d",
+      "tracked_changes": "audit documents and evidence only; product source unchanged",
+      "remote_main_verified": true
+    },
+    "chainbench": {
+      "path": "/Users/kevin/work/github/0xmhha/chainbench",
+      "revision": "662fff77382eb031df687d371a8bc8f63cad581f",
+      "tracked_changes": [],
+      "remote_main_verified": true
+    },
+    "buddy_related_only": {
+      "path": "/Users/kevin/work/github/0xmhha/auto-coding/buddy",
+      "revision": "dbeed22b6fef7ae0f18b2a9df60c5343a4592d03",
+      "tracked_changes": [],
+      "remote_main_verified": true
+    },
+    "coding-agent": {
+      "path": "/private/tmp/ks-upper-wi-coding-agent",
+      "revision": "3a66d91f6486077edc0f09d00c5549e40dd55081",
+      "tracked_changes": [],
+      "remote_main_verified": true
+    }
+  },
+  "protected_paths_excluded": [
+    ".claude/",
+    "logs/"
+  ],
+  "external_changes_authorized": false,
+  "tests_scope": "existing owned mock/unit tests, actual mock-fixture registered schemas, and an owned synthetic CKG stdio probe; no live chain or LLM session started",
+  "coding_agent_source": "isolated sparse checkout of remote main; private .claude/ and logs/ excluded",
+  "learning_repository": {
+    "status": "owner not identified; no implementation absence claim",
+    "candidate_rejected": {
+      "repository": "0xmhha/claude-knowledge-vault",
+      "revision": "da1d960233dca50a9e05a17637764034d9943dc8",
+      "reason": "conversation history search; not dedicated ingest and admin learning loop"
+    }
+  },
+  "test_commands": [
+    {
+      "owner": "knowledge-system",
+      "command": "GOTOOLCHAIN=go1.26.9 go test -json ./pkg/graph/policy ./pkg/graph/security ./pkg/graph/mcphandlers ./internal/graph/mcp ./internal/system/mcp ./internal/system/composer/stage3",
+      "exit_code": 0
+    },
+    {
+      "owner": "chainbench",
+      "command": "GOTOOLCHAIN=go1.26.9 go test -json ./internal/testhelper ./internal/nodemonitor ./internal/mcp -run 'Test(StopNode|StartNode|RestartNode|Partition|HealPartition|Gate_|Classify|MCP|.*Network)'",
+      "exit_code": 0
+    },
+    {
+      "owner": "coding-agent",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 bench/p0-mutants/tests/test_rules.py",
+      "exit_code": 0
+    },
+    {
+      "owner": "coding-agent",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 bench/p2-cks-fault/tests/test_policy.py",
+      "exit_code": 0
+    },
+    {
+      "owner": "coding-agent",
+      "command": "python3 bench/p0-mutants/score.py --out <owned-temp-output> --json",
+      "exit_code": 0
+    },
+    {
+      "owner": "coding-agent",
+      "command": "python3 bench/p2-cks-fault/score.py --out <owned-temp-output> --json",
+      "exit_code": 0
+    },
+    {
+      "owner": "coding-agent",
+      "command": "bash contract/lint-tool-names.sh",
+      "exit_code": 0
+    },
+    {
+      "owner": "knowledge-system",
+      "command": "python3 system/eval/upper-work-items-audit-2026-10-14/probe-graph-mcp.py --binary bin/ckg --out <owned-output>",
+      "exit_code": 0
+    },
+    {
+      "owner": "knowledge-system",
+      "command": "GOTOOLCHAIN=go1.26.9 go test -overlay=<mapping probe-cks-schema.go.txt as internal/system/mcp/upper_work_item_audit_test.go> ./internal/system/mcp -run ^TestUpperWorkItemAuditSchemas$ -v",
+      "exit_code": 0,
+      "scope": "one schema inventory probe; production sources unchanged"
+    }
+  ],
+  "runtime": {
+    "go": "go version go1.26.9 darwin/arm64",
+    "python": "Python 3.11.4"
+  }
+}

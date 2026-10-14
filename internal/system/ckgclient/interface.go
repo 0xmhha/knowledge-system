@@ -196,7 +196,8 @@ type ConcurrencyOpts struct {
 // Health is the result of a Client.Health() call. Reports backend state
 // (reachability + version pins), not call-specific metrics.
 type Health struct {
-	Reachable bool
+	ProjectID, DatasetID, SnapshotID, SourceMode string
+	Reachable                                    bool
 	// SchemaVersion is the ckg store schema version; the evaluation
 	// harness compares this across runs.
 	SchemaVersion string

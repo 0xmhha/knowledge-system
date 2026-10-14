@@ -138,6 +138,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 
 	registerGetForTask(s, d)
 	registerGetForTaskV2(s, d)
+	registerLabelSuspects(s, d)
 	registerSemanticStatus(s, d)
 	registerSemanticReads(s, d)
 	registerHealth(s, d)
@@ -146,6 +147,9 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	registerFindCallees(s, d)
 	registerGetSubgraph(s, d)
 	registerReviewFunction(s, d)
+	registerValueAnalysis(s, d)
+	registerValueDependencyExpansion(s, d)
+	registerPolicySecurity(s, d)
 	registerImpactAnalysis(s, d)
 	registerConcurrencyImpact(s, d)
 	registerChangeHistory(s, d)

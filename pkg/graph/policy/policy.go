@@ -163,6 +163,7 @@ func Resolve(f *File, codeNodes []types.Node, policyFilePath string) ResolveResu
 			DocComment:    e.Description,
 			SubKind:       e.Category,
 			Confidence:    types.ConfExtracted,
+			Annotation:    &types.AnnotationPayload{Description: e.Description},
 		}
 		out.Nodes = append(out.Nodes, policyNode)
 

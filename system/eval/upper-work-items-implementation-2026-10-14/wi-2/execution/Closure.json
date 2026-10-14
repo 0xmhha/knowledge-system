@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "snapshot_sha256": "95f8325ab9ca0d23168083a4e911b2eb518c3e8d051730e5b8e01d16ff12a65e",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "6a5557dd727f188f",
+      "canonical_id": "example.invalid/rule-fixture.Closure",
+      "file": "cases.go",
+      "commit": "ca5acdcf78b4cfa02b4b67be4a52d4d7e3de4fe4",
+      "sha256": "261dc3c0f987bf555e71a374cbd6e5264515d2c657d8b4fc6fe3add28d6d3da9",
+      "language": "go",
+      "start_line": 53,
+      "start_byte": 1532,
+      "bytes": 98,
+      "snapshot_sha256": "95f8325ab9ca0d23168083a4e911b2eb518c3e8d051730e5b8e01d16ff12a65e",
+      "function_name": "Closure"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "partial",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 1576,
+          "end_byte": 1628,
+          "start_line": 53,
+          "end_line": 53
+        },
+        "text": "return func() *exec.Cmd { return exec.Command(cmd) }",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 1532,
+          "end_byte": 1573,
+          "start_line": 53,
+          "end_line": 53
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [],
+    "diagnostics": [
+      {
+        "code": "isolated_type_info_partial",
+        "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+      },
+      {
+        "code": "closure_unsupported",
+        "message": "Captured variables and closure calls require conservative analysis",
+        "location": {
+          "start_byte": 1583,
+          "end_byte": 1628,
+          "start_line": 53,
+          "end_line": 53
+        }
+      },
+      {
+        "code": "opaque_call",
+        "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+        "location": {
+          "start_byte": 1609,
+          "end_byte": 1626,
+          "start_line": 53,
+          "end_line": 53
+        }
+      },
+      {
+        "code": "closure_value_unknown",
+        "message": "Captured variable effects are not inlined into caller execution",
+        "location": {
+          "start_byte": 1583,
+          "end_byte": 1628,
+          "start_line": 53,
+          "end_line": 53
+        }
+      }
+    ],
+    "truncated": false,
+    "elapsed_micros": 39,
+    "variables": [
+      {
+        "id": "v1545",
+        "name": "cmd",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 1545,
+          "end_byte": 1548,
+          "start_line": 53,
+          "end_line": 53
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "entry/definition/v1545/1545",
+        "node": "entry",
+        "variable": "v1545",
+        "role": "definition",
+        "location": {
+          "start_byte": 1545,
+          "end_byte": 1548,
+          "start_line": 53,
+          "end_line": 53
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [],
+    "iterations": 6,
+    "facts_peak": 12,
+    "rules": {
+      "pack_id": "go-local-review",
+      "pack_version": "1.0.0",
+      "pack_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
+      "engine_version": "1",
+      "origin": "automatic",
+      "status": "matched_bounded",
+      "limits": {
+        "max_candidates": 64,
+        "max_flow_steps": 4096
+      },
+      "flow_steps": 11,
+      "candidates": [],
+      "limitations": [
+        "empty_candidates_do_not_establish_safety",
+        "syntax_targets_unresolved",
+        "parameters_not_proven_attacker_controlled",
+        "lexical_may_reach_not_path_feasibility",
+        "sanitizers_and_opaque_call_effects_not_proven",
+        "aliases_closures_fields_and_indirect_sinks_unsupported"
+      ]
+    }
+  },
+  "elapsed_micros": 499
+}

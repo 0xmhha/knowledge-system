@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-structured-review.py", line 107, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-structured-review.py", line 86, in main
+    run('build-review',[sys.executable,str(script),'build','--workspace',str(workspace),'--bundle',str(root/'bundle.json'),'--judgments',str(root/'judgments.json')]);checks.append('actual-artifact-builder')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-structured-review.py", line 45, in run
+    (root/(label+'.stdout.txt')).write_bytes(out.stdout);(root/(label+'.stderr.txt')).write_bytes(out.stderr);(root/(label+'.receipt.json')).write_bytes(encode({'command':command,'exit_code':out.returncode,'elapsed_seconds':time.monotonic()-started,'stdout_sha256':sha(out.stdout),'stderr_sha256':sha(out.stderr)}));require(out.returncode==expected,'execution failed '+label);return out.stdout
+                                                                                                                                                                                                                                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-value-dependencies.py", line 49, in require
+    if not value:raise RuntimeError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: execution failed build-review

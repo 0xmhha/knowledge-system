@@ -1,0 +1,186 @@
+{
+  "scope": "actual Go proposal materialization, oracle/metric/regression execution, selection/check/guards",
+  "panel_origin": "model",
+  "independent_human_acceptance": "not_recorded",
+  "cli_exit": 0,
+  "decision": {
+    "status": "SELECTED",
+    "selected_candidate": "loop",
+    "selected_commit": "c9ce0a2e48b0205159a0facf4c93d6b9261a31f4",
+    "selected_tree": "3c7cfc8ff567f9c079b492f0bce42591e96b45c3",
+    "reason": "hard-eligible, unanimous preference and sole observed Pareto candidate",
+    "axes_used": [
+      "changed_lines",
+      "allocations"
+    ],
+    "rejections": {
+      "literal": "oracle/regression/execution hard condition failed"
+    }
+  },
+  "original_source_unchanged": true,
+  "original_head_unchanged": true,
+  "selection_check": "PASS",
+  "applied_tree_check": "PASS",
+  "final_current_head_oracle": "PASS",
+  "both_completion_guards": "allowed",
+  "fixture_stage_executions": [
+    {
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "ok  \texample.test/oracle\t6.063s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "gofmt",
+        "-l",
+        "."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "panel_executions": [
+    {
+      "role": "correctness",
+      "kind": "model",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "correctness",
+        "role": "correctness",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "Observed: all 16 oracle checks passed. The fix fails (RED) on base and passes (GREEN) on head for the symptom case under both the primary and independent oracles, and the empty and single cases stay GREEN. Both mutants were handled as expected, and the regression driver reported PASS (exit 0). Semantic judgment: the change replaces the buggy last-element return with a sum of every entry. That is the intended total, and an empty slice still returns 0. It reads the immutable input without mutating it. These finite tests do not prove it is correct for every input, but nothing in the diff suggests a correctness defect.",
+            "evidence_sha256": [
+              "fac01a7ef8ebb9391fe6e0b3533c11e32fbae18fb3e78ad58fab832ba5354c11"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "Observed: all 16 oracle checks passed, and the regression driver reported PASS (exit 0). Semantic judgment: it computes the same sum as loop, but over a copy of the input made with append([]int(nil), entries...). An empty or nil slice gives a nil copy and a total of 0, which is correct. The extra copy is not needed for correctness, since the input is immutable. That copy costs 1 allocation per call and adds one changed line, which is a cost tradeoff on the frozen axes, not a safety defect. So this is not a reason to reject it in the correctness role.",
+            "evidence_sha256": [
+              "506040156b45a97968d16a7e54e691c0b4b53d0fcf23ba3f197c92a12d0077ff"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "This candidate is hard-ineligible (hard_eligible=false), and both its oracle verdict and regression result are FAIL. Observed: on head, the independent oracle is RED for the symptom case, and both oracles are RED for the empty and single cases. Semantic judgment: returning the constant 42 hides the symptom instead of fixing the computation, and it is wrong for any input whose total is not 42, including an empty ledger.",
+            "evidence_sha256": [
+              "40c0c0fb79322ff9f11339ea73b6fdbc08005bbaa2b450169624708b5d635701"
+            ]
+          }
+        ],
+        "preferred_candidate": "loop"
+      }
+    },
+    {
+      "role": "maintainability",
+      "kind": "model",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "maintainability",
+        "role": "maintainability",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "What was tested: hard_eligible is true, the oracle verdict and regression both PASS, and every listed check passed on base, head and both mutants. My judgment: the diff replaces the last-entry return with a simple summing loop. The code says what it means, has no special cases and no hidden state, and the function stays pure. Reported metrics: 7 changed lines and 0 allocations per call. A finite set of passing tests does not prove the fix is correct for every input.",
+            "evidence_sha256": [
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "What was tested: hard_eligible is true, the oracle verdict and regression both PASS, and every listed check passed. My judgment: the summing logic is the same as in loop and is easy to read. The extra defensive copy is not needed because the inputs are immutable, so it adds a little noise, but it does not make the code unsafe to maintain. Reported metrics: 8 changed lines and 1 allocation per call. Its higher cost on both measures is a reason to prefer loop, not to reject this candidate.",
+            "evidence_sha256": [
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "What was tested: hard_eligible is false, and the oracle verdict and regression are both FAIL. The head checks failed for the independent symptom oracle and for the empty and single cases. My judgment: the change hardcodes 42 to hide the symptom and drops the real computation. That fails the minimum maintainability bar for this role.",
+            "evidence_sha256": [
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873"
+            ]
+          }
+        ],
+        "preferred_candidate": "loop"
+      }
+    },
+    {
+      "role": "regression",
+      "kind": "model",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "regression",
+        "role": "regression",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "Observed: the regression driver reported PASS (exit 0). All head checks passed for symptom, empty and single on both the primary and independent oracles. Base was RED on the symptom case. Both mutants were caught by at least one oracle. Semantic judgment: summing every entry in a loop handles empty and single-entry inputs the same way as before, and the function has no side effects on its inputs. These finite tests don't prove it is correct for every input, but this meets the regression-safety minimum within scope.",
+            "evidence_sha256": [
+              "ebdd1908b5a8360dd1e0fd5ab4be2df8c0270b2ec5cbd54f4f8d41a6a8a38cb0"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "Observed: the regression driver reported PASS (exit 0). All head checks passed for symptom, empty and single on both oracles. Semantic judgment: copying the slice before summing gives the same results as loop, and with immutable inputs it adds no regression risk. The extra allocation (1/call vs 0) and the extra changed line are cost tradeoffs, not safety failures, so they are not grounds for rejection in this role.",
+            "evidence_sha256": [
+              "babfd38dab67cdac84969331781d323b6060a6cdcfa1afc84249627c0b442588"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "Hard-ineligible: the regression driver reported FAIL and the oracle verdict is FAIL. Observed head failures: the independent oracle went RED on the symptom case, and both oracles went RED on the empty and single cases, which were GREEN on base. Returning the constant 42 hides the symptom and breaks behavior that worked before.",
+            "evidence_sha256": [
+              "a85ba3b02f45af69395159624691a743b25ab369a1d6eb7934f440c1ae05662b"
+            ]
+          }
+        ],
+        "preferred_candidate": "loop"
+      }
+    }
+  ]
+}

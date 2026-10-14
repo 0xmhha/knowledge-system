@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "status": "analyzed_bounded",
+  "snapshot_sha256": "dce0fd380e88cb120c0b55ffef474a9bf2a5c5c4239b50c1bf330e6018be6833",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "75e2531e9ea7d26b",
+      "canonical_id": "example.invalid/value-fixture/a.Loop",
+      "file": "a/flow.go",
+      "commit": "f511632b1b85a9a001c4b2381d2416322c9b9a53",
+      "sha256": "6b88c31e932e7286b7b44cb0c95487d3e7ca028b0b92dd97df32312ffcdc926f",
+      "language": "go",
+      "start_line": 14,
+      "start_byte": 212,
+      "bytes": 72,
+      "snapshot_sha256": "dce0fd380e88cb120c0b55ffef474a9bf2a5c5c4239b50c1bf330e6018be6833",
+      "function_name": "Loop"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "analyzed_bounded",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "ForBody",
+        "reachable": true,
+        "nodes": [
+          "b1/n0",
+          "b1/n1"
+        ]
+      },
+      {
+        "id": 2,
+        "kind": "ForDone",
+        "reachable": true,
+        "nodes": [
+          "b2/n0"
+        ]
+      },
+      {
+        "id": 3,
+        "kind": "ForLoop",
+        "reachable": true,
+        "nodes": [
+          "b3/n0"
+        ]
+      },
+      {
+        "id": 4,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 236,
+          "end_byte": 242,
+          "start_line": 15,
+          "end_line": 15
+        },
+        "text": "y := 0",
+        "synthetic": false
+      },
+      {
+        "id": "b1/n0",
+        "block": 1,
+        "kind": "IncDecStmt",
+        "location": {
+          "start_byte": 258,
+          "end_byte": 261,
+          "start_line": 17,
+          "end_line": 17
+        },
+        "text": "x--",
+        "synthetic": false
+      },
+      {
+        "id": "b1/n1",
+        "block": 1,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 264,
+          "end_byte": 269,
+          "start_line": 18,
+          "end_line": 18
+        },
+        "text": "y = x",
+        "synthetic": false
+      },
+      {
+        "id": "b2/n0",
+        "block": 2,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 274,
+          "end_byte": 282,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "text": "return y",
+        "synthetic": false
+      },
+      {
+        "id": "b3/n0",
+        "block": 3,
+        "kind": "BinaryExpr",
+        "location": {
+          "start_byte": 248,
+          "end_byte": 253,
+          "start_line": 16,
+          "end_line": 16
+        },
+        "text": "x > 0",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 212,
+          "end_byte": 232,
+          "start_line": 14,
+          "end_line": 14
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "b0",
+        "to": "b3",
+        "kind": "cfg",
+        "certainty": "structural"
+      },
+      {
+        "from": "b1",
+        "to": "b3",
+        "kind": "cfg",
+        "certainty": "structural"
+      },
+      {
+        "from": "b3",
+        "to": "b1",
+        "kind": "cfg",
+        "condition": "true",
+        "certainty": "conservative"
+      },
+      {
+        "from": "b3",
+        "to": "b2",
+        "kind": "cfg",
+        "condition": "false",
+        "certainty": "conservative"
+      },
+      {
+        "from": "b1/n0",
+        "to": "b1/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v222"
+      },
+      {
+        "from": "entry",
+        "to": "b1/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v222"
+      },
+      {
+        "from": "b1/n0",
+        "to": "b1/n1",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v222"
+      },
+      {
+        "from": "b0/n0",
+        "to": "b2/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v236"
+      },
+      {
+        "from": "b1/n1",
+        "to": "b2/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v236"
+      },
+      {
+        "from": "b1/n0",
+        "to": "b3/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v222"
+      },
+      {
+        "from": "entry",
+        "to": "b3/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v222"
+      },
+      {
+        "from": "b3/n0",
+        "to": "b1/n0",
+        "kind": "control_dependence",
+        "condition": "true",
+        "certainty": "normal_exit_structural"
+      },
+      {
+        "from": "b3/n0",
+        "to": "b1/n1",
+        "kind": "control_dependence",
+        "condition": "true",
+        "certainty": "normal_exit_structural"
+      },
+      {
+        "from": "b3/n0",
+        "to": "b3/n0",
+        "kind": "control_dependence",
+        "condition": "true",
+        "certainty": "normal_exit_structural"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "elapsed_micros": 71,
+    "variables": [
+      {
+        "id": "v222",
+        "name": "x",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 222,
+          "end_byte": 223,
+          "start_line": 14,
+          "end_line": 14
+        }
+      },
+      {
+        "id": "v236",
+        "name": "y",
+        "kind": "local",
+        "declaration": {
+          "start_byte": 236,
+          "end_byte": 237,
+          "start_line": 15,
+          "end_line": 15
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/definition/v236/236",
+        "node": "b0/n0",
+        "variable": "v236",
+        "role": "definition",
+        "location": {
+          "start_byte": 236,
+          "end_byte": 237,
+          "start_line": 15,
+          "end_line": 15
+        },
+        "reachable": true
+      },
+      {
+        "id": "b1/n0/definition/v222/258",
+        "node": "b1/n0",
+        "variable": "v222",
+        "role": "definition",
+        "location": {
+          "start_byte": 258,
+          "end_byte": 259,
+          "start_line": 17,
+          "end_line": 17
+        },
+        "reachable": true
+      },
+      {
+        "id": "b1/n0/use/v222/258",
+        "node": "b1/n0",
+        "variable": "v222",
+        "role": "use",
+        "location": {
+          "start_byte": 258,
+          "end_byte": 259,
+          "start_line": 17,
+          "end_line": 17
+        },
+        "reachable": true
+      },
+      {
+        "id": "b1/n1/definition/v236/264",
+        "node": "b1/n1",
+        "variable": "v236",
+        "role": "definition",
+        "location": {
+          "start_byte": 264,
+          "end_byte": 265,
+          "start_line": 18,
+          "end_line": 18
+        },
+        "reachable": true
+      },
+      {
+        "id": "b1/n1/use/v222/268",
+        "node": "b1/n1",
+        "variable": "v222",
+        "role": "use",
+        "location": {
+          "start_byte": 268,
+          "end_byte": 269,
+          "start_line": 18,
+          "end_line": 18
+        },
+        "reachable": true
+      },
+      {
+        "id": "b2/n0/use/v236/281",
+        "node": "b2/n0",
+        "variable": "v236",
+        "role": "use",
+        "location": {
+          "start_byte": 281,
+          "end_byte": 282,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "reachable": true
+      },
+      {
+        "id": "b3/n0/use/v222/248",
+        "node": "b3/n0",
+        "variable": "v222",
+        "role": "use",
+        "location": {
+          "start_byte": 248,
+          "end_byte": 249,
+          "start_line": 16,
+          "end_line": 16
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v222/222",
+        "node": "entry",
+        "variable": "v222",
+        "role": "definition",
+        "location": {
+          "start_byte": 222,
+          "end_byte": 223,
+          "start_line": 14,
+          "end_line": 14
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "b1/n0/definition/v222/258",
+        "use": "b1/n0/use/v222/258",
+        "variable": "v222",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "entry/definition/v222/222",
+        "use": "b1/n0/use/v222/258",
+        "variable": "v222",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "b1/n0/definition/v222/258",
+        "use": "b1/n1/use/v222/268",
+        "variable": "v222",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "b0/n0/definition/v236/236",
+        "use": "b2/n0/use/v236/281",
+        "variable": "v236",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "b1/n1/definition/v236/264",
+        "use": "b2/n0/use/v236/281",
+        "variable": "v236",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "b1/n0/definition/v222/258",
+        "use": "b3/n0/use/v222/248",
+        "variable": "v222",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "entry/definition/v222/222",
+        "use": "b3/n0/use/v222/248",
+        "variable": "v222",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 10,
+    "facts_peak": 57
+  },
+  "elapsed_micros": 353
+}

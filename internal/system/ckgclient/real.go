@@ -82,11 +82,12 @@ const FilterOverfetchRatio = 3
 // storeReader.LoadManifestSnapshot. The fields covered here are the ones
 // the cks adapter actually surfaces (snapshot pin + freshness).
 type ManifestSnapshot struct {
-	SchemaVersion  string
-	CKGVersion     string
-	BuildTimestamp string
-	SrcRoot        string
-	SrcCommit      string
+	ProjectID, DatasetID, SnapshotID, SourceMode string
+	SchemaVersion                                string
+	CKGVersion                                   string
+	BuildTimestamp                               string
+	SrcRoot                                      string
+	SrcCommit                                    string
 	// GraphDigest is ckg's deterministic logical digest of the CODE graph
 	// (nodes+edges, temporal excluded — Q1, 2026-07-10). The coordinate-pin
 	// anchor the alignment assert compares against ckv's sources.ckg record.
@@ -140,6 +141,7 @@ func (a *realStoreReader) LoadManifestSnapshot() (ManifestSnapshot, error) {
 		return ManifestSnapshot{}, err
 	}
 	return ManifestSnapshot{
+		ProjectID: m.ProjectID, DatasetID: m.DatasetID, SnapshotID: m.SnapshotID, SourceMode: m.SourceMode,
 		SchemaVersion:  m.SchemaVersion,
 		CKGVersion:     m.CKGVersion,
 		BuildTimestamp: m.BuildTimestamp,
@@ -1105,6 +1107,7 @@ func (r *Real) Health(ctx context.Context) (Health, error) {
 		return Health{Reachable: false}, fmt.Errorf("ckgclient: load manifest: %w", err)
 	}
 	return Health{
+		ProjectID: snap.ProjectID, DatasetID: snap.DatasetID, SnapshotID: snap.SnapshotID, SourceMode: snap.SourceMode,
 		Reachable:     true,
 		SchemaVersion: snap.SchemaVersion,
 		IndexedHead:   snap.SrcCommit,
@@ -1171,6 +1174,14 @@ func matchQname(cands []types.Node, src contract.Citation) string {
 	}
 
 	// 1. Exact span.
+	// A one-line function can share its exact span with ReturnStmt/CallSite.
+	// Resolve the declaration before those AST details; storage order must
+	// not turn a function seed into an isolated return statement.
+	for _, n := range real {
+		if declaredSymbol(n.Type) && n.StartLine == src.StartLine && n.EndLine == src.EndLine {
+			return n.QualifiedName
+		}
+	}
 	for _, n := range real {
 		if n.StartLine == src.StartLine && n.EndLine == src.EndLine {
 			return n.QualifiedName

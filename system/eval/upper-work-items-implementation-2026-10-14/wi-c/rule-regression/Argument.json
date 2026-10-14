@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "snapshot_sha256": "2bb7c2df932ea0734377c133e696148dfd7df3118ad7e0b27071e8eab4653c5d",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "34e448add50f0c48",
+      "canonical_id": "example.invalid/rule-fixture.Argument",
+      "file": "cases.go",
+      "commit": "a417933b6b63711e67fea5139f368e992e4ebd34",
+      "sha256": "fe4c040ed1c794d725a9d565ffb77ba90e13b894b4d44df415cef08ffcace0b5",
+      "language": "go",
+      "start_line": 19,
+      "start_byte": 558,
+      "bytes": 74,
+      "snapshot_sha256": "2bb7c2df932ea0734377c133e696148dfd7df3118ad7e0b27071e8eab4653c5d",
+      "function_name": "Argument"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "partial",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 597,
+          "end_byte": 630,
+          "start_line": 19,
+          "end_line": 19
+        },
+        "text": "return exec.Command(\"fixed\", cmd)",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 558,
+          "end_byte": 593,
+          "start_line": 19,
+          "end_line": 19
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v572"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "isolated_type_info_partial",
+        "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+      },
+      {
+        "code": "opaque_call",
+        "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+        "location": {
+          "start_byte": 604,
+          "end_byte": 630,
+          "start_line": 19,
+          "end_line": 19
+        }
+      },
+      {
+        "code": "external_value_unknown",
+        "message": "Value read has no local lexical definition; no source edge is invented",
+        "location": {
+          "start_byte": 604,
+          "end_byte": 608,
+          "start_line": 19,
+          "end_line": 19
+        }
+      }
+    ],
+    "truncated": false,
+    "elapsed_micros": 29,
+    "variables": [
+      {
+        "id": "v572",
+        "name": "cmd",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 572,
+          "end_byte": 575,
+          "start_line": 19,
+          "end_line": 19
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/use/v572/626",
+        "node": "b0/n0",
+        "variable": "v572",
+        "role": "use",
+        "location": {
+          "start_byte": 626,
+          "end_byte": 629,
+          "start_line": 19,
+          "end_line": 19
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v572/572",
+        "node": "entry",
+        "variable": "v572",
+        "role": "definition",
+        "location": {
+          "start_byte": 572,
+          "end_byte": 575,
+          "start_line": 19,
+          "end_line": 19
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "entry/definition/v572/572",
+        "use": "b0/n0/use/v572/626",
+        "variable": "v572",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 6,
+    "facts_peak": 14,
+    "rules": {
+      "pack_id": "go-local-review",
+      "pack_version": "1.0.0",
+      "pack_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
+      "engine_version": "2",
+      "origin": "automatic",
+      "status": "matched_bounded",
+      "limits": {
+        "max_candidates": 64,
+        "max_flow_steps": 4096
+      },
+      "flow_steps": 24,
+      "candidates": [],
+      "limitations": [
+        "empty_candidates_do_not_establish_safety",
+        "syntax_targets_unresolved",
+        "parameters_not_proven_attacker_controlled",
+        "lexical_may_reach_not_path_feasibility",
+        "sanitizers_and_opaque_call_effects_not_proven",
+        "aliases_closures_fields_and_indirect_sinks_unsupported"
+      ]
+    }
+  },
+  "elapsed_micros": 294
+}

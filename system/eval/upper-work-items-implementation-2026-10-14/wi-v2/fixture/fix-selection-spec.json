@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "source_base_ref": "3b32990ba115372f98daf2c3473f3cb2bb664bba",
+  "oracle_plan": "oracle-template.json",
+  "oracle_sources": {
+    "primary_test.go": "kit/primary_test.go",
+    "independent_test.go": "kit/independent_test.go",
+    "metric_test.go": "kit/metric_test.go",
+    "oracles/go_oracle_driver.py": "kit/oracles/go_oracle_driver.py",
+    "oracles/selection_driver.py": "kit/oracles/selection_driver.py",
+    "acceptance.json": "kit/acceptance.json",
+    "derivation.md": "kit/derivation.md"
+  },
+  "criteria": {
+    "selection_rule": "unanimous-panel-and-pareto",
+    "axes": [
+      {
+        "id": "changed_lines",
+        "unit": "lines",
+        "direction": "min",
+        "required": true
+      },
+      {
+        "id": "allocations",
+        "unit": "allocations/call",
+        "direction": "min",
+        "required": true
+      }
+    ],
+    "role_scope": "Each accept/reject concerns the minimum safety of that role; merely preferring a cheaper valid candidate is not a rejection. This is an isolated pure function with immutable inputs. No claim about production callsites or universal optimality."
+  },
+  "regression_driver": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "oracles/selection_driver.py",
+      "regression"
+    ],
+    "source_file": "oracles/selection_driver.py"
+  },
+  "metric_drivers": [
+    {
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "oracles/selection_driver.py",
+        "metrics"
+      ],
+      "source_file": "oracles/selection_driver.py"
+    }
+  ],
+  "judges": [
+    {
+      "id": "correctness",
+      "role": "correctness",
+      "kind": "fixture",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py"
+      ],
+      "adapter_source": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py",
+      "adapter_sha256": "919ab4816a69ebb26c05ba5b12d0be29571ff45653aee50e3b2e946dc76cd823"
+    },
+    {
+      "id": "maintainability",
+      "role": "maintainability",
+      "kind": "fixture",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py"
+      ],
+      "adapter_source": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py",
+      "adapter_sha256": "919ab4816a69ebb26c05ba5b12d0be29571ff45653aee50e3b2e946dc76cd823"
+    },
+    {
+      "id": "regression",
+      "role": "regression",
+      "kind": "fixture",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py"
+      ],
+      "adapter_source": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/go-selection-smoke-xcg_fj2d/subject/.coding-agent/tickets/fixture/fixture_judge.py",
+      "adapter_sha256": "919ab4816a69ebb26c05ba5b12d0be29571ff45653aee50e3b2e946dc76cd823"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "loop",
+      "rationale": "recompute every credit at its producer with a constant-space loop",
+      "commit_subject": "fix: include every ledger credit",
+      "changes": [
+        {
+          "path": "ledger.go",
+          "before": "package ledger\n\nfunc Balance(entries []int) int {\n\tif len(entries) == 0 {\n\t\treturn 0\n\t}\n\treturn entries[len(entries)-1]\n}\n",
+          "after": "package ledger\n\nfunc Balance(entries []int) int {\n\ttotal := 0\n\tfor _, credit := range entries {\n\t\ttotal += credit\n\t}\n\treturn total\n}\n"
+        }
+      ],
+      "mutants": [
+        {
+          "id": "lost-credit",
+          "kind": "reintroduce_symptom",
+          "patches": [
+            {
+              "path": "ledger.go",
+              "before": "total += credit",
+              "after": "total = credit"
+            }
+          ]
+        },
+        {
+          "id": "literal-overfit",
+          "kind": "overfit",
+          "patches": [
+            {
+              "path": "ledger.go",
+              "before": "return total",
+              "after": "return 42"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "copy",
+      "rationale": "snapshot credits before recomputing the same total, paying an extra allocation",
+      "commit_subject": "fix: total all copied ledger credits",
+      "changes": [
+        {
+          "path": "ledger.go",
+          "before": "package ledger\n\nfunc Balance(entries []int) int {\n\tif len(entries) == 0 {\n\t\treturn 0\n\t}\n\treturn entries[len(entries)-1]\n}\n",
+          "after": "package ledger\n\nfunc Balance(entries []int) int {\n\tcopied := append([]int(nil), entries...)\n\ttotal := 0\n\tfor _, credit := range copied {\n\t\ttotal += credit\n\t}\n\treturn total\n}\n"
+        }
+      ],
+      "mutants": [
+        {
+          "id": "lost-credit",
+          "kind": "reintroduce_symptom",
+          "patches": [
+            {
+              "path": "ledger.go",
+              "before": "total += credit",
+              "after": "total = credit"
+            }
+          ]
+        },
+        {
+          "id": "literal-overfit",
+          "kind": "overfit",
+          "patches": [
+            {
+              "path": "ledger.go",
+              "before": "return total",
+              "after": "return 42"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "literal",
+      "rationale": "tempting symptom masking: return only the primary example total",
+      "commit_subject": "fix: return the example ledger total",
+      "changes": [
+        {
+          "path": "ledger.go",
+          "before": "package ledger\n\nfunc Balance(entries []int) int {\n\tif len(entries) == 0 {\n\t\treturn 0\n\t}\n\treturn entries[len(entries)-1]\n}\n",
+          "after": "package ledger\n\nfunc Balance(entries []int) int { return 42 }\n"
+        }
+      ],
+      "mutants": [
+        {
+          "id": "lost-credit",
+          "kind": "reintroduce_symptom",
+          "patches": [
+            {
+              "path": "ledger.go",
+              "before": "return 42",
+              "after": "return entries[len(entries)-1]"
+            }
+          ]
+        },
+        {
+          "id": "literal-overfit",
+          "kind": "overfit",
+          "patches": [
+            {
+              "path": "ledger.go",
+              "before": "return 42",
+              "after": "return 41"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timeout_seconds": 120,
+  "max_total_seconds": 1200
+}

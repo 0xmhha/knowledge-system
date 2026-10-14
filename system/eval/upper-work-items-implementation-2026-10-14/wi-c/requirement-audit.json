@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "implementation_scope_verified": true,
+  "independent_acceptance": "not_recorded",
+  "requirements": {
+    "source/entry/sequence/module views": {
+      "evidence": [
+        "execution/bundle.json",
+        "execution/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/deep-review.json",
+        "execution/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/sequence.mmd",
+        "execution/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/modules.mmd"
+      ],
+      "scope": "bounded local CFG sequence, retained file/symbol membership, original rule/value pins; runtime trace/interprocedural module edges and structural snapshot association explicitly unknown"
+    },
+    "data/state/guards/exceptions and vulnerability candidates": {
+      "evidence": [
+        "execution/judgments.json",
+        "execution/range-control.json",
+        "execution/fixture-race.stdout.txt",
+        "execution/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/review-report.md"
+      ],
+      "scope": "compiled state mutation/guard alternatives, original anchors and assumption-labelled agent findings; memory/alias/range/short-circuit/exception/target uncertainty retained, no verified vulnerability"
+    },
+    "complexity/resource/io/priority/tradeoffs": {
+      "evidence": [
+        "execution/judgments.json",
+        "execution/source/logic.go",
+        "execution/source/logic_test.go",
+        "execution/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/review-report.md"
+      ],
+      "scope": "six mandatory reasoning dimensions with original-node evidence and assumptions/unknowns; local loop resource/I/O and stability-versus-optimization reasoning, no runtime measurements/LLM quality assertion"
+    },
+    "shared CKS consumption and metadata contract": {
+      "evidence": [
+        "execution/cks/tools.json",
+        "execution/cks/mcp.stdout.jsonl",
+        "coding-agent.patch",
+        "checks/ks-wic-owner-verified-contract.log"
+      ],
+      "scope": "actual CKS31 metadata equals both C1 input mirrors; one rule call contains value/control analysis; no duplicate consumer graph/matcher"
+    },
+    "review-only path, validator and delivery gate": {
+      "evidence": [
+        "execution/build-review.stdout.txt",
+        "execution/bound-analysis-handoff.stdout.txt",
+        "execution/bound-review-delivery.stdout.txt",
+        "execution/verify-delivery.stdout.txt",
+        "execution/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/state.json",
+        "coding-agent.patch"
+      ],
+      "scope": "ANALYSIS typed report hash -> PLANNING report hash -> delivered partial review; same standalone CLI validates hooks/direct edits; delivered != independent accepted"
+    },
+    "tamper/bounds/unknown and regression": {
+      "evidence": [
+        "execution/summary.json",
+        "execution/incomplete-review-denied.stdout.txt",
+        "execution/tamper-source-denied.stdout.txt",
+        "execution/tamper-dimension-denied.stdout.txt",
+        "execution/tamper-diagram-denied.stdout.txt",
+        "checks/ks-wic-owner-verified-tests.log",
+        "checks/ks-wic-primary-full-test.log",
+        "checks/ks-wic-primary-race.log",
+        "checks/ks-wic-primary-lint.log",
+        "rule-regression/summary.json",
+        "value-regression/summary.json"
+      ],
+      "scope": "16 actual checks including nine tamper controls,15 new unit tests within142 plugin tests, standalone old hook/126 tool-name checks, full primary build/test/race/fmt/vet/pinned lint/docs; max4MiB/32 findings/64 anchors and incomplete backend refusal"
+    }
+  }
+}

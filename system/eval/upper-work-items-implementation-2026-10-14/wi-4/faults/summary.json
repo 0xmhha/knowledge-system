@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "case": "restart",
+      "verdict": "INCONCLUSIVE",
+      "before": {
+        "planned": 1,
+        "attempted": 1,
+        "completed": 1,
+        "symptom_failures": 1,
+        "control_failures": 0,
+        "infrastructure_errors": 0,
+        "missing": 0,
+        "failure_rate": 1,
+        "upper_failure_rate_95": 1
+      },
+      "cleanup_recorded": [
+        true
+      ],
+      "stop_reason": "planned_trials_finished",
+      "acceptance": "not_recorded"
+    },
+    {
+      "case": "injection_failure",
+      "verdict": "ERROR",
+      "before": {
+        "planned": 1,
+        "attempted": 1,
+        "completed": 0,
+        "symptom_failures": 0,
+        "control_failures": 0,
+        "infrastructure_errors": 1,
+        "missing": 0,
+        "failure_rate": null,
+        "upper_failure_rate_95": null
+      },
+      "cleanup_recorded": [
+        true
+      ],
+      "stop_reason": "planned_trials_finished",
+      "acceptance": "not_recorded"
+    },
+    {
+      "case": "timeout",
+      "verdict": "ERROR",
+      "before": {
+        "planned": 1,
+        "attempted": 1,
+        "completed": 0,
+        "symptom_failures": 0,
+        "control_failures": 0,
+        "infrastructure_errors": 1,
+        "missing": 0,
+        "failure_rate": null,
+        "upper_failure_rate_95": null
+      },
+      "cleanup_recorded": [
+        true
+      ],
+      "stop_reason": "planned_trials_finished",
+      "acceptance": "not_recorded"
+    },
+    {
+      "case": "partial",
+      "verdict": "ERROR",
+      "before": {
+        "planned": 3,
+        "attempted": 2,
+        "completed": 1,
+        "symptom_failures": 1,
+        "control_failures": 0,
+        "infrastructure_errors": 1,
+        "missing": 1,
+        "failure_rate": 1,
+        "upper_failure_rate_95": 1
+      },
+      "cleanup_recorded": [
+        true,
+        true
+      ],
+      "stop_reason": "total_time_budget",
+      "acceptance": "not_recorded"
+    },
+    {
+      "case": "cancel",
+      "verdict": "ERROR",
+      "before": {
+        "planned": 3,
+        "attempted": 1,
+        "completed": 0,
+        "symptom_failures": 0,
+        "control_failures": 0,
+        "infrastructure_errors": 1,
+        "missing": 2,
+        "failure_rate": null,
+        "upper_failure_rate_95": null
+      },
+      "cleanup_recorded": [
+        true
+      ],
+      "stop_reason": "total_time_budget",
+      "acceptance": "not_recorded"
+    },
+    {
+      "case": "parent_death",
+      "verdict": "ERROR",
+      "before": {
+        "planned": 3,
+        "attempted": 1,
+        "completed": 0,
+        "symptom_failures": 0,
+        "control_failures": 0,
+        "infrastructure_errors": 1,
+        "missing": 2,
+        "failure_rate": null,
+        "upper_failure_rate_95": null
+      },
+      "cleanup_recorded": [
+        true
+      ],
+      "stop_reason": "total_time_budget",
+      "acceptance": "not_recorded"
+    },
+    {
+      "case": "cleanup_failure",
+      "verdict": "ERROR",
+      "before": {
+        "planned": 3,
+        "attempted": 1,
+        "completed": 0,
+        "symptom_failures": 0,
+        "control_failures": 0,
+        "infrastructure_errors": 1,
+        "missing": 2,
+        "failure_rate": null,
+        "upper_failure_rate_95": null
+      },
+      "cleanup_recorded": [
+        false
+      ],
+      "stop_reason": "cleanup_unresolved",
+      "acceptance": "not_recorded"
+    }
+  ],
+  "scope": "actual public owned protocol-fixture faults/cancellation, not consensus or production acceptance",
+  "acceptance": "not_recorded"
+}

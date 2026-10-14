@@ -1,0 +1,2292 @@
+diff --git a/cmd/chainbench/chaincmd/equivalence_test.go b/cmd/chainbench/chaincmd/equivalence_test.go
+index b9fb16cb..73a15a38 100644
+--- a/cmd/chainbench/chaincmd/equivalence_test.go
++++ b/cmd/chainbench/chaincmd/equivalence_test.go
+@@ -92,6 +92,7 @@ func normalize(v any, dir string) {
+ 	switch t := v.(type) {
+ 	case map[string]any:
+ 		delete(t, "at")
++		delete(t, "startedAt")
+ 		// compositionId is derived from the workspace directory, which the two
+ 		// surfaces deliberately run in different temp dirs, so it differs by
+ 		// construction — a run-specific value like the timestamp, not a
+@@ -227,3 +228,17 @@ func TestEquivalence_TheWorkspaceDefaultIsOneDefault(t *testing.T) {
+ 		t.Errorf("the surface's default is not under app's root %s:\n%s", root, out)
+ 	}
+ }
++
++func TestEquivalenceNormalizesBothRuntimeTimestampsWithoutHidingComposition(t *testing.T) {
++	a := map[string]any{"chain": "stablenet", "steps": map[string]any{"new": map[string]any{"at": "first-end", "startedAt": "first-start", "result": "done"}}}
++	b := map[string]any{"chain": "stablenet", "steps": map[string]any{"new": map[string]any{"at": "second-end", "startedAt": "second-start", "result": "done"}}}
++	normalize(a, "/first")
++	normalize(b, "/second")
++	if !reflect.DeepEqual(a, b) {
++		t.Fatal("wall-clock boundaries affected surface equivalence")
++	}
++	b["chain"] = "other"
++	if reflect.DeepEqual(a, b) {
++		t.Fatal("real composition difference hidden")
++	}
++}
+diff --git a/cmd/chainbench/experimentcmd/experiment.go b/cmd/chainbench/experimentcmd/experiment.go
+new file mode 100644
+index 00000000..42df6da6
+--- /dev/null
++++ b/cmd/chainbench/experimentcmd/experiment.go
+@@ -0,0 +1,86 @@
++package experimentcmd
++
++import (
++	"encoding/json"
++	"fmt"
++	"github.com/0xmhha/chainbench/internal/app"
++	"github.com/spf13/cobra"
++	"io"
++	"os"
++)
++
++func New() *cobra.Command {
++	var file string
++	command := &cobra.Command{Use: "experiment", Short: "Run a frozen timing, fault or observation investigation", RunE: func(cmd *cobra.Command, _ []string) error {
++		raw, e := os.ReadFile(file)
++		if e != nil {
++			return e
++		}
++		if len(raw) > 256_000 {
++			return fmt.Errorf("experiment input exceeds 256KB")
++		}
++		in, e := app.DecodeExperimentInput(raw)
++		if e != nil {
++			return e
++		}
++		report, e := app.RunExperiment(cmd.Context(), app.Deps{}, in)
++		if e != nil {
++			return e
++		}
++		if e = json.NewEncoder(cmd.OutOrStdout()).Encode(report); e != nil {
++			return e
++		}
++		if report.Verdict == "ERROR" {
++			return fmt.Errorf("experiment execution or controls failed; inspect the recorded result")
++		}
++		return nil
++	}}
++
++	var prepareFile string
++	prepare := &cobra.Command{Use: "prepare", Short: "Fill missing pins from the clean binaries and complete DSL; allocate no nodes", RunE: func(cmd *cobra.Command, _ []string) error {
++		raw, e := os.ReadFile(prepareFile)
++		if e != nil {
++			return e
++		}
++		in, e := app.DecodeExperimentInput(raw)
++		if e != nil {
++			return e
++		}
++		in, e = app.FreezeExperimentInputs(in)
++		if e != nil {
++			return e
++		}
++		return json.NewEncoder(cmd.OutOrStdout()).Encode(in)
++	}}
++	prepare.Flags().StringVar(&prepareFile, "input", "", "JSON input with caller-selected commits and conditions")
++	_ = prepare.MarkFlagRequired("input")
++	command.AddCommand(prepare)
++	var reportFile string
++	verify := &cobra.Command{Use: "verify", Short: "Verify raw experiment receipts and derived accounting", RunE: func(cmd *cobra.Command, _ []string) error {
++		f, e := os.Open(reportFile)
++		if e != nil {
++			return e
++		}
++		defer func() { _ = f.Close() }()
++		d := json.NewDecoder(io.LimitReader(f, 256*1024*1024))
++		d.DisallowUnknownFields()
++		var report app.ExperimentReport
++		if e = d.Decode(&report); e != nil {
++			return e
++		}
++		if e = d.Decode(new(any)); e != io.EOF {
++			return fmt.Errorf("exactly one JSON report required")
++		}
++		if e = app.VerifyExperimentReport(report); e != nil {
++			return e
++		}
++		_, e = fmt.Fprintln(cmd.OutOrStdout(), "PASS: receipts and accounting; independent acceptance not recorded")
++		return e
++	}}
++	verify.Flags().StringVar(&reportFile, "report", "", "recorded experiment report")
++	_ = verify.MarkFlagRequired("report")
++	command.AddCommand(verify)
++	command.Flags().StringVar(&file, "input", "", "frozen JSON experiment input file")
++	_ = command.MarkFlagRequired("input")
++	return command
++}
+diff --git a/cmd/chainbench/root.go b/cmd/chainbench/root.go
+index 0a033250..14a6cc64 100644
+--- a/cmd/chainbench/root.go
++++ b/cmd/chainbench/root.go
+@@ -6,6 +6,7 @@ import (
+ 	"github.com/0xmhha/chainbench/cmd/chainbench/accountcmd"
+ 	"github.com/0xmhha/chainbench/cmd/chainbench/catalogcmd"
+ 	"github.com/0xmhha/chainbench/cmd/chainbench/chaincmd"
++	"github.com/0xmhha/chainbench/cmd/chainbench/experimentcmd"
+ 	"github.com/0xmhha/chainbench/cmd/chainbench/filecmd"
+ 	"github.com/0xmhha/chainbench/cmd/chainbench/keyringcmd"
+ 	"github.com/0xmhha/chainbench/cmd/chainbench/lifecyclecmd"
+@@ -42,6 +43,7 @@ func newRootCmd() *cobra.Command {
+ 		lifecyclecmd.NewVerify(),
+ 		lifecyclecmd.NewBaseline(),
+ 		suitecmd.NewRun(),
++		experimentcmd.New(),
+ 		chaincmd.New(),
+ 		keyringcmd.NewValidator(),
+ 		suitecmd.NewValidate(),
+diff --git a/docs/dev/architecture/layers.md b/docs/dev/architecture/layers.md
+index ede47c98..86458cbd 100644
+--- a/docs/dev/architecture/layers.md
++++ b/docs/dev/architecture/layers.md
+@@ -63,7 +63,7 @@
+ flowchart TD
+     L6["L6 표면<br/>cmd · mcp · dashboard"]
+     L5["L5 유스케이스<br/>app"]
+-    L4["L4 오케스트레이션<br/>testengine · bringup · chainsetup · chainsetup/verb"]
++    L4["L4 오케스트레이션<br/>testengine · experiment · bringup · chainsetup · chainsetup/verb"]
+     L3["L3 도메인 서비스<br/>session · collector · health · dsl · dsl/interp"]
+     L2b["L2b 체인 어댑터<br/>chains/*"]
+     L2a["L2a 합의 패밀리<br/>consensus/*"]
+@@ -90,7 +90,7 @@ flowchart TD
+ > 두 목록의 순서는 일부러 다르다 — `core` 안에 L0·L1·L3 이 함께 있고 L3 인 `dsl/*`·`testhelper` 는
+ > `core` 밖이라, 경로만 보고는 층을 알 수 없다.
+ 
+-## 3. 모듈 배치 (54개 전수 — R5 은퇴: testkit·testrun 삭제, testsupport 신설; 2026-09-01 / chainsetup/verb 분리; 2026-09-21 / core/origin 신설; 2026-09-22 / core/statemachine 신설; 2026-09-22 / webcli 신설; 2026-10-12)
++## 3. 모듈 배치 (55개 전수 — R5 은퇴: testkit·testrun 삭제, testsupport 신설; 2026-09-01 / chainsetup/verb 분리; 2026-09-21 / core/origin 신설; 2026-09-22 / core/statemachine 신설; 2026-09-22 / webcli 신설; 2026-10-12)
+ 
+ ### L0 커널 — 공용 어휘
+ 
+@@ -164,6 +164,7 @@ flowchart TD
+ 
+ | 패키지 | 담는 것 |
+ |---|---|
++| `experiment` | 동결한 타이밍·주입·관찰 조사의 반복 실행, 실패 분모·불확실성과 자원 정리; 노드 구성은 testengine의 composition owner에 위임 |
+ | `testengine` | 테스트 엔진 — 바깥 흐름 `RunSuite` 가 4단계를 소유한다(R4): ① DSL 이 선언한 체인을 chainsetup 으로 구성 ② pre-test hook ③ test ④ post-test hook(②~④는 interpreter 가 spec 에서 수행). 자체 조립 경로(`NewBuildEnv`·`NewLocalEngine`)는 R4 에서 삭제 — 구성 소유자는 chainsetup 하나이고, testengine → chainsetup 의존은 이 구조의 일부다(P6.1 게이트 대체) |
+ | `chainsetup` | 체인 셋업 오케스트레이터 — 스텝 컴포지션(구 netcompose 흡수) + 옛 `setup` 경로(P6.2 은퇴 예정). `chain up` 케이스 러너는 P6.4 에서 삭제, `tests/tc/` 선언 + `testengine.RunSuite`(R4; app 은 MCP 경유 위임)가 대신한다 |
+ | `chainsetup/verb` | 셋업 동사 — 표면이 부르는 함수들(`ChainUp`·`ChainKeys`·`ChainGenesis`·`ChainStart`…)과 그것들을 machine 에 태우는 얇은 진입점(`step.go`·`compare.go`). `chainsetup` 객체 위에 얹히며 반대 방향 의존은 없다(2026-09-21 측정: 아래에서 위를 보는 간선 0). 나눈 이유는 `chainsetup` 이 파일 39개가 흩어진 것이 아니라 `Workspace` 객체 하나이고, 그 메서드 본문은 비공개 내부를 40곳 가까이 써서 나눌 수 없기 때문이다 — 나눌 수 있는 유일한 선이 동사층이었다 |
+diff --git a/docs/dev/architecture/package-tree.md b/docs/dev/architecture/package-tree.md
+index 8b3e58fb..6c0ec549 100644
+--- a/docs/dev/architecture/package-tree.md
++++ b/docs/dev/architecture/package-tree.md
+@@ -24,11 +24,11 @@
+ 
+ | 묶음 | 패키지 | 줄 |
+ |---|---|---|
+-| `internal/` | 54 | 82,220 |
+-| `cmd/` | 19 | 5,654 |
++| `internal/` | 55 | 84,211 |
++| `cmd/` | 20 | 5,742 |
+ | `scripts/inventory/` | 3 | 790 |
+ | `tests/` | 1 | 135 |
+-| **합계** | **77** | **88,799** |
++| **합계** | **79** | **90,878** |
+ 
+ 이 묶음의 숫자는 `internal/arch/packagetree_test.go` 가 `go list ./...` 와 맞춰 본다. `layers.md` §3 의
+ 제목에 있던 개수가 43 에서 멈춰 실제 48 과 갈라져 있었기 때문에 — 개수는 사람이 세면 늦는다 —
+@@ -36,7 +36,7 @@
+ 
+ ---
+ 
+-## 1. `internal/core` — 26패키지 19,976줄 · 프로젝트 공용 기반
++## 1. `internal/core` — 26패키지 19,979줄 · 프로젝트 공용 기반
+ 
+ ```
+ internal/core/
+@@ -80,7 +80,7 @@ internal/core/
+ │                            · 인자 디코딩(ArgString·ArgInt·ArgBigInt·ArgStrings·ArgBool)
+ ├── preflight      311  [L1] 현재 vs 목표 비교 — 타깃에 조립된 체인(Have)과 다음 테스트가 원하는 체인(Want)을 견줘
+ │                            reuse / rebuild-nodes N / rebuild-all / compose 를 답한다. 판단만 하고 보지 않는다
+-├── session      2,782  [L3] 아티팩트 레이아웃의 소유자 .chainbench/<session>/ — 세션·환경·컴포지션 +
++├── session      2,785  [L3] 아티팩트 레이아웃의 소유자 .chainbench/<session>/ — 세션·환경·컴포지션 +
+ │                            이름 붙인 네트워크 레지스트리(SaveNetwork·LoadNetwork·ListNetworks·RemoveNetwork)
+ ├── collector    1,460  [L3] live tail·chainstate·bp 참여·reorg + 이벤트(Bus·Event·Kind·Phase)
+ │                            + 로그 검색·타임라인(Search·Timeline) + RPC 로부터의 체인 종류·능력 감지
+@@ -123,14 +123,14 @@ internal/validatorset 85  [L3] 체인의 합의 신원 제시 — 키셋에서 
+ 
+ ---
+ 
+-## 3. 자원 · 테스트 · 표면 — 17패키지 58,402줄
++## 3. 자원 · 테스트 · 표면 — 18패키지 60,390줄
+ 
+ ```
+ internal/preset    553  [L1] preset 문서 두 갈래의 정의와 로더 — 체인(`Chain`·`LoadChainPreset`)과
+                           키(`Key`). 문서는 `presets/chain/`·`presets/keys/` 에 있고, 쓰는 모듈은
+                           정의하지 않고 쓰기만 한다(keyring 은 Entry·Network 를, poa 는 거버넌스 어댑터를)
+ 
+-internal/resource  3,748  [L1] 네트워크가 무엇으로 조립되는가 — 풀(호스트 × 포트 슬롯)·배정(Assign)·
++internal/resource  3,772  [L1] 네트워크가 무엇으로 조립되는가 — 풀(호스트 × 포트 슬롯)·배정(Assign)·
+                           포트 밴드 산술(Plan·PlanBands·ValidatePorts)·서버 세트(호스트·밴드·자격·호스트키·docker 치환)·
+                           여는 유일 통로(Opener)·세트를 풀로 해석(Pool·PoolFor)·인벤토리·baseline 드리프트 검사·
+                           워크스페이스 설정·머신 지정(Spec·Access)·devp2p network id 해석(Resolve·Flag·ValidateUniform)
+@@ -139,7 +139,7 @@ internal/dsl/             [L3] 테스트 정의 언어 (DDD C1, 핵심 도메인
+ ├── (dsl)      2,234  v1·v2 문법·파싱·검증·statement 파생(Parse·SequenceOf·ActionName·ArgsOf) + JSON 스키마.
+ │                     순수 — 실행 인프라(rpc·session·collector)를 import 하지 않는다
+ ├── assert       399  타입 인식 비교 프리미티브 — 해석기가 어세션을 검사할 때 쓰는 비교기(Equal·InDelta 등)
+-└── interp     1,044  실행 계약(Action·Assertion·Registry·Reader·Deps·ActionCtx·AssertCtx·NodeControl)
++└── interp     1,079  실행 계약(Action·Assertion·Registry·Reader·Deps·ActionCtx·AssertCtx·NodeControl)
+                       + 해석기(NewInterpreter·Run) + $ref/save 바인딩 + Fingerprint(환경 재사용 키)
+                       + Unresolved(오프라인 이름 검증) + caseTimeout. 계약이 여기 사는 것이 핵심 —
+                       testhelper(L3)가 구현하므로 testengine(L4)으로 올릴 수 없다
+@@ -148,19 +148,21 @@ internal/testhelper 5,893 [L3] DSL 내장 어휘 — 액션(sendTx·waitBlock·r
+                           registerContract·newAccount·faucet·partition/heal·start/stop/restart/swapNode·ws open/subscribe)
+                           과 어세션·리더의 구현 및 등록(Register·Registry) + 계정 해석(ResolveAccount)
+ 
+-internal/testengine 5,788 [L4] 테스트 엔진 — RunSuite 가 4단계를 소유: ① DSL 이 선언한 체인을 chainsetup 으로 구성
++internal/experiment 1,209 [L4] 동결된 타이밍·주입·관찰 반복 실행과 source pin·factual outcome·불확실성
++
++internal/testengine 6,237 [L4] 테스트 엔진 — RunSuite 가 4단계를 소유: ① DSL 이 선언한 체인을 chainsetup 으로 구성
+                           ② pre-test hook ③ test ④ post-test hook(②~④는 해석기가 spec 에서 수행).
+                           + attach 경로(AttachWorkspaceRun·NewAttachEngine) · Precheck · ValidateSpecs ·
+                           overlay 작성 · 노드 게이트 연결(factsFromReport) · 세션 요약
+ 
+-internal/chainsetup 12,288 [L4] 체인 셋업 오케스트레이터 — 선언을 이름 붙인 스텝 열로 바꿔 실행하고
++internal/chainsetup 12,340 [L4] 체인 셋업 오케스트레이터 — 선언을 이름 붙인 스텝 열로 바꿔 실행하고
+                           워크스페이스에 무엇을 했는지 기록한다. ChainNew·ChainKeys·ChainGenesis·ChainConfig·ChainAllocate·
+                           ChainProvision·ChainStart·ChainUp·ChainResume·ChainRestart·ChainStop·ChainRm·ChainStatus·ChainHealth·
+                           ChainLogs·ChainEnodes·ChainEndpoints·ChainLaunchOpts·ChainBaseline{Check,Approve}·
+                           ChainVerifyValidators·NodeStart/Stop/Swap·Hardfork{Plan,Execute}·
+                           재사용 판단(PlanReuse·ReconcileReuse·GenesisDeclared·WantOf)·실행 중 프로세스 실사
+ 
+-internal/chainsetup/verb 1,501 [L4] 셋업 동사 — 표면이 부르는 함수(ChainNew·ChainKeys·ChainGenesis·ChainConfig·ChainAllocate·
++internal/chainsetup/verb 1,519 [L4] 셋업 동사 — 표면이 부르는 함수(ChainNew·ChainKeys·ChainGenesis·ChainConfig·ChainAllocate·
+                           ChainProvision·ChainInit·ChainStart·ChainUp·ChainResume·ChainRestart·ChainStop·ChainRm·ChainStatus·
+                           ChainHealth·ChainLogs·ChainEnodes·ChainEndpoints·ChainLaunchOpts·NodeStart/Stop/Swap·
+                           Hardfork{Plan,Execute}·ChainCrossFork)과 그것들을 몰고 가는 상태 기계(composition 표·
+@@ -171,15 +173,15 @@ internal/nodemonitor  412 [L4] 테스트 실행 허가 판정 + 제한 복구(E6
+                           WAITABLE 은 예산까지 대기 · RESTARTABLE 은 상한까지 재시작 · FATAL 은 파괴적 조치 없이 종료(Gate).
+                           관측과 재시작은 재구현하지 않고 seam(Observer·Restarter)으로 주입받는다
+ 
+-internal/app      17,002  [L5] 유스케이스 1개 = 함수 1개. cobra·MCP 타입을 모른다. Net*(20여) · Keyring*(8) ·
++internal/app      17,135  [L5] 유스케이스 1개 = 함수 1개. cobra·MCP 타입을 모른다. Net*(20여) · Keyring*(8) ·
+                           Tx/Contract(TxSend·TxWait·ContractDeploy·ContractCall) · Faucet · Report · Log* ·
+                           Network*(attach/detach/registry) · Upgrade{Run,Genesis} · Hardfork{Plan,Execute} ·
+                           RunSuite(s) · Verify* · Capabilit* · Resolve*(binary·chain·key·nodes·server) · GCSessions
+-internal/feature     539  [L5] 기능 등록의 한 자리 — Descriptor·Register[In,Out]·Stage·ReadOnly, 그리고 입력 struct
++internal/feature     540  [L5] 기능 등록의 한 자리 — Descriptor·Register[In,Out]·Stage·ReadOnly, 그리고 입력 struct
+                           태그 하나가 만드는 두 바인딩(Flags → cobra 플래그, Schema → MCP JSON 스키마).
+                           명령을 생성하지는 않는다 — 이름·계층·도움말은 사람이 정한다
+ 
+-internal/mcp       3,094  [L6] MCP 표면(요구 14) — 도구 스키마 바인딩과 렌더링.
++internal/mcp       3,161  [L6] MCP 표면(요구 14) — 도구 스키마 바인딩과 렌더링.
+                           chain·network·keyring·capability·run·log·tx·consensus 도구군 + read-only 선언
+ internal/dashboard 2,351  [L6] 대시보드 HTTP 백엔드(요구 19) — SSE 스트림 · runs/sessions API · SPA 자산
+ internal/webcli     123  [L6] Web이 chainbench CLI를 하위 프로세스로 실행하는 곳 — 바이너리를 찾고,
+@@ -193,13 +195,13 @@ internal/testsupport  26  [L0] 교차 패키지 테스트 게이트 — ServersB
+ 
+ ---
+ 
+-## 4. `cmd/` — 19패키지 5,654줄 · [L6] 표면
++## 4. `cmd/` — 20패키지 5,742줄 · [L6] 표면
+ 
+ `layers.md` §3 의 배치 검사는 `internal/` 만 대상으로 한다 — `cmd` 는 정의상 최상위이고 무엇이든
+ import 할 수 있다.
+ 
+ ```
+-cmd/chainbench           303  main. 사용자용 CLI(요구 15) 루트 조립
++cmd/chainbench           305  main. 사용자용 CLI(요구 15) 루트 조립
+ ├── surface               96  모든 명령군이 자기에 대해 말해야 하는 것 — 명령 트리의 두 번째 렌더링이
+ │                             손으로 유지하는 목록이 아니라 선언 하나를 읽게 한다
+ ├── exitcode              33  종료 상태를 결정한 명령에서 그것을 적용하는 main 까지 운반
+@@ -210,6 +212,7 @@ cmd/chainbench           303  main. 사용자용 CLI(요구 15) 루트 조립
+ ├── nodecmd              178  네트워크의 노드 1개 — 개별 start/stop, RPC 대화
+ ├── suitecmd             675  테스트 스펙 실행 — run(스펙이 선언한 네트워크를 구성 또는 attach 후 실행)·
+ │                             validate(실행 없이 검사)·migrate-spec(v1 → v2)
++├── experimentcmd       86  동결된 타이밍·장애·관찰 조사 공개 실행
+ ├── testcmd               65  디렉토리의 DSL 테스트 케이스 목록 — run 전에 무엇이 있는지 발견
+ ├── txcmd                212  체인에 일을 맡기고 결과를 기다리기 — send·wait·deploy·call
+ ├── accountcmd           177  노드나 체인이 아니라 ACCOUNT 에 가하는 것 — 상태 읽기, 자금 공급
+diff --git a/docs/dev/timing-investigations.md b/docs/dev/timing-investigations.md
+new file mode 100644
+index 00000000..79ae3dee
+--- /dev/null
++++ b/docs/dev/timing-investigations.md
+@@ -0,0 +1,66 @@
++# 동결한 타이밍·주입·관찰 조사
++
++`chainbench experiment`와 `chainbench_experiment` MCP 도구는 동일한
++`app.RunExperiment`를 실행한다. 기존 composition owner·registered DSL·
++readiness monitor를 사용한다. 기존 네트워크를 재현 시험의 소유 자원으로
++받지 않으며 `artifact_root`는 새 디렉터리여야 한다.
++
++입력은 `plan`, 전체 `case`, `binary_by_commit`, `artifact_root`다.
++외부 환경 파일은 `assets_sha256`으로 동결한다. `plan`은 실행 전에 커밋·
++실행 파일·driver·논리 환경, 증상 assertion과 정상 대조, 반복 분모,
++주입 위치와 seed, 시간 예산, node 집합을 지정한다.
++
++```sh
++chainbench experiment prepare --input proposal.json > frozen.json
++chainbench experiment --input frozen.json
++chainbench experiment verify --report <artifact_root>/report.json
++```
++
++prepare는 누락된 해시를 실제 파일에서 채우고, 이미 지정한 pin이 다르면
++거부한다. 실행 파일은 정확한 커밋과 `vcs.modified=false`를 가진 Go 빌드여야
++한다. driver 해시는 전체 DSL의 canonical JSON이다. object 순서·공백은
++CLI/MCP 전송에서 바뀔 수 있으며 DSL과 MCP의 JSON 값·숫자 해석을 따른다.
++큰 정수의 정확한 값은 기존 DSL 규칙처럼 문자열로 쓴다. 중복 key·추가 JSON
++문서·미지 입력 필드·256KB 초과 입력은 공개 CLI에서 거부한다.
++
++재현·비교 모드는 매 trial마다 새 제어·데이터 디렉터리와 생성 key set을
++사용한다. remote target도 허용된 data root 아래에 별도 trial 경로를
++배정한다. 실제 node machine에서 executable·genesis·config checksum을
++읽고, 실제 process argv와 PID를 구성 소유자의 기록과 대조한다.
++remote 실제 배포에 대한 수용 증거는 별도로 기록해야 한다.
++현재 adapter는 단일 실행 파일 네트워크이며 mixed-binary/upgrade 환경은
++거부한다. 이 거부를 조사 완료나 전체 기능 수용으로 취급하지 않는다.
++
++`delay`, `restart`, `partition`은 동결한 `<case id>/step/<do index>`에서
++실행된다. 정상 대조 실패, assertion 평가/RPC 오류, 주입 미실행, 초기화
++실패, 소유권/출처 변경과 정리 실패는 증상 실패와 구분한다. 정리에는
++취소된 trial과 분리된 예산을 사용하고, 미해결 정리가 있으면 다음 trial을
++시작하지 않는다. readiness 예산은 남은 trial 예산의 절반 이내이면서
++최대30초다. 실행과 정리는 해당 composition이 만든 자원만 대상으로 한다.
++
++관찰 모드는 `observe_workspace`와 그 실제 구성의
++`observe_composition_sha256`를 추가로 동결한다. prepare는 기존 구성을
++읽어 이 pin을 채운다. 없거나 미구성된 workspace는 거부한다.
++관찰 interpreter에는 node control과 keyring을 전달하지 않고 readiness
++재시작도 호출하지 않는다. approved read-only RPC와 assertion만 허용한다.
++총 관찰 window를 반복 수로 나누고, 각 window에서 최대500ms 간격으로
++읽는다. window가 지나면 새로운 증상 표본을 실행하지 않는다.
++실제로 평가된 지정 assertion 실패와 정상 대조·같은 출처 event가 있어야
++`RECURRED`와 `resume_requested=true`를 반환한다. 시간 창에 대한 sampling
++결과이며 순간적인 모든 장애를 관측했다고 주장하지 않는다.
++
++보고서는 실제 assertion 원자료, 주입 receipt와 schedule/lease,
++monitor event·시간·poll 수, trial별 오류와 cleanup, 시도·완료·누락 분모를
++보존한다. `input.json`과 `report.json`은 mode0600으로 원자 저장한다.
++verify는 canonical 원자료 해시, assertion·주입 연결, trial 순서와 schedule,
++정리·분모·판정·관찰 시간 창을 재검사한다. 일관성 검증이며 실행 host의
++독립 신뢰나 원인·수정 수용을 증명하지 않는다. `acceptance=not_recorded`다.
++
++표본30개 미만은 `INCONCLUSIVE`다. 비교에서 충분한 재현과 수정 후 단측95%
++binomial 상한 조건을 만족하면 `OBSERVED_RATE_BOUND_MET`로 기록한다.
++증상이 충분히 재현되지 않으면 `AWAITING_OBSERVATION`이다. 관찰 시간 창에서
++재발이 없었다는 사실로 수정 완료를 승인하지 않는다.
++
++현재 공개 경로의 소유 go-stablenet trial·관찰·정리와 controlled concurrency
++시험을 검증했다. coding-agent 조사/완료 gate 통합, 실제 fault/timeout 반례,
++최종 커밋 기준 replay 및 독립 production 수용은 별도 증거가 필요하다.
+diff --git a/internal/app/experiment.go b/internal/app/experiment.go
+new file mode 100644
+index 00000000..2dc7f8ee
+--- /dev/null
++++ b/internal/app/experiment.go
+@@ -0,0 +1,61 @@
++package app
++
++import (
++	"context"
++	"fmt"
++	"github.com/0xmhha/chainbench/internal/experiment"
++	"github.com/0xmhha/chainbench/internal/testengine"
++)
++
++type ExperimentIn = testengine.ExperimentIn
++type ExperimentReport = experiment.Report
++
++func RunExperiment(ctx context.Context, d Deps, in ExperimentIn) (ExperimentReport, error) {
++	return testengine.RunExperiment(ctx, d.chainsetupDeps(), in)
++}
++func ExperimentEnvironmentDigest(raw []byte, assets ...map[string]string) (string, error) {
++	return testengine.ExperimentEnvironmentDigest(raw, assets...)
++}
++
++// VerifyExperimentReport checks unchanged raw receipts and derived accounting.
++func VerifyExperimentReport(report ExperimentReport) error { return experiment.VerifyDSLReport(report) }
++
++// FreezeExperimentInputs fills absent pins from actual inputs, refusing changes
++// to any pin already provided. It allocates no runtime resources.
++func FreezeExperimentInputs(in ExperimentIn) (ExperimentIn, error) {
++	driver, e := experiment.DSLDriverDigest(in.Case)
++	if e != nil {
++		return in, e
++	}
++	environment, e := ExperimentEnvironmentDigest(in.Case, in.AssetsSHA256)
++	if e != nil {
++		return in, e
++	}
++	sources := []*experiment.Source{&in.Plan.Before}
++	if in.Plan.After != nil {
++		copyAfter := *in.Plan.After
++		in.Plan.After = &copyAfter
++		sources = append(sources, in.Plan.After)
++	}
++	for _, old := range sources {
++		source, e := experiment.FreezeBinarySource(in.BinaryByCommit[old.Commit], old.Commit, driver, environment)
++		if e != nil {
++			return in, e
++		}
++		if old.BinarySHA256 != "" && old.BinarySHA256 != source.BinarySHA256 || old.DriverSHA256 != "" && old.DriverSHA256 != source.DriverSHA256 || old.EnvironmentSHA256 != "" && old.EnvironmentSHA256 != source.EnvironmentSHA256 {
++			return in, fmt.Errorf("existing source pin differs; refusing to rewrite frozen conditions")
++		}
++		*old = source
++	}
++	if in.Plan.Mode == "observation" {
++		digest, e := testengine.ExperimentCompositionDigest(context.Background(), Deps{}.chainsetupDeps(), in.ObserveWorkspace)
++		if e != nil {
++			return in, e
++		}
++		if in.ObserveCompositionSHA256 != "" && in.ObserveCompositionSHA256 != digest {
++			return in, fmt.Errorf("existing observation composition pin differs")
++		}
++		in.ObserveCompositionSHA256 = digest
++	}
++	return in, in.Plan.Validate()
++}
+diff --git a/internal/app/experiment_input.go b/internal/app/experiment_input.go
+new file mode 100644
+index 00000000..0216080b
+--- /dev/null
++++ b/internal/app/experiment_input.go
+@@ -0,0 +1,72 @@
++package app
++
++import (
++	"bytes"
++	"encoding/json"
++	"fmt"
++	"io"
++)
++
++// DecodeExperimentInput rejects duplicate fields, trailing documents, unknown
++// fields and unbounded input before composition can allocate any resources.
++func DecodeExperimentInput(raw []byte) (ExperimentIn, error) {
++	var in ExperimentIn
++	if len(raw) > 256_000 {
++		return in, fmt.Errorf("experiment input exceeds 256KB")
++	}
++	tokens := json.NewDecoder(bytes.NewReader(raw))
++	if e := experimentJSONValue(tokens, 0); e != nil {
++		return in, e
++	}
++	if _, e := tokens.Token(); e != io.EOF {
++		return in, fmt.Errorf("exactly one JSON input document required")
++	}
++	decoder := json.NewDecoder(bytes.NewReader(raw))
++	decoder.DisallowUnknownFields()
++	err := decoder.Decode(&in)
++	return in, err
++}
++func experimentJSONValue(d *json.Decoder, depth int) error {
++	if depth > 64 {
++		return fmt.Errorf("experiment input nesting exceeds 64")
++	}
++	token, e := d.Token()
++	if e != nil {
++		return e
++	}
++	delimiter, ok := token.(json.Delim)
++	if !ok {
++		return nil
++	}
++	switch delimiter {
++	case '{':
++		seen := map[string]bool{}
++		for d.More() {
++			key, e := d.Token()
++			if e != nil {
++				return e
++			}
++			name, ok := key.(string)
++			if !ok {
++				return fmt.Errorf("object key required")
++			}
++			if seen[name] {
++				return fmt.Errorf("duplicate experiment input field %q", name)
++			}
++			seen[name] = true
++			if e = experimentJSONValue(d, depth+1); e != nil {
++				return e
++			}
++		}
++	case '[':
++		for d.More() {
++			if e = experimentJSONValue(d, depth+1); e != nil {
++				return e
++			}
++		}
++	default:
++		return fmt.Errorf("unexpected JSON delimiter")
++	}
++	_, e = d.Token()
++	return e
++}
+diff --git a/internal/app/experiment_input_test.go b/internal/app/experiment_input_test.go
+new file mode 100644
+index 00000000..23d4f8fb
+--- /dev/null
++++ b/internal/app/experiment_input_test.go
+@@ -0,0 +1,18 @@
++package app
++
++import (
++	"strings"
++	"testing"
++)
++
++func TestExperimentInputRejectsAmbiguousDocuments(t *testing.T) {
++	for _, raw := range []string{`{"plan":{},"plan":{}}`, `{"plan":{"before":{"commit":"a","commit":"b"}}}`, `{"case":{"id":"a","id":"b"}}`, `{} {}`, `{"unknown":1}`, strings.Repeat("[", 65) + strings.Repeat("]", 65), strings.Repeat(" ", 256001)} {
++		if _, e := DecodeExperimentInput([]byte(raw)); e == nil {
++			t.Fatal("ambiguous/unbounded input accepted")
++		}
++	}
++	in, e := DecodeExperimentInput([]byte(`{"plan":{"id":"caller-chosen"},"case":{"id":"unique"}}`))
++	if e != nil || in.Plan.ID != "caller-chosen" {
++		t.Fatal(in, e)
++	}
++}
+diff --git a/internal/chainsetup/runtime_pins.go b/internal/chainsetup/runtime_pins.go
+new file mode 100644
+index 00000000..772e8607
+--- /dev/null
++++ b/internal/chainsetup/runtime_pins.go
+@@ -0,0 +1,51 @@
++package chainsetup
++
++import (
++	"context"
++	"fmt"
++)
++
++// RuntimePins is a read-only content snapshot on the actual node machines.
++// It hashes executables and launch files, never private key material.
++func (w *Workspace) RuntimePins(ctx context.Context) (map[string]string, error) {
++	if e := w.allow("RuntimePins"); e != nil {
++		return nil, e
++	}
++	out := map[string]string{}
++	cached := map[string]string{}
++	for _, ns := range w.state.Nodes {
++		t, e := w.machineFor(ns)
++		if e != nil {
++			return nil, e
++		}
++		binary := w.launchBinary(ns)
++		key := ns.Server + "\x00" + binary
++		digest, ok := cached[key]
++		if !ok {
++			digest, e = t.Files.Checksum(ctx, binary)
++			if e != nil {
++				return nil, e
++			}
++			cached[key] = digest
++		}
++		out[fmt.Sprintf("node%d/binary", ns.Index)] = digest
++		for _, path := range []string{w.state.GenesisPath, ns.ConfigPath} {
++			want, known := w.state.LaunchInputs[path]
++			if path == "" || !known {
++				return nil, fmt.Errorf("node%d launch input provenance unavailable", ns.Index)
++			}
++			actual, e := t.Files.Checksum(ctx, path)
++			if e != nil {
++				return nil, e
++			}
++			if actual != want {
++				return nil, fmt.Errorf("node%d launch input changed: %s", ns.Index, path)
++			}
++			out[fmt.Sprintf("node%d/input/%s", ns.Index, path)] = actual
++		}
++	}
++	if len(w.state.Nodes) == 0 {
++		return nil, fmt.Errorf("runtime node table unavailable")
++	}
++	return out, nil
++}
+diff --git a/internal/chainsetup/runtime_pins_test.go b/internal/chainsetup/runtime_pins_test.go
+new file mode 100644
+index 00000000..ac866b9e
+--- /dev/null
++++ b/internal/chainsetup/runtime_pins_test.go
+@@ -0,0 +1,38 @@
++package chainsetup
++
++import (
++	"context"
++	"os"
++	"path/filepath"
++	"testing"
++
++	"github.com/0xmhha/chainbench/internal/core/filestore"
++	"github.com/0xmhha/chainbench/internal/core/node"
++	"github.com/0xmhha/chainbench/internal/resource"
++)
++
++func TestRuntimePinsReadActualBytesAndRefuseChangedLaunchInputs(t *testing.T) {
++	dir := t.TempDir()
++	binary := filepath.Join(dir, "binary")
++	config := filepath.Join(dir, "config")
++	genesis := filepath.Join(dir, "genesis")
++	for _, p := range []string{binary, config, genesis} {
++		if e := os.WriteFile(p, []byte(p), 0600); e != nil {
++			t.Fatal(e)
++		}
++	}
++	w := &Workspace{state: State{Binary: binary, Target: resource.Spec{DataRoot: dir}, GenesisPath: genesis, Nodes: []node.Record{{Index: 1, ConfigPath: config}}, LaunchInputs: map[string]string{config: filestore.Hash([]byte(config)), genesis: filestore.Hash([]byte(genesis))}}}
++	pins, e := w.RuntimePins(context.Background())
++	if e != nil {
++		t.Fatal(e)
++	}
++	if pins["node1/binary"] != filestore.Hash([]byte(binary)) {
++		t.Fatal("actual executable not hashed")
++	}
++	if e = os.WriteFile(config, []byte("changed"), 0600); e != nil {
++		t.Fatal(e)
++	}
++	if _, e = w.RuntimePins(context.Background()); e == nil {
++		t.Fatal("changed runtime config accepted")
++	}
++}
+diff --git a/internal/chainsetup/verb/runtime_pins.go b/internal/chainsetup/verb/runtime_pins.go
+new file mode 100644
+index 00000000..5914e6e9
+--- /dev/null
++++ b/internal/chainsetup/verb/runtime_pins.go
+@@ -0,0 +1,18 @@
++package verb
++
++import (
++	"context"
++	"github.com/0xmhha/chainbench/internal/chainsetup"
++)
++
++// ChainRuntimePins reads actual node-machine file hashes through the existing
++// workspace owner and resource seam; it allocates or controls no node.
++func ChainRuntimePins(ctx context.Context, d chainsetup.Deps, in ChainObserveIn) (map[string]string, error) {
++	ws, e := chainsetup.Open(in.DataDir, d.Clock)
++	if e != nil {
++		return nil, e
++	}
++	ws.SetEnv(d.Env)
++	ws.SetServerLookup(d.ServerLookup)
++	return ws.RuntimePins(ctx)
++}
+diff --git a/internal/chainsetup/verb_needs.go b/internal/chainsetup/verb_needs.go
+index 1fad4fcd..d41877ba 100644
+--- a/internal/chainsetup/verb_needs.go
++++ b/internal/chainsetup/verb_needs.go
+@@ -117,6 +117,7 @@ var verbNeeds = map[string]verbNeed{
+ 	"Preflight":        {run: placed},
+ 	"Hardfork":         {run: placed, node: []nodeNeed{launched}, nodeAll: true},
+ 	"VerifyValidators": {run: placed},
++	"RuntimePins":      {run: placed},
+ 
+ 	// Destructive.
+ 	"Rm": {run: stopped},
+diff --git a/internal/experiment/dsl.go b/internal/experiment/dsl.go
+index d1b87e34..635081e1 100644
+--- a/internal/experiment/dsl.go
++++ b/internal/experiment/dsl.go
+@@ -37,15 +37,18 @@ type dslTrial struct {
+ 	lease     DSLLease
+ 	binary    string
+ 	injection *InjectionObservation
+-	events    []Event
++	receipts  []RawReceipt
+ }
+ 
+ func (f *DSLFactory) Open(ctx context.Context, r TrialRequest) (TrialSession, error) {
+ 	if f.OpenLease == nil {
+ 		return nil, fmt.Errorf("composition owner unavailable")
+ 	}
+-	sum := sha256.Sum256(f.Case)
+-	if hex.EncodeToString(sum[:]) != r.Source.DriverSHA256 {
++	digest, e := DSLDriverDigest(f.Case)
++	if e != nil {
++		return nil, e
++	}
++	if digest != r.Source.DriverSHA256 {
+ 		return nil, fmt.Errorf("frozen DSL driver differs")
+ 	}
+ 	spec, e := dsl.Parse(f.Case)
+@@ -89,8 +92,11 @@ func (s *dslTrial) Identity(ctx context.Context) (SessionIdentity, error) {
+ 	if e := verifyGoBinary(s.binary, s.request.Source); e != nil {
+ 		return SessionIdentity{}, e
+ 	}
+-	sum := sha256.Sum256(s.factory.Case)
+-	if hex.EncodeToString(sum[:]) != s.request.Source.DriverSHA256 {
++	digest, e := DSLDriverDigest(s.factory.Case)
++	if e != nil {
++		return SessionIdentity{}, e
++	}
++	if digest != s.request.Source.DriverSHA256 {
+ 		return SessionIdentity{}, fmt.Errorf("DSL changed during trial")
+ 	}
+ 	return s.lease.Identity(ctx)
+@@ -102,6 +108,86 @@ func (s *dslTrial) Close(ctx context.Context) error {
+ 	return s.lease.Close(ctx)
+ }
+ func (s *dslTrial) Run(ctx context.Context) (Observation, error) {
++	started := time.Now()
++	deadline := started.Add(s.request.ObservationWindow)
++	if s.request.Mode == "observation" {
++		if s.request.ObservationWindow <= 0 {
++			return Observation{}, fmt.Errorf("positive observation window required")
++		}
++		watch, cancel := context.WithDeadline(ctx, deadline)
++		defer cancel()
++		ctx = watch
++	}
++	for polls := 1; ; polls++ {
++		if polls > 1000 {
++			return Observation{Receipts: s.receipts, Polls: polls - 1}, fmt.Errorf("observation poll budget exceeded")
++		}
++		out, err := s.runOnce(ctx)
++		out.Receipts = append([]RawReceipt(nil), s.receipts...)
++		out.Polls = polls
++		if s.request.Mode == "observation" {
++			out.WatchedSeconds = time.Since(started).Seconds()
++		}
++		if err != nil || s.request.Mode != "observation" || len(out.Events) > 0 {
++			return out, err
++		}
++		if err = validateObservation(Plan{AssertionID: s.request.AssertionID, NormalAssertionIDs: s.request.NormalAssertionIDs}, s.request.Source, s.request.Schedule, out, started, time.Now().UTC()); err != nil {
++			return out, err
++		}
++		for _, c := range out.Controls {
++			if !c.Pass {
++				return out, nil
++			}
++		}
++		if remaining := time.Until(deadline); remaining <= 0 {
++			return out, nil
++		} else {
++			wait := 500 * time.Millisecond
++			if remaining < wait {
++				wait = remaining
++			}
++			timer := time.NewTimer(wait)
++			select {
++			case <-ctx.Done():
++				timer.Stop()
++				if time.Until(deadline) <= 0 && ctx.Err() == context.DeadlineExceeded {
++					out.WatchedSeconds = time.Since(started).Seconds()
++					return out, nil
++				}
++				return out, ctx.Err()
++			case <-timer.C:
++			}
++			if time.Until(deadline) <= 0 {
++				out.WatchedSeconds = time.Since(started).Seconds()
++				return out, nil
++			}
++		}
++		identity, err := s.lease.Identity(ctx)
++		if err != nil {
++			return out, err
++		}
++		if time.Until(deadline) <= 0 {
++			out.WatchedSeconds = time.Since(started).Seconds()
++			return out, nil
++		}
++		if identity.Source != s.request.Source || !identity.ReadOnly {
++			return out, fmt.Errorf("observation identity changed")
++		}
++	}
++}
++
++func (s *dslTrial) receipt(kind string, body any) (string, error) {
++	raw, err := json.Marshal(body)
++	if err != nil {
++		return "", err
++	}
++	sum := sha256.Sum256(raw)
++	hash := hex.EncodeToString(sum[:])
++	s.receipts = append(s.receipts, RawReceipt{Kind: kind, SHA256: hash, Body: raw})
++	return hash, nil
++}
++
++func (s *dslTrial) runOnce(ctx context.Context) (Observation, error) {
+ 	rec := &dslEvidence{}
+ 	deps := s.lease.Dependencies()
+ 	env := s.lease.Environment()
+@@ -115,11 +201,13 @@ func (s *dslTrial) Run(ctx context.Context) (Observation, error) {
+ 		ctx = interp.WithStepHook(ctx, s.inject)
+ 	}
+ 	status, e := interp.NewInterpreter(deps).Run(ctx, s.spec, env, rec)
+-	out := Observation{Injection: s.injection, Controls: []AssertionObservation{}, Events: []Event{}}
++	out := Observation{Injection: s.injection, Controls: []AssertionObservation{}, Events: []MonitorEvent{}}
+ 	for _, a := range rec.asserts {
+-		raw, _ := json.Marshal(a)
+-		sum := sha256.Sum256(raw)
+-		assertion := AssertionObservation{ID: a.ID, Pass: a.Pass, Error: a.Error, ReceiptSHA256: hex.EncodeToString(sum[:])}
++		hash, err := s.receipt("assertion", a)
++		if err != nil {
++			return out, err
++		}
++		assertion := AssertionObservation{ID: a.ID, Pass: a.Pass, Error: a.Error, ReceiptSHA256: hash}
+ 		if a.ID == s.request.AssertionID {
+ 			if out.Symptom.ID != "" {
+ 				return out, fmt.Errorf("duplicate designated assertion")
+@@ -144,7 +232,7 @@ func (s *dslTrial) Run(ctx context.Context) (Observation, error) {
+ 		return out, fmt.Errorf("DSL post-action failed")
+ 	}
+ 	if s.request.Mode == "observation" && !out.Symptom.Pass && out.Symptom.ID == s.request.AssertionID && out.Symptom.Error == "" {
+-		out.Events = append(out.Events, Event{Name: s.request.Resume.Event, AssertionID: out.Symptom.ID, Source: s.request.Source, ObservedAt: time.Now().UTC(), ReceiptSHA256: out.Symptom.ReceiptSHA256})
++		out.Events = append(out.Events, MonitorEvent{Name: s.request.Resume.Event, AssertionID: out.Symptom.ID, Source: s.request.Source, ObservedAt: time.Now().UTC(), ReceiptSHA256: out.Symptom.ReceiptSHA256})
+ 	}
+ 	return out, nil
+ }
+@@ -202,13 +290,15 @@ func (s *dslTrial) inject(ctx context.Context, id string, index int, d *interp.D
+ 		}
+ 	}
+ 	receipt := InjectionObservation{Kind: want.Kind, Target: want.Target, Step: want.Step, DelayMS: s.request.Schedule.DelayMS, Executed: true}
+-	raw, _ := json.Marshal(struct {
++	hash, err := s.receipt("injection", struct {
+ 		Injection InjectionObservation
+ 		Schedule  Schedule
+ 		Lease     string
+ 	}{receipt, s.request.Schedule, identity.LeaseID})
+-	sum := sha256.Sum256(raw)
+-	receipt.ReceiptSHA256 = hex.EncodeToString(sum[:])
++	if err != nil {
++		return err
++	}
++	receipt.ReceiptSHA256 = hash
+ 	s.injection = &receipt
+ 	rec.PostAction(session.PostResult{Name: "experiment-injection", OK: true, Detail: receipt.ReceiptSHA256})
+ 	return nil
+@@ -233,7 +323,7 @@ func verifyGoBinary(path string, want Source) error {
+ 	}
+ 	build, e := buildinfo.ReadFile(path)
+ 	if e != nil {
+-		return fmt.Errorf("Go binary source provenance unavailable")
++		return fmt.Errorf("go binary source provenance unavailable")
+ 	}
+ 	revision, modified := "", ""
+ 	for _, setting := range build.Settings {
+@@ -245,7 +335,7 @@ func verifyGoBinary(path string, want Source) error {
+ 		}
+ 	}
+ 	if revision != want.Commit || modified != "false" {
+-		return fmt.Errorf("Go binary must report the exact clean frozen commit")
++		return fmt.Errorf("go binary must report the exact clean frozen commit")
+ 	}
+ 	return nil
+ }
+@@ -293,3 +383,41 @@ func (r *dslEvidence) PostAction(p session.PostResult) {
+ }
+ func (r *dslEvidence) Status(session.TestStatus) {}
+ func (r *dslEvidence) Reason(string)             {}
++
++// DSLDriverDigest pins the complete driver's canonical JSON. It uses the same
++// JSON value/number semantics as the interpreter and MCP argument decoder, so
++// map ordering and insignificant formatting cannot change transport identity.
++// Exact large numeric values must be DSL strings, as in the existing DSL.
++func DSLDriverDigest(raw []byte) (string, error) {
++	var value any
++	if e := json.Unmarshal(raw, &value); e != nil {
++		return "", e
++	}
++	canonical, e := json.Marshal(value)
++	if e != nil {
++		return "", e
++	}
++	sum := sha256.Sum256(canonical)
++	return hex.EncodeToString(sum[:]), nil
++}
++
++// FreezeBinarySource reads actual bytes and exact clean Go build provenance.
++func FreezeBinarySource(path, commit, driver, environment string) (Source, error) {
++	f, e := os.Open(path)
++	if e != nil {
++		return Source{}, e
++	}
++	defer func() { _ = f.Close() }()
++	h := sha256.New()
++	if _, e = io.Copy(h, f); e != nil {
++		return Source{}, e
++	}
++	source := Source{Commit: commit, BinarySHA256: hex.EncodeToString(h.Sum(nil)), DriverSHA256: driver, EnvironmentSHA256: environment}
++	if e = source.validate(); e != nil {
++		return Source{}, e
++	}
++	if e = verifyGoBinary(path, source); e != nil {
++		return Source{}, e
++	}
++	return source, nil
++}
+diff --git a/internal/experiment/dsl_test.go b/internal/experiment/dsl_test.go
+index 1cbd8da4..3de341ef 100644
+--- a/internal/experiment/dsl_test.go
++++ b/internal/experiment/dsl_test.go
+@@ -125,7 +125,10 @@ func TestLiveDSLTimingComparison(t *testing.T) {
+ 	p.NormalAssertionIDs = []string{"timing/assert/1"}
+ 	p.OwnedNodeIDs = []string{"node1"}
+ 	p.Injection = &Injection{Kind: "delay", Target: "node1", Step: "timing/step/1", MinDelayMS: 0, MaxDelayMS: 3}
+-	driverHash := hashBytes([]byte(timingDSL))
++	driverHash, e := DSLDriverDigest([]byte(timingDSL))
++	if e != nil {
++		t.Fatal(e)
++	}
+ 	envHash := hashBytes([]byte("owned-loopback-one-node-v1"))
+ 	beforeBytes, e := os.ReadFile(beforeBin)
+ 	if e != nil {
+@@ -176,7 +179,7 @@ func TestLiveDSLTimingComparison(t *testing.T) {
+ 			return lease, nil
+ 		}
+ 	}
+-	r, e := Run(context.Background(), p, factory)
++	r, e := RunInvestigation(context.Background(), p, factory)
+ 	if e != nil {
+ 		t.Fatal(e)
+ 	}
+diff --git a/internal/experiment/observation_test.go b/internal/experiment/observation_test.go
+new file mode 100644
+index 00000000..dbc7b163
+--- /dev/null
++++ b/internal/experiment/observation_test.go
+@@ -0,0 +1,111 @@
++package experiment
++
++import (
++	"context"
++	"encoding/json"
++	"net/http"
++	"net/http/httptest"
++	"path/filepath"
++	"sync"
++	"testing"
++	"time"
++
++	"github.com/0xmhha/chainbench/internal/core/node"
++	"github.com/0xmhha/chainbench/internal/core/rpc"
++	"github.com/0xmhha/chainbench/internal/core/session"
++	"github.com/0xmhha/chainbench/internal/dsl"
++	"github.com/0xmhha/chainbench/internal/dsl/interp"
++	"github.com/0xmhha/chainbench/internal/testhelper"
++)
++
++type readLease struct {
++	identity SessionIdentity
++	env      session.Environment
++	deps     interp.Deps
++}
++
++func (l *readLease) Identity(context.Context) (SessionIdentity, error) { return l.identity, nil }
++func (l *readLease) Environment() interp.NodeTable                     { return l.env }
++func (l *readLease) Dependencies() interp.Deps                         { return l.deps }
++func (l *readLease) Close(context.Context) error                       { return nil }
++func TestReadOnlyDSLActuallyWatchesUntilRecurrenceOrWindow(t *testing.T) {
++	for _, mode := range []string{"recurrence", "window", "rpc_error", "cancel"} {
++		t.Run(mode, func(t *testing.T) {
++			var started time.Time
++			var once sync.Once
++			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++				once.Do(func() { started = time.Now() })
++				var q struct {
++					ID     any
++					Method string
++				}
++				_ = json.NewDecoder(r.Body).Decode(&q)
++				value := "0x1"
++				if q.Method == "eth_blockNumber" {
++					value = "0x0"
++					if mode == "recurrence" && time.Since(started) > 100*time.Millisecond {
++						value = "0x1"
++					}
++				}
++				body := map[string]any{"jsonrpc": "2.0", "id": q.ID, "result": value}
++				if mode == "rpc_error" && q.Method == "eth_blockNumber" {
++					delete(body, "result")
++					body["error"] = map[string]any{"code": -32000, "message": "owned transport failure"}
++				}
++				_ = json.NewEncoder(w).Encode(body)
++			}))
++			defer server.Close()
++			raw := []byte(`{"schemaVersion":"1","id":"monitor","chain":{"name":"owned-fixture","binary":"pinned"},"assertions":[{"assert":"blockNumber","on":"node1","compare":"Equal","expected":"0"},{"assert":"chainId","on":"node1","expected":"1"}]}`)
++			spec, e := dsl.Parse(raw)
++			if e != nil {
++				t.Fatal(e)
++			}
++			sess, e := session.New(filepath.Join(t.TempDir(), "artifacts"), "observation", time.Now().UTC())
++			if e != nil {
++				t.Fatal(e)
++			}
++			env, e := sess.NewEnvironment("readonly")
++			if e != nil {
++				t.Fatal(e)
++			}
++			env.PopulateNodeTable(node.NodeSet{Nodes: []node.Node{{Index: 1, RPCURL: server.URL}}})
++			source := frozenPlan().Before
++			lease := &readLease{identity: SessionIdentity{Source: source, LeaseID: "read-only", ReadOnly: true}, env: env, deps: interp.Deps{RPC: func(u string) *rpc.Client { return rpc.Dial(u) }, Actions: testhelper.Registry()}}
++			request := TrialRequest{Mode: "observation", Source: source, AssertionID: "monitor/assert/0", NormalAssertionIDs: []string{"monitor/assert/1"}, Resume: &ResumeTrigger{Event: "designated_failure", AssertionID: "monitor/assert/0", WindowSeconds: 1}, ObservationWindow: time.Second}
++			trial := &dslTrial{request: request, spec: spec, lease: lease}
++			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
++			defer cancel()
++			if mode == "cancel" {
++				cancel()
++			}
++			out, e := trial.Run(ctx)
++			switch mode {
++			case "rpc_error", "cancel":
++				if e == nil {
++					t.Fatal("infra/cancel masqueraded as monitor success")
++				}
++				if len(out.Events) != 0 {
++					t.Fatal("infra emitted recurrence")
++				}
++			case "recurrence":
++				if e != nil || len(out.Events) != 1 || out.Symptom.Pass || out.Polls < 2 || out.WatchedSeconds < .4 {
++					t.Fatalf("polls=%d watched=%f events=%d pass=%v error=%v", out.Polls, out.WatchedSeconds, len(out.Events), out.Symptom.Pass, e)
++				}
++			case "window":
++				if e != nil || len(out.Events) != 0 || !out.Symptom.Pass || out.WatchedSeconds < 1 || out.Polls < 2 {
++					t.Fatalf("polls=%d watched=%f events=%d pass=%v error=%v", out.Polls, out.WatchedSeconds, len(out.Events), out.Symptom.Pass, e)
++				}
++			}
++			if e == nil {
++				tr := Trial{Identity: &lease.identity, Schedule: request.Schedule, Observation: &out}
++				if e = verifyDSLReceipts(tr); e != nil {
++					t.Fatal(e)
++				}
++				out.Receipts[0].Body = json.RawMessage(`{}`)
++				if e = verifyDSLReceipts(tr); e == nil {
++					t.Fatal("changed raw receipt accepted")
++				}
++			}
++		})
++	}
++}
+diff --git a/internal/experiment/plan.go b/internal/experiment/plan.go
+index c2efee5e..9040718a 100644
+--- a/internal/experiment/plan.go
++++ b/internal/experiment/plan.go
+@@ -124,9 +124,12 @@ func (p Plan) Validate() error {
+ 		return fmt.Errorf("invalid owned node set")
+ 	}
+ 	if p.Mode == "observation" {
+-		if p.Injection != nil || p.Resume == nil || p.Resume.Event == "" || p.Resume.AssertionID != p.AssertionID || p.Resume.WindowSeconds < 1 || p.Resume.WindowSeconds > 3600 {
++		if p.Injection != nil || p.Resume == nil || (p.Resume.Event == "" || len(p.Resume.Event) > 128) || p.Resume.AssertionID != p.AssertionID || p.Resume.WindowSeconds < 1 || p.Resume.WindowSeconds > 3600 {
+ 			return fmt.Errorf("observation requires bounded designated resume trigger and no injection")
+ 		}
++		if p.Resume.WindowSeconds > p.TotalTimeoutSeconds || (p.Resume.WindowSeconds+p.Repetitions-1)/p.Repetitions >= p.TrialTimeoutSeconds {
++			return fmt.Errorf("observation window must fit total and per-trial budgets with execution margin")
++		}
+ 	} else {
+ 		if p.Resume != nil || p.Injection == nil {
+ 			return fmt.Errorf("reproduction/comparison needs explicit injection")
+diff --git a/internal/experiment/run.go b/internal/experiment/run.go
+index a8b80728..7ac5eb86 100644
+--- a/internal/experiment/run.go
++++ b/internal/experiment/run.go
+@@ -25,6 +25,7 @@ type TrialRequest struct {
+ 	AssertionID        string
+ 	NormalAssertionIDs []string
+ 	Resume             *ResumeTrigger
++	ObservationWindow  time.Duration
+ }
+ 
+ // TrialSession owns only the resources its factory allocated. Close must not
+@@ -35,10 +36,11 @@ type TrialSession interface {
+ 	Close(context.Context) error
+ }
+ type SessionIdentity struct {
+-	Source       Source   `json:"source"`
+-	LeaseID      string   `json:"lease_id"`
+-	OwnedNodeIDs []string `json:"owned_node_ids"`
+-	ReadOnly     bool     `json:"read_only"`
++	RuntimeSHA256 string   `json:"runtime_sha256,omitempty"`
++	Source        Source   `json:"source"`
++	LeaseID       string   `json:"lease_id"`
++	OwnedNodeIDs  []string `json:"owned_node_ids"`
++	ReadOnly      bool     `json:"read_only"`
+ }
+ type AssertionObservation struct {
+ 	ID            string `json:"id"`
+@@ -54,18 +56,26 @@ type InjectionObservation struct {
+ 	Executed      bool   `json:"executed"`
+ 	ReceiptSHA256 string `json:"receipt_sha256"`
+ }
+-type Event struct {
++type MonitorEvent struct {
+ 	Name          string    `json:"name"`
+ 	AssertionID   string    `json:"assertion_id"`
+ 	Source        Source    `json:"source"`
+ 	ObservedAt    time.Time `json:"observed_at"`
+ 	ReceiptSHA256 string    `json:"receipt_sha256"`
+ }
++type RawReceipt struct {
++	Kind   string          `json:"kind"`
++	SHA256 string          `json:"sha256"`
++	Body   json.RawMessage `json:"body"`
++}
+ type Observation struct {
+-	Symptom   AssertionObservation   `json:"symptom"`
+-	Controls  []AssertionObservation `json:"controls"`
+-	Injection *InjectionObservation  `json:"injection"`
+-	Events    []Event                `json:"events"`
++	Receipts       []RawReceipt           `json:"receipts,omitempty"`
++	Polls          int                    `json:"polls,omitempty"`
++	WatchedSeconds float64                `json:"watched_seconds,omitempty"`
++	Symptom        AssertionObservation   `json:"symptom"`
++	Controls       []AssertionObservation `json:"controls"`
++	Injection      *InjectionObservation  `json:"injection"`
++	Events         []MonitorEvent         `json:"events"`
+ }
+ type Trial struct {
+ 	Cohort       string           `json:"cohort"`
+@@ -80,7 +90,7 @@ type Trial struct {
+ 	StartedAt    time.Time        `json:"started_at"`
+ 	FinishedAt   time.Time        `json:"finished_at"`
+ }
+-type Counts struct {
++type TrialCounts struct {
+ 	Planned              int      `json:"planned"`
+ 	Attempted            int      `json:"attempted"`
+ 	Completed            int      `json:"completed"` // usable designated assertion + controls + cleanup
+@@ -92,19 +102,19 @@ type Counts struct {
+ 	UpperFailureRate95   *float64 `json:"upper_failure_rate_95"`
+ }
+ type Report struct {
+-	SchemaVersion   int     `json:"schema_version"`
+-	Plan            Plan    `json:"plan"`
+-	PlanSHA256      string  `json:"plan_sha256"`
+-	Trials          []Trial `json:"trials"`
+-	Before          Counts  `json:"before"`
+-	After           *Counts `json:"after"`
+-	Verdict         string  `json:"verdict"`
+-	StopReason      string  `json:"stop_reason"`
+-	ResumeRequested bool    `json:"resume_requested"`
+-	Acceptance      string  `json:"acceptance"`
++	SchemaVersion   int          `json:"schema_version"`
++	Plan            Plan         `json:"plan"`
++	PlanSHA256      string       `json:"plan_sha256"`
++	Trials          []Trial      `json:"trials"`
++	Before          TrialCounts  `json:"before"`
++	After           *TrialCounts `json:"after"`
++	Verdict         string       `json:"verdict"`
++	StopReason      string       `json:"stop_reason"`
++	ResumeRequested bool         `json:"resume_requested"`
++	Acceptance      string       `json:"acceptance"`
+ }
+ 
+-func Run(parent context.Context, p Plan, f Factory) (Report, error) {
++func RunInvestigation(parent context.Context, p Plan, f Factory) (Report, error) {
+ 	if e := p.Validate(); e != nil {
+ 		return Report{}, e
+ 	}
+@@ -142,6 +152,14 @@ func Run(parent context.Context, p Plan, f Factory) (Report, error) {
+ 			}
+ 			trial := execute(ctx, p, source, schedule, label, f)
+ 			out.Trials = append(out.Trials, trial)
++			if p.Mode == "observation" && trial.Outcome == "SYMPTOM_FAIL" && trial.Observation != nil {
++				for _, event := range trial.Observation.Events {
++					if event.Name == p.Resume.Event && event.AssertionID == p.Resume.AssertionID {
++						out.StopReason = "designated_symptom_recurred"
++						stop = true
++					}
++				}
++			}
+ 			if !trial.CleanupOK {
+ 				out.StopReason = "cleanup_unresolved"
+ 				stop = true
+@@ -194,6 +212,7 @@ func execute(parent context.Context, p Plan, source Source, schedule Schedule, c
+ 	if p.Resume != nil {
+ 		r := *p.Resume
+ 		request.Resume = &r
++		request.ObservationWindow = time.Duration(r.WindowSeconds) * time.Second / time.Duration(p.Repetitions)
+ 	}
+ 	var session TrialSession
+ 	defer func() {
+@@ -259,7 +278,7 @@ func execute(parent context.Context, p Plan, source Source, schedule Schedule, c
+ 		return
+ 	}
+ 	after, err := session.Identity(ctx)
+-	if err != nil || after.Source != identity.Source || after.LeaseID != identity.LeaseID || after.ReadOnly != identity.ReadOnly || !sameSet(after.OwnedNodeIDs, identity.OwnedNodeIDs) {
++	if err != nil || after.Source != identity.Source || after.LeaseID != identity.LeaseID || after.ReadOnly != identity.ReadOnly || after.RuntimeSHA256 != identity.RuntimeSHA256 || !sameSet(after.OwnedNodeIDs, identity.OwnedNodeIDs) {
+ 		trial.Error = "session_identity_changed"
+ 		return
+ 	}
+@@ -334,8 +353,8 @@ func validateObservation(p Plan, source Source, schedule Schedule, o Observation
+ 	}
+ 	return nil
+ }
+-func count(trials []Trial, cohort string, planned int) Counts {
+-	c := Counts{Planned: planned}
++func count(trials []Trial, cohort string, planned int) TrialCounts {
++	c := TrialCounts{Planned: planned}
+ 	for _, trial := range trials {
+ 		if trial.Cohort != cohort {
+ 			continue
+diff --git a/internal/experiment/run_test.go b/internal/experiment/run_test.go
+index 2255dcde..f9f02694 100644
+--- a/internal/experiment/run_test.go
++++ b/internal/experiment/run_test.go
+@@ -62,7 +62,7 @@ func (s *trialSession) Close(ctx context.Context) error {
+ }
+ func runExperiment(t *testing.T, p Plan, f *trialFactory) Report {
+ 	t.Helper()
+-	r, e := Run(context.Background(), p, f)
++	r, e := RunInvestigation(context.Background(), p, f)
+ 	if e != nil {
+ 		t.Fatal(e)
+ 	}
+@@ -194,7 +194,7 @@ func TestBinomialUpperBoundAnalyticCases(t *testing.T) {
+ func TestCancellationLeavesMissingTrialsAndUsesLiveCleanupContext(t *testing.T) {
+ 	ctx, cancel := context.WithCancel(context.Background())
+ 	f := &trialFactory{edit: func(s *trialSession) { cancel() }}
+-	r, e := Run(ctx, frozenPlan(), f)
++	r, e := RunInvestigation(ctx, frozenPlan(), f)
+ 	if e != nil {
+ 		t.Fatal(e)
+ 	}
+@@ -226,9 +226,9 @@ func TestObservationRecurrenceRequiresMatchingSourceEventAndSymptom(t *testing.T
+ 			p.Repetitions = 1
+ 			p.MinCompleted = 1
+ 			p.MinSymptomFailures = 1
+-			p.Resume = &ResumeTrigger{Event: "assertion_failed", AssertionID: p.AssertionID, WindowSeconds: 60}
++			p.Resume = &ResumeTrigger{Event: "assertion_failed", AssertionID: p.AssertionID, WindowSeconds: 1}
+ 			f := &trialFactory{edit: func(s *trialSession) {
+-				event := Event{Name: "assertion_failed", AssertionID: p.AssertionID, Source: p.Before, ObservedAt: time.Now().UTC(), ReceiptSHA256: strings.Repeat("f", 64)}
++				event := MonitorEvent{Name: "assertion_failed", AssertionID: p.AssertionID, Source: p.Before, ObservedAt: time.Now().UTC(), ReceiptSHA256: strings.Repeat("f", 64)}
+ 				switch mode {
+ 				case "other_event":
+ 					event.Name = "node_unready"
+@@ -237,7 +237,7 @@ func TestObservationRecurrenceRequiresMatchingSourceEventAndSymptom(t *testing.T
+ 				case "passed_symptom":
+ 					s.observation.Symptom.Pass = true
+ 				}
+-				s.observation.Events = []Event{event}
++				s.observation.Events = []MonitorEvent{event}
+ 			}}
+ 			r := runExperiment(t, p, f)
+ 			if (r.Verdict == "RECURRED") != (mode == "correct") || r.ResumeRequested != (mode == "correct") {
+diff --git a/internal/experiment/verify.go b/internal/experiment/verify.go
+new file mode 100644
+index 00000000..0e5ac36f
+--- /dev/null
++++ b/internal/experiment/verify.go
+@@ -0,0 +1,175 @@
++package experiment
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"fmt"
++	"reflect"
++
++	"github.com/0xmhha/chainbench/internal/core/session"
++)
++
++// VerifyDSLReport checks content and accounting, not trust in the executing
++// host. A hash proves unchanged bytes; it does not prove independent acceptance.
++func VerifyDSLReport(r Report) error {
++	if r.SchemaVersion != 1 || r.Acceptance != "not_recorded" {
++		return fmt.Errorf("unsupported report or unrecorded acceptance changed")
++	}
++	digest, err := r.Plan.Digest()
++	if err != nil {
++		return err
++	}
++	if digest != r.PlanSHA256 {
++		return fmt.Errorf("plan digest differs")
++	}
++	schedules, _ := r.Plan.Schedules()
++	cohorts := 1
++	if r.Plan.After != nil {
++		cohorts = 2
++	}
++	if len(r.Trials) > len(schedules)*cohorts {
++		return fmt.Errorf("trial budget exceeded")
++	}
++	for i, t := range r.Trials {
++		source := r.Plan.Before
++		cohort := "before"
++		if i%cohorts == 1 {
++			source = *r.Plan.After
++			cohort = "after"
++		}
++		if t.Cohort != cohort || t.Source != source || t.Schedule != schedules[i/cohorts] || t.StartedAt.IsZero() || t.FinishedAt.Before(t.StartedAt) {
++			return fmt.Errorf("trial identity/order differs")
++		}
++		if t.Outcome == "ERROR" {
++			if t.Error == "" && t.CleanupError == "" {
++				return fmt.Errorf("error trial has no reason")
++			}
++			continue
++		}
++		if !t.CleanupOK || t.CleanupError != "" || t.Error != "" || t.Identity == nil || t.Identity.Source != source || t.Observation == nil {
++			return fmt.Errorf("usable trial identity/cleanup missing")
++		}
++		if err := validateObservation(r.Plan, source, t.Schedule, *t.Observation, t.StartedAt, t.FinishedAt); err != nil {
++			return err
++		}
++		if r.Plan.Mode == "observation" {
++			want := float64(r.Plan.Resume.WindowSeconds) / float64(r.Plan.Repetitions)
++			if t.Observation.Polls < 1 || t.Observation.WatchedSeconds < 0 || t.Observation.WatchedSeconds > t.FinishedAt.Sub(t.StartedAt).Seconds()+.01 {
++				return fmt.Errorf("invalid observation window receipt")
++			}
++			if t.Outcome == "PASS" && t.Observation.WatchedSeconds+.001 < want {
++				return fmt.Errorf("observation window was not completed")
++			}
++		}
++		if err := verifyDSLReceipts(t); err != nil {
++			return err
++		}
++		outcome := "PASS"
++		if !t.Observation.Symptom.Pass {
++			outcome = "SYMPTOM_FAIL"
++		}
++		for _, c := range t.Observation.Controls {
++			if !c.Pass {
++				outcome = "CONTROL_FAIL"
++			}
++		}
++		if outcome != t.Outcome {
++			return fmt.Errorf("trial outcome differs from assertions")
++		}
++	}
++	before := count(r.Trials, "before", r.Plan.Repetitions)
++	if !reflect.DeepEqual(before, r.Before) {
++		return fmt.Errorf("before denominator differs")
++	}
++	var after *TrialCounts
++	if r.Plan.After != nil {
++		v := count(r.Trials, "after", r.Plan.Repetitions)
++		after = &v
++	}
++	if !reflect.DeepEqual(after, r.After) {
++		return fmt.Errorf("after denominator differs")
++	}
++	expected := verdict(r)
++	resume := false
++	if r.Plan.Mode == "observation" {
++		expected = "AWAITING_OBSERVATION"
++		if before.InfrastructureErrors > 0 || before.ControlFailures > 0 {
++			expected = "ERROR"
++		} else {
++			for _, t := range r.Trials {
++				if t.Outcome != "SYMPTOM_FAIL" || t.Observation == nil {
++					continue
++				}
++				for _, e := range t.Observation.Events {
++					if e.Name == r.Plan.Resume.Event && e.AssertionID == r.Plan.Resume.AssertionID {
++						resume = true
++						expected = "RECURRED"
++					}
++				}
++			}
++		}
++	}
++	if r.Verdict != expected || r.ResumeRequested != resume {
++		return fmt.Errorf("verdict/resumption differs from evidence")
++	}
++	return nil
++}
++func verifyDSLReceipts(t Trial) error {
++	o := t.Observation
++	bodies := map[string]RawReceipt{}
++	for _, receipt := range o.Receipts {
++		var compact bytes.Buffer
++		if err := json.Compact(&compact, receipt.Body); err != nil {
++			return err
++		}
++		sum := sha256.Sum256(compact.Bytes())
++		if hex.EncodeToString(sum[:]) != receipt.SHA256 {
++			return fmt.Errorf("raw receipt hash differs")
++		}
++		if old, ok := bodies[receipt.SHA256]; ok && old.Kind != receipt.Kind {
++			return fmt.Errorf("receipt kind collision")
++		}
++		bodies[receipt.SHA256] = receipt
++	}
++	assertions := append([]AssertionObservation{o.Symptom}, o.Controls...)
++	for _, a := range assertions {
++		receipt, ok := bodies[a.ReceiptSHA256]
++		if !ok || receipt.Kind != "assertion" {
++			return fmt.Errorf("assertion raw receipt missing")
++		}
++		var raw session.AssertResult
++		if e := json.Unmarshal(receipt.Body, &raw); e != nil {
++			return e
++		}
++		if raw.ID != a.ID || raw.Pass != a.Pass || raw.Error != a.Error {
++			return fmt.Errorf("assertion receipt fields differ")
++		}
++	}
++	if o.Injection != nil {
++		receipt, ok := bodies[o.Injection.ReceiptSHA256]
++		if !ok || receipt.Kind != "injection" {
++			return fmt.Errorf("injection raw receipt missing")
++		}
++		var raw struct {
++			Injection InjectionObservation
++			Schedule  Schedule
++			Lease     string
++		}
++		if e := json.Unmarshal(receipt.Body, &raw); e != nil {
++			return e
++		}
++		wanted := *o.Injection
++		wanted.ReceiptSHA256 = ""
++		if raw.Injection != wanted || raw.Schedule != t.Schedule || raw.Lease != t.Identity.LeaseID {
++			return fmt.Errorf("injection receipt identity differs")
++		}
++	}
++	for _, e := range o.Events {
++		if e.AssertionID != o.Symptom.ID || e.ReceiptSHA256 != o.Symptom.ReceiptSHA256 {
++			return fmt.Errorf("monitor event not bound to designated assertion")
++		}
++	}
++	return nil
++}
+diff --git a/internal/experiment/verify_test.go b/internal/experiment/verify_test.go
+new file mode 100644
+index 00000000..aec43dde
+--- /dev/null
++++ b/internal/experiment/verify_test.go
+@@ -0,0 +1,92 @@
++package experiment
++
++import (
++	"encoding/json"
++	"testing"
++
++	"github.com/0xmhha/chainbench/internal/core/session"
++)
++
++func receiptFixture(t *testing.T, s *trialSession) {
++	t.Helper()
++	d := &dslTrial{}
++	for _, a := range append([]AssertionObservation{s.observation.Symptom}, s.observation.Controls...) {
++		hash, e := d.receipt("assertion", session.AssertResult{ID: a.ID, Pass: a.Pass})
++		if e != nil {
++			t.Fatal(e)
++		}
++		if a.ID == s.observation.Symptom.ID {
++			s.observation.Symptom.ReceiptSHA256 = hash
++		} else {
++			for i := range s.observation.Controls {
++				if s.observation.Controls[i].ID == a.ID {
++					s.observation.Controls[i].ReceiptSHA256 = hash
++				}
++			}
++		}
++	}
++	inj := *s.observation.Injection
++	inj.ReceiptSHA256 = ""
++	hash, e := d.receipt("injection", struct {
++		Injection InjectionObservation
++		Schedule  Schedule
++		Lease     string
++	}{inj, s.request.Schedule, s.identity.LeaseID})
++	if e != nil {
++		t.Fatal(e)
++	}
++	s.observation.Injection.ReceiptSHA256 = hash
++	s.observation.Receipts = d.receipts
++}
++func TestReportVerifierRejectsTamperingAndPreservesJSONRoundTrip(t *testing.T) {
++	report := runExperiment(t, frozenPlan(), &trialFactory{edit: func(s *trialSession) { receiptFixture(t, s) }})
++	raw, e := json.MarshalIndent(report, "", "  ")
++	if e != nil {
++		t.Fatal(e)
++	}
++	var roundtrip Report
++	if e = json.Unmarshal(raw, &roundtrip); e != nil {
++		t.Fatal(e)
++	}
++	if e = VerifyDSLReport(roundtrip); e != nil {
++		t.Fatal("persisted receipt verification", e)
++	}
++	for _, mode := range []string{"denominator", "verdict", "acceptance", "schedule", "receipt", "missing", "assertion", "ownership"} {
++		t.Run(mode, func(t *testing.T) {
++			var r Report
++			_ = json.Unmarshal(raw, &r)
++			switch mode {
++			case "denominator":
++				r.Before.Completed++
++			case "verdict":
++				r.Verdict = "REPRODUCED"
++			case "acceptance":
++				r.Acceptance = "accepted"
++			case "schedule":
++				r.Trials[0].Schedule.DelayMS++
++			case "receipt":
++				r.Trials[0].Observation.Receipts[0].Body = json.RawMessage(`{}`)
++			case "missing":
++				r.Trials[0].Observation.Receipts = nil
++			case "assertion":
++				r.Trials[0].Observation.Symptom.Pass = true
++			case "ownership":
++				r.Trials[0].CleanupOK = false
++			}
++			if e = VerifyDSLReport(r); e == nil {
++				t.Fatal("changed report accepted")
++			}
++		})
++	}
++}
++func TestDriverDigestIgnoresOnlyInsignificantJSONWhitespace(t *testing.T) {
++	a, e := DSLDriverDigest([]byte(`{"id":"probe","steps":["a b"]}`))
++	if e != nil {
++		t.Fatal(e)
++	}
++	b, _ := DSLDriverDigest([]byte("{\n \"steps\": [\"a b\"], \"id\": \"probe\"\n}"))
++	c, _ := DSLDriverDigest([]byte(`{"id":"probe","steps":["ab"]}`))
++	if a != b || a == c {
++		t.Fatal("driver pin lost significant contents or included formatting")
++	}
++}
+diff --git a/internal/feature/test.go b/internal/feature/test.go
+index b75d728a..2037acd8 100644
+--- a/internal/feature/test.go
++++ b/internal/feature/test.go
+@@ -9,6 +9,7 @@ import "github.com/0xmhha/chainbench/internal/app"
+ // them so each definition's own preflight decides whether to reuse it. They are
+ // registered together so a surface cannot offer one without the other.
+ func init() {
++	Register(Registration{Name: "experiment.run", Stage: StageTest, Summary: "Execute a frozen bounded timing/fault investigation or read-only observation; retain receipts and uncertainty"}, app.RunExperiment)
+ 	Register(Registration{
+ 		Name: "test.run", Stage: StageTest,
+ 		Summary: "Run a DSL test definition: compose the network it declares, then run it",
+diff --git a/internal/mcp/experiment_schema.go b/internal/mcp/experiment_schema.go
+new file mode 100644
+index 00000000..ec08710f
+--- /dev/null
++++ b/internal/mcp/experiment_schema.go
+@@ -0,0 +1,33 @@
++package mcp
++
++import "strconv"
++
++// experimentInputSchema exposes the same required pins and bounded plan that
++// the executable validator enforces. The case retains its existing DSL schema.
++func experimentInputSchema() map[string]any {
++	text := func(max int) map[string]any {
++		return map[string]any{"type": "string", "minLength": 1, "maxLength": max}
++	}
++	hash := func(n int) map[string]any {
++		return map[string]any{"type": "string", "pattern": "^[0-9a-f]{" + strconv.Itoa(n) + "}$"}
++	}
++	integer := func(min, max int) map[string]any {
++		return map[string]any{"type": "integer", "minimum": min, "maximum": max}
++	}
++	object := func(properties map[string]any, required ...string) map[string]any {
++		return map[string]any{"type": "object", "properties": properties, "required": required, "additionalProperties": false}
++	}
++	nullable := func(schema map[string]any) map[string]any {
++		return map[string]any{"anyOf": []any{schema, map[string]any{"type": "null"}}}
++	}
++	strings := func(min, max int) map[string]any {
++		return map[string]any{"type": "array", "items": text(128), "minItems": min, "maxItems": max, "uniqueItems": true}
++	}
++	source := object(map[string]any{"commit": hash(40), "binary_sha256": hash(64), "driver_sha256": hash(64), "environment_sha256": hash(64)}, "commit", "binary_sha256", "driver_sha256", "environment_sha256")
++	injection := object(map[string]any{"kind": map[string]any{"type": "string", "enum": []string{"delay", "restart", "partition"}}, "target": text(128), "step": text(128), "min_delay_ms": integer(0, 60000), "max_delay_ms": integer(0, 60000)}, "kind", "target", "step", "min_delay_ms", "max_delay_ms")
++	resume := object(map[string]any{"event": text(128), "assertion_id": text(128), "window_seconds": integer(1, 3600)}, "event", "assertion_id", "window_seconds")
++	plan := object(map[string]any{
++		"schema_version": map[string]any{"type": "integer", "const": 1}, "id": text(128), "mode": map[string]any{"type": "string", "enum": []string{"reproduction", "comparison", "observation"}}, "symptom": text(4096), "assertion_id": text(128), "seed": text(128), "before": source, "after": nullable(source), "repetitions": integer(1, 1000), "min_completed": integer(1, 1000), "min_symptom_failures": integer(1, 1000), "max_failure_rate": map[string]any{"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1}, "trial_timeout_seconds": integer(1, 300), "total_timeout_seconds": integer(1, 7200), "owned_node_ids": strings(0, 32), "normal_assertion_ids": strings(1, 16), "injection": nullable(injection), "resume": nullable(resume),
++	}, "schema_version", "id", "mode", "symptom", "assertion_id", "seed", "before", "repetitions", "min_completed", "min_symptom_failures", "max_failure_rate", "trial_timeout_seconds", "total_timeout_seconds", "owned_node_ids", "normal_assertion_ids")
++	return object(map[string]any{"plan": plan, "case": map[string]any{"type": "object", "description": "Complete existing v1 or v2 DSL; driver pin hashes canonical JSON using interpreter value semantics."}, "binary_by_commit": map[string]any{"type": "object", "propertyNames": hash(40), "additionalProperties": text(4096), "maxProperties": 2}, "artifact_root": text(4096), "assets_sha256": map[string]any{"type": "object", "additionalProperties": hash(64)}, "observe_workspace": text(4096), "observe_composition_sha256": hash(64)}, "plan", "case", "binary_by_commit", "artifact_root")
++}
+diff --git a/internal/mcp/experiment_tool.go b/internal/mcp/experiment_tool.go
+new file mode 100644
+index 00000000..261892f8
+--- /dev/null
++++ b/internal/mcp/experiment_tool.go
+@@ -0,0 +1,33 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++	"fmt"
++	"github.com/0xmhha/chainbench/internal/app"
++)
++
++func experimentTool() Tool {
++	return Tool{Name: "chainbench_experiment", Description: "Execute one frozen bounded timing/fault/observation experiment. Requires plan, exact DSL case, source-pinned binaries and a new artifact_root. Comparison/reproduction own fresh composed networks; observation is read-only against observe_workspace. Returns factual denominators and uncertainty, never cause acceptance.", InputSchema: map[string]any{"type": "object", "properties": map[string]any{"input": experimentInputSchema()}, "required": []string{"input"}, "additionalProperties": false}, Handler: func(ctx context.Context, args map[string]any) (string, error) {
++		if len(args) != 1 || args["input"] == nil {
++			return "", fmt.Errorf("chainbench_experiment: input is required")
++		}
++		raw, e := json.Marshal(args["input"])
++		if e != nil || len(raw) > 256_000 {
++			return "", fmt.Errorf("chainbench_experiment: bounded JSON input required")
++		}
++		in, e := app.DecodeExperimentInput(raw)
++		if e != nil {
++			return "", fmt.Errorf("chainbench_experiment: %w", e)
++		}
++		report, e := app.RunExperiment(ctx, app.Deps{}, in)
++		if e != nil {
++			return "", e
++		}
++		result, e := json.Marshal(report)
++		if e != nil {
++			return "", e
++		}
++		return string(result), nil
++	}}
++}
+diff --git a/internal/mcp/experiment_tool_test.go b/internal/mcp/experiment_tool_test.go
+new file mode 100644
+index 00000000..9e15bb15
+--- /dev/null
++++ b/internal/mcp/experiment_tool_test.go
+@@ -0,0 +1,18 @@
++package mcp
++
++import (
++	"context"
++	"testing"
++)
++
++func TestExperimentToolRefusesUnknownOrMissingInputs(t *testing.T) {
++	tool := experimentTool()
++	for _, args := range []map[string]any{{}, {"input": map[string]any{"unknown": true}}, {"input": map[string]any{}, "extra": true}} {
++		if _, e := tool.Handler(context.Background(), args); e == nil {
++			t.Fatal("unbounded/unknown input accepted")
++		}
++	}
++	if tool.ReadOnly {
++		t.Fatal("experiment may compose/inject; cannot advertise read-only")
++	}
++}
+diff --git a/internal/mcp/tools.go b/internal/mcp/tools.go
+index 0fb94ceb..016db54d 100644
+--- a/internal/mcp/tools.go
++++ b/internal/mcp/tools.go
+@@ -21,6 +21,7 @@ func Default(name, version string) *Server {
+ 	s.Register(runTool())
+ 	s.Register(fileUploadTool())
+ 	s.Register(testListTool())
++	s.Register(experimentTool())
+ 	s.Register(hardforkTool())
+ 	s.Register(validateTool())
+ 	s.Register(consensusTool())
+diff --git a/internal/resource/trial.go b/internal/resource/trial.go
+new file mode 100644
+index 00000000..334cf528
+--- /dev/null
++++ b/internal/resource/trial.go
+@@ -0,0 +1,24 @@
++package resource
++
++import (
++	"fmt"
++	"path"
++	"path/filepath"
++)
++
++// FreshTrialTarget allocates a unique trial sub-root within the target's accepted
++// parent. The caller cannot reuse the physical data root of another network.
++func FreshTrialTarget(target Spec, localDir string) (Spec, error) {
++	if localDir == "" || !filepath.IsAbs(localDir) {
++		return Spec{}, fmt.Errorf("allocated local trial directory required")
++	}
++	if target.IsRemote() {
++		if target.DataRoot == "" {
++			return Spec{}, fmt.Errorf("remote trial requires an accepted data parent")
++		}
++		target.DataRoot = path.Join(target.DataRoot, "experiments", filepath.Base(localDir))
++	} else {
++		target.DataRoot = localDir
++	}
++	return target, nil
++}
+diff --git a/internal/resource/trial_test.go b/internal/resource/trial_test.go
+new file mode 100644
+index 00000000..1929cc66
+--- /dev/null
++++ b/internal/resource/trial_test.go
+@@ -0,0 +1,21 @@
++package resource
++
++import "testing"
++
++func TestFreshTrialTargetsKeepUniqueOwnershipRoots(t *testing.T) {
++	local, e := FreshTrialTarget(Spec{DataRoot: "/existing/network"}, "/tmp/trial-a")
++	if e != nil || local.DataRoot != "/tmp/trial-a" {
++		t.Fatal(local, e)
++	}
++	remote, e := FreshTrialTarget(Spec{Server: "accepted-server", DataRoot: "/accepted/parent"}, "/tmp/trial-a")
++	if e != nil || remote.DataRoot != "/accepted/parent/experiments/trial-a" || remote.Server != "accepted-server" {
++		t.Fatal(remote, e)
++	}
++	other, e := FreshTrialTarget(remote, "/tmp/trial-b")
++	if e != nil || other.DataRoot == remote.DataRoot {
++		t.Fatal("physical ownership root reused")
++	}
++	if _, e = FreshTrialTarget(Spec{Server: "accepted-server"}, "/tmp/trial-a"); e == nil {
++		t.Fatal("remote parent inferred without acceptance")
++	}
++}
+diff --git a/internal/testengine/experiment.go b/internal/testengine/experiment.go
+new file mode 100644
+index 00000000..3eab9d40
+--- /dev/null
++++ b/internal/testengine/experiment.go
+@@ -0,0 +1,449 @@
++package testengine
++
++import (
++	"context"
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"fmt"
++	"io"
++	"os"
++	"path/filepath"
++	"sort"
++	"strings"
++	"time"
++
++	"github.com/0xmhha/chainbench/internal/accounts"
++	"github.com/0xmhha/chainbench/internal/chainsetup"
++	"github.com/0xmhha/chainbench/internal/chainsetup/verb"
++	"github.com/0xmhha/chainbench/internal/core/process"
++	"github.com/0xmhha/chainbench/internal/core/rpc"
++	"github.com/0xmhha/chainbench/internal/core/session"
++	"github.com/0xmhha/chainbench/internal/dsl"
++	"github.com/0xmhha/chainbench/internal/dsl/interp"
++	"github.com/0xmhha/chainbench/internal/experiment"
++	"github.com/0xmhha/chainbench/internal/resource"
++	"github.com/0xmhha/chainbench/internal/testhelper"
++)
++
++type ExperimentIn struct {
++	Plan                     experiment.Plan   `json:"plan"`
++	Case                     json.RawMessage   `json:"case"`
++	BinaryByCommit           map[string]string `json:"binary_by_commit"`
++	ArtifactRoot             string            `json:"artifact_root"`
++	AssetsSHA256             map[string]string `json:"assets_sha256,omitempty"`
++	ObserveCompositionSHA256 string            `json:"observe_composition_sha256,omitempty"`
++	ObserveWorkspace         string            `json:"observe_workspace,omitempty"`
++}
++
++// ExperimentEnvironmentDigest freezes the declared environment, independent of
++// per-trial workspace/port allocation and before/after binary locations. The
++// raw complete DSL remains separately pinned as the driver.
++func ExperimentEnvironmentDigest(raw []byte, assets ...map[string]string) (string, error) {
++	s, e := dsl.Parse(raw)
++	if e != nil {
++		return "", e
++	}
++	s.ID = "environment"
++	s.Steps = nil
++	s.Assertions = nil
++	s.Sequence = nil
++	s.PreActions = nil
++	s.PostActions = nil
++	s.OnFailActions = nil
++	s.Chain.Binary = "$subject"
++	s.Chain.Binaries = nil
++	encoded, e := json.Marshal(struct {
++		Version   string
++		Spec      dsl.Spec
++		Blueprint string
++		Launch    map[string][]string
++		Config    map[string][]string
++		Peering   string
++		Accounts  map[string]dsl.AccountV2
++	}{"chainbench-environment-v1", s, s.EnvBlueprint, s.EnvLaunch, s.EnvConfig, s.EnvPeering, s.EnvAccounts})
++	if e != nil {
++		return "", e
++	}
++	pins := map[string]string{}
++	if len(assets) > 0 {
++		pins = assets[0]
++	}
++	encoded, e = json.Marshal(struct {
++		Environment json.RawMessage
++		Assets      map[string]string
++		KeyPolicy   string
++	}{encoded, pins, "generated trial-owned keys"})
++	if e != nil {
++		return "", e
++	}
++	sum := sha256.Sum256(encoded)
++	return hex.EncodeToString(sum[:]), nil
++}
++
++// RunExperiment reaches the same composition owner, readiness gate, node
++// control and registered DSL interpreter as RunSuite. A fresh root cannot
++// reuse a caller's already-running network. Observation takes no node control.
++func RunExperiment(ctx context.Context, sd chainsetup.Deps, in ExperimentIn) (experiment.Report, error) {
++	// Freeze nested caller-owned maps and pointers before any resource work.
++	encoded, e := json.Marshal(in)
++	if e != nil {
++		return experiment.Report{}, e
++	}
++	var owned ExperimentIn
++	if e = json.Unmarshal(encoded, &owned); e != nil {
++		return experiment.Report{}, e
++	}
++	in = owned
++	if e := in.Plan.Validate(); e != nil {
++		return experiment.Report{}, e
++	}
++	if e := verifyExperimentAssets(in.Case, in.AssetsSHA256); e != nil {
++		return experiment.Report{}, e
++	}
++	digest, e := ExperimentEnvironmentDigest(in.Case, in.AssetsSHA256)
++	if e != nil {
++		return experiment.Report{}, e
++	}
++	if digest != in.Plan.Before.EnvironmentSHA256 {
++		return experiment.Report{}, fmt.Errorf("frozen environment differs")
++	}
++	if in.Plan.Mode != "observation" && in.ObserveCompositionSHA256 != "" {
++		return experiment.Report{}, fmt.Errorf("composition pin is only for observation")
++	}
++	if in.Plan.Mode == "observation" && len(in.ObserveCompositionSHA256) != 64 {
++		return experiment.Report{}, fmt.Errorf("observation requires a frozen actual composition digest")
++	}
++	if (in.Plan.Mode == "observation") != (in.ObserveWorkspace != "") {
++		return experiment.Report{}, fmt.Errorf("observation requires an explicit existing workspace; other modes cannot adopt it")
++	}
++	if in.ArtifactRoot == "" {
++		return experiment.Report{}, fmt.Errorf("fresh artifact_root is required")
++	}
++	// Refuse reuse before creating nodes. Every trial directory is allocated by
++	// this invocation beneath this root; it cannot be supplied as an owned lease.
++	if e = os.Mkdir(in.ArtifactRoot, 0700); e != nil {
++		return experiment.Report{}, fmt.Errorf("artifact root must be new: %w", e)
++	}
++	if e = writeExperimentJSON(filepath.Join(in.ArtifactRoot, "input.json"), in); e != nil {
++		return experiment.Report{}, e
++	}
++	factory := &experiment.DSLFactory{Case: append([]byte(nil), in.Case...), BinaryByCommit: in.BinaryByCommit}
++	factory.OpenLease = func(ctx context.Context, r experiment.TrialRequest, binary string) (experiment.DSLLease, error) {
++		dir, e := os.MkdirTemp(in.ArtifactRoot, "trial-")
++		if e != nil {
++			return nil, e
++		}
++		if e := verifyExperimentAssets(in.Case, in.AssetsSHA256); e != nil {
++			return nil, e
++		}
++		lease := &experimentLease{sd: sd, request: r, dir: dir, workspace: dir, caseRaw: in.Case, environmentDigest: digest, assets: in.AssetsSHA256, binary: binary, compositionDigest: in.ObserveCompositionSHA256}
++		if r.Mode == "observation" {
++			lease.workspace = in.ObserveWorkspace
++			lease.readOnly = true
++		}
++		if !lease.readOnly {
++			inputs := RunSuiteIn{DataDir: dir, SpecContent: [][]byte{in.Case}, Binary: binary, KeysSource: "generate", ArtifactRoot: filepath.Join(dir, "artifacts")}
++			_, parsed, comp, e := resolveComposition(ctx, inputs)
++			if e != nil {
++				return lease, e
++			}
++			if comp.up == nil || parsed[0].EnvAttach != nil || len(parsed[0].Chain.Binaries) > 0 || parsed[0].EnvUpgrade != nil {
++				return lease, fmt.Errorf("experiment requires a composed single-binary network")
++			}
++			// Fresh physical data as well as a fresh control-plane directory.
++			// A remote target needs its own ownership allocation, never a reused
++			// path merely claimed by this JSON request.
++			comp.up.Target, e = resource.FreshTrialTarget(comp.up.Target, dir)
++			if e != nil {
++				return lease, e
++			}
++			lease.chain = parsed[0].Chain.Name
++			// The ordinary composition implementation creates and records the network;
++			// cleanup retains this workspace handle even on a partial bring-up failure.
++			var out RunSuiteOut
++			gateBudget := 30 * time.Second
++			if deadline, ok := ctx.Deadline(); ok {
++				if remaining := time.Until(deadline) / 2; remaining < gateBudget {
++					gateBudget = remaining
++				}
++			}
++			lease.net, e = composeWorkspace(ctx, sd, *comp.up, &out, gateBudget)
++			if e != nil {
++				return lease, e
++			}
++			if e = prepareChain(ctx, sd, inputs, comp, parsed, &lease.net, &out); e != nil {
++				return lease, e
++			}
++		} else {
++			state, e := verb.ChainStatus(ctx, sd, verb.ChainStatusIn{DataDir: lease.workspace})
++			if e != nil {
++				return lease, e
++			}
++			lease.chain = state.State.Chain
++			spec, e := dsl.Parse(in.Case)
++			if e != nil {
++				return lease, e
++			}
++			if spec.Chain.Name != lease.chain {
++				return lease, fmt.Errorf("actual observation chain differs from DSL")
++			}
++			// Observation never calls the readiness gate: that gate can restart nodes.
++			status, e := verb.NetworkStatus(ctx, sd, verb.NetworkStatusIn{DataDir: lease.workspace})
++			if e != nil {
++				return lease, e
++			}
++			lease.net.nodes = &status.Nodes
++		}
++		if lease.net.nodes == nil || len(lease.net.nodes.Nodes) == 0 {
++			return lease, fmt.Errorf("composed node table unavailable")
++		}
++		sess, e := session.New(filepath.Join(dir, "artifacts"), "frozen experiment", time.Now().UTC())
++		if e != nil {
++			return lease, e
++		}
++		env, e := sess.NewEnvironment(session.Fingerprint(digest))
++		if e != nil {
++			return lease, e
++		}
++		env.PopulateNodeTable(*lease.net.nodes)
++		lease.env = env
++		deps, e := experimentInterpreterDeps(lease.chain, lease.net, lease.readOnly)
++		if e != nil {
++			return lease, e
++		}
++		if lease.readOnly {
++			deps.Nodes = nil
++			deps.Keys = nil
++		}
++		lease.deps = deps
++		return lease, nil
++	}
++	report, runErr := experiment.RunInvestigation(ctx, in.Plan, factory)
++	if runErr != nil {
++		return report, runErr
++	}
++	if e = verifyExperimentAssets(in.Case, in.AssetsSHA256); e != nil {
++		return experiment.Report{}, e
++	}
++	if e = experiment.VerifyDSLReport(report); e != nil {
++		return report, fmt.Errorf("report evidence consistency: %w", e)
++	}
++	if e = writeExperimentJSON(filepath.Join(in.ArtifactRoot, "report.json"), report); e != nil {
++		return report, e
++	}
++	return report, nil
++}
++
++// experimentInterpreterDeps follows the existing attach wiring; accounts and keys are owned
++// by the composition, not reconstructed from a model-generated claim.
++func experimentInterpreterDeps(chain string, net composed, readOnly bool) (interp.Deps, error) {
++	accts, e := accounts.ForChain(chain)
++	if e != nil {
++		return interp.Deps{}, e
++	}
++	if readOnly {
++		return interp.Deps{RPC: func(u string) *rpc.Client { return rpc.Dial(u) }, Actions: testhelper.Registry(), Accounts: accts, Contracts: chainContracts(chain), Validators: chainValidators(chain)}, nil
++	}
++	keys, e := ringForOutput(net.keysDir, "")
++	if e != nil {
++		return interp.Deps{}, e
++	}
++	if net.ring != nil {
++		keys = net.ring
++	}
++	return interp.Deps{RPC: func(u string) *rpc.Client { return rpc.Dial(u) }, Actions: testhelper.Registry(), Accounts: accts, Keys: keys, Nodes: net.control, Contracts: chainContracts(chain), Validators: chainValidators(chain)}, nil
++}
++
++type experimentLease struct {
++	sd                        chainsetup.Deps
++	request                   experiment.TrialRequest
++	dir, workspace, chain     string
++	caseRaw                   []byte
++	environmentDigest         string
++	assets                    map[string]string
++	binary, compositionDigest string
++	readOnly                  bool
++	net                       composed
++	env                       session.Environment
++	deps                      interp.Deps
++}
++
++func (l *experimentLease) Environment() interp.NodeTable { return l.env }
++func (l *experimentLease) Dependencies() interp.Deps     { return l.deps }
++func (l *experimentLease) Identity(ctx context.Context) (experiment.SessionIdentity, error) {
++	id := experiment.SessionIdentity{Source: l.request.Source, LeaseID: filepath.Base(l.dir), ReadOnly: l.readOnly, OwnedNodeIDs: []string{}}
++	if e := verifyExperimentAssets(l.caseRaw, l.assets); e != nil {
++		return id, e
++	}
++	digest, e := ExperimentEnvironmentDigest(l.caseRaw, l.assets)
++	if e != nil || digest != l.environmentDigest {
++		return id, fmt.Errorf("declared environment changed")
++	}
++	status, e := verb.ChainStatus(ctx, l.sd, verb.ChainStatusIn{DataDir: l.workspace})
++	if e != nil {
++		return id, e
++	}
++	if status.State.Binary != l.binary {
++		return id, fmt.Errorf("actual composed binary differs from frozen subject")
++	}
++	if l.readOnly {
++		digest, e := ExperimentCompositionDigest(ctx, l.sd, l.workspace)
++		if e != nil {
++			return id, e
++		}
++		if digest != l.compositionDigest {
++			return id, fmt.Errorf("actual observation composition changed")
++		}
++	}
++	pins, e := verb.ChainRuntimePins(ctx, l.sd, verb.ChainObserveIn{DataDir: l.workspace})
++	if e != nil {
++		return id, e
++	}
++	for path, digest := range pins {
++		if strings.HasSuffix(path, "/binary") && digest != "sha256:"+l.request.Source.BinarySHA256 {
++			return id, fmt.Errorf("actual node executable bytes differ from frozen source")
++		}
++	}
++	raw, e := json.Marshal(pins)
++	if e != nil {
++		return id, e
++	}
++	runtime := sha256.Sum256(raw)
++	id.RuntimeSHA256 = hex.EncodeToString(runtime[:])
++	observations, e := verb.ChainObserve(ctx, l.sd, verb.ChainObserveIn{DataDir: l.workspace})
++	if e != nil {
++		return id, e
++	}
++	for _, n := range observations.Nodes {
++		if n.State != process.OwnedRunning || n.Executable != "ready" {
++			return id, fmt.Errorf("node%d recorded launch not verified: %s", n.Index, n.State)
++		}
++		id.OwnedNodeIDs = append(id.OwnedNodeIDs, fmt.Sprintf("node%d", n.Index))
++	}
++	sort.Strings(id.OwnedNodeIDs)
++	return id, nil
++}
++func (l *experimentLease) Close(ctx context.Context) error {
++	if l.readOnly {
++		return nil
++	}
++	// A parse refusal before any composition record created owns no processes.
++	if _, e := verb.ChainStatus(ctx, l.sd, verb.ChainStatusIn{DataDir: l.workspace}); e != nil {
++		entries, readErr := os.ReadDir(l.workspace)
++		if readErr == nil && len(entries) == 0 {
++			return nil
++		}
++		return fmt.Errorf("cleanup ownership record unavailable: %w", e)
++	}
++	if _, e := verb.ChainStop(ctx, l.sd, verb.ChainStopIn{DataDir: l.workspace}); e != nil {
++		return e
++	}
++	observations, e := verb.ChainObserve(ctx, l.sd, verb.ChainObserveIn{DataDir: l.workspace})
++	if e != nil {
++		return e
++	}
++	for _, n := range observations.Nodes {
++		if n.State != process.OwnedStopped && n.State != process.OwnedMissing {
++			return fmt.Errorf("owned cleanup unresolved for node%d: %s", n.Index, n.State)
++		}
++	}
++	return nil
++}
++
++func verifyExperimentAssets(raw []byte, pins map[string]string) error {
++	s, e := dsl.Parse(raw)
++	if e != nil {
++		return e
++	}
++	refs := []string{s.Chain.Config, s.Chain.ManifestPath, s.Chain.TemplatePath, s.Chain.GenesisExisting, s.EnvBlueprint}
++	if s.EnvKeys != nil && s.EnvKeys.Ref != "" {
++		return fmt.Errorf("experiment uses generated trial-owned keys; external key sets require a separately pinned owner")
++	}
++	for _, ref := range refs {
++		if ref != "" && pins[ref] == "" {
++			return fmt.Errorf("external environment asset must be pinned: %s", ref)
++		}
++	}
++	for path, want := range pins {
++		if len(want) != 64 {
++			return fmt.Errorf("invalid asset digest")
++		}
++		f, e := os.Open(path)
++		if e != nil {
++			return e
++		}
++		info, e := f.Stat()
++		if e != nil || !info.Mode().IsRegular() {
++			_ = f.Close()
++			return fmt.Errorf("asset must be a regular file")
++		}
++		h := sha256.New()
++		_, e = io.Copy(h, f)
++		closeErr := f.Close()
++		if e != nil {
++			return e
++		}
++		if closeErr != nil {
++			return closeErr
++		}
++		if hex.EncodeToString(h.Sum(nil)) != want {
++			return fmt.Errorf("external environment asset changed: %s", path)
++		}
++	}
++	return nil
++}
++
++// A interrupted write cannot leave a partial document under the final name.
++func writeExperimentJSON(path string, value any) error {
++	raw, err := json.MarshalIndent(value, "", "  ")
++	if err != nil {
++		return err
++	}
++	file, err := os.CreateTemp(filepath.Dir(path), ".experiment-")
++	if err != nil {
++		return err
++	}
++	temp := file.Name()
++	defer func() { _ = os.Remove(temp) }()
++	if err = file.Chmod(0600); err == nil {
++		_, err = file.Write(append(raw, '\n'))
++	}
++	if err == nil {
++		err = file.Sync()
++	}
++	closeErr := file.Close()
++	if err != nil {
++		return err
++	}
++	if closeErr != nil {
++		return closeErr
++	}
++	return os.Rename(temp, path)
++}
++
++// ExperimentCompositionDigest freezes the existing owner's persisted snapshot.
++// It records actual configuration, launch inputs, placements and runtime PIDs;
++// the read-only observer refuses to attach to a merely claimed environment.
++func ExperimentCompositionDigest(ctx context.Context, sd chainsetup.Deps, workspace string) (string, error) {
++	info, e := os.Stat(workspace)
++	if e != nil {
++		return "", e
++	}
++	if !info.IsDir() {
++		return "", fmt.Errorf("existing composition directory required")
++	}
++	status, e := verb.ChainStatus(ctx, sd, verb.ChainStatusIn{DataDir: workspace})
++	if e != nil {
++		return "", e
++	}
++	if status.State.CompositionID == "" || status.State.Chain == "" || len(status.State.Nodes) == 0 {
++		return "", fmt.Errorf("existing composed owner record required")
++	}
++	raw, e := json.Marshal(status.State)
++	if e != nil {
++		return "", e
++	}
++	sum := sha256.Sum256(raw)
++	return hex.EncodeToString(sum[:]), nil
++}
+diff --git a/internal/testengine/experiment_test.go b/internal/testengine/experiment_test.go
+new file mode 100644
+index 00000000..1ef27d04
+--- /dev/null
++++ b/internal/testengine/experiment_test.go
+@@ -0,0 +1,109 @@
++package testengine
++
++import (
++	"context"
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++
++	"github.com/0xmhha/chainbench/internal/chainsetup"
++	"github.com/0xmhha/chainbench/internal/experiment"
++)
++
++const experimentCase = `{"schemaVersion":"1","id":"probe","chain":{"name":"go-stablenet","binary":"pinned"},"steps":[{"read":{"source":"chainId"}}],"assertions":[{"assert":"chainId","expected":"1"},{"assert":"peerCount","expected":"0"}]}`
++
++func testExperimentInput(t *testing.T) ExperimentIn {
++	t.Helper()
++	digest, e := ExperimentEnvironmentDigest([]byte(experimentCase))
++	if e != nil {
++		t.Fatal(e)
++	}
++	driver, e := experiment.DSLDriverDigest([]byte(experimentCase))
++	if e != nil {
++		t.Fatal(e)
++	}
++	source := experiment.Source{Commit: strings.Repeat("1", 40), BinarySHA256: strings.Repeat("2", 64), DriverSHA256: driver, EnvironmentSHA256: digest}
++	p := experiment.Plan{SchemaVersion: 1, ID: "probe", Mode: "reproduction", Symptom: "wrong chain", AssertionID: "probe/assert/0", NormalAssertionIDs: []string{"probe/assert/1"}, Seed: "fixed", Before: source, Repetitions: 1, MinCompleted: 1, MinSymptomFailures: 1, MaxFailureRate: .05, TrialTimeoutSeconds: 1, TotalTimeoutSeconds: 1, OwnedNodeIDs: []string{"node1"}, Injection: &experiment.Injection{Kind: "delay", Target: "node1", Step: "probe/step/0", MaxDelayMS: 1}}
++	return ExperimentIn{Plan: p, Case: json.RawMessage(experimentCase), ArtifactRoot: filepath.Join(t.TempDir(), "new-root")}
++}
++func TestExperimentRefusesUnfrozenInputsBeforeCreatingResources(t *testing.T) {
++	for _, mode := range []string{"environment", "observation_path", "asset"} {
++		t.Run(mode, func(t *testing.T) {
++			in := testExperimentInput(t)
++			switch mode {
++			case "environment":
++				in.Plan.Before.EnvironmentSHA256 = strings.Repeat("f", 64)
++			case "observation_path":
++				in.ObserveWorkspace = "existing-network"
++			case "asset":
++				in.Case = json.RawMessage(strings.Replace(experimentCase, `"binary":"pinned"`, `"binary":"pinned","config":"missing-config"`, 1))
++			}
++			if _, e := RunExperiment(context.Background(), chainsetup.Deps{}, in); e == nil {
++				t.Fatal("invalid execution input accepted")
++			}
++			if _, e := os.Stat(in.ArtifactRoot); !os.IsNotExist(e) {
++				t.Fatal("invalid input created resources")
++			}
++		})
++	}
++}
++func TestExperimentRootCannotAdoptExistingDirectory(t *testing.T) {
++	in := testExperimentInput(t)
++	if e := os.Mkdir(in.ArtifactRoot, 0700); e != nil {
++		t.Fatal(e)
++	}
++	if _, e := RunExperiment(context.Background(), chainsetup.Deps{}, in); e == nil {
++		t.Fatal("existing root adopted as trial ownership")
++	}
++}
++func TestEnvironmentPinsIncludeAssetsAndIgnorePredicateOnly(t *testing.T) {
++	first, e := ExperimentEnvironmentDigest([]byte(experimentCase))
++	if e != nil {
++		t.Fatal(e)
++	}
++	predicate := strings.Replace(experimentCase, `"expected":"1"`, `"expected":"2"`, 1)
++	second, _ := ExperimentEnvironmentDigest([]byte(predicate))
++	if first != second {
++		t.Fatal("predicate leaked into logical environment")
++	}
++	config := strings.Replace(experimentCase, `"binary":"pinned"`, `"binary":"pinned","config":"config.json"`, 1)
++	third, _ := ExperimentEnvironmentDigest([]byte(config))
++	if first == third {
++		t.Fatal("config reference not bound")
++	}
++	fourth, _ := ExperimentEnvironmentDigest([]byte(config), map[string]string{"config.json": strings.Repeat("a", 64)})
++	if third == fourth {
++		t.Fatal("asset bytes not bound")
++	}
++}
++func TestExternalAssetChangesAreRefused(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "config.json")
++	if e := os.WriteFile(path, []byte("{}"), 0600); e != nil {
++		t.Fatal(e)
++	}
++	sum := sha256.Sum256([]byte("{}"))
++	pins := map[string]string{path: hex.EncodeToString(sum[:])}
++	if e := verifyExperimentAssets([]byte(experimentCase), pins); e != nil {
++		t.Fatal(e)
++	}
++	if e := os.WriteFile(path, []byte("changed"), 0600); e != nil {
++		t.Fatal(e)
++	}
++	if e := verifyExperimentAssets([]byte(experimentCase), pins); e == nil {
++		t.Fatal("changed external file accepted")
++	}
++}
++
++func TestObservationPinRefusesMissingWorkspaceWithoutCreatingIt(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "absent")
++	if _, e := ExperimentCompositionDigest(context.Background(), chainsetup.Deps{}, path); e == nil {
++		t.Fatal("missing observation owner accepted")
++	}
++	if _, e := os.Stat(path); !os.IsNotExist(e) {
++		t.Fatal("read-only observation created missing workspace")
++	}
++}

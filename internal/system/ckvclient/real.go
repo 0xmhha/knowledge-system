@@ -207,6 +207,7 @@ func (r *Real) Health(ctx context.Context) (Health, error) {
 	man := r.eng.Manifest()
 	modelUp, reason := r.probeModel(ctx)
 	h := Health{
+		ProjectID: man.ProjectID, DatasetID: man.DatasetID, SnapshotID: man.SnapshotID, SourceMode: man.SourceMode,
 		Reachable:      true,
 		ModelReachable: modelUp,
 		StatsHash:      man.IndexedHead,

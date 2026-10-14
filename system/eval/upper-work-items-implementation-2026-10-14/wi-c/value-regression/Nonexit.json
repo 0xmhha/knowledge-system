@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "snapshot_sha256": "7b508b196daee4e23b9f53a76de9bd4dc8a078d7e1ed2cadade0db9c368831a3",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "da19f95a8ef07517",
+      "canonical_id": "example.invalid/value-fixture/a.Nonexit",
+      "file": "a/flow.go",
+      "commit": "44319e6130418b01c1009f5c28e9147bd6677020",
+      "sha256": "d67caa88ed41ea392ee1260a139a9bd8e03cd85af0d270ea572ba8c7d3f91cac",
+      "language": "go",
+      "start_line": 30,
+      "start_byte": 488,
+      "bytes": 53,
+      "snapshot_sha256": "7b508b196daee4e23b9f53a76de9bd4dc8a078d7e1ed2cadade0db9c368831a3",
+      "function_name": "Nonexit"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "partial",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "IfThen",
+        "reachable": true,
+        "nodes": []
+      },
+      {
+        "id": 2,
+        "kind": "IfDone",
+        "reachable": true,
+        "nodes": [
+          "b2/n0"
+        ]
+      },
+      {
+        "id": 3,
+        "kind": "ForBody",
+        "reachable": true,
+        "nodes": []
+      },
+      {
+        "id": 4,
+        "kind": "ForDone",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "Ident",
+        "location": {
+          "start_byte": 518,
+          "end_byte": 522,
+          "start_line": 31,
+          "end_line": 31
+        },
+        "text": "flag",
+        "synthetic": false
+      },
+      {
+        "id": "b2/n0",
+        "block": 2,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 540,
+          "end_byte": 541,
+          "start_line": 35,
+          "end_line": 35
+        },
+        "text": "}",
+        "synthetic": true
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 488,
+          "end_byte": 511,
+          "start_line": 30,
+          "end_line": 30
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "b0",
+        "to": "b1",
+        "kind": "cfg",
+        "condition": "true",
+        "certainty": "conservative"
+      },
+      {
+        "from": "b0",
+        "to": "b2",
+        "kind": "cfg",
+        "condition": "false",
+        "certainty": "conservative"
+      },
+      {
+        "from": "b1",
+        "to": "b3",
+        "kind": "cfg",
+        "certainty": "structural"
+      },
+      {
+        "from": "b3",
+        "to": "b3",
+        "kind": "cfg",
+        "certainty": "structural"
+      },
+      {
+        "from": "b4",
+        "to": "b2",
+        "kind": "cfg",
+        "certainty": "structural"
+      },
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v501"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "nontermination_control_unknown",
+        "message": "Normal-exit postdominators exclude possible non-exiting paths",
+        "location": {
+          "start_byte": 512,
+          "end_byte": 541,
+          "start_line": 30,
+          "end_line": 35
+        }
+      },
+      {
+        "code": "nontermination_control_unknown",
+        "message": "Normal-exit postdominators exclude possible non-exiting paths",
+        "location": {
+          "start_byte": 515,
+          "end_byte": 539,
+          "start_line": 31,
+          "end_line": 34
+        }
+      },
+      {
+        "code": "nontermination_control_unknown",
+        "message": "Normal-exit postdominators exclude possible non-exiting paths",
+        "location": {
+          "start_byte": 527,
+          "end_byte": 536,
+          "start_line": 32,
+          "end_line": 33
+        }
+      }
+    ],
+    "truncated": false,
+    "elapsed_micros": 33,
+    "variables": [
+      {
+        "id": "v501",
+        "name": "flag",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 501,
+          "end_byte": 505,
+          "start_line": 30,
+          "end_line": 30
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/use/v501/518",
+        "node": "b0/n0",
+        "variable": "v501",
+        "role": "use",
+        "location": {
+          "start_byte": 518,
+          "end_byte": 522,
+          "start_line": 31,
+          "end_line": 31
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v501/501",
+        "node": "entry",
+        "variable": "v501",
+        "role": "definition",
+        "location": {
+          "start_byte": 501,
+          "end_byte": 505,
+          "start_line": 30,
+          "end_line": 30
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "entry/definition/v501/501",
+        "use": "b0/n0/use/v501/518",
+        "variable": "v501",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 8,
+    "facts_peak": 14
+  },
+  "elapsed_micros": 278
+}

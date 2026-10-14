@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "implementation_scope_verified": true,
+  "independent_acceptance": "not_recorded",
+  "requirements": {
+    "typed public policy/security exposure": {
+      "evidence": [
+        "execution/tools.json",
+        "execution/annotations.json",
+        "execution/canonical.json",
+        "primary.patch"
+      ],
+      "scope": "CKS33 tools, one exact symbol selector, bounded outgoing governance/security relations; selected source/manifest/node metadata pins; runtime input and output schemas"
+    },
+    "explanation modification hint and manual provenance": {
+      "evidence": [
+        "execution/annotations.json",
+        "execution/rules-separate.json",
+        "checks/ks-sp-query-access-final.log"
+      ],
+      "scope": "structured loader fields persist through shared SQLite/PG attrs codecs; real SQLite index proof; old merged text kept with unknown hint/severity; manual claims and separately opt-in automatic rules/LLM reasoning do not become verified vulnerability"
+    },
+    "truthful original source and reviewer boundaries": {
+      "evidence": [
+        "execution/annotations.json",
+        "execution/after-deletion.json",
+        "execution/original-source/security.yaml.txt"
+      ],
+      "scope": "original YAML bytes/row/version/reviewer/time/approval are unretained and unknown; graph metadata SHA/indexed Go commit not elevated to annotation proof; identities not authenticated; no live source fallback"
+    },
+    "bounded retrieval snapshot changes and input refusal": {
+      "evidence": [
+        "execution/cap.json",
+        "execution/cks/mcp.stdout.jsonl",
+        "checks/ks-sp-query-access-final.log",
+        "primary.patch"
+      ],
+      "scope": "SQL LIMIT+1, default32/cap128, default1000ms/cap5000 cooperative time; strict malformed/dual/null/fraction/zero/unknown refusal, legacy bounded backend unavailable; private code/annotation and incorrect target rejected; manifest/node/blob/tag/edge/more changes and page deadlines clear results; no hard byte-memory, preemptive deadline or DB snapshot transaction promise"
+    },
+    "negative and transport trust separation": {
+      "evidence": [
+        "execution/empty.json",
+        "execution/missing.json",
+        "checks/ks-sp-query-access-final.log"
+      ],
+      "scope": "no_annotations distinct from not_found; safety_verdict always unknown; actual HTTP handler invocation for allowed loopback and pre-backend rejection for unlisted CIDR/public/invalid peer, forwarded-header spoof refused; readOnlyHint not authorization or reviewer authentication"
+    },
+    "current contracts and meaningful regressions": {
+      "evidence": [
+        "checks/ks-sp-committed-full-test.log",
+        "checks/ks-sp-committed-build.log",
+        "checks/ks-sp-committed-lint.log",
+        "checks/ks-sp-race.log",
+        "checks/ks-sp-final-query-race.log",
+        "checks/ks-sp-consumer-tests-fixed.log",
+        "checks/ks-sp-consumer-hooks.log",
+        "checks/ks-sp-consumer-contract.log",
+        "expansion-regression/summary.json",
+        "review-regression/summary.json",
+        "rule-regression/summary.json",
+        "value-regression/summary.json",
+        "prior-item-git-audit.json"
+      ],
+      "scope": "full primary build/test/fmt/vet/pinned lint/boundary/docs, changed-path race and final query/access tests,142 consumer tests and standalone hooks/C1 references; committed public annotation14/expansion12/review16/rule39/value15 controls; EOF0; independent acceptance not_recorded"
+    }
+  }
+}

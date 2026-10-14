@@ -1,0 +1,257 @@
+{
+  "rows": [
+    {
+      "id": "healthy",
+      "health": "serviceable",
+      "note": "control: all ok \u2192 both proceed clean",
+      "before": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "serviceable at start"
+      },
+      "before_silent_incomplete": false,
+      "before_missing_core": [],
+      "after": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "core intact (only enhancement lost, if any)"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [],
+      "expected_after": "CLEAN",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "backend_down",
+      "health": "down",
+      "note": "control: health down \u2192 both BLOCKED",
+      "before": {
+        "decision": "BLOCKED",
+        "missing": [],
+        "reason": "backend down"
+      },
+      "before_silent_incomplete": false,
+      "before_missing_core": [],
+      "after": {
+        "decision": "BLOCKED",
+        "missing": [],
+        "reason": "backend down (non-serviceable)"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [],
+      "expected_after": "BLOCKED",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "ckv_down_at_start",
+      "health": "degraded",
+      "note": "control: ckv down at start (degraded backend = non-serviceable) \u2192 both BLOCKED",
+      "before": {
+        "decision": "BLOCKED",
+        "missing": [],
+        "reason": "backend degraded"
+      },
+      "before_silent_incomplete": false,
+      "before_missing_core": [],
+      "after": {
+        "decision": "BLOCKED",
+        "missing": [],
+        "reason": "backend degraded (non-serviceable)"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [],
+      "expected_after": "BLOCKED",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "primary_transient",
+      "health": "serviceable",
+      "note": "get_for_task flaps; before=silent-incomplete, after retry recovers \u2192 CLEAN",
+      "before": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "serviceable at start"
+      },
+      "before_silent_incomplete": true,
+      "before_missing_core": [
+        "get_for_task"
+      ],
+      "after": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "core intact (only enhancement lost, if any)"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [],
+      "expected_after": "CLEAN",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "primary_persistent",
+      "health": "serviceable",
+      "note": "PRIMARY lost; before=silent-incomplete, after BLOCKED (no evidence base)",
+      "before": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "serviceable at start"
+      },
+      "before_silent_incomplete": true,
+      "before_missing_core": [
+        "get_for_task"
+      ],
+      "after": {
+        "decision": "BLOCKED",
+        "missing": [
+          "get_for_task"
+        ],
+        "reason": "PRIMARY get_for_task lost \u2014 no evidence base"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [
+        "get_for_task"
+      ],
+      "expected_after": "BLOCKED",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "completeness_persistent",
+      "health": "serviceable",
+      "note": "blast-radius evidence lost; before=silent-incomplete, after DEGRADED+flag",
+      "before": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "serviceable at start"
+      },
+      "before_silent_incomplete": true,
+      "before_missing_core": [
+        "impact_analysis"
+      ],
+      "after": {
+        "decision": "DEGRADED",
+        "missing": [
+          "impact_analysis"
+        ],
+        "reason": "COMPLETENESS evidence lost \u2014 flagged + propagated"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [
+        "impact_analysis"
+      ],
+      "expected_after": "DEGRADED",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "completeness_transient",
+      "health": "serviceable",
+      "note": "write-site evidence flaps; before=silent-incomplete, after retry \u2192 CLEAN",
+      "before": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "serviceable at start"
+      },
+      "before_silent_incomplete": true,
+      "before_missing_core": [
+        "find_callers"
+      ],
+      "after": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "core intact (only enhancement lost, if any)"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [],
+      "expected_after": "CLEAN",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "enhancement_persistent",
+      "health": "serviceable",
+      "note": "only enhancement lost; correctly NOT silent \u2014 both proceed (after notes it)",
+      "before": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "serviceable at start"
+      },
+      "before_silent_incomplete": false,
+      "before_missing_core": [],
+      "after": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "core intact (only enhancement lost, if any)"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [],
+      "expected_after": "CLEAN",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "mixed",
+      "health": "serviceable",
+      "note": "find_callers persistent (DEGRADED), get_subgraph recovers, freshness noted",
+      "before": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "serviceable at start"
+      },
+      "before_silent_incomplete": true,
+      "before_missing_core": [
+        "find_callers"
+      ],
+      "after": {
+        "decision": "DEGRADED",
+        "missing": [
+          "find_callers"
+        ],
+        "reason": "COMPLETENESS evidence lost \u2014 flagged + propagated"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [
+        "find_callers"
+      ],
+      "expected_after": "DEGRADED",
+      "after_matches_expected": true,
+      "over_block": false
+    },
+    {
+      "id": "intermittent_all_recover",
+      "health": "serviceable",
+      "note": "both core calls flap but recover on retry; before=silent-incomplete, after CLEAN",
+      "before": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "serviceable at start"
+      },
+      "before_silent_incomplete": true,
+      "before_missing_core": [
+        "get_for_task",
+        "impact_analysis"
+      ],
+      "after": {
+        "decision": "CLEAN",
+        "missing": [],
+        "reason": "core intact (only enhancement lost, if any)"
+      },
+      "after_silent_incomplete": false,
+      "after_missing_core": [],
+      "expected_after": "CLEAN",
+      "after_matches_expected": true,
+      "over_block": false
+    }
+  ],
+  "summary": {
+    "scenarios": 10,
+    "before_silent_incomplete": 6,
+    "after_silent_incomplete": 0,
+    "after_over_block": 0,
+    "after_decision_mismatches": 0,
+    "retry_recovered": 3
+  }
+}

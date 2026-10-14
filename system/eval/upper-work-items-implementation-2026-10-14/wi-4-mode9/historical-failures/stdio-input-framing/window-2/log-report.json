@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "plan": {
+    "schema_version": 1,
+    "id": "owned-log-window-2",
+    "source": {
+      "commit": "86665541f15157ab96f495fb2942b69aba1e7033",
+      "binary_sha256": "49d094fd3bf396888d5479efb12f021ea59f9b30c4bb044da4c6f1d4c42c8370",
+      "driver_sha256": "1258d982db55580b9538a2aea83a200bf1c6710aa1dd4a3c11cc702979114ef0",
+      "environment_sha256": "0f184a372ed48b1fee7963a9ebc16c696a812f3849e655a0e1267baa76a055ab"
+    },
+    "probe_id": "read-probe",
+    "instrumentation_sha256": "1258d982db55580b9538a2aea83a200bf1c6710aa1dd4a3c11cc702979114ef0",
+    "event": "read-before-commit",
+    "sites": [
+      "main/read"
+    ],
+    "window_seconds": 2,
+    "poll_ms": 100,
+    "max_bytes": 65536,
+    "max_events": 32,
+    "anchors": [
+      {
+        "node": 1,
+        "id": 334522996,
+        "initial": ""
+      }
+    ]
+  },
+  "plan_sha256": "1c1c3d9e817f4a8e746c510b120d1c331899fc82788fd17b826f1c9cf48cbff8",
+  "events": [
+    {
+      "node": 1,
+      "offset": 0,
+      "raw": "MjAyNi8xMC8xNCAxNToyNjozNSBLU19USU1JTkdfVjEgeyJzY2hlbWFfdmVyc2lvbiI6MSwicHJvYmVfaWQiOiJyZWFkLXByb2JlIiwiZXZlbnQiOiJyZWFkLWJlZm9yZS1jb21taXQiLCJzaXRlIjoibWFpbi9yZWFkIiwic3ltcHRvbSI6dHJ1ZSwidmFsdWVzIjp7InJlYWR5IjpmYWxzZX19",
+      "sha256": "0014855ca1f2ad21c803b269f95f3d42999a41a5344505f8d46505f68789364a",
+      "record": {
+        "schema_version": 1,
+        "probe_id": "read-probe",
+        "event": "read-before-commit",
+        "site": "main/read",
+        "symptom": true,
+        "values": {
+          "ready": false
+        }
+      },
+      "observed_at": "2026-10-14T06:26:35.184568Z"
+    }
+  ],
+  "polls": 1,
+  "started_at": "2026-10-14T06:26:35.155878Z",
+  "finished_at": "2026-10-14T06:26:35.200474Z",
+  "verdict": "RECURRED",
+  "reason": "structured_symptom_log_observed",
+  "resume_requested": true,
+  "acceptance": "not_recorded"
+}

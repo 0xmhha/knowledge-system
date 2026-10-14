@@ -1,0 +1,1814 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 5b8aa4b7..f7ce1262 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -23,6 +23,8 @@ jobs:
+         run: make test-race
+       - name: Retained Go dependence through real stdio MCP
+         run: python3 scripts/eval-value-dependencies.py --binary "$GITHUB_WORKSPACE/bin/ckg" --out "$RUNNER_TEMP/value-dependence-evidence"
++      - name: Opt-in Go rules through graph and composer MCP
++        run: python3 scripts/eval-go-rule-candidates.py --binary "$GITHUB_WORKSPACE/bin/ckg" --cks-binary "$GITHUB_WORKSPACE/bin/cks" --out "$RUNNER_TEMP/go-rule-evidence"
+       - name: Domain artifacts match their entries
+         run: make check-domain-artifacts
+ 
+diff --git a/docs/DOCUMENTATION-CATALOG.json b/docs/DOCUMENTATION-CATALOG.json
+index dfd52132..b65a4bec 100644
+--- a/docs/DOCUMENTATION-CATALOG.json
++++ b/docs/DOCUMENTATION-CATALOG.json
+@@ -1264,6 +1264,13 @@
+     "system/eval/upper-work-items-implementation-2026-10-14/wi-1/README.md": {
+       "role": "frozen_evidence",
+       "source_paths": []
++    },
++    "docs/graph/GO-RULE-CANDIDATES.md": {
++      "role": "reference",
++      "source_paths": [
++        "pkg/graph/valueflow",
++        "pkg/graph/mcphandlers"
++      ]
+     }
+   }
+ }
+diff --git a/docs/graph/ARCHITECTURE.md b/docs/graph/ARCHITECTURE.md
+index b4e5d25b..2e546598 100644
+--- a/docs/graph/ARCHITECTURE.md
++++ b/docs/graph/ARCHITECTURE.md
+@@ -18,7 +18,7 @@ SQLite is the default store. The PostgreSQL integration is opt-in; supported sel
+ - `ckg audit` and `ckg validate`: source/database parity and graph consistency.
+ - `ckg eval-retrieval`, `ckg benchmark`, `ckg bench-mcp`: deterministic measurement tools; [evaluation](./EVAL.md) records their limits.
+ 
+-The eleven graph MCP registrations include symbol/callers/callees/subgraph/text/context/impact/concurrency/history/evidence queries and the bounded retained Go [value/control dependence query](./VALUE-DEPENDENCIES.md). Storage-reader validation is shared by registration; a custom integration must preserve the retrieval boundary.
++The twelve graph MCP registrations include symbol/callers/callees/subgraph/text/context/impact/concurrency/history/evidence queries and the bounded retained Go [value/control dependence query](./VALUE-DEPENDENCIES.md), plus opt-in [Go rule candidates](./GO-RULE-CANDIDATES.md). Storage-reader validation is shared by registration; a custom integration must preserve the retrieval boundary.
+ 
+ ## Developer boundaries
+ 
+diff --git a/docs/graph/GO-RULE-CANDIDATES.md b/docs/graph/GO-RULE-CANDIDATES.md
+new file mode 100644
+index 00000000..20030799
+--- /dev/null
++++ b/docs/graph/GO-RULE-CANDIDATES.md
+@@ -0,0 +1,53 @@
++# Opt-in Go rule candidates
++
++Contract version 1; pack `go-local-review@1.0.0`. Automatic analysis is enabled
++only by an explicit pack selection. It reads retained function blobs and reuses
++one CFG, isolated Go type binding, reaching-definition and control analysis.
++It never writes policy/security YAML, graph annotations or reviewer approval.
++
++## Frozen initial rules
++
++| Rule | Source | Sink | Interpretation |
++| --- | --- | --- | --- |
++| `parameter-command-name` | Named scalar function parameter | Direct identifier first argument of syntactic `exec.Command` or `exec.CommandContext` (argument 1 for Context) | Parameter-derived command-name review candidate; command arguments alone do not match |
++| `discarded-conversion-error` | First result of `strconv.Atoi`, `ParseInt`, `ParseUint` when second assignment target is `_` | Direct identifier in an explicit return | Conversion result may reach a return after its error was discarded |
++
++Selector matches are syntax assumptions, not resolved imported functions. Renamed
++imports, indirect calls, qualified field/index sinks, closures and alias-mediated
++flows are outside initial matching. A same-named local selector can cause a false
++positive. Parameters are potential input sources, not proof of attacker control.
++No integer-overflow, command-injection or exploitability verdict is produced.
++
++One witness is retained per source/sink pair; alternative path feasibility is not enumerated.
++Paths follow lexical reaching definitions, then corresponding assignment RHS
++uses; multi-result RHS dependencies are conservative. Branches and loops may
++reach without proving runtime feasibility. Control conditions cite original
++nodes and labels. Calls on a path remain opaque. Sanitizer semantics are
++`not_proven`; apparent sanitizer calls do not suppress candidates. Replacing an
++input with a literal kills that lexical flow, without proving whole-program
++safety. Manual annotations retain independent provenance.
++
++## Public input and output
++
++Read-only CKG/CKS MCP `rule_candidates` accepts required `rule_pack` (exact ID above),
++required `function` (the strict `value_dependencies` identity/pins/limits object),
++optional positive `max_candidates` ≤64 and `max_flow_steps` ≤4096. There is no
++implicit default pack. Unknown fields, duplicates, nulls, ambiguous identities,
++stale pins, fractions and out-of-range bounds are rejected.
++
++The output is the shared value-dependency envelope with optional `analysis.rules`:
++pack ID/version/SHA256, engine version, automatic origin, status, stop reason,
++actual matching-work steps, limits, candidates and limitations. Each candidate
++has a stable ID, rule ID, source/sink locations, path node IDs, control conditions,
++certainty and unverified target/sanitizer status. The encompassing analysis
++retains immutable function/blob/snapshot pins, node locations and diagnostics.
++Unsupported or exhausted base analysis cannot produce a complete rule result;
++empty candidates never mean safe. Bounds cover matching work and emitted
++candidates, with the same cooperative total query deadline as value analysis.
++
++Implementation verification requires compiled owned Go cases and actual retained
++index → namespaced MCP, including positive, kill, command-argument-only,
++branch/loop/shadow, sanitizer unknown, selector spoof/rename, discarded/checked
++errors, manual annotation coexistence and bounded incomplete results. Precision
++and recall denominators must name this fixture scope; independent vulnerability
++acceptance is separate.
+diff --git a/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md b/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
+index a7b005e9..9efadbd8 100644
+--- a/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
++++ b/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
+@@ -418,3 +418,20 @@ unknown으로 남긴다. Positive/negative/sanitized/branch/alias/외부 target/
+ 미탐·manual overlay coexistence fixture와 실제 index→MCP 실행을 요구한다.
+ 기존 태그를 overwrite하지 않고 default-off를 유지하며 version/규칙/소스가
+ 바뀌면 근거를 다시 계산한다. 구체 pack과 공개 query schema를 먼저 고정한다.
++
++### WI-2 구현 중간 확인
++
++[고정 계약](../graph/GO-RULE-CANDIDATES.md)의 `go-local-review@1.0.0`을
++명시적으로 선택하는 CKG/CKS `rule_candidates`와 CKS `value_dependencies`
++공개 경로를 추가했다. CKS는 동일 CKG 엔진·입출력 스키마를 사용하며 별도
++분석/판정은 하지 않는다. AST/타입/CFG/def-use를 한 번 계산하고 변수 사용
++위치에서 정의와 대응 RHS를 역추적한다. 분기/loop·강한 kill·shadow·병렬/복합
++대입·오류 폐기·수동 YAML 공존을 확인한다. source/snapshot drift를 거부하며
++pack/version/hash·원문 위치·경로·제어 조건·상한·중단 이유를 보존한다.
++
++실제 소표본은 정화 helper 및 동명 selector에서 오탐, import 별칭·pointer·
++closure에서 미탐을 보인다. `syntax_only_unverified`/`not_proven` 및 한계 목록을
++출력하며 빈 후보를 안전으로 바꾸지 않는다. 모든 manual YAML/graph를 읽기만
++한다. 최종 source-bound 실행·전체 회귀·Git 근거 패킷 확인 전까지 WI-2는
++`in_progress`, 검증 완료 수는5/9로 유지한다. 다음은 동일 범위 최종 검증과
++근거 고정이며, 이후 WI-C→WI-6→WI-SP 순서다.
+diff --git a/internal/system/ckgclient/valueflow.go b/internal/system/ckgclient/valueflow.go
+new file mode 100644
+index 00000000..fb6d1bcd
+--- /dev/null
++++ b/internal/system/ckgclient/valueflow.go
+@@ -0,0 +1,32 @@
++package ckgclient
++
++import (
++	"context"
++
++	"github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers"
++	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
++)
++
++// ValueAnalysisClient is an optional backend capability. Older/dummy backends
++// stay available and explicitly report unavailable; they never invent analysis.
++type ValueAnalysisClient interface {
++	ValueDependencies(context.Context, valueflow.QueryInput) (valueflow.QueryResult, error)
++	RuleCandidates(context.Context, valueflow.RuleQueryInput) (valueflow.QueryResult, error)
++}
++
++var _ ValueAnalysisClient = (*Real)(nil)
++
++func (r *Real) ValueDependencies(ctx context.Context, q valueflow.QueryInput) (valueflow.QueryResult, error) {
++	reader, ok := r.s.(*realStoreReader)
++	if !ok || r.closed {
++		return valueflow.QueryResult{SchemaVersion: 1, Status: "unavailable", Reason: "retained value-analysis backend unavailable"}, nil
++	}
++	return valueflow.Query(ctx, mcphandlers.NewLLMSafeReader(reader.r), q)
++}
++func (r *Real) RuleCandidates(ctx context.Context, q valueflow.RuleQueryInput) (valueflow.QueryResult, error) {
++	reader, ok := r.s.(*realStoreReader)
++	if !ok || r.closed {
++		return valueflow.QueryResult{SchemaVersion: 1, Status: "unavailable", Reason: "retained rule-analysis backend unavailable"}, nil
++	}
++	return valueflow.QueryRules(ctx, mcphandlers.NewLLMSafeReader(reader.r), q)
++}
+diff --git a/internal/system/mcp/output_schema_test.go b/internal/system/mcp/output_schema_test.go
+index f75ff0d0..65634db2 100644
+--- a/internal/system/mcp/output_schema_test.go
++++ b/internal/system/mcp/output_schema_test.go
+@@ -101,6 +101,8 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
+ 		ToolNameGetForTaskV2:             {"format_version", "coordinates", "query", "citations", "evidence_state", "metadata"},
+ 		ToolNameGetInvariantEnforcement:  {"inv_id", "statement", "enforced_at"},
+ 		ToolNameGetSubgraph:              {"seed", "nodes", "edges"},
++		ToolNameValueDependencies:        {"schema_version", "status", "analysis", "elapsed_micros"},
++		ToolNameRuleCandidates:           {"schema_version", "status", "analysis", "elapsed_micros"},
+ 		ToolNameReviewFunction:           {"seed", "code", "history", "tests", "available", "limits"},
+ 		ToolNameImpactAnalysis:           {"seed", "result"},
+ 		ToolNameSearchText:               {"query", "hits"},
+diff --git a/internal/system/mcp/schema_golden_test.go b/internal/system/mcp/schema_golden_test.go
+index 801dca54..877b3e08 100644
+--- a/internal/system/mcp/schema_golden_test.go
++++ b/internal/system/mcp/schema_golden_test.go
+@@ -98,7 +98,17 @@ func TestSchemaGolden_AllInputsMatchContract(t *testing.T) {
+ 			if !ok {
+ 				t.Fatal("tool missing from input contract")
+ 			}
+-			got, err := json.Marshal(registered.Tool.InputSchema)
++			wire, err := json.Marshal(registered.Tool)
++			if err != nil {
++				t.Fatal(err)
++			}
++			var definition struct {
++				Input json.RawMessage `json:"inputSchema"`
++			}
++			if err = json.Unmarshal(wire, &definition); err != nil {
++				t.Fatal(err)
++			}
++			got, err := json.Marshal(definition.Input)
+ 			if err != nil {
+ 				t.Fatal(err)
+ 			}
+diff --git a/internal/system/mcp/server.go b/internal/system/mcp/server.go
+index 586a9fe9..67eb5e57 100644
+--- a/internal/system/mcp/server.go
++++ b/internal/system/mcp/server.go
+@@ -147,6 +147,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
+ 	registerFindCallees(s, d)
+ 	registerGetSubgraph(s, d)
+ 	registerReviewFunction(s, d)
++	registerValueAnalysis(s, d)
+ 	registerImpactAnalysis(s, d)
+ 	registerConcurrencyImpact(s, d)
+ 	registerChangeHistory(s, d)
+diff --git a/internal/system/mcp/testdata/agent-mcp.schema.json b/internal/system/mcp/testdata/agent-mcp.schema.json
+index cafe77df..b33ad726 100644
+--- a/internal/system/mcp/testdata/agent-mcp.schema.json
++++ b/internal/system/mcp/testdata/agent-mcp.schema.json
+@@ -499,6 +499,120 @@
+         "type": "object"
+       }
+     },
++    "cks.context.rule_candidates": {
++      "description": "Explicit opt-in go-local-review@1.0.0 retained Go rule candidates using one shared lexical value/control analysis. Parameter to command-name and discarded conversion-error to return patterns. Candidates are automatic review inputs, never verified vulnerabilities or manual policy/security annotations. Syntax-only targets, unknown sanitizers, memory/alias and feasibility limitations remain explicit. Empty results never prove safety.",
++      "input": {
++        "additionalProperties": false,
++        "properties": {
++          "function": {
++            "additionalProperties": false,
++            "oneOf": [
++              {
++                "required": [
++                  "node_id"
++                ]
++              },
++              {
++                "required": [
++                  "canonical_id"
++                ]
++              }
++            ],
++            "properties": {
++              "canonical_id": {
++                "maxLength": 512,
++                "minLength": 1,
++                "type": "string"
++              },
++              "expected_commit": {
++                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++                "type": "string"
++              },
++              "expected_snapshot_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "expected_source_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "limits": {
++                "additionalProperties": false,
++                "properties": {
++                  "max_ast_nodes": {
++                    "maximum": 4096,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_blocks": {
++                    "maximum": 256,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_edges": {
++                    "maximum": 4096,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_facts": {
++                    "maximum": 65536,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_iterations": {
++                    "maximum": 128,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_nodes": {
++                    "maximum": 1024,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_source_bytes": {
++                    "maximum": 262144,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "timeout_ms": {
++                    "maximum": 1000,
++                    "minimum": 1,
++                    "type": "integer"
++                  }
++                },
++                "type": "object"
++              },
++              "node_id": {
++                "maxLength": 128,
++                "minLength": 1,
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          },
++          "max_candidates": {
++            "maximum": 64,
++            "minimum": 1,
++            "type": "integer"
++          },
++          "max_flow_steps": {
++            "maximum": 4096,
++            "minimum": 1,
++            "type": "integer"
++          },
++          "rule_pack": {
++            "const": "go-local-review@1.0.0",
++            "type": "string"
++          }
++        },
++        "required": [
++          "rule_pack",
++          "function"
++        ],
++        "type": "object"
++      }
++    },
+     "cks.context.search_text": {
+       "description": "BM25 keyword search over the ckg full-text index (code-aware tokenizer). Use when terms must match exactly: function names, identifiers, error strings. Anti-pattern: stacking searches to 'find the cause' -- a text hit is a location, not a cause. After locating, traverse toward the value's producer with find_callers/find_callees instead of searching again.",
+       "input": {
+@@ -573,6 +687,96 @@
+         "type": "object"
+       }
+     },
++    "cks.context.value_dependencies": {
++      "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
++      "input": {
++        "additionalProperties": false,
++        "oneOf": [
++          {
++            "required": [
++              "node_id"
++            ]
++          },
++          {
++            "required": [
++              "canonical_id"
++            ]
++          }
++        ],
++        "properties": {
++          "canonical_id": {
++            "maxLength": 512,
++            "minLength": 1,
++            "type": "string"
++          },
++          "expected_commit": {
++            "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++            "type": "string"
++          },
++          "expected_snapshot_sha256": {
++            "pattern": "^[0-9a-f]{64}$",
++            "type": "string"
++          },
++          "expected_source_sha256": {
++            "pattern": "^[0-9a-f]{64}$",
++            "type": "string"
++          },
++          "limits": {
++            "additionalProperties": false,
++            "properties": {
++              "max_ast_nodes": {
++                "maximum": 4096,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_blocks": {
++                "maximum": 256,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_edges": {
++                "maximum": 4096,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_facts": {
++                "maximum": 65536,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_iterations": {
++                "maximum": 128,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_nodes": {
++                "maximum": 1024,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_source_bytes": {
++                "maximum": 262144,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "timeout_ms": {
++                "maximum": 1000,
++                "minimum": 1,
++                "type": "integer"
++              }
++            },
++            "type": "object"
++          },
++          "node_id": {
++            "maxLength": 128,
++            "minLength": 1,
++            "type": "string"
++          }
++        },
++        "required": [],
++        "type": "object"
++      }
++    },
+     "cks.ops.freshness": {
+       "description": "Compare the index snapshot against the source repository: indexed commit vs HEAD and the changed-file list. Call at session start and after pulls/commits -- stale files mean citations may mislead. If stale, run cks.ops.index (files you created this session are never in the index; read them directly).",
+       "input": {
+diff --git a/internal/system/mcp/valueflow.go b/internal/system/mcp/valueflow.go
+new file mode 100644
+index 00000000..8b5640e9
+--- /dev/null
++++ b/internal/system/mcp/valueflow.go
+@@ -0,0 +1,62 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++
++	mcpgo "github.com/mark3labs/mcp-go/mcp"
++	mcpserver "github.com/mark3labs/mcp-go/server"
++
++	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
++	"github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers"
++	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
++)
++
++var ToolNameValueDependencies = toolName("context.value_dependencies")
++var ToolNameRuleCandidates = toolName("context.rule_candidates")
++
++// Share the graph engine's computation and executable schemas, with no second
++// matcher, live-source fallback, transport or authorization bypass.
++func registerValueAnalysis(s *mcpserver.MCPServer, d Deps) {
++	for _, rules := range []bool{false, true} {
++		tool := mcphandlers.ValueDependencyTool()
++		name := ToolNameValueDependencies
++		if rules {
++			tool = mcphandlers.RuleCandidateTool()
++			name = ToolNameRuleCandidates
++		}
++		tool.Name = name
++		s.AddTool(tool, func(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
++			raw, e := json.Marshal(req.GetRawArguments())
++			if e != nil {
++				return nil, e
++			}
++			unavailable := valueflow.QueryResult{SchemaVersion: 1, Status: "unavailable", Reason: "backend does not support retained value/rule analysis"}
++			backend, ok := d.CKG.(ckgclient.ValueAnalysisClient)
++			var result valueflow.QueryResult
++			if rules {
++				q, err := valueflow.DecodeRuleQueryInput(raw)
++				if err != nil {
++					return nil, err
++				}
++				if !ok {
++					return mcpgo.NewToolResultStructuredOnly(unavailable), nil
++				}
++				result, e = backend.RuleCandidates(ctx, q)
++			} else {
++				q, err := valueflow.DecodeQueryInput(raw)
++				if err != nil {
++					return nil, err
++				}
++				if !ok {
++					return mcpgo.NewToolResultStructuredOnly(unavailable), nil
++				}
++				result, e = backend.ValueDependencies(ctx, q)
++			}
++			if e != nil {
++				return nil, e
++			}
++			return mcpgo.NewToolResultStructuredOnly(result), nil
++		})
++	}
++}
+diff --git a/internal/system/mcp/valueflow_test.go b/internal/system/mcp/valueflow_test.go
+new file mode 100644
+index 00000000..06ed8f9c
+--- /dev/null
++++ b/internal/system/mcp/valueflow_test.go
+@@ -0,0 +1,127 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++	"strings"
++	"testing"
++
++	mcpgo "github.com/mark3labs/mcp-go/mcp"
++	mcpserver "github.com/mark3labs/mcp-go/server"
++
++	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
++	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
++)
++
++type valueAnalysisFake struct {
++	ckgclient.Client
++	result     valueflow.QueryResult
++	ruleInput  valueflow.RuleQueryInput
++	valueInput valueflow.QueryInput
++}
++
++func (f *valueAnalysisFake) RuleCandidates(_ context.Context, q valueflow.RuleQueryInput) (valueflow.QueryResult, error) {
++	f.ruleInput = q
++	if q.Function.ExpectedSourceSHA256 != "" {
++		return valueflow.QueryResult{SchemaVersion: 1, Status: "source_mismatch", Reason: "fixture backend rejected pin"}, nil
++	}
++	return f.result, nil
++}
++func (f *valueAnalysisFake) ValueDependencies(_ context.Context, q valueflow.QueryInput) (valueflow.QueryResult, error) {
++	f.valueInput = q
++	out := f.result
++	analysis := *out.Analysis
++	analysis.Rules = nil
++	out.Analysis = &analysis
++	return out, nil
++}
++func TestComposerValueRuleFacadePreservesBackendResultAndInput(t *testing.T) {
++	source := valueflow.Source{NodeID: "1111111111111111", File: "p.go", Language: "go", StartByte: 200, StartLine: 12, Commit: strings.Repeat("a", 40), SnapshotSHA256: strings.Repeat("b", 64)}
++	analysis, e := valueflow.AnalyzeRules(context.Background(), source, []byte("func F(cmd string){exec.Command(cmd)}"), valueflow.Options{}, valueflow.RulePackID, valueflow.RuleOptions{})
++	if e != nil {
++		t.Fatal(e)
++	}
++	nodeID := source.NodeID
++	real := &valueAnalysisFake{result: valueflow.QueryResult{SchemaVersion: 1, Status: analysis.Status, SnapshotSHA256: source.SnapshotSHA256, Analysis: &analysis}}
++	f := newFixture(t, nil)
++	f.deps.CKG = real
++	s := mcpserver.NewMCPServer("fixture", "1", mcpserver.WithOutputSchemaValidation())
++	if e = Register(s, f.deps); e != nil {
++		t.Fatal(e)
++	}
++	direct, e := real.RuleCandidates(context.Background(), valueflow.RuleQueryInput{RulePack: valueflow.RulePackID, Function: valueflow.QueryInput{NodeID: nodeID}})
++	if e != nil {
++		t.Fatal(e)
++	}
++	for _, tc := range []struct {
++		name   string
++		args   map[string]any
++		status string
++	}{
++		{ToolNameValueDependencies, map[string]any{"node_id": nodeID}, "partial"},
++		{ToolNameRuleCandidates, map[string]any{"rule_pack": valueflow.RulePackID, "function": map[string]any{"node_id": nodeID}}, "partial"},
++		{ToolNameRuleCandidates, map[string]any{"rule_pack": valueflow.RulePackID, "function": map[string]any{"node_id": nodeID, "expected_source_sha256": strings.Repeat("b", 64)}}, "source_mismatch"},
++	} {
++		req, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": tc.name, "arguments": tc.args}})
++		raw, _ := json.Marshal(s.HandleMessage(context.Background(), req))
++		var wire struct {
++			Error  any `json:"error"`
++			Result struct {
++				IsError    bool                  `json:"isError"`
++				Structured valueflow.QueryResult `json:"structuredContent"`
++			} `json:"result"`
++		}
++		if e = json.Unmarshal(raw, &wire); e != nil || wire.Error != nil || wire.Result.IsError || wire.Result.Structured.Status != tc.status {
++			t.Fatal(string(raw), e)
++		}
++		out := wire.Result.Structured
++		if tc.status == "source_mismatch" {
++			if out.Analysis != nil {
++				t.Fatal("stale result published")
++			}
++			continue
++		}
++		if real.ruleInput.Function.NodeID != nodeID || real.ruleInput.RulePack != valueflow.RulePackID {
++			t.Fatal("facade changed backend input")
++		}
++		if out.Analysis.Source != direct.Analysis.Source {
++			t.Fatal("composer changed source pins")
++		}
++		if tc.name == ToolNameValueDependencies && out.Analysis.Rules != nil {
++			t.Fatal("implicit pack")
++		}
++		if tc.name == ToolNameRuleCandidates {
++			want, _ := json.Marshal(direct.Analysis.Rules)
++			got, _ := json.Marshal(out.Analysis.Rules)
++			if string(want) != string(got) {
++				t.Fatal("facade changed engine output", string(got))
++			}
++		}
++	}
++}
++func TestComposerValueRuleFacadeUnsupportedBackendAndRawInputValidation(t *testing.T) {
++	f := newFixture(t, nil)
++	s := mcpserver.NewMCPServer("fixture", "1")
++	if e := Register(s, f.deps); e != nil {
++		t.Fatal(e)
++	}
++	tool := s.GetTool(ToolNameRuleCandidates)
++	req := mcpgo.CallToolRequest{}
++	req.Params.Arguments = map[string]any{"rule_pack": valueflow.RulePackID, "function": map[string]any{"node_id": "1111111111111111"}}
++	reply, e := tool.Handler(context.Background(), req)
++	if e != nil {
++		t.Fatal(e)
++	}
++	raw, _ := json.Marshal(reply.StructuredContent)
++	var out valueflow.QueryResult
++	_ = json.Unmarshal(raw, &out)
++	if out.Status != "unavailable" || out.Analysis != nil {
++		t.Fatal("dummy backend invented analysis", string(raw))
++	}
++	for _, raw := range []string{`{"function":{"node_id":"1111111111111111"}}`, `{"rule_pack":"go-local-review@1.0.0","function":{"node_id":"1111111111111111","node_id":"other"}}`, `{"rule_pack":"go-local-review@1.0.0","function":{"node_id":"1111111111111111"},"max_flow_steps":0}`} {
++		req.Params.RawArguments = json.RawMessage(raw)
++		if _, e = tool.Handler(context.Background(), req); e == nil {
++			t.Fatal("facade bypassed strict decoder", raw)
++		}
++	}
++}
+diff --git a/pkg/graph/mcphandlers/registerall.go b/pkg/graph/mcphandlers/registerall.go
+index c9d004ac..fcab428c 100644
+--- a/pkg/graph/mcphandlers/registerall.go
++++ b/pkg/graph/mcphandlers/registerall.go
+@@ -31,6 +31,7 @@ func RegisterAll(s *server.MCPServer, reader store.Reader) {
+ 	RegisterImpactOfChange(s, reader)
+ 	RegisterConcurrencyImpact(s, reader)
+ 	RegisterValueDependencies(s, reader)
++	RegisterRuleCandidates(s, reader)
+ 	RegisterChangeHistory(s, reader)
+ 	// One Cache per Run amortises BM25 corpus indexing across every
+ 	// evidence_for_intent call. Manifest-keyed invalidation handles
+diff --git a/pkg/graph/mcphandlers/rules.go b/pkg/graph/mcphandlers/rules.go
+new file mode 100644
+index 00000000..dc4863b4
+--- /dev/null
++++ b/pkg/graph/mcphandlers/rules.go
+@@ -0,0 +1,45 @@
++package mcphandlers
++
++import (
++	"context"
++	"encoding/json"
++
++	mcp "github.com/mark3labs/mcp-go/mcp"
++	server "github.com/mark3labs/mcp-go/server"
++
++	"github.com/0xmhha/knowledge-system/pkg/graph/store"
++	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
++)
++
++// RegisterRuleCandidates exposes an explicit opt-in pack; never writes manual tags.
++func RegisterRuleCandidates(s *server.MCPServer, reader store.Reader) {
++	reader = safeReader(reader)
++	tool := RuleCandidateTool()
++	s.AddTool(tool, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
++		raw, e := json.Marshal(req.GetRawArguments())
++		if e != nil {
++			return nil, e
++		}
++		input, e := valueflow.DecodeRuleQueryInput(raw)
++		if e != nil {
++			return nil, e
++		}
++		out, e := valueflow.QueryRules(ctx, reader, input)
++		if e != nil {
++			return nil, e
++		}
++		return textResult(out), nil
++	})
++}
++
++// RuleCandidateTool returns shared opt-in input/output metadata for facades.
++func RuleCandidateTool() mcp.Tool {
++	function := ValueDependencyTool().RawInputSchema
++	integer := func(cap int) map[string]any { return map[string]any{"type": "integer", "minimum": 1, "maximum": cap} }
++	raw, _ := json.Marshal(map[string]any{"type": "object", "additionalProperties": false, "required": []string{"rule_pack", "function"}, "properties": map[string]any{"rule_pack": map[string]any{"type": "string", "const": valueflow.RulePackID}, "function": function, "max_candidates": integer(64), "max_flow_steps": integer(4096)}})
++	tool := nsTool("rule_candidates", mcp.WithReadOnlyHintAnnotation(true), mcp.WithDescription("Explicit opt-in go-local-review@1.0.0 retained Go rule candidates using one shared lexical value/control analysis. Parameter to command-name and discarded conversion-error to return patterns. Candidates are automatic review inputs, never verified vulnerabilities or manual policy/security annotations. Syntax-only targets, unknown sanitizers, memory/alias and feasibility limitations remain explicit. Empty results never prove safety."))
++	tool.InputSchema = mcp.ToolInputSchema{}
++	tool.RawInputSchema = raw
++	tool.OutputSchema = valueFlowOutputSchema()
++	return tool
++}
+diff --git a/pkg/graph/mcphandlers/rules_test.go b/pkg/graph/mcphandlers/rules_test.go
+new file mode 100644
+index 00000000..38e9edfe
+--- /dev/null
++++ b/pkg/graph/mcphandlers/rules_test.go
+@@ -0,0 +1,125 @@
++package mcphandlers
++
++import (
++	"context"
++	"encoding/json"
++	"reflect"
++	"testing"
++
++	mcp "github.com/mark3labs/mcp-go/mcp"
++	server "github.com/mark3labs/mcp-go/server"
++
++	"github.com/0xmhha/knowledge-system/pkg/graph/types"
++	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
++)
++
++func TestRuleCandidatesPublicSchemaAndManualAnnotationCoexistence(t *testing.T) {
++	store := valueStore(t)
++	blob := []byte("func F(cmd string){exec.Command(cmd)}")
++	nodes, e := store.NodesByIDs([]string{"1111111111111111"})
++	if e != nil {
++		t.Fatal(e)
++	}
++	node := nodes[0]
++	node.EndByte = node.StartByte + len(blob)
++	if e = store.InsertNodes([]types.Node{node}); e != nil {
++		t.Fatal(e)
++	}
++	if e = store.InsertBlobs(map[string][]byte{node.ID: blob}); e != nil {
++		t.Fatal(e)
++	}
++	manual := types.Node{ID: "security:manual-review", Type: types.NodeSecurityPattern, Name: "Manual review", QualifiedName: "manual-review", Language: "security", FilePath: "review.yaml", StartLine: 1, Confidence: types.ConfExtracted}
++	if e = store.InsertNodes([]types.Node{manual}); e != nil {
++		t.Fatal(e)
++	}
++	if e = store.InsertEdges([]types.Edge{{Src: node.ID, Dst: manual.ID, Type: types.EdgeHasSecurityPattern, FilePath: "review.yaml", Confidence: types.ConfExtracted}}); e != nil {
++		t.Fatal(e)
++	}
++	s := server.NewMCPServer("test", "1", server.WithOutputSchemaValidation())
++	RegisterAll(s, store)
++	tool := s.GetTool(ToolName("rule_candidates"))
++	if tool == nil {
++		t.Fatal("rule tool not registered")
++	}
++	schema, _ := json.Marshal(tool.Tool)
++	var document map[string]any
++	_ = json.Unmarshal(schema, &document)
++	if document["annotations"].(map[string]any)["readOnlyHint"] != true {
++		t.Fatal("candidate tool not read-only")
++	}
++	args := map[string]any{"rule_pack": valueflow.RulePackID, "function": map[string]any{"node_id": node.ID}}
++	request, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": ToolName("rule_candidates"), "arguments": args}})
++	response, _ := json.Marshal(s.HandleMessage(context.Background(), request))
++	var wire struct {
++		Error  any `json:"error"`
++		Result struct {
++			IsError    bool                  `json:"isError"`
++			Structured valueflow.QueryResult `json:"structuredContent"`
++		} `json:"result"`
++	}
++	if e = json.Unmarshal(response, &wire); e != nil || wire.Error != nil || wire.Result.IsError || wire.Result.Structured.Analysis == nil {
++		t.Fatal(string(response), e)
++	}
++	rules := wire.Result.Structured.Analysis.Rules
++	if rules == nil || len(rules.Candidates) != 1 || rules.Candidates[0].Origin != "automatic" {
++		t.Fatal(rules)
++	}
++	current, e := store.NodesByIDs([]string{manual.ID})
++	if e != nil || len(current) != 1 || !reflect.DeepEqual(current[0], manual) {
++		t.Fatal("manual annotation overwritten", current, e)
++	}
++	plain := s.GetTool(ToolName("value_dependencies"))
++	req := mcp.CallToolRequest{}
++	req.Params.Arguments = map[string]any{"node_id": node.ID}
++	reply, e := plain.Handler(context.Background(), req)
++	if e != nil {
++		t.Fatal(e)
++	}
++	raw, _ := json.Marshal(reply.StructuredContent)
++	var base valueflow.QueryResult
++	_ = json.Unmarshal(raw, &base)
++	if base.Analysis == nil || base.Analysis.Rules != nil {
++		t.Fatal("default enabled rules", string(raw))
++	}
++}
++func TestRuleCandidatesRawContractRejectsImplicitPackAndInvalidBounds(t *testing.T) {
++	s := server.NewMCPServer("test", "1")
++	RegisterRuleCandidates(s, valueStore(t))
++	tool := s.GetTool(ToolName("rule_candidates"))
++	for _, raw := range []string{`{"function":{"node_id":"1111111111111111"}}`, `{"rule_pack":"latest","function":{"node_id":"1111111111111111"}}`, `{"rule_pack":"go-local-review@1.0.0","function":{"node_id":"1111111111111111","node_id":"x"}}`, `{"rule_pack":"go-local-review@1.0.0","function":{"node_id":"1111111111111111"},"max_candidates":65}`, `{"rule_pack":"go-local-review@1.0.0","function":{"node_id":"1111111111111111"},"max_flow_steps":null}`} {
++		req := mcp.CallToolRequest{}
++		req.Params.RawArguments = json.RawMessage(raw)
++		if _, e := tool.Handler(context.Background(), req); e == nil {
++			t.Fatal("invalid raw input accepted", raw)
++		}
++	}
++}
++func TestRuleOutputValidatorRejectsFalseCandidateType(t *testing.T) {
++	s := server.NewMCPServer("test", "1", server.WithOutputSchemaValidation())
++	RegisterRuleCandidates(s, valueStore(t))
++	tool := s.GetTool(ToolName("rule_candidates"))
++	s.AddTool(tool.Tool, func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
++		req := mcp.CallToolRequest{}
++		req.Params.Arguments = map[string]any{"rule_pack": valueflow.RulePackID, "function": map[string]any{"node_id": "1111111111111111"}}
++		reply, e := tool.Handler(context.Background(), req)
++		if e != nil {
++			return nil, e
++		}
++		raw, _ := json.Marshal(reply.StructuredContent)
++		var value map[string]any
++		_ = json.Unmarshal(raw, &value)
++		value["analysis"].(map[string]any)["rules"].(map[string]any)["candidates"] = 42
++		return mcp.NewToolResultStructuredOnly(value), nil
++	})
++	req, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": ToolName("rule_candidates"), "arguments": map[string]any{"rule_pack": valueflow.RulePackID, "function": map[string]any{"node_id": "1111111111111111"}}}})
++	raw, _ := json.Marshal(s.HandleMessage(context.Background(), req))
++	var wire struct {
++		Result struct {
++			IsError bool `json:"isError"`
++		} `json:"result"`
++	}
++	_ = json.Unmarshal(raw, &wire)
++	if !wire.Result.IsError {
++		t.Fatal("schema validation skipped", string(raw))
++	}
++}
+diff --git a/pkg/graph/mcphandlers/valueflow.go b/pkg/graph/mcphandlers/valueflow.go
+index 9e6f9db6..00167dc8 100644
+--- a/pkg/graph/mcphandlers/valueflow.go
++++ b/pkg/graph/mcphandlers/valueflow.go
+@@ -15,19 +15,7 @@ import (
+ // in-process consumers. Exact retained identity avoids same-name source mixing.
+ func RegisterValueDependencies(s *server.MCPServer, reader store.Reader) {
+ 	reader = safeReader(reader)
+-	integer := func(cap int) map[string]any { return map[string]any{"type": "integer", "minimum": 1, "maximum": cap} }
+-	tool := nsTool("value_dependencies", mcp.WithReadOnlyHintAnnotation(true), mcp.WithDescription("Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety."),
+-		mcp.WithString("node_id", mcp.MinLength(1), mcp.MaxLength(128)), mcp.WithString("canonical_id", mcp.MinLength(1), mcp.MaxLength(512)),
+-		mcp.WithString("expected_commit", mcp.Pattern("^([0-9a-f]{40}|[0-9a-f]{64})$")), mcp.WithString("expected_source_sha256", mcp.Pattern("^[0-9a-f]{64}$")), mcp.WithString("expected_snapshot_sha256", mcp.Pattern("^[0-9a-f]{64}$")),
+-		mcp.WithObject("limits", mcp.AdditionalProperties(false), mcp.Properties(map[string]any{"max_source_bytes": integer(256 * 1024), "max_ast_nodes": integer(4096), "max_blocks": integer(256), "max_nodes": integer(1024), "max_edges": integer(4096), "max_iterations": integer(128), "max_facts": integer(65536), "timeout_ms": integer(1000)})))
+-	tool.InputSchema.AdditionalProperties = false
+-	rawSchema, _ := json.Marshal(tool.InputSchema)
+-	var schema map[string]any
+-	_ = json.Unmarshal(rawSchema, &schema)
+-	schema["oneOf"] = []map[string]any{{"required": []string{"node_id"}}, {"required": []string{"canonical_id"}}}
+-	tool.RawInputSchema, _ = json.Marshal(schema)
+-	tool.InputSchema = mcp.ToolInputSchema{}
+-	tool.OutputSchema = valueFlowOutputSchema()
++	tool := ValueDependencyTool()
+ 	s.AddTool(tool, func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+ 		raw, e := json.Marshal(req.GetRawArguments())
+ 		if e != nil {
+@@ -44,3 +32,26 @@ func RegisterValueDependencies(s *server.MCPServer, reader store.Reader) {
+ 		return textResult(result), nil
+ 	})
+ }
++
++func exactValueInput(tool mcp.Tool) mcp.Tool {
++	tool.InputSchema.AdditionalProperties = false
++	rawSchema, _ := json.Marshal(tool.InputSchema)
++	var schema map[string]any
++	_ = json.Unmarshal(rawSchema, &schema)
++	schema["oneOf"] = []map[string]any{{"required": []string{"node_id"}}, {"required": []string{"canonical_id"}}}
++	tool.RawInputSchema, _ = json.Marshal(schema)
++	tool.InputSchema = mcp.ToolInputSchema{}
++	return tool
++}
++
++// ValueDependencyTool returns the shared public metadata for CKG and CKS.
++func ValueDependencyTool() mcp.Tool {
++	integer := func(cap int) map[string]any { return map[string]any{"type": "integer", "minimum": 1, "maximum": cap} }
++	tool := nsTool("value_dependencies", mcp.WithReadOnlyHintAnnotation(true), mcp.WithDescription("Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety."),
++		mcp.WithString("node_id", mcp.MinLength(1), mcp.MaxLength(128)), mcp.WithString("canonical_id", mcp.MinLength(1), mcp.MaxLength(512)),
++		mcp.WithString("expected_commit", mcp.Pattern("^([0-9a-f]{40}|[0-9a-f]{64})$")), mcp.WithString("expected_source_sha256", mcp.Pattern("^[0-9a-f]{64}$")), mcp.WithString("expected_snapshot_sha256", mcp.Pattern("^[0-9a-f]{64}$")),
++		mcp.WithObject("limits", mcp.AdditionalProperties(false), mcp.Properties(map[string]any{"max_source_bytes": integer(256 * 1024), "max_ast_nodes": integer(4096), "max_blocks": integer(256), "max_nodes": integer(1024), "max_edges": integer(4096), "max_iterations": integer(128), "max_facts": integer(65536), "timeout_ms": integer(1000)})))
++	tool = exactValueInput(tool)
++	tool.OutputSchema = valueFlowOutputSchema()
++	return tool
++}
+diff --git a/pkg/graph/mcphandlers/valueflow_schema.go b/pkg/graph/mcphandlers/valueflow_schema.go
+index 41989e65..cb40ab27 100644
+--- a/pkg/graph/mcphandlers/valueflow_schema.go
++++ b/pkg/graph/mcphandlers/valueflow_schema.go
+@@ -26,6 +26,9 @@ func valueFlowOutputSchema() mcp.ToolOutputSchema {
+ 	occurrence := object(map[string]any{"id": text, "node": text, "variable": text, "role": text, "location": location, "reachable": map[string]any{"type": "boolean"}}, "id", "node", "variable", "role", "location", "reachable")
+ 	defuse := object(map[string]any{"definition": text, "use": text, "variable": text, "certainty": text}, "definition", "use", "variable", "certainty")
+ 	diagnostic := object(map[string]any{"code": text, "message": text, "location": location}, "code", "message")
+-	analysis := object(map[string]any{"schema_version": map[string]any{"type": "integer", "const": 1}, "source": source, "limits": object(options), "status": text, "capability": map[string]any{"type": "object", "additionalProperties": text}, "blocks": array(block), "nodes": array(node), "edges": array(edge), "diagnostics": array(diagnostic), "truncated": map[string]any{"type": "boolean"}, "elapsed_micros": integer, "variables": array(variable), "occurrences": array(occurrence), "def_use": array(defuse), "iterations": integer, "facts_peak": integer}, "schema_version", "source", "limits", "status", "capability", "blocks", "nodes", "edges", "diagnostics", "truncated", "elapsed_micros", "variables", "occurrences", "def_use", "iterations", "facts_peak")
++	condition := object(map[string]any{"node": text, "condition": text, "location": location}, "node", "condition", "location")
++	candidate := object(map[string]any{"id": text, "rule_id": map[string]any{"type": "string", "enum": []string{"parameter-command-name", "discarded-conversion-error"}}, "origin": map[string]any{"const": "automatic", "type": "string"}, "source_occurrence": text, "source_location": location, "sink_occurrence": text, "sink_location": location, "path": array(text), "conditions": array(condition), "certainty": map[string]any{"type": "string", "const": "lexical_may_reach"}, "target_resolution": map[string]any{"type": "string", "const": "syntax_only_unverified"}, "sanitizer": map[string]any{"type": "string", "const": "not_proven"}}, "id", "rule_id", "origin", "source_occurrence", "source_location", "sink_occurrence", "sink_location", "path", "conditions", "certainty", "target_resolution", "sanitizer")
++	rules := object(map[string]any{"pack_id": map[string]any{"type": "string", "const": "go-local-review"}, "pack_version": map[string]any{"type": "string", "const": "1.0.0"}, "pack_sha256": text, "engine_version": map[string]any{"type": "string", "const": "1"}, "origin": map[string]any{"type": "string", "const": "automatic"}, "status": map[string]any{"type": "string", "enum": []string{"matched_bounded", "incomplete"}}, "stop_reason": text, "limits": object(map[string]any{"max_candidates": integer, "max_flow_steps": integer}, "max_candidates", "max_flow_steps"), "flow_steps": integer, "candidates": array(candidate), "limitations": array(text)}, "pack_id", "pack_version", "pack_sha256", "engine_version", "origin", "status", "limits", "flow_steps", "candidates", "limitations")
++	analysis := object(map[string]any{"schema_version": map[string]any{"type": "integer", "const": 1}, "source": source, "limits": object(options), "status": text, "capability": map[string]any{"type": "object", "additionalProperties": text}, "blocks": array(block), "nodes": array(node), "edges": array(edge), "diagnostics": array(diagnostic), "truncated": map[string]any{"type": "boolean"}, "elapsed_micros": integer, "variables": array(variable), "occurrences": array(occurrence), "def_use": array(defuse), "iterations": integer, "facts_peak": integer, "rules": rules}, "schema_version", "source", "limits", "status", "capability", "blocks", "nodes", "edges", "diagnostics", "truncated", "elapsed_micros", "variables", "occurrences", "def_use", "iterations", "facts_peak")
+ 	return mcp.ToolOutputSchema{Type: "object", AdditionalProperties: false, Required: []string{"schema_version", "status", "analysis", "elapsed_micros"}, Properties: map[string]any{"schema_version": map[string]any{"type": "integer", "const": 1}, "status": map[string]any{"type": "string", "enum": []string{"analyzed_bounded", "partial", "budget_exhausted", "unsupported", "source_mismatch", "snapshot_changed", "unavailable", "not_found", "ambiguous"}}, "reason": text, "snapshot_sha256": text, "elapsed_micros": integer, "analysis": map[string]any{"anyOf": []any{map[string]any{"type": "null"}, analysis}}}}
+ }
+diff --git a/pkg/graph/valueflow/cfg.go b/pkg/graph/valueflow/cfg.go
+index e3628f84..cd5d09c0 100644
+--- a/pkg/graph/valueflow/cfg.go
++++ b/pkg/graph/valueflow/cfg.go
+@@ -90,6 +90,7 @@ type Result struct {
+ 	DefUse        []DefUse          `json:"def_use"`
+ 	Iterations    int               `json:"iterations"`
+ 	FactsPeak     int               `json:"facts_peak"`
++	Rules         *RuleResult       `json:"rules,omitempty"`
+ }
+ 
+ type analysis struct {
+@@ -123,19 +124,26 @@ func limits(o Options) (Options, error) {
+ // control flow. Value/def-use/control dependence is deliberately not yet
+ // advertised by this first kernel; later analysis stages must compute it.
+ func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) (Result, error) {
+-	return build(ctx, source, blob, options, false)
++	return build(ctx, source, blob, options, false, nil)
+ }
+ 
+ // Analyze computes lexical reaching definitions and value/control dependence
+ // once in the graph engine. Memory, external effects and unsupported constructs
+ // remain explicit; a missing edge is never a proof of safety.
+ func Analyze(ctx context.Context, source Source, blob []byte, options Options) (Result, error) {
+-	return build(ctx, source, blob, options, true)
++	return build(ctx, source, blob, options, true, nil)
+ }
+ 
+-func build(ctx context.Context, source Source, blob []byte, options Options, dependence bool) (out Result, err error) {
++func build(ctx context.Context, source Source, blob []byte, options Options, dependence bool, rules *RuleOptions) (out Result, err error) {
+ 	started := time.Now()
+-	defer func() { out.ElapsedMicros = time.Since(started).Microseconds() }()
++	defer func() {
++		out.ElapsedMicros = time.Since(started).Microseconds()
++		if rules != nil && err == nil && out.Rules == nil {
++			out.Rules = newRuleResult(*rules)
++			out.Rules.Status = "incomplete"
++			out.Rules.StopReason = "base_analysis_incomplete"
++		}
++	}()
+ 	options, err = limits(options)
+ 	if err != nil {
+ 		return out, err
+@@ -341,6 +349,11 @@ func build(ctx context.Context, source Source, blob []byte, options Options, dep
+ 		a.compute()
+ 		out = a.result
+ 	}
++	if rules != nil {
++		a.result = out
++		a.matchRules(*rules)
++		out = a.result
++	}
+ 	return out, nil
+ }
+ func (a *analysis) loc(node ast.Node) Location {
+diff --git a/pkg/graph/valueflow/query.go b/pkg/graph/valueflow/query.go
+index 5e8ff1c5..ec4da938 100644
+--- a/pkg/graph/valueflow/query.go
++++ b/pkg/graph/valueflow/query.go
+@@ -70,50 +70,9 @@ func DecodeQueryInput(raw []byte) (QueryInput, error) {
+ 	if len(raw) > 8192 {
+ 		return q, fmt.Errorf("value-flow input exceeds8KiB")
+ 	}
+-	d := json.NewDecoder(bytes.NewReader(raw))
+-	var walk func(int) error
+-	walk = func(depth int) error {
+-		if depth > 4 {
+-			return fmt.Errorf("input nesting limit exceeded")
+-		}
+-		v, e := d.Token()
+-		if e != nil {
+-			return e
+-		}
+-		if v == nil {
+-			return fmt.Errorf("explicit null is not a supported input")
+-		}
+-		delimiter, ok := v.(json.Delim)
+-		if !ok {
+-			return nil
+-		}
+-		if delimiter != '{' {
+-			return fmt.Errorf("only schema objects accepted")
+-		}
+-		seen := map[string]bool{}
+-		for d.More() {
+-			key, e := d.Token()
+-			if e != nil {
+-				return e
+-			}
+-			name, ok := key.(string)
+-			if !ok || seen[name] {
+-				return fmt.Errorf("duplicate input field")
+-			}
+-			seen[name] = true
+-			if e = walk(depth + 1); e != nil {
+-				return e
+-			}
+-		}
+-		_, e = d.Token()
+-		return e
+-	}
+-	if e := walk(0); e != nil {
++	if e := validateInputObject(raw); e != nil {
+ 		return q, e
+ 	}
+-	if _, e := d.Token(); e != io.EOF {
+-		return q, fmt.Errorf("one input document required")
+-	}
+ 	var fields map[string]json.RawMessage
+ 	if e := json.Unmarshal(raw, &fields); e != nil {
+ 		return q, e
+@@ -148,7 +107,11 @@ func DecodeQueryInput(raw []byte) (QueryInput, error) {
+ // Query reads only a retained graph symbol/blob. It never opens its live file.
+ // Name-based ambiguous resolution belongs in find_symbol; this query requires
+ // the exact selected identity and verifies snapshot/blob/metadata before return.
+-func Query(ctx context.Context, r store.Reader, q QueryInput) (out QueryResult, err error) {
++func Query(ctx context.Context, r store.Reader, q QueryInput) (QueryResult, error) {
++	return query(ctx, r, q, nil)
++}
++
++func query(ctx context.Context, r store.Reader, q QueryInput, rules *RuleOptions) (out QueryResult, err error) {
+ 	started := time.Now()
+ 	defer func() { out.ElapsedMicros = time.Since(started).Microseconds() }()
+ 	out = QueryResult{SchemaVersion: 1, Status: "unavailable"}
+@@ -240,7 +203,7 @@ func Query(ctx context.Context, r store.Reader, q QueryInput) (out QueryResult,
+ 		return finish("source_mismatch", "retained node coordinates/blob length differ")
+ 	}
+ 	source := Source{FunctionName: selected.Name, NodeID: selected.ID, CanonicalID: selected.CanonicalID, File: selected.FilePath, Commit: before.SrcCommit, SnapshotSHA256: snapshot, Language: selected.Language, StartLine: selected.StartLine, StartByte: selected.StartByte}
+-	result, e := Analyze(bounded, source, blob, opts)
++	result, e := build(bounded, source, blob, opts, true, rules)
+ 	if e != nil {
+ 		return out, e
+ 	}
+@@ -276,3 +239,51 @@ func Query(ctx context.Context, r store.Reader, q QueryInput) (out QueryResult,
+ 	out.Analysis = &result
+ 	return out, nil
+ }
++
++func validateInputObject(raw []byte) error {
++	d := json.NewDecoder(bytes.NewReader(raw))
++	var walk func(int) error
++	walk = func(depth int) error {
++		if depth > 4 {
++			return fmt.Errorf("input nesting limit exceeded")
++		}
++		v, e := d.Token()
++		if e != nil {
++			return e
++		}
++		if v == nil {
++			return fmt.Errorf("explicit null is not a supported input")
++		}
++		delimiter, ok := v.(json.Delim)
++		if !ok {
++			return nil
++		}
++		if delimiter != '{' {
++			return fmt.Errorf("only schema objects accepted")
++		}
++		seen := map[string]bool{}
++		for d.More() {
++			key, e := d.Token()
++			if e != nil {
++				return e
++			}
++			name, ok := key.(string)
++			if !ok || seen[name] {
++				return fmt.Errorf("duplicate input field")
++			}
++			seen[name] = true
++			if e = walk(depth + 1); e != nil {
++				return e
++			}
++		}
++		_, e = d.Token()
++		return e
++	}
++	if e := walk(0); e != nil {
++		return e
++	}
++	if _, e := d.Token(); e != io.EOF {
++		return fmt.Errorf("one input document required")
++	}
++	return nil
++}
+diff --git a/pkg/graph/valueflow/rules.go b/pkg/graph/valueflow/rules.go
+new file mode 100644
+index 00000000..660035b3
+--- /dev/null
++++ b/pkg/graph/valueflow/rules.go
+@@ -0,0 +1,378 @@
++package valueflow
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"fmt"
++	"go/ast"
++	"go/token"
++	"sort"
++
++	"github.com/0xmhha/knowledge-system/pkg/graph/store"
++)
++
++const RulePackID = "go-local-review@1.0.0"
++const rulePackDefinition = `{"id":"go-local-review","version":"1.0.0","rules":[{"id":"parameter-command-name","source":"named scalar parameter","sink":"exec.Command arg0 or exec.CommandContext arg1 direct identifier"},{"id":"discarded-conversion-error","source":"strconv.Atoi/ParseInt/ParseUint first result with blank second target","sink":"explicit return direct identifier"}],"flow":"lexical reaching definitions and corresponding RHS uses","target_resolution":"syntax_only","sanitizer":"not_proven"}`
++
++type RuleOptions struct {
++	MaxCandidates int `json:"max_candidates"`
++	MaxFlowSteps  int `json:"max_flow_steps"`
++}
++type RuleQueryInput struct {
++	RulePack      string     `json:"rule_pack"`
++	Function      QueryInput `json:"function"`
++	MaxCandidates int        `json:"max_candidates,omitempty"`
++	MaxFlowSteps  int        `json:"max_flow_steps,omitempty"`
++}
++type RuleCondition struct {
++	Node      string   `json:"node"`
++	Condition string   `json:"condition"`
++	Location  Location `json:"location"`
++}
++type RuleCandidate struct {
++	ID               string          `json:"id"`
++	RuleID           string          `json:"rule_id"`
++	Origin           string          `json:"origin"`
++	SourceOccurrence string          `json:"source_occurrence"`
++	SourceLocation   Location        `json:"source_location"`
++	SinkOccurrence   string          `json:"sink_occurrence"`
++	SinkLocation     Location        `json:"sink_location"`
++	Path             []string        `json:"path"`
++	Conditions       []RuleCondition `json:"conditions"`
++	Certainty        string          `json:"certainty"`
++	TargetResolution string          `json:"target_resolution"`
++	Sanitizer        string          `json:"sanitizer"`
++}
++type RuleResult struct {
++	PackID        string          `json:"pack_id"`
++	PackVersion   string          `json:"pack_version"`
++	PackSHA256    string          `json:"pack_sha256"`
++	EngineVersion string          `json:"engine_version"`
++	Origin        string          `json:"origin"`
++	Status        string          `json:"status"`
++	StopReason    string          `json:"stop_reason,omitempty"`
++	Limits        RuleOptions     `json:"limits"`
++	FlowSteps     int             `json:"flow_steps"`
++	Candidates    []RuleCandidate `json:"candidates"`
++	Limitations   []string        `json:"limitations"`
++}
++
++func ruleOptions(o RuleOptions) (RuleOptions, error) {
++	if o.MaxCandidates == 0 {
++		o.MaxCandidates = 64
++	}
++	if o.MaxFlowSteps == 0 {
++		o.MaxFlowSteps = 4096
++	}
++	if o.MaxCandidates < 1 || o.MaxCandidates > 64 || o.MaxFlowSteps < 1 || o.MaxFlowSteps > 4096 {
++		return o, fmt.Errorf("rule limits outside supported bounds")
++	}
++	return o, nil
++}
++func DecodeRuleQueryInput(raw []byte) (RuleQueryInput, error) {
++	var q RuleQueryInput
++	if len(raw) > 8192 {
++		return q, fmt.Errorf("rule input exceeds8KiB")
++	}
++	if e := validateInputObject(raw); e != nil {
++		return q, e
++	}
++	d := json.NewDecoder(bytes.NewReader(raw))
++	d.DisallowUnknownFields()
++	if e := d.Decode(&q); e != nil {
++		return q, e
++	}
++	if q.RulePack != RulePackID {
++		return q, fmt.Errorf("explicit supported rule_pack required")
++	}
++	var fields map[string]json.RawMessage
++	_ = json.Unmarshal(raw, &fields)
++	function, e := DecodeQueryInput(fields["function"])
++	if e != nil {
++		return q, e
++	}
++	q.Function = function
++	for _, name := range []string{"max_candidates", "max_flow_steps"} {
++		if field, ok := fields[name]; ok {
++			var n int
++			if e = json.Unmarshal(field, &n); e != nil || n < 1 {
++				return q, fmt.Errorf("explicit positive integer rule bound required")
++			}
++		}
++	}
++	_, e = ruleOptions(RuleOptions{q.MaxCandidates, q.MaxFlowSteps})
++	return q, e
++}
++func QueryRules(ctx context.Context, r store.Reader, q RuleQueryInput) (QueryResult, error) {
++	if q.RulePack != RulePackID {
++		return QueryResult{}, fmt.Errorf("explicit supported rule_pack required")
++	}
++	o, e := ruleOptions(RuleOptions{q.MaxCandidates, q.MaxFlowSteps})
++	if e != nil {
++		return QueryResult{}, e
++	}
++	return query(ctx, r, q.Function, &o)
++}
++
++// AnalyzeRules reuses one parse/type/CFG computation; ordinary Analyze is off.
++func AnalyzeRules(ctx context.Context, source Source, blob []byte, limits Options, pack string, o RuleOptions) (Result, error) {
++	if pack != RulePackID {
++		return Result{}, fmt.Errorf("explicit supported rule_pack required")
++	}
++	o, e := ruleOptions(o)
++	if e != nil {
++		return Result{}, e
++	}
++	return build(ctx, source, blob, limits, true, &o)
++}
++func selector(call *ast.CallExpr) (string, string) {
++	sel, ok := call.Fun.(*ast.SelectorExpr)
++	if !ok {
++		return "", ""
++	}
++	id, ok := sel.X.(*ast.Ident)
++	if !ok {
++		return "", ""
++	}
++	return id.Name, sel.Sel.Name
++}
++func (a *analysis) matchRules(o RuleOptions) {
++	r := newRuleResult(o)
++	a.result.Rules = r
++	stop := func(reason string) { r.Status = "incomplete"; r.StopReason = reason }
++	if a.result.Truncated || a.result.Status == "unsupported" || a.result.Capability["def_use"] == "not_computed" {
++		stop("base_analysis_incomplete")
++		return
++	}
++	step := func() bool {
++		if a.context.Err() != nil {
++			stop("deadline")
++			return false
++		}
++		if r.FlowSteps >= o.MaxFlowSteps {
++			stop("flow_steps")
++			return false
++		}
++		r.FlowSteps++
++		return true
++	}
++	nodes := map[string]Node{}
++	occ := map[string]Occurrence{}
++	uses := map[string][]Occurrence{}
++	incoming := map[string][]Occurrence{}
++	variables := map[string]Variable{}
++	for _, n := range a.result.Nodes {
++		if !step() {
++			return
++		}
++		nodes[n.ID] = n
++	}
++	for _, v := range a.result.Variables {
++		if !step() {
++			return
++		}
++		variables[v.ID] = v
++	}
++	definitions := map[string][]Occurrence{}
++	for _, v := range a.result.Occurrences {
++		if !step() {
++			return
++		}
++		occ[v.ID] = v
++		if v.Role == "definition" && v.Reachable {
++			definitions[v.Node] = append(definitions[v.Node], v)
++		}
++		if v.Role == "use" && v.Reachable {
++			uses[v.Node] = append(uses[v.Node], v)
++		}
++	}
++	for _, e := range a.result.DefUse {
++		if !step() {
++			return
++		}
++		incoming[e.Use] = append(incoming[e.Use], occ[e.Definition])
++	}
++	// Conversion source identity is an occurrence, never a name-based join.
++	discarded := map[string]bool{}
++	for _, n := range a.result.Nodes {
++		if !step() {
++			return
++		}
++		stmt, ok := a.astNodes[n.ID].(*ast.AssignStmt)
++		if !ok || len(stmt.Lhs) != 2 || len(stmt.Rhs) != 1 {
++			continue
++		}
++		blank, ok := stmt.Lhs[1].(*ast.Ident)
++		if !ok || blank.Name != "_" {
++			continue
++		}
++		call, ok := stmt.Rhs[0].(*ast.CallExpr)
++		if !ok {
++			continue
++		}
++		owner, name := selector(call)
++		if owner != "strconv" || (name != "Atoi" && name != "ParseInt" && name != "ParseUint") {
++			continue
++		}
++		for _, v := range definitions[n.ID] {
++			if v.Location == a.loc(stmt.Lhs[0]) {
++				discarded[v.ID] = true
++			}
++		}
++	}
++	seenCandidates := map[string]bool{}
++	// Walk each direct-identifier sink backwards through occurrence-level def-use.
++	emit := func(rule string, sink Occurrence, sinkLocation Location) {
++		type work struct {
++			use  Occurrence
++			path []string
++		}
++		pending := []work{{sink, []string{sink.Node}}}
++		visited := map[string]bool{}
++		for len(pending) > 0 && r.Status != "incomplete" {
++			w := pending[0]
++			pending = pending[1:]
++			if visited[w.use.ID] {
++				continue
++			}
++			visited[w.use.ID] = true
++			for _, def := range incoming[w.use.ID] {
++				if !step() {
++					return
++				}
++				path := append([]string{def.Node}, w.path...)
++				source := rule == "parameter-command-name" && def.Node == "entry" && variables[def.Variable].Kind == "parameter" || rule == "discarded-conversion-error" && discarded[def.ID]
++				if source {
++					id := hashBytes([]byte(r.PackSHA256 + "/" + a.result.Source.NodeID + "/" + a.result.Source.SnapshotSHA256 + "/" + a.result.Source.SHA256 + "/" + rule + "/" + def.ID + "/" + sink.ID))
++					if seenCandidates[id] {
++						continue
++					}
++					seenCandidates[id] = true
++					if len(r.Candidates) >= o.MaxCandidates {
++						stop("candidates")
++						return
++					}
++					conditions := []RuleCondition{}
++					seen := map[string]bool{}
++					for _, edge := range a.result.Edges {
++						if edge.Kind != "control_dependence" {
++							continue
++						}
++						if !step() {
++							return
++						}
++						for _, node := range path {
++							if edge.To == node {
++								key := edge.From + "/" + edge.Condition
++								if !seen[key] {
++									seen[key] = true
++									conditions = append(conditions, RuleCondition{edge.From, edge.Condition, nodes[edge.From].Location})
++								}
++							}
++						}
++					}
++					sort.Slice(conditions, func(i, j int) bool {
++						return conditions[i].Node+conditions[i].Condition < conditions[j].Node+conditions[j].Condition
++					})
++					r.Candidates = append(r.Candidates, RuleCandidate{id, rule, "automatic", def.ID, def.Location, sink.ID, sinkLocation, path, conditions, "lexical_may_reach", "syntax_only_unverified", "not_proven"})
++					continue
++				}
++				// Only RHS feeding the selected definition; never traverse unrelated
++				// command arguments or a different parallel assignment's RHS.
++				expressions := []ast.Expr{}
++				switch stmt := a.astNodes[def.Node].(type) {
++				case *ast.AssignStmt:
++					for i, lhs := range stmt.Lhs {
++						if a.loc(lhs) == def.Location {
++							if len(stmt.Rhs) == len(stmt.Lhs) {
++								expressions = append(expressions, stmt.Rhs[i])
++								if stmt.Tok != token.ASSIGN && stmt.Tok != token.DEFINE {
++									expressions = append(expressions, lhs)
++								}
++							} else {
++								expressions = append(expressions, stmt.Rhs...)
++							}
++						}
++					}
++				case *ast.ValueSpec:
++					for i, lhs := range stmt.Names {
++						if a.loc(lhs) == def.Location {
++							if len(stmt.Values) == len(stmt.Names) {
++								expressions = append(expressions, stmt.Values[i])
++							} else {
++								expressions = append(expressions, stmt.Values...)
++							}
++						}
++					}
++				}
++				for _, use := range uses[def.Node] {
++					if !step() {
++						return
++					}
++					for _, expr := range expressions {
++						loc := a.loc(expr)
++						if use.Location.StartByte >= loc.StartByte && use.Location.EndByte <= loc.EndByte {
++							pending = append(pending, work{use, path})
++							break
++						}
++					}
++				}
++			}
++		}
++	}
++	for _, n := range a.result.Nodes {
++		if !step() {
++			return
++		}
++		node := a.astNodes[n.ID]
++		if node == nil {
++			continue
++		}
++		ast.Inspect(node, func(item ast.Node) bool {
++			if r.Status == "incomplete" {
++				return false
++			}
++			if !step() {
++				return false
++			}
++			if _, ok := item.(*ast.FuncLit); ok {
++				return false
++			}
++			var args []ast.Expr
++			rule := ""
++			switch v := item.(type) {
++			case *ast.CallExpr:
++				owner, name := selector(v)
++				index := 0
++				if name == "CommandContext" {
++					index = 1
++				}
++				if owner == "exec" && (name == "Command" || name == "CommandContext") && len(v.Args) > index {
++					args = []ast.Expr{v.Args[index]}
++					rule = "parameter-command-name"
++				}
++			case *ast.ReturnStmt:
++				args = v.Results
++				rule = "discarded-conversion-error"
++			}
++			for _, arg := range args {
++				if _, ok := arg.(*ast.Ident); !ok {
++					continue
++				}
++				location := a.loc(arg)
++				for _, use := range uses[n.ID] {
++					if use.Location == location {
++						emit(rule, use, location)
++					}
++				}
++			}
++			return true
++		})
++	}
++	sort.Slice(r.Candidates, func(i, j int) bool { return r.Candidates[i].ID < r.Candidates[j].ID })
++}
++
++func newRuleResult(o RuleOptions) *RuleResult {
++	return &RuleResult{PackID: "go-local-review", PackVersion: "1.0.0", PackSHA256: hashBytes([]byte(rulePackDefinition)), EngineVersion: "1", Origin: "automatic", Status: "matched_bounded", Limits: o, Candidates: []RuleCandidate{}, Limitations: []string{"empty_candidates_do_not_establish_safety", "syntax_targets_unresolved", "parameters_not_proven_attacker_controlled", "lexical_may_reach_not_path_feasibility", "sanitizers_and_opaque_call_effects_not_proven", "aliases_closures_fields_and_indirect_sinks_unsupported"}}
++}
+diff --git a/pkg/graph/valueflow/rules_test.go b/pkg/graph/valueflow/rules_test.go
+new file mode 100644
+index 00000000..4dfb7f42
+--- /dev/null
++++ b/pkg/graph/valueflow/rules_test.go
+@@ -0,0 +1,158 @@
++package valueflow
++
++import (
++	"context"
++	"encoding/json"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++func ruleAnalyze(t *testing.T, code string, o RuleOptions) Result {
++	t.Helper()
++	r, e := AnalyzeRules(context.Background(), retained(), []byte(code), Options{}, RulePackID, o)
++	if e != nil || r.Rules == nil {
++		t.Fatal(r, e)
++	}
++	return r
++}
++func TestRulePackScalarCommandCorpus(t *testing.T) {
++	cases := []struct {
++		name, code string
++		count      int
++	}{
++		{"parameter", "func F(cmd string){exec.Command(cmd)}", 1},
++		{"copy", "func F(cmd string){name:=cmd;exec.Command(name)}", 1},
++		{"compound", "func F(cmd string){cmd+=\"suffix\";exec.Command(cmd)}", 1},
++		{"kill", "func F(cmd string){name:=cmd;name=\"fixed\";exec.Command(name)}", 0},
++		{"literal", "func F(cmd string){exec.Command(\"fixed\",cmd)}", 0},
++		{"branch", "func F(cmd string,flag bool){name:=\"fixed\";if flag{name=cmd};exec.Command(name)}", 1},
++		{"loop", "func F(cmd string,flag bool){name:=\"fixed\";for flag{name=cmd;flag=false};exec.Command(name)}", 1},
++		{"shadow", "func F(cmd string){name:=\"fixed\";{name:=cmd;_=name};exec.Command(name)}", 0},
++		{"parallel_rhs", "func F(cmd string){name,other:=\"fixed\",cmd;_=other;exec.Command(name)}", 0},
++		{"command_context", "func F(cmd string){exec.CommandContext(nil,cmd)}", 1},
++		{"unknown_sanitizer", "func F(cmd string){name:=sanitize(cmd);exec.Command(name)}", 1},
++		{"alias_unknown", "func F(cmd string){ref:=&cmd;exec.Command(*ref)}", 0},
++		{"renamed_import_miss", "func F(cmd string){process.Command(cmd)}", 0},
++		{"spoofed_target_candidate", "func F(cmd string,exec Fake){exec.Command(cmd)}", 1},
++		{"closure_not_inlined", "func F(cmd string){f:=func(){exec.Command(cmd)};_=f}", 0},
++		{"unreachable", "func F(cmd string){return;exec.Command(cmd)}", 0},
++	}
++	for _, tc := range cases {
++		t.Run(tc.name, func(t *testing.T) {
++			r := ruleAnalyze(t, tc.code, RuleOptions{})
++			if r.Rules.Status != "matched_bounded" || len(r.Rules.Candidates) != tc.count {
++				t.Fatalf("%+v", r.Rules)
++			}
++			for _, c := range r.Rules.Candidates {
++				if c.RuleID != "parameter-command-name" || c.Origin != "automatic" || c.TargetResolution != "syntax_only_unverified" || c.Sanitizer != "not_proven" || len(c.Path) < 2 || c.SourceLocation.StartByte < 400 || c.SinkLocation.StartByte < 400 {
++					t.Fatal("false provenance/semantic claim", c)
++				}
++			}
++			if tc.name == "branch" && len(r.Rules.Candidates[0].Conditions) == 0 {
++				t.Fatal("branch condition lost")
++			}
++		})
++	}
++}
++func TestRulePackDiscardedErrorCorpus(t *testing.T) {
++	cases := []struct {
++		name, code string
++		count      int
++	}{
++		{"discarded", "func F(s string)int{v,_:=strconv.Atoi(s);return v}", 1},
++		{"copy", "func F(s string)int{v,_:=strconv.ParseInt(s,10,64);out:=v;return out}", 1},
++		{"checked", "func F(s string)int{v,err:=strconv.Atoi(s);if err!=nil{return 0};return v}", 0},
++		{"overwritten", "func F(s string)int{v,_:=strconv.Atoi(s);v=3;return v}", 0},
++		{"unused", "func F(s string)int{v,_:=strconv.Atoi(s);_=v;return 3}", 0},
++		{"branch", "func F(s string,flag bool)int{v,_:=strconv.Atoi(s);if flag{return v};return 0}", 1},
++		{"renamed_miss", "func F(s string)int{v,_:=conversion.Atoi(s);return v}", 0},
++	}
++	for _, tc := range cases {
++		t.Run(tc.name, func(t *testing.T) {
++			r := ruleAnalyze(t, tc.code, RuleOptions{})
++			if r.Rules.Status != "matched_bounded" || len(r.Rules.Candidates) != tc.count {
++				t.Fatalf("%+v", r.Rules)
++			}
++			for _, c := range r.Rules.Candidates {
++				if c.RuleID != "discarded-conversion-error" {
++					t.Fatal(c)
++				}
++			}
++		})
++	}
++}
++func TestRuleBoundsOptInAndDeterministicSourcePins(t *testing.T) {
++	code := "func F(cmd string){exec.Command(cmd);exec.Command(cmd)}"
++	r := ruleAnalyze(t, code, RuleOptions{MaxCandidates: 1})
++	if len(r.Rules.Candidates) != 1 || r.Rules.Status != "incomplete" || r.Rules.StopReason != "candidates" {
++		t.Fatal(r.Rules)
++	}
++	r = ruleAnalyze(t, code, RuleOptions{MaxFlowSteps: 1})
++	if r.Rules.Status != "incomplete" || r.Rules.FlowSteps != 1 || r.Rules.StopReason != "flow_steps" {
++		t.Fatal(r.Rules)
++	}
++	r = ruleAnalyze(t, code, RuleOptions{})
++	again := ruleAnalyze(t, code, RuleOptions{})
++	if !reflect.DeepEqual(r.Rules, again.Rules) {
++		t.Fatal("nondeterministic pack/candidates")
++	}
++	plain, e := Analyze(context.Background(), retained(), []byte(code), Options{})
++	if e != nil || plain.Rules != nil || !reflect.DeepEqual(plain.DefUse, r.DefUse) {
++		t.Fatal("default enabled or recomputed different base graph")
++	}
++	for _, pack := range []string{"", "latest", "go-local-review@2.0.0"} {
++		if _, e = AnalyzeRules(context.Background(), retained(), []byte(code), Options{}, pack, RuleOptions{}); e == nil {
++			t.Fatal("implicit/unknown pack")
++		}
++	}
++	source := retained()
++	source.NodeID = "other"
++	changed, e := AnalyzeRules(context.Background(), source, []byte(code), Options{}, RulePackID, RuleOptions{})
++	if e != nil || changed.Rules.Candidates[0].ID == r.Rules.Candidates[0].ID {
++		t.Fatal("candidate mixed source identity", e)
++	}
++	ctx, cancel := context.WithCancel(context.Background())
++	cancel()
++	r, e = AnalyzeRules(ctx, retained(), []byte(code), Options{}, RulePackID, RuleOptions{})
++	if e != nil || r.Rules.Status != "incomplete" || r.Rules.StopReason != "base_analysis_incomplete" {
++		t.Fatal(r, e)
++	}
++	r, e = AnalyzeRules(context.Background(), retained(), []byte(code), Options{MaxNodes: 1}, RulePackID, RuleOptions{})
++	if e != nil || !r.Truncated || r.Rules.Status != "incomplete" {
++		t.Fatal(r, e)
++	}
++}
++func TestRuleQueryStrictInputPinsAndChangingSnapshot(t *testing.T) {
++	valid := `{"rule_pack":"go-local-review@1.0.0","function":{"node_id":"1111111111111111"}}`
++	q, e := DecodeRuleQueryInput([]byte(valid))
++	if e != nil {
++		t.Fatal(e)
++	}
++	for _, raw := range []string{`{}`, strings.Replace(valid, "go-local-review@1.0.0", "latest", 1), strings.Replace(valid, `"node_id":"1111111111111111"`, `"node_id":"1111111111111111","node_id":"x"`, 1), strings.Replace(valid, `"function":{`, `"unknown":true,"function":{`, 1), strings.Replace(valid, `"function":{`, `"max_candidates":0,"function":{`, 1), strings.Replace(valid, `"function":{`, `"max_flow_steps":1.5,"function":{`, 1), strings.Replace(valid, `"function":{"node_id":"1111111111111111"}`, `"function":null`, 1), valid + `{}`} {
++		if _, e = DecodeRuleQueryInput([]byte(raw)); e == nil {
++			t.Fatal("invalid input accepted", raw)
++		}
++	}
++	s, id := queryFixture(t)
++	q.Function.NodeID = id
++	out, e := QueryRules(context.Background(), s, q)
++	if e != nil || out.Analysis == nil || out.Analysis.Rules == nil {
++		t.Fatal(out, e)
++	}
++	for _, mode := range []string{"manifest", "node", "blob"} {
++		out, e = QueryRules(context.Background(), &driftingReader{Reader: s, mode: mode}, q)
++		if e != nil || out.Status != "snapshot_changed" || out.Analysis != nil {
++			t.Fatal(out, e)
++		}
++	}
++	q.Function.ExpectedSourceSHA256 = strings.Repeat("b", 64)
++	out, e = QueryRules(context.Background(), s, q)
++	if e != nil || out.Status != "source_mismatch" || out.Analysis != nil {
++		t.Fatal(out, e)
++	}
++	raw, e := json.Marshal(ruleAnalyze(t, "func F(cmd string){exec.Command(cmd)}", RuleOptions{}))
++	if e != nil || !strings.Contains(string(raw), `"origin":"automatic"`) {
++		t.Fatal(e)
++	}
++}
+diff --git a/scripts/eval-go-rule-candidates.py b/scripts/eval-go-rule-candidates.py
+new file mode 100644
+index 00000000..28e09c4b
+--- /dev/null
++++ b/scripts/eval-go-rule-candidates.py
+@@ -0,0 +1,151 @@
++#!/usr/bin/env python3
++"""Owned compiled Go corpus -> retained graph -> actual opt-in MCP rule queries.
++
++Reports exact corpus scope and deliberate FP/FN limitations. Never executes a
++constructed command, reads personal sessions, or records human acceptance.
++"""
++from pathlib import Path
++import argparse
++import hashlib
++import json
++import sqlite3
++import subprocess
++import time
++import importlib.util
++_spec = importlib.util.spec_from_file_location("value_probe", Path(__file__).with_name("eval-value-dependencies.py"))
++_probe = importlib.util.module_from_spec(_spec)
++_spec.loader.exec_module(_probe)
++Client, encode, require, sha = _probe.Client, _probe.encode, _probe.require, _probe.sha
++PACK = 'go-local-review@1.0.0'
++SOURCE = '''package cases
++import (
++ "context"
++ "os/exec"
++ process "os/exec"
++ "strconv"
++ conversion "strconv"
++)
++type Fake struct{}
++func (Fake) Command(string) string { return "fixed" }
++func sanitize(string)string{return "fixed"}
++func Parameter(cmd string)*exec.Cmd{return exec.Command(cmd)}
++func Compound(cmd string)*exec.Cmd{cmd+="suffix";return exec.Command(cmd)}
++func Copy(cmd string)*exec.Cmd{name:=cmd;return exec.Command(name)}
++func Kill(cmd string)*exec.Cmd{name:=cmd;name="fixed";return exec.Command(name)}
++func Argument(cmd string)*exec.Cmd{return exec.Command("fixed",cmd)}
++func Branch(cmd string,flag bool)*exec.Cmd{name:="fixed";if flag{name=cmd};return exec.Command(name)}
++func Loop(cmd string,flag bool)*exec.Cmd{name:="fixed";for flag{name=cmd;flag=false};return exec.Command(name)}
++func Shadow(cmd string)*exec.Cmd{name:="fixed";{name:=cmd;_=name};return exec.Command(name)}
++func Parallel(cmd string)*exec.Cmd{name,other:="fixed",cmd;_=other;return exec.Command(name)}
++func CommandContext(cmd string)*exec.Cmd{return exec.CommandContext(context.Background(),cmd)}
++func Sanitizer(cmd string)*exec.Cmd{name:=sanitize(cmd);return exec.Command(name)}
++func Alias(cmd string)*exec.Cmd{ref:=&cmd;return exec.Command(*ref)}
++func Renamed(cmd string)*exec.Cmd{return process.Command(cmd)}
++func Spoof(cmd string,exec Fake)string{return exec.Command(cmd)}
++func Closure(cmd string)func()*exec.Cmd{return func()*exec.Cmd{return exec.Command(cmd)}}
++func Discard(s string)int{v,_:=strconv.Atoi(s);return v}
++func DiscardCopy(s string)int64{v,_:=strconv.ParseInt(s,10,64);out:=v;return out}
++func Checked(s string)int{v,err:=strconv.Atoi(s);if err!=nil{return 0};return v}
++func ErrorKill(s string)int{v,_:=strconv.Atoi(s);v=3;return v}
++func ErrorUnused(s string)int{v,_:=strconv.Atoi(s);_=v;return 3}
++func ErrorBranch(s string,flag bool)int{v,_:=strconv.Atoi(s);if flag{return v};return 0}
++func ErrorRenamed(s string)int{v,_:=conversion.Atoi(s);return v}
++func Multiple(cmd string){exec.Command(cmd);exec.Command(cmd)}
++'''
++TEST = '''package cases
++import "testing"
++func TestIndependentRuntimeContracts(t *testing.T){
++ input:="/fixture/input-command"
++ if Compound(input).Path!=input+"suffix"{t.Fatal("compound input propagation lost")}
++ for _,cmd:=range []string{Parameter(input).Path,Copy(input).Path,Branch(input,true).Path,Loop(input,true).Path,CommandContext(input).Path,Alias(input).Path,Renamed(input).Path,Closure(input)().Path}{if cmd!=input{t.Fatal("input-dependent name lost",cmd)}}
++ for _,cmd:=range []string{Kill(input).Path,Argument(input).Path,Branch(input,false).Path,Loop(input,false).Path,Shadow(input).Path,Parallel(input).Path,Sanitizer(input).Path,Spoof(input,Fake{})}{if cmd!="fixed"{t.Fatal("fixed command contract",cmd)}}
++ if Discard("17")!=17||Discard("bad")!=0||DiscardCopy("17")!=17||Checked("bad")!=0||ErrorKill("bad")!=3||ErrorUnused("bad")!=3||ErrorBranch("17",true)!=17||ErrorBranch("17",false)!=0||ErrorRenamed("17")!=17{t.Fatal("conversion contract")}
++ Multiple(input)
++}
++'''
++# (expected count under documented matching contract, independent review-condition
++# truth for THIS compiled fixture). Truth concerns data/error handling, not exploits.
++CASES = {
++ 'Parameter': (1,True), 'Compound': (1,True), 'Copy': (1,True), 'Kill': (0,False),
++ 'Argument': (0,False), 'Branch': (1,True), 'Loop': (1,True),
++ 'Shadow': (0,False), 'Parallel': (0,False), 'CommandContext': (1,True),
++ 'Sanitizer': (1,False), 'Alias': (0,True), 'Renamed': (0,True),
++ 'Spoof': (1,False), 'Closure': (0,True),
++ 'Discard': (1,True), 'DiscardCopy': (1,True), 'Checked': (0,False),
++ 'ErrorKill': (0,False), 'ErrorUnused': (0,False), 'ErrorBranch': (1,True),
++ 'ErrorRenamed': (0,True), 'Multiple': (2,True),
++}
++
++def graph_digest(directory):
++ db=next(directory.glob('*.db'))
++ with sqlite3.connect(f'file:{db}?mode=ro',uri=True) as connection:
++  rows=list(connection.iterdump())
++ return sha('\n'.join(rows).encode())
++
++def main():
++ parser=argparse.ArgumentParser();parser.add_argument('--binary',type=Path,required=True);parser.add_argument('--cks-binary',type=Path,required=True);parser.add_argument('--out',type=Path,required=True);args=parser.parse_args()
++ root=args.out.resolve();require(not root.exists(),'fresh owned execution directory required');root.mkdir();repo=root/'source';repo.mkdir()
++ def run(label,command,cwd=repo):
++  started=time.monotonic();out=subprocess.run(command,cwd=cwd,capture_output=True,timeout=150)
++  (root/(label+'.stdout.txt')).write_bytes(out.stdout);(root/(label+'.stderr.txt')).write_bytes(out.stderr)
++  (root/(label+'.receipt.json')).write_bytes(encode({'command':command,'exit_code':out.returncode,'elapsed_seconds':time.monotonic()-started,'stdout_sha256':sha(out.stdout),'stderr_sha256':sha(out.stderr)}))
++  require(out.returncode==0,'failed '+label);return out.stdout.decode().strip()
++ for name,contents in {'go.mod':'module example.invalid/rule-fixture\n\ngo 1.26.9\n','cases.go':SOURCE,'cases_test.go':TEST,'manual.yaml':'''security_patterns:
++  - id: manual-command-review
++    name: Manual command review
++    category: command
++    severity: info
++    description: Owned fixture operator annotation; no automatic confirmation
++    matches: ["cases.Parameter"]
++'''}.items():(repo/name).write_text(contents)
++ run('format',['gofmt','-w','cases.go','cases_test.go']);run('git-init',['git','init','-q']);run('git-add',['git','add','.'])
++ run('git-commit',['git','-c','user.name=Owned rule fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','test: capture local rule review cases'])
++ commit=run('git-head',['git','rev-parse','HEAD']);run('fixture-normal-race',['go','test','-race','-count=1','./...']);run('fixture-vet',['go','vet','./...']);run('fixture-bundle',['git','bundle','create',str(root/'source.bundle'),'HEAD'])
++ graph=root/'graph';binary=args.binary.resolve();run('index',[str(binary),'build','--src',str(repo),'--out',str(graph),'--lang','go','--security-pattern-file',str(repo/'manual.yaml')],root)
++ before=graph_digest(graph);client=Client(binary,graph,root);checks=[];found={};outputs={};confusion={'tp':0,'tn':0,'fp':0,'fn':0};times=[]
++ try:
++  require('error'not in client.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-rule-verifier','version':'1'}}),'initialize failed')
++  tools=client.request('tools/list')['result']['tools'];tool=next(t for t in tools if t['name']=='flow_probe.context.rule_candidates');require(tool['annotations']['readOnlyHint']is True,'rule write annotation');(root/'tools.json').write_bytes(encode(tools))
++  manual=client.tool('find_symbol',{'name':'manual-command-review','exact':True})['nodes'];require(any(n['type']=='SecurityPattern'for n in manual),'manual YAML annotation absent before analysis')
++  for name,(count,truth) in CASES.items():
++   nodes=client.tool('find_symbol',{'name':name,'exact':False})['nodes'];require(len(nodes)==1,'ambiguous '+name);found[name]=nodes[0]
++   query={'rule_pack':PACK,'function':{'node_id':nodes[0]['id'],'expected_commit':commit}}
++   out=client.tool('rule_candidates',query);r=out.get('analysis');require(r is not None and r.get('rules'),'missing computed rules '+name);rules=r['rules'];require(rules['status']=='matched_bounded'and len(rules['candidates'])==count,'contract mismatch '+name+': '+str(rules))
++   require(rules['origin']=='automatic'and len(rules['pack_sha256'])==64 and r['source']['commit']==commit,'pack/source provenance lost');require(not r['truncated'],'base incomplete')
++   for c in rules['candidates']:
++    require(c['sanitizer']=='not_proven'and c['target_resolution']=='syntax_only_unverified','semantic confidence overclaim')
++    require(all(any(n['id']==p for n in r['nodes'])for p in c['path']),'path references missing original nodes')
++   if name in ('Branch','ErrorBranch'):require(any(c['conditions']for c in rules['candidates']),'branch conditions lost')
++   key='tp'if count and truth else'tn'if not count and not truth else'fp'if count else'fn';confusion[key]+=1
++   times.append(out['elapsed_micros']);outputs[name]=out;(root/(name+'.json')).write_bytes(encode(out));checks.append(name+' contract')
++  # Boundaries are executed through the actual public MCP, not just unit calls.
++  out=client.tool('rule_candidates',{'rule_pack':PACK,'function':{'node_id':found['Multiple']['id']},'max_candidates':1});require(out['analysis']['rules']['status']=='incomplete'and out['analysis']['rules']['stop_reason']=='candidates'and len(out['analysis']['rules']['candidates'])==1,'candidate cap hidden');checks.append('candidate limit')
++  out=client.tool('rule_candidates',{'rule_pack':PACK,'function':{'node_id':found['Parameter']['id']},'max_flow_steps':1});require(out['analysis']['rules']['status']=='incomplete'and out['analysis']['rules']['flow_steps']==1,'work limit hidden');checks.append('flow limit')
++  out=client.tool('rule_candidates',{'rule_pack':PACK,'function':{'node_id':found['Parameter']['id'],'expected_source_sha256':'0'*64}});require(out['status']=='source_mismatch'and out['analysis']is None,'stale pin accepted');checks.append('stale pin')
++  plain=client.tool('value_dependencies',{'node_id':found['Parameter']['id']});require('rules'not in plain['analysis'],'default enabled rules');checks.append('default off')
++  for arguments in ({'function':{'node_id':found['Parameter']['id']}},{'rule_pack':'latest','function':{'node_id':found['Parameter']['id']}},{'rule_pack':PACK,'function':{'node_id':found['Parameter']['id']},'max_candidates':0}):
++   response=client.request('tools/call',{'name':'flow_probe.context.rule_candidates','arguments':arguments});require('error'in response or response.get('result',{}).get('isError'),'invalid input accepted')
++  checks.append('pack/input refusal')
++  (repo/'cases.go').unlink()
++  out=client.tool('rule_candidates',{'rule_pack':PACK,'function':{'node_id':found['Parameter']['id'],'expected_source_sha256':outputs['Parameter']['analysis']['source']['sha256'],'expected_snapshot_sha256':outputs['Parameter']['snapshot_sha256']}})
++  require(out['analysis']['rules']==outputs['Parameter']['analysis']['rules'],'live source fallback or unstable retained results');checks.append('retained source after deletion')
++  after_manual=client.tool('find_symbol',{'name':'manual-command-review','exact':True})['nodes'];require(after_manual==manual,'manual annotation overwritten');checks.append('manual annotation retained')
++ finally:client.close()
++ require(graph_digest(graph)==before,'read-only candidate query changed persisted graph');checks.append('persisted graph unchanged')
++ cksroot=root/'cks';cksroot.mkdir();config=cksroot/'cks.yaml'
++ sanitizer=Path(__file__).resolve().parents[1]/'system/policies/sanitization_rules.yaml'
++ config.write_text('version: 1\nname: owned-rule-verifier\nbackends:\n  ckg:\n    path: '+str(graph/'graph.db')+'\n  ckv:\n    provider: mock\nlisten:\n  transport: stdio\nlogging:\n  level: error\nsanitize:\n  rules_path: '+str(sanitizer)+'\n  default_action: drop\n  fail_closed_on_unknown_rule: true\n')
++ cks=Client(args.cks_binary.resolve(),graph,cksroot,command=[str(args.cks_binary.resolve()),'mcp','--config',str(config)],namespace='cks.context.')
++ try:
++  require('error'not in cks.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-rule-facade','version':'1'}}),'CKS initialize failed')
++  cks_tools=cks.request('tools/list')['result']['tools'];(cksroot/'tools.json').write_bytes(encode(cks_tools))
++  for name in ('Parameter','Kill','Discard','Sanitizer','Alias'):
++   q={'rule_pack':PACK,'function':{'node_id':found[name]['id'],'expected_commit':commit}}
++   out=cks.tool('rule_candidates',q);require(out['analysis']['rules']==outputs[name]['analysis']['rules']and out['analysis']['source']==outputs[name]['analysis']['source'],'CKS facade changed graph computation '+name);(cksroot/(name+'.json')).write_bytes(encode(out));checks.append('CKS '+name+' parity')
++  plain=cks.tool('value_dependencies',{'node_id':found['Parameter']['id']});require('rules'not in plain['analysis'],'CKS default enabled pack');checks.append('CKS default off')
++  stale=cks.tool('rule_candidates',{'rule_pack':PACK,'function':{'node_id':found['Parameter']['id'],'expected_source_sha256':'0'*64}});require(stale['status']=='source_mismatch'and stale['analysis']is None,'CKS lost stale-pin boundary');checks.append('CKS stale pin')
++ finally:cks.close()
++ require(graph_digest(graph)==before,'CKS facade changed graph');checks.append('CKS graph unchanged')
++ denom=len(CASES);summary={'schema_version':1,'scope':'owned compiled Go fixture; review-condition observations, not vulnerability acceptance','source_commit':commit,'binary_sha256':sha(binary.read_bytes()),'checks':checks,'cases':denom,'matching_contract_passed':denom,'review_condition_confusion':confusion,'precision':confusion['tp']/(confusion['tp']+confusion['fp']),'recall':confusion['tp']/(confusion['tp']+confusion['fn']),'known_false_positives':['Sanitizer','Spoof'],'known_false_negatives':['Alias','Renamed','Closure','ErrorRenamed'],'elapsed_micros':{'min':min(times),'max':max(times),'total':sum(times)},'tools_count':len(tools),'cks_tools_count':len(cks_tools),'cks_requests':cks.id,'cks_exit':cks.proc.returncode,'cks_binary_sha256':sha(args.cks_binary.read_bytes()),'requests':client.id,'mcp_exit':client.proc.returncode,'independent_acceptance':'not_recorded'}
++ (root/'summary.json').write_bytes(encode(summary));print(json.dumps({'out':str(root),'checks':len(checks),'cases':denom,'confusion':confusion,'mcp_exit':client.proc.returncode}))
++if __name__=='__main__':main()
+diff --git a/scripts/eval-value-dependencies.py b/scripts/eval-value-dependencies.py
+index 4c075cc5..42c45020 100644
+--- a/scripts/eval-value-dependencies.py
++++ b/scripts/eval-value-dependencies.py
+@@ -50,9 +50,9 @@ def require(value,message):
+ def encode(value):return (json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode()
+ def sha(raw):return hashlib.sha256(raw).hexdigest()
+ class Client:
+- def __init__(self,binary,graph,root):
+-  self.root=root;self.id=0;self.queue=queue.Queue();self.stderr=(root/'mcp.stderr.txt').open('wb');self.stdout=(root/'mcp.stdout.jsonl').open('w');self.stdin=(root/'mcp.stdin.jsonl').open('w')
+-  self.proc=subprocess.Popen([str(binary),'mcp','--graph',str(graph),'--namespace','flow_probe'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=self.stderr,text=True)
++ def __init__(self,binary,graph,root,command=None,namespace="flow_probe.context."):
++  self.namespace=namespace;self.root=root;self.id=0;self.queue=queue.Queue();self.stderr=(root/'mcp.stderr.txt').open('wb');self.stdout=(root/'mcp.stdout.jsonl').open('w');self.stdin=(root/'mcp.stdin.jsonl').open('w')
++  self.proc=subprocess.Popen(command or [str(binary),'mcp','--graph',str(graph),'--namespace','flow_probe'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=self.stderr,text=True)
+   def read():
+    for line in self.proc.stdout:self.queue.put(line)
+    self.queue.put(None)
+@@ -66,7 +66,7 @@ class Client:
+    if reply.get('id')==self.id:return reply
+   raise TimeoutError('actual MCP response timed out')
+  def tool(self,name,arguments):
+-  reply=self.request('tools/call',{'name':'flow_probe.context.'+name,'arguments':arguments});require('error'not in reply,'actual tool protocol error: '+str(reply.get('error')));value=reply['result'];require(not value.get('isError'),'actual tool execution error: '+str(value));return value.get('structuredContent')or json.loads(value['content'][0]['text'])
++  reply=self.request('tools/call',{'name':self.namespace+name,'arguments':arguments});require('error'not in reply,'actual tool protocol error: '+str(reply.get('error')));value=reply['result'];require(not value.get('isError'),'actual tool execution error: '+str(value));return value.get('structuredContent')or json.loads(value['content'][0]['text'])
+  def close(self):
+   self.proc.stdin.close()
+   try:self.proc.wait(timeout=20)

@@ -1,0 +1,15 @@
+version: 1
+name: owned-rule-verifier
+backends:
+  ckg:
+    path: /private/tmp/ks-wi6-rule-regression/graph/graph.db
+  ckv:
+    provider: mock
+listen:
+  transport: stdio
+logging:
+  level: error
+sanitize:
+  rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true

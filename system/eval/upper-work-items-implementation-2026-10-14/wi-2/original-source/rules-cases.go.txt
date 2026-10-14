@@ -1,0 +1,73 @@
+package cases
+
+import (
+	"context"
+	"os/exec"
+	process "os/exec"
+	"strconv"
+	conversion "strconv"
+)
+
+type Fake struct{}
+
+func (Fake) Command(string) string   { return "fixed" }
+func sanitize(string) string         { return "fixed" }
+func Parameter(cmd string) *exec.Cmd { return exec.Command(cmd) }
+func Compound(cmd string) *exec.Cmd  { cmd += "suffix"; return exec.Command(cmd) }
+func Copy(cmd string) *exec.Cmd      { name := cmd; return exec.Command(name) }
+func Kill(cmd string) *exec.Cmd      { name := cmd; name = "fixed"; return exec.Command(name) }
+func Argument(cmd string) *exec.Cmd  { return exec.Command("fixed", cmd) }
+func Branch(cmd string, flag bool) *exec.Cmd {
+	name := "fixed"
+	if flag {
+		name = cmd
+	}
+	return exec.Command(name)
+}
+func Loop(cmd string, flag bool) *exec.Cmd {
+	name := "fixed"
+	for flag {
+		name = cmd
+		flag = false
+	}
+	return exec.Command(name)
+}
+func Shadow(cmd string) *exec.Cmd {
+	name := "fixed"
+	{
+		name := cmd
+		_ = name
+	}
+	return exec.Command(name)
+}
+func Parallel(cmd string) *exec.Cmd {
+	name, other := "fixed", cmd
+	_ = other
+	return exec.Command(name)
+}
+func CommandContext(cmd string) *exec.Cmd { return exec.CommandContext(context.Background(), cmd) }
+func Sanitizer(cmd string) *exec.Cmd      { name := sanitize(cmd); return exec.Command(name) }
+func Alias(cmd string) *exec.Cmd          { ref := &cmd; return exec.Command(*ref) }
+func Renamed(cmd string) *exec.Cmd        { return process.Command(cmd) }
+func Spoof(cmd string, exec Fake) string  { return exec.Command(cmd) }
+func Closure(cmd string) func() *exec.Cmd { return func() *exec.Cmd { return exec.Command(cmd) } }
+func Discard(s string) int                { v, _ := strconv.Atoi(s); return v }
+func DiscardCopy(s string) int64          { v, _ := strconv.ParseInt(s, 10, 64); out := v; return out }
+func Checked(s string) int {
+	v, err := strconv.Atoi(s)
+	if err != nil {
+		return 0
+	}
+	return v
+}
+func ErrorKill(s string) int   { v, _ := strconv.Atoi(s); v = 3; return v }
+func ErrorUnused(s string) int { v, _ := strconv.Atoi(s); _ = v; return 3 }
+func ErrorBranch(s string, flag bool) int {
+	v, _ := strconv.Atoi(s)
+	if flag {
+		return v
+	}
+	return 0
+}
+func ErrorRenamed(s string) int { v, _ := conversion.Atoi(s); return v }
+func Multiple(cmd string)       { exec.Command(cmd); exec.Command(cmd) }

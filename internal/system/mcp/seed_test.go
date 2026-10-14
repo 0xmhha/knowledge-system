@@ -28,6 +28,7 @@ var seedParamNames = map[string]bool{"symbol": true}
 // tool against its owner makes a new tool declare which half it belongs to
 // instead of quietly belonging to neither.
 var seedCoverage = map[string]string{
+	ToolNameLabelSuspects:     "mcp",
 	ToolNameFindCallers:       "mcp",
 	ToolNameFindCallees:       "mcp",
 	ToolNameChangeHistory:     "mcp",

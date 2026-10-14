@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "plan": {
+    "schema_version": 1,
+    "id": "owned-log-window-1",
+    "source": {
+      "commit": "86665541f15157ab96f495fb2942b69aba1e7033",
+      "binary_sha256": "49d094fd3bf396888d5479efb12f021ea59f9b30c4bb044da4c6f1d4c42c8370",
+      "driver_sha256": "1258d982db55580b9538a2aea83a200bf1c6710aa1dd4a3c11cc702979114ef0",
+      "environment_sha256": "0f184a372ed48b1fee7963a9ebc16c696a812f3849e655a0e1267baa76a055ab"
+    },
+    "probe_id": "read-probe",
+    "instrumentation_sha256": "1258d982db55580b9538a2aea83a200bf1c6710aa1dd4a3c11cc702979114ef0",
+    "event": "read-before-commit",
+    "sites": [
+      "main/read"
+    ],
+    "window_seconds": 2,
+    "poll_ms": 100,
+    "max_bytes": 65536,
+    "max_events": 32,
+    "anchors": [
+      {
+        "node": 1,
+        "id": 334522996,
+        "initial": ""
+      }
+    ]
+  },
+  "plan_sha256": "63ae5a545ae2a16025fec5321fa63340cc3247a9b71d1aa932d3666b724fdb61",
+  "events": [],
+  "polls": 17,
+  "started_at": "2026-10-14T06:26:31.79387Z",
+  "finished_at": "2026-10-14T06:26:33.795938Z",
+  "verdict": "AWAITING_OBSERVATION",
+  "reason": "window_finished",
+  "resume_requested": false,
+  "acceptance": "not_recorded"
+}

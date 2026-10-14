@@ -46,19 +46,21 @@
 
 ## 외부 상위 목표의 책임
 
-6월 상위 계획의 WI10개는 지식 제품의 9월 리팩토링18개와 범위가 다르다. 외부 저장소의 최신 코드·실행은 이번 문서 정리에서 감사하지 않았다. 코드 도구가 존재한다는 사실로 아래 항목의 완료를 추정하지 않는다.
+현재 구현 진행은 [상위 WI 구현 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md)를 따른다. 아래 표는 재감사의 기준 상태이며 구현 이후의 검증·잔여는 구현 원장에서 갱신한다.
 
-| ID | 목표·담당 | 현재 확인 가능한 경계 |
+6월 상위 계획의 WI10개는 지식 제품의 9월 리팩토링18개와 범위가 다르다. 2026-10-14에 담당 소스와 안전한 시험을 [재감사](./UPPER-WORK-ITEMS-AUDIT.md)했다. 감사 결과 기록은10/10, 원래 기능 전체의 완료·독립 수용 판정은0/10이다. WI-5의 담당 저장소는 미확보다. 코드 도구·절차 문서·단위 시험만으로 외부 전체 워크플로의 완료를 추정하지 않는다.
+
+| ID | 목표·담당 | 감사 후 현재 경계·잔여 |
 |---|---|---|
-| WI-V1 | 오라클 타당성·mutation/민감도/독립 재유도; coding-agent | 외부 현재 구현 미감사. RED/GREEN만으로 충분한지 실제 false-done 차단 확인 |
-| WI-V2 | 수정 후보 생성·judge-panel 선택; coding-agent | 외부 미감사. 같은 증상에 대한 후보별 비교·선택 증거 필요 |
-| WI-3 | 증상→코드 후보 추림·객관 신호 라벨링; coding-agent+CKS | CKS 개별 탐색/flow 도구 존재, 일반 코드 후보 통합 라벨링 완료 근거 없음. LLM의 증상별 판단과 사실 신호 분리 계약 확인 |
-| WI-4 | 비결정/타이밍 재현·방어·모니터링; coding-agent+ChainBench | 외부 미감사. 재현 불가/주입/관찰의 완료 조건과 실제 사례 필요 |
-| WI-1 | dataflow/CFG/PDG; CKG | 제품 내 값 흐름 레이어 근거 미확보. 언어·on-demand/전체·정확도/비용 계약과 실측 필요 |
-| WI-2 | LLM 비의존 규칙 태깅/취약점; CKG/CKS | 수동 Policy/SecurityPattern 있음. source→sink 탐지와 작은 타입/룰 팩 효과 별도 확인 |
-| WI-C | 시퀀스/모듈·data/state·가드·성능·우선순위 산출물; coding-agent | 외부 미감사. 도구/다이어그램 존재와 깊은 리뷰 산출물의 수용은 구별 |
-| WI-6 | 다단·dataflow-shaped 확장; CKS | 호출 hop/curated flow 확장 있음. 값 의존성을 따라가는 확장과 비용/누락 검증 필요 |
-| WI-SP | security-pattern/policy MCP 노출; CKS+CKG | 저장/연결 존재. 전용 공개 질의·권한·출처 계약과 실제 반환 검증 필요; v2 정책 근거로 통째 완료 처리하지 않음 |
-| WI-5 | 암묵지 수집·관리자 학습; 별도 ingest MCP/플러그인 | 외부 미감사·당시 지금 구현하지 않음. 사람 검토·sanitize·dedup·승격/회수·색인 소비 실제 루프 확인 |
+| WI-V1 | 오라클 타당성; coding-agent | RED/GREEN·수정 타당성 분리와 sibling 검사 있음. 일부 무효 오라클·과적합은 WARN 통과; 독립 오라클·실제 false-done 반례 미수용 |
+| WI-V2 | 수정 후보 생성·judge-panel 선택; coding-agent | 경쟁 원인 probe는 있음. 같은 증상의 복수 수정안 비교·패널 선택 계약·실행 미확보 |
+| WI-3 | 증상→코드 후보·객관 신호; coding-agent+CKS | 개별 탐색·거리/score/impact·원인 라벨 있음. 입력 schema 차이·통합 후보 신호/provenance/null·반복 확장 계약 남음 |
+| WI-4 | 비결정/타이밍 재현·방어·관찰; coding-agent+ChainBench | 장애 주입·bounded monitor·simulation/e2e 절차와 모의 시험 있음. 반복 분모·실패율·실제 연결 실행 미수용 |
+| WI-1 | dataflow/CFG/PDG; CKG | AST·호출·field 관계 있음. def-use·control/data dependency 레이어 근거 미확보 |
+| WI-2 | 결정론 규칙 태깅/취약점; CKG/CKS | 수동 Policy/SecurityPattern resolve는 있음. source→sink 자동 탐지·타입/룰 팩 효과 미확보 |
+| WI-C | 깊은 구조화 리뷰; coding-agent | light findings 보고서·CKS 함수 근거 있음. sequence/module/data/state/guard/cost 산출물·소비자 연결·독립 수용 남음 |
+| WI-6 | 다단·dataflow-shaped 확장; CKS | bounded 호출 hop·curated flow 있음. 자동 값 의존 확장은 WI-1 의존, 독립 recall/noise/cost 미수용 |
+| WI-SP | security-pattern/policy MCP; CKS+CKG | CKG 일반 조회의 간접 노출 실측됨. CKS annotation 관계 변환·전용 schema/출처/권한·소비자 연결 남음 |
+| WI-5 | 암묵지 수집·관리자 학습; 별도 ingest MCP/플러그인 | 담당 미확보로 구현·실행 판정 불가. 개정된 명령 수집→파일 ingest→관리자 store/승격/회수 루프 필요 |
 
-이 항목들은 별도 범위 합의와 대상 저장소 증거가 필요한 후속 추적이다. 이번 작업으로 외부 코드, 운영 호스트 또는 학습 서비스를 변경하지 않는다.
+감사한 revision·원문·시험과 반례는 재감사 문서의 증거 패킷에 고정했다. 기능 구현은 구체 명세와 담당 저장소별 실행·수용을 확인한 후 완료 처리한다. 이번 감사에서 외부 코드·운영 호스트·학습 서비스는 변경하지 않았다.

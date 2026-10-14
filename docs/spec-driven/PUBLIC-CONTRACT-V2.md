@@ -116,3 +116,38 @@ v2 본문은32000bytes, citation은12개다. 최대128개 candidate refs를 입�
 ## 온톨로지 준비 상태와 설명
 
 현재 cks.semantic.status/lookup_term/get_concept/trace_requirement는 읽기 전용으로 같은 좌표를 검증한다. cks.context.get_for_task_v2의 explain_ontology는 최대8개념·20변경의 bounded 설명을 선택 출력한다. 설정 모드를 바꾸지 않으며, 점수는 문자열이고 미인용 후보 식별자는 해시로 제한한다. 설명과 semantic 문맥도 v2 무결성 계약으로 검증한다. [도구 가이드](../../system/docs/ontology-mcp.md)를 따른다.
+
+## 반복 조사용 후보 신호
+
+`cks.context.label_suspects`는 증상별 반복 조사의 한 단계에서 객관 신호만
+합성한다. `symptom`과 symbol, file+line, 이전 인용의 expand 중 하나를
+전달한다. seed를 생략하면 의미·키워드 검색으로 시작한다. 원인 판정은
+소비자 가설과 재현·독립 oracle에 남겨 둔다.
+
+출력은 후보별 distance/relation, seed 기준 impact category와 concurrency
+방향, 반환된 PR reference의 recency, backend별 검색 rank/score/source다.
+각 신호는 value/status/reason/provenance를 갖고, 미확보·오류·미지원 값은
+명시적 null이다. 데이터 흐름과 security provider가 연결되기 전의 신호는
+unsupported다. 검색 점수는 원인 확률이 아니며 backend 사이에 비교하지
+않는다. 거리와 빈 membership은 상한 안에서 관찰된 결과다.
+
+기본 후보/seed/enrichment/backend 호출/깊이/협력적 시간 예산은
+10/3/3/32/2/1000ms, 최대20/8/8/64/3/5000ms다. 예산에는 마지막 backend
+identity 검사가 포함되며, 보관 소스 검증 시간은 별도다. 중단·누락은
+partial과 budget.stop_reasons에 기록한다. 기한을 무시하는 기존 local
+store는 진행 중인 한 query를 늦게 끝낼 수 있지만 늦은 결과는 게시하지
+않는다. 그래프·벡터 identity가 요청 중 바뀌면 전체 응답을 거부한다.
+
+보관 데이터셋에서는 coordinates와 candidate.retained_citation 및
+provenance.retained_anchor가 동일한 project/dataset/snapshot/source mode와
+원문 file/content SHA256에 고정된다. source policy 검사를 통과해야 하며
+원문 본문은 이 응답에 포함하지 않는다. 다음 expand에는 받은
+CitationV2를 그대로 전달한다. snapshot-only/working-tree 인용을 committed
+증거로 바꾸거나 해시·데이터셋 좌표를 제거하면 거부한다. 보관 증거의
+고유 참조는128개, 참조당32KB, 총256KB로 제한한다.
+
+실제 등록된29개 도구의 모든 입력 schema 제약은
+`internal/system/mcp/testdata/agent-mcp.schema.json`과 대조한다. 소비자
+coding-agent에는 같은 schema와 wire name/host alias를 함께 배포한다.
+현재 구현·검증 증거와 전체 수용 상태는
+[상위 작업 구현 기록](UPPER-WORK-ITEMS-IMPLEMENTATION.md)에 구분해 기록한다.

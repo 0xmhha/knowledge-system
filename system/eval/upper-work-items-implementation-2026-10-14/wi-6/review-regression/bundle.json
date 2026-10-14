@@ -1,0 +1,979 @@
+{
+  "schema_version": 1,
+  "ticket_id": "DEEP-REVIEW-FIXTURE",
+  "rules": {
+    "tool": "cks.context.rule_candidates",
+    "arguments": {
+      "rule_pack": "go-local-review@1.0.0",
+      "function": {
+        "node_id": "c7b299f57164a5df",
+        "expected_commit": "8c15984acd234449e2c278d2263bcd236aca51d8",
+        "expected_source_sha256": "2debeb905228667208557e416dafb9f64fc596b441b29b7e90a86e901bcbf96b"
+      }
+    },
+    "result": {
+      "schema_version": 1,
+      "status": "partial",
+      "snapshot_sha256": "edc86e75c5d0a3cd83e08c5aa7952cbb26d9717c7e11a836d66220e0884bcff9",
+      "analysis": {
+        "schema_version": 1,
+        "source": {
+          "node_id": "c7b299f57164a5df",
+          "canonical_id": "example.invalid/deep-fixture.Process",
+          "file": "logic.go",
+          "commit": "8c15984acd234449e2c278d2263bcd236aca51d8",
+          "sha256": "2debeb905228667208557e416dafb9f64fc596b441b29b7e90a86e901bcbf96b",
+          "language": "go",
+          "start_line": 12,
+          "start_byte": 158,
+          "bytes": 241,
+          "snapshot_sha256": "edc86e75c5d0a3cd83e08c5aa7952cbb26d9717c7e11a836d66220e0884bcff9",
+          "function_name": "Process"
+        },
+        "limits": {
+          "max_source_bytes": 262144,
+          "max_ast_nodes": 4096,
+          "max_blocks": 256,
+          "max_nodes": 1024,
+          "max_edges": 4096,
+          "max_iterations": 128,
+          "timeout_ms": 1000,
+          "max_facts": 65536
+        },
+        "status": "partial",
+        "capability": {
+          "cfg": "bounded_go",
+          "control_dependence": "normal_exit_postdominators",
+          "data_dependence": "local_scalar_may_reach",
+          "def_use": "lexical_may_reach",
+          "exceptions": "unsupported",
+          "local_binding": "isolated_go_types",
+          "memory_alias": "unsupported",
+          "package_types": "unavailable_function_blob",
+          "short_circuit": "unsupported"
+        },
+        "blocks": [
+          {
+            "id": 0,
+            "kind": "Body",
+            "reachable": true,
+            "nodes": [
+              "entry",
+              "b0/n0",
+              "b0/n1",
+              "b0/n2",
+              "b0/n3"
+            ]
+          },
+          {
+            "id": 1,
+            "kind": "RangeLoop",
+            "reachable": true,
+            "nodes": []
+          },
+          {
+            "id": 2,
+            "kind": "RangeBody",
+            "reachable": true,
+            "nodes": [
+              "b2/n0"
+            ]
+          },
+          {
+            "id": 3,
+            "kind": "RangeDone",
+            "reachable": true,
+            "nodes": [
+              "b3/n0",
+              "b3/n1"
+            ]
+          },
+          {
+            "id": 4,
+            "kind": "IfThen",
+            "reachable": true,
+            "nodes": [
+              "b4/n0"
+            ]
+          },
+          {
+            "id": 5,
+            "kind": "IfDone",
+            "reachable": true,
+            "nodes": [
+              "b5/n0"
+            ]
+          },
+          {
+            "id": 6,
+            "kind": "Unreachable",
+            "reachable": false,
+            "nodes": []
+          }
+        ],
+        "nodes": [
+          {
+            "id": "b0/n0",
+            "block": 0,
+            "kind": "AssignStmt",
+            "location": {
+              "start_byte": 237,
+              "end_byte": 247,
+              "start_line": 13,
+              "end_line": 13
+            },
+            "text": "total := 0",
+            "synthetic": false
+          },
+          {
+            "id": "b0/n1",
+            "block": 0,
+            "kind": "Ident",
+            "location": {
+              "start_byte": 271,
+              "end_byte": 277,
+              "start_line": 14,
+              "end_line": 14
+            },
+            "text": "values",
+            "synthetic": false
+          },
+          {
+            "id": "b0/n2",
+            "block": 0,
+            "kind": "Ident",
+            "location": {
+              "start_byte": 253,
+              "end_byte": 254,
+              "start_line": 14,
+              "end_line": 14
+            },
+            "text": "_",
+            "synthetic": false
+          },
+          {
+            "id": "b0/n3",
+            "block": 0,
+            "kind": "Ident",
+            "location": {
+              "start_byte": 256,
+              "end_byte": 261,
+              "start_line": 14,
+              "end_line": 14
+            },
+            "text": "value",
+            "synthetic": false
+          },
+          {
+            "id": "b2/n0",
+            "block": 2,
+            "kind": "AssignStmt",
+            "location": {
+              "start_byte": 282,
+              "end_byte": 296,
+              "start_line": 15,
+              "end_line": 15
+            },
+            "text": "total += value",
+            "synthetic": false
+          },
+          {
+            "id": "b3/n0",
+            "block": 3,
+            "kind": "AssignStmt",
+            "location": {
+              "start_byte": 301,
+              "end_byte": 318,
+              "start_line": 17,
+              "end_line": 17
+            },
+            "text": "box.Total = total",
+            "synthetic": false
+          },
+          {
+            "id": "b3/n1",
+            "block": 3,
+            "kind": "BinaryExpr",
+            "location": {
+              "start_byte": 323,
+              "end_byte": 342,
+              "start_line": 18,
+              "end_line": 18
+            },
+            "text": "strict && total < 0",
+            "synthetic": false
+          },
+          {
+            "id": "b4/n0",
+            "block": 4,
+            "kind": "AssignStmt",
+            "location": {
+              "start_byte": 347,
+              "end_byte": 364,
+              "start_line": 19,
+              "end_line": 19
+            },
+            "text": "command = \"fixed\"",
+            "synthetic": false
+          },
+          {
+            "id": "b5/n0",
+            "block": 5,
+            "kind": "ReturnStmt",
+            "location": {
+              "start_byte": 369,
+              "end_byte": 397,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "text": "return exec.Command(command)",
+            "synthetic": false
+          },
+          {
+            "id": "entry",
+            "block": 0,
+            "kind": "entry",
+            "location": {
+              "start_byte": 158,
+              "end_byte": 233,
+              "start_line": 12,
+              "end_line": 12
+            },
+            "text": "",
+            "synthetic": true
+          }
+        ],
+        "edges": [
+          {
+            "from": "b0",
+            "to": "b1",
+            "kind": "cfg",
+            "certainty": "structural"
+          },
+          {
+            "from": "b1",
+            "to": "b2",
+            "kind": "cfg",
+            "condition": "branch_0",
+            "certainty": "conservative"
+          },
+          {
+            "from": "b1",
+            "to": "b3",
+            "kind": "cfg",
+            "condition": "branch_1",
+            "certainty": "conservative"
+          },
+          {
+            "from": "b2",
+            "to": "b1",
+            "kind": "cfg",
+            "certainty": "structural"
+          },
+          {
+            "from": "b3",
+            "to": "b4",
+            "kind": "cfg",
+            "condition": "true",
+            "certainty": "conservative"
+          },
+          {
+            "from": "b3",
+            "to": "b5",
+            "kind": "cfg",
+            "condition": "false",
+            "certainty": "conservative"
+          },
+          {
+            "from": "b4",
+            "to": "b5",
+            "kind": "cfg",
+            "certainty": "structural"
+          },
+          {
+            "from": "entry",
+            "to": "b0/n1",
+            "kind": "reference_dependence",
+            "certainty": "may_reach",
+            "variable": "v197"
+          },
+          {
+            "from": "b0/n0",
+            "to": "b2/n0",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v237"
+          },
+          {
+            "from": "b2/n0",
+            "to": "b2/n0",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v237"
+          },
+          {
+            "from": "b0/n0",
+            "to": "b3/n0",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v237"
+          },
+          {
+            "from": "b2/n0",
+            "to": "b3/n0",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v237"
+          },
+          {
+            "from": "entry",
+            "to": "b3/n0",
+            "kind": "address_dependence",
+            "certainty": "may_reach",
+            "variable": "v171"
+          },
+          {
+            "from": "entry",
+            "to": "b3/n1",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v211"
+          },
+          {
+            "from": "b0/n0",
+            "to": "b3/n1",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v237"
+          },
+          {
+            "from": "b2/n0",
+            "to": "b3/n1",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v237"
+          },
+          {
+            "from": "b4/n0",
+            "to": "b5/n0",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v181"
+          },
+          {
+            "from": "entry",
+            "to": "b5/n0",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v181"
+          },
+          {
+            "from": "b1",
+            "to": "b1",
+            "kind": "control_dependence",
+            "condition": "branch_0",
+            "certainty": "normal_exit_structural"
+          },
+          {
+            "from": "b1",
+            "to": "b2/n0",
+            "kind": "control_dependence",
+            "condition": "branch_0",
+            "certainty": "normal_exit_structural"
+          },
+          {
+            "from": "b3/n1",
+            "to": "b4/n0",
+            "kind": "control_dependence",
+            "condition": "true",
+            "certainty": "normal_exit_structural"
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "isolated_type_info_partial",
+            "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+          },
+          {
+            "code": "short_circuit_unsupported",
+            "message": "CFG does not model short-circuit expression edges",
+            "location": {
+              "start_byte": 323,
+              "end_byte": 342,
+              "start_line": 18,
+              "end_line": 18
+            }
+          },
+          {
+            "code": "opaque_call",
+            "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+            "location": {
+              "start_byte": 376,
+              "end_byte": 397,
+              "start_line": 21,
+              "end_line": 21
+            }
+          },
+          {
+            "code": "range_binding_unsupported",
+            "message": "Range iteration bindings are not modeled as proven scalar assignments",
+            "location": {
+              "start_byte": 249,
+              "end_byte": 299,
+              "start_line": 14,
+              "end_line": 16
+            }
+          },
+          {
+            "code": "reference_alias_unknown",
+            "message": "Reference binding flow does not establish memory alias/effect semantics",
+            "location": {
+              "start_byte": 271,
+              "end_byte": 277,
+              "start_line": 14,
+              "end_line": 14
+            }
+          },
+          {
+            "code": "external_value_unknown",
+            "message": "Value read has no local lexical definition; no source edge is invented",
+            "location": {
+              "start_byte": 256,
+              "end_byte": 261,
+              "start_line": 14,
+              "end_line": 14
+            }
+          },
+          {
+            "code": "memory_write_untracked",
+            "message": "Indirect writes do not kill or define scalar container variables",
+            "location": {
+              "start_byte": 301,
+              "end_byte": 310,
+              "start_line": 17,
+              "end_line": 17
+            }
+          },
+          {
+            "code": "field_read_untracked",
+            "message": "Field memory/type/alias relationships are not proven from a function blob",
+            "location": {
+              "start_byte": 301,
+              "end_byte": 310,
+              "start_line": 17,
+              "end_line": 17
+            }
+          },
+          {
+            "code": "external_value_unknown",
+            "message": "Value read has no local lexical definition; no source edge is invented",
+            "location": {
+              "start_byte": 376,
+              "end_byte": 380,
+              "start_line": 21,
+              "end_line": 21
+            }
+          },
+          {
+            "code": "reaching_definition_unknown",
+            "message": "No reachable local definition; missing value source remains unknown",
+            "location": {
+              "start_byte": 282,
+              "end_byte": 296,
+              "start_line": 15,
+              "end_line": 15
+            }
+          }
+        ],
+        "truncated": false,
+        "elapsed_micros": 223,
+        "variables": [
+          {
+            "id": "v171",
+            "name": "box",
+            "kind": "parameter",
+            "declaration": {
+              "start_byte": 171,
+              "end_byte": 174,
+              "start_line": 12,
+              "end_line": 12
+            }
+          },
+          {
+            "id": "v181",
+            "name": "command",
+            "kind": "parameter",
+            "declaration": {
+              "start_byte": 181,
+              "end_byte": 188,
+              "start_line": 12,
+              "end_line": 12
+            }
+          },
+          {
+            "id": "v197",
+            "name": "values",
+            "kind": "parameter",
+            "declaration": {
+              "start_byte": 197,
+              "end_byte": 203,
+              "start_line": 12,
+              "end_line": 12
+            }
+          },
+          {
+            "id": "v211",
+            "name": "strict",
+            "kind": "parameter",
+            "declaration": {
+              "start_byte": 211,
+              "end_byte": 217,
+              "start_line": 12,
+              "end_line": 12
+            }
+          },
+          {
+            "id": "v237",
+            "name": "total",
+            "kind": "local",
+            "declaration": {
+              "start_byte": 237,
+              "end_byte": 242,
+              "start_line": 13,
+              "end_line": 13
+            }
+          },
+          {
+            "id": "v256",
+            "name": "value",
+            "kind": "range_unknown",
+            "declaration": {
+              "start_byte": 256,
+              "end_byte": 261,
+              "start_line": 14,
+              "end_line": 14
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "id": "b0/n0/definition/v237/237",
+            "node": "b0/n0",
+            "variable": "v237",
+            "role": "definition",
+            "location": {
+              "start_byte": 237,
+              "end_byte": 242,
+              "start_line": 13,
+              "end_line": 13
+            },
+            "reachable": true
+          },
+          {
+            "id": "b0/n1/reference/v197/271",
+            "node": "b0/n1",
+            "variable": "v197",
+            "role": "reference",
+            "location": {
+              "start_byte": 271,
+              "end_byte": 277,
+              "start_line": 14,
+              "end_line": 14
+            },
+            "reachable": true
+          },
+          {
+            "id": "b2/n0/definition/v237/282",
+            "node": "b2/n0",
+            "variable": "v237",
+            "role": "definition",
+            "location": {
+              "start_byte": 282,
+              "end_byte": 287,
+              "start_line": 15,
+              "end_line": 15
+            },
+            "reachable": true
+          },
+          {
+            "id": "b2/n0/use/v237/282",
+            "node": "b2/n0",
+            "variable": "v237",
+            "role": "use",
+            "location": {
+              "start_byte": 282,
+              "end_byte": 287,
+              "start_line": 15,
+              "end_line": 15
+            },
+            "reachable": true
+          },
+          {
+            "id": "b2/n0/use/v256/291",
+            "node": "b2/n0",
+            "variable": "v256",
+            "role": "use",
+            "location": {
+              "start_byte": 291,
+              "end_byte": 296,
+              "start_line": 15,
+              "end_line": 15
+            },
+            "reachable": true
+          },
+          {
+            "id": "b3/n0/address/v171/301",
+            "node": "b3/n0",
+            "variable": "v171",
+            "role": "address",
+            "location": {
+              "start_byte": 301,
+              "end_byte": 304,
+              "start_line": 17,
+              "end_line": 17
+            },
+            "reachable": true
+          },
+          {
+            "id": "b3/n0/use/v237/313",
+            "node": "b3/n0",
+            "variable": "v237",
+            "role": "use",
+            "location": {
+              "start_byte": 313,
+              "end_byte": 318,
+              "start_line": 17,
+              "end_line": 17
+            },
+            "reachable": true
+          },
+          {
+            "id": "b3/n1/use/v211/323",
+            "node": "b3/n1",
+            "variable": "v211",
+            "role": "use",
+            "location": {
+              "start_byte": 323,
+              "end_byte": 329,
+              "start_line": 18,
+              "end_line": 18
+            },
+            "reachable": true
+          },
+          {
+            "id": "b3/n1/use/v237/333",
+            "node": "b3/n1",
+            "variable": "v237",
+            "role": "use",
+            "location": {
+              "start_byte": 333,
+              "end_byte": 338,
+              "start_line": 18,
+              "end_line": 18
+            },
+            "reachable": true
+          },
+          {
+            "id": "b4/n0/definition/v181/347",
+            "node": "b4/n0",
+            "variable": "v181",
+            "role": "definition",
+            "location": {
+              "start_byte": 347,
+              "end_byte": 354,
+              "start_line": 19,
+              "end_line": 19
+            },
+            "reachable": true
+          },
+          {
+            "id": "b5/n0/use/v181/389",
+            "node": "b5/n0",
+            "variable": "v181",
+            "role": "use",
+            "location": {
+              "start_byte": 389,
+              "end_byte": 396,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "reachable": true
+          },
+          {
+            "id": "entry/definition/v171/171",
+            "node": "entry",
+            "variable": "v171",
+            "role": "definition",
+            "location": {
+              "start_byte": 171,
+              "end_byte": 174,
+              "start_line": 12,
+              "end_line": 12
+            },
+            "reachable": true
+          },
+          {
+            "id": "entry/definition/v181/181",
+            "node": "entry",
+            "variable": "v181",
+            "role": "definition",
+            "location": {
+              "start_byte": 181,
+              "end_byte": 188,
+              "start_line": 12,
+              "end_line": 12
+            },
+            "reachable": true
+          },
+          {
+            "id": "entry/definition/v197/197",
+            "node": "entry",
+            "variable": "v197",
+            "role": "definition",
+            "location": {
+              "start_byte": 197,
+              "end_byte": 203,
+              "start_line": 12,
+              "end_line": 12
+            },
+            "reachable": true
+          },
+          {
+            "id": "entry/definition/v211/211",
+            "node": "entry",
+            "variable": "v211",
+            "role": "definition",
+            "location": {
+              "start_byte": 211,
+              "end_byte": 217,
+              "start_line": 12,
+              "end_line": 12
+            },
+            "reachable": true
+          }
+        ],
+        "def_use": [
+          {
+            "definition": "entry/definition/v197/197",
+            "use": "b0/n1/reference/v197/271",
+            "variable": "v197",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b0/n0/definition/v237/237",
+            "use": "b2/n0/use/v237/282",
+            "variable": "v237",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b2/n0/definition/v237/282",
+            "use": "b2/n0/use/v237/282",
+            "variable": "v237",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b0/n0/definition/v237/237",
+            "use": "b3/n0/use/v237/313",
+            "variable": "v237",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b2/n0/definition/v237/282",
+            "use": "b3/n0/use/v237/313",
+            "variable": "v237",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "entry/definition/v171/171",
+            "use": "b3/n0/address/v171/301",
+            "variable": "v171",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "entry/definition/v211/211",
+            "use": "b3/n1/use/v211/323",
+            "variable": "v211",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b0/n0/definition/v237/237",
+            "use": "b3/n1/use/v237/333",
+            "variable": "v237",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b2/n0/definition/v237/282",
+            "use": "b3/n1/use/v237/333",
+            "variable": "v237",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b4/n0/definition/v181/347",
+            "use": "b5/n0/use/v181/389",
+            "variable": "v181",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "entry/definition/v181/181",
+            "use": "b5/n0/use/v181/389",
+            "variable": "v181",
+            "certainty": "lexical_may_reach"
+          }
+        ],
+        "iterations": 14,
+        "facts_peak": 102,
+        "rules": {
+          "pack_id": "go-local-review",
+          "pack_version": "1.0.0",
+          "pack_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
+          "engine_version": "2",
+          "origin": "automatic",
+          "status": "matched_bounded",
+          "limits": {
+            "max_candidates": 64,
+            "max_flow_steps": 4096
+          },
+          "flow_steps": 123,
+          "candidates": [
+            {
+              "id": "c621577a8cc6c914f86a8d86cea773858d883ea4136d9df5b52dc4d9aae2824c",
+              "rule_id": "parameter-command-name",
+              "origin": "automatic",
+              "source_occurrence": "entry/definition/v181/181",
+              "source_location": {
+                "start_byte": 181,
+                "end_byte": 188,
+                "start_line": 12,
+                "end_line": 12
+              },
+              "sink_occurrence": "b5/n0/use/v181/389",
+              "sink_location": {
+                "start_byte": 389,
+                "end_byte": 396,
+                "start_line": 21,
+                "end_line": 21
+              },
+              "path": [
+                "entry",
+                "b5/n0"
+              ],
+              "conditions": [],
+              "certainty": "lexical_may_reach",
+              "target_resolution": "syntax_only_unverified",
+              "sanitizer": "not_proven"
+            }
+          ],
+          "limitations": [
+            "empty_candidates_do_not_establish_safety",
+            "syntax_targets_unresolved",
+            "parameters_not_proven_attacker_controlled",
+            "lexical_may_reach_not_path_feasibility",
+            "sanitizers_and_opaque_call_effects_not_proven",
+            "aliases_closures_fields_and_indirect_sinks_unsupported"
+          ]
+        }
+      },
+      "elapsed_micros": 512
+    }
+  },
+  "function_review": {
+    "tool": "cks.context.review_function",
+    "arguments": {
+      "symbol": "example.invalid/deep-fixture.Process",
+      "caller_depth": 2
+    },
+    "result": {
+      "seed": {
+        "id": "c7b299f57164a5df",
+        "qualified_name": "fixture.Process",
+        "type": "Function",
+        "file_path": "logic.go",
+        "start_line": 12,
+        "end_line": 22
+      },
+      "code": {
+        "signature": "func Process(box *Box, command string, values []int, strict bool) *exec.Cmd",
+        "uses_types": [
+          {
+            "id": "f1f0d01a74c47916",
+            "qualified_name": "fixture.Box",
+            "type": "Struct",
+            "file_path": "logic.go",
+            "start_line": 5,
+            "end_line": 5
+          }
+        ],
+        "instantiates": null,
+        "writes_fields": [
+          {
+            "id": "f0a7ca5f02f3a2e9",
+            "qualified_name": "fixture.Box.Total",
+            "type": "Field",
+            "file_path": "logic.go",
+            "start_line": 5,
+            "end_line": 5
+          }
+        ],
+        "return_statements": 1,
+        "control": {
+          "IfStmt": 1,
+          "LoopStmt": 1
+        },
+        "call_sites": [
+          {
+            "line": 21,
+            "text": "exec.Command(command)"
+          }
+        ],
+        "call_sites_total": 1,
+        "callees": null,
+        "interface_implementers": {},
+        "callers": null,
+        "via_interfaces": null,
+        "caller_paths": null,
+        "entry_points": 0,
+        "caller_walk_truncated": false,
+        "goroutines": null,
+        "sends_to": null,
+        "recvs_from": null,
+        "acquires_locks": null,
+        "releases_locks": null,
+        "timeout_paths": null,
+        "cancellation_paths": null
+      },
+      "history": {
+        "commits": [
+          {
+            "sha": "8c15984acd234449e2c278d2263bcd236aca51d8",
+            "time": 1791974463,
+            "subject": "test: capture state guard and priority review conditions"
+          }
+        ],
+        "commits_total": 1,
+        "prs": []
+      },
+      "tests": {
+        "callers": [
+          {
+            "id": "3a56c9465401b70c",
+            "qualified_name": "fixture.TestIndependentStateAndGuard",
+            "type": "Function",
+            "file_path": "logic_test.go",
+            "start_line": 5,
+            "end_line": 20
+          }
+        ],
+        "callers_total": 1
+      },
+      "available": [
+        "history: 1 commits and 0 PRs changed this function; diffs and related past changes: cks.context.change_history",
+        "tests: 1 test functions call it; cks.context.find_callers lists them (it includes tests unless exclude_tests=true)"
+      ],
+      "limits": [
+        "calls through function values, callbacks, reflection and generated code have no graph edges and do not appear in callers or callees",
+        "a channel send or receive is listed, but the goroutine on the other end is not resolved",
+        "history covers the commits the index walked per file (a bounded recent window), not the whole repository history"
+      ]
+    }
+  }
+}

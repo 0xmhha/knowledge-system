@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "implementation_scope_verified": true,
+  "independent_acceptance": "not_recorded",
+  "requirements": {
+    "bounded shared local calculation/composition": {
+      "evidence": [
+        "execution/expanded.json",
+        "execution/cks/tools.json",
+        "primary.patch"
+      ],
+      "scope": "CKG shared one local calculation per selected function, CKS composition, source identities and cooperative function/hop/candidate/node/edge/fact/time caps"
+    },
+    "calls/local dependence/curated distinction": {
+      "evidence": [
+        "execution/expanded.json",
+        "execution/summary.json"
+      ],
+      "scope": "retained call hops explicitly not computed argument/return or memory transfer; curated operator flow stays separate get_flow, not automatically looked up/joined or promoted to computation"
+    },
+    "cycle/dedup/unknown/stop and immutable source": {
+      "evidence": [
+        "execution/cks/mcp.stdout.jsonl",
+        "checks/ks-wi6-drift-tests.log",
+        "checks/ks-wi6-mcp-tests.log"
+      ],
+      "scope": "one analysis per unique function; actual cycle, stale/invalid/input limits, source deletion; final manifest/node/blob/edge/more recheck and legacy reader partial/unavailable"
+    },
+    "SQL budgets and retrieval safety boundary": {
+      "evidence": [
+        "primary.patch",
+        "checks/ks-wi6-tests-fixed.log",
+        "checks/ks-wi6-mcp-tests.log",
+        "execution/cap-candidates.json"
+      ],
+      "scope": "optional bounded SQLite/PG parameterized SQL cap+context before Go materialization; ambiguous history filtering; SQLite actual SQL and PG query-shape checks, no new live PG claim"
+    },
+    "independent recall/noise/cost comparison": {
+      "evidence": [
+        "execution/baseline.json",
+        "execution/expanded.json",
+        "execution/summary.json",
+        "original-source/logic.go.txt",
+        "execution/fixture-race.stdout.txt"
+      ],
+      "scope": "compiled6-function fixture,4 independent relevant targets; baseline1/4,expanded4/4 plus1 noise of5 returned; elapsed costs are fixture observations only"
+    },
+    "public contracts and full regressions": {
+      "evidence": [
+        "checks/ks-wi6-full-test.log",
+        "checks/ks-wi6-race.log",
+        "checks/ks-wi6-build.log",
+        "checks/ks-wi6-lint.log",
+        "checks/ks-wi6-consumer-tests.log",
+        "checks/ks-wi6-consumer-contract.log",
+        "review-regression/summary.json",
+        "rule-regression/summary.json",
+        "value-regression/summary.json"
+      ],
+      "scope": "actual32 CKS tools/C1 mirrors,142 consumer tests/126 tool refs, full primary build/test/five-package race/fmt/vet/pinned lint/boundary/docs, previous review16/rule39/value15 actual controls"
+    }
+  }
+}

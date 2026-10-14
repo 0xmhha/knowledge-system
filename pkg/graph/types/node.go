@@ -1,11 +1,20 @@
 package types
 
+// AnnotationPayload preserves operator fields without guessing from merged text.
+// It does not authenticate the author or retain the original YAML document.
+type AnnotationPayload struct {
+	Description string `json:"description"`
+	Remediation string `json:"remediation"`
+	Severity    string `json:"severity"`
+}
+
 // Node mirrors the SQLite nodes row plus runtime fields (spec §5.3).
 type Node struct {
-	ID            string   `json:"id"             validate:"required,len=16"`
-	Type          NodeType `json:"type"           validate:"required"`
-	Name          string   `json:"name"           validate:"required"`
-	QualifiedName string   `json:"qualified_name" validate:"required"`
+	Annotation    *AnnotationPayload `json:"annotation,omitempty"`
+	ID            string             `json:"id"             validate:"required,len=16"`
+	Type          NodeType           `json:"type"           validate:"required"`
+	Name          string             `json:"name"           validate:"required"`
+	QualifiedName string             `json:"qualified_name" validate:"required"`
 	// CanonicalID is the globally-unique, import-path-qualified identity of the
 	// symbol (e.g. "github.com/ethereum/go-ethereum/core/vm.(*EVM).Call"),
 	// receiver- and signature-aware, used for exact resolution. QualifiedName

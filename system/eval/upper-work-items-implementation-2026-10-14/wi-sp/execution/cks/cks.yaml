@@ -1,0 +1,15 @@
+version: 1
+name: owned-policy-security
+backends:
+  ckg:
+    path: /private/tmp/ks-sp-committed-execution/graph/graph.db
+  ckv:
+    provider: mock
+listen:
+  transport: stdio
+logging:
+  level: error
+sanitize:
+  rules_path: /private/tmp/ks-sp-committed-execution/cks/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true

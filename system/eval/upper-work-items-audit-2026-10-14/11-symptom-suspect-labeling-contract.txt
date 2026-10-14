@@ -1,0 +1,96 @@
+# 항목 3 — 증상→의심코드 라벨링: 입출력 계약 (설계 초안)
+
+> 상태: 계약 초안(스테이징). 코드 없음 — 승인 후 구축. (학습루프 교훈대로 *검토 먼저*.)
+> 모델(07 §2-(3) 확정): **CKS = 후보 추림(prune) + 객관 신호 라벨링 + 반복 확장. LLM = 가설→walk→판단.** CKS가 *고정 의심도 점수로 정답을 정하지 않는다.*
+> 그라운딩: cks MCP 도구 반환 스키마 실측(아래 file:line). 작성일: 2026-06-26.
+
+---
+
+## 1. 모델 재확인
+
+- **사실(객관, 문제 무관) = CKS 계산** / **판단(증상 의존) = LLM.**
+- CKS는 후보를 추려 *신호로 라벨링*만; "이 중 무엇이 원인인가"의 가중·결정은 LLM이 증상 의미로.
+- 순수 "CKS 스코어링"도, 순수 "LLM 맨몸 walk"(비용·context rot)도 아닌 그 사이.
+
+## 2. 오늘 가용한 객관 신호 (실측)
+
+| 신호 | 산출 도구 | 반환 필드 (file:line) | 비고 |
+|---|---|---|---|
+| 거리(hops) | `find_callers`/`find_callees`/`get_subgraph` | `Neighbor.Distance` (pack.go:105-110) | seed로부터 hop 수 — **가용** |
+| 관계 종류 | `get_subgraph`(8종)/`find_callers`(calls·called_by) | `Neighbor.Relation` (pack.go:76-100) | calls/implements/imports/references/embeds/defines/tested_by |
+| 결합 카테고리 | `impact_analysis` | `ImpactGroup.Category` (impact.go:3-13) | callers/interface/type_users/distributed/concurrent/other. **멤버십만**(거리 없음) |
+| recency | `change_history` | `PRRef.MergedAt` + `Hunk.Score` (history.go) | 최근 변경=의심↑. **commit COUNT 집계는 없음**(배열 길이로 근사) |
+| 동시성 접촉·방향 | `concurrency_impact` | `Module.Direction` affects/affected_by/both (concurrency.go:6-16) | edge-type·거리는 미노출 |
+| 검색 랭크/점수 | `semantic_search`/`search_text` | `Hit.Rank/Score/Source/CKGNodeID` (hit.go:34-41) | free-text 증상 시딩 |
+
+**갭(오늘 없음):**
+- **dataflow-on-path 도달성** — 항목 1(PDG) 필요. 부재.
+- **security-pattern/policy 태그** — CKG는 인덱싱하나 **cks MCP 미노출**(하드닝 백로그 pending).
+- **impact_analysis/concurrency_impact의 per-node 거리** — 부재(멤버십·방향만).
+- **caller 빈도/엣지 빈도** — 배열 길이 외 없음.
+
+## 3. I/O 계약
+
+### 입력 (symptom)
+- (a) **구조적**: `file:line` 또는 `symbol`(스택의 최상위 프레임 등) → 그래프 시딩.
+- (b) **자유 텍스트**: 증상 서술/에러 메시지 → `semantic_search`+`search_text`로 시딩.
+- (선택) **hint**: 증상 성격(예: "timing/concurrency 의심") — LLM이 신호 가중에 쓰는 메모(게이트 아님).
+- (선택) **expand**: 특정 후보의 이웃 더 달라는 반복 확장 요청.
+
+### 출력 (labeled candidates — 점수 아님)
+```jsonc
+{
+  "symptom": { "kind": "site|text", "ref": "core/txpool/validation.go:337 | <text>" },
+  "candidates": [
+    {
+      "citation": { "file": "...", "start_line": 0, "end_line": 0, "commit_hash": "" },
+      "symbol": "qualified.name",
+      "signals": {
+        "distance": 2,                       // find_callers/get_subgraph (없으면 null)
+        "relations": ["called_by"],          // 관계 종류
+        "impact_category": ["callers"],      // 멤버십(거리 없음)
+        "recency": { "last_merged_at": "RFC3339|null", "pr_count": 0 },
+        "concurrency": { "touched": true, "direction": "affected_by|null" },
+        "retrieval": { "rank": 1, "score": 0.0, "source": "ckg|ckv|fused" },
+        "security_tag": null                 // 오늘 미가용(MCP 미노출) — v2/백로그
+        // "dataflow_on_path": null          // 항목 1 이후
+      },
+      "provenance": ["find_callers","change_history"]   // 어느 도구가 라벨을 채웠나
+    }
+  ],
+  "notes": "LLM이 signals를 증상 의미로 가중해 판단. CKS는 점수/정답을 정하지 않음."
+}
+```
+- **반복 확장**: `expand(candidate)` → 그 노드의 이웃을 같은 라벨 스키마로 추가 반환.
+
+## 4. 거주 결정 (fork) — 어디에 둘 것인가
+
+| 옵션 | 무엇 | 장점 | 단점 |
+|---|---|---|---|
+| **v1 [권장 1차]** | coding-agent **skill**이 기존 cks 도구를 *composition*해 라벨드 후보 조립 → LLM 판단 | **CKS 변경 없음**, 지금 가능, 신호 set 실검증 | 후보당 **멀티 라운드트립**(토큰/지연) |
+| v2 (나중) | cks에 **`label_suspects` 번들 MCP 도구** 추가(서버측 composition, 1콜) | 1콜·context 절약·일관 라벨 | CKS 변경 + 누락 신호(거리 in impact, security-tag) 보강 필요 |
+
+권장: **v1(skill)으로 1차** — 어떤 신호가 실제 판단에 유용한지 검증한 뒤, 그 set을 v2 번들 도구로 굳힘(그때 security-pattern MCP 노출·impact 거리·항목1 dataflow도 합류).
+
+## 5. composition 알고리즘 (v1 skill)
+
+1. **시드**: 구조적이면 `find_symbol`로 해소 / 자유텍스트면 `semantic_search`+`search_text`(상위 K).
+2. **후보 수집**: 시드에서 `find_callers`(역방향=증상→원인 walk)·`get_subgraph`(depth N)로 이웃. 상한 적용.
+3. **라벨링**(후보별): distance(2에서)·relations(2)·impact_category(`impact_analysis`)·recency(`change_history` symbol 모드)·concurrency(`concurrency_impact`).
+4. **반환**: §3 스키마. **LLM이 가중·판단**(예: hint=concurrency면 concurrency·recency↑).
+5. **반복**: LLM이 좁히며 `expand`로 더 요청.
+
+## 6. 비용 균형추
+
+v1은 후보당 멀티 콜이라 비쌈 → **후보 상한 + 단계적 라벨링**(먼저 distance/recency 싼 신호로 1차 추림 → 살아남은 소수만 impact/concurrency 라벨). composer 토큰버짓 정신 유지. 맨몸 walk 금지(context rot).
+
+## 7. 갭·의존성
+- **dataflow-on-path**: 항목 1(PDG) 필요 → v1엔 `null`, 항목 1 이후 추가.
+- **security_tag**: cks MCP 노출 필요(하드닝 백로그 "Policy/SecurityPattern MCP-unexposed") → v2/백로그와 합류.
+- **impact/concurrency per-node 거리**: v2 번들 도구에서 보강.
+
+## 8. 열린 결정 (확인)
+1. **거주**: v1 skill(composition, CKS 변경 없음) 먼저 — 동의?
+2. **신호 set**: §2 표의 6개로 1차 충분? (security_tag·dataflow는 의존성 풀릴 때 추가.)
+3. **시드 기본**: 증상이 보통 *site*로 오나 *free-text*로 오나? (둘 다 지원하되 기본 흐름 결정.)
+4. **상한·단계적 라벨링** 파라미터(후보 N, 1차 신호 set).

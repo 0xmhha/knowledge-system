@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-go-rule-candidates.py", line 135, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-go-rule-candidates.py", line 107, in main
+    manual=client.tool('find_symbol',{'name':'Manual command review','exact':False})['nodes'];require(any(n['type']=='security_pattern'for n in manual),'manual YAML annotation absent before analysis')
+                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-value-dependencies.py", line 49, in require
+    if not value:raise RuntimeError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: manual YAML annotation absent before analysis

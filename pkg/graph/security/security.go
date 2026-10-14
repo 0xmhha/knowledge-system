@@ -186,6 +186,7 @@ func Resolve(f *File, codeNodes []types.Node, yamlPath string) ResolveResult {
 			DocComment:    buildDocComment(e),
 			SubKind:       e.Category,
 			Confidence:    types.ConfExtracted,
+			Annotation:    &types.AnnotationPayload{Description: e.Description, Remediation: e.Remediation, Severity: e.Severity},
 		}
 		out.Nodes = append(out.Nodes, patternNode)
 
