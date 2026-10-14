@@ -61,7 +61,7 @@
     {
       "id": "F-07",
       "topic": "new_inputs_gold_and_holdout",
-      "preparation_status": "source_candidates_prepared_gold_pending",
+      "preparation_status": "source_candidates_and_ai_review_drafts_prepared_independent_gold_pending",
       "decision_status": "pending",
       "receipt": null
     },
@@ -70,7 +70,11 @@
       "topic": "runtime_recipes_and_owned_resources",
       "preparation_status": "recipe_templates_prepared_runtime_boundaries_pending",
       "decision_status": "pending",
-      "receipt": null
+      "receipt": null,
+      "remaining_source_risks": [
+        "auto_stop_hook_reentry_before_publication_boundary",
+        "chainbench_stdio_sigterm_exit_unverified"
+      ]
     }
   ],
   "roles": {
@@ -487,7 +491,8 @@
       "remaining": [
         "checkout_tree_verification",
         "toolchain_and_build_dependency_pins",
-        "build_timeout"
+        "build_timeout",
+        "signal_context_and_unmasked_exit_cleanup_verification"
       ]
     },
     {
@@ -558,7 +563,8 @@
         "visible_permission_or_approved_handler",
         "prepublication_boundary_enforcement",
         "public_input_gold_access_separation",
-        "timeout_owned_children_cleanup"
+        "timeout_owned_children_cleanup",
+        "auto_stop_hook_reentry_and_terminal_boundary_compatibility"
       ],
       "prohibited_flags": [
         "--dangerously-skip-permissions",
@@ -615,7 +621,17 @@
   },
   "host_preflight": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-HOST-PREFLIGHT.json",
-    "sha256": "7f8b9c48c34daa5fa04ac08bf22f7e9c638d5e56173f51e62cb09c0f0abcd48c",
+    "sha256": "1b0716c59cd8b5704b9e45e5b6bee4cc7d19c6a15ee09e9673ad2a99756e12e8",
     "kind": "preparation_only"
+  },
+  "review_draft_packet": {
+    "status": "ai_draft_not_independent_gold",
+    "public_path": "docs/spec-driven/operational-preparation/review-drafts/public-inputs.json",
+    "public_sha256": "b15efd704c9e80d8e2e10244e14ec772850a6c7e8080b6859feaa6afb9ef5fa6",
+    "gold_draft_path": "docs/spec-driven/operational-preparation/review-drafts/gold-drafts.json",
+    "gold_draft_sha256": "a01df54e0969a5416bbe13086a625ea525022efcab6de2b8a20a51685e1cc6eb",
+    "review_cases": 10,
+    "value_control_anchor_functions": 3,
+    "approved_gold_records": 0
   }
 }

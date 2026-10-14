@@ -1,6 +1,6 @@
 # 운영·독립 수용 검증 계획
 
-문서 최종 정리 기준일: 2026-10-15 Asia/Seoul. source 후보 관측은2026-10-14에 수행했다. **계획 초안**이며 검증 실행·새 정답·수치 기준 승인·독립 수용은 아직 수행하지 않았다. [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)의9/9 implemented와 독립 수용 not_recorded는 유지한다. 준비/실행/판정 상태는 [별도 검증 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)으로 추적한다.
+문서 최종 정리 기준일: 2026-10-15 Asia/Seoul. source 후보 관측은2026-10-14에 수행했다. **계획 초안**이며 검증 실행·새 정답·수치 기준 승인·독립 수용은 아직 수행하지 않았다. [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)의9/9 implemented와 독립 수용 not_recorded는 유지한다. 준비/실행/판정 상태는 [별도 검증 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)으로 추적한다. [source 정답·리뷰 초안](./OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)을 작성했으며 독립 채택과 실제 실행은 미완료다.
 
 ## 첫 검증 대상과 적용 범위
 

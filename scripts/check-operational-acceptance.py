@@ -33,6 +33,90 @@ def human_receipt(receipt, digest):
             and receipt.get("protocol_sha256") == digest)
 
 
+def check_review_draft_packet(root, reference):
+    """Verify draft separation and source anchors; never validate fact semantics."""
+    errors = []
+
+    def read(path, expected):
+        if not isinstance(path, str) or not isinstance(expected, str):
+            raise ValueError("missing draft path/hash")
+        target = (root / path).resolve()
+        if not target.is_relative_to(root.resolve()):
+            raise ValueError("draft reference escapes repository")
+        raw = target.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != expected:
+            raise ValueError("draft file hash differs")
+        return raw
+
+    try:
+        public = json.loads(read(reference["public_path"], reference["public_sha256"]))
+        private = json.loads(read(reference["gold_draft_path"], reference["gold_draft_sha256"]))
+        forbidden = {"expected_answer", "expected_source_fact_draft", "required_rubric_anchors_draft", "data_anchors", "control_anchors", "gold_draft_path"}
+
+        def leaks(value):
+            if isinstance(value, dict):
+                return bool(forbidden.intersection(value)) or any(leaks(v) for v in value.values())
+            if isinstance(value, list):
+                return any(leaks(v) for v in value)
+            return False
+
+        if public.get("gold_included") is not False or leaks(public):
+            errors.append("public draft contains gold labels or references")
+        cases = public.get("cases", [])
+        reviews = private.get("review_drafts", [])
+        ids = [c.get("case_id") for c in cases]
+        if (len(cases) != reference.get("review_cases") or len(set(ids)) != len(ids)
+                or set(ids) != {r.get("case_id") for r in reviews}):
+            errors.append("public/private draft case identities differ")
+        if private.get("independent_gold_records") != 0 or private.get("approved_cases") != 0:
+            errors.append("AI draft packet promoted to independent gold")
+        if private.get("ckg_output_used") is not False or private.get("runtime_executions") != 0:
+            errors.append("draft origin/runtime status differs from declared source-only preparation")
+        public_sources = {c["case_id"]: c["source"] for c in cases}
+        for case in cases:
+            if case.get("approved") is not False or case.get("split") is not None:
+                errors.append("public draft marked approved or assigned to holdout")
+        for row in reviews:
+            if (row.get("origin") != "ai_manual_source_reading" or row.get("approved") is not False
+                    or row.get("independence_verified") is not False or row.get("review_receipt") is not None):
+                errors.append("AI review draft marked independently approved")
+            source = row["source"]
+            if public_sources.get(row.get("case_id")) != source:
+                errors.append("public/private source identity differs")
+            raw = read(source["excerpt_path"], source["excerpt_sha256"])
+            if hashlib.sha256(raw).hexdigest() != source["function_sha256"]:
+                errors.append("function excerpt hash differs from pinned function")
+            for fact in row.get("required_rubric_anchors_draft", []):
+                a = fact["start_byte"] - source["start_byte"]
+                b = fact["end_byte_exclusive"] - source["start_byte"]
+                if not (0 <= a < b <= len(raw)) or hashlib.sha256(raw[a:b]).hexdigest() != fact["span_sha256"]:
+                    errors.append("review source anchor bytes/hash differ")
+                elif (source["start_line"] + raw[:a].count(b"\n") != fact["start_line"]
+                      or source["start_line"] + raw[:b].count(b"\n") - 1 != fact["end_line"]):
+                    errors.append("review source anchor line mapping differs")
+        anchors = private.get("value_control_anchor_drafts", [])
+        if len(anchors) != reference.get("value_control_anchor_functions"):
+            errors.append("value/control draft function count differs")
+        for row in anchors:
+            if row.get("approved") is not False or row.get("precision_recall_scoring_allowed") is not False:
+                errors.append("non-exhaustive anchors promoted to scorable gold")
+            source = row["source"]
+            raw = read(source["excerpt_path"], source["excerpt_sha256"])
+            for edge in row["data_anchors"] + row["control_anchors"]:
+                for key in ("definition", "use", "predicate", "dependent_statement"):
+                    if key not in edge:
+                        continue
+                    anchor = edge[key]
+                    a, b = anchor["start_byte"] - source["start_byte"], anchor["end_byte_exclusive"] - source["start_byte"]
+                    if not (0 <= a < b <= len(raw)) or hashlib.sha256(raw[a:b]).hexdigest() != anchor["sha256"]:
+                        errors.append("value/control source anchor bytes/hash differ")
+                    elif source["start_line"] + raw[:a].count(b"\n") != anchor["line"]:
+                        errors.append("value/control anchor line mapping differs")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        errors.append("review draft packet invalid: " + str(exc))
+    return errors
+
+
 def check(root, protocol, ledger, require_frozen=False):
     errors, pending = [], []
     digest = protocol_hash(protocol)
@@ -61,6 +145,8 @@ def check(root, protocol, ledger, require_frozen=False):
         if reference is not None:
             if not isinstance(reference, dict) or not file_hash(reference.get("path"), reference.get("sha256")):
                 errors.append("preparation reference missing or hash differs: " + field)
+    if protocol.get("review_draft_packet") is not None:
+        errors.extend(check_review_draft_packet(root, protocol["review_draft_packet"]))
     for row in requirements:
         if row.get("decision_status") != "approved" or not human_receipt(row.get("receipt"), digest):
             pending.append(row.get("id", "unknown freeze requirement"))

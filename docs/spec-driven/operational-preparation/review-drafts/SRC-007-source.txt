@@ -1,0 +1,15 @@
+func ReadAllBadBlocks(db ethdb.Reader) []*types.Block {
+	blob, err := db.Get(badBlockKey)
+	if err != nil {
+		return nil
+	}
+	var badBlocks []*badBlock
+	if err := rlp.DecodeBytes(blob, &badBlocks); err != nil {
+		return nil
+	}
+	var blocks []*types.Block
+	for _, bad := range badBlocks {
+		blocks = append(blocks, types.NewBlockWithHeader(bad.Header).WithBody(bad.Body.Transactions, bad.Body.Uncles).WithWithdrawals(bad.Body.Withdrawals))
+	}
+	return blocks
+}

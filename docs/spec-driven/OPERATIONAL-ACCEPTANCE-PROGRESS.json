@@ -229,9 +229,10 @@
         },
         "host_preflight": {
           "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-HOST-PREFLIGHT.json",
-          "sha256": "7f8b9c48c34daa5fa04ac08bf22f7e9c638d5e56173f51e62cb09c0f0abcd48c",
+          "sha256": "1b0716c59cd8b5704b9e45e5b6bee4cc7d19c6a15ee09e9673ad2a99756e12e8",
           "kind": "preparation_only"
-        }
+        },
+        "review_draft_packet": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md"
       },
       "completed_preparation": [
         "read_only_source_inventory",
@@ -239,7 +240,10 @@
         "freeze_requirement_checklist",
         "source_only_function_review_expansion_candidates",
         "read_only_host_cli_preflight",
-        "draft_runtime_recipes_and_boundary_risks"
+        "draft_runtime_recipes_and_boundary_risks",
+        "public_review_inputs_and_separate_ai_rubric_drafts",
+        "non_exhaustive_value_control_anchor_drafts",
+        "stop_reentry_and_unmasked_shutdown_completion_requirements"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -255,12 +259,12 @@
         "date": "2026-10-15",
         "kind": "preparation_only_not_runtime_or_independent_acceptance",
         "guard_regression_tests": {
-          "passed": 22,
+          "passed": 26,
           "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_operational_acceptance.py"
         },
         "documentation_contract_tests_passed": 20,
         "package_notice_tests_passed": 3,
-        "live_document_check_count": 114,
+        "live_document_check_count": 115,
         "require_frozen_rejected_with_exit": 1,
         "original_source_completion_guard": "pass",
         "verified_original_bindings": 2069,
@@ -269,7 +273,12 @@
         "source_candidates_are_gold": false,
         "host_model_calls": 0,
         "host_agent_sessions": 0,
-        "nodes_started": 0
+        "nodes_started": 0,
+        "review_draft_cases": 10,
+        "review_source_rubric_anchors": 45,
+        "non_exhaustive_data_anchors": 15,
+        "non_exhaustive_control_anchors": 8,
+        "approved_independent_gold_records": 0
       },
       "candidate_counts": {
         "source_functions": 40,
@@ -277,7 +286,9 @@
         "review_inputs": 10,
         "expansion_intents": 20,
         "approved_cases": 0,
-        "gold_records": 0
+        "gold_records": 0,
+        "ai_review_rubric_drafts": 10,
+        "non_exhaustive_value_control_draft_functions": 3
       }
     },
     {

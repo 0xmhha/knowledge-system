@@ -3,6 +3,9 @@
 import copy
 import importlib.util
 import json
+import hashlib
+import shutil
+import tempfile
 from pathlib import Path
 import unittest
 
@@ -134,6 +137,39 @@ class PreparationGuardTests(unittest.TestCase):
     def test_recipe_run_cannot_precede_freeze(self):
         self.protocol["runtime_recipes"][0]["execution_status"] = "pass"
         self.assertTrue(any("recipe execution" in e for e in self.errors()))
+
+    def mutated_packet_errors(self, kind, mutate):
+        reference = copy.deepcopy(self.protocol["review_draft_packet"])
+        folder = Path("docs/spec-driven/operational-preparation/review-drafts")
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            root = Path(tmp)
+            shutil.copytree(guard.ROOT / folder, root / folder)
+            path_field = "public_path" if kind == "public" else "gold_draft_path"
+            hash_field = "public_sha256" if kind == "public" else "gold_draft_sha256"
+            path = root / reference[path_field]
+            data = json.loads(path.read_text())
+            mutate(data)
+            path.write_text(json.dumps(data))
+            reference[hash_field] = hashlib.sha256(path.read_bytes()).hexdigest()
+            return guard.check_review_draft_packet(root, reference)
+
+    def test_gold_labels_cannot_leak_into_public_input(self):
+        errors = self.mutated_packet_errors("public", lambda d: d["cases"][0].update(expected_answer="fake answer"))
+        self.assertTrue(any("contains gold" in e for e in errors))
+
+    def test_ai_rubric_cannot_be_marked_independently_approved(self):
+        errors = self.mutated_packet_errors("private", lambda d: d["review_drafts"][0].update(approved=True))
+        self.assertTrue(any("independently approved" in e for e in errors))
+
+    def test_non_exhaustive_edges_cannot_enable_recall_scoring(self):
+        errors = self.mutated_packet_errors("private", lambda d: d["value_control_anchor_drafts"][0].update(precision_recall_scoring_allowed=True))
+        self.assertTrue(any("scorable gold" in e for e in errors))
+
+    def test_review_anchor_tampering_is_rejected(self):
+        def mutate(d):
+            d["review_drafts"][0]["required_rubric_anchors_draft"][0]["span_sha256"] = "0" * 64
+        errors = self.mutated_packet_errors("private", mutate)
+        self.assertTrue(any("anchor bytes/hash" in e for e in errors))
 
 
 if __name__ == "__main__":
