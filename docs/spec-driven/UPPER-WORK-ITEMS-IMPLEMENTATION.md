@@ -17,7 +17,7 @@
 | 1 | WI-V1 | coding-agent | 구현·controlled 실행/반례 검증 완료·증거 커밋 | 실제 host/체인·독립 수용 보류 |
 | 2 | WI-V2 | coding-agent | 구현·실제 Go/모델/반례 검증 완료·증거 커밋 | 독립 사람/production 최적성 미수용 |
 | 3 | WI-3 | coding-agent+CKS | 구현·명시 범위 검증 | 독립 수용 미판정 |
-| 4 | WI-4 | coding-agent+ChainBench | 대기 | 미완료/미수용 |
+| 4 | WI-4 | coding-agent+ChainBench | 공개 경로·관찰 검증, agent 통합 진행 | 미완료/미수용 |
 | 5 | WI-1 | CKG | 대기 | 미완료/미수용 |
 | 6 | WI-2 | CKG/CKS | 대기 | 미완료/미수용 |
 | 7 | WI-C | coding-agent | 대기 | 미완료/미수용 |
