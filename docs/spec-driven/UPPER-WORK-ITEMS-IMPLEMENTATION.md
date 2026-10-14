@@ -18,8 +18,8 @@
 | 2 | WI-V2 | coding-agent | 구현·실제 Go/모델/반례 검증 완료·증거 커밋 | 독립 사람/production 최적성 미수용 |
 | 3 | WI-3 | coding-agent+CKS | 구현·명시 범위 검증 | 독립 수용 미판정 |
 | 4 | WI-4 | coding-agent+ChainBench | 원래 모드9 포함 구현·명시 범위 실행 검증·증거 커밋 | production/독립 수용 미판정 |
-| 5 | WI-1 | CKG | 설계·구현 진행 | 미완료/미수용 |
-| 6 | WI-2 | CKG/CKS | 대기 | 미완료/미수용 |
+| 5 | WI-1 | CKG | bounded Go 구현·공개 실행 검증·증거 커밋 | production/독립 수용 미판정 |
+| 6 | WI-2 | CKG/CKS | 설계·구현 진행 | 미완료/미수용 |
 | 7 | WI-C | coding-agent | 대기 | 미완료/미수용 |
 | 8 | WI-6 | CKS | 대기 | 미완료/미수용 |
 | 9 | WI-SP | CKS+CKG | 대기 | 미완료/미수용 |
@@ -93,7 +93,7 @@
 
 각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
 
-현재: 구현·명시 범위 실행 검증4/9, WI-1 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-1 Go 값 의존 분석. 남은 이번 구현 범위: WI-1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+현재: 구현·명시 범위 실행 검증5/9, WI-2 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-2 opt-in Go 규칙 후보 분석. 남은 이번 구현 범위: WI-2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
 ## WI-V1 검증 기록
 
@@ -350,12 +350,12 @@ source bytes·statement/node/edge·fixed-point iteration·시간 상한을 사�
 Go 이외 언어는 unsupported다. WI-2 룰·WI-6 확장·WI-C 리뷰·WI-SP 태그가
 이 결과를 재사용하며 calls/curated-flow와 계산된 값/제어 관계를 혼합하지 않는다.
 
-- [ ] Typed schema/capability·source pin·bounded CFG와 공개 계산 API.
-- [ ] Lexical def-use/redefinition/branch join/loop·field/call uncertainty.
-- [ ] Control/data dependence와 nontermination/unsupported diagnostics.
-- [ ] 공개 CKG MCP 입력/출력·tools/list·ambiguous/missing/stale source 처리.
-- [ ] 독립 expected fixture·원문 위치·상한/비용·실제 index→MCP 실행.
-- [ ] build/test/race/fmt/lint·새 primary source binding·근거 커밋 후 완료 체크.
+- [x] Typed schema/capability·source pin·bounded CFG와 공개 계산 API.
+- [x] Lexical def-use/redefinition/branch join/loop·field/call uncertainty.
+- [x] Control/data dependence와 nontermination/unsupported diagnostics.
+- [x] 공개 CKG MCP 입력/출력·tools/list·ambiguous/missing/stale source 처리.
+- [x] 독립 expected fixture·원문 위치·상한/비용·실제 index→MCP 실행.
+- [x] build/test/race/fmt/lint·새 primary source binding·근거 커밋 후 완료 체크.
 
 ### WI-1 진행: 제한된 CFG kernel
 
@@ -390,3 +390,31 @@ stdio MCP의 첫11개 검증이 통과했다. 포인터/field/closure/비종료�
 유지하고 SDK output schema의 실제 음성 제어도 확인한다. 최종 code commit
 replay·전체 regression·새 source binding·원래 범위 audit 전에 완료 체크하지 않는다.
 [지원 범위와 공개 API](../graph/VALUE-DEPENDENCIES.md)를 기준으로 검증한다.
+
+
+## WI-1 최종 검증과 다음 단계
+
+소스337300b0의 clean VCS 바이너리로 compile/race→index→namespaced stdio MCP
+15개 검증/31요청/실제11개 tools·EOF exit0을 재실행했다. [최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-1/README.md)을6332da9d에 커밋하고74개 산출물/1617개 source·dependency SHA와 원래8개 요구 범위의 근거 존재를 확인했다. Go 핵심35개 새/확장 시험과 전체 primary test/build·관련 race·fmt/vet/pinned2.14.0 lint·경계/문서 검사 PASS다.
+
+신뢰할 수 없는 전체 package 타입/field memory/alias/call/closure/generic/비종료는
+명시된 partial/unknown으로 남긴다. 초기 AST 객체/lint·상수 source·output schema
+실패와 수정 근거를 보존했다. 부정 source/schema·bound를 안전/완료로 승격하지
+않는다. 이는 bounded Go 구현 완료이며 production/독립 전체 수용은 미판정이다.
+
+### WI-2 설계: opt-in 결정론 후보와 수동 annotation 공존
+
+기존 policy/security YAML overlay는 사람/운영자 입력으로 유지한다. 자동 규칙은
+별도 query artifact의 candidate이며 검증된 취약점·사람 승인·정책 태그로 쓰지
+않는다. CKG에서 WI-1의 동일 분석/핀을 한 번 계산해 재사용하고 CKS는 이 결과를
+합성한다. read-only opt-in rule pack의 ID/version/digest·실행 engine version·
+source/sink 조건/위치·흐름 경로·sanitizer/guard/외부 target resolution unknown·
+상한/중단 이유·자동/수동 origin을 반환한다.
+
+첫 pack은 Go 함수의 제한된 scalar source→sink 및 ignored-error 후보를
+대상으로 한다. selector 이름 일치는 외부 call의 실제 의미/취약점 증명이 아니다.
+분기 조건·불완전 flow·alias·동적 dispatch·sanitizer는 지원 범위에서 판정하거나
+unknown으로 남긴다. Positive/negative/sanitized/branch/alias/외부 target/오탐/
+미탐·manual overlay coexistence fixture와 실제 index→MCP 실행을 요구한다.
+기존 태그를 overwrite하지 않고 default-off를 유지하며 version/규칙/소스가
+바뀌면 근거를 다시 계산한다. 구체 pack과 공개 query schema를 먼저 고정한다.

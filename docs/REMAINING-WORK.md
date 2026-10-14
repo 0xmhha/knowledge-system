@@ -1,6 +1,6 @@
-현재 진행: [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 WI-V1→V2→3→4→1→2→C→6→SP를 순차 구현한다. 구현·명시 범위 검증 **4/9**이며 WI-1을 진행한다. 남은 전체 구현 순서는 **WI-1 → WI-2 → WI-C → WI-6 → WI-SP**다. production/독립 전체 수용은 별도 미판정이고 WI-5는 이번 순서에 포함하지 않는다.
+현재 진행: [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 요청 범위에서 구현·명시 범위 검증 **5/9** 완료이며 WI-2를 진행한다. 남은 전체 구현 순서는 **WI-2 → WI-C → WI-6 → WI-SP**다. production/독립 전체 수용은 별도 미판정이며 WI-5는 이번 순서에 포함하지 않는다.
 
-WI-4 원래 모드9의 관찰 전용 코드 삽입·base/probe 정상/race·실제 소유 로그 미재발/재발·공개 MCP·상태 hook·cleanup을 [증거 커밋](../system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/README.md)으로 확인했다. 초기 미재현은 INCONCLUSIVE이고 재발은 ANALYSIS만 재개한다. 이전 중간 packet과 실패 기록은 보존한다. 다음은 CKG Go 값/제어 의존 계산과 공개 질의다.
+WI-4 원래 모드9 완료 근거는 [관찰 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/README.md), WI-1 Go 값/제어 의존과 공개 질의는 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-1/README.md)에 보존했다. 소스337300b0 clean binary로15개 실제 compile/race→index→MCP 검증과 source/hash/unknown/bound/refusal/EOF 검증 PASS, 증거6332da9d·현재1617개 source/dependency SHA 확인. 다음은 opt-in 결정론 Go 규칙 후보와 수동 annotation 공존이다.
 
 추가 요청 완료: [서버 종료 보완 SD-01–04](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md)4/4 완료. 원인 재현·구현·실측2세션·EOF/SIGTERM·커밋 SHA/진행 원장 검증 PASS. 이전 두 종료 오류는 보존했다. 이 요청의 남은 작업0개·다음 작업없음.
 
