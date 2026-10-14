@@ -1,0 +1,30 @@
+Serve the fused knowledge MCP server (foreground)
+
+Usage:
+  cks mcp [flags]
+  cks mcp [command]
+
+Aliases:
+  mcp, serve
+
+Available Commands:
+  client-config Print a ready-to-paste MCP client entry for a --config'd instance
+  down          Manage supervised MCP instances (down)
+  gen-config    Write a runtime config YAML from flags
+  list          Manage supervised MCP instances (list)
+  reload        Manage supervised MCP instances (reload)
+  restart       Manage supervised MCP instances (restart)
+  service       Run this instance as a launchd agent that survives sleep, crashes and logout
+  start         Manage supervised MCP instances (start)
+  status        Manage supervised MCP instances (status)
+  stop          Manage supervised MCP instances (stop)
+  up            Manage supervised MCP instances (up)
+
+Flags:
+      --config string      path to cks.yaml (optional; falls back to defaults)
+  -h, --help               help for mcp
+      --http-addr string   full host:port override when you need to name the interface yourself; prefer --port
+      --name string        override config name (MCP instance name) — for running several instances
+      --port string        serve on this port instead of the configured one; the host is kept (or 127.0.0.1 when the config names none)
+
+Use "cks mcp [command] --help" for more information about a command.

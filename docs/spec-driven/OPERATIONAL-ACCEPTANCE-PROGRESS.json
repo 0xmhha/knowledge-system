@@ -221,12 +221,25 @@
       "status": "preparing",
       "evidence": {
         "protocol": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.json",
-        "source_inventory": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-SOURCE-INVENTORY.json"
+        "source_inventory": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-SOURCE-INVENTORY.json",
+        "input_candidates": {
+          "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-INPUT-CANDIDATES.json",
+          "sha256": "029285c70ad60d104cdd59aa351ff07984905440c72465f3ecd094b16ed2a114",
+          "kind": "preparation_only"
+        },
+        "host_preflight": {
+          "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-HOST-PREFLIGHT.json",
+          "sha256": "7f8b9c48c34daa5fa04ac08bf22f7e9c638d5e56173f51e62cb09c0f0abcd48c",
+          "kind": "preparation_only"
+        }
       },
       "completed_preparation": [
         "read_only_source_inventory",
         "structured_input_and_metric_proposals",
-        "freeze_requirement_checklist"
+        "freeze_requirement_checklist",
+        "source_only_function_review_expansion_candidates",
+        "read_only_host_cli_preflight",
+        "draft_runtime_recipes_and_boundary_risks"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -242,7 +255,7 @@
         "date": "2026-10-15",
         "kind": "preparation_only_not_runtime_or_independent_acceptance",
         "guard_regression_tests": {
-          "passed": 18,
+          "passed": 22,
           "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_operational_acceptance.py"
         },
         "documentation_contract_tests_passed": 20,
@@ -251,7 +264,20 @@
         "require_frozen_rejected_with_exit": 1,
         "original_source_completion_guard": "pass",
         "verified_original_bindings": 2069,
-        "original_implementation_and_acceptance_ledgers_byte_unchanged": true
+        "original_implementation_and_acceptance_ledgers_byte_unchanged": true,
+        "source_candidate_bindings_verified": 40,
+        "source_candidates_are_gold": false,
+        "host_model_calls": 0,
+        "host_agent_sessions": 0,
+        "nodes_started": 0
+      },
+      "candidate_counts": {
+        "source_functions": 40,
+        "modules": 8,
+        "review_inputs": 10,
+        "expansion_intents": 20,
+        "approved_cases": 0,
+        "gold_records": 0
       }
     },
     {

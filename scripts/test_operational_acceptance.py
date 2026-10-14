@@ -115,6 +115,26 @@ class PreparationGuardTests(unittest.TestCase):
         self.ledger["items"][0]["quality_gate"] = "looks_good"
         self.assertTrue(any("unknown item verdict" in e for e in self.errors()))
 
+    def test_candidate_hash_tampering_is_rejected(self):
+        self.protocol["input_candidate_pool"]["sha256"] = "0" * 64
+        self.assertTrue(any("preparation reference" in e for e in self.errors()))
+
+    def test_host_capture_hash_tampering_is_rejected(self):
+        self.protocol["host_preflight"]["sha256"] = "0" * 64
+        self.assertTrue(any("preparation reference" in e for e in self.errors()))
+
+    def test_host_recipe_cannot_skip_hooks_or_permissions(self):
+        original = copy.deepcopy(self.protocol)
+        for flag in ("--bare", "--safe-mode", "--dangerously-skip-permissions", "bypassPermissions"):
+            with self.subTest(flag=flag):
+                self.protocol = copy.deepcopy(original)
+                self.protocol["runtime_recipes"][0]["argv_template"].append(flag)
+                self.assertTrue(any("bypasses" in e for e in self.errors()))
+
+    def test_recipe_run_cannot_precede_freeze(self):
+        self.protocol["runtime_recipes"][0]["execution_status"] = "pass"
+        self.assertTrue(any("recipe execution" in e for e in self.errors()))
+
 
 if __name__ == "__main__":
     unittest.main()

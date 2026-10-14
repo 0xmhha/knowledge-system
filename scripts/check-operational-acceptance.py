@@ -56,6 +56,11 @@ def check(root, protocol, ledger, require_frozen=False):
         errors.append("freeze checklist must contain F-01 through F-08 exactly once")
     if not file_hash(protocol.get("source_inventory"), protocol.get("source_inventory_sha256")):
         errors.append("source preparation inventory missing or hash differs")
+    for field in ("input_candidate_pool", "host_preflight"):
+        reference = protocol.get(field)
+        if reference is not None:
+            if not isinstance(reference, dict) or not file_hash(reference.get("path"), reference.get("sha256")):
+                errors.append("preparation reference missing or hash differs: " + field)
     for row in requirements:
         if row.get("decision_status") != "approved" or not human_receipt(row.get("receipt"), digest):
             pending.append(row.get("id", "unknown freeze requirement"))
@@ -115,6 +120,20 @@ def check(root, protocol, ledger, require_frozen=False):
         errors.append("DEV/FINAL family overlap across work items")
     if not protocol.get("runtime_recipes") or not protocol.get("owned_resources"):
         pending.append("runtime:recipes_and_owned_resources")
+    for recipe in protocol.get("runtime_recipes", []):
+        argv = recipe.get("argv_template", [])
+        if not isinstance(argv, list) or not argv:
+            errors.append("runtime recipe lacks argv")
+            continue
+        forbidden = {"--dangerously-skip-permissions", "--allow-dangerously-skip-permissions", "--bare", "--safe-mode"}
+        if forbidden.intersection(argv) or "bypassPermissions" in argv:
+            errors.append("host recipe bypasses permissions or required hooks")
+        if recipe.get("status") != "ready" or any("{" in str(a) or "}" in str(a) for a in argv):
+            pending.append("runtime:unresolved_recipe:" + recipe.get("id", "unknown"))
+        if not recipe.get("timeout_seconds"):
+            pending.append("runtime:recipe_timeout:" + recipe.get("id", "unknown"))
+        if not protocol.get("freeze") and recipe.get("execution_status") != "not_run":
+            errors.append("runtime recipe execution recorded before freeze")
     freeze = protocol.get("freeze")
     frozen = (not pending and isinstance(freeze, dict) and bool(freeze.get("frozen_at"))
               and freeze.get("protocol_sha256") == digest

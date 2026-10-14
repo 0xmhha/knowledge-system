@@ -61,14 +61,14 @@
     {
       "id": "F-07",
       "topic": "new_inputs_gold_and_holdout",
-      "preparation_status": "not_prepared",
+      "preparation_status": "source_candidates_prepared_gold_pending",
       "decision_status": "pending",
       "receipt": null
     },
     {
       "id": "F-08",
       "topic": "runtime_recipes_and_owned_resources",
-      "preparation_status": "not_prepared",
+      "preparation_status": "recipe_templates_prepared_runtime_boundaries_pending",
       "decision_status": "pending",
       "receipt": null
     }
@@ -443,7 +443,139 @@
     "exact_argv_cwd_env_input_timeout_for_each_recipe",
     "resource_cost_limits_and_abort_conditions"
   ],
-  "runtime_recipes": [],
+  "runtime_recipes": [
+    {
+      "id": "BUILD-CKS",
+      "status": "draft_unresolved",
+      "execution_status": "not_run",
+      "argv_template": [
+        "go",
+        "build",
+        "-o",
+        "{owned_binary_dir}/cks",
+        "./cmd/cks"
+      ],
+      "cwd_template": "{knowledge_execution_checkout}",
+      "env_names": [
+        "GOTOOLCHAIN",
+        "GOCACHE"
+      ],
+      "timeout_seconds": null,
+      "remaining": [
+        "checkout_tree_verification",
+        "toolchain_and_build_dependency_pins",
+        "build_timeout"
+      ]
+    },
+    {
+      "id": "BUILD-CHAINBENCH",
+      "status": "draft_unresolved",
+      "execution_status": "not_run",
+      "argv_template": [
+        "go",
+        "build",
+        "-o",
+        "{owned_binary_dir}/chainbench-mcp",
+        "./cmd/chainbench-mcp"
+      ],
+      "cwd_template": "{chainbench_execution_checkout}",
+      "env_names": [
+        "GOTOOLCHAIN",
+        "GOCACHE"
+      ],
+      "timeout_seconds": null,
+      "remaining": [
+        "checkout_tree_verification",
+        "toolchain_and_build_dependency_pins",
+        "build_timeout"
+      ]
+    },
+    {
+      "id": "SERVE-CKS",
+      "status": "draft_unresolved",
+      "execution_status": "not_run",
+      "argv_template": [
+        "{cks_binary}",
+        "mcp",
+        "--config",
+        "{owned_cks_yaml}",
+        "--http-addr",
+        "127.0.0.1:{reserved_cks_port}",
+        "--name",
+        "{run_id}"
+      ],
+      "cwd_template": "{owned_run_directory}",
+      "env_names": [],
+      "timeout_seconds": null,
+      "remaining": [
+        "real_dataset_graph_vector_model_pins",
+        "config_bytes_and_acl",
+        "port_ownership_and_pid_lease",
+        "graceful_cleanup_recipe"
+      ]
+    },
+    {
+      "id": "HOST-PILOT",
+      "status": "draft_unresolved",
+      "execution_status": "not_run",
+      "argv_template": [
+        "claude",
+        "--print",
+        "--model",
+        "{approved_llm_model}",
+        "--plugin-dir",
+        "{frozen_plugin_directory}",
+        "--max-budget-usd",
+        "{approved_usd_cap}",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{owned_mcp_json}",
+        "--setting-sources",
+        "",
+        "--settings",
+        "{owned_settings_json}",
+        "--permission-mode",
+        "manual",
+        "--include-hook-events",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "{public_prompt_without_gold}"
+      ],
+      "cwd_template": "{go_stablenet_execution_copy}",
+      "env_names": [
+        "CLAUDE_CONFIG_DIR",
+        "ANTHROPIC_API_KEY",
+        "CKS_MCP_URL",
+        "CHAINBENCH_DIR"
+      ],
+      "timeout_seconds": null,
+      "remaining": [
+        "provider_auth_without_personal_config",
+        "model_cost_review",
+        "explicit_mcp_plugin_configuration_compatibility",
+        "actual_hooks_dispatch_capture",
+        "visible_permission_or_approved_handler",
+        "prepublication_boundary_enforcement",
+        "public_input_gold_access_separation",
+        "timeout_owned_children_cleanup"
+      ],
+      "prohibited_flags": [
+        "--dangerously-skip-permissions",
+        "--allow-dangerously-skip-permissions",
+        "--bare",
+        "--safe-mode"
+      ],
+      "publication_boundary_status": "not_enforced_or_verified",
+      "scope_stop": "actual_evaluation_gate_before_push_pr_jira_or_deployment",
+      "forbidden_completion_substitutes": [
+        "fabricated_PR_URL",
+        "manual_completed_state",
+        "skipped_evaluator_or_hook",
+        "suppressed_error_as_success"
+      ]
+    }
+  ],
   "owned_resources": [],
   "evidence_record_required_fields": [
     "run_id",
@@ -475,5 +607,15 @@
     "F-06",
     "F-07",
     "F-08"
-  ]
+  ],
+  "input_candidate_pool": {
+    "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-INPUT-CANDIDATES.json",
+    "sha256": "029285c70ad60d104cdd59aa351ff07984905440c72465f3ecd094b16ed2a114",
+    "kind": "preparation_only"
+  },
+  "host_preflight": {
+    "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-HOST-PREFLIGHT.json",
+    "sha256": "7f8b9c48c34daa5fa04ac08bf22f7e9c638d5e56173f51e62cb09c0f0abcd48c",
+    "kind": "preparation_only"
+  }
 }
