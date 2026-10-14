@@ -1,4 +1,6 @@
-현재 진행: [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 요청 범위에서 구현·명시 범위 검증 **6/9** 완료이며 WI-C를 진행한다. 남은 전체 구현 순서는 **WI-C → WI-6 → WI-SP**다. production/독립 전체 수용은 별도 미판정이며 WI-5는 이번 순서에 포함하지 않는다.
+현재 진행: [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 요청 범위에서 구현·명시 범위 검증 **7/9** 완료이며 WI-6을 진행한다. 남은 전체 구현 순서는 **WI-6 → WI-SP**다. production/독립 전체 수용은 별도 미판정이며 WI-5는 이번 순서에 포함하지 않는다.
+
+WI-C 부분 심층 리뷰·보고서 전달 게이트의 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-c/README.md)은16개 실제 공개 경로 검사/142개 plugin 테스트·전체 primary 회귀와 출처/추론/unknown 한계를 보존한다.
 
 WI-2 초기 Go pack·CKG/CKS 공개 후보 분석은 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-2/README.md)으로 고정했다.23개 실제 사례·39개 공개 검증·기존15개 회귀와 전체 build/test/fmt/lint PASS, 오탐2/미탐4와 한계·독립 수용 미판정은 유지한다.
 

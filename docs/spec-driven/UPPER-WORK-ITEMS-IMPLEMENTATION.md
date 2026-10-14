@@ -20,8 +20,8 @@
 | 4 | WI-4 | coding-agent+ChainBench | 원래 모드9 포함 구현·명시 범위 실행 검증·증거 커밋 | production/독립 수용 미판정 |
 | 5 | WI-1 | CKG | bounded Go 구현·공개 실행 검증·증거 커밋 | production/독립 수용 미판정 |
 | 6 | WI-2 | CKG/CKS | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
-| 7 | WI-C | coding-agent | 설계·구현 진행 | 미완료/미수용 |
-| 8 | WI-6 | CKS | 대기 | 미완료/미수용 |
+| 7 | WI-C | coding-agent | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
+| 8 | WI-6 | CKS | 설계·구현 진행 | 미완료/미수용 |
 | 9 | WI-SP | CKS+CKG | 대기 | 미완료/미수용 |
 
 ## 항목별 계약과 필요한 검증
@@ -93,7 +93,7 @@
 
 각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
 
-현재: 구현·명시 범위 실행 검증6/9, WI-C 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-C 구조화 깊은 리뷰. 남은 이번 구현 범위: WI-C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+현재: 구현·명시 범위 실행 검증7/9, WI-6 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-6 값 의존 확장. 남은 이번 구현 범위: WI-6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
 ## WI-V1 검증 기록
 
@@ -500,3 +500,30 @@ COMPLETION의 전달 검증 순서를 유지한다. PR 피드백 반영 `/review
 validator·도구 소비자 갱신·analyzer/orchestrator/hook·실제 artifact 실행은 아직
 구현하지 않았으며 WI-C는 미완료다. 현재6/9, 다음은 WI-C validator와 소비자
 계약/경로 구현이며, 남은 전체 작업은WI-C→WI-6→WI-SP다.
+
+### WI-C 최종 검증과 WI-6 시작
+
+책임 저장소 coding-agent45d9bc8b의 typed 심층 부분 리뷰·원문/계산/추론/unknown·
+6개 필수 reasoning dimension·CFG sequence/module membership view·검토 기준/
+우선순위·분석/보고서 SHA 완료 게이트를 검증했다. CKS31 실제 계약/Go compile·
+race 사례→공개 도구→artifact→hook/CLI16개 검사,9개 변조/우회 거부,142개
+plugin 테스트와 기존 standalone 훅·126개 도구 이름 참조 검사 PASS. 구조적
+리뷰의 자체 snapshot/blob 핀 부재·진짜 runtime trace/interprocedural modules·
+메모리/alias/가드 실행 가능성·외부 target·미측정 비용·LLM/사람 품질은 unknown
+또는 independent not_recorded다. 보고서 전달을 취약점 확인/사람 수용으로
+승격하지 않는다.
+
+primary3a12951 clean 바이너리 전체 build/test/race/fmt/vet/pinned lint/boundary/
+docs와 기존 rule39/value15 실제 회귀 PASS. range의 empty control block에는
+engine2가 structural_block_unlocated를 반환하고 원문 좌표를 생략한다.
+[최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-c/README.md)의300개
+산출물·1627개 primary source/dependency·13개 owner 변경·5개 승인 입력을
+증거c56d491c의 Git 객체/현재 파일로 검증했다. 현재7/9, 다음WI-6, 남은WI-6→WI-SP.
+
+WI-6은 여러 함수의 local value/control 결과를 CKS가 합성한다. call hop과
+curated flow는 계산된 interprocedural 값 전달로 바꾸지 않는다. exact seed·
+candidate/function/hop/총 계산 예산·cycle/dedup·snapshot/source·중단 이유를
+보존하며, Store의 무제한 neighborhood를 가져온 뒤 자르는 방식으로 예산을
+주장하지 않는다. bounded 저장소 조회 경계를 먼저 구현하고, 독립 정답
+fixture의 recall/noise/cost 분모와 실제 공개 도구 실행으로 검증한 뒤 완료를
+체크한다.
