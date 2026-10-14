@@ -15,8 +15,8 @@
 | 순서 | ID | 담당 | 구현·검증 상태 | 전체 목표/독립 수용 |
 |---|---|---|---|---|
 | 1 | WI-V1 | coding-agent | 구현·controlled 실행/반례 검증 완료·증거 커밋 | 실제 host/체인·독립 수용 보류 |
-| 2 | WI-V2 | coding-agent | 구현·최종 모델/Go 실행·반례 검증 통과, 증거 커밋 대기 | 미완료/미수용 |
-| 3 | WI-3 | coding-agent+CKS | 대기 | 미완료/미수용 |
+| 2 | WI-V2 | coding-agent | 구현·실제 Go/모델/반례 검증 완료·증거 커밋 | 독립 사람/production 최적성 미수용 |
+| 3 | WI-3 | coding-agent+CKS | 신호·소비자 계약 구현 진행 | 미완료/미수용 |
 | 4 | WI-4 | coding-agent+ChainBench | 대기 | 미완료/미수용 |
 | 5 | WI-1 | CKG | 대기 | 미완료/미수용 |
 | 6 | WI-2 | CKG/CKS | 대기 | 미완료/미수용 |
@@ -92,7 +92,7 @@
 
 각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
 
-현재: 구현·controlled 검증1/9, WI-V2 계약 구체화 중. 전체 목표의 독립 수용은0/9다. 다음: WI-V2 구현. 남은 이번 구현 범위: WI-V2/3/4/1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+현재: 구현·명시 범위 실행 검증2/9, WI-3 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-3 객관 신호·소비자 계약 정합. 남은 이번 구현 범위: WI-3/4/1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
 ## WI-V1 검증 기록
 
@@ -148,4 +148,10 @@ coding-agent 로컬 커밋 `068d3c3f2340a89317ca1cbb11f5bf1d30f620b1`. [WI-V2 pa
 - 실제 선택 check·적용 tree check·final HEAD V1·양쪽 completion guard·build/race/vet/fmt PASS. 시험 중 원 checkout/HEAD/index는 유지됐고 적용은 owned fixture에서만 수행했다.
 - 최종 선택은 명시한 후보/축/작업부하에 한정된다. 실제 production 코드의 전 후보 최적성·독립 사람 수용·설치된 전체 plugin host 흐름은 미판정이다.
 
-커밋된 packet을 재검증한 뒤 구현 상태를 갱신한다. 다음은 WI-3다.
+증거 커밋 `8ec6bb1f20dcd74cdcdf91fdd937ba0e8fbba388`의 모든 packet SHA를 Git object로 확인한 뒤 구현 완료 상태를 기록했다. 다음은 WI-3다.
+
+## WI-3 다음 구현의 책임 경계
+
+원 계약의 v1 흐름을 유지한다: LLM의 증상 가설·walk·판단과 CKS 객관 신호를 분리한다. 우선 소비자/실제 등록 schema의 모든 input type/required/이름을 맞추고 명시 host 정규화 검증을 둔다. 신호 합성은 CKS에서 재사용하며 graph 계산은 CKG에 둔다.
+
+seed는 symbol/위치/텍스트를 지원하고 후보·depth·backend 호출/시간 예산을 고정한다. cheap distance/relations/retrieval을 먼저 얻고 소수 후보에 impact/recency/concurrency를 채운다. 신호별 source/revision·가용/오류/미지원·null를 명시한다. 후보를 원인으로 판정하는 자동 점수는 만들지 않는다. 반복 확장과 dedup/중단 이유를 같은 schema로 반환한다. Security/dataflow 신호는 WI-1/2/SP 연결 전까지 미지원 null을 유지하고, 이후 실제 provider에 연결한다.
