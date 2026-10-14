@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-go-rule-candidates.py", line 137, in main
+    require('error'not in cks.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-rule-facade','version':'1'}}),'CKS initialize failed')
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-value-dependencies.py", line 65, in request
+    value=self.queue.get(timeout=max(.01,deadline-time.monotonic()));require(value is not None,'MCP stream ended');self.stdout.write(value);self.stdout.flush();reply=json.loads(value)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-value-dependencies.py", line 49, in require
+    if not value:raise RuntimeError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: MCP stream ended
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-go-rule-candidates.py", line 148, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-go-rule-candidates.py", line 144, in main
+    finally:cks.close()
+            ^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-value-dependencies.py", line 75, in close
+    require(self.proc.returncode==0,'MCP EOF termination failed')
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-value-dependencies.py", line 49, in require
+    if not value:raise RuntimeError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: MCP EOF termination failed

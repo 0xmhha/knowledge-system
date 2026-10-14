@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-go-rule-candidates.py", line 151, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/eval-go-rule-candidates.py", line 108, in main
+    tools=client.request('tools/list')['result']['tools'];tool=next(t for t in tools if t['name']=='flow_probe.context.rule_candidates');require(tool['annotations']['readOnlyHint']is True,'rule write annotation');(root/'tools.json').write_bytes(encode(tools))
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+StopIteration

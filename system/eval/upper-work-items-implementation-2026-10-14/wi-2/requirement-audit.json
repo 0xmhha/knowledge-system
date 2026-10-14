@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "implementation_scope_verified": true,
+  "independent_acceptance": "not_recorded",
+  "requirements": {
+    "versioned source/sink rules and explicit opt-in": {
+      "evidence": [
+        "pkg/graph/valueflow/rules.go",
+        "docs/graph/GO-RULE-CANDIDATES.md",
+        "execution/tools.json",
+        "execution/summary.json"
+      ],
+      "scope": "fixed Go syntax-target pack; default-off, version/digest/engine; strict raw schemas"
+    },
+    "value path and condition provenance": {
+      "evidence": [
+        "execution/Parameter.json",
+        "execution/Compound.json",
+        "execution/Branch.json",
+        "execution/Loop.json",
+        "execution/ErrorBranch.json",
+        "pkg/graph/valueflow/rules_test.go"
+      ],
+      "scope": "one lexical witness per source/sink pair; corresponding RHS/compound old-value, kill/shadow/parallel distinctions; original coordinates and immutable source/blob/snapshot"
+    },
+    "sanitizer/alias/external target uncertainty and accuracy": {
+      "evidence": [
+        "execution/Sanitizer.json",
+        "execution/Alias.json",
+        "execution/Renamed.json",
+        "execution/Spoof.json",
+        "execution/Closure.json",
+        "execution/ErrorRenamed.json",
+        "execution/summary.json"
+      ],
+      "scope": "23 independently compiled/race-tested fixture review conditions: TP10 TN7 FP2 FN4; precision10/12 recall10/14; not exploits/general security accuracy"
+    },
+    "manual/automatic coexistence": {
+      "evidence": [
+        "original-source/rules-manual.yaml.txt",
+        "execution/mcp.stdout.jsonl",
+        "execution/summary.json",
+        "pkg/graph/mcphandlers/rules_test.go"
+      ],
+      "scope": "manual YAML node remains separate, automatic origin explicit, full persisted graph digest unchanged; no fabricated manual reviewer"
+    },
+    "bounds and incomplete/unsupported refusal": {
+      "evidence": [
+        "pkg/graph/valueflow/rules_test.go",
+        "execution/mcp.stdout.jsonl",
+        "execution/summary.json"
+      ],
+      "scope": "candidate/work/deadline/base limits, strict input, stale source/changed snapshot/missing pack refusal; no empty-list safety verdict"
+    },
+    "CKG owns computation and CKS shares public schema/results": {
+      "evidence": [
+        "execution/cks/tools.json",
+        "execution/cks/Parameter.json",
+        "execution/cks/Sanitizer.json",
+        "internal/system/ckgclient/valueflow.go",
+        "internal/system/mcp/valueflow_test.go",
+        "execution/summary.json"
+      ],
+      "scope": "clean CKG12/CKS31 actual tools; CKS five-case exact parity/default off/stale pin/unchanged graph and both EOF0; legacy backend unavailable"
+    },
+    "whole build/test/fmt/lint and previous dependence regression": {
+      "evidence": [
+        "checks/ks-wi2-full-test-final.log",
+        "checks/ks-wi2-race-final.log",
+        "checks/ks-wi2-build-final.log",
+        "checks/ks-wi2-lint-fixed.log",
+        "value-regression/summary.json"
+      ],
+      "scope": "full Go tests/build, four-package race, pinned v2.14 lint/fmt/vet/boundaries/docs, previous15 actual dependence checks; independent acceptance not_recorded"
+    }
+  }
+}

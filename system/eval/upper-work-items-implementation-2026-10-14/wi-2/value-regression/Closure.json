@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "snapshot_sha256": "3bec81416331e0321e90b3bfac0d13ed7fc31fcc701b958238b968a7de53f365",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "71322762234b5000",
+      "canonical_id": "example.invalid/value-fixture/a.Closure",
+      "file": "a/flow.go",
+      "commit": "40b76a53a78cda475fc2261fee28d30016419de8",
+      "sha256": "43c94c5ec8945cec3c545a399c8cfb53362480dadff68103f5095aab4794c6c3",
+      "language": "go",
+      "start_line": 29,
+      "start_byte": 421,
+      "bytes": 66,
+      "snapshot_sha256": "3bec81416331e0321e90b3bfac0d13ed7fc31fcc701b958238b968a7de53f365",
+      "function_name": "Closure"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "partial",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0",
+          "b0/n1",
+          "b0/n2"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 447,
+          "end_byte": 468,
+          "start_line": 29,
+          "end_line": 29
+        },
+        "text": "f := func() { x = 9 }",
+        "synthetic": false
+      },
+      {
+        "id": "b0/n1",
+        "block": 0,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 470,
+          "end_byte": 475,
+          "start_line": 29,
+          "end_line": 29
+        },
+        "text": "_ = f",
+        "synthetic": false
+      },
+      {
+        "id": "b0/n2",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 477,
+          "end_byte": 485,
+          "start_line": 29,
+          "end_line": 29
+        },
+        "text": "return x",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 421,
+          "end_byte": 444,
+          "start_line": 29,
+          "end_line": 29
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "b0/n0",
+        "to": "b0/n1",
+        "kind": "reference_dependence",
+        "certainty": "may_reach",
+        "variable": "v447"
+      },
+      {
+        "from": "entry",
+        "to": "b0/n2",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v434"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "closure_unsupported",
+        "message": "Captured variables and closure calls require conservative analysis",
+        "location": {
+          "start_byte": 452,
+          "end_byte": 468,
+          "start_line": 29,
+          "end_line": 29
+        }
+      },
+      {
+        "code": "closure_value_unknown",
+        "message": "Captured variable effects are not inlined into caller execution",
+        "location": {
+          "start_byte": 452,
+          "end_byte": 468,
+          "start_line": 29,
+          "end_line": 29
+        }
+      },
+      {
+        "code": "reference_alias_unknown",
+        "message": "Reference binding flow does not establish memory alias/effect semantics",
+        "location": {
+          "start_byte": 474,
+          "end_byte": 475,
+          "start_line": 29,
+          "end_line": 29
+        }
+      }
+    ],
+    "truncated": false,
+    "elapsed_micros": 29,
+    "variables": [
+      {
+        "id": "v434",
+        "name": "x",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 434,
+          "end_byte": 435,
+          "start_line": 29,
+          "end_line": 29
+        }
+      },
+      {
+        "id": "v447",
+        "name": "f",
+        "kind": "local",
+        "declaration": {
+          "start_byte": 447,
+          "end_byte": 448,
+          "start_line": 29,
+          "end_line": 29
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/definition/v447/447",
+        "node": "b0/n0",
+        "variable": "v447",
+        "role": "definition",
+        "location": {
+          "start_byte": 447,
+          "end_byte": 448,
+          "start_line": 29,
+          "end_line": 29
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n1/reference/v447/474",
+        "node": "b0/n1",
+        "variable": "v447",
+        "role": "reference",
+        "location": {
+          "start_byte": 474,
+          "end_byte": 475,
+          "start_line": 29,
+          "end_line": 29
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n2/use/v434/484",
+        "node": "b0/n2",
+        "variable": "v434",
+        "role": "use",
+        "location": {
+          "start_byte": 484,
+          "end_byte": 485,
+          "start_line": 29,
+          "end_line": 29
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v434/434",
+        "node": "entry",
+        "variable": "v434",
+        "role": "definition",
+        "location": {
+          "start_byte": 434,
+          "end_byte": 435,
+          "start_line": 29,
+          "end_line": 29
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "b0/n0/definition/v447/447",
+        "use": "b0/n1/reference/v447/474",
+        "variable": "v447",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "entry/definition/v434/434",
+        "use": "b0/n2/use/v434/484",
+        "variable": "v434",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 6,
+    "facts_peak": 18
+  },
+  "elapsed_micros": 259
+}
