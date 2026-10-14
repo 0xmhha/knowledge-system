@@ -374,3 +374,19 @@ return 위치와 cap/cancel/미지원/opaque effect 시험이 통과했다. 첫 
 loop fixed-point와 제어 의존, 이후 source-bound 공개 질의다.
 
 CFG kernel 검증 소스 커밋7a7f1320과 [중간 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-1-cfg-checkpoint/README.md)를 d6c24421에 보존했다. 현재1609개 primary source/dependency SHA를 Git object로 확인했다. 이 source binding 갱신은 기존 수용 조건을 바꾸거나 WI-1을 완료로 표시하지 않는다.
+
+
+### WI-1 진행: 값/제어 의존과 공개 질의
+
+현재 def-use/reaching definitions·강한 재정의 kill·분기 합류·loop fixed point·
+normal-exit postdominator control dependence를 공유 API에 구현했다. Go 타입
+바인딩으로 lexical identity를 계산하고, 누락 package 타입은 partial이다.
+상수는 compile-time source node(block=-1), 참조/aggregate/generic unknown은
+별도 관계다. `value_dependencies` CKG MCP 입력/출력 schema와 실제 runtime
+검사를 등록했다. source/blob/manifest/node를 재확인하고 live file은 읽지 않는다.
+
+독립 관계·원문·상한·drift·schema 반례와 실제 compile/race→index→namespaced
+stdio MCP의 첫11개 검증이 통과했다. 포인터/field/closure/비종료는 unknown을
+유지하고 SDK output schema의 실제 음성 제어도 확인한다. 최종 code commit
+replay·전체 regression·새 source binding·원래 범위 audit 전에 완료 체크하지 않는다.
+[지원 범위와 공개 API](../graph/VALUE-DEPENDENCIES.md)를 기준으로 검증한다.

@@ -30,6 +30,7 @@ func RegisterAll(s *server.MCPServer, reader store.Reader) {
 	RegisterGetContextForTask(s, reader)
 	RegisterImpactOfChange(s, reader)
 	RegisterConcurrencyImpact(s, reader)
+	RegisterValueDependencies(s, reader)
 	RegisterChangeHistory(s, reader)
 	// One Cache per Run amortises BM25 corpus indexing across every
 	// evidence_for_intent call. Manifest-keyed invalidation handles

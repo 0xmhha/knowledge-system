@@ -10,6 +10,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"go/types"
 	"strings"
 	"time"
 
@@ -17,15 +18,17 @@ import (
 )
 
 type Source struct {
-	NodeID      string `json:"node_id"`
-	CanonicalID string `json:"canonical_id,omitempty"`
-	File        string `json:"file"`
-	Commit      string `json:"commit,omitempty"`
-	SHA256      string `json:"sha256"`
-	Language    string `json:"language"`
-	StartLine   int    `json:"start_line"`
-	StartByte   int    `json:"start_byte"`
-	Bytes       int    `json:"bytes"`
+	NodeID         string `json:"node_id"`
+	CanonicalID    string `json:"canonical_id,omitempty"`
+	File           string `json:"file"`
+	Commit         string `json:"commit,omitempty"`
+	SHA256         string `json:"sha256"`
+	Language       string `json:"language"`
+	StartLine      int    `json:"start_line"`
+	StartByte      int    `json:"start_byte"`
+	Bytes          int    `json:"bytes"`
+	SnapshotSHA256 string `json:"snapshot_sha256,omitempty"`
+	FunctionName   string `json:"function_name,omitempty"`
 }
 type Options struct {
 	MaxSourceBytes int `json:"max_source_bytes"`
@@ -35,6 +38,7 @@ type Options struct {
 	MaxEdges       int `json:"max_edges"`
 	MaxIterations  int `json:"max_iterations"`
 	TimeoutMS      int `json:"timeout_ms"`
+	MaxFacts       int `json:"max_facts"`
 }
 type Location struct {
 	StartByte int `json:"start_byte"`
@@ -62,6 +66,7 @@ type Edge struct {
 	Kind      string `json:"kind"`
 	Condition string `json:"condition,omitempty"`
 	Certainty string `json:"certainty"`
+	Variable  string `json:"variable,omitempty"`
 }
 type Diagnostic struct {
 	Code     string    `json:"code"`
@@ -80,6 +85,11 @@ type Result struct {
 	Diagnostics   []Diagnostic      `json:"diagnostics"`
 	Truncated     bool              `json:"truncated"`
 	ElapsedMicros int64             `json:"elapsed_micros"`
+	Variables     []Variable        `json:"variables"`
+	Occurrences   []Occurrence      `json:"occurrences"`
+	DefUse        []DefUse          `json:"def_use"`
+	Iterations    int               `json:"iterations"`
+	FactsPeak     int               `json:"facts_peak"`
 }
 
 type analysis struct {
@@ -91,12 +101,13 @@ type analysis struct {
 	prefix   int
 	blob     []byte
 	context  context.Context
+	typeInfo *types.Info
 }
 
 func limits(o Options) (Options, error) {
-	defaults := Options{256 * 1024, 4096, 256, 1024, 4096, 128, 1000}
-	requested := []*int{&o.MaxSourceBytes, &o.MaxASTNodes, &o.MaxBlocks, &o.MaxNodes, &o.MaxEdges, &o.MaxIterations, &o.TimeoutMS}
-	caps := []int{defaults.MaxSourceBytes, defaults.MaxASTNodes, defaults.MaxBlocks, defaults.MaxNodes, defaults.MaxEdges, defaults.MaxIterations, defaults.TimeoutMS}
+	defaults := Options{MaxSourceBytes: 256 * 1024, MaxASTNodes: 4096, MaxBlocks: 256, MaxNodes: 1024, MaxEdges: 4096, MaxIterations: 128, TimeoutMS: 1000, MaxFacts: 65536}
+	requested := []*int{&o.MaxSourceBytes, &o.MaxASTNodes, &o.MaxBlocks, &o.MaxNodes, &o.MaxEdges, &o.MaxIterations, &o.TimeoutMS, &o.MaxFacts}
+	caps := []int{defaults.MaxSourceBytes, defaults.MaxASTNodes, defaults.MaxBlocks, defaults.MaxNodes, defaults.MaxEdges, defaults.MaxIterations, defaults.TimeoutMS, defaults.MaxFacts}
 	for i, value := range requested {
 		if *value == 0 {
 			*value = caps[i]
@@ -111,7 +122,18 @@ func limits(o Options) (Options, error) {
 // BuildCFG reports executable successors, not an AST ordering masquerading as
 // control flow. Value/def-use/control dependence is deliberately not yet
 // advertised by this first kernel; later analysis stages must compute it.
-func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) (out Result, err error) {
+func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) (Result, error) {
+	return build(ctx, source, blob, options, false)
+}
+
+// Analyze computes lexical reaching definitions and value/control dependence
+// once in the graph engine. Memory, external effects and unsupported constructs
+// remain explicit; a missing edge is never a proof of safety.
+func Analyze(ctx context.Context, source Source, blob []byte, options Options) (Result, error) {
+	return build(ctx, source, blob, options, true)
+}
+
+func build(ctx context.Context, source Source, blob []byte, options Options, dependence bool) (out Result, err error) {
 	started := time.Now()
 	defer func() { out.ElapsedMicros = time.Since(started).Microseconds() }()
 	options, err = limits(options)
@@ -121,7 +143,7 @@ func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) 
 	hash := sha256.Sum256(blob)
 	source.SHA256 = hex.EncodeToString(hash[:])
 	source.Bytes = len(blob)
-	out = Result{SchemaVersion: 1, Source: source, Limits: options, Status: "partial", Capability: map[string]string{"cfg": "bounded_go", "def_use": "not_computed", "data_dependence": "not_computed", "control_dependence": "not_computed", "package_types": "unavailable_function_blob", "memory_alias": "unsupported", "exceptions": "unsupported", "short_circuit": "unsupported"}, Blocks: []Block{}, Nodes: []Node{}, Edges: []Edge{}, Diagnostics: []Diagnostic{}}
+	out = Result{SchemaVersion: 1, Source: source, Limits: options, Status: "partial", Capability: map[string]string{"cfg": "bounded_go", "def_use": "not_computed", "data_dependence": "not_computed", "control_dependence": "not_computed", "package_types": "unavailable_function_blob", "memory_alias": "unsupported", "exceptions": "unsupported", "short_circuit": "unsupported"}, Blocks: []Block{}, Nodes: []Node{}, Edges: []Edge{}, Diagnostics: []Diagnostic{}, Variables: []Variable{}, Occurrences: []Occurrence{}, DefUse: []DefUse{}}
 	diagnostic := func(code, message string) {
 		out.Diagnostics = append(out.Diagnostics, Diagnostic{Code: code, Message: message})
 	}
@@ -133,6 +155,9 @@ func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) 
 	}
 	if source.NodeID == "" || source.File == "" || source.StartLine < 1 || source.StartByte < 0 {
 		return out, fmt.Errorf("retained source identity/location required")
+	}
+	if source.Commit != "" && !validSHA(source.Commit, 40, 64) {
+		diagnostic("revision_not_immutable", "Retained revision is not a full immutable commit; snapshot/blob pins still apply")
 	}
 	if source.Commit == "" {
 		diagnostic("revision_unavailable", "Snapshot source commit is unavailable; no live checkout revision is inferred")
@@ -156,7 +181,7 @@ func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) 
 	}
 	prefix := "package __valueflow\n"
 	fs := token.NewFileSet()
-	file, parseError := parser.ParseFile(fs, source.File, prefix+string(blob), 0)
+	file, parseError := parser.ParseFile(fs, source.File, prefix+string(blob), parser.SkipObjectResolution)
 	if parseError != nil {
 		out.Status = "unsupported"
 		diagnostic("invalid_function_source", parseError.Error())
@@ -171,6 +196,11 @@ func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) 
 	if !ok || fn.Body == nil {
 		out.Status = "unsupported"
 		diagnostic("function_body_required", "A function/method body is required")
+		return out, nil
+	}
+	if source.FunctionName != "" && source.FunctionName != fn.Name.Name {
+		out.Status = "unsupported"
+		diagnostic("function_identity_mismatch", "Retained symbol and parsed function declaration differ")
 		return out, nil
 	}
 	count := 0
@@ -188,11 +218,35 @@ func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) 
 	}
 	// Unknown callees may return. Never infer os.Exit/log.Fatal or an unresolved
 	// identifier named panic as a proven no-return call from an isolated blob.
-	graph := cfg.New(fn.Body, func(*ast.CallExpr) bool { return true })
+	if controlError := validateBranches(fn.Body); controlError != nil {
+		out.Status = "unsupported"
+		diagnostic("invalid_control_flow", controlError.Error())
+		return out, nil
+	}
+	graph, cfgError := retainedCFG(fn.Body)
+	if cfgError != nil {
+		out.Status = "unsupported"
+		diagnostic("invalid_control_flow", cfgError.Error())
+		return out, nil
+	}
 	if len(graph.Blocks) > options.MaxBlocks {
 		return exhausted("CFG block limit exceeded")
 	}
 	a := analysis{result: out, fs: fs, fn: fn, graph: graph, prefix: len(prefix), blob: blob, context: bounded, astNodes: map[string]ast.Node{}}
+	if dependence {
+		a.typeInfo = &types.Info{Defs: map[*ast.Ident]types.Object{}, Uses: map[*ast.Ident]types.Object{}, Types: map[ast.Expr]types.TypeAndValue{}}
+		typeErrors := 0
+		config := types.Config{Error: func(error) { typeErrors++ }}
+		_, _ = config.Check("retained/function", fs, []*ast.File{file}, a.typeInfo)
+		if typeErrors > 0 {
+			a.result.Diagnostics = append(a.result.Diagnostics, Diagnostic{Code: "isolated_type_info_partial", Message: "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"})
+		}
+		a.result.Capability["local_binding"] = "isolated_go_types"
+		if bounded.Err() != nil {
+			out = a.result
+			return exhausted("Isolated Go type binding deadline ended")
+		}
+	}
 	conditions := map[ast.Expr]bool{}
 	ast.Inspect(fn.Body, func(node ast.Node) bool {
 		switch value := node.(type) {
@@ -252,7 +306,9 @@ func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) 
 	// An explicit partial result prevents absent dependence edges being read as
 	// safe. CFG cannot represent short-circuit/exception semantics; next stages
 	// retain diagnostics rather than promising whole-program precision.
-	diagnostic("dependence_not_computed", "This CFG kernel has not computed def-use or data/control dependence")
+	if !dependence {
+		diagnostic("dependence_not_computed", "This CFG kernel has not computed def-use or data/control dependence")
+	}
 	ast.Inspect(fn.Body, func(node ast.Node) bool {
 		var code, message string
 		switch value := node.(type) {
@@ -280,6 +336,11 @@ func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) 
 		}
 		return true
 	})
+	if dependence {
+		a.result = out
+		a.compute()
+		out = a.result
+	}
 	return out, nil
 }
 func (a *analysis) loc(node ast.Node) Location {
@@ -292,4 +353,16 @@ func (a *analysis) loc(node ast.Node) Location {
 	start = max(0, min(start, len(a.blob)))
 	finish = max(start, min(finish, len(a.blob)))
 	return Location{StartByte: a.result.Source.StartByte + start, EndByte: a.result.Source.StartByte + finish, StartLine: a.result.Source.StartLine + begin.Line - 2, EndLine: a.result.Source.StartLine + end.Line - 2}
+}
+
+// cfg assumes semantically valid branches; syntactically valid malformed Go
+// (e.g. break outside a loop) must not panic through a public MCP request.
+func retainedCFG(body *ast.BlockStmt) (graph *cfg.CFG, err error) {
+	defer func() {
+		if value := recover(); value != nil {
+			graph = nil
+			err = fmt.Errorf("unsupported control flow: %v", value)
+		}
+	}()
+	return cfg.New(body, func(*ast.CallExpr) bool { return true }), nil
 }
