@@ -83,6 +83,7 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
 	// The properties each response is recognisable by: the json tags on the
 	// type its handler constructs.
 	want := map[string][]string{
+		ToolNameLabelSuspects:            {"schema_version", "snapshot", "coordinates", "candidates", "partial", "budget"},
 		ToolNameSemanticLookupTerm:       {"state", "reason"},
 		ToolNameSemanticGetConcept:       {"state", "reason"},
 		ToolNameSemanticTraceRequirement: {"state", "reason"},

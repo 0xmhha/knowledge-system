@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strings"
 	"testing"
@@ -71,10 +72,9 @@ func TestSchemaGolden_RegisteredToolsMatchContract(t *testing.T) {
 	}
 }
 
-// The primary tool's input shape is a consumer contract. The historical
-// fixture listed task/max_citations/budget_tokens while the registered tool
-// accepted prompt/intent; a name-only comparison did not detect that drift.
-func TestSchemaGolden_GetForTaskInputMatchesContract(t *testing.T) {
+// Verify all schema semantics, including nested types, item shapes, required
+// fields and bounds. Descriptions are editorial; executable constraints are not.
+func TestSchemaGolden_AllInputsMatchContract(t *testing.T) {
 	f := newFixture(t, nil)
 	srv := mcpserver.NewMCPServer("cks-test", "0.0.1")
 	if err := Register(srv, f.deps); err != nil {
@@ -86,43 +86,54 @@ func TestSchemaGolden_GetForTaskInputMatchesContract(t *testing.T) {
 	}
 	var fixture struct {
 		Tools map[string]struct {
-			Input struct {
-				Properties map[string]json.RawMessage `json:"properties"`
-				Required   []string                   `json:"required"`
-			} `json:"input"`
+			Input json.RawMessage `json:"input"`
 		} `json:"tools"`
 	}
-	if err := json.Unmarshal(raw, &fixture); err != nil {
+	if err = json.Unmarshal(raw, &fixture); err != nil {
 		t.Fatal(err)
 	}
-	for _, toolName := range []string{ToolNameGetForTask, ToolNameGetForTaskV2,
-		ToolNameSemanticLookupTerm, ToolNameSemanticGetConcept, ToolNameSemanticTraceRequirement} {
-		t.Run(toolName, func(t *testing.T) {
-			registered := srv.GetTool(toolName)
-			if registered == nil {
-				t.Fatal("context tool is not registered")
-			}
-			want, ok := fixture.Tools[toolName]
+	for name, registered := range srv.ListTools() {
+		t.Run(name, func(t *testing.T) {
+			want, ok := fixture.Tools[name]
 			if !ok {
-				t.Fatal("context tool missing from contract fixture")
+				t.Fatal("tool missing from input contract")
 			}
-			got := registered.Tool.InputSchema
-			if strings.Join(got.Required, ",") != strings.Join(want.Input.Required, ",") {
-				t.Errorf("required inputs: registered=%v fixture=%v", got.Required, want.Input.Required)
+			got, err := json.Marshal(registered.Tool.InputSchema)
+			if err != nil {
+				t.Fatal(err)
 			}
-			actualNames := make(map[string]struct{}, len(got.Properties))
-			for name := range got.Properties {
-				actualNames[name] = struct{}{}
-			}
-			fixtureNames := make(map[string]struct{}, len(want.Input.Properties))
-			for name := range want.Input.Properties {
-				fixtureNames[name] = struct{}{}
-			}
-			if strings.Join(sortedKeys(actualNames), ",") != strings.Join(sortedKeys(fixtureNames), ",") {
-				t.Errorf("input names: registered=%v fixture=%v", sortedKeys(actualNames), sortedKeys(fixtureNames))
+			if !reflect.DeepEqual(schemaSemantics(got), schemaSemantics(want.Input)) {
+				t.Errorf("input schema drift:\nregistered=%s\nfixture=%s", got, want.Input)
 			}
 		})
 	}
+}
+func schemaSemantics(raw []byte) any {
+	var decoded any
+	if err := json.Unmarshal(raw, &decoded); err != nil {
+		panic(err)
+	}
+	var normalize func(any) any
+	normalize = func(value any) any {
+		switch v := value.(type) {
+		case map[string]any:
+			out := map[string]any{}
+			for k, item := range v {
+				if k != "description" && k != "title" {
+					out[k] = normalize(item)
+				}
+			}
+			return out
+		case []any:
+			for i, item := range v {
+				v[i] = normalize(item)
+			}
+			return v
+		default:
+			return value
+		}
+	}
+	return normalize(decoded)
 }
 
 func sortedKeys(m map[string]struct{}) []string {

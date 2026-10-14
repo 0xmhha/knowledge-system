@@ -155,3 +155,21 @@ coding-agent 로컬 커밋 `068d3c3f2340a89317ca1cbb11f5bf1d30f620b1`. [WI-V2 pa
 원 계약의 v1 흐름을 유지한다: LLM의 증상 가설·walk·판단과 CKS 객관 신호를 분리한다. 우선 소비자/실제 등록 schema의 모든 input type/required/이름을 맞추고 명시 host 정규화 검증을 둔다. 신호 합성은 CKS에서 재사용하며 graph 계산은 CKG에 둔다.
 
 seed는 symbol/위치/텍스트를 지원하고 후보·depth·backend 호출/시간 예산을 고정한다. cheap distance/relations/retrieval을 먼저 얻고 소수 후보에 impact/recency/concurrency를 채운다. 신호별 source/revision·가용/오류/미지원·null를 명시한다. 후보를 원인으로 판정하는 자동 점수는 만들지 않는다. 반복 확장과 dedup/중단 이유를 같은 schema로 반환한다. Security/dataflow 신호는 WI-1/2/SP 연결 전까지 미지원 null을 유지하고, 이후 실제 provider에 연결한다.
+
+### WI-3 진행 기록: 신호와 소비자 연결
+
+구현 진행 중이며 완료 표시는 유지하지 않는다. CKS factual label endpoint,
+한 단계 BFS 거리 계산, 선언 symbol/site 식별, seed 기준 영향·동시성,
+예산과 null·provenance, 보관 source/hash 검증을 추가했다. 전체29개 입력
+schema를 비교하는 provider/consumer 계약과 coding-agent 설치 패키지의
+schema 사본, 반복 산출물 validator 및 분석 handoff SHA gate를 연결했다.
+
+실제 합성 Go 소스→SQLite 인덱스→stdio MCP→소비자 산출물에서
+Leaf/Middle/Top 거리0/1/2와 반복 확장을 확인했다. 한 줄 함수와 ReturnStmt의
+동일 span 오인도 이 실행에서 발견해 수정했다. Claude Code의 실제 HTTP
+호스트가 `mcp__cks__cks_context_label_suspects`로 정규화해 읽기 전용 도구를
+호출하고 동일 관찰값을 수신했다. 이 검증은 소유한 합성 소스에 한정되며
+실제 대상 저장소의 원인 판정·운영 수용을 대신하지 않는다.
+
+전체 build/test/race/fmt/lint 및 최종 commit-bound 실행 증거를 확인하고
+증거를 먼저 커밋한 뒤 구현 검증 상태를 갱신한다. 다음은 WI-4다.

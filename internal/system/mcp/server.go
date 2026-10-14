@@ -138,6 +138,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 
 	registerGetForTask(s, d)
 	registerGetForTaskV2(s, d)
+	registerLabelSuspects(s, d)
 	registerSemanticStatus(s, d)
 	registerSemanticReads(s, d)
 	registerHealth(s, d)
