@@ -1,0 +1,400 @@
+{
+  "schema_version": 1,
+  "symptom": "hang in Leaf call path",
+  "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+  "coordinates": null,
+  "candidates": [
+    {
+      "citation": {
+        "file": "path.go",
+        "start_line": 4,
+        "end_line": 4,
+        "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+      },
+      "retained_citation": null,
+      "symbol": "example.org/suspect-fixture.Middle",
+      "signals": {
+        "distance": {
+          "value": 0,
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "seed",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "relations": {
+          "value": [],
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "seed",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "impact_category": {
+          "value": [],
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.impact_analysis",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "recency": {
+          "value": {
+            "last_merged_at": null,
+            "pr_count": 0,
+            "scope": "returned PR references (max 10), not commit count"
+          },
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.change_history",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "concurrency": {
+          "value": {
+            "touched": false,
+            "direction": []
+          },
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.concurrency_impact",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "retrieval": {
+          "value": null,
+          "status": "unavailable",
+          "reason": "not retrieved",
+          "provenance": []
+        },
+        "security_tag": {
+          "value": null,
+          "status": "unsupported",
+          "reason": "policy/security provider not yet connected",
+          "provenance": []
+        },
+        "dataflow_on_path": {
+          "value": null,
+          "status": "unsupported",
+          "reason": "value dependency provider not yet connected",
+          "provenance": []
+        }
+      }
+    },
+    {
+      "citation": {
+        "file": "path.go",
+        "start_line": 5,
+        "end_line": 5,
+        "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+      },
+      "retained_citation": null,
+      "symbol": "example.org/suspect-fixture.Top",
+      "signals": {
+        "distance": {
+          "value": 1,
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.neighbors",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "relations": {
+          "value": [
+            "called_by"
+          ],
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.neighbors",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "impact_category": {
+          "value": [
+            "callers"
+          ],
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.impact_analysis",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "recency": {
+          "value": {
+            "last_merged_at": null,
+            "pr_count": 0,
+            "scope": "returned PR references (max 10), not commit count"
+          },
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.change_history",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 5,
+                "end_line": 5,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "concurrency": {
+          "value": {
+            "touched": false,
+            "direction": []
+          },
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.concurrency_impact",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "retrieval": {
+          "value": null,
+          "status": "unavailable",
+          "reason": "not retrieved",
+          "provenance": []
+        },
+        "security_tag": {
+          "value": null,
+          "status": "unsupported",
+          "reason": "policy/security provider not yet connected",
+          "provenance": []
+        },
+        "dataflow_on_path": {
+          "value": null,
+          "status": "unsupported",
+          "reason": "value dependency provider not yet connected",
+          "provenance": []
+        }
+      }
+    },
+    {
+      "citation": {
+        "file": "path.go",
+        "start_line": 3,
+        "end_line": 3,
+        "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+      },
+      "retained_citation": null,
+      "symbol": "example.org/suspect-fixture.Leaf",
+      "signals": {
+        "distance": {
+          "value": 1,
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.neighbors",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "relations": {
+          "value": [
+            "calls"
+          ],
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.neighbors",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "impact_category": {
+          "value": [],
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.impact_analysis",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "recency": {
+          "value": {
+            "last_merged_at": null,
+            "pr_count": 0,
+            "scope": "returned PR references (max 10), not commit count"
+          },
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.change_history",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 3,
+                "end_line": 3,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "concurrency": {
+          "value": {
+            "touched": false,
+            "direction": []
+          },
+          "status": "observed",
+          "provenance": [
+            {
+              "tool": "graph.concurrency_impact",
+              "snapshot": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+              "anchor": {
+                "file": "path.go",
+                "start_line": 4,
+                "end_line": 4,
+                "commit_hash": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d"
+              },
+              "retained_anchor": null
+            }
+          ]
+        },
+        "retrieval": {
+          "value": null,
+          "status": "unavailable",
+          "reason": "not retrieved",
+          "provenance": []
+        },
+        "security_tag": {
+          "value": null,
+          "status": "unsupported",
+          "reason": "policy/security provider not yet connected",
+          "provenance": []
+        },
+        "dataflow_on_path": {
+          "value": null,
+          "status": "unsupported",
+          "reason": "value dependency provider not yet connected",
+          "provenance": []
+        }
+      }
+    }
+  ],
+  "partial": false,
+  "budget": {
+    "max_candidates": 10,
+    "max_seeds": 3,
+    "max_enriched": 3,
+    "max_calls": 32,
+    "calls": 12,
+    "depth": 1,
+    "elapsed_ms": 1,
+    "time_budget_ms": 1000,
+    "stop_reasons": []
+  },
+  "notes": [
+    "Signals are observations, not cause probabilities. The agent supplies symptom-specific judgments.",
+    "Search scores remain per backend; they are not comparable cause scores.",
+    "Distance is the shortest observed path within bounded traversal; an incomplete walk may miss a shorter path.",
+    "Empty impact or concurrency membership is scoped to returned bounded seed queries; it does not prove absence in the entire graph.",
+    "History counts are returned PR references, not total commit counts. Empty results are scoped observations.",
+    "Deadline is cooperative; a non-cancellable local store may finish one in-flight query after the budget."
+  ]
+}

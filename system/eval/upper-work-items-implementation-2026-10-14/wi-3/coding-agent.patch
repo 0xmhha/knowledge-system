@@ -1,0 +1,2938 @@
+From b9290af1982b55693a5f49bbc9fad5dc2cbb76af Mon Sep 17 00:00:00 2001
+From: 0xmhha <mhha@wemade.com>
+Date: Wed, 14 Oct 2026 10:39:19 +0900
+Subject: [PATCH] feat: preserve bounded suspect evidence before bugfix
+ planning
+
+---
+ .github/workflows/ci.yml                    |    1 +
+ contract/agent-mcp.schema.json              | 1388 +++++++++++++++++--
+ plugin/agents/analyzer.md                   |    8 +
+ plugin/agents/planner.md                    |    5 +
+ plugin/contracts/cks-tools.schema.json      |  826 +++++++++++
+ plugin/hooks/hooks.json                     |    5 +
+ plugin/hooks/suspect-labeling-guard.py      |   39 +
+ plugin/scripts/suspect_labels.py            |  156 +++
+ plugin/scripts/tests/test_suspect_labels.py |   96 ++
+ plugin/skills/state-machine/SKILL.md        |   12 +
+ plugin/skills/suspect-labeling/SKILL.md     |   66 +
+ 11 files changed, 2504 insertions(+), 98 deletions(-)
+ create mode 100644 plugin/contracts/cks-tools.schema.json
+ create mode 100644 plugin/hooks/suspect-labeling-guard.py
+ create mode 100644 plugin/scripts/suspect_labels.py
+ create mode 100644 plugin/scripts/tests/test_suspect_labels.py
+ create mode 100644 plugin/skills/suspect-labeling/SKILL.md
+
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 519b9a5..f6dba36 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -41,6 +41,7 @@ jobs:
+           python plugin/scripts/tests/test_oracle_gate.py
+           python plugin/scripts/tests/test_go_oracle_driver.py
+           python plugin/scripts/tests/test_fix_selection.py
++          python plugin/scripts/tests/test_suspect_labels.py
+ 
+   # jira-gateway-mcp Go binary: must build and pass its unit tests.
+   go-jira-gateway:
+diff --git a/contract/agent-mcp.schema.json b/contract/agent-mcp.schema.json
+index 828505b..12e4e1f 100644
+--- a/contract/agent-mcp.schema.json
++++ b/contract/agent-mcp.schema.json
+@@ -7,18 +7,32 @@
+     "Citation": {
+       "type": "object",
+       "properties": {
+-        "file": { "type": "string" },
+-        "start_line": { "type": "integer" },
+-        "end_line": { "type": "integer" }
++        "file": {
++          "type": "string"
++        },
++        "start_line": {
++          "type": "integer"
++        },
++        "end_line": {
++          "type": "integer"
++        }
+       },
+-      "required": ["file"]
++      "required": [
++        "file"
++      ]
+     },
+     "PRRef": {
+       "type": "object",
+       "properties": {
+-        "number": { "type": "integer" },
+-        "title": { "type": "string" },
+-        "merged_at": { "type": "string" }
++        "number": {
++          "type": "integer"
++        },
++        "title": {
++          "type": "string"
++        },
++        "merged_at": {
++          "type": "string"
++        }
+       }
+     }
+   },
+@@ -27,100 +41,821 @@
+       "server": "cks",
+       "namespace": "cks.",
+       "tools": {
+-        "cks_context_get_for_task": {
++        "cks_context_change_history": {
+           "owner": "cks",
+-          "description": "Compose a budgeted evidence pack for a development task (the primary planning entrypoint): intent -> semantic -> keyword/graph -> budget -> sanitize.",
+-          "input": { "properties": { "prompt": { "type": "string" }, "max_citations": { "type": "number" }, "budget_tokens": { "type": "number" } }, "required": ["prompt"] }
++          "wire_name": "cks.context.change_history",
++          "description": "Modification history for a symbol or intent: PR refs (provenance) and BM25-ranked diff hunks. Use AFTER traversal or reproduction has implicated a site -- anchoring history on an unverified hypothesis amplifies confirmation bias (history 'evidence' for the wrong suspect reads convincing).",
++          "input": {
++            "properties": {
++              "intent": {
++                "description": "Natural-language query the hunks should match against (optional if symbol is set).",
++                "type": "string"
++              },
++              "k": {
++                "description": "Maximum hunks to return when intent is set (0 = backend default).",
++                "type": "number"
++              },
++              "max_count": {
++                "description": "Maximum PR refs to return when symbol is set (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Fully-qualified symbol name to look up PR refs for (optional if intent is set).",
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
+         },
+-        "cks_context_semantic_search": {
++        "cks_context_concurrency_impact": {
+           "owner": "cks",
+-          "description": "Vector (meaning) search over the indexed corpus. Hits carry source=ckv.",
+-          "input": { "properties": { "query": { "type": "string" }, "k": { "type": "number" }, "language": { "type": "string" }, "path_glob": { "type": "string" }, "kinds": { "type": "array" } }, "required": ["query"] }
++          "wire_name": "cks.context.concurrency_impact",
++          "description": "Concurrency blast radius of a symbol: goroutines it spawns, channels it sends to/receives from, locks it acquires, plus modules reached over concurrency edges. Use when a change touches shared state or ordering -- before assuming a data race is or is not possible.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth over concurrency edges (default: 3).",
++                "type": "number"
++              },
++              "max_total": {
++                "description": "Cap on total modules returned (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_search_text": {
++        "cks_context_expand_flow": {
+           "owner": "cks",
+-          "description": "BM25 keyword (exactness) search over the indexed corpus. Hits carry source=ckg.",
+-          "input": { "properties": { "query": { "type": "string" }, "k": { "type": "number" }, "language": { "type": "string" }, "path_glob": { "type": "string" } }, "required": ["query"] }
++          "wire_name": "cks.context.expand_flow",
++          "description": "Steps adjacent to a flow step: direction 'up' traverses producers, 'down' traverses consumers. Use to trace a value's produce->store->consume lifecycle one hop at a time when the whole flow is too large.",
++          "input": {
++            "properties": {
++              "direction": {
++                "description": "\"up\" (producers) or \"down\" (consumers). Default \"down\".",
++                "type": "string"
++              },
++              "hops": {
++                "description": "Traversal hops (default 1).",
++                "type": "number"
++              },
++              "limit": {
++                "description": "Cap on returned neighbors (0 = backend default).",
++                "type": "number"
++              },
++              "step_id": {
++                "description": "Origin step id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "step_id"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_find_symbol": {
++        "cks_context_find_branches": {
++          "owner": "cks",
++          "wire_name": "cks.context.find_branches",
++          "description": "Map a free-text symptom to ranked when->then@at failure-condition candidates from the flow corpus. This is the natural-language ENTRY POINT into flows -- use it before get_flow when all you have is a symptom.",
++          "input": {
++            "properties": {
++              "k": {
++                "description": "Max matches to return (default 10).",
++                "type": "number"
++              },
++              "symptom_text": {
++                "description": "Free-text symptom description.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symptom_text"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_find_callees": {
+           "owner": "cks",
+-          "description": "Resolve a symbol name to its definition citation(s).",
+-          "input": { "properties": { "name": { "type": "string" }, "language": { "type": "string" }, "kinds": { "type": "array" } }, "required": ["name"] }
++          "wire_name": "cks.context.find_callees",
++          "description": "Forward call-graph traversal: what the given symbol calls. Use to unpack what a suspicious function actually reaches downstream (which store/update/IO). Pair with find_callers to cover the produce->store->consume lifecycle in both directions.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
++                "type": "number"
++              },
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "max_total": {
++                "description": "Cap on total neighbours (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
+         },
+         "cks_context_find_callers": {
+           "owner": "cks",
+-          "description": "List the callers of a symbol (reverse call edges).",
+-          "input": { "properties": { "symbol": { "type": "string" }, "depth": { "type": "number" }, "max_total": { "type": "number" } }, "required": ["symbol"] }
++          "wire_name": "cks.context.find_callers",
++          "description": "Reverse call-graph traversal: who calls the given symbol (calls/invokes edges, interface-dispatch bridged). The core cause-finding move for a stale or wrong value: from the consumer, traverse UP toward whoever produces/updates the value. depth=2 covers most producer chains.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
++                "type": "number"
++              },
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "max_total": {
++                "description": "Cap on total neighbours (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_find_callees": {
++        "cks_context_find_invariants": {
+           "owner": "cks",
+-          "description": "List the callees of a symbol (forward call edges).",
+-          "input": { "properties": { "symbol": { "type": "string" }, "depth": { "type": "number" }, "max_total": { "type": "number" } }, "required": ["symbol"] }
++          "wire_name": "cks.context.find_invariants",
++          "description": "List curated invariants (domain rules) matching a filter. Scope by file, policy category, or minimum confidence tier. Use on the diagnose path to check a planned change against the rules that govern the touched code before implementing.",
++          "input": {
++            "properties": {
++              "category": {
++                "description": "Filter by policy category (\"\" = any).",
++                "type": "string"
++              },
++              "file": {
++                "description": "Restrict to one source file (\"\" = any).",
++                "type": "string"
++              },
++              "tier_min": {
++                "description": "Minimum confidence tier 1|2|3 (0 = backend default).",
++                "type": "number"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
+         },
+-        "cks_context_get_subgraph": {
++        "cks_context_find_symbol": {
+           "owner": "cks",
+-          "description": "Return all nodes/edges within depth hops of a symbol, all edge types.",
+-          "input": { "properties": { "symbol": { "type": "string" }, "depth": { "type": "number" }, "max_total": { "type": "number" } }, "required": ["symbol"] }
++          "wire_name": "cks.context.find_symbol",
++          "description": "Resolve a symbol name to its definition citation(s) via ckg's qualified-name index. Suffix match by default; pass the fully-qualified name for an exact hit. Use to turn a name you already know into a traversal anchor.",
++          "input": {
++            "properties": {
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "kinds": {
++                "description": "Comma-separated symbol kinds (e.g., \"function,method\").",
++                "type": "string"
++              },
++              "language": {
++                "description": "Restrict to a language (e.g., \"go\").",
++                "type": "string"
++              },
++              "name": {
++                "description": "Symbol name (e.g., \"ProcessRequest\" or \"pkg.Type.Method\").",
++                "type": "string"
++              },
++              "path_glob": {
++                "description": "Restrict to file paths matching this glob.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "name"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_impact_analysis": {
++        "cks_context_get_conventions": {
+           "owner": "cks",
+-          "description": "Reverse-dependency closure of a symbol, grouped by coupling category (callers/interface/type_users/distributed/concurrent/other).",
+-          "input": { "properties": { "symbol": { "type": "string" }, "depth": { "type": "number" }, "max_total": { "type": "number" } }, "required": ["symbol"] }
++          "wire_name": "cks.context.get_conventions",
++          "description": "Return per-package AST-convention summaries (the codebase's idioms: error handling, locking, naming) under a package prefix. Use to match new code to how the surrounding package already does things.",
++          "input": {
++            "properties": {
++              "package_prefix": {
++                "description": "Package path prefix (\"\" = all packages).",
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
+         },
+-        "cks_context_concurrency_impact": {
++        "cks_context_get_flow": {
+           "owner": "cks",
+-          "description": "Concurrency blast radius of a symbol: goroutines/channels/locks it spawns/sends-to/acquires and modules reached over concurrency edges, both directions.",
+-          "input": { "properties": { "symbol": { "type": "string" }, "depth": { "type": "number" }, "max_total": { "type": "number" } }, "required": ["symbol"] }
++          "wire_name": "cks.context.get_flow",
++          "description": "Return a curated flow as a topological step sequence (cycle-safe): symbol, citation, calls/reads/writes/emits, branches, invariants per step. Select by flow_id / entry-point ID / invariant_id -- these are curated IDs matched exactly, NOT code symbols. From a natural-language symptom, call find_branches first, then get_flow(flow_id).",
++          "input": {
++            "properties": {
++              "entry_point": {
++                "description": "Entry-point symbol of the flow.",
++                "type": "string"
++              },
++              "flow_id": {
++                "description": "Flow identifier.",
++                "type": "string"
++              },
++              "invariant_id": {
++                "description": "Invariant whose enforcing flow to return.",
++                "type": "string"
++              },
++              "max_steps": {
++                "description": "Cap on returned steps (0 = backend default).",
++                "type": "number"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
+         },
+-        "cks_context_change_history": {
++        "cks_context_get_for_task": {
+           "owner": "cks",
+-          "description": "PR refs (provenance) and/or BM25-ranked hunk evidence for a symbol or intent.",
+-          "input": { "properties": { "intent": { "type": "string" }, "symbol": { "type": "string" }, "k": { "type": "number" }, "max_count": { "type": "number" } } }
++          "wire_name": "cks.context.get_for_task",
++          "description": "START HERE for any analysis/design/bugfix task. One call composes an EvidencePack: intent-ranked citations, code bodies, and graph_neighbors relation wiring (source->target: calls/called_by/implements/...), token-budgeted, sanitized, SHA-256 integrity-stamped. Read graph_neighbors before issuing per-edge traversal calls -- it already answers 'who calls / what does it call' for the top hits. Use the narrower tools only to go deeper on a specific point.",
++          "input": {
++            "properties": {
++              "intent": {
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "type": "string"
++              },
++              "prompt": {
++                "description": "Natural-language task description or symptom, as a full sentence. Example: \"restore proposal tx stays stuck in pending after GasTip revert\".",
++                "type": "string"
++              }
++            },
++            "required": [
++              "prompt"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_find_invariants": {
++        "cks_context_get_for_task_v2": {
+           "owner": "cks",
+-          "description": "Curated invariants (domain rules) filtered by file, policy category, and minimum confidence tier. Direct lookup for the rules governing a file about to change.",
+-          "input": { "properties": { "file": { "type": "string" }, "category": { "type": "string" }, "tier_min": { "type": "number" } } }
++          "wire_name": "cks.context.get_for_task_v2",
++          "description": "Compose archive-backed v2 evidence with immutable dataset citations and sha256-v2 integrity.",
++          "input": {
++            "properties": {
++              "explain_ontology": {
++                "default": false,
++                "description": "Explain matched ontology concepts and bounded candidate score/rank changes. Does not enable ontology or claim quality; body selection is the composer stage, final v2 budget may further omit evidence.",
++                "type": "boolean"
++              },
++              "include_knowledge": {
++                "default": false,
++                "description": "Add reviewed local policy context from this retained dataset.",
++                "type": "boolean"
++              },
++              "intent": {
++                "description": "Optional task intent override.",
++                "type": "string"
++              },
++              "knowledge_as_of": {
++                "description": "Policy date (YYYY-MM-DD) when include_knowledge is true.",
++                "type": "string"
++              },
++              "knowledge_subsystem": {
++                "description": "Explicit subsystem scope when include_knowledge is true.",
++                "type": "string"
++              },
++              "prompt": {
++                "description": "Natural-language development task.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "prompt"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_get_conventions": {
++        "cks_context_get_invariant_enforcement": {
+           "owner": "cks",
+-          "description": "Per-package AST-convention summaries (codebase idioms: error handling, locking, naming) under a package prefix.",
+-          "input": { "properties": { "package_prefix": { "type": "string" } } }
++          "wire_name": "cks.context.get_invariant_enforcement",
++          "description": "Enumerate every site that enforces a curated invariant. Use to check a planned change against domain rules (the 'empty block implies same state root' class) before implementing.",
++          "input": {
++            "properties": {
++              "inv_id": {
++                "description": "Invariant identifier.",
++                "type": "string"
++              },
++              "max": {
++                "description": "Cap on enforcement sites (0 = backend default).",
++                "type": "number"
++              }
++            },
++            "required": [
++              "inv_id"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_find_branches": {
++        "cks_context_get_subgraph": {
+           "owner": "cks",
+-          "description": "Map a free-text symptom to ranked when->then@at failure-condition candidates from the flow corpus. Natural-language entry point into flows -- use before get_flow when all you have is a symptom.",
+-          "input": { "properties": { "symptom_text": { "type": "string" }, "k": { "type": "number" } }, "required": ["symptom_text"] }
++          "wire_name": "cks.context.get_subgraph",
++          "description": "Neighborhood traversal across ALL edge types (calls, implements, imports, tested_by, ...) within depth hops of the seed symbol. Use when caller/callee alone is too narrow -- e.g., mapping a type's interface/implementation web. Cost grows fast with depth; prefer depth 1-2.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
++                "type": "number"
++              },
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "max_total": {
++                "description": "Cap on total nodes (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to seed the traversal: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty neighborhood -- use find_symbol to get the canonical_id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_get_flow": {
++        "cks_context_impact_analysis": {
+           "owner": "cks",
+-          "description": "Curated flow as a topological step sequence (cycle-safe): symbol, citation, calls/reads/writes/emits, branches, invariants per step. Select by flow_id / entry_point / invariant_id -- curated IDs, not code symbols.",
+-          "input": { "properties": { "flow_id": { "type": "string" }, "entry_point": { "type": "string" }, "invariant_id": { "type": "string" }, "max_steps": { "type": "number" } } }
++          "wire_name": "cks.context.impact_analysis",
++          "description": "Reverse-dependency closure of a symbol, grouped by coupling category (callers, interface, type_users, distributed, concurrent). Use during PLANNING to answer 'what breaks if I change this?' and to find co-consumers of a shared dependency before editing it.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth (default: backend default, typically 2).",
++                "type": "number"
++              },
++              "max_total": {
++                "description": "Cap on total citations across all categories (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_expand_flow": {
++        "cks_context_label_suspects": {
+           "owner": "cks",
+-          "description": "Steps adjacent to a flow step: direction 'up' traverses producers, 'down' traverses consumers. Trace a value's produce->store->consume lifecycle one hop at a time when the whole flow is too large.",
+-          "input": { "properties": { "step_id": { "type": "string" }, "direction": { "type": "string" }, "hops": { "type": "number" }, "limit": { "type": "number" } }, "required": ["step_id"] }
++          "wire_name": "cks.context.label_suspects",
++          "description": "Bounded factual labels for an iterative symptom investigation. Choose symbol, file+line, expansion citations, or text-only seed discovery. Returns evidence and unknowns; never decides the root cause. Pinned datasets require retained expansion citations.",
++          "input": {
++            "properties": {
++              "budget_ms": {
++                "description": "Integer 10..5000, default 1000; cooperative backend deadline, excludes retained-source verification.",
++                "type": "number"
++              },
++              "commit": {
++                "description": "Optional exact indexed commit assertion.",
++                "type": "string"
++              },
++              "depth": {
++                "description": "Integer 1..3, default 2.",
++                "type": "number"
++              },
++              "expand": {
++                "description": "Prior CitationV2 seeds for iterative expansion (legacy unpinned datasets use Citation).",
++                "items": {
++                  "additionalProperties": false,
++                  "properties": {
++                    "base_commit": {
++                      "type": "string"
++                    },
++                    "commit_hash": {
++                      "type": "string"
++                    },
++                    "content_sha256": {
++                      "type": "string"
++                    },
++                    "dataset_id": {
++                      "type": "string"
++                    },
++                    "end_line": {
++                      "minimum": 1,
++                      "type": "integer"
++                    },
++                    "file": {
++                      "type": "string"
++                    },
++                    "file_sha256": {
++                      "type": "string"
++                    },
++                    "origin_id": {
++                      "type": "string"
++                    },
++                    "project_id": {
++                      "type": "string"
++                    },
++                    "snapshot_id": {
++                      "type": "string"
++                    },
++                    "source_mode": {
++                      "type": "string"
++                    },
++                    "start_line": {
++                      "minimum": 1,
++                      "type": "integer"
++                    }
++                  },
++                  "required": [
++                    "file",
++                    "start_line",
++                    "end_line",
++                    "commit_hash"
++                  ],
++                  "type": "object"
++                },
++                "maxItems": 8,
++                "type": "array"
++              },
++              "file": {
++                "description": "Optional repository-relative site file; requires line.",
++                "type": "string"
++              },
++              "line": {
++                "description": "Positive integer site line.",
++                "type": "number"
++              },
++              "max_calls": {
++                "description": "Integer 4..64, default 32, includes final identity checks.",
++                "type": "number"
++              },
++              "max_candidates": {
++                "description": "Integer 1..20, default 10.",
++                "type": "number"
++              },
++              "max_enriched": {
++                "description": "Integer 1..8, default 3; expensive labels for first candidates only.",
++                "type": "number"
++              },
++              "max_seeds": {
++                "description": "Integer 1..8, default 3.",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Optional unique symbol seed.",
++                "type": "string"
++              },
++              "symptom": {
++                "description": "Symptom used for seed discovery; judgments remain the agent's responsibility.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symptom"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_context_get_invariant_enforcement": {
++        "cks_context_review_function": {
+           "owner": "cks",
+-          "description": "Enumerate every site that enforces a curated invariant. Check a planned change against domain rules before implementing.",
+-          "input": { "properties": { "inv_id": { "type": "string" }, "max": { "type": "number" } }, "required": ["inv_id"] }
++          "wire_name": "cks.context.review_function",
++          "description": "Review one function the way a person reads it, in three separate views. code (production code only): signature, used/created types and written fields, control statements and call sites in source order, callees with the implementations behind interface calls, callers and call paths back to entry points (also through the interfaces a method implements), goroutines, channels, locks, timeout/cancellation paths. history: the commits and PRs that changed the function. tests: its test callers, listed but not followed. Cheaper and more focused than get_subgraph, which mixes all edge types.",
++          "input": {
++            "properties": {
++              "caller_depth": {
++                "description": "How far to walk callers toward entry points (1-5, default 5).",
++                "type": "number"
++              },
++              "max_items": {
++                "description": "Entries per list (default 40); totals are always reported.",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Function or method: a ckg qualified_name, a bare name that resolves unambiguously, or a canonical_id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
+         },
+-        "cks_ops_health": {
++        "cks_context_search_text": {
++          "owner": "cks",
++          "wire_name": "cks.context.search_text",
++          "description": "BM25 keyword search over the ckg full-text index (code-aware tokenizer). Use when terms must match exactly: function names, identifiers, error strings. Anti-pattern: stacking searches to 'find the cause' -- a text hit is a location, not a cause. After locating, traverse toward the value's producer with find_callers/find_callees instead of searching again.",
++          "input": {
++            "properties": {
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "expand": {
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "type": "boolean"
++              },
++              "k": {
++                "description": "Maximum hits to return (0 = backend default).",
++                "type": "number"
++              },
++              "language": {
++                "description": "Restrict to a language (e.g., \"go\").",
++                "type": "string"
++              },
++              "path_glob": {
++                "description": "Restrict to file paths matching this glob.",
++                "type": "string"
++              },
++              "query": {
++                "description": "Keyword query (terms joined as OR by default).",
++                "type": "string"
++              }
++            },
++            "required": [
++              "query"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_semantic_search": {
+           "owner": "cks",
+-          "description": "Backend reachability + version pins. Reports degraded when ckv (embedder) is unavailable.",
+-          "input": { "properties": {} }
++          "wire_name": "cks.context.semantic_search",
++          "description": "Vector-similarity search over the ckv index (bge-m3). Use for natural-language symptoms or intent ('restore proposal stuck pending') where wording differs from code tokens. Similar is NOT correct: hits are entry points, not causes -- confirm by traversing relations (find_callers/find_callees) from a hit. For exact identifiers prefer search_text or find_symbol.",
++          "input": {
++            "properties": {
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "expand": {
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "type": "boolean"
++              },
++              "k": {
++                "description": "Maximum hits to return (0 = backend default).",
++                "type": "number"
++              },
++              "kinds": {
++                "description": "Comma-separated symbol kinds (e.g., \"function,method\").",
++                "type": "string"
++              },
++              "language": {
++                "description": "Restrict to a language (e.g., \"go\").",
++                "type": "string"
++              },
++              "path_glob": {
++                "description": "Restrict to file paths matching this glob.",
++                "type": "string"
++              },
++              "query": {
++                "description": "Natural-language query (e.g., \"validator quorum check at finalize\").",
++                "type": "string"
++              }
++            },
++            "required": [
++              "query"
++            ],
++            "type": "object"
++          }
+         },
+         "cks_ops_freshness": {
+           "owner": "cks",
+-          "description": "Index-vs-HEAD staleness: indexed head, current head, changed files.",
+-          "input": { "properties": {} }
++          "wire_name": "cks.ops.freshness",
++          "description": "Compare the index snapshot against the source repository: indexed commit vs HEAD and the changed-file list. Call at session start and after pulls/commits -- stale files mean citations may mislead. If stale, run cks.ops.index (files you created this session are never in the index; read them directly).",
++          "input": {
++            "properties": {},
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_ops_health": {
++          "owner": "cks",
++          "wire_name": "cks.ops.health",
++          "description": "Aggregate cks backend health: ok | degraded | down from ckg/ckv reachability. Call once at session start. degraded means ckv (semantic entry) is unavailable -- keyword/graph tools still work but natural-language recall is reduced.",
++          "input": {
++            "properties": {},
++            "required": [],
++            "type": "object"
++          }
+         },
+         "cks_ops_index": {
+           "owner": "cks",
+-          "description": "Refresh the ckv + ckg indexes (maintenance op). mode=incremental|full.",
+-          "input": { "properties": { "mode": { "type": "string" }, "since_commit": { "type": "string" } } }
++          "wire_name": "cks.ops.index",
++          "description": "Refresh a flat legacy dataset's ckv (vector) and ckg (graph) indexes for the configured source tree. Use ONLY after cks.ops.freshness reports stale. mode=incremental reindexes files changed since the indexed commit; mode=full rebuilds everything (slow). Versioned/pinned datasets are refused before any write; use cks setup with the reviewed config, project ID and a new version.",
++          "input": {
++            "properties": {
++              "mode": {
++                "description": "\"incremental\" (default) or \"full\".",
++                "type": "string"
++              },
++              "since_commit": {
++                "description": "Base commit for an incremental reindex (default: the index's recorded head).",
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_ops_reindex": {
++          "owner": "cks",
++          "wire_name": "cks.ops.reindex",
++          "description": "Start an asynchronous blue-green reindex of a dataset to a new version: build <out>/<version>, run the alignment+quality gate, then atomically promote it to current. current is left unchanged if the gate fails, so a bad rebuild never breaks the live dataset. Returns a job_id immediately; poll ops.setup_status for progress. Legacy datasets only; pinned v2 maintenance requires cks setup with the reviewed config, project ID and a new version.",
++          "input": {
++            "properties": {
++              "embedder": {
++                "description": "vector embedding backend (mock, bgeonnx, ollama); empty uses the vector CLI default",
++                "type": "string"
++              },
++              "min_canonical_ratio": {
++                "default": 0,
++                "description": "gate floor for canonical_id coverage (CanonicalCount/SymbolCount); 0 disables the check",
++                "type": "number"
++              },
++              "model_name": {
++                "description": "vector embedding model name",
++                "type": "string"
++              },
++              "out": {
++                "description": "dataset root; the new version builds in <out>/<version> and current is flipped on success",
++                "type": "string"
++              },
++              "src": {
++                "description": "source tree to index",
++                "type": "string"
++              },
++              "version": {
++                "description": "version label for the new dataset directory; empty auto-generates one",
++                "type": "string"
++              }
++            },
++            "required": [
++              "src",
++              "out"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_ops_setup": {
++          "owner": "cks",
++          "wire_name": "cks.ops.setup",
++          "description": "Start an asynchronous knowledge-dataset build for a source tree: graph index, vector index aligned to it, and an alignment verification gate. Returns a job_id immediately; poll ops.setup_status for progress. Legacy targets only; versioned/pinned maintenance requires cks setup with the reviewed config, project ID and a new version.",
++          "input": {
++            "properties": {
++              "embedder": {
++                "description": "vector embedding backend (mock, bgeonnx, ollama); empty uses the vector CLI default",
++                "type": "string"
++              },
++              "model_name": {
++                "description": "vector embedding model name",
++                "type": "string"
++              },
++              "out": {
++                "description": "dataset root; graph index in <out>/graph, vector index in <out>/vector",
++                "type": "string"
++              },
++              "skip_vector": {
++                "default": false,
++                "description": "build only the graph index",
++                "type": "boolean"
++              },
++              "src": {
++                "description": "source tree to index",
++                "type": "string"
++              }
++            },
++            "required": [
++              "src",
++              "out"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_ops_setup_status": {
++          "owner": "cks",
++          "wire_name": "cks.ops.setup_status",
++          "description": "Progress of an asynchronous ops job (ops.setup or ops.reindex): state (running|done|failed), error if any, and the tail of the progress-event stream.",
++          "input": {
++            "properties": {
++              "job_id": {
++                "type": "string"
++              },
++              "tail": {
++                "default": 20,
++                "description": "max trailing events to return",
++                "type": "number"
++              }
++            },
++            "required": [
++              "job_id"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_semantic_get_concept": {
++          "owner": "cks",
++          "wire_name": "cks.semantic.get_concept",
++          "description": "Read a source-backed ontology concept, definition, scope, terms, review status and typed incident relations. Relations are evidence-linked records, not inferred truth.",
++          "input": {
++            "properties": {
++              "concept_id": {
++                "type": "string"
++              },
++              "limit": {
++                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
++                "type": "number"
++              }
++            },
++            "required": [
++              "concept_id"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_semantic_lookup_term": {
++          "owner": "cks",
++          "wire_name": "cks.semantic.lookup_term",
++          "description": "Read exact ontology terms in this pinned dataset, preserving all reviewed/proposed/rejected interpretations and ambiguity. Does not rewrite search or activate ontology.",
++          "input": {
++            "properties": {
++              "language": {
++                "type": "string"
++              },
++              "limit": {
++                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
++                "type": "number"
++              },
++              "term": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "language",
++              "term"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_semantic_status": {
++          "owner": "cks",
++          "wire_name": "cks.semantic.status",
++          "description": "Inspect reviewed ontology availability for this pinned dataset without changing it. Separates disabled retrieval from missing, stale, unreviewed or ready data; readiness is not a quality or test-acceptance verdict.",
++          "input": {
++            "properties": {},
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_semantic_trace_requirement": {
++          "owner": "cks",
++          "wire_name": "cks.semantic.trace_requirement",
++          "description": "Read a requirement, Given/When/Then criteria and reviewed code/test paths without requiring policy context. Missing/unreviewed/conflicting links are explicit. Linked does not mean tests ran or criteria were accepted.",
++          "input": {
++            "properties": {
++              "limit": {
++                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
++                "type": "number"
++              },
++              "requirement_id": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "requirement_id"
++            ],
++            "type": "object"
++          }
+         }
+       }
+     },
+@@ -131,145 +866,533 @@
+         "chainbench_init": {
+           "owner": "chainbench",
+           "description": "Initialize a local go-stablenet network from a profile (genesis + TOML + datadirs).",
+-          "input": { "properties": { "profile": { "type": "string" }, "project_root": { "type": "string" }, "binary_path": { "type": "string" } } }
++          "input": {
++            "properties": {
++              "profile": {
++                "type": "string"
++              },
++              "project_root": {
++                "type": "string"
++              },
++              "binary_path": {
++                "type": "string"
++              }
++            }
++          }
+         },
+         "chainbench_start": {
+           "owner": "chainbench",
+           "description": "Start all chain nodes of an initialized network.",
+-          "input": { "properties": { "project_root": { "type": "string" }, "binary_path": { "type": "string" } } }
++          "input": {
++            "properties": {
++              "project_root": {
++                "type": "string"
++              },
++              "binary_path": {
++                "type": "string"
++              }
++            }
++          }
+         },
+         "chainbench_status": {
+           "owner": "chainbench",
+           "description": "Per-node block height, peers, running state, and consensus health.",
+-          "input": { "properties": { "network": { "type": "string" } } }
++          "input": {
++            "properties": {
++              "network": {
++                "type": "string"
++              }
++            }
++          }
+         },
+         "chainbench_test_run": {
+           "owner": "chainbench",
+           "description": "Run a built-in test by 'category/name' (e.g. basic/consensus, basic/tx-send).",
+-          "input": { "properties": { "test": { "type": "string" }, "format": { "type": "string" } }, "required": ["test"] }
++          "input": {
++            "properties": {
++              "test": {
++                "type": "string"
++              },
++              "format": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "test"
++            ]
++          }
+         },
+         "chainbench_report": {
+           "owner": "chainbench",
+           "description": "Test results report. With format=json returns the C4 loop-back shape parsed for summary.failed.",
+-          "input": { "properties": { "format": { "type": "string" } } },
++          "input": {
++            "properties": {
++              "format": {
++                "type": "string"
++              }
++            }
++          },
+           "output": {
+             "properties": {
+               "summary": {
+                 "properties": {
+-                  "total_tests": { "type": "integer" },
+-                  "passed": { "type": "integer" },
+-                  "failed": { "type": "integer" },
+-                  "assertions": { "properties": { "passed": { "type": "integer" }, "failed": { "type": "integer" } } }
++                  "total_tests": {
++                    "type": "integer"
++                  },
++                  "passed": {
++                    "type": "integer"
++                  },
++                  "failed": {
++                    "type": "integer"
++                  },
++                  "assertions": {
++                    "properties": {
++                      "passed": {
++                        "type": "integer"
++                      },
++                      "failed": {
++                        "type": "integer"
++                      }
++                    }
++                  }
+                 }
+               },
+-              "tests": { "type": "array" }
++              "tests": {
++                "type": "array"
++              }
+             }
+           }
+         },
+         "chainbench_failure_context": {
+           "owner": "chainbench",
+           "description": "Most recent failure context snapshot (per-node height, peers, syncing, log tails).",
+-          "input": { "properties": {} }
++          "input": {
++            "properties": {}
++          }
+         },
+         "chainbench_stop": {
+           "owner": "chainbench",
+           "description": "Stop all running chain nodes gracefully (local network only).",
+-          "input": { "properties": { "network": { "type": "string" } } }
++          "input": {
++            "properties": {
++              "network": {
++                "type": "string"
++              }
++            }
++          }
+         },
+         "chainbench_restart": {
+           "owner": "chainbench",
+           "description": "Restart the chain: stop all nodes, clean data, re-initialize with the same profile, and start fresh.",
+-          "input": { "properties": { "project_root": { "type": "string" }, "binary_path": { "type": "string" } } }
++          "input": {
++            "properties": {
++              "project_root": {
++                "type": "string"
++              },
++              "binary_path": {
++                "type": "string"
++              }
++            }
++          }
+         },
+         "chainbench_state_compact": {
+           "owner": "chainbench",
+           "description": "Compact JSON snapshot (<300B) of current chain state: running status, profile, per-node height/peers, consensus health, last test result.",
+-          "input": { "properties": {} }
++          "input": {
++            "properties": {}
++          }
+         },
+         "chainbench_test_list": {
+           "owner": "chainbench",
+           "description": "List all available built-in tests, organized by category (e.g. basic/consensus, basic/tx-send).",
+-          "input": { "properties": {} }
++          "input": {
++            "properties": {}
++          }
+         },
+         "chainbench_contract_deploy": {
+           "owner": "chainbench",
+           "description": "Deploy a contract by signing a contract-creation tx (to: nil). mode 'legacy' (gas_price) or '1559' (max_fee + max_priority). Returns {tx_hash, contract_address}; confirm via chainbench_tx_wait.",
+-          "input": { "properties": { "network": { "type": "string" }, "signer": { "type": "string" }, "mode": { "type": "string" }, "bytecode": { "type": "string" }, "abi": { "type": "string" }, "constructor_args": { "type": "array" }, "gas": { "type": ["string", "number"] }, "gas_price": { "type": "string" }, "max_fee_per_gas": { "type": "string" }, "max_priority_fee_per_gas": { "type": "string" }, "node_id": { "type": "string" }, "nonce": { "type": ["string", "number"] }, "value": { "type": "string" } }, "required": ["network", "signer", "mode", "bytecode"] }
++          "input": {
++            "properties": {
++              "network": {
++                "type": "string"
++              },
++              "signer": {
++                "type": "string"
++              },
++              "mode": {
++                "type": "string"
++              },
++              "bytecode": {
++                "type": "string"
++              },
++              "abi": {
++                "type": "string"
++              },
++              "constructor_args": {
++                "type": "array"
++              },
++              "gas": {
++                "type": [
++                  "string",
++                  "number"
++                ]
++              },
++              "gas_price": {
++                "type": "string"
++              },
++              "max_fee_per_gas": {
++                "type": "string"
++              },
++              "max_priority_fee_per_gas": {
++                "type": "string"
++              },
++              "node_id": {
++                "type": "string"
++              },
++              "nonce": {
++                "type": [
++                  "string",
++                  "number"
++                ]
++              },
++              "value": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "network",
++              "signer",
++              "mode",
++              "bytecode"
++            ]
++          }
+         },
+         "chainbench_contract_call": {
+           "owner": "chainbench",
+           "description": "Read-only contract call (eth_call). Provide raw calldata, or abi+method+args for server-side encoding. Returns result_raw always; result_decoded only in ABI mode.",
+-          "input": { "properties": { "network": { "type": "string" }, "contract_address": { "type": "string" }, "abi": { "type": "string" }, "method": { "type": "string" }, "args": { "type": "array" }, "calldata": { "type": "string" }, "from": { "type": "string" }, "block_number": { "type": ["string", "number"] }, "node_id": { "type": "string" } }, "required": ["network", "contract_address"] }
++          "input": {
++            "properties": {
++              "network": {
++                "type": "string"
++              },
++              "contract_address": {
++                "type": "string"
++              },
++              "abi": {
++                "type": "string"
++              },
++              "method": {
++                "type": "string"
++              },
++              "args": {
++                "type": "array"
++              },
++              "calldata": {
++                "type": "string"
++              },
++              "from": {
++                "type": "string"
++              },
++              "block_number": {
++                "type": [
++                  "string",
++                  "number"
++                ]
++              },
++              "node_id": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "network",
++              "contract_address"
++            ]
++          }
+         },
+         "chainbench_tx_send": {
+           "owner": "chainbench",
+           "description": "Send a signed transaction. Modes: 'legacy' (gas_price), '1559' (max_fee + max_priority), 'set_code' (EIP-7702, authorization_list), 'fee_delegation' (go-stablenet 0x16, fee_payer). Signer/fee_payer are aliases; key material never crosses the MCP boundary.",
+-          "input": { "properties": { "network": { "type": "string" }, "signer": { "type": "string" }, "mode": { "type": "string" }, "to": { "type": "string" }, "value": { "type": "string" }, "data": { "type": "string" }, "gas": { "type": ["string", "number"] }, "gas_price": { "type": "string" }, "max_fee_per_gas": { "type": "string" }, "max_priority_fee_per_gas": { "type": "string" }, "nonce": { "type": ["string", "number"] }, "fee_payer": { "type": "string" }, "authorization_list": { "type": "array" }, "node_id": { "type": "string" } }, "required": ["network", "signer", "mode"] }
++          "input": {
++            "properties": {
++              "network": {
++                "type": "string"
++              },
++              "signer": {
++                "type": "string"
++              },
++              "mode": {
++                "type": "string"
++              },
++              "to": {
++                "type": "string"
++              },
++              "value": {
++                "type": "string"
++              },
++              "data": {
++                "type": "string"
++              },
++              "gas": {
++                "type": [
++                  "string",
++                  "number"
++                ]
++              },
++              "gas_price": {
++                "type": "string"
++              },
++              "max_fee_per_gas": {
++                "type": "string"
++              },
++              "max_priority_fee_per_gas": {
++                "type": "string"
++              },
++              "nonce": {
++                "type": [
++                  "string",
++                  "number"
++                ]
++              },
++              "fee_payer": {
++                "type": "string"
++              },
++              "authorization_list": {
++                "type": "array"
++              },
++              "node_id": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "network",
++              "signer",
++              "mode"
++            ]
++          }
+         },
+         "chainbench_tx_wait": {
+           "owner": "chainbench",
+           "description": "Poll for a tx receipt with exponential backoff; returns receipt fields when mined (status, block_number, gas_used, logs_count, ...) or {status:'pending'} on timeout. Default timeout_ms 60000.",
+-          "input": { "properties": { "network": { "type": "string" }, "tx_hash": { "type": "string" }, "node_id": { "type": "string" }, "timeout_ms": { "type": "integer" } }, "required": ["network", "tx_hash"] }
++          "input": {
++            "properties": {
++              "network": {
++                "type": "string"
++              },
++              "tx_hash": {
++                "type": "string"
++              },
++              "node_id": {
++                "type": "string"
++              },
++              "timeout_ms": {
++                "type": "integer"
++              }
++            },
++            "required": [
++              "network",
++              "tx_hash"
++            ]
++          }
+         },
+         "chainbench_txpool_inspect": {
+           "owner": "chainbench",
+           "description": "Transaction pool status (pending/queued counts) across all running nodes or a specific node.",
+-          "input": { "properties": { "node": { "type": "integer" } } }
++          "input": {
++            "properties": {
++              "node": {
++                "type": "integer"
++              }
++            }
++          }
+         },
+         "chainbench_node_rpc": {
+           "owner": "chainbench",
+           "description": "Send a JSON-RPC call directly to a specific node and return the response (e.g. eth_blockNumber, eth_getBalance, net_peerCount).",
+-          "input": { "properties": { "node": { "type": "integer" }, "method": { "type": "string" }, "params": { "type": "string" } }, "required": ["node", "method"] }
++          "input": {
++            "properties": {
++              "node": {
++                "type": "integer"
++              },
++              "method": {
++                "type": "string"
++              },
++              "params": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "node",
++              "method"
++            ]
++          }
+         },
+         "chainbench_consensus_status": {
+           "owner": "chainbench",
+           "description": "WBFT consensus activity statistics over a block range: validator participation, block-authoring distribution, round stability, seal signature counts.",
+-          "input": { "properties": { "blocks": { "type": "integer" }, "node": { "type": "integer" } } }
++          "input": {
++            "properties": {
++              "blocks": {
++                "type": "integer"
++              },
++              "node": {
++                "type": "integer"
++              }
++            }
++          }
+         },
+         "chainbench_consensus_health": {
+           "owner": "chainbench",
+           "description": "Quick consensus health check across all running nodes: block production, sync status, validator agreement, round stability.",
+-          "input": { "properties": {} }
++          "input": {
++            "properties": {}
++          }
+         },
+         "chainbench_consensus_validators": {
+           "owner": "chainbench",
+           "description": "WBFT validator set at a specific block (validator addresses and count). Omit block for latest.",
+-          "input": { "properties": { "block": { "type": "integer" }, "node": { "type": "integer" } } }
++          "input": {
++            "properties": {
++              "block": {
++                "type": "integer"
++              },
++              "node": {
++                "type": "integer"
++              }
++            }
++          }
+         },
+         "chainbench_consensus_block_info": {
+           "owner": "chainbench",
+           "description": "Decoded WBFT extra data from a block header: consensus round, prepared/committed seals, RANDAO reveal, gas tip, epoch info.",
+-          "input": { "properties": { "block": { "type": "integer" }, "node": { "type": "integer" } }, "required": ["block"] }
++          "input": {
++            "properties": {
++              "block": {
++                "type": "integer"
++              },
++              "node": {
++                "type": "integer"
++              }
++            },
++            "required": [
++              "block"
++            ]
++          }
+         },
+         "chainbench_network_partition": {
+           "owner": "chainbench",
+           "description": "Create or heal a network partition between two node groups (admin_removePeer / admin_addPeer) to test BFT consensus under splits.",
+-          "input": { "properties": { "action": { "type": "string" }, "group_a": { "type": "array" }, "group_b": { "type": "array" } }, "required": ["action", "group_a", "group_b"] }
++          "input": {
++            "properties": {
++              "action": {
++                "type": "string"
++              },
++              "group_a": {
++                "type": "array"
++              },
++              "group_b": {
++                "type": "array"
++              }
++            },
++            "required": [
++              "action",
++              "group_a",
++              "group_b"
++            ]
++          }
+         },
+         "chainbench_network_peers": {
+           "owner": "chainbench",
+           "description": "Peer connectivity for all running nodes or a specific node: peer count, connected peer IDs, topology overview.",
+-          "input": { "properties": { "node": { "type": "integer" } } }
++          "input": {
++            "properties": {
++              "node": {
++                "type": "integer"
++              }
++            }
++          }
+         },
+         "chainbench_network_topology": {
+           "owner": "chainbench",
+           "description": "Set a P2P topology for testing: 'full-mesh', 'hub-spoke' (via hub node), or 'ring'. Useful for testing consensus under restricted connectivity.",
+-          "input": { "properties": { "topology": { "type": "string" }, "hub": { "type": "integer" } }, "required": ["topology"] }
++          "input": {
++            "properties": {
++              "topology": {
++                "type": "string"
++              },
++              "hub": {
++                "type": "integer"
++              }
++            },
++            "required": [
++              "topology"
++            ]
++          }
+         },
+         "chainbench_log_search": {
+           "owner": "chainbench",
+           "description": "Search node log files for a grep-compatible regex pattern; returns matching log lines. Omit node to search all nodes.",
+-          "input": { "properties": { "pattern": { "type": "string" }, "node": { "type": "integer" } }, "required": ["pattern"] }
++          "input": {
++            "properties": {
++              "pattern": {
++                "type": "string"
++              },
++              "node": {
++                "type": "integer"
++              }
++            },
++            "required": [
++              "pattern"
++            ]
++          }
+         },
+         "chainbench_log_timeline": {
+           "owner": "chainbench",
+           "description": "Consensus event timeline from all node logs: block proposals, votes, commits, and view changes ordered by timestamp.",
+-          "input": { "properties": {} }
++          "input": {
++            "properties": {}
++          }
+         },
+         "chainbench_events_get": {
+           "owner": "chainbench",
+           "description": "Fetch event logs (eth_getLogs) with optional address / block-range / topics filtering. When abi + event are both given, each log is decoded server-side as decoded:{event,args}.",
+-          "input": { "properties": { "network": { "type": "string" }, "address": { "type": "string" }, "from_block": { "type": ["string", "number"] }, "to_block": { "type": ["string", "number"] }, "topics": { "type": "array" }, "abi": { "type": "string" }, "event": { "type": "string" }, "node_id": { "type": "string" } }, "required": ["network"] }
++          "input": {
++            "properties": {
++              "network": {
++                "type": "string"
++              },
++              "address": {
++                "type": "string"
++              },
++              "from_block": {
++                "type": [
++                  "string",
++                  "number"
++                ]
++              },
++              "to_block": {
++                "type": [
++                  "string",
++                  "number"
++                ]
++              },
++              "topics": {
++                "type": "array"
++              },
++              "abi": {
++                "type": "string"
++              },
++              "event": {
++                "type": "string"
++              },
++              "node_id": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "network"
++            ]
++          }
+         }
+       }
+     },
+@@ -280,32 +1403,101 @@
+         "jira_read_ticket": {
+           "owner": "jira-gateway",
+           "description": "Read a Jira ticket. Returns fields + _filter_metadata.scan_result (CLEAN/REDACTED/BLOCKED).",
+-          "input": { "properties": { "ticket_id": { "type": "string" } }, "required": ["ticket_id"] }
++          "input": {
++            "properties": {
++              "ticket_id": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "ticket_id"
++            ]
++          }
+         },
+         "jira_read_comments": {
+           "owner": "jira-gateway",
+           "description": "Read a ticket's comments.",
+-          "input": { "properties": { "ticket_id": { "type": "string" } }, "required": ["ticket_id"] }
++          "input": {
++            "properties": {
++              "ticket_id": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "ticket_id"
++            ]
++          }
+         },
+         "jira_search": {
+           "owner": "jira-gateway",
+           "description": "Search tickets (JQL).",
+-          "input": { "properties": { "jql": { "type": "string" }, "max_results": { "type": "number" } }, "required": ["jql"] }
++          "input": {
++            "properties": {
++              "jql": {
++                "type": "string"
++              },
++              "max_results": {
++                "type": "number"
++              }
++            },
++            "required": [
++              "jql"
++            ]
++          }
+         },
+         "jira_add_comment": {
+           "owner": "jira-gateway",
+           "description": "Add a comment to a ticket.",
+-          "input": { "properties": { "ticket_id": { "type": "string" }, "body": { "type": "string" } }, "required": ["ticket_id", "body"] }
++          "input": {
++            "properties": {
++              "ticket_id": {
++                "type": "string"
++              },
++              "body": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "ticket_id",
++              "body"
++            ]
++          }
+         },
+         "jira_update_status": {
+           "owner": "jira-gateway",
+           "description": "Transition a ticket's status.",
+-          "input": { "properties": { "ticket_id": { "type": "string" }, "status": { "type": "string" } }, "required": ["ticket_id", "status"] }
++          "input": {
++            "properties": {
++              "ticket_id": {
++                "type": "string"
++              },
++              "status": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "ticket_id",
++              "status"
++            ]
++          }
+         },
+         "jira_update_assignee": {
+           "owner": "jira-gateway",
+           "description": "Reassign a ticket.",
+-          "input": { "properties": { "ticket_id": { "type": "string" }, "assignee": { "type": "string" } }, "required": ["ticket_id", "assignee"] }
++          "input": {
++            "properties": {
++              "ticket_id": {
++                "type": "string"
++              },
++              "assignee": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "ticket_id",
++              "assignee"
++            ]
++          }
+         }
+       }
+     }
+diff --git a/plugin/agents/analyzer.md b/plugin/agents/analyzer.md
+index e8a07ef..bcb5e79 100644
+--- a/plugin/agents/analyzer.md
++++ b/plugin/agents/analyzer.md
+@@ -25,6 +25,7 @@ tools:
+   - mcp__plugin_coding-agent_cks__cks_context_concurrency_impact
+   - mcp__plugin_coding-agent_cks__cks_context_change_history
+   - mcp__plugin_coding-agent_cks__cks_context_get_for_task
++  - mcp__plugin_coding-agent_cks__cks_context_label_suspects
+   - mcp__plugin_coding-agent_cks__cks_context_find_invariants
+   - mcp__plugin_coding-agent_cks__cks_context_get_conventions
+   - mcp__plugin_coding-agent_cks__cks_ops_health
+@@ -59,6 +60,7 @@ tools:
+   - mcp__plugin_coding-agent_chainbench__chainbench_events_get
+ skills:
+   - oracle-validity
++  - suspect-labeling
+   - state-machine
+   - template-parse
+   - domain-pack
+@@ -70,6 +72,12 @@ skills:
+ 
+ # Analyzer Agent
+ 
++For bugfix investigation apply `suspect-labeling`: bounded iterative factual
++CKS rounds and separate agent hypotheses. Persist `suspect-labels.json`,
++including an actual failed tool receipt if unavailable, before handing off
++ANALYSIS. Validate it with `scripts/suspect_labels.py --check`. Labels never
++confirm a cause or replace reproduction and independent oracles.
++
+ The Analyzer is the **understanding** stage: *what is wrong, prove it, and why*.
+ It owns situation analysis, problem reproduction, and root-cause identification.
+ It produces documented findings; it does NOT design the fix, write the fix plan,
+diff --git a/plugin/agents/planner.md b/plugin/agents/planner.md
+index f9222a0..4108016 100644
+--- a/plugin/agents/planner.md
++++ b/plugin/agents/planner.md
+@@ -28,6 +28,7 @@ tools:
+ skills:
+   - fix-selection
+   - oracle-validity
++  - suspect-labeling
+   - state-machine
+   - template-parse
+   - domain-pack
+@@ -36,6 +37,10 @@ skills:
+ 
+ # Planner Agent
+ 
++Before bugfix planning, read `suspect-labels.json` and validate it with
++`scripts/suspect_labels.py --check`. Preserve null signals and provenance;
++separate candidate hypotheses from reproduced cause acceptance.
++
+ The Planner is the deep-thinking phase of the pipeline. It produces
+ documented decisions; it does not modify production code.
+ 
+diff --git a/plugin/contracts/cks-tools.schema.json b/plugin/contracts/cks-tools.schema.json
+new file mode 100644
+index 0000000..5266357
+--- /dev/null
++++ b/plugin/contracts/cks-tools.schema.json
+@@ -0,0 +1,826 @@
++{
++  "providers": {
++    "cks": {
++      "server": "cks",
++      "namespace": "cks.",
++      "tools": {
++        "cks_context_change_history": {
++          "owner": "cks",
++          "wire_name": "cks.context.change_history",
++          "description": "Modification history for a symbol or intent: PR refs (provenance) and BM25-ranked diff hunks. Use AFTER traversal or reproduction has implicated a site -- anchoring history on an unverified hypothesis amplifies confirmation bias (history 'evidence' for the wrong suspect reads convincing).",
++          "input": {
++            "properties": {
++              "intent": {
++                "description": "Natural-language query the hunks should match against (optional if symbol is set).",
++                "type": "string"
++              },
++              "k": {
++                "description": "Maximum hunks to return when intent is set (0 = backend default).",
++                "type": "number"
++              },
++              "max_count": {
++                "description": "Maximum PR refs to return when symbol is set (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Fully-qualified symbol name to look up PR refs for (optional if intent is set).",
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_context_concurrency_impact": {
++          "owner": "cks",
++          "wire_name": "cks.context.concurrency_impact",
++          "description": "Concurrency blast radius of a symbol: goroutines it spawns, channels it sends to/receives from, locks it acquires, plus modules reached over concurrency edges. Use when a change touches shared state or ordering -- before assuming a data race is or is not possible.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth over concurrency edges (default: 3).",
++                "type": "number"
++              },
++              "max_total": {
++                "description": "Cap on total modules returned (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_expand_flow": {
++          "owner": "cks",
++          "wire_name": "cks.context.expand_flow",
++          "description": "Steps adjacent to a flow step: direction 'up' traverses producers, 'down' traverses consumers. Use to trace a value's produce->store->consume lifecycle one hop at a time when the whole flow is too large.",
++          "input": {
++            "properties": {
++              "direction": {
++                "description": "\"up\" (producers) or \"down\" (consumers). Default \"down\".",
++                "type": "string"
++              },
++              "hops": {
++                "description": "Traversal hops (default 1).",
++                "type": "number"
++              },
++              "limit": {
++                "description": "Cap on returned neighbors (0 = backend default).",
++                "type": "number"
++              },
++              "step_id": {
++                "description": "Origin step id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "step_id"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_find_branches": {
++          "owner": "cks",
++          "wire_name": "cks.context.find_branches",
++          "description": "Map a free-text symptom to ranked when->then@at failure-condition candidates from the flow corpus. This is the natural-language ENTRY POINT into flows -- use it before get_flow when all you have is a symptom.",
++          "input": {
++            "properties": {
++              "k": {
++                "description": "Max matches to return (default 10).",
++                "type": "number"
++              },
++              "symptom_text": {
++                "description": "Free-text symptom description.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symptom_text"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_find_callees": {
++          "owner": "cks",
++          "wire_name": "cks.context.find_callees",
++          "description": "Forward call-graph traversal: what the given symbol calls. Use to unpack what a suspicious function actually reaches downstream (which store/update/IO). Pair with find_callers to cover the produce->store->consume lifecycle in both directions.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
++                "type": "number"
++              },
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "max_total": {
++                "description": "Cap on total neighbours (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_find_callers": {
++          "owner": "cks",
++          "wire_name": "cks.context.find_callers",
++          "description": "Reverse call-graph traversal: who calls the given symbol (calls/invokes edges, interface-dispatch bridged). The core cause-finding move for a stale or wrong value: from the consumer, traverse UP toward whoever produces/updates the value. depth=2 covers most producer chains.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
++                "type": "number"
++              },
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "max_total": {
++                "description": "Cap on total neighbours (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_find_invariants": {
++          "owner": "cks",
++          "wire_name": "cks.context.find_invariants",
++          "description": "List curated invariants (domain rules) matching a filter. Scope by file, policy category, or minimum confidence tier. Use on the diagnose path to check a planned change against the rules that govern the touched code before implementing.",
++          "input": {
++            "properties": {
++              "category": {
++                "description": "Filter by policy category (\"\" = any).",
++                "type": "string"
++              },
++              "file": {
++                "description": "Restrict to one source file (\"\" = any).",
++                "type": "string"
++              },
++              "tier_min": {
++                "description": "Minimum confidence tier 1|2|3 (0 = backend default).",
++                "type": "number"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_context_find_symbol": {
++          "owner": "cks",
++          "wire_name": "cks.context.find_symbol",
++          "description": "Resolve a symbol name to its definition citation(s) via ckg's qualified-name index. Suffix match by default; pass the fully-qualified name for an exact hit. Use to turn a name you already know into a traversal anchor.",
++          "input": {
++            "properties": {
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "kinds": {
++                "description": "Comma-separated symbol kinds (e.g., \"function,method\").",
++                "type": "string"
++              },
++              "language": {
++                "description": "Restrict to a language (e.g., \"go\").",
++                "type": "string"
++              },
++              "name": {
++                "description": "Symbol name (e.g., \"ProcessRequest\" or \"pkg.Type.Method\").",
++                "type": "string"
++              },
++              "path_glob": {
++                "description": "Restrict to file paths matching this glob.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "name"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_get_conventions": {
++          "owner": "cks",
++          "wire_name": "cks.context.get_conventions",
++          "description": "Return per-package AST-convention summaries (the codebase's idioms: error handling, locking, naming) under a package prefix. Use to match new code to how the surrounding package already does things.",
++          "input": {
++            "properties": {
++              "package_prefix": {
++                "description": "Package path prefix (\"\" = all packages).",
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_context_get_flow": {
++          "owner": "cks",
++          "wire_name": "cks.context.get_flow",
++          "description": "Return a curated flow as a topological step sequence (cycle-safe): symbol, citation, calls/reads/writes/emits, branches, invariants per step. Select by flow_id / entry-point ID / invariant_id -- these are curated IDs matched exactly, NOT code symbols. From a natural-language symptom, call find_branches first, then get_flow(flow_id).",
++          "input": {
++            "properties": {
++              "entry_point": {
++                "description": "Entry-point symbol of the flow.",
++                "type": "string"
++              },
++              "flow_id": {
++                "description": "Flow identifier.",
++                "type": "string"
++              },
++              "invariant_id": {
++                "description": "Invariant whose enforcing flow to return.",
++                "type": "string"
++              },
++              "max_steps": {
++                "description": "Cap on returned steps (0 = backend default).",
++                "type": "number"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_context_get_for_task": {
++          "owner": "cks",
++          "wire_name": "cks.context.get_for_task",
++          "description": "START HERE for any analysis/design/bugfix task. One call composes an EvidencePack: intent-ranked citations, code bodies, and graph_neighbors relation wiring (source->target: calls/called_by/implements/...), token-budgeted, sanitized, SHA-256 integrity-stamped. Read graph_neighbors before issuing per-edge traversal calls -- it already answers 'who calls / what does it call' for the top hits. Use the narrower tools only to go deeper on a specific point.",
++          "input": {
++            "properties": {
++              "intent": {
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "type": "string"
++              },
++              "prompt": {
++                "description": "Natural-language task description or symptom, as a full sentence. Example: \"restore proposal tx stays stuck in pending after GasTip revert\".",
++                "type": "string"
++              }
++            },
++            "required": [
++              "prompt"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_get_for_task_v2": {
++          "owner": "cks",
++          "wire_name": "cks.context.get_for_task_v2",
++          "description": "Compose archive-backed v2 evidence with immutable dataset citations and sha256-v2 integrity.",
++          "input": {
++            "properties": {
++              "explain_ontology": {
++                "default": false,
++                "description": "Explain matched ontology concepts and bounded candidate score/rank changes. Does not enable ontology or claim quality; body selection is the composer stage, final v2 budget may further omit evidence.",
++                "type": "boolean"
++              },
++              "include_knowledge": {
++                "default": false,
++                "description": "Add reviewed local policy context from this retained dataset.",
++                "type": "boolean"
++              },
++              "intent": {
++                "description": "Optional task intent override.",
++                "type": "string"
++              },
++              "knowledge_as_of": {
++                "description": "Policy date (YYYY-MM-DD) when include_knowledge is true.",
++                "type": "string"
++              },
++              "knowledge_subsystem": {
++                "description": "Explicit subsystem scope when include_knowledge is true.",
++                "type": "string"
++              },
++              "prompt": {
++                "description": "Natural-language development task.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "prompt"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_get_invariant_enforcement": {
++          "owner": "cks",
++          "wire_name": "cks.context.get_invariant_enforcement",
++          "description": "Enumerate every site that enforces a curated invariant. Use to check a planned change against domain rules (the 'empty block implies same state root' class) before implementing.",
++          "input": {
++            "properties": {
++              "inv_id": {
++                "description": "Invariant identifier.",
++                "type": "string"
++              },
++              "max": {
++                "description": "Cap on enforcement sites (0 = backend default).",
++                "type": "number"
++              }
++            },
++            "required": [
++              "inv_id"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_get_subgraph": {
++          "owner": "cks",
++          "wire_name": "cks.context.get_subgraph",
++          "description": "Neighborhood traversal across ALL edge types (calls, implements, imports, tested_by, ...) within depth hops of the seed symbol. Use when caller/callee alone is too narrow -- e.g., mapping a type's interface/implementation web. Cost grows fast with depth; prefer depth 1-2.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
++                "type": "number"
++              },
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "max_total": {
++                "description": "Cap on total nodes (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to seed the traversal: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty neighborhood -- use find_symbol to get the canonical_id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_impact_analysis": {
++          "owner": "cks",
++          "wire_name": "cks.context.impact_analysis",
++          "description": "Reverse-dependency closure of a symbol, grouped by coupling category (callers, interface, type_users, distributed, concurrent). Use during PLANNING to answer 'what breaks if I change this?' and to find co-consumers of a shared dependency before editing it.",
++          "input": {
++            "properties": {
++              "depth": {
++                "description": "Maximum traversal depth (default: backend default, typically 2).",
++                "type": "number"
++              },
++              "max_total": {
++                "description": "Cap on total citations across all categories (0 = no cap).",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_label_suspects": {
++          "owner": "cks",
++          "wire_name": "cks.context.label_suspects",
++          "description": "Bounded factual labels for an iterative symptom investigation. Choose symbol, file+line, expansion citations, or text-only seed discovery. Returns evidence and unknowns; never decides the root cause. Pinned datasets require retained expansion citations.",
++          "input": {
++            "properties": {
++              "budget_ms": {
++                "description": "Integer 10..5000, default 1000; cooperative backend deadline, excludes retained-source verification.",
++                "type": "number"
++              },
++              "commit": {
++                "description": "Optional exact indexed commit assertion.",
++                "type": "string"
++              },
++              "depth": {
++                "description": "Integer 1..3, default 2.",
++                "type": "number"
++              },
++              "expand": {
++                "description": "Prior CitationV2 seeds for iterative expansion (legacy unpinned datasets use Citation).",
++                "items": {
++                  "additionalProperties": false,
++                  "properties": {
++                    "base_commit": {
++                      "type": "string"
++                    },
++                    "commit_hash": {
++                      "type": "string"
++                    },
++                    "content_sha256": {
++                      "type": "string"
++                    },
++                    "dataset_id": {
++                      "type": "string"
++                    },
++                    "end_line": {
++                      "minimum": 1,
++                      "type": "integer"
++                    },
++                    "file": {
++                      "type": "string"
++                    },
++                    "file_sha256": {
++                      "type": "string"
++                    },
++                    "origin_id": {
++                      "type": "string"
++                    },
++                    "project_id": {
++                      "type": "string"
++                    },
++                    "snapshot_id": {
++                      "type": "string"
++                    },
++                    "source_mode": {
++                      "type": "string"
++                    },
++                    "start_line": {
++                      "minimum": 1,
++                      "type": "integer"
++                    }
++                  },
++                  "required": [
++                    "file",
++                    "start_line",
++                    "end_line",
++                    "commit_hash"
++                  ],
++                  "type": "object"
++                },
++                "maxItems": 8,
++                "type": "array"
++              },
++              "file": {
++                "description": "Optional repository-relative site file; requires line.",
++                "type": "string"
++              },
++              "line": {
++                "description": "Positive integer site line.",
++                "type": "number"
++              },
++              "max_calls": {
++                "description": "Integer 4..64, default 32, includes final identity checks.",
++                "type": "number"
++              },
++              "max_candidates": {
++                "description": "Integer 1..20, default 10.",
++                "type": "number"
++              },
++              "max_enriched": {
++                "description": "Integer 1..8, default 3; expensive labels for first candidates only.",
++                "type": "number"
++              },
++              "max_seeds": {
++                "description": "Integer 1..8, default 3.",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Optional unique symbol seed.",
++                "type": "string"
++              },
++              "symptom": {
++                "description": "Symptom used for seed discovery; judgments remain the agent's responsibility.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symptom"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_review_function": {
++          "owner": "cks",
++          "wire_name": "cks.context.review_function",
++          "description": "Review one function the way a person reads it, in three separate views. code (production code only): signature, used/created types and written fields, control statements and call sites in source order, callees with the implementations behind interface calls, callers and call paths back to entry points (also through the interfaces a method implements), goroutines, channels, locks, timeout/cancellation paths. history: the commits and PRs that changed the function. tests: its test callers, listed but not followed. Cheaper and more focused than get_subgraph, which mixes all edge types.",
++          "input": {
++            "properties": {
++              "caller_depth": {
++                "description": "How far to walk callers toward entry points (1-5, default 5).",
++                "type": "number"
++              },
++              "max_items": {
++                "description": "Entries per list (default 40); totals are always reported.",
++                "type": "number"
++              },
++              "symbol": {
++                "description": "Function or method: a ckg qualified_name, a bare name that resolves unambiguously, or a canonical_id.",
++                "type": "string"
++              }
++            },
++            "required": [
++              "symbol"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_search_text": {
++          "owner": "cks",
++          "wire_name": "cks.context.search_text",
++          "description": "BM25 keyword search over the ckg full-text index (code-aware tokenizer). Use when terms must match exactly: function names, identifiers, error strings. Anti-pattern: stacking searches to 'find the cause' -- a text hit is a location, not a cause. After locating, traverse toward the value's producer with find_callers/find_callees instead of searching again.",
++          "input": {
++            "properties": {
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "expand": {
++                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "type": "boolean"
++              },
++              "k": {
++                "description": "Maximum hits to return (0 = backend default).",
++                "type": "number"
++              },
++              "language": {
++                "description": "Restrict to a language (e.g., \"go\").",
++                "type": "string"
++              },
++              "path_glob": {
++                "description": "Restrict to file paths matching this glob.",
++                "type": "string"
++              },
++              "query": {
++                "description": "Keyword query (terms joined as OR by default).",
++                "type": "string"
++              }
++            },
++            "required": [
++              "query"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_context_semantic_search": {
++          "owner": "cks",
++          "wire_name": "cks.context.semantic_search",
++          "description": "Vector-similarity search over the ckv index (bge-m3). Use for natural-language symptoms or intent ('restore proposal stuck pending') where wording differs from code tokens. Similar is NOT correct: hits are entry points, not causes -- confirm by traversing relations (find_callers/find_callees) from a hit. For exact identifiers prefer search_text or find_symbol.",
++          "input": {
++            "properties": {
++              "exclude_tests": {
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "type": "boolean"
++              },
++              "expand": {
++                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "type": "boolean"
++              },
++              "k": {
++                "description": "Maximum hits to return (0 = backend default).",
++                "type": "number"
++              },
++              "kinds": {
++                "description": "Comma-separated symbol kinds (e.g., \"function,method\").",
++                "type": "string"
++              },
++              "language": {
++                "description": "Restrict to a language (e.g., \"go\").",
++                "type": "string"
++              },
++              "path_glob": {
++                "description": "Restrict to file paths matching this glob.",
++                "type": "string"
++              },
++              "query": {
++                "description": "Natural-language query (e.g., \"validator quorum check at finalize\").",
++                "type": "string"
++              }
++            },
++            "required": [
++              "query"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_ops_freshness": {
++          "owner": "cks",
++          "wire_name": "cks.ops.freshness",
++          "description": "Compare the index snapshot against the source repository: indexed commit vs HEAD and the changed-file list. Call at session start and after pulls/commits -- stale files mean citations may mislead. If stale, run cks.ops.index (files you created this session are never in the index; read them directly).",
++          "input": {
++            "properties": {},
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_ops_health": {
++          "owner": "cks",
++          "wire_name": "cks.ops.health",
++          "description": "Aggregate cks backend health: ok | degraded | down from ckg/ckv reachability. Call once at session start. degraded means ckv (semantic entry) is unavailable -- keyword/graph tools still work but natural-language recall is reduced.",
++          "input": {
++            "properties": {},
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_ops_index": {
++          "owner": "cks",
++          "wire_name": "cks.ops.index",
++          "description": "Refresh a flat legacy dataset's ckv (vector) and ckg (graph) indexes for the configured source tree. Use ONLY after cks.ops.freshness reports stale. mode=incremental reindexes files changed since the indexed commit; mode=full rebuilds everything (slow). Versioned/pinned datasets are refused before any write; use cks setup with the reviewed config, project ID and a new version.",
++          "input": {
++            "properties": {
++              "mode": {
++                "description": "\"incremental\" (default) or \"full\".",
++                "type": "string"
++              },
++              "since_commit": {
++                "description": "Base commit for an incremental reindex (default: the index's recorded head).",
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_ops_reindex": {
++          "owner": "cks",
++          "wire_name": "cks.ops.reindex",
++          "description": "Start an asynchronous blue-green reindex of a dataset to a new version: build <out>/<version>, run the alignment+quality gate, then atomically promote it to current. current is left unchanged if the gate fails, so a bad rebuild never breaks the live dataset. Returns a job_id immediately; poll ops.setup_status for progress. Legacy datasets only; pinned v2 maintenance requires cks setup with the reviewed config, project ID and a new version.",
++          "input": {
++            "properties": {
++              "embedder": {
++                "description": "vector embedding backend (mock, bgeonnx, ollama); empty uses the vector CLI default",
++                "type": "string"
++              },
++              "min_canonical_ratio": {
++                "default": 0,
++                "description": "gate floor for canonical_id coverage (CanonicalCount/SymbolCount); 0 disables the check",
++                "type": "number"
++              },
++              "model_name": {
++                "description": "vector embedding model name",
++                "type": "string"
++              },
++              "out": {
++                "description": "dataset root; the new version builds in <out>/<version> and current is flipped on success",
++                "type": "string"
++              },
++              "src": {
++                "description": "source tree to index",
++                "type": "string"
++              },
++              "version": {
++                "description": "version label for the new dataset directory; empty auto-generates one",
++                "type": "string"
++              }
++            },
++            "required": [
++              "src",
++              "out"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_ops_setup": {
++          "owner": "cks",
++          "wire_name": "cks.ops.setup",
++          "description": "Start an asynchronous knowledge-dataset build for a source tree: graph index, vector index aligned to it, and an alignment verification gate. Returns a job_id immediately; poll ops.setup_status for progress. Legacy targets only; versioned/pinned maintenance requires cks setup with the reviewed config, project ID and a new version.",
++          "input": {
++            "properties": {
++              "embedder": {
++                "description": "vector embedding backend (mock, bgeonnx, ollama); empty uses the vector CLI default",
++                "type": "string"
++              },
++              "model_name": {
++                "description": "vector embedding model name",
++                "type": "string"
++              },
++              "out": {
++                "description": "dataset root; graph index in <out>/graph, vector index in <out>/vector",
++                "type": "string"
++              },
++              "skip_vector": {
++                "default": false,
++                "description": "build only the graph index",
++                "type": "boolean"
++              },
++              "src": {
++                "description": "source tree to index",
++                "type": "string"
++              }
++            },
++            "required": [
++              "src",
++              "out"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_ops_setup_status": {
++          "owner": "cks",
++          "wire_name": "cks.ops.setup_status",
++          "description": "Progress of an asynchronous ops job (ops.setup or ops.reindex): state (running|done|failed), error if any, and the tail of the progress-event stream.",
++          "input": {
++            "properties": {
++              "job_id": {
++                "type": "string"
++              },
++              "tail": {
++                "default": 20,
++                "description": "max trailing events to return",
++                "type": "number"
++              }
++            },
++            "required": [
++              "job_id"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_semantic_get_concept": {
++          "owner": "cks",
++          "wire_name": "cks.semantic.get_concept",
++          "description": "Read a source-backed ontology concept, definition, scope, terms, review status and typed incident relations. Relations are evidence-linked records, not inferred truth.",
++          "input": {
++            "properties": {
++              "concept_id": {
++                "type": "string"
++              },
++              "limit": {
++                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
++                "type": "number"
++              }
++            },
++            "required": [
++              "concept_id"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_semantic_lookup_term": {
++          "owner": "cks",
++          "wire_name": "cks.semantic.lookup_term",
++          "description": "Read exact ontology terms in this pinned dataset, preserving all reviewed/proposed/rejected interpretations and ambiguity. Does not rewrite search or activate ontology.",
++          "input": {
++            "properties": {
++              "language": {
++                "type": "string"
++              },
++              "limit": {
++                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
++                "type": "number"
++              },
++              "term": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "language",
++              "term"
++            ],
++            "type": "object"
++          }
++        },
++        "cks_semantic_status": {
++          "owner": "cks",
++          "wire_name": "cks.semantic.status",
++          "description": "Inspect reviewed ontology availability for this pinned dataset without changing it. Separates disabled retrieval from missing, stale, unreviewed or ready data; readiness is not a quality or test-acceptance verdict.",
++          "input": {
++            "properties": {},
++            "required": [],
++            "type": "object"
++          }
++        },
++        "cks_semantic_trace_requirement": {
++          "owner": "cks",
++          "wire_name": "cks.semantic.trace_requirement",
++          "description": "Read a requirement, Given/When/Then criteria and reviewed code/test paths without requiring policy context. Missing/unreviewed/conflicting links are explicit. Linked does not mean tests ran or criteria were accepted.",
++          "input": {
++            "properties": {
++              "limit": {
++                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
++                "type": "number"
++              },
++              "requirement_id": {
++                "type": "string"
++              }
++            },
++            "required": [
++              "requirement_id"
++            ],
++            "type": "object"
++          }
++        }
++      }
++    }
++  }
++}
+diff --git a/plugin/hooks/hooks.json b/plugin/hooks/hooks.json
+index eb10963..af5bc46 100644
+--- a/plugin/hooks/hooks.json
++++ b/plugin/hooks/hooks.json
+@@ -45,6 +45,11 @@
+             "type": "command",
+             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/fix-selection-guard.py\"",
+             "timeout": 20
++          },
++          {
++            "type": "command",
++            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/suspect-labeling-guard.py\"",
++            "timeout": 10
+           }
+         ]
+       },
+diff --git a/plugin/hooks/suspect-labeling-guard.py b/plugin/hooks/suspect-labeling-guard.py
+new file mode 100644
+index 0000000..347905e
+--- /dev/null
++++ b/plugin/hooks/suspect-labeling-guard.py
+@@ -0,0 +1,39 @@
++#!/usr/bin/env python3
++"""Bind bugfix analysis handoff to validated factual labels or a failed tool receipt."""
++import hashlib
++import importlib.util
++import json
++import os
++from pathlib import Path
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++sys.path.insert(0,str(ROOT/'scripts'))
++from suspect_labels import verify_state
++spec=importlib.util.spec_from_file_location('completion_guard',ROOT/'hooks/completion-guard.py');helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
++
++def main():
++ try:data=json.load(sys.stdin)
++ except (ValueError,TypeError):return 0
++ if not isinstance(data,dict) or data.get('tool_name') not in ('Write','Edit'):return 0
++ inputs=data.get('tool_input')
++ if not isinstance(inputs,dict) or not isinstance(inputs.get('file_path'),str):return 0
++ path=Path(inputs['file_path']);path=path if path.is_absolute() else Path(data.get('cwd') or os.getcwd())/path
++ if path.name!='state.json':return 0
++ recognizable='.coding-agent' in path.parts and 'tickets' in path.parts
++ try:
++  old=path.read_text() if path.exists() else '{}'
++  state=json.loads(old)
++  if not recognizable and not (isinstance(state,dict) and state.get('ticket_id')):return 0
++  proposed=json.loads(helper.proposed_content(data,old))
++  if not isinstance(state,dict) or not isinstance(proposed,dict):raise ValueError('pipeline state must be object')
++  if state.get('ticket_type')!='bugfix' and proposed.get('ticket_type')!='bugfix':return 0
++  if state.get('ticket_type')=='bugfix' and proposed.get('ticket_type')!='bugfix':raise ValueError('cannot bypass bugfix label evidence by changing ticket type')
++  completed=proposed.get('states',{}).get('ANALYSIS',{}).get('status')=='completed'
++  target=proposed.get('current_state')
++  if completed or target in ('PLANNING','DESIGN','IMPLEMENTATION','EVALUATION','COMPLETION','COMPLETED'):
++   raw=(path.parent/'suspect-labels.json').read_bytes();verify_state(json.loads(raw))
++   if proposed.get('states',{}).get('ANALYSIS',{}).get('suspect_labels_sha256')!=hashlib.sha256(raw).hexdigest():raise ValueError('analysis must bind exact validated label artifact SHA256')
++ except Exception as exc:helper.deny('Bugfix factual labels blocked: '+str(exc))
++ return 0
++
++if __name__=='__main__':raise SystemExit(main())
+diff --git a/plugin/scripts/suspect_labels.py b/plugin/scripts/suspect_labels.py
+new file mode 100644
+index 0000000..b811eaf
+--- /dev/null
++++ b/plugin/scripts/suspect_labels.py
+@@ -0,0 +1,156 @@
++#!/usr/bin/env python3
++"""Validate and persist bounded CKS observations separately from agent judgments."""
++import argparse
++import hashlib
++import json
++import math
++from pathlib import Path
++
++SIGNALS=('distance','relations','impact_category','recency','concurrency','retrieval','security_tag','dataflow_on_path')
++ABSENT={'unavailable','not_requested','unsupported','error','budget_exhausted'}
++STOP={'sufficient_evidence','no_new_candidates','budget_exhausted','awaiting_observation','backend_unavailable'}
++MAX_ROUNDS=3
++MAX_CANDIDATES=20
++MAX_CALLS=96
++
++class Invalid(ValueError):pass
++
++def require(ok,message):
++    if not ok:raise Invalid(message)
++
++def number(v):return isinstance(v,(int,float)) and not isinstance(v,bool) and math.isfinite(v)
++def integer(v,lo=0,hi=1_000_000):return number(v) and int(v)==v and lo<=v<=hi
++
++def citation(c,snapshot):
++    require(isinstance(c,dict),'citation must be object')
++    file=c.get('file');require(isinstance(file,str) and file and not file.startswith(('/','../','.claude/','logs/','@cks/')) and '\\' not in file and all(part not in ('','..','.') for part in file.split('/')),'invalid citation file')
++    require(integer(c.get('start_line'),1) and integer(c.get('end_line'),c['start_line']),'invalid citation lines')
++    require(c.get('commit_hash')==snapshot,'citation snapshot mismatch')
++    return (file,c['start_line'],c['end_line'],snapshot)
++
++def retained(c,base,coords):
++    require(isinstance(c,dict),'retained citation missing')
++    require(all(c.get(k)==coords.get(k) for k in ('project_id','dataset_id','snapshot_id','source_mode','base_commit')),'retained coordinates mismatch')
++    require(c.get('file')==base['file'] and c.get('start_line')==base['start_line'] and c.get('end_line')==base['end_line'] and c.get('origin_id')=='repo','retained source location mismatch')
++    require(c.get('commit_hash')==(coords['base_commit'] if coords['source_mode']=='committed' else ''),'retained commit misrepresented')
++    for key in ('file_sha256','content_sha256'):
++        value=c.get(key);require(isinstance(value,str) and len(value)==64 and all(ch in '0123456789abcdef' for ch in value),'invalid source hash')
++
++def validate_response(r):
++    require(isinstance(r,dict) and r.get('schema_version')==1,'wrong label schema')
++    require(isinstance(r.get('symptom'),str) and r['symptom'].strip(),'symptom missing')
++    snapshot=r.get('snapshot');require(isinstance(snapshot,str),'snapshot missing')
++    coords=r.get('coordinates')
++    if coords is not None:
++        require(isinstance(coords,dict) and all(isinstance(coords.get(k),str) for k in ('project_id','dataset_id','snapshot_id','source_mode','base_commit')),'invalid coordinates')
++        require(all(coords[k] for k in ('project_id','dataset_id','snapshot_id')) and coords['base_commit']==snapshot and coords['source_mode'] in ('committed','working-tree','snapshot-only'),'invalid pinned source identity')
++    else:require(bool(snapshot),'unpinned snapshot missing')
++    require(type(r.get('partial')) is bool,'partial must be boolean')
++    b=r.get('budget');require(isinstance(b,dict),'budget missing')
++    for key,lo,hi in [('max_candidates',1,20),('max_seeds',1,8),('max_enriched',1,8),('max_calls',4,64),('depth',1,3),('time_budget_ms',10,5000)]:require(integer(b.get(key),lo,hi),'invalid '+key)
++    require(integer(b.get('calls'),0,b['max_calls']) and integer(b.get('elapsed_ms')),'budget count invalid')
++    require(isinstance(b.get('stop_reasons'),list) and all(isinstance(x,str) for x in b['stop_reasons']),'stop reasons missing')
++    require(not b['stop_reasons'] or r['partial'],'incomplete observations marked complete')
++    candidates=r.get('candidates');require(isinstance(candidates,list) and 0<len(candidates)<=b['max_candidates'],'candidate cap invalid')
++    seen=set()
++    for c in candidates:
++        key=citation(c.get('citation'),snapshot);require(key not in seen,'duplicate candidate');seen.add(key)
++        require(c.get('symbol') is None or isinstance(c['symbol'],str),'invalid symbol')
++        if coords is not None:retained(c.get('retained_citation'),c['citation'],coords)
++        else:require(c.get('retained_citation') is None,'unbound retained citation')
++        signals=c.get('signals');require(isinstance(signals,dict) and set(signals)==set(SIGNALS),'signal set mismatch')
++        for name in SIGNALS:
++            s=signals[name];require(isinstance(s,dict) and 'value' in s,'explicit signal value missing')
++            status=s.get('status');require(status=='observed' or status in ABSENT,'unknown signal status')
++            value=s['value'];provenance=s.get('provenance');require(isinstance(provenance,list),'provenance missing')
++            if status in ABSENT:require(value is None and isinstance(s.get('reason'),str) and bool(s['reason']),'unavailable signal must be null with reason')
++            else:
++                require(value is not None and len(provenance)>0,'observed signal requires value and provenance')
++                if name=='distance':require(integer(value,0,b['depth']),'invalid distance')
++                elif name in ('relations','impact_category','security_tag'):require(isinstance(value,list) and all(isinstance(x,str) for x in value),'invalid list signal')
++                elif name=='dataflow_on_path':require(type(value) is bool,'invalid dataflow signal')
++                elif name=='recency':require(isinstance(value,dict) and integer(value.get('pr_count'),0,10) and isinstance(value.get('scope'),str) and 'not commit count' in value['scope'] and (value.get('last_merged_at') is None or isinstance(value.get('last_merged_at'),str)),'unscoped history signal')
++                elif name=='concurrency':require(isinstance(value,dict) and type(value.get('touched')) is bool and isinstance(value.get('direction'),list) and all(x in ('affects','affected_by','both') for x in value['direction']),'invalid concurrency signal')
++                elif name=='retrieval':require(isinstance(value,list) and len(value)>0 and all(isinstance(x,dict) and integer(x.get('rank'),1) and number(x.get('score')) and x.get('source') in ('graph','vector') for x in value),'invalid retrieval observation')
++            for p in provenance:
++                require(isinstance(p,dict) and isinstance(p.get('tool'),str) and p['tool'] and p.get('snapshot')==snapshot,'signal provenance mismatch')
++                citation(p.get('anchor'),snapshot)
++                if coords is not None:retained(p.get('retained_anchor'),p['anchor'],coords)
++    return r
++
++def canonical(value):return json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()
++def digest(value):return hashlib.sha256(canonical(value)).hexdigest()
++
++def check_contract(tools,contract_path=None):
++    path=contract_path or Path(__file__).resolve().parents[1]/'contracts'/'cks-tools.schema.json'
++    # Installed plugin layouts may place the repository contract separately.
++    contract=json.loads(Path(path).read_text())['providers']['cks']['tools']
++    observed={t['name']:t for t in tools};expected={t['wire_name']:t for t in contract.values()}
++    require(set(observed)==set(expected),'registered CKS tool set differs from consumer contract')
++    def semantics(v):
++        if isinstance(v,dict):return {k:semantics(x) for k,x in v.items() if k not in ('description','title')}
++        if isinstance(v,list):return [semantics(x) for x in v]
++        return v
++    for name,want in expected.items():require(semantics(observed[name]['inputSchema'])==semantics(want['input']),'input schema differs: '+name)
++    require(len({name.replace('.','_') for name in expected})==len(expected),'host normalization collision')
++    for alias,tool in contract.items():require(alias==tool['wire_name'].replace('.','_'),'host alias differs from explicit wire name')
++    return len(expected)
++
++def append_round(state,response,stop=None,judgments=None):
++    validate_response(response)
++    if state is None:state={'schema_version':1,'symptom':response['symptom'],'snapshot':response['snapshot'],'coordinates':response['coordinates'],'rounds':[],'judgments':[],'stop_reason':None,'acceptance':'not_recorded'}
++    require(state.get('schema_version')==1 and state.get('acceptance')=='not_recorded','labels cannot assert cause acceptance')
++    require(state.get('stop_reason') is None,'investigation already stopped')
++    require(len(state['rounds'])<MAX_ROUNDS,'round cap reached')
++    for prior in state['rounds']:
++        validate_response(prior['response']);require(digest(prior['response'])==prior['sha256'],'prior response hash mismatch')
++    require(all(state[k]==response[k] for k in ('symptom','snapshot','coordinates')),'mixed investigation context')
++    total_calls=sum(x['response']['budget']['calls'] for x in state['rounds'])+response['budget']['calls'];require(total_calls<=MAX_CALLS,'total call cap reached')
++    all_candidates={citation(c['citation'],state['snapshot']) for x in state['rounds'] for c in x['response']['candidates']}
++    all_candidates.update(citation(c['citation'],state['snapshot']) for c in response['candidates']);require(len(all_candidates)<=MAX_CANDIDATES,'total candidate cap reached')
++    for j in judgments or []:
++        require(isinstance(j,dict) and j.get('origin')=='agent_judgment' and j.get('state') in ('candidate','rejected','unknown') and isinstance(j.get('rationale'),str) and j['rationale'].strip(),'invalid separate agent judgment')
++        require(citation(j.get('citation'),state['snapshot']) in all_candidates,'judgment refers to unknown candidate')
++        require(isinstance(j.get('unknowns'),list) and all(isinstance(u,str) for u in j['unknowns']),'judgment unknowns required')
++    require(stop is None or stop in STOP,'unknown stop reason')
++    state['rounds'].append({'sha256':digest(response),'response':response});state['judgments'].extend(judgments or [])
++    state['total_calls']=total_calls;state['candidate_count']=len(all_candidates)
++    state['stop_reason']=stop or ('budget_exhausted' if len(state['rounds'])>=MAX_ROUNDS or total_calls>=MAX_CALLS else None)
++    return state
++
++def verify_state(state,finished=True):
++    require(isinstance(state,dict) and state.get('schema_version')==1 and state.get('acceptance')=='not_recorded','labels cannot assert cause acceptance')
++    if state.get('status')=='unavailable':
++        failure=state.get('failure');require(isinstance(failure,dict),'failed tool receipt required')
++        request=failure.get('request');response=failure.get('response')
++        require(isinstance(request,dict) and request.get('name')=='cks.context.label_suspects' and isinstance(request.get('arguments'),dict) and isinstance(request['arguments'].get('symptom'),str) and request['arguments']['symptom'].strip(),'actual label request required')
++        require(isinstance(response,dict) and response.get('isError') is True and bool(response.get('content')),'actual failed tool result required')
++        require(isinstance(state.get('reason'),str) and state['reason'].strip(),'failure reason missing')
++        return state
++    rounds=state.get('rounds');require(isinstance(rounds,list) and 0<len(rounds)<=MAX_ROUNDS,'invalid investigation rounds')
++    require(not finished or state.get('stop_reason') in STOP,'finished investigation needs stop reason')
++    rebuilt=None
++    for i,prior in enumerate(rounds):
++        require(isinstance(prior,dict) and digest(prior.get('response'))==prior.get('sha256'),'prior response hash mismatch')
++        last=i==len(rounds)-1
++        rebuilt=append_round(rebuilt,prior['response'],state.get('stop_reason') if last else None,state.get('judgments',[]) if last else [])
++    require(rebuilt==state,'investigation metadata differs from verified responses')
++    return state
++
++def main():
++    p=argparse.ArgumentParser();p.add_argument('--check');p.add_argument('--round');p.add_argument('--state');p.add_argument('--judgments');p.add_argument('--stop',choices=sorted(STOP));p.add_argument('--check-contract');p.add_argument('--contract');a=p.parse_args()
++    if a.check:
++        verify_state(json.loads(Path(a.check).read_text()));print('factual label artifact: PASS; cause acceptance not recorded');return
++    if a.check_contract:
++        print('CKS input contract: PASS (%d tools)'%check_contract(json.loads(Path(a.check_contract).read_text()),a.contract));return
++    require(a.round and a.state,'round and state required');path=Path(a.state)
++    response=json.loads(Path(a.round).read_text());state=json.loads(path.read_text()) if path.exists() else None
++    if state is not None:verify_state(state,finished=False)
++    judgments=json.loads(Path(a.judgments).read_text()) if a.judgments else []
++    state=append_round(state,response,a.stop,judgments);raw=json.dumps(state,indent=2,ensure_ascii=False,allow_nan=False)+'\n'
++    temp=path.with_name(path.name+'.pending');temp.write_text(raw);temp.replace(path)
++    print('factual labels recorded: rounds=%d candidates=%d calls=%d acceptance=not_recorded'%(len(state['rounds']),state['candidate_count'],state['total_calls']))
++
++if __name__=='__main__':
++    try:main()
++    except (Invalid,ValueError,KeyError,TypeError,OSError) as e:raise SystemExit('suspect labels refused: '+str(e))
+diff --git a/plugin/scripts/tests/test_suspect_labels.py b/plugin/scripts/tests/test_suspect_labels.py
+new file mode 100644
+index 0000000..29140f4
+--- /dev/null
++++ b/plugin/scripts/tests/test_suspect_labels.py
+@@ -0,0 +1,96 @@
++import copy
++import importlib.util
++import json
++from pathlib import Path
++import unittest
++
++ROOT=Path(__file__).resolve().parents[2]
++spec=importlib.util.spec_from_file_location('suspect_labels',ROOT/'scripts/suspect_labels.py');labels=importlib.util.module_from_spec(spec);spec.loader.exec_module(labels)
++
++
++def response():
++ c={'file':'a.go','start_line':1,'end_line':2,'commit_hash':'head'}
++ unknown={'value':None,'status':'unsupported','reason':'provider unavailable','provenance':[]}
++ signals={name:copy.deepcopy(unknown) for name in labels.SIGNALS}
++ signals['distance']={'value':0,'status':'observed','provenance':[{'tool':'seed','snapshot':'head','anchor':c,'retained_anchor':None}]}
++ return {'schema_version':1,'symptom':'hang','snapshot':'head','coordinates':None,'partial':False,'candidates':[{'citation':c,'retained_citation':None,'symbol':'Alpha','signals':signals}], 'budget':{'max_candidates':10,'max_seeds':3,'max_enriched':3,'max_calls':32,'depth':2,'time_budget_ms':1000,'calls':5,'elapsed_ms':3,'stop_reasons':[]}}
++
++class LabelsTests(unittest.TestCase):
++ def refused(self,r):
++  with self.assertRaises(labels.Invalid):labels.validate_response(r)
++ def test_real_shape_and_explicit_null(self):
++  r=response();self.assertIs(labels.validate_response(r),r)
++  r['candidates'][0]['signals']['security_tag']['value']=[];self.refused(r)
++ def test_false_zero_and_unknown_without_reason_refused(self):
++  for value in [False,0,[],{}]:
++   r=response();r['candidates'][0]['signals']['dataflow_on_path']['value']=value;self.refused(r)
++  r=response();r['candidates'][0]['signals']['dataflow_on_path'].pop('reason');self.refused(r)
++ def test_observation_needs_anchor_and_snapshot(self):
++  for field,value in [('provenance',[]),('value',None)]:
++   r=response();r['candidates'][0]['signals']['distance'][field]=value;self.refused(r)
++  r=response();r['candidates'][0]['signals']['distance']['provenance'][0]['snapshot']='other';self.refused(r)
++ def test_duplicate_and_foreign_candidates_refused(self):
++  r=response();r['candidates'].append(copy.deepcopy(r['candidates'][0]));self.refused(r)
++  r=response();r['candidates'][0]['citation']['commit_hash']='other';self.refused(r)
++ def test_backend_score_not_cause_score(self):
++  r=response();s=r['candidates'][0]['signals']['distance'];r['candidates'][0]['signals']['retrieval']={'status':'observed','value':[{'rank':1,'score':42,'source':'graph'},{'rank':1,'score':.3,'source':'vector'}],'provenance':s['provenance']};labels.validate_response(r)
++  r['candidates'][0]['signals']['retrieval']['value'][0]['score']=float('nan');self.refused(r)
++ def test_call_depth_partial_bounds(self):
++  for field,value in [('calls',33),('depth',4),('max_candidates',21),('elapsed_ms',True)]:
++   r=response();r['budget'][field]=value;self.refused(r)
++  r=response();r['budget']['stop_reasons']=['call_budget'];self.refused(r)
++ def test_personal_and_escape_paths_refused(self):
++  for path in ['.claude/a.go','logs/a.go','../a.go','/tmp/a.go','a/../b.go']:
++   r=response();r['candidates'][0]['citation']['file']=path;self.refused(r)
++ def test_round_cap_and_context_consistency(self):
++  state=None
++  for _ in range(3):state=labels.append_round(state,response())
++  self.assertEqual(state['stop_reason'],'budget_exhausted');self.assertEqual(state['candidate_count'],1)
++  with self.assertRaises(labels.Invalid):labels.append_round(state,response())
++  state=labels.append_round(None,response());r=response();r['symptom']='different'
++  with self.assertRaises(labels.Invalid):labels.append_round(state,r)
++ def test_prior_hash_change_refused(self):
++  state=labels.append_round(None,response());state['rounds'][0]['response']['symptom']='changed'
++  with self.assertRaises(labels.Invalid):labels.append_round(state,response())
++ def test_separate_judgment_cannot_accept_cause(self):
++  j={'origin':'agent_judgment','state':'candidate','rationale':'possible edge','citation':response()['candidates'][0]['citation'],'unknowns':['schedule']}
++  state=labels.append_round(None,response(),'awaiting_observation',[j]);self.assertEqual(state['acceptance'],'not_recorded');self.assertEqual(state['judgments'],[j])
++  j['state']='confirmed'
++  with self.assertRaises(labels.Invalid):labels.append_round(None,response(),judgments=[j])
++ def test_contract_schema_semantics_and_alias_collision(self):
++  contract=json.loads((ROOT/'contracts/cks-tools.schema.json').read_text())
++  tools=[{'name':v['wire_name'],'inputSchema':v['input']} for v in contract['providers']['cks']['tools'].values()]
++  self.assertEqual(labels.check_contract(tools),29)
++  wrong=copy.deepcopy(tools);wrong[0]['inputSchema']['properties']['symptom']={'type':'array'}
++  with self.assertRaises(labels.Invalid):labels.check_contract(wrong)
++  with self.assertRaises(labels.Invalid):labels.check_contract(tools[:-1])
++  full=json.loads((ROOT.parent/'contract/agent-mcp.schema.json').read_text());self.assertEqual(full['providers']['cks'],contract['providers']['cks'])
++
++ def test_finished_artifact_recomputed_and_tamper_refused(self):
++  state=labels.append_round(None,response(),'no_new_candidates');labels.verify_state(state)
++  state['candidate_count']=12
++  with self.assertRaises(labels.Invalid):labels.verify_state(state)
++  state=labels.append_round(None,response())
++  with self.assertRaises(labels.Invalid):labels.verify_state(state)
++ def test_failure_requires_actual_error_receipt(self):
++  state={'schema_version':1,'status':'unavailable','acceptance':'not_recorded','reason':'service down','failure':{'request':{'name':'cks.context.label_suspects','arguments':{'symptom':'hang'}},'response':{'isError':True,'content':[{'type':'text','text':'graph_unavailable'}]}}}
++  labels.verify_state(state);state['failure']['response']['isError']=False
++  with self.assertRaises(labels.Invalid):labels.verify_state(state)
++ def test_handoff_guard_accepts_bound_receipt_and_rejects_missing_or_changed(self):
++  import hashlib,subprocess,sys,tempfile
++  with tempfile.TemporaryDirectory() as tmp:
++   workspace=Path(tmp)/'.coding-agent/tickets/FIX';workspace.mkdir(parents=True);path=workspace/'state.json'
++   old={'ticket_id':'FIX','ticket_type':'bugfix','current_state':'ANALYSIS','states':{'ANALYSIS':{'status':'in_progress'}}};path.write_text(json.dumps(old))
++   artifact=workspace/'suspect-labels.json';candidate=copy.deepcopy(old);candidate['current_state']='PLANNING';candidate['states']['ANALYSIS']['status']='completed'
++   def invoke():
++    event={'tool_name':'Write','cwd':tmp,'tool_input':{'file_path':str(path),'content':json.dumps(candidate)}}
++    return subprocess.run([sys.executable,str(ROOT/'hooks/suspect-labeling-guard.py')],input=json.dumps(event),text=True,capture_output=True)
++   self.assertIn('deny',invoke().stdout)
++   artifact.write_text(json.dumps(labels.append_round(None,response(),'no_new_candidates')))
++   self.assertIn('deny',invoke().stdout)
++   candidate['states']['ANALYSIS']['suspect_labels_sha256']=hashlib.sha256(artifact.read_bytes()).hexdigest()
++   self.assertEqual(invoke().stdout,'')
++   artifact.write_text(artifact.read_text()+' ');self.assertIn('deny',invoke().stdout)
++   candidate['ticket_type']='fresh';self.assertIn('deny',invoke().stdout)
++
++if __name__=='__main__':unittest.main()
+diff --git a/plugin/skills/state-machine/SKILL.md b/plugin/skills/state-machine/SKILL.md
+index e7a54d1..60a5f57 100644
+--- a/plugin/skills/state-machine/SKILL.md
++++ b/plugin/skills/state-machine/SKILL.md
+@@ -495,3 +495,15 @@ coding-agent 파이프라인의 상태 전이를 관리한다. 이 skill은 `Rea
+    })
+ 3. transition(workspace_dir, "EVALUATION", "ANALYSIS")
+ ```
++
++
++## Bugfix factual-label evidence at analysis handoff
++
++Before marking ANALYSIS completed or entering PLANNING, validate
++`workspace_dir/suspect-labels.json` with `suspect_labels.py --check`. Record
++its exact file SHA256 in `states.ANALYSIS.suspect_labels_sha256`. The installed
++`suspect-labeling-guard.py` rejects missing/unfinished/mixed-source/tampered
++observations and absent or mismatched bindings at subsequent state writes.
++An actual failed label-tool receipt is recorded as unavailable, never as an
++empty successful candidate set. This observation artifact neither confirms
++root cause nor relaxes the existing reproduction/oracle/selection gates.
+diff --git a/plugin/skills/suspect-labeling/SKILL.md b/plugin/skills/suspect-labeling/SKILL.md
+new file mode 100644
+index 0000000..a233af1
+--- /dev/null
++++ b/plugin/skills/suspect-labeling/SKILL.md
+@@ -0,0 +1,66 @@
++---
++name: suspect-labeling
++description: "Iterate over bounded code candidates using CKS factual labels, preserve each signal's evidence and unknowns, and keep symptom-specific judgments separate."
++type: skill
++---
++
++# Evidence before symptom judgment
++
++Use the agent's iterative v1 workflow. The CKS batch label tool is a factual
++step in that workflow; it never supplies a one-shot root-cause verdict or a
++candidate probability. The LLM owns symptom-specific hypotheses; reproduction
++and the oracle gates own acceptance.
++
++1. Read health and the source coordinates. Choose exactly one seed mode:
++   unique symbol, repository-relative file+line, previous expansion citations,
++   or symptom-only semantic/keyword discovery. A different source/index or
++   ambiguous symbol is not silently interchangeable with the target checkout.
++2. Call `mcp__plugin_coding-agent_cks__cks_context_label_suspects` using the
++   contract's real input schema. Default limits: candidates10, seeds3,
++   enriched3, backend calls32, depth2, cooperative1000ms. Maximum per-round
++   limits:20/8/8/64/depth3/5000ms. Keep cheap graph/retrieval observations
++   first; enrich only a few candidates. Missing fields, backend failures,
++   unsupported security/dataflow and exhausted budgets remain explicit nulls.
++3. Save the exact structured response as `suspect-round-1.json` in
++   `workspace_dir`; run the validator below into `suspect-labels.json`.
++   The installed plugin bundles all registered CKS input schemas. On server
++   version changes compare tools/list with `--check-contract tools.json`;
++   mismatched property types, requirements, nested shapes or tool sets require
++   coordinated updates, not guessed arguments. Wire names and host aliases
++   are explicit in the contract; the live host receipt records compatibility.
++4. Inspect distance/relation, seed-relative impact-category membership,
++   returned PR-reference recency, concurrency direction and backend-specific
++   retrieval rank/score/source. A shortest observed path can be incomplete.
++   Empty capped membership/history is scoped to that query, not proof of global
++   absence. Search scores from different backends are not comparable cause
++   scores. Never convert null into safe/false/zero or claim uncomputed tags.
++5. Record separate `agent_judgment` entries with candidate citation,
++   candidate/rejected/unknown state, rationale and explicit unknowns. They
++   cannot assert confirmed cause. Preserve all CKS signal provenance and
++   retained source hashes unchanged. Pinned working-tree/snapshot sources use
++   `retained_citation` as expansion seeds; unpinned committed sources use
++   `citation`. Legacy expansion must not strip retained dataset coordinates.
++6. Expand selected evidence anchors only when that will answer a concrete
++   remaining question. At most3 rounds,20 distinct candidate citations and96
++   total backend calls per investigation. Stop for sufficient evidence,
++   no new candidates, exhausted budget, awaiting observation or unavailable
++   backend. Record that reason; more rounds require a fresh explicitly scoped
++   investigation. An unresolved signal is a question for observation, not a
++   manufactured confidence score.
++7. Planner reads and validates the finished label artifact before design.
++   Symptoms that have not reproduced remain candidates/awaiting observation.
++   Independent primary/holdout oracle validity remains required separately;
++   factual labels do not authorize production changes or completion.
++
++```bash
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/suspect_labels.py" --round "{workspace_dir}/suspect-round-1.json" --state "{workspace_dir}/suspect-labels.json"
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/suspect_labels.py" --round "{workspace_dir}/suspect-round-2.json" --state "{workspace_dir}/suspect-labels.json" --judgments "{workspace_dir}/suspect-judgments.json" --stop awaiting_observation
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/suspect_labels.py" --check "{workspace_dir}/suspect-labels.json"
++```
++
++If the tool fails, preserve the actual request/error as
++`{schema_version:1,status:"unavailable",failure:{request:{name:"cks.context.label_suspects",arguments:{...}},response:{isError:true,...}},reason:"...",acceptance:"not_recorded"}`
++in `suspect-labels.json`. The validator accepts only an explicit failed tool
++receipt, not an empty candidate list relabeled as a successful investigation.
++Continue the existing reproduction requirements; this receipt grants no
++exception to their acceptance gates. Do not transmit private settings/history.
+-- 
+2.55.0
+

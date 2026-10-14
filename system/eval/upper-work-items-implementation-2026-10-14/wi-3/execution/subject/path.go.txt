@@ -1,0 +1,5 @@
+package fixture
+
+func Leaf() int { return 1 }
+func Middle() int { return Leaf() }
+func Top() int { return Middle() }
