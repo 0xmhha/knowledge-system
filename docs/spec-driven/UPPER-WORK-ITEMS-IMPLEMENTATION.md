@@ -208,3 +208,11 @@ agent 조사 산출물의 통합 증거로 취급하지 않는다. 기존 개발
 structured event/trigger로 후속 재개 조건을 기록한다. 소유하지 않은 node의
 중지·reset은 실행 대상에 넣지 않는다. 다음은 이 contract의 typed 모델과
 기존 DSL/monitor adapter, 실제 반복·timeout·cleanup·재발 반례다.
+
+
+WI-4 중간 보존: ChainBench `b67f8bf92bc3cd13aa06e3e081e7e3214bb76bb7`에서 typed plan과
+SHA256 기반 반복 스케줄 및 거부 조건 시험이 PASS다. checkpoint는
+`system/eval/upper-work-items-implementation-2026-10-14/wi-4-checkpoint/checkpoint.json`이다.
+반복 실행·소유 노드 확인/cleanup·DSL/monitor·통계 분모·실제 재현/재발 및
+전체 회귀는 아직 남았으므로 WI-4의 implementation_verified는 false다.
+다음은 실제 반복 실행기와 기존 primitive adapter이며 전체 목표는 active다.

@@ -1,0 +1,280 @@
+From b67f8bf92bc3cd13aa06e3e081e7e3214bb76bb7 Mon Sep 17 00:00:00 2001
+From: 0xmhha <mhha@wemade.com>
+Date: Wed, 14 Oct 2026 10:56:21 +0900
+Subject: [PATCH] feat: freeze timing experiment sources and schedules
+
+---
+ internal/experiment/plan.go      | 170 +++++++++++++++++++++++++++++++
+ internal/experiment/plan_test.go |  83 +++++++++++++++
+ 2 files changed, 253 insertions(+)
+ create mode 100644 internal/experiment/plan.go
+ create mode 100644 internal/experiment/plan_test.go
+
+diff --git a/internal/experiment/plan.go b/internal/experiment/plan.go
+new file mode 100644
+index 00000000..c2efee5e
+--- /dev/null
++++ b/internal/experiment/plan.go
+@@ -0,0 +1,170 @@
++// Package experiment freezes timing/fault/observation investigations before
++// execution. It distinguishes the designated symptom from infrastructure errors.
++package experiment
++
++import (
++	"crypto/sha256"
++	"encoding/binary"
++	"encoding/hex"
++	"encoding/json"
++	"fmt"
++	"strings"
++)
++
++type Source struct {
++	Commit            string `json:"commit"`
++	BinarySHA256      string `json:"binary_sha256"`
++	DriverSHA256      string `json:"driver_sha256"`
++	EnvironmentSHA256 string `json:"environment_sha256"`
++}
++
++type Injection struct {
++	Kind       string `json:"kind"`   // delay, restart, partition; observation never injects
++	Target     string `json:"target"` // node id inside the trial-owned network
++	Step       string `json:"step"`
++	MinDelayMS int    `json:"min_delay_ms"`
++	MaxDelayMS int    `json:"max_delay_ms"`
++}
++
++type ResumeTrigger struct {
++	Event         string `json:"event"`
++	AssertionID   string `json:"assertion_id"`
++	WindowSeconds int    `json:"window_seconds"`
++}
++
++type Plan struct {
++	SchemaVersion       int            `json:"schema_version"`
++	ID                  string         `json:"id"`
++	Mode                string         `json:"mode"` // reproduction, comparison, observation
++	Symptom             string         `json:"symptom"`
++	AssertionID         string         `json:"assertion_id"`
++	Seed                string         `json:"seed"`
++	Before              Source         `json:"before"`
++	After               *Source        `json:"after"`
++	Repetitions         int            `json:"repetitions"`
++	MinCompleted        int            `json:"min_completed"`
++	MinSymptomFailures  int            `json:"min_symptom_failures"`
++	MaxFailureRate      float64        `json:"max_failure_rate"`
++	TrialTimeoutSeconds int            `json:"trial_timeout_seconds"`
++	TotalTimeoutSeconds int            `json:"total_timeout_seconds"`
++	OwnedNodeIDs        []string       `json:"owned_node_ids"`
++	NormalAssertionIDs  []string       `json:"normal_assertion_ids"`
++	Injection           *Injection     `json:"injection"`
++	Resume              *ResumeTrigger `json:"resume"`
++}
++
++type Schedule struct {
++	Trial   int    `json:"trial"`
++	Seed    string `json:"seed"`
++	DelayMS int    `json:"delay_ms"`
++}
++
++func validHash(s string, n int) bool {
++	if len(s) != n || strings.ToLower(s) != s {
++		return false
++	}
++	_, e := hex.DecodeString(s)
++	return e == nil
++}
++func (s Source) validate() error {
++	if !validHash(s.Commit, 40) || !validHash(s.BinarySHA256, 64) || !validHash(s.DriverSHA256, 64) || !validHash(s.EnvironmentSHA256, 64) {
++		return fmt.Errorf("source, binary, driver and environment pins required")
++	}
++	return nil
++}
++func unique(values []string) bool {
++	seen := map[string]bool{}
++	for _, v := range values {
++		if v == "" || len(v) > 128 || seen[v] {
++			return false
++		}
++		seen[v] = true
++	}
++	return true
++}
++func contains(values []string, value string) bool {
++	for _, v := range values {
++		if v == value {
++			return true
++		}
++	}
++	return false
++}
++func (p Plan) Validate() error {
++	if p.SchemaVersion != 1 || p.ID == "" || len(p.ID) > 128 || strings.TrimSpace(p.Symptom) == "" || len(p.Symptom) > 4096 || p.AssertionID == "" || len(p.AssertionID) > 128 || p.Seed == "" || len(p.Seed) > 128 {
++		return fmt.Errorf("invalid experiment identity")
++	}
++	if p.Mode != "reproduction" && p.Mode != "comparison" && p.Mode != "observation" {
++		return fmt.Errorf("unsupported experiment mode")
++	}
++	if e := p.Before.validate(); e != nil {
++		return e
++	}
++	if (p.Mode == "comparison") != (p.After != nil) {
++		return fmt.Errorf("comparison requires distinct frozen before and after sources")
++	}
++	if p.After != nil {
++		if e := p.After.validate(); e != nil {
++			return e
++		}
++		if p.After.Commit == p.Before.Commit || p.After.DriverSHA256 != p.Before.DriverSHA256 || p.After.EnvironmentSHA256 != p.Before.EnvironmentSHA256 {
++			return fmt.Errorf("comparison sources must differ under the same driver/environment")
++		}
++	}
++	if p.Repetitions < 1 || p.Repetitions > 1000 || p.MinCompleted < 1 || p.MinCompleted > p.Repetitions || p.MinSymptomFailures < 1 || p.MinSymptomFailures > p.Repetitions || !(p.MaxFailureRate > 0 && p.MaxFailureRate < 1) {
++		return fmt.Errorf("invalid frozen denominator/rate threshold")
++	}
++	if p.TrialTimeoutSeconds < 1 || p.TrialTimeoutSeconds > 300 || p.TotalTimeoutSeconds < 1 || p.TotalTimeoutSeconds > 7200 {
++		return fmt.Errorf("invalid time budget")
++	}
++	if len(p.NormalAssertionIDs) < 1 || len(p.NormalAssertionIDs) > 16 || !unique(p.NormalAssertionIDs) || contains(p.NormalAssertionIDs, p.AssertionID) {
++		return fmt.Errorf("distinct normal control assertions required")
++	}
++	if len(p.OwnedNodeIDs) > 32 || !unique(p.OwnedNodeIDs) {
++		return fmt.Errorf("invalid owned node set")
++	}
++	if p.Mode == "observation" {
++		if p.Injection != nil || p.Resume == nil || p.Resume.Event == "" || p.Resume.AssertionID != p.AssertionID || p.Resume.WindowSeconds < 1 || p.Resume.WindowSeconds > 3600 {
++			return fmt.Errorf("observation requires bounded designated resume trigger and no injection")
++		}
++	} else {
++		if p.Resume != nil || p.Injection == nil {
++			return fmt.Errorf("reproduction/comparison needs explicit injection")
++		}
++		i := p.Injection
++		if (i.Kind != "delay" && i.Kind != "restart" && i.Kind != "partition") || !contains(p.OwnedNodeIDs, i.Target) || i.Step == "" || len(i.Step) > 128 || i.MinDelayMS < 0 || i.MaxDelayMS < i.MinDelayMS || i.MaxDelayMS > 60000 {
++			return fmt.Errorf("injection must target a trial-owned node at a bounded named step")
++		}
++	}
++	return nil
++}
++
++// Schedules are derived by a specified hash algorithm, not a language's evolving
++// RNG implementation. Before and after use exactly the same trial schedules.
++func (p Plan) Schedules() ([]Schedule, error) {
++	if e := p.Validate(); e != nil {
++		return nil, e
++	}
++	schedules := make([]Schedule, p.Repetitions)
++	for i := range schedules {
++		sum := sha256.Sum256([]byte(fmt.Sprintf("chainbench-experiment-v1\x00%s\x00%d", p.Seed, i+1)))
++		delay := 0
++		if p.Injection != nil {
++			width := uint64(p.Injection.MaxDelayMS - p.Injection.MinDelayMS + 1)
++			delay = p.Injection.MinDelayMS + int(binary.BigEndian.Uint64(sum[:8])%width)
++		}
++		schedules[i] = Schedule{Trial: i + 1, Seed: hex.EncodeToString(sum[:]), DelayMS: delay}
++	}
++	return schedules, nil
++}
++func (p Plan) Digest() (string, error) {
++	if e := p.Validate(); e != nil {
++		return "", e
++	}
++	s, e := json.Marshal(p)
++	if e != nil {
++		return "", e
++	}
++	sum := sha256.Sum256(s)
++	return hex.EncodeToString(sum[:]), nil
++}
+diff --git a/internal/experiment/plan_test.go b/internal/experiment/plan_test.go
+new file mode 100644
+index 00000000..fa7b4663
+--- /dev/null
++++ b/internal/experiment/plan_test.go
+@@ -0,0 +1,83 @@
++package experiment
++
++import (
++	"math"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++func frozenPlan() Plan {
++	s := Source{Commit: strings.Repeat("1", 40), BinarySHA256: strings.Repeat("2", 64), DriverSHA256: strings.Repeat("3", 64), EnvironmentSHA256: strings.Repeat("4", 64)}
++	after := s
++	after.Commit = strings.Repeat("5", 40)
++	after.BinarySHA256 = strings.Repeat("6", 64)
++	return Plan{SchemaVersion: 1, ID: "timing-fixture", Mode: "comparison", Symptom: "read before commit", AssertionID: "read-committed", Seed: "fixed-seed", Before: s, After: &after, Repetitions: 60, MinCompleted: 60, MinSymptomFailures: 3, MaxFailureRate: .05, TrialTimeoutSeconds: 5, TotalTimeoutSeconds: 120, OwnedNodeIDs: []string{"trial-node"}, NormalAssertionIDs: []string{"normal-read"}, Injection: &Injection{Kind: "delay", Target: "trial-node", Step: "commit", MinDelayMS: 1, MaxDelayMS: 10}}
++}
++func TestFrozenSchedulesReproducibleAcrossBothSources(t *testing.T) {
++	p := frozenPlan()
++	a, e := p.Schedules()
++	if e != nil {
++		t.Fatal(e)
++	}
++	b, e := p.Schedules()
++	if e != nil || !reflect.DeepEqual(a, b) {
++		t.Fatal("unstable schedule", e)
++	}
++	for i, s := range a {
++		if s.Trial != i+1 || len(s.Seed) != 64 || s.DelayMS < 1 || s.DelayMS > 10 {
++			t.Fatal(s)
++		}
++	}
++	d, e := p.Digest()
++	if e != nil {
++		t.Fatal(e)
++	}
++	p.Seed = "other"
++	next, _ := p.Digest()
++	if next == d {
++		t.Fatal("changed timing conditions not bound")
++	}
++	different, _ := p.Schedules()
++	if reflect.DeepEqual(a, different) {
++		t.Fatal("seed ignored")
++	}
++}
++func TestInvalidExperimentConditionsRejected(t *testing.T) {
++	for name, edit := range map[string]func(*Plan){
++		"foreign_target":          func(p *Plan) { p.Injection.Target = "production-node" },
++		"duplicate_owners":        func(p *Plan) { p.OwnedNodeIDs = append(p.OwnedNodeIDs, "trial-node") },
++		"missing_normal":          func(p *Plan) { p.NormalAssertionIDs = nil },
++		"symptom_is_control":      func(p *Plan) { p.NormalAssertionIDs = []string{p.AssertionID} },
++		"wrong_comparison_driver": func(p *Plan) { p.After.DriverSHA256 = strings.Repeat("7", 64) },
++		"unknown_source":          func(p *Plan) { p.Before.Commit = "" },
++		"same_source":             func(p *Plan) { p.After.Commit = p.Before.Commit },
++		"nan_rate":                func(p *Plan) { p.MaxFailureRate = math.NaN() },
++		"zero_denominator":        func(p *Plan) { p.Repetitions = 0 },
++		"unbounded_delay":         func(p *Plan) { p.Injection.MaxDelayMS = 60001 },
++		"unsupported_fault":       func(p *Plan) { p.Injection.Kind = "reset" },
++		"injected_observation":    func(p *Plan) { p.Mode = "observation"; p.After = nil },
++	} {
++		t.Run(name, func(t *testing.T) {
++			p := frozenPlan()
++			edit(&p)
++			if e := p.Validate(); e == nil {
++				t.Fatal("invalid frozen conditions accepted")
++			}
++		})
++	}
++}
++func TestObservationOnlyHasBoundedResumeTrigger(t *testing.T) {
++	p := frozenPlan()
++	p.Mode = "observation"
++	p.After = nil
++	p.Injection = nil
++	p.Resume = &ResumeTrigger{Event: "assertion_failed", AssertionID: p.AssertionID, WindowSeconds: 60}
++	if e := p.Validate(); e != nil {
++		t.Fatal(e)
++	}
++	p.Resume.AssertionID = "other"
++	if e := p.Validate(); e == nil {
++		t.Fatal("unrelated event can resume symptom investigation")
++	}
++}
+-- 
+2.55.0
+
