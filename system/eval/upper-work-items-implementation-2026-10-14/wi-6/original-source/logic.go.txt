@@ -1,0 +1,19 @@
+package fixture
+
+func Seed(x int) int {
+	Noise()
+	if x < 0 {
+		return Cycle(x + 1)
+	}
+	return Transform(x)
+}
+func Cycle(x int) int {
+	if x < 0 {
+		return Seed(x + 1)
+	}
+	return Transform(x)
+}
+func Transform(x int) int { return Normalize(x) + 1 }
+func Normalize(x int) int { return x + 2 }
+func Noise() int          { return 99 }
+func Isolated(x int) int  { return x * 2 }

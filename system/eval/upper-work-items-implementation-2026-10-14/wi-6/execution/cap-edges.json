@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "graph": {
+    "schema_version": 1,
+    "status": "budget_exhausted",
+    "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+    "limits": {
+      "max_functions": 4,
+      "max_hops": 1,
+      "max_candidates": 32,
+      "max_total_nodes": 2048,
+      "max_total_edges": 1,
+      "max_total_facts": 131072,
+      "timeout_ms": 1000
+    },
+    "functions": [
+      {
+        "hop": 0,
+        "result": {
+          "schema_version": 1,
+          "status": "budget_exhausted",
+          "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+          "analysis": {
+            "schema_version": 1,
+            "source": {
+              "node_id": "0a014f39bd4b265c",
+              "canonical_id": "example.invalid/expansion-fixture.Seed",
+              "file": "logic.go",
+              "commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+              "sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784",
+              "language": "go",
+              "start_line": 3,
+              "start_byte": 17,
+              "bytes": 91,
+              "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+              "function_name": "Seed"
+            },
+            "limits": {
+              "max_source_bytes": 262144,
+              "max_ast_nodes": 4096,
+              "max_blocks": 256,
+              "max_nodes": 1024,
+              "max_edges": 1,
+              "max_iterations": 128,
+              "timeout_ms": 1000,
+              "max_facts": 65536
+            },
+            "status": "budget_exhausted",
+            "capability": {
+              "cfg": "bounded_go",
+              "control_dependence": "not_computed",
+              "data_dependence": "not_computed",
+              "def_use": "not_computed",
+              "exceptions": "unsupported",
+              "local_binding": "isolated_go_types",
+              "memory_alias": "unsupported",
+              "package_types": "unavailable_function_blob",
+              "short_circuit": "unsupported"
+            },
+            "blocks": [
+              {
+                "id": 0,
+                "kind": "Body",
+                "reachable": true,
+                "nodes": [
+                  "b0/n0",
+                  "b0/n1"
+                ]
+              }
+            ],
+            "nodes": [
+              {
+                "id": "b0/n0",
+                "block": 0,
+                "kind": "ExprStmt",
+                "location": {
+                  "start_byte": 41,
+                  "end_byte": 48,
+                  "start_line": 4,
+                  "end_line": 4
+                },
+                "text": "Noise()",
+                "synthetic": false
+              },
+              {
+                "id": "b0/n1",
+                "block": 0,
+                "kind": "BinaryExpr",
+                "location": {
+                  "start_byte": 53,
+                  "end_byte": 58,
+                  "start_line": 5,
+                  "end_line": 5
+                },
+                "text": "x < 0",
+                "synthetic": false
+              }
+            ],
+            "edges": [
+              {
+                "from": "b0",
+                "to": "b1",
+                "kind": "cfg",
+                "condition": "true",
+                "certainty": "conservative"
+              }
+            ],
+            "diagnostics": [
+              {
+                "code": "isolated_type_info_partial",
+                "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+              },
+              {
+                "code": "budget_exhausted",
+                "message": "CFG edge limit exceeded"
+              }
+            ],
+            "truncated": true,
+            "elapsed_micros": 134,
+            "variables": [],
+            "occurrences": [],
+            "def_use": [],
+            "iterations": 0,
+            "facts_peak": 0
+          },
+          "elapsed_micros": 493
+        }
+      }
+    ],
+    "hops": [],
+    "candidates": 0,
+    "deduplicated": 0,
+    "total_nodes": 2,
+    "total_edges": 1,
+    "total_facts": 0,
+    "stop_reasons": [
+      "function_analysis"
+    ],
+    "limitations": [
+      "local_value_control_analysis_not_whole_program",
+      "call_hops_not_computed_argument_or_return_transfer",
+      "curated_flow_is_separate_operator_metadata",
+      "memory_alias_external_effects_and_path_feasibility_unknown",
+      "logical_fact_and_output_caps_not_process_memory_bounds",
+      "deadline_cooperative_for_parser_typechecker_and_legacy_reader"
+    ],
+    "elapsed_micros": 552
+  },
+  "curated_flow": {
+    "origin": "operator_curated_metadata",
+    "status": "separate_not_joined",
+    "query_tool": "cks.context.get_flow",
+    "source_association": "not_verified",
+    "reason": "Curated call order/reads/writes are separate records; they are not local computed def-use/control or a verified cross-dataset join"
+  }
+}

@@ -1,0 +1,1250 @@
+diff --git a/docs/graph/VALUE-DEPENDENCIES.md b/docs/graph/VALUE-DEPENDENCIES.md
+index fe81e8f8..092de964 100644
+--- a/docs/graph/VALUE-DEPENDENCIES.md
++++ b/docs/graph/VALUE-DEPENDENCIES.md
+@@ -111,3 +111,34 @@ budgets, source drift and actual runtime schema validation. The opt-in
+ builds its index and exercises namespaced stdio MCP. It preserves raw requests,
+ responses, source bundle and receipts. Source deletion confirms no live fallback.
+ Independent production and whole-goal human acceptance remain separate.
++
++## Bounded multi-function context in CKS
++
++CKS `context.value_dependency_expansion` composes the same local Go computation
++through retained outgoing calls/invokes. Its required `function` object has the
++exact selector/source pins/limits above. Optional `limits` defaults to4 functions,
++1 hop,32 unique candidates,2048 total local nodes,8192 local edges plus call hops,
++131072 cumulative analyzed facts and1000ms cooperative total time. Caps are8/3/
++128/4096/16384/262144/5000 respectively. Logical fact/output budgets do not claim
++process-byte limits or parser/typechecker preemption.
++
++Each retained function is computed once within an expansion, cycles and repeated
++targets are deduplicated, and function/blob/manifest pins are rechecked along with
++consulted metadata and edge pages. SQL retrieves a bounded stable prefix before
++Go materialization; legacy readers lacking this optional capability report
++partial/unavailable, never an unbounded fallback. Candidate/function/hop/output/
++fact/time bounds and source changes remain explicit. More rows at a page boundary
++are a conservative incomplete signal even when some returned rows are filtered.
++
++Call hops have `origin=retained_call_graph` and `argument_mapping=not_computed`.
++They are context links rather than calculated parameter/return or memory transfer.
++Each function's local def-use/value/control relations remain under its own source
++identity. Curated operator flows retain the existing separate `context.get_flow`
++surface: the expansion labels them `separate_not_joined`, with source association
++`not_verified`. It does not borrow their reads/writes/order as computed dependence.
++This endpoint does not automatically perform a curated-flow lookup or dataset join.
++
++A controlled6-function corpus compares independent relevance labels: baseline
++returns1 of4 relevant functions; expansion returns all4 plus1 noise function.
++Report denominators, caps and elapsed cost for that fixture; they are not global
++recall, a relevance proof, whole-program transfer or an optimization claim.
+diff --git a/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md b/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
+index cfc6a888..4e96e145 100644
+--- a/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
++++ b/docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md
+@@ -527,3 +527,47 @@ candidate/function/hop/총 계산 예산·cycle/dedup·snapshot/source·중단 
+ 주장하지 않는다. bounded 저장소 조회 경계를 먼저 구현하고, 독립 정답
+ fixture의 recall/noise/cost 분모와 실제 공개 도구 실행으로 검증한 뒤 완료를
+ 체크한다.
++
++### WI-6 구현 중간 확인
++
++`store.BoundedEdgeReader`의 선택적 `IncidentEdges`는 SQL limit+취소 context를
++적용한다. SQLite와 PostgreSQL query를 매개변수화하고, 기존 safe reader의
++ambiguous history 경계도 유지한다. `valueflow.Expand`는 동일 retained snapshot
++안에서 함수별 계산을 한 번씩 수행하고 call-hop/지역 의존을 분리하며
++cycle/dedup·seed/candidate/function/hop·총 node/edge/fact/time 예산을 보존한다.
++최종 metadata/blob/edge 및 more 표식 변화를 재검증한다. legacy reader는
++partial/unavailable이며 무제한 neighborhood fallback은 하지 않는다.
++
++CKS read-only `value_dependency_expansion`와 실제32 tools/list/C1 계약을
++추가했다. Curated flow는 기존 get_flow의 operator metadata로 별도 조회하며,
++확장 endpoint가 자동 조회하거나 source/dataset join·계산된 interprocedural
++값 전달을 주장하지 않는다. schema는 separate_not_joined/not_verified를
++반환한다. 이 지원 범위와 미지원/unknown은 공개 문서에 고정한다.
++
++독립 compiled/race Go6함수 fixture12개 실제 MCP 검사에서 관련4함수 기준
++baseline1/4→확장4/4, noise1/반환5와 비용을 기록했다. cycle·상한·입력/stale
++거부·원문 삭제 후 유지도 통과했다. 전체 회귀·커밋 기준 clean 실행·Git
++근거 확인 전까지 WI-6는 in_progress, 현재7/9를 유지한다. 남은WI-6→WI-SP.
++
++### WI-SP 고정 설계: 기존 retained annotation과 보안 경계
++
++다음 작업은 CKS의 read-only typed policy/security 질의다. exact selected symbol과
++retained snapshot을 기준으로 bounded governed_by/has_security_pattern 조회를
++사용하고 실제 관련 symbol·설명·수정 hint·manual/rule origin·unknown/not-found·
++기준 source/metadata SHA와 조회 상한/중단을 반환한다. 이름으로 source를
++혼합하거나 live YAML/source를 query에서 읽지 않는다.
++
++현 legacy loader는 YAML의 설명/위험/적용 symbol을 graph node로 보존하지만,
++실제 YAML 행·문서 버전·검토자·검토 시간·승인 상태와 원문 bytes는 모두 저장하지
++않는다. line1 기본값이나 현재 Go commit을 annotation 원문의 검토/버전 핀으로
++승격하지 않는다. 해당 provenance는 unknown으로 노출하고 필요한 원문/검토
++metadata를 지원할 때만 typed 검증과 writer/reader round-trip을 추가한다.
++manual annotation은 위험 후보/운영자 입력이며 자동 규칙 후보나 LLM 판단과
++분리한다. 빈 태그는 안전/정책 적합 판정이 아니다.
++
++기존 MCP 등록과 HTTP 접근/CIDR 정책 안에서만 노출한다. readOnlyHint는
++authorization 증명이 아니며 사용자/검토자 인증·서명 trust 기능은 미지원으로
++표시한다. private source와 ambiguous history 경계를 우회하지 않는다.
++양성/음성·빈 태그·규칙/수동 구분·설명/hint·source/version/reviewer unknown·
++조건/권한 거부·도구 등록/소비자 계약·source 변조/상한의 실제 공개 실행과
++회귀 근거를 확인한 후에만 WI-SP 완료를 체크한다.
+diff --git a/internal/graph/persist/bounded_edges.go b/internal/graph/persist/bounded_edges.go
+new file mode 100644
+index 00000000..926594c9
+--- /dev/null
++++ b/internal/graph/persist/bounded_edges.go
+@@ -0,0 +1,104 @@
++package persist
++
++import (
++	"context"
++	"fmt"
++	"strings"
++
++	"github.com/0xmhha/knowledge-system/pkg/graph/types"
++)
++
++// EdgePageInput bounds rows in SQL before materializing them. Direction is
++// explicit and edge kinds are parameters, never interpolated SQL identifiers.
++type EdgePageInput struct {
++	NodeID    string
++	Direction string
++	Types     []string
++	Limit     int
++}
++type BoundedEdgeReader interface {
++	IncidentEdges(context.Context, EdgePageInput) ([]types.Edge, bool, error)
++}
++
++func edgePageSQL(q EdgePageInput, postgres bool) (string, []any, error) {
++	if q.NodeID == "" || len(q.NodeID) > 128 || q.Limit < 1 || q.Limit > 256 || len(q.Types) > 8 {
++		return "", nil, fmt.Errorf("invalid bounded edge input")
++	}
++	args := []any{}
++	parameter := func(v any) string {
++		args = append(args, v)
++		if postgres {
++			return fmt.Sprintf("$%d", len(args))
++		}
++		return "?"
++	}
++	where := ""
++	switch q.Direction {
++	case "outgoing":
++		where = "src = " + parameter(q.NodeID)
++	case "incoming":
++		where = "dst = " + parameter(q.NodeID)
++	case "both":
++		where = "(src = " + parameter(q.NodeID) + " OR dst = " + parameter(q.NodeID) + ")"
++	default:
++		return "", nil, fmt.Errorf("explicit edge direction required")
++	}
++	if len(q.Types) > 0 {
++		marks := []string{}
++		for _, kind := range q.Types {
++			if kind == "" || len(kind) > 64 {
++				return "", nil, fmt.Errorf("invalid edge kind")
++			}
++			marks = append(marks, parameter(kind))
++		}
++		where += " AND type IN (" + strings.Join(marks, ",") + ")"
++	}
++	sql := `SELECT id, src, dst, type, COALESCE(file_path,''), COALESCE(line,0), count, confidence, COALESCE(dispatch_kind,'') FROM edges WHERE ` + where + ` ORDER BY type, src, dst, id LIMIT ` + parameter(q.Limit+1)
++	return sql, args, nil
++}
++func (s *sqliteStore) IncidentEdges(ctx context.Context, q EdgePageInput) ([]types.Edge, bool, error) {
++	sql, args, e := edgePageSQL(q, false)
++	if e != nil {
++		return nil, false, e
++	}
++	if ctx == nil {
++		return nil, false, fmt.Errorf("context required")
++	}
++	rows, e := s.db.QueryContext(ctx, sql, args...)
++	if e != nil {
++		return nil, false, e
++	}
++	defer func() { _ = rows.Close() }()
++	edges, e := scanEdges(rows)
++	if e != nil {
++		return nil, false, e
++	}
++	more := len(edges) > q.Limit
++	if more {
++		edges = edges[:q.Limit]
++	}
++	return edges, more, nil
++}
++func (s *pgStore) IncidentEdges(ctx context.Context, q EdgePageInput) ([]types.Edge, bool, error) {
++	sql, args, e := edgePageSQL(q, true)
++	if e != nil {
++		return nil, false, e
++	}
++	if ctx == nil {
++		return nil, false, fmt.Errorf("context required")
++	}
++	rows, e := s.pool.Query(ctx, sql, args...)
++	if e != nil {
++		return nil, false, e
++	}
++	defer rows.Close()
++	edges, e := scanPGEdges(rows)
++	if e != nil {
++		return nil, false, e
++	}
++	more := len(edges) > q.Limit
++	if more {
++		edges = edges[:q.Limit]
++	}
++	return edges, more, nil
++}
+diff --git a/internal/graph/persist/bounded_edges_test.go b/internal/graph/persist/bounded_edges_test.go
+new file mode 100644
+index 00000000..c1e880e3
+--- /dev/null
++++ b/internal/graph/persist/bounded_edges_test.go
+@@ -0,0 +1,62 @@
++package persist
++
++import (
++	"context"
++	"path/filepath"
++	"strings"
++	"testing"
++
++	"github.com/0xmhha/knowledge-system/pkg/graph/types"
++)
++
++func TestBoundedIncidentEdgesLimitsFiltersDirectionsAndCancellation(t *testing.T) {
++	s, e := Open(filepath.Join(t.TempDir(), "graph.db"))
++	if e != nil {
++		t.Fatal(e)
++	}
++	defer func() { _ = s.Close() }()
++	if e = s.Migrate(); e != nil {
++		t.Fatal(e)
++	}
++	nodes := []types.Node{{ID: "a", Name: "A", Type: types.NodeFunction}, {ID: "b", Name: "B", Type: types.NodeFunction}, {ID: "c", Name: "C", Type: types.NodeFunction}}
++	if e = s.InsertNodes(nodes); e != nil {
++		t.Fatal(e)
++	}
++	if e = s.InsertEdges([]types.Edge{{Src: "a", Dst: "b", Type: "calls", Confidence: types.ConfExtracted}, {Src: "a", Dst: "c", Type: "calls", Confidence: types.ConfExtracted}, {Src: "c", Dst: "a", Type: "invokes", Confidence: types.ConfExtracted}}); e != nil {
++		t.Fatal(e)
++	}
++	var reader BoundedEdgeReader = s
++	out, more, e := reader.IncidentEdges(context.Background(), EdgePageInput{NodeID: "a", Direction: "outgoing", Types: []string{"calls"}, Limit: 1})
++	if e != nil || !more || len(out) != 1 || out[0].Dst != "b" {
++		t.Fatal(out, more, e)
++	}
++	out, more, e = reader.IncidentEdges(context.Background(), EdgePageInput{NodeID: "a", Direction: "incoming", Types: []string{"invokes"}, Limit: 2})
++	if e != nil || more || len(out) != 1 || out[0].Src != "c" {
++		t.Fatal(out, more, e)
++	}
++	out, more, e = reader.IncidentEdges(context.Background(), EdgePageInput{NodeID: "a", Direction: "both", Limit: 4})
++	if e != nil || more || len(out) != 3 {
++		t.Fatal(out, more, e)
++	}
++	ctx, cancel := context.WithCancel(context.Background())
++	cancel()
++	if _, _, e = reader.IncidentEdges(ctx, EdgePageInput{NodeID: "a", Direction: "both", Limit: 1}); e == nil {
++		t.Fatal("canceled SQL context ignored")
++	}
++}
++func TestBoundedEdgeSQLParametersCapsAndDialect(t *testing.T) {
++	for _, postgres := range []bool{false, true} {
++		q, args, e := edgePageSQL(EdgePageInput{NodeID: "' or true--", Direction: "both", Types: []string{"calls", "invokes"}, Limit: 2}, postgres)
++		if e != nil || strings.Contains(q, "' or true") || len(args) != 5 || args[4] != 3 {
++			t.Fatal(q, args, e)
++		}
++		if postgres && !strings.Contains(q, "LIMIT $5") {
++			t.Fatal(q)
++		}
++	}
++	for _, input := range []EdgePageInput{{NodeID: "a", Direction: "outgoing", Limit: 0}, {NodeID: "a", Direction: "outgoing", Limit: 257}, {NodeID: "a", Direction: "drop table", Limit: 2}, {NodeID: "a", Direction: "both", Limit: 2, Types: []string{""}}} {
++		if _, _, e := edgePageSQL(input, false); e == nil {
++			t.Fatal("invalid bound/direction accepted")
++		}
++	}
++}
+diff --git a/internal/system/ckgclient/valueflow.go b/internal/system/ckgclient/valueflow.go
+index fb6d1bcd..ff67e958 100644
+--- a/internal/system/ckgclient/valueflow.go
++++ b/internal/system/ckgclient/valueflow.go
+@@ -30,3 +30,17 @@ func (r *Real) RuleCandidates(ctx context.Context, q valueflow.RuleQueryInput) (
+ 	}
+ 	return valueflow.QueryRules(ctx, mcphandlers.NewLLMSafeReader(reader.r), q)
+ }
++
++// ValueExpansionClient composes function-local calculations through bounded
++// retained call pages; legacy readers report unavailable rather than full scans.
++type ValueExpansionClient interface {
++	ValueDependencyExpansion(context.Context, valueflow.ExpansionInput) (valueflow.ExpansionResult, error)
++}
++
++func (r *Real) ValueDependencyExpansion(ctx context.Context, q valueflow.ExpansionInput) (valueflow.ExpansionResult, error) {
++	reader, ok := r.s.(*realStoreReader)
++	if !ok || r.closed {
++		return valueflow.ExpansionResult{SchemaVersion: 1, Status: "unavailable", StopReasons: []string{"retained_backend_unavailable"}, Functions: []valueflow.ExpandedFunction{}, Hops: []valueflow.SymbolHop{}, Limitations: []string{"no safe bounded graph expansion backend"}}, nil
++	}
++	return valueflow.Expand(ctx, mcphandlers.NewLLMSafeReader(reader.r), q)
++}
+diff --git a/internal/system/mcp/output_schema_test.go b/internal/system/mcp/output_schema_test.go
+index 65634db2..eb3304db 100644
+--- a/internal/system/mcp/output_schema_test.go
++++ b/internal/system/mcp/output_schema_test.go
+@@ -102,6 +102,7 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
+ 		ToolNameGetInvariantEnforcement:  {"inv_id", "statement", "enforced_at"},
+ 		ToolNameGetSubgraph:              {"seed", "nodes", "edges"},
+ 		ToolNameValueDependencies:        {"schema_version", "status", "analysis", "elapsed_micros"},
++		ToolNameValueDependencyExpansion: {"schema_version", "graph", "curated_flow"},
+ 		ToolNameRuleCandidates:           {"schema_version", "status", "analysis", "elapsed_micros"},
+ 		ToolNameReviewFunction:           {"seed", "code", "history", "tests", "available", "limits"},
+ 		ToolNameImpactAnalysis:           {"seed", "result"},
+diff --git a/internal/system/mcp/server.go b/internal/system/mcp/server.go
+index 67eb5e57..71be6956 100644
+--- a/internal/system/mcp/server.go
++++ b/internal/system/mcp/server.go
+@@ -148,6 +148,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
+ 	registerGetSubgraph(s, d)
+ 	registerReviewFunction(s, d)
+ 	registerValueAnalysis(s, d)
++	registerValueDependencyExpansion(s, d)
+ 	registerImpactAnalysis(s, d)
+ 	registerConcurrencyImpact(s, d)
+ 	registerChangeHistory(s, d)
+diff --git a/internal/system/mcp/testdata/agent-mcp.schema.json b/internal/system/mcp/testdata/agent-mcp.schema.json
+index b33ad726..0476e21e 100644
+--- a/internal/system/mcp/testdata/agent-mcp.schema.json
++++ b/internal/system/mcp/testdata/agent-mcp.schema.json
+@@ -777,6 +777,146 @@
+         "type": "object"
+       }
+     },
++    "cks.context.value_dependency_expansion": {
++      "description": "Bounded expansion of distinct retained Go function-local value/control analyses through outgoing calls/invokes. SQL-limited candidates, function/hop/aggregate node-edge-fact/time budgets, cycle/dedup, source/snapshot pins and stop reasons. Call hops do not prove argument/return or memory transfer. Curated operator flows remain a separate get_flow surface with an unverified dataset join, never computed dependence or a safety verdict. Exact selected identity required; no live source fallback.",
++      "input": {
++        "additionalProperties": false,
++        "properties": {
++          "function": {
++            "additionalProperties": false,
++            "oneOf": [
++              {
++                "required": [
++                  "node_id"
++                ]
++              },
++              {
++                "required": [
++                  "canonical_id"
++                ]
++              }
++            ],
++            "properties": {
++              "canonical_id": {
++                "maxLength": 512,
++                "minLength": 1,
++                "type": "string"
++              },
++              "expected_commit": {
++                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++                "type": "string"
++              },
++              "expected_snapshot_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "expected_source_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "limits": {
++                "additionalProperties": false,
++                "properties": {
++                  "max_ast_nodes": {
++                    "maximum": 4096,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_blocks": {
++                    "maximum": 256,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_edges": {
++                    "maximum": 4096,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_facts": {
++                    "maximum": 65536,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_iterations": {
++                    "maximum": 128,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_nodes": {
++                    "maximum": 1024,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_source_bytes": {
++                    "maximum": 262144,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "timeout_ms": {
++                    "maximum": 1000,
++                    "minimum": 1,
++                    "type": "integer"
++                  }
++                },
++                "type": "object"
++              },
++              "node_id": {
++                "maxLength": 128,
++                "minLength": 1,
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          },
++          "limits": {
++            "additionalProperties": false,
++            "properties": {
++              "max_candidates": {
++                "maximum": 128,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_functions": {
++                "maximum": 8,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_hops": {
++                "maximum": 3,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_total_edges": {
++                "maximum": 16384,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_total_facts": {
++                "maximum": 262144,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_total_nodes": {
++                "maximum": 4096,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "timeout_ms": {
++                "maximum": 5000,
++                "minimum": 1,
++                "type": "integer"
++              }
++            },
++            "type": "object"
++          }
++        },
++        "required": [
++          "function"
++        ],
++        "type": "object"
++      }
++    },
+     "cks.ops.freshness": {
+       "description": "Compare the index snapshot against the source repository: indexed commit vs HEAD and the changed-file list. Call at session start and after pulls/commits -- stale files mean citations may mislead. If stale, run cks.ops.index (files you created this session are never in the index; read them directly).",
+       "input": {
+diff --git a/internal/system/mcp/value_expansion.go b/internal/system/mcp/value_expansion.go
+new file mode 100644
+index 00000000..ea6c4061
+--- /dev/null
++++ b/internal/system/mcp/value_expansion.go
+@@ -0,0 +1,58 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++
++	mcpgo "github.com/mark3labs/mcp-go/mcp"
++	mcpserver "github.com/mark3labs/mcp-go/server"
++
++	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
++	"github.com/0xmhha/knowledge-system/pkg/graph/mcphandlers"
++	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
++)
++
++var ToolNameValueDependencyExpansion = toolName("context.value_dependency_expansion")
++
++type curatedFlowSeparation struct {
++	Origin            string `json:"origin"`
++	Status            string `json:"status"`
++	QueryTool         string `json:"query_tool"`
++	SourceAssociation string `json:"source_association"`
++	Reason            string `json:"reason"`
++}
++type valueExpansionResponse struct {
++	SchemaVersion int                       `json:"schema_version"`
++	Graph         valueflow.ExpansionResult `json:"graph"`
++	CuratedFlow   curatedFlowSeparation     `json:"curated_flow"`
++}
++
++func registerValueDependencyExpansion(s *mcpserver.MCPServer, d Deps) {
++	integer := func(cap int) map[string]any { return map[string]any{"type": "integer", "minimum": 1, "maximum": cap} }
++	limits := map[string]any{"max_functions": integer(8), "max_hops": integer(3), "max_candidates": integer(128), "max_total_nodes": integer(4096), "max_total_edges": integer(16384), "max_total_facts": integer(262144), "timeout_ms": integer(5000)}
++	raw, _ := json.Marshal(map[string]any{"type": "object", "additionalProperties": false, "required": []string{"function"}, "properties": map[string]any{"function": mcphandlers.ValueDependencyTool().RawInputSchema, "limits": map[string]any{"type": "object", "additionalProperties": false, "properties": limits}}})
++	tool := mcpgo.NewTool(ToolNameValueDependencyExpansion, mcpgo.WithReadOnlyHintAnnotation(true), mcpgo.WithOutputSchema[valueExpansionResponse](), mcpgo.WithDescription("Bounded expansion of distinct retained Go function-local value/control analyses through outgoing calls/invokes. SQL-limited candidates, function/hop/aggregate node-edge-fact/time budgets, cycle/dedup, source/snapshot pins and stop reasons. Call hops do not prove argument/return or memory transfer. Curated operator flows remain a separate get_flow surface with an unverified dataset join, never computed dependence or a safety verdict. Exact selected identity required; no live source fallback."))
++	tool.InputSchema = mcpgo.ToolInputSchema{}
++	tool.RawInputSchema = raw
++	s.AddTool(tool, func(ctx context.Context, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
++		raw, e := json.Marshal(req.GetRawArguments())
++		if e != nil {
++			return nil, e
++		}
++		input, e := valueflow.DecodeExpansionInput(raw)
++		if e != nil {
++			return nil, e
++		}
++		response := valueExpansionResponse{SchemaVersion: 1, CuratedFlow: curatedFlowSeparation{Origin: "operator_curated_metadata", Status: "separate_not_joined", QueryTool: ToolNameGetFlow, SourceAssociation: "not_verified", Reason: "Curated call order/reads/writes are separate records; they are not local computed def-use/control or a verified cross-dataset join"}}
++		backend, ok := d.CKG.(ckgclient.ValueExpansionClient)
++		if !ok {
++			response.Graph = valueflow.ExpansionResult{SchemaVersion: 1, Status: "unavailable", Functions: []valueflow.ExpandedFunction{}, Hops: []valueflow.SymbolHop{}, StopReasons: []string{"bounded_value_backend_unavailable"}, Limitations: []string{"no safe bounded expansion backend"}}
++			return mcpgo.NewToolResultStructuredOnly(response), nil
++		}
++		response.Graph, e = backend.ValueDependencyExpansion(ctx, input)
++		if e != nil {
++			return nil, e
++		}
++		return mcpgo.NewToolResultStructuredOnly(response), nil
++	})
++}
+diff --git a/internal/system/mcp/value_expansion_test.go b/internal/system/mcp/value_expansion_test.go
+new file mode 100644
+index 00000000..ba42298d
+--- /dev/null
++++ b/internal/system/mcp/value_expansion_test.go
+@@ -0,0 +1,74 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++	"testing"
++
++	mcpgo "github.com/mark3labs/mcp-go/mcp"
++	mcpserver "github.com/mark3labs/mcp-go/server"
++
++	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
++	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
++)
++
++type expansionFake struct {
++	ckgclient.Client
++	input valueflow.ExpansionInput
++}
++
++func (f *expansionFake) ValueDependencyExpansion(_ context.Context, q valueflow.ExpansionInput) (valueflow.ExpansionResult, error) {
++	f.input = q
++	return valueflow.ExpansionResult{SchemaVersion: 1, Status: "expanded_bounded", Functions: []valueflow.ExpandedFunction{}, Hops: []valueflow.SymbolHop{}, StopReasons: []string{}, Limitations: []string{"fixture local analyses only"}}, nil
++}
++func TestValueExpansionPublicSchemaBackendDelegationAndCuratedSeparation(t *testing.T) {
++	fixture := newFixture(t, nil)
++	backend := &expansionFake{Client: fixture.deps.CKG}
++	fixture.deps.CKG = backend
++	s := mcpserver.NewMCPServer("fixture", "1", mcpserver.WithOutputSchemaValidation())
++	if e := Register(s, fixture.deps); e != nil {
++		t.Fatal(e)
++	}
++	request, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": map[string]any{"name": ToolNameValueDependencyExpansion, "arguments": map[string]any{"function": map[string]any{"node_id": "exact-source"}, "limits": map[string]any{"max_functions": 2}}}})
++	wire, _ := json.Marshal(s.HandleMessage(context.Background(), request))
++	var response struct {
++		Error  any `json:"error"`
++		Result struct {
++			IsError    bool                   `json:"isError"`
++			Structured valueExpansionResponse `json:"structuredContent"`
++		} `json:"result"`
++	}
++	if e := json.Unmarshal(wire, &response); e != nil || response.Error != nil || response.Result.IsError {
++		t.Fatal(string(wire), e)
++	}
++	if backend.input.Function.NodeID != "exact-source" || backend.input.Limits.MaxFunctions != 2 || response.Result.Structured.CuratedFlow.Status != "separate_not_joined" || response.Result.Structured.CuratedFlow.SourceAssociation != "not_verified" {
++		t.Fatal("delegation/provenance changed", response)
++	}
++}
++func TestValueExpansionActualDuplicateNullFractionalUnknownAndLegacyBackend(t *testing.T) {
++	fixture := newFixture(t, nil)
++	s := mcpserver.NewMCPServer("fixture", "1")
++	if e := Register(s, fixture.deps); e != nil {
++		t.Fatal(e)
++	}
++	tool := s.GetTool(ToolNameValueDependencyExpansion)
++	for _, raw := range []string{`{"function":{"node_id":"a","node_id":"b"}}`, `{"function":null}`, `{"function":{"node_id":"a"},"limits":{"max_functions":1.5}}`, `{"function":{"node_id":"a"},"unknown":true}`} {
++		req := mcpgo.CallToolRequest{}
++		req.Params.RawArguments = json.RawMessage(raw)
++		if _, e := tool.Handler(context.Background(), req); e == nil {
++			t.Fatal("runtime input bypass", raw)
++		}
++	}
++	req := mcpgo.CallToolRequest{}
++	req.Params.Arguments = map[string]any{"function": map[string]any{"node_id": "a"}}
++	reply, e := tool.Handler(context.Background(), req)
++	if e != nil {
++		t.Fatal(e)
++	}
++	raw, _ := json.Marshal(reply.StructuredContent)
++	var out valueExpansionResponse
++	_ = json.Unmarshal(raw, &out)
++	if out.Graph.Status != "unavailable" {
++		t.Fatal("legacy invented value expansion", string(raw))
++	}
++}
+diff --git a/pkg/graph/mcphandlers/safety.go b/pkg/graph/mcphandlers/safety.go
+index 914f3841..c7c6453b 100644
+--- a/pkg/graph/mcphandlers/safety.go
++++ b/pkg/graph/mcphandlers/safety.go
+@@ -1,6 +1,7 @@
+ package mcphandlers
+ 
+ import (
++	"context"
+ 	"database/sql"
+ 
+ 	"github.com/0xmhha/knowledge-system/pkg/graph/store"
+@@ -197,3 +198,30 @@ func isAmbiguousMeta(n types.Node) bool {
+ 	}
+ 	return n.Type == types.NodeHunk || n.Type == types.NodeCommit
+ }
++
++// IncidentEdges preserves the history boundary for optional bounded readers.
++// Filtering can return fewer rows; more is conservative, never false complete.
++func (s *llmSafeReader) IncidentEdges(ctx context.Context, q store.EdgePageInput) ([]types.Edge, bool, error) {
++	bounded, ok := s.Reader.(store.BoundedEdgeReader)
++	if !ok {
++		return nil, false, store.ErrBoundedEdgesUnsupported
++	}
++	edges, more, e := bounded.IncidentEdges(ctx, q)
++	if e != nil {
++		return nil, false, e
++	}
++	ids := map[string]bool{}
++	for _, edge := range edges {
++		ids[edge.Src] = true
++		ids[edge.Dst] = true
++	}
++	selected := make([]string, 0, len(ids))
++	for id := range ids {
++		selected = append(selected, id)
++	}
++	nodes, e := s.NodesByIDs(selected)
++	if e != nil {
++		return nil, false, e
++	}
++	return filterLLMSafeEdges(edges, nodeIDSet(nodes)), more, nil
++}
+diff --git a/pkg/graph/mcphandlers/valueflow_test.go b/pkg/graph/mcphandlers/valueflow_test.go
+index 57a6ceb4..77c7de03 100644
+--- a/pkg/graph/mcphandlers/valueflow_test.go
++++ b/pkg/graph/mcphandlers/valueflow_test.go
+@@ -11,6 +11,7 @@ import (
+ 	server "github.com/mark3labs/mcp-go/server"
+ 
+ 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
++	"github.com/0xmhha/knowledge-system/pkg/graph/store"
+ 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
+ 	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
+ )
+@@ -170,3 +171,23 @@ func TestOutputValidationIsActiveAndRejectsFalseSchemaTypes(t *testing.T) {
+ 		t.Fatal("output validator skipped/accepted wrong declared type", string(wire))
+ 	}
+ }
++
++func TestBoundedEdgeCapabilityPreservesAmbiguousHistoryBoundary(t *testing.T) {
++	s := valueStore(t)
++	ambiguous := types.Node{ID: "ambiguous-source", Type: types.NodeHunk, Name: "Ambiguous", Confidence: types.ConfAmbiguous}
++	if e := s.InsertNodes([]types.Node{ambiguous}); e != nil {
++		t.Fatal(e)
++	}
++	if e := s.InsertEdges([]types.Edge{{Src: ambiguous.ID, Dst: "1111111111111111", Type: "calls", Confidence: types.ConfExtracted}}); e != nil {
++		t.Fatal(e)
++	}
++	reader := NewLLMSafeReader(s)
++	bounded, ok := reader.(store.BoundedEdgeReader)
++	if !ok {
++		t.Fatal("optional bounded capability hidden")
++	}
++	edges, _, e := bounded.IncidentEdges(context.Background(), store.EdgePageInput{NodeID: "1111111111111111", Direction: "incoming", Types: []string{"calls"}, Limit: 4})
++	if e != nil || len(edges) != 0 {
++		t.Fatal("ambiguous history edge leaked", edges, e)
++	}
++}
+diff --git a/pkg/graph/store/bounded_edges.go b/pkg/graph/store/bounded_edges.go
+new file mode 100644
+index 00000000..c2746ab4
+--- /dev/null
++++ b/pkg/graph/store/bounded_edges.go
+@@ -0,0 +1,13 @@
++package store
++
++import (
++	"errors"
++	"github.com/0xmhha/knowledge-system/internal/graph/persist"
++)
++
++// BoundedEdgeReader is optional for legacy/custom Readers. Callers must return
++// unavailable when absent; an unbounded read plus slicing is not equivalent.
++type BoundedEdgeReader = persist.BoundedEdgeReader
++type EdgePageInput = persist.EdgePageInput
++
++var ErrBoundedEdgesUnsupported = errors.New("bounded edge queries unavailable on this graph reader")
+diff --git a/pkg/graph/valueflow/expand.go b/pkg/graph/valueflow/expand.go
+new file mode 100644
+index 00000000..56d1ad3e
+--- /dev/null
++++ b/pkg/graph/valueflow/expand.go
+@@ -0,0 +1,333 @@
++package valueflow
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"fmt"
++	"reflect"
++	"time"
++
++	"github.com/0xmhha/knowledge-system/pkg/graph/store"
++	"github.com/0xmhha/knowledge-system/pkg/graph/types"
++)
++
++type ExpansionLimits struct {
++	MaxFunctions  int `json:"max_functions"`
++	MaxHops       int `json:"max_hops"`
++	MaxCandidates int `json:"max_candidates"`
++	MaxTotalNodes int `json:"max_total_nodes"`
++	MaxTotalEdges int `json:"max_total_edges"`
++	MaxTotalFacts int `json:"max_total_facts"`
++	TimeoutMS     int `json:"timeout_ms"`
++}
++type ExpansionInput struct {
++	Function QueryInput      `json:"function"`
++	Limits   ExpansionLimits `json:"limits,omitempty"`
++}
++type ExpandedFunction struct {
++	Hop    int         `json:"hop"`
++	Result QueryResult `json:"result"`
++}
++type SymbolHop struct {
++	SourceNode      string `json:"source_node"`
++	TargetNode      string `json:"target_node"`
++	Relation        string `json:"relation"`
++	Origin          string `json:"origin"`
++	ArgumentMapping string `json:"argument_mapping"`
++	SourceFile      string `json:"source_file,omitempty"`
++	SourceLine      int    `json:"source_line,omitempty"`
++}
++type ExpansionResult struct {
++	SchemaVersion  int                `json:"schema_version"`
++	Status         string             `json:"status"`
++	SnapshotSHA256 string             `json:"snapshot_sha256,omitempty"`
++	Limits         ExpansionLimits    `json:"limits"`
++	Functions      []ExpandedFunction `json:"functions"`
++	Hops           []SymbolHop        `json:"hops"`
++	Candidates     int                `json:"candidates"`
++	Deduplicated   int                `json:"deduplicated"`
++	TotalNodes     int                `json:"total_nodes"`
++	TotalEdges     int                `json:"total_edges"`
++	TotalFacts     int                `json:"total_facts"`
++	StopReasons    []string           `json:"stop_reasons"`
++	Limitations    []string           `json:"limitations"`
++	ElapsedMicros  int64              `json:"elapsed_micros"`
++}
++
++func expansionLimits(o ExpansionLimits) (ExpansionLimits, error) {
++	defaults := ExpansionLimits{4, 1, 32, 2048, 8192, 131072, 1000}
++	requested := []*int{&o.MaxFunctions, &o.MaxHops, &o.MaxCandidates, &o.MaxTotalNodes, &o.MaxTotalEdges, &o.MaxTotalFacts, &o.TimeoutMS}
++	values := []int{defaults.MaxFunctions, defaults.MaxHops, defaults.MaxCandidates, defaults.MaxTotalNodes, defaults.MaxTotalEdges, defaults.MaxTotalFacts, defaults.TimeoutMS}
++	caps := []int{8, 3, 128, 4096, 16384, 262144, 5000}
++	for i, v := range requested {
++		if *v == 0 {
++			*v = values[i]
++		}
++		if *v < 1 || *v > caps[i] {
++			return o, fmt.Errorf("expansion limit outside supported bounds")
++		}
++	}
++	return o, nil
++}
++func DecodeExpansionInput(raw []byte) (ExpansionInput, error) {
++	var q ExpansionInput
++	if len(raw) > 8192 {
++		return q, fmt.Errorf("expansion input exceeds8KiB")
++	}
++	if e := validateInputObject(raw); e != nil {
++		return q, e
++	}
++	decoder := json.NewDecoder(bytes.NewReader(raw))
++	decoder.DisallowUnknownFields()
++	if e := decoder.Decode(&q); e != nil {
++		return q, e
++	}
++	var fields map[string]json.RawMessage
++	_ = json.Unmarshal(raw, &fields)
++	function, e := DecodeQueryInput(fields["function"])
++	if e != nil {
++		return q, e
++	}
++	q.Function = function
++	if field, ok := fields["limits"]; ok {
++		var values map[string]int
++		if e = json.Unmarshal(field, &values); e != nil {
++			return q, e
++		}
++		for _, v := range values {
++			if v < 1 {
++				return q, fmt.Errorf("explicit positive expansion limits required")
++			}
++		}
++	}
++	_, e = expansionLimits(q.Limits)
++	return q, e
++}
++
++// Expand composes distinct function-local computations through retained call
++// hops. A hop is never claimed as computed argument/return or memory transfer.
++func Expand(ctx context.Context, r store.Reader, q ExpansionInput) (out ExpansionResult, err error) {
++	started := time.Now()
++	defer func() { out.ElapsedMicros = time.Since(started).Microseconds() }()
++	o, e := expansionLimits(q.Limits)
++	if e != nil {
++		return out, e
++	}
++	if e = q.Function.validate(); e != nil {
++		return out, e
++	}
++	if ctx == nil || r == nil {
++		return out, fmt.Errorf("context and graph reader required")
++	}
++	out = ExpansionResult{SchemaVersion: 1, Status: "expanded_bounded", Limits: o, Functions: []ExpandedFunction{}, Hops: []SymbolHop{}, StopReasons: []string{}, Limitations: []string{"local_value_control_analysis_not_whole_program", "call_hops_not_computed_argument_or_return_transfer", "curated_flow_is_separate_operator_metadata", "memory_alias_external_effects_and_path_feasibility_unknown", "logical_fact_and_output_caps_not_process_memory_bounds", "deadline_cooperative_for_parser_typechecker_and_legacy_reader"}}
++	bounded, cancel := context.WithTimeout(ctx, time.Duration(o.TimeoutMS)*time.Millisecond)
++	defer cancel()
++	stop := func(reason string) {
++		out.Status = "budget_exhausted"
++		for _, s := range out.StopReasons {
++			if s == reason {
++				return
++			}
++		}
++		out.StopReasons = append(out.StopReasons, reason)
++	}
++	invalid := func(status, reason string) {
++		out.Status = status
++		out.Functions = []ExpandedFunction{}
++		out.Hops = []SymbolHop{}
++		out.StopReasons = []string{reason}
++	}
++	type pending struct {
++		input QueryInput
++		hop   int
++	}
++	queue := []pending{{q.Function, 0}}
++	seen := map[string]bool{}
++	seenCandidates := map[string]bool{}
++	// Re-read the exact consulted node/edge/blob records at the end, not only a
++	// manifest. A custom mutable reader must not mix intermediate snapshots.
++	retainedNodes := map[string]types.Node{}
++	retainedBlobs := map[string]string{}
++	pages := map[string][]types.Edge{}
++	pageMore := map[string]bool{}
++	pageInputs := map[string]store.EdgePageInput{}
++	var seedSnapshot string
++	for len(queue) > 0 {
++		if bounded.Err() != nil {
++			stop("deadline")
++			break
++		}
++		if len(out.Functions) >= o.MaxFunctions {
++			stop("functions")
++			break
++		}
++		item := queue[0]
++		queue = queue[1:]
++		if item.input.NodeID != "" && seen[item.input.NodeID] {
++			out.Deduplicated++
++			continue
++		}
++		remainingNodes := o.MaxTotalNodes - out.TotalNodes
++		remainingEdges := o.MaxTotalEdges - out.TotalEdges - len(out.Hops)
++		remainingFacts := o.MaxTotalFacts - out.TotalFacts
++		if min(remainingNodes, remainingEdges, remainingFacts) < 1 {
++			stop("aggregate_analysis")
++			break
++		}
++		opts, e := limits(item.input.Limits)
++		if e != nil {
++			return out, e
++		}
++		opts.MaxNodes = min(opts.MaxNodes, remainingNodes)
++		opts.MaxEdges = min(opts.MaxEdges, remainingEdges)
++		opts.MaxFacts = min(opts.MaxFacts, remainingFacts)
++		item.input.Limits = opts
++		if seedSnapshot != "" {
++			item.input.ExpectedSnapshotSHA256 = seedSnapshot
++		}
++		result, e := Query(bounded, r, item.input)
++		if e != nil {
++			return out, e
++		}
++		if result.Status == "snapshot_changed" || result.Status == "source_mismatch" {
++			invalid(result.Status, "source_or_snapshot_changed")
++			return out, nil
++		}
++		out.Functions = append(out.Functions, ExpandedFunction{item.hop, result})
++		if result.Analysis == nil {
++			if len(out.Functions) == 1 {
++				out.Status = result.Status
++			}
++			out.StopReasons = append(out.StopReasons, "function_"+result.Status)
++			continue
++		}
++		a := result.Analysis
++		id := a.Source.NodeID
++		seen[id] = true
++		if seedSnapshot == "" {
++			seedSnapshot = result.SnapshotSHA256
++			out.SnapshotSHA256 = seedSnapshot
++		}
++		out.TotalNodes += len(a.Nodes)
++		out.TotalEdges += len(a.Edges)
++		out.TotalFacts += a.FactsPeak
++		if a.Truncated {
++			stop("function_analysis")
++			break
++		}
++		nodes, e := r.NodesByIDs([]string{id})
++		if e != nil || len(nodes) != 1 {
++			invalid("snapshot_changed", "selected_node_unavailable")
++			return out, nil
++		}
++		retainedNodes[id] = nodes[0]
++		retainedBlobs[id] = a.Source.SHA256
++		if item.hop >= o.MaxHops {
++			out.StopReasons = append(out.StopReasons, "hop_boundary")
++			continue
++		}
++		edgesReader, ok := r.(store.BoundedEdgeReader)
++		if !ok {
++			out.Status = "partial"
++			out.StopReasons = append(out.StopReasons, "bounded_reader_unavailable")
++			continue
++		}
++		remainingCandidates := o.MaxCandidates - out.Candidates
++		if remainingCandidates < 1 {
++			stop("candidates")
++			break
++		}
++		request := store.EdgePageInput{NodeID: id, Direction: "outgoing", Types: []string{"calls", "invokes"}, Limit: min(remainingCandidates, 256)}
++		edges, more, e := edgesReader.IncidentEdges(bounded, request)
++		if e != nil {
++			if bounded.Err() != nil {
++				stop("deadline")
++			} else {
++				out.Status = "partial"
++				out.StopReasons = append(out.StopReasons, "bounded_edges_unavailable")
++			}
++			break
++		}
++		pages[id] = edges
++		pageMore[id] = more
++		pageInputs[id] = request
++		if more {
++			stop("candidates")
++		}
++		for _, edge := range edges {
++			if len(out.Hops)+out.TotalEdges >= o.MaxTotalEdges {
++				stop("aggregate_edges")
++				break
++			}
++			if edge.Src != id || (edge.Type != "calls" && edge.Type != "invokes") {
++				invalid("unavailable", "reader_edge_contract_invalid")
++				return out, nil
++			}
++			out.Hops = append(out.Hops, SymbolHop{id, edge.Dst, string(edge.Type), "retained_call_graph", "not_computed", edge.FilePath, edge.Line})
++			if seenCandidates[edge.Dst] || seen[edge.Dst] {
++				out.Deduplicated++
++				continue
++			}
++			seenCandidates[edge.Dst] = true
++			out.Candidates++
++			target, e := r.NodesByIDs([]string{edge.Dst})
++			if e != nil || len(target) != 1 {
++				out.StopReasons = append(out.StopReasons, "unresolved_call_target")
++				continue
++			}
++			retainedNodes[edge.Dst] = target[0]
++			if target[0].Type != types.NodeFunction && target[0].Type != types.NodeMethod {
++				out.StopReasons = append(out.StopReasons, "non_function_target")
++				continue
++			}
++			queue = append(queue, pending{QueryInput{NodeID: edge.Dst, Limits: q.Function.Limits}, item.hop + 1})
++		}
++	}
++	// Verification is part of the same budget. A missed deadline cannot certify
++	// a complete expansion, even when some earlier local calculations succeeded.
++	if bounded.Err() != nil {
++		stop("deadline")
++		return out, nil
++	}
++	if seedSnapshot != "" {
++		m, e := r.GetManifest()
++		if e != nil {
++			invalid("unavailable", "final_manifest_unavailable")
++			return out, nil
++		}
++		raw, e := json.Marshal(m)
++		if e != nil {
++			return out, e
++		}
++		if hashBytes(raw) != seedSnapshot {
++			invalid("snapshot_changed", "final_manifest_changed")
++			return out, nil
++		}
++	}
++	for id, expected := range retainedNodes {
++		nodes, e := r.NodesByIDs([]string{id})
++		if e != nil || len(nodes) != 1 || !reflect.DeepEqual(nodes[0], expected) {
++			invalid("snapshot_changed", "final_node_changed")
++			return out, nil
++		}
++	}
++	for id, expected := range retainedBlobs {
++		blob, e := r.GetBlob(id)
++		if e != nil || hashBytes(blob) != expected {
++			invalid("snapshot_changed", "final_blob_changed")
++			return out, nil
++		}
++	}
++	for id, expected := range pages {
++		edges, more, e := r.(store.BoundedEdgeReader).IncidentEdges(bounded, pageInputs[id])
++		if e != nil || more != pageMore[id] || !reflect.DeepEqual(edges, expected) {
++			invalid("snapshot_changed", "final_edge_page_changed")
++			return out, nil
++		}
++	}
++	if bounded.Err() != nil {
++		stop("deadline")
++	}
++	return out, nil
++}
+diff --git a/pkg/graph/valueflow/expand_test.go b/pkg/graph/valueflow/expand_test.go
+new file mode 100644
+index 00000000..ff86cb3d
+--- /dev/null
++++ b/pkg/graph/valueflow/expand_test.go
+@@ -0,0 +1,128 @@
++package valueflow
++
++import (
++	"context"
++	"path/filepath"
++	"strings"
++	"testing"
++
++	"github.com/0xmhha/knowledge-system/internal/graph/persist"
++	"github.com/0xmhha/knowledge-system/pkg/graph/store"
++	"github.com/0xmhha/knowledge-system/pkg/graph/types"
++)
++
++func expansionFixture(t *testing.T) persist.Store {
++	t.Helper()
++	s, e := persist.Open(filepath.Join(t.TempDir(), "graph.db"))
++	if e != nil {
++		t.Fatal(e)
++	}
++	t.Cleanup(func() { _ = s.Close() })
++	if e = s.Migrate(); e != nil {
++		t.Fatal(e)
++	}
++	for _, item := range []struct{ id, name, blob string }{{"a", "A", "func A(x int)int{return B(x)}"}, {"b", "B", "func B(x int)int{return C(x)+A(x)}"}, {"c", "C", "func C(x int)int{return x+1}"}, {"noise", "Noise", "func Noise()int{return 3}"}} {
++		blob := []byte(item.blob)
++		node := types.Node{ID: item.id, Name: item.name, QualifiedName: "p." + item.name, CanonicalID: "example.invalid/p." + item.name, Type: types.NodeFunction, Language: "go", FilePath: "p.go", StartLine: 1, EndLine: 1, EndByte: len(blob), Confidence: types.ConfExtracted}
++		if e = s.InsertNodes([]types.Node{node}); e != nil {
++			t.Fatal(e)
++		}
++		if e = s.InsertBlobs(map[string][]byte{node.ID: blob}); e != nil {
++			t.Fatal(e)
++		}
++	}
++	if e = s.InsertEdges([]types.Edge{{Src: "a", Dst: "b", Type: "calls", FilePath: "p.go", Line: 1, Confidence: types.ConfExtracted}, {Src: "a", Dst: "noise", Type: "calls", FilePath: "p.go", Line: 1, Confidence: types.ConfExtracted}, {Src: "b", Dst: "a", Type: "calls", FilePath: "p.go", Line: 1, Confidence: types.ConfExtracted}, {Src: "b", Dst: "c", Type: "calls", FilePath: "p.go", Line: 1, Confidence: types.ConfExtracted}}); e != nil {
++		t.Fatal(e)
++	}
++	if e = s.SetManifest(persist.Manifest{SchemaVersion: "1.24", SrcCommit: strings.Repeat("a", 40)}); e != nil {
++		t.Fatal(e)
++	}
++	return s
++}
++func TestExpansionLocalCalculationsCallHopsCycleAndNoiseAreDistinct(t *testing.T) {
++	s := expansionFixture(t)
++	out, e := Expand(context.Background(), s, ExpansionInput{Function: QueryInput{NodeID: "a"}, Limits: ExpansionLimits{MaxHops: 3, MaxFunctions: 8}})
++	if e != nil || out.Status != "expanded_bounded" || len(out.Functions) != 4 || out.Deduplicated < 1 {
++		t.Fatal(out, e)
++	}
++	seen := map[string]bool{}
++	for _, function := range out.Functions {
++		r := function.Result.Analysis
++		if r == nil || seen[r.Source.NodeID] || r.Source.SnapshotSHA256 != out.SnapshotSHA256 {
++			t.Fatal("mixed/duplicate local result")
++		}
++		seen[r.Source.NodeID] = true
++	}
++	for _, hop := range out.Hops {
++		if hop.Origin != "retained_call_graph" || hop.ArgumentMapping != "not_computed" {
++			t.Fatal("call hop relabelled data transfer", hop)
++		}
++	}
++	if !seen["noise"] {
++		t.Fatal("noise must remain visible, not implicitly labelled relevant")
++	}
++}
++func TestExpansionCapsStalePinsUnsupportedReaderAndCancellation(t *testing.T) {
++	s := expansionFixture(t)
++	for _, limit := range []ExpansionLimits{{MaxFunctions: 1}, {MaxCandidates: 1}, {MaxTotalNodes: 1}, {MaxTotalEdges: 1}, {MaxTotalFacts: 1}} {
++		out, e := Expand(context.Background(), s, ExpansionInput{Function: QueryInput{NodeID: "a"}, Limits: limit})
++		if e != nil || out.Status != "budget_exhausted" || len(out.StopReasons) == 0 || len(out.Functions) > out.Limits.MaxFunctions || out.Candidates > out.Limits.MaxCandidates || out.TotalNodes > out.Limits.MaxTotalNodes || out.TotalEdges+len(out.Hops) > out.Limits.MaxTotalEdges || out.TotalFacts > out.Limits.MaxTotalFacts {
++			t.Fatal(out, e)
++		}
++	}
++	out, e := Expand(context.Background(), s, ExpansionInput{Function: QueryInput{NodeID: "a", ExpectedSourceSHA256: strings.Repeat("b", 64)}})
++	if e != nil || out.Status != "source_mismatch" || len(out.Functions) != 0 {
++		t.Fatal(out, e)
++	}
++	out, e = Expand(context.Background(), struct{ store.Reader }{s}, ExpansionInput{Function: QueryInput{NodeID: "a"}})
++	if e != nil || out.Status != "partial" || len(out.Functions) != 1 {
++		t.Fatal(out, e)
++	}
++	ctx, cancel := context.WithCancel(context.Background())
++	cancel()
++	out, e = Expand(ctx, s, ExpansionInput{Function: QueryInput{NodeID: "a"}})
++	if e != nil || out.Status != "budget_exhausted" {
++		t.Fatal(out, e)
++	}
++}
++func TestExpansionDecoderExactIdentityAndStrictLimits(t *testing.T) {
++	good := `{"function":{"canonical_id":"example.invalid/p.A"},"limits":{"max_hops":2}}`
++	if _, e := DecodeExpansionInput([]byte(good)); e != nil {
++		t.Fatal(e)
++	}
++	for _, raw := range []string{`{}`, `{"function":{"node_id":"a","canonical_id":"p.A"}}`, `{"function":{"node_id":"a","node_id":"b"}}`, `{"function":{"node_id":"a"},"limits":{"max_hops":0}}`, `{"function":{"node_id":"a"},"limits":{"max_hops":1.1}}`, `{"function":{"node_id":"a"},"limits":{"max_hops":4}}`, `{"function":{"node_id":"a"},"unknown":true}`} {
++		if _, e := DecodeExpansionInput([]byte(raw)); e == nil {
++			t.Fatal("invalid expansion input accepted", raw)
++		}
++	}
++}
++
++type expansionPageDrift struct {
++	store.Reader
++	bounded store.BoundedEdgeReader
++	reads   map[string]int
++	mode    string
++}
++
++func (r *expansionPageDrift) IncidentEdges(ctx context.Context, q store.EdgePageInput) ([]types.Edge, bool, error) {
++	edges, more, e := r.bounded.IncidentEdges(ctx, q)
++	r.reads[q.NodeID]++
++	if r.reads[q.NodeID] > 1 && q.NodeID == "a" {
++		if r.mode == "more" {
++			more = !more
++		} else if len(edges) > 0 {
++			edges[0].Line++
++		}
++	}
++	return edges, more, e
++}
++func TestExpansionRechecksConsumedEdgesAndTruncationMarker(t *testing.T) {
++	for _, mode := range []string{"edge", "more"} {
++		s := expansionFixture(t)
++		reader := &expansionPageDrift{Reader: s, bounded: s.(store.BoundedEdgeReader), reads: map[string]int{}, mode: mode}
++		out, e := Expand(context.Background(), reader, ExpansionInput{Function: QueryInput{NodeID: "a"}})
++		if e != nil || out.Status != "snapshot_changed" || len(out.Functions) != 0 || len(out.Hops) != 0 {
++			t.Fatal("mixed expansion survived", out, e)
++		}
++	}
++}
+diff --git a/scripts/eval-structured-review.py b/scripts/eval-structured-review.py
+index 05ea5bf9..e7e83ae4 100644
+--- a/scripts/eval-structured-review.py
++++ b/scripts/eval-structured-review.py
+@@ -62,7 +62,7 @@ def main():
+   cks.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-structured-review','version':'1'}})
+   tools=cks.request('tools/list')['result']['tools'];(cksroot/'tools.json').write_bytes(encode(tools))
+   sys.path.insert(0,str(plugin/'scripts'));import suspect_labels
+-  contract_count=suspect_labels.check_contract(tools,plugin/'contracts/cks-tools.schema.json');require(contract_count==31,'consumer contract differs from actual tools')
++  contract_count=suspect_labels.check_contract(tools,plugin/'contracts/cks-tools.schema.json');require(contract_count==len(tools),'consumer contract differs from actual tools')
+   blob=node['source'].encode();require(blob in (source/'logic.go').read_bytes(),'retained function blob differs from compiled fixture')
+   rules_args={'rule_pack':'go-local-review@1.0.0','function':{'node_id':node['id'],'expected_commit':commit,'expected_source_sha256':sha(blob)}}
+   range_rules=cks.tool('rule_candidates',{'rule_pack':'go-local-review@1.0.0','function':{'node_id':repeat['id'],'expected_commit':commit,'expected_source_sha256':sha(repeat['source'].encode())}})
+diff --git a/scripts/eval-value-expansion.py b/scripts/eval-value-expansion.py
+new file mode 100644
+index 00000000..31d915fd
+--- /dev/null
++++ b/scripts/eval-value-expansion.py
+@@ -0,0 +1,50 @@
++#!/usr/bin/env python3
++"""Owned compiled call-cycle/noise corpus -> actual bounded CKS expansion.
++
++Independent symbol relevance denominators compare a local seed baseline with
++bounded call-context expansion. Does not certify interprocedural value transfer.
++"""
++from pathlib import Path
++import argparse,importlib.util,json,subprocess,time
++ROOT=Path(__file__).resolve().parents[1]
++spec=importlib.util.spec_from_file_location('value_probe',ROOT/'scripts/eval-value-dependencies.py');p=importlib.util.module_from_spec(spec);spec.loader.exec_module(p)
++SOURCE='''package fixture
++func Seed(x int)int { Noise();if x<0{return Cycle(x+1)};return Transform(x) }
++func Cycle(x int)int {if x<0{return Seed(x+1)};return Transform(x)}
++func Transform(x int)int{return Normalize(x)+1}
++func Normalize(x int)int{return x+2}
++func Noise()int{return 99}
++func Isolated(x int)int{return x*2}
++'''
++TEST='''package fixture
++import "testing"
++func TestIndependentCallAndValueContracts(t *testing.T){if Seed(2)!=5||Seed(-2)!=3||Cycle(-1)!=3||Transform(1)!=4||Normalize(1)!=3||Noise()!=99||Isolated(3)!=6{t.Fatal("fixture contract")}}
++'''
++def main():
++ parser=argparse.ArgumentParser();parser.add_argument('--binary',type=Path,required=True);parser.add_argument('--cks-binary',type=Path,required=True);parser.add_argument('--plugin-root',type=Path,required=True);parser.add_argument('--out',type=Path,required=True);args=parser.parse_args();root=args.out.resolve();p.require(not root.exists(),'fresh owned root required');root.mkdir();repo=root/'source';repo.mkdir()
++ def run(label,cmd,cwd=repo):
++  before=time.monotonic();out=subprocess.run(cmd,cwd=cwd,capture_output=True,timeout=150);(root/(label+'.stdout.txt')).write_bytes(out.stdout);(root/(label+'.stderr.txt')).write_bytes(out.stderr);(root/(label+'.receipt.json')).write_bytes(p.encode({'command':cmd,'exit_code':out.returncode,'elapsed_seconds':time.monotonic()-before}));p.require(out.returncode==0,'failed '+label);return out.stdout.decode().strip()
++ for name,text in {'go.mod':'module example.invalid/expansion-fixture\n\ngo 1.26.9\n','logic.go':SOURCE,'logic_test.go':TEST}.items():(repo/name).write_text(text)
++ run('format',['gofmt','-w','logic.go','logic_test.go']);run('git-init',['git','init','-q']);run('git-add',['git','add','.']);run('git-commit',['git','-c','user.name=Owned expansion fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','test: capture call cycle and value relevance conditions']);commit=run('git-head',['git','rev-parse','HEAD']);run('fixture-race',['go','test','-race','-count=1','./...']);run('fixture-vet',['go','vet','./...']);run('fixture-bundle',['git','bundle','create',str(root/'fixture.bundle'),'HEAD'])
++ graph=root/'graph';run('index',[str(args.binary.resolve()),'build','--src',str(repo),'--out',str(graph),'--lang','go'],root);ckgroot=root/'ckg';ckgroot.mkdir();ckg=p.Client(args.binary.resolve(),graph,ckgroot)
++ try:
++  ckg.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-expansion-selection','version':'1'}});found={}
++  for name in ('Seed','Cycle','Transform','Normalize','Noise','Isolated'):
++   nodes=ckg.tool('find_symbol',{'name':name,'exact':False,'include_blobs':True})['nodes'];p.require(len(nodes)==1,'ambiguous '+name);found[name]=nodes[0]
++ finally:ckg.close()
++ cksroot=root/'cks';cksroot.mkdir();policy=cksroot/'sanitization_rules.yaml';policy.write_bytes((ROOT/'system/policies/sanitization_rules.yaml').read_bytes());config=cksroot/'cks.yaml';config.write_text('version: 1\nname: owned-value-expansion\nbackends:\n  ckg:\n    path: '+str(graph/'graph.db')+'\n  ckv:\n    provider: mock\nlisten:\n  transport: stdio\nlogging:\n  level: error\nsanitize:\n  rules_path: '+str(policy)+'\n  default_action: drop\n  fail_closed_on_unknown_rule: true\n')
++ client=p.Client(None,None,cksroot,command=[str(args.cks_binary.resolve()),'mcp','--config',str(config)],namespace='cks.context.');checks=[]
++ try:
++  client.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-expansion-evaluator','version':'1'}});tools=client.request('tools/list')['result']['tools'];(cksroot/'tools.json').write_bytes(p.encode(tools));sys_path=args.plugin_root.resolve()/'scripts';import sys;sys.path.insert(0,str(sys_path));import suspect_labels;count=suspect_labels.check_contract(tools,args.plugin_root.resolve()/'contracts/cks-tools.schema.json');p.require(count==32,'consumer contract drift')
++  selected=found['Seed'];query={'node_id':selected['id'],'expected_commit':commit,'expected_source_sha256':p.sha(selected['source'].encode())};baseline=client.tool('value_dependencies',query);(root/'baseline.json').write_bytes(p.encode(baseline));expanded=client.tool('value_dependency_expansion',{'function':query,'limits':{'max_functions':8,'max_hops':3}});(root/'expanded.json').write_bytes(p.encode(expanded));result=expanded['graph'];p.require(result['status']=='expanded_bounded','bounded expansion incomplete: '+str(result['stop_reasons']));functions=result['functions'];ids=[f['result']['analysis']['source']['node_id']for f in functions];p.require(len(ids)==len(set(ids))==5 and result['deduplicated']>=1,'cycle/dedup or function counts wrong');p.require(all(f['result']['snapshot_sha256']==result['snapshot_sha256']for f in functions),'mixed snapshots');checks.append('unique source-pinned local analyses with cycle dedup')
++  p.require(all(h['origin']=='retained_call_graph'and h['argument_mapping']=='not_computed'for h in result['hops']),'call hop promoted to computed value transfer');p.require(expanded['curated_flow']['status']=='separate_not_joined'and expanded['curated_flow']['source_association']=='not_verified','curated operator data promoted to computed dependence');checks.append('call/value/control/curated provenance separation')
++  relevant={found[n]['id']for n in ('Seed','Cycle','Transform','Normalize')};baseline_ids={baseline['analysis']['source']['node_id']};chosen=set(ids);metrics={'fixture_relevant_symbols':4,'baseline_returned':len(baseline_ids),'baseline_recall':len(baseline_ids&relevant)/4,'expanded_returned':len(chosen),'expanded_recall':len(chosen&relevant)/4,'expanded_noise':len(chosen-relevant),'expanded_precision':len(chosen&relevant)/len(chosen),'baseline_elapsed_micros':baseline['elapsed_micros'],'expanded_elapsed_micros':result['elapsed_micros'],'scope':'independently compiled source relevance labels for this6-function fixture only; no whole-program optimality'};p.require(metrics['baseline_recall']==.25 and metrics['expanded_recall']==1 and metrics['expanded_noise']==1,'independent recall/noise denominator mismatch');checks.append('independent relevance recall noise cost comparison')
++  for name,limits in [('functions',{'max_functions':1}),('candidates',{'max_candidates':1}),('nodes',{'max_total_nodes':1}),('edges',{'max_total_edges':1}),('facts',{'max_total_facts':1})]:
++   value=client.tool('value_dependency_expansion',{'function':query,'limits':limits});(root/('cap-'+name+'.json')).write_bytes(p.encode(value));g=value['graph'];p.require(g['status']=='budget_exhausted'and g['stop_reasons'],'hidden '+name+' cap');checks.append(name+' budget')
++  isolated=client.tool('value_dependency_expansion',{'function':{'node_id':found['Isolated']['id']}});p.require(len(isolated['graph']['functions'])==1 and not isolated['graph']['hops'],'isolated function invented neighbors');checks.append('isolated negative')
++  bad=client.tool('value_dependency_expansion',{'function':{'node_id':selected['id'],'expected_source_sha256':'0'*64}});p.require(bad['graph']['status']=='source_mismatch'and not bad['graph']['functions'],'stale source published');checks.append('stale source refusal')
++  invalid=client.request('tools/call',{'name':'cks.context.value_dependency_expansion','arguments':{'function':query,'limits':{'max_hops':0}}});p.require('error'in invalid or invalid.get('result',{}).get('isError'),'bad limits accepted');checks.append('actual runtime input refusal')
++  (repo/'logic.go').unlink();again=client.tool('value_dependency_expansion',{'function':{**query,'expected_snapshot_sha256':result['snapshot_sha256']},'limits':{'max_functions':8,'max_hops':3}});p.require([f['result']['analysis']['source']for f in again['graph']['functions']]==[f['result']['analysis']['source']for f in functions],'live source fallback or unstable selection');checks.append('retained expansion after source deletion')
++ finally:client.close()
++ summary={'schema_version':1,'fixture_commit':commit,'checks':checks,'metrics':metrics,'cks_tools':count,'ckg_exit':ckg.proc.returncode,'cks_exit':client.proc.returncode,'cks_requests':client.id,'binary_sha256':p.sha(args.binary.read_bytes()),'cks_binary_sha256':p.sha(args.cks_binary.read_bytes()),'independent_acceptance':'not_recorded'};(root/'summary.json').write_bytes(p.encode(summary));print(json.dumps({'out':str(root),'checks':len(checks),'recall':metrics['expanded_recall'],'noise':metrics['expanded_noise'],'mcp_exit':client.proc.returncode}))
++if __name__=='__main__':main()
