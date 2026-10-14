@@ -14,8 +14,8 @@
 
 | 순서 | ID | 담당 | 구현·검증 상태 | 전체 목표/독립 수용 |
 |---|---|---|---|---|
-| 1 | WI-V1 | coding-agent | 구현·최종 검증 통과, 증거 커밋 대기 | 실제 host/체인·독립 수용 보류 |
-| 2 | WI-V2 | coding-agent | 대기 | 미완료/미수용 |
+| 1 | WI-V1 | coding-agent | 구현·controlled 실행/반례 검증 완료·증거 커밋 | 실제 host/체인·독립 수용 보류 |
+| 2 | WI-V2 | coding-agent | 후보·패널 계약 구체화 중 | 미완료/미수용 |
 | 3 | WI-3 | coding-agent+CKS | 대기 | 미완료/미수용 |
 | 4 | WI-4 | coding-agent+ChainBench | 대기 | 미완료/미수용 |
 | 5 | WI-1 | CKG | 대기 | 미완료/미수용 |
@@ -92,7 +92,7 @@
 
 각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
 
-현재: WI-V1 명세·구현 진행. 다음: WI-V2. 남은 이번 범위: WI-V1/V2/3/4/1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+현재: 구현·controlled 검증1/9, WI-V2 계약 구체화 중. 전체 목표의 독립 수용은0/9다. 다음: WI-V2 구현. 남은 이번 구현 범위: WI-V2/3/4/1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
 ## WI-V1 검증 기록
 
@@ -104,4 +104,14 @@ coding-agent 로컬 커밋 `5fd101e682b5d0286dbcd27fcd2b4a266bb7bc50`에 실행�
 - 검사는 actual subject의 committed snapshots에 한정한다. separate derivation/method는 확인한 fixture 구조이며 의미적 독립성·사람 수용·전 입력 정확도는 자동 증명하지 않는다.
 - 실제 Claude host·production chain·독립 사람 수용은 미실행이다. 필수 e2e에 실행 가능한 adapter가 없으면 완료를 차단한다. 이 연결의 실제 실행은 WI-4에서도 추적한다.
 
-증거를 커밋한 뒤에만 구현 완료 상태를 기록한다. 다음은 WI-V2다.
+증거 커밋 `e040fc288a5fb438d35c77ab5281eb7aefce9a68`의 packet을 Git object에서 재검증한 후 구현 완료 상태를 기록했다. [기계 판독 진행 원장](./UPPER-WORK-ITEMS-PROGRESS.json)은 evidence revision·manifest SHA·owner commit과 미수용 범위를 분리한다. 다음은 WI-V2다.
+
+## WI-V2 세부 계약: 다음 구현
+
+후보 생성은 Planner가 같은 증상·동결된 수용 조건에서 최소2개의 실제 수정안을 작성하는 단계다. 패널은 correctness/regression/maintainability 관점을 분리하고 근거 파일·판정·반대 의견을 기록한다. 런타임 검증기는 후보별 commit/oracle·실행된 metric의 근거를 검증하고 hard 부적격을 배제한다. 패널/지표의 자기 주장이나 단순 weighted sum을 최선의 증명으로 취급하지 않는다.
+
+- 후보마다 같은 frozen plan과 source baseline을 유지하고 source commit·diff·V1 실행 보고서를 결속한다.
+- 비교축/방향/단위/필수 여부·예산·패널 역할·합의 규칙을 후보 선택 전에 동결한다.
+- 측정되지 않은 값은 unknown이다. 부적격·불일치·동률·패널 disagreement·모두 기각은 selection 보류/기각을 반환한다.
+- 선택된 commit과 근거는 DESIGN→IMPLEMENTATION/EVALUATION 경로에 연결하고, 실제 구현/HEAD가 선택과 달라지면 재평가한다.
+- 다음 시험은 실제 같은 증상을 고치는2개 후보와 literal overfit/회귀 후보의 실행 비교, 근거 변조·기준 drift·동률·전부 기각 반례다.
