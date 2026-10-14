@@ -1,6 +1,6 @@
 현재 추가 요청: 서버 종료 보완4/4 완료.378호출 EOF 종료에서 임시 원문 트리 삭제 지연을 재현했고 검증된 archive 직접 읽기로 제거했다. 실측2세션756팩·질의/종료 오류0, Close11.1/10.9ms, EOF·대기/실행 SIGTERM 모두 exit0·강제 종료없음·reader lease 해제. 현재/커밋 SHA1839개와 기존 진행 guard PASS. workspace `bin/cks`도 실측 바이너리로 갱신했다. 이 요청의 남은 작업0개·다음 작업없음. [작업표](./GO-STABLENET-DATASET-COMPARISON.md), [완료 근거](../../system/eval/stablenet-shutdown-2026-10-14/completion.json).
 
-현재 진행 작업은 [상위 WI 구현 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 WI-V1→WI-V2→WI-3→WI-4→WI-1→WI-2→WI-C→WI-6→WI-SP다. 구현 검증3/9이며 WI-4 공개 실행·관찰 검증을 보존한 뒤 coding-agent 통합을 진행한다. 원장은 [기계 판독 진행표](./UPPER-WORK-ITEMS-PROGRESS.json)다. 아래 go-stablenet 데이터 생성·비교 기록은 이미 완료한 선행 작업이다. 일반 진행 보고에는 사용자가 별도로 보류한 출시 사항을 포함하지 않고, 요청한 데이터 작업의 진행·검증·다음 단계만 설명한다.
+현재 진행 작업은 [상위 WI 구현 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 WI-V1→WI-V2→WI-3→WI-4→WI-1→WI-2→WI-C→WI-6→WI-SP다. 구현 검증3/9이며 WI-4 공개 실행·소비자 전이 검증을 보존했다. 다음은 native fault/timeout/signal 및 최종 통합 replay다. 원장은 [기계 판독 진행표](./UPPER-WORK-ITEMS-PROGRESS.json)다. 아래 go-stablenet 데이터 생성·비교 기록은 이미 완료한 선행 작업이다. 일반 진행 보고에는 사용자가 별도로 보류한 출시 사항을 포함하지 않고, 요청한 데이터 작업의 진행·검증·다음 단계만 설명한다.
 
 [go-stablenet 비교 작업표](./GO-STABLENET-DATASET-COMPARISON.md)의 출처 매핑 수정·42질문 재평가·SNK06 검토는3/3 실행 완료다. 수정 데이터의756회 질의 오류0, 정상 pack 원문 검증 통과, 기존 SNK06 실패와 캡처 종료 오류2회 보존. 현재/커밋 SHA1833개와 기존 진행 guard PASS. 남은 요청 작업0개이며 근거는 진행 JSON을 따른다.
 
