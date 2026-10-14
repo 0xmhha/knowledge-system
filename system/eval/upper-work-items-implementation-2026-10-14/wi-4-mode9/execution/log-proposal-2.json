@@ -1,0 +1,27 @@
+{
+  "plan": {
+    "schema_version": 1,
+    "id": "owned-log-window-2",
+    "source": {
+      "commit": "f9f24b8d2b7a7d186401233fdbce59c405f280e5"
+    },
+    "probe_id": "read-probe",
+    "instrumentation_sha256": "3dc7c843c8b78fe6a97570f51317bf03ae7813dc88a982ce44a501b4e2d76153",
+    "event": "read-before-commit",
+    "sites": [
+      "main/read"
+    ],
+    "window_seconds": 2,
+    "poll_ms": 100,
+    "max_bytes": 65536,
+    "max_events": 32,
+    "anchors": [
+      {
+        "node": 1
+      }
+    ]
+  },
+  "workspace": "/tmp/w4log-jnw0iedz",
+  "binary": "/private/tmp/ks-wi4-mode9-final/probe-node",
+  "artifact_root": "/private/tmp/ks-wi4-mode9-final/window-2"
+}

@@ -1,0 +1,79 @@
+{
+  "plan": {
+    "schema_version": 1,
+    "id": "unreproduced-read",
+    "mode": "reproduction",
+    "symptom": "read before concurrent commit; no consensus claim",
+    "assertion_id": "unreproduced-read/assert/0",
+    "seed": "late-schedule",
+    "before": {
+      "commit": "02931c31e14a815c8e3d7018fac6eed730b0c2b7"
+    },
+    "after": null,
+    "repetitions": 3,
+    "min_completed": 3,
+    "min_symptom_failures": 1,
+    "max_failure_rate": 0.05,
+    "trial_timeout_seconds": 30,
+    "total_timeout_seconds": 120,
+    "owned_node_ids": [
+      "node1"
+    ],
+    "normal_assertion_ids": [
+      "unreproduced-read/assert/1"
+    ],
+    "injection": {
+      "kind": "delay",
+      "target": "node1",
+      "step": "unreproduced-read/step/1",
+      "min_delay_ms": 500,
+      "max_delay_ms": 500
+    },
+    "resume": null
+  },
+  "case": {
+    "schemaVersion": "1",
+    "id": "unreproduced-read",
+    "chain": {
+      "name": "stablenet",
+      "binary": "pinned"
+    },
+    "topology": {
+      "bp": 1
+    },
+    "steps": [
+      {
+        "read": {
+          "source": "balanceAt",
+          "on": "node1",
+          "address": "0x0000000000000000000000000000000000000001"
+        }
+      },
+      {
+        "read": {
+          "source": "chainId",
+          "on": "node1"
+        }
+      }
+    ],
+    "assertions": [
+      {
+        "assert": "balanceAt",
+        "on": "node1",
+        "address": "0x0000000000000000000000000000000000000002",
+        "compare": "Equal",
+        "expected": "1"
+      },
+      {
+        "assert": "chainId",
+        "on": "node1",
+        "compare": "Equal",
+        "expected": "8283"
+      }
+    ]
+  },
+  "binary_by_commit": {
+    "02931c31e14a815c8e3d7018fac6eed730b0c2b7": "/private/tmp/ks-wi4-mode9-final/base-node"
+  },
+  "artifact_root": "/tmp/w4lu-qnusun06"
+}

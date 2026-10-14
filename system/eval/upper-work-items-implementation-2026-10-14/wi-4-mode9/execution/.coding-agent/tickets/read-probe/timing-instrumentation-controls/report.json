@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "plan_sha256": "3dc7c843c8b78fe6a97570f51317bf03ae7813dc88a982ce44a501b4e2d76153",
+  "runner_sha256": "a40cf106441d30c58452cf4b42f2ab0d79f9ee3b36eba6c4f26b65d8b39eca4b",
+  "toolchain": "go version go1.26.9 darwin/arm64",
+  "trials": [
+    {
+      "source": "base",
+      "commit": "02931c31e14a815c8e3d7018fac6eed730b0c2b7",
+      "kind": "normal",
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "-json",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "base-normal.stdout.txt",
+      "stdout_sha256": "15582656b10af459b3558fc04ce0bd12bf00c4d5e9a06dc5eba2a313f824270b",
+      "stderr": "base-normal.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_ids": [
+        [
+          "example.invalid/owned-log-fixture",
+          "TestReadBeforeAndAfterActualCommit"
+        ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "source": "base",
+      "commit": "02931c31e14a815c8e3d7018fac6eed730b0c2b7",
+      "kind": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-json",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "base-race.stdout.txt",
+      "stdout_sha256": "96b47ddde9fba149ba5176281595ea0b41f8ab2beaa2dddd7a561862528e5919",
+      "stderr": "base-race.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_ids": [
+        [
+          "example.invalid/owned-log-fixture",
+          "TestReadBeforeAndAfterActualCommit"
+        ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "source": "base",
+      "commit": "02931c31e14a815c8e3d7018fac6eed730b0c2b7",
+      "kind": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "base-vet.stdout.txt",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "base-vet.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_ids": [],
+      "status": "PASS"
+    },
+    {
+      "source": "base",
+      "commit": "02931c31e14a815c8e3d7018fac6eed730b0c2b7",
+      "kind": "build",
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "base-build.stdout.txt",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "base-build.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_ids": [],
+      "status": "PASS"
+    },
+    {
+      "source": "probe",
+      "commit": "f9f24b8d2b7a7d186401233fdbce59c405f280e5",
+      "kind": "normal",
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "-json",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "probe-normal.stdout.txt",
+      "stdout_sha256": "094a08581ac8111569e8562336bb9946e1a54fd71ecd0ede3fddc992db065666",
+      "stderr": "probe-normal.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_ids": [
+        [
+          "example.invalid/owned-log-fixture",
+          "TestReadBeforeAndAfterActualCommit"
+        ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "source": "probe",
+      "commit": "f9f24b8d2b7a7d186401233fdbce59c405f280e5",
+      "kind": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-json",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "probe-race.stdout.txt",
+      "stdout_sha256": "077b1e52c5c6df3fb4d515d664bb410c96e5496a577ad220fcb286912c792216",
+      "stderr": "probe-race.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_ids": [
+        [
+          "example.invalid/owned-log-fixture",
+          "TestReadBeforeAndAfterActualCommit"
+        ]
+      ],
+      "status": "PASS"
+    },
+    {
+      "source": "probe",
+      "commit": "f9f24b8d2b7a7d186401233fdbce59c405f280e5",
+      "kind": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "probe-vet.stdout.txt",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "probe-vet.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_ids": [],
+      "status": "PASS"
+    },
+    {
+      "source": "probe",
+      "commit": "f9f24b8d2b7a7d186401233fdbce59c405f280e5",
+      "kind": "build",
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "probe-build.stdout.txt",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "probe-build.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_ids": [],
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS",
+  "errors": [],
+  "scope": "same frozen normal/race suite, build and vet at both source snapshots; no timing-neutrality proof",
+  "timing_neutrality": "not_proven",
+  "acceptance": "not_recorded"
+}

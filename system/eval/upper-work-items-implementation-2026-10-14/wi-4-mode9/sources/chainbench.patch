@@ -1,0 +1,1239 @@
+diff --git a/cmd/chainbench/experimentcmd/experiment.go b/cmd/chainbench/experimentcmd/experiment.go
+index 42df6da6..fefc1240 100644
+--- a/cmd/chainbench/experimentcmd/experiment.go
++++ b/cmd/chainbench/experimentcmd/experiment.go
+@@ -54,7 +54,7 @@ func New() *cobra.Command {
+ 	}}
+ 	prepare.Flags().StringVar(&prepareFile, "input", "", "JSON input with caller-selected commits and conditions")
+ 	_ = prepare.MarkFlagRequired("input")
+-	command.AddCommand(prepare)
++	command.AddCommand(prepare, logCommand())
+ 	var reportFile string
+ 	verify := &cobra.Command{Use: "verify", Short: "Verify raw experiment receipts and derived accounting", RunE: func(cmd *cobra.Command, _ []string) error {
+ 		f, e := os.Open(reportFile)
+diff --git a/cmd/chainbench/experimentcmd/logs.go b/cmd/chainbench/experimentcmd/logs.go
+new file mode 100644
+index 00000000..46021b7a
+--- /dev/null
++++ b/cmd/chainbench/experimentcmd/logs.go
+@@ -0,0 +1,83 @@
++package experimentcmd
++
++import (
++	"encoding/json"
++	"fmt"
++	"io"
++	"os"
++
++	"github.com/0xmhha/chainbench/internal/app"
++	"github.com/spf13/cobra"
++)
++
++func logCommand() *cobra.Command {
++	var file string
++	root := &cobra.Command{Use: "observe-logs", Short: "Watch frozen structured code logs without controlling nodes"}
++	decode := func() (app.LogObservationIn, error) {
++		raw, e := os.ReadFile(file)
++		if e != nil {
++			return app.LogObservationIn{}, e
++		}
++		return app.DecodeLogObservationInput(raw)
++	}
++	root.RunE = func(cmd *cobra.Command, _ []string) error {
++		in, e := decode()
++		if e != nil {
++			return e
++		}
++		r, e := app.ObserveTimingLogs(cmd.Context(), app.Deps{}, in)
++		if e != nil {
++			return e
++		}
++		if e = json.NewEncoder(cmd.OutOrStdout()).Encode(r); e != nil {
++			return e
++		}
++		if r.Verdict == "ERROR" {
++			return fmt.Errorf("log observation failed: %s", r.Reason)
++		}
++		return nil
++	}
++	root.Flags().StringVar(&file, "input", "", "frozen source/composition/log cursor input")
++	_ = root.MarkFlagRequired("input")
++	var proposal string
++	prepare := &cobra.Command{Use: "prepare", Short: "Freeze current source and complete-line log cursors without writes to the network", RunE: func(cmd *cobra.Command, _ []string) error {
++		file = proposal
++		in, e := decode()
++		if e != nil {
++			return e
++		}
++		in, e = app.PrepareLogObservation(cmd.Context(), app.Deps{}, in)
++		if e != nil {
++			return e
++		}
++		return json.NewEncoder(cmd.OutOrStdout()).Encode(in)
++	}}
++	prepare.Flags().StringVar(&proposal, "input", "", "proposed log observation input")
++	_ = prepare.MarkFlagRequired("input")
++	var reportFile string
++	verify := &cobra.Command{Use: "verify", Short: "Check retained raw log events and accounting", RunE: func(cmd *cobra.Command, _ []string) error {
++		f, e := os.Open(reportFile)
++		if e != nil {
++			return e
++		}
++		defer func() { _ = f.Close() }()
++		decoder := json.NewDecoder(io.LimitReader(f, 1<<20))
++		decoder.DisallowUnknownFields()
++		var report app.LogObservationReport
++		if e = decoder.Decode(&report); e != nil {
++			return e
++		}
++		if e = decoder.Decode(new(any)); e != io.EOF {
++			return fmt.Errorf("one report document required")
++		}
++		if e = app.VerifyLogObservationReport(report); e != nil {
++			return e
++		}
++		_, e = fmt.Fprintln(cmd.OutOrStdout(), "PASS")
++		return e
++	}}
++	verify.Flags().StringVar(&reportFile, "report", "", "recorded log report")
++	_ = verify.MarkFlagRequired("report")
++	root.AddCommand(prepare, verify)
++	return root
++}
+diff --git a/docs/dev/architecture/package-tree.md b/docs/dev/architecture/package-tree.md
+index 53257be7..f2adc4a8 100644
+--- a/docs/dev/architecture/package-tree.md
++++ b/docs/dev/architecture/package-tree.md
+@@ -24,11 +24,11 @@
+ 
+ | 묶음 | 패키지 | 줄 |
+ |---|---|---|
+-| `internal/` | 55 | 84,211 |
+-| `cmd/` | 20 | 5,747 |
++| `internal/` | 55 | 84,903 |
++| `cmd/` | 20 | 5,830 |
+ | `scripts/inventory/` | 3 | 790 |
+ | `tests/` | 1 | 135 |
+-| **합계** | **79** | **90,883** |
++| **합계** | **79** | **91,658** |
+ 
+ 이 묶음의 숫자는 `internal/arch/packagetree_test.go` 가 `go list ./...` 와 맞춰 본다. `layers.md` §3 의
+ 제목에 있던 개수가 43 에서 멈춰 실제 48 과 갈라져 있었기 때문에 — 개수는 사람이 세면 늦는다 —
+@@ -123,7 +123,7 @@ internal/validatorset 85  [L3] 체인의 합의 신원 제시 — 키셋에서 
+ 
+ ---
+ 
+-## 3. 자원 · 테스트 · 표면 — 18패키지 60,390줄
++## 3. 자원 · 테스트 · 표면 — 18패키지 61,082줄
+ 
+ ```
+ internal/preset    553  [L1] preset 문서 두 갈래의 정의와 로더 — 체인(`Chain`·`LoadChainPreset`)과
+@@ -148,21 +148,21 @@ internal/testhelper 5,893 [L3] DSL 내장 어휘 — 액션(sendTx·waitBlock·r
+                           registerContract·newAccount·faucet·partition/heal·start/stop/restart/swapNode·ws open/subscribe)
+                           과 어세션·리더의 구현 및 등록(Register·Registry) + 계정 해석(ResolveAccount)
+ 
+-internal/experiment 1,209 [L4] 동결된 타이밍·주입·관찰 반복 실행과 source pin·factual outcome·불확실성
++internal/experiment 1,592 [L4] 동결된 타이밍·주입·관찰 반복 실행과 source pin·factual outcome·불확실성
+ 
+-internal/testengine 6,237 [L4] 테스트 엔진 — RunSuite 가 4단계를 소유: ① DSL 이 선언한 체인을 chainsetup 으로 구성
++internal/testengine 6,388 [L4] 테스트 엔진 — RunSuite 가 4단계를 소유: ① DSL 이 선언한 체인을 chainsetup 으로 구성
+                           ② pre-test hook ③ test ④ post-test hook(②~④는 해석기가 spec 에서 수행).
+                           + attach 경로(AttachWorkspaceRun·NewAttachEngine) · Precheck · ValidateSpecs ·
+                           overlay 작성 · 노드 게이트 연결(factsFromReport) · 세션 요약
+ 
+-internal/chainsetup 12,340 [L4] 체인 셋업 오케스트레이터 — 선언을 이름 붙인 스텝 열로 바꿔 실행하고
++internal/chainsetup 12,374 [L4] 체인 셋업 오케스트레이터 — 선언을 이름 붙인 스텝 열로 바꿔 실행하고
+                           워크스페이스에 무엇을 했는지 기록한다. ChainNew·ChainKeys·ChainGenesis·ChainConfig·ChainAllocate·
+                           ChainProvision·ChainStart·ChainUp·ChainResume·ChainRestart·ChainStop·ChainRm·ChainStatus·ChainHealth·
+                           ChainLogs·ChainEnodes·ChainEndpoints·ChainLaunchOpts·ChainBaseline{Check,Approve}·
+                           ChainVerifyValidators·NodeStart/Stop/Swap·Hardfork{Plan,Execute}·
+                           재사용 판단(PlanReuse·ReconcileReuse·GenesisDeclared·WantOf)·실행 중 프로세스 실사
+ 
+-internal/chainsetup/verb 1,519 [L4] 셋업 동사 — 표면이 부르는 함수(ChainNew·ChainKeys·ChainGenesis·ChainConfig·ChainAllocate·
++internal/chainsetup/verb 1,537 [L4] 셋업 동사 — 표면이 부르는 함수(ChainNew·ChainKeys·ChainGenesis·ChainConfig·ChainAllocate·
+                           ChainProvision·ChainInit·ChainStart·ChainUp·ChainResume·ChainRestart·ChainStop·ChainRm·ChainStatus·
+                           ChainHealth·ChainLogs·ChainEnodes·ChainEndpoints·ChainLaunchOpts·NodeStart/Stop/Swap·
+                           Hardfork{Plan,Execute}·ChainCrossFork)과 그것들을 몰고 가는 상태 기계(composition 표·
+@@ -173,15 +173,15 @@ internal/nodemonitor  412 [L4] 테스트 실행 허가 판정 + 제한 복구(E6
+                           WAITABLE 은 예산까지 대기 · RESTARTABLE 은 상한까지 재시작 · FATAL 은 파괴적 조치 없이 종료(Gate).
+                           관측과 재시작은 재구현하지 않고 seam(Observer·Restarter)으로 주입받는다
+ 
+-internal/app      17,135  [L5] 유스케이스 1개 = 함수 1개. cobra·MCP 타입을 모른다. Net*(20여) · Keyring*(8) ·
++internal/app      17,175  [L5] 유스케이스 1개 = 함수 1개. cobra·MCP 타입을 모른다. Net*(20여) · Keyring*(8) ·
+                           Tx/Contract(TxSend·TxWait·ContractDeploy·ContractCall) · Faucet · Report · Log* ·
+                           Network*(attach/detach/registry) · Upgrade{Run,Genesis} · Hardfork{Plan,Execute} ·
+                           RunSuite(s) · Verify* · Capabilit* · Resolve*(binary·chain·key·nodes·server) · GCSessions
+-internal/feature     540  [L5] 기능 등록의 한 자리 — Descriptor·Register[In,Out]·Stage·ReadOnly, 그리고 입력 struct
++internal/feature     543  [L5] 기능 등록의 한 자리 — Descriptor·Register[In,Out]·Stage·ReadOnly, 그리고 입력 struct
+                           태그 하나가 만드는 두 바인딩(Flags → cobra 플래그, Schema → MCP JSON 스키마).
+                           명령을 생성하지는 않는다 — 이름·계층·도움말은 사람이 정한다
+ 
+-internal/mcp       3,161  [L6] MCP 표면(요구 14) — 도구 스키마 바인딩과 렌더링.
++internal/mcp       3,224  [L6] MCP 표면(요구 14) — 도구 스키마 바인딩과 렌더링.
+                           chain·network·keyring·capability·run·log·tx·consensus 도구군 + read-only 선언
+ internal/dashboard 2,351  [L6] 대시보드 HTTP 백엔드(요구 19) — SSE 스트림 · runs/sessions API · SPA 자산
+ internal/webcli     123  [L6] Web이 chainbench CLI를 하위 프로세스로 실행하는 곳 — 바이너리를 찾고,
+@@ -195,7 +195,7 @@ internal/testsupport  26  [L0] 교차 패키지 테스트 게이트 — ServersB
+ 
+ ---
+ 
+-## 4. `cmd/` — 20패키지 5,747줄 · [L6] 표면
++## 4. `cmd/` — 20패키지 5,830줄 · [L6] 표면
+ 
+ `layers.md` §3 의 배치 검사는 `internal/` 만 대상으로 한다 — `cmd` 는 정의상 최상위이고 무엇이든
+ import 할 수 있다.
+@@ -212,7 +212,7 @@ cmd/chainbench           310  main. 사용자용 CLI(요구 15) 루트 조립
+ ├── nodecmd              178  네트워크의 노드 1개 — 개별 start/stop, RPC 대화
+ ├── suitecmd             675  테스트 스펙 실행 — run(스펙이 선언한 네트워크를 구성 또는 attach 후 실행)·
+ │                             validate(실행 없이 검사)·migrate-spec(v1 → v2)
+-├── experimentcmd       86  동결된 타이밍·장애·관찰 조사 공개 실행
++├── experimentcmd      169  동결된 타이밍·장애·관찰 조사 공개 실행
+ ├── testcmd               65  디렉토리의 DSL 테스트 케이스 목록 — run 전에 무엇이 있는지 발견
+ ├── txcmd                212  체인에 일을 맡기고 결과를 기다리기 — send·wait·deploy·call
+ ├── accountcmd           177  노드나 체인이 아니라 ACCOUNT 에 가하는 것 — 상태 읽기, 자금 공급
+diff --git a/internal/app/experiment_input.go b/internal/app/experiment_input.go
+index 0216080b..87a599ad 100644
+--- a/internal/app/experiment_input.go
++++ b/internal/app/experiment_input.go
+@@ -70,3 +70,22 @@ func experimentJSONValue(d *json.Decoder, depth int) error {
+ 	_, e = d.Token()
+ 	return e
+ }
++
++// DecodeLogObservationInput shares the strict token boundary with experiments.
++func DecodeLogObservationInput(raw []byte) (LogObservationIn, error) {
++	var in LogObservationIn
++	if len(raw) > 1024*1024 {
++		return in, fmt.Errorf("log input byte budget exceeded")
++	}
++	tokens := json.NewDecoder(bytes.NewReader(raw))
++	if e := experimentJSONValue(tokens, 0); e != nil {
++		return in, e
++	}
++	if _, e := tokens.Token(); e != io.EOF {
++		return in, fmt.Errorf("one log input document required")
++	}
++	d := json.NewDecoder(bytes.NewReader(raw))
++	d.DisallowUnknownFields()
++	err := d.Decode(&in)
++	return in, err
++}
+diff --git a/internal/app/log_observation.go b/internal/app/log_observation.go
+new file mode 100644
+index 00000000..311a793c
+--- /dev/null
++++ b/internal/app/log_observation.go
+@@ -0,0 +1,21 @@
++package app
++
++import (
++	"context"
++	"github.com/0xmhha/chainbench/internal/experiment"
++	"github.com/0xmhha/chainbench/internal/testengine"
++)
++
++type LogObservationIn = testengine.LogObservationIn
++type LogObservationReport = experiment.LogWatchReport
++
++func PrepareLogObservation(ctx context.Context, d Deps, in LogObservationIn) (LogObservationIn, error) {
++	return testengine.PrepareLogObservation(ctx, d.chainsetupDeps(), in)
++}
++func ObserveTimingLogs(ctx context.Context, d Deps, in LogObservationIn) (LogObservationReport, error) {
++	return testengine.ObserveTimingLogs(ctx, d.chainsetupDeps(), in)
++}
++
++func VerifyLogObservationReport(report LogObservationReport) error {
++	return experiment.VerifyLogWatchReport(report)
++}
+diff --git a/internal/chainsetup/log_window.go b/internal/chainsetup/log_window.go
+new file mode 100644
+index 00000000..414fb7b3
+--- /dev/null
++++ b/internal/chainsetup/log_window.go
+@@ -0,0 +1,33 @@
++package chainsetup
++
++import (
++	"context"
++	"fmt"
++	"github.com/0xmhha/chainbench/internal/resource"
++)
++
++// LogWindow reads a bounded immutable snapshot of one recorded node's log via
++// the same opener that owns its actual machine. The caller supplies no path.
++func (w *Workspace) LogWindow(ctx context.Context, index, limit int) (resource.LogSnapshot, error) {
++	if e := w.allow("LogWindow"); e != nil {
++		return resource.LogSnapshot{}, e
++	}
++	for _, node := range w.state.Nodes {
++		if node.Index != index {
++			continue
++		}
++		access, e := w.machineFor(node)
++		if e != nil {
++			return resource.LogSnapshot{}, e
++		}
++		out, e := w.opener().Read(ctx, resource.ReadRequest{Target: access.Spec, Log: &resource.LogRead{Path: node.LogPath, Offset: 0, Limit: limit}})
++		if e != nil {
++			return resource.LogSnapshot{}, e
++		}
++		if out.LogMissing || out.Log == nil {
++			return resource.LogSnapshot{}, fmt.Errorf("recorded node log unavailable")
++		}
++		return *out.Log, nil
++	}
++	return resource.LogSnapshot{}, fmt.Errorf("recorded node index unavailable")
++}
+diff --git a/internal/chainsetup/verb/log_window.go b/internal/chainsetup/verb/log_window.go
+new file mode 100644
+index 00000000..a0c59853
+--- /dev/null
++++ b/internal/chainsetup/verb/log_window.go
+@@ -0,0 +1,18 @@
++package verb
++
++import (
++	"context"
++	"github.com/0xmhha/chainbench/internal/chainsetup"
++	"github.com/0xmhha/chainbench/internal/resource"
++)
++
++// ChainLogWindow is a read of only the log path the composition recorded.
++func ChainLogWindow(ctx context.Context, d chainsetup.Deps, workspace string, node, limit int) (resource.LogSnapshot, error) {
++	ws, e := chainsetup.Open(workspace, d.Clock)
++	if e != nil {
++		return resource.LogSnapshot{}, e
++	}
++	ws.SetEnv(d.Env)
++	ws.SetServerLookup(d.ServerLookup)
++	return ws.LogWindow(ctx, node, limit)
++}
+diff --git a/internal/chainsetup/verb_needs.go b/internal/chainsetup/verb_needs.go
+index d41877ba..68c7e5ea 100644
+--- a/internal/chainsetup/verb_needs.go
++++ b/internal/chainsetup/verb_needs.go
+@@ -118,6 +118,7 @@ var verbNeeds = map[string]verbNeed{
+ 	"Hardfork":         {run: placed, node: []nodeNeed{launched}, nodeAll: true},
+ 	"VerifyValidators": {run: placed},
+ 	"RuntimePins":      {run: placed},
++	"LogWindow":        {run: placed},
+ 
+ 	// Destructive.
+ 	"Rm": {run: stopped},
+diff --git a/internal/experiment/log_monitor.go b/internal/experiment/log_monitor.go
+new file mode 100644
+index 00000000..eb98d4a0
+--- /dev/null
++++ b/internal/experiment/log_monitor.go
+@@ -0,0 +1,308 @@
++package experiment
++
++import (
++	"bytes"
++	"context"
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"errors"
++	"fmt"
++	"io"
++	"time"
++)
++
++const TracePrefix = "KS_TIMING_V1 "
++
++type TraceRecord struct {
++	SchemaVersion int            `json:"schema_version"`
++	ProbeID       string         `json:"probe_id"`
++	Event         string         `json:"event"`
++	Site          string         `json:"site"`
++	Symptom       bool           `json:"symptom"`
++	Values        map[string]any `json:"values"`
++}
++type LogAnchor struct {
++	Node    int    `json:"node"`
++	ID      uint64 `json:"id"`
++	Initial []byte `json:"initial"`
++}
++type LogWatchPlan struct {
++	SchemaVersion         int         `json:"schema_version"`
++	ID                    string      `json:"id"`
++	Source                Source      `json:"source"`
++	ProbeID               string      `json:"probe_id"`
++	InstrumentationSHA256 string      `json:"instrumentation_sha256"`
++	Event                 string      `json:"event"`
++	Sites                 []string    `json:"sites"`
++	WindowSeconds         int         `json:"window_seconds"`
++	PollMS                int         `json:"poll_ms"`
++	MaxBytes              int         `json:"max_bytes"`
++	MaxEvents             int         `json:"max_events"`
++	Anchors               []LogAnchor `json:"anchors"`
++}
++type LogReadFrame struct {
++	ID   uint64
++	Size int64
++	Data []byte
++}
++type LogWatchBackend interface {
++	Identity(context.Context) (Source, error)
++	Read(context.Context, int, int) (LogReadFrame, error)
++}
++type TraceObservation struct {
++	Node       int         `json:"node"`
++	Offset     int         `json:"offset"`
++	Raw        []byte      `json:"raw"`
++	SHA256     string      `json:"sha256"`
++	Record     TraceRecord `json:"record"`
++	ObservedAt time.Time   `json:"observed_at"`
++}
++type LogWatchReport struct {
++	SchemaVersion   int                `json:"schema_version"`
++	Plan            LogWatchPlan       `json:"plan"`
++	PlanSHA256      string             `json:"plan_sha256"`
++	Events          []TraceObservation `json:"events"`
++	Polls           int                `json:"polls"`
++	StartedAt       time.Time          `json:"started_at"`
++	FinishedAt      time.Time          `json:"finished_at"`
++	Verdict         string             `json:"verdict"`
++	Reason          string             `json:"reason"`
++	ResumeRequested bool               `json:"resume_requested"`
++	Acceptance      string             `json:"acceptance"`
++}
++
++func (p LogWatchPlan) Validate() error {
++	if p.SchemaVersion != 1 || p.ID == "" || len(p.ID) > 128 || p.ProbeID == "" || len(p.ProbeID) > 128 || p.Event == "" || len(p.Event) > 128 || !validHash(p.InstrumentationSHA256, 64) || p.WindowSeconds < 1 || p.WindowSeconds > 3600 || p.PollMS < 50 || p.PollMS > 5000 || p.MaxBytes < 4096 || p.MaxBytes > 65536 || p.MaxEvents < 1 || p.MaxEvents > 256 || len(p.Anchors) < 1 || len(p.Anchors) > 8 || len(p.Sites) < 1 || len(p.Sites) > 32 {
++		return fmt.Errorf("invalid bounded log watch plan")
++	}
++	if p.Source.DriverSHA256 != p.InstrumentationSHA256 {
++		return fmt.Errorf("instrumentation/source pin differs")
++	}
++	seenSites := map[string]bool{}
++	for _, site := range p.Sites {
++		if len(site) == 0 || len(site) > 256 || seenSites[site] {
++			return fmt.Errorf("site budget exceeded")
++		}
++		seenSites[site] = true
++	}
++	if e := p.Source.validate(); e != nil {
++		return e
++	}
++	seen := map[int]bool{}
++	for _, a := range p.Anchors {
++		if a.Node < 1 || a.Node > 32 || a.ID == 0 || seen[a.Node] || len(a.Initial) > p.MaxBytes || len(a.Initial) > 0 && a.Initial[len(a.Initial)-1] != '\n' {
++			return fmt.Errorf("invalid complete-line initial log anchor")
++		}
++		seen[a.Node] = true
++	}
++	return nil
++}
++func traceDigest(raw []byte) string { h := sha256.Sum256(raw); return hex.EncodeToString(h[:]) }
++func parseTrace(raw []byte) (TraceRecord, error) {
++	var out TraceRecord
++	i := bytes.Index(raw, []byte(TracePrefix))
++	if i < 0 {
++		return out, fmt.Errorf("trace prefix missing")
++	}
++	if len(raw) > 4096 {
++		return out, fmt.Errorf("trace line budget exceeded")
++	}
++	body := raw[i+len(TracePrefix):]
++	if e := strictTraceJSON(body); e != nil {
++		return out, e
++	}
++	var fields map[string]json.RawMessage
++	if e := json.Unmarshal(body, &fields); e != nil {
++		return out, e
++	}
++	for _, key := range []string{"schema_version", "probe_id", "event", "site", "symptom", "values"} {
++		if len(fields[key]) == 0 || bytes.Equal(fields[key], []byte("null")) {
++			return out, fmt.Errorf("explicit trace fields required")
++		}
++	}
++	decoder := json.NewDecoder(bytes.NewReader(raw[i+len(TracePrefix):]))
++	decoder.DisallowUnknownFields()
++	if e := decoder.Decode(&out); e != nil {
++		return out, e
++	}
++	if e := decoder.Decode(new(any)); e != io.EOF {
++		return out, fmt.Errorf("trailing trace document")
++	}
++	if out.SchemaVersion != 1 || out.ProbeID == "" || out.Event == "" || out.Site == "" || out.Values == nil || len(out.Values) > 16 {
++		return out, fmt.Errorf("invalid trace record")
++	}
++	return out, nil
++}
++func WatchLogs(ctx context.Context, p LogWatchPlan, b LogWatchBackend) (out LogWatchReport, err error) {
++	if e := p.Validate(); e != nil {
++		return out, e
++	}
++	if b == nil {
++		return out, fmt.Errorf("log backend missing")
++	}
++	raw, _ := json.Marshal(p)
++	_ = json.Unmarshal(raw, &p)
++	started := time.Now()
++	out = LogWatchReport{SchemaVersion: 1, Plan: p, PlanSHA256: traceDigest(raw), Events: []TraceObservation{}, StartedAt: started.UTC(), Verdict: "AWAITING_OBSERVATION", Acceptance: "not_recorded"}
++	defer func() { out.FinishedAt = time.Now().UTC() }()
++	fail := func(reason string) (LogWatchReport, error) {
++		out.Verdict = "ERROR"
++		out.Reason = reason
++		out.ResumeRequested = false
++		return out, nil
++	}
++	deadline := started.Add(time.Duration(p.WindowSeconds) * time.Second)
++	watched, cancel := context.WithDeadline(ctx, deadline)
++	defer cancel()
++	windowEnded := func(e error) bool {
++		return ctx.Err() == nil && watched.Err() == context.DeadlineExceeded && errors.Is(e, context.DeadlineExceeded)
++	}
++	prefixes := map[int][]byte{}
++	offsets := map[int]int{}
++	for _, a := range p.Anchors {
++		prefixes[a.Node] = append([]byte(nil), a.Initial...)
++		offsets[a.Node] = len(a.Initial)
++	}
++	for {
++		if ctx.Err() != nil {
++			return fail("observation_cancelled")
++		}
++		if time.Until(deadline) <= 0 {
++			out.Reason = "window_finished"
++			return out, nil
++		}
++		identity, e := b.Identity(watched)
++		if windowEnded(e) && out.Polls > 0 {
++			out.Reason = "window_finished"
++			return out, nil
++		}
++		if e != nil || identity != p.Source {
++			return fail("actual_source_environment_changed")
++		}
++		out.Polls++
++		for _, anchor := range p.Anchors {
++			frame, e := b.Read(watched, anchor.Node, p.MaxBytes+1)
++			if windowEnded(e) {
++				out.Reason = "window_finished"
++				return out, nil
++			}
++			if e != nil {
++				return fail("log_read_failed")
++			}
++			old := prefixes[anchor.Node]
++			if frame.ID != anchor.ID || frame.Size < int64(len(old)) || len(frame.Data) < len(old) || !bytes.Equal(frame.Data[:len(old)], old) {
++				return fail("log_rotation_truncation_or_mutation")
++			}
++			if len(frame.Data) > p.MaxBytes || frame.Size > int64(p.MaxBytes) {
++				return fail("log_byte_budget_exhausted")
++			}
++			cursor := offsets[anchor.Node]
++			for cursor < len(frame.Data) {
++				next := bytes.IndexByte(frame.Data[cursor:], '\n')
++				if next < 0 {
++					break
++				}
++				line := frame.Data[cursor : cursor+next]
++				start := cursor
++				cursor += next + 1
++				if !bytes.Contains(line, []byte(TracePrefix)) {
++					continue
++				}
++				record, e := parseTrace(line)
++				if e != nil {
++					return fail("malformed_trace_record")
++				}
++				if record.ProbeID != p.ProbeID {
++					continue
++				}
++				if !contains(p.Sites, record.Site) {
++					return fail("trace_site_not_frozen")
++				}
++				if len(out.Events) >= p.MaxEvents {
++					return fail("event_budget_exhausted")
++				}
++				out.Events = append(out.Events, TraceObservation{Node: anchor.Node, Offset: start, Raw: append([]byte(nil), line...), SHA256: traceDigest(line), Record: record, ObservedAt: time.Now().UTC()})
++				if record.Event == p.Event && record.Symptom {
++					if time.Until(deadline) <= 0 {
++						return fail("event_outside_window")
++					}
++					final, e := b.Identity(watched)
++					if e != nil || final != p.Source {
++						return fail("event_source_environment_changed")
++					}
++					out.Verdict = "RECURRED"
++					out.Reason = "structured_symptom_log_observed"
++					out.ResumeRequested = true
++					return out, nil
++				}
++			}
++			offsets[anchor.Node] = cursor
++			prefixes[anchor.Node] = append([]byte(nil), frame.Data...)
++		}
++		wait := time.Duration(p.PollMS) * time.Millisecond
++		if remaining := time.Until(deadline); remaining < wait {
++			wait = remaining
++		}
++		timer := time.NewTimer(wait)
++		select {
++		case <-ctx.Done():
++			timer.Stop()
++			return fail("observation_cancelled")
++		case <-timer.C:
++		}
++	}
++}
++
++func strictTraceJSON(raw []byte) error {
++	d := json.NewDecoder(bytes.NewReader(raw))
++	var consume func(int) error
++	consume = func(depth int) error {
++		if depth > 16 {
++			return fmt.Errorf("trace nesting budget exceeded")
++		}
++		value, e := d.Token()
++		if e != nil {
++			return e
++		}
++		delimiter, ok := value.(json.Delim)
++		if !ok {
++			return nil
++		}
++		switch delimiter {
++		case '{':
++			seen := map[string]bool{}
++			for d.More() {
++				key, e := d.Token()
++				if e != nil {
++					return e
++				}
++				name, ok := key.(string)
++				if !ok || seen[name] {
++					return fmt.Errorf("duplicate trace key")
++				}
++				seen[name] = true
++				if e = consume(depth + 1); e != nil {
++					return e
++				}
++			}
++		case '[':
++			for d.More() {
++				if e = consume(depth + 1); e != nil {
++					return e
++				}
++			}
++		default:
++			return fmt.Errorf("unexpected trace delimiter")
++		}
++		_, e = d.Token()
++		return e
++	}
++	if e := consume(0); e != nil {
++		return e
++	}
++	if _, e := d.Token(); e != io.EOF {
++		return fmt.Errorf("one trace document required")
++	}
++	return nil
++}
+diff --git a/internal/experiment/log_monitor_test.go b/internal/experiment/log_monitor_test.go
+new file mode 100644
+index 00000000..e8a768c9
+--- /dev/null
++++ b/internal/experiment/log_monitor_test.go
+@@ -0,0 +1,221 @@
++package experiment
++
++import (
++	"context"
++	"encoding/json"
++	"fmt"
++	"strings"
++	"testing"
++	"time"
++)
++
++type logBackend struct {
++	source Source
++	frames []LogReadFrame
++	reads  int
++	drift  bool
++}
++
++func (b *logBackend) Identity(context.Context) (Source, error) {
++	out := b.source
++	if b.drift && b.reads > 0 {
++		out.Commit = strings.Repeat("9", 40)
++	}
++	return out, nil
++}
++func (b *logBackend) Read(context.Context, int, int) (LogReadFrame, error) {
++	index := b.reads
++	b.reads++
++	if index >= len(b.frames) {
++		index = len(b.frames) - 1
++	}
++	return b.frames[index], nil
++}
++func logPlan() LogWatchPlan {
++	s := frozenPlan().Before
++	s.DriverSHA256 = strings.Repeat("3", 64)
++	return LogWatchPlan{SchemaVersion: 1, ID: "log-observe", Source: s, ProbeID: "probe", InstrumentationSHA256: strings.Repeat("3", 64), Event: "read", Sites: []string{"Read/before"}, WindowSeconds: 1, PollMS: 50, MaxBytes: 4096, MaxEvents: 4, Anchors: []LogAnchor{{Node: 1, ID: 1, Initial: []byte("boot\n")}}}
++}
++func logLine(symptom bool) []byte {
++	raw, _ := json.Marshal(TraceRecord{SchemaVersion: 1, ProbeID: "probe", Event: "read", Site: "Read/before", Symptom: symptom, Values: map[string]any{"value": 0}})
++	return append(append([]byte(TracePrefix), raw...), '\n')
++}
++func frame(data []byte) LogReadFrame { return LogReadFrame{ID: 1, Size: int64(len(data)), Data: data} }
++func TestStructuredLogRecurrenceRequiresFrozenSourceAndSite(t *testing.T) {
++	p := logPlan()
++	raw := append([]byte("boot\n"), logLine(true)...)
++	b := &logBackend{source: p.Source, frames: []LogReadFrame{frame(raw)}}
++	r, e := WatchLogs(context.Background(), p, b)
++	if e == nil {
++		e = VerifyLogWatchReport(r)
++	}
++	if e != nil || r.Verdict != "RECURRED" || !r.ResumeRequested || r.Acceptance != "not_recorded" || len(r.Events) != 1 || r.Events[0].SHA256 != traceDigest(r.Events[0].Raw) {
++		t.Fatalf("verdict=%s reason=%s events=%d error=%v", r.Verdict, r.Reason, len(r.Events), e)
++	}
++}
++func TestLogMutationRotationMalformedAndBoundErrorsCannotResume(t *testing.T) {
++	for _, mode := range []string{"rewrite", "rotate", "source", "malformed", "site", "budget", "partial_mutation"} {
++		t.Run(mode, func(t *testing.T) {
++			p := logPlan()
++			data := append([]byte("boot\n"), logLine(true)...)
++			f := frame(data)
++			b := &logBackend{source: p.Source, frames: []LogReadFrame{f}}
++			switch mode {
++			case "rewrite":
++				f.Data[0] = 'X'
++				b.frames[0] = f
++			case "rotate":
++				f.ID = 2
++				b.frames[0] = f
++			case "source":
++				b.drift = true
++			case "malformed":
++				b.frames = []LogReadFrame{frame([]byte("boot\nKS_TIMING_V1 {bad}\n"))}
++			case "site":
++				b.frames = []LogReadFrame{frame([]byte(strings.Replace(string(data), "Read/before", "Unknown/site", 1)))}
++			case "budget":
++				p.MaxEvents = 1
++				b.frames = []LogReadFrame{frame(append(append([]byte("boot\n"), logLine(false)...), logLine(true)...))}
++			case "partial_mutation":
++				b.frames = []LogReadFrame{frame([]byte("boot\nKS_TIMING_V1 {\"symptom\":false")), frame(data)}
++			}
++			r, e := WatchLogs(context.Background(), p, b)
++			if e == nil {
++				e = VerifyLogWatchReport(r)
++			}
++			if e != nil || r.Verdict != "ERROR" || r.ResumeRequested {
++				t.Fatalf("verdict=%s reason=%s events=%d error=%v", r.Verdict, r.Reason, len(r.Events), e)
++			}
++		})
++	}
++}
++func TestLogPartialLineIsNotEventUntilCompleted(t *testing.T) {
++	p := logPlan()
++	line := logLine(true)
++	first := append([]byte("boot\n"), line[:len(line)-1]...)
++	complete := append(append([]byte(nil), first...), '\n')
++	b := &logBackend{source: p.Source, frames: []LogReadFrame{frame(first), frame(complete)}}
++	r, e := WatchLogs(context.Background(), p, b)
++	if e == nil {
++		e = VerifyLogWatchReport(r)
++	}
++	if e != nil || r.Verdict != "RECURRED" || r.Polls != 2 {
++		t.Fatalf("verdict=%s reason=%s events=%d error=%v", r.Verdict, r.Reason, len(r.Events), e)
++	}
++}
++func TestNoLogRecurrenceWaitsFullWindowAndCancellationIsError(t *testing.T) {
++	p := logPlan()
++	b := &logBackend{source: p.Source, frames: []LogReadFrame{frame([]byte("boot\n"))}}
++	start := time.Now()
++	r, e := WatchLogs(context.Background(), p, b)
++	if e == nil {
++		e = VerifyLogWatchReport(r)
++	}
++	if e != nil || r.Verdict != "AWAITING_OBSERVATION" || r.ResumeRequested || time.Since(start) < time.Second {
++		t.Fatalf("verdict=%s reason=%s events=%d error=%v", r.Verdict, r.Reason, len(r.Events), e)
++	}
++	ctx, cancel := context.WithCancel(context.Background())
++	cancel()
++	r, e = WatchLogs(ctx, p, b)
++	if e == nil {
++		e = VerifyLogWatchReport(r)
++	}
++	if e != nil || r.Verdict != "ERROR" || r.Reason != "observation_cancelled" {
++		t.Fatalf("verdict=%s reason=%s events=%d error=%v", r.Verdict, r.Reason, len(r.Events), e)
++	}
++}
++
++func TestAmbiguousOrMissingTraceFieldsCannotResume(t *testing.T) {
++	for _, bad := range []string{
++		strings.Replace(string(logLine(true)), `"symptom":true,`, "", 1),
++		strings.Replace(string(logLine(true)), `"symptom":true`, `"symptom":null`, 1),
++		strings.Replace(string(logLine(true)), `"symptom":true`, `"symptom":false,"symptom":true`, 1),
++		strings.Replace(string(logLine(true)), `"value":0`, `"value":1,"value":0`, 1),
++	} {
++		p := logPlan()
++		b := &logBackend{source: p.Source, frames: []LogReadFrame{frame([]byte("boot\n" + bad))}}
++		r, e := WatchLogs(context.Background(), p, b)
++		if e != nil || r.Verdict != "ERROR" || r.ResumeRequested || VerifyLogWatchReport(r) != nil {
++			t.Fatalf("ambiguous log accepted: %+v %v", r, e)
++		}
++	}
++}
++func TestRetainedLogReportTamperingCannotBecomeAResume(t *testing.T) {
++	p := logPlan()
++	b := &logBackend{source: p.Source, frames: []LogReadFrame{frame(append([]byte("boot\n"), logLine(true)...))}}
++	r, e := WatchLogs(context.Background(), p, b)
++	if e != nil {
++		t.Fatal(e)
++	}
++	for _, kind := range []string{"plan", "raw", "record", "offset", "time", "missing_event", "acceptance", "early_window"} {
++		t.Run(kind, func(t *testing.T) {
++			raw, _ := json.Marshal(r)
++			var modified LogWatchReport
++			_ = json.Unmarshal(raw, &modified)
++			switch kind {
++			case "plan":
++				modified.Plan.Event = "different"
++			case "raw":
++				modified.Events[0].Raw[0] = 'X'
++			case "record":
++				modified.Events[0].Record.Symptom = false
++			case "offset":
++				modified.Events[0].Offset = 0
++			case "time":
++				modified.Events[0].ObservedAt = modified.StartedAt.Add(-time.Second)
++			case "missing_event":
++				modified.Events = nil
++			case "acceptance":
++				modified.Acceptance = "accepted"
++			case "early_window":
++				modified.Events = nil
++				modified.Verdict = "AWAITING_OBSERVATION"
++				modified.ResumeRequested = false
++				modified.Reason = "window_finished"
++			}
++			if VerifyLogWatchReport(modified) == nil {
++				t.Fatal("tampered report accepted")
++			}
++		})
++	}
++}
++
++type deadlineLogBackend struct {
++	source    Source
++	unrelated bool
++}
++
++func (b deadlineLogBackend) Identity(context.Context) (Source, error) { return b.source, nil }
++func (b deadlineLogBackend) Read(ctx context.Context, _, _ int) (LogReadFrame, error) {
++	<-ctx.Done()
++	if b.unrelated {
++		return LogReadFrame{}, fmt.Errorf("actual independent read error")
++	}
++	return LogReadFrame{}, fmt.Errorf("read: %w", ctx.Err())
++}
++func TestWindowDeadlineInsideReadIsAwaitingButIndependentFailureRemainsError(t *testing.T) {
++	p := logPlan()
++	for _, unrelated := range []bool{false, true} {
++		r, e := WatchLogs(context.Background(), p, deadlineLogBackend{source: p.Source, unrelated: unrelated})
++		want := "AWAITING_OBSERVATION"
++		if unrelated {
++			want = "ERROR"
++		}
++		if e != nil || r.Verdict != want || r.ResumeRequested || VerifyLogWatchReport(r) != nil {
++			t.Fatalf("deadline boundary: %+v %v", r, e)
++		}
++	}
++}
++
++type identityDeadlineBackend struct{ deadlineLogBackend }
++
++func (b identityDeadlineBackend) Identity(ctx context.Context) (Source, error) {
++	<-ctx.Done()
++	return Source{}, ctx.Err()
++}
++func TestNoEstablishedSourceCannotBecomeSuccessfulAwaitingWindow(t *testing.T) {
++	r, e := WatchLogs(context.Background(), logPlan(), identityDeadlineBackend{})
++	if e != nil || r.Verdict != "ERROR" || r.Reason != "actual_source_environment_changed" || VerifyLogWatchReport(r) != nil {
++		t.Fatalf("unestablished source: %+v %v", r, e)
++	}
++}
+diff --git a/internal/experiment/log_verify.go b/internal/experiment/log_verify.go
+new file mode 100644
+index 00000000..7c8dee9b
+--- /dev/null
++++ b/internal/experiment/log_verify.go
+@@ -0,0 +1,75 @@
++package experiment
++
++import (
++	"bytes"
++	"encoding/json"
++	"fmt"
++	"time"
++)
++
++// VerifyLogWatchReport checks retained content/accounting. It cannot authenticate
++// an executor or establish instrumentation timing neutrality or fix acceptance.
++func VerifyLogWatchReport(r LogWatchReport) error {
++	bad := func() error { return fmt.Errorf("inconsistent structured log report") }
++	if e := r.Plan.Validate(); e != nil {
++		return e
++	}
++	raw, _ := json.Marshal(r.Plan)
++	if r.SchemaVersion != 1 || r.PlanSHA256 != traceDigest(raw) || r.Acceptance != "not_recorded" || r.StartedAt.IsZero() || r.FinishedAt.Before(r.StartedAt) || r.Polls < 0 || r.Polls > 72001 || len(r.Events) > r.Plan.MaxEvents {
++		return bad()
++	}
++	anchors := map[int]LogAnchor{}
++	next := map[int]int{}
++	for _, a := range r.Plan.Anchors {
++		anchors[a.Node] = a
++		next[a.Node] = len(a.Initial)
++	}
++	recurrence := false
++	var previous time.Time
++	for i, event := range r.Events {
++		if _, ok := anchors[event.Node]; !ok {
++			return bad()
++		}
++		if event.Offset < next[event.Node] || event.Offset+len(event.Raw)+1 > r.Plan.MaxBytes || event.SHA256 != traceDigest(event.Raw) || bytes.Contains(event.Raw, []byte{'\n'}) || event.ObservedAt.Before(r.StartedAt) || event.ObservedAt.Before(previous) || event.ObservedAt.After(r.FinishedAt) {
++			return bad()
++		}
++		parsed, e := parseTrace(event.Raw)
++		if e != nil {
++			return e
++		}
++		retained, _ := json.Marshal(event.Record)
++		actual, _ := json.Marshal(parsed)
++		if !bytes.Equal(retained, actual) || parsed.ProbeID != r.Plan.ProbeID || !contains(r.Plan.Sites, parsed.Site) {
++			return bad()
++		}
++		next[event.Node] = event.Offset + len(event.Raw) + 1
++		previous = event.ObservedAt
++		if parsed.Symptom && parsed.Event == r.Plan.Event {
++			if recurrence || i != len(r.Events)-1 {
++				return bad()
++			}
++			recurrence = true
++		}
++	}
++	switch r.Verdict {
++	case "RECURRED":
++		if !recurrence || !r.ResumeRequested || r.Polls < 1 || r.Reason != "structured_symptom_log_observed" || !previous.Before(r.StartedAt.Add(time.Duration(r.Plan.WindowSeconds)*time.Second)) {
++			return bad()
++		}
++	case "AWAITING_OBSERVATION":
++		if recurrence || r.ResumeRequested || r.Polls < 1 || r.Reason != "window_finished" || r.FinishedAt.Sub(r.StartedAt) < time.Duration(r.Plan.WindowSeconds)*time.Second {
++			return bad()
++		}
++	case "ERROR":
++		if r.ResumeRequested {
++			return bad()
++		}
++		allowed := []string{"observation_cancelled", "actual_source_environment_changed", "log_read_failed", "log_rotation_truncation_or_mutation", "log_byte_budget_exhausted", "malformed_trace_record", "trace_site_not_frozen", "event_budget_exhausted", "event_outside_window", "event_source_environment_changed"}
++		if !contains(allowed, r.Reason) {
++			return bad()
++		}
++	default:
++		return bad()
++	}
++	return nil
++}
+diff --git a/internal/feature/test.go b/internal/feature/test.go
+index 2037acd8..483f32ab 100644
+--- a/internal/feature/test.go
++++ b/internal/feature/test.go
+@@ -9,6 +9,9 @@ import "github.com/0xmhha/chainbench/internal/app"
+ // them so each definition's own preflight decides whether to reuse it. They are
+ // registered together so a surface cannot offer one without the other.
+ func init() {
++	Register(Registration{Name: "experiment.prepare-logs", Stage: StageTest, ReadOnly: true, Summary: "Freeze actual source/composition/log cursors for a structured log observation"}, app.PrepareLogObservation)
++	Register(Registration{Name: "experiment.observe-logs", Stage: StageTest, Summary: "Watch only recorded node logs during a bounded window and retain source-bound events"}, app.ObserveTimingLogs)
++
+ 	Register(Registration{Name: "experiment.run", Stage: StageTest, Summary: "Execute a frozen bounded timing/fault investigation or read-only observation; retain receipts and uncertainty"}, app.RunExperiment)
+ 	Register(Registration{
+ 		Name: "test.run", Stage: StageTest,
+diff --git a/internal/mcp/log_observation.go b/internal/mcp/log_observation.go
+new file mode 100644
+index 00000000..4cbdcb1b
+--- /dev/null
++++ b/internal/mcp/log_observation.go
+@@ -0,0 +1,61 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++	"fmt"
++	"github.com/0xmhha/chainbench/internal/app"
++)
++
++func logObservationTool(prepare bool) Tool {
++	name := "chainbench_observe_logs"
++	description := "Observe frozen structured code logs on recorded node machines, with no node control. Returns recurrence/awaiting/error and source-bound raw events; never fix acceptance."
++	if prepare {
++		name = "chainbench_prepare_log_observation"
++		description = "Freeze actual clean source/composition and complete-line cursors for a structured log observation. Reads only; creates no node or file."
++	}
++	schema := logObservationSchema()
++	if prepare {
++		source := schema["properties"].(map[string]any)["plan"].(map[string]any)["properties"].(map[string]any)["source"].(map[string]any)
++		source["required"] = []string{"commit"}
++	}
++	return Tool{Name: name, Description: description, ReadOnly: prepare, InputSchema: map[string]any{"type": "object", "properties": map[string]any{"input": schema}, "required": []string{"input"}, "additionalProperties": false}, Handler: func(ctx context.Context, args map[string]any) (string, error) {
++		if len(args) != 1 || args["input"] == nil {
++			return "", fmt.Errorf("log observation input required")
++		}
++		raw, e := json.Marshal(args["input"])
++		if e != nil {
++			return "", e
++		}
++		in, e := app.DecodeLogObservationInput(raw)
++		if e != nil {
++			return "", e
++		}
++		var result any
++		if prepare {
++			result, e = app.PrepareLogObservation(ctx, app.Deps{}, in)
++		} else {
++			result, e = app.ObserveTimingLogs(ctx, app.Deps{}, in)
++		}
++		if e != nil {
++			return "", e
++		}
++		out, e := json.Marshal(result)
++		return string(out), e
++	}}
++}
++func logObservationSchema() map[string]any {
++	text := func(max int) map[string]any {
++		return map[string]any{"type": "string", "minLength": 1, "maxLength": max}
++	}
++	integer := func(min, max int) map[string]any {
++		return map[string]any{"type": "integer", "minimum": min, "maximum": max}
++	}
++	object := func(props map[string]any, required ...string) map[string]any {
++		return map[string]any{"type": "object", "properties": props, "required": required, "additionalProperties": false}
++	}
++	source := experimentInputSchema()["properties"].(map[string]any)["plan"].(map[string]any)["properties"].(map[string]any)["before"]
++	anchor := object(map[string]any{"node": integer(1, 32), "id": map[string]any{"type": "integer", "minimum": 1}, "initial": map[string]any{"type": "string", "contentEncoding": "base64", "maxLength": 87384}}, "node")
++	plan := object(map[string]any{"schema_version": map[string]any{"type": "integer", "const": 1}, "id": text(128), "source": source, "probe_id": text(128), "instrumentation_sha256": map[string]any{"type": "string", "pattern": "^[0-9a-f]{64}$"}, "event": text(128), "sites": map[string]any{"type": "array", "items": text(256), "minItems": 1, "maxItems": 32, "uniqueItems": true}, "window_seconds": integer(1, 3600), "poll_ms": integer(50, 5000), "max_bytes": integer(4096, 65536), "max_events": integer(1, 256), "anchors": map[string]any{"type": "array", "items": anchor, "minItems": 1, "maxItems": 8}}, "schema_version", "id", "source", "probe_id", "instrumentation_sha256", "event", "sites", "window_seconds", "poll_ms", "max_bytes", "max_events", "anchors")
++	return object(map[string]any{"plan": plan, "workspace": text(4096), "binary": text(4096), "artifact_root": text(4096)}, "plan", "workspace", "binary")
++}
+diff --git a/internal/mcp/log_observation_test.go b/internal/mcp/log_observation_test.go
+new file mode 100644
+index 00000000..d16c201e
+--- /dev/null
++++ b/internal/mcp/log_observation_test.go
+@@ -0,0 +1,38 @@
++package mcp
++
++import (
++	"context"
++	"encoding/json"
++	"testing"
++)
++
++func TestLogObservationToolsAreActuallyRegisteredAndRejectBadInputs(t *testing.T) {
++	server := Default("test", "0")
++	raw := server.Handle(context.Background(), []byte(`{"jsonrpc":"2.0","id":1,"method":"tools/list"}`))
++	var reply struct {
++		Result struct {
++			Tools []struct {
++				Name string `json:"name"`
++			}
++		} `json:"result"`
++	}
++	if e := json.Unmarshal(raw, &reply); e != nil {
++		t.Fatal(e)
++	}
++	found := map[string]bool{}
++	for _, tool := range reply.Result.Tools {
++		found[tool.Name] = true
++	}
++	for _, prepare := range []bool{false, true} {
++		tool := logObservationTool(prepare)
++		if !found[tool.Name] {
++			t.Fatal("public registration missing", tool.Name)
++		}
++		if tool.ReadOnly != prepare {
++			t.Fatal("read-only annotation mismatch")
++		}
++		if _, e := tool.Handler(context.Background(), map[string]any{"input": map[string]any{"unknown": true}}); e == nil {
++			t.Fatal("unknown input accepted")
++		}
++	}
++}
+diff --git a/internal/mcp/tools.go b/internal/mcp/tools.go
+index 016db54d..83542075 100644
+--- a/internal/mcp/tools.go
++++ b/internal/mcp/tools.go
+@@ -22,6 +22,8 @@ func Default(name, version string) *Server {
+ 	s.Register(fileUploadTool())
+ 	s.Register(testListTool())
+ 	s.Register(experimentTool())
++	s.Register(logObservationTool(false))
++	s.Register(logObservationTool(true))
+ 	s.Register(hardforkTool())
+ 	s.Register(validateTool())
+ 	s.Register(consensusTool())
+diff --git a/internal/testengine/log_observation.go b/internal/testengine/log_observation.go
+new file mode 100644
+index 00000000..e9969722
+--- /dev/null
++++ b/internal/testengine/log_observation.go
+@@ -0,0 +1,151 @@
++package testengine
++
++import (
++	"context"
++	"encoding/json"
++	"fmt"
++	"os"
++	"path/filepath"
++	"strconv"
++	"strings"
++
++	"github.com/0xmhha/chainbench/internal/chainsetup"
++	"github.com/0xmhha/chainbench/internal/chainsetup/verb"
++	"github.com/0xmhha/chainbench/internal/experiment"
++)
++
++type LogObservationIn struct {
++	Plan         experiment.LogWatchPlan `json:"plan"`
++	Workspace    string                  `json:"workspace"`
++	Binary       string                  `json:"binary"`
++	ArtifactRoot string                  `json:"artifact_root"`
++}
++type ownerLogWatch struct {
++	sd    chainsetup.Deps
++	input LogObservationIn
++}
++
++func (b ownerLogWatch) Identity(ctx context.Context) (experiment.Source, error) {
++	source := b.input.Plan.Source
++	digest, e := ExperimentCompositionDigest(ctx, b.sd, b.input.Workspace)
++	if e != nil {
++		return experiment.Source{}, fmt.Errorf("actual composition unavailable: %w", e)
++	}
++	if digest != source.EnvironmentSHA256 {
++		return experiment.Source{}, fmt.Errorf("actual composition pin changed")
++	}
++	status, e := verb.ChainStatus(ctx, b.sd, verb.ChainStatusIn{DataDir: b.input.Workspace})
++	if e != nil {
++		return experiment.Source{}, e
++	}
++	if status.State.Binary != b.input.Binary {
++		return experiment.Source{}, fmt.Errorf("actual binary path differs")
++	}
++	pins, e := verb.ChainRuntimePins(ctx, b.sd, verb.ChainObserveIn{DataDir: b.input.Workspace})
++	if e != nil {
++		return experiment.Source{}, e
++	}
++	for path, digest := range pins {
++		if strings.HasSuffix(path, "/binary") && digest != "sha256:"+source.BinarySHA256 {
++			return experiment.Source{}, fmt.Errorf("actual node executable differs")
++		}
++	}
++	verified, e := experiment.FreezeBinarySource(b.input.Binary, source.Commit, source.DriverSHA256, source.EnvironmentSHA256)
++	if e != nil || verified != source {
++		return experiment.Source{}, fmt.Errorf("binary/source bytes changed")
++	}
++	for _, anchor := range b.input.Plan.Anchors {
++		if pins["node"+strconv.Itoa(anchor.Node)+"/binary"] == "" {
++			return experiment.Source{}, fmt.Errorf("log node is not recorded")
++		}
++	}
++	return source, nil
++}
++func (b ownerLogWatch) Read(ctx context.Context, node, limit int) (experiment.LogReadFrame, error) {
++	snapshot, e := verb.ChainLogWindow(ctx, b.sd, b.input.Workspace, node, limit)
++	return experiment.LogReadFrame{ID: snapshot.ID, Size: snapshot.Size, Data: snapshot.Data}, e
++}
++
++// PrepareLogObservation binds an existing composition and current complete-line
++// log cursors. It creates or controls no nodes and never repairs the network.
++func PrepareLogObservation(ctx context.Context, sd chainsetup.Deps, in LogObservationIn) (LogObservationIn, error) {
++	in = cloneLogInput(in)
++	digest, e := ExperimentCompositionDigest(ctx, sd, in.Workspace)
++	if e != nil {
++		return in, e
++	}
++	source, e := experiment.FreezeBinarySource(in.Binary, in.Plan.Source.Commit, in.Plan.InstrumentationSHA256, digest)
++	if e != nil {
++		return in, e
++	}
++	prior := in.Plan.Source
++	if prior.BinarySHA256 != "" && prior.BinarySHA256 != source.BinarySHA256 || prior.DriverSHA256 != "" && prior.DriverSHA256 != source.DriverSHA256 || prior.EnvironmentSHA256 != "" && prior.EnvironmentSHA256 != source.EnvironmentSHA256 {
++		return in, fmt.Errorf("existing source pin differs")
++	}
++	in.Plan.Source = source
++	if len(in.Plan.Anchors) < 1 || len(in.Plan.Anchors) > 8 {
++		return in, fmt.Errorf("explicit recorded log nodes required")
++	}
++	for i, anchor := range in.Plan.Anchors {
++		snapshot, e := verb.ChainLogWindow(ctx, sd, in.Workspace, anchor.Node, in.Plan.MaxBytes+1)
++		if e != nil {
++			return in, e
++		}
++		if snapshot.Size > int64(in.Plan.MaxBytes) || len(snapshot.Data) > in.Plan.MaxBytes {
++			return in, fmt.Errorf("initial log byte budget exhausted")
++		}
++		if anchor.ID != 0 && (anchor.ID != snapshot.ID || string(anchor.Initial) != string(snapshot.Data)) {
++			return in, fmt.Errorf("initial log pin differs")
++		}
++		in.Plan.Anchors[i] = experiment.LogAnchor{Node: anchor.Node, ID: snapshot.ID, Initial: append([]byte{}, snapshot.Data...)}
++	}
++	if e = in.Plan.Validate(); e != nil {
++		return in, e
++	}
++	if _, e = (ownerLogWatch{sd: sd, input: in}).Identity(ctx); e != nil {
++		return in, e
++	}
++	return in, nil
++}
++
++// ObserveTimingLogs watches only owner-recorded files. Its report is a factual
++// recurrence/awaiting/error receipt; instrumentation and fix gates stay separate.
++func ObserveTimingLogs(ctx context.Context, sd chainsetup.Deps, in LogObservationIn) (experiment.LogWatchReport, error) {
++	in = cloneLogInput(in)
++	if e := in.Plan.Validate(); e != nil {
++		return experiment.LogWatchReport{}, e
++	}
++	if in.Plan.Source.DriverSHA256 != in.Plan.InstrumentationSHA256 {
++		return experiment.LogWatchReport{}, fmt.Errorf("instrumentation plan/source pin differ")
++	}
++	if _, e := (ownerLogWatch{sd: sd, input: in}).Identity(ctx); e != nil {
++		return experiment.LogWatchReport{}, e
++	}
++	if in.ArtifactRoot == "" {
++		return experiment.LogWatchReport{}, fmt.Errorf("new artifact root required")
++	}
++	if e := os.Mkdir(in.ArtifactRoot, 0700); e != nil {
++		return experiment.LogWatchReport{}, e
++	}
++	if e := writeExperimentJSON(filepath.Join(in.ArtifactRoot, "log-input.json"), in); e != nil {
++		return experiment.LogWatchReport{}, e
++	}
++	report, e := experiment.WatchLogs(ctx, in.Plan, ownerLogWatch{sd: sd, input: in})
++	if e != nil {
++		return report, e
++	}
++	if e = experiment.VerifyLogWatchReport(report); e != nil {
++		return report, e
++	}
++	if e = writeExperimentJSON(filepath.Join(in.ArtifactRoot, "log-report.json"), report); e != nil {
++		return report, e
++	}
++	return report, nil
++}
++
++func cloneLogInput(in LogObservationIn) LogObservationIn {
++	raw, _ := json.Marshal(in)
++	var out LogObservationIn
++	_ = json.Unmarshal(raw, &out)
++	return out
++}

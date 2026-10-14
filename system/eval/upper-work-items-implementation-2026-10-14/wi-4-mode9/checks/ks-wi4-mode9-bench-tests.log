@@ -1,0 +1,27 @@
+..
+[bench] wrote /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpicif5zdj/exp/report/comparison.{json,md,csv}
+.............
+----------------------------------------------------------------------
+Ran 15 tests in 1.343s
+
+OK
+# Bench comparison — unit-exp
+
+## Mode rollup
+
+> 핵심 비교축은 **correct(최종정확성)** · **bug_cycles(총비용 동인)** · **side_fx(회귀-클래스 실패, 낮을수록 좋음)** · **total_tokens(Σ across cycles)**. 단발 토큰이 아니라 '옳은 수정까지의 총비용'을 본다(§2 방법론).
+
+| mode | cells | correct | bug_cycles(Σ/avg) | side_fx | total_tokens | avg_cost($) | avg_latency(s) | safety | cost |
+|------|-------|---------|-------------------|---------|--------------|-------------|----------------|--------|------|
+| A_cks | 1 | 1/1 | 0/0.0 | 0 | 1375 | 0.020025 | 300.0 | 0 | estimated |
+| B_code_only | 1 | 0/1 | 0/0.0 | 0 | 2875 | 0.042525 | 300.0 | 0 | estimated |
+| C_code_skills | 1 | 1/1 | 0/0.0 | 0 | 1375 | 0.020025 | 300.0 | 0 | estimated |
+
+## Per-task (correct · cycles · side_fx · tokens · $)
+
+| task | A_cks | B_code_only | C_code_skills |
+|------|------|------|------|
+| STABLE-0001 | ✓ · 0cyc · 0sfx · 1375tok · $0.020025 | ✗ · 0cyc · 0sfx · 2875tok · $0.042525 | ✓ · 0cyc · 0sfx · 1375tok · $0.020025 |
+
+> cost marked `estimated` is derived from transcript char counts (chars/4); supply real Claude session JSONL for `actual` cost.
+

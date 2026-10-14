@@ -1,0 +1,13 @@
+source-only AST and actual base/probe normal/race controls PASS
+actual owned repeated attempt INCONCLUSIVE; no planning permitted
+Traceback (most recent call last):
+  File "/private/tmp/ks-upper-wi-coding-agent/bench/timing/log_probe.py", line 104, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/private/tmp/ks-upper-wi-coding-agent/bench/timing/log_probe.py", line 80, in main
+    files=logs.paths(workspace,window);state['states']['ANALYSIS']['log_observation_result_sha256']=timing.sha(files['result'].read_bytes());save();checked=logs.state_check(workspace,state);expected='AWAITING_OBSERVATION'if window==1 else'RECURRED';timing.require(checked['verdict']==expected,'unexpected log observation');print('actual source-bound window '+str(window)+' '+expected+'; resume_target='+str(checked['resume_target']),flush=True)
+                                                                                                                                                                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-upper-wi-coding-agent/plugin/scripts/timing_investigation.py", line 24, in require
+    if not ok: raise Invalid(message)
+               ^^^^^^^^^^^^^^^^^^^^^^
+timing_investigation.Invalid: unexpected log observation

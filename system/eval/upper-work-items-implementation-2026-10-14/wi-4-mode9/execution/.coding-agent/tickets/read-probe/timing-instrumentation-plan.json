@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "probe_id": "read-probe",
+  "repo_root": "/private/tmp/ks-wi4-mode9-final/source",
+  "base_commit": "02931c31e14a815c8e3d7018fac6eed730b0c2b7",
+  "probe_commit": "f9f24b8d2b7a7d186401233fdbce59c405f280e5",
+  "runner_sha256": "a40cf106441d30c58452cf4b42f2ab0d79f9ee3b36eba6c4f26b65d8b39eca4b",
+  "helper_source_sha256": "69e0714a85c03080dc75fb561ca88b9dcfca0a5ab1841d14fb8a41e8724a6abc",
+  "helper_binary_sha256": "3bf86257fc6ac00554743786cb2c324c2a310ab08504dbd747f68fed1f9371a5",
+  "source_diff_sha256": "cb8283dffaeacb7cc4cb22a1baa1161baff77b78c3f473aa967ea5ed4da9bf02",
+  "files": [
+    {
+      "file": "main.go",
+      "before_sha256": "73cf79907a457b8eb656789d3dad158a0230e96f70e2ee1f18761bc6b0697bf9",
+      "after_sha256": "5ddc1f199d008cb570d4636cc03d3ea7f535b23cffc5a525c754c81d8e2d96b2",
+      "guard_result": {
+        "schema_version": 1,
+        "status": "PASS",
+        "sites": [
+          {
+            "event": "read-before-commit",
+            "site": "main/read",
+            "symbol": "main",
+            "line": 91,
+            "format_sha256": "36a43737adb318c14e383ba08bc308c998537bd76f879a3fa44f64eb76c08713"
+          }
+        ],
+        "baseline_ast_sha256": "a556f5d675701fefacc38541605ab2dcbe00362a66df0520cdf0851e906ab35c"
+      },
+      "guard_stdout_sha256": "430b0a446380ade0a248c90f832c857c5e9e43151b40ae67c30f54a5f01d8675"
+    }
+  ],
+  "semantic_controls": "not_executed",
+  "timing_neutrality": "not_proven",
+  "acceptance": "not_recorded"
+}
