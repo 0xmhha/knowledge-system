@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "item": "WI-V2",
+  "owner_repository": "0xmhha/coding-agent",
+  "base_commit": "5fd101e682b5d0286dbcd27fcd2b4a266bb7bc50",
+  "source_commit": "068d3c3f2340a89317ca1cbb11f5bf1d30f620b1",
+  "source_tree": "63c0d56aad04e2bc3f5e02a607968fb74219c231",
+  "source_files_sha256": {
+    ".github/workflows/ci.yml": "66abd95498814db6b78ff1b5494b04f9fb65d2f0023cd75ac2b852437427d4a6",
+    "README.md": "347a4905d806f31eaf4e6c2af508068c9805e92b555c8529f50ed432b6846b4f",
+    "bench/oracle-validity/selection_smoke.py": "a69cc4a459bc0f3ace81e8e9e3b456809755f01fd8d95e0fae9a54029161f93e",
+    "plugin/agents/evaluator.md": "53e3801d62ed6884a68d0c502f7bfc01e6059a0856abaa882db71e062a99c839",
+    "plugin/agents/implementer.md": "05f21abeac7054970f210ba57258d42d7732b1b029bd06ebee7e1ad2c324d7fc",
+    "plugin/agents/orchestrator.md": "45f5dab6a5bcd8d497b41e11f24ee616e7d204366df70d90502b8d0ce1f8f539",
+    "plugin/agents/planner.md": "99d52f7252769a4f946bf613aee35011b033ccaca55c535e38f3c272e9cdfc8d",
+    "plugin/hooks/fix-selection-guard.py": "caa12de8863363d4bf28320961cc9ed88d4d06a6837608750cd6391980cf1442",
+    "plugin/hooks/hooks.json": "273e6f7eb0efd5924565b8f0e612296c857da0c6f3ced336dd72d0b896c0d5d1",
+    "plugin/scripts/claude_fix_judge.py": "a44f4b8256c9503f15aeb3ed3ba339196bc25bf59c415eb330517f7cf9f1513c",
+    "plugin/scripts/fix_selection.py": "78fcce73a046dde2f7251ba117cdf7271bb18e5e21a9a7176de809cfa234f54b",
+    "plugin/scripts/oracle_gate.py": "76d4ca4d0f93e37576a057bd28b6e5f4040db227d9c4ab4b9ede5c023392c6c4",
+    "plugin/scripts/tests/test_fix_selection.py": "ea687ecbff9a68fb0e66efd874afef749765107c51e9677df56f738712cf0da0",
+    "plugin/skills/fix-selection/SKILL.md": "fb668eaf9671e803fd72909022090a779abc7962f78f9461b8566cb2f8e5ac47",
+    "plugin/skills/state-machine/SKILL.md": "2cae96433cde17514e748eb8a3c315867553e36941aea0ad1d2e30453822d1d1"
+  },
+  "recovery_patch": "coding-agent.patch",
+  "recovery_commit_object": "coding-agent-commit.raw",
+  "implementation_scope": "distinct proposal commits, frozen oracle/regression/metric execution, measured/Pareto comparison, actual role-panel CLI and selected-tree/state guards",
+  "verified": {
+    "plugin_tests": 82,
+    "new_selection_tests": 19,
+    "bench_tests": 15,
+    "hooks": "ALL PASS",
+    "model_sessions": 3,
+    "model_roles": [
+      "correctness",
+      "regression",
+      "maintainability"
+    ],
+    "model_labels": [
+      "claude-opus-5-5"
+    ],
+    "oracle_runs_final_model_pipeline": 64,
+    "go_build_race_vet_fmt": "PASS",
+    "selection_current_head_both_guards": "PASS",
+    "checkout_index_preserved_during_trials": true
+  },
+  "limits": {
+    "independent_human_acceptance": "not_recorded",
+    "scope_of_optimality": "observed candidates, frozen axes and controlled Go workload; not global production optimality",
+    "installed_full_plugin_host_pipeline": "not executed; CLI/model invocation and exact hook payloads executed",
+    "production_chain": "not executed"
+  },
+  "prior_attempts": {
+    "model-initial": "preserved exact earlier runner source and receipts; superseded by incomplete-execution deferral fix",
+    "model": "same first model receipt copied before final source execution",
+    "fixture": "explicit fixture opinion run at the earlier implementation state"
+  },
+  "next_item": "WI-3"
+}

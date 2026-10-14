@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "tier": "simulation",
+  "base_ref": "3b32990ba115372f98daf2c3473f3cb2bb664bba",
+  "symptom_id": "ledger-total",
+  "symptom_case": "symptom",
+  "controls": [
+    "empty",
+    "single"
+  ],
+  "ticket_file": "ticket.json",
+  "ticket_sha256": "07bf024cb2a0ece86925537011c6d8b8d512952b4e16c9f5231af7a8af0eaa51",
+  "requirement_file": "acceptance.json",
+  "independent_derivation_file": "derivation.md",
+  "frozen_files": {
+    "primary_test.go": "eca20ee5c663d25df4811df7b796314d96d2c0db21fccaba896f93c6b3e2a52e",
+    "independent_test.go": "2bba02bbe7995640d75086f3e030b63d3cef5324878aba560892b70e56702d0b",
+    "metric_test.go": "299730986aca521bb8b374e76f718f40d9ebd0f7f3f0f9cc7042d65aafed5f10",
+    "oracles/go_oracle_driver.py": "3b937b329883bc71c7d8bbc9f2a4f5d279c21f498adc13e910c1e27053e8e7cb",
+    "oracles/selection_driver.py": "fad08d68dbb4271c68d76d0105b8fe295fb8323cfac609129cf6b4010523accb",
+    "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+    "derivation.md": "69580efb8b6e978126981dae629b8c7962a433b6b578084189f38598b283c1d2",
+    "go.mod": "596d6797539a5029aba7bbea544fac485b2a21a3c77e8526d215a5d17eab7efb"
+  },
+  "oracles": [
+    {
+      "id": "primary",
+      "role": "primary",
+      "assertion_id": "ticket_balance",
+      "files": [
+        "primary_test.go"
+      ],
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "oracles/go_oracle_driver.py",
+        "--package",
+        ".",
+        "--test",
+        "TestPrimary",
+        "--assertion-id",
+        "ticket_balance"
+      ]
+    },
+    {
+      "id": "independent",
+      "role": "independent",
+      "assertion_id": "conservation",
+      "files": [
+        "independent_test.go"
+      ],
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "oracles/go_oracle_driver.py",
+        "--package",
+        ".",
+        "--test",
+        "TestIndependent",
+        "--assertion-id",
+        "conservation"
+      ]
+    }
+  ],
+  "mutants": [
+    {
+      "id": "lost-credit",
+      "kind": "reintroduce_symptom",
+      "patches": [
+        {
+          "path": "ledger.go",
+          "before": "total += credit",
+          "after": "total = credit"
+        }
+      ]
+    },
+    {
+      "id": "literal-overfit",
+      "kind": "overfit",
+      "patches": [
+        {
+          "path": "ledger.go",
+          "before": "return total",
+          "after": "return 42"
+        }
+      ]
+    }
+  ],
+  "timeout_seconds": 120,
+  "max_total_seconds": 600
+}

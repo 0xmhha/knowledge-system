@@ -15,7 +15,7 @@
 | 순서 | ID | 담당 | 구현·검증 상태 | 전체 목표/독립 수용 |
 |---|---|---|---|---|
 | 1 | WI-V1 | coding-agent | 구현·controlled 실행/반례 검증 완료·증거 커밋 | 실제 host/체인·독립 수용 보류 |
-| 2 | WI-V2 | coding-agent | 후보·패널 계약 구체화 중 | 미완료/미수용 |
+| 2 | WI-V2 | coding-agent | 구현·최종 모델/Go 실행·반례 검증 통과, 증거 커밋 대기 | 미완료/미수용 |
 | 3 | WI-3 | coding-agent+CKS | 대기 | 미완료/미수용 |
 | 4 | WI-4 | coding-agent+ChainBench | 대기 | 미완료/미수용 |
 | 5 | WI-1 | CKG | 대기 | 미완료/미수용 |
@@ -115,3 +115,37 @@ coding-agent 로컬 커밋 `5fd101e682b5d0286dbcd27fcd2b4a266bb7bc50`에 실행�
 - 측정되지 않은 값은 unknown이다. 부적격·불일치·동률·패널 disagreement·모두 기각은 selection 보류/기각을 반환한다.
 - 선택된 commit과 근거는 DESIGN→IMPLEMENTATION/EVALUATION 경로에 연결하고, 실제 구현/HEAD가 선택과 달라지면 재평가한다.
 - 다음 시험은 실제 같은 증상을 고치는2개 후보와 literal overfit/회귀 후보의 실행 비교, 근거 변조·기준 drift·동률·전부 기각 반례다.
+
+### WI-V2 실행 schema와 연결 계약
+
+selection specification은 schema_version1, source_base_ref, oracle_plan(작업공간 상대 경로), oracle_sources(필요 시 작업공간의 frozen 파일), criteria(고정된 축/방향/단위/필수 여부), regression_driver, metric_drivers, judges(정확성·회귀·유지보수 역할), candidates(최소2개 실제 변경 제안·rationale·mutation 계획)를 가진다. `oracle_sources`는 테스트/오라클/수용 조건에 한정한다. source_base_ref의 생산 코드를 변경해 RED를 만드는 carrier는 허용하지 않는다.
+
+실행기는 별도 Git index와 commit-tree로 RED carrier와 후보 커밋을 만들며 원래 branch/index/소스는 유지한다. V1은 명시한 후보 commit에서 trial receipt를 생성한다. trial receipt는 최종 현재 HEAD의 완료 receipt로 사용할 수 없다. 각 후보는 같은 수용 조건/정상 제어/오라클·미수정 생산 소스에 결속된다.
+
+회귀/metric command는 frozen adapter에서 실행하며 assertion/실행 오류·unknown을 구분한다. 변경 줄 수는 Git diff 실측값이다. 선택은 hard 적격성→패널 승인→관측된 축의 Pareto 우위 순이다. 우열 없음/필수 값 미측정/패널 충돌/모두 기각은 보류·동률·기각이며 임의 첫 후보로 진행하지 않는다. 판단은 관측된 후보·축의 범위로 한정한다.
+
+패널 command는 실제 source diff·V1/회귀/metric 원자료의 hash를 입력으로 받고 역할별 typed 의견과 이유·근거 인용을 반환한다. fixture 패널과 실제 모델/사람의 의견을 구분한다. model/human 자기 표시만으로 독립 수용을 생성하지 않는다. 모델 host 검증은 실제 command 실행 원자료를 남긴다.
+
+DESIGN→IMPLEMENTATION에는 생성·평가·선택 보고서가 필요하고, 실제 적용은 선택된 tree와 일치해야 한다. 이전 V1의 첫 RED carrier 생성은 이 연결에서는 DESIGN의 trial 준비가 앞당겨 수행한다. Implementer는 그 carrier를 새로 만들거나 base를 merge-base로 바꾸지 않는다. 최종 HEAD에서 V1을 다시 실행하며 후보 선택·코드 변경 시 재평가한다.
+
+## WI-V2 실행 검증 진행
+
+실행기는 production checkout/index를 변경하지 않고 신규 테스트/오라클만 담은 RED carrier와 2개 이상 실제 후보 commit을 만든다. V1의 명시 후보 ref 시험은 trial scope이며 최종 HEAD 완료 receipt로 사용할 수 없다. frozen 회귀/metric adapters·role별 adapter hash와 원자료 hash를 검증하고, 현재 적용 tree가 선택 tree와 다르면 차단한다.
+
+새 후보 반례19개를 포함한 plugin82개, 기존 bench15개와 hooks ALL PASS를 확인했다. 최종 모델 원자료와 소스를 커밋하기 전에는 구현 완료 체크하지 않는다.
+
+실제 Go fixture에서 loop/copy/literal3개의 후보를 실행했다. loop/copy는 동일 오라클·회귀를 통과했고, literal은 FAIL이다. loop는 변경7줄·allocation0/call, copy는8줄·1/call이다. fixture 의견임을 명시한 실행에서 선택·실제 적용·final HEAD V1·양쪽 guard가 통과했다. 실제 모델의 정확성/회귀/유지보수3세션도 이 판정을 수행했으며 첫 실행의 원자료는 model-initial로 보존했다. 이후 실행 오류 후보의 부적격 처리 대신 전체 보류 정책을 보강했으므로 최종 소스 모델 실행을 다시 고정한다.
+
+수치/실행 근거와 모델 의견은 구분한다. 같은 모델의 역할별 세션이며 독립 사람 수용·production 프로젝트의 최적성은 자동 생성하지 않는다. 테스트 범위와 실제 모델 adapter invocation은 packet에 구분하여 기록한다.
+
+### WI-V2 최종 증거 고정
+
+coding-agent 로컬 커밋 `068d3c3f2340a89317ca1cbb11f5bf1d30f620b1`. [WI-V2 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-v2/)에 source patch/commit object·3개 후보 Git bundle·측정/원자료·모델 receipt·최종 HEAD report를 보존했다. 최종 원자료와 현재 source SHA가 일치함을 확인했다.
+
+- plugin82개, 새 선택 반례19개, 기존 bench15개, hooks ALL PASS.
+- 실제 모델3별도 세션(정확성/회귀/유지보수)이 loop를 선호했다. provider가 보고한 모델 label은 claude-opus-5-5이며 사용자 구성 기본값을 사용했다. 이를 독립 사람 수용으로 기록하지 않는다.
+- 후보3개·오라클48회와 선택된 실제 HEAD의16회, 총64회 실행. literal 과적합은 oracle/regression FAIL로 기각. loop/copy는 둘 다 PASS, 관측된 변경7/8줄·할당0/1회에서 loop가 우위였다.
+- 실제 선택 check·적용 tree check·final HEAD V1·양쪽 completion guard·build/race/vet/fmt PASS. 시험 중 원 checkout/HEAD/index는 유지됐고 적용은 owned fixture에서만 수행했다.
+- 최종 선택은 명시한 후보/축/작업부하에 한정된다. 실제 production 코드의 전 후보 최적성·독립 사람 수용·설치된 전체 plugin host 흐름은 미판정이다.
+
+커밋된 packet을 재검증한 뒤 구현 상태를 갱신한다. 다음은 WI-3다.

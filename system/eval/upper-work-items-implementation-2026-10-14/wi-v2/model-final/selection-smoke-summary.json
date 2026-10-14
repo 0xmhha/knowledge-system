@@ -1,0 +1,189 @@
+{
+  "scope": "actual Go proposal materialization, oracle/metric/regression execution, selection/check/guards",
+  "panel_origin": "model",
+  "independent_human_acceptance": "not_recorded",
+  "cli_exit": 0,
+  "decision": {
+    "status": "SELECTED",
+    "selected_candidate": "loop",
+    "selected_commit": "9ce33557a22aa90c81ad90a5c0c0d76e785b8717",
+    "selected_tree": "3c7cfc8ff567f9c079b492f0bce42591e96b45c3",
+    "reason": "hard-eligible, unanimous preference and sole observed Pareto candidate",
+    "axes_used": [
+      "changed_lines",
+      "allocations"
+    ],
+    "rejections": {
+      "literal": "oracle/regression/execution hard condition failed"
+    }
+  },
+  "original_source_unchanged": true,
+  "original_head_unchanged": true,
+  "selection_check": "PASS",
+  "applied_tree_check": "PASS",
+  "final_current_head_oracle": "PASS",
+  "both_completion_guards": "allowed",
+  "fixture_stage_executions": [
+    {
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "ok  \texample.test/oracle\t1.373s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "gofmt",
+        "-l",
+        "."
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "panel_executions": [
+    {
+      "role": "correctness",
+      "kind": "model",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "correctness",
+        "role": "correctness",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "Observed: the oracle verdict is PASS and regression is PASS. On base, the symptom case is RED. On head, the symptom, empty and single cases are GREEN for both the primary and independent oracles. The lost-credit mutant is caught. Semantic judgment: the diff sums every entry, which fixes the bug where Balance returned only the last entry. An empty input gives 0. Finite tests do not prove universal correctness, but this candidate meets the minimum correctness bar for this isolated pure function.",
+            "evidence_sha256": [
+              "3c0bb5301b68762aae11167ee420d5352ec8027b362ecff698eda98efadeacc3"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "Observed: the oracle verdict is PASS and regression is PASS, with the same green/red pattern as loop on base, head and mutants. Semantic judgment: it copies the input and then sums every entry, so it returns the same results as loop. The copy is safe, and since the inputs are immutable it adds no correctness benefit. The extra allocation (1.0/call) and one extra changed line are cost-axis issues, not correctness defects, so they are not grounds to reject.",
+            "evidence_sha256": [
+              "724705f55d5e82f88c83c4a9c06938e21894e9927b9e9b615b3d5eb5631dcaec"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "Hard-ineligible (hard_eligible=false). Observed: the oracle verdict is FAIL and regression is FAIL. On head, the independent symptom oracle is RED, and the empty and single cases are RED for both oracles. Semantic judgment: returning the constant 42 hides the primary example instead of computing the total, and it breaks the empty-input result of 0.",
+            "evidence_sha256": [
+              "15f16933194b7e8c4b920af12df08522fbfdf30a46ae58dcb1d18edf60e6321a"
+            ]
+          }
+        ],
+        "preferred_candidate": "loop"
+      }
+    },
+    {
+      "role": "maintainability",
+      "kind": "model",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "maintainability",
+        "role": "maintainability",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "Observed results: the candidate is hard-eligible, the oracle verdict is PASS, the regression check is PASS, and the head symptom, empty and single cases are all GREEN under both oracles. The independent oracle catches the literal-overfit mutant. Measured metrics are 7 changed lines and 0.0 allocations/call. My judgment: the code is a simple, readable summing loop with no special cases and no hard-coded values, so it is easy to maintain. Passing these finite tests does not prove it is correct for every input.",
+            "evidence_sha256": [
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "Observed results: the candidate is hard-eligible, the oracle verdict is PASS, the regression check is PASS, and the head symptom, empty and single cases are all GREEN under both oracles. Measured metrics are 8 changed lines and 1.0 allocations/call. My judgment: because this is a pure function with immutable inputs, the defensive copy is unnecessary and adds a little noise. That costs it on the axes, but it does not make the code unsafe to maintain, so I am not rejecting it on that basis.",
+            "evidence_sha256": [
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "Observed results: the candidate is not hard-eligible, and both the oracle verdict and the regression check are FAIL. At head, the independent symptom check is RED, and the empty and single cases are RED under both oracles. My judgment: returning the constant 42 hides the symptom instead of fixing it, which is an unmaintainable overfit.",
+            "evidence_sha256": [
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873"
+            ]
+          }
+        ],
+        "preferred_candidate": "loop"
+      }
+    },
+    {
+      "role": "regression",
+      "kind": "model",
+      "exit_code": 0,
+      "error": null,
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "regression",
+        "role": "regression",
+        "votes": [
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "Observed: the regression driver returned PASS (exit 0) and all 16 oracle checks passed. On head, the symptom, empty and single cases are GREEN under both oracles, and the base and mutant cases behave as expected. Semantic reading: a plain summation loop returns 0 for an empty slice and the element itself for a single-element slice, so it keeps the earlier empty and single behaviour while fixing the total. The inputs are immutable and the function is pure, so the fix creates no new side effects. Finite tests do not prove universal correctness, and I make no claim about production callsites.",
+            "evidence_sha256": [
+              "82a7b289f29096c61136122ce64156bc11515b35f239a90b74b3f32af0881269",
+              "c40e1046f74daecd61175634bb11a88a47c4efbfb7610571ad1be98aa51e1155"
+            ]
+          },
+          {
+            "candidate_id": "copy",
+            "verdict": "accept",
+            "reason": "Observed: the regression driver returned PASS (exit 0) and all 16 oracle checks passed, including the head empty and single cases under both oracles. Semantic reading: it adds up a defensive copy, so it returns the same total as the loop candidate and does not change behaviour on the tested cases. Its extra allocation (measured at 1.0 allocations/call) and one extra changed line cost more, but they are not regressions. Under role_scope, being more expensive is not grounds to reject it here.",
+            "evidence_sha256": [
+              "0567f788743dd179c16695f854356aac6a5c18a3bf22a1c2535ad5ee4368e1f5",
+              "51792db8a980377db6a9eb166c6a011d4a38e5764f55e92346e67831f0c9b5f1"
+            ]
+          },
+          {
+            "candidate_id": "literal",
+            "verdict": "reject",
+            "reason": "This candidate is hard-ineligible. Observed: regression FAIL and oracle_verdict FAIL. Head empty and single are RED under both oracles, which breaks behaviour that was GREEN on base. The independent symptom oracle is also RED on head. Returning the constant 42 hides the symptom instead of fixing the total, and it breaks the existing empty and single behaviour.",
+            "evidence_sha256": [
+              "181b89e9459274ff6743599ca47e048a670cb1d38f2831b88d33af23cb0ad457",
+              "a8e19e2eaee4de3befa374238f8b5646f32c2b021b341c34c3286440c67d8873"
+            ]
+          }
+        ],
+        "preferred_candidate": "loop"
+      }
+    }
+  ]
+}
