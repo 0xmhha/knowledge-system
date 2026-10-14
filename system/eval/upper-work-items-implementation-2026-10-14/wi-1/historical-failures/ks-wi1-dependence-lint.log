@@ -1,0 +1,9 @@
+pkg/graph/valueflow/dependence.go:39:22: SA1019: go/ast.Object has been deprecated since Go 1.22 and an alternative has been available since Go 1.0: The relationship between Idents and Objects cannot be correctly computed without type information. For example, the expression T{K: 0} may denote a struct, map, slice, or array literal, depending on the type of T. If T is a struct, then K refers to a field of T, whereas for the other types it refers to a value in the environment. (staticcheck)
+	variables      map[*ast.Object]Variable
+	                    ^
+pkg/graph/valueflow/dependence.go:47:35: SA1019: go/ast.Object has been deprecated since Go 1.22 and an alternative has been available since Go 1.0: The relationship between Idents and Objects cannot be correctly computed without type information. For example, the expression T{K: 0} may denote a struct, map, slice, or array literal, depending on the type of T. If T is a struct, then K refers to a field of T, whereas for the other types it refers to a value in the environment. (staticcheck)
+	f := &flow{a: a, variables: map[*ast.Object]Variable{}, effects: map[string]effects{}, occurrences: map[string]Occurrence{}, diagnosticKeys: map[string]bool{}}
+	                                 ^
+2 issues:
+* staticcheck: 2
+exit status 1

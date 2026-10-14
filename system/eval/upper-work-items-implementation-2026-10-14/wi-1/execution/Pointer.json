@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "snapshot_sha256": "dce0fd380e88cb120c0b55ffef474a9bf2a5c5c4239b50c1bf330e6018be6833",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "6bbe54f58bcc5681",
+      "canonical_id": "example.invalid/value-fixture/a.Pointer",
+      "file": "a/flow.go",
+      "commit": "f511632b1b85a9a001c4b2381d2416322c9b9a53",
+      "sha256": "cf12793a12538d4cf11d82cb425e1995e3c99c179cb2173e76ae878ea847e31c",
+      "language": "go",
+      "start_line": 37,
+      "start_byte": 610,
+      "bytes": 66,
+      "snapshot_sha256": "dce0fd380e88cb120c0b55ffef474a9bf2a5c5c4239b50c1bf330e6018be6833",
+      "function_name": "Pointer"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "partial",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0",
+          "b0/n1"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 646,
+          "end_byte": 661,
+          "start_line": 37,
+          "end_line": 37
+        },
+        "text": "copy := pointer",
+        "synthetic": false
+      },
+      {
+        "id": "b0/n1",
+        "block": 0,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 663,
+          "end_byte": 674,
+          "start_line": 37,
+          "end_line": 37
+        },
+        "text": "return copy",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 610,
+          "end_byte": 641,
+          "start_line": 37,
+          "end_line": 37
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "reference_dependence",
+        "certainty": "may_reach",
+        "variable": "v623"
+      },
+      {
+        "from": "b0/n0",
+        "to": "b0/n1",
+        "kind": "reference_dependence",
+        "certainty": "may_reach",
+        "variable": "v646"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "reference_alias_unknown",
+        "message": "Reference binding flow does not establish memory alias/effect semantics",
+        "location": {
+          "start_byte": 654,
+          "end_byte": 661,
+          "start_line": 37,
+          "end_line": 37
+        }
+      },
+      {
+        "code": "reference_alias_unknown",
+        "message": "Reference binding flow does not establish memory alias/effect semantics",
+        "location": {
+          "start_byte": 670,
+          "end_byte": 674,
+          "start_line": 37,
+          "end_line": 37
+        }
+      }
+    ],
+    "truncated": false,
+    "elapsed_micros": 26,
+    "variables": [
+      {
+        "id": "v623",
+        "name": "pointer",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 623,
+          "end_byte": 630,
+          "start_line": 37,
+          "end_line": 37
+        }
+      },
+      {
+        "id": "v646",
+        "name": "copy",
+        "kind": "local",
+        "declaration": {
+          "start_byte": 646,
+          "end_byte": 650,
+          "start_line": 37,
+          "end_line": 37
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/definition/v646/646",
+        "node": "b0/n0",
+        "variable": "v646",
+        "role": "definition",
+        "location": {
+          "start_byte": 646,
+          "end_byte": 650,
+          "start_line": 37,
+          "end_line": 37
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n0/reference/v623/654",
+        "node": "b0/n0",
+        "variable": "v623",
+        "role": "reference",
+        "location": {
+          "start_byte": 654,
+          "end_byte": 661,
+          "start_line": 37,
+          "end_line": 37
+        },
+        "reachable": true
+      },
+      {
+        "id": "b0/n1/reference/v646/670",
+        "node": "b0/n1",
+        "variable": "v646",
+        "role": "reference",
+        "location": {
+          "start_byte": 670,
+          "end_byte": 674,
+          "start_line": 37,
+          "end_line": 37
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v623/623",
+        "node": "entry",
+        "variable": "v623",
+        "role": "definition",
+        "location": {
+          "start_byte": 623,
+          "end_byte": 630,
+          "start_line": 37,
+          "end_line": 37
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "entry/definition/v623/623",
+        "use": "b0/n0/reference/v623/654",
+        "variable": "v623",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "b0/n0/definition/v646/646",
+        "use": "b0/n1/reference/v646/670",
+        "variable": "v646",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 6,
+    "facts_peak": 18
+  },
+  "elapsed_micros": 254
+}

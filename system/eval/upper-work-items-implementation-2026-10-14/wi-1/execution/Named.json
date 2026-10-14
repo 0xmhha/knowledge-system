@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "status": "analyzed_bounded",
+  "snapshot_sha256": "dce0fd380e88cb120c0b55ffef474a9bf2a5c5c4239b50c1bf330e6018be6833",
+  "analysis": {
+    "schema_version": 1,
+    "source": {
+      "node_id": "158633258cf3d4d9",
+      "canonical_id": "example.invalid/value-fixture/a.Named",
+      "file": "a/flow.go",
+      "commit": "f511632b1b85a9a001c4b2381d2416322c9b9a53",
+      "sha256": "7f5be8b0c7858c8fb883c3bdf3c0b60be3f6f549e69b38819794bc286c946496",
+      "language": "go",
+      "start_line": 23,
+      "start_byte": 353,
+      "bytes": 67,
+      "snapshot_sha256": "dce0fd380e88cb120c0b55ffef474a9bf2a5c5c4239b50c1bf330e6018be6833",
+      "function_name": "Named"
+    },
+    "limits": {
+      "max_source_bytes": 262144,
+      "max_ast_nodes": 4096,
+      "max_blocks": 256,
+      "max_nodes": 1024,
+      "max_edges": 4096,
+      "max_iterations": 128,
+      "timeout_ms": 1000,
+      "max_facts": 65536
+    },
+    "status": "analyzed_bounded",
+    "capability": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "blocks": [
+      {
+        "id": 0,
+        "kind": "Body",
+        "reachable": true,
+        "nodes": [
+          "entry",
+          "b0/n0"
+        ]
+      },
+      {
+        "id": 1,
+        "kind": "IfThen",
+        "reachable": true,
+        "nodes": [
+          "b1/n0"
+        ]
+      },
+      {
+        "id": 2,
+        "kind": "IfDone",
+        "reachable": true,
+        "nodes": [
+          "b2/n0"
+        ]
+      },
+      {
+        "id": 3,
+        "kind": "Unreachable",
+        "reachable": false,
+        "nodes": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "b0/n0",
+        "block": 0,
+        "kind": "Ident",
+        "location": {
+          "start_byte": 391,
+          "end_byte": 395,
+          "start_line": 24,
+          "end_line": 24
+        },
+        "text": "flag",
+        "synthetic": false
+      },
+      {
+        "id": "b1/n0",
+        "block": 1,
+        "kind": "AssignStmt",
+        "location": {
+          "start_byte": 400,
+          "end_byte": 407,
+          "start_line": 25,
+          "end_line": 25
+        },
+        "text": "out = 1",
+        "synthetic": false
+      },
+      {
+        "id": "b2/n0",
+        "block": 2,
+        "kind": "ReturnStmt",
+        "location": {
+          "start_byte": 412,
+          "end_byte": 418,
+          "start_line": 27,
+          "end_line": 27
+        },
+        "text": "return",
+        "synthetic": false
+      },
+      {
+        "id": "entry",
+        "block": 0,
+        "kind": "entry",
+        "location": {
+          "start_byte": 353,
+          "end_byte": 384,
+          "start_line": 23,
+          "end_line": 23
+        },
+        "text": "",
+        "synthetic": true
+      }
+    ],
+    "edges": [
+      {
+        "from": "b0",
+        "to": "b1",
+        "kind": "cfg",
+        "condition": "true",
+        "certainty": "conservative"
+      },
+      {
+        "from": "b0",
+        "to": "b2",
+        "kind": "cfg",
+        "condition": "false",
+        "certainty": "conservative"
+      },
+      {
+        "from": "b1",
+        "to": "b2",
+        "kind": "cfg",
+        "certainty": "structural"
+      },
+      {
+        "from": "entry",
+        "to": "b0/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v364"
+      },
+      {
+        "from": "b1/n0",
+        "to": "b2/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v376"
+      },
+      {
+        "from": "entry",
+        "to": "b2/n0",
+        "kind": "data_dependence",
+        "certainty": "may_reach",
+        "variable": "v376"
+      },
+      {
+        "from": "b0/n0",
+        "to": "b1/n0",
+        "kind": "control_dependence",
+        "condition": "true",
+        "certainty": "normal_exit_structural"
+      }
+    ],
+    "diagnostics": [],
+    "truncated": false,
+    "elapsed_micros": 39,
+    "variables": [
+      {
+        "id": "v364",
+        "name": "flag",
+        "kind": "parameter",
+        "declaration": {
+          "start_byte": 364,
+          "end_byte": 368,
+          "start_line": 23,
+          "end_line": 23
+        }
+      },
+      {
+        "id": "v376",
+        "name": "out",
+        "kind": "result_zero",
+        "declaration": {
+          "start_byte": 376,
+          "end_byte": 379,
+          "start_line": 23,
+          "end_line": 23
+        }
+      }
+    ],
+    "occurrences": [
+      {
+        "id": "b0/n0/use/v364/391",
+        "node": "b0/n0",
+        "variable": "v364",
+        "role": "use",
+        "location": {
+          "start_byte": 391,
+          "end_byte": 395,
+          "start_line": 24,
+          "end_line": 24
+        },
+        "reachable": true
+      },
+      {
+        "id": "b1/n0/definition/v376/400",
+        "node": "b1/n0",
+        "variable": "v376",
+        "role": "definition",
+        "location": {
+          "start_byte": 400,
+          "end_byte": 403,
+          "start_line": 25,
+          "end_line": 25
+        },
+        "reachable": true
+      },
+      {
+        "id": "b2/n0/implicit_return/v376/412",
+        "node": "b2/n0",
+        "variable": "v376",
+        "role": "implicit_return",
+        "location": {
+          "start_byte": 412,
+          "end_byte": 418,
+          "start_line": 27,
+          "end_line": 27
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v364/364",
+        "node": "entry",
+        "variable": "v364",
+        "role": "definition",
+        "location": {
+          "start_byte": 364,
+          "end_byte": 368,
+          "start_line": 23,
+          "end_line": 23
+        },
+        "reachable": true
+      },
+      {
+        "id": "entry/definition/v376/376",
+        "node": "entry",
+        "variable": "v376",
+        "role": "definition",
+        "location": {
+          "start_byte": 376,
+          "end_byte": 379,
+          "start_line": 23,
+          "end_line": 23
+        },
+        "reachable": true
+      }
+    ],
+    "def_use": [
+      {
+        "definition": "entry/definition/v364/364",
+        "use": "b0/n0/use/v364/391",
+        "variable": "v364",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "b1/n0/definition/v376/400",
+        "use": "b2/n0/implicit_return/v376/412",
+        "variable": "v376",
+        "certainty": "lexical_may_reach"
+      },
+      {
+        "definition": "entry/definition/v376/376",
+        "use": "b2/n0/implicit_return/v376/412",
+        "variable": "v376",
+        "certainty": "lexical_may_reach"
+      }
+    ],
+    "iterations": 9,
+    "facts_peak": 38
+  },
+  "elapsed_micros": 287
+}
