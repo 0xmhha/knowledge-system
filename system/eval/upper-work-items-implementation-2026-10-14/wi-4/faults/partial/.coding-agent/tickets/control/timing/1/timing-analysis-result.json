@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "ticket_id": "control",
+  "phase": "analysis",
+  "plan_sha256": "b2f9b902c917e3f312d2574cc64a2bb453bb47927f5d7c4fdececeffad4fb976",
+  "report_sha256": "bbd6686c879ac1a195b8aebd2c0663a0908cdf110e953d5b6d18e9172d0f738e",
+  "receipt_sha256": "6d53838aaa9b653943c384388895b4e152d204d6002eeb53e165934e0259bb72",
+  "provider": {
+    "binary": "/private/tmp/ks-wi4-public-chainbench",
+    "binary_sha256": "3b87bf4cdea20a978e3140174b8f3ccb0b805315e65d43863b48a7438b6ad7c4",
+    "source_commit": "5f6483864a4a6a91f32ff02d532275039c72db80"
+  },
+  "branches": {
+    "normal": {
+      "status": "ERROR",
+      "origin": "same-trial designated normal control assertions"
+    },
+    "reproduction": {
+      "status": "ERROR",
+      "before": {
+        "planned": 3,
+        "attempted": 2,
+        "completed": 1,
+        "symptom_failures": 1,
+        "control_failures": 0,
+        "infrastructure_errors": 1,
+        "missing": 1,
+        "failure_rate": 1,
+        "upper_failure_rate_95": 1
+      }
+    },
+    "defense": {
+      "status": "NOT_RUN",
+      "after": null
+    },
+    "observation": {
+      "status": "NOT_RUN",
+      "resume_requested": false
+    }
+  },
+  "verdict": "ERROR",
+  "resume_requested": false,
+  "native_verifier_stdout_sha256": "5aa45dc15b51c0e84466346d382f3f8f863b5eb6c09e5aea0e9187d2ba0a39b7",
+  "acceptance": "not_recorded"
+}

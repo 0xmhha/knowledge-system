@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "plan": {
+    "schema_version": 1,
+    "id": "cleanup_failure",
+    "mode": "reproduction",
+    "symptom": "controlled concurrent read before commit; no consensus claim",
+    "assertion_id": "owned-timing/assert/0",
+    "seed": "owned-paired-v1",
+    "before": {
+      "commit": "01a3ce43d2c13e09217f991bac695ee0c5bc6a07",
+      "binary_sha256": "d3e6510a3eb7e4ff85a1e72f48246386d856081ac8084c92259179b4e6f12a20",
+      "driver_sha256": "70b4807ffcad24951c883908c24b21b1f75f4056401b366d357b2cd010074a83",
+      "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+    },
+    "after": null,
+    "repetitions": 3,
+    "min_completed": 3,
+    "min_symptom_failures": 1,
+    "max_failure_rate": 0.05,
+    "trial_timeout_seconds": 8,
+    "total_timeout_seconds": 45,
+    "owned_node_ids": [
+      "node1"
+    ],
+    "normal_assertion_ids": [
+      "owned-timing/assert/1"
+    ],
+    "injection": {
+      "kind": "delay",
+      "target": "node1",
+      "step": "owned-timing/step/1",
+      "min_delay_ms": 20000,
+      "max_delay_ms": 20000
+    },
+    "resume": null
+  },
+  "plan_sha256": "892001989725549f6223952a4422f4172f5c584e3267afeb631c865a84c19839",
+  "trials": [
+    {
+      "cohort": "before",
+      "source": {
+        "commit": "01a3ce43d2c13e09217f991bac695ee0c5bc6a07",
+        "binary_sha256": "d3e6510a3eb7e4ff85a1e72f48246386d856081ac8084c92259179b4e6f12a20",
+        "driver_sha256": "70b4807ffcad24951c883908c24b21b1f75f4056401b366d357b2cd010074a83",
+        "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+      },
+      "schedule": {
+        "trial": 1,
+        "seed": "24c699ab18a6b6bdad50023560b9c20966be6e61f13051a6a592e36d20b7e4b7",
+        "delay_ms": 20000
+      },
+      "identity": {
+        "runtime_sha256": "2ec3e360bae155fb0a0082460397ec754c53ff67a4671f604d531b41c319cdd4",
+        "source": {
+          "commit": "01a3ce43d2c13e09217f991bac695ee0c5bc6a07",
+          "binary_sha256": "d3e6510a3eb7e4ff85a1e72f48246386d856081ac8084c92259179b4e6f12a20",
+          "driver_sha256": "70b4807ffcad24951c883908c24b21b1f75f4056401b366d357b2cd010074a83",
+          "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+        },
+        "lease_id": "trial-3460257222",
+        "owned_node_ids": [
+          "node1"
+        ],
+        "read_only": false
+      },
+      "observation": {
+        "polls": 1,
+        "symptom": {
+          "id": "",
+          "pass": false,
+          "receipt_sha256": ""
+        },
+        "controls": [],
+        "injection": null,
+        "events": []
+      },
+      "outcome": "ERROR",
+      "error": "execution_failed: context deadline exceeded",
+      "cleanup_ok": false,
+      "cleanup_error": "chainsetup: stop: 0 of 1 node(s) stopped; node1: chainsetup: refusing to signal node1's recorded pid 72718: it is not the recorded launch (argv_mismatch)",
+      "started_at": "2026-10-14T05:11:23.068048Z",
+      "finished_at": "2026-10-14T05:11:31.234311Z"
+    }
+  ],
+  "before": {
+    "planned": 3,
+    "attempted": 1,
+    "completed": 0,
+    "symptom_failures": 0,
+    "control_failures": 0,
+    "infrastructure_errors": 1,
+    "missing": 2,
+    "failure_rate": null,
+    "upper_failure_rate_95": null
+  },
+  "after": null,
+  "verdict": "ERROR",
+  "stop_reason": "cleanup_unresolved",
+  "resume_requested": false,
+  "acceptance": "not_recorded"
+}

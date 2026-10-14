@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "ticket_id": "timing",
+  "phase": "evaluation",
+  "plan_sha256": "3834bf27fc0ffb2f33eb0dfd3f0783118973b34ab9aeda76121e35492ec0d2cc",
+  "report_sha256": "71ea1751ff1e10df461077092e7396e9c2fd35397c099f8bd6994253ad15daf8",
+  "receipt_sha256": "6f4414283df166107e15ec4eb86b46773a03feaa02b0a3ff52bab48ceab53035",
+  "provider": {
+    "binary": "/private/tmp/ks-wi4-public-chainbench",
+    "binary_sha256": "3b87bf4cdea20a978e3140174b8f3ccb0b805315e65d43863b48a7438b6ad7c4",
+    "source_commit": "5f6483864a4a6a91f32ff02d532275039c72db80"
+  },
+  "branches": {
+    "normal": {
+      "status": "PASS",
+      "origin": "same-trial designated normal control assertions"
+    },
+    "reproduction": {
+      "status": "REPRODUCED",
+      "before": {
+        "planned": 60,
+        "attempted": 60,
+        "completed": 60,
+        "symptom_failures": 60,
+        "control_failures": 0,
+        "infrastructure_errors": 0,
+        "missing": 0,
+        "failure_rate": 1,
+        "upper_failure_rate_95": 1
+      }
+    },
+    "defense": {
+      "status": "OBSERVED_RATE_BOUND_MET",
+      "after": {
+        "planned": 60,
+        "attempted": 60,
+        "completed": 60,
+        "symptom_failures": 0,
+        "control_failures": 0,
+        "infrastructure_errors": 0,
+        "missing": 0,
+        "failure_rate": 0,
+        "upper_failure_rate_95": 0.048702913310097504
+      }
+    },
+    "observation": {
+      "status": "NOT_RUN",
+      "resume_requested": false
+    }
+  },
+  "verdict": "OBSERVED_RATE_BOUND_MET",
+  "resume_requested": false,
+  "native_verifier_stdout_sha256": "5aa45dc15b51c0e84466346d382f3f8f863b5eb6c09e5aea0e9187d2ba0a39b7",
+  "acceptance": "not_recorded"
+}

@@ -55,6 +55,7 @@
 - 실행 전 seed/schedule·반복 분모·증상 failure 조건·전/후 기준·time budget·소유 노드·cleanup을 고정한다. 인프라 실패와 증상 실패를 구분한다.
 - 명시 timing/fault 주입, 정상/재현/방어/관찰 분기. 미재현은 원인 미확정·관찰 대기이며 완료한 수정으로 승격하지 않는다.
 - 모니터의 structured event/trigger·환경 pin·재개 조건, 통계 부족의 inconclusive와 기존 ChainBench 주입/monitor 연결.
+- 원래 master workplan §2.2의 모드9는 미재현 시 observation-only 코드 로그 삽입과 재발 대기를 요구한다. 외부 RPC polling만으로 이를 대체하지 않는다. 삽입 위치/patch·source revision·로그 event/schema/기록 출처·환경·bounded window/재개 조건을 고정하고, 기능 변경과 별도 검증·race/정상 사례·로그 변조/미재발/재발 반례를 확인한다.
 - 실제 반복 결과·timeout/부분 완료·주입 실패·cleanup·재발 이벤트 반례. 기존 또는 외부 노드를 정지하지 않는다.
 
 ### WI-1: Go 값 의존 분석
@@ -285,3 +286,27 @@ WI-4의 실제 native fault/timeout/부분 완료/주입 오류/cleanup 반례,
 parent 종료 감시·실제 signal cleanup, 최종 통합 commit replay/host alias가
 남아 implementation_verified=false다. 독립 production 수용도 미기록이다.
 현재 구현 검증3/9, 남은 순서 WI-4→WI-1→WI-2→WI-C→WI-6→WI-SP를 유지한다.
+
+
+## WI-4 실제 종료·반례 검증과 원래 범위 대조
+
+coding-agent `18aca435c4f8c9e17378ad40f60c76f09ee7bc7a`, ChainBench
+`5f6483864a4a6a91f32ff02d532275039c72db80`를 로컬 커밋했다.
+부모 사망 시 닫힌 표준 pipe에 쓰다 SIGPIPE로 cancellation/cleanup이 중단되는
+실제 실패를 subprocess RED→race GREEN으로 수정했다. consumer의 parent watch와
+직접 취소 forwarding을 유지하고 실제 부모 강제 종료·raw report 저장·node 정리를
+확인했다. 7개 실제 fault/timeout/부분 분모/cancel/parent-death/cleanup refusal
+및 복구 반례를 [실행 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-4/README.md)에
+보존한다. 거부된 cleanup은 실패를 유지하며 해당 trial 뒤 실행을 중단했다.
+
+깨끗한 source의 public composition180개 trial 정리, 재현60회/전후60쌍
+60/60→0/60·upper bound0.0487, 전체 ChainBench 검사와 plugin116·timing20·
+bench 회귀·tool lint PASS. 첫 race의 live process table churn/unknown 결과는
+보존했고 제품 ownership 판정을 완화하지 않은 동일 source 재검사가 PASS다.
+실제 Claude host의 정확한 MCP alias 호출과 실제 unknown-field 거부도 확인했다.
+
+원래 master workplan §2.2 대조에서 모드9 observation-only 코드 로그 삽입·
+재발 대기를 확인했다. 현재 read-only RPC 관찰만으로 이 기준을 대체하지 않는다.
+삽입 위치/patch·source·event/schema/기록 출처·behavior/race 대조와 실제
+로그 기반 재발/재개가 남았으므로 WI-4는 in_progress/검증3/9다.
+다음은 이 원래 경로의 구현이며 이후 WI-1→WI-2→WI-C→WI-6→WI-SP가 남는다.
