@@ -16,7 +16,7 @@
 |---|---|---|---|---|
 | 1 | WI-V1 | coding-agent | 구현·controlled 실행/반례 검증 완료·증거 커밋 | 실제 host/체인·독립 수용 보류 |
 | 2 | WI-V2 | coding-agent | 구현·실제 Go/모델/반례 검증 완료·증거 커밋 | 독립 사람/production 최적성 미수용 |
-| 3 | WI-3 | coding-agent+CKS | 신호·소비자 계약 구현 진행 | 미완료/미수용 |
+| 3 | WI-3 | coding-agent+CKS | 구현·명시 범위 검증 | 독립 수용 미판정 |
 | 4 | WI-4 | coding-agent+ChainBench | 대기 | 미완료/미수용 |
 | 5 | WI-1 | CKG | 대기 | 미완료/미수용 |
 | 6 | WI-2 | CKG/CKS | 대기 | 미완료/미수용 |
@@ -92,7 +92,7 @@
 
 각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
 
-현재: 구현·명시 범위 실행 검증2/9, WI-3 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-3 객관 신호·소비자 계약 정합. 남은 이번 구현 범위: WI-3/4/1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+현재: 구현·명시 범위 실행 검증3/9, WI-4 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-4 반복·주입·관찰. 남은 이번 구현 범위: WI-4/1/2/C/6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
 ## WI-V1 검증 기록
 
@@ -173,3 +173,38 @@ Leaf/Middle/Top 거리0/1/2와 반복 확장을 확인했다. 한 줄 함수와 
 
 전체 build/test/race/fmt/lint 및 최종 commit-bound 실행 증거를 확인하고
 증거를 먼저 커밋한 뒤 구현 검증 상태를 갱신한다. 다음은 WI-4다.
+
+
+## WI-3 구현 검증과 남은 수용 범위
+
+CKS `63a7411742426839244948743dd02b902df350aa`와 coding-agent
+`b9290af1982b55693a5f49bbc9fad5dc2cbb76af`를 로컬 커밋했다.
+증거 커밋 `fd56be6f637135fdf673cd28766701fee970c467`의29개 산출물과1607개 source binding을
+Git 객체에서 모두 재검증한 다음에만 원장을 implemented로 갱신했다.
+기존 승인 입력5개와 역사 수용 기록은 유지한다. build/test/race/fmt/vet/lint,
+boundaries/documentation PASS, 전체 Go119개 시험 package와 plugin96개 test PASS.
+
+실제 Go 인덱스→MCP→소비자2회/3후보/26호출, null·출처·확장·정지 기록,
+정확한 플러그인 prefix의 실제 Claude HTTP 호출 PASS. 생성한 시험 서버는
+EOF/SIGTERM으로 정상 종료했다. [증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-3/README.md)를
+source commit과 SHA로 고정했으며 개인 설정/기록은 지식 입력으로 쓰지 않는다.
+
+실제 production target의 model-backed text seed, 설치된 전체 bugfix role
+흐름과 독립 수용·원인 판정은 미기록이다. 이 명시 범위 구현 검증을 전체
+목표 완료로 바꾸지 않는다. Security/dataflow 연결은 후속 담당 항목에 남긴다.
+
+## WI-4 착수: 기존 primitive와 새 계약
+
+기존 ChainBench `662fff77382eb031df687d371a8bc8f63cad581f`에는
+stop/start/restart·partition/heal의 DSL action과 node readiness monitor가
+있다. 아직 frozen seed/schedule·반복 분모·증상/인프라 실패 구분을 가진
+agent 조사 산출물의 통합 증거로 취급하지 않는다. 기존 개발 checkout을
+변경하지 않고 별도 checkout에서 구현한다.
+
+실행 전에 source/environment·정상/재현/방어/관찰 분기·seed/schedule·
+반복수/시간·실패 조건·소유 node와 cleanup을 동결한다. 반복이 부족하거나
+증상이 미재현이면 inconclusive/awaiting_observation이고 수정 완료가 아니다.
+실패 주입이 실행됐다는 receipt와 실제 증상 receipt를 분리하며, monitor의
+structured event/trigger로 후속 재개 조건을 기록한다. 소유하지 않은 node의
+중지·reset은 실행 대상에 넣지 않는다. 다음은 이 contract의 typed 모델과
+기존 DSL/monitor adapter, 실제 반복·timeout·cleanup·재발 반례다.

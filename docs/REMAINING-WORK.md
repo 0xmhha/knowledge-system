@@ -1,4 +1,4 @@
-현재 진행: 사용자 요청에 따라 [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 WI-V1→V2→3→4→1→2→C→6→SP를 순차 구현한다. WI-V1과 WI-V2의 명시 범위 구현·실행/반례 검증을 증거 커밋 후 완료 기록했다(2/9). WI-3 진행 중, 나머지6개 대기. 독립 전체 수용은 별도 미판정이다. 이번 구현 순서는 WI-5를 포함하지 않는다.
+현재 진행: 사용자 요청에 따라 [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 WI-V1→V2→3→4→1→2→C→6→SP를 순차 구현한다. WI-V1·WI-V2·WI-3의 명시 범위 구현·실행/반례 검증을 증거 커밋 후 완료 기록했다(3/9). WI-4 진행 중, 이후 WI-1·WI-2·WI-C·WI-6·WI-SP가 남았다. production/독립 전체 수용은 별도 미판정이며 이번 구현 순서는 WI-5를 포함하지 않는다.
 
 추가 요청 완료: [서버 종료 보완 SD-01–04](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md)4/4 완료. 원인 재현·구현·실측2세션·EOF/SIGTERM·커밋 SHA/진행 원장 검증 PASS. 이전 두 종료 오류는 보존했다. 이 요청의 남은 작업0개·다음 작업없음.
 
@@ -44,7 +44,7 @@
 |---|---|---|
 | 1 | WI-V1 | 독립 오라클·무효/과적합 반례·차단/경고 정책·실제 에이전트 판정; coding-agent |
 | 2 | WI-V2 | 동일 증상의 복수 수정안·평가축·패널 선택/기각; coding-agent |
-| 3 | WI-3 | 실제 MCP 입력과 소비자 계약 정합·bounded 후보/객관 신호/provenance/null·반복 확장; coding-agent+CKS |
+| 3 | WI-3 | 명시 범위 구현 검증 완료. production text seed·설치된 전체 bugfix role·독립 수용 남음; coding-agent+CKS |
 | 4 | WI-4 | 반복 분모·증상 실패율·타이밍 주입·재현 불가 관찰의 실제 연결 실행; coding-agent+ChainBench |
 | 5 | WI-1 | 언어/비용/정확도 계약·CFG/def-use/control/data dependency; CKG |
 | 6 | WI-2 | 수동/자동 구분·결정론 타입/규칙·source→sink 탐지·양성/음성 평가; CKG/CKS |
