@@ -216,3 +216,19 @@ SHA256 기반 반복 스케줄 및 거부 조건 시험이 PASS다. checkpoint�
 반복 실행·소유 노드 확인/cleanup·DSL/monitor·통계 분모·실제 재현/재발 및
 전체 회귀는 아직 남았으므로 WI-4의 implementation_verified는 false다.
 다음은 실제 반복 실행기와 기존 primitive adapter이며 전체 목표는 active다.
+
+
+WI-4 반복 실행기 중간 보존: ChainBench `eebc18fffb02a831ff62af9845f565e470680322`.
+소스/binary/DSL pin·동일 스케줄 전/후 비교, 증상/정상 대조/인프라/정리
+오류 분리, 소표본 inconclusive와 95% binomial 상한을 구현했다. 기존 DSL에는
+요청별 주입 hook과 assertion 평가 오류·위치 ID 기록을 연결했다.
+실제 소유 Go RPC node의 전/후60회씩 실행은 60/60→0/60 증상 실패,
+수정 후 실패율 상한0.0487029133, 생성 node120/120 cleanup PASS다.
+첫 DSL 이름 불일치의120개 실행 오류는 별도 보존했으며 증상 실패로
+집계하지 않았다. build·단위/race/vet·엔진/어휘/세션 회귀 PASS.
+
+이 기록은 controlled 시험 프로그램의 중간 증거이며 공개 경로·실제
+composition adapter·모니터 window/재개 event·원자료 검증·agent gate·
+실행 반례와 전체 최종 회귀/commit-bound replay가 아직 남았다.
+`system/eval/upper-work-items-implementation-2026-10-14/wi-4-runner-checkpoint/checkpoint.json`
+에서 복구 가능하며 WI-4 implementation_verified=false를 유지한다.
