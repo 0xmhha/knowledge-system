@@ -1,0 +1,1760 @@
+diff --git a/contract/agent-mcp.schema.json b/contract/agent-mcp.schema.json
+index 21e0772..354bad3 100644
+--- a/contract/agent-mcp.schema.json
++++ b/contract/agent-mcp.schema.json
+@@ -154,7 +154,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -183,7 +183,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -231,7 +231,7 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "kinds": {
+@@ -306,7 +306,7 @@
+           "input": {
+             "properties": {
+               "intent": {
+-                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+                 "type": "string"
+               },
+               "prompt": {
+@@ -391,7 +391,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -571,6 +571,122 @@
+             "type": "object"
+           }
+         },
++        "cks_context_rule_candidates": {
++          "owner": "cks",
++          "wire_name": "cks.context.rule_candidates",
++          "description": "Explicit opt-in go-local-review@1.0.0 retained Go rule candidates using one shared lexical value/control analysis. Parameter to command-name and discarded conversion-error to return patterns. Candidates are automatic review inputs, never verified vulnerabilities or manual policy/security annotations. Syntax-only targets, unknown sanitizers, memory/alias and feasibility limitations remain explicit. Empty results never prove safety.",
++          "input": {
++            "additionalProperties": false,
++            "properties": {
++              "function": {
++                "additionalProperties": false,
++                "oneOf": [
++                  {
++                    "required": [
++                      "node_id"
++                    ]
++                  },
++                  {
++                    "required": [
++                      "canonical_id"
++                    ]
++                  }
++                ],
++                "properties": {
++                  "canonical_id": {
++                    "maxLength": 512,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "expected_commit": {
++                    "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++                    "type": "string"
++                  },
++                  "expected_snapshot_sha256": {
++                    "pattern": "^[0-9a-f]{64}$",
++                    "type": "string"
++                  },
++                  "expected_source_sha256": {
++                    "pattern": "^[0-9a-f]{64}$",
++                    "type": "string"
++                  },
++                  "limits": {
++                    "additionalProperties": false,
++                    "properties": {
++                      "max_ast_nodes": {
++                        "maximum": 4096,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_blocks": {
++                        "maximum": 256,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_edges": {
++                        "maximum": 4096,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_facts": {
++                        "maximum": 65536,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_iterations": {
++                        "maximum": 128,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_nodes": {
++                        "maximum": 1024,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_source_bytes": {
++                        "maximum": 262144,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "timeout_ms": {
++                        "maximum": 1000,
++                        "minimum": 1,
++                        "type": "integer"
++                      }
++                    },
++                    "type": "object"
++                  },
++                  "node_id": {
++                    "maxLength": 128,
++                    "minLength": 1,
++                    "type": "string"
++                  }
++                },
++                "required": [],
++                "type": "object"
++              },
++              "max_candidates": {
++                "maximum": 64,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_flow_steps": {
++                "maximum": 4096,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "rule_pack": {
++                "const": "go-local-review@1.0.0",
++                "type": "string"
++              }
++            },
++            "required": [
++              "rule_pack",
++              "function"
++            ],
++            "type": "object"
++          }
++        },
+         "cks_context_search_text": {
+           "owner": "cks",
+           "wire_name": "cks.context.search_text",
+@@ -578,11 +694,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -615,11 +731,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -649,6 +765,98 @@
+             "type": "object"
+           }
+         },
++        "cks_context_value_dependencies": {
++          "owner": "cks",
++          "wire_name": "cks.context.value_dependencies",
++          "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
++          "input": {
++            "additionalProperties": false,
++            "oneOf": [
++              {
++                "required": [
++                  "node_id"
++                ]
++              },
++              {
++                "required": [
++                  "canonical_id"
++                ]
++              }
++            ],
++            "properties": {
++              "canonical_id": {
++                "maxLength": 512,
++                "minLength": 1,
++                "type": "string"
++              },
++              "expected_commit": {
++                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++                "type": "string"
++              },
++              "expected_snapshot_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "expected_source_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "limits": {
++                "additionalProperties": false,
++                "properties": {
++                  "max_ast_nodes": {
++                    "maximum": 4096,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_blocks": {
++                    "maximum": 256,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_edges": {
++                    "maximum": 4096,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_facts": {
++                    "maximum": 65536,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_iterations": {
++                    "maximum": 128,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_nodes": {
++                    "maximum": 1024,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_source_bytes": {
++                    "maximum": 262144,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "timeout_ms": {
++                    "maximum": 1000,
++                    "minimum": 1,
++                    "type": "integer"
++                  }
++                },
++                "type": "object"
++              },
++              "node_id": {
++                "maxLength": 128,
++                "minLength": 1,
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
++        },
+         "cks_ops_freshness": {
+           "owner": "cks",
+           "wire_name": "cks.ops.freshness",
+diff --git a/plugin/agents/analyzer.md b/plugin/agents/analyzer.md
+index f982939..01d31e0 100644
+--- a/plugin/agents/analyzer.md
++++ b/plugin/agents/analyzer.md
+@@ -900,10 +900,22 @@ design. If `mode == "code_review"`, go to §7 instead of transitioning to PLANNI
+ ---
+ 
+ ## 7. Review report (mode: code_review)
+-Code review stops after a light situation analysis. Produce `review-report.md`
+-(target, criteria, findings, recommendation), then `state-machine.transition` to the
+-review_only terminal (same artifact the Orchestrator's review_only flow expects). No
+-reproduction or fix plan.
++Code review uses the source-bound `structured-review` contract. Select an exact
++retained function identity and explicit go-local-review@1.0.0 pack, capture real
++CKS review_function and rule_candidates responses, and reuse the value/control
++analysis already included in the rule envelope. Never compute a parallel graph.
++Record six reasoning sections, original-node anchors, assumptions/unknowns,
++findings with priority/tradeoff, and review criteria. Unsupported/unavailable
++responses do not establish safety. The structural review lacks its own snapshot
++pin: its association is identity-only and must remain explicitly unverified.
++
++Build deep-review.json, deep-review-evidence.json, source-bound diagrams and a
++report draft with plugin/scripts/deep_review.py. Run the same verifier and bind
++states.ANALYSIS.deep_review_sha256 to exact artifact bytes before handoff. Follow
++review_only ANALYSIS -> PLANNING -> COMPLETION. The Planner validates the report
++and binds states.PLANNING.review_report_sha256. The delivery hook checks both;
++report delivery never grants independent human acceptance. No reproduction,
++production change, fix plan, tracker message or PR publication is implied.
+ 
+ ---
+ 
+diff --git a/plugin/agents/orchestrator.md b/plugin/agents/orchestrator.md
+index 20c8797..9243fe2 100644
+--- a/plugin/agents/orchestrator.md
++++ b/plugin/agents/orchestrator.md
+@@ -384,7 +384,14 @@ TICKET_INTAKE → ANALYSIS → PLANNING (review-report) → COMPLETION
+ Differences from "full":
+ 
+ - The Planner is dispatched with `mode = "code_review"` during PLANNING.
+-- The expected artifact is `review-report.md` (not plan.md).
++- The expected artifacts are validated deep-review.json, deep-review-evidence.json,
++  sequence.mmd, modules.mmd and review-report.md. Apply structured-review; preserve
++  calculated/agent/unknown attribution and the unpinned structural association.
++- Before terminal delivery run plugin/scripts/deep_review.py verify --workspace
++  on the identified ticket. Bind ANALYSIS.deep_review_sha256 and the completed
++  PLANNING.review_report_sha256; direct state edits require this CLI as well.
++- Delivered partial review is not independent acceptance or vulnerability proof.
++- The expected report is review-report.md (not plan.md).
+ - After PLANNING completes, the Orchestrator skips DESIGN/IMPL/EVAL and goes
+   directly to a terminal handler:
+ 
+diff --git a/plugin/contracts/cks-tools.schema.json b/plugin/contracts/cks-tools.schema.json
+index 5266357..20efc31 100644
+--- a/plugin/contracts/cks-tools.schema.json
++++ b/plugin/contracts/cks-tools.schema.json
+@@ -117,7 +117,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -146,7 +146,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -194,7 +194,7 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "kinds": {
+@@ -269,7 +269,7 @@
+           "input": {
+             "properties": {
+               "intent": {
+-                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+                 "type": "string"
+               },
+               "prompt": {
+@@ -354,7 +354,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -534,6 +534,122 @@
+             "type": "object"
+           }
+         },
++        "cks_context_rule_candidates": {
++          "owner": "cks",
++          "wire_name": "cks.context.rule_candidates",
++          "description": "Explicit opt-in go-local-review@1.0.0 retained Go rule candidates using one shared lexical value/control analysis. Parameter to command-name and discarded conversion-error to return patterns. Candidates are automatic review inputs, never verified vulnerabilities or manual policy/security annotations. Syntax-only targets, unknown sanitizers, memory/alias and feasibility limitations remain explicit. Empty results never prove safety.",
++          "input": {
++            "additionalProperties": false,
++            "properties": {
++              "function": {
++                "additionalProperties": false,
++                "oneOf": [
++                  {
++                    "required": [
++                      "node_id"
++                    ]
++                  },
++                  {
++                    "required": [
++                      "canonical_id"
++                    ]
++                  }
++                ],
++                "properties": {
++                  "canonical_id": {
++                    "maxLength": 512,
++                    "minLength": 1,
++                    "type": "string"
++                  },
++                  "expected_commit": {
++                    "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++                    "type": "string"
++                  },
++                  "expected_snapshot_sha256": {
++                    "pattern": "^[0-9a-f]{64}$",
++                    "type": "string"
++                  },
++                  "expected_source_sha256": {
++                    "pattern": "^[0-9a-f]{64}$",
++                    "type": "string"
++                  },
++                  "limits": {
++                    "additionalProperties": false,
++                    "properties": {
++                      "max_ast_nodes": {
++                        "maximum": 4096,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_blocks": {
++                        "maximum": 256,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_edges": {
++                        "maximum": 4096,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_facts": {
++                        "maximum": 65536,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_iterations": {
++                        "maximum": 128,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_nodes": {
++                        "maximum": 1024,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "max_source_bytes": {
++                        "maximum": 262144,
++                        "minimum": 1,
++                        "type": "integer"
++                      },
++                      "timeout_ms": {
++                        "maximum": 1000,
++                        "minimum": 1,
++                        "type": "integer"
++                      }
++                    },
++                    "type": "object"
++                  },
++                  "node_id": {
++                    "maxLength": 128,
++                    "minLength": 1,
++                    "type": "string"
++                  }
++                },
++                "required": [],
++                "type": "object"
++              },
++              "max_candidates": {
++                "maximum": 64,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "max_flow_steps": {
++                "maximum": 4096,
++                "minimum": 1,
++                "type": "integer"
++              },
++              "rule_pack": {
++                "const": "go-local-review@1.0.0",
++                "type": "string"
++              }
++            },
++            "required": [
++              "rule_pack",
++              "function"
++            ],
++            "type": "object"
++          }
++        },
+         "cks_context_search_text": {
+           "owner": "cks",
+           "wire_name": "cks.context.search_text",
+@@ -541,11 +657,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -578,11 +694,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -612,6 +728,98 @@
+             "type": "object"
+           }
+         },
++        "cks_context_value_dependencies": {
++          "owner": "cks",
++          "wire_name": "cks.context.value_dependencies",
++          "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
++          "input": {
++            "additionalProperties": false,
++            "oneOf": [
++              {
++                "required": [
++                  "node_id"
++                ]
++              },
++              {
++                "required": [
++                  "canonical_id"
++                ]
++              }
++            ],
++            "properties": {
++              "canonical_id": {
++                "maxLength": 512,
++                "minLength": 1,
++                "type": "string"
++              },
++              "expected_commit": {
++                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
++                "type": "string"
++              },
++              "expected_snapshot_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "expected_source_sha256": {
++                "pattern": "^[0-9a-f]{64}$",
++                "type": "string"
++              },
++              "limits": {
++                "additionalProperties": false,
++                "properties": {
++                  "max_ast_nodes": {
++                    "maximum": 4096,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_blocks": {
++                    "maximum": 256,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_edges": {
++                    "maximum": 4096,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_facts": {
++                    "maximum": 65536,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_iterations": {
++                    "maximum": 128,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_nodes": {
++                    "maximum": 1024,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "max_source_bytes": {
++                    "maximum": 262144,
++                    "minimum": 1,
++                    "type": "integer"
++                  },
++                  "timeout_ms": {
++                    "maximum": 1000,
++                    "minimum": 1,
++                    "type": "integer"
++                  }
++                },
++                "type": "object"
++              },
++              "node_id": {
++                "maxLength": 128,
++                "minLength": 1,
++                "type": "string"
++              }
++            },
++            "required": [],
++            "type": "object"
++          }
++        },
+         "cks_ops_freshness": {
+           "owner": "cks",
+           "wire_name": "cks.ops.freshness",
+diff --git a/plugin/hooks/deep-review-guard.py b/plugin/hooks/deep-review-guard.py
+new file mode 100644
+index 0000000..42453f5
+--- /dev/null
++++ b/plugin/hooks/deep-review-guard.py
+@@ -0,0 +1,38 @@
++#!/usr/bin/env python3
++"""Bind code-review handoff/delivery to validated partial review artifacts.
++
++Only guards identified Write/Edit pipeline state. Direct shell edits require
++running the same deep_review verify CLI; this hook cannot authenticate transport.
++"""
++import importlib.util
++import json
++import os
++from pathlib import Path
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++sys.path.insert(0,str(ROOT/'scripts'))
++from deep_review import verify_workspace
++spec=importlib.util.spec_from_file_location('completion_guard',ROOT/'hooks/completion-guard.py');helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
++def main():
++ try:data=json.load(sys.stdin)
++ except (ValueError,TypeError):return 0
++ if not isinstance(data,dict)or data.get('tool_name')not in('Write','Edit'):return 0
++ inputs=data.get('tool_input');
++ if not isinstance(inputs,dict)or not isinstance(inputs.get('file_path'),str):return 0
++ path=Path(inputs['file_path']);path=path if path.is_absolute()else Path(data.get('cwd')or os.getcwd())/path
++ if path.name!='state.json':return 0
++ recognizable='.coding-agent'in path.parts and 'tickets'in path.parts
++ try:
++  old=path.read_text()if path.exists()else'{}';state=json.loads(old)
++  if not recognizable and not(isinstance(state,dict)and state.get('ticket_id')):return 0
++  proposed=json.loads(helper.proposed_content(data,old))
++  if not isinstance(state,dict)or not isinstance(proposed,dict):raise ValueError('pipeline state must stay an object')
++  if state.get('ticket_type')!='code_review'and proposed.get('ticket_type')!='code_review':return 0
++  if state.get('ticket_type')=='code_review'and proposed.get('ticket_type')!='code_review':raise ValueError('cannot bypass review delivery by changing ticket type')
++  old_hash=state.get('states',{}).get('ANALYSIS',{}).get('deep_review_sha256');new_hash=proposed.get('states',{}).get('ANALYSIS',{}).get('deep_review_sha256')
++  if old_hash and old_hash!=new_hash and proposed.get('current_state')!='ANALYSIS':raise ValueError('frozen review identity changed outside analysis')
++  completed=proposed.get('states',{}).get('ANALYSIS',{}).get('status')=='completed'
++  if completed or proposed.get('current_state')in('PLANNING','COMPLETION','COMPLETED'):verify_workspace(path.parent,proposed)
++ except Exception as error:helper.deny('Structured review delivery blocked: '+str(error))
++ return 0
++if __name__=='__main__':raise SystemExit(main())
+diff --git a/plugin/hooks/hooks.json b/plugin/hooks/hooks.json
+index ade9501..7c72b12 100644
+--- a/plugin/hooks/hooks.json
++++ b/plugin/hooks/hooks.json
+@@ -55,6 +55,11 @@
+             "type": "command",
+             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/timing-investigation-guard.py\"",
+             "timeout": 45
++          },
++          {
++            "type": "command",
++            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/deep-review-guard.py\"",
++            "timeout": 15
+           }
+         ]
+       },
+diff --git a/plugin/scripts/deep_review.py b/plugin/scripts/deep_review.py
+new file mode 100644
+index 0000000..a36dcf3
+--- /dev/null
++++ b/plugin/scripts/deep_review.py
+@@ -0,0 +1,188 @@
++#!/usr/bin/env python3
++"""Source-bound structured code-review artifacts and delivery validation.
++
++Consumes actual retained CKS responses; does not compute CFG/rules, run a model,
++modify code, contact trackers or confer human acceptance. CLI verification is
++also required outside Write/Edit hooks. Transport authenticity is not proven
++by local JSON validation; response/source hashes only bind the supplied data.
++"""
++from pathlib import Path, PurePosixPath
++import argparse
++import hashlib
++import json
++import re
++
++SCHEMA=1
++MAX_BYTES=4*1024*1024
++MAX_FINDINGS=32
++MAX_STATEMENTS=64
++SECTIONS=('data_state','guards_exceptions','complexity','resources','io','priority_tradeoffs')
++SHA=re.compile(r'^[0-9a-f]{64}$')
++COMMIT=re.compile(r'^(?:[0-9a-f]{40}|[0-9a-f]{64})$')
++class Invalid(ValueError):pass
++
++def require(condition,message):
++ if not condition:raise Invalid(message)
++def canonical(value):return json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()
++def sha(raw):return hashlib.sha256(raw).hexdigest()
++def exact(value,required,optional=()):
++ require(isinstance(value,dict)and set(required)<=set(value)and set(value)<=set(required)|set(optional),'missing/unknown fields: '+','.join(required))
++def nonempty(value):return isinstance(value,str)and bool(value.strip())and len(value)<=8192
++def load(path):
++ raw=Path(path).read_bytes();require(len(raw)<=MAX_BYTES,'artifact exceeds4MiB')
++ def pairs(items):
++  result={}
++  for k,v in items:require(k not in result,'duplicate JSON field');result[k]=v
++  return result
++ value=json.loads(raw,object_pairs_hook=pairs,parse_constant=lambda _:(_ for _ in ()).throw(Invalid('nonfinite JSON')))
++ return raw,value
++def private_path(name):
++ require(nonempty(name),'source path required');path=PurePosixPath(name)
++ require(not path.is_absolute()and str(path)==name and '..'not in path.parts and '.claude'not in path.parts and path.parts[0]!='logs'and '\\'not in name,'private/unclean source path')
++def location(v):
++ exact(v,('start_byte','end_byte','start_line','end_line'))
++ require(all(type(x)is int for x in v.values())and 0<=v['start_byte']<=v['end_byte']and 1<=v['start_line']<=v['end_line'],'invalid source location')
++def source_pin(v):
++ exact(v,('node_id','file','commit','sha256','language','start_line','start_byte','bytes','snapshot_sha256'),('canonical_id','function_name'))
++ private_path(v['file']);require(nonempty(v['node_id'])and COMMIT.fullmatch(v['commit'])and SHA.fullmatch(v['sha256'])and SHA.fullmatch(v['snapshot_sha256']),'immutable source identity required')
++ require(v['language']=='go'and type(v['start_line'])is int and v['start_line']>=1 and type(v['start_byte'])is int and v['start_byte']>=0 and type(v['bytes'])is int and 0<v['bytes']<=256*1024,'unsupported source scope')
++ return v
++
++def validate_bundle(bundle):
++ exact(bundle,('schema_version','ticket_id','rules','function_review'))
++ require(bundle['schema_version']==SCHEMA and nonempty(bundle['ticket_id']),'bundle identity/version')
++ receipt=bundle['rules'];exact(receipt,('tool','arguments','result'))
++ require(receipt['tool']=='cks.context.rule_candidates','explicit retained rule tool required')
++ args=receipt['arguments'];exact(args,('rule_pack','function'),('max_candidates','max_flow_steps'))
++ require(args['rule_pack']=='go-local-review@1.0.0','explicit versioned rule pack required')
++ query=args['function'];exact(query,(),('node_id','canonical_id','expected_commit','expected_source_sha256','expected_snapshot_sha256','limits'))
++ require(('node_id'in query)!=('canonical_id'in query),'exact selected function identity required')
++ require(all(nonempty(query[k])for k in query if k!='limits'),'explicit nonempty query strings required')
++ caps={'max_source_bytes':256*1024,'max_ast_nodes':4096,'max_blocks':256,'max_nodes':1024,'max_edges':4096,'max_iterations':128,'max_facts':65536,'timeout_ms':1000}
++ if 'limits'in query:
++  require(isinstance(query['limits'],dict)and set(query['limits'])<=set(caps),'invalid/unknown base limits')
++  require(all(type(n)is int and 1<=n<=caps[k]for k,n in query['limits'].items()),'invalid base limit value')
++ for k,cap in [('max_candidates',64),('max_flow_steps',4096)]:
++  if k in args:require(type(args[k])is int and 1<=args[k]<=cap,'invalid rule bound')
++ result=receipt['result'];require(isinstance(result,dict)and result.get('status')in('partial','analyzed_bounded')and isinstance(result.get('analysis'),dict),'incomplete/unavailable base analysis cannot finish review')
++ analysis=result['analysis'];source=source_pin(analysis['source']);require(result['snapshot_sha256']==source['snapshot_sha256'],'query snapshot differs from source')
++ for key,target in [('node_id','node_id'),('canonical_id','canonical_id'),('expected_commit','commit'),('expected_source_sha256','sha256'),('expected_snapshot_sha256','snapshot_sha256')]:
++  if key in query:require(query[key]==source.get(target),'request/source pin mismatch: '+key)
++ require(not analysis.get('truncated')and analysis.get('schema_version')==1,'truncated/wrong base analysis')
++ nodes=analysis['nodes'];require(isinstance(nodes,list)and len(nodes)<=1024,'node cap/type')
++ by_id={};blocks={'b'+str(b['id'])for b in analysis['blocks']}
++ for node in nodes:
++  require(isinstance(node,dict)and nonempty(node.get('id'))and node['id']not in by_id,'invalid/duplicate graph node');location(node['location']);require(isinstance(node.get('text'),str)and type(node.get('block'))is int,'source text/block required');by_id[node['id']]=node;blocks.add('b'+str(node['block']))
++  loc=node['location'];require(source['start_byte']<=loc['start_byte']<=loc['end_byte']<=source['start_byte']+source['bytes']and loc['start_line']>=source['start_line'],'node outside retained source')
++  if not node.get('synthetic'):require(loc['end_byte']-loc['start_byte']==len(node['text'].encode())and loc['end_line']-loc['start_line']==node['text'].count('\n'),'node text/location differs')
++ edges=analysis['edges'];require(isinstance(edges,list)and len(edges)<=4096,'edge cap/type')
++ for edge in edges:
++  require(isinstance(edge,dict),'edge object required');ids=blocks if edge.get('kind')=='cfg'else blocks|set(by_id)if edge.get('kind')=='control_dependence'else set(by_id);require(edge.get('from')in ids and edge.get('to')in ids,'edge references foreign nodes')
++ rules=analysis['rules'];require(isinstance(rules,dict)and rules.get('status')=='matched_bounded'and rules.get('origin')=='automatic'and rules.get('pack_id')=='go-local-review'and rules.get('pack_version')=='1.0.0'and SHA.fullmatch(rules.get('pack_sha256','')),'unsupported/incomplete rules cannot finish review')
++ candidates=rules['candidates'];require(isinstance(candidates,list)and len(candidates)<=64,'candidate cap/type')
++ for c in candidates:
++  require(c.get('origin')=='automatic'and c.get('certainty')=='lexical_may_reach'and c.get('target_resolution')=='syntax_only_unverified'and c.get('sanitizer')=='not_proven','candidate certainty/origin overclaim')
++  require(SHA.fullmatch(c.get('id',''))and isinstance(c.get('path'),list)and len(c['path'])>0 and all(n in by_id for n in c['path']),'candidate path/id invalid');location(c['source_location']);location(c['sink_location'])
++  require(isinstance(c.get('conditions'),list)and len(c['conditions'])<=4096,'condition cap/type')
++  for condition in c['conditions']:
++   exact(condition,('node','condition'),('location','location_status'))
++   require(nonempty(condition['condition']),'condition label required')
++   status=condition.get('location_status','source_node')
++   if status=='source_node':require(condition['node']in by_id and condition.get('location')==by_id[condition['node']]['location'],'condition original citation differs')
++   else:require(status=='structural_block_unlocated'and condition['node']in blocks and 'location'not in condition,'unlocated control cannot fabricate a citation')
++ review=bundle['function_review'];exact(review,('tool','arguments','result'));require(review['tool']=='cks.context.review_function','function review receipt required')
++ require(isinstance(review['arguments'],dict)and review['arguments'].get('symbol')in(source.get('canonical_id'),source['node_id'],review['result'].get('seed',{}).get('qualified_name')),'function review selector differs')
++ seed=review['result'].get('seed',{});require(seed.get('id')==source['node_id']and seed.get('file_path')==source['file']and seed.get('start_line')==source['start_line'],'structural review identity/location differs')
++ require(isinstance(review['result'].get('code'),dict),'structural review unavailable')
++ return source,analysis,by_id
++
++def validate_judgments(judgments,by_id,candidates):
++ exact(judgments,('sections','findings','criteria'))
++ exact(judgments['sections'],SECTIONS)
++ known=0
++ for name,section in judgments['sections'].items():
++  exact(section,('status','claim','evidence_nodes','assumptions','unknowns','origin'))
++  require(section['status']in('inferred','unknown')and section['origin']=='agent_reasoning'and nonempty(section['claim']),'invalid reasoning section '+name)
++  require(isinstance(section['evidence_nodes'],list)and len(section['evidence_nodes'])<=MAX_STATEMENTS and all(n in by_id for n in section['evidence_nodes']),'foreign reasoning evidence')
++  for field in ('assumptions','unknowns'):require(isinstance(section[field],list)and all(nonempty(s)for s in section[field]),'explicit assumptions/unknowns required')
++  if section['status']=='inferred':require(section['evidence_nodes']and section['assumptions'],'inference requires evidence and assumptions');known+=1
++  else:require(section['unknowns'],'unknown section requires limitations')
++ require(known>0,'all-unknown placeholder cannot complete a deep review')
++ findings=judgments['findings'];require(isinstance(findings,list)and len(findings)<=MAX_FINDINGS,'finding cap/type')
++ ids=set()
++ for finding in findings:
++  exact(finding,('id','category','claim','suggestion','priority','evidence_nodes','rule_candidates','assumptions','unknowns','origin','state'))
++  require(nonempty(finding['id'])and finding['id']not in ids and finding['origin']=='agent_reasoning'and finding['state']=='review_candidate','finding identity/origin or verified vulnerability overclaim');ids.add(finding['id'])
++  require(finding['priority']in('high','medium','low')and finding['category']in('state','guard','exception','complexity','resource','io','tradeoff'),'finding category/priority')
++  require(nonempty(finding['claim'])and nonempty(finding['suggestion']),'finding explanation/remediation required')
++  require(isinstance(finding['evidence_nodes'],list)and finding['evidence_nodes']and all(n in by_id for n in finding['evidence_nodes']),'finding original evidence required')
++  require(isinstance(finding['rule_candidates'],list)and all(c in candidates for c in finding['rule_candidates']),'unknown automatic candidate')
++  for name in ('assumptions','unknowns'):require(isinstance(finding[name],list)and finding[name]and all(nonempty(s)for s in finding[name]),'finding assumptions/unknowns required')
++ criteria=judgments['criteria'];require(isinstance(criteria,list)and 0<len(criteria)<=32,'review criteria required')
++ seen=set()
++ for row in criteria:
++  exact(row,('id','requirement','section','status','reason'))
++  require(nonempty(row['id'])and row['id']not in seen and nonempty(row['requirement'])and row['section']in SECTIONS and row['status']in('covered','unknown')and nonempty(row['reason']),'invalid/duplicate review criterion');seen.add(row['id'])
++  if row['status']=='covered':require(judgments['sections'][row['section']]['status']=='inferred','unknown section cannot fulfill review criterion')
++ return judgments
++
++def computed_view(analysis):
++ return {'origin':'graph_computation','sequence':{'kind':'bounded_cfg_not_execution_trace','edges':[e for e in analysis['edges']if e['kind']=='cfg']},'module':{'kind':'retained_file_membership','file':analysis['source']['file'],'symbol':analysis['source']['node_id'],'interprocedural_edges':'unknown'},'value_control':{'nodes':analysis['nodes'],'edges':analysis['edges'],'variables':analysis['variables'],'occurrences':analysis['occurrences'],'def_use':analysis['def_use']},'automatic_rule_candidates':analysis['rules']['candidates'],'capability':analysis['capability'],'diagnostics':analysis['diagnostics']}
++
++def build(bundle,judgments):
++ source,analysis,by_id=validate_bundle(bundle);validate_judgments(judgments,by_id,{c['id']for c in analysis['rules']['candidates']})
++ return {'schema_version':SCHEMA,'ticket_id':bundle['ticket_id'],'status':'structured_partial_review','source':source,'evidence_sha256':sha(canonical(bundle)),'computed':computed_view(analysis),'reasoning':judgments,'structural_review':{'origin':'graph_record','snapshot_association':'identity_only_unverified_snapshot','response':bundle['function_review']['result']},'limitations':['graph rule/value computation is bounded, not whole-program safety','structural review lacks its own immutable snapshot/blob pin; no atomic cross-call proof','source/CFG order is not a runtime call trace','agent findings, complexity/resources/I/O and priorities are reasoning, not measured facts','local receipt hashes do not authenticate MCP transport or grant reviewer acceptance'],'independent_acceptance':'not_recorded'}
++
++def validate(report,bundle):
++ exact(report,('schema_version','ticket_id','status','source','evidence_sha256','computed','reasoning','structural_review','limitations','independent_acceptance'))
++ expected=build(bundle,report['reasoning']);require(report==expected,'report/source/computed/origin/limitations changed');return report
++
++def markdown(report):
++ # JSON code blocks preserve attribution and avoid rendering source text as HTML.
++ def safe(value):return json.dumps(value,ensure_ascii=False,indent=2,sort_keys=True).replace('```','\\u0060\\u0060\\u0060')
++ lines=['# Structured function review','', 'Status: structured partial review; independent acceptance: not recorded.','', 'Source pins:', '```json',safe(report['source']),'```','', 'Computed CFG sequence (not an execution trace):','```json',safe(report['computed']['sequence']),'```','', 'Module membership:', '```json',safe(report['computed']['module']),'```']
++ for name in SECTIONS:
++  section=report['reasoning']['sections'][name];lines+=['', '## '+name,'','```json',safe(section),'```']
++ lines+=['','## Findings and review criteria','','```json',safe({'findings':report['reasoning']['findings'],'criteria':report['reasoning']['criteria']}),'```','','## Limitations','']+['- '+s for s in report['limitations']]
++ lines+=['','## Diagrams (computed local structure; no runtime trace)','','```mermaid',sequence_diagram(report),'```','','```mermaid',module_diagram(report),'```']
++ return '\n'.join(lines)+'\n'
++
++def sequence_diagram(report):
++ edges=report['computed']['sequence']['edges'];ids=sorted({e[k]for e in edges for k in ('from','to')})
++ labels={b:'v'+sha(b.encode())[:12]for b in ids};lines=['flowchart TD','%% Computed bounded CFG; runtime feasibility, calls and exceptions remain unknown.']
++ for b in ids:lines.append('  '+labels[b]+'["'+b+'"]')
++ for e in edges:
++  label=e.get('condition','') or 'successor'
++  lines.append('  '+labels[e['from']]+' -->|'+label+'| '+labels[e['to']])
++ if not ids:lines.append('  empty["No CFG successors; no safety conclusion"]')
++ return '\n'.join(lines)
++def module_diagram(report):
++ module=report['computed']['module'];label=json.dumps(module['file'],ensure_ascii=True)
++ return '\n'.join(['flowchart LR','%% Computed retained-file membership; interprocedural edges are unknown.','  file['+label+'] -->|computed membership| symbol["Selected retained function"]','  symbol -.->|unknown, not computed| external["Interprocedural relationships unavailable"]'])
++
++def write_review(workspace,bundle,judgments):
++ workspace=Path(workspace);require(workspace.is_dir(),'existing ticket workspace required');report=build(bundle,judgments)
++ (workspace/'deep-review-evidence.json').write_bytes(canonical(bundle)+b'\n');(workspace/'deep-review.json').write_bytes(canonical(report)+b'\n');(workspace/'review-report.md').write_text(markdown(report));(workspace/'sequence.mmd').write_text(sequence_diagram(report)+'\n');(workspace/'modules.mmd').write_text(module_diagram(report)+'\n');return report
++
++def verify_workspace(workspace,state=None):
++ workspace=Path(workspace);raw,report=load(workspace/'deep-review.json');_,bundle=load(workspace/'deep-review-evidence.json');validate(report,bundle)
++ text=(workspace/'review-report.md').read_text();require(text==markdown(report),'review delivery report differs from typed artifact')
++ require((workspace/'sequence.mmd').read_text()==sequence_diagram(report)+'\n'and (workspace/'modules.mmd').read_text()==module_diagram(report)+'\n','diagram differs from source-bound view')
++ if state is None:_,state=load(workspace/'state.json')
++ require(isinstance(state,dict)and state.get('ticket_type')=='code_review'and state.get('ticket_id')==report['ticket_id'],'review ticket identity/type differs')
++ analysis=state.get('states',{}).get('ANALYSIS',{});require(analysis.get('deep_review_sha256')==sha(raw),'analysis must bind exact validated deep review bytes')
++ if state.get('current_state')in('COMPLETION','COMPLETED'):
++  planning=state.get('states',{}).get('PLANNING',{});require(planning.get('review_report_sha256')==sha(text.encode())and planning.get('status')=='completed','completion requires bound delivered review report')
++ return {'status':'validated_delivery','ticket_id':report['ticket_id'],'deep_review_sha256':sha(raw),'review_report_sha256':sha(text.encode()),'independent_acceptance':'not_recorded'}
++
++def main():
++ parser=argparse.ArgumentParser();sub=parser.add_subparsers(dest='action',required=True)
++ create=sub.add_parser('build');create.add_argument('--workspace',type=Path,required=True);create.add_argument('--bundle',type=Path,required=True);create.add_argument('--judgments',type=Path,required=True)
++ verify=sub.add_parser('verify');verify.add_argument('--workspace',type=Path,required=True)
++ args=parser.parse_args()
++ try:
++  if args.action=='build':_,bundle=load(args.bundle);_,judgments=load(args.judgments);report=write_review(args.workspace,bundle,judgments);print(json.dumps({'status':report['status'],'independent_acceptance':'not_recorded'}))
++  else:print(json.dumps(verify_workspace(args.workspace)))
++ except (Invalid,ValueError,TypeError,KeyError,OSError)as error:print(json.dumps({'status':'invalid','reason':str(error)}));return 2
++ return 0
++if __name__=='__main__':raise SystemExit(main())
+diff --git a/plugin/scripts/tests/fixtures/deep-review-bundle.json b/plugin/scripts/tests/fixtures/deep-review-bundle.json
+new file mode 100644
+index 0000000..f8da86e
+--- /dev/null
++++ b/plugin/scripts/tests/fixtures/deep-review-bundle.json
+@@ -0,0 +1,545 @@
++{
++  "schema_version": 1,
++  "ticket_id": "REVIEW-FIXTURE",
++  "rules": {
++    "tool": "cks.context.rule_candidates",
++    "arguments": {
++      "rule_pack": "go-local-review@1.0.0",
++      "function": {
++        "node_id": "33d3573fa387fa44",
++        "expected_commit": "ca5acdcf78b4cfa02b4b67be4a52d4d7e3de4fe4",
++        "expected_source_sha256": "e0e50cf281fa4c56277ee0635f4be74a1e622475e083f883745695cb8198aeb0",
++        "expected_snapshot_sha256": "95f8325ab9ca0d23168083a4e911b2eb518c3e8d051730e5b8e01d16ff12a65e"
++      }
++    },
++    "result": {
++      "schema_version": 1,
++      "status": "partial",
++      "snapshot_sha256": "95f8325ab9ca0d23168083a4e911b2eb518c3e8d051730e5b8e01d16ff12a65e",
++      "analysis": {
++        "schema_version": 1,
++        "source": {
++          "node_id": "33d3573fa387fa44",
++          "canonical_id": "example.invalid/rule-fixture.Branch",
++          "file": "cases.go",
++          "commit": "ca5acdcf78b4cfa02b4b67be4a52d4d7e3de4fe4",
++          "sha256": "e0e50cf281fa4c56277ee0635f4be74a1e622475e083f883745695cb8198aeb0",
++          "language": "go",
++          "start_line": 20,
++          "start_byte": 633,
++          "bytes": 119,
++          "snapshot_sha256": "95f8325ab9ca0d23168083a4e911b2eb518c3e8d051730e5b8e01d16ff12a65e",
++          "function_name": "Branch"
++        },
++        "limits": {
++          "max_source_bytes": 262144,
++          "max_ast_nodes": 4096,
++          "max_blocks": 256,
++          "max_nodes": 1024,
++          "max_edges": 4096,
++          "max_iterations": 128,
++          "timeout_ms": 1000,
++          "max_facts": 65536
++        },
++        "status": "partial",
++        "capability": {
++          "cfg": "bounded_go",
++          "control_dependence": "normal_exit_postdominators",
++          "data_dependence": "local_scalar_may_reach",
++          "def_use": "lexical_may_reach",
++          "exceptions": "unsupported",
++          "local_binding": "isolated_go_types",
++          "memory_alias": "unsupported",
++          "package_types": "unavailable_function_blob",
++          "short_circuit": "unsupported"
++        },
++        "blocks": [
++          {
++            "id": 0,
++            "kind": "Body",
++            "reachable": true,
++            "nodes": [
++              "entry",
++              "b0/n0",
++              "b0/n1"
++            ]
++          },
++          {
++            "id": 1,
++            "kind": "IfThen",
++            "reachable": true,
++            "nodes": [
++              "b1/n0"
++            ]
++          },
++          {
++            "id": 2,
++            "kind": "IfDone",
++            "reachable": true,
++            "nodes": [
++              "b2/n0"
++            ]
++          },
++          {
++            "id": 3,
++            "kind": "Unreachable",
++            "reachable": false,
++            "nodes": []
++          }
++        ],
++        "nodes": [
++          {
++            "id": "b0/n0",
++            "block": 0,
++            "kind": "AssignStmt",
++            "location": {
++              "start_byte": 681,
++              "end_byte": 696,
++              "start_line": 21,
++              "end_line": 21
++            },
++            "text": "name := \"fixed\"",
++            "synthetic": false
++          },
++          {
++            "id": "b0/n1",
++            "block": 0,
++            "kind": "Ident",
++            "location": {
++              "start_byte": 701,
++              "end_byte": 705,
++              "start_line": 22,
++              "end_line": 22
++            },
++            "text": "flag",
++            "synthetic": false
++          },
++          {
++            "id": "b1/n0",
++            "block": 1,
++            "kind": "AssignStmt",
++            "location": {
++              "start_byte": 710,
++              "end_byte": 720,
++              "start_line": 23,
++              "end_line": 23
++            },
++            "text": "name = cmd",
++            "synthetic": false
++          },
++          {
++            "id": "b2/n0",
++            "block": 2,
++            "kind": "ReturnStmt",
++            "location": {
++              "start_byte": 725,
++              "end_byte": 750,
++              "start_line": 25,
++              "end_line": 25
++            },
++            "text": "return exec.Command(name)",
++            "synthetic": false
++          },
++          {
++            "id": "entry",
++            "block": 0,
++            "kind": "entry",
++            "location": {
++              "start_byte": 633,
++              "end_byte": 677,
++              "start_line": 20,
++              "end_line": 20
++            },
++            "text": "",
++            "synthetic": true
++          }
++        ],
++        "edges": [
++          {
++            "from": "b0",
++            "to": "b1",
++            "kind": "cfg",
++            "condition": "true",
++            "certainty": "conservative"
++          },
++          {
++            "from": "b0",
++            "to": "b2",
++            "kind": "cfg",
++            "condition": "false",
++            "certainty": "conservative"
++          },
++          {
++            "from": "b1",
++            "to": "b2",
++            "kind": "cfg",
++            "certainty": "structural"
++          },
++          {
++            "from": "entry",
++            "to": "b0/n1",
++            "kind": "data_dependence",
++            "certainty": "may_reach",
++            "variable": "v657"
++          },
++          {
++            "from": "entry",
++            "to": "b1/n0",
++            "kind": "data_dependence",
++            "certainty": "may_reach",
++            "variable": "v645"
++          },
++          {
++            "from": "b0/n0",
++            "to": "b2/n0",
++            "kind": "data_dependence",
++            "certainty": "may_reach",
++            "variable": "v681"
++          },
++          {
++            "from": "b1/n0",
++            "to": "b2/n0",
++            "kind": "data_dependence",
++            "certainty": "may_reach",
++            "variable": "v681"
++          },
++          {
++            "from": "b0/n1",
++            "to": "b1/n0",
++            "kind": "control_dependence",
++            "condition": "true",
++            "certainty": "normal_exit_structural"
++          }
++        ],
++        "diagnostics": [
++          {
++            "code": "isolated_type_info_partial",
++            "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
++          },
++          {
++            "code": "opaque_call",
++            "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
++            "location": {
++              "start_byte": 732,
++              "end_byte": 750,
++              "start_line": 25,
++              "end_line": 25
++            }
++          },
++          {
++            "code": "external_value_unknown",
++            "message": "Value read has no local lexical definition; no source edge is invented",
++            "location": {
++              "start_byte": 732,
++              "end_byte": 736,
++              "start_line": 25,
++              "end_line": 25
++            }
++          }
++        ],
++        "truncated": false,
++        "elapsed_micros": 83,
++        "variables": [
++          {
++            "id": "v645",
++            "name": "cmd",
++            "kind": "parameter",
++            "declaration": {
++              "start_byte": 645,
++              "end_byte": 648,
++              "start_line": 20,
++              "end_line": 20
++            }
++          },
++          {
++            "id": "v657",
++            "name": "flag",
++            "kind": "parameter",
++            "declaration": {
++              "start_byte": 657,
++              "end_byte": 661,
++              "start_line": 20,
++              "end_line": 20
++            }
++          },
++          {
++            "id": "v681",
++            "name": "name",
++            "kind": "local",
++            "declaration": {
++              "start_byte": 681,
++              "end_byte": 685,
++              "start_line": 21,
++              "end_line": 21
++            }
++          }
++        ],
++        "occurrences": [
++          {
++            "id": "b0/n0/definition/v681/681",
++            "node": "b0/n0",
++            "variable": "v681",
++            "role": "definition",
++            "location": {
++              "start_byte": 681,
++              "end_byte": 685,
++              "start_line": 21,
++              "end_line": 21
++            },
++            "reachable": true
++          },
++          {
++            "id": "b0/n1/use/v657/701",
++            "node": "b0/n1",
++            "variable": "v657",
++            "role": "use",
++            "location": {
++              "start_byte": 701,
++              "end_byte": 705,
++              "start_line": 22,
++              "end_line": 22
++            },
++            "reachable": true
++          },
++          {
++            "id": "b1/n0/definition/v681/710",
++            "node": "b1/n0",
++            "variable": "v681",
++            "role": "definition",
++            "location": {
++              "start_byte": 710,
++              "end_byte": 714,
++              "start_line": 23,
++              "end_line": 23
++            },
++            "reachable": true
++          },
++          {
++            "id": "b1/n0/use/v645/717",
++            "node": "b1/n0",
++            "variable": "v645",
++            "role": "use",
++            "location": {
++              "start_byte": 717,
++              "end_byte": 720,
++              "start_line": 23,
++              "end_line": 23
++            },
++            "reachable": true
++          },
++          {
++            "id": "b2/n0/use/v681/745",
++            "node": "b2/n0",
++            "variable": "v681",
++            "role": "use",
++            "location": {
++              "start_byte": 745,
++              "end_byte": 749,
++              "start_line": 25,
++              "end_line": 25
++            },
++            "reachable": true
++          },
++          {
++            "id": "entry/definition/v645/645",
++            "node": "entry",
++            "variable": "v645",
++            "role": "definition",
++            "location": {
++              "start_byte": 645,
++              "end_byte": 648,
++              "start_line": 20,
++              "end_line": 20
++            },
++            "reachable": true
++          },
++          {
++            "id": "entry/definition/v657/657",
++            "node": "entry",
++            "variable": "v657",
++            "role": "definition",
++            "location": {
++              "start_byte": 657,
++              "end_byte": 661,
++              "start_line": 20,
++              "end_line": 20
++            },
++            "reachable": true
++          }
++        ],
++        "def_use": [
++          {
++            "definition": "entry/definition/v657/657",
++            "use": "b0/n1/use/v657/701",
++            "variable": "v657",
++            "certainty": "lexical_may_reach"
++          },
++          {
++            "definition": "entry/definition/v645/645",
++            "use": "b1/n0/use/v645/717",
++            "variable": "v645",
++            "certainty": "lexical_may_reach"
++          },
++          {
++            "definition": "b0/n0/definition/v681/681",
++            "use": "b2/n0/use/v681/745",
++            "variable": "v681",
++            "certainty": "lexical_may_reach"
++          },
++          {
++            "definition": "b1/n0/definition/v681/710",
++            "use": "b2/n0/use/v681/745",
++            "variable": "v681",
++            "certainty": "lexical_may_reach"
++          }
++        ],
++        "iterations": 9,
++        "facts_peak": 42,
++        "rules": {
++          "pack_id": "go-local-review",
++          "pack_version": "1.0.0",
++          "pack_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
++          "engine_version": "1",
++          "origin": "automatic",
++          "status": "matched_bounded",
++          "limits": {
++            "max_candidates": 64,
++            "max_flow_steps": 4096
++          },
++          "flow_steps": 60,
++          "candidates": [
++            {
++              "id": "4ae4ecf912f74ff40c685b1b7b20d1f28abac275e2d3366ffb6ba9f4915a9bde",
++              "rule_id": "parameter-command-name",
++              "origin": "automatic",
++              "source_occurrence": "entry/definition/v645/645",
++              "source_location": {
++                "start_byte": 645,
++                "end_byte": 648,
++                "start_line": 20,
++                "end_line": 20
++              },
++              "sink_occurrence": "b2/n0/use/v681/745",
++              "sink_location": {
++                "start_byte": 745,
++                "end_byte": 749,
++                "start_line": 25,
++                "end_line": 25
++              },
++              "path": [
++                "entry",
++                "b1/n0",
++                "b2/n0"
++              ],
++              "conditions": [
++                {
++                  "node": "b0/n1",
++                  "condition": "true",
++                  "location": {
++                    "start_byte": 701,
++                    "end_byte": 705,
++                    "start_line": 22,
++                    "end_line": 22
++                  }
++                }
++              ],
++              "certainty": "lexical_may_reach",
++              "target_resolution": "syntax_only_unverified",
++              "sanitizer": "not_proven"
++            }
++          ],
++          "limitations": [
++            "empty_candidates_do_not_establish_safety",
++            "syntax_targets_unresolved",
++            "parameters_not_proven_attacker_controlled",
++            "lexical_may_reach_not_path_feasibility",
++            "sanitizers_and_opaque_call_effects_not_proven",
++            "aliases_closures_fields_and_indirect_sinks_unsupported"
++          ]
++        }
++      },
++      "elapsed_micros": 363
++    }
++  },
++  "function_review": {
++    "tool": "cks.context.review_function",
++    "arguments": {
++      "symbol": "example.invalid/rule-fixture.Branch",
++      "caller_depth": 2
++    },
++    "result": {
++      "seed": {
++        "id": "33d3573fa387fa44",
++        "qualified_name": "cases.Branch",
++        "type": "Function",
++        "file_path": "cases.go",
++        "start_line": 20,
++        "end_line": 26
++      },
++      "code": {
++        "signature": "func Branch(cmd string, flag bool) *exec.Cmd",
++        "uses_types": null,
++        "instantiates": null,
++        "writes_fields": null,
++        "return_statements": 1,
++        "control": {
++          "IfStmt": 1
++        },
++        "call_sites": [
++          {
++            "line": 25,
++            "text": "exec.Command(name)"
++          }
++        ],
++        "call_sites_total": 1,
++        "callees": null,
++        "interface_implementers": {},
++        "callers": null,
++        "via_interfaces": null,
++        "caller_paths": null,
++        "entry_points": 0,
++        "caller_walk_truncated": false,
++        "goroutines": null,
++        "sends_to": null,
++        "recvs_from": null,
++        "acquires_locks": null,
++        "releases_locks": null,
++        "timeout_paths": null,
++        "cancellation_paths": null
++      },
++      "history": {
++        "commits": [
++          {
++            "sha": "ca5acdcf78b4cfa02b4b67be4a52d4d7e3de4fe4",
++            "time": 1791968582,
++            "subject": "test: capture local rule review cases"
++          }
++        ],
++        "commits_total": 1,
++        "prs": []
++      },
++      "tests": {
++        "callers": [
++          {
++            "id": "595d12b3d5de388d",
++            "qualified_name": "cases.TestIndependentRuntimeContracts",
++            "type": "Function",
++            "file_path": "cases_test.go",
++            "start_line": 5,
++            "end_line": 24
++          }
++        ],
++        "callers_total": 1
++      },
++      "available": [
++        "history: 1 commits and 0 PRs changed this function; diffs and related past changes: cks.context.change_history",
++        "tests: 1 test functions call it; cks.context.find_callers lists them (it includes tests unless exclude_tests=true)"
++      ],
++      "limits": [
++        "calls through function values, callbacks, reflection and generated code have no graph edges and do not appear in callers or callees",
++        "a channel send or receive is listed, but the goroutine on the other end is not resolved",
++        "history covers the commits the index walked per file (a bounded recent window), not the whole repository history"
++      ]
++    }
++  }
++}
+diff --git a/plugin/scripts/tests/fixtures/deep-review-judgments.json b/plugin/scripts/tests/fixtures/deep-review-judgments.json
+new file mode 100644
+index 0000000..ea7d074
+--- /dev/null
++++ b/plugin/scripts/tests/fixtures/deep-review-judgments.json
+@@ -0,0 +1,113 @@
++{
++  "sections": {
++    "data_state": {
++      "status": "unknown",
++      "claim": "This bounded function review has no verified data_state assessment",
++      "evidence_nodes": [],
++      "assumptions": [],
++      "unknowns": [
++        "No whole-program/measurement evidence supplied"
++      ],
++      "origin": "agent_reasoning"
++    },
++    "guards_exceptions": {
++      "status": "inferred",
++      "claim": "The local branch can select the parameter as a command name; evaluate an allowlist guard",
++      "evidence_nodes": [
++        "b2/n0"
++      ],
++      "assumptions": [
++        "The syntactic exec selector is the intended standard library call",
++        "The parameter may be influenced by the caller"
++      ],
++      "unknowns": [
++        "Actual target/import resolution and attacker influence are not proven",
++        "External call and exception behavior are unknown"
++      ],
++      "origin": "agent_reasoning"
++    },
++    "complexity": {
++      "status": "unknown",
++      "claim": "This bounded function review has no verified complexity assessment",
++      "evidence_nodes": [],
++      "assumptions": [],
++      "unknowns": [
++        "No whole-program/measurement evidence supplied"
++      ],
++      "origin": "agent_reasoning"
++    },
++    "resources": {
++      "status": "unknown",
++      "claim": "This bounded function review has no verified resources assessment",
++      "evidence_nodes": [],
++      "assumptions": [],
++      "unknowns": [
++        "No whole-program/measurement evidence supplied"
++      ],
++      "origin": "agent_reasoning"
++    },
++    "io": {
++      "status": "unknown",
++      "claim": "This bounded function review has no verified io assessment",
++      "evidence_nodes": [],
++      "assumptions": [],
++      "unknowns": [
++        "No whole-program/measurement evidence supplied"
++      ],
++      "origin": "agent_reasoning"
++    },
++    "priority_tradeoffs": {
++      "status": "inferred",
++      "claim": "Prefer a scoped guard review before optimizing the source selection; the tradeoff is stricter inputs versus compatibility",
++      "evidence_nodes": [
++        "b2/n0"
++      ],
++      "assumptions": [
++        "Input restrictions are an intended review concern"
++      ],
++      "unknowns": [
++        "Caller requirements and measured performance are unavailable"
++      ],
++      "origin": "agent_reasoning"
++    }
++  },
++  "findings": [
++    {
++      "id": "guard-review",
++      "category": "guard",
++      "claim": "Parameter-derived command-name candidate needs scoped guard review",
++      "suggestion": "Check intended caller permissions and allowed command names before changing behavior",
++      "priority": "high",
++      "evidence_nodes": [
++        "b2/n0"
++      ],
++      "rule_candidates": [
++        "4ae4ecf912f74ff40c685b1b7b20d1f28abac275e2d3366ffb6ba9f4915a9bde"
++      ],
++      "assumptions": [
++        "This selector is the intended command API"
++      ],
++      "unknowns": [
++        "No exploit or missing whole-program authorization is established"
++      ],
++      "origin": "agent_reasoning",
++      "state": "review_candidate"
++    }
++  ],
++  "criteria": [
++    {
++      "id": "guard",
++      "requirement": "Review local command-name guards",
++      "section": "guards_exceptions",
++      "status": "covered",
++      "reason": "Source-bound local branch and rule candidate reviewed under explicit assumptions"
++    },
++    {
++      "id": "cost",
++      "requirement": "Assess resource and runtime cost",
++      "section": "resources",
++      "status": "unknown",
++      "reason": "No runtime measurement or whole-call-graph evidence supplied"
++    }
++  ]
++}
+diff --git a/plugin/scripts/tests/test_deep_review.py b/plugin/scripts/tests/test_deep_review.py
+new file mode 100644
+index 0000000..cc34068
+--- /dev/null
++++ b/plugin/scripts/tests/test_deep_review.py
+@@ -0,0 +1,94 @@
++import copy
++import importlib.util
++import json
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++ROOT=Path(__file__).resolve().parents[2]
++spec=importlib.util.spec_from_file_location('deep_review',ROOT/'scripts/deep_review.py');review=importlib.util.module_from_spec(spec);spec.loader.exec_module(review)
++FIXTURE=Path(__file__).parent/'fixtures'
++def bundle():return json.loads((FIXTURE/'deep-review-bundle.json').read_text())
++def judgments():return json.loads((FIXTURE/'deep-review-judgments.json').read_text())
++class DeepReviewTests(unittest.TestCase):
++ def test_actual_source_shape_and_inferred_unknown_split(self):
++  b=bundle();report=review.build(b,judgments());review.validate(report,b)
++  self.assertEqual(report['computed']['origin'],'graph_computation');self.assertEqual(report['reasoning']['sections']['resources']['status'],'unknown');self.assertEqual(report['structural_review']['snapshot_association'],'identity_only_unverified_snapshot');self.assertEqual(report['independent_acceptance'],'not_recorded')
++  self.assertIn('flowchart TD',review.sequence_diagram(report));self.assertIn('unknown, not computed',review.module_diagram(report))
++ def test_canonical_hash_is_stable(self):
++  b=bundle();reordered=json.loads(json.dumps(b,sort_keys=True));self.assertEqual(review.build(b,judgments()),review.build(reordered,judgments()))
++ def test_missing_required_dimensions_and_all_unknown_placeholder_rejected(self):
++  j=judgments();j['sections'].pop('io')
++  with self.assertRaises(review.Invalid):review.build(bundle(),j)
++  j=judgments()
++  for section in j['sections'].values():section.update(status='unknown',unknowns=['not reviewed'])
++  with self.assertRaises(review.Invalid):review.build(bundle(),j)
++ def test_reasoning_needs_original_evidence_and_assumptions(self):
++  for field,value in [('evidence_nodes',[]),('evidence_nodes',['foreign']),('assumptions',[])]:
++   j=judgments();j['sections']['guards_exceptions'][field]=value
++   with self.assertRaises(review.Invalid):review.build(bundle(),j)
++ def test_empty_unknown_and_false_observation_rejected(self):
++  for change in ['missing_reason','observed']:
++   j=judgments();section=j['sections']['resources'];section['unknowns']=[] if change=='missing_reason'else['unknown'];section['status']='observed'if change=='observed'else'unknown'
++   with self.assertRaises(review.Invalid):review.build(bundle(),j)
++ def test_findings_cannot_be_confirmed_vulnerabilities(self):
++  for field,value in [('state','confirmed'),('origin','graph_computation'),('evidence_nodes',['foreign']),('rule_candidates',['foreign'])]:
++   j=judgments();j['findings'][0][field]=value
++   with self.assertRaises(review.Invalid):review.build(bundle(),j)
++ def test_unknown_section_cannot_cover_criterion(self):
++  j=judgments();j['criteria'][1]['status']='covered'
++  with self.assertRaises(review.Invalid):review.build(bundle(),j)
++ def test_foreign_source_identity_snapshot_and_private_paths_rejected(self):
++  for field,value in [('node_id','foreign'),('commit','main'),('snapshot_sha256','0'*64),('file','.claude/session.go'),('file','logs/session.go'),('file','../source.go')]:
++   b=bundle();b['rules']['result']['analysis']['source'][field]=value
++   with self.assertRaises(review.Invalid):review.build(b,judgments())
++ def test_other_structural_symbol_and_missing_pin_not_borrowed(self):
++  b=bundle();b['function_review']['result']['seed']['id']='foreign'
++  with self.assertRaises(review.Invalid):review.build(b,judgments())
++  b=bundle();r=review.build(b,judgments());self.assertEqual(r['structural_review']['snapshot_association'],'identity_only_unverified_snapshot')
++ def test_unsupported_truncated_unknown_pack_and_bound_rejected(self):
++  for change in ['truncated','base','rules','pack','bound']:
++   b=bundle()
++   if change=='truncated':b['rules']['result']['analysis']['truncated']=True
++   if change=='base':b['rules']['result']['status']='unsupported'
++   if change=='rules':b['rules']['result']['analysis']['rules']['status']='incomplete'
++   if change=='pack':b['rules']['arguments']['rule_pack']='latest'
++   if change=='bound':b['rules']['arguments']['max_flow_steps']=0
++   with self.assertRaises(review.Invalid):review.build(b,judgments())
++ def test_foreign_edges_and_outside_source_positions_rejected(self):
++  b=bundle();b['rules']['result']['analysis']['edges'][0]['to']='outside'
++  with self.assertRaises(review.Invalid):review.build(b,judgments())
++  b=bundle();b['rules']['result']['analysis']['nodes'][0]['location']['end_byte']=999999
++  with self.assertRaises(review.Invalid):review.build(b,judgments())
++ def test_report_computed_edge_and_acceptance_tamper_rejected(self):
++  b=bundle();r=review.build(b,judgments());r['computed']['sequence']['edges'][0]['condition']='proven'
++  with self.assertRaises(review.Invalid):review.validate(r,b)
++  r=review.build(b,judgments());r['independent_acceptance']='accepted'
++  with self.assertRaises(review.Invalid):review.validate(r,b)
++ def make_workspace(self,root):
++  workspace=Path(root)/'.coding-agent/tickets/REVIEW-FIXTURE';workspace.mkdir(parents=True);review.write_review(workspace,bundle(),judgments());raw=(workspace/'deep-review.json').read_bytes();state={'ticket_id':'REVIEW-FIXTURE','ticket_type':'code_review','current_state':'PLANNING','states':{'ANALYSIS':{'status':'completed','deep_review_sha256':review.sha(raw)},'PLANNING':{'status':'pending'}}};(workspace/'state.json').write_text(json.dumps(state));return workspace,state
++ def hook(self,workspace,state):
++  event={'tool_name':'Write','cwd':str(workspace),'tool_input':{'file_path':str(workspace/'state.json'),'content':json.dumps(state)}}
++  result=subprocess.run([sys.executable,str(ROOT/'hooks/deep-review-guard.py')],input=json.dumps(event),text=True,capture_output=True);self.assertEqual(result.returncode,0,result.stderr);return result.stdout
++ def test_delivery_hash_hook_cli_and_diagrams(self):
++  with tempfile.TemporaryDirectory()as root:
++   workspace,state=self.make_workspace(root);review.verify_workspace(workspace);self.assertEqual(self.hook(workspace,state),'')
++   state['current_state']='COMPLETED';self.assertIn('deny',self.hook(workspace,state))
++   state['states']['PLANNING']={'status':'completed','review_report_sha256':review.sha((workspace/'review-report.md').read_bytes())};self.assertEqual(self.hook(workspace,state),'');review.verify_workspace(workspace,state)
++   out=subprocess.run([sys.executable,str(ROOT/'scripts/deep_review.py'),'verify','--workspace',str(workspace)],capture_output=True,text=True);self.assertEqual(out.returncode,0,out.stdout)
++   (workspace/'modules.mmd').unlink();self.assertIn('deny',self.hook(workspace,state))
++ def test_type_bypass_frozen_hash_report_and_bundle_tamper_denied(self):
++  with tempfile.TemporaryDirectory()as root:
++   workspace,state=self.make_workspace(root);wrong=copy.deepcopy(state);wrong['ticket_type']='feature';self.assertIn('deny',self.hook(workspace,wrong))
++   wrong=copy.deepcopy(state);wrong['states']['ANALYSIS']['deep_review_sha256']='0'*64;self.assertIn('deny',self.hook(workspace,wrong))
++   (workspace/'review-report.md').write_text('review complete');self.assertIn('deny',self.hook(workspace,state))
++   review.write_review(workspace,bundle(),judgments());b=bundle();b['rules']['arguments']['function']['expected_commit']='0'*40;(workspace/'deep-review-evidence.json').write_text(json.dumps(b));self.assertIn('deny',self.hook(workspace,state))
++ def test_duplicate_and_nonfinite_json_rejected(self):
++  with tempfile.TemporaryDirectory()as root:
++   path=Path(root)/'input.json'
++   for raw in ['{"schema_version":1,"schema_version":2}','{"number":NaN}']:
++    path.write_text(raw)
++    with self.assertRaises(review.Invalid):review.load(path)
++if __name__=='__main__':unittest.main()
+diff --git a/plugin/scripts/tests/test_suspect_labels.py b/plugin/scripts/tests/test_suspect_labels.py
+index 29140f4..16386ff 100644
+--- a/plugin/scripts/tests/test_suspect_labels.py
++++ b/plugin/scripts/tests/test_suspect_labels.py
+@@ -60,7 +60,7 @@ class LabelsTests(unittest.TestCase):
+  def test_contract_schema_semantics_and_alias_collision(self):
+   contract=json.loads((ROOT/'contracts/cks-tools.schema.json').read_text())
+   tools=[{'name':v['wire_name'],'inputSchema':v['input']} for v in contract['providers']['cks']['tools'].values()]
+-  self.assertEqual(labels.check_contract(tools),29)
++  self.assertEqual(labels.check_contract(tools),31)
+   wrong=copy.deepcopy(tools);wrong[0]['inputSchema']['properties']['symptom']={'type':'array'}
+   with self.assertRaises(labels.Invalid):labels.check_contract(wrong)
+   with self.assertRaises(labels.Invalid):labels.check_contract(tools[:-1])
+diff --git a/plugin/skills/state-machine/SKILL.md b/plugin/skills/state-machine/SKILL.md
+index 66f6f2b..9ef0c22 100644
+--- a/plugin/skills/state-machine/SKILL.md
++++ b/plugin/skills/state-machine/SKILL.md
+@@ -538,3 +538,16 @@ log_observation_result_sha256. AWAITING remains analysis; RECURRED only requests
+ fresh bounded ANALYSIS generation. Erasing classification or promoting log
+ recurrence to reproduced/planning/completed is denied. Source/event/raw files
+ remain immutable. Timing neutrality and fix acceptance are not inferred.
++
++## Source-bound code review handoff and delivery
++
++For ticket_type code_review, complete ANALYSIS only after applying
++structured-review and verifying deep-review.json/evidence/source-bound diagrams
++and report draft through plugin/scripts/deep_review.py. Bind exact
++states.ANALYSIS.deep_review_sha256. The review_only route is ANALYSIS -> PLANNING
++-> COMPLETION; do not jump from light analysis to a terminal. PLANNING binds
++review_report_sha256 and completed status after validating delivery. The
++PreToolUse deep-review guard denies missing/tampered/foreign or changed source
++artifacts and type/hash bypass. Direct shell edits are outside hooks and require
++the same CLI. Delivery is a partial structured report; human acceptance remains
++not_recorded. Return to ANALYSIS to revise a frozen report identity.
+diff --git a/plugin/skills/structured-review/SKILL.md b/plugin/skills/structured-review/SKILL.md
+new file mode 100644
+index 0000000..0da018e
+--- /dev/null
++++ b/plugin/skills/structured-review/SKILL.md
+@@ -0,0 +1,47 @@
++---
++name: structured-review
++description: Source-bound partial function review with calculated and agent reasoning provenance, diagrams, review criteria and delivery validation.
++---
++
++# Structured function review
++
++Apply for code_review analysis. Retain exact selected symbol, commit/blob/snapshot
++pins. Explicitly select go-local-review@1.0.0 in the request; automatic rule
++analysis is not enabled by default globally. Capture actual CKS rule_candidates
++and review_function request/results in an owned ticket bundle. The rule result
++already contains computed value/control data: reuse it. Keep unavailable or
++unsupported data explicit; never replace it with safe/false/zero placeholders.
++
++The evidence bundle has schema_version1, ticket_id, rules and function_review.
++Each receipt has tool, arguments, result. Tool names are actual wire names.
++Rule/function query identity must match. Structural review has no independent
++snapshot/blob pin; record identity_only_unverified_snapshot, without borrowing
++another call's pin to claim atomic cross-call consistency. A receipt hash binds
++supplied JSON and does not authenticate MCP transport or reviewer identity.
++
++Provide judgments with sections data_state, guards_exceptions, complexity,
++resources, io and priority_tradeoffs. Each section is agent_reasoning with status
++inferred or unknown, claim, original evidence_nodes, assumptions and unknowns.
++All-unknown placeholders cannot finish analysis. Findings are review_candidate
++agent reasoning, original anchors, rule candidate references, remediation,
++priority, assumptions and unknowns. Criteria bind the user's requirement to a
++section with covered/unknown and rationale. An unknown section cannot be marked
++covered. AST counts are not complexity or performance measurements; explain
++assumptions and external effects. Model priority tradeoffs without treating a
++review suggestion as an executed fix or independent acceptance.
++
++Use plugin/scripts/deep_review.py build --workspace <owned-ticket> --bundle
++<captured-bundle> --judgments <judgments>. It emits typed evidence/review,
++sequence.mmd (bounded CFG order, not runtime trace), modules.mmd (retained file
++membership; interprocedural links unknown) and review-report.md. Computed nodes
++and edges originate in CKG; agent interpretations remain separate. The report
++and diagrams are canonical views, so arbitrary edits fail verification.
++
++Bind the emitted deep-review SHA to states.ANALYSIS.deep_review_sha256. Run
++plugin/scripts/deep_review.py verify --workspace <owned-ticket>, then hand off
++ANALYSIS -> PLANNING. Planner validates delivery and binds the report SHA to
++states.PLANNING.review_report_sha256 with completed status. The review-only
++terminal verifies both. Never skip directly from light review to COMPLETION.
++Human/production acceptance stays not_recorded. Hooks only cover identified
++Write/Edit state transitions; direct shell edits require the same CLI verifier.
++This workflow does not authorize posting to trackers or publishing a PR.
