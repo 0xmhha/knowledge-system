@@ -7,12 +7,12 @@
 | 지식 팩 첨부 | include_knowledge 기본 false, 명시 opt-in |
 | 사용 타입 선언 삽입 | retrieval.type_neighbors 기본 off |
 | 로컬 개인 운영 | 사용자 수용 범위에서 허용 |
-| main 반영 | PR #98과 [PR #99](https://github.com/0xmhha/knowledge-system/pull/99) 스쿼시 머지 완료. PR #99의 main 커밋9a397188에서 CI5/5 성공 |
+| main 반영 | [PR #102](https://github.com/0xmhha/knowledge-system/pull/102) 스쿼시 머지·main a214fbb1 동기화 확인. PR head e77e59b8의 [CI5/5](https://github.com/0xmhha/knowledge-system/actions/runs/38565382940) 성공 |
 | 공개키·신뢰 조건 | N16 미충족, 사용자 결정으로 보류 |
 | 태그·공개 배포 | 보류, 별도 사용자 결정 필요 |
 | 팀·조직·외부 운영 소비자 | 현재 수용 범위 밖 |
 
-2026-10-13 사용자의 스쿼시 머지·main 동기화 지시는 저장소 반영을 승인했다. 기능 기본 활성화·태그·배포·키 생성 승인으로 확대하지 않는다. [main CI](https://github.com/0xmhha/knowledge-system/actions/runs/38362113044)는 빌드·린트·race·산출물·두 평가 게이트·취약점·native 설치 계약을 확인했다.
+2026-10-14 사용자의 PR #102 스쿼시 머지·main 동기화 지시는 해당 저장소 반영을 승인했다. 기능 기본 활성화·태그·배포·키 생성 승인으로 확대하지 않는다. [PR #102 CI](https://github.com/0xmhha/knowledge-system/actions/runs/38565382940)는 빌드·린트·race·산출물·두 평가 게이트·취약점·native 설치 계약을 확인했다.
 
 Go1.26.9의 취약점 검사에서 호출 취약점0·import 패키지 취약점0이었다. x/mod 모듈 수준의 미호출 항목 GO-2026-6180/6179는 남는다. 이 스캔은 기존 설치 바이너리 또는 C/native 의존성의 안전 판정이 아니다. 최소 Go 버전의 설치 호환성 시험도 보안 수용으로 바꾸지 않는다.
 

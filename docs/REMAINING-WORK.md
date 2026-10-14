@@ -1,31 +1,42 @@
-현재 요청 상위 WI 구현은 **9/9 완료**다(WI-V1/V2/3/4/1/2/C/6/SP). 다음 구현 없음·남은 전체 요청 구현0개. WI-SP primary9aff96b6/consumerfdb4d51, 증거e10f12b1의417 산출물·1644 source/dependency·3 consumer 변경·5 승인 입력을 Git/현재 bytes/복구 bundle로 확인했다(2069 연결). 이전8개 증거도1092 Git 연결로 재확인했다. CKS33 계약·실제 annotation14/expansion12/review16/rule39/value15, 전체 build/test/race/fmt/vet/lint/docs·142 consumer/standalone hooks PASS. typed 정책/보안 질의와 manual/automatic/unknown 구분, 기존 HTTP/CIDR·private 경계를 유지하며 독립 사람/production/전체 수용은 not_recorded다. 로컬 커밋·복구 자료를 보존했으며 이 구현 요청에 push/PR/merge는 자동 포함하지 않는다. [현재 작업표](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md), [진행 원장](./spec-driven/UPPER-WORK-ITEMS-PROGRESS.json), [API](./graph/POLICY-SECURITY.md), [완료 근거](../system/eval/upper-work-items-implementation-2026-10-14/wi-sp/README.md). 아래는 선행 기록이다.
-
-WI-6 bounded 함수 문맥 확장의 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-6/README.md)은12개 actual 공개 검사/전체 회귀·독립 분모4의 회수율1/4→4/4+noise1과 calls/curated/value의 구분·한계를 보존한다.
-
-WI-C 부분 심층 리뷰·보고서 전달 게이트의 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-c/README.md)은16개 실제 공개 경로 검사/142개 plugin 테스트·전체 primary 회귀와 출처/추론/unknown 한계를 보존한다.
-
-WI-2 초기 Go pack·CKG/CKS 공개 후보 분석은 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-2/README.md)으로 고정했다.23개 실제 사례·39개 공개 검증·기존15개 회귀와 전체 build/test/fmt/lint PASS, 오탐2/미탐4와 한계·독립 수용 미판정은 유지한다.
-
-WI-4 원래 모드9 완료 근거는 [관찰 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/README.md), WI-1 Go 값/제어 의존과 공개 질의는 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-1/README.md)에 보존했다. 소스337300b0 clean binary로15개 실제 compile/race→index→MCP 검증과 source/hash/unknown/bound/refusal/EOF 검증 PASS, 증거6332da9d·현재1617개 source/dependency SHA 확인. 다음은 opt-in 결정론 Go 규칙 후보와 수동 annotation 공존이다.
-
-추가 요청 완료: [서버 종료 보완 SD-01–04](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md)4/4 완료. 원인 재현·구현·실측2세션·EOF/SIGTERM·커밋 SHA/진행 원장 검증 PASS. 이전 두 종료 오류는 보존했다. 이 요청의 남은 작업0개·다음 작업없음.
-
 # 남은 전체 작업
 
-2026-10-13 · 코드 기준 main9a397188. 기존 리팩토링 **17/18**, 온톨로지 **4/4** 완료. 기존 필수 잔여는 **N16 한 개**이며 미충족·보류다. PR #99 스쿼시 머지·main 동기화와 main CI5/5 확인은 완료했다. 문서 정리는 별도 유지보수이며 제품의 품질·수용 범위를 변경하지 않는다.
+2026-10-14 문서 정리 기준이다. 완료 상태는 [구현 원장](./spec-driven/UPPER-WORK-ITEMS-PROGRESS.json)과 기록된 증거를 따른다. 완료한 구현, 운영·독립 수용 검증, 새로 채택해야 할 후속 범위를 구분한다.
 
-## 승인된 필수 잔여와 보류 결정
+## 완료한 요청 범위
 
-| 우선순위 | 작업 | 상태·착수 조건 | 완료에 필요한 증거 |
-|---|---|---|---|
-| 1 | N16 공개키·신뢰·권한 | 사용자 결정으로 보류. 재개 지시 전 키 생성이나 완료 체크를 하지 않음 | 실제 공개키 fingerprint·권한자·신뢰 경로·서명 대상·보관/교체/폐기·고지 적합성 판정·회귀 근거 |
-| 2 | 태그·공개 배포 | 보류. 별도 범위·사용자 승인 필요 | 지원 대상, 신뢰·복구·내용/품질/비용 한계, 배포 대상과 권한을 구체적으로 판정 |
+| 범위 | 확인한 완료 상태 | 현재 근거 |
+|---|---|---|
+| 상위 WI 선택9개 구현 | WI-V1/V2/3/4/1/2/C/6/SP 모두 implemented·implementation_verified=true | [현재 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md), [진행 원장](./spec-driven/UPPER-WORK-ITEMS-PROGRESS.json) |
+| knowledge-system 통합 | [PR #102](https://github.com/0xmhha/knowledge-system/pull/102) 스쿼시 머지·main 동기화 확인, 통합 commit a214fbb1. PR head e77e59b8의 CI5/5 성공 | [CI 실행](https://github.com/0xmhha/knowledge-system/actions/runs/38565382940) |
+| go-stablenet 비교·출처 수정 | 요청3개 실행 완료 | [비교 작업표](./spec-driven/GO-STABLENET-DATASET-COMPARISON.md) |
+| 서버 종료 보완 | SD-01–04 모두 완료 | [완료 근거](../system/eval/stablenet-shutdown-2026-10-14/completion.json) |
+| 온톨로지 MCP 보완 | O-01–04 구현·명시 시험 범위 완료 | [리팩토링 원장](./spec-driven/REFACTORING-PROGRESS.json) |
 
-다음 필수 작업은 **N16 재개 여부 결정**이다. 보류 유지 중에는 승인 없이 구현을 이어갈 필수 항목이 없다. 완료한17개/4개 항목의 수용 조건과 증거는 [실행 명세](./spec-driven/REFACTORING-EXECUTION-SPEC.md), [이력 원장](./spec-driven/REFACTORING-PROGRESS.json), [범위별 작업표](./spec-driven/REFACTORING-REMAINING-WORKLIST.md)로 검증한다.
+상위9개 구현의 잔여는0개다. 이 수치는 아래의 독립 수용·새 기능·외부 운영 전체가 완료됐다는 의미로 확대하지 않는다. coding-agent·ChainBench 구현의 원본 commit/patch/bundle은 증거에 보존돼 있으며 knowledge-system PR의 머지로 다른 저장소 반영을 추정하지 않는다.
+
+## 아직 구현 범위가 확정되지 않은 WI-5
+
+WI-5는 암묵지 수집·관리자 학습을 위한 별도 ingest MCP/플러그인이다. 담당 저장소가 미확보여서 구현·실행 상태를 판정하지 않았다. 먼저 담당·프로젝트·수집 대상을 지정한 뒤 명령 수집 → 파일 ingest → 관리자 검토 → 승격·회수 → 색인 검증의 계약과 실제 실행을 고정해야 한다. 다른9개 구현의 완료 수에 포함하지 않는다.
+
+## 구현 후 남은 운영·독립 수용 검증
+
+9개 모두 독립 수용 상태는 not_recorded다. controlled fixture·공개 MCP 실행·CI 통과는 기록된 구현 검증이며, 실제 host/체인/전체 프로젝트·독립 검토자의 수용 기록은 각 범위를 먼저 확정해 진행한다.
+
+| ID | 남은 운영·독립 수용 검증 | 담당 |
+|---|---|---|
+| WI-V1 | 실제 에이전트 host·프로젝트에서 오라클·완료 차단 검증과 독립 검토 | coding-agent |
+| WI-V2 | 실제 후보 선택 결과의 독립 수용과 품질·비용 평가 | coding-agent |
+| WI-3 | production 텍스트 입력과 설치된 전체 bugfix 역할의 연결 실행 | coding-agent+CKS |
+| WI-4 | 실제 체인·host에서 반복 재현·방어·관찰·재발 검증 | coding-agent+ChainBench |
+| WI-1 | 실제 프로젝트의 값·제어 의존 정확도·비용·지원 범위 수용 | CKG |
+| WI-2 | 독립 보안 사례의 오탐·미탐과 규칙 효과 평가 | CKG/CKS |
+| WI-C | 실제 에이전트 리뷰 절차·산출물의 독립 내용 검토 | coding-agent |
+| WI-6 | 실제 corpus에서 확장 효과·noise·cost 평가 | CKS |
+| WI-SP | 실제 소비자의 정책·보안 질의와 운영 권한·출처 경계 수용 | CKS+CKG |
 
 ## 별도 범위가 필요한 후속 작업
 
-이 목록은 기존 완료 수에 더하지 않는다. 소표본으로 종료한 기능을 품질 성공으로 바꾸거나 새 기능 구현을 승인한 목록도 아니다.
+다음13개는 후속 범위 목록이다. 기존 구현 완료 수에 더하지 않으며, 문서 정리가 새 기능 채택·운영 변경을 승인하지 않는다. 기능별 목적·담당·입력·설계·완료 기준과 실행 증거를 정한 뒤 진행한다.
 
 | 후속 범위 | 현재 코드·증거의 경계 | 다음에 필요한 일 |
 |---|---|---|
@@ -40,29 +51,20 @@ WI-4 원래 모드9 완료 근거는 [관찰 packet](../system/eval/upper-work-i
 | native CoreML embedder | native 구현 있음, 일반 CLI의 embedder dispatch에는 연결되지 않음 | 지원/실험 범위 결정·명시 연결·native 검증 |
 | embedding LRU cache | wrapper 구현 있으나 기본 생성 경로에 연결되지 않음 | 메모리/invalidations·효과 기준·명시 옵션 검토 |
 | append-only audit integration | auditlog/observe 구현과 audit_dir 설정은 있음. 운영 composer에 연결 완료 근거 없음 | 감사 대상·보관/개인정보·권한·failure 정책과 실제 wiring |
-| 상위 WI10개 | [재감사](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md) 기록10/10. 기능 전체 완료0/10; WI-5 담당 미확보 | WI-V1 우선. WI-3/SP 소비자 입력 정합은 연결 실행의 선행 조건. 아래 WI 잔여표 참조 |
 | 선택적 viewer 상호작용 | 통합 viewer/Atlas 있음. BFS-ripple은 과거 UI 제안 | 채택 시 redraw·성능·접근성 완료 기준과 시험 범위 결정 |
 | 배포 머신·다운스트림 동기화 | 로컬 코드/CI만으로 원격 서비스나 다른 저장소의 상태를 알 수 없음 | 필요 시 대상·권한을 정하고 실제 binary/dataset/model/agent/network/power 상태와 소비자 결과 확인 |
 
-## 상위 WI 재감사 후 잔여 작업
+## 승인된 필수 잔여와 보류 결정
 
-2026-10-14 기준 감사 기록10/10 완료, 기능 전체의 완료·독립 수용0/10. 구현 없음으로 단정할 수 없는 항목과 부분 구현을 구분했다. 상세 설계 부족분·시험·source revision은 [재감사 명세](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md)에 있다. 이 표는 기존 후속 범위의 상위 WI 행을 세분화하며 기존 승인 기능 완료 수에 더하지 않는다.
+| 우선순위 | 작업 | 상태·착수 조건 | 완료에 필요한 증거 |
+|---|---|---|---|
+| 1 | N16 공개키·신뢰·권한 | 사용자 결정으로 보류. 재개 지시 전 키 생성이나 완료 체크를 하지 않음 | 실제 공개키 fingerprint·권한자·신뢰 경로·서명 대상·보관/교체/폐기·고지 적합성 판정·회귀 근거 |
+| 2 | 태그·공개 배포 | 보류. 별도 범위·사용자 승인 필요 | 지원 대상, 신뢰·복구·내용/품질/비용 한계, 배포 대상과 권한을 구체적으로 판정 |
 
-| 우선순위 | ID | 남은 작업·담당 |
-|---|---|---|
-| 1 | WI-V1 | 독립 오라클·무효/과적합 반례·차단/경고 정책·실제 에이전트 판정; coding-agent |
-| 2 | WI-V2 | 동일 증상의 복수 수정안·평가축·패널 선택/기각; coding-agent |
-| 3 | WI-3 | 명시 범위 구현 검증 완료. production text seed·설치된 전체 bugfix role·독립 수용 남음; coding-agent+CKS |
-| 4 | WI-4 | 반복 분모·증상 실패율·타이밍 주입·재현 불가 관찰의 실제 연결 실행; coding-agent+ChainBench |
-| 5 | WI-1 | 언어/비용/정확도 계약·CFG/def-use/control/data dependency; CKG |
-| 6 | WI-2 | 수동/자동 구분·결정론 타입/규칙·source→sink 탐지·양성/음성 평가; CKG/CKS |
-| 7 | WI-C | sequence/module/data/state/guard/cost/priority의 구조화 리뷰·소비자 연결·독립 수용; coding-agent |
-| 8 | WI-6 | WI-1 이후 값 의존 확장·recall/noise/cost·상한/중단 검증; CKS |
-| 9 | WI-SP | CKG 간접 노출을 CKS에 연결·typed 태그/출처/권한/없는 태그·소비자 질의; CKS+CKG |
-| 별도 | WI-5 | 담당 저장소 지정 후 수집→파일 ingest→관리자 검토→승격/회수→색인 검증 |
+다음 필수 작업은 **N16 재개 여부 결정**이다. 보류 유지 중에는 승인 없이 구현을 이어갈 필수 항목이 없다. 완료한17개/4개 항목의 수용 조건과 증거는 [실행 명세](./spec-driven/REFACTORING-EXECUTION-SPEC.md), [이력 원장](./spec-driven/REFACTORING-PROGRESS.json), [범위별 작업표](./spec-driven/REFACTORING-REMAINING-WORKLIST.md)로 검증한다.
 
-다음 권고는 WI-V1이다. 소비자 입력 schema 정합(WI-3/SP)을 연결 실행 전에 확인한다. 학습 저장소 확보는 별도 의존성이며 다른9개를 중단시키지 않는다. 외부 저장소 변경·실제 체인·LLM 실행·새 수용 기준은 각 기능의 구체 범위를 고정해 진행한다.
+## 다음 순서와 중복 집계 방지
 
-과거 “worksheet 내 프로젝트 catalog”, “v2 유지보수 제자리 쓰기”, “온톨로지 MCP 미노출”은 현재 구현과 다르므로 신규 미완료 목록에 남기지 않는다. Catalog는 명시 선택 팩으로 분리됐고 v2 pinned 쓰기는 거부/후보 빌드 경로이며 읽기 MCP 네 도구와 bounded explanation은 구현됐다. legacy 직접 갱신은 지원되는 별도 경계다.
+문서의 옛 WI 잔여표 정리는 완료했다. 다음 권고는 운영·독립 수용 검증의 대상·완료 기준을 확정하고, 배포 머신·다른 저장소·설치된 소비자의 실제 상태를 확인하는 것이다. WI-5 담당 확보는 별도 의존성이며 다른 검증을 중단시키지 않는다.
 
-이 저장소의 문서 정리로 외부 상위 목표나 운영 호스트 검증까지 완료 처리하지 않는다. 다음 작업을 채택할 때 목적·담당·입력·설계·완료 기준·실행 증거를 먼저 고정한다.
+과거 재감사의 구현 부족분은 [감사 기록](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md)에 남긴다. 최신9/9 구현을 과거 표로 되돌리지 않는다. 일반 검증 체크리스트의 빈 체크박스는 매 변경의 절차이며 프로젝트 잔여 기능으로 집계하지 않는다. 기존 worksheet catalog·pinned v2 쓰기 거부·온톨로지 MCP·정책/보안 질의를 새 미구현 항목으로 재등록하지 않는다.
