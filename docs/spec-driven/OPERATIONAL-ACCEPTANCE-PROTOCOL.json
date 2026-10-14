@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "document_date": "2026-10-15",
+  "status": "draft_for_review",
+  "plan": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md",
+  "source_inventory": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-SOURCE-INVENTORY.json",
+  "source_inventory_sha256": "ee3552ab48d2c81b12c26e22733898022e7c18e1036f308e5717d8352b0eba5e",
+  "scope_proposal": {
+    "environment": "isolated_local_go_pilot",
+    "bugfix_terminal": "actual_evaluation_gate_before_external_publication",
+    "code_review_terminal": "actual_typed_report_diagrams_hooks_local_delivery",
+    "external_pr_jira_messages_deployment": false,
+    "ontology_enabled": false,
+    "type_neighbors_enabled": false,
+    "knowledge_opt_in": true,
+    "original_developer_checkout_mutations": false
+  },
+  "freeze_requirements": [
+    {
+      "id": "F-01",
+      "topic": "scope_and_terminal_boundary",
+      "preparation_status": "ready_for_review",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-02",
+      "topic": "source_candidates",
+      "preparation_status": "prepared",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-03",
+      "topic": "sampling_and_scoring",
+      "preparation_status": "ready_for_review",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-04",
+      "topic": "statistical_method_and_sufficiency",
+      "preparation_status": "ready_for_review",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-05",
+      "topic": "roles_and_independence",
+      "preparation_status": "awaiting_assignment",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-06",
+      "topic": "llm_and_resource_budget",
+      "preparation_status": "awaiting_assignment",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-07",
+      "topic": "new_inputs_gold_and_holdout",
+      "preparation_status": "not_prepared",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-08",
+      "topic": "runtime_recipes_and_owned_resources",
+      "preparation_status": "not_prepared",
+      "decision_status": "pending",
+      "receipt": null
+    }
+  ],
+  "roles": {
+    "gold_author": null,
+    "independent_content_reviewer": null,
+    "final_scope_acceptor": null,
+    "execution_operator": null,
+    "independence_declaration": null
+  },
+  "model": {
+    "embedding_candidate": "BGE-M3",
+    "embedding_dimensions_candidate": 1024,
+    "embedding_runtime_identity": null,
+    "llm_provider": null,
+    "llm_model": null,
+    "llm_version_or_digest": null,
+    "llm_cost_limit": null,
+    "currency": null,
+    "cost_accounting_source": null
+  },
+  "resources": {
+    "status": "proposed_not_approved",
+    "parallel_measurement_sessions": 1,
+    "owned_nodes_max": 2,
+    "index_minutes_max": 90,
+    "host_case_minutes_max": 30,
+    "repeat_arm_minutes_max": 30,
+    "observation_minutes_max": 10,
+    "llm_provider": null,
+    "llm_model": null,
+    "llm_cost_limit": null
+  },
+  "measurement_proposal": {
+    "warmup_calls": 2,
+    "retrieval_repeats": 5,
+    "warm_repeats": 20,
+    "cold_repeats": 3,
+    "cold_definition": "fresh_CKS_process_model_cache_residency_recorded_separately",
+    "paired_order": "counterbalanced_record_each_arm_order",
+    "latency_percentile_method": null,
+    "owned_server_shutdown_modes": [
+      "EOF",
+      "idle_SIGTERM",
+      "active_SIGTERM"
+    ],
+    "shutdown_repeats_per_mode": 3,
+    "shutdown_seconds_max": 5,
+    "forced_kills_allowed": 0,
+    "unmeasured_cost": null
+  },
+  "statistics_proposal": {
+    "status": "proposed_not_approved",
+    "method": "paired cluster bootstrap on independent fact/function/seed families",
+    "confidence_percent": 95,
+    "replicates": 10000,
+    "seed": 20261015,
+    "percentiles": [
+      2.5,
+      97.5
+    ],
+    "undefined_fraction_inconclusive_above": 0.05,
+    "scope": "descriptive scoped assessment; not population-wide production failure or success proof"
+  },
+  "input_groups": [
+    {
+      "id": "WI-V1",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_defect_tickets_min": 2,
+        "normal_controls": true,
+        "symptom_reintroduction_mutants": true,
+        "overfit_mutants": true,
+        "oracles": [
+          "primary",
+          "independently_derived"
+        ]
+      },
+      "metrics_proposal": {
+        "declared_oracle_and_normal_control_pass_fraction": 1.0,
+        "expected_invalid_refusal_fraction": 1.0
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-V2",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "shared_ticket_group": "WI-V1",
+        "candidates_per_ticket_min": 2,
+        "independent_acceptable_candidate_set": true
+      },
+      "metrics_proposal": {
+        "selected_candidates_satisfy_hard_gates_and_gold": true,
+        "all_bad_selection": null,
+        "ties_and_insufficiency_explicit": true
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-3",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_fact_families_min": 20,
+        "symptom_types_min": 4,
+        "top_k": 10
+      },
+      "metrics_proposal": {
+        "macro_case_recall_at_10_min": 0.8
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-4",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_seed_schedule_families_min": 5,
+        "planned_runs_per_arm_min": 100,
+        "baseline_symptom_events_min": 10
+      },
+      "metrics_proposal": {
+        "fix_to_baseline_symptom_rate_ratio_max": 0.5,
+        "no_recurrence_verdict": "inconclusive"
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-1",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_functions_min": 30,
+        "constructs": [
+          "declaration_redefinition",
+          "branch",
+          "loop",
+          "shadow",
+          "return"
+        ],
+        "functions_per_construct_min": 4,
+        "gold_semantics": "structural_lexical_may_reach_not_path_feasibility"
+      },
+      "metrics_proposal": {
+        "data_edge_precision_min": 0.95,
+        "data_edge_recall_min": 0.9,
+        "control_edge_precision_min": 0.95,
+        "control_edge_recall_min": 0.9
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-2",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "metrics_proposal": {
+        "candidate_precision_min": 0.8,
+        "candidate_recall_min": 0.8,
+        "vulnerability_acceptance_separate": true
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-C",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "metrics_proposal": {
+        "required_rubric_omissions_max": 0,
+        "source_artifact_state_binding_match_fraction": 1.0
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-6",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "metrics_proposal": {
+        "macro_recall_delta_min": 0.1,
+        "macro_noise_fraction_delta_max": 0.1,
+        "warm_p95_latency_ratio_max": 2.0,
+        "delta_unit": "fraction_difference_0.10_equals_10_percentage_points",
+        "empty_return_noise_fraction": null
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-SP",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "metrics_proposal": {
+        "annotation_match_fraction": 1.0,
+        "expected_permission_refusal_fraction": 1.0,
+        "unavailable_yaml_or_reviewer_provenance": "unknown"
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    }
+  ],
+  "case_record_required_fields": [
+    "case_id",
+    "family_id",
+    "work_item_ids",
+    "split",
+    "origin",
+    "repository_commit",
+    "source_path",
+    "source_span",
+    "source_sha256",
+    "public_input_path",
+    "public_input_sha256",
+    "gold_path",
+    "gold_sha256",
+    "gold_author",
+    "gold_method",
+    "independent_reviewer",
+    "supported_scope",
+    "expected_unknowns",
+    "baseline",
+    "seed_schedule_or_pair_order",
+    "required_roles_tools_controls",
+    "rubric_or_matching_rule",
+    "review_receipt"
+  ],
+  "input_constraints": {
+    "split_values": [
+      "DEV",
+      "FINAL"
+    ],
+    "split_unit": "independent_fact_function_or_seed_family",
+    "old_fixtures_and_questions": "regression_only",
+    "gold_visible_to_host": false,
+    "final_seen_before_code_change": "retire_to_regression_and_create_new_holdout",
+    "controlled_project_results": "separate_denominators",
+    "rule_shortage_verdict": "inconclusive",
+    "all_planned_runs_preserved": true
+  },
+  "runtime_preflight_required_fields": [
+    "binary_path_sha256_buildinfo_source_commit",
+    "host_plugin_version_bytes_hook_dispatch",
+    "actual_tools_list_schemas_namespace_mapping",
+    "embedding_provider_server_version_digest_dimensions_preprocessing",
+    "dataset_manifest_snapshot_hashes",
+    "owned_pid_port_data_directory_lease",
+    "current_candidate_rollback_boundaries",
+    "exact_argv_cwd_env_input_timeout_for_each_recipe",
+    "resource_cost_limits_and_abort_conditions"
+  ],
+  "runtime_recipes": [],
+  "owned_resources": [],
+  "evidence_record_required_fields": [
+    "run_id",
+    "case_id",
+    "arm",
+    "source_input_protocol_hashes",
+    "runtime_inventory_hash",
+    "started_at",
+    "ended_at",
+    "command_argv_cwd_sanitized_env",
+    "raw_request_response_error_paths_hashes",
+    "exit_and_termination_reason",
+    "required_role_hook_dispatch",
+    "planned_valid_missing_cancelled_infrastructure_symptom_counts",
+    "latency_tokens_calls_measured_cost",
+    "cleanup_receipt",
+    "operational_verdict",
+    "quality_verdict",
+    "human_review_receipt"
+  ],
+  "freeze": null,
+  "execution_allowed": false,
+  "blocked_by": [
+    "F-01",
+    "F-02",
+    "F-03",
+    "F-04",
+    "F-05",
+    "F-06",
+    "F-07",
+    "F-08"
+  ]
+}

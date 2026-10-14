@@ -190,13 +190,13 @@ AI 모델은 제안/사전 검토자로 별도 origin에 기록한다. 과거 �
 
 | 순서 | 단계 | 완료에 필요한 내용 | 현재 상태 |
 |---|---|---|---|
-| 0 | 범위·기준 검토/동결 | pilot 대상·terminal/delivery 범위·담당·새 gold/표본·수치/confidence/비용 기준의 receipt/hash | not_started |
+| 0 | 범위·기준 검토/동결 | pilot 대상·terminal/delivery 범위·담당·새 gold/표본·수치/confidence/비용 기준의 receipt/hash | preparing; source inventory·protocol 초안 준비 |
 | 1 | runtime inventory·설치/연결 | fresh binary/model/dataset/plugin/host/tool pin·현재/후보/rollback 경계·owned node 확인 | not_started, source 후보만 관측 |
 | 2 | 실제 host pilot | 새 결함2건·code_review10건의 허용된 실제 역할/도구/hook/산출물과 필수 반례 | not_started |
 | 3 | 독립 평가 | WI-1/2/3/4/6/SP 새 입력·정답·baseline·분모·성능/내용 채점·실패/부족분 | not_started |
 | 4 | 사람의 기준별 수용 |9개 각각 운영/quality 결과·제약·independent receipt·승인 범위 | not_started |
 
-운영 검증의 첫 파일 쓰기/노드 실행/모델 호출은 단계0에서 정한 대상·한도 안에서 수행한다. 이번 요청은 계획 작성이며 단계0 승인이나 실제 실행 완료가 아니다. 다음 단계에서 결정할 항목은 대상/설치 방식, 게시 전 terminal 범위, gold/reviewer 역할, 새 입력·통계/수치 gate, 모델·비용/시간·node 한도다. 정리 작업은 이 결정을 대신하지 않는다.
+운영 검증의 첫 파일 쓰기/노드 실행/모델 호출은 단계0에서 정한 대상·한도 안에서 수행한다. [실행 protocol과 동결 체크리스트](./OPERATIONAL-ACCEPTANCE-PROTOCOL.md)를 준비했으며 단계0 승인이나 실제 실행 완료는 아니다. 다음 단계에서 결정할 항목은 대상/설치 방식, 게시 전 terminal 범위, gold/reviewer 역할, 새 입력·통계/수치 gate, 모델·비용/시간·node 한도다. 정리 작업은 이 결정을 대신하지 않는다.
 
 ## 증거 보존과 상태 갱신
 

@@ -218,8 +218,41 @@
   "phases": [
     {
       "id": "0",
-      "status": "not_started",
-      "evidence": null
+      "status": "preparing",
+      "evidence": {
+        "protocol": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.json",
+        "source_inventory": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-SOURCE-INVENTORY.json"
+      },
+      "completed_preparation": [
+        "read_only_source_inventory",
+        "structured_input_and_metric_proposals",
+        "freeze_requirement_checklist"
+      ],
+      "remaining_freeze_requirements": [
+        "F-01",
+        "F-02",
+        "F-03",
+        "F-04",
+        "F-05",
+        "F-06",
+        "F-07",
+        "F-08"
+      ],
+      "preparation_validation": {
+        "date": "2026-10-15",
+        "kind": "preparation_only_not_runtime_or_independent_acceptance",
+        "guard_regression_tests": {
+          "passed": 18,
+          "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_operational_acceptance.py"
+        },
+        "documentation_contract_tests_passed": 20,
+        "package_notice_tests_passed": 3,
+        "live_document_check_count": 114,
+        "require_frozen_rejected_with_exit": 1,
+        "original_source_completion_guard": "pass",
+        "verified_original_bindings": 2069,
+        "original_implementation_and_acceptance_ledgers_byte_unchanged": true
+      }
     },
     {
       "id": "1",
@@ -256,5 +289,7 @@
     "llm_provider": null,
     "llm_model": null,
     "llm_cost_limit": null
-  }
+  },
+  "protocol_draft": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.json",
+  "source_preparation_inventory": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-SOURCE-INVENTORY.json"
 }

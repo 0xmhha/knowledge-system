@@ -3,7 +3,7 @@
 | Purpose | Current document |
 |---|---|
 | Resume | [current handoff](./CURRENT-HANDOFF.md) |
-| Operational and independent acceptance | [targets and criteria](./OPERATIONAL-ACCEPTANCE-PLAN.md), [acceptance ledger](./OPERATIONAL-ACCEPTANCE-PROGRESS.json) |
+| Operational and independent acceptance | [targets and criteria](./OPERATIONAL-ACCEPTANCE-PLAN.md), [acceptance ledger](./OPERATIONAL-ACCEPTANCE-PROGRESS.json), [protocol and freeze checklist](./OPERATIONAL-ACCEPTANCE-PROTOCOL.md) |
 | All remaining scope | [remaining work](../REMAINING-WORK.md) |
 | Completed implementations and pending independent acceptance | [implementation specification](./UPPER-WORK-ITEMS-IMPLEMENTATION.md), [implementation ledger](./UPPER-WORK-ITEMS-PROGRESS.json) |
 | Original purpose and external responsibilities | [purpose and scope](./PURPOSE-AND-SCOPE.md) |

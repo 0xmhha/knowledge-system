@@ -1,6 +1,6 @@
 # 남은 전체 작업
 
-2026-10-14 문서 정리 기준이다. 완료 상태는 [구현 원장](./spec-driven/UPPER-WORK-ITEMS-PROGRESS.json)과 기록된 증거를 따른다. 완료한 구현, 운영·독립 수용 검증, 새로 채택해야 할 후속 범위를 구분한다.
+2026-10-15 준비 상태 기준이다. 구현·문서 main 통합 근거는2026-10-14 기록을 따른다. 완료 상태는 [구현 원장](./spec-driven/UPPER-WORK-ITEMS-PROGRESS.json)과 기록된 증거를 따른다. 완료한 구현, 운영·독립 수용 검증, 새로 채택해야 할 후속 범위를 구분한다.
 
 ## 완료한 요청 범위
 
@@ -20,7 +20,7 @@ WI-5는 암묵지 수집·관리자 학습을 위한 별도 ingest MCP/플러그
 
 ## 구현 후 남은 운영·독립 수용 검증
 
-[대상·완료 기준 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)과 [별도 검증 원장](./spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 로컬 Go pilot 후보·항목별 입력/제안 gate·필요 receipt를 정리했다. 계획은 draft이며 실행/수용은0/9다.
+[대상·완료 기준 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)과 [별도 검증 원장](./spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 로컬 Go pilot 후보·항목별 입력/제안 gate·필요 receipt를 정리했다. 계획은 draft이며 실행/수용은0/9다. [실행 protocol·동결 체크리스트](./spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.md)와 source inventory를 준비했고 단계0은 preparing이다. 검토자·모델/비용·새 gold·runtime recipe와 범위/기준 채택 기록이 필요하다.
 
 9개 모두 독립 수용 상태는 not_recorded다. controlled fixture·공개 MCP 실행·CI 통과는 기록된 구현 검증이며, 실제 host/체인/전체 프로젝트·독립 검토자의 수용 기록은 각 범위를 먼저 확정해 진행한다.
 
