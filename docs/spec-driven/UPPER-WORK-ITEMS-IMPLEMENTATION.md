@@ -21,8 +21,8 @@
 | 5 | WI-1 | CKG | bounded Go 구현·공개 실행 검증·증거 커밋 | production/독립 수용 미판정 |
 | 6 | WI-2 | CKG/CKS | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
 | 7 | WI-C | coding-agent | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
-| 8 | WI-6 | CKS | 설계·구현 진행 | 미완료/미수용 |
-| 9 | WI-SP | CKS+CKG | 대기 | 미완료/미수용 |
+| 8 | WI-6 | CKS | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
+| 9 | WI-SP | CKS+CKG | 설계·구현 진행 | 미완료/미수용 |
 
 ## 항목별 계약과 필요한 검증
 
@@ -93,7 +93,7 @@
 
 각 구현 항목의 세부 체크·커밋·검증 packet 링크는 해당 항목을 구현하며 갱신한다. 아직 실행하지 않은 세부 조건에는 체크를 하지 않는다. 기존 감사 packet은 바꾸지 않고 별도의 구현 packet으로 보존한다.
 
-현재: 구현·명시 범위 실행 검증7/9, WI-6 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-6 값 의존 확장. 남은 이번 구현 범위: WI-6/SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
+현재: 구현·명시 범위 실행 검증8/9, WI-SP 진행 중. 전체 목표의 독립 수용은0/9다. 다음: WI-SP 정책·보안 태그 질의. 남은 이번 구현 범위: WI-SP. 전체 후속 범위와 WI-5 의존성은 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
 ## WI-V1 검증 기록
 
@@ -571,3 +571,30 @@ authorization 증명이 아니며 사용자/검토자 인증·서명 trust 기�
 양성/음성·빈 태그·규칙/수동 구분·설명/hint·source/version/reviewer unknown·
 조건/권한 거부·도구 등록/소비자 계약·source 변조/상한의 실제 공개 실행과
 회귀 근거를 확인한 후에만 WI-SP 완료를 체크한다.
+
+### WI-6 최종 검증과 마지막 WI-SP
+
+WI-6를 명시된 bounded local-context 범위로 완료 기록한다. primary3b0c7521
+clean 바이너리와 consumer4e65eefc의 실제32 도구/C1 계약, compiled/race6함수
+fixture12 공개 검사, cycle/dedup·입력/stale·function/candidate/node/edge/fact
+상한·원문 삭제 후 retained 조회 PASS. 독립 관련4함수 분모에서 baseline1/4,
+확장4/4+noise1/반환5와 cost를 기록한다. 전체 build/test·5패키지 race·fmt/
+vet/pinned lint/boundary/docs,142개 consumer 테스트·126 도구 참조와 기존
+review16/rule39/value15 공개 회귀 PASS.
+
+[최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-6/README.md)344개
+산출물·1635개 primary source/dependency·3개 consumer 변경·5개 승인 입력은
+증거fcdea20f의 Git 객체와 현재 source로 확인했다. SQL limit/context는 조회
+메모리화 이전에 적용하고 ambiguous history 경계는 유지한다. 조회한
+manifest/node/blob/edge/more의 최종 변화도 거부한다. PostgreSQL은 query-shape/
+compile 검증이며 새로운 live 실행을 주장하지 않는다.
+
+call hop은 argument_mapping=not_computed, 지역 값/제어와 다른 출처다. curated
+flow는 기존 get_flow에 별도로 남고 자동 조회/검증된 dataset join을 하지
+않는다. source/data/control·memory/alias/외부 effects·실행 가능성·cost/global
+optimality의 한계와 independent not_recorded를 유지한다. 현재8/9.
+
+다음/남은 전체 구현은 WI-SP다: typed policy/security 공개 질의, source/version/
+reviewer/manual-rule origin/unknown, bounded 조회·기존 HTTP/권한/읽기 경계,
+소비자 도구 계약·양성/음성/빈 태그/상한/stale/거부 공개 실행·회귀 근거.
+설계는 위 계약에 고정했고 실제 WI-SP 기능은 아직 구현/완료하지 않았다.

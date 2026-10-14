@@ -1,4 +1,6 @@
-현재 진행: [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 요청 범위에서 구현·명시 범위 검증 **7/9** 완료이며 WI-6을 진행한다. 남은 전체 구현 순서는 **WI-6 → WI-SP**다. production/독립 전체 수용은 별도 미판정이며 WI-5는 이번 순서에 포함하지 않는다.
+현재 진행: [상위 WI 구현 명세](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md)의 요청 범위에서 구현·명시 범위 검증 **8/9** 완료이며 WI-SP를 진행한다. 남은 전체 구현 순서는 **WI-SP**다. production/독립 전체 수용은 별도 미판정이며 WI-5는 이번 순서에 포함하지 않는다.
+
+WI-6 bounded 함수 문맥 확장의 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-6/README.md)은12개 actual 공개 검사/전체 회귀·독립 분모4의 회수율1/4→4/4+noise1과 calls/curated/value의 구분·한계를 보존한다.
 
 WI-C 부분 심층 리뷰·보고서 전달 게이트의 [최종 packet](../system/eval/upper-work-items-implementation-2026-10-14/wi-c/README.md)은16개 실제 공개 경로 검사/142개 plugin 테스트·전체 primary 회귀와 출처/추론/unknown 한계를 보존한다.
 
