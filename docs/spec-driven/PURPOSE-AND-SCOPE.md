@@ -46,21 +46,19 @@
 
 ## 외부 상위 목표의 책임
 
-현재 구현 진행은 [상위 WI 구현 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md)를 따른다. 아래 표는 재감사의 기준 상태이며 구현 이후의 검증·잔여는 구현 원장에서 갱신한다.
+원 상위 WI10개와 기존 리팩토링 작업은 범위가 다르다. 구현 전 [재감사](./UPPER-WORK-ITEMS-AUDIT.md)는 그때의 담당·source·부족분을 보존하는 자료다. 현재 구현 상태는 [구현 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md)와 [원장](./UPPER-WORK-ITEMS-PROGRESS.json)을 따른다. 선택9개는 구현·명시 검증9/9 완료이며 knowledge-system은 PR #102로 main에 반영됐다.9개 전체의 독립 production/사람 수용은 not_recorded다.
 
-6월 상위 계획의 WI10개는 지식 제품의 9월 리팩토링18개와 범위가 다르다. 2026-10-14에 담당 소스와 안전한 시험을 [재감사](./UPPER-WORK-ITEMS-AUDIT.md)했다. 감사 결과 기록은10/10, 원래 기능 전체의 완료·독립 수용 판정은0/10이다. WI-5의 담당 저장소는 미확보다. 코드 도구·절차 문서·단위 시험만으로 외부 전체 워크플로의 완료를 추정하지 않는다.
-
-| ID | 목표·담당 | 감사 후 현재 경계·잔여 |
+| ID | 현재 구현·책임 | 남은 후속 범위 |
 |---|---|---|
-| WI-V1 | 오라클 타당성; coding-agent | RED/GREEN·수정 타당성 분리와 sibling 검사 있음. 일부 무효 오라클·과적합은 WARN 통과; 독립 오라클·실제 false-done 반례 미수용 |
-| WI-V2 | 수정 후보 생성·judge-panel 선택; coding-agent | 경쟁 원인 probe는 있음. 같은 증상의 복수 수정안 비교·패널 선택 계약·실행 미확보 |
-| WI-3 | 증상→코드 후보·객관 신호; coding-agent+CKS | 개별 탐색·거리/score/impact·원인 라벨 있음. 입력 schema 차이·통합 후보 신호/provenance/null·반복 확장 계약 남음 |
-| WI-4 | 비결정/타이밍 재현·방어·관찰; coding-agent+ChainBench | 장애 주입·bounded monitor·simulation/e2e 절차와 모의 시험 있음. 반복 분모·실패율·실제 연결 실행 미수용 |
-| WI-1 | dataflow/CFG/PDG; CKG | AST·호출·field 관계 있음. def-use·control/data dependency 레이어 근거 미확보 |
-| WI-2 | 결정론 규칙 태깅/취약점; CKG/CKS | 수동 Policy/SecurityPattern resolve는 있음. source→sink 자동 탐지·타입/룰 팩 효과 미확보 |
-| WI-C | 깊은 구조화 리뷰; coding-agent | light findings 보고서·CKS 함수 근거 있음. sequence/module/data/state/guard/cost 산출물·소비자 연결·독립 수용 남음 |
-| WI-6 | 다단·dataflow-shaped 확장; CKS | bounded 호출 hop·curated flow 있음. 자동 값 의존 확장은 WI-1 의존, 독립 recall/noise/cost 미수용 |
-| WI-SP | security-pattern/policy MCP; CKS+CKG | CKG 일반 조회의 간접 노출 실측됨. CKS annotation 관계 변환·전용 schema/출처/권한·소비자 연결 남음 |
-| WI-5 | 암묵지 수집·관리자 학습; 별도 ingest MCP/플러그인 | 담당 미확보로 구현·실행 판정 불가. 개정된 명령 수집→파일 ingest→관리자 store/승격/회수 루프 필요 |
+| WI-V1 | 오라클·무효/과적합 반례·완료 gate; coding-agent | 실제 host/프로젝트 연결·독립 수용 |
+| WI-V2 | 복수 수정 후보·판정 패널·선택/기각 계약; coding-agent | 실제 후보 선택 품질·비용의 독립 수용 |
+| WI-3 | bounded 의심 후보·typed 신호/provenance/unknown; coding-agent+CKS | production 입력·설치된 전체 bugfix 역할 연결 |
+| WI-4 | 반복·주입·관찰·모드9 실행 근거; coding-agent+ChainBench | 실제 chain/host 반복·방어·재발 수용 |
+| WI-1 | retained Go CFG·값/제어 의존 공개 계산; CKG | 실제 프로젝트의 정확도·비용·지원 범위 수용 |
+| WI-2 | opt-in Go rule pack·source→sink 후보와 수동 구분; CKG/CKS | 독립 사례의 오탐·미탐·효과 평가 |
+| WI-C | typed partial review·보고서/그림·전달 gate; coding-agent | 실제 리뷰 절차·독립 내용 검토 |
+| WI-6 | SQL-bounded 지역 값/제어 계산의 함수 문맥 확장; CKS | 실제 corpus recall/noise/cost 수용 |
+| WI-SP | typed 정책·보안 MCP 질의·출처 unknown·권한 경계; CKS+CKG | 실제 소비자·운영 신뢰 경계 수용 |
+| WI-5 | 별도 ingest MCP/플러그인 담당 미확보 | 담당 지정 후 수집→파일 ingest→관리자 검토→승격/회수→색인 검증 |
 
-감사한 revision·원문·시험과 반례는 재감사 문서의 증거 패킷에 고정했다. 기능 구현은 구체 명세와 담당 저장소별 실행·수용을 확인한 후 완료 처리한다. 이번 감사에서 외부 코드·운영 호스트·학습 서비스는 변경하지 않았다.
+이 표의9개 구현 완료는 원래 기능 전체의 production 품질·독립 수용과 분리한다. source bundle을 보존한 다른 저장소의 변경은 해당 저장소 게시·설치 상태를 별도로 확인한다. 전체 후속·선택 범위·보류 결정은 [남은 작업](../REMAINING-WORK.md)에만 집계한다.

@@ -4,6 +4,7 @@
 |---|---|
 | Resume | [current handoff](./CURRENT-HANDOFF.md) |
 | All remaining scope | [remaining work](../REMAINING-WORK.md) |
+| Completed implementations and pending independent acceptance | [implementation specification](./UPPER-WORK-ITEMS-IMPLEMENTATION.md), [implementation ledger](./UPPER-WORK-ITEMS-PROGRESS.json) |
 | Original purpose and external responsibilities | [purpose and scope](./PURPOSE-AND-SCOPE.md) |
 | Verify accepted task conditions | [execution specification](./REFACTORING-EXECUTION-SPEC.md), [task worklist](./REFACTORING-REMAINING-WORKLIST.md), [progress ledger](./REFACTORING-PROGRESS.json) |
 | Dataset response and identity | [public v1/v2 contract](./PUBLIC-CONTRACT-V2.md), [source snapshot contract](./SOURCE-SNAPSHOT-ADR.md) |

@@ -1,12 +1,15 @@
-현재 추가 요청: 서버 종료 보완4/4 완료.378호출 EOF 종료에서 임시 원문 트리 삭제 지연을 재현했고 검증된 archive 직접 읽기로 제거했다. 실측2세션756팩·질의/종료 오류0, Close11.1/10.9ms, EOF·대기/실행 SIGTERM 모두 exit0·강제 종료없음·reader lease 해제. 현재/커밋 SHA1839개와 기존 진행 guard PASS. workspace `bin/cks`도 실측 바이너리로 갱신했다. 이 요청의 남은 작업0개·다음 작업없음. [작업표](./GO-STABLENET-DATASET-COMPARISON.md), [완료 근거](../../system/eval/stablenet-shutdown-2026-10-14/completion.json).
-
-현재 요청 상위 WI 구현은 **9/9 완료**다(WI-V1/V2/3/4/1/2/C/6/SP). 다음 구현 없음·남은 전체 요청 구현0개. WI-SP primary9aff96b6/consumerfdb4d51, 증거e10f12b1의417 산출물·1644 source/dependency·3 consumer 변경·5 승인 입력을 Git/현재 bytes/복구 bundle로 확인했다(2069 연결). 이전8개 증거도1092 Git 연결로 재확인했다. CKS33 계약·실제 annotation14/expansion12/review16/rule39/value15, 전체 build/test/race/fmt/vet/lint/docs·142 consumer/standalone hooks PASS. typed 정책/보안 질의와 manual/automatic/unknown 구분, 기존 HTTP/CIDR·private 경계를 유지하며 독립 사람/production/전체 수용은 not_recorded다. 로컬 커밋·복구 자료를 보존했으며 이 구현 요청에 push/PR/merge는 자동 포함하지 않는다. [현재 작업표](./UPPER-WORK-ITEMS-IMPLEMENTATION.md), [진행 원장](./UPPER-WORK-ITEMS-PROGRESS.json), [API](../graph/POLICY-SECURITY.md), [완료 근거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-sp/README.md). 아래는 선행 기록이다.
-
-[go-stablenet 비교 작업표](./GO-STABLENET-DATASET-COMPARISON.md)의 출처 매핑 수정·42질문 재평가·SNK06 검토는3/3 실행 완료다. 수정 데이터의756회 질의 오류0, 정상 pack 원문 검증 통과, 기존 SNK06 실패와 캡처 종료 오류2회 보존. 현재/커밋 SHA1833개와 기존 진행 guard PASS. 남은 요청 작업0개이며 근거는 진행 JSON을 따른다.
-
 # 현재 인수인계
 
-2026-10-13 기준 제품 코드는 main9a397188이다. [PR #99](https://github.com/0xmhha/knowledge-system/pull/99)는 스쿼시 머지됐고 로컬 main 동기화와 [main CI5/5](https://github.com/0xmhha/knowledge-system/actions/runs/38362113044)를 확인했다. 현재 checkout/원격 동기화는 `git status --short --branch`로 확인한다. 이 문서에 고정한 검증 commit을 미래의 실시간 HEAD로 사용하지 않는다.
+2026-10-14 통합 확인 기준은 main a214fbb18039f2e63ee93c0f073bfb1b61c3e716이다. [PR #102](https://github.com/0xmhha/knowledge-system/pull/102)는 head e77e59b8의 [CI5/5](https://github.com/0xmhha/knowledge-system/actions/runs/38565382940) 통과 후 스쿼시 머지됐다. 통합 시 로컬 main/원격 main·PR tree 동일성·clean worktree·기록된 source/evidence guard를 확인했다. 현재 checkout은 `git status --short --branch`로 확인하며 고정한 통합 commit을 미래의 실시간 HEAD로 해석하지 않는다.
+
+## 현재 완료와 남은 범위
+
+- 상위 WI-V1/V2/3/4/1/2/C/6/SP는 구현·명시 검증9/9 완료다.9개 운영·사람 독립 수용은 not_recorded이며 [전체 작업표](../REMAINING-WORK.md)에 별도 기록한다.
+- WI-5는 담당 저장소 미확보다. 다른9개 구현 완료 수와 구분한다. 일반 후속13개는 기능별 범위 결정이 필요하다.
+- go-stablenet 출처 매핑·42질문 재평가·SNK06 범위 검토3/3, 서버 종료 SD-01–04는4/4 완료다. 원래 SNK06 실패·과거 종료 오류는 보존한다. [비교/종료 작업표](./GO-STABLENET-DATASET-COMPARISON.md)를 따른다.
+- coding-agent·ChainBench의 원본 commit/patch/bundle은 구현 packet에 보존한다. knowledge-system 머지로 다른 저장소 게시·설치·운영 상태를 완료 처리하지 않는다.
+
+현재 문서의 옛 WI 구현 잔여·중간 다음 작업 정리는 완료했다. 다음 권고는 운영·독립 수용 대상·완료 기준 확정과 외부 저장소/머신/설치된 소비자 상태 확인이다. 구현 상세는 [현재 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md), evidence revision·SHA·owner commit은 [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)에 있다.
 
 ## 먼저 읽을 문서
 
