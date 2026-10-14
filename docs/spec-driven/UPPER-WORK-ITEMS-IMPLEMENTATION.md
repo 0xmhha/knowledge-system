@@ -2,6 +2,8 @@
 
 2026-10-14 사용자가 WI-V1부터 WI-SP까지 구현 진행을 요청했다. [재감사](./UPPER-WORK-ITEMS-AUDIT.md)는 입력 근거로 고정하고, 이 문서를 구현 진행의 현재 기준으로 사용한다. WI-5는 이번 순서에 포함하지 않는다. 기존 승인·시험·소표본의 한계를 구현 성공으로 덮어쓰지 않는다.
 
+현재 요청 구현 **9/9 완료**. 다음 구현과 남은 전체 요청 구현은 **없음**이다. 독립 사람/production/전체 수용은 구현 검증과 별도이며 미판정 상태를 유지한다.
+
 ## 목적과 상태 규칙
 
 버그수정의 오라클·수정 선택·진단·비결정 재현을 먼저 연결하고, CKG 값 의존·규칙 분석을 기반으로 깊은 리뷰와 CKS 확장·정책/보안 질의를 제공한다. 그래프 계산은 CKG, 객관 신호 합성은 CKS, 판단과 절차는 coding-agent가 담당한다. 동일 계산을 에이전트 스크립트에 복제하지 않는다.
@@ -22,7 +24,7 @@
 | 6 | WI-2 | CKG/CKS | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
 | 7 | WI-C | coding-agent | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
 | 8 | WI-6 | CKS | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
-| 9 | WI-SP | CKS+CKG | 설계·구현 진행 | 미완료/미수용 |
+| 9 | WI-SP | CKS+CKG | 구현·명시 범위 실행 검증 완료 | 독립 수용 미판정 |
 
 ## 항목별 계약과 필요한 검증
 
@@ -615,3 +617,41 @@ annotation path는 원래 overlay path 그대로일 수 있으므로 private 경
 후 반환한다. 사용자 인증/서명 검증은 미지원; 기존 HTTP ACL만 적용한다.
 row 수는 SQL로 제한하며 blob/row byte 크기와 오래된 동기 Reader는 hard
 process-memory/강제 deadline 보장을 제공하지 않음을 명시한다.
+
+### WI-SP 최종 검증과 요청 구현 9/9 종료
+
+CKS read-only `context.policy_security`를 구현하고33개 도구/C1 소비자 계약을
+동기화했다. exact code symbol의 bounded outgoing governance/security page,
+selected code blob/commit/manifest와 graph metadata SHA, typed explanation/
+remediation/severity, 수동 origin과 불확실성을 반환한다. 원문 YAML bytes/실제
+행/version/reviewer/time/approval은 저장되지 않아 unknown이며 line1/Go commit을
+원문 증명으로 승격하지 않는다. legacy merged 설명은 유지하고 분리 불가능한
+hint/severity는 unknown이다. 자동 rule_candidates는 별도 opt-in이며 이 도구가
+실행/혼합하지 않는다. 빈 태그와 수동 위험 후보는 안전/정책 적합 판정이 아니다.
+
+기본32/최대128 SQL LIMIT+1, 기본1초/최대5초 협력적 timeout, stale pin 거부,
+최종 manifest/seed/blob/tag/edge/more 변화와 deadline에서 결과 초기화,
+private/ambiguous history 경계와 기존 HTTP/CIDR 접근 정책을 검증했다. HTTP
+handler는 loopback 도구 호출을 허용하고 public/unlisted CIDR/잘못된 peer 및
+forwarded-header 위조를 backend 호출 전에 거부한다. readOnlyHint는 권한 증명,
+reviewer 인증/서명 기능이 아니며 hard bytes/memory·강제 deadline·DB snapshot
+transaction/변경 후 되돌림 감지를 주장하지 않는다. 새 live PostgreSQL 검증은
+수행하지 않았고 typed attrs codec은 두 backend가 공유한다.
+
+primary9aff96b6/consumerfdb4d51 clean binary의 compiled/race corpus 실제14개
+검사,33 tools/C1, Go/YAML 삭제 후 동일 retained 결과, 두 서버 EOF0 PASS.
+전체 build/test·변경 경로 race·fmt/vet/pinned lint/boundary/docs,142 consumer
+테스트·standalone hooks·126 도구 참조, 기존 expansion12/review16/rule39/value15
+공개 회귀 PASS. 초기 오류는 historical_not_completion_evidence로 별도 보존한다.
+
+[최종 packet](../../system/eval/upper-work-items-implementation-2026-10-14/wi-sp/README.md)의
+417 산출물·1644 primary source/dependency·3 consumer 변경·5 승인 입력은 증거
+e10f12b1의 Git 객체와 현재 source/복구 bundle로 검증했다(2069 연결). 이전8개
+manifest와1084 산출물도 기록된 Git revision 기준으로 재확인했다(1092 연결).
+이 검사는 새 production/체인 실행이나 사람 수용을 생성하지 않는다.
+
+요청한 WI-V1/V2/3/4/1/2/C/6/SP 구현은9/9 완료다. 현재 다음 구현 없음,
+남은 전체 요청 구현0개. 명시된 부분 지원과 unknown/오탐·미탐은 API/근거에
+유지하며 독립 production/사람/전체 목표 수용은 not_recorded다. 완료 원장은
+[진행 JSON](./UPPER-WORK-ITEMS-PROGRESS.json), 현재 API는
+[정책/보안 질의](../graph/POLICY-SECURITY.md)를 따른다.
