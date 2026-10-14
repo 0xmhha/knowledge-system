@@ -372,3 +372,5 @@ return 위치와 cap/cancel/미지원/opaque effect 시험이 통과했다. 첫 
 계산과 공개 MCP는 `not_computed`다. status를 partial로 반환하고 WI-1 완료
 체크는 유지하지 않는다. 다음은 lexical reaching-definitions·재정의 kill·합류/
 loop fixed-point와 제어 의존, 이후 source-bound 공개 질의다.
+
+CFG kernel 검증 소스 커밋7a7f1320과 [중간 증거](../../system/eval/upper-work-items-implementation-2026-10-14/wi-1-cfg-checkpoint/README.md)를 d6c24421에 보존했다. 현재1609개 primary source/dependency SHA를 Git object로 확인했다. 이 source binding 갱신은 기존 수용 조건을 바꾸거나 WI-1을 완료로 표시하지 않는다.
