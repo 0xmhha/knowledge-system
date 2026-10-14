@@ -20,6 +20,8 @@ WI-5는 암묵지 수집·관리자 학습을 위한 별도 ingest MCP/플러그
 
 ## 구현 후 남은 운영·독립 수용 검증
 
+[대상·완료 기준 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)과 [별도 검증 원장](./spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 로컬 Go pilot 후보·항목별 입력/제안 gate·필요 receipt를 정리했다. 계획은 draft이며 실행/수용은0/9다.
+
 9개 모두 독립 수용 상태는 not_recorded다. controlled fixture·공개 MCP 실행·CI 통과는 기록된 구현 검증이며, 실제 host/체인/전체 프로젝트·독립 검토자의 수용 기록은 각 범위를 먼저 확정해 진행한다.
 
 | ID | 남은 운영·독립 수용 검증 | 담당 |
@@ -65,6 +67,6 @@ WI-5는 암묵지 수집·관리자 학습을 위한 별도 ingest MCP/플러그
 
 ## 다음 순서와 중복 집계 방지
 
-문서의 옛 WI 잔여표 정리는 완료했다. 다음 권고는 운영·독립 수용 검증의 대상·완료 기준을 확정하고, 배포 머신·다른 저장소·설치된 소비자의 실제 상태를 확인하는 것이다. WI-5 담당 확보는 별도 의존성이며 다른 검증을 중단시키지 않는다.
+문서의 옛 WI 잔여표 정리는 완료했다. 다음은 [운영·독립 수용 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)의 단계0 대상·gold/reviewer·기준·모델/자원 한도를 검토·동결한 뒤, 단계1 runtime inventory와 설치된 소비자 상태를 확인하는 것이다. WI-5 담당 확보는 별도 의존성이며 다른 검증을 중단시키지 않는다.
 
 과거 재감사의 구현 부족분은 [감사 기록](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md)에 남긴다. 최신9/9 구현을 과거 표로 되돌리지 않는다. 일반 검증 체크리스트의 빈 체크박스는 매 변경의 절차이며 프로젝트 잔여 기능으로 집계하지 않는다. 기존 worksheet catalog·pinned v2 쓰기 거부·온톨로지 MCP·정책/보안 질의를 새 미구현 항목으로 재등록하지 않는다.

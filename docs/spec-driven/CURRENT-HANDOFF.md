@@ -9,7 +9,7 @@
 - go-stablenet 출처 매핑·42질문 재평가·SNK06 범위 검토3/3, 서버 종료 SD-01–04는4/4 완료다. 원래 SNK06 실패·과거 종료 오류는 보존한다. [비교/종료 작업표](./GO-STABLENET-DATASET-COMPARISON.md)를 따른다.
 - coding-agent·ChainBench의 원본 commit/patch/bundle은 구현 packet에 보존한다. knowledge-system 머지로 다른 저장소 게시·설치·운영 상태를 완료 처리하지 않는다.
 
-현재 문서의 옛 WI 구현 잔여·중간 다음 작업 정리는 완료했다. 다음 권고는 운영·독립 수용 대상·완료 기준 확정과 외부 저장소/머신/설치된 소비자 상태 확인이다. 구현 상세는 [현재 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md), evidence revision·SHA·owner commit은 [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)에 있다.
+문서 정리는 [PR #103](https://github.com/0xmhha/knowledge-system/pull/103)에서 CI5/5 후 스쿼시 머지됐고 main ad52d956 동기화·기록된 source/evidence guard를 확인했다. [운영·독립 수용 계획](./OPERATIONAL-ACCEPTANCE-PLAN.md)은 로컬 Go pilot 대상·9개 항목의 입력/완료 gate·판정/증거 규칙을 정리한 draft다. [별도 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)의 실행/수용은0/9이며 단계0–4 전부 미실행이다. 다음은 단계0의 대상·새 입력·검토자·기준/한도 검토와 동결이다. 구현 상세는 [현재 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md), evidence revision·SHA·owner commit은 [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)에 있다.
 
 ## 먼저 읽을 문서
 
