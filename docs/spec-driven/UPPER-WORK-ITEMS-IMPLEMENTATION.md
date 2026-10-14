@@ -418,3 +418,20 @@ unknown으로 남긴다. Positive/negative/sanitized/branch/alias/외부 target/
 미탐·manual overlay coexistence fixture와 실제 index→MCP 실행을 요구한다.
 기존 태그를 overwrite하지 않고 default-off를 유지하며 version/규칙/소스가
 바뀌면 근거를 다시 계산한다. 구체 pack과 공개 query schema를 먼저 고정한다.
+
+### WI-2 구현 중간 확인
+
+[고정 계약](../graph/GO-RULE-CANDIDATES.md)의 `go-local-review@1.0.0`을
+명시적으로 선택하는 CKG/CKS `rule_candidates`와 CKS `value_dependencies`
+공개 경로를 추가했다. CKS는 동일 CKG 엔진·입출력 스키마를 사용하며 별도
+분석/판정은 하지 않는다. AST/타입/CFG/def-use를 한 번 계산하고 변수 사용
+위치에서 정의와 대응 RHS를 역추적한다. 분기/loop·강한 kill·shadow·병렬/복합
+대입·오류 폐기·수동 YAML 공존을 확인한다. source/snapshot drift를 거부하며
+pack/version/hash·원문 위치·경로·제어 조건·상한·중단 이유를 보존한다.
+
+실제 소표본은 정화 helper 및 동명 selector에서 오탐, import 별칭·pointer·
+closure에서 미탐을 보인다. `syntax_only_unverified`/`not_proven` 및 한계 목록을
+출력하며 빈 후보를 안전으로 바꾸지 않는다. 모든 manual YAML/graph를 읽기만
+한다. 최종 source-bound 실행·전체 회귀·Git 근거 패킷 확인 전까지 WI-2는
+`in_progress`, 검증 완료 수는5/9로 유지한다. 다음은 동일 범위 최종 검증과
+근거 고정이며, 이후 WI-C→WI-6→WI-SP 순서다.

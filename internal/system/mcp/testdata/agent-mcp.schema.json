@@ -499,6 +499,120 @@
         "type": "object"
       }
     },
+    "cks.context.rule_candidates": {
+      "description": "Explicit opt-in go-local-review@1.0.0 retained Go rule candidates using one shared lexical value/control analysis. Parameter to command-name and discarded conversion-error to return patterns. Candidates are automatic review inputs, never verified vulnerabilities or manual policy/security annotations. Syntax-only targets, unknown sanitizers, memory/alias and feasibility limitations remain explicit. Empty results never prove safety.",
+      "input": {
+        "additionalProperties": false,
+        "properties": {
+          "function": {
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "required": [
+                  "node_id"
+                ]
+              },
+              {
+                "required": [
+                  "canonical_id"
+                ]
+              }
+            ],
+            "properties": {
+              "canonical_id": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "expected_commit": {
+                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
+                "type": "string"
+              },
+              "expected_snapshot_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "expected_source_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "limits": {
+                "additionalProperties": false,
+                "properties": {
+                  "max_ast_nodes": {
+                    "maximum": 4096,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_blocks": {
+                    "maximum": 256,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_edges": {
+                    "maximum": 4096,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_facts": {
+                    "maximum": 65536,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_iterations": {
+                    "maximum": 128,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_nodes": {
+                    "maximum": 1024,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_source_bytes": {
+                    "maximum": 262144,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "timeout_ms": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "node_id": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [],
+            "type": "object"
+          },
+          "max_candidates": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "max_flow_steps": {
+            "maximum": 4096,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "rule_pack": {
+            "const": "go-local-review@1.0.0",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule_pack",
+          "function"
+        ],
+        "type": "object"
+      }
+    },
     "cks.context.search_text": {
       "description": "BM25 keyword search over the ckg full-text index (code-aware tokenizer). Use when terms must match exactly: function names, identifiers, error strings. Anti-pattern: stacking searches to 'find the cause' -- a text hit is a location, not a cause. After locating, traverse toward the value's producer with find_callers/find_callees instead of searching again.",
       "input": {
@@ -570,6 +684,96 @@
         "required": [
           "query"
         ],
+        "type": "object"
+      }
+    },
+    "cks.context.value_dependencies": {
+      "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
+      "input": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "node_id"
+            ]
+          },
+          {
+            "required": [
+              "canonical_id"
+            ]
+          }
+        ],
+        "properties": {
+          "canonical_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "expected_commit": {
+            "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
+            "type": "string"
+          },
+          "expected_snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "expected_source_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "limits": {
+            "additionalProperties": false,
+            "properties": {
+              "max_ast_nodes": {
+                "maximum": 4096,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_blocks": {
+                "maximum": 256,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_edges": {
+                "maximum": 4096,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_facts": {
+                "maximum": 65536,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_iterations": {
+                "maximum": 128,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_nodes": {
+                "maximum": 1024,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_source_bytes": {
+                "maximum": 262144,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "timeout_ms": {
+                "maximum": 1000,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "node_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [],
         "type": "object"
       }
     },

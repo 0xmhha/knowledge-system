@@ -18,7 +18,7 @@ SQLite is the default store. The PostgreSQL integration is opt-in; supported sel
 - `ckg audit` and `ckg validate`: source/database parity and graph consistency.
 - `ckg eval-retrieval`, `ckg benchmark`, `ckg bench-mcp`: deterministic measurement tools; [evaluation](./EVAL.md) records their limits.
 
-The eleven graph MCP registrations include symbol/callers/callees/subgraph/text/context/impact/concurrency/history/evidence queries and the bounded retained Go [value/control dependence query](./VALUE-DEPENDENCIES.md). Storage-reader validation is shared by registration; a custom integration must preserve the retrieval boundary.
+The twelve graph MCP registrations include symbol/callers/callees/subgraph/text/context/impact/concurrency/history/evidence queries and the bounded retained Go [value/control dependence query](./VALUE-DEPENDENCIES.md), plus opt-in [Go rule candidates](./GO-RULE-CANDIDATES.md). Storage-reader validation is shared by registration; a custom integration must preserve the retrieval boundary.
 
 ## Developer boundaries
 

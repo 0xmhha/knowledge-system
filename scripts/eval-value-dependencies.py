@@ -50,9 +50,9 @@ def require(value,message):
 def encode(value):return (json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode()
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 class Client:
- def __init__(self,binary,graph,root):
-  self.root=root;self.id=0;self.queue=queue.Queue();self.stderr=(root/'mcp.stderr.txt').open('wb');self.stdout=(root/'mcp.stdout.jsonl').open('w');self.stdin=(root/'mcp.stdin.jsonl').open('w')
-  self.proc=subprocess.Popen([str(binary),'mcp','--graph',str(graph),'--namespace','flow_probe'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=self.stderr,text=True)
+ def __init__(self,binary,graph,root,command=None,namespace="flow_probe.context."):
+  self.namespace=namespace;self.root=root;self.id=0;self.queue=queue.Queue();self.stderr=(root/'mcp.stderr.txt').open('wb');self.stdout=(root/'mcp.stdout.jsonl').open('w');self.stdin=(root/'mcp.stdin.jsonl').open('w')
+  self.proc=subprocess.Popen(command or [str(binary),'mcp','--graph',str(graph),'--namespace','flow_probe'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=self.stderr,text=True)
   def read():
    for line in self.proc.stdout:self.queue.put(line)
    self.queue.put(None)
@@ -66,7 +66,7 @@ class Client:
    if reply.get('id')==self.id:return reply
   raise TimeoutError('actual MCP response timed out')
  def tool(self,name,arguments):
-  reply=self.request('tools/call',{'name':'flow_probe.context.'+name,'arguments':arguments});require('error'not in reply,'actual tool protocol error: '+str(reply.get('error')));value=reply['result'];require(not value.get('isError'),'actual tool execution error: '+str(value));return value.get('structuredContent')or json.loads(value['content'][0]['text'])
+  reply=self.request('tools/call',{'name':self.namespace+name,'arguments':arguments});require('error'not in reply,'actual tool protocol error: '+str(reply.get('error')));value=reply['result'];require(not value.get('isError'),'actual tool execution error: '+str(value));return value.get('structuredContent')or json.loads(value['content'][0]['text'])
  def close(self):
   self.proc.stdin.close()
   try:self.proc.wait(timeout=20)

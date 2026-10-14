@@ -98,7 +98,17 @@ func TestSchemaGolden_AllInputsMatchContract(t *testing.T) {
 			if !ok {
 				t.Fatal("tool missing from input contract")
 			}
-			got, err := json.Marshal(registered.Tool.InputSchema)
+			wire, err := json.Marshal(registered.Tool)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var definition struct {
+				Input json.RawMessage `json:"inputSchema"`
+			}
+			if err = json.Unmarshal(wire, &definition); err != nil {
+				t.Fatal(err)
+			}
+			got, err := json.Marshal(definition.Input)
 			if err != nil {
 				t.Fatal(err)
 			}

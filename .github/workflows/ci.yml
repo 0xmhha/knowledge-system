@@ -23,6 +23,8 @@ jobs:
         run: make test-race
       - name: Retained Go dependence through real stdio MCP
         run: python3 scripts/eval-value-dependencies.py --binary "$GITHUB_WORKSPACE/bin/ckg" --out "$RUNNER_TEMP/value-dependence-evidence"
+      - name: Opt-in Go rules through graph and composer MCP
+        run: python3 scripts/eval-go-rule-candidates.py --binary "$GITHUB_WORKSPACE/bin/ckg" --cks-binary "$GITHUB_WORKSPACE/bin/cks" --out "$RUNNER_TEMP/go-rule-evidence"
       - name: Domain artifacts match their entries
         run: make check-domain-artifacts
 

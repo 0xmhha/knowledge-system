@@ -90,6 +90,7 @@ type Result struct {
 	DefUse        []DefUse          `json:"def_use"`
 	Iterations    int               `json:"iterations"`
 	FactsPeak     int               `json:"facts_peak"`
+	Rules         *RuleResult       `json:"rules,omitempty"`
 }
 
 type analysis struct {
@@ -123,19 +124,26 @@ func limits(o Options) (Options, error) {
 // control flow. Value/def-use/control dependence is deliberately not yet
 // advertised by this first kernel; later analysis stages must compute it.
 func BuildCFG(ctx context.Context, source Source, blob []byte, options Options) (Result, error) {
-	return build(ctx, source, blob, options, false)
+	return build(ctx, source, blob, options, false, nil)
 }
 
 // Analyze computes lexical reaching definitions and value/control dependence
 // once in the graph engine. Memory, external effects and unsupported constructs
 // remain explicit; a missing edge is never a proof of safety.
 func Analyze(ctx context.Context, source Source, blob []byte, options Options) (Result, error) {
-	return build(ctx, source, blob, options, true)
+	return build(ctx, source, blob, options, true, nil)
 }
 
-func build(ctx context.Context, source Source, blob []byte, options Options, dependence bool) (out Result, err error) {
+func build(ctx context.Context, source Source, blob []byte, options Options, dependence bool, rules *RuleOptions) (out Result, err error) {
 	started := time.Now()
-	defer func() { out.ElapsedMicros = time.Since(started).Microseconds() }()
+	defer func() {
+		out.ElapsedMicros = time.Since(started).Microseconds()
+		if rules != nil && err == nil && out.Rules == nil {
+			out.Rules = newRuleResult(*rules)
+			out.Rules.Status = "incomplete"
+			out.Rules.StopReason = "base_analysis_incomplete"
+		}
+	}()
 	options, err = limits(options)
 	if err != nil {
 		return out, err
@@ -339,6 +347,11 @@ func build(ctx context.Context, source Source, blob []byte, options Options, dep
 	if dependence {
 		a.result = out
 		a.compute()
+		out = a.result
+	}
+	if rules != nil {
+		a.result = out
+		a.matchRules(*rules)
 		out = a.result
 	}
 	return out, nil

@@ -70,49 +70,8 @@ func DecodeQueryInput(raw []byte) (QueryInput, error) {
 	if len(raw) > 8192 {
 		return q, fmt.Errorf("value-flow input exceeds8KiB")
 	}
-	d := json.NewDecoder(bytes.NewReader(raw))
-	var walk func(int) error
-	walk = func(depth int) error {
-		if depth > 4 {
-			return fmt.Errorf("input nesting limit exceeded")
-		}
-		v, e := d.Token()
-		if e != nil {
-			return e
-		}
-		if v == nil {
-			return fmt.Errorf("explicit null is not a supported input")
-		}
-		delimiter, ok := v.(json.Delim)
-		if !ok {
-			return nil
-		}
-		if delimiter != '{' {
-			return fmt.Errorf("only schema objects accepted")
-		}
-		seen := map[string]bool{}
-		for d.More() {
-			key, e := d.Token()
-			if e != nil {
-				return e
-			}
-			name, ok := key.(string)
-			if !ok || seen[name] {
-				return fmt.Errorf("duplicate input field")
-			}
-			seen[name] = true
-			if e = walk(depth + 1); e != nil {
-				return e
-			}
-		}
-		_, e = d.Token()
-		return e
-	}
-	if e := walk(0); e != nil {
+	if e := validateInputObject(raw); e != nil {
 		return q, e
-	}
-	if _, e := d.Token(); e != io.EOF {
-		return q, fmt.Errorf("one input document required")
 	}
 	var fields map[string]json.RawMessage
 	if e := json.Unmarshal(raw, &fields); e != nil {
@@ -148,7 +107,11 @@ func DecodeQueryInput(raw []byte) (QueryInput, error) {
 // Query reads only a retained graph symbol/blob. It never opens its live file.
 // Name-based ambiguous resolution belongs in find_symbol; this query requires
 // the exact selected identity and verifies snapshot/blob/metadata before return.
-func Query(ctx context.Context, r store.Reader, q QueryInput) (out QueryResult, err error) {
+func Query(ctx context.Context, r store.Reader, q QueryInput) (QueryResult, error) {
+	return query(ctx, r, q, nil)
+}
+
+func query(ctx context.Context, r store.Reader, q QueryInput, rules *RuleOptions) (out QueryResult, err error) {
 	started := time.Now()
 	defer func() { out.ElapsedMicros = time.Since(started).Microseconds() }()
 	out = QueryResult{SchemaVersion: 1, Status: "unavailable"}
@@ -240,7 +203,7 @@ func Query(ctx context.Context, r store.Reader, q QueryInput) (out QueryResult, 
 		return finish("source_mismatch", "retained node coordinates/blob length differ")
 	}
 	source := Source{FunctionName: selected.Name, NodeID: selected.ID, CanonicalID: selected.CanonicalID, File: selected.FilePath, Commit: before.SrcCommit, SnapshotSHA256: snapshot, Language: selected.Language, StartLine: selected.StartLine, StartByte: selected.StartByte}
-	result, e := Analyze(bounded, source, blob, opts)
+	result, e := build(bounded, source, blob, opts, true, rules)
 	if e != nil {
 		return out, e
 	}
@@ -275,4 +238,52 @@ func Query(ctx context.Context, r store.Reader, q QueryInput) (out QueryResult, 
 	out.Status = result.Status
 	out.Analysis = &result
 	return out, nil
+}
+
+func validateInputObject(raw []byte) error {
+	d := json.NewDecoder(bytes.NewReader(raw))
+	var walk func(int) error
+	walk = func(depth int) error {
+		if depth > 4 {
+			return fmt.Errorf("input nesting limit exceeded")
+		}
+		v, e := d.Token()
+		if e != nil {
+			return e
+		}
+		if v == nil {
+			return fmt.Errorf("explicit null is not a supported input")
+		}
+		delimiter, ok := v.(json.Delim)
+		if !ok {
+			return nil
+		}
+		if delimiter != '{' {
+			return fmt.Errorf("only schema objects accepted")
+		}
+		seen := map[string]bool{}
+		for d.More() {
+			key, e := d.Token()
+			if e != nil {
+				return e
+			}
+			name, ok := key.(string)
+			if !ok || seen[name] {
+				return fmt.Errorf("duplicate input field")
+			}
+			seen[name] = true
+			if e = walk(depth + 1); e != nil {
+				return e
+			}
+		}
+		_, e = d.Token()
+		return e
+	}
+	if e := walk(0); e != nil {
+		return e
+	}
+	if _, e := d.Token(); e != io.EOF {
+		return fmt.Errorf("one input document required")
+	}
+	return nil
 }
