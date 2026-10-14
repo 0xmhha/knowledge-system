@@ -21,7 +21,17 @@ func TestExportToolContract(t *testing.T) {
 	}
 	tools := map[string]any{}
 	for name, registered := range srv.ListTools() {
-		tools[name] = map[string]any{"description": registered.Tool.Description, "input": registered.Tool.InputSchema}
+		wire, e := json.Marshal(registered.Tool)
+		if e != nil {
+			t.Fatal(e)
+		}
+		var definition struct {
+			Input json.RawMessage `json:"inputSchema"`
+		}
+		if e = json.Unmarshal(wire, &definition); e != nil {
+			t.Fatal(e)
+		}
+		tools[name] = map[string]any{"description": registered.Tool.Description, "input": definition.Input}
 	}
 	raw, e := json.MarshalIndent(map[string]any{"tools": tools}, "", "  ")
 	if e != nil {

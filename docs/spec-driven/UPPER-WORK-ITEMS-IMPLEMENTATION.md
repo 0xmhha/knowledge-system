@@ -598,3 +598,20 @@ optimality의 한계와 independent not_recorded를 유지한다. 현재8/9.
 reviewer/manual-rule origin/unknown, bounded 조회·기존 HTTP/권한/읽기 경계,
 소비자 도구 계약·양성/음성/빈 태그/상한/stale/거부 공개 실행·회귀 근거.
 설계는 위 계약에 고정했고 실제 WI-SP 기능은 아직 구현/완료하지 않았다.
+
+### WI-SP 실행 계약: context.policy_security
+
+CKS 한 도구에서 exact node/canonical ID의 outgoing governed_by 및
+has_security_pattern만 조회한다. 기본32/최대128 annotation, 기본1초/최대5초
+협력적 deadline, SQL LIMIT+1, 최종 manifest/seed/blob/tag/edge/more 재검증을
+적용한다. 자동 분석은 기존 rule_candidates의 별도 opt-in 표면을 안내하며
+이번 도구가 실행/혼합하지 않는다. 빈 결과는 no_annotations, 안전 판정은 unknown.
+새 loader는 description/remediation/severity를 typed annotation payload로
+보존하고 SQLite/PG 공통 attrs round-trip을 검증한다. 기존 graph의 merged
+DocComment는 explanation으로 유지하고 hint/severity 분리는 unknown이다.
+원문 bytes/실제 행/버전/reviewer/review time/approval은 수집되지 않아 unknown.
+metadata SHA는 retained node bytes의 해시이며 YAML 원문 SHA가 아니다.
+annotation path는 원래 overlay path 그대로일 수 있으므로 private 경계 검사
+후 반환한다. 사용자 인증/서명 검증은 미지원; 기존 HTTP ACL만 적용한다.
+row 수는 SQL로 제한하며 blob/row byte 크기와 오래된 동기 Reader는 hard
+process-memory/강제 deadline 보장을 제공하지 않음을 명시한다.

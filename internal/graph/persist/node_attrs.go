@@ -22,19 +22,20 @@ import (
 // own SQLite column. Tags match the JSON tags on types.Node so
 // downstream tooling can deserialise the column directly.
 type nodeAttrs struct {
-	SlotIndex                     int      `json:"slot_index,omitempty"`
-	HasAssembly                   bool     `json:"has_assembly,omitempty"`
-	HasLowLevelCall               bool     `json:"has_low_level_call,omitempty"`
-	HasValueTransfer              bool     `json:"has_value_transfer,omitempty"`
-	YulBuiltins                   []string `json:"yul_builtins,omitempty"`
-	IsFunctionTyped               bool     `json:"is_function_typed,omitempty"`
-	HasFunctionTypedVar           bool     `json:"has_function_typed_var,omitempty"`
-	HasFunctionPointerCall        bool     `json:"has_function_pointer_call,omitempty"`
-	HasExternalCall               bool     `json:"has_external_call,omitempty"`
-	HasInheritanceMROFallback     bool     `json:"has_inheritance_mro_fallback,omitempty"`
-	HasFunctionPointerPropagation bool     `json:"has_function_pointer_propagation,omitempty"`
-	HasSelfReentrantCall          bool     `json:"has_self_reentrant_call,omitempty"`
-	HasSelfDelegatecallDead       bool     `json:"has_self_delegatecall_dead,omitempty"`
+	Annotation                    *types.AnnotationPayload `json:"annotation,omitempty"`
+	SlotIndex                     int                      `json:"slot_index,omitempty"`
+	HasAssembly                   bool                     `json:"has_assembly,omitempty"`
+	HasLowLevelCall               bool                     `json:"has_low_level_call,omitempty"`
+	HasValueTransfer              bool                     `json:"has_value_transfer,omitempty"`
+	YulBuiltins                   []string                 `json:"yul_builtins,omitempty"`
+	IsFunctionTyped               bool                     `json:"is_function_typed,omitempty"`
+	HasFunctionTypedVar           bool                     `json:"has_function_typed_var,omitempty"`
+	HasFunctionPointerCall        bool                     `json:"has_function_pointer_call,omitempty"`
+	HasExternalCall               bool                     `json:"has_external_call,omitempty"`
+	HasInheritanceMROFallback     bool                     `json:"has_inheritance_mro_fallback,omitempty"`
+	HasFunctionPointerPropagation bool                     `json:"has_function_pointer_propagation,omitempty"`
+	HasSelfReentrantCall          bool                     `json:"has_self_reentrant_call,omitempty"`
+	HasSelfDelegatecallDead       bool                     `json:"has_self_delegatecall_dead,omitempty"`
 }
 
 // marshalNodeAttrs serialises a Node's marker surface into the
@@ -43,6 +44,7 @@ type nodeAttrs struct {
 // minimal for the common case where a node has no markers.
 func marshalNodeAttrs(n *types.Node) string {
 	a := nodeAttrs{
+		Annotation:                    n.Annotation,
 		SlotIndex:                     n.SlotIndex,
 		HasAssembly:                   n.HasAssembly,
 		HasLowLevelCall:               n.HasLowLevelCall,
@@ -78,6 +80,7 @@ func unmarshalNodeAttrs(blob string, n *types.Node) {
 	if err := json.Unmarshal([]byte(blob), &a); err != nil {
 		return
 	}
+	n.Annotation = a.Annotation
 	n.SlotIndex = a.SlotIndex
 	n.HasAssembly = a.HasAssembly
 	n.HasLowLevelCall = a.HasLowLevelCall
@@ -94,7 +97,7 @@ func unmarshalNodeAttrs(blob string, n *types.Node) {
 }
 
 func isZeroAttrs(a nodeAttrs) bool {
-	return a.SlotIndex == 0 &&
+	return a.Annotation == nil && a.SlotIndex == 0 &&
 		!a.HasAssembly &&
 		!a.HasLowLevelCall &&
 		!a.HasValueTransfer &&

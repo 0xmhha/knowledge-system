@@ -25,3 +25,5 @@ The twelve graph MCP registrations include symbol/callers/callees/subgraph/text/
 Consumer engines use `pkg/graph` rather than importing graph implementation internals. New fields must round-trip through readers/writers and supported old stores. A cache schema change and a public manifest compatibility change are distinct decisions. [Verification checklist](./VERIFICATION-CHECKLIST.md) covers surface and negative-path testing; [purpose](./VISION.md) defines the responsibility boundary.
 
 Current graph support does not establish independent coding-agent answer quality, external benchmark completion, or whole-program CFG/PDG precision. The on-demand Go layer has explicit scalar/normal-exit, type/import, alias/effect and cost boundaries; follow-ups remain in [remaining work](../REMAINING-WORK.md).
+
+CKS exposes33 tools, including the read-only [policy/security annotation query](./POLICY-SECURITY.md). CKG remains12 tools; this query reuses the retained graph through CKS.

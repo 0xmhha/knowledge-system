@@ -149,6 +149,7 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	registerReviewFunction(s, d)
 	registerValueAnalysis(s, d)
 	registerValueDependencyExpansion(s, d)
+	registerPolicySecurity(s, d)
 	registerImpactAnalysis(s, d)
 	registerConcurrencyImpact(s, d)
 	registerChangeHistory(s, d)
