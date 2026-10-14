@@ -11,6 +11,7 @@ import (
 	server "github.com/mark3labs/mcp-go/server"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/pkg/graph/store"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 	"github.com/0xmhha/knowledge-system/pkg/graph/valueflow"
 )
@@ -168,5 +169,25 @@ func TestOutputValidationIsActiveAndRejectsFalseSchemaTypes(t *testing.T) {
 	}
 	if !response.Result.IsError {
 		t.Fatal("output validator skipped/accepted wrong declared type", string(wire))
+	}
+}
+
+func TestBoundedEdgeCapabilityPreservesAmbiguousHistoryBoundary(t *testing.T) {
+	s := valueStore(t)
+	ambiguous := types.Node{ID: "ambiguous-source", Type: types.NodeHunk, Name: "Ambiguous", Confidence: types.ConfAmbiguous}
+	if e := s.InsertNodes([]types.Node{ambiguous}); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.InsertEdges([]types.Edge{{Src: ambiguous.ID, Dst: "1111111111111111", Type: "calls", Confidence: types.ConfExtracted}}); e != nil {
+		t.Fatal(e)
+	}
+	reader := NewLLMSafeReader(s)
+	bounded, ok := reader.(store.BoundedEdgeReader)
+	if !ok {
+		t.Fatal("optional bounded capability hidden")
+	}
+	edges, _, e := bounded.IncidentEdges(context.Background(), store.EdgePageInput{NodeID: "1111111111111111", Direction: "incoming", Types: []string{"calls"}, Limit: 4})
+	if e != nil || len(edges) != 0 {
+		t.Fatal("ambiguous history edge leaked", edges, e)
 	}
 }

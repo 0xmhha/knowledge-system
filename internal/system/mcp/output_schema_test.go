@@ -102,6 +102,7 @@ func TestOutputSchemaDescribesTheDeclaredResponse(t *testing.T) {
 		ToolNameGetInvariantEnforcement:  {"inv_id", "statement", "enforced_at"},
 		ToolNameGetSubgraph:              {"seed", "nodes", "edges"},
 		ToolNameValueDependencies:        {"schema_version", "status", "analysis", "elapsed_micros"},
+		ToolNameValueDependencyExpansion: {"schema_version", "graph", "curated_flow"},
 		ToolNameRuleCandidates:           {"schema_version", "status", "analysis", "elapsed_micros"},
 		ToolNameReviewFunction:           {"seed", "code", "history", "tests", "available", "limits"},
 		ToolNameImpactAnalysis:           {"seed", "result"},

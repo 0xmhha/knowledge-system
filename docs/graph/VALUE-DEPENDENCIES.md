@@ -111,3 +111,34 @@ budgets, source drift and actual runtime schema validation. The opt-in
 builds its index and exercises namespaced stdio MCP. It preserves raw requests,
 responses, source bundle and receipts. Source deletion confirms no live fallback.
 Independent production and whole-goal human acceptance remain separate.
+
+## Bounded multi-function context in CKS
+
+CKS `context.value_dependency_expansion` composes the same local Go computation
+through retained outgoing calls/invokes. Its required `function` object has the
+exact selector/source pins/limits above. Optional `limits` defaults to4 functions,
+1 hop,32 unique candidates,2048 total local nodes,8192 local edges plus call hops,
+131072 cumulative analyzed facts and1000ms cooperative total time. Caps are8/3/
+128/4096/16384/262144/5000 respectively. Logical fact/output budgets do not claim
+process-byte limits or parser/typechecker preemption.
+
+Each retained function is computed once within an expansion, cycles and repeated
+targets are deduplicated, and function/blob/manifest pins are rechecked along with
+consulted metadata and edge pages. SQL retrieves a bounded stable prefix before
+Go materialization; legacy readers lacking this optional capability report
+partial/unavailable, never an unbounded fallback. Candidate/function/hop/output/
+fact/time bounds and source changes remain explicit. More rows at a page boundary
+are a conservative incomplete signal even when some returned rows are filtered.
+
+Call hops have `origin=retained_call_graph` and `argument_mapping=not_computed`.
+They are context links rather than calculated parameter/return or memory transfer.
+Each function's local def-use/value/control relations remain under its own source
+identity. Curated operator flows retain the existing separate `context.get_flow`
+surface: the expansion labels them `separate_not_joined`, with source association
+`not_verified`. It does not borrow their reads/writes/order as computed dependence.
+This endpoint does not automatically perform a curated-flow lookup or dataset join.
+
+A controlled6-function corpus compares independent relevance labels: baseline
+returns1 of4 relevant functions; expansion returns all4 plus1 noise function.
+Report denominators, caps and elapsed cost for that fixture; they are not global
+recall, a relevance proof, whole-program transfer or an optimization claim.

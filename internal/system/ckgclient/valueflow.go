@@ -30,3 +30,17 @@ func (r *Real) RuleCandidates(ctx context.Context, q valueflow.RuleQueryInput) (
 	}
 	return valueflow.QueryRules(ctx, mcphandlers.NewLLMSafeReader(reader.r), q)
 }
+
+// ValueExpansionClient composes function-local calculations through bounded
+// retained call pages; legacy readers report unavailable rather than full scans.
+type ValueExpansionClient interface {
+	ValueDependencyExpansion(context.Context, valueflow.ExpansionInput) (valueflow.ExpansionResult, error)
+}
+
+func (r *Real) ValueDependencyExpansion(ctx context.Context, q valueflow.ExpansionInput) (valueflow.ExpansionResult, error) {
+	reader, ok := r.s.(*realStoreReader)
+	if !ok || r.closed {
+		return valueflow.ExpansionResult{SchemaVersion: 1, Status: "unavailable", StopReasons: []string{"retained_backend_unavailable"}, Functions: []valueflow.ExpandedFunction{}, Hops: []valueflow.SymbolHop{}, Limitations: []string{"no safe bounded graph expansion backend"}}, nil
+	}
+	return valueflow.Expand(ctx, mcphandlers.NewLLMSafeReader(reader.r), q)
+}

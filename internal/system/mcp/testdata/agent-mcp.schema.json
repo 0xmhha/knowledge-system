@@ -777,6 +777,146 @@
         "type": "object"
       }
     },
+    "cks.context.value_dependency_expansion": {
+      "description": "Bounded expansion of distinct retained Go function-local value/control analyses through outgoing calls/invokes. SQL-limited candidates, function/hop/aggregate node-edge-fact/time budgets, cycle/dedup, source/snapshot pins and stop reasons. Call hops do not prove argument/return or memory transfer. Curated operator flows remain a separate get_flow surface with an unverified dataset join, never computed dependence or a safety verdict. Exact selected identity required; no live source fallback.",
+      "input": {
+        "additionalProperties": false,
+        "properties": {
+          "function": {
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "required": [
+                  "node_id"
+                ]
+              },
+              {
+                "required": [
+                  "canonical_id"
+                ]
+              }
+            ],
+            "properties": {
+              "canonical_id": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "expected_commit": {
+                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
+                "type": "string"
+              },
+              "expected_snapshot_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "expected_source_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "limits": {
+                "additionalProperties": false,
+                "properties": {
+                  "max_ast_nodes": {
+                    "maximum": 4096,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_blocks": {
+                    "maximum": 256,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_edges": {
+                    "maximum": 4096,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_facts": {
+                    "maximum": 65536,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_iterations": {
+                    "maximum": 128,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_nodes": {
+                    "maximum": 1024,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_source_bytes": {
+                    "maximum": 262144,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "timeout_ms": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "node_id": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [],
+            "type": "object"
+          },
+          "limits": {
+            "additionalProperties": false,
+            "properties": {
+              "max_candidates": {
+                "maximum": 128,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_functions": {
+                "maximum": 8,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_hops": {
+                "maximum": 3,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_total_edges": {
+                "maximum": 16384,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_total_facts": {
+                "maximum": 262144,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_total_nodes": {
+                "maximum": 4096,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "timeout_ms": {
+                "maximum": 5000,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "function"
+        ],
+        "type": "object"
+      }
+    },
     "cks.ops.freshness": {
       "description": "Compare the index snapshot against the source repository: indexed commit vs HEAD and the changed-file list. Call at session start and after pulls/commits -- stale files mean citations may mislead. If stale, run cks.ops.index (files you created this session are never in the index; read them directly).",
       "input": {

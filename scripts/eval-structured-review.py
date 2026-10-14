@@ -62,7 +62,7 @@ def main():
   cks.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-structured-review','version':'1'}})
   tools=cks.request('tools/list')['result']['tools'];(cksroot/'tools.json').write_bytes(encode(tools))
   sys.path.insert(0,str(plugin/'scripts'));import suspect_labels
-  contract_count=suspect_labels.check_contract(tools,plugin/'contracts/cks-tools.schema.json');require(contract_count==31,'consumer contract differs from actual tools')
+  contract_count=suspect_labels.check_contract(tools,plugin/'contracts/cks-tools.schema.json');require(contract_count==len(tools),'consumer contract differs from actual tools')
   blob=node['source'].encode();require(blob in (source/'logic.go').read_bytes(),'retained function blob differs from compiled fixture')
   rules_args={'rule_pack':'go-local-review@1.0.0','function':{'node_id':node['id'],'expected_commit':commit,'expected_source_sha256':sha(blob)}}
   range_rules=cks.tool('rule_candidates',{'rule_pack':'go-local-review@1.0.0','function':{'node_id':repeat['id'],'expected_commit':commit,'expected_source_sha256':sha(repeat['source'].encode())}})

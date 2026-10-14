@@ -527,3 +527,47 @@ candidate/function/hop/총 계산 예산·cycle/dedup·snapshot/source·중단 �
 주장하지 않는다. bounded 저장소 조회 경계를 먼저 구현하고, 독립 정답
 fixture의 recall/noise/cost 분모와 실제 공개 도구 실행으로 검증한 뒤 완료를
 체크한다.
+
+### WI-6 구현 중간 확인
+
+`store.BoundedEdgeReader`의 선택적 `IncidentEdges`는 SQL limit+취소 context를
+적용한다. SQLite와 PostgreSQL query를 매개변수화하고, 기존 safe reader의
+ambiguous history 경계도 유지한다. `valueflow.Expand`는 동일 retained snapshot
+안에서 함수별 계산을 한 번씩 수행하고 call-hop/지역 의존을 분리하며
+cycle/dedup·seed/candidate/function/hop·총 node/edge/fact/time 예산을 보존한다.
+최종 metadata/blob/edge 및 more 표식 변화를 재검증한다. legacy reader는
+partial/unavailable이며 무제한 neighborhood fallback은 하지 않는다.
+
+CKS read-only `value_dependency_expansion`와 실제32 tools/list/C1 계약을
+추가했다. Curated flow는 기존 get_flow의 operator metadata로 별도 조회하며,
+확장 endpoint가 자동 조회하거나 source/dataset join·계산된 interprocedural
+값 전달을 주장하지 않는다. schema는 separate_not_joined/not_verified를
+반환한다. 이 지원 범위와 미지원/unknown은 공개 문서에 고정한다.
+
+독립 compiled/race Go6함수 fixture12개 실제 MCP 검사에서 관련4함수 기준
+baseline1/4→확장4/4, noise1/반환5와 비용을 기록했다. cycle·상한·입력/stale
+거부·원문 삭제 후 유지도 통과했다. 전체 회귀·커밋 기준 clean 실행·Git
+근거 확인 전까지 WI-6는 in_progress, 현재7/9를 유지한다. 남은WI-6→WI-SP.
+
+### WI-SP 고정 설계: 기존 retained annotation과 보안 경계
+
+다음 작업은 CKS의 read-only typed policy/security 질의다. exact selected symbol과
+retained snapshot을 기준으로 bounded governed_by/has_security_pattern 조회를
+사용하고 실제 관련 symbol·설명·수정 hint·manual/rule origin·unknown/not-found·
+기준 source/metadata SHA와 조회 상한/중단을 반환한다. 이름으로 source를
+혼합하거나 live YAML/source를 query에서 읽지 않는다.
+
+현 legacy loader는 YAML의 설명/위험/적용 symbol을 graph node로 보존하지만,
+실제 YAML 행·문서 버전·검토자·검토 시간·승인 상태와 원문 bytes는 모두 저장하지
+않는다. line1 기본값이나 현재 Go commit을 annotation 원문의 검토/버전 핀으로
+승격하지 않는다. 해당 provenance는 unknown으로 노출하고 필요한 원문/검토
+metadata를 지원할 때만 typed 검증과 writer/reader round-trip을 추가한다.
+manual annotation은 위험 후보/운영자 입력이며 자동 규칙 후보나 LLM 판단과
+분리한다. 빈 태그는 안전/정책 적합 판정이 아니다.
+
+기존 MCP 등록과 HTTP 접근/CIDR 정책 안에서만 노출한다. readOnlyHint는
+authorization 증명이 아니며 사용자/검토자 인증·서명 trust 기능은 미지원으로
+표시한다. private source와 ambiguous history 경계를 우회하지 않는다.
+양성/음성·빈 태그·규칙/수동 구분·설명/hint·source/version/reviewer unknown·
+조건/권한 거부·도구 등록/소비자 계약·source 변조/상한의 실제 공개 실행과
+회귀 근거를 확인한 후에만 WI-SP 완료를 체크한다.
