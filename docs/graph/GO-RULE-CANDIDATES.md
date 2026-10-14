@@ -22,7 +22,9 @@ One witness is retained per source/sink pair; alternative path feasibility is no
 Paths follow lexical reaching definitions, then corresponding assignment RHS
 uses; multi-result RHS dependencies are conservative. Branches and loops may
 reach without proving runtime feasibility. Control conditions cite original
-nodes and labels. Calls on a path remain opaque. Sanitizer semantics are
+nodes and labels. Engine version2 marks an empty structural control block as
+`structural_block_unlocated` and omits its unavailable source location; it never
+invents byte/line zero as an original citation. Calls on a path remain opaque. Sanitizer semantics are
 `not_proven`; apparent sanitizer calls do not suppress candidates. Replacing an
 input with a literal kills that lexical flow, without proving whole-program
 safety. Manual annotations retain independent provenance.

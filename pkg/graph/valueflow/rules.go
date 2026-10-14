@@ -26,9 +26,10 @@ type RuleQueryInput struct {
 	MaxFlowSteps  int        `json:"max_flow_steps,omitempty"`
 }
 type RuleCondition struct {
-	Node      string   `json:"node"`
-	Condition string   `json:"condition"`
-	Location  Location `json:"location"`
+	Node           string    `json:"node"`
+	Condition      string    `json:"condition"`
+	Location       *Location `json:"location,omitempty"`
+	LocationStatus string    `json:"location_status"`
 }
 type RuleCandidate struct {
 	ID               string          `json:"id"`
@@ -267,7 +268,13 @@ func (a *analysis) matchRules(o RuleOptions) {
 								key := edge.From + "/" + edge.Condition
 								if !seen[key] {
 									seen[key] = true
-									conditions = append(conditions, RuleCondition{edge.From, edge.Condition, nodes[edge.From].Location})
+									condition := RuleCondition{Node: edge.From, Condition: edge.Condition, LocationStatus: "structural_block_unlocated"}
+									if node, known := nodes[edge.From]; known {
+										loc := node.Location
+										condition.Location = &loc
+										condition.LocationStatus = "source_node"
+									}
+									conditions = append(conditions, condition)
 								}
 							}
 						}
@@ -374,5 +381,5 @@ func (a *analysis) matchRules(o RuleOptions) {
 }
 
 func newRuleResult(o RuleOptions) *RuleResult {
-	return &RuleResult{PackID: "go-local-review", PackVersion: "1.0.0", PackSHA256: hashBytes([]byte(rulePackDefinition)), EngineVersion: "1", Origin: "automatic", Status: "matched_bounded", Limits: o, Candidates: []RuleCandidate{}, Limitations: []string{"empty_candidates_do_not_establish_safety", "syntax_targets_unresolved", "parameters_not_proven_attacker_controlled", "lexical_may_reach_not_path_feasibility", "sanitizers_and_opaque_call_effects_not_proven", "aliases_closures_fields_and_indirect_sinks_unsupported"}}
+	return &RuleResult{PackID: "go-local-review", PackVersion: "1.0.0", PackSHA256: hashBytes([]byte(rulePackDefinition)), EngineVersion: "2", Origin: "automatic", Status: "matched_bounded", Limits: o, Candidates: []RuleCandidate{}, Limitations: []string{"empty_candidates_do_not_establish_safety", "syntax_targets_unresolved", "parameters_not_proven_attacker_controlled", "lexical_may_reach_not_path_feasibility", "sanitizers_and_opaque_call_effects_not_proven", "aliases_closures_fields_and_indirect_sinks_unsupported"}}
 }

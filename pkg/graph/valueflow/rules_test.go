@@ -156,3 +156,24 @@ func TestRuleQueryStrictInputPinsAndChangingSnapshot(t *testing.T) {
 		t.Fatal(e)
 	}
 }
+
+func TestRuleRangeControlWithoutASTLocationRemainsExplicitUnknown(t *testing.T) {
+	r := ruleAnalyze(t, "func F(cmd string,values []int){for range values{exec.Command(cmd)}}", RuleOptions{})
+	if len(r.Rules.Candidates) != 1 {
+		t.Fatal(r.Rules)
+	}
+	unknown := false
+	for _, condition := range r.Rules.Candidates[0].Conditions {
+		if condition.LocationStatus == "structural_block_unlocated" {
+			unknown = true
+			if condition.Location != nil {
+				t.Fatal("fabricated original location", condition)
+			}
+		} else if condition.LocationStatus != "source_node" || condition.Location == nil || condition.Location.StartLine < 1 {
+			t.Fatal("missing source/unknown distinction", condition)
+		}
+	}
+	if !unknown || r.Rules.EngineVersion != "2" {
+		t.Fatal("range block location not explicitly unknown", r.Rules)
+	}
+}
