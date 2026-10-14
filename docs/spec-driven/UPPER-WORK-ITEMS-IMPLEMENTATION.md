@@ -457,3 +457,46 @@ WI-C는 기존 PR 피드백 반영 명령과 함수 내부 심층 리뷰를 혼�
 tradeoff를 검증 가능한 계약으로 고정하고 coding-agent 리뷰 경로에 연결한다.
 MCP 소비자 계약을 새 CKS 도구에 맞춰 갱신하며 완료 전에 실제 source-bound
 fixture·validator·경로·수용 연결·회귀 근거를 요구한다.
+
+### WI-C 고정 구현 계약: 보고서 전달과 사람 수용 분리
+
+현재 coding-agent analyzer의 `code_review` 경로는 light 상황 분석 뒤
+review-report.md를 만들고 종료한다. Orchestrator의 review_only 흐름은
+ANALYSIS→PLANNING→COMPLETION인데 analyzer는 직접 terminal을 지시한다.
+이 불일치를 해소하고 ANALYSIS의 typed 심층 자료→PLANNING의 검토 보고서→
+COMPLETION의 전달 검증 순서를 유지한다. PR 피드백 반영 `/review`는 별도다.
+
+1. 입력은 명시된 검토 대상/기준/규칙 pack, exact retained symbol identity와
+   commit/blob/snapshot 핀이다. 실제 CKS `review_function`과 `rule_candidates`
+   응답을 SHA로 묶는다. 규칙 응답에 포함된 value/control 결과를 재사용하여
+   소비자가 CFG나 규칙을 다시 만들지 않는다. 미지원 pack/backend면 실제
+   실패/미지원 응답을 기록하며 빈 안전 판정으로 대체하지 않는다.
+2. `deep-review.json`은 출처·도구 요청/응답·모듈/시퀀스·data/state·guard/exception·
+   complexity/resource/I/O·priority/tradeoff·검토 기준 연결·unknown·수용 상태를
+   닫힌 구조로 보존한다. 계산된 CFG/def-use/규칙과 agent 추론/제안은 출처를
+   분리하며, 추론에는 원문 근거와 가정이 필요하다. 수동 태그/LLM 판단을
+   계산된 취약점으로 바꾸지 않는다. 미검토/미지원 부분은 명시적 unknown이다.
+3. source order의 호출 목록은 실제 실행 trace가 아니다. sequence/module
+   diagram에는 관찰된 문법·계산된 로컬 연결·추론한 interprocedural 연결을
+   각각 표시하고, 조건/경로 실행 가능성·동적 target·alias/state·exception·
+   측정 없는 성능/자원 수치의 한계를 유지한다. AST 개수로 O(n)이나 안전을
+   판정하지 않는다. 누락 guard 및 우선순위 제안은 reasoning으로 표기한다.
+4. 기존 `review_function` 응답은 seed ID/path/line은 제공하지만 snapshot/blob
+   핀은 제공하지 않는다. 다른 응답의 핀을 자동 상속해 atomic 일치를 주장하지
+   않는다. identity/원문 위치를 대조하고 그 응답의 snapshot association을
+   unknown으로 표시한다. 계산된 value/규칙의 immutable 핀은 보존한다.
+5. 분석 완료·planning 진입·review_only 종료는 정확한 검증 artifact/report SHA에
+   연결한다. type 변경·필수 section 삭제·다른 source·잘못된 계산 edge·
+   unsupported를 safe로 바꾸기·근거 변경/삭제·미검증 종료를 거부한다. hook
+   경계 밖 직접 편집에는 같은 CLI verifier를 제공한다. 사람 수용은 별도이며
+   artifact의 구조 검사/보고서 전달만으로 `accepted`를 기록하지 않는다.
+6. 소비자 C1 입력 계약을 현재 CKS31개 tools/list에 맞춰 갱신한다. 실제
+   owned compiled Go fixture의 상태 변경/guard 누락/분기·loop·외부 호출·
+   resource/I/O 추론/안정성-속도 상충 자료, 공개 MCP→artifact→hook→보고서
+   경로 및 음성 tamper controls를 실행한다. 산출물·source/runner·비용·한계·
+   조건별 결과를 커밋 근거로 고정한 뒤에만 WI-C 완료를 체크한다.
+
+현 단계는 기존 경로와 실제 공개 함수 리뷰 응답 확인/계약 고정까지다.
+validator·도구 소비자 갱신·analyzer/orchestrator/hook·실제 artifact 실행은 아직
+구현하지 않았으며 WI-C는 미완료다. 현재6/9, 다음은 WI-C validator와 소비자
+계약/경로 구현이며, 남은 전체 작업은WI-C→WI-6→WI-SP다.
