@@ -88,10 +88,12 @@
 | 문서 | 125개, 문서 계약20개·패키지 안내3개 통과 |
 | 작업표 허위 완료 방지 | 7개 시험 통과 |
 | 기존 source/input/bundle 바이트 결속 | 2,069개 통과 |
-| 새 Go 파일을 포함한 기존 소스목록 guard | 결속 참조 갱신 단계 |
+| 새 Go 파일을 포함한 기존 소스목록 guard | 1,647개 결속, 검사 통과 |
 
 전체 모듈에서 skip된19개는 실제 모델/자체 graph/특정 플랫폼·환경 지정 등이 필요한 기존 조건부 시험이며 통과로 세지 않았다. 목록에19개 모두 `state=skip`으로 보존한다. Go가 package skip으로 보고한12개 패키지는 별도 집계한다.
 
 [증거 manifest](../../system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json)는 실행 로그·전체 시험 목록과 소스를 결속한다. 기존 source 목록에는 새 Go3개를 추가한 [별도 바이트 결속](../../system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/source-binding.json)을 만들고 이전 승인·완료 판정은 유지한다. [이전 ontology 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)의384회 및 별도8회와 이번 collection 시험 분모는 합치지 않는다.
 
 다음은 KM-01.3의 실제 backend·공개 조회 adapter 연결과 경계 검증이다. 이후 KM-02.1의 version-aware 도구 계약으로 이어간다. 신규 기능7개 외의 운영·독립 수용9개와 선택 후속12개는 [전체 작업표](../REMAINING-WORK.md)에 그대로 유지한다.
+
+소스 결속 갱신을 완료했다. [별도 검사 기록](../../system/eval/knowledge-roadmap-2026-10-15/km-01-source-binding-update/receipt.json)은 구현 커밋을 참조하며, 기존 원장의 나머지 필드·승인·완료 판정이 그대로임을 확인한다. 기반 packet의 `pending committed manifest`는 첫 커밋 시점의 기록이며 현재 상태는 이 후속 기록을 따른다.
