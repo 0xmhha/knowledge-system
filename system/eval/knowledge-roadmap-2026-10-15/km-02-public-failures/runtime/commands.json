@@ -1,0 +1,42 @@
+[
+  {
+    "label": "gen-reader-v3",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-KM024-failure-final-20261015/project-a/dataset/v3",
+      "--source-root",
+      "/private/tmp/ks-KM024-failure-final-20261015/project-a/source",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-KM024-failure-final-20261015/reader-v3.yaml"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "gen-reader-v4",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-KM024-failure-final-20261015/project-a/dataset/v4",
+      "--source-root",
+      "/private/tmp/ks-KM024-failure-final-20261015/project-a/source",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-KM024-failure-final-20261015/reader-v4.yaml"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  }
+]

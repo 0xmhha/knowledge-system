@@ -1,6 +1,6 @@
 # KM-02 공개 버전 DB 구축·상태·취소
 
-관리 플러그인이 작업 접수를 DB 구축 완료로 오인하지 않도록, 등록된 프로젝트의 불변 후보 구축과 실제 활성화를 구분한다. [요청·상태 계약](./VERSIONED-MAINTENANCE-CONTRACT.md)의 공개 실행 연결이다. KM-02.3의 영속 작업·실제 host 재시작과 E2 read lease/rollback/GC까지 검증했다. KM-02.4 공개 실패 검증은 별도다. 전체 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+관리 플러그인이 작업 접수를 DB 구축 완료로 오인하지 않도록, 등록된 프로젝트의 불변 후보 구축과 실제 활성화를 구분한다. [요청·상태 계약](./VERSIONED-MAINTENANCE-CONTRACT.md)의 공개 실행 연결이다. KM-02.3의 영속 작업·실제 host 재시작과 E2 read lease/rollback/GC까지 검증했다. KM-02.4의 공개 실패36항목까지 검증해 KM-02를 완료했다. 전체 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 등록과 공개 도구
 
@@ -37,7 +37,7 @@ inspect는 읽기 작업이며 output을 생성하지 않는다. build는 immuta
 
 ## 이번 단계의 지원 범위
 
-공개 작업 registry와 동일 key replay는 소유 root의 durable journal로 보존한다. 응답 capability는 `job_persistence=durable_journal`, `serving_adoption=not_observed`, `input_preparation=existing_reviewed_or_rendered_inputs`다. profile 최대32개·접수 기록 최대128개로 제한하며 초과 시 거부한다. 프로세스 재시작은 terminal snapshot과 원래 요청을 복원한다. 미종료 작업은 recovering에서 writer 소유·publication 이력·소유 scratch를 확인하고 종료 상태를 결정하며, 같은 구축을 자동 재실행하지 않는다. 저장 실패가 불확실하면 stale 상태를 응답하지 않고 reconcile_required로 거부한다. 정상 종료는 실행 중 작업의 취소 의도를 먼저 저장하고 하위 종료·정리를 기다린다. 강제 종료·취소·EOF는 E1, read lease/rollback/GC는 E2에서 검증했다. KM-02.3을 완료했으며 다음은 KM-02.4의 공개 실패 보호 검증이다.
+공개 작업 registry와 동일 key replay는 소유 root의 durable journal로 보존한다. 응답 capability는 `job_persistence=durable_journal`, `serving_adoption=not_observed`, `input_preparation=existing_reviewed_or_rendered_inputs`다. profile 최대32개·접수 기록 최대128개로 제한하며 초과 시 거부한다. 프로세스 재시작은 terminal snapshot과 원래 요청을 복원한다. 미종료 작업은 recovering에서 writer 소유·publication 이력·소유 scratch를 확인하고 종료 상태를 결정하며, 같은 구축을 자동 재실행하지 않는다. 저장 실패가 불확실하면 stale 상태를 응답하지 않고 reconcile_required로 거부한다. 정상 종료는 실행 중 작업의 취소 의도를 먼저 저장하고 하위 종료·정리를 기다린다. 강제 종료·취소·EOF는 E1, read lease/rollback/GC는 E2에서 검증했다. KM-02.4까지 검증해 KM-02를 완료했으며 다음은 KM-03의 매니저 연결이다.
 
 등록한 profile의 현재 접근 범위를 먼저 확인한 뒤 scoped key를 재조회한다. 같은 key/요청이면 source/current/version이 바뀌어도 같은 작업을 돌려주며, 같은 key의 다른 요청은 `idempotency_conflict`다. 새 요청은 source·profile·입력·embedding·base·기존 version을 모두 검사한다. 작업 제한 시간은 caller deadline과 profile 상한 중 허용된 범위이며 기존 하위 프로세스의 취소 경로를 사용한다.
 
@@ -157,3 +157,25 @@ E1 실제 fixture를 hash로 결속해 새 소유 경로에 복원하고21항목
 삭제된 v3의 설정 생성기는 경로를 담은 설정을 만들 수 있지만 실제 reader 서버는 시작을 거부하고 다른 dataset으로 대체하지 않았다. 현재 v5 조회는 실제 새 retained 구현을 반환했다. v3 DB를 삭제하고 host를 재시작해도 원래 succeeded snapshot과 key replay는 같았다. 과거 receipt는 현재 reader가 그 DB를 읽는다는 증거가 아니다.
 
 [E2 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json)은 raw MCP/CLI·GC 계획/결과·삭제 후 fixture·E1 입력 hash를 보관한다. 증거 보호12개, 캐시 없는 전체 Go3,794통과·18skip, 관련 race784통과·2skip, build/fmt/lint·문서 계약을 검증했다. E1의0fa42cef source snapshot 검증과 현재 결과를 구분했다. KM-02.3 완료로 전체7/28이다. 다음은 KM-02.4이며 KM-02 전체·검색 품질·온톨로지 효과·독립 수용은 완료가 아니다.
+
+
+## KM-02.4 실행 계획: 공개 실패가 기존 서비스를 훼손하지 않는가
+
+E1의 실제 두 프로젝트 DB를 새 소유 경로로 복원하고 A의 current=v3와 실제 pinned reader를 유지한다. 공개 도구의 타 project/profile/base 좌표, 부적절한 version, 기존 version, caller path/command 주입과 타 프로젝트 job 조회/취소를 거부해야 한다. 실제 graph 한쪽 실패, 실제 graph 완성 후 vector 실패, 외부 commit/root의 semantic corpus 불일치, source/profile의 구축 중 변경도 후보를 활성화하지 못해야 한다.
+
+별도 실제 graph 대기 창에서10초 deadline·취소·EOF·부모 SIGKILL을 검증한다. 각 사건 뒤 current·기존 원문/인용·다른 프로젝트·과거 history의 byte를 대조한다. 취소와 EOF는 canceled, 강제 종료는 interrupted, deadline은 deadline_exceeded 실패로 구분하며 실제 하위 종료/owned scratch 정리 전 terminal을 만들지 않는다. 이후 새 요청의 정상 v4 구축·조회까지 확인한다.
+
+이번 변경은 시험/문서 코드이며 Go 구현은 E2 source binding의 유지 Go1,253개와 byte 단위로 같아야 한다. 같을 때만 E2의 캐시 없는 전체 Go/race 결과를 명시적으로 참조하고, 새 MCP 실패 matrix·증거 보호·build/fmt/lint/문서 검사는 별도로 기록한다. Go 소스가 달라지면 이전 결과를 재사용하지 않는다. 모든 항목이 실제로 통과한 뒤에만 .4와 KM-02 전체를 체크한다.
+
+KM-02.4의 reader 실행 중 byte 대조는 원래 DB/manifest/source 파일 전체 hash를 확인한다. SQLite vector reader가 여는 일시적 vector.db-shm/vector.db-wal은 별도 기록하며 WAL은0byte여야 한다. 그 밖의 새 파일이나 원래 파일의 hash 변경은 거부하고, reader 종료 후에는 sidecar를 포함한 전체 파일 목록/byte가 원래대로 돌아와야 한다.
+
+
+### KM-02.4 검증 완료
+
+실제 current=v3·pinned reader·다른 프로젝트의 held DB를 둔36항목을 통과했다. 잘못된 대상/경로/명령/기존 version/타 작업 요청은 공개 거부했다. graph 한쪽 실패, 실제 graph 완성 후 vector 실패와 외부 commit/root의 semantic corpus 불일치는 failed이며 원래 current를 바꾸지 않았다. 실제 구축 도중 source/profile 변경도 게시를 막았다.10초 deadline은 deadline_exceeded, 취소와 EOF는 canceled, 부모 SIGKILL은 interrupted로 끝났다. 각 사건 뒤 실제 원문/인용·기존 DB·다른 프로젝트·history를 대조했다. 하위 writer 종료 후 소유 scratch가 정리됐다.
+
+실제 reader는 vector.db-shm과0byte vector.db-wal을 일시 생성했다. 원래 모든 파일의 hash는 같았고, 다른 추가 파일/비어 있지 않은 WAL은 허용하지 않았다. reader 종료 후 전체 목록과 byte도 같았다. 이후 새 요청은 정상 v4를 게시했고 기존 v3와 새 v4의 실제 좌표/원문을 분리 조회했다.5연결 중 의도한 SIGKILL1개는 -9, EOF4개는0이다.
+
+Go 구현1,253개와 E2의 모든 결속 입력은 byte 단위로 같았다. 그 조건에서 E2의 캐시 없는 전체 Go3,794통과·18skip과 관련 race784통과·2skip을 명시적으로 참조했다. 이번에는 Go 시험의 새 실행으로 세지 않았다. build/fmt/lint·문서와 증거 보호12개는 별도로 실행했다. [실패 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures/manifest.json)이 현재 원자료와 참조 관계를 보관한다.
+
+KM-02의4/4를 완료해 전체8/28·기능2/7이다. 다음은 KM-03.1 매니저 패키지/등록/설치/진단/초기 구축/복구 절차다. 검색 품질·온톨로지 효과·독립 수용 완료를 뜻하지 않는다.

@@ -1,8 +1,8 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 KM-02.3 영속 기록·실제 host 복구·reader/rollback/GC를 완료했다. 전체28개 중7개 완료·3개 진행 중(OE-01.1–03)·18개 미착수다. 다음은 KM-02.4의 공개 실패 보호 검증이다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 별도 운영 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 KM-01·KM-02 로컬 구현을 완료했다. 세부28개 중8개 완료·3개 진행 중(OE-01.1–03)·17개 미착수다. 다음은 KM-03.1의 Claude 지식 매니저 패키지·등록/진단/초기 구축/복구 설계다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 별도 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
 
-표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는1/7이다.
+표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는2/7이다.
 
 ## 전체28개 세부 작업과 시험 단계
 
@@ -15,7 +15,7 @@
 | KM-02.1 | legacy/versioned capability와 새 요청·상태 계약 | 완료 | [계약](./VERSIONED-MAINTENANCE-CONTRACT.md)·schema·101사례 통과; 새 공개 실행은 .2–04 |
 | KM-02.2 | 비동기 build/status/cancel과 정합 gate | 완료 | [공개 실행](./VERSIONED-MAINTENANCE-RUNTIME.md)28항목·실제 retained 조회2건·EOF5개·전체 Go/race·증거 보호10개 통과 |
 | KM-02.3 | idempotency/lock/중단/실패/rollback | 완료 | A–D2·실제 E1 host43/E2 retention21·전체 Go/race 검증; .4 별도 |
-| KM-02.4 | 공개 도구의 잘못된 대상·부분 실패·취소 보호 | 미착수 | 미실행 |
+| KM-02.4 | 공개 도구의 잘못된 대상·부분 실패·취소 보호 | 완료 | 실제 공개36항목·부분 DB·기존 current/reader·마지막 v4 정상 게시/조회 검증 |
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 미착수 | 미실행 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 미착수 | 미실행 |
 | KM-03.3 | 암묵지 질문·불확실성·검토/채택/회수 | 미착수 | 미실행 |
@@ -396,3 +396,23 @@ B 증거 보호13개도 통과했다. 실제 공개 회귀는81개 도구 호출
 [E2 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json)과 실행 명세를 따른다. E1은0fa42cef snapshot에서 별도 검증했다. 소스1,686입력은 유지 Go1,253개·기타433개이며 추가3입력은 E1 실제 fixture/manifest/원시 관찰이다. 원래 승인5입력은 바꾸지 않는다. 증거 보호12개는 wire·인용·계획·CLI 거부·기록/입력·skip·완료 집계 변조를 거부한다.
 
 KM-02.3 완료로 전체7/28이며 다음은 KM-02.4의 공개 잘못된 대상/경로·graph/vector 부분 실패·의미 입력 불일치·timeout/cancel/shutdown 보호 검증이다. 남은21개는 KM-02.4, KM-03.1–4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 별도 정책 생성기 보완·운영/독립 수용9개·선택 후속12개도 유지한다.
+
+
+## KM-02.4 완료: 공개 실패 전체 matrix
+
+| 범위 | 실제 결과 |
+|---|---|
+| project/profile/base·version·경로/명령·타 작업 조회/취소 | 공개 거부·current 보존 |
+| graph 실패·graph 완료 후 vector 실패 | failed·부분 DB 활성화 없음·scratch 정리 |
+| foreign semantic corpus commit/root | 실제 graph 뒤 실패·기존 원문 조회 보존 |
+| 구축 중 source/profile 변경 | publication 거부 |
+| 실제10초 deadline | failed/deadline_exceeded·writer 종료·scratch 정리 |
+| 취소·EOF·SIGKILL | canceled/canceled/interrupted·기존 current·reader·다른 project 보존 |
+| 사건별 byte/원문/인용 | 원래 DB/manifest/source/history hash 불변 |
+| SQLite reader 공유 파일 | 별도 기록·WAL0byte·reader 종료 후 전체 목록/byte 복원 |
+| 마지막 정상 요청 | 실제 v4 게시·기존 v3와 새 v4 reader 좌표/원문 분리 |
+| 고정36항목·실제5연결 | 고의 SIGKILL1회 -9·EOF4회0 |
+| Go 결과 | E2의1253 Go·모든 결속 입력 동일 후 전체3794통과/18skip·race784통과/2skip 참조 |
+| 이번 별도 검사 | build/fmt/vet/lint·문서·증거 보호12개 |
+
+[실패 matrix packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures/manifest.json)과 실행 명세를 따른다. 현재 소스1,689입력은 유지 Go1,253개·기타436개이며 추가3입력은 E2 manifest와 실제 module/race raw proof다. 원래 승인5입력은 그대로다. Go를 새로 실행한 것으로 기록하지 않는다. KM-02의4/4를 완료해 전체8/28·기능2/7이다. 남은20개는 KM-03.1–4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 다음은 KM-03.1이며 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.

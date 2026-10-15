@@ -4,7 +4,7 @@
   "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
   "scope_status": "user_requested_features_with_implementation_in_progress",
   "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
-  "implementation_completed": 1,
+  "implementation_completed": 2,
   "total_work_items": 7,
   "total_subtasks": 28,
   "implementation_or_runtime_changed_by_this_documentation": false,
@@ -86,8 +86,8 @@
       "priority": "P0",
       "scope": "versioned_maintenance_tools",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "in_progress",
-      "design_status": "public_durable_recovery_and_readlease_rollback_GC_verified_KM02_4_pending",
+      "status": "complete",
+      "design_status": "locally_verified_public_durable_build_recovery_retention_and_failure_matrix",
       "depends_on": [
         "KM-01"
       ],
@@ -97,9 +97,10 @@
         "docs/spec-driven/VERSIONED-MAINTENANCE-RUNTIME.md",
         "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures/manifest.json"
       ],
-      "verification": "E1_actual_host43_E2_actual_retention21_fresh_Go3794_pass18_skip_related_race784_pass2_skip",
+      "verification": "actual_public_failures36_raw_MCP_partial_DB_current_reader_preservation_recovery_and_new_publication",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -128,8 +129,11 @@
         },
         {
           "id": "KM-02.4",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         }
       ],
       "execution_stages": {
@@ -137,11 +141,9 @@
         "design_schema_and_lifecycle": "verified_101_cases",
         "public_versioned_build_status_cancel": "verified_actual_public_28_checks_5_clean_EOF_sessions",
         "durable_jobs_idempotency_crash_recovery": "verified_A_B_C_D1_D2_E1_E2_actual_public_host_replay_shutdown_readlease_rollback_GC",
-        "real_public_maintenance_evaluation": "local_lifecycle_and_retained_v2_reads_only_mock_embedding_not_quality_or_independent_acceptance"
+        "real_public_maintenance_evaluation": "actual_E1_host43_E2_retention21_KM02_4_failures36_mock_embedding_not_quality_or_independent_acceptance"
       },
-      "remaining": [
-        "KM-02.4 verify public wrong targets/paths, graph/vector partial failure, semantic mismatch, timeout/cancel/shutdown preserve current/readers"
-      ]
+      "remaining": []
     },
     {
       "id": "KM-03",
@@ -396,7 +398,7 @@
     "documentation_contract_tests_passed": 20,
     "live_documents_checked": 127,
     "ontology_effect_executed": true,
-    "feature_completion_count": 1,
+    "feature_completion_count": 2,
     "ontology_effect_scope": "local descriptive observation only; no independent quality verdict",
     "ontology_effect_calls": 384,
     "ontology_mechanism_probe_calls": 8,
@@ -446,7 +448,7 @@
     "maintenance_runtime_EOF_sessions": 5,
     "maintenance_runtime_false_completion_tests": 10,
     "maintenance_runtime_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json",
-    "current_Go_validation_reused": false,
+    "current_Go_validation_reused": true,
     "journal_foundation_race_cases": 114,
     "journal_foundation_scope": "private_store_and_status_validation_only_not_public_durability",
     "journal_foundation_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-journal-foundation/manifest.json",
@@ -485,8 +487,14 @@
     "public_retention_EOF_sessions": 5,
     "public_retention_evidence_guard_tests_passed": 12,
     "public_retention_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json",
-    "retention_binding_advance": "verified_committed_manifest_and_source_checker"
+    "retention_binding_advance": "verified_committed_manifest_and_source_checker",
+    "current_Go_reference_scope": "unchanged_1253_Go_and_all_E2_bound_inputs_count1_proof",
+    "public_maintenance_failure_checks": 36,
+    "public_maintenance_failure_expected_SIGKILLs": 1,
+    "public_maintenance_failure_EOF_sessions": 4,
+    "public_maintenance_failure_guard_tests": 12,
+    "public_maintenance_failure_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures/manifest.json"
   },
-  "completed_subtasks": 7,
+  "completed_subtasks": 8,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
 }
