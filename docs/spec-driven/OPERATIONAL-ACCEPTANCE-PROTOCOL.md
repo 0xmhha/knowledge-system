@@ -44,7 +44,7 @@ WI-V1/V2의 실제 결함 티켓, WI-3의 증상/원인 정답, WI-4의 재현 s
 
 [host preflight](./OPERATIONAL-ACCEPTANCE-HOST-PREFLIGHT.json)에는 실제 CLI2.1.299의 version/help와 CKS mcp help, 소비자 source의 hash를 보존했다. model/auth·설치 plugin·실제 hook/tool 호출은 미확인이다. coding-agent README의 예전 stdio 설정과 달리 현재 plugin source는 HTTP CKS를 사용하므로 source·CLI 기준으로 recipe를 작성한다.
 
-소비자 source의 local analyze는 Jira intake를 생략해도 평가 후 push/PR 생성을 수행한다. auto_merge=false는 merge만 멈춘다. 기존 git hook은 이 게시 전 종료 경계를 보장하지 않으며 auto Stop hook은 비terminal 평가 상태의 실행을 다시 이어가도록 요청한다. 따라서 HOST-PILOT recipe는 게시 차단 검증이 완료되기 전까지 draft_unresolved다. prompt만으로 차단했다고 판정하거나 모의 PR URL/완료 상태를 쓰지 않는다. baseline ChainBench MCP의 SIGTERM exit -15를 개발 회귀시험에서 재현했고 [준비용 소비자 보완](./OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)의 새 source 후보 bdf5ad27에서 signal/EOF·pollable stdio와 소유한 상태 root를 구현·검증했다. 실제 노드 cleanup·설치 연결은 미확인이다. 이 개발 시험을9개 항목의 actual runtime/품질 gate에 넣지 않는다.
+기존 baseline 소비자 source의 local analyze는 Jira intake를 생략해도 평가 후 push/PR 생성을 수행한다. auto_merge=false는 merge만 멈춘다. 기존 baseline git hook은 이 게시 전 종료 경계를 보장하지 않으며 auto Stop hook은 비terminal 평가 상태의 실행을 다시 이어가도록 요청한다. 따라서 HOST-PILOT recipe는 게시 차단 검증이 완료되기 전까지 draft_unresolved다. prompt만으로 차단했다고 판정하거나 모의 PR URL/완료 상태를 쓰지 않는다. baseline ChainBench MCP의 SIGTERM exit -15를 개발 회귀시험에서 재현했고 [준비용 소비자 보완](./OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)의 새 source 후보 bdf5ad27에서 signal/EOF·pollable stdio와 소유한 상태 root를 구현·검증했다. 실제 노드 cleanup·설치 연결은 미확인이다. 이 개발 시험을9개 항목의 actual runtime/품질 gate에 넣지 않는다.
 
 ## 새 입력을 작성하는 순서
 
@@ -71,3 +71,10 @@ run마다 protocol/input/runtime hash, raw 요청/응답/오류·exit·종료 �
 준비 검증: guard 회귀28개·문서 계약20개·package notice3개 통과, 현재 문서116개 검사 통과. 미동결 상태의 require-frozen은 의도대로 exit1이며 실행 허용을 거부한다. 새 함수 후보40개의 Git blob·파일/span hash·위치 연결과 기존 source/evidence guard·2069개 원본 연결 검사도 통과했고 기존 구현/수용 원장 bytes는 변경하지 않았다. 이 결과는 **준비 문서와 상태 검사**의 근거이며 runtime/독립 품질/사람 수용 성공 수에 포함하지 않는다.
 
 다음은 F-05/06 정보를 반영하며 새 입력·gold와 runtime recipe를 준비하고 F-01–08의 구체 자료를 검토하는 것이다. 단계0 동결 후 단계1 runtime inventory, 단계2 actual host, 단계3 독립 평가, 단계4 사람 수용으로 진행한다. 실행/독립 수용은0/9이며 [전체 남은 작업](../REMAINING-WORK.md)의 별도 범위도 그대로 남는다.
+
+## coding-agent 준비 후보와 운영 경계
+
+[OP-CA-01](./OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)의 evaluation_only/로컬 EVALUATED 정책을 개발 검증했다.
+기본 auto_merge=false만으로는 게시를 막지 못한다. source 후보 채택·실제 host의 hook/도구 권한 연결은 미확인이다.
+known-command/tool guard를 네트워크 sandbox로 간주하지 않으며 격리 clone·제한된 host/MCP 정책을 검증해야 한다.
+단계0 승인·모델/비용·독립 gold가 정해지기 전 actual pilot을 실행하거나9개 gate를 완료 처리하지 않는다.

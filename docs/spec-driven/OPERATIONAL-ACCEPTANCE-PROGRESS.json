@@ -233,7 +233,8 @@
           "kind": "preparation_only"
         },
         "review_draft_packet": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md",
-        "chainbench_readiness_fix": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json"
+        "chainbench_readiness_fix": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
+        "coding_agent_readiness_fix": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json"
       },
       "completed_preparation": [
         "read_only_source_inventory",
@@ -245,7 +246,8 @@
         "public_review_inputs_and_separate_ai_rubric_drafts",
         "non_exhaustive_value_control_anchor_drafts",
         "stop_reentry_and_unmasked_shutdown_completion_requirements",
-        "chainbench_stdio_readiness_patch_with_isolated_state_and_controlled_regression"
+        "chainbench_stdio_readiness_patch_with_isolated_state_and_controlled_regression",
+        "coding_agent_evaluation_only_exit_and_stop_reentry_controlled_regression"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -339,6 +341,18 @@
       "manifest": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
       "manifest_sha256": "d6bef9e2cea8711e10acd36cf43038b218ba3394d359393a9aa39a715c628452",
       "candidate_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "candidate_adoption": "pending",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded"
+    },
+    {
+      "id": "OP-CA-01",
+      "component": "coding-agent",
+      "status": "implemented_controlled_checks_passed",
+      "manifest": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json",
+      "manifest_sha256": "9a380dcc900db6098ae04822737d211c641728b25909114d8d4d5008bb392d92",
+      "candidate_commit": "b6e2abdc8892bb5e82044997f4f2285ece9c5b35",
       "candidate_adoption": "pending",
       "operational_gate": "not_run",
       "quality_gate": "not_run",

@@ -41,4 +41,40 @@ candidate source·artifact hash가 확인된 것은 prepared source 후보의 �
 
 ## 다음과 남은 범위
 
-다음 source 준비 작업은 coding-agent의 게시 전 종료 정책과 auto Stop 재진입을 함께 처리하는 것이다. 이어 새 독립 gold·case/family/DEV/FINAL, reviewer 역할·LLM/비용·metric/자원 기준을 고정하고 actual host/node 검증을 수행한다. stage0은 preparing, stage1–4는 미시작, 운영/독립 수용은0/9다. WI-5·별도 후속13개·태그/공개 배포 결정은 [전체 작업표](../REMAINING-WORK.md)에 남긴다.
+coding-agent 게시 전 종료·Stop 처리는 아래 OP-CA-01 후보에서 개발 검증을 완료했다. 다음은 두 소비자 후보의 채택·격리 host 연결과 새 입력/정답 검토다. 이어 새 독립 gold·case/family/DEV/FINAL, reviewer 역할·LLM/비용·metric/자원 기준을 고정하고 actual host/node 검증을 수행한다. stage0은 preparing, stage1–4는 미시작, 운영/독립 수용은0/9다. WI-5·별도 후속13개·태그/공개 배포 결정은 [전체 작업표](../REMAINING-WORK.md)에 남긴다.
+
+## OP-CA-01 — 게시 전 평가 종료와 auto Stop 재진입
+
+후보 `b6e2abdc8892bb5e82044997f4f2285ece9c5b35`을 `/private/tmp/ks-op-coding-agent-evaluation-only`의 별도 branch에서 구현했다.
+기존 baseline fdb4d515와 승인된 구현 증거는 변경하지 않았다. source 채택·설치/게시·실제 host 검증은 pending이다.
+
+| 세부 기능·목적 | 개발 검증 상태 |
+|---|---|
+| local/full/bugfix auto 전용 `--evaluation-only`; auto-merge/미지원 유형 조합 거부 | 완료 |
+| intake 정책·ticket/repo/workspace/base 신원 lock; 사후 완화 차단 | 완료 |
+| 기존 oracle completion·applied selection·완료 stage/plan/report·clean tracked source 검사 재사용 | 완료 |
+| 검증된 EVALUATED와 state/source/artifact/runner hash receipt; PR/COMPLETION 미기록 | 완료 |
+| 정상/반복 Stop 종료, 미완료·변조 시 평가/진단 요구, stop_hook_active 단일 재진입 해제 | 완료 |
+| 오래된 policy/다른 auto_merge 티켓에 의한 경계 해제·게시 재진입 방지 | 완료 |
+| 알려진 push/PR/Jira 등 도구 차단·Write/Edit 정책/가짜 PR 차단 | 완료, 아래 제한 적용 |
+| 회귀·실제 CLI/hook subprocess 원자료·patch/bundle·복구 | 완료, manifest 참조 |
+
+새 경계 시험 15개, 전체 plugin script 시험 157개,
+bench 시험 15개, 기존 hook26개, Python syntax·hook JSON·shell syntax·공백·C1 도구명 계약을 통과했다.
+통제 smoke는 실제 Python 결함·두 source 후보·dual-oracle/control/mutant를 실행하고 정상 종료/반복 Stop/게시 거부/변조 거부의 원요청·응답을 보존한다.
+fixture panel 의견은 독립 검토가 아니다. 첫 정책 시험의 실패1건과 기존 hook fixture의 실패1건은 원자료에 남기며 최종 pass로 세지 않는다.
+기존 hook fixture는 synthetic Git commit 실패를 무시하던 문제를 수정했다. 서명 비활성은 일회용 fixture 명령에만 적용하며 후보 source commit의 GPG 설정은 유지한다.
+
+EVALUATED는 로컬 평가 gate 종료이며 게시·독립 품질·사람 수용이 아니다. 필요한 ChainBench/regression skip은 기존 tier 규칙을 따른다.
+종료 뒤 host의 Agent PostToolUse 기록이 이어지므로 `logs/impl.log`와 `logs/agent-transcript.jsonl`은 append telemetry로 보존하되 exit gate hash 대상에서 제외한다.
+그 외 report/source/state 변경은 receipt를 무효화한다. receipt hash는 검토자 신원 인증이나 각 역할의 실제 host dispatch 증명이 아니다.
+
+publication guard는 알려진 Bash 표기와 MCP 도구 범위의 유한 검사다. 임의 script/alias/encoded 명령·직접 shell 파일 수정·host bypass의 전체 외부 전송을 막는 sandbox가 아니다.
+이번 시험의 model 호출·설치 host session·외부 게시 호출은 모두0이다. 실제 host hook 연결/권한·제한된 MCP/네트워크·pilot 실행은 단계0/1에서 검증한다.
+전용 격리 clone에서만 사용하고 게시가 필요한 다른 작업과 섞지 않는다. 기존 publish/default 경로는 유지한다.
+
+[manifest](../../system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json)에 source blob/SHA·검사·실패 로그·통제 smoke·복구를 결속했다.
+[patch](../../system/eval/operational-preparation-2026-10-15/coding-agent-exit/change.patch)와
+[bundle](../../system/eval/operational-preparation-2026-10-15/coding-agent-exit/coding-agent.bundle)을 primary에 보존한다.
+bundle은 baseline fdb4d515가 필요하며 기존 [coding-agent 복구 lineage](./EVIDENCE-RECOVERY.md)를 유지한다.
+운영/독립 수용은 여전히0/9다.

@@ -72,7 +72,7 @@
       "decision_status": "pending",
       "receipt": null,
       "remaining_source_risks": [
-        "auto_stop_hook_reentry_before_publication_boundary",
+        "coding_agent_candidate_not_adopted_or_host_hooks_verified",
         "chainbench_candidate_not_adopted_or_installed",
         "chainbench_real_node_active_cleanup_unverified",
         "other_platform_stdio_shutdown_unmeasured"
@@ -568,7 +568,7 @@
         "prepublication_boundary_enforcement",
         "public_input_gold_access_separation",
         "timeout_owned_children_cleanup",
-        "auto_stop_hook_reentry_and_terminal_boundary_compatibility"
+        "installed_host_policy_lock_and_stop_hook_receipt_dispatch"
       ],
       "prohibited_flags": [
         "--dangerously-skip-permissions",
@@ -647,6 +647,18 @@
       "manifest": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
       "manifest_sha256": "d6bef9e2cea8711e10acd36cf43038b218ba3394d359393a9aa39a715c628452",
       "candidate_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "candidate_adoption": "pending",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded"
+    },
+    {
+      "id": "OP-CA-01",
+      "component": "coding-agent",
+      "status": "implemented_controlled_checks_passed",
+      "manifest": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json",
+      "manifest_sha256": "9a380dcc900db6098ae04822737d211c641728b25909114d8d4d5008bb392d92",
+      "candidate_commit": "b6e2abdc8892bb5e82044997f4f2285ece9c5b35",
       "candidate_adoption": "pending",
       "operational_gate": "not_run",
       "quality_gate": "not_run",

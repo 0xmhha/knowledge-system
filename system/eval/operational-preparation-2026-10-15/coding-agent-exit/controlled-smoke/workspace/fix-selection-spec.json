@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "source_base_ref": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+  "oracle_plan": "oracle-template.json",
+  "criteria": {
+    "selection_rule": "unanimous-panel-and-pareto",
+    "axes": [
+      {
+        "id": "changed_lines",
+        "unit": "lines",
+        "direction": "min",
+        "required": true
+      }
+    ]
+  },
+  "regression_driver": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "oracles/regression.py"
+    ],
+    "source_file": "oracles/regression.py"
+  },
+  "metric_drivers": [],
+  "judges": [
+    {
+      "id": "correctness",
+      "role": "correctness",
+      "kind": "fixture",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py"
+      ],
+      "adapter_source": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py",
+      "adapter_sha256": "0db13d255270b7e73b99cfbebb8c3756026c55fc5c65abb2fbf51357bd9fb843"
+    },
+    {
+      "id": "maintainability",
+      "role": "maintainability",
+      "kind": "fixture",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py"
+      ],
+      "adapter_source": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py",
+      "adapter_sha256": "0db13d255270b7e73b99cfbebb8c3756026c55fc5c65abb2fbf51357bd9fb843"
+    },
+    {
+      "id": "regression",
+      "role": "regression",
+      "kind": "fixture",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py"
+      ],
+      "adapter_source": "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py",
+      "adapter_sha256": "0db13d255270b7e73b99cfbebb8c3756026c55fc5c65abb2fbf51357bd9fb843"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "sum",
+      "rationale": "recompute the aggregate from every credit",
+      "commit_subject": "fix: sum every ledger credit",
+      "changes": [
+        {
+          "path": "ledger.py",
+          "before": "def balance(entries):\n    return entries[-1] if entries else 0\n",
+          "after": "def balance(entries):\n    return sum(entries)\n"
+        }
+      ],
+      "mutants": [
+        {
+          "id": "lost",
+          "kind": "reintroduce_symptom",
+          "patches": [
+            {
+              "path": "ledger.py",
+              "before": "sum(entries)",
+              "after": "entries[-1] if entries else 0"
+            }
+          ]
+        },
+        {
+          "id": "overfit",
+          "kind": "overfit",
+          "patches": [
+            {
+              "path": "ledger.py",
+              "before": "sum(entries)",
+              "after": "42"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "loop",
+      "rationale": "accumulate every credit explicitly",
+      "commit_subject": "fix: accumulate all ledger credits",
+      "changes": [
+        {
+          "path": "ledger.py",
+          "before": "def balance(entries):\n    return entries[-1] if entries else 0\n",
+          "after": "def balance(entries):\n    total = 0\n    for value in entries:\n        total += value\n    return total\n"
+        }
+      ],
+      "mutants": [
+        {
+          "id": "lost",
+          "kind": "reintroduce_symptom",
+          "patches": [
+            {
+              "path": "ledger.py",
+              "before": "total += value",
+              "after": "total = value"
+            }
+          ]
+        },
+        {
+          "id": "overfit",
+          "kind": "overfit",
+          "patches": [
+            {
+              "path": "ledger.py",
+              "before": "return total",
+              "after": "return 42"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timeout_seconds": 5,
+  "max_total_seconds": 120
+}

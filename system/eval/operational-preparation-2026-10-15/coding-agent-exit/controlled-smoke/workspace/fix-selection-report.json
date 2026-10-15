@@ -1,0 +1,1446 @@
+{
+  "schema_version": 1,
+  "runner_sha256": "78fcce73a046dde2f7251ba117cdf7271bb18e5e21a9a7176de809cfa234f54b",
+  "oracle_runner_sha256": "91455e7fdea626f6666a5314052ffebed100f36d4d8f43d3d1e92982078d602e",
+  "repo_root": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject",
+  "spec_sha256": "ee7939b53a5de4af5ca703154fe792bbcf72b4eeb64b1eb308bd8c6babff2986",
+  "oracle_template_sha256": "530207352956f4822d493626b1693bbe165b60bc61e5eedb486eb7823a09d43b",
+  "source_base_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+  "oracle_base_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+  "symptom_id": "ledger-total",
+  "candidates": [
+    {
+      "id": "sum",
+      "rationale": "recompute the aggregate from every credit",
+      "commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+      "tree": "d2434578a2219b94bd52f4cadc8452980d8913c7",
+      "diff": "diff --git a/ledger.py b/ledger.py\nindex d1acd33..da66a63 100644\n--- a/ledger.py\n+++ b/ledger.py\n@@ -1,2 +1,2 @@\n def balance(entries):\n-    return entries[-1] if entries else 0\n+    return sum(entries)\n",
+      "diff_sha256": "90678251341dedf32f4f86c9d8b157d89f9bd30f0b9a379b49016fe9965d8d94",
+      "oracle_plan": {
+        "schema_version": 1,
+        "tier": "simulation",
+        "base_ref": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+        "symptom_id": "ledger-total",
+        "symptom_case": "symptom",
+        "controls": [
+          "empty",
+          "single"
+        ],
+        "ticket_file": "ticket.json",
+        "ticket_sha256": "504a5013d5e8cb7d67623b00b42f962bcc6ce1059226a4d9b906c429cf7e7275",
+        "requirement_file": "acceptance.json",
+        "independent_derivation_file": "derivation.md",
+        "frozen_files": {
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "fc3f994c6969206ab176bb4f9eaab0d19897ec12cd8c96bb5502d5fcbeca1457",
+          "oracles/primary.py": "fd57f6a86a912a8ea731f20b0f1ecd081107e582522f044cfb50478d87592870",
+          "oracles/independent.py": "7421e50fdb3ba43b4a8734dcc627b4572e82d83011e54d89665caf3a084b0644",
+          "oracles/regression.py": "ddb4cac835d85afd802c3ba3ad27c6bc690e547bea22698682735a1a95be0972"
+        },
+        "oracles": [
+          {
+            "id": "primary",
+            "role": "primary",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "assertion_id": "ticket_balance",
+            "files": [
+              "oracles/primary.py"
+            ]
+          },
+          {
+            "id": "independent",
+            "role": "independent",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "assertion_id": "conservation",
+            "files": [
+              "oracles/independent.py"
+            ]
+          }
+        ],
+        "mutants": [
+          {
+            "id": "lost",
+            "kind": "reintroduce_symptom",
+            "patches": [
+              {
+                "path": "ledger.py",
+                "before": "sum(entries)",
+                "after": "entries[-1] if entries else 0"
+              }
+            ]
+          },
+          {
+            "id": "overfit",
+            "kind": "overfit",
+            "patches": [
+              {
+                "path": "ledger.py",
+                "before": "sum(entries)",
+                "after": "42"
+              }
+            ]
+          }
+        ],
+        "timeout_seconds": 5,
+        "max_total_seconds": 119.28297758288682
+      },
+      "oracle_report": {
+        "schema_version": 1,
+        "mechanical_verdict": "PASS",
+        "repo_root": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject",
+        "base_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+        "head_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+        "plan_sha256": "d14f6f04ec212fbc703680170d0f1dc166afbb0b443ffbe60334d1f5eb07ea77",
+        "runner_sha256": "91455e7fdea626f6666a5314052ffebed100f36d4d8f43d3d1e92982078d602e",
+        "symptom_id": "ledger-total",
+        "frozen_files": {
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "fc3f994c6969206ab176bb4f9eaab0d19897ec12cd8c96bb5502d5fcbeca1457",
+          "oracles/primary.py": "fd57f6a86a912a8ea731f20b0f1ecd081107e582522f044cfb50478d87592870",
+          "oracles/independent.py": "7421e50fdb3ba43b4a8734dcc627b4572e82d83011e54d89665caf3a084b0644",
+          "oracles/regression.py": "ddb4cac835d85afd802c3ba3ad27c6bc690e547bea22698682735a1a95be0972"
+        },
+        "tier": "simulation",
+        "execution_scope": "candidate_trial",
+        "runs": [
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 78,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "884333bb9a006e81290d22522ff4b249437d4fa1b9a492c35fe62a42234e16bf",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 174,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "713f3924a2c891ff118e7c0441ef36b9f9bdf9a0abdf21c949558df6321e083d",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 116,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "5fdc8753913e138250844eb0d8922f6e5811e3bbfaf00491034d4ca3284038b5",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 88,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "f545f57fa83db2409f90dfb9a9114b1a1c10366c024004730cb6fb5e2ffc0db0",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 87,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "6bb834e24a20d2b539833e5d77b08f543b223dc5a2c65625d6fa6a1b297a3a03",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 78,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "54aadf4a866adc1966b55cb02475c2e97ec8ab3a8e73870b10e778c5f548f875",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 197,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "e7b9cf3c86e19a92e2574b5886193890c83b41ab55730a9699f0e97cb6027e5a",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 87,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "5e4ac5d9f7e6cfd9ec46a5a42a5fea9e5c665feb7d0ef8fa1b734e1775f516fb",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 79,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "b0a00c4c7d0509a4bf6353f547fa11e5fa1fec31f6c151aa5a5074fab99f48dd",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 149,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "ffe46ea397e5df06ffec8b87613e058f0573d09b31102b901b2319c1100d0d27",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 169,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "05c9ad1161428b056b1d6608aef53ea7080602322b23e9708b176b454df8a586",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 126,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "072aded0fd470a37983282568ae774b2539d644783140dd151445acdb6ffc0f5",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:lost",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 79,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "423f8d4bdb4f8eadecc2033cf852aa1d9a8b81650b20276df8e707e08d98c5d6",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:lost",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 81,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "5cbea33e47cd865e8f1348ba25908940f294d7736bea81d26c1c7f4675c72a81",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:overfit",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 85,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "e7b9cf3c86e19a92e2574b5886193890c83b41ab55730a9699f0e97cb6027e5a",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:overfit",
+            "subject_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 82,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "5cbea33e47cd865e8f1348ba25908940f294d7736bea81d26c1c7f4675c72a81",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          }
+        ],
+        "checks": [
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:overfit",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "ASSERTION",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:overfit",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          }
+        ],
+        "independent_human_acceptance": "not_recorded",
+        "limits": [
+          "Separate drivers and derivation do not prove semantic independence without review.",
+          "Finite controls/mutants do not prove correctness for every input."
+        ]
+      },
+      "oracle_plan_bytes": "{\n  \"schema_version\": 1,\n  \"tier\": \"simulation\",\n  \"base_ref\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\",\n  \"symptom_id\": \"ledger-total\",\n  \"symptom_case\": \"symptom\",\n  \"controls\": [\n    \"empty\",\n    \"single\"\n  ],\n  \"ticket_file\": \"ticket.json\",\n  \"ticket_sha256\": \"504a5013d5e8cb7d67623b00b42f962bcc6ce1059226a4d9b906c429cf7e7275\",\n  \"requirement_file\": \"acceptance.json\",\n  \"independent_derivation_file\": \"derivation.md\",\n  \"frozen_files\": {\n    \"acceptance.json\": \"5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7\",\n    \"derivation.md\": \"fc3f994c6969206ab176bb4f9eaab0d19897ec12cd8c96bb5502d5fcbeca1457\",\n    \"oracles/primary.py\": \"fd57f6a86a912a8ea731f20b0f1ecd081107e582522f044cfb50478d87592870\",\n    \"oracles/independent.py\": \"7421e50fdb3ba43b4a8734dcc627b4572e82d83011e54d89665caf3a084b0644\",\n    \"oracles/regression.py\": \"ddb4cac835d85afd802c3ba3ad27c6bc690e547bea22698682735a1a95be0972\"\n  },\n  \"oracles\": [\n    {\n      \"id\": \"primary\",\n      \"role\": \"primary\",\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/primary.py\"\n      ],\n      \"assertion_id\": \"ticket_balance\",\n      \"files\": [\n        \"oracles/primary.py\"\n      ]\n    },\n    {\n      \"id\": \"independent\",\n      \"role\": \"independent\",\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/independent.py\"\n      ],\n      \"assertion_id\": \"conservation\",\n      \"files\": [\n        \"oracles/independent.py\"\n      ]\n    }\n  ],\n  \"mutants\": [\n    {\n      \"id\": \"lost\",\n      \"kind\": \"reintroduce_symptom\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.py\",\n          \"before\": \"sum(entries)\",\n          \"after\": \"entries[-1] if entries else 0\"\n        }\n      ]\n    },\n    {\n      \"id\": \"overfit\",\n      \"kind\": \"overfit\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.py\",\n          \"before\": \"sum(entries)\",\n          \"after\": \"42\"\n        }\n      ]\n    }\n  ],\n  \"timeout_seconds\": 5,\n  \"max_total_seconds\": 119.28297758288682\n}\n",
+      "metrics": {
+        "changed_lines": {
+          "value": 2,
+          "unit": "lines",
+          "origin": "Git diff --numstat"
+        }
+      },
+      "drivers": [
+        {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            "oracles/regression.py"
+          ],
+          "exit_code": 0,
+          "timed_out": false,
+          "launch_error": null,
+          "stdout": "{\"schema_version\": 1, \"candidate_id\": \"sum\", \"subject_commit\": \"300deec8b894141f90a19cd3d8c9b471ee0d1db0\", \"status\": \"PASS\"}\n",
+          "stderr": "",
+          "stdout_sha256": "16c6b4f2ca51a34177a83f499a74137392f325254497cef44ea41e6772deeb55",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "duration_ms": 178,
+          "kind": "regression",
+          "source_file": "oracles/regression.py"
+        }
+      ],
+      "regression": "PASS",
+      "hard_eligible": true,
+      "observation_complete": true,
+      "evidence_sha256": [
+        "90678251341dedf32f4f86c9d8b157d89f9bd30f0b9a379b49016fe9965d8d94",
+        "35d6f27eb469232f650d51ec11ab67e150a516aca227389658c90dad0b6015d4",
+        "3c5e64781fbc193ef3ed2882b829e234391b88f69fbfb3157b1fda836f92764f"
+      ]
+    },
+    {
+      "id": "loop",
+      "rationale": "accumulate every credit explicitly",
+      "commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+      "tree": "4529f2feb7e034ff69d7804f2f76f8138a28df17",
+      "diff": "diff --git a/ledger.py b/ledger.py\nindex d1acd33..68bcd83 100644\n--- a/ledger.py\n+++ b/ledger.py\n@@ -1,2 +1,5 @@\n def balance(entries):\n-    return entries[-1] if entries else 0\n+    total = 0\n+    for value in entries:\n+        total += value\n+    return total\n",
+      "diff_sha256": "2a0991359b4ab2f55179d54ceeab15d1bca488c5b1ae54a9d1932454fb4d3d83",
+      "oracle_plan": {
+        "schema_version": 1,
+        "tier": "simulation",
+        "base_ref": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+        "symptom_id": "ledger-total",
+        "symptom_case": "symptom",
+        "controls": [
+          "empty",
+          "single"
+        ],
+        "ticket_file": "ticket.json",
+        "ticket_sha256": "504a5013d5e8cb7d67623b00b42f962bcc6ce1059226a4d9b906c429cf7e7275",
+        "requirement_file": "acceptance.json",
+        "independent_derivation_file": "derivation.md",
+        "frozen_files": {
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "fc3f994c6969206ab176bb4f9eaab0d19897ec12cd8c96bb5502d5fcbeca1457",
+          "oracles/primary.py": "fd57f6a86a912a8ea731f20b0f1ecd081107e582522f044cfb50478d87592870",
+          "oracles/independent.py": "7421e50fdb3ba43b4a8734dcc627b4572e82d83011e54d89665caf3a084b0644",
+          "oracles/regression.py": "ddb4cac835d85afd802c3ba3ad27c6bc690e547bea22698682735a1a95be0972"
+        },
+        "oracles": [
+          {
+            "id": "primary",
+            "role": "primary",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "assertion_id": "ticket_balance",
+            "files": [
+              "oracles/primary.py"
+            ]
+          },
+          {
+            "id": "independent",
+            "role": "independent",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "assertion_id": "conservation",
+            "files": [
+              "oracles/independent.py"
+            ]
+          }
+        ],
+        "mutants": [
+          {
+            "id": "lost",
+            "kind": "reintroduce_symptom",
+            "patches": [
+              {
+                "path": "ledger.py",
+                "before": "total += value",
+                "after": "total = value"
+              }
+            ]
+          },
+          {
+            "id": "overfit",
+            "kind": "overfit",
+            "patches": [
+              {
+                "path": "ledger.py",
+                "before": "return total",
+                "after": "return 42"
+              }
+            ]
+          }
+        ],
+        "timeout_seconds": 5,
+        "max_total_seconds": 115.65907950000837
+      },
+      "oracle_report": {
+        "schema_version": 1,
+        "mechanical_verdict": "PASS",
+        "repo_root": "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject",
+        "base_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+        "head_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+        "plan_sha256": "3149eef7235dab6621277e4b98c992b3df0ff4c5ed7fda9265308807a2b0cab6",
+        "runner_sha256": "91455e7fdea626f6666a5314052ffebed100f36d4d8f43d3d1e92982078d602e",
+        "symptom_id": "ledger-total",
+        "frozen_files": {
+          "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+          "derivation.md": "fc3f994c6969206ab176bb4f9eaab0d19897ec12cd8c96bb5502d5fcbeca1457",
+          "oracles/primary.py": "fd57f6a86a912a8ea731f20b0f1ecd081107e582522f044cfb50478d87592870",
+          "oracles/independent.py": "7421e50fdb3ba43b4a8734dcc627b4572e82d83011e54d89665caf3a084b0644",
+          "oracles/regression.py": "ddb4cac835d85afd802c3ba3ad27c6bc690e547bea22698682735a1a95be0972"
+        },
+        "tier": "simulation",
+        "execution_scope": "candidate_trial",
+        "runs": [
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 193,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "884333bb9a006e81290d22522ff4b249437d4fa1b9a492c35fe62a42234e16bf",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 152,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "713f3924a2c891ff118e7c0441ef36b9f9bdf9a0abdf21c949558df6321e083d",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 134,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "5fdc8753913e138250844eb0d8922f6e5811e3bbfaf00491034d4ca3284038b5",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 209,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "f545f57fa83db2409f90dfb9a9114b1a1c10366c024004730cb6fb5e2ffc0db0",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 150,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "6bb834e24a20d2b539833e5d77b08f543b223dc5a2c65625d6fa6a1b297a3a03",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "base",
+            "subject_commit": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 164,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "54aadf4a866adc1966b55cb02475c2e97ec8ab3a8e73870b10e778c5f548f875",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 137,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "fcf61e9520eba722724a50aaecfb0b534071f3890c3e24d48833c380f43bddc5",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 178,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "7e0da247697d0134bb28855a1eeb442c30fcad1c7c74e445af5e93bc0eaeed5a",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 102,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"empty\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "4f7d8e31bb77aa57a6d778f39ecd1976f51877d66eeaae76a31b9cc5ff924e77",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "empty",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 151,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"empty\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "5e4dce6c951dbf7944406e8ae1cb4aa57a135d3acb978acf0c23ee712baf23f6",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "head",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 88,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"single\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "a1ac21fb559dd36ec4639daa028411abb060ae860936404b87f4e6cca5716692",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "head",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "single",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 169,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"single\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "ed7702770ab1dceda2fe7d27e1166af3398fa4e01105bfb91e37c2ba9a25ac41",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:lost",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 188,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "230ed864d32591e368a5aeb2e858121b0e2c029b6e89a6f511ada85e0dc1f407",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:lost",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 129,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "2b947b9ece117944b26ea76237536de18df223fa450b284e590f4d38c159602f",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          },
+          {
+            "oracle_id": "primary",
+            "role": "primary",
+            "variant": "mutant:overfit",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/primary.py"
+            ],
+            "exit_code": 0,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 129,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"ticket_balance\", \"case_id\": \"symptom\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"pass\"}\n",
+            "stderr": "",
+            "stdout_sha256": "fcf61e9520eba722724a50aaecfb0b534071f3890c3e24d48833c380f43bddc5",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "GREEN",
+            "reason": "bound assertion passed"
+          },
+          {
+            "oracle_id": "independent",
+            "role": "independent",
+            "variant": "mutant:overfit",
+            "subject_commit": "3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5",
+            "case_id": "symptom",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+              "oracles/independent.py"
+            ],
+            "exit_code": 1,
+            "timed_out": false,
+            "launch_error": null,
+            "duration_ms": 346,
+            "stdout": "{\"schema_version\": 1, \"symptom_id\": \"ledger-total\", \"assertion_id\": \"conservation\", \"case_id\": \"symptom\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"outcome\": \"symptom_fail\"}\n",
+            "stderr": "",
+            "stdout_sha256": "2b947b9ece117944b26ea76237536de18df223fa450b284e590f4d38c159602f",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "source_unchanged": true,
+            "outcome": "RED",
+            "reason": "bound symptom assertion failed"
+          }
+        ],
+        "checks": [
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "base",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "empty",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "primary",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "head",
+            "case_id": "single",
+            "oracle_id": "independent",
+            "expected": "GREEN",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:lost",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:overfit",
+            "case_id": "symptom",
+            "oracle_id": "primary",
+            "expected": "ASSERTION",
+            "actual": "GREEN",
+            "reason": "bound assertion passed",
+            "passed": true
+          },
+          {
+            "variant": "mutant:overfit",
+            "case_id": "symptom",
+            "oracle_id": "independent",
+            "expected": "RED",
+            "actual": "RED",
+            "reason": "bound symptom assertion failed",
+            "passed": true
+          }
+        ],
+        "independent_human_acceptance": "not_recorded",
+        "limits": [
+          "Separate drivers and derivation do not prove semantic independence without review.",
+          "Finite controls/mutants do not prove correctness for every input."
+        ]
+      },
+      "oracle_plan_bytes": "{\n  \"schema_version\": 1,\n  \"tier\": \"simulation\",\n  \"base_ref\": \"1bae1c16ec6b1af9d6585a497e2930b7d76a5d22\",\n  \"symptom_id\": \"ledger-total\",\n  \"symptom_case\": \"symptom\",\n  \"controls\": [\n    \"empty\",\n    \"single\"\n  ],\n  \"ticket_file\": \"ticket.json\",\n  \"ticket_sha256\": \"504a5013d5e8cb7d67623b00b42f962bcc6ce1059226a4d9b906c429cf7e7275\",\n  \"requirement_file\": \"acceptance.json\",\n  \"independent_derivation_file\": \"derivation.md\",\n  \"frozen_files\": {\n    \"acceptance.json\": \"5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7\",\n    \"derivation.md\": \"fc3f994c6969206ab176bb4f9eaab0d19897ec12cd8c96bb5502d5fcbeca1457\",\n    \"oracles/primary.py\": \"fd57f6a86a912a8ea731f20b0f1ecd081107e582522f044cfb50478d87592870\",\n    \"oracles/independent.py\": \"7421e50fdb3ba43b4a8734dcc627b4572e82d83011e54d89665caf3a084b0644\",\n    \"oracles/regression.py\": \"ddb4cac835d85afd802c3ba3ad27c6bc690e547bea22698682735a1a95be0972\"\n  },\n  \"oracles\": [\n    {\n      \"id\": \"primary\",\n      \"role\": \"primary\",\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/primary.py\"\n      ],\n      \"assertion_id\": \"ticket_balance\",\n      \"files\": [\n        \"oracles/primary.py\"\n      ]\n    },\n    {\n      \"id\": \"independent\",\n      \"role\": \"independent\",\n      \"command\": [\n        \"/Library/Frameworks/Python.framework/Versions/3.11/bin/python3\",\n        \"oracles/independent.py\"\n      ],\n      \"assertion_id\": \"conservation\",\n      \"files\": [\n        \"oracles/independent.py\"\n      ]\n    }\n  ],\n  \"mutants\": [\n    {\n      \"id\": \"lost\",\n      \"kind\": \"reintroduce_symptom\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.py\",\n          \"before\": \"total += value\",\n          \"after\": \"total = value\"\n        }\n      ]\n    },\n    {\n      \"id\": \"overfit\",\n      \"kind\": \"overfit\",\n      \"patches\": [\n        {\n          \"path\": \"ledger.py\",\n          \"before\": \"return total\",\n          \"after\": \"return 42\"\n        }\n      ]\n    }\n  ],\n  \"timeout_seconds\": 5,\n  \"max_total_seconds\": 115.65907950000837\n}\n",
+      "metrics": {
+        "changed_lines": {
+          "value": 5,
+          "unit": "lines",
+          "origin": "Git diff --numstat"
+        }
+      },
+      "drivers": [
+        {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            "oracles/regression.py"
+          ],
+          "exit_code": 0,
+          "timed_out": false,
+          "launch_error": null,
+          "stdout": "{\"schema_version\": 1, \"candidate_id\": \"loop\", \"subject_commit\": \"3a7f7b86d1cc9b3e51c1aba567b08ebc2413a2f5\", \"status\": \"PASS\"}\n",
+          "stderr": "",
+          "stdout_sha256": "f20dee036ca261235b3eca114c9ca06cb376dfc9342391d23284fbd4d0786b58",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "duration_ms": 644,
+          "kind": "regression",
+          "source_file": "oracles/regression.py"
+        }
+      ],
+      "regression": "PASS",
+      "hard_eligible": true,
+      "observation_complete": true,
+      "evidence_sha256": [
+        "2a0991359b4ab2f55179d54ceeab15d1bca488c5b1ae54a9d1932454fb4d3d83",
+        "0370d26e86a0d3841fb494c244bf05500b964eb07c7680e1d33c4bc135c72ce3",
+        "0c90ee97104163a3b9f48b40e1dfe5a63c70995da9f853cd22a4c3fda92c114b"
+      ]
+    }
+  ],
+  "panel": [
+    {
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "launch_error": null,
+      "stdout": "{\"schema_version\": 1, \"judge_id\": \"correctness\", \"role\": \"correctness\", \"preferred_candidate\": \"sum\", \"votes\": [{\"candidate_id\": \"sum\", \"verdict\": \"accept\", \"reason\": \"controlled fixture: use observed hard eligibility and edit size, not independent judgment\", \"evidence_sha256\": [\"90678251341dedf32f4f86c9d8b157d89f9bd30f0b9a379b49016fe9965d8d94\", \"35d6f27eb469232f650d51ec11ab67e150a516aca227389658c90dad0b6015d4\", \"3c5e64781fbc193ef3ed2882b829e234391b88f69fbfb3157b1fda836f92764f\"]}, {\"candidate_id\": \"loop\", \"verdict\": \"accept\", \"reason\": \"controlled fixture: use observed hard eligibility and edit size, not independent judgment\", \"evidence_sha256\": [\"2a0991359b4ab2f55179d54ceeab15d1bca488c5b1ae54a9d1932454fb4d3d83\", \"0370d26e86a0d3841fb494c244bf05500b964eb07c7680e1d33c4bc135c72ce3\", \"0c90ee97104163a3b9f48b40e1dfe5a63c70995da9f853cd22a4c3fda92c114b\"]}]}\n",
+      "stderr": "",
+      "stdout_sha256": "105d59da3cce9245d9eac06c061eb5d8f5dc8e170a23f0aead7cfa2c3aea0837",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "duration_ms": 679,
+      "judge_id": "correctness",
+      "role": "correctness",
+      "kind": "fixture",
+      "adapter_sha256": "0db13d255270b7e73b99cfbebb8c3756026c55fc5c65abb2fbf51357bd9fb843",
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "correctness",
+        "role": "correctness",
+        "preferred_candidate": "sum",
+        "votes": [
+          {
+            "candidate_id": "sum",
+            "verdict": "accept",
+            "reason": "controlled fixture: use observed hard eligibility and edit size, not independent judgment",
+            "evidence_sha256": [
+              "90678251341dedf32f4f86c9d8b157d89f9bd30f0b9a379b49016fe9965d8d94",
+              "35d6f27eb469232f650d51ec11ab67e150a516aca227389658c90dad0b6015d4",
+              "3c5e64781fbc193ef3ed2882b829e234391b88f69fbfb3157b1fda836f92764f"
+            ]
+          },
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "controlled fixture: use observed hard eligibility and edit size, not independent judgment",
+            "evidence_sha256": [
+              "2a0991359b4ab2f55179d54ceeab15d1bca488c5b1ae54a9d1932454fb4d3d83",
+              "0370d26e86a0d3841fb494c244bf05500b964eb07c7680e1d33c4bc135c72ce3",
+              "0c90ee97104163a3b9f48b40e1dfe5a63c70995da9f853cd22a4c3fda92c114b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "launch_error": null,
+      "stdout": "{\"schema_version\": 1, \"judge_id\": \"maintainability\", \"role\": \"maintainability\", \"preferred_candidate\": \"sum\", \"votes\": [{\"candidate_id\": \"sum\", \"verdict\": \"accept\", \"reason\": \"controlled fixture: use observed hard eligibility and edit size, not independent judgment\", \"evidence_sha256\": [\"90678251341dedf32f4f86c9d8b157d89f9bd30f0b9a379b49016fe9965d8d94\", \"35d6f27eb469232f650d51ec11ab67e150a516aca227389658c90dad0b6015d4\", \"3c5e64781fbc193ef3ed2882b829e234391b88f69fbfb3157b1fda836f92764f\"]}, {\"candidate_id\": \"loop\", \"verdict\": \"accept\", \"reason\": \"controlled fixture: use observed hard eligibility and edit size, not independent judgment\", \"evidence_sha256\": [\"2a0991359b4ab2f55179d54ceeab15d1bca488c5b1ae54a9d1932454fb4d3d83\", \"0370d26e86a0d3841fb494c244bf05500b964eb07c7680e1d33c4bc135c72ce3\", \"0c90ee97104163a3b9f48b40e1dfe5a63c70995da9f853cd22a4c3fda92c114b\"]}]}\n",
+      "stderr": "",
+      "stdout_sha256": "5e3785d2ced19bb183652b7399c5b91ed73d34e84fb3457924aa5444ba14d0a8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "duration_ms": 228,
+      "judge_id": "maintainability",
+      "role": "maintainability",
+      "kind": "fixture",
+      "adapter_sha256": "0db13d255270b7e73b99cfbebb8c3756026c55fc5c65abb2fbf51357bd9fb843",
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "maintainability",
+        "role": "maintainability",
+        "preferred_candidate": "sum",
+        "votes": [
+          {
+            "candidate_id": "sum",
+            "verdict": "accept",
+            "reason": "controlled fixture: use observed hard eligibility and edit size, not independent judgment",
+            "evidence_sha256": [
+              "90678251341dedf32f4f86c9d8b157d89f9bd30f0b9a379b49016fe9965d8d94",
+              "35d6f27eb469232f650d51ec11ab67e150a516aca227389658c90dad0b6015d4",
+              "3c5e64781fbc193ef3ed2882b829e234391b88f69fbfb3157b1fda836f92764f"
+            ]
+          },
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "controlled fixture: use observed hard eligibility and edit size, not independent judgment",
+            "evidence_sha256": [
+              "2a0991359b4ab2f55179d54ceeab15d1bca488c5b1ae54a9d1932454fb4d3d83",
+              "0370d26e86a0d3841fb494c244bf05500b964eb07c7680e1d33c4bc135c72ce3",
+              "0c90ee97104163a3b9f48b40e1dfe5a63c70995da9f853cd22a4c3fda92c114b"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmpwderb6l6/subject/.coding-agent/tickets/fixture/fixture-panel.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "launch_error": null,
+      "stdout": "{\"schema_version\": 1, \"judge_id\": \"regression\", \"role\": \"regression\", \"preferred_candidate\": \"sum\", \"votes\": [{\"candidate_id\": \"sum\", \"verdict\": \"accept\", \"reason\": \"controlled fixture: use observed hard eligibility and edit size, not independent judgment\", \"evidence_sha256\": [\"90678251341dedf32f4f86c9d8b157d89f9bd30f0b9a379b49016fe9965d8d94\", \"35d6f27eb469232f650d51ec11ab67e150a516aca227389658c90dad0b6015d4\", \"3c5e64781fbc193ef3ed2882b829e234391b88f69fbfb3157b1fda836f92764f\"]}, {\"candidate_id\": \"loop\", \"verdict\": \"accept\", \"reason\": \"controlled fixture: use observed hard eligibility and edit size, not independent judgment\", \"evidence_sha256\": [\"2a0991359b4ab2f55179d54ceeab15d1bca488c5b1ae54a9d1932454fb4d3d83\", \"0370d26e86a0d3841fb494c244bf05500b964eb07c7680e1d33c4bc135c72ce3\", \"0c90ee97104163a3b9f48b40e1dfe5a63c70995da9f853cd22a4c3fda92c114b\"]}]}\n",
+      "stderr": "",
+      "stdout_sha256": "07b9daea2e1d2905c36971756ddd48b67e9cfa1fe893cff5390fdcef04fd781c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "duration_ms": 325,
+      "judge_id": "regression",
+      "role": "regression",
+      "kind": "fixture",
+      "adapter_sha256": "0db13d255270b7e73b99cfbebb8c3756026c55fc5c65abb2fbf51357bd9fb843",
+      "opinion": {
+        "schema_version": 1,
+        "judge_id": "regression",
+        "role": "regression",
+        "preferred_candidate": "sum",
+        "votes": [
+          {
+            "candidate_id": "sum",
+            "verdict": "accept",
+            "reason": "controlled fixture: use observed hard eligibility and edit size, not independent judgment",
+            "evidence_sha256": [
+              "90678251341dedf32f4f86c9d8b157d89f9bd30f0b9a379b49016fe9965d8d94",
+              "35d6f27eb469232f650d51ec11ab67e150a516aca227389658c90dad0b6015d4",
+              "3c5e64781fbc193ef3ed2882b829e234391b88f69fbfb3157b1fda836f92764f"
+            ]
+          },
+          {
+            "candidate_id": "loop",
+            "verdict": "accept",
+            "reason": "controlled fixture: use observed hard eligibility and edit size, not independent judgment",
+            "evidence_sha256": [
+              "2a0991359b4ab2f55179d54ceeab15d1bca488c5b1ae54a9d1932454fb4d3d83",
+              "0370d26e86a0d3841fb494c244bf05500b964eb07c7680e1d33c4bc135c72ce3",
+              "0c90ee97104163a3b9f48b40e1dfe5a63c70995da9f853cd22a4c3fda92c114b"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "decision": {
+    "status": "SELECTED",
+    "selected_candidate": "sum",
+    "selected_commit": "300deec8b894141f90a19cd3d8c9b471ee0d1db0",
+    "selected_tree": "d2434578a2219b94bd52f4cadc8452980d8913c7",
+    "reason": "hard-eligible, unanimous preference and sole observed Pareto candidate",
+    "axes_used": [
+      "changed_lines"
+    ],
+    "rejections": {}
+  },
+  "independent_human_acceptance": "not_recorded",
+  "scope": "observed proposals/axes plus role-separated opinions; not a proof of the globally best possible fix"
+}

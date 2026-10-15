@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-15T00:19:33.257061+00:00",
+  "kind": "controlled_development_regression_not_operational_independent_acceptance",
+  "fix_id": "OP-CA-01",
+  "status": "implemented_controlled_checks_passed",
+  "owner": "coding-agent",
+  "source_path": "/private/tmp/ks-op-coding-agent-evaluation-only",
+  "branch": "codex/prepublication-exit",
+  "base_commit": "fdb4d515d891cbacef032ac0c431c94dc20aa946",
+  "candidate_commit": "b6e2abdc8892bb5e82044997f4f2285ece9c5b35",
+  "candidate_tree": "c42d3f9da5f1e815e1e38a36cce5b6790960e9a8",
+  "checkout_clean": true,
+  "candidate_adoption": "pending",
+  "publication": "not_pushed_or_pr_created",
+  "installation": "not_measured",
+  "operational_gate": "not_run",
+  "quality_gate": "not_run",
+  "independent_acceptance": "not_recorded",
+  "scope": [
+    "explicit immutable local/full/bugfix auto evaluation_only policy",
+    "reuse oracle/selection/stage checks at validated EVALUATED receipt",
+    "Stop local boundary and one-continuation re-entry handling",
+    "known publication tools and Write/Edit policy downgrade guards"
+  ],
+  "limits": [
+    "finite tool guard; not outbound-network sandbox or authenticated receipt",
+    "actual installed host event dispatch, model execution and integration not measured",
+    "fixture opinions and source mutants are not independent production quality/gold",
+    "append telemetry impl.log/agent-transcript.jsonl excluded from exit evidence hashes"
+  ],
+  "checks": {
+    "policy-tests": {
+      "status": "PASS",
+      "tests": 15
+    },
+    "all-script-tests": {
+      "status": "PASS",
+      "tests": 157
+    },
+    "bench-tests": {
+      "status": "PASS",
+      "tests": 15
+    },
+    "hooks": {
+      "status": "PASS",
+      "checks": 26
+    },
+    "static": {
+      "status": "PASS",
+      "scope": "changed Python AST, hook JSON, existing shell syntax, diff whitespace, C1 tool-name contract"
+    }
+  },
+  "model_calls": 0,
+  "host_sessions": 0,
+  "external_publication_calls": 0,
+  "attempts": [
+    {
+      "path": "policy-first-failure.log",
+      "status": "failed",
+      "counted_as_final_pass": false,
+      "note": "12 tests, one normal-exit assertion failed during development; superseded, not hidden"
+    },
+    {
+      "path": "hooks-first-failure.log",
+      "status": "failed",
+      "counted_as_final_pass": false,
+      "note": "preexisting hook fixture ignored a failed signed synthetic Git commit; hermetic fixture creation now checks errors and disables signing only inside disposable fixture commands"
+    }
+  ],
+  "changed_sources": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "git_blob": "cd1815a7d69b40c79c581fd044bdce8d0cd3cc3e",
+      "sha256": "190c828be9251d9dd9fafb50af102395a87193890977b36ed97634e80938b4bb"
+    },
+    {
+      "path": "README.md",
+      "git_blob": "6c7fa83d092a6904327c88fb7704c132eef8ccd4",
+      "sha256": "687b1a0fe5ecf26fc7c04dac7cfe2cb2b56e4b3d4a1b07e44f9de384b2eb6cc5"
+    },
+    {
+      "path": "bench/evaluation-exit/smoke.py",
+      "git_blob": "91b98121d418441b72c47ea4048cbf08b506cefa",
+      "sha256": "3e21dcedc062e78063e3a40da612bdefdd7b4f6104d2a5af3e946072ca9f0e6b"
+    },
+    {
+      "path": "bench/hooks/test_hooks.py",
+      "git_blob": "12515e93a853db5ca098a31055eb468a08b33510",
+      "sha256": "fc215eb6d2aa444db86729abe736c1d2e2dd05da512e9e9144d503f80d24ac1a"
+    },
+    {
+      "path": "plugin/PUBLICATION-POLICY.md",
+      "git_blob": "607b713fba6da3a7181ea63387b32bd2d4dbbaac",
+      "sha256": "c22cbe70b3f1776c37335975498fe5475e2ab9b2c7d83ff16b5cb6590baf04ec"
+    },
+    {
+      "path": "plugin/agents/orchestrator.md",
+      "git_blob": "8d1d4b9f17a98a9a5cad700d91353d477a7a0432",
+      "sha256": "c8cbe9d6ea5d7ab3825c96c33484e576b8a3ee0a295ce9100aea2574582644f4"
+    },
+    {
+      "path": "plugin/commands/analyze.md",
+      "git_blob": "faf8d957423ed42ada818469887fafafd2348b7d",
+      "sha256": "b4a24498d68347f48053ca4db237a4f0a55eaa32ebab31e3c58281dd38fdc8a5"
+    },
+    {
+      "path": "plugin/hooks/completion-guard.py",
+      "git_blob": "af22176351af522adf306b5ca848711762a72468",
+      "sha256": "70414953ca27ec01805f12de10f63706a5293b958ff6add37a5348a799dc665a"
+    },
+    {
+      "path": "plugin/hooks/hooks.json",
+      "git_blob": "6ac86453b4b88109bcbb0292ba6d760a706d3e8e",
+      "sha256": "25a486781e9427bd3d8d60a771d1480715a8b08051095d7a3965a5bf0db5251c"
+    },
+    {
+      "path": "plugin/hooks/on-stop.py",
+      "git_blob": "e000646d9ca7dba89ab91ffd156a5230b53f2563",
+      "sha256": "a08ab970fab75f9804169b9f0ab947c66428bd2c9b4fd91636277b3d3db6914f"
+    },
+    {
+      "path": "plugin/hooks/publication-guard.py",
+      "git_blob": "f5a483ccadab2d1a5030fee3498f11ac2aee7e89",
+      "sha256": "c1d08564dd73833f3972eb3fc99a7171b1e574e9d74ec7917d6d0e3de609227d"
+    },
+    {
+      "path": "plugin/scripts/publication_policy.py",
+      "git_blob": "8ae0bb3f8c9a2b3569c9653c88e712c2ef93b50b",
+      "sha256": "c1849b5a9468f5c0bf9b417c66cac0d6a6c8f15f5dc5e99e5897f3e447ecd5c8"
+    },
+    {
+      "path": "plugin/scripts/tests/test_publication_policy.py",
+      "git_blob": "9d56e1741d53ccb3fb829ae64c576ff1b9c48c5e",
+      "sha256": "43de4c9415a60ed2991376e0349b8b91f8cbe4d569c543b9c2ab4ed06457edd4"
+    },
+    {
+      "path": "plugin/skills/state-machine/SKILL.md",
+      "git_blob": "8c1b647e1b05ffd1ec97fa25db0f50c0a7107781",
+      "sha256": "b59555d0ce4955563a265a78f76e7be349c53b4802d75f73363217dfc678f9c3"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "all-script-tests.log",
+      "sha256": "7abf80e53abf385ac9ec7c17f637ffa5fa4e958deea4c51cb00e8cf656dd9aef",
+      "bytes": 27234
+    },
+    {
+      "path": "bench-tests.log",
+      "sha256": "18a58918ecb4b2355e2c8daa270b87b76e7d4b323b24be0c4f97e8afa663cc6e",
+      "bytes": 1447
+    },
+    {
+      "path": "change.patch",
+      "sha256": "a3c329d67a7341109896233ddfe344df1b85f9bd45d016d4552e3208da1f793e",
+      "bytes": 56042
+    },
+    {
+      "path": "coding-agent.bundle",
+      "sha256": "a1dd3fb164cd180e96fb23986f8406bd53b568fb689c439ca8e9d3671e7b472c",
+      "bytes": 18281
+    },
+    {
+      "path": "controlled-smoke/events.json",
+      "sha256": "4b3becf80837d4ea2bec4f30ee8d857d571fe48d46ae6f73cb9045d5da893e08",
+      "bytes": 4170
+    },
+    {
+      "path": "controlled-smoke/state-before-exit.json",
+      "sha256": "c57e30197fe0c618e7d2aa9d87bc7f578ac7a2246a1efd3aa0fc040ca240131d",
+      "bytes": 1680
+    },
+    {
+      "path": "controlled-smoke/subject.bundle",
+      "sha256": "a49b1bfd89baade44aa6f2dbbd777620b93b87c4d0c6d002ea8c2e42c9d87e93",
+      "bytes": 2983
+    },
+    {
+      "path": "controlled-smoke/workspace/evaluation-exit.json",
+      "sha256": "688bcb11e56badbde5eb2908bf307c1e14cbb531edbac1bb217606d47521d9cf",
+      "bytes": 1317
+    },
+    {
+      "path": "controlled-smoke/workspace/fix-selection-report.json",
+      "sha256": "f7121a9226841d84ed08197311ebbdcd71d9905b6933271f25a9f19865d2e7c4",
+      "bytes": 69799
+    },
+    {
+      "path": "controlled-smoke/workspace/fix-selection-spec.json",
+      "sha256": "ee7939b53a5de4af5ca703154fe792bbcf72b4eeb64b1eb308bd8c6babff2986",
+      "bytes": 4267
+    },
+    {
+      "path": "controlled-smoke/workspace/fixture-panel.py",
+      "sha256": "0db13d255270b7e73b99cfbebb8c3756026c55fc5c65abb2fbf51357bd9fb843",
+      "bytes": 565
+    },
+    {
+      "path": "controlled-smoke/workspace/oracle-template.json",
+      "sha256": "530207352956f4822d493626b1693bbe165b60bc61e5eedb486eb7823a09d43b",
+      "bytes": 2016
+    },
+    {
+      "path": "controlled-smoke/workspace/oracle-validity-plan.json",
+      "sha256": "d14f6f04ec212fbc703680170d0f1dc166afbb0b443ffbe60334d1f5eb07ea77",
+      "bytes": 2044
+    },
+    {
+      "path": "controlled-smoke/workspace/oracle-validity-report.json",
+      "sha256": "47c5b0d9c788b4a4415a110867c3df16a550a8440a9f316200aabd45ecf9d117",
+      "bytes": 20188
+    },
+    {
+      "path": "controlled-smoke/workspace/publication-policy.json",
+      "sha256": "0578bb9f92afc64ca8862636aa8b65fa5b4d521a43b5ce70d587d60023ffca4b",
+      "bytes": 476
+    },
+    {
+      "path": "controlled-smoke/workspace/state.json",
+      "sha256": "6150e02407902b5219674af42150a066cf964ac35cd21bd73b904620d8c61c0e",
+      "bytes": 2112
+    },
+    {
+      "path": "controlled-smoke/workspace/test-report.md",
+      "sha256": "22323edec222a6004fbf97c6607b98557b93c612733e7fe05c8e351112eeed87",
+      "bytes": 59
+    },
+    {
+      "path": "controlled-smoke/workspace/ticket.json",
+      "sha256": "504a5013d5e8cb7d67623b00b42f962bcc6ce1059226a4d9b906c429cf7e7275",
+      "bytes": 70
+    },
+    {
+      "path": "hooks-first-failure.log",
+      "sha256": "18b4d78beb3deb71afc968a676b19cece45caaf62dc09760c3d961882b9bfcda",
+      "bytes": 901
+    },
+    {
+      "path": "hooks.log",
+      "sha256": "e4f154818ab7d451dbe8b23ab0f8da1354d6f3e38205460670dcb0aade627486",
+      "bytes": 855
+    },
+    {
+      "path": "policy-first-failure.log",
+      "sha256": "a8ddd045a9fded1edcab8198210ff41cec024a08020b55303c99bd4b9a7dfd32",
+      "bytes": 689
+    },
+    {
+      "path": "policy-tests.log",
+      "sha256": "5ea3ada41b6a569d7888a6f853ef8819cb7ec3b4c356a14c19254082ff769b59",
+      "bytes": 2233
+    },
+    {
+      "path": "recovery.json",
+      "sha256": "d9abd6aa38d40e5c186f025521f3cde80246bc55e9bd1c73274d7b3ae247509f",
+      "bytes": 789
+    },
+    {
+      "path": "smoke.log",
+      "sha256": "cab00789ddcd1c24f98c46d90aee8e6a3b61ccd1d1e614ded92ae16b3770c4d5",
+      "bytes": 335
+    },
+    {
+      "path": "static.log",
+      "sha256": "1f1f77779bcf94d1d66c1c53bad3d96769f898603f408455d196aa9df55b45cd",
+      "bytes": 156
+    }
+  ],
+  "commands": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 GOTOOLCHAIN=go1.26.9 GOCACHE=/private/tmp/ks-corpus-go-cache python3 -m unittest discover -s plugin/scripts/tests -v",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 plugin/scripts/tests/test_publication_policy.py -v",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s bench/tests -t .",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 bench/hooks/test_hooks.py",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 bench/evaluation-exit/smoke.py --out /private/tmp/ks-ca-boundary-final",
+      "exit_code": 0
+    }
+  ],
+  "recovery": "PASS"
+}

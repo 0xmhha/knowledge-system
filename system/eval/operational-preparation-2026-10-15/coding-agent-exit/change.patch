@@ -1,0 +1,1069 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 81e506b..cd1815a 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -38,6 +38,8 @@ jobs:
+         run: |
+           python plugin/scripts/tests/test_doctor.py
+           python plugin/scripts/tests/test_setup.py
++          python plugin/scripts/tests/test_publication_policy.py
++          python bench/hooks/test_hooks.py
+           python plugin/scripts/tests/test_oracle_gate.py
+           python plugin/scripts/tests/test_go_oracle_driver.py
+           python plugin/scripts/tests/test_fix_selection.py
+diff --git a/README.md b/README.md
+index de1b36d..6c7fa83 100644
+--- a/README.md
++++ b/README.md
+@@ -151,3 +151,5 @@ coding-agent/
+ ## License
+ 
+ Apache-2.0 — see [LICENSE](LICENSE).
++
++평가만 실행하고 게시 전에 종료하려면 [local evaluation policy](plugin/PUBLICATION-POLICY.md)의 `--evaluation-only` 계약을 따른다. 이 옵션은 local/full/bugfix auto 실행용이며 실제 host 연결 검증과 독립 수용을 대신하지 않는다.
+diff --git a/bench/evaluation-exit/smoke.py b/bench/evaluation-exit/smoke.py
+new file mode 100644
+index 0000000..91b9812
+--- /dev/null
++++ b/bench/evaluation-exit/smoke.py
+@@ -0,0 +1,69 @@
++#!/usr/bin/env python3
++"""Record controlled local-boundary CLI/hook events; no host or model calls."""
++import argparse
++import json
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++
++ROOT = Path(__file__).resolve().parents[2]
++sys.path.insert(0, str(ROOT / 'plugin/scripts/tests'))
++from test_publication_policy import PolicyTests
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--out', type=Path, required=True)
++    out = parser.parse_args().out.resolve()
++    out.mkdir(parents=True, exist_ok=False)
++    case = PolicyTests()
++    case.setUp()
++    events = []
++    try:
++        def cli(action):
++            result = case.cli(action)
++            events.append({'kind': 'cli', 'action': action, 'exit_code': result.returncode,
++                           'stdout': result.stdout, 'stderr': result.stderr})
++            return result
++        def hook(name, payload):
++            result = case.hook(name, payload)
++            events.append({'kind': 'hook_subprocess_not_host', 'hook': name,
++                           'payload': payload, 'response': result})
++            return result
++        assert cli('--init').returncode == 0
++        assert hook('on-stop.py', {'stop_hook_active': False})['decision'] == 'block'
++        assert hook('on-stop.py', {'stop_hook_active': True}) == {}
++        case.ready()
++        shutil.copyfile(case.f.workspace / 'state.json', out / 'state-before-exit.json')
++        assert cli('--finalize').returncode == 0
++        assert cli('--check-exit').returncode == 0
++        assert hook('on-stop.py', {'stop_hook_active': False}) == {}
++        assert hook('on-stop.py', {'stop_hook_active': False}) == {}
++        for payload in (
++            {'tool_name': 'Bash', 'tool_input': {'command': 'git push origin evaluation-fixture'}},
++            {'tool_name': 'Bash', 'tool_input': {'command': 'gh pr create --title evaluation-fixture'}},
++            {'tool_name': 'mcp__plugin_coding-agent_jira-gateway__jira_add_comment', 'tool_input': {}},
++        ):
++            result = hook('publication-guard.py', payload)
++            assert result['hookSpecificOutput']['permissionDecision'] == 'deny'
++        shutil.copytree(case.f.workspace, out / 'workspace')
++        subprocess.run(['git', '-C', str(case.f.repo), 'bundle', 'create', str(out / 'subject.bundle'), '--all'], check=True)
++        report = case.f.workspace / 'test-report.md'
++        report.write_text('tampered')
++        assert cli('--check-exit').returncode != 0
++        assert hook('on-stop.py', {'stop_hook_active': False})['decision'] == 'block'
++        summary = {'kind': 'controlled_fixture_cli_and_hook_subprocesses', 'status': 'PASS',
++                   'oracle_executions': 'actual Python ledger controls and source mutants',
++                   'selection': 'two actual source proposals, fixture panel opinions',
++                   'model_calls': 0, 'host_sessions': 0, 'external_publication_calls': 0,
++                   'independent_human_acceptance': 'not_recorded', 'events': events}
++        (out / 'events.json').write_text(json.dumps(summary, indent=2) + '\n')
++        print(json.dumps({k: v for k, v in summary.items() if k != 'events'}))
++        return 0
++    finally:
++        case.doCleanups()
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/bench/hooks/test_hooks.py b/bench/hooks/test_hooks.py
+index f143770..12515e9 100644
+--- a/bench/hooks/test_hooks.py
++++ b/bench/hooks/test_hooks.py
+@@ -36,7 +36,7 @@ def check(name, cond):
+ 
+ 
+ def _git(cwd, *args):
+-    subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
++    subprocess.run(["git", "-c", "commit.gpgsign=false", *args], cwd=cwd, capture_output=True, text=True, check=True)
+ 
+ 
+ def _init_repo(path, branch):
+diff --git a/plugin/PUBLICATION-POLICY.md b/plugin/PUBLICATION-POLICY.md
+new file mode 100644
+index 0000000..607b713
+--- /dev/null
++++ b/plugin/PUBLICATION-POLICY.md
+@@ -0,0 +1,53 @@
++# Local evaluation without publication
++
++Use `/coding-agent:analyze "<requirement>" --type bugfix --evaluation-only`
++in a dedicated isolated project clone. This opt-in supports local full bugfix
++pipelines in auto mode. It rejects review/release/feature, Jira intake and
++`--auto-merge`. Existing tickets/default publish behavior are unchanged;
++`auto_merge=false` by itself still permits PR creation.
++
++Before dispatch, intake writes config.publication_policy=evaluation_only and
++runs scripts/publication_policy.py --workspace <absolute-workspace> --repo
++<absolute-repo> --init. This exclusively creates publication-policy.json,
++binding ticket, repo, workspace, source base and auto mode. The lock is not
++replaced on resume. Policy/identity changes are rejected by Write/Edit guards.
++
++At EVALUATION_PASS the orchestrator runs the same CLI with --finalize instead
++of pushing or creating a PR. It checks completed pipeline stages and plan steps,
++the existing oracle completion and applied candidate-selection gates, the
++nonempty evaluation report and clean tracked subject source. Existing oracle
++tier rules still govern permitted ChainBench/regression skips; required stage
++FAIL/missing, e2e skips, unresolved oracle/selection and stale evidence fail.
++The CLI writes evaluation-exit.json before atomically replacing state.json with
++EVALUATED. COMPLETION/PR delivery stays unperformed. Exit is local evaluation,
++not independent quality, human acceptance or publication authorization.
++
++The receipt binds state, HEAD/tree, runner and workspace evidence hashes. Append
++telemetry logs/impl.log and logs/agent-transcript.jsonl are excluded so the host's
++final PostToolUse Agent event remains recorded; those logs are not exit gate
++evidence. Other modified/added/deleted evidence, source and state invalidate it.
++Use --check-exit on resume. An interrupted receipt without the terminal state
++is not completion; recover any leftover state.next.json explicitly before retry.
++
++Stop prioritizes the newest locked evaluation workspace in this isolated repo.
++A valid EVALUATED receipt allows repeated stops without publication re-entry.
++An incomplete or invalid boundary requests evaluation/diagnosis or BLOCKED,
++never publication. BLOCKED stops locally. stop_hook_active allows the host to
++stop after its single continuation; that flag never proves evaluation passed.
++The lock remains effective after the old freshness window and after local exit.
++Another ticket's auto_merge flag cannot relax it.
++
++PreToolUse publication-guard covers known git push/send-email, gh PR/release/API,
++common transfer/deploy command spellings and MCP outside CKS/ChainBench/read-only
++Jira. Direct policy/receipt Write/Edit is denied. It is a finite tool guard,
++not a shell interpreter or an outbound-network sandbox: scripts, aliases,
++encoded commands, direct file writes, arbitrary programs and host bypasses are
++not comprehensively prevented. No caller identity is authenticated by hashes.
++Use restricted host tools/MCP/network permissions; actual host event dispatch
++and outbound isolation still need separate validation. Do not run evaluation
++and unrelated publishing tasks together in this clone. To publish later, use
++an explicitly authorized new workflow/clone; do not downgrade this ticket.
++
++Controlled tests execute real oracle/selection fixtures and hook subprocesses.
++Fixture panel opinions are not independent review. No model calls, external
++PR/Jira mutations or installed-host session is needed for these tests.
+diff --git a/plugin/agents/orchestrator.md b/plugin/agents/orchestrator.md
+index 9243fe2..8d1d4b9 100644
+--- a/plugin/agents/orchestrator.md
++++ b/plugin/agents/orchestrator.md
+@@ -103,12 +103,13 @@ LLM spends a full pipeline; it does not replace the downstream live checks.
+    - Re-read state.json (sub-agents update it directly).
+    - Validate the transition by calling state-machine.transition() if not
+      already done by the sub-agent.
+-   - Loop back to step 1, unless the new state is COMPLETED, BLOCKED, or
++   - Loop back to step 1, unless the new state is EVALUATED, COMPLETED, BLOCKED, or
+      the user must be prompted.
+ ```
+ 
+ The loop terminates when:
+ 
++- `current_state == "EVALUATED"` → verify local exit receipt, report scoped evaluation, STOP.
+ - `current_state == "COMPLETED"` → report success.
+ - `current_state == "BLOCKED"` → report BLOCKED + failure_summary.
+ - A sub-agent returned with an error the Orchestrator cannot recover.
+@@ -143,7 +144,7 @@ it as a stuck pipeline and report.
+ +-------------------+------------------------------------------------------+
+ | EVALUATION        | Dispatch Evaluator agent.                            |
+ +-------------------+------------------------------------------------------+
+-| EVALUATION_PASS   | Terminal: see §4 (PR + Jira → COMPLETION).           |
++| EVALUATION_PASS   | Policy boundary: see §4 (local exit OR publication).           |
+ +-------------------+------------------------------------------------------+
+ | EVALUATION_FAIL   | Re-entry: see §5 (cycle counter, dispatch Planner    |
+ |                   | in bug-cycle mode OR transition→BLOCKED).            |
+@@ -161,7 +162,25 @@ Pipeline variant branching is handled in §6 (Code Review / Release).
+ 
+ ---
+ 
+-## 4. EVALUATION_PASS → COMPLETION
++## 4. EVALUATION_PASS → policy boundary
++
++먼저 config.publication_policy를 확인한다. `evaluation_only`이면 아래 게시 절차에
++진입하지 않고 다음 CLI만 실행한다:
++
++```bash
++python3 "${CLAUDE_PLUGIN_ROOT}/scripts/publication_policy.py" --workspace "{workspace_dir}" --repo "{repo_root}" --finalize
++```
++
++exit0 및 EVALUATED 상태를 다시 확인하고 로컬 평가 결과·receipt·제약을 보고하고 STOP한다.
++이 상태는 delivery/독립 수용이 아니다. PR URL을 채우거나 COMPLETION/COMPLETED로 바꾸지 않는다.
++실패하면 평가/진단으로 돌아가거나 BLOCKED로 보고하며 publish로 정책을 완화하지 않는다.
++resume에서 EVALUATED는 같은 CLI의 --check-exit만 수행한 뒤 STOP한다. 손상된 receipt는
++성공으로 보고하지 않는다. Stop hook의 stop_hook_active 재진입 해제는 완료 증거가 아니다.
++intake policy lock 누락/충돌은 pipeline 시작 전에 해결해야 한다.
++
++`publish`(기본/기존 티켓)에만 다음 기존 게시 절차를 적용한다.
++
++### EVALUATION_PASS → COMPLETION
+ 
+ For a bugfix, before creating any PR or completion side effects, rerun the
+ read-only executable gate check:
+diff --git a/plugin/commands/analyze.md b/plugin/commands/analyze.md
+index 64133f0..faf8d95 100644
+--- a/plugin/commands/analyze.md
++++ b/plugin/commands/analyze.md
+@@ -1,6 +1,6 @@
+ ---
+ description: 자유 텍스트 요구사항 기반 작업 시작. 요구사항 intake → ticket.json 합성 → Orchestrator 디스패치. Jira 불필요.
+-argument-hint: "\"<요구사항 텍스트>\"  [--type feature|bugfix|code_review|release] [--auto-merge]"
++argument-hint: "\"<요구사항 텍스트>\"  [--type feature|bugfix|code_review|release] [--auto-merge] [--evaluation-only]"
+ allowed-tools: Read, Write, Edit, Bash, Agent, TodoWrite, mcp__plugin_coding-agent_cks, mcp__plugin_coding-agent_chainbench, mcp__plugin_coding-agent_jira-gateway
+ ---
+ 
+@@ -25,15 +25,21 @@ Jira 티켓 없이 **자유 텍스트 요구사항**으로 자동화 파이프
+ 
+ ---
+ 
++`--evaluation-only`는 local full bugfix에만 지원한다. `--auto-merge`와 함께 쓰면
++intake에서 거부한다. 유형 추론/template-parse 결과가 bugfix가 아니면 거부한다.
++다른 유형이나 기존 티켓을 평가 전용으로 사후 변경하지 않는다.
++
+ ## 1. 인자 검증
+ 
+ ```
+ 1.1. 인자 파싱
+    - 따옴표로 감싼 요구사항 본문 → requirement_text
+    - 옵션 --type <feature|bugfix|code_review|release> → type_hint (선택)
++   - 옵션 --evaluation-only (플래그) → evaluation_only_flag = true (기본 false)
++   - 두 플래그 조합/지원하지 않는 유형은 state 생성 전에 거부
+    - 옵션 --auto-merge (플래그) → auto_merge_flag = true (기본 false)
+    - 빈 요구사항 → 사용법 출력 후 중단:
+-     "사용법: /coding-agent:analyze \"<요구사항 텍스트>\" [--type <유형>] [--auto-merge]"
++     "사용법: /coding-agent:analyze \"<요구사항 텍스트>\" [--type <유형>] [--auto-merge] [--evaluation-only]"
+ ```
+ 
+ ---
+@@ -126,14 +132,21 @@ Jira 티켓 없이 **자유 텍스트 요구사항**으로 자동화 파이프
+      workspace_dir={workspace},
+      pipeline_variant={pipeline_variant},
+      requirement_source="local",
+-     base_ref={base_ref}
++     base_ref={base_ref},
++     publication_policy=(evaluation_only_flag ? "evaluation_only" : "publish")
+    )
+    # autonomy 는 requirement_source="local" 에서 {mode:auto, on_blocked:escalate,
+    # auto_merge:false} 로 유도된다. --auto-merge 가 주어졌으면 init_state 후
+    # state.config.autonomy.auto_merge = true 로 덮어쓴다(merge/tag/push 게이트 해제;
+    # 단 merge.md §3 안전조건은 유지). 미지정 시 false(PR 까지만 자율).
+ 
+-5.4. TICKET_INTAKE.sensitive_check 기록
++5.4. --evaluation-only인 경우 dispatch 전에:
++   init_state가 처음부터 evaluation_only로 state를 생성했는지 확인한다.
++   기본 publish state를 만든 뒤 정책을 덮어쓰지 않는다. 실행:
++   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/publication_policy.py" --workspace "{workspace}" --repo "{repo_root}" --init
++   exit0 필수. 정책은 intake 이후 불변이다. 실패 시 dispatch하지 않는다.
++
++5.5. TICKET_INTAKE.sensitive_check 기록
+    states.TICKET_INTAKE.sensitive_check = {
+      "result": "{scan_result}",        # CLEAN | REDACTED (로컬 스캔)
+      "redacted_count": N,
+@@ -167,3 +180,10 @@ Jira 티켓 없이 **자유 텍스트 요구사항**으로 자동화 파이프
+ - [ ] 로컬 민감정보 auto-redact (BLOCKED 하드스톱 없음)
+ - [ ] state.json 이 requirement_source="local" 로 초기화
+ - [ ] Orchestrator 가 Jira 호출 없이 파이프라인 수행 (PR 생성까지 자율, merge 게이트 유지)
++
++## 평가 전용 종료
++
++`--evaluation-only`에서는 EVALUATION_PASS 후 `publication_policy.py --finalize`를
++실행해 EVALUATED와 evaluation-exit.json을 기록한다. 검증 실패는 로컬 완료가 아니다.
++PR URL/COMPLETION을 만들지 않고 push·PR·Jira 갱신 없이 결과와 제한을 보고한다.
++정상 게시 모드의 기존 동작은 유지한다. auto_merge=false만으로는 게시 전 종료가 아니다.
+diff --git a/plugin/hooks/completion-guard.py b/plugin/hooks/completion-guard.py
+index f896880..af22176 100644
+--- a/plugin/hooks/completion-guard.py
++++ b/plugin/hooks/completion-guard.py
+@@ -11,6 +11,8 @@ import sys
+ 
+ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+ from oracle_gate import GateError, completion_check  # noqa: E402
++from publication_policy import transition_check  # noqa: E402
++import subprocess
+ 
+ 
+ def deny(reason):
+@@ -82,6 +84,15 @@ def main():
+         new_hash = candidate.get("states", {}).get("ANALYSIS", {}).get("oracle_validity_plan_sha256")
+         if old_hash and old_hash != new_hash and candidate.get("current_state") != "ANALYSIS":
+             raise GateError("frozen plan identity cannot change outside diagnosis")
++        # Legacy publish workspaces retain their existing completion behavior.
++        needs_policy = ("publication_policy" in old_state.get("config", {})
++                        or "publication_policy" in candidate.get("config", {})
++                        or (workspace / "publication-policy.json").exists()
++                        or candidate.get("current_state") == "EVALUATED")
++        if old_state and needs_policy:
++            root = subprocess.run(["git", "-C", str(workspace), "rev-parse", "--show-toplevel"],
++                                  check=True, capture_output=True, text=True, timeout=5).stdout.strip()
++            transition_check(workspace, old_state, candidate, Path(root))
+         if candidate.get("current_state") in ("COMPLETION", "COMPLETED"):
+             completion_check(workspace, candidate)
+     except Exception as exc:
+diff --git a/plugin/hooks/hooks.json b/plugin/hooks/hooks.json
+index 7c72b12..6ac8645 100644
+--- a/plugin/hooks/hooks.json
++++ b/plugin/hooks/hooks.json
+@@ -22,12 +22,22 @@
+           {
+             "type": "command",
+             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/on-stop.py\"",
+-            "timeout": 5
++            "timeout": 90
+           }
+         ]
+       }
+     ],
+     "PreToolUse": [
++      {
++        "matcher": "*",
++        "hooks": [
++          {
++            "type": "command",
++            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/publication-guard.py\"",
++            "timeout": 10
++          }
++        ]
++      },
+       {
+         "matcher": "Write|Edit",
+         "hooks": [
+@@ -39,7 +49,7 @@
+           {
+             "type": "command",
+             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/completion-guard.py\"",
+-            "timeout": 15
++            "timeout": 90
+           },
+           {
+             "type": "command",
+diff --git a/plugin/hooks/on-stop.py b/plugin/hooks/on-stop.py
+index 5c89841..e000646 100755
+--- a/plugin/hooks/on-stop.py
++++ b/plugin/hooks/on-stop.py
+@@ -12,7 +12,8 @@ Safe by construction (no infinite loops, no nagging):
+   - only in autonomy.mode == "auto";
+   - only while current_state is non-terminal AND eval cycle <= max_eval_cycles;
+   - skip workspaces untouched for > STALE_SECONDS (abandoned, not in-flight).
+-Generic across repos. Any parse failure -> exit 0 (never blocks).
++Generic across repos. Unrelated parse failures allow stopping; a damaged locked
++evaluation workspace requests repair, never publication. Re-entry still stops.
+ """
+ import sys
+ import json
+@@ -20,18 +21,21 @@ import os
+ import glob
+ import time
+ import subprocess
++from pathlib import Path
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
++from publication_policy import policy, check_exit, MODE, TERMINAL as LOCAL_TERMINAL
+ 
+ TERMINAL = {"COMPLETION", "COMPLETED", "BLOCKED"}
+ STALE_SECONDS = 60 * 60  # don't nudge a workspace untouched for over an hour
+ 
+ 
+-def _repo_root():
++def _repo_root(cwd=None):
+     try:
+         out = subprocess.run(["git", "rev-parse", "--show-toplevel"],
+-                             capture_output=True, text=True, timeout=2)
+-        return out.stdout.strip() or os.getcwd()
++                             capture_output=True, text=True, timeout=2, cwd=cwd)
++        return out.stdout.strip() or cwd or os.getcwd()
+     except Exception:
+-        return os.getcwd()
++        return cwd or os.getcwd()
+ 
+ 
+ def main():
+@@ -40,22 +44,47 @@ def main():
+     except Exception:
+         return 0
+     # Core re-entry guard: if we already blocked once in this stop chain, let it stop.
+-    if data.get("stop_hook_active"):
++    if not isinstance(data, dict) or data.get("stop_hook_active"):
+         return 0
+ 
+-    root = _repo_root()
++    root = _repo_root(data.get("cwd"))
+     paths = glob.glob(os.path.join(root, ".coding-agent", "tickets", "*", "state.json"))
+-    paths.sort(key=lambda p: _safe_mtime(p), reverse=True)
++    paths.sort(key=lambda p: (_evaluation_path(p), _safe_mtime(p)), reverse=True)
+     now = time.time()
+ 
+     for p in paths:
+-        if now - _safe_mtime(p) > STALE_SECONDS:
+-            continue
+         try:
+             st = json.load(open(p, encoding="utf-8"))
+         except Exception:
++            st = None
++        if not isinstance(st, dict):
++            if Path(p).with_name("publication-policy.json").exists():
++                print(json.dumps({"decision": "block", "reason": "Evaluation-only state is unreadable; repair or report BLOCKED, do not publish."}))
++                return 0
+             continue
+         cs = st.get("current_state")
++        workspace = Path(p).parent
++        cfg = st.get("config") if isinstance(st.get("config"), dict) else {}
++        local = (workspace / "publication-policy.json").exists() or cfg.get("publication_policy", "publish") != "publish"
++        if local or cs == LOCAL_TERMINAL:
++            # A policy lock remains effective after the freshness window and after local exit.
++            try:
++                if policy(workspace, st, Path(root)) != MODE:
++                    raise ValueError("EVALUATED without evaluation_only")
++                if cs == LOCAL_TERMINAL:
++                    check_exit(workspace, st, Path(root))
++                    return 0
++                if cs == "BLOCKED":
++                    return 0
++                reason = ("Evaluation-only pipeline incomplete. Resume evaluation/diagnosis from state.json; "
++                          "at EVALUATION_PASS run publication_policy.py --finalize. Never push, create a PR, "
++                          "update Jira or enter COMPLETION. A verified EVALUATED receipt permits stopping.")
++            except Exception as exc:
++                reason = f"Evaluation-only boundary invalid: {exc}. Repair evidence or report BLOCKED; do not publish."
++            print(json.dumps({"decision": "block", "reason": reason}))
++            return 0
++        if now - _safe_mtime(p) > STALE_SECONDS:
++            continue
+         if not cs or cs in TERMINAL:
+             continue
+         cfg = st.get("config") or {}
+@@ -79,6 +108,16 @@ def main():
+     return 0
+ 
+ 
++def _evaluation_path(p):
++    if Path(p).with_name("publication-policy.json").exists():
++        return True
++    try:
++        st = json.loads(Path(p).read_text())
++        return st.get("config", {}).get("publication_policy", "publish") != "publish"
++    except Exception:
++        return False
++
++
+ def _safe_mtime(p):
+     try:
+         return os.path.getmtime(p)
+diff --git a/plugin/hooks/publication-guard.py b/plugin/hooks/publication-guard.py
+new file mode 100644
+index 0000000..f5a483c
+--- /dev/null
++++ b/plugin/hooks/publication-guard.py
+@@ -0,0 +1,81 @@
++#!/usr/bin/env python3
++"""Best-effort publication tool guard for isolated evaluation-only repositories.
++
++Known Bash spellings and write tools only; not a shell interpreter, network
++sandbox, identity authority, or substitute for restricted host MCP/config.
++The repository remains restricted while any evaluation-only ticket lock exists.
++"""
++import json
++import os
++from pathlib import Path
++import re
++import subprocess
++import sys
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
++from publication_policy import MODE, POLICY, RECEIPT, load, policy
++
++
++def deny(reason):
++    print(json.dumps({'hookSpecificOutput': {'hookEventName': 'PreToolUse',
++          'permissionDecision': 'deny', 'permissionDecisionReason': reason}}))
++
++
++def main():
++    try:
++        data = json.load(sys.stdin)
++        if not isinstance(data, dict):
++            return 0
++        cwd = Path(data.get('cwd') or os.getcwd())
++        root = subprocess.run(['git', '-C', str(cwd), 'rev-parse', '--show-toplevel'],
++                              capture_output=True, text=True, timeout=5).stdout.strip()
++        if not root:
++            return 0
++        repo = Path(root)
++        restricted = False
++        for workspace in (repo / '.coding-agent/tickets').glob('*'):
++            try:
++                state = load(workspace / 'state.json')
++                if (workspace / POLICY).exists() or state.get('config', {}).get('publication_policy', 'publish') != 'publish':
++                    restricted = True
++                    policy(workspace, state, repo)
++            except Exception:
++                # A broken owned ticket cannot erase a policy restriction.
++                if (workspace / POLICY).exists() or (workspace / 'state.json').exists():
++                    restricted = True
++        if not restricted:
++            return 0
++        tool = data.get('tool_name', '')
++        inputs = data.get('tool_input') or {}
++        if tool in ('Write', 'Edit'):
++            path = Path(inputs.get('file_path') or '.')
++            if not path.is_absolute():
++                path = cwd / path
++            if path.name in (POLICY, RECEIPT):
++                deny('Evaluation boundary files are managed by publication_policy.py; direct edits are blocked.')
++        elif tool == 'Bash':
++            command = inputs.get('command') or ''
++            # Broad lexical matching also catches common wrappers, newlines and absolute binaries.
++            # Arbitrary scripts/aliases/encoded commands remain outside this finite guard.
++            publication = (re.search(r'\bgit\b[^;&|\n]*\b(push|send-email)\b', command)
++                           or re.search(r'\bgh\b[^;&|\n]*\b(pr\s+(create|merge|edit|comment|review)|release\s+(create|upload)|api)\b', command)
++                           or re.search(r'\b(curl|wget|scp|rsync|ssh|nc|netcat|wrangler|vercel|deploy)\b', command))
++            if publication:
++                deny('Evaluation-only repository: publication/remote-write commands are blocked; stop locally after validated evaluation.')
++        elif tool.startswith('mcp__'):
++            # This policy's supported runtime uses only CKS/ChainBench plus read-only Jira.
++            # All other MCP tools require a different host configuration/scope.
++            name = tool.rsplit('__', 1)[-1]
++            provider = tool.split('__')[1] if '__' in tool else ''
++            allowed = (provider in ('cks', 'chainbench') or provider.endswith(('_cks', '_chainbench'))
++                       or name in ('jira_read_ticket', 'jira_read_comments'))
++            if not allowed:
++                deny('Evaluation-only repository: this MCP tool is outside the local evaluation allowlist.')
++    except Exception as exc:
++        # A malformed payload cannot authorize a positively identified restricted action.
++        deny('Cannot verify evaluation publication boundary: ' + str(exc))
++    return 0
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/plugin/scripts/publication_policy.py b/plugin/scripts/publication_policy.py
+new file mode 100644
+index 0000000..8ae0bb3
+--- /dev/null
++++ b/plugin/scripts/publication_policy.py
+@@ -0,0 +1,198 @@
++#!/usr/bin/env python3
++"""Local bugfix evaluation boundary. Not an outbound-network sandbox or approval."""
++import argparse
++import copy
++import hashlib
++import json
++from pathlib import Path
++import subprocess
++
++from oracle_gate import GateError, completion_check
++from fix_selection import verify_selection
++
++POLICY = 'publication-policy.json'
++RECEIPT = 'evaluation-exit.json'
++MODE = 'evaluation_only'
++TERMINAL = 'EVALUATED'
++
++
++def digest(value):
++    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
++
++
++def load(path):
++    value = json.loads(path.read_text())
++    if not isinstance(value, dict):
++        raise GateError(f'{path.name} must be an object')
++    return value
++
++
++def git(repo, *args):
++    return subprocess.run(['git', '-C', str(repo), *args], check=True, capture_output=True,
++                          text=True, timeout=10).stdout.strip()
++
++
++def policy(workspace, state, repo):
++    """Default publication behavior is unchanged; an opt-in cannot silently disappear."""
++    if workspace.resolve().parent != (repo.resolve() / '.coding-agent/tickets').resolve():
++        raise GateError('evaluation workspace must be a direct owned ticket directory')
++    mode = state.get('config', {}).get('publication_policy', 'publish')
++    path = workspace / POLICY
++    if mode not in ('publish', MODE):
++        raise GateError('unknown publication policy')
++    if not path.exists():
++        if mode == MODE:
++            raise GateError('evaluation_only requires an intake policy lock')
++        return 'publish'
++    locked = load(path)
++    expected = {'schema_version': 1, 'mode': MODE, 'autonomy_mode': 'auto', 'ticket_id': state.get('ticket_id'),
++                'ticket_type': 'bugfix', 'pipeline_variant': 'full',
++                'requirement_source': 'local', 'repo_root': str(repo.resolve()),
++                'workspace': str(workspace.resolve()), 'base_ref': state.get('config', {}).get('base_ref')}
++    if (locked != expected or mode != MODE or state.get('ticket_type') != 'bugfix'
++            or state.get('pipeline_variant') != 'full' or state.get('requirement_source') != 'local'
++            or state.get('config', {}).get('autonomy', {}).get('mode') != 'auto'
++            or state.get('config', {}).get('autonomy', {}).get('auto_merge') is not False
++            or not locked['ticket_id'] or not locked['base_ref']):
++        raise GateError('evaluation-only intake identity/policy changed or conflicts with auto_merge')
++    return MODE
++
++
++def initialize(workspace, state, repo):
++    if workspace.resolve().parent != (repo.resolve() / '.coding-agent/tickets').resolve():
++        raise GateError('evaluation workspace must be a direct owned ticket directory')
++    if state.get('current_state') != 'TICKET_INTAKE':
++        raise GateError('policy can only be locked at intake')
++    cfg = state.get('config', {})
++    value = {'schema_version': 1, 'mode': MODE, 'autonomy_mode': 'auto', 'ticket_id': state.get('ticket_id'),
++             'ticket_type': 'bugfix', 'pipeline_variant': 'full', 'requirement_source': 'local',
++             'repo_root': str(repo.resolve()), 'workspace': str(workspace.resolve()),
++             'base_ref': cfg.get('base_ref')}
++    if git(repo, 'rev-parse', 'HEAD') != cfg.get('base_ref'):
++        raise GateError('intake base must be the actual HEAD')
++    path = workspace / POLICY
++    if path.exists():
++        policy(workspace, state, repo)
++        return  # idempotent resume; never replace a different lock
++    # Validate before writing, including explicit opt-in and incompatible modes.
++    if (cfg.get('publication_policy') != MODE or not value['ticket_id']
++            or any(state.get(k) != value[k] for k in ('ticket_type', 'pipeline_variant', 'requirement_source'))
++            or cfg.get('autonomy', {}).get('mode') != 'auto'
++            or cfg.get('autonomy', {}).get('auto_merge') is not False):
++        raise GateError('evaluation_only requires local full bugfix and auto_merge=false')
++    with path.open('x') as stream:
++        stream.write(json.dumps(value, indent=2) + '\n')
++
++
++def artifacts(workspace):
++    result = {}
++    for path in sorted(workspace.rglob('*')):
++        if path.is_symlink():
++            raise GateError('exit evidence cannot contain symlinks')
++        if path.is_file() and path.relative_to(workspace).as_posix() not in ('state.json', RECEIPT, 'logs/impl.log', 'logs/agent-transcript.jsonl'):
++            if path.stat().st_size > 64 * 1024 * 1024:
++                raise GateError('exit evidence file exceeds 64 MiB')
++            result[path.relative_to(workspace).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
++    return result
++
++
++def prerequisites(workspace, state, repo):
++    if policy(workspace, state, repo) != MODE:
++        raise GateError('local evaluation exit requires evaluation_only')
++    if state.get('current_state') not in ('EVALUATION_PASS', TERMINAL):
++        raise GateError('evaluation exit requires EVALUATION_PASS')
++    for stage in ('TICKET_INTAKE', 'ANALYSIS', 'PLANNING', 'DESIGN', 'IMPLEMENTATION'):
++        if state.get('states', {}).get(stage, {}).get('status') != 'completed':
++            raise GateError(f'required pipeline stage incomplete: {stage}')
++    steps = state.get('states', {}).get('IMPLEMENTATION', {}).get('plan_progress', {}).get('steps')
++    if not isinstance(steps, list) or not steps or any(
++            step.get('status') != 'completed' or not step.get('commits') for step in steps):
++        raise GateError('implementation plan steps are missing or incomplete')
++    evaluation = state.get('states', {}).get('EVALUATION', {})
++    if evaluation.get('status') != 'completed' or not evaluation.get('completed_at'):
++        raise GateError('evaluation stage must have completed')
++    if state.get('states', {}).get('COMPLETION', {}).get('pr_url'):
++        raise GateError('evaluation-only cannot claim a published PR')
++    report = evaluation.get('report_path')
++    if report != 'test-report.md' or not (workspace / report).is_file() or not (workspace / report).read_text().strip():
++        raise GateError('evaluation report is missing')
++    # Keep the existing required stages and their tier-dependent skip semantics.
++    # A missing/failed required stage, oracle, or selected tree cannot exit.
++    completion_check(workspace, state, repo)
++    verify_selection(workspace, repo, state, applied=True)
++    if git(repo, 'status', '--porcelain', '--untracked-files=no'):
++        raise GateError('tracked subject source is dirty')
++
++
++def receipt(workspace, state, repo):
++    return {'schema_version': 1, 'kind': 'local_evaluation_only_not_delivery_or_acceptance',
++            'state_sha256': digest(state), 'head': git(repo, 'rev-parse', 'HEAD'),
++            'tree': git(repo, 'rev-parse', 'HEAD^{tree}'), 'artifacts': artifacts(workspace),
++            'boundary_runner_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
++            'independent_human_acceptance': 'not_recorded'}
++
++
++def check_exit(workspace, state, repo):
++    if state.get('current_state') != TERMINAL:
++        raise GateError('not a local evaluation terminal')
++    prerequisites(workspace, state, repo)
++    if load(workspace / RECEIPT) != receipt(workspace, state, repo):
++        raise GateError('local exit receipt is missing, stale or altered')
++
++
++def finalize(workspace, state, repo):
++    if state.get('current_state') == TERMINAL:
++        check_exit(workspace, state, repo)
++        return
++    if (workspace / 'state.next.json').exists():
++        raise GateError('interrupted state.next.json requires explicit recovery before retry')
++    prerequisites(workspace, state, repo)
++    final = copy.deepcopy(state)
++    final['current_state'] = TERMINAL
++    final['current_agent'] = None
++    # Receipt first: interruption before state write cannot manufacture terminal success.
++    (workspace / RECEIPT).write_text(json.dumps(receipt(workspace, final, repo), indent=2) + '\n')
++    temporary = workspace / 'state.next.json'
++    temporary.write_text(json.dumps(final, indent=2) + '\n')
++    temporary.replace(workspace / 'state.json')
++
++
++def transition_check(workspace, old, candidate, repo):
++    if (old.get('config', {}).get('publication_policy', 'publish') !=
++            candidate.get('config', {}).get('publication_policy', 'publish')):
++        raise GateError('publication policy is immutable after state creation')
++    mode = policy(workspace, candidate, repo)
++    if mode == MODE:
++        if candidate.get('current_state') in ('COMPLETION', 'COMPLETED'):
++            raise GateError('evaluation_only cannot enter publication/completion')
++        if candidate.get('states', {}).get('COMPLETION', {}).get('pr_url'):
++            raise GateError('evaluation_only cannot record a PR URL')
++        if candidate.get('current_state') == TERMINAL:
++            check_exit(workspace, candidate, repo)
++    elif candidate.get('current_state') == TERMINAL:
++        raise GateError('EVALUATED requires an evaluation-only policy')
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--workspace', type=Path, required=True)
++    parser.add_argument('--repo', type=Path, required=True)
++    group = parser.add_mutually_exclusive_group(required=True)
++    group.add_argument('--init', action='store_true')
++    group.add_argument('--finalize', action='store_true')
++    group.add_argument('--check-exit', action='store_true')
++    args = parser.parse_args()
++    try:
++        workspace, repo = args.workspace.resolve(), args.repo.resolve()
++        state = load(workspace / 'state.json')
++        action = initialize if args.init else finalize if args.finalize else check_exit
++        action(workspace, state, repo)
++        print(json.dumps({'publication_policy': MODE, 'check': 'PASS', 'action': action.__name__}))
++        return 0
++    except (GateError, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
++        print(json.dumps({'check': 'ERROR', 'reason': str(exc)}))
++        return 2
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/plugin/scripts/tests/test_publication_policy.py b/plugin/scripts/tests/test_publication_policy.py
+new file mode 100644
+index 0000000..9d56e17
+--- /dev/null
++++ b/plugin/scripts/tests/test_publication_policy.py
+@@ -0,0 +1,253 @@
++"""Real oracle/selection executions and hook subprocesses, with fixture opinions.
++No host/model execution, production gold, network publication or human acceptance.
++"""
++import copy
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++SCRIPTS = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(SCRIPTS))
++import publication_policy as policy
++from oracle_gate import GateError
++import test_fix_selection as fixtures
++
++
++class PolicyTests(unittest.TestCase):
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.tmp.cleanup)
++        f = self.f = fixtures.build_fixture(Path(self.tmp.name))
++        f.state.update(current_state='TICKET_INTAKE', pipeline_variant='full', requirement_source='local')
++        f.state['config'] = {'base_ref': f.base, 'publication_policy': 'evaluation_only',
++                             'autonomy': {'mode': 'auto', 'auto_merge': False}}
++        f.save_state()
++
++    def lock(self):
++        policy.initialize(self.f.workspace, self.f.state, self.f.repo)
++
++    def ready(self):
++        f = self.f
++        self.lock()
++        # Preserve the selector template while carrying the selected candidate's oracle.
++        template = f.workspace / 'oracle-template.json'
++        template.write_bytes(f.plan_path.read_bytes())
++        f.selection['oracle_plan'] = template.name
++        f.selection_path.write_text(json.dumps(f.selection, indent=2) + '\n')
++        result = fixtures.select.run_selection(f.workspace, f.repo)
++        fixtures.bind(f, result)
++        f.git('merge', '--ff-only', result['decision']['selected_commit'])
++        winner = next(c for c in result['candidates'] if c['id'] == result['decision']['selected_candidate'])
++        f.plan_path.write_text(winner['oracle_plan_bytes'])
++        f.plan = json.loads(winner['oracle_plan_bytes'])
++        f.state['states']['ANALYSIS']['oracle_validity_plan_sha256'] = fixtures.oracle.sha(f.plan_path.read_bytes())
++        f.state['states']['IMPLEMENTATION']['reproduction_commit'] = result['oracle_base_commit']
++        f.bind(f.run())
++        f.state['current_state'] = 'EVALUATION_PASS'
++        for stage in ('TICKET_INTAKE', 'ANALYSIS', 'PLANNING', 'DESIGN', 'IMPLEMENTATION', 'EVALUATION'):
++            f.state['states'].setdefault(stage, {}).update(status='completed', completed_at='2026-10-15T00:00:00Z')
++        f.state['states']['IMPLEMENTATION']['plan_progress'] = {'steps': [
++            {'status': 'completed', 'commits': [result['decision']['selected_commit']]}]}
++        f.state['states']['EVALUATION']['report_path'] = 'test-report.md'
++        (f.workspace / 'test-report.md').write_text('Controlled fixture evaluation. Not independent acceptance.\n')
++        f.save_state()
++
++    def hook(self, name, data):
++        p = subprocess.run([sys.executable, str(SCRIPTS.parent / 'hooks' / name)],
++                           input=json.dumps({'cwd': str(self.f.repo), **data}), cwd=self.f.repo,
++                           capture_output=True, text=True, timeout=90)
++        self.assertEqual(p.returncode, 0, p.stderr)
++        return json.loads(p.stdout) if p.stdout else {}
++
++    def stop(self, active=False):
++        return self.hook('on-stop.py', {'stop_hook_active': active})
++
++    def cli(self, action):
++        return subprocess.run([sys.executable, str(SCRIPTS / 'publication_policy.py'),
++                               '--workspace', str(self.f.workspace), '--repo', str(self.f.repo), action],
++                              capture_output=True, text=True, timeout=90)
++
++    def test_valid_exit_cli_and_repeated_stop_remain_local(self):
++        self.ready()
++        result = self.cli('--finalize')
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        state = policy.load(self.f.workspace / 'state.json')
++        self.assertEqual(state['current_state'], 'EVALUATED')
++        self.assertNotIn('pr_url', state.get('states', {}).get('COMPLETION', {}))
++        result = self.cli('--check-exit')
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        result = self.cli('--finalize')
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        self.assertEqual(self.stop(), {})
++        self.assertEqual(self.stop(), {})
++        self.assertEqual(self.stop(True), {})
++        # Host PostToolUse Agent logging follows orchestrator return; telemetry must
++        # survive without changing the immutable gate evidence or restarting work.
++        result = subprocess.run(['bash', str(SCRIPTS.parent / 'hooks/on-agent-complete.sh')],
++                                input=json.dumps({'tool_input': {'subagent_type': 'orchestrator'},
++                                                  'tool_response': 'local evaluation only'}),
++                                cwd=self.f.repo, capture_output=True, text=True)
++        self.assertEqual(result.returncode, 0)
++        self.assertTrue((self.f.workspace / 'logs/impl.log').exists())
++        self.assertEqual(self.cli('--check-exit').returncode, 0)
++        # Another old auto workspace must not pull the stopped evaluation into PR creation.
++        other = self.f.workspace.parent / 'old-publish'; other.mkdir()
++        (other / 'state.json').write_text(json.dumps({'current_state': 'DESIGN',
++                                                      'config': {'autonomy': {'mode': 'auto'}}}))
++        self.assertEqual(self.stop(), {})
++
++    def test_default_publish_and_auto_merge_false_still_continue(self):
++        self.f.state['config'].pop('publication_policy')
++        self.f.state['current_state'] = 'EVALUATION_PASS'
++        self.f.save_state()
++        self.assertEqual(policy.policy(self.f.workspace, self.f.state, self.f.repo), 'publish')
++        self.assertIn('COMPLETION', self.stop()['reason'])
++        self.assertEqual(self.hook('publication-guard.py', {'tool_name': 'Bash', 'tool_input': {'command': 'git push origin branch'}}), {})
++
++    def test_early_stop_reentry_never_requests_publication(self):
++        self.lock()
++        out = self.stop()
++        self.assertEqual(out['decision'], 'block')
++        self.assertIn('Never push', out['reason'])
++        self.assertEqual(self.stop(True), {})
++        self.assertNotEqual(self.cli('--finalize').returncode, 0)
++
++    def test_conflicting_or_unsupported_intake_rejected(self):
++        for field, value in [('ticket_type', 'code_review'), ('pipeline_variant', 'review_only'), ('requirement_source', 'jira')]:
++            old = self.f.state[field]
++            self.f.state[field] = value
++            with self.assertRaises(GateError): self.lock()
++            self.f.state[field] = old
++        self.f.state['config']['autonomy']['auto_merge'] = True
++        with self.assertRaises(GateError): self.lock()
++        self.assertFalse((self.f.workspace / policy.POLICY).exists())
++
++    def test_missing_lock_and_forged_terminal_cannot_stop(self):
++        self.f.state['current_state'] = 'EVALUATED'
++        self.f.save_state()
++        self.assertEqual(self.stop()['decision'], 'block')
++        self.assertNotEqual(self.cli('--check-exit').returncode, 0)
++
++    def test_failed_missing_required_stage_and_skipped_implementation_rejected(self):
++        self.ready()
++        original = copy.deepcopy(self.f.state)
++        for change in ('fail', 'missing', 'skipped', 'steps'):
++            self.f.state = copy.deepcopy(original)
++            if change == 'fail': self.f.state['states']['EVALUATION']['results']['unit_test'] = 'FAIL'
++            if change == 'missing': self.f.state['states']['EVALUATION']['results'].pop('lint')
++            if change == 'skipped': self.f.state['states']['ANALYSIS']['status'] = 'skipped'
++            if change == 'steps': self.f.state['states']['IMPLEMENTATION']['plan_progress']['steps'] = []
++            self.f.save_state()
++            self.assertNotEqual(self.cli('--finalize').returncode, 0, change)
++            self.assertFalse((self.f.workspace / policy.RECEIPT).exists())
++
++    def test_receipt_artifact_and_source_tamper_rejected(self):
++        self.ready()
++        result = self.cli('--finalize')
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        for name in (policy.RECEIPT, 'test-report.md', 'oracle-validity-report.json', policy.POLICY):
++            path = self.f.workspace / name
++            old = path.read_bytes()
++            path.write_text('{}\n')
++            self.assertNotEqual(self.cli('--check-exit').returncode, 0, name)
++            self.assertEqual(self.stop()['decision'], 'block', name)
++            path.write_bytes(old)
++        source = self.f.repo / 'ledger.py'
++        source.write_text(source.read_text() + '\n')
++        self.assertNotEqual(self.cli('--check-exit').returncode, 0)
++
++    def test_state_hash_and_source_commit_change_rejected(self):
++        self.ready()
++        result = self.cli('--finalize')
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        path = self.f.workspace / 'state.json'
++        old = path.read_bytes()
++        state = policy.load(path); state['failure_log'] = ['altered']; path.write_text(json.dumps(state))
++        self.assertNotEqual(self.cli('--check-exit').returncode, 0)
++        path.write_bytes(old)
++        self.f.git('commit', '--allow-empty', '-qm', 'test: change source identity')
++        self.assertNotEqual(self.cli('--check-exit').returncode, 0)
++
++    def test_state_guard_blocks_policy_downgrade_fake_pr_and_completion(self):
++        self.lock()
++        for change in ('policy', 'merge', 'type', 'base', 'pr', 'terminal'):
++            state = copy.deepcopy(self.f.state)
++            if change == 'policy': state['config']['publication_policy'] = 'publish'
++            if change == 'merge': state['config']['autonomy']['auto_merge'] = True
++            if change == 'type': state['ticket_type'] = 'feature'
++            if change == 'base': state['config']['base_ref'] = '0' * 40
++            if change == 'pr': state['states']['COMPLETION'] = {'pr_url': 'https://example.test/pr/1'}
++            if change == 'terminal': state['current_state'] = 'COMPLETION'
++            out = self.hook('completion-guard.py', {'tool_name': 'Write', 'tool_input': {
++                'file_path': str(self.f.workspace / 'state.json'), 'content': json.dumps(state)}})
++            self.assertEqual(out['hookSpecificOutput']['permissionDecision'], 'deny', change)
++
++    def test_known_publication_routes_denied_even_after_exit(self):
++        self.ready(); self.assertEqual(self.cli('--finalize').returncode, 0)
++        for command in ('git push origin branch', 'env X=1 git -C /tmp/x push origin branch',
++                        '/usr/bin/git push --tags', 'true\ngh pr create --title x',
++                        'gh pr merge 1', 'gh api repos/x/y -X POST', 'curl https://example.test'):
++            out = self.hook('publication-guard.py', {'tool_name': 'Bash', 'tool_input': {'command': command}})
++            self.assertEqual(out['hookSpecificOutput']['permissionDecision'], 'deny', command)
++        for tool in ('mcp__plugin_coding-agent_jira-gateway__jira_add_comment',
++                     'mcp__plugin_coding-agent_jira-gateway__jira_update_status', 'mcp__github__create_pull_request'):
++            out = self.hook('publication-guard.py', {'tool_name': tool, 'tool_input': {}})
++            self.assertEqual(out['hookSpecificOutput']['permissionDecision'], 'deny', tool)
++        for tool in ('mcp__plugin_coding-agent_cks__cks.ops.health',
++                     'mcp__plugin_coding-agent_chainbench__chainbench_stop'):
++            self.assertEqual(self.hook('publication-guard.py', {'tool_name': tool}), {})
++
++    def test_stale_ticket_and_unrelated_auto_merge_do_not_erase_policy(self):
++        self.lock()
++        os.utime(self.f.workspace / 'state.json', (1, 1))
++        other = self.f.workspace.parent / 'other'; other.mkdir()
++        (other / 'state.json').write_text(json.dumps({'current_state': 'COMPLETED', 'config': {'autonomy': {'auto_merge': True}}}))
++        self.assertEqual(self.stop()['decision'], 'block')
++        out = self.hook('publication-guard.py', {'tool_name': 'Bash', 'tool_input': {'command': 'git push origin x'}})
++        self.assertEqual(out['hookSpecificOutput']['permissionDecision'], 'deny')
++
++    def test_direct_policy_receipt_edits_and_symlink_evidence_rejected(self):
++        self.lock()
++        for name in (policy.POLICY, policy.RECEIPT):
++            out = self.hook('publication-guard.py', {'tool_name': 'Write', 'tool_input': {
++                'file_path': str(self.f.workspace / name), 'content': '{}'}})
++            self.assertEqual(out['hookSpecificOutput']['permissionDecision'], 'deny')
++        (self.f.workspace / 'leak').symlink_to(self.f.repo / 'ledger.py')
++        with self.assertRaises(GateError): policy.artifacts(self.f.workspace)
++
++
++    def test_unknown_policy_and_edit_downgrade_rejected(self):
++        self.lock()
++        out = self.hook('completion-guard.py', {'tool_name': 'Edit', 'tool_input': {
++            'file_path': str(self.f.workspace / 'state.json'),
++            'old_string': '"publication_policy": "evaluation_only"',
++            'new_string': '"publication_policy": "publish"'}})
++        self.assertEqual(out['hookSpecificOutput']['permissionDecision'], 'deny')
++        self.f.state['config']['publication_policy'] = 'unknown'
++        self.f.save_state()
++        self.assertEqual(self.stop()['decision'], 'block')
++
++    def test_damaged_autonomy_and_policy_identity_cannot_bypass_stop(self):
++        self.lock()
++        self.f.state['config']['autonomy']['mode'] = 'interactive'
++        self.f.save_state()
++        self.assertEqual(self.stop()['decision'], 'block')
++        (self.f.workspace / 'state.json').write_text('broken JSON')
++        self.assertEqual(self.stop()['decision'], 'block')
++        self.f.state['config'] = None
++        self.f.save_state()
++        self.assertEqual(self.stop()['decision'], 'block')
++
++    def test_interrupted_receipt_before_state_write_is_not_completion(self):
++        self.lock()
++        (self.f.workspace / policy.RECEIPT).write_text('{"kind":"incomplete"}')
++        self.assertEqual(self.stop()['decision'], 'block')
++        self.assertNotEqual(self.cli('--check-exit').returncode, 0)
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/plugin/skills/state-machine/SKILL.md b/plugin/skills/state-machine/SKILL.md
+index 9ef0c22..8c1b647 100644
+--- a/plugin/skills/state-machine/SKILL.md
++++ b/plugin/skills/state-machine/SKILL.md
+@@ -47,6 +47,7 @@ coding-agent 파이프라인의 상태 전이를 관리한다. 이 skill은 `Rea
+     "base_ref": null,            // intake 시점 `git rev-parse HEAD` — 이 티켓의 베이스 커밋(불변).
+                                  // implementer 는 여기서 분기한다. 다른 브랜치 checkout/pull 로
+                                  // 베이스를 옮기지 않는다 (implementer §3.1).
++    "publication_policy": "publish", // publish (기본) | evaluation_only (local/full/bugfix만)
+     "base_policy": "current",    // "current" (default: 현재 HEAD 가 베이스) | "latest" (opt-in:
+                                  // 원격 기본 브랜치 최신에서 분기 — origin/HEAD 해석, main 가정 금지)
+     "autonomy": {
+@@ -142,7 +143,7 @@ coding-agent 파이프라인의 상태 전이를 관리한다. 이 skill은 `Rea
+ 
+ ## 2. 제공 함수
+ 
+-### 2.1 init_state(ticket_id, ticket_type, workspace_dir, pipeline_variant, requirement_source)
++### 2.1 init_state(ticket_id, ticket_type, workspace_dir, pipeline_variant, requirement_source, publication_policy)
+ 
+ **역할**: state.json을 새로 생성하고 TICKET_INTAKE 상태로 초기화.
+ 
+@@ -154,6 +155,9 @@ coding-agent 파이프라인의 상태 전이를 관리한다. 이 skill은 `Rea
+ - `requirement_source` (string, optional): "jira" (기본) | "local". `/coding-agent:analyze`
+   자유 텍스트 진입은 "local". orchestrator가 이 값으로 Jira pre-flight/종료 동기화를 분기한다.
+ 
++- `publication_policy` (optional): publish 기본. evaluation_only는 local/full/bugfix 및 auto_merge=false,
++  autonomy.mode=auto에서만 허용한다. state 최초 생성 시 config에 기록하며 사후 전환은 금지한다.
++
+ **절차**:
+ 
+ 1. 현재 UTC 시각을 ISO 8601 포맷으로 획득.
+@@ -551,3 +555,16 @@ PreToolUse deep-review guard denies missing/tampered/foreign or changed source
+ artifacts and type/hash bypass. Direct shell edits are outside hooks and require
+ the same CLI. Delivery is a partial structured report; human acceptance remains
+ not_recorded. Return to ANALYSIS to revise a frozen report identity.
++
++## 게시 전 로컬 평가 종료 계약
++
++`config.publication_policy=evaluation_only`는 local/full/bugfix intake에서만 지정하고
++`publication_policy.py --init`로 source base·ticket·workspace·repo 신원을 잠근다.
++auto_merge=true와 조합하거나 기존 state에서 정책/신원을 바꾸지 않는다.
++EVALUATION_PASS 뒤 --finalize는 기존 oracle completion 및 applied selection 검사를
++재사용하고 required stages·완료 report·clean tracked source를 확인한다.
++성공하면 EVALUATED와 state/source/artifact 해시가 결속된 evaluation-exit.json을 기록한다.
++EVALUATED는 게시 완료·품질 수용이 아닌 로컬 평가 종료다. COMPLETION은 pending이며 PR URL은 null이다.
++재개/Stop은 --check-exit와 동일 검사를 수행한다. 실패·누락·변조·조기 종료를 성공으로 세지 않는다.
++Write/Edit guard는 정책 완화/가짜 PR/직접 COMPLETION을 차단한다. shell/사람의 직접 파일 수정과
++임의 네트워크 호출을 완전히 차단하는 sandbox는 아니다. 격리 clone·제한된 MCP와 host 권한을 병행한다.

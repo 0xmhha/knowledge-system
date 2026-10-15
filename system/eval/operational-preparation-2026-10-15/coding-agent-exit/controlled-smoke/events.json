@@ -1,0 +1,135 @@
+{
+  "kind": "controlled_fixture_cli_and_hook_subprocesses",
+  "status": "PASS",
+  "oracle_executions": "actual Python ledger controls and source mutants",
+  "selection": "two actual source proposals, fixture panel opinions",
+  "model_calls": 0,
+  "host_sessions": 0,
+  "external_publication_calls": 0,
+  "independent_human_acceptance": "not_recorded",
+  "events": [
+    {
+      "kind": "cli",
+      "action": "--init",
+      "exit_code": 0,
+      "stdout": "{\"publication_policy\": \"evaluation_only\", \"check\": \"PASS\", \"action\": \"initialize\"}\n",
+      "stderr": ""
+    },
+    {
+      "kind": "hook_subprocess_not_host",
+      "hook": "on-stop.py",
+      "payload": {
+        "stop_hook_active": false
+      },
+      "response": {
+        "decision": "block",
+        "reason": "Evaluation-only pipeline incomplete. Resume evaluation/diagnosis from state.json; at EVALUATION_PASS run publication_policy.py --finalize. Never push, create a PR, update Jira or enter COMPLETION. A verified EVALUATED receipt permits stopping."
+      }
+    },
+    {
+      "kind": "hook_subprocess_not_host",
+      "hook": "on-stop.py",
+      "payload": {
+        "stop_hook_active": true
+      },
+      "response": {}
+    },
+    {
+      "kind": "cli",
+      "action": "--finalize",
+      "exit_code": 0,
+      "stdout": "{\"publication_policy\": \"evaluation_only\", \"check\": \"PASS\", \"action\": \"finalize\"}\n",
+      "stderr": ""
+    },
+    {
+      "kind": "cli",
+      "action": "--check-exit",
+      "exit_code": 0,
+      "stdout": "{\"publication_policy\": \"evaluation_only\", \"check\": \"PASS\", \"action\": \"check_exit\"}\n",
+      "stderr": ""
+    },
+    {
+      "kind": "hook_subprocess_not_host",
+      "hook": "on-stop.py",
+      "payload": {
+        "stop_hook_active": false
+      },
+      "response": {}
+    },
+    {
+      "kind": "hook_subprocess_not_host",
+      "hook": "on-stop.py",
+      "payload": {
+        "stop_hook_active": false
+      },
+      "response": {}
+    },
+    {
+      "kind": "hook_subprocess_not_host",
+      "hook": "publication-guard.py",
+      "payload": {
+        "tool_name": "Bash",
+        "tool_input": {
+          "command": "git push origin evaluation-fixture"
+        }
+      },
+      "response": {
+        "hookSpecificOutput": {
+          "hookEventName": "PreToolUse",
+          "permissionDecision": "deny",
+          "permissionDecisionReason": "Evaluation-only repository: publication/remote-write commands are blocked; stop locally after validated evaluation."
+        }
+      }
+    },
+    {
+      "kind": "hook_subprocess_not_host",
+      "hook": "publication-guard.py",
+      "payload": {
+        "tool_name": "Bash",
+        "tool_input": {
+          "command": "gh pr create --title evaluation-fixture"
+        }
+      },
+      "response": {
+        "hookSpecificOutput": {
+          "hookEventName": "PreToolUse",
+          "permissionDecision": "deny",
+          "permissionDecisionReason": "Evaluation-only repository: publication/remote-write commands are blocked; stop locally after validated evaluation."
+        }
+      }
+    },
+    {
+      "kind": "hook_subprocess_not_host",
+      "hook": "publication-guard.py",
+      "payload": {
+        "tool_name": "mcp__plugin_coding-agent_jira-gateway__jira_add_comment",
+        "tool_input": {}
+      },
+      "response": {
+        "hookSpecificOutput": {
+          "hookEventName": "PreToolUse",
+          "permissionDecision": "deny",
+          "permissionDecisionReason": "Evaluation-only repository: this MCP tool is outside the local evaluation allowlist."
+        }
+      }
+    },
+    {
+      "kind": "cli",
+      "action": "--check-exit",
+      "exit_code": 2,
+      "stdout": "{\"check\": \"ERROR\", \"reason\": \"local exit receipt is missing, stale or altered\"}\n",
+      "stderr": ""
+    },
+    {
+      "kind": "hook_subprocess_not_host",
+      "hook": "on-stop.py",
+      "payload": {
+        "stop_hook_active": false
+      },
+      "response": {
+        "decision": "block",
+        "reason": "Evaluation-only boundary invalid: local exit receipt is missing, stale or altered. Repair evidence or report BLOCKED; do not publish."
+      }
+    }
+  ]
+}

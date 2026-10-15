@@ -1,0 +1,31 @@
+git-guard
+  ok   force-push --force denied
+  ok   force-push -f denied
+  ok   force-with-lease NOT denied as force
+  ok   push origin main denied
+  ok   push HEAD:master denied
+  ok   push feature branch allowed
+  ok   reset --hard asks
+  ok   clean -fd asks
+  ok   branch -D asks
+  ok   tag push asks
+  ok   normal push allowed
+  ok   non-git command allowed
+  ok   git status allowed
+  FAIL commit on main denied
+  ok   commit on feature allowed
+on-stop
+  ok   auto + non-terminal -> block
+  ok   stop_hook_active -> no block
+  ok   interactive -> no block
+  ok   terminal COMPLETION -> no block
+  ok   over cycle cap -> no block
+  ok   stale workspace -> no block
+  ok   no workspace -> no block
+session-context
+  ok   in-flight workspace surfaced
+  ok   cycle shown
+  ok   all terminal -> silent
+  ok   BLOCKED surfaced for attention
+
+FAIL — 1 hook check(s) regressed: ['commit on main denied']

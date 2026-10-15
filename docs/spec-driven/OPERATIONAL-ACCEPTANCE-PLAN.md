@@ -207,3 +207,10 @@ AI 모델은 제안/사전 검토자로 별도 origin에 기록한다. 과거 �
 ## 다음과 전체 후속 범위
 
 다음은 단계0의 대상·새 입력·검토자·완료 기준을 검토·동결하는 것이다. 이 계획의 미실행 단계는0–4 전부이며 운영/독립 수용 완료는0/9다. WI-5 및 일반 후속13개·태그/공개 배포 결정은 [전체 작업표](../REMAINING-WORK.md)의 별도 범위로 유지한다. 계획을 독립 품질 성공이나 조직/외부 production 전체 수용으로 확대하지 않는다.
+
+## 2026-10-15 coding-agent 준비 보완
+
+[OP-CA-01](./OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)은 후보 b6e2abdc에서 local/full/bugfix auto의
+evaluation_only 정책·EVALUATED receipt·Stop 재진입과 알려진 게시 도구 경계를 개발 검증했다.
+실제 설치 host 실행·외부 전송 격리·독립 품질/수용은 미확인이다. 단계0 preparing과 동결/실행 금지를 유지하고,
+source 후보 채택 후 제한된 host에서 hook 연결을 별도 검증한다.
