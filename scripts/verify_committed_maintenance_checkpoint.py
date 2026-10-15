@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'manager-bootstrap': {
+        'revision': '2c2b7ed1', 'folder': 'km-03-bootstrap',
+        'scope': 'historical_KM03_1_owned_registration_metadata_only',
+        'scripts': ['check-knowledge-manager-bootstrap-evidence.py', 'test_knowledge_manager_bootstrap_evidence.py'],
+    },
     'public-failures': {
         'revision': '6705ed57', 'folder': 'km-02-public-failures',
         'scope': 'historical_KM02_complete_actual_public_failure_matrix',

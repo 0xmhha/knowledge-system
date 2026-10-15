@@ -152,16 +152,17 @@
       "scope": "knowledge_manager_plugin",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "native_package_registration_doctor_launcher_verified_grounded_collection_next",
+      "design_status": "grounded_collection_native_proposed_overlay_locally_verified_review_and_reader_pending",
       "depends_on": [
         "KM-02"
       ],
       "evidence": [
         "docs/spec-driven/KNOWLEDGE-MANAGER-PLUGIN.md",
         "plugins/knowledge-manager/README.md",
-        "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-collection/manifest.json"
       ],
-      "verification": "registration14_native_manifest_skills_agents3_actual_metadata_bootstrap9_not_model_or_full_manager",
+      "verification": "registration14_collection23_actual_collection_native_overlay24_evidence13_not_human_review_or_DB_readiness",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -174,8 +175,11 @@
         },
         {
           "id": "KM-03.2",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         },
         {
           "id": "KM-03.3",
@@ -189,7 +193,6 @@
         }
       ],
       "remaining": [
-        "KM-03.2 grounded document-free collection and compatible knowledge drafts",
         "KM-03.3 tacit questions uncertainty conflicts exclusions and review/adoption/retraction",
         "KM-03.4 actual Claude host full build/query reader binding and failure recovery"
       ]
@@ -514,6 +517,6 @@
     "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
     "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
   },
-  "completed_subtasks": 9,
+  "completed_subtasks": 10,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
 }

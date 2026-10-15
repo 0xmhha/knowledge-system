@@ -56,3 +56,14 @@ KM-04의 주기 실행은 별도 명시 일정과 trigger를 가진 manager 동�
 패키지 형식·path 변수·네이티브 validation은 [공식 reference](https://code.claude.com/docs/en/plugins-reference)와 [생성 guide](https://code.claude.com/docs/en/plugins-create)를2026-10-15에 확인했다. 실제 설치 CLI의 validation 결과와 모델/host 행동 검증을 구분한다.
 
 같은 profile의 journal은 한 host가 소유한다. 이미 해당 유지 보수 서버가 실행 중이면 별도 doctor connection이 registry 소유 때문에 거부될 수 있다. 이때 기존 host의 상태를 확인하며 lock/journal을 삭제하거나 두 번째 writer를 강제로 만들지 않는다.
+
+## KM-03.2 실행 계약: 수집과 초안
+
+수집 결과는 CKS dataset snapshot과 별도의 collection ID를 가진다. 실제 읽은 project/file/byte·선택 정책·Git metadata·제공 자료를 결속하며 CKS의 snapshot ID를 임의로 만들지 않는다. 원문 blob, 포괄 범위/제외 수, 수집 시각과 helper version을 보존한다. source는 수정하지 않으며 지원 text 범위·자원 상한과 수집 중 변경을 검사한다. 링크/외부 경로·secret/명시 제외 자료는 근거에 섞지 않는다. 제한 초과·자료 없음·입력 변경은 성공한 완전 수집으로 처리하지 않는다.
+
+초안은 `observed_excerpt`, `fact`, `hypothesis`, `reported_decision`, `reported_command_result`, `troubleshooting`, `question`을 구분하고 모두 proposed로 시작한다. 원문에 대한 실제 line/hash reference가 필요하다. 기본 생성은 관찰한 원문 발췌이며 코드 의미나 설계 이유의 자동 검증이 아니다. agent가 해석한 주장은 별도 claim 입력으로 제안한다. 결정 보고에는 문서 또는 실제 제공 자료의 근거가 있어야 하며 code만 보고 사람의 결정을 생성하지 않는다. 제공된 명령/결과는 재실행하지 않은 보고로 기록한다. actor/시점이 없으면 unknown으로 남긴다.
+
+별도 state 안에서 기본 `.cks/knowledge`와 questions의 제안 문서를 만들어 실제 CKS knowledge validate/lock 계약을 확인한다. 일반 코드 관찰을 규범 policy나 ADR로 억지 변환하지 않는다. 이는 엔진이 보관 가능한 지식 입력 초안의 구조 검증이다. 원래 source에 대한 채택·human review·DB 생성/활성화·검색 반영은 아니다. 이 연결은 KM-03.3/04에서 구현·검증한다. 수집기의 제외 정책과 원래 source 전체 DB capture의 제외는 별도 경계이며, 전체 manager는 그 연결 검증 전 완료로 표시하지 않는다.
+
+
+KM-03.2 검증 완료: 수집23개·등록 회귀14개·실제 두 프로젝트/native CKS24항목·증거 보호13개를 통과했다. 실제 Git diff는 선택한 기존 파일의 HEAD→working tree만 대상으로 별도 change origin에 보관한다. 기본64파일/256KiB·각 diff64KiB이며 삭제 파일 추적은 KM-04다. 오래된 collection/초안은 당시 근거로 재현할 수 있지만 최신 source의 검토/채택으로 승계하지 않는다. 기본/사용자 claim 초안 모두 actual validate/lock을 통과했으며 policy/ADR를 생성하지 않았다. [packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-collection/manifest.json)에 원시 명령·원문·draft seal을 보존한다. 다음은 KM-03.3의 질문·중복/상충·정확한 subject 검토·채택·회수다.

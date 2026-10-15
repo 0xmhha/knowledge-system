@@ -1,9 +1,10 @@
-# Knowledge manager · initial package
+# Knowledge manager · evidence collection and proposed drafts
 
 This Claude Code plugin is the project-scoped manager entry point. Users select
 a source and storage locations; they do not need to write source documentation.
-The package currently implements registration and diagnosis. Grounded drafts,
-review/adoption and actual host end-to-end management remain separate stages.
+The package implements registration, diagnosis and bounded evidence collections
+with proposed knowledge drafts. Review/adoption and actual host end-to-end
+management remain separate stages.
 
 | Capability | Current state |
 |---|---|
@@ -11,7 +12,8 @@ review/adoption and actual host end-to-end management remain separate stages.
 | Offline owner/config/binary diagnosis | Implemented |
 | Actual MCP initialization and four maintenance tool discovery | Implemented; model inspection not implied |
 | Maintenance launcher | Implemented; exposes the configured CKS server |
-| Evidence-backed draft collection and tacit knowledge review | Planned in KM-03.2/03 |
+| Source/hash/line evidence collection and proposed native overlay | Implemented in KM-03.2 |
+| Tacit knowledge review/adoption/retraction | Planned in KM-03.3 |
 | Managed DB reader broker and full Claude host workflow | Planned in KM-03.4 |
 | Regular/change-triggered updates | Planned in KM-04 |
 
@@ -63,9 +65,69 @@ Stop diagnosis on missing binaries, a changed registration/config/engine,
 foreign project owner, unsafe/overlapping paths, missing maintenance tools or
 unsupported source/model capability. Never repair it by calling legacy index
 mutations. No background hook, scheduler, automatic publication or global
-installation is enabled by this initial package.
+installation is enabled by this package.
 
 The layout and local loading follow the [official plugin reference](https://code.claude.com/docs/en/plugins-reference)
 and [plugin creation guide](https://code.claude.com/docs/en/plugins-create).
 The local authoring check is `claude plugin validate --strict --json` against
 this directory. This validates the package; it does not prove model behavior.
+
+
+## Collect and propose without writing source documentation
+
+```sh
+python3 plugins/knowledge-manager/scripts/manager.py collect \
+  --registration /workspace/manager/acme/registration.json \
+  --exclude 'private/**'
+python3 plugins/knowledge-manager/scripts/manager.py evidence \
+  --registration /workspace/manager/acme/registration.json \
+  --collection-id '<returned-collection-id>' --origin-id repo \
+  --path path/to/source.go --start-line 1 --end-line 20
+python3 plugins/knowledge-manager/scripts/manager.py draft \
+  --registration /workspace/manager/acme/registration.json \
+  --collection-id '<returned-collection-id>'
+```
+
+Collection reads selected UTF-8 source/docs/config files into an owned immutable
+bundle. Defaults bound files, file/total bytes and traversal. Common secret file
+patterns, explicit exclusions, links and detected sensitive content are omitted;
+counts are recorded without copying omitted data. This is the collector's scope,
+not a completed policy for indexing the original full source tree.
+
+The collection ID is separate from a CKS snapshot ID. Every evidence reference
+binds project, collection, origin, path, full file hash, inclusive line range and
+full span hash. `repo`, `provided` and `change` origins stay distinct even at the same path.
+Text previews are bounded and explicitly marked when truncated. The immutable
+blob retains the complete span. Unchanged collection inputs replay the original
+observation. Changed input creates a different collection.
+
+For an exact selected Git root, bounded `HEAD` to working-tree diffs are
+recorded as `change` evidence (default 64 selected existing files, 256 KiB
+total, 64 KiB per diff). External diff/text conversion is disabled; deleted
+secret values are checked before retaining diff text. Coverage records omitted
+or unexamined files. Deleted paths and complete update tracking belong to
+KM-04. Use `--max-diff-files 0` to disable change text collection.
+
+`collect --context-file` accepts a bounded JSON object with `schema_version: 1`,
+the exact `project_id` and `records`. Record kinds are `decision`,
+`troubleshooting`, `command_result`, `note`; optional actor/time remain unknown
+when absent. Commands/results are supplied reports and are never executed.
+Restricted/private material is refused. Supply a separate selected public
+projection if a mixed file contains private records.
+
+`draft --claims-file` accepts `schema_version`, exact `project_id` and
+`collection_id`, plus `claims` with `kind`, `statement`, `refs`. Each reference
+specifies `origin_id` (default `repo`), `path`, `start_line`, `end_line`.
+Kinds are `observed_excerpt`, `fact`, `hypothesis`, `reported_decision`,
+`reported_command_result`, `troubleshooting`, `question`. A reported decision
+needs documentation/provided material; a command report needs the corresponding
+provided origin. Interpretation stays proposed; a source reference does not
+validate a statement's meaning or supply a human approval.
+
+The default draft quotes observed excerpts; it does not invent semantic rules
+or design decisions. Seed coverage is explicit. The isolated draft project has
+a real native `.cks/knowledge` overlay and passes actual CKS validate/lock.
+Original source, dataset and global configuration remain unchanged. An existing
+draft replays only after its owned content seal is checked. Use `draft-status`
+with the returned draft ID to inspect it. Review, source adoption, retrieval
+integration and the managed reader broker remain KM-03.3/04 requirements.

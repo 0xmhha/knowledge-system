@@ -44,8 +44,8 @@ def file_hash(path):
     return h.hexdigest()
 
 
-def strict_read(path):
-    require(path.is_file() and not path.is_symlink() and path.stat().st_size <= 65536 and path.stat().st_nlink == 1, 'registration_invalid')
+def strict_read(path,limit=65536):
+    require(path.is_file() and not path.is_symlink() and path.stat().st_size <= limit and path.stat().st_nlink == 1, 'registration_invalid')
     def pairs(items):
         result = {}
         for key,value in items:
@@ -245,6 +245,29 @@ def main():
     doctor.add_argument('--connect',action='store_true')
     launch = commands.add_parser('serve')
     launch.add_argument('--registration',default=os.environ.get('CKS_MANAGER_REGISTRATION'))
+    collection = commands.add_parser('collect')
+    collection.add_argument('--registration',required=True)
+    collection.add_argument('--exclude',action='append',default=[])
+    collection.add_argument('--context-file')
+    collection.add_argument('--max-files',type=int,default=5000)
+    collection.add_argument('--max-file-bytes',type=int,default=2*1024*1024)
+    collection.add_argument('--max-total-bytes',type=int,default=128*1024*1024)
+    collection.add_argument('--max-diff-files',type=int,default=64)
+    collection.add_argument('--max-diff-bytes',type=int,default=256*1024)
+    excerpt = commands.add_parser('evidence')
+    excerpt.add_argument('--registration',required=True)
+    excerpt.add_argument('--collection-id',required=True)
+    excerpt.add_argument('--path',required=True)
+    excerpt.add_argument('--origin-id',choices=('repo','provided','change'),default='repo')
+    excerpt.add_argument('--start-line',type=int,required=True)
+    excerpt.add_argument('--end-line',type=int,required=True)
+    proposed = commands.add_parser('draft')
+    proposed.add_argument('--registration',required=True)
+    proposed.add_argument('--collection-id',required=True)
+    proposed.add_argument('--claims-file')
+    draft_status = commands.add_parser('draft-status')
+    draft_status.add_argument('--registration',required=True)
+    draft_status.add_argument('--draft-id',required=True)
     args = parser.parse_args()
     try:
         if args.operation=='register':
@@ -255,10 +278,22 @@ def main():
             if args.operation=='serve':
                 binary = r['binaries']['cks']['path']
                 os.execv(binary,[binary,'mcp','--config',str(Path(r['state_root'])/'cks.json')])
-            result = {'schema_version':1,'stage':'registration_verified_not_built','project_id':r['project_id'],'profile_id':r['profile_id'],
-                      'draft_collection':False,'review_workflow':False,'managed_reader_broker':False,'scheduling':False,'model_readiness':'not_measured'}
-            if args.connect:
-                result['connection'] = connect(r)
+            if args.operation in ('collect','evidence','draft','draft-status'):
+                from collection import collect,evidence,draft,load_draft
+                if args.operation=='collect':
+                    result = collect(args,r)
+                elif args.operation=='evidence':
+                    result = evidence(r,args.collection_id,args.path,args.start_line,args.end_line,args.origin_id)
+                elif args.operation=='draft':
+                    result = draft(args,r)
+                else:
+                    directory,content = load_draft(r,args.draft_id)
+                    result = {'schema_version':1,'stage':'draft_proposed','draft_dir':str(directory),'draft':content}
+            else:
+                result = {'schema_version':1,'stage':'registration_verified_not_built','project_id':r['project_id'],'profile_id':r['profile_id'],
+                          'draft_collection':True,'review_workflow':False,'managed_reader_broker':False,'scheduling':False,'model_readiness':'not_measured'}
+                if args.connect:
+                    result['connection'] = connect(r)
         print(json.dumps(result,ensure_ascii=False))
         return 0
     except Failure as error:
@@ -270,4 +305,7 @@ def main():
 
 
 if __name__=='__main__':
+    # Collection imports this module for the shared error/ownership contract.
+    # Reuse this running module so CLI failures keep one exception identity.
+    sys.modules['manager'] = sys.modules[__name__]
     raise SystemExit(main())

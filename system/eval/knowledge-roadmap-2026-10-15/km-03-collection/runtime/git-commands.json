@@ -1,0 +1,49 @@
+[
+  {
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-KM032-collection-packet-20261015/source-a",
+      "init",
+      "--quiet"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-KM032-collection-packet-20261015/source-a",
+      "add",
+      "--",
+      "."
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-KM032-collection-packet-20261015/source-a",
+      "-c",
+      "user.name=fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "-c",
+      "commit.gpgsign=false",
+      "-c",
+      "core.hooksPath=/dev/null",
+      "commit",
+      "--quiet",
+      "-m",
+      "Controlled source fixture"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]
