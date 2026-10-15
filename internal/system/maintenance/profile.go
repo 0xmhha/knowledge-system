@@ -163,22 +163,9 @@ func attachInputs(o *setup.Options) error {
 	} else if !os.IsNotExist(err) {
 		return reject("input_stale")
 	}
-	roots := []string{}
-	if o.DomainKnowledge != "" {
-		roots = append(roots, o.DomainCorpusDir())
-	}
-	if o.SemanticCorpus != "" {
-		roots = append(roots, o.SemanticCorpus)
-	}
-	if o.FlowCorpus != "" {
-		root := filepath.Dir(o.FlowCorpus)
-		found := false
-		for _, p := range roots {
-			found = found || p == root
-		}
-		if !found {
-			roots = append(roots, root)
-		}
+	roots, err := setup.RetainedDocumentRoots(*o)
+	if err != nil {
+		return reject("input_stale")
 	}
 	for i, root := range roots {
 		if safeDirectory(root, false) != nil {

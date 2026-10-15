@@ -229,6 +229,17 @@ func VerifyContent(o Options, emit func(Event)) error {
 	}
 
 	var missing []string
+	documents, err := ExtraDocumentRoots(o)
+	if err != nil {
+		return err
+	}
+	for _, root := range documents {
+		if !rooted(root) {
+			missing = append(missing, "a selected document corpus is not among the index's docs roots")
+		} else if cm.Languages["markdown"] == 0 {
+			missing = append(missing, "selected document corpora produced no Markdown chunks")
+		}
+	}
 	if o.DomainKnowledge != "" {
 		if !rooted(o.DomainCorpusDir()) {
 			missing = append(missing, fmt.Sprintf("the domain corpus %s is not among the index's docs roots", o.DomainCorpusDir()))

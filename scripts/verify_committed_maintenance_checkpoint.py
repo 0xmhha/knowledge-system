@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'manager-review': {
+        'revision': '3d39801c', 'folder': 'km-03-review',
+        'scope': 'historical_KM03_3_supplied_review_and_filtered_input_only',
+        'scripts': ['check-knowledge-manager-review-evidence.py', 'test_knowledge_manager_review_evidence.py'],
+    },
     'manager-collection': {
         'revision': '322daf39', 'folder': 'km-03-collection',
         'scope': 'historical_KM03_2_proposed_collection_not_review_or_reader',

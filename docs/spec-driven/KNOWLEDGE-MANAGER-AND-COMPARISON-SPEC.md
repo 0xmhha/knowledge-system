@@ -146,3 +146,6 @@ KM-03.2 완료: 문서 없는 두 프로젝트에서 source/config/Git 변경·�
 
 
 KM-03.3 완료: 질문·중복/공유 근거 해석 후보, 정확한 subject의 제공 검토·CAS event, 제외 자료를 재수집하지 않는 filtered input 채택·회수를 구현했다. 검토35·수집23·등록14·실제 CLI/native CKS24항목과 증거 보호14개를 검증했다. 통제 fixture 응답은 실제 사람 인증·독립 수용으로 세지 않는다. 원래 source와 DB는 바꾸지 않았다. 전체11/28·기능2/7이며 다음은 KM-03.4 실제 Claude host/managed reader와 구축·조회 연결이다. [review packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-review/manifest.json)을 따른다.
+
+
+KM-03.4 A 중간 완료: 검토 문서의 명시 색인·별도 retained origin과 held 후보 실제 원문/인용14항목을 검증했다. 새 전체 Go3,820통과/18skip·race810통과/2skip이며 과거 Go를 재사용하지 않았다. [A packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-document-index/manifest.json)을 따른다. B의 adoption-bound profile/reader와 C 실제 Claude host는 남아 KM-03.4 체크박스는 미완료, 전체11/28·기능2/7이다.

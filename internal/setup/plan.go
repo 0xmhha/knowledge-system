@@ -75,6 +75,9 @@ type Options struct {
 	// SemanticCorpus is a separately rendered, reviewed Markdown corpus.
 	// Its manifest is checked against the graph build before CKV consumes it.
 	SemanticCorpus string
+	// DocumentCorpora are explicitly selected ordinary Markdown roots. Unlike
+	// SemanticCorpus, they do not claim reviewed semantic projection status.
+	DocumentCorpora []string
 
 	// SkipVector builds only the graph index (and skips alignment
 	// verification, which needs both).
@@ -203,6 +206,13 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 	if o.SemanticCorpus != "" && o.SkipVector {
 		return Plan{}, fmt.Errorf("setup: semantic corpus requires vector build")
 	}
+	documentRoots, err := ExtraDocumentRoots(o)
+	if err != nil {
+		return Plan{}, err
+	}
+	if len(documentRoots) > 0 && o.SkipVector {
+		return Plan{}, fmt.Errorf("setup: document corpora require vector build")
+	}
 	graphBin := o.GraphBin
 	if graphBin == "" {
 		graphBin = "ckg"
@@ -312,6 +322,12 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 	}
 
 	if !o.SkipVector {
+		if len(documentRoots) > 0 {
+			steps = append(steps, Step{ID: "document-corpora-verify", Title: "Verify selected document inputs before embedding",
+				VerifyContext: func(ctx context.Context, _ func(Event)) error {
+					return VerifyDocumentCorpora(ctx, documentRoots, o.CaptureLimits())
+				}})
+		}
 		vectorCmd := []string{vectorBin, "build", "--src", o.Src, "--out", o.VectorDir(), "--ckg", o.GraphDir()}
 		if o.LogicalSrcRoot != "" {
 			vectorCmd = append(vectorCmd, "--logical-src-root", o.LogicalSrcRoot)
@@ -349,6 +365,9 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 		if o.SemanticCorpus != "" {
 			vectorCmd = append(vectorCmd, "--docs", o.SemanticCorpus)
 		}
+		for _, root := range documentRoots {
+			vectorCmd = append(vectorCmd, "--docs", root)
+		}
 		if o.FlowCorpus != "" {
 			vectorCmd = append(vectorCmd, "--flow-corpus", o.FlowCorpus)
 		}
@@ -382,7 +401,7 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 				},
 			},
 		)
-		if o.DomainKnowledge != "" || o.FlowCorpus != "" {
+		if o.DomainKnowledge != "" || o.FlowCorpus != "" || len(documentRoots) > 0 {
 			opts := o
 			steps = append(steps, Step{
 				ID:    "verify-content",

@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 KM-01·KM-02와 KM-03.1–03을 완료했다. 전체28개 중11개 완료·3개 진행 중(OE-01.1–03)·14개 미착수다. 다음은 KM-03.4 실제 Claude host/managed reader와 구축·조회 연결이다. [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [별도 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 KM-01·KM-02와 KM-03.1–03을 완료했다. 전체28개 중11개 완료·4개 진행 중(KM-03.4, OE-01.1–03)·13개 미착수다. 다음은 KM-03.4 실제 Claude host/managed reader와 구축·조회 연결이다. [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [별도 작업표](../REMAINING-WORK.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는2/7이다.
 
@@ -19,7 +19,7 @@
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 완료 | 등록14·native3·실제 metadata bootstrap9·증거10; 초안/검토/reader 미구현 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 완료 | 수집23·등록14·실제 Git/CKS native 초안24·증거13; 사람 검토/DB 조회 아님 |
 | KM-03.3 | 암묵지 질문·불확실성·검토/채택/회수 | 완료 | 검토35·수집23·등록14·실제 CLI/native24·증거14; 통제 응답, DB 조회/신원 인증 아님 |
-| KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 미착수 | 미실행 |
+| KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 진행 중 | A 실제 문서 색인/원문14·새 전체 Go3838/race812·증거14; B broker/C 실제 host 남음 |
 | KM-04.1 | 수동·정기·변경 trigger와 성공 기준 | 미착수 | 미실행 |
 | KM-04.2 | 변경/삭제/no-op/stale와 재검토 | 미착수 | 미실행 |
 | KM-04.3 | 중복·lease·재시작·retry·자원 상한 | 미착수 | 미실행 |
@@ -467,3 +467,20 @@ KM-02.3 완료로 전체7/28이며 다음은 KM-02.4의 공개 잘못된 대상/
 | 별도 gate | build/fmt/vet/lint·문서·증거 보호14개 | 모델/온톨로지 품질 아님 |
 
 [review packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-review/manifest.json)과 [계약](./KNOWLEDGE-MANAGER-PLUGIN.md)을 따른다. 소스1,699입력은 유지 Go1,253개·기타446개이며 원래 승인5개를 보존한다. 이전 collection은322daf39 snapshot에서 별도 검증했다. 전체11/28·기능2/7이며 남은17개는 KM-03.4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 다음은 KM-03.4이며 정책 생성기·운영/독립 수용9개·선택 후속12개도 별도로 유지한다.
+
+
+## KM-03.4 중간 A: 검토 지식의 실제 색인·retained 조회
+
+| 검증 | 결과 | 경계 |
+|---|---|---|
+| 새 일반 문서 입력 | 명시 document_corpora/반복 --document-corpus | 의미 승인/기존 semantic export로 오인하지 않음·기본 비어 있음 |
+| 신규 Go 회귀 | 26사례 통과 | root 순서·byte/add/delete/order·빈/링크/비 text·상한·취소·누락 색인 |
+| 캐시 없는 전체 Go | 3,838사례=3,820통과+18skip·135패키지·실패0 | 이전 Go 결과 재사용 없음 |
+| 캐시 없는 관련6패키지 race | 812사례=810통과+2skip·실패0 | 신규26사례는 위 분모에 포함 |
+| 실제 manager 입력→공개 build | held 후보·필수 gate 통과·current 없음 | fixture 검토·mock embedding·품질 아님 |
+| 실제 DB 자료 | 검토 note의 별도 docs origin/byte·Markdown chunks | private 원문 재유입 없음 |
+| 실제 MCP 원문/인용 | 후보 좌표/project 일치·입력 삭제 후 동일 원문 | manager broker/실제 Claude host 미검증 |
+| 실제14항목·3연결 | durable replay·EOF0/0/0 | 상태/게시/serving 구분 |
+| 별도 gate | build/fmt/vet/lint·문서131개·증거14개 | 독립 수용 아님 |
+
+[A packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-document-index/manifest.json)과 [계약](./KNOWLEDGE-MANAGER-PLUGIN.md)을 따른다. 소스1,702입력=유지 Go1,256개+기타446개이며 승인5개는 그대로다. 초기 개발 실패와 최종 통과의 raw 결과를 구분해 보존했다. 이전 review checkpoint는3d39801c snapshot에서 검증했다. A만 완료했으므로 전체11/28·기능2/7을 유지한다. 남은17개는 KM-03.4(B adoption-bound 유지 보수/reader, C 실제 host), KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 정책 생성기·운영/독립 수용9개·선택 후속12개도 별도로 유지한다.

@@ -79,3 +79,16 @@ review 입력은 정확한 project/draft, 예상 직전 revision, 실제 제공�
 채택은 검토된 claim과 수집 당시 공개 source만 별도 소유 input project에 투영한다. 원래 source 전체를 capture하지 않으며 수집 제외 자료가 이 경로로 다시 들어오지 않게 한다. 채택 시 현재 선택 source/Git 신원과 근거 byte를 다시 검사하고 변경되면 새 collection/draft/review를 요구한다. 제공 자료는 기록된 당시 보고이며 최신 사실로 자동 승격하지 않는다. 실제 native overlay validate/lock을 확인하지만 DB 게시·reader 채택은 KM-03.4다. 회수는 정확한 채택 ID와 actor/이유·예상 revision에 결속하고 미래 build 사용을 차단한다. 이미 게시된 DB의 rollback/회수는 별도 KM-02 도구 절차로 남긴다.
 
 KM-03.3을 검토35개·수집 회귀23개·등록14개·실제 CLI/native CKS24항목·증거 보호14개로 검증했다. 중단 복구는 event 이전/이후의 주입된 I/O 실패와 재실행으로 확인했으며 이 단계에서 실제 프로세스 SIGKILL을 새로 실행했다고 세지 않는다. 삭제/추가/변경/Git 신원 변경·변조·stale revision·회수 입력 재사용을 거부한다. 통제된 응답의 저장·filtered input 채택 완료이며 실제 사용자 신원 인증·DB 게시/검색/host 전체·독립 수용은 별도다. [증거](../../system/eval/knowledge-roadmap-2026-10-15/km-03-review/manifest.json)를 따른다.
+
+## KM-03.4 실행 단계
+
+1. A — 검토 문서 색인: setup의 명시 `document_corpora`/반복 `--document-corpus`로 일반 Markdown 근거를 vector 입력과 retained docs origin에 연결한다. 이는 commit 기반 semantic export와 별도 입력이며 의미 검증·policy/ADR 승인으로 세지 않는다. 순서/byte가 input/snapshot 신원에 포함되고 링크·변경·빈 색인·상한 초과·중복 root를 거부한다. 기본값은 비어 있으며 기존 setup에는 자동 색인을 추가하지 않는다. 실제 공개 도구로 구축한 자료의 원문/인용 조회를 확인한다.
+2. B — manager 연결: 정확한 현재 adoption의 filtered input만 profile로 구성하고 inspect/build/status/cancel을 실제 CKS에 전달한다. 별도 reader는 정확한 scoped job의 held/succeeded 후보 좌표에 결속하며 과거 receipt나 current fallback을 사용하지 않는다. source/input·review 회수/대체·손상/GC·타 프로젝트를 다시 확인한다. held를 게시로 말하지 않는다. Python package는 표준 라이브러리만 유지한다.
+3. C — 실제 Claude host: 로컬 시험 응답기로 실제 설치 host의 plugin 등록→수집→초안/제공 검토→build→DB 원문 조회와 실패·EOF/재시작을 검증한다. 유료 실제 모델·독립 사람 수용/온톨로지 품질은 별도다.
+
+A만으로 KM-03.4 또는 KM-03 전체를 완료로 표시하지 않는다. 문서 없는 프로젝트는 매니저가 만든 검토 지식을 사용하며 사용자가 문서 파일을 먼저 작성하는 조건을 추가하지 않는다.
+
+
+KM-03.4 A 완료: `document_corpora`를 명시한 실제 profile에서 매니저가 만든 검토 지식을 구축하고 held 후보의 원문/인용을 조회했다. 별도 docs origin의 정확한 byte·제외 자료 미혼입·live 입력 삭제 후 저장 원문 보존·durable replay·3연결 EOF0을14항목으로 검증했다. 전체 Go를 새 `-count=1`로3,838사례(3,820통과·18skip), 관련6패키지 race812사례(810통과·2skip) 실행했다. 새26사례는 위 전체/race 분모에 포함하며 별도로 더하지 않는다. build/fmt/vet/lint·문서131개·증거 보호14개를 통과했다. 초기 미사용 import/임시 경로 canonical fixture/required gate 단언 실패는 [packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-document-index/manifest.json)의 initial-failures에 보존했다. 실 운영 자료나 게시 current를 수정하지 않았다.
+
+현재 plugin launcher는 여전히 원래 유지 보수 서버이며 B의 adoption-bound profile/reader broker와 C의 실제 Claude host 전체 흐름은 미완료다. A의 native reader 증거를 그 둘의 완료로 세지 않는다. 전체11/28·기능2/7을 유지하고 B→C→KM-04로 진행한다.

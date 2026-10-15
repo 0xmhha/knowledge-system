@@ -16,35 +16,36 @@ import (
 // against the config file's directory so a pack can reference its own data
 // portably.
 type fileConfig struct {
-	ProjectID            string `yaml:"project_id"`
-	SourceMode           string `yaml:"source_mode"`
-	Src                  string `yaml:"src"`
-	Out                  string `yaml:"out"`
-	GraphBin             string `yaml:"graph_bin"`
-	VectorBin            string `yaml:"vector_bin"`
-	PolicyFile           string `yaml:"policy_file"`
-	SecurityPatternFile  string `yaml:"security_pattern_file"`
-	Embedder             string `yaml:"embedder"`
-	ModelName            string `yaml:"model_name"`
-	EmbedDim             int    `yaml:"embed_dim"`
-	OllamaURL            string `yaml:"ollama_url"`
-	QueryPrefixPolicy    string `yaml:"query_prefix_policy"`
-	VectorBuildSources   string `yaml:"vector_build_sources"`
-	VectorPolicy         string `yaml:"vector_policy"`
-	SemanticCorpus       string `yaml:"semantic_corpus"`
-	SkipVector           bool   `yaml:"skip_vector"`
-	Filelist             string `yaml:"filelist"`
-	DomainKnowledge      string `yaml:"domain_knowledge"`
-	DerivedDir           string `yaml:"derived_dir"`
-	CodeRoot             string `yaml:"code_root"`
-	GlossaryFile         string `yaml:"glossary_file"`
-	FlowCorpus           string `yaml:"flow_corpus"`
-	CksBin               string `yaml:"cks_bin"`
-	MaxCaptureFiles      int    `yaml:"max_capture_files"`
-	MaxCaptureFileBytes  int64  `yaml:"max_capture_file_bytes"`
-	MaxCaptureTotalBytes int64  `yaml:"max_capture_total_bytes"`
-	BuildTimeout         string `yaml:"build_timeout"`
-	MinFreeBytes         int64  `yaml:"min_free_bytes"`
+	ProjectID            string   `yaml:"project_id"`
+	SourceMode           string   `yaml:"source_mode"`
+	Src                  string   `yaml:"src"`
+	Out                  string   `yaml:"out"`
+	GraphBin             string   `yaml:"graph_bin"`
+	VectorBin            string   `yaml:"vector_bin"`
+	PolicyFile           string   `yaml:"policy_file"`
+	SecurityPatternFile  string   `yaml:"security_pattern_file"`
+	Embedder             string   `yaml:"embedder"`
+	ModelName            string   `yaml:"model_name"`
+	EmbedDim             int      `yaml:"embed_dim"`
+	OllamaURL            string   `yaml:"ollama_url"`
+	QueryPrefixPolicy    string   `yaml:"query_prefix_policy"`
+	VectorBuildSources   string   `yaml:"vector_build_sources"`
+	VectorPolicy         string   `yaml:"vector_policy"`
+	SemanticCorpus       string   `yaml:"semantic_corpus"`
+	DocumentCorpora      []string `yaml:"document_corpora"`
+	SkipVector           bool     `yaml:"skip_vector"`
+	Filelist             string   `yaml:"filelist"`
+	DomainKnowledge      string   `yaml:"domain_knowledge"`
+	DerivedDir           string   `yaml:"derived_dir"`
+	CodeRoot             string   `yaml:"code_root"`
+	GlossaryFile         string   `yaml:"glossary_file"`
+	FlowCorpus           string   `yaml:"flow_corpus"`
+	CksBin               string   `yaml:"cks_bin"`
+	MaxCaptureFiles      int      `yaml:"max_capture_files"`
+	MaxCaptureFileBytes  int64    `yaml:"max_capture_file_bytes"`
+	MaxCaptureTotalBytes int64    `yaml:"max_capture_total_bytes"`
+	BuildTimeout         string   `yaml:"build_timeout"`
+	MinFreeBytes         int64    `yaml:"min_free_bytes"`
 }
 
 // LoadConfig reads a setup config file into Options. Path-valued fields that
@@ -99,6 +100,13 @@ func loadConfig(path string, strict bool) (Options, error) {
 		}
 		return filepath.Join(base, p)
 	}
+	documents := make([]string, 0, len(fc.DocumentCorpora))
+	for _, root := range fc.DocumentCorpora {
+		if root == "" {
+			return Options{}, fmt.Errorf("invalid document corpus root")
+		}
+		documents = append(documents, rel(root))
+	}
 	return Options{
 		ProjectID:           fc.ProjectID,
 		SourceMode:          fc.SourceMode,
@@ -116,6 +124,7 @@ func loadConfig(path string, strict bool) (Options, error) {
 		VectorBuildSources:  rel(fc.VectorBuildSources),
 		VectorPolicy:        rel(fc.VectorPolicy),
 		SemanticCorpus:      rel(fc.SemanticCorpus),
+		DocumentCorpora:     documents,
 		SkipVector:          fc.SkipVector,
 		FilelistConfig:      rel(fc.Filelist),
 		DomainKnowledge:     rel(fc.DomainKnowledge),

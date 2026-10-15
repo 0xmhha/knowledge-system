@@ -223,6 +223,7 @@ func runSetup(args []string) (result error) {
 	fs.StringVar(&o.VectorBuildSources, "vector-build-sources", "", "JSON with exact Go source paths permitted through CKV's build/ default ignore")
 	fs.StringVar(&o.VectorPolicy, "vector-policy", "", "vector chunk-categorization policy YAML")
 	fs.StringVar(&o.SemanticCorpus, "semantic-corpus", "", "reviewed semantic Markdown corpus directory from cks semantic export-text")
+	fs.StringArrayVar(&o.DocumentCorpora, "document-corpus", nil, "ordinary Markdown corpus directory to retain and index (repeatable; no semantic approval implied)")
 	fs.StringVar(&o.FilelistConfig, "filelist", "", "filelist config; derives <out>/files-from.json and scopes both engine builds")
 	fs.StringVar(&o.DomainKnowledge, "domain-knowledge", "", "project domain-knowledge dir; re-derives the corpus, governance policy and glossary before the builds")
 	fs.StringVar(&o.DerivedDir, "derived-dir", "", "where the derived domain artifacts land (default: generated/ beside domain-knowledge)")
@@ -277,6 +278,9 @@ func runSetup(args []string) (result error) {
 		merge("vector-build-sources", &o.VectorBuildSources, base.VectorBuildSources)
 		merge("vector-policy", &o.VectorPolicy, base.VectorPolicy)
 		merge("semantic-corpus", &o.SemanticCorpus, base.SemanticCorpus)
+		if !set["document-corpus"] {
+			o.DocumentCorpora = append([]string{}, base.DocumentCorpora...)
+		}
 		merge("filelist", &o.FilelistConfig, base.FilelistConfig)
 		merge("domain-knowledge", &o.DomainKnowledge, base.DomainKnowledge)
 		merge("derived-dir", &o.DerivedDir, base.DerivedDir)
