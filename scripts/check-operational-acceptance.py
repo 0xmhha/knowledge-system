@@ -172,6 +172,59 @@ def check(root, protocol, ledger, require_frozen=False):
             relative = path.relative_to(root).as_posix()
             if not file_hash(relative, artifact.get("sha256")):
                 errors.append("readiness artifact missing or hash differs")
+    host = protocol.get("host_connection_verification")
+    if host != ledger.get("host_connection_verification"):
+        errors.append("protocol/ledger local host references differ")
+    if host is not None:
+        try:
+            if (host.get("scope") != "owned_local_session_only"
+                    or not file_hash(host.get("manifest"), host.get("manifest_sha256"))):
+                raise ValueError("local host scope or manifest binding differs")
+            manifest_path = root / host["manifest"]
+            manifest = json.loads(manifest_path.read_text())
+            if (manifest.get("kind") != "local_scripted_transport_actual_host_not_model_acceptance"
+                    or manifest.get("adoption_scope") != "owned_local_session_only"
+                    or manifest.get("status") != "pass"
+                    or manifest.get("actual_upstream_model_inference") != "not_run"
+                    or manifest.get("actual_agent_pipeline_acceptance") != "not_run"
+                    or manifest.get("operational_gate") != "not_run"
+                    or manifest.get("quality_gate") != "not_run"
+                    or manifest.get("independent_acceptance") != "not_recorded"):
+                raise ValueError("local scripted host verification promoted beyond its scope")
+            for artifact in manifest["artifacts"]:
+                path = manifest_path.parent / artifact["path"]
+                if (not path.resolve().is_relative_to(manifest_path.parent.resolve())
+                        or not file_hash(path.relative_to(root).as_posix(), artifact["sha256"])):
+                    raise ValueError("local host artifact missing or altered")
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("local_host_probe", Path(__file__).with_name("operational-host-probe.py"))
+            probe = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(probe)
+            cases = manifest["final_cases"]
+            if len(cases) != 5 or {case["case"] for case in cases} != {"valid", "tools", "incomplete", "tampered", "cancel"}:
+                raise ValueError("local host case coverage differs")
+            for case in cases:
+                folder = manifest_path.parent / "final" / case["attempt"]
+                if not folder.resolve().is_relative_to(manifest_path.parent.resolve()):
+                    raise ValueError("local host case path escapes packet")
+                assessed = probe.assess(folder)
+                if assessed.get("actual_host_version") != manifest["host"]["version"].split()[0]:
+                    raise ValueError("host version identity differs")
+                init = next(json.loads(line) for line in (folder / "host.stdout.jsonl").read_text().splitlines()
+                            if json.loads(line).get("subtype") == "init")
+                plugin = next(row for row in init["plugins"] if row["name"] == "coding-agent")
+                if plugin["path"] != manifest["source_adoptions"]["coding_agent"]["plugin_root"]:
+                    raise ValueError("host plugin path differs from adopted source")
+                if assessed.get("status") != "PASS" or {k:v for k,v in case.items() if k != "attempt"} != assessed:
+                    raise ValueError("actual host evidence disagrees with its recorded verdict")
+            for patch in patches:
+                component = patch["component"].replace("-", "_")
+                adopted = manifest["source_adoptions"][component]
+                if (patch.get("adopted_commit") != adopted["source_commit"]
+                        or patch.get("adoption_scope") != "owned_local_session_only"):
+                    raise ValueError("adopted source/host scope is unbound")
+        except (OSError, ValueError, KeyError, TypeError, StopIteration) as exc:
+            errors.append("local host readiness invalid: " + str(exc))
     for row in requirements:
         if row.get("decision_status") != "approved" or not human_receipt(row.get("receipt"), digest):
             pending.append(row.get("id", "unknown freeze requirement"))

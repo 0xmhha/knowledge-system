@@ -47,6 +47,20 @@ class PreparationGuardTests(unittest.TestCase):
     def test_draft_does_not_satisfy_frozen_gate(self):
         self.assertTrue(self.errors(True))
 
+    def test_local_host_adoption_cannot_expand_to_production(self):
+        if "host_connection_verification" not in self.protocol:
+            self.skipTest("local host preparation not yet recorded")
+        self.protocol["host_connection_verification"]["scope"] = "production"
+        self.ledger["host_connection_verification"]["scope"] = "production"
+        self.assertTrue(self.errors())
+
+    def test_local_host_adopted_source_cannot_change_without_evidence(self):
+        if "host_connection_verification" not in self.protocol:
+            self.skipTest("local host preparation not yet recorded")
+        for rows in (self.protocol["readiness_candidate_patches"], self.ledger["readiness_fixes"]):
+            rows[0]["adopted_commit"] = "0" * 40
+        self.assertTrue(self.errors())
+
     def test_hash_tampering_is_rejected(self):
         self.protocol["source_inventory_sha256"] = "0" * 64
         self.assertTrue(self.errors())

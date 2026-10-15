@@ -214,3 +214,9 @@ AI 모델은 제안/사전 검토자로 별도 origin에 기록한다. 과거 �
 evaluation_only 정책·EVALUATED receipt·Stop 재진입과 알려진 게시 도구 경계를 개발 검증했다.
 실제 설치 host 실행·외부 전송 격리·독립 품질/수용은 미확인이다. 단계0 preparing과 동결/실행 금지를 유지하고,
 source 후보 채택 후 제한된 host에서 hook 연결을 별도 검증한다.
+
+## 로컬 host 연결 준비 결과
+
+[격리 채택·연결 명세](./ISOLATED-HOST-ADOPTION.md)의 source 채택과 실제 CLI/로컬 스크립트 응답기5개 사례를 검증했다. coding-agent는 SessionStart 보완 b7e7868, ChainBench는 bdf5ad27이며 source·binary·설정·hook 입력·MCP frame·종료를 결속했다. strict MCP alias와 알려진 게시 거부, Stop 단일 재진입, host 취소/서버 종료를 확인했다.
+
+전체 실제 agent/model/CKS/노드 pilot은 여전히 미실행이다. source/로컬 host 사전 검증만 별도 준비 기록으로 채택하며 단계0 preparing·동결 전 execution_allowed=false·운영/품질/독립 수용0/9를 유지한다. 다음은 reviewer·모델/비용·자원·새 gold/case/family·DEV/FINAL·기준을 확정하는 것이다.

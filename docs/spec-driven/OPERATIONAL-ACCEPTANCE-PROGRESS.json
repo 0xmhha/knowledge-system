@@ -234,7 +234,8 @@
         },
         "review_draft_packet": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md",
         "chainbench_readiness_fix": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
-        "coding_agent_readiness_fix": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json"
+        "coding_agent_readiness_fix": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json",
+        "isolated_host_connection": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json"
       },
       "completed_preparation": [
         "read_only_source_inventory",
@@ -247,7 +248,8 @@
         "non_exhaustive_value_control_anchor_drafts",
         "stop_reentry_and_unmasked_shutdown_completion_requirements",
         "chainbench_stdio_readiness_patch_with_isolated_state_and_controlled_regression",
-        "coding_agent_evaluation_only_exit_and_stop_reentry_controlled_regression"
+        "coding_agent_evaluation_only_exit_and_stop_reentry_controlled_regression",
+        "adopted_consumer_sources_and_actual_cli_local_scripted_connection_five_cases"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -263,12 +265,12 @@
         "date": "2026-10-15",
         "kind": "preparation_only_not_runtime_or_independent_acceptance",
         "guard_regression_tests": {
-          "passed": 28,
+          "passed": 30,
           "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_operational_acceptance.py"
         },
         "documentation_contract_tests_passed": 20,
         "package_notice_tests_passed": 3,
-        "live_document_check_count": 116,
+        "live_document_check_count": 117,
         "require_frozen_rejected_with_exit": 1,
         "original_source_completion_guard": "pass",
         "verified_original_bindings": 2069,
@@ -282,7 +284,12 @@
         "review_source_rubric_anchors": 45,
         "non_exhaustive_data_anchors": 15,
         "non_exhaustive_control_anchors": 8,
-        "approved_independent_gold_records": 0
+        "approved_independent_gold_records": 0,
+        "local_host_evidence_verifier_tests_passed": 8,
+        "actual_cli_sessions_with_local_scripted_api": 10,
+        "final_local_cli_connection_cases": 5,
+        "actual_agent_role_pipeline_sessions": 0,
+        "real_model_inference": "not_run"
       },
       "candidate_counts": {
         "source_functions": 40,
@@ -341,10 +348,12 @@
       "manifest": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
       "manifest_sha256": "d6bef9e2cea8711e10acd36cf43038b218ba3394d359393a9aa39a715c628452",
       "candidate_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
-      "candidate_adoption": "pending",
+      "candidate_adoption": "adopted_for_owned_local_host",
       "operational_gate": "not_run",
       "quality_gate": "not_run",
-      "independent_acceptance": "not_recorded"
+      "independent_acceptance": "not_recorded",
+      "adopted_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "adoption_scope": "owned_local_session_only"
     },
     {
       "id": "OP-CA-01",
@@ -353,10 +362,17 @@
       "manifest": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json",
       "manifest_sha256": "9a380dcc900db6098ae04822737d211c641728b25909114d8d4d5008bb392d92",
       "candidate_commit": "b6e2abdc8892bb5e82044997f4f2285ece9c5b35",
-      "candidate_adoption": "pending",
+      "candidate_adoption": "adopted_for_owned_local_host",
       "operational_gate": "not_run",
       "quality_gate": "not_run",
-      "independent_acceptance": "not_recorded"
+      "independent_acceptance": "not_recorded",
+      "adopted_commit": "b7e78689676769e8536626e76eed7165d870e1ba",
+      "adoption_scope": "owned_local_session_only"
     }
-  ]
+  ],
+  "host_connection_verification": {
+    "scope": "owned_local_session_only",
+    "manifest": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json",
+    "manifest_sha256": "741fb22917ab562697cf7b0ecc973e13ed4e4f3533ac549868f4b3aeb11df42e"
+  }
 }

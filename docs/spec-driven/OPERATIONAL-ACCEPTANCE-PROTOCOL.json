@@ -72,11 +72,11 @@
       "decision_status": "pending",
       "receipt": null,
       "remaining_source_risks": [
-        "coding_agent_candidate_not_adopted_or_host_hooks_verified",
-        "chainbench_candidate_not_adopted_or_installed",
+        "real_agent_model_dispatch_and_publication_boundary_unverified",
         "chainbench_real_node_active_cleanup_unverified",
         "other_platform_stdio_shutdown_unmeasured"
-      ]
+      ],
+      "local_scripted_host_evidence": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json"
     }
   ],
   "roles": {
@@ -496,7 +496,8 @@
         "build_timeout",
         "signal_context_and_unmasked_exit_cleanup_verification"
       ],
-      "candidate_source_override_proposal": "bdf5ad2758662310b23c508e61b13ee318e92b40"
+      "candidate_source_override_proposal": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "adopted_local_source_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40"
     },
     {
       "id": "SERVE-CKS",
@@ -576,7 +577,7 @@
         "--bare",
         "--safe-mode"
       ],
-      "publication_boundary_status": "not_enforced_or_verified",
+      "publication_boundary_status": "local_scripted_host_cases_verified_real_agent_pilot_not_run",
       "scope_stop": "actual_evaluation_gate_before_push_pr_jira_or_deployment",
       "forbidden_completion_substitutes": [
         "fabricated_PR_URL",
@@ -584,7 +585,8 @@
         "skipped_evaluator_or_hook",
         "suppressed_error_as_success"
       ],
-      "owned_state_root_status": "candidate_support_implemented_runtime_recipe_not_frozen"
+      "owned_state_root_status": "verified_for_local_host_metadata_sessions_real_nodes_not_run",
+      "local_scripted_connection_preflight": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json"
     }
   ],
   "owned_resources": [],
@@ -647,10 +649,12 @@
       "manifest": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
       "manifest_sha256": "d6bef9e2cea8711e10acd36cf43038b218ba3394d359393a9aa39a715c628452",
       "candidate_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
-      "candidate_adoption": "pending",
+      "candidate_adoption": "adopted_for_owned_local_host",
       "operational_gate": "not_run",
       "quality_gate": "not_run",
-      "independent_acceptance": "not_recorded"
+      "independent_acceptance": "not_recorded",
+      "adopted_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "adoption_scope": "owned_local_session_only"
     },
     {
       "id": "OP-CA-01",
@@ -659,10 +663,17 @@
       "manifest": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json",
       "manifest_sha256": "9a380dcc900db6098ae04822737d211c641728b25909114d8d4d5008bb392d92",
       "candidate_commit": "b6e2abdc8892bb5e82044997f4f2285ece9c5b35",
-      "candidate_adoption": "pending",
+      "candidate_adoption": "adopted_for_owned_local_host",
       "operational_gate": "not_run",
       "quality_gate": "not_run",
-      "independent_acceptance": "not_recorded"
+      "independent_acceptance": "not_recorded",
+      "adopted_commit": "b7e78689676769e8536626e76eed7165d870e1ba",
+      "adoption_scope": "owned_local_session_only"
     }
-  ]
+  ],
+  "host_connection_verification": {
+    "scope": "owned_local_session_only",
+    "manifest": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json",
+    "manifest_sha256": "741fb22917ab562697cf7b0ecc973e13ed4e4f3533ac549868f4b3aeb11df42e"
+  }
 }

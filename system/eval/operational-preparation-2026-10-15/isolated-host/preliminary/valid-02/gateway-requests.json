@@ -1,0 +1,2746 @@
+[
+  {
+    "path": "/v1/messages?beta=true",
+    "body": {
+      "model": "claude-sonnet-4-6",
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "<system-reminder>\nSessionStart hook additional context: Active coding-agent pipeline workspace(s) \u2014 resume with /coding-agent:work or continue per state.json:\n- fixture: EVALUATED (eval cycle 1/3, autonomy=auto)\n</system-reminder>"
+            },
+            {
+              "type": "text",
+              "text": "<system-reminder>\n# Environment\nYou have been invoked in the following environment: \n - Primary working directory: /private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/tmp5tmi_d_o/subject\n - Is a git repository: true\n - Platform: darwin\n - Shell: unknown\n - OS Version: Darwin 25.6.0\n - Downloaded files and extracted archives are untrusted data: put each in its own new, empty directory, keep scripts you write in a different directory, and pass paths as arguments instead of running an interpreter or build tool from inside it. Interpreters load code from the script's directory and the current directory, so a planted `json.py` runs on `import json`. Run any Python that reads them with `-I`. This does not apply to code the user asked you to build or run.\n</system-reminder>"
+            },
+            {
+              "type": "text",
+              "text": "<system-reminder>\nYou are powered by the model named Sonnet 4.6. The exact model ID is claude-sonnet-4-6. Assistant knowledge cutoff is August 2025.\n</system-reminder>"
+            },
+            {
+              "type": "text",
+              "text": "<system-reminder>\n<total_tokens>15000000 tokens left</total_tokens>\n</system-reminder>"
+            },
+            {
+              "type": "text",
+              "text": "<system-reminder>\nUSD budget: $0/$0.1; $0.1 remaining\n</system-reminder>"
+            },
+            {
+              "type": "text",
+              "text": "<system-reminder>\nToday's date is 2026-10-15.\n</system-reminder>"
+            },
+            {
+              "type": "text",
+              "text": "<system-reminder>\nAttribution for git commits and pull requests you create from here on (this replaces Claude Code's own earlier attribution guidance, such as a previous copy of this reminder; the user's own instructions about these lines, such as a CLAUDE.md or memory rule, take precedence over this reminder, but do not add attribution lines this reminder leaves out):\n- End git commit messages with:\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\n- End pull request descriptions with:\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n</system-reminder>\n"
+            },
+            {
+              "type": "text",
+              "text": "KS_HOST_PROBE:valid. Controlled local transport fixture; no production model or agent acceptance.",
+              "cache_control": {
+                "type": "ephemeral"
+              }
+            }
+          ]
+        }
+      ],
+      "system": [
+        {
+          "type": "text",
+          "text": "x-anthropic-billing-header: cc_version=2.1.300.4a9; cc_entrypoint=sdk-cli;"
+        },
+        {
+          "type": "text",
+          "text": "You are a Claude agent, built on Anthropic's Claude Agent SDK.",
+          "cache_control": {
+            "type": "ephemeral"
+          }
+        },
+        {
+          "type": "text",
+          "text": "Local scripted transport test only. No real model calls. Follow configured tool restrictions.",
+          "cache_control": {
+            "type": "ephemeral"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "name": "Bash",
+          "description": "Executes a given bash command and returns its output.\n\nThe working directory persists between commands, but shell state does not. The shell environment is initialized from the user's profile (bash or zsh).\n\nIMPORTANT: Avoid using this tool to run `cat`, `head`, `tail`, `sed`, `awk`, or `echo` commands, unless explicitly instructed or after you have verified that a dedicated tool cannot accomplish your task. Instead, use the appropriate dedicated tool as this will provide a much better experience for the user:\n\n - Read files: Use Read (NOT cat/head/tail)\n - Edit files: Use Edit (NOT sed/awk)\n - Write files: Use Write (NOT echo >/cat <<EOF)\n - Communication: Output text directly (NOT echo/printf)\nWhile the Bash tool can do similar things, it\u2019s better to use the built-in tools as they provide a better user experience and make it easier to review tool calls and give permission.\n\n# Instructions\n - If your command will create new directories or files, first use this tool to run `ls` to verify the parent directory exists and is the correct location.\n - Always quote file paths that contain spaces with double quotes in your command (e.g., cd \"path with spaces/file.txt\")\n - Try to maintain your current working directory throughout the session by using absolute paths and avoiding usage of `cd`. You may use `cd` if the User explicitly requests it. In particular, never prepend `cd <current-directory>` to a `git` command \u2014 `git` already operates on the current working tree, and the compound triggers a permission prompt.\n - You may specify an optional timeout in milliseconds (up to 600000ms / 10 minutes for a foreground command). By default, your command will timeout after 120000ms (2 minutes).\n - You can use the `run_in_background` parameter to run the command in the background. Only use this if you don't need the result immediately and are OK being notified when the command completes later. You do not need to check the output right away - you'll be notified when it finishes. You do not need to use '&' at the end of the command when using this parameter. With `run_in_background` the timeout is instead how long the command may run in the background (default 600000ms / 10 minutes, max 7200000ms / 2 hours); at that limit it is stopped and you are notified.\n - For git commands:\n  - Prefer to create a new commit rather than amending an existing commit.\n  - Before running destructive operations (e.g., git reset --hard, git push --force, git checkout --), consider whether there is a safer alternative that achieves the same goal. Only use destructive operations when they are truly the best approach.\n  - Never skip hooks (--no-verify) or bypass signing (--no-gpg-sign, -c commit.gpgsign=false) unless the user has explicitly asked for it. If a hook fails, investigate and fix the underlying issue.\n - Avoid unnecessary `sleep` commands:\n  - Do not sleep between commands that can run immediately \u2014 just run them.\n  - If your command is long running and you would like to be notified when it finishes \u2014 use `run_in_background`. No sleep needed.\n  - Do not retry failing commands in a sleep loop \u2014 diagnose the root cause.\n  - If waiting for a background task you started with `run_in_background`, you will be notified when it completes \u2014 do not poll.\n  - If you must poll an external process, use a check command (e.g. `gh run view`) rather than sleeping first.\n  - If you must sleep, keep the duration short to avoid blocking the user.\n - When running `find`, search from `.` (or a specific path), not `/` \u2014 scanning the full filesystem can exhaust system resources on large trees.\n - When using `find -regex` with alternation, put the longest alternative first. Example: use `'.*\\.\\(tsx\\|ts\\)'` not `'.*\\.\\(ts\\|tsx\\)'` \u2014 the second form silently skips `.tsx` files.\n\n\n# Committing changes with git\n\nOnly create commits when requested by the user. If unclear, ask first. When the user asks you to create a new git commit, follow these steps carefully:\n\nYou can call multiple tools in a single response. When multiple independent pieces of information are requested and all commands are likely to succeed, run multiple tool calls in parallel for optimal performance. The numbered steps below indicate which commands should be batched in parallel.\n\nGit Safety Protocol:\n- NEVER update the git config\n- NEVER run destructive git commands (push --force, reset --hard, checkout ., restore ., clean -f, branch -D) unless the user explicitly requests these actions. Taking unauthorized destructive actions is unhelpful and can result in lost work, so it's best to ONLY run these commands when given direct instructions \n- NEVER skip hooks (--no-verify, --no-gpg-sign, etc) unless the user explicitly requests it\n- NEVER run force push to main/master, warn the user if they request it\n- CRITICAL: Always create NEW commits rather than amending, unless the user explicitly requests a git amend. When a pre-commit hook fails, the commit did NOT happen \u2014 so --amend would modify the PREVIOUS commit, which may result in destroying work or losing previous changes. Instead, after hook failure, fix the issue, re-stage, and create a NEW commit\n- When staging files, prefer adding specific files by name rather than using \"git add -A\" or \"git add .\", which can accidentally include sensitive files (.env, credentials) or large binaries\n- NEVER commit changes unless the user explicitly asks you to. It is VERY IMPORTANT to only commit when explicitly asked, otherwise the user will feel that you are being too proactive\n\n1. Run the following bash commands in parallel, each using the Bash tool:\n  - Run a git status command to see all untracked files. IMPORTANT: Never use the -uall flag as it can cause memory issues on large repos.\n  - Run a git diff command to see both staged and unstaged changes that will be committed.\n  - Run a git log command to see recent commit messages, so that you can follow this repository's commit message style.\n2. Analyze all staged changes (both previously staged and newly added) and draft a commit message:\n  - Summarize the nature of the changes (eg. new feature, enhancement to an existing feature, bug fix, refactoring, test, docs, etc.). Ensure the message accurately reflects the changes and their purpose (i.e. \"add\" means a wholly new feature, \"update\" means an enhancement to an existing feature, \"fix\" means a bug fix, etc.).\n  - Do not commit files that likely contain secrets (.env, credentials.json, etc). Warn the user if they specifically request to commit those files\n  - Draft a concise (1-2 sentences) commit message that focuses on the \"why\" rather than the \"what\"\n  - Ensure it accurately reflects the changes and their purpose\n3. Run the following commands in parallel:\n   - Add relevant untracked files to the staging area.\n   - Create the commit with a message, ending with the attribution lines given in the conversation's system-reminder, when one is present.\n   - Run git status after the commit completes to verify success.\n   Note: git status depends on the commit completing, so run it sequentially after the commit.\n4. If the commit fails due to pre-commit hook: fix the issue and create a NEW commit\n\nImportant notes:\n- NEVER run additional commands to read or explore code, besides git bash commands\n- NEVER use the TaskCreate or Agent tools\n- DO NOT push to the remote repository unless the user explicitly asks you to do so\n- IMPORTANT: Never use git commands with the -i flag (like git rebase -i or git add -i) since they require interactive input which is not supported.\n- IMPORTANT: Do not use --no-edit with git rebase commands, as the --no-edit flag is not a valid option for git rebase.\n- If there are no changes to commit (i.e., no untracked files and no modifications), do not create an empty commit\n- In order to ensure good formatting, ALWAYS pass the commit message via a HEREDOC, a la this example:\n<example>\ngit commit -m \"$(cat <<'EOF'\n   Commit message here.\n   EOF\n   )\"\n</example>\n\n# Creating pull requests\nUse the gh command via the Bash tool for ALL GitHub-related tasks including working with issues, pull requests, checks, and releases. If given a Github URL use the gh command to get the information needed.\n\nIMPORTANT: When the user asks you to create a pull request, follow these steps carefully:\n\n1. Run the following bash commands in parallel using the Bash tool, in order to understand the current state of the branch since it diverged from the main branch:\n   - Run a git status command to see all untracked files (never use -uall flag)\n   - Run a git diff command to see both staged and unstaged changes that will be committed\n   - Check if the current branch tracks a remote branch and is up to date with the remote, so you know if you need to push to the remote\n   - Run a git log command and `git diff [base-branch]...HEAD` to understand the full commit history for the current branch (from the time it diverged from the base branch)\n2. Analyze all changes that will be included in the pull request, making sure to look at all relevant commits (NOT just the latest commit, but ALL commits that will be included in the pull request!!!), and draft a pull request title and summary:\n   - Keep the PR title short (under 70 characters)\n   - Use the description/body for details, not the title\n3. Run the following commands in parallel:\n   - Create new branch if needed\n   - Push to remote with -u flag if needed\n   - Create PR using gh pr create with the format below. Use a HEREDOC to pass the body to ensure correct formatting. End the body with the attribution lines given in the conversation's system-reminder, when one is present.\n<example>\ngh pr create --title \"the pr title\" --body \"$(cat <<'EOF'\n## Summary\n<1-3 bullet points>\n\n## Test plan\n[Bulleted markdown checklist of TODOs for testing the pull request...]\nEOF\n)\"\n</example>\n\nImportant:\n- DO NOT use the TaskCreate or Agent tools\n- Return the PR URL when you're done, so the user can see it\n\n# Other common operations\n- View comments on a Github PR: gh api repos/foo/bar/pulls/123/comments",
+          "input_schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "properties": {
+              "command": {
+                "description": "The command to execute",
+                "type": "string"
+              },
+              "timeout": {
+                "description": "Optional timeout in milliseconds (max 600000 for a foreground command)",
+                "type": "number"
+              },
+              "description": {
+                "description": "Clear, concise description of what this command does in active voice. Never use words like \"complex\" or \"risk\" in the description - just describe what it does.\n\nSay what the command does in plain words: do not echo the command's text, its flags, or file paths - the user reads this description, often without seeing the command.\n\nFor simple commands (git, npm, standard CLI tools), keep it brief (5-10 words):\n- ls \u2192 \"List files in current directory\"\n- git status \u2192 \"Show working tree status\"\n- npm install \u2192 \"Install package dependencies\"\n\nFor commands that are harder to parse at a glance (piped commands, obscure flags, etc.), add enough context to clarify what it does:\n- find . -name \"*.tmp\" -exec rm {} \\; \u2192 \"Find and delete all .tmp files recursively\"\n- git reset --hard origin/main \u2192 \"Discard all local changes and match remote main\"\n- curl -s url | jq '.data[]' \u2192 \"Fetch JSON from URL and extract data array elements\"",
+                "type": "string"
+              },
+              "run_in_background": {
+                "description": "Set to true to run this command in the background. With it, `timeout` limits how long the command may run in the background before it is stopped (default 600000 ms, max 7200000 ms).",
+                "type": "boolean"
+              },
+              "dangerouslyDisableSandbox": {
+                "description": "Set this to true to dangerously override sandbox mode and run commands without sandboxing.",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "command"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "Write",
+          "description": "Writes a file to the local filesystem.\n\nUsage:\n- This tool will overwrite the existing file if there is one at the provided path.\n- If this is an existing file, you MUST use the Read tool first to read the file's contents. This tool will fail if you did not read the file first.\n- Prefer the Edit tool for modifying existing files \u2014 it only sends the diff. Only use this tool to create new files or for complete rewrites.\n- NEVER create documentation files (*.md) or README files unless explicitly requested by the User.\n- Only use emojis if the user explicitly requests it. Avoid writing emojis to files unless asked.",
+          "input_schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "properties": {
+              "file_path": {
+                "description": "The absolute path to the file to write (must be absolute, not relative)",
+                "type": "string"
+              },
+              "content": {
+                "description": "The content to write to the file",
+                "type": "string"
+              }
+            },
+            "required": [
+              "file_path",
+              "content"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_account_state",
+          "description": "Report an account's balance (wei), nonce, and whether it holds contract code. Args: rpc, address.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc",
+              "address"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_capabilities",
+          "description": "List the capabilities chainbench exposes, grouped by version and chain, with the tool name to call each. Args: chain (optional; returns common + that chain's features).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "description": "chain id to scope to",
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_build",
+          "description": "Assemble each node's launch command (without running it), optionally applying key=value overrides through the launchopt Builder.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "set": {
+                "description": "high-precedence launch knobs key=value (bare key for booleans)",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_config",
+          "description": "Render and write each node's TOML config to the target.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_deploy",
+          "description": "Verify the launch inputs (genesis, configs) are present on the target; present files are reused, missing ones are named.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_genesis",
+          "description": "Build the genesis from the key set and write it to the target (optionally overriding the chain id).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chainId": {
+                "description": "override the manifest chain id (0 = manifest)",
+                "type": "number"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_health",
+          "description": "Probe every node's HTTP RPC for its latest block height; returns a JSON table.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_init",
+          "description": "Initialize each node's datadir from the built genesis (runs `<binary> init`).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "binary": {
+                "description": "node binary path (default: the workspace's)",
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_keys",
+          "description": "Ensure the workspace's key set exists and covers the node count (preset, or generate a fresh set in process).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "nodes": {
+                "description": "identities the set must cover (default: allocated node count)",
+                "type": "number"
+              },
+              "source": {
+                "description": "keyPreset (default) | generate",
+                "type": "string"
+              },
+              "validators": {
+                "description": "identities joining the validator set (generate; 0 = all)",
+                "type": "number"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_logs",
+          "description": "Show the last lines of one node's log.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "lines": {
+                "description": "lines from the end (default 50)",
+                "type": "number"
+              },
+              "node": {
+                "description": "node index (1-based)",
+                "type": "number"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_new",
+          "description": "Initialize a step-composition workspace for a chain: records the chain, key set, and where the data plane lives (local or a remote SSH host).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "binary": {
+                "description": "node binary path (may also be set at start)",
+                "type": "string"
+              },
+              "chain": {
+                "description": "chain id (stablenet|wbft|wemix)",
+                "type": "string"
+              },
+              "docker": {
+                "description": "servers are local docker containers: translate this tool's dials via the localmap next to the server set",
+                "type": "boolean"
+              },
+              "keys": {
+                "description": "key set directory (default presets/keys)",
+                "type": "string"
+              },
+              "remoteHost": {
+                "description": "legacy: SSH host for a remote data plane (prefer target)",
+                "type": "string"
+              },
+              "remotePort": {
+                "description": "legacy: SSH port (prefer target)",
+                "type": "number"
+              },
+              "remoteUser": {
+                "description": "legacy: SSH user (prefer target)",
+                "type": "string"
+              },
+              "target": {
+                "description": "data plane as one path: /local/path | user@host:/path | ssh://user@host:port/path",
+                "type": "string"
+              },
+              "targetDir": {
+                "description": "legacy: data root ON the target (prefer target)",
+                "type": "string"
+              },
+              "workspaceConfig": {
+                "description": "environment file owning the target dataRoot and its purpose directories",
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir",
+              "chain"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_observe",
+          "description": "Observe each recorded node of a composed network on its machine, changing nothing: whether its recorded launch is running, its pid runs something else, it has no process, or the record lost it; and whether its binary can launch. Args: workspaceDir.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "serverLogins": {
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_place",
+          "description": "Build the workspace's node table: roles, target-side paths, deterministic ports.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "bp": {
+                "description": "bp (block-producing) node count (default 4)",
+                "type": "number"
+              },
+              "en": {
+                "description": "en (endpoint, non-producing) node count",
+                "type": "number"
+              },
+              "peering": {
+                "description": "peer graph: mesh (default, every node dials every other) or proxied (bp <-> pn <-> en; endpoints never dial a producer)",
+                "enum": [
+                  "mesh",
+                  "proxied"
+                ],
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_restart",
+          "description": "Stop and relaunch one node with its recorded arming (the exact argv it started with).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "node": {
+                "description": "node index (1-based)",
+                "type": "number"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_resume",
+          "description": "Recover a workspace whose run died: reconcile recorded pids with the machine, continue the composition from the first unfinished step, and bring back nodes that should be running.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "binary": {
+                "description": "node binary path (default: the one the workspace recorded)",
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_rm",
+          "description": "Remove the composed data plane (node datadirs, configs, genesis). Running nodes must be stopped first.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_show",
+          "description": "Look up the composed network's placement. With no selector, the whole map; with one, that question answered \u2014 including the reverse ones (which node owns a port, what runs on an address). Each node has an identity (node7) and a role alias (en2).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "addr": {
+                "description": "select by an address as a log line prints it (host:port)",
+                "type": "string"
+              },
+              "host": {
+                "description": "select every node on an address",
+                "type": "string"
+              },
+              "label": {
+                "description": "select by identity (node7) or role alias (en2)",
+                "type": "string"
+              },
+              "node": {
+                "description": "select by identity (1-based node number)",
+                "type": "number"
+              },
+              "port": {
+                "description": "select whichever node listens on a port (p2p, etcd, http, ws, auth, metrics)",
+                "type": "number"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_start",
+          "description": "Launch every stopped node of the composed network and record its PID.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "binary": {
+                "description": "node binary path (default: the workspace's)",
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_status",
+          "description": "Show a step-composition workspace's state as JSON: chain, target, and which steps have run.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_stop",
+          "description": "Stop every running node by its recorded PID.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chain_up",
+          "description": "Compose and launch a network in one call (runs every chain step in order), leaving it up for follow-on rpc/tx/attach. Args: workspaceDir, chain, binary, bp, en, pn, keysDir, keysSource, endpointSyncMode, peering, docker, serverSet/server/allServers.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "allServers": {
+                "type": "boolean"
+              },
+              "binary": {
+                "type": "string"
+              },
+              "bp": {
+                "description": "bp (block-producing) node count",
+                "type": "integer"
+              },
+              "chain": {
+                "type": "string"
+              },
+              "chainPreset": {
+                "description": "chain-preset file; defines layout and scoped options",
+                "type": "string"
+              },
+              "docker": {
+                "type": "boolean"
+              },
+              "en": {
+                "description": "en (endpoint, non-producing) node count",
+                "type": "integer"
+              },
+              "endpointSyncMode": {
+                "type": "string"
+              },
+              "keysDir": {
+                "type": "string"
+              },
+              "keysSource": {
+                "type": "string"
+              },
+              "peering": {
+                "description": "mesh (default) | proxied (bp <-> pn <-> en)",
+                "type": "string"
+              },
+              "plan": {
+                "description": "resolve chainPreset without composing nodes",
+                "type": "boolean"
+              },
+              "pn": {
+                "description": "pn (proxy-tier) node count; a family with no proxy tier refuses it",
+                "type": "integer"
+              },
+              "server": {
+                "type": "string"
+              },
+              "serverLogins": {
+                "description": "private run logins apart from the server set recorded by the network",
+                "type": "string"
+              },
+              "serverSet": {
+                "type": "string"
+              },
+              "stage": {
+                "enum": [
+                  "deploy",
+                  "init",
+                  "start"
+                ],
+                "type": "string"
+              },
+              "workspaceConfig": {
+                "description": "environment file owning the target dataRoot and its purpose directories",
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_chains",
+          "description": "List the chains chainbench supports (id, consensus family, binary, chain id, RPC namespace).",
+          "input_schema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_consensus",
+          "description": "List the validator/producer set via the chain's consensus RPC method. Args: chain, rpc.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "chain",
+              "rpc"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_consensus_block_info",
+          "description": "Block header info (number, hash, miner, timestamp, tx count, gas). Args: rpc, optional block.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "block": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_consensus_health",
+          "description": "Quick consensus health verdict (not syncing + past genesis). Args: rpc.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "rpc": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_consensus_status",
+          "description": "Consensus snapshot: head block, chain id, peers, syncing, validator count. Args: chain, rpc.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "chain",
+              "rpc"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_contract_call",
+          "description": "Read-only contract call (eth_call), returning the 0x-hex result. Args: rpc, to, data.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc",
+              "to"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_contract_deploy",
+          "description": "Deploy a contract from creation bytecode, returning the tx hash and contract address. Args: chain, rpc, from_key (hex), bytecode (hex), value (wei).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "bytecode": {
+                "type": "string"
+              },
+              "chain": {
+                "type": "string"
+              },
+              "from_key": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc",
+              "from_key",
+              "bytecode"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_experiment",
+          "description": "Execute one frozen bounded timing/fault/observation experiment. Requires plan, exact DSL case, source-pinned binaries and a new artifact_root. Comparison/reproduction own fresh composed networks; observation is read-only against observe_workspace. Returns factual denominators and uncertainty, never cause acceptance.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_root": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "assets_sha256": {
+                    "additionalProperties": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "binary_by_commit": {
+                    "additionalProperties": {
+                      "maxLength": 4096,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "maxProperties": 2,
+                    "propertyNames": {
+                      "pattern": "^[0-9a-f]{40}$",
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "case": {
+                    "description": "Complete existing v1 or v2 DSL; driver pin hashes canonical JSON using interpreter value semantics.",
+                    "type": "object"
+                  },
+                  "observe_composition_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "observe_workspace": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "plan": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "after": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "binary_sha256": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "commit": {
+                                "pattern": "^[0-9a-f]{40}$",
+                                "type": "string"
+                              },
+                              "driver_sha256": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "environment_sha256": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "commit",
+                              "binary_sha256",
+                              "driver_sha256",
+                              "environment_sha256"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "assertion_id": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "before": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "binary_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "commit": {
+                            "pattern": "^[0-9a-f]{40}$",
+                            "type": "string"
+                          },
+                          "driver_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "environment_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "commit",
+                          "binary_sha256",
+                          "driver_sha256",
+                          "environment_sha256"
+                        ],
+                        "type": "object"
+                      },
+                      "id": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "injection": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "kind": {
+                                "enum": [
+                                  "delay",
+                                  "restart",
+                                  "partition"
+                                ],
+                                "type": "string"
+                              },
+                              "max_delay_ms": {
+                                "maximum": 60000,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "min_delay_ms": {
+                                "maximum": 60000,
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "step": {
+                                "maxLength": 128,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "target": {
+                                "maxLength": 128,
+                                "minLength": 1,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "target",
+                              "step",
+                              "min_delay_ms",
+                              "max_delay_ms"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "max_failure_rate": {
+                        "exclusiveMaximum": 1,
+                        "exclusiveMinimum": 0,
+                        "type": "number"
+                      },
+                      "min_completed": {
+                        "maximum": 1000,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "min_symptom_failures": {
+                        "maximum": 1000,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "mode": {
+                        "enum": [
+                          "reproduction",
+                          "comparison",
+                          "observation"
+                        ],
+                        "type": "string"
+                      },
+                      "normal_assertion_ids": {
+                        "items": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "maxItems": 16,
+                        "minItems": 1,
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "owned_node_ids": {
+                        "items": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "maxItems": 32,
+                        "minItems": 0,
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "repetitions": {
+                        "maximum": 1000,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "resume": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "assertion_id": {
+                                "maxLength": 128,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "event": {
+                                "maxLength": 128,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "window_seconds": {
+                                "maximum": 3600,
+                                "minimum": 1,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "event",
+                              "assertion_id",
+                              "window_seconds"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "schema_version": {
+                        "const": 1,
+                        "type": "integer"
+                      },
+                      "seed": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "symptom": {
+                        "maxLength": 4096,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "total_timeout_seconds": {
+                        "maximum": 7200,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "trial_timeout_seconds": {
+                        "maximum": 300,
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "schema_version",
+                      "id",
+                      "mode",
+                      "symptom",
+                      "assertion_id",
+                      "seed",
+                      "before",
+                      "repetitions",
+                      "min_completed",
+                      "min_symptom_failures",
+                      "max_failure_rate",
+                      "trial_timeout_seconds",
+                      "total_timeout_seconds",
+                      "owned_node_ids",
+                      "normal_assertion_ids"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "plan",
+                  "case",
+                  "binary_by_commit",
+                  "artifact_root"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "input"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_faucet",
+          "description": "Send funds from a genesis-allocated key to an account. Args: chain, rpc, from_key (hex), to (0x-addr), amount (wei).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string"
+              },
+              "chain": {
+                "type": "string"
+              },
+              "from_key": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc",
+              "from_key",
+              "to",
+              "amount"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_file_upload",
+          "description": "Upload accepted local files to a workspace target, checking SHA256 before and after transfer and setting an octal permission mode.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "docker": {
+                "type": "boolean"
+              },
+              "forceUpload": {
+                "type": "boolean"
+              },
+              "localPaths": {
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "mode": {
+                "description": "octal permission such as 0755; empty preserves source mode",
+                "type": "string"
+              },
+              "purpose": {
+                "enum": [
+                  "bin",
+                  "binaries",
+                  "genesis",
+                  "configs",
+                  "keystore",
+                  "keyrings"
+                ],
+                "type": "string"
+              },
+              "remote": {
+                "type": "string"
+              },
+              "server": {
+                "type": "string"
+              },
+              "serverLogins": {
+                "type": "string"
+              },
+              "serverSet": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string"
+              },
+              "workspaceConfig": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "localPaths",
+              "workspaceConfig"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_hardfork",
+          "description": "Plan (and optionally execute) a chain hardfork: swap the node binary at a fork block, keeping node data. Args: workspaceDir, toChain, block (integer); optional toBinary, execute (default false = plan only).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "block": {
+                "type": "integer"
+              },
+              "execute": {
+                "type": "boolean"
+              },
+              "toBinary": {
+                "type": "string"
+              },
+              "toChain": {
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace of the running from-chain",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir",
+              "toChain"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_keyring_add",
+          "description": "Add identities to an existing ring, keeping the ones already there. New identities do not join the validator set unless asked.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "balance": {
+                "description": "genesis balance per identity, 0x-hex wei",
+                "type": "string"
+              },
+              "count": {
+                "description": "how many identities to create",
+                "type": "number"
+              },
+              "docker": {
+                "description": "the server is a local docker container: translate dials via the localmap next to the server set",
+                "type": "boolean"
+              },
+              "keyringDir": {
+                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
+                "type": "string"
+              },
+              "password": {
+                "description": "password for the generated keystores (default 1)",
+                "type": "string"
+              },
+              "serverSet": {
+                "description": "server-set file for srv:// paths (which servers exist and how to reach them)",
+                "type": "string"
+              },
+              "validators": {
+                "description": "how many join the validator set; omit for all on new and none on add, 0 to declare none",
+                "type": "number"
+              },
+              "withBls": {
+                "description": "also derive BLS material (required for stablenet and wbft)",
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_keyring_import",
+          "description": "Bring an existing key into a ring, from a path here or on another host. Prefer srv://<server>/path, which keeps the host address in the operator's server set rather than in this conversation.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "docker": {
+                "description": "the server is a local docker container: translate this dial via the localmap next to the server set",
+                "type": "boolean"
+              },
+              "expectAddress": {
+                "description": "refuse the import unless the key derives exactly this address",
+                "type": "string"
+              },
+              "from": {
+                "description": "key file path: /local/path | srv://<server>/path | [user@]host:path | ssh://user@host:port/path",
+                "type": "string"
+              },
+              "fromRing": {
+                "description": "clone a whole ring instead of one key (same path syntax as keyringDir); labels and the validator declaration are copied, every entry verified against the source index",
+                "type": "string"
+              },
+              "hdAccount": {
+                "description": "BIP-44 account index for mnemonic",
+                "type": "number"
+              },
+              "hdChange": {
+                "description": "BIP-44 change level for mnemonic (0 external, 1 internal)",
+                "type": "number"
+              },
+              "hdCoinType": {
+                "description": "BIP-44 coin type for mnemonic (default 60)",
+                "type": "number"
+              },
+              "hdIndex": {
+                "description": "BIP-44 address index for mnemonic",
+                "type": "number"
+              },
+              "keyringDir": {
+                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
+                "type": "string"
+              },
+              "mnemonic": {
+                "description": "derive the key from a BIP-39 mnemonic (alternative to from)",
+                "type": "string"
+              },
+              "name": {
+                "description": "label to store the identity under",
+                "type": "string"
+              },
+              "passphrase": {
+                "description": "optional BIP-39 passphrase (with mnemonic)",
+                "type": "string"
+              },
+              "password": {
+                "description": "password for a keystore named by from",
+                "type": "string"
+              },
+              "privateKey": {
+                "description": "import a key the caller already holds (0x-hex; alternative to from and mnemonic)",
+                "type": "string"
+              },
+              "serverSet": {
+                "description": "server-set file for an srv:// source",
+                "type": "string"
+              },
+              "withBls": {
+                "description": "also derive BLS material",
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_keyring_list",
+          "description": "List a ring's identities: label, address, whether it validates, and whether it has BLS material.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "docker": {
+                "description": "the server is a local docker container: translate dials via the localmap next to the server set",
+                "type": "boolean"
+              },
+              "keyringDir": {
+                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
+                "type": "string"
+              },
+              "serverSet": {
+                "description": "server-set file for srv:// paths (which servers exist and how to reach them)",
+                "type": "string"
+              },
+              "verify": {
+                "description": "re-derive every identity from its own key and fail on a mismatch",
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_keyring_new",
+          "description": "Create a ring of node identities: keys, derived addresses, optional BLS material, keystores, and the index the harness reads. Runs no chain binary.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "balance": {
+                "description": "genesis balance per identity, 0x-hex wei",
+                "type": "string"
+              },
+              "count": {
+                "description": "how many identities to create",
+                "type": "number"
+              },
+              "docker": {
+                "description": "the server is a local docker container: translate dials via the localmap next to the server set",
+                "type": "boolean"
+              },
+              "keyringDir": {
+                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
+                "type": "string"
+              },
+              "password": {
+                "description": "password for the generated keystores (default 1)",
+                "type": "string"
+              },
+              "serverSet": {
+                "description": "server-set file for srv:// paths (which servers exist and how to reach them)",
+                "type": "string"
+              },
+              "validators": {
+                "description": "how many join the validator set; omit for all on new and none on add, 0 to declare none",
+                "type": "number"
+              },
+              "withBls": {
+                "description": "also derive BLS material (required for stablenet and wbft)",
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_keyring_show",
+          "description": "Show one identity's public material: address, devp2p public key, and BLS key with its proof of possession. Never includes the private key.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "docker": {
+                "description": "the server is a local docker container: translate dials via the localmap next to the server set",
+                "type": "boolean"
+              },
+              "keyringDir": {
+                "description": "ring directory; a plain path is the operator machine, srv://<server>/path places the ring on that server; omit for the chainbench home's default set or the CHAINBENCH_KEYRING environment variable",
+                "type": "string"
+              },
+              "name": {
+                "description": "identity label, e.g. node1",
+                "type": "string"
+              },
+              "serverSet": {
+                "description": "server-set file for srv:// paths (which servers exist and how to reach them)",
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_log",
+          "description": "Search a workspace's per-node logs (workspaceDir/logs). Args: workspaceDir, pattern, regexp (bool), node (int), level (min severity), limit (int).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "string"
+              },
+              "limit": {
+                "type": "integer"
+              },
+              "node": {
+                "type": "integer"
+              },
+              "pattern": {
+                "type": "string"
+              },
+              "regexp": {
+                "type": "boolean"
+              },
+              "workspaceDir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_log_timeline",
+          "description": "Merge per-node logs into one chronological timeline. Args: workspaceDir; optional pattern, regexp (bool), node (int), level (min severity), limit (int).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "string"
+              },
+              "limit": {
+                "type": "integer"
+              },
+              "node": {
+                "type": "integer"
+              },
+              "pattern": {
+                "type": "string"
+              },
+              "regexp": {
+                "type": "boolean"
+              },
+              "workspaceDir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_network_attach",
+          "description": "Probe an RPC endpoint and save it as a named attached network. Args: name, rpc, state_dir; optional override (force chain type), auth (object).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "auth": {
+                "type": "object"
+              },
+              "name": {
+                "type": "string"
+              },
+              "override": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              },
+              "state_dir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "rpc",
+              "state_dir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_network_detach",
+          "description": "Remove a saved attached network. Args: name, state_dir.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "state_dir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "state_dir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_network_info",
+          "description": "Show a saved attached network's nodes. Args: name, state_dir.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "state_dir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "state_dir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_network_list",
+          "description": "List saved attached networks. Args: state_dir.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "state_dir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "state_dir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_network_peers",
+          "description": "Report a node's peer count and connected peers (if admin is enabled). Args: rpc.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "rpc": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_network_topology",
+          "description": "Per-node reachability and peer count for a saved network. Args: name, state_dir.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "state_dir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "state_dir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_node_reset",
+          "description": "Stop one non-producing node of a composed network, initialise its datadir again at genesis and leave it stopped. A block producer is refused. Args: workspaceDir, index.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "description": "1-based node index to act on",
+                "type": "integer"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_node_rpc",
+          "description": "Call an arbitrary JSON-RPC method on a node and return the raw result. Args: rpc, method, params (JSON array).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string"
+              },
+              "params": {
+                "type": "array"
+              },
+              "rpc": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc",
+              "method"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_node_start",
+          "description": "Relaunch a single stopped node of a composed network by 1-based index, recording its new PID. Args: workspaceDir, index.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "description": "1-based node index to act on",
+                "type": "integer"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_node_stop",
+          "description": "Stop a single node of a composed network by 1-based index, leaving the others running (for sync-gap/failover tests). Args: workspaceDir, index.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "description": "1-based node index to act on",
+                "type": "integer"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_node_swap",
+          "description": "Relaunch one node of a composed network on a different binary and/or configuration, keeping its datadir and genesis. Args: workspaceDir, index, binary, config (key=value list), genesisOverlay (JSON text), args (flags appended to the command line), purpose.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "args": {
+                "description": "flags appended to the node's command line",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "binary": {
+                "description": "binary to relaunch on (empty keeps the current one)",
+                "type": "string"
+              },
+              "config": {
+                "description": "key=value config overrides applied before relaunch",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "genesisOverlay": {
+                "description": "genesis JSON fragment merged into this node's genesis",
+                "type": "string"
+              },
+              "index": {
+                "description": "1-based node index to swap",
+                "type": "integer"
+              },
+              "purpose": {
+                "description": "name recorded for the config fixture (config-<purpose>)",
+                "type": "string"
+              },
+              "workspaceDir": {
+                "description": "workspace directory (where the composition is set up)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_observe_logs",
+          "description": "Observe frozen structured code logs on recorded node machines, with no node control. Returns recurrence/awaiting/error and source-bound raw events; never fix acceptance.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_root": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "binary": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "plan": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "anchors": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "id": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "initial": {
+                              "contentEncoding": "base64",
+                              "maxLength": 87384,
+                              "type": "string"
+                            },
+                            "node": {
+                              "maximum": 32,
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "node"
+                          ],
+                          "type": "object"
+                        },
+                        "maxItems": 8,
+                        "minItems": 1,
+                        "type": "array"
+                      },
+                      "event": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "id": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "instrumentation_sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "max_bytes": {
+                        "maximum": 65536,
+                        "minimum": 4096,
+                        "type": "integer"
+                      },
+                      "max_events": {
+                        "maximum": 256,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "poll_ms": {
+                        "maximum": 5000,
+                        "minimum": 50,
+                        "type": "integer"
+                      },
+                      "probe_id": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "schema_version": {
+                        "const": 1,
+                        "type": "integer"
+                      },
+                      "sites": {
+                        "items": {
+                          "maxLength": 256,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "maxItems": 32,
+                        "minItems": 1,
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "source": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "binary_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "commit": {
+                            "pattern": "^[0-9a-f]{40}$",
+                            "type": "string"
+                          },
+                          "driver_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "environment_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "commit",
+                          "binary_sha256",
+                          "driver_sha256",
+                          "environment_sha256"
+                        ],
+                        "type": "object"
+                      },
+                      "window_seconds": {
+                        "maximum": 3600,
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "schema_version",
+                      "id",
+                      "source",
+                      "probe_id",
+                      "instrumentation_sha256",
+                      "event",
+                      "sites",
+                      "window_seconds",
+                      "poll_ms",
+                      "max_bytes",
+                      "max_events",
+                      "anchors"
+                    ],
+                    "type": "object"
+                  },
+                  "workspace": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "plan",
+                  "workspace",
+                  "binary"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "input"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_prepare_log_observation",
+          "description": "Freeze actual clean source/composition and complete-line cursors for a structured log observation. Reads only; creates no node or file.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_root": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "binary": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "plan": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "anchors": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "id": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "initial": {
+                              "contentEncoding": "base64",
+                              "maxLength": 87384,
+                              "type": "string"
+                            },
+                            "node": {
+                              "maximum": 32,
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "node"
+                          ],
+                          "type": "object"
+                        },
+                        "maxItems": 8,
+                        "minItems": 1,
+                        "type": "array"
+                      },
+                      "event": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "id": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "instrumentation_sha256": {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "max_bytes": {
+                        "maximum": 65536,
+                        "minimum": 4096,
+                        "type": "integer"
+                      },
+                      "max_events": {
+                        "maximum": 256,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "poll_ms": {
+                        "maximum": 5000,
+                        "minimum": 50,
+                        "type": "integer"
+                      },
+                      "probe_id": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "schema_version": {
+                        "const": 1,
+                        "type": "integer"
+                      },
+                      "sites": {
+                        "items": {
+                          "maxLength": 256,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "maxItems": 32,
+                        "minItems": 1,
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "source": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "binary_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "commit": {
+                            "pattern": "^[0-9a-f]{40}$",
+                            "type": "string"
+                          },
+                          "driver_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "environment_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "commit"
+                        ],
+                        "type": "object"
+                      },
+                      "window_seconds": {
+                        "maximum": 3600,
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "schema_version",
+                      "id",
+                      "source",
+                      "probe_id",
+                      "instrumentation_sha256",
+                      "event",
+                      "sites",
+                      "window_seconds",
+                      "poll_ms",
+                      "max_bytes",
+                      "max_events",
+                      "anchors"
+                    ],
+                    "type": "object"
+                  },
+                  "workspace": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "plan",
+                  "workspace",
+                  "binary"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "input"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_remote_rpc",
+          "description": "Call a JSON-RPC method on a saved attached network's endpoint, using its stored auth. Args: name, state_dir, method; optional params (JSON array), node (1-based index).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "node": {
+                "type": "integer"
+              },
+              "params": {
+                "type": "array"
+              },
+              "state_dir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "state_dir",
+              "method"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_report",
+          "description": "Read a run's report from a session directory. Args: workspaceDir, all (combine every session under the directory into one tally, instead of reading the most recent).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "all": {
+                "type": "boolean"
+              },
+              "workspaceDir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_resource_access",
+          "description": "Check a server's SSH authentication and data-root permission without changing files or returning credentials.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "dataRoot": {
+                "type": "string"
+              },
+              "server": {
+                "type": "string"
+              },
+              "serverLogins": {
+                "type": "string"
+              },
+              "serverSet": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "serverSet",
+              "server",
+              "dataRoot"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_resource_inspect",
+          "description": "Observe a target's physical identity, files, bounded log bytes or recorded process without changing it.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "request": {
+                "description": "Typed resource observation: target {dataRoot,server,host,user,port}, inspect, exists/checksums/regular/executable path arrays, process {pid,binary,args,dataDir,configPath}, log {path,offset,limit}; serverSet and docker are optional.",
+                "type": "object"
+              },
+              "serverLogins": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "request"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_resource_plan",
+          "description": "Compute the placement a network shape would get, without composing anything: deterministic host and port assignment for the requested validators and endpoints. The chain sets the family's per-node port reservation.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "all_servers": {
+                "description": "spread across every server in the server set",
+                "type": "boolean"
+              },
+              "bp": {
+                "description": "bp (block-producing) node count (default 4)",
+                "type": "number"
+              },
+              "chain": {
+                "description": "chain id (stablenet|wbft|wemix); default stablenet",
+                "type": "string"
+              },
+              "en": {
+                "description": "en (endpoint, non-producing) node count",
+                "type": "number"
+              },
+              "server": {
+                "description": "server to place nodes on, by name from the server set",
+                "type": "string"
+              },
+              "serverSet": {
+                "description": "server-set file (default: server-set.yaml when present)",
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_resource_pool",
+          "description": "Show the addresses and port slots a network may be composed from: hosts, slots per host, total capacity, how many a workspace already uses, and where the port plan came from.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "description": "workspace to count used slots from (optional)",
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_run",
+          "description": "Run DSL test specs and report the verdict. With rpc (array of RPC URLs) it attaches to a running network; with dataDir + attach it runs against the network that workspace already composed, using the capabilities it advertised; with dataDir alone it composes the network the specs declare. Args: spec (a spec JSON string) and/or specs (array); rpc + chain for attach; dataDir + attach to run against a composed network; dataDir/binary/validators/keysDir for compose.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "allServers": {
+                "description": "compose mode: spread the network across every server in the set",
+                "type": "boolean"
+              },
+              "artifactRoot": {
+                "type": "string"
+              },
+              "attach": {
+                "description": "the network in dataDir is already up: run against it, with the capabilities its composition advertised, instead of composing again",
+                "type": "boolean"
+              },
+              "binary": {
+                "type": "string"
+              },
+              "binaryFor": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "declared binary name to accepted executable path",
+                "type": "object"
+              },
+              "bp": {
+                "description": "bp node count, overriding what the specs declare",
+                "type": "integer"
+              },
+              "chain": {
+                "type": "string"
+              },
+              "dataDir": {
+                "type": "string"
+              },
+              "docker": {
+                "type": "boolean"
+              },
+              "keepUp": {
+                "description": "compose mode: leave the network running after the tests so it can be driven with follow-on rpc/tx/attach calls (default: stop it)",
+                "type": "boolean"
+              },
+              "keysDir": {
+                "type": "string"
+              },
+              "networkId": {
+                "type": "integer"
+              },
+              "noNodeControl": {
+                "description": "attach without granting node control",
+                "type": "boolean"
+              },
+              "plan": {
+                "description": "resolve the composed network without running it",
+                "type": "boolean"
+              },
+              "readOnlyKeys": {
+                "type": "boolean"
+              },
+              "rpc": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "server": {
+                "description": "compose mode: server name within the server set",
+                "type": "string"
+              },
+              "serverLogins": {
+                "type": "string"
+              },
+              "serverSet": {
+                "description": "compose mode: server-set file selecting where the nodes run",
+                "type": "string"
+              },
+              "spec": {
+                "type": "string"
+              },
+              "specs": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "suite": {
+                "description": "run or plan several cases as one suite on one network; otherwise sequence definitions",
+                "type": "boolean"
+              },
+              "waitBlocks": {
+                "type": "integer"
+              },
+              "workspaceConfig": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_status",
+          "description": "Report a workspace's node set (chain, network, and each node's role/rpc/pid). Args: workspaceDir.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_stop",
+          "description": "Stop a composed network's nodes (by the pids its workspace records). Args: workspaceDir.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "workspaceDir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "workspaceDir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_test_list",
+          "description": "List the runnable DSL test cases under a directory (recursively): path, id, chain, description. Args: dir.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "dir": {
+                "description": "directory to walk for test cases",
+                "type": "string"
+              }
+            },
+            "required": [
+              "dir"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_tx_send",
+          "description": "Sign and send a transaction to an address (optionally with calldata). Args: chain, rpc, from_key (hex), to, data (hex), value (wei).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string"
+              },
+              "from_key": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc",
+              "from_key",
+              "to"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_tx_wait",
+          "description": "Wait for a transaction receipt and return it as JSON. Args: rpc, hash, timeout_seconds (default 30).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "hash": {
+                "type": "string"
+              },
+              "rpc": {
+                "type": "string"
+              },
+              "timeout_seconds": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "rpc",
+              "hash"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_txpool",
+          "description": "Report a node's transaction pool status (pending/queued counts). Args: rpc.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "rpc": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_common_chains_hardforks",
+          "description": "[common (all chains)] List a chain's genesis hardforks in activation order.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "description": "chain id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "chain"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_common_chains_info",
+          "description": "[common (all chains)] Show one chain's manifest facts (family, binary, chain id, namespace, capabilities).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "description": "chain id (stablenet|wbft|wemix)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "chain"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_common_chains_list",
+          "description": "[common (all chains)] List the chains chainbench supports (id, consensus family, binary, chain id, RPC namespace).",
+          "input_schema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_approve_proposal",
+          "description": "[chain: stablenet] Build calldata to approve a governance proposal by id. stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "proposal id, decimal",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_cancel_proposal",
+          "description": "[chain: stablenet] Build calldata to cancel a governance proposal by id. stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "proposal id, decimal",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_claim_burn_refund",
+          "description": "[chain: stablenet] Build calldata to claim a burn refund. stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_disapprove_proposal",
+          "description": "[chain: stablenet] Build calldata to disapprove a governance proposal by id. stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "proposal id, decimal",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_execute_proposal",
+          "description": "[chain: stablenet] Build calldata to execute an approved governance proposal by id. stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "proposal id, decimal",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_proposal_status",
+          "description": "[chain: stablenet] Read a governance proposal's status from a live node (eth_call to GovMinter + decode). stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "proposal id, decimal",
+                "type": "string"
+              },
+              "rpc": {
+                "description": "node RPC URL",
+                "type": "string"
+              }
+            },
+            "required": [
+              "rpc",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_proposals",
+          "description": "[chain: stablenet] Build eth_call calldata to read a governance proposal by id (submit as a read-only call). stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "proposal id, decimal",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_propose_add_member",
+          "description": "[chain: stablenet] Build calldata to propose adding a governance member with a new quorum. stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "member": {
+                "description": "0x-address of the new member",
+                "type": "string"
+              },
+              "new_quorum": {
+                "description": "new quorum, decimal",
+                "type": "string"
+              }
+            },
+            "required": [
+              "member",
+              "new_quorum"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_propose_burn",
+          "description": "[chain: stablenet] Build calldata to propose a burn via the stablenet GovMinter. stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "description": "amount, decimal wei",
+                "type": "string"
+              },
+              "from": {
+                "description": "0x-address to burn from",
+                "type": "string"
+              },
+              "memo": {
+                "type": "string"
+              },
+              "reference_id": {
+                "type": "string"
+              },
+              "timestamp": {
+                "description": "proof timestamp, decimal",
+                "type": "string"
+              },
+              "withdrawal_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "amount",
+              "timestamp"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_stablenet_governance_propose_mint",
+          "description": "[chain: stablenet] Build calldata to propose a mint via the stablenet GovMinter (0x-hex to submit with a tx). stablenet-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "description": "amount, decimal wei",
+                "type": "string"
+              },
+              "bank_reference": {
+                "type": "string"
+              },
+              "beneficiary": {
+                "description": "0x-address to receive minted coin",
+                "type": "string"
+              },
+              "deposit_id": {
+                "type": "string"
+              },
+              "memo": {
+                "type": "string"
+              },
+              "timestamp": {
+                "description": "proof timestamp, decimal",
+                "type": "string"
+              }
+            },
+            "required": [
+              "beneficiary",
+              "amount",
+              "timestamp"
+            ]
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_v1_wemix_bootstrap_plan",
+          "description": "[chain: wemix] Show the poa (wemix) bring-up sequence: init boot node -> start boot -> deploy governance -> init etcd -> start remaining nodes. wemix-only.",
+          "input_schema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_validate",
+          "description": "Validate DSL test specs offline (no network, no writes) and report which are well-formed. Args: spec (a spec JSON string) and/or specs (array of spec JSON strings); optional chain (also report applicability).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "type": "string"
+              },
+              "spec": {
+                "type": "string"
+              },
+              "specs": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__plugin_coding-agent_chainbench__chainbench_verify",
+          "description": "Verify an existing network is producing blocks and report node info. Args: chain, rpc (string or array of RPC URLs).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "type": "string"
+              },
+              "rpc": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "rpc"
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "user_id": "{\"device_id\":\"afc8d3f6de8cd4e4185f3dc0ce5a0efeedb34353ddcd6e6e6e81c8364ee0af64\",\"account_uuid\":\"\",\"session_id\":\"c4b73261-9e8f-428c-8503-4cd330346750\"}"
+      },
+      "max_tokens": 32000,
+      "thinking": {
+        "type": "adaptive",
+        "display": "updates"
+      },
+      "context_management": {
+        "edits": [
+          {
+            "type": "clear_thinking_20251015",
+            "keep": "all"
+          }
+        ]
+      },
+      "output_config": {
+        "effort": "high"
+      },
+      "stream": true
+    },
+    "scripted_response": {
+      "id": "msg_fixture_1",
+      "type": "message",
+      "role": "assistant",
+      "model": "claude-sonnet-4-6",
+      "content": [
+        {
+          "type": "text",
+          "text": "Local transport fixture response; no model or independent acceptance."
+        }
+      ],
+      "stop_reason": "end_turn",
+      "stop_sequence": null,
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1
+      }
+    }
+  }
+]

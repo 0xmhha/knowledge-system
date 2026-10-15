@@ -78,3 +78,9 @@ run마다 protocol/input/runtime hash, raw 요청/응답/오류·exit·종료 �
 기본 auto_merge=false만으로는 게시를 막지 못한다. source 후보 채택·실제 host의 hook/도구 권한 연결은 미확인이다.
 known-command/tool guard를 네트워크 sandbox로 간주하지 않으며 격리 clone·제한된 host/MCP 정책을 검증해야 한다.
 단계0 승인·모델/비용·독립 gold가 정해지기 전 actual pilot을 실행하거나9개 gate를 완료 처리하지 않는다.
+
+## 로컬 host 연결 준비 결과
+
+[격리 채택·연결 명세](./ISOLATED-HOST-ADOPTION.md)의 source 채택과 실제 CLI/로컬 스크립트 응답기5개 사례를 검증했다. coding-agent는 SessionStart 보완 b7e7868, ChainBench는 bdf5ad27이며 source·binary·설정·hook 입력·MCP frame·종료를 결속했다. strict MCP alias와 알려진 게시 거부, Stop 단일 재진입, host 취소/서버 종료를 확인했다.
+
+전체 실제 agent/model/CKS/노드 pilot은 여전히 미실행이다. source/로컬 host 사전 검증만 별도 준비 기록으로 채택하며 단계0 preparing·동결 전 execution_allowed=false·운영/품질/독립 수용0/9를 유지한다. 다음은 reviewer·모델/비용·자원·새 gold/case/family·DEV/FINAL·기준을 확정하는 것이다.

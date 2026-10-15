@@ -1,6 +1,6 @@
 # 운영 검증 준비를 위한 소비자 보완
 
-2026-10-15. 이 작업은 격리된 소비자 source 후보를 수정한 **개발 회귀검증**이다. [운영 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)의 실제 host·독립 평가·사람 수용은 미실행이며 protocol은 미동결이다. 원래9개 구현의 승인 source/원장/증거는 유지한다.
+2026-10-15. 이 작업은 격리된 소비자 source 후보를 수정한 **개발 회귀검증**이다. [운영 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)의 실제 모델/역할 pilot·독립 평가·사람 수용은 미실행이며 protocol은 미동결이다. 원래9개 구현의 승인 source/원장/증거는 유지한다.
 
 ## OP-CB-01 — ChainBench stdio 종료와 상태 경로 격리
 
@@ -41,12 +41,12 @@ candidate source·artifact hash가 확인된 것은 prepared source 후보의 �
 
 ## 다음과 남은 범위
 
-coding-agent 게시 전 종료·Stop 처리는 아래 OP-CA-01 후보에서 개발 검증을 완료했다. 다음은 두 소비자 후보의 채택·격리 host 연결과 새 입력/정답 검토다. 이어 새 독립 gold·case/family/DEV/FINAL, reviewer 역할·LLM/비용·metric/자원 기준을 고정하고 actual host/node 검증을 수행한다. stage0은 preparing, stage1–4는 미시작, 운영/독립 수용은0/9다. WI-5·별도 후속13개·태그/공개 배포 결정은 [전체 작업표](../REMAINING-WORK.md)에 남긴다.
+coding-agent 게시 전 종료·Stop 처리는 아래 OP-CA-01 후보에서 개발 검증을 완료했다. 두 소비자의 로컬 채택·실제 host 연결은 아래 OP-HOST-01에 기록했다. 다음은 새 입력/정답 검토·모델/자원 지정과 단계0 동결이다. 이어 새 독립 gold·case/family/DEV/FINAL, reviewer 역할·LLM/비용·metric/자원 기준을 고정하고 actual host/node 검증을 수행한다. stage0은 preparing, stage1–4는 미시작, 운영/독립 수용은0/9다. WI-5·별도 후속13개·태그/공개 배포 결정은 [전체 작업표](../REMAINING-WORK.md)에 남긴다.
 
 ## OP-CA-01 — 게시 전 평가 종료와 auto Stop 재진입
 
 후보 `b6e2abdc8892bb5e82044997f4f2285ece9c5b35`을 `/private/tmp/ks-op-coding-agent-evaluation-only`의 별도 branch에서 구현했다.
-기존 baseline fdb4d515와 승인된 구현 증거는 변경하지 않았다. source 채택·설치/게시·실제 host 검증은 pending이다.
+기존 baseline fdb4d515와 승인된 구현 증거는 변경하지 않았다. 이 보완 당시 source 채택·설치/게시·실제 host 검증은 pending이었다. 이후 로컬 채택은 OP-HOST-01을 따른다.
 
 | 세부 기능·목적 | 개발 검증 상태 |
 |---|---|
@@ -78,3 +78,9 @@ publication guard는 알려진 Bash 표기와 MCP 도구 범위의 유한 검사
 [bundle](../../system/eval/operational-preparation-2026-10-15/coding-agent-exit/coding-agent.bundle)을 primary에 보존한다.
 bundle은 baseline fdb4d515가 필요하며 기존 [coding-agent 복구 lineage](./EVIDENCE-RECOVERY.md)를 유지한다.
 운영/독립 수용은 여전히0/9다.
+
+## OP-HOST-01 — 로컬 source 채택과 실제 host 연결
+
+[채택·검증 명세](./ISOLATED-HOST-ADOPTION.md)에 coding-agent b7e7868·ChainBench bdf5ad27의 local session 채택과 실제 CLI2.1.300 연결을 기록했다. b7e7868은 실제 SessionStart에서 발견한 EVALUATED 재개 안내를 수정한다. hook29개·policy15개·host verdict 단위8개와 최종 CLI5개 사례를 검증했다. Stop의 false→true 입력, MCP alias·metadata 호출, 명시적인 push/정책 완화 deny, receipt 실패 유지, host143/서버0 취소와 owned PID10개 정리를 확인했다.
+
+이 결과는 로컬 스크립트 API·통제 fixture의 연결 증거다. provider 모델·실제 agent 역할/CKS·활동 노드·독립 gold 수용은 미실행이다. 원래 개발 시험과 초기 문제 기록을 보존하고 로컬 연결을9개 운영 수용으로 올리지 않는다. 새 source/runner/원자료·복구 bundle과104개 artifact는 [manifest](../../system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json)를 따른다.
