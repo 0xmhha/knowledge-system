@@ -230,3 +230,21 @@ worker stdin은 owner 채널이며 이 옵션은 일반 standalone 실행에 강
 전체15/28·기능3/7이다. 다음은 KM-04.4의 지속 periodic/change·두 번 변경·삭제/no-op·실패/복구·이전 snapshot과 다른 프로젝트 보존을 통합 확인하는 단계다. 남은13개는 KM-04.4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
 
 C2 증거 대조에서는 시험 observer가 실제 policy template 객체를 그대로 저장한 뒤 시험 policy를 enabled로 바꾸면서 기록도 바뀌는 문제를 잡았다. 원본 RPC는 disabled/hold를 반환했고 제품 동작은 정상이었다. observer/consumer를 deep copy로 분리하고 raw MCP와 실제 Claude2회를 다시 실행해 원본 응답과 기록을 대조했다. 최종222호출·36도구 결과는 재실행의 실제 횟수이며 반복 status를 새 독립 시험으로 합산하지 않는다. 초기 불일치 관찰/원본 wire와 최초 제품 시험 실패는 별도 보존한다.
+
+
+## KM-04.4 실행 전 고정 계획
+
+현재 단계는 통합 검증 진행 중이며 완료가 아니다. 소유 임시 프로젝트2개를 별도 UUID/profile/state/dataset으로 등록하고 실제 MCP6도구와 mock embedding으로 lifecycle을 검증한다. 첫 프로젝트의 periodic loop에서 v1(code7/문서/명시 ontology 원문/제공 note)→code8와 문서 삭제 v2→실제 checked no-op을 관찰한다. 같은 host에서 worker를 멈추고 change trigger를 명시해 code9·명시 ontology root 전체 삭제·제공 note 변경 v3을 관찰한다. 삭제된 자료는 최신 retained blobs/조회에 없고 v1의 exact read에서는 보존돼야 한다. 역할 ontology는 수집 원문이라는 뜻이며 의미 승인을 만들지 않는다.
+
+그 다음 code10에서 통제 graph 실패를 실제 native job으로 관측한다. current와 마지막 성공은 v3을 보존해야 하며 원인을 해제한 뒤 같은 input/cycle의 제한된 새 key/version retry가 실제 code10을 게시/조회해야 한다. source 경합은 bounded polling 내 defer일 수 있으나 immutable 입력/등록·코드·불확실 저장을 무시하고 계속하지 않는다. 다른 프로젝트는 같은 함수 이름을 다른 구현으로 유지하며, current·불변 version bytes·실제 bodies/citations가 전후 같아야 한다. 한 host에서 다른 프로젝트 job/좌표를 요청하면 거부해야 한다.
+
+기간/호출은 실제 local clock과 raw MCP로 보존한다. poll/status 반복은 독립 품질 표본으로 세지 않는다. 재시도 성공은 실제 job·gate·current·query로 판단하고 private/excluded 자료와 원래 source의 불필요한 문서 생성을 검사한다. 모델 품질·ontology 효과·독립 수용은 별도다. 이 계획의 실행·증거 보호가 끝날 때까지 KM-04.4와 KM-04 전체 완료를 표시하지 않는다.
+
+
+## KM-04.4 실제 연속 갱신 완료
+
+KM-04.4 완료: 실제 두 프로젝트에서20항목·MCP221호출·정상 EOF2개를 검증했다. A는 periodic/change로7→8→9→10을 게시하고 문서·명시 ontology 원자료 root 삭제와 제공 메모 교체를 반영했다. 실제 graph 실패1건은 current/마지막 성공을 보존했고 같은 입력의 연결된 attempt2가 복구했다. no-op은 중복 job을 만들지 않았고 v1 코드/삭제된 자료의 당시 인용을 계속 조회했다. 동명 module/Value를 가진 B의 DB 전체 파일 hash·current·실제 본문/인용은 불변이었다. 비공개 자료 제외·자동 의미/사람 검토 미생성도 확인했다. 이는 mock embedding의 실제 lifecycle 검증이며 검색 품질·온톨로지 효과·독립 수용은 별도다.
+
+[원자료 packet](../../system/eval/knowledge-roadmap-2026-10-16/km-04-periodic/manifest.json)을 따른다. 기존 Python268개와 Go3862(3844통과18skip)·race836(834통과2skip)은 소스 byte가 같음을 확인하여 동결 증거를 참조하며 새 실행으로 세지 않는다. 초기 단독 대문자 식별자 질문은 본문0개였고 일반 자연어 질의에는 같은 원자료가 나타났다. 실패 조회/추가 진단을 보존하고 OE-01의 질의 해석·재현율 후보로 이관하며 개선 완료로 세지 않는다.
+
+전체16/28·기능4/7 완료다. 다음은 KM-05.1의 산업 개념·정의·별칭·포함/제외·비교 축 설계다. 남은12개는 KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 계속한다.

@@ -4,7 +4,7 @@
   "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
   "scope_status": "user_requested_features_with_implementation_in_progress",
   "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
-  "implementation_completed": 3,
+  "implementation_completed": 4,
   "total_work_items": 7,
   "total_subtasks": 28,
   "implementation_or_runtime_changed_by_this_documentation": false,
@@ -215,8 +215,8 @@
       "priority": "P0",
       "scope": "continuous_updates",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "in_progress",
-      "design_status": "KM04_1_2_3_complete_actual_updates_MCP_Claude_and_owned_recovery_KM04_4_pending",
+      "status": "complete",
+      "design_status": "locally_verified_actual_two_project_periodic_change_delete_failure_retry_retained_reads",
       "depends_on": [
         "KM-03"
       ],
@@ -228,9 +228,10 @@
         "system/eval/knowledge-roadmap-2026-10-15/km-04-state/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-15/km-04-worker/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-16/km-04-worker-host/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-16/km-04-updates-MCP/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-16/km-04-updates-MCP/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-04-periodic/manifest.json"
       ],
-      "verification": "KM04_3_integrated_python268_publicMCP20_tools222_sessions3_parentkill_EOF_Claude2_tools36_B2Go_ref_not_final_periodic_acceptance",
+      "verification": "actual20_checks_221tools_2EOF0_A5jobs4publications_failure1_B1job_immutable_other_project",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -259,18 +260,19 @@
         },
         {
           "id": "KM-04.4",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         }
       ],
-      "remaining": [
-        "KM-04.4 actual sequential and periodic/change multi-project verification"
-      ],
+      "remaining": [],
       "execution_stages": {
         "policy_trigger_success_contract": "verified_27_cases",
         "automatic_observation_projection": "verified_32_cases_actual_manual_4DB_16_checks_11EOF0_82calls",
         "durable_worker": "complete_A_B1_B2_C1_C2_actual_updates_MCP_Claude_parent_EOF_kill_exact_recovery",
-        "actual_periodic_execution": "not_started",
+        "actual_periodic_execution": "verified_actual_20_checks_two_projects_periodic_change_delete_noop_failed_graph_linked_retry_retained_and_other_project_unchanged",
         "native_original_source_publication_check": "actual14_3jobs_2publications_1stale_refusal_90calls_5EOF0_no_independent_acceptance",
         "durable_state_foundation": "50_fault_contract_cases_with_one_actual_native_inspection_no_native_job_execution",
         "foreground_worker": "actual14_native_RPC97_jobs6_publications4_failure1_canceled_exact_replay1_EOF16_0",
@@ -562,7 +564,7 @@
     "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
     "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
   },
-  "completed_subtasks": 15,
+  "completed_subtasks": 16,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
   "manager_host_validation": {
     "packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json",
@@ -570,6 +572,18 @@
     "actual_tool_results": 68,
     "manager_unit_tests": 103,
     "evidence_tests": 16,
+    "real_model_calls": 0,
+    "independent_acceptance": false
+  },
+  "periodic_validation": {
+    "packet": "system/eval/knowledge-roadmap-2026-10-16/km-04-periodic/manifest.json",
+    "checks": 20,
+    "actual_tool_calls": 221,
+    "projects": 2,
+    "EOF_exit_codes": [
+      0,
+      0
+    ],
     "real_model_calls": 0,
     "independent_acceptance": false
   }

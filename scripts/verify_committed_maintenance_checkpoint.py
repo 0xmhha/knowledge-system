@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'manager-updates-MCP': {
+        'revision': '4a2ca4cd', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-04-updates-MCP',
+        'scope': 'historical_KM04_3_complete_integrated_updates_MCP_Claude_not_final_periodic',
+        'scripts': ['check-manager-updates-MCP-evidence.py', 'test_manager_updates_MCP_evidence.py'],
+    },
     'manager-worker-host': {
         'revision': 'ebec0858', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-04-worker-host',
         'scope': 'historical_KM04_3_C1_actual_CLI_worker_lifecycle_not_MCP_operation',
