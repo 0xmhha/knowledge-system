@@ -86,19 +86,25 @@
       "priority": "P0",
       "scope": "versioned_maintenance_tools",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "not_started",
-      "design_status": "draft",
+      "status": "in_progress",
+      "design_status": "strict_schema_lifecycle_request_status_error_contract_complete_runtime_not_connected",
       "depends_on": [
         "KM-01"
       ],
-      "evidence": [],
-      "verification": "not_run",
+      "evidence": [
+        "docs/spec-driven/VERSIONED-MAINTENANCE-CONTRACT.md",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-contract/manifest.json"
+      ],
+      "verification": "design_conformance_101_cases_passed_no_public_versioned_execution",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
           "id": "KM-02.1",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         },
         {
           "id": "KM-02.2",
@@ -115,6 +121,18 @@
           "status": "not_started",
           "evidence": []
         }
+      ],
+      "execution_stages": {
+        "capability_audit": "verified_current_MCP35_CLI_help_and_source",
+        "design_schema_and_lifecycle": "verified_101_cases",
+        "public_versioned_build_status_cancel": "not_connected",
+        "durable_jobs_idempotency_crash_recovery": "not_implemented",
+        "real_public_maintenance_evaluation": "not_run"
+      },
+      "remaining": [
+        "KM-02.2 implement operator profile inspection and public asynchronous version-aware build/status/cancel",
+        "KM-02.3 implement durable journal, replay, locks, timeout and publication recovery",
+        "KM-02.4 verify public cross-project and partial-failure/cancel/shutdown controls"
       ]
     },
     {
@@ -368,7 +386,7 @@
   "latest_preparation_validation": {
     "adopted_policy_guard_tests_passed": 8,
     "documentation_contract_tests_passed": 20,
-    "live_documents_checked": 125,
+    "live_documents_checked": 126,
     "ontology_effect_executed": true,
     "feature_completion_count": 1,
     "ontology_effect_scope": "local descriptive observation only; no independent quality verdict",
@@ -407,8 +425,14 @@
     "go_validation_method": "source_bound_reuse_no_Go_source_changes",
     "final_isolation_metadata_gates": "passed_raw_protocol_HTTP_Git_citations_preservation_docs_and_current_ledger",
     "final_isolation_false_completion_tests_passed": 9,
-    "current_roadmap_tests_passed": 7
+    "current_roadmap_tests_passed": 7,
+    "maintenance_contract_cases_passed": 101,
+    "maintenance_contract_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-contract/manifest.json",
+    "maintenance_contract_scope": "design_only_not_runtime_success",
+    "current_Go_dependency_inputs_match": true,
+    "maintenance_contract_final_gates": "passed_design101_probe_history_roadmap7_document126_evidence_guard9_source_inventory",
+    "maintenance_contract_false_completion_tests_passed": 9
   },
-  "completed_subtasks": 4,
+  "completed_subtasks": 5,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
 }

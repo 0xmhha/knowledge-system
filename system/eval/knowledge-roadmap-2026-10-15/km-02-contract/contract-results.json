@@ -1,0 +1,717 @@
+{
+  "scope": "KM-02.1_schema_and_lifecycle_design_only",
+  "cases": [
+    {
+      "id": "RQ01-hold-valid",
+      "kind": "request",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "RQ02-activate-valid",
+      "kind": "request",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "RQ03-first-build-absent",
+      "kind": "request",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "RQ04-working-tree",
+      "kind": "request",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "RQ04-snapshot-only",
+      "kind": "request",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "RQ10-missing-project",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ11-foreign-project",
+      "kind": "request",
+      "expected": "project_mismatch",
+      "observed": "project_mismatch",
+      "passed": true
+    },
+    {
+      "id": "RQ12-unknown-profile",
+      "kind": "request",
+      "expected": "profile_unknown",
+      "observed": "profile_unknown",
+      "passed": true
+    },
+    {
+      "id": "RQ13-profile-stale",
+      "kind": "request",
+      "expected": "profile_stale",
+      "observed": "profile_stale",
+      "passed": true
+    },
+    {
+      "id": "RQ14-source-stale",
+      "kind": "request",
+      "expected": "source_stale",
+      "observed": "source_stale",
+      "passed": true
+    },
+    {
+      "id": "RQ15-commit-stale",
+      "kind": "request",
+      "expected": "source_stale",
+      "observed": "source_stale",
+      "passed": true
+    },
+    {
+      "id": "RQ16-committed-empty",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ17-snapshot-has-commit",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ18-input-stale",
+      "kind": "request",
+      "expected": "input_stale",
+      "observed": "input_stale",
+      "passed": true
+    },
+    {
+      "id": "RQ19-embedding-stale",
+      "kind": "request",
+      "expected": "embedding_stale",
+      "observed": "embedding_stale",
+      "passed": true
+    },
+    {
+      "id": "RQ20-foreign-base",
+      "kind": "request",
+      "expected": "project_mismatch",
+      "observed": "project_mismatch",
+      "passed": true
+    },
+    {
+      "id": "RQ21-base-stale",
+      "kind": "request",
+      "expected": "base_stale",
+      "observed": "base_stale",
+      "passed": true
+    },
+    {
+      "id": "RQ22-base-missing",
+      "kind": "request",
+      "expected": "base_stale",
+      "observed": "base_stale",
+      "passed": true
+    },
+    {
+      "id": "RQ23-current",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ24-case-current",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ25-path-traversal",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ26-existing-version",
+      "kind": "request",
+      "expected": "version_exists",
+      "observed": "version_exists",
+      "passed": true
+    },
+    {
+      "id": "RQ27-path-injection",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ28-command-injection",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ29-skip-vector",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ30-activation-policy",
+      "kind": "request",
+      "expected": "unsupported_capability",
+      "observed": "unsupported_capability",
+      "passed": true
+    },
+    {
+      "id": "RQ31-timeout-policy",
+      "kind": "request",
+      "expected": "unsupported_capability",
+      "observed": "unsupported_capability",
+      "passed": true
+    },
+    {
+      "id": "RQ32-timeout-zero",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ33-short-key",
+      "kind": "request",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "RQ34-weaken-required-gates",
+      "kind": "request",
+      "expected": "unsupported_capability",
+      "observed": "unsupported_capability",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-queued",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-running",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-cancel_requested",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-recovering",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-held_for_review",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-succeeded",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-failed",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-canceled",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-valid-interrupted",
+      "kind": "status",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-no-candidate",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-no-publication",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-not-built",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-vector-not-run",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-vector-failed",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-required-semantic-omitted",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-foreign-candidate",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-wrong-source",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-wrong-input",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-not-activated",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-bad-receipt",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-publication-base-stale",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-serving-inferred",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-wrong-request",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-terminal-flag",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-error-on-success",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-held-activated",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-queued-built",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "ST-reject-failed-missing-error",
+      "kind": "status",
+      "expected": "invalid_status",
+      "observed": "invalid_status",
+      "passed": true
+    },
+    {
+      "id": "CN-queued",
+      "kind": "cancel",
+      "expected": "accepted",
+      "observed": "accepted",
+      "passed": true
+    },
+    {
+      "id": "CN-running",
+      "kind": "cancel",
+      "expected": "accepted",
+      "observed": "accepted",
+      "passed": true
+    },
+    {
+      "id": "CN-cancel_requested",
+      "kind": "cancel",
+      "expected": "already_requested",
+      "observed": "already_requested",
+      "passed": true
+    },
+    {
+      "id": "CN-recovering",
+      "kind": "cancel",
+      "expected": "reconcile_required",
+      "observed": "reconcile_required",
+      "passed": true
+    },
+    {
+      "id": "CN-held_for_review",
+      "kind": "cancel",
+      "expected": "already_terminal",
+      "observed": "already_terminal",
+      "passed": true
+    },
+    {
+      "id": "CN-succeeded",
+      "kind": "cancel",
+      "expected": "too_late",
+      "observed": "too_late",
+      "passed": true
+    },
+    {
+      "id": "CN-failed",
+      "kind": "cancel",
+      "expected": "already_terminal",
+      "observed": "already_terminal",
+      "passed": true
+    },
+    {
+      "id": "CN-canceled",
+      "kind": "cancel",
+      "expected": "already_terminal",
+      "observed": "already_terminal",
+      "passed": true
+    },
+    {
+      "id": "CN-publish-won-race",
+      "kind": "cancel",
+      "expected": "too_late",
+      "observed": "too_late",
+      "passed": true
+    },
+    {
+      "id": "TR-queued-running",
+      "kind": "transition",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "TR-running-held_for_review",
+      "kind": "transition",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "TR-running-succeeded",
+      "kind": "transition",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "TR-running-cancel_requested",
+      "kind": "transition",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "TR-cancel_requested-canceled",
+      "kind": "transition",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "TR-recovering-succeeded",
+      "kind": "transition",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "TR-running-interrupted",
+      "kind": "transition",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "TR-succeeded-running",
+      "kind": "transition",
+      "expected": "invalid_transition",
+      "observed": "invalid_transition",
+      "passed": true
+    },
+    {
+      "id": "TR-held_for_review-succeeded",
+      "kind": "transition",
+      "expected": "invalid_transition",
+      "observed": "invalid_transition",
+      "passed": true
+    },
+    {
+      "id": "TR-cancel_requested-succeeded",
+      "kind": "transition",
+      "expected": "invalid_transition",
+      "observed": "invalid_transition",
+      "passed": true
+    },
+    {
+      "id": "TR-failed-queued",
+      "kind": "transition",
+      "expected": "invalid_transition",
+      "observed": "invalid_transition",
+      "passed": true
+    },
+    {
+      "id": "TR-queued-succeeded",
+      "kind": "transition",
+      "expected": "invalid_transition",
+      "observed": "invalid_transition",
+      "passed": true
+    },
+    {
+      "id": "ID-new",
+      "kind": "idempotency",
+      "expected": "new",
+      "observed": "new",
+      "passed": true
+    },
+    {
+      "id": "ID-replay",
+      "kind": "idempotency",
+      "expected": "replay",
+      "observed": "replay",
+      "passed": true
+    },
+    {
+      "id": "ID-changed-same-key",
+      "kind": "idempotency",
+      "expected": "idempotency_conflict",
+      "observed": "idempotency_conflict",
+      "passed": true
+    },
+    {
+      "id": "JR-other-project",
+      "kind": "reference",
+      "expected": "job_unknown",
+      "observed": "job_unknown",
+      "passed": true
+    },
+    {
+      "id": "JR-other-profile",
+      "kind": "reference",
+      "expected": "job_unknown",
+      "observed": "job_unknown",
+      "passed": true
+    },
+    {
+      "id": "JR-unknown-job",
+      "kind": "reference",
+      "expected": "job_unknown",
+      "observed": "job_unknown",
+      "passed": true
+    },
+    {
+      "id": "JR-valid",
+      "kind": "reference",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "JSON-valid",
+      "kind": "decode",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "JSON-duplicate",
+      "kind": "decode",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "JSON-trailing",
+      "kind": "decode",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "JSON-nan",
+      "kind": "decode",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "JSON-decimal",
+      "kind": "decode",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "JSON-over-limit",
+      "kind": "decode",
+      "expected": "invalid_request",
+      "observed": "invalid_request",
+      "passed": true
+    },
+    {
+      "id": "HASH-key-order-independent",
+      "kind": "fingerprint",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "OB-start",
+      "kind": "observation",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "OB-finish",
+      "kind": "observation",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "OB-terminal-poll",
+      "kind": "observation",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    },
+    {
+      "id": "OB-same-revision-changed-body",
+      "kind": "observation",
+      "expected": "invalid_observation",
+      "observed": "invalid_observation",
+      "passed": true
+    },
+    {
+      "id": "OB-rewind",
+      "kind": "observation",
+      "expected": "invalid_observation",
+      "observed": "invalid_observation",
+      "passed": true
+    },
+    {
+      "id": "OB-wrong-job",
+      "kind": "observation",
+      "expected": "invalid_observation",
+      "observed": "invalid_observation",
+      "passed": true
+    },
+    {
+      "id": "OB-terminal-mutation",
+      "kind": "observation",
+      "expected": "invalid_observation",
+      "observed": "invalid_observation",
+      "passed": true
+    },
+    {
+      "id": "OB-progress",
+      "kind": "observation",
+      "expected": "accept",
+      "observed": "accept",
+      "passed": true
+    }
+  ],
+  "total": 101,
+  "passed": 101,
+  "failed": 0,
+  "new_runtime_MCP_tools_exposed": false,
+  "dataset_maintenance_executed": false
+}

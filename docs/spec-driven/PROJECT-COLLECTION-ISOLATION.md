@@ -46,7 +46,7 @@ ScopedRef는 전체 좌표+origin+상대 path+local ID로 키를 만든다. Scop
 
 기존 graph/vector/semantic DB·identity·원문·도구 DTO는 변경하지 않았다. 새 catalog는 별도 설정이다. 기존 stable project ID를 사용하고 InspectVersionIdentity로 확인한 pinned 버전만 등록한다. legacy DB는 기존 경로로 읽고, collection에 넣으려면 정상적인 versioned build가 필요하다. 현재 저장된 DB의 ID를 새 catalog에 맞춰 직접 고치지 않는다.
 
-현재 `cks mcp`는 collection 설정이 있을 때 공개 조회 adapter를 연결한다. KM-01.4 최종 반례를 통과했고 다음은 KM-02.1의 version-aware 도구 capability/요청 설계다. 산업 공통 개념/프로젝트 매핑은 KM-05, 비교 자료 수집은 KM-06이다.
+현재 `cks mcp`는 collection 설정이 있을 때 공개 조회 adapter를 연결한다. KM-01.4 최종 반례와 [KM-02.1 계약 설계](./VERSIONED-MAINTENANCE-CONTRACT.md)를 완료했다. 다음은 KM-02.2의 공개 version-aware 도구 연결이다. 산업 공통 개념/프로젝트 매핑은 KM-05, 비교 자료 수집은 KM-06이다.
 
 ## MCP 연결과 설정
 
