@@ -195,3 +195,14 @@ func TestDatasetOwnerCannotBeReplacedOrSymlinked(t *testing.T) {
 		t.Fatal("linked owner accepted")
 	}
 }
+
+func TestDigestPreservesExactLargeIntegerIdentity(t *testing.T) {
+	a, err := Digest(map[string]uint64{"revision": 9007199254740992}, "owned.test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := Digest(map[string]uint64{"revision": 9007199254740993}, "owned.test")
+	if err != nil || a == b {
+		t.Fatal("integer precision merged distinct records")
+	}
+}

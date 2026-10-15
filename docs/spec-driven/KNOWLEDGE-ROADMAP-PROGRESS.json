@@ -118,8 +118,10 @@
         },
         {
           "id": "KM-02.3",
-          "status": "not_started",
-          "evidence": []
+          "status": "in_progress",
+          "evidence": [
+            "docs/spec-driven/VERSIONED-MAINTENANCE-RUNTIME.md"
+          ]
         },
         {
           "id": "KM-02.4",
@@ -131,11 +133,11 @@
         "capability_audit": "verified_current_MCP35_CLI_help_and_source",
         "design_schema_and_lifecycle": "verified_101_cases",
         "public_versioned_build_status_cancel": "verified_actual_public_28_checks_5_clean_EOF_sessions",
-        "durable_jobs_idempotency_crash_recovery": "not_implemented",
+        "durable_jobs_idempotency_crash_recovery": "private_journal_foundation_verified_114_race_cases_public_runtime_still_process_lifetime",
         "real_public_maintenance_evaluation": "local_lifecycle_and_retained_v2_reads_only_mock_embedding_not_quality_or_independent_acceptance"
       },
       "remaining": [
-        "KM-02.3 implement durable journal, replay, locks, timeout and publication recovery",
+        "KM-02.3 B connect durable job admission/transitions/scoped replay/restart; C publication intent/history recovery; D child ownership/deadline; E actual public recovery and rollback/read lease regression",
         "KM-02.4 verify public cross-project and partial-failure/cancel/shutdown controls"
       ]
     },
@@ -400,16 +402,16 @@
     "knowledge_roadmap_guard_tests_passed": 7,
     "collection_race_cases_passed": 40,
     "collection_top_level_tests_passed": 17,
-    "module_test_cases": 3665,
-    "module_tests_passed": 3646,
+    "module_test_cases": 3734,
+    "module_tests_passed": 3715,
     "module_tests_skipped": 19,
     "module_failed_tests": 0,
     "build_fmt_lint_passed": true,
     "refactoring_source_inventory_bindings_passed": 1660,
     "refactoring_source_inventory_checker_exit": 0,
     "source_binding_update_receipt": "system/eval/knowledge-roadmap-2026-10-15/km-02-runtime-source-binding-update/receipt.json",
-    "related_race_cases": 634,
-    "related_race_passed": 632,
+    "related_race_cases": 703,
+    "related_race_passed": 701,
     "related_race_skipped": 2,
     "public_collection_checks": 24,
     "public_collection_tool_calls": 21,
@@ -426,7 +428,7 @@
     "final_isolation_evidence_packs": 20,
     "final_isolation_writer_refusals": 18,
     "final_isolation_clean_EOF_sessions": 3,
-    "go_validation_method": "fresh_current_Go_module_and_related_race_not_historical_reuse",
+    "go_validation_method": "fresh_current_Go_private_journal_foundation_and_public_compatibility_only",
     "final_isolation_metadata_gates": "passed_raw_protocol_HTTP_Git_citations_preservation_docs_and_current_ledger",
     "final_isolation_false_completion_tests_passed": 9,
     "current_roadmap_tests_passed": 7,
@@ -442,7 +444,14 @@
     "maintenance_runtime_EOF_sessions": 5,
     "maintenance_runtime_false_completion_tests": 10,
     "maintenance_runtime_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json",
-    "current_Go_validation_reused": false
+    "current_Go_validation_reused": false,
+    "journal_foundation_race_cases": 114,
+    "journal_foundation_scope": "private_store_and_status_validation_only_not_public_durability",
+    "journal_foundation_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-journal-foundation/manifest.json",
+    "journal_foundation_evidence_guard_tests_passed": 13,
+    "journal_foundation_public_compatibility_checks": 28,
+    "journal_foundation_public_compatibility_tool_calls": 112,
+    "journal_foundation_public_compatibility_wire_pairs": 121
   },
   "completed_subtasks": 6,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"

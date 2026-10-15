@@ -253,20 +253,14 @@ func Decode(raw []byte, target any) error {
 	if err := requiredFields(raw, reflect.TypeOf(target)); err != nil {
 		return err
 	}
-	if r, ok := target.(*BuildRequest); ok && r.Base.State == "absent" {
-		var fields map[string]json.RawMessage
-		if err := json.Unmarshal(raw, &fields); err != nil {
-			return reject("invalid_request")
-		}
-		var base map[string]json.RawMessage
-		if err := json.Unmarshal(fields["base"], &base); err != nil || len(base) != 1 {
-			return reject("invalid_request")
-		}
-	}
+
 	return nil
 }
 
 func requiredFields(raw json.RawMessage, t reflect.Type) error {
+	if t.Kind() == reflect.Pointer && bytes.Equal(bytes.TrimSpace(raw), []byte("null")) {
+		return nil
+	}
 	for t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
@@ -276,6 +270,13 @@ func requiredFields(raw json.RawMessage, t reflect.Type) error {
 	var fields map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &fields); err != nil || fields == nil {
 		return reject("invalid_request")
+	}
+	if t == reflect.TypeOf(Base{}) {
+		var state string
+		if json.Unmarshal(fields["state"], &state) != nil ||
+			(state == "absent" && len(fields) != 1) || (state == "pinned" && len(fields) != 3) {
+			return reject("invalid_request")
+		}
 	}
 	allowed := map[string]bool{}
 	for i := 0; i < t.NumField(); i++ {
@@ -316,7 +317,9 @@ func Digest(value any, domain string) (string, error) {
 		return "", err
 	}
 	var object any
-	if err := json.Unmarshal(raw, &object); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(raw))
+	decoder.UseNumber()
+	if err := decoder.Decode(&object); err != nil {
 		return "", err
 	}
 	raw, err = json.Marshal(object)

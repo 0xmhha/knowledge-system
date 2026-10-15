@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 단계는 KM-02.2 공개 구축·취소 로컬 검증 완료다. KM-01의4개 세부 작업과 KM-02.1/02.2를 완료했으며 전체28개 중6개 완료·3개 진행 중·19개 미착수다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 단계는 KM-02.2 완료 후 KM-02.3 영속 기록·복구 구현 중이다. KM-01의4개 세부 작업과 KM-02.1/02.2를 완료했으며 전체28개 중6개 완료·4개 진행 중·18개 미착수다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는1/7이다.
 
@@ -14,7 +14,7 @@
 | KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 완료 | 실제4DB·최종52항목 통과; 동일 원문 fork·모델 분리·쓰기18건 거부·rollback/GC/재시작 보존 |
 | KM-02.1 | legacy/versioned capability와 새 요청·상태 계약 | 완료 | [계약](./VERSIONED-MAINTENANCE-CONTRACT.md)·schema·101사례 통과; 새 공개 실행은 .2–04 |
 | KM-02.2 | 비동기 build/status/cancel과 정합 gate | 완료 | [공개 실행](./VERSIONED-MAINTENANCE-RUNTIME.md)28항목·실제 retained 조회2건·EOF5개·전체 Go/race·증거 보호10개 통과 |
-| KM-02.3 | idempotency/lock/중단/실패/rollback | 미착수 | 미실행 |
+| KM-02.3 | idempotency/lock/중단/실패/rollback | 진행 중 | private journal·상태 적합성 기반 race114개 통과; 공개 영속/복구 미구현·미검증 |
 | KM-02.4 | 공개 도구의 잘못된 대상·부분 실패·취소 보호 | 미착수 | 미실행 |
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 미착수 | 미실행 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 미착수 | 미실행 |
@@ -268,4 +268,23 @@ KM-02.1 당시 설계 적합성·증거 검사는 `python3 scripts/check-version
 | 영속 job·재시작 복구 | 미구현·미실행, KM-02.3 |
 | 전체 KM-02·독립 수용·검색 품질 | 완료 아님 |
 
-현재 완료6/28·진행3/28(OE-01.1–03)·미착수19/28다. 다음은 KM-02.3, 이후 .4 → KM-03 → KM-04 → KM-05 → KM-06 → OE-01 확대/다중 프로젝트 평가 순서다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 범위다.
+현재 완료6/28·진행4/28(KM-02.3, OE-01.1–03)·미착수18/28다. 다음은 KM-02.3, 이후 .4 → KM-03 → KM-04 → KM-05 → KM-06 → OE-01 확대/다중 프로젝트 평가 순서다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 범위다.
+
+
+## KM-02.3 중간 단계 A: 기록 기반만 검증
+
+| 검증 | 결과·한계 |
+|---|---|
+| Go 상태/전이/관찰의 설계 대조 | 28/12/8사례와 parent 시험 통과 |
+| maintenance package race | 전체114사례 통과·실패/skip0 |
+| journal 기록 | scope/key·단독 writer·재열기·terminal 불변·원자적 교체·손상/거짓 성공·symlink/hardlink·128한도 검사 |
+| 별도 시험 프로세스 종료 | 기록 rename 전/후 즉시 종료와 재열기 통과; 실제 DB 작업 복구는 아직 아님 |
+| 전체 Go | 3,734사례=3,715통과+19skip·실패0 |
+| 관련5패키지 race | 703사례=701통과+2skip; maintenance114개 포함 |
+| 중간 증거 보호 | 13개 통과; private 기반을 공개 영속/복구 완료로 표시하는 오류 거부 |
+| 공개 기존 동작 회귀 | 다시28항목·5개 정상 EOF; 영속 capability는 계속 process_lifetime |
+| 완료 집계 | 6/28 유지; KM-02.3은 진행 중 |
+
+다음은 [실행 명세의 B–E](./VERSIONED-MAINTENANCE-RUNTIME.md)에 따라 공개 service의 durable 접수·replay, publication 전후 증거, 하위 프로세스 소유/중단, 실제 MCP 복구와 rollback/GC/read lease를 연결·검증한다. 이 단계의 기록 저장기 시험을 공개 복구나 독립 수용으로 올리지 않는다.
+
+A 단계의 [검증 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-journal-foundation/manifest.json)에 새 전체 시험 목록·원시 wire를 보존한다. 공개 동작 재실행은112개 도구 호출·121개 전체 wire쌍이며 polling 횟수는 고정28개 항목과 별도다. 현재 소스 결속은1,664입력(유지 Go1,235개·기타429개)이다.

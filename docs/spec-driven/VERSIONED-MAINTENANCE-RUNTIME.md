@@ -50,3 +50,23 @@ activation receipt는 과거 전환의 증거이며 현재 모든 reader가 새 
 최종 공개 시험28항목은 기본33도구 호환·4도구 opt-in/schema·inspect 무변경·stale profile/source/input/model·경로 주입/타 프로젝트 거부·첫 구축/게시·replay/conflict·타 작업 조회/취소 거부·게시 후 취소·두 프로젝트 held·이전 DB 보존·stale base·두 번째 게시·실행 중 writer 충돌/취소·종료 snapshot·재연결 범위·이전/새 버전 실제 조회·다섯 연결 EOF를 확인한다. polling 횟수는 실행 시간에 따라 달라지므로 고정 시험 수와 합치지 않는다.
 
 [검증 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json)에 원시 wire·상태 관찰·fixture DB/원문·전체 Go/race 시험 목록·build/lint 결과를 보존한다. `check-maintenance-runtime-evidence.py`와 `test_maintenance_runtime_evidence.py`는 누락·거짓 게시·취소 성공 위조·상태/원문 변조·skip 승격 등 허위 완료를 검사한다. 과거 KM-02.1 설계 packet은 변경하지 않으며 `verify_committed_maintenance_design.py`로 당시7034ce85 snapshot에서 검증한다.
+
+## KM-02.3 진행 중: 영속성 기반과 남은 연결
+
+현재 private journal 기반을 추가했다. 공개 service는 아직 메모리 registry를 사용하며 capability는 계속 process_lifetime이다. 이 기반의 통과를 KM-02.3 완료나 공개 재시작 복구로 세지 않는다.
+
+| 내부 단계 | 상태·목적 | 검증·다음 연결 |
+|---|---|---|
+| A: 저장 상태/record 적합성 | 기반 구현·로컬 검증 | 기존 설계의 상태28·전이12·관찰8사례를 Go로 대조. source/input/model/base와 후보·필수 gate·실제 receipt가 맞아야 성공 기록 허용 |
+| A: 원자적 journal·단독 writer | 기반 구현·로컬 검증 | file sync→rename→directory sync, scoped owner/key·checksum·최대128기록. 오류 뒤 stale 메모리를 내보내지 않고 owner lock을 유지한 채 재조정 요구 |
+| A: 기록 교체 전후 owner 종료 | 기반 구현·로컬 검증 | 소유한 별도 시험 프로세스를 즉시 종료하고 재열기. 온전한 이전/새 record·자동 flock 해제 확인. **DB 구축 프로세스 복구 시험과 별개** |
+| B: 공개 접수/상태/취소·재시작 연결 | 미구현 | queued와 key를 durable 저장한 뒤 접수 응답. 각 변경 저장 실패는 공개 성공으로 표시하지 않는다. 원래 접수 pin으로 replay하고 현재 접근 scope를 먼저 확인 |
+| C: 활성화 전후 장애와 증거 | 미구현 | 기존 dataset/pointer lock 안에서 publication intent/결과를 남기고 재시작 시 정합 확인. 이후 정상 전환/rollback으로 current가 이동해도 이전 성공 이력을 잃지 않아야 함 |
+| D: 중단된 하위 프로세스·시간 상한 | 미구현 | 부모 강제 종료 시 실제 하위 작업 중단/정리와 writer 소유가 끝났는지 확인한 뒤 interrupted/canceled 판정. PID 재사용만 보고 남의 프로세스를 종료하지 않음 |
+| E: 공개 복구·읽기/rollback/GC 회귀 | 미실행 | 두 프로젝트의 중복·timeout·부분 실패·publication 전후 종료·재시작, 기존 reader pin/rollback/GC 보존을 실제 MCP에서 확인 |
+
+A 기반은 maintenance package race114개와 전체 Go3,715통과/19skip·build/fmt/lint로 검증했다. 기존 공개 동작28항목도 다시 통과했고 연결5개가 정상 종료했다. 모든 기록 파일은 private store 시험이며 운영 DB나 개인 세션 자료를 입력으로 사용하지 않는다. `verify_committed_maintenance_runtime.py`는 이전 KM-02.2 증거를31c1f30d snapshot에서 확인하므로 새 Go 변경을 과거 시험으로 통과 처리하지 않는다.
+
+다음은 B의 service 연결이며 C/D의 commit 경계·하위 실행 소유까지 구현·검증하기 전에는 job_persistence를 durable로 바꾸지 않는다. KM-02.3과 KM-02.4 모두 아직 완료가 아니다.
+
+A의 [중간 검증 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-journal-foundation/manifest.json)은 공개 기존 동작28항목을 재실행한 원시 wire와 새로운 Go/race 기록을 함께 보존한다. `check-maintenance-journal-foundation.py`와 `test_maintenance_journal_foundation.py`의13개 검사는 기존 공개 증거 보호와 함께 private 저장기 시험이 KM-02.3 전체 완료로 승격되는 것을 거부한다. 관련5패키지 race는703사례(701통과·2skip)이며 maintenance114사례를 포함하므로 두 수를 더하지 않는다.
