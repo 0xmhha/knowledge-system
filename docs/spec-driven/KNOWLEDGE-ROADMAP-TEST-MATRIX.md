@@ -129,10 +129,12 @@
 | 실제 DB·공개 MCP | 24항목·21도구호출·26요청/응답·정상 EOF3회 통과 |
 | fmt·전체 lint·vet·engine 경계·문서 | 통과; lint0 issues·문서125개·계약20개·패키지 안내3개 |
 | 작업표 허위 완료 방지 | 기존7개·새 공개 증거8개 통과 |
-| 기존 소스목록 갱신 | 1,652개 현재 바이트 결속 작성; 커밋 후 guard 대기 |
+| 기존 소스목록 갱신 | 구현 커밋16a75b8d의1,652개 결속·기존 source/input/evidence guard 통과 |
 
 전체 모듈의19개 skip과 관련 race의2개 skip은 명시적인 기존 환경 조건이며 통과로 세지 않는다. 각 이름·패키지·상태는 전체 시험 목록에 보존했다. package skip12개도 별도 집계한다. 이전 [기반 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json)의3,605개/공개 미연결 기록은 당시 범위를 보존하며 최신 상태는 이번 packet을 따른다. 처음 fixture의 model 이름을 잘못 지정해 시작이 거부된 이력도 `initial-failure/`에 보존했다.
 
 실제 DB/manifest18파일과 current 포인터2개가 그대로임을 확인했다. 원문 손상은 소유한 fixture에서 재현하고 정확히 복구했다. 유효한 조회 근거14팩을 검증한 사실과 검색 품질·독립 수용은 분리한다. ontology의384회 관찰과 별도8회 진단에 이번 분모를 합치지 않는다.
 
 다음은 KM-01.4의 최종 격리 반례 검증이다. 이후 KM-02.1의 version-aware 도구 계약으로 이어간다. 신규7개 기능 외의 생성기 보완·운영/독립 수용9개·선택 후속12개는 [전체 작업표](../REMAINING-WORK.md)에 유지한다.
+
+[소스 결속 후속 기록](../../system/eval/knowledge-roadmap-2026-10-15/km-01-public-source-binding-update/receipt.json)은 구현 커밋16a75b8d의 manifest를 기존 원장에 연결하고 나머지 승인·완료 필드를 그대로 유지한 사실을 기록한다. 공개 조회 packet의 `pending_committed_manifest`는 구현 커밋 당시의 상태이며 현재 완료된 소스 검사는 이 후속 기록을 따른다.

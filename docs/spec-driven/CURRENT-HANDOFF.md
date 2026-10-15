@@ -1,6 +1,6 @@
 # 현재 인수인계
 
-최신 단계: [KM-01 공개 조회](./PROJECT-COLLECTION-ISOLATION.md)를 실제 CKG/CKV에 연결했다. 선택적 `cks.collection.status`·`cks.collection.get_context`를 추가했고 기본33도구는 유지한다. 소유한 실제 DB3개와 mock embedding으로24항목·21도구호출·정상 EOF3회, 전체 Go3,600통과/19skip, 관련 race444통과/2skip을 확인했다. KM-01.1/02/03 완료, .4와 전체 KM-01은 진행 중이다. 다음은 동일 바이트 fork·서로 다른 embedding 설정·공개 쓰기 표면 전체의 최종 격리 검증이다. [전체 작업·시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 원시 증거를 함께 갱신한다.
+최신 단계: [KM-01 공개 조회](./PROJECT-COLLECTION-ISOLATION.md)를 실제 CKG/CKV에 연결했다. 선택적 `cks.collection.status`·`cks.collection.get_context`를 추가했고 기본33도구는 유지한다. 소유한 실제 DB3개와 mock embedding으로24항목·21도구호출·정상 EOF3회, 전체 Go3,600통과/19skip, 관련 race444통과/2skip과 fmt/lint/문서125개·최신 소스1,652개 결속 검사를 통과했다. 구현 커밋은16a75b8d다. KM-01.1/02/03 완료, .4와 전체 KM-01은 진행 중이다. 다음은 동일 바이트 fork·서로 다른 embedding 설정·공개 쓰기 표면 전체의 최종 격리 검증이다. [전체 작업·시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 원시 증거를 함께 갱신한다.
 
 최신 진행: [정책 overlay 적용 검증](./POLICY-OVERLAY-ADOPTION.md)에서 별도 source0bf2f4d1 profile로 실제 graph125,089node/176,822edge·정책42/연결146·CKS24도구호출을 확인했다. 수정7건의 source/canonical parity와 음성3개를 통과했고 기존 원본/운영 current는 보존했다. 일반 domain sync는 여전히 기존 정책을 재생성하므로 생성기 수정은 미완료다. [OE-01 단일 프로젝트 개발 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은 source baca2869의 별도 복제본에서384회 실패/누락0·인용3,616개 검증을 마쳤다. 활성288회 no_match·순위 차이0, 정확 용어의 별도 진단8회는 매칭/정의 검색 동작·최종 boost0이다. 기본 off·품질 inconclusive·새 기능 완료0/7·기존 독립 수용0/9를 유지한다. KM-01의 최신 상태는 위 최신 단계와 시험표를 따른다.
 
