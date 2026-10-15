@@ -1,5 +1,10 @@
 # 현재 인수인계
 
+2026-10-15 최신 우선 범위: [지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json). 온톨로지 효과 평가 OE-01을 우선 필수 검증으로 채택했다. KM-01 프로젝트 격리, KM-02 버전 DB 운영 도구, KM-03 Claude 매니저 플러그인, KM-04 주기 갱신, KM-05 공통 개념 매핑, KM-06 비교 근거 MCP를 요구로 등록했다.7개/하위28개는 미착수이며 설계 초안이다. 기존 WI-5는 KM-03/04로 구체화하여 중복 집계하지 않는다. 기존 선택 후속13개 중 ontology 평가는 OE-01로 이동했으므로 선택 후보는12개다.
+
+로컬 개발·도구/회귀 검증은 정식 독립 수용의 단계0 동결·담당자·유료 모델 지정 없이 계속한다. 실제 모델 실행/독립 수용에 해당 조건을 적용한다. 다음은 정책 연결7건 보완·OE-01 단일 프로젝트 평가, 확장 경로는 KM-01→02→03→04와 KM-05→06 후 다중 프로젝트 평가다. 원래9개 구현/독립 수용 원장은 별도로 유지한다.
+
+
 2026-10-14 통합 확인 기준은 main a214fbb18039f2e63ee93c0f073bfb1b61c3e716이다. [PR #102](https://github.com/0xmhha/knowledge-system/pull/102)는 head e77e59b8의 [CI5/5](https://github.com/0xmhha/knowledge-system/actions/runs/38565382940) 통과 후 스쿼시 머지됐다. 통합 시 로컬 main/원격 main·PR tree 동일성·clean worktree·기록된 source/evidence guard를 확인했다. 현재 checkout은 `git status --short --branch`로 확인하며 고정한 통합 commit을 미래의 실시간 HEAD로 해석하지 않는다.
 
 ## 현재 완료와 남은 범위

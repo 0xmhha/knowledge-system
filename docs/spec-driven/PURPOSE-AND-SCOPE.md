@@ -59,6 +59,10 @@
 | WI-C | typed partial review·보고서/그림·전달 gate; coding-agent | 실제 리뷰 절차·독립 내용 검토 |
 | WI-6 | SQL-bounded 지역 값/제어 계산의 함수 문맥 확장; CKS | 실제 corpus recall/noise/cost 수용 |
 | WI-SP | typed 정책·보안 MCP 질의·출처 unknown·권한 경계; CKS+CKG | 실제 소비자·운영 신뢰 경계 수용 |
-| WI-5 | 별도 ingest MCP/플러그인 담당 미확보 | 담당 지정 후 수집→파일 ingest→관리자 검토→승격/회수→색인 검증 |
+| WI-5 | 지식 구축·지속 갱신 매니저 플러그인으로 범위 구체화; 미구현 | KM-03/04 및 기반 KM-01/02로 구현·검증; 중복 집계하지 않음 |
 
 이 표의9개 구현 완료는 원래 기능 전체의 production 품질·독립 수용과 분리한다. source bundle을 보존한 다른 저장소의 변경은 해당 저장소 게시·설치 상태를 별도로 확인한다. 전체 후속·선택 범위·보류 결정은 [남은 작업](../REMAINING-WORK.md)에만 집계한다.
+
+## 2026-10-15 채택한 다음 범위
+
+[지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)에 문서 작성 부담을 줄이는 Claude 매니저, 지속 갱신, 다중 프로젝트 격리와 산업 개념별 비교 근거 제공을 등록했다. 온톨로지 효과 평가도 우선 필수 범위다. 현재는 요구 등록/설계 초안이며 구현 완료는0/7이다. [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)은 기존9개 정식 평가와 별도로 관리하며, 독립 평가의 미동결은 로컬 개발 전체의 착수 조건이 아니다.

@@ -48,4 +48,4 @@
 1. 위7개 이름 수정의 정책 의미를 검토하고 새 평가용 overlay로 채택할지 결정한다. 기존 source-bound YAML/packet을 덮어써 과거 증거를 바꾸지 않는다. 아직 approved cases·DEV/FINAL·금액/시간 한도·동결은 없다.
 2. 정책/security query12개·4/4/4 그룹·독립 family를 검토한다. WI-2 project 표본 부족은 inconclusive로 유지하고 별도 controlled 분모의 채택 여부를 정한다. 이번 연결 진단은 취약점 탐지나 자동 rule 양성 검증이 아니다.
 3. 정답 작성자·독립 내용 검토자·최종 수용자·실행 담당자, 실제 모델·인증 방식·비용 한도를 지정한다. 새 결함/증상/seed·완전한 의존 정답·review/intent 정답과 DEV/FINAL·기준·실행 recipe를 확정해 단계0을 동결한다.
-4. 이후 단계1–4의 실제 runtime·품질·독립 수용을 수행한다. 현재9개 모두 not_run/not_recorded다. WI-5 및 별도 후속13개·태그/공개 배포 결정은 [전체 작업표](../REMAINING-WORK.md)에 남아 있다.
+4. 이후 단계1–4의 실제 runtime·품질·독립 수용을 수행한다. 현재9개 모두 not_run/not_recorded다. WI-5는 새 지식 매니저 KM-03/04로 구체화했고 온톨로지 효과 평가는 필수 OE-01로 이동했다. 새 기능·평가7개와 선택 후속12개·태그/공개 배포 결정은 [전체 작업표](../REMAINING-WORK.md)에 남아 있다.

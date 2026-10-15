@@ -1,5 +1,7 @@
 # 운영·독립 수용 검증 계획
 
+2026-10-15 범위 정리: 이 문서의 단계0 조건은 아래9개 정식 운영·독립 평가의 조건이다. 로컬 기능 개발·도구/회귀 검증 전체를 차단하는 공통 gate로 사용하지 않는다. 사용자가 추가한 온톨로지 효과 평가와 지식 매니저/프로젝트 비교는 [새 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [별도 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)에 관리한다. 실제 모델/외부 노드 실행과 사람의 독립 수용에 필요한 지정은 해당 실행 전에 적용하며, 새 요구 등록을 기존 gold/독립 수용 승인으로 기록하지 않는다.
+
 문서 최종 정리 기준일: 2026-10-15 Asia/Seoul. source 후보 관측은2026-10-14에 수행했다. **계획 초안**이며 검증 실행·새 정답·수치 기준 승인·독립 수용은 아직 수행하지 않았다. [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)의9/9 implemented와 독립 수용 not_recorded는 유지한다. 준비/실행/판정 상태는 [별도 검증 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)으로 추적한다. [source 정답·리뷰 초안](./OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)을 작성했으며 독립 채택과 실제 실행은 미완료다. [ChainBench 준비 보완](./OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)의 새 source 후보와 개발 회귀검증은 별도 기록한다.
 
 ## 첫 검증 대상과 적용 범위
