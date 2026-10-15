@@ -8,6 +8,7 @@ import hashlib
 from pathlib import Path
 import re
 import subprocess
+import sys
 import uuid
 
 from manager import Failure, canonical, digest, file_hash, load_registration, require, strict_read, sync_dir, write_new
@@ -17,6 +18,41 @@ from update_contract import completed, validate
 
 def checksum(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def pin_policy(policy,r,allow_missing_material=False):
+    """Store one normalized policy; this does not enable a worker or a job."""
+    policy=validate(policy,r,allow_missing_material=allow_missing_material)
+    directory=owned_directory(Path(r['state_root'])/'updates',r)
+    policies=owned_directory(directory/'policies',r)
+    key=domain_hash('cks.manager-update-policy.v1',policy)
+    path=policies/(key+'.json')
+    with writer(policies):
+        if path.exists():
+            require(strict_read(path)==policy,'update_policy_changed')
+        else:
+            require(len(list(policies.glob('*.json')))<129,'update_policy_limit')
+            stage=policies/('.pending-'+uuid.uuid4().hex)
+            write_new(stage,policy);stage.rename(path);sync_dir(policies)
+    return path,policy
+
+
+def source_check(r,policy_path,input_id):
+    """Only owned immutable policy/input plus the actual pinned manager code."""
+    path=Path(policy_path)
+    require(path.is_absolute()and path.resolve()==path and path.parent==Path(r['state_root'])/'updates/policies','update_policy_invalid')
+    policy=validate(strict_read(path),r,allow_missing_material=True)
+    require(path.name==domain_hash('cks.manager-update-policy.v1',policy)+'.json','update_policy_changed')
+    directory,captured=load_input(r,input_id)
+    require(captured['identity']['policy_digest']==domain_hash('cks.manager-update-policy.v1',policy),'update_policy_changed')
+    scripts=Path(__file__).resolve().parent
+    executable=Path(sys.executable).resolve()
+    files=[executable,*sorted(scripts.glob('*.py')),path,Path(r['state_root'])/'registration.json',directory/'manifest.json',directory/'capture.json']
+    for file in files:
+        require(file.resolve()==file and file.is_file()and not file.is_symlink()and file.stat().st_nlink==1,'update_check_changed')
+    return {'command':[str(executable),str(scripts/'manager.py'),'verify-update-source','--registration',str(Path(r['state_root'])/'registration.json'),
+                       '--policy-file',str(path),'--input-id',input_id],
+            'pinned_files':{str(file):file_hash(file)for file in files},'timeout_seconds':60}
 
 
 def capture(policy,r,allow_missing_material=False):

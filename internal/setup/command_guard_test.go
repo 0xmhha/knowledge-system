@@ -195,6 +195,31 @@ func TestGuardianAbsoluteDeadlineWorksWhileOwnerSocketStaysOpen(t *testing.T) {
 	}
 }
 
+func TestGuardianPastAbsoluteDeadlineCannotStartCommand(t *testing.T) {
+	pair, err := unix.Socketpair(unix.AF_UNIX, unix.SOCK_STREAM, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	parent, child := os.NewFile(uintptr(pair[0]), "owner"), os.NewFile(uintptr(pair[1]), "guardian")
+	defer func() { _ = parent.Close(); _ = child.Close() }()
+	marker := filepath.Join(t.TempDir(), "must-not-exist")
+	payload := guardedCommand{SchemaVersion: 1, Argv: []string{"/bin/sh", "-c", `printf late > "$1"`, "owned", marker}, DeadlineUnixNano: time.Now().Add(-time.Second).UnixNano()}
+	raw, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, os.Args[0], "__dataset-step", base64.RawURLEncoding.EncodeToString(raw))
+	cmd.ExtraFiles = []*os.File{child}
+	if cmd.Run() == nil {
+		t.Fatal("past deadline succeeded")
+	}
+	if _, err := os.Stat(marker); !os.IsNotExist(err) {
+		t.Fatal("past deadline executed a command")
+	}
+}
+
 func TestDerivedFreshVerificationHonorsContextDeadline(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()

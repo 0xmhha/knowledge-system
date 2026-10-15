@@ -170,7 +170,8 @@ func RunGuardedDatasetStep(encoded string) error {
 	if unix.Fstat(3, &stat) != nil || stat.Mode&unix.S_IFMT != unix.S_IFSOCK {
 		return fmt.Errorf("dataset owner channel invalid")
 	}
-	ctx, cancel := context.WithDeadline(context.Background(), time.Unix(0, payload.DeadlineUnixNano))
+	deadline := time.Unix(0, payload.DeadlineUnixNano)
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
 	if _, err := control.Write([]byte{1}); err != nil {
 		return err
@@ -193,11 +194,22 @@ func RunGuardedDatasetStep(encoded string) error {
 	}
 	defer func() { _ = quiescent.Close() }()
 	cmd.ExtraFiles = append(cmd.ExtraFiles, writer)
+	// Check the absolute clock at the exec boundary as well as the context.
+	// The context timer callback may not have run while this process was
+	// descheduled; an elapsed deadline must never start a fresh command.
+	if !time.Now().Before(deadline) {
+		_ = writer.Close()
+		return context.DeadlineExceeded
+	}
 	if err := cmd.Start(); err != nil {
 		_ = writer.Close()
 		return err
 	}
 	_ = writer.Close()
+	if !time.Now().Before(deadline) {
+		cancel()
+		_ = cmd.Cancel()
+	}
 	closed := make(chan struct{})
 	go func() { _, _ = io.Copy(io.Discard, quiescent); close(closed) }()
 	err = cmd.Wait()

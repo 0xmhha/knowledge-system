@@ -19,11 +19,12 @@ import (
 
 // Profile is operator-owned configuration, never accepted in tool arguments.
 type Profile struct {
-	ID                string   `yaml:"id" json:"id"`
-	ProjectID         string   `yaml:"project_id" json:"project_id"`
-	SetupConfig       string   `yaml:"setup_config" json:"setup_config"`
-	AllowedActivation []string `yaml:"allowed_activation" json:"allowed_activation"`
-	TimeoutSeconds    int      `yaml:"timeout_seconds" json:"timeout_seconds"`
+	ID                string       `yaml:"id" json:"id"`
+	ProjectID         string       `yaml:"project_id" json:"project_id"`
+	SetupConfig       string       `yaml:"setup_config" json:"setup_config"`
+	AllowedActivation []string     `yaml:"allowed_activation" json:"allowed_activation"`
+	TimeoutSeconds    int          `yaml:"timeout_seconds" json:"timeout_seconds"`
+	SourceCheck       *SourceCheck `yaml:"source_check,omitempty" json:"source_check,omitempty"`
 }
 
 type registered struct {
@@ -49,6 +50,9 @@ func (p Profile) Validate() error {
 			return reject("unsupported_capability")
 		}
 		seen[mode] = true
+	}
+	if p.SourceCheck != nil && p.SourceCheck.Validate() != nil {
+		return reject("profile_unknown")
 	}
 	return nil
 }
@@ -236,6 +240,9 @@ func prepare(ctx context.Context, p registered, self string) (prepared, error) {
 	}
 	if o.Src != p.src || o.Out != p.out {
 		return prepared{}, reject("profile_stale")
+	}
+	if err := runSourceCheck(ctx, p.spec.SourceCheck, self); err != nil {
+		return prepared{}, err
 	}
 	if err := attachInputs(&o); err != nil {
 		return prepared{}, err

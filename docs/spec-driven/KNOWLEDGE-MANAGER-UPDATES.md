@@ -105,3 +105,23 @@ prepare-update는 선택 원문의 immutable 관찰 입력을 만들고 변경�
 KM-04.2 완료: 자동 관찰 입력·선택 파일의 추가/수정/삭제·same-byte rename 후보·명시 knowledge/ontology 원문·제공 기록·검토 stale/no-op pin을 구현했다. 사용자 source에 문서를 쓰거나 review/human_response를 만들지 않고 native knowledge init/validate/lock/validate를 수행한다. 정책27·입력32·기존 manager103의162개와 실제 공개 MCP16항목·4개 held DB·82호출·11연결 EOF0·증거 보호14개를 검증했다. 실제 두 번 변경·삭제 후 최신 원문/인용과 이전 snapshot/타 프로젝트 DB 보존, 실제 inspect/status/reader가 있는 무변경 판정을 확인했다. 메타데이터/input equality만으로 DB no-op을 승인하지 않는다. 이 실행은 수동 검증이며 주기 worker 검증이 아니다. build/fmt/vet/lint·문서132개를 통과했고 Go1256개·의존/fixture byte가 C와 같아 원래3,820통과/18skip·race810통과/2skip을 참조했다. 새 Go 실행으로 세지 않는다.
 
 [관찰 입력 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-inputs/manifest.json)을 따른다. 전체14/28·기능3/7이며 다음은 KM-04.3의 durable intent·한 writer·재시작/retry·실제 worker와 gated 전환이다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도 유지하며 멈추라는 요청 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-04.3의 A/B/C 실행 구분
+
+A는 native 유지 보수의 원문 재확인, B는 매니저의 durable worker·일정·중복/retry와 상태, C는 실제 주기/중단/복구 연결 검증으로 나눈다. A만 통과해도 KM-04.3 또는 전체 KM-04를 완료로 표시하지 않는다.
+
+등록 profile의 선택적 source_check는 command(argv), pinned_files(절대 canonical 파일→SHA-256), timeout_seconds(1–60)를 갖는다. operator가 소유한 설정이며 도구 요청으로 실행 파일/인자를 선택할 수 없다. 기본 nil이면 기존 profile digest·도구 목록·동작을 유지한다. argv 최대32개·고정 파일64개, 파일당128MiB·전체256MiB를 제한하고 링크/하드링크·byte 변경·명령 실패·deadline을 거부한다. shell 문자열로 재해석하지 않으며 stdout/stderr는 보관하지 않는다. 실행 전후 파일 pin을 확인하고 기존 guardian의 owner socket·process group·deadline 감독을 사용한다.
+
+source_check는 native inspect/admission, 후보 완료 확인과 pointer lock 안의 최종 게시 직전에 실행한다. 매니저는 실제 Python interpreter와 plugin 코드·소유 immutable 정책/등록·입력 manifest/capture를 결속하고 verify-update-source로 원래 source/material/provided fingerprint를 다시 계산한다. build가 사용하는 불변 사본만 확인하고 바뀐 원래 source를 놓치는 문제를 막는다. 이는 확인 시점의 원문 신원 검사이며 의미 승인/수용이나 파일 시스템 전체를 원자적으로 잠그는 보장은 아니다.
+
+이 원문 전용 probe만 DB 소유 검사를 native에 맡긴다. native 접수는 root owner가 기록되기 전에 소유 journal을 만들 수 있기 때문이다. probe는 등록/config/엔진·입력 owner/hash와 원래 source를 읽고 확인하며 DB에 쓰거나 소유권을 채택하지 않는다. 기본 등록/doctor·prepare-update와 모든 DB 쓰기는 기존 소유 검사를 유지한다. 이미 접수된 작업의 exact replay/status는 source check의 현재 결과와 분리해 과거 결과를 재현한다.
+
+
+## KM-04.3 A 검증 기록
+
+KM-04.3 A 원문 전환 전 확인 완료: operator profile의 선택적 source_check로 실제 Python/코드·소유 정책/등록/불변 입력을 고정하고 admission/후보 완료/게시 pointer lock 안에서 원래 source fingerprint를 재확인한다. 실제 MCP14항목·90호출·3개 job에서 v1 게시→v2 원문 변경으로 게시 거부/current·기존 reader 보존→v3 복구 게시/조회와5연결 EOF0을 확인했다. Go 전체3,862사례(3,844통과·18skip), 관련6패키지 race836(834통과·2skip)을 새로 실행했고 Python174개·증거 보호14개·build/fmt/vet/lint·문서132개를 통과했다. 추가 source-check23사례와 이미 지난 deadline1사례는 전체/race 분모 안에 포함하며 중복 합산하지 않는다.
+
+처음에는 원문 probe가 native 접수 중의 아직 root owner가 없는 소유 journal과 충돌했다. 원문 전용 probe만 읽기 확인과 DB 소유 검증을 분리했고 기본 등록·doctor·prepare·DB 쓰기의 소유 검증은 유지했다. Native 오류의 실제 structuredContent를 읽도록 검증기도 수정했다. 최초 race의 기존 deadline 시험1회 late-writer 실패는5회 반복에서 재현되지 않았다. timer callback 도착만 가정하지 않도록 exec 직전/직후 절대 시각 확인을 보강하고 과거 deadline 거부 시험을 추가했다. 두 경계를 각각5회 확인한 뒤 최종 전체·race를 순차 실행해 실패0을 확인했다. 최초 실패의 단일 원인을 입증했다고 주장하지 않으며 initial-failures의 원자료를 보존한다.
+
+[원문 확인 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-source-check/manifest.json)을 따른다. 현재 소스1,707입력=Go1,258+기타449이며 승인5개는 보존했다. 직전2c03322f의 입력 검증을 동결 snapshot에서 별도 확인했다. A는 native 원문 검사 범위다. KM-04.3의 B durable worker/일정/중복/retry와 C 중단/복구 연결, KM-04.4 실제 주기 실행은 남는다. 전체14/28·기능3/7을 유지한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 다음 B를 진행한다.

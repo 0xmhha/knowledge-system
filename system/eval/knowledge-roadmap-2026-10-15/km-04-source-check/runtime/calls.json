@@ -1,0 +1,4607 @@
+[
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "profile": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+          "profile_digest": "65c40c8e55b355c5883777caf5427b7ef20e9e9ebd98f5f6c2287d6c494be73d",
+          "source_pin": {
+            "mode": "snapshot-only",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "base_commit": ""
+          },
+          "input_digest": "c1365db6ce6f1f35bae7199d55f6fb412c93b645c66083ce44f1f49a9504038f",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "observed_base": {
+            "state": "absent"
+          },
+          "existing_versions": [],
+          "allowed_activation": [
+            "activate_after_gate"
+          ],
+          "required_gates": [
+            "source",
+            "identity",
+            "graph",
+            "vector",
+            "knowledge"
+          ],
+          "timeout_max_seconds": 120
+        },
+        "capabilities": {
+          "versioned_build": true,
+          "cancel": true,
+          "job_persistence": "durable_journal",
+          "serving_adoption": "not_observed",
+          "input_preparation": "existing_reviewed_or_rendered_inputs"
+        }
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.build",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "profile_digest": "65c40c8e55b355c5883777caf5427b7ef20e9e9ebd98f5f6c2287d6c494be73d",
+      "source_pin": {
+        "mode": "snapshot-only",
+        "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+        "base_commit": ""
+      },
+      "input_digest": "c1365db6ce6f1f35bae7199d55f6fb412c93b645c66083ce44f1f49a9504038f",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+      "base": {
+        "state": "absent"
+      },
+      "new_version": "guarded-v1",
+      "activation": "activate_after_gate",
+      "idempotency_key": "owned-original-check-guarded-v1",
+      "deadline_seconds": 120
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 1,
+        "state": "queued",
+        "phase": "accepted",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "52e11c4b90a953f9b7f176a678f351b0"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "52e11c4b90a953f9b7f176a678f351b0",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "72dd3840f7d924ff46eaafe454e01f94c74f8bf645b4eacd317b6e80209e2453",
+        "target_version": "guarded-v1",
+        "revision": 7,
+        "state": "succeeded",
+        "phase": "finished",
+        "terminal": true,
+        "build_complete": true,
+        "activated": true,
+        "candidate": {
+          "version": "guarded-v1",
+          "coordinates": {
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "input_digest": "c1365db6ce6f1f35bae7199d55f6fb412c93b645c66083ce44f1f49a9504038f",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370"
+        },
+        "publication": {
+          "base": {
+            "state": "absent"
+          },
+          "version": "guarded-v1",
+          "coordinates": {
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "published_at": "2026-10-15T14:04:33.671455Z",
+          "receipt_digest": "066559466cb7cb5c20e256586246fec392ca4dfad8f1a1a731eb852f7219279b"
+        },
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "profile": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+          "profile_digest": "65c40c8e55b355c5883777caf5427b7ef20e9e9ebd98f5f6c2287d6c494be73d",
+          "source_pin": {
+            "mode": "snapshot-only",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "base_commit": ""
+          },
+          "input_digest": "c1365db6ce6f1f35bae7199d55f6fb412c93b645c66083ce44f1f49a9504038f",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "observed_base": {
+            "state": "pinned",
+            "version": "guarded-v1",
+            "coordinates": {
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            }
+          },
+          "existing_versions": [
+            "guarded-v1"
+          ],
+          "allowed_activation": [
+            "activate_after_gate"
+          ],
+          "required_gates": [
+            "source",
+            "identity",
+            "graph",
+            "vector",
+            "knowledge"
+          ],
+          "timeout_max_seconds": 120
+        },
+        "capabilities": {
+          "versioned_build": true,
+          "cancel": true,
+          "job_persistence": "durable_journal",
+          "serving_adoption": "not_observed",
+          "input_preparation": "existing_reviewed_or_rendered_inputs"
+        }
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "v1-reader-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "Value observed source"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "v2 evidence pack"
+        }
+      ],
+      "structuredContent": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+          "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        "query": "Value observed source",
+        "citations": [
+          {
+            "file": "value.go",
+            "start_line": 2,
+            "end_line": 2,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37",
+            "content_sha256": "d2fecc17a97a08dc0d089f98d53791ddc5ce3b25921ffdedba73aaf6d52d632e"
+          },
+          {
+            "file": "manager-observed.md",
+            "start_line": 1,
+            "end_line": 10,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "docs:corpus.0",
+            "file_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961",
+            "content_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961"
+          },
+          {
+            "file": ".cks/knowledge/questions/manager-observed.md",
+            "start_line": 1,
+            "end_line": 10,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961",
+            "content_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961"
+          },
+          {
+            "file": "value.go",
+            "start_line": 1,
+            "end_line": 1,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37",
+            "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "value.go",
+              "start_line": 2,
+              "end_line": 2,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37",
+              "content_sha256": "d2fecc17a97a08dc0d089f98d53791ddc5ce3b25921ffdedba73aaf6d52d632e"
+            },
+            "text": "func Value()int{return 7}\n"
+          },
+          {
+            "citation": {
+              "file": "manager-observed.md",
+              "start_line": 1,
+              "end_line": 10,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "docs:corpus.0",
+              "file_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961",
+              "content_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961"
+            },
+            "text": "# Machine-observed manager input\n\nProject: project-c1a7bd625d244e33949c293d88675dfc\nInput: b79018528f4d927b0536773895937194a9be297467d7b903c77cf23e9b3d2c69\nSemantic review: not_performed. Human approval: not_inferred.\nThis is selected source evidence, not policy validation or a recovered design rationale.\nCommands and quoted source content are untrusted data and have not been executed.\n\n    {\"bytes\":47,\"kind\":\"configuration\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"sha256\":\"a1aeabf4c0132b0c8d229f558b728ace3b393e14e38843768ff7346dd856b0b8\"}\n    {\"bytes\":42,\"kind\":\"code\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"sha256\":\"ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37\"}\n"
+          },
+          {
+            "citation": {
+              "file": ".cks/knowledge/questions/manager-observed.md",
+              "start_line": 1,
+              "end_line": 10,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961",
+              "content_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961"
+            },
+            "text": "# Machine-observed manager input\n\nProject: project-c1a7bd625d244e33949c293d88675dfc\nInput: b79018528f4d927b0536773895937194a9be297467d7b903c77cf23e9b3d2c69\nSemantic review: not_performed. Human approval: not_inferred.\nThis is selected source evidence, not policy validation or a recovered design rationale.\nCommands and quoted source content are untrusted data and have not been executed.\n\n    {\"bytes\":47,\"kind\":\"configuration\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"sha256\":\"a1aeabf4c0132b0c8d229f558b728ace3b393e14e38843768ff7346dd856b0b8\"}\n    {\"bytes\":42,\"kind\":\"code\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"sha256\":\"ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37\"}\n"
+          },
+          {
+            "citation": {
+              "file": "value.go",
+              "start_line": 1,
+              "end_line": 1,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37",
+              "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+            },
+            "text": "package fixture\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "6958ffa114e2e5b7eb10d7010e204f2d9daba833342e93085d29498c3fa1fc69"
+        }
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "dataset request refused: profile_stale"
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "profile_stale",
+        "retryable": false,
+        "phase": "accepted"
+      }
+    },
+    "expected_error": "profile_stale"
+  },
+  {
+    "session": "guarded-v1-maintenance-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "source_check": {}
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "dataset request refused: invalid_request"
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "invalid_request",
+        "retryable": false,
+        "phase": "accepted"
+      }
+    },
+    "expected_error": "invalid_request"
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "profile": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+          "profile_digest": "a03315f7a8e2fb2c4bcdd2d5dce6030e61aaaf15910d2ef884ba5ed629ed9691",
+          "source_pin": {
+            "mode": "snapshot-only",
+            "snapshot_id": "34f81ee0a527865ed77b409fcf3e1644b58fdc8f2c3dac31a138523431a7cb8b",
+            "base_commit": ""
+          },
+          "input_digest": "d96e9390f55e2c565a2d958730ac038cef97d3696ecdea03fc7c3e2cae54d692",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "observed_base": {
+            "state": "pinned",
+            "version": "guarded-v1",
+            "coordinates": {
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            }
+          },
+          "existing_versions": [
+            "guarded-v1"
+          ],
+          "allowed_activation": [
+            "activate_after_gate"
+          ],
+          "required_gates": [
+            "source",
+            "identity",
+            "graph",
+            "vector",
+            "knowledge"
+          ],
+          "timeout_max_seconds": 120
+        },
+        "capabilities": {
+          "versioned_build": true,
+          "cancel": true,
+          "job_persistence": "durable_journal",
+          "serving_adoption": "not_observed",
+          "input_preparation": "existing_reviewed_or_rendered_inputs"
+        }
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.build",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "profile_digest": "a03315f7a8e2fb2c4bcdd2d5dce6030e61aaaf15910d2ef884ba5ed629ed9691",
+      "source_pin": {
+        "mode": "snapshot-only",
+        "snapshot_id": "34f81ee0a527865ed77b409fcf3e1644b58fdc8f2c3dac31a138523431a7cb8b",
+        "base_commit": ""
+      },
+      "input_digest": "d96e9390f55e2c565a2d958730ac038cef97d3696ecdea03fc7c3e2cae54d692",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+      "base": {
+        "state": "pinned",
+        "version": "guarded-v1",
+        "coordinates": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+          "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        }
+      },
+      "new_version": "guarded-v2",
+      "activation": "activate_after_gate",
+      "idempotency_key": "owned-original-check-guarded-v2",
+      "deadline_seconds": 120
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 1,
+        "state": "queued",
+        "phase": "accepted",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "c49a58ff1684103da8ade9471a11c386"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 5,
+        "state": "failed",
+        "phase": "finished",
+        "terminal": true,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": {
+          "code": "source_stale",
+          "retryable": false,
+          "phase": "build_vector"
+        },
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v2-maintenance-session",
+    "tool": "cks.dataset.build",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "profile_digest": "a03315f7a8e2fb2c4bcdd2d5dce6030e61aaaf15910d2ef884ba5ed629ed9691",
+      "source_pin": {
+        "mode": "snapshot-only",
+        "snapshot_id": "34f81ee0a527865ed77b409fcf3e1644b58fdc8f2c3dac31a138523431a7cb8b",
+        "base_commit": ""
+      },
+      "input_digest": "d96e9390f55e2c565a2d958730ac038cef97d3696ecdea03fc7c3e2cae54d692",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+      "base": {
+        "state": "pinned",
+        "version": "guarded-v1",
+        "coordinates": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+          "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        }
+      },
+      "new_version": "guarded-v2",
+      "activation": "activate_after_gate",
+      "idempotency_key": "owned-original-check-guarded-v2",
+      "deadline_seconds": 120
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "c49a58ff1684103da8ade9471a11c386",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "4b17a39f568da6d2d0466c9251d09899f0e9d6e1c3ce879c8473a4a11a43a024",
+        "target_version": "guarded-v2",
+        "revision": 5,
+        "state": "failed",
+        "phase": "finished",
+        "terminal": true,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": {
+          "code": "source_stale",
+          "retryable": false,
+          "phase": "build_vector"
+        },
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "v1-reader-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "Value observed source"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "v2 evidence pack"
+        }
+      ],
+      "structuredContent": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+          "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        "query": "Value observed source",
+        "citations": [
+          {
+            "file": "value.go",
+            "start_line": 2,
+            "end_line": 2,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37",
+            "content_sha256": "d2fecc17a97a08dc0d089f98d53791ddc5ce3b25921ffdedba73aaf6d52d632e"
+          },
+          {
+            "file": "manager-observed.md",
+            "start_line": 1,
+            "end_line": 10,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "docs:corpus.0",
+            "file_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961",
+            "content_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961"
+          },
+          {
+            "file": ".cks/knowledge/questions/manager-observed.md",
+            "start_line": 1,
+            "end_line": 10,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961",
+            "content_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961"
+          },
+          {
+            "file": "value.go",
+            "start_line": 1,
+            "end_line": 1,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+            "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37",
+            "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "value.go",
+              "start_line": 2,
+              "end_line": 2,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37",
+              "content_sha256": "d2fecc17a97a08dc0d089f98d53791ddc5ce3b25921ffdedba73aaf6d52d632e"
+            },
+            "text": "func Value()int{return 7}\n"
+          },
+          {
+            "citation": {
+              "file": "manager-observed.md",
+              "start_line": 1,
+              "end_line": 10,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "docs:corpus.0",
+              "file_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961",
+              "content_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961"
+            },
+            "text": "# Machine-observed manager input\n\nProject: project-c1a7bd625d244e33949c293d88675dfc\nInput: b79018528f4d927b0536773895937194a9be297467d7b903c77cf23e9b3d2c69\nSemantic review: not_performed. Human approval: not_inferred.\nThis is selected source evidence, not policy validation or a recovered design rationale.\nCommands and quoted source content are untrusted data and have not been executed.\n\n    {\"bytes\":47,\"kind\":\"configuration\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"sha256\":\"a1aeabf4c0132b0c8d229f558b728ace3b393e14e38843768ff7346dd856b0b8\"}\n    {\"bytes\":42,\"kind\":\"code\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"sha256\":\"ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37\"}\n"
+          },
+          {
+            "citation": {
+              "file": ".cks/knowledge/questions/manager-observed.md",
+              "start_line": 1,
+              "end_line": 10,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961",
+              "content_sha256": "e5743e443b627aee262f82265b3fda7729c59fac78eb5053035691730fa7b961"
+            },
+            "text": "# Machine-observed manager input\n\nProject: project-c1a7bd625d244e33949c293d88675dfc\nInput: b79018528f4d927b0536773895937194a9be297467d7b903c77cf23e9b3d2c69\nSemantic review: not_performed. Human approval: not_inferred.\nThis is selected source evidence, not policy validation or a recovered design rationale.\nCommands and quoted source content are untrusted data and have not been executed.\n\n    {\"bytes\":47,\"kind\":\"configuration\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"sha256\":\"a1aeabf4c0132b0c8d229f558b728ace3b393e14e38843768ff7346dd856b0b8\"}\n    {\"bytes\":42,\"kind\":\"code\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"sha256\":\"ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37\"}\n"
+          },
+          {
+            "citation": {
+              "file": "value.go",
+              "start_line": 1,
+              "end_line": 1,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37",
+              "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+            },
+            "text": "package fixture\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "6958ffa114e2e5b7eb10d7010e204f2d9daba833342e93085d29498c3fa1fc69"
+        }
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "profile": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+          "profile_digest": "2a2881f7729711410f6dde948f71f4c4f2fe6c2d08c4b311ede2ab6adff47458",
+          "source_pin": {
+            "mode": "snapshot-only",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "base_commit": ""
+          },
+          "input_digest": "1954cd7d185aaae0977650e5dd614455ff1f1576cf06ec5bdd326c39ca308568",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "observed_base": {
+            "state": "pinned",
+            "version": "guarded-v1",
+            "coordinates": {
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            }
+          },
+          "existing_versions": [
+            "guarded-v1",
+            "guarded-v2"
+          ],
+          "allowed_activation": [
+            "activate_after_gate"
+          ],
+          "required_gates": [
+            "source",
+            "identity",
+            "graph",
+            "vector",
+            "knowledge"
+          ],
+          "timeout_max_seconds": 120
+        },
+        "capabilities": {
+          "versioned_build": true,
+          "cancel": true,
+          "job_persistence": "durable_journal",
+          "serving_adoption": "not_observed",
+          "input_preparation": "existing_reviewed_or_rendered_inputs"
+        }
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.build",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "profile_digest": "2a2881f7729711410f6dde948f71f4c4f2fe6c2d08c4b311ede2ab6adff47458",
+      "source_pin": {
+        "mode": "snapshot-only",
+        "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+        "base_commit": ""
+      },
+      "input_digest": "1954cd7d185aaae0977650e5dd614455ff1f1576cf06ec5bdd326c39ca308568",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+      "base": {
+        "state": "pinned",
+        "version": "guarded-v1",
+        "coordinates": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+          "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        }
+      },
+      "new_version": "guarded-v3",
+      "activation": "activate_after_gate",
+      "idempotency_key": "owned-original-check-guarded-v3",
+      "deadline_seconds": 120
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 1,
+        "state": "queued",
+        "phase": "accepted",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 2,
+        "state": "running",
+        "phase": "capture",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 4,
+        "state": "running",
+        "phase": "build_vector",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 6,
+        "state": "running",
+        "phase": "publish",
+        "terminal": false,
+        "build_complete": true,
+        "activated": false,
+        "candidate": {
+          "version": "guarded-v3",
+          "coordinates": {
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "input_digest": "1954cd7d185aaae0977650e5dd614455ff1f1576cf06ec5bdd326c39ca308568",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370"
+        },
+        "publication": null,
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+      "job_id": "3cc8c205ec23cf670d140656143ef16e"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "schema_version": 1,
+        "job_id": "3cc8c205ec23cf670d140656143ef16e",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "request_digest": "1a465d5d6bd9076e42b59526cddd5c2a349495a8a5ba40e37fdb78683a0969fd",
+        "target_version": "guarded-v3",
+        "revision": 7,
+        "state": "succeeded",
+        "phase": "finished",
+        "terminal": true,
+        "build_complete": true,
+        "activated": true,
+        "candidate": {
+          "version": "guarded-v3",
+          "coordinates": {
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "input_digest": "1954cd7d185aaae0977650e5dd614455ff1f1576cf06ec5bdd326c39ca308568",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370"
+        },
+        "publication": {
+          "base": {
+            "state": "pinned",
+            "version": "guarded-v1",
+            "coordinates": {
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "aeecd238ca45357eca455cdeca26f7b1fb810dec02e97784996c8b10bb21c187",
+              "snapshot_id": "983ce834591255eebeb1fe8edcd8464197c0ebaea1fa337d1722c4b53626b216",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            }
+          },
+          "version": "guarded-v3",
+          "coordinates": {
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "published_at": "2026-10-15T14:04:39.371047Z",
+          "receipt_digest": "55f634c4e8272cdde2ac04f78012665e2d222f4cbe518bcb25b4e915921b1edc"
+        },
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "guarded-v3-maintenance-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+      "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "scoped dataset maintenance result; inspect structured status"
+        }
+      ],
+      "structuredContent": {
+        "profile": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "profile_id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+          "profile_digest": "2a2881f7729711410f6dde948f71f4c4f2fe6c2d08c4b311ede2ab6adff47458",
+          "source_pin": {
+            "mode": "snapshot-only",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "base_commit": ""
+          },
+          "input_digest": "1954cd7d185aaae0977650e5dd614455ff1f1576cf06ec5bdd326c39ca308568",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "observed_base": {
+            "state": "pinned",
+            "version": "guarded-v3",
+            "coordinates": {
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+              "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            }
+          },
+          "existing_versions": [
+            "guarded-v1",
+            "guarded-v2",
+            "guarded-v3"
+          ],
+          "allowed_activation": [
+            "activate_after_gate"
+          ],
+          "required_gates": [
+            "source",
+            "identity",
+            "graph",
+            "vector",
+            "knowledge"
+          ],
+          "timeout_max_seconds": 120
+        },
+        "capabilities": {
+          "versioned_build": true,
+          "cancel": true,
+          "job_persistence": "durable_journal",
+          "serving_adoption": "not_observed",
+          "input_preparation": "existing_reviewed_or_rendered_inputs"
+        }
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "v3-reader-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "Value observed source"
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "v2 evidence pack"
+        }
+      ],
+      "structuredContent": {
+        "format_version": 2,
+        "coordinates": {
+          "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+          "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+          "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        "query": "Value observed source",
+        "citations": [
+          {
+            "file": "value.go",
+            "start_line": 2,
+            "end_line": 2,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "6226b712c49b7a9e5047df3dc2fddaaefe314b3c74c353a426393b9a28e5c265",
+            "content_sha256": "3f4b2972b07528e3a762a83d16a4aaefa561f7f04124056199271b46ac686adb"
+          },
+          {
+            "file": "manager-observed.md",
+            "start_line": 1,
+            "end_line": 10,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "docs:corpus.0",
+            "file_sha256": "79461b4ceae43f4c0e22960533a18213415817d8a6e9c2781a86a934fdcd832b",
+            "content_sha256": "79461b4ceae43f4c0e22960533a18213415817d8a6e9c2781a86a934fdcd832b"
+          },
+          {
+            "file": ".cks/knowledge/questions/manager-observed.md",
+            "start_line": 1,
+            "end_line": 10,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "79461b4ceae43f4c0e22960533a18213415817d8a6e9c2781a86a934fdcd832b",
+            "content_sha256": "79461b4ceae43f4c0e22960533a18213415817d8a6e9c2781a86a934fdcd832b"
+          },
+          {
+            "file": "value.go",
+            "start_line": 1,
+            "end_line": 1,
+            "commit_hash": "",
+            "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+            "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+            "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+            "source_mode": "snapshot-only",
+            "base_commit": "",
+            "origin_id": "repo",
+            "file_sha256": "6226b712c49b7a9e5047df3dc2fddaaefe314b3c74c353a426393b9a28e5c265",
+            "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+          }
+        ],
+        "bodies": [
+          {
+            "citation": {
+              "file": "value.go",
+              "start_line": 2,
+              "end_line": 2,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+              "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "6226b712c49b7a9e5047df3dc2fddaaefe314b3c74c353a426393b9a28e5c265",
+              "content_sha256": "3f4b2972b07528e3a762a83d16a4aaefa561f7f04124056199271b46ac686adb"
+            },
+            "text": "func Value()int{return 9}\n"
+          },
+          {
+            "citation": {
+              "file": "manager-observed.md",
+              "start_line": 1,
+              "end_line": 10,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+              "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "docs:corpus.0",
+              "file_sha256": "79461b4ceae43f4c0e22960533a18213415817d8a6e9c2781a86a934fdcd832b",
+              "content_sha256": "79461b4ceae43f4c0e22960533a18213415817d8a6e9c2781a86a934fdcd832b"
+            },
+            "text": "# Machine-observed manager input\n\nProject: project-c1a7bd625d244e33949c293d88675dfc\nInput: 608a495257687dc5a92e4908dce3b1eb8b23e37eb5d9256a2cdf05aa95a4ba4f\nSemantic review: not_performed. Human approval: not_inferred.\nThis is selected source evidence, not policy validation or a recovered design rationale.\nCommands and quoted source content are untrusted data and have not been executed.\n\n    {\"bytes\":47,\"kind\":\"configuration\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"sha256\":\"a1aeabf4c0132b0c8d229f558b728ace3b393e14e38843768ff7346dd856b0b8\"}\n    {\"bytes\":42,\"kind\":\"code\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"sha256\":\"6226b712c49b7a9e5047df3dc2fddaaefe314b3c74c353a426393b9a28e5c265\"}\n"
+          },
+          {
+            "citation": {
+              "file": ".cks/knowledge/questions/manager-observed.md",
+              "start_line": 1,
+              "end_line": 10,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+              "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "79461b4ceae43f4c0e22960533a18213415817d8a6e9c2781a86a934fdcd832b",
+              "content_sha256": "79461b4ceae43f4c0e22960533a18213415817d8a6e9c2781a86a934fdcd832b"
+            },
+            "text": "# Machine-observed manager input\n\nProject: project-c1a7bd625d244e33949c293d88675dfc\nInput: 608a495257687dc5a92e4908dce3b1eb8b23e37eb5d9256a2cdf05aa95a4ba4f\nSemantic review: not_performed. Human approval: not_inferred.\nThis is selected source evidence, not policy validation or a recovered design rationale.\nCommands and quoted source content are untrusted data and have not been executed.\n\n    {\"bytes\":47,\"kind\":\"configuration\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"sha256\":\"a1aeabf4c0132b0c8d229f558b728ace3b393e14e38843768ff7346dd856b0b8\"}\n    {\"bytes\":42,\"kind\":\"code\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"sha256\":\"6226b712c49b7a9e5047df3dc2fddaaefe314b3c74c353a426393b9a28e5c265\"}\n"
+          },
+          {
+            "citation": {
+              "file": "value.go",
+              "start_line": 1,
+              "end_line": 1,
+              "commit_hash": "",
+              "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+              "dataset_id": "adf4d53dee9241929211313b6ee2fb75d7e3b5131f7131efd70f6f4a4252be18",
+              "snapshot_id": "7e781c8bfd3f7ea53e7cde8f9a41caa9b19d7738b8c50d33e241fc9850956f62",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "6226b712c49b7a9e5047df3dc2fddaaefe314b3c74c353a426393b9a28e5c265",
+              "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6"
+            },
+            "text": "package fixture\n"
+          }
+        ],
+        "graph_neighbors": [],
+        "semantic": null,
+        "evidence_state": "complete",
+        "metadata": {
+          "integrity_hash_algo": "sha256-v2",
+          "integrity_hash": "38ff9c87f0d7f2bd04ce2f81bca89934d17d0527560957a9e7a370dde89fd40a"
+        }
+      }
+    },
+    "expected_error": null
+  }
+]

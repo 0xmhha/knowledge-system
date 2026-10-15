@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'manager-update-inputs': {
+        'revision': '2c03322f', 'folder': 'km-04-inputs',
+        'scope': 'historical_KM04_2_observed_inputs_not_scheduler_runtime',
+        'scripts': ['check-manager-update-inputs-evidence.py', 'test_manager_update_inputs_evidence.py'],
+    },
     'manager-update-contract': {
         'revision': '7268ac7f', 'folder': 'km-04-contract',
         'scope': 'historical_KM04_1_policy_design_not_scheduler_runtime',

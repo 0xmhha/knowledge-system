@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -40,6 +41,24 @@ type Runner interface {
 // it, a server launchd started has no `go` to hand the graph build, and the
 // failure surfaces deep inside go/packages instead of here.
 type SubprocessRunner struct{ GuardianBinary string }
+
+// RunGuardedCommand runs an operator-configured check with the same owner
+// socket/deadline/process-group supervision as build steps. It accepts no shell
+// text, keeps no output and does not resolve a build toolchain first. Callers
+// must bind argv/executable bytes and provide a bounded context.
+func RunGuardedCommand(ctx context.Context, guardian string, argv, env []string) error {
+	if guardian == "" || len(argv) == 0 || argv[0] == "" {
+		return fmt.Errorf("guarded check requires guardian and argv")
+	}
+	ctx = context.WithValue(ctx, commandGuardianKey{}, guardian)
+	cmd := setupCommandContext(ctx, argv[0], argv[1:]...)
+	cmd.Env = append(cmd.Environ(), env...)
+	cmd.Stdout, cmd.Stderr = io.Discard, io.Discard
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return ctx.Err()
+}
 
 // toolchainTools are what a build subprocess shells out to: go/packages runs
 // `go list`, and indexing records each chunk's commit.

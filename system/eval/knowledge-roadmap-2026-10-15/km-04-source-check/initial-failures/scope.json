@@ -1,0 +1,9 @@
+{
+  "native_probe": "The initial original-source probe checked dataset ownership during native admission after the owned journal existed but before root ownership was claimed. Read-only source verification now leaves DB ownership to native maintenance; normal registration/doctor/preparation/mutations keep the original check.",
+  "native_error_parser": "Actual native errors have human-readable content plus typed structuredContent. Corrected verifier to use the actual typed error.",
+  "race_observation": "One initial race execution of the existing absolute deadline test observed a late writer. Five repetitions before the code change did not reproduce it; no unique root cause is claimed.",
+  "boundary_strengthening": "Check actual wall clock immediately before/after exec, independently of timer callback delivery; add a past-deadline no-exec test. Both boundary cases passed five race repetitions and the final full module and six-package race run passed sequentially.",
+  "initial_module_is_not_final_validation": true,
+  "paid_model_calls": 0,
+  "independent_acceptance": false
+}

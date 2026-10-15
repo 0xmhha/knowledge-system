@@ -142,7 +142,7 @@ def register(args):
             'registration_file':str(state/'registration.json'),'dataset_created':False,'source_modified':False,'paid_model_calls':0}
 
 
-def load_registration(path):
+def load_registration(path,check_dataset=True):
     p = Path(path).expanduser()
     require(p.is_absolute() and not p.is_symlink(), 'absolute_path_required')
     p = p.resolve()
@@ -168,7 +168,8 @@ def load_registration(path):
     setup,config = strict_read(state/'setup.json'),strict_read(state/'cks.json')
     require(setup['src']==str(source) and setup['out']==str(dataset) and setup['project_id']==r['project_id'] and
             config['maintenance']['profiles'][0]['id']==r['profile_id'], 'registration_invalid')
-    dataset_owner(dataset,r['project_id'])
+    if check_dataset:
+        dataset_owner(dataset,r['project_id'])
     return r
 
 
@@ -289,13 +290,20 @@ def main():
     update_input.add_argument('--registration',required=True)
     update_input.add_argument('--policy-file',required=True)
     update_input.add_argument('--previous-input')
+    source_check = commands.add_parser('verify-update-source')
+    source_check.add_argument('--registration',required=True)
+    source_check.add_argument('--policy-file',required=True)
+    source_check.add_argument('--input-id',required=True)
     args = parser.parse_args()
     try:
         if args.operation=='register':
             result = register(args)
         else:
             require(args.registration,'registration_required')
-            r = load_registration(args.registration)
+            # A native admission may own a durable journal before claiming the
+            # dataset root. This fixed read-only probe checks only original
+            # source/input freshness; native maintenance checks DB ownership.
+            r = load_registration(args.registration,check_dataset=args.operation!='verify-update-source')
             if args.operation=='serve':
                 from broker import serve
                 serve(args.registration)
@@ -306,6 +314,13 @@ def main():
             elif args.operation=='prepare-update':
                 from update_inputs import prepare
                 result=prepare(strict_read(Path(args.policy_file)),r,args.previous_input)
+            elif args.operation=='verify-update-source':
+                from update_inputs import capture,load_input
+                _,expected=load_input(r,args.input_id)
+                actual,_=capture(strict_read(Path(args.policy_file)),r,allow_missing_material=True)
+                require(actual['input_id']==expected['input_id'],'source_changed')
+                result={'schema_version':1,'stage':'original_source_fingerprint_verified','input_id':args.input_id,
+                        'semantic_review':'not_performed','source_modified':False,'DB_published':False}
             elif args.operation in ('collect','evidence','draft','draft-status'):
                 from collection import collect,evidence,draft,load_draft
                 if args.operation=='collect':

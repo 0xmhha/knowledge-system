@@ -1,0 +1,22 @@
+PASS: actual profile admits a pinned original-source verification command
+PASS: unchanged original source can actually pass native gates and publish
+PASS: actual published v1 reads retained original code
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-source-check.py", line 111, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-source-check.py", line 80, in main
+    bound.write_text('changed owned guard input\n');tool(client,'cks.dataset.inspect_profile',scope,error='profile_stale');bound.write_text('owned stable guard input\n')
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-source-check.py", line 36, in tool
+    require(result.get('isError')is True,'expected tool refusal');value=json.loads(result['content'][0]['text']);require(value.get('code')==error,'different refusal: '+str(value));return result
+                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "name": "cks",
+  "listen": {
+    "transport": "stdio",
+    "mcp_stdio": true
+  },
+  "logging": {
+    "level": "error",
+    "mode": "prod"
+  },
+  "sanitize": {
+    "rules_path": "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/sanitization_rules.yaml"
+  },
+  "maintenance": {
+    "profiles": [
+      {
+        "id": "profile-929ce74575bbc63a230d9ae4574c5e55",
+        "project_id": "project-c1a7bd625d244e33949c293d88675dfc",
+        "setup_config": "/private/tmp/ks-KM043A-source-check-final2-20261015/guarded-v3-setup.json",
+        "allowed_activation": [
+          "activate_after_gate"
+        ],
+        "timeout_seconds": 120,
+        "source_check": {
+          "command": [
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3.11",
+            "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+            "verify-update-source",
+            "--registration",
+            "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/registration.json",
+            "--policy-file",
+            "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/updates/policies/65a165a05ac5d951dfa449ec3a01fb0f50c8dd1ce75968166932829915de3a67.json",
+            "--input-id",
+            "608a495257687dc5a92e4908dce3b1eb8b23e37eb5d9256a2cdf05aa95a4ba4f"
+          ],
+          "pinned_files": {
+            "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3.11": "690ff84223d152000549f124e52752a724c0797a0f88a5c68b2b6fa304e50e36",
+            "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/broker.py": "dc06b748896d97e57670ffeb78c5f3c0bd991e94613f1bf18af9d182d038db95",
+            "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/collection.py": "7fffa7b1d7a4b1ae387ebad3f104e6ad482fa26ff3225e616cebc1a8cd1cb0de",
+            "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py": "c35d049d8b296277fec12d7816fae3b4b12e99a5e00c1db5fc21fd2c0538555f",
+            "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/review.py": "cd46657183310af5f33ee4ee487c8e5f264d100b4e28f8f6b6f187ea54b384c5",
+            "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/update_contract.py": "87f321737e314545d7326b40beaee2f77d44e3a2664518beb1014d876297b1b8",
+            "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/update_inputs.py": "2259faf5a328c0cf3208cbad89b09353143a77da613fb1bdc6b0efd0dc451476",
+            "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/updates/policies/65a165a05ac5d951dfa449ec3a01fb0f50c8dd1ce75968166932829915de3a67.json": "4de247e3ec2f94759ac9c09a867f9bfbad1d9d4a9be2f6dca8c2d82b8ded8a43",
+            "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/registration.json": "2e0d1d00e28f166e97d9f3454dcadd66fc4362bf742a0390694855bc30e552cf",
+            "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/updates/inputs/608a495257687dc5a92e4908dce3b1eb8b23e37eb5d9256a2cdf05aa95a4ba4f/manifest.json": "4dc43b893758e2402161ef962d2892f9276a4982e23058d83e201b0ac2cd56cf",
+            "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/updates/inputs/608a495257687dc5a92e4908dce3b1eb8b23e37eb5d9256a2cdf05aa95a4ba4f/capture.json": "446d2394e141273d2f5fd565e6b9e461dca1fc43f77197a3b2717da13cf452e9",
+            "/private/tmp/ks-KM043A-source-check-final2-20261015/guard-proof.txt": "ffe644005d28899b57eaf05765e318462fbe6ae3278757df1aaf92a6aa4bce0f"
+          },
+          "timeout_seconds": 60
+        }
+      }
+    ]
+  }
+}

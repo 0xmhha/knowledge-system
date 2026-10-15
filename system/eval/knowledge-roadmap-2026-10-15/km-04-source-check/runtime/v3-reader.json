@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "name": "cks",
+  "listen": {
+    "transport": "stdio",
+    "mcp_stdio": true
+  },
+  "logging": {
+    "level": "error",
+    "mode": "prod"
+  },
+  "sanitize": {
+    "rules_path": "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/sanitization_rules.yaml",
+    "default_action": "drop",
+    "fail_closed_on_unknown_rule": true
+  },
+  "backends": {
+    "ckg": {
+      "path": "/private/tmp/ks-KM043A-source-check-final2-20261015/dataset/guarded-v3/graph/graph.db",
+      "source_root": "/private/tmp/ks-KM043A-source-check-final2-20261015/manager/updates/inputs/608a495257687dc5a92e4908dce3b1eb8b23e37eb5d9256a2cdf05aa95a4ba4f/project",
+      "timeout_ms": 5000
+    },
+    "ckv": {
+      "path": "/private/tmp/ks-KM043A-source-check-final2-20261015/dataset/guarded-v3/vector",
+      "provider": "mock",
+      "embed_model": "mock-feature-hash-v1"
+    }
+  }
+}
