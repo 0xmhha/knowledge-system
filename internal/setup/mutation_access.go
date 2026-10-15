@@ -26,5 +26,5 @@ func WithDatasetMutationLock(ctx context.Context, dataset string, action func(co
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	return action(ctx)
+	return action(context.WithValue(ctx, mutationLeaseKey{}, lock.file))
 }

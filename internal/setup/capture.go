@@ -352,7 +352,7 @@ func ReadSourceFileNoFollow(rootPath, rel string, maxBytes int64) ([]byte, error
 }
 
 func captureHeadContext(ctx context.Context, root string) (string, error) {
-	cmd := exec.CommandContext(ctx, "git", "-C", root, "rev-parse", "HEAD")
+	cmd := setupCommandContext(ctx, "git", "-C", root, "rev-parse", "HEAD")
 	buf, err := cmd.Output()
 	return strings.TrimSpace(string(buf)), err
 }
@@ -388,7 +388,7 @@ func captureModeEntriesContext(ctx context.Context, root, mode string, maxFiles 
 		paths, err := capturePathsContext(ctx, root, maxFiles)
 		return paths, nil, err
 	}
-	cmd := buildCommandContext(ctx, "git", "-C", root, "ls-files", "-z", "--cached", "--stage")
+	cmd := setupCommandContext(ctx, "git", "-C", root, "ls-files", "-z", "--cached", "--stage")
 	pipe, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, nil, err
@@ -541,7 +541,7 @@ func (c CapturedSource) MaterializeBuildTreeContext(ctx context.Context, path st
 			if head, err := captureHeadContext(ctx, c.Root); err != nil || head != c.Identity.SourceCommit {
 				return nil, fmt.Errorf("working-tree base commit changed before materialization: %v", err)
 			}
-			cmd := exec.CommandContext(ctx, "git", "-C", c.Root, "worktree", "add", "--detach", path, c.Identity.SourceCommit)
+			cmd := setupCommandContext(ctx, "git", "-C", c.Root, "worktree", "add", "--detach", path, c.Identity.SourceCommit)
 			if out, err := cmd.CombinedOutput(); err != nil {
 				return nil, fmt.Errorf("create temporary Git worktree: %w: %s", err, out)
 			}

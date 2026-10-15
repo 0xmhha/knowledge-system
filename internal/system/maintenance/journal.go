@@ -26,8 +26,9 @@ type journalRecord struct {
 	DeadlineAt        string         `json:"deadline_at"`
 	// Optional for compatibility with private A/B records. Once set, this
 	// intent survives the public status changing to recovering.
-	CancelRequested bool      `json:"cancel_requested,omitempty"`
-	Status          JobStatus `json:"status"`
+	CancelRequested   bool      `json:"cancel_requested,omitempty"`
+	ExecutionProtocol string    `json:"execution_protocol,omitempty"`
+	Status            JobStatus `json:"status"`
 }
 
 type journalEnvelope struct {
@@ -55,6 +56,9 @@ type journalStore struct {
 }
 
 func validateRecord(r journalRecord) error {
+	if r.ExecutionProtocol != "" && r.ExecutionProtocol != "owner-socket-mutation-lease-v1" {
+		return reject("reconcile_required")
+	}
 	created, cerr := time.Parse(time.RFC3339Nano, r.CreatedAt)
 	deadline, derr := time.Parse(time.RFC3339Nano, r.DeadlineAt)
 	if r.SchemaVersion != 1 || cerr != nil || derr != nil || deadline.Sub(created) != time.Duration(r.Request.DeadlineSeconds)*time.Second ||
@@ -267,7 +271,7 @@ func (s *journalStore) save(value journalRecord) error {
 			return reject("reconcile_required")
 		}
 		if !equalJSON(old.Request, value.Request) || !equalJSON(old.Profile, value.Profile) || old.ExpectedDatasetID != value.ExpectedDatasetID ||
-			old.CreatedAt != value.CreatedAt || old.DeadlineAt != value.DeadlineAt || validateJournalUpdate(old.Status, value.Status) != nil {
+			old.CreatedAt != value.CreatedAt || old.DeadlineAt != value.DeadlineAt || old.ExecutionProtocol != value.ExecutionProtocol || validateJournalUpdate(old.Status, value.Status) != nil {
 			return reject("reconcile_required")
 		}
 		if equalJSON(old, value) {

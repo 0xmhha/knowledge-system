@@ -292,7 +292,7 @@ func (s *Service) Build(ctx context.Context, request BuildRequest) (JobStatus, e
 			stop()
 			return JobStatus{}, err
 		}
-		record := journalRecord{SchemaVersion: 1, Request: request, Profile: prepared.view, ExpectedDatasetID: prepared.identity.DatasetID,
+		record := journalRecord{SchemaVersion: 1, ExecutionProtocol: "owner-socket-mutation-lease-v1", Request: request, Profile: prepared.view, ExpectedDatasetID: prepared.identity.DatasetID,
 			CreatedAt: created.Format(time.RFC3339Nano), DeadlineAt: deadline.Format(time.RFC3339Nano), Status: cloneStatus(j.status)}
 		if err := store.save(record); err != nil {
 			stop()
@@ -400,7 +400,7 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 		j.status.Revision++
 		return previous, j.persistLocked()
 	}
-	err := setup.Reindex(ctx, value.options, r.NewVersion, gates, setup.SubprocessRunner{}, func(event setup.Event) {
+	err := setup.Reindex(ctx, value.options, r.NewVersion, gates, setup.SubprocessRunner{GuardianBinary: value.options.CksBin}, func(event setup.Event) {
 		if event.Type != "start" && event.Type != "done" {
 			return
 		}
@@ -419,12 +419,20 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 			err = setCandidate()
 		}
 	}
+	// A stopped guardian is not sufficient if an escaped descendant still
+	// retains inherited writer ownership. Reindex has released our own copy.
+	var quiescenceErr error
+	if err != nil && !errors.Is(err, setup.ErrDatasetWriterBusy) {
+		probe, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		quiescenceErr = setup.WithDatasetMutationLock(probe, p.out, func(context.Context) error { return nil })
+		cancel()
+	}
 	j.mu.Lock()
 	defer j.mu.Unlock()
 	if j.status.Terminal || j.persistenceFailed {
 		return
 	}
-	if errors.Is(err, setup.ErrDurabilityUncertain) || errors.Is(err, setup.ErrPublicationUnresolved) {
+	if errors.Is(err, setup.ErrDurabilityUncertain) || errors.Is(err, setup.ErrPublicationUnresolved) || quiescenceErr != nil {
 		// current may already have changed. Publication reconciliation must
 		// settle this before reporting failure/cancellation or admitting a
 		// replacement writer. C–E will provide the durable proof/recovery.

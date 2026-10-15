@@ -12,6 +12,7 @@
 package setup
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -159,7 +160,8 @@ type Step struct {
 	// Verify runs an in-process check for internal steps. It may emit
 	// non-fatal findings through the provided callback and returns an error
 	// only when the step must fail the plan.
-	Verify func(emit func(Event)) error
+	Verify        func(emit func(Event)) error
+	VerifyContext func(context.Context, func(Event)) error
 }
 
 // Plan is the ordered step list for one setup run.
@@ -241,6 +243,9 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 				Verify: func(emit func(Event)) error {
 					return VerifyDerivedFresh("policy-fresh", "the governance policy", argv, o.PolicyFile, emit)
 				},
+				VerifyContext: func(ctx context.Context, emit func(Event)) error {
+					return VerifyDerivedFreshContext(ctx, "policy-fresh", "the governance policy", argv, o.PolicyFile, emit)
+				},
 			})
 		}
 		if o.GlossaryFile != "" {
@@ -250,6 +255,9 @@ func buildPlan(o Options, captured *CapturedSource) (Plan, error) {
 				Title: "Check the alias glossary against the domain entries",
 				Verify: func(emit func(Event)) error {
 					return VerifyDerivedFresh("glossary-fresh", "the alias glossary", argv, o.GlossaryFile, emit)
+				},
+				VerifyContext: func(ctx context.Context, emit func(Event)) error {
+					return VerifyDerivedFreshContext(ctx, "glossary-fresh", "the alias glossary", argv, o.GlossaryFile, emit)
 				},
 			})
 		}

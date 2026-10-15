@@ -22,6 +22,11 @@ CHECKPOINTS = {
         'scope': 'historical_KM02_3_A_private_foundation_and_process_compatibility_only',
         'scripts': ['check-maintenance-journal-foundation.py', 'test_maintenance_journal_foundation.py'],
     },
+    'publication-recovery': {
+        'revision': '17633b22', 'folder': 'km-02-publication-recovery',
+        'scope': 'historical_KM02_3_C_managed_history_private_recovery_process_compatibility_only',
+        'scripts': ['check-maintenance-publication-evidence.py', 'test_maintenance_publication_evidence.py'],
+    },
     'private-service': {
         'revision': '29169b2b', 'folder': 'km-02-durable-service',
         'scope': 'historical_KM02_3_B_private_service_and_process_compatibility_only',

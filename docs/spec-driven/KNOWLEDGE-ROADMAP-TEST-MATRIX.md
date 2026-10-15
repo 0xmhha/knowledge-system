@@ -326,3 +326,18 @@ B 증거 보호13개도 통과했다. 실제 공개 회귀는81개 도구 호출
 [C packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-publication-recovery/manifest.json)에 전체 시험 목록·원시 protocol·실제 pointer history를 보존한다. 현재 소스 결속1,674입력은 유지 Go1,244개·기타430개이며, 실제 held DB 검사에 사용한 기존 immutable fixture도 포함한다. 기존5개 approved input과 승인/완료 상태는 바꾸지 않는다.
 
 현재 전체6개 완료·4개 진행 중·18개 미착수다. 다음은 D의 부모 생존/deadline 감독·하위 writer lease·안전한 staging 정리, 이후 E의 실제 공개 재시작·lease/rollback/GC 검증이다. 그 뒤 KM-02.4 → KM-03.1–4 → KM-04.1–4 → KM-05.1–4 → KM-06.1–4 → OE-01.1–4를 진행한다. 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.
+
+
+## KM-02.3 중간 단계 D1: 실행 감독·소유 lease
+
+| 검증 | 결과·한계 |
+|---|---|
+| 감독 경로7개 | argv/작업 위치·출력, 실제 부모 kill, 취소·늦은 쓰기, 독립 절대 deadline, 상속 lease, freshness context 통과 |
+| race로 발견한 descriptor 경쟁 | 수정 후 같은7개 race 통과; Start/Wait가 파일 수명을 소유 |
+| 전체 Go | 3,789사례=3,770통과+19skip·실패0 |
+| 관련6패키지 race | 763사례=761통과+2skip·실패0; CLI setup도 포함 |
+| 실제 공개 회귀 | CKS 내부 감독 명령 사용28항목·90도구호출·99wire쌍·정상 EOF5개 |
+| build/fmt/vet/lint/문서·증거 | 통과; 계약20개·안내3개·live127개·증거 보호13개 |
+| owned staging 정리·전체 D/E | 미구현·미검증; 전체 완료 수6/28 유지 |
+
+[D1 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-command-supervision/manifest.json)과 [실행 명세](./VERSIONED-MAINTENANCE-RUNTIME.md)를 따른다. 현재 소스1,679입력은 유지 Go1,249개·기타430개다. 다음은 D2의 owner token/프로젝트/후보와 결속된 staging 정리와 quiescence 판정 연결이다. 이후 E 실제 공개 재시작·lease/rollback/GC → KM-02.4 → KM-03.1–4 → KM-04.1–4 → KM-05.1–4 → KM-06.1–4 → OE-01.1–4를 진행한다. 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도 유지한다.

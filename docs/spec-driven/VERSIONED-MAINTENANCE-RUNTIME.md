@@ -101,3 +101,16 @@ C의 실제 보관 held DB 검사까지 통과했다. source-bound KM-02.2 fixtu
 최종 C 검증은 maintenance race141개, 관련5패키지751사례(749통과·2skip), 전체 Go3,782사례(3,763통과·19skip), build/fmt/lint·문서 계약, 증거 보호14개다. [C packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-publication-recovery/manifest.json)의 `check-maintenance-publication-evidence.py`·`test_maintenance_publication_evidence.py`는 다른 프로젝트로 재서명한 실제 history와 private/합성/공개 완료의 혼동을 거부한다.
 
 다음 D는 부모 강제 종료 때 실제 하위 명령·descendant와 writer 소유를 다룬다. 부모 생존 pipe와 절대 deadline을 보는 감독 경로, 하위 실행 동안의 기존 mutation lock lease, 안전하게 결속한 staging 정리를 구현·검증한다. 종료가 확인되지 않은 pre-gate 작업은 계속 recovering으로 두며 PID만 보고 다른 프로세스를 종료하지 않는다. D/E의 실제 host 전체 검증 전까지 공개 New는 메모리 모드이고 job_persistence도 process_lifetime이다. C 중간 검증을 KM-02.3 전체 완료로 올리지 않는다.
+
+
+### D1 중간 검증 완료: 부모 생존·deadline 감독과 mutation lease
+
+실행 파일은 기존 setup plan에서만 선택한다. 내부 감독 명령은 상속한 Unix owner socket을 필수로 요구하며 public tool 인자에서 명령·경로를 받지 않는다. 부모 연결 종료와 절대 deadline을 관찰하고, 직접 시작한 process group·실행 lease를 정리한다. PID를 나중에 추측해 다른 프로세스를 종료하지 않는다. 현재 MCP의 graph/vector뿐 아니라 capture/Git·gate 명령과 파생 문서 freshness 검사에도 이 context를 전달했다. 기존 Verify 호출은 유지하고 production runner는 VerifyContext를 우선한다.
+
+모든 실행은 기존 mutation lock의 같은 소유를 상속한다. 부모의 descriptor만 닫아 잠금을 조기 해제하지 않는다. 하위 소유가 남아 있는 경우 취소/실패를 완료로 단정하지 않고 recovering으로 보류한다. Start 중 파일을 닫는 경쟁을 race 시험으로 발견해 Start/Wait가 descriptor 수명을 관리하도록 수정했다.
+
+D1의7개 시험은 argv/작업 위치/출력 보존, 실제 부모 kill 후 늦은 쓰기 차단·lease 해제, 취소, 부모 socket을 열어둔 상태의 절대 deadline, 부모 descriptor 종료 후 하위 lease 보존, freshness context의 제한 시간을 검증했다. 전체 Go3,789사례(3,770통과·19skip), 관련6패키지763사례(761통과·2skip), build/fmt/lint·문서 계약, 실제 CKS 공개28항목·EOF5개·증거 보호13개를 통과했다.
+
+[D1 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-command-supervision/manifest.json)은 `check-maintenance-supervision-evidence.py`·`test_maintenance_supervision_evidence.py`로 검사한다. D1은 **소유한 staging의 복구 정리까지 완료했다는 뜻이 아니다**. 다음 D2에서는 candidate와 random owner token으로 결속한 staging record를 만들고, 확인된 writer quiescence 아래에서 그 임시 경로만 정리한다. 출처가 확인되지 않는 경로나 다른 작업의 자료는 제거하지 않는다. capture 안의 실패 진단과 일회용 외부 임시 공간을 구분하고 freshness 임시 출력도 같은 scratch 안에 둔다.
+
+D2 정리와 E 실제 공개 재시작·rollback/read lease/GC를 확인한 뒤에만 새로운 protocol의 pre-gate 작업을 interrupted/canceled로 확정하고 공개 durable 모드를 켠다. 과거 protocol이 없는 private record의 실행 종료를 추정하지 않는다. KM-02.3은 진행 중이며 전체 완료 수6/28을 유지한다.

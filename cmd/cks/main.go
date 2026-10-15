@@ -57,6 +57,7 @@ func main() {
 	root.AddCommand(agentcli.NewCmd())
 	root.AddCommand(evalcli.NewCmd())
 	root.AddCommand(setupcli.NewCmd())
+	root.AddCommand(setupcli.NewDatasetStepCmd())
 	root.AddCommand(setupcli.NewRollbackCmd())
 	root.AddCommand(setupcli.NewGCCmd())
 	root.AddCommand(semanticcli.NewCmd())

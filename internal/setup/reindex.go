@@ -117,7 +117,7 @@ func acquireReindexLock(dataset string) (*reindexLock, error) {
 
 func (l *reindexLock) release() {
 	if l != nil && l.file != nil {
-		_ = unix.Flock(int(l.file.Fd()), unix.LOCK_UN)
+		// Close ownership only after every inherited child descriptor closes.
 		_ = l.file.Close()
 		l.file = nil // Keep the inode: unlinking splits contenders into two locks.
 	}
@@ -678,6 +678,10 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		return err
 	}
 	defer lock.release()
+	ctx = context.WithValue(ctx, mutationLeaseKey{}, lock.file)
+	if subprocess, ok := r.(SubprocessRunner); ok && subprocess.GuardianBinary != "" {
+		ctx = context.WithValue(ctx, commandGuardianKey{}, subprocess.GuardianBinary)
+	}
 	if gopt.BeforeCandidate != nil {
 		if err := gopt.BeforeCandidate(ctx); err != nil {
 			return err

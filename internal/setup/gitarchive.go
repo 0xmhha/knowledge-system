@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -29,7 +28,7 @@ type CapturedGitHistory struct {
 }
 
 func runArchiveGitContext(ctx context.Context, args ...string) error {
-	cmd := exec.CommandContext(ctx, "git", args...)
+	cmd := setupCommandContext(ctx, "git", args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("git %s: %w: %s", strings.Join(args, " "), err, out)
@@ -63,7 +62,7 @@ func captureGitHistoryContext(ctx context.Context, source, bundle, base string, 
 	// does not copy a potentially huge source pack before the byte limit can
 	// apply. Only the resulting bounded bundle is retained, and the restored
 	// build repository has no alternate.
-	objectPath, err := exec.CommandContext(ctx, "git", "-C", source, "rev-parse", "--git-path", "objects").Output()
+	objectPath, err := setupCommandContext(ctx, "git", "-C", source, "rev-parse", "--git-path", "objects").Output()
 	if err != nil {
 		return nil, fmt.Errorf("locate source Git objects: %w", err)
 	}
@@ -102,7 +101,7 @@ func captureGitHistoryContext(ctx context.Context, source, bundle, base string, 
 			_ = os.Remove(bundle)
 		}
 	}()
-	cmd := exec.CommandContext(ctx, "git", "-C", seed, "bundle", "create", "-", "--all")
+	cmd := setupCommandContext(ctx, "git", "-C", seed, "bundle", "create", "-", "--all")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	stdout, err := cmd.StdoutPipe()
@@ -115,12 +114,12 @@ func captureGitHistoryContext(ctx context.Context, source, bundle, base string, 
 	hash := sha256.New()
 	written, copyErr := io.CopyN(io.MultiWriter(file, hash), contextReader{ctx: ctx, reader: stdout}, maxBytes+1)
 	if written > maxBytes {
-		_ = cmd.Process.Kill()
+		_ = cmd.Cancel()
 		_ = cmd.Wait()
 		return nil, fmt.Errorf("git history archive exceeds %d bytes", maxBytes)
 	}
 	if copyErr != nil && copyErr != io.EOF {
-		_ = cmd.Process.Kill()
+		_ = cmd.Cancel()
 		_ = cmd.Wait()
 		return nil, fmt.Errorf("write Git history archive: %w", copyErr)
 	}

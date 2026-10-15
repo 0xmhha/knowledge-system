@@ -39,7 +39,7 @@ type Runner interface {
 // resolved from this machine rather than inherited — see toolchainEnv. Without
 // it, a server launchd started has no `go` to hand the graph build, and the
 // failure surfaces deep inside go/packages instead of here.
-type SubprocessRunner struct{}
+type SubprocessRunner struct{ GuardianBinary string }
 
 // toolchainTools are what a build subprocess shells out to: go/packages runs
 // `go list`, and indexing records each chunk's commit.
@@ -104,15 +104,21 @@ var reportToolchain = func() func(emit func(Event)) {
 	}
 }()
 
-func (SubprocessRunner) Run(ctx context.Context, s Step, emit func(Event)) error {
+func (runner SubprocessRunner) Run(ctx context.Context, s Step, emit func(Event)) error {
 	if s.Cmd == nil {
+		if s.VerifyContext != nil {
+			return s.VerifyContext(ctx, emit)
+		}
 		if s.Verify == nil {
 			return fmt.Errorf("step %s: neither command nor verify", s.ID)
 		}
 		return s.Verify(emit)
 	}
 	reportToolchain(emit)
-	cmd := buildCommandContext(ctx, s.Cmd[0], s.Cmd[1:]...)
+	if runner.GuardianBinary != "" {
+		ctx = context.WithValue(ctx, commandGuardianKey{}, runner.GuardianBinary)
+	}
+	cmd := setupCommandContext(ctx, s.Cmd[0], s.Cmd[1:]...)
 	// Toolchain first, then the step's own env: a step that names a variable
 	// outranks the machine-wide resolution (exec keeps the last duplicate).
 	cmd.Env = append(cmd.Environ(), toolchainEnv().env...)
