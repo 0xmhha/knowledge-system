@@ -1,0 +1,704 @@
+{
+  "schema_version": 1,
+  "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+  "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+  "registration_token": "dac2a22251a74f33b94d66361351953e",
+  "registration_digest": "edde328cf7749892c99a52e46d8c737422b20a98a5363c9709c015bd98ac445f",
+  "revision": 97,
+  "policy": {
+    "path": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/policies/8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242.json",
+    "digest": "8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242"
+  },
+  "phase": "building",
+  "last_checked": 1792080808.901345,
+  "pending": "25b4f405b82248a4bc80616f471ed4b8",
+  "attempts": [
+    {
+      "id": "7c2dbe794cf8434aa8bc61dc939bf23f",
+      "cycle_id": "7c2dbe794cf8434aa8bc61dc939bf23f",
+      "previous_attempt": null,
+      "attempt": 1,
+      "input_id": "c0d35e394c98e6499cf87b7f7a1408f85ac5715bc31c2dcc3dd6f91eef2bc90e",
+      "policy": {
+        "path": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/policies/8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242.json",
+        "digest": "8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242"
+      },
+      "bundle": {
+        "config": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/5d6d4d7caeb63b2b6bd4954219a629abbdafd8f0a7c60ea86a54fa7e10912bb2/cks.json",
+        "files": {
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/5d6d4d7caeb63b2b6bd4954219a629abbdafd8f0a7c60ea86a54fa7e10912bb2/setup.json": "8642080edbe9cbb8f12ab7dfafdb87b074c35574d3dcafffc31ad4337ae9eadc",
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/5d6d4d7caeb63b2b6bd4954219a629abbdafd8f0a7c60ea86a54fa7e10912bb2/cks.json": "eda0d173807f372a912c530fa8a282437c5e30b46659d876fd685a012f441c39"
+        }
+      },
+      "profile": {
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "7d19015cae1915da4b8b54b7f2bbe615c3aa1d6d2d3f454944593af89ac04f69",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "dadc058373e4c935f15e35ff4a1382cf98158d58690935d8bc3a08b410e47f86",
+          "base_commit": ""
+        },
+        "input_digest": "5340da4fbd10a1d39a43494da2ddb2ce1604fc7c0fa964878fd8f471ae516994",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "observed_base": {
+          "state": "absent"
+        },
+        "existing_versions": [],
+        "allowed_activation": [
+          "activate_after_gate"
+        ],
+        "required_gates": [
+          "source",
+          "identity",
+          "graph",
+          "vector",
+          "knowledge"
+        ],
+        "timeout_max_seconds": 120
+      },
+      "request": {
+        "schema_version": 1,
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "7d19015cae1915da4b8b54b7f2bbe615c3aa1d6d2d3f454944593af89ac04f69",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "dadc058373e4c935f15e35ff4a1382cf98158d58690935d8bc3a08b410e47f86",
+          "base_commit": ""
+        },
+        "input_digest": "5340da4fbd10a1d39a43494da2ddb2ce1604fc7c0fa964878fd8f471ae516994",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "base": {
+          "state": "absent"
+        },
+        "new_version": "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+        "activation": "activate_after_gate",
+        "idempotency_key": "manager-update-7c2dbe794cf8434aa8bc61dc939bf23f",
+        "deadline_seconds": 120
+      },
+      "request_digest": "be75639dfcf0475c9fa5926a866d1ea00df0fde53f4704a2b0056063945b0322",
+      "created_at": 1792080782.673005,
+      "observed_at": 1792080787.039608,
+      "job": {
+        "schema_version": 1,
+        "job_id": "3460398a8e1813fa2ef6b9088db0286c",
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "request_digest": "be75639dfcf0475c9fa5926a866d1ea00df0fde53f4704a2b0056063945b0322",
+        "target_version": "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+        "revision": 7,
+        "state": "succeeded",
+        "phase": "finished",
+        "terminal": true,
+        "build_complete": true,
+        "activated": true,
+        "candidate": {
+          "version": "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "a1513c11e81198cac85c4c2b5cfaf6071dffc735c8256778a2f4adb34a9498a6",
+            "snapshot_id": "dadc058373e4c935f15e35ff4a1382cf98158d58690935d8bc3a08b410e47f86",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "input_digest": "5340da4fbd10a1d39a43494da2ddb2ce1604fc7c0fa964878fd8f471ae516994",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370"
+        },
+        "publication": {
+          "base": {
+            "state": "absent"
+          },
+          "version": "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "a1513c11e81198cac85c4c2b5cfaf6071dffc735c8256778a2f4adb34a9498a6",
+            "snapshot_id": "dadc058373e4c935f15e35ff4a1382cf98158d58690935d8bc3a08b410e47f86",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "published_at": "2026-10-15T16:13:07.370097Z",
+          "receipt_digest": "24e109eeccd936bbc748bc1ad56cacfa000ab11441f7841989c52d364e8b15db"
+        },
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      },
+      "outcome": "succeeded",
+      "read_receipt": {
+        "at": 1792080787.039608,
+        "coordinates": {
+          "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+          "dataset_id": "a1513c11e81198cac85c4c2b5cfaf6071dffc735c8256778a2f4adb34a9498a6",
+          "snapshot_id": "dadc058373e4c935f15e35ff4a1382cf98158d58690935d8bc3a08b410e47f86",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        "pack_digest": "c3303bf648a00b9eb4f59ef35e652b28be4fd1f46b4a7930a081eb9365e31c9c"
+      }
+    },
+    {
+      "id": "689eb0f2ad024fc8b168901c36030cfa",
+      "cycle_id": "689eb0f2ad024fc8b168901c36030cfa",
+      "previous_attempt": null,
+      "attempt": 1,
+      "input_id": "2c3fcaf6b014455cbc05a0a31deeda1991281392147cf41c0812b981dc99c94f",
+      "policy": {
+        "path": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/policies/8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242.json",
+        "digest": "8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242"
+      },
+      "bundle": {
+        "config": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/ccbde1fdad49fd4e70d359522af0261055272e90bbd9bff57940addda75539d3/cks.json",
+        "files": {
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/ccbde1fdad49fd4e70d359522af0261055272e90bbd9bff57940addda75539d3/setup.json": "04e021ec0794df8e30783f64efd6d6cc5bec714abfc2c6ce68e981ce7a6aae97",
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/ccbde1fdad49fd4e70d359522af0261055272e90bbd9bff57940addda75539d3/cks.json": "1b604521f6b438f1a2072d733958e51b28c0d23234af621a945156c01b9ef0c8"
+        }
+      },
+      "profile": {
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "6630923afe3ced7bf87a24675f4a87d18782de2a75871e5bdd9375057e8b022b",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+          "base_commit": ""
+        },
+        "input_digest": "38a7d22f5b6ec047e0f06d4c36186c90cfe61545d02fec2f9bad84c925001637",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "observed_base": {
+          "state": "pinned",
+          "version": "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "a1513c11e81198cac85c4c2b5cfaf6071dffc735c8256778a2f4adb34a9498a6",
+            "snapshot_id": "dadc058373e4c935f15e35ff4a1382cf98158d58690935d8bc3a08b410e47f86",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          }
+        },
+        "existing_versions": [
+          "manager-7c2dbe794cf8434aa8bc61dc939bf23f"
+        ],
+        "allowed_activation": [
+          "activate_after_gate"
+        ],
+        "required_gates": [
+          "source",
+          "identity",
+          "graph",
+          "vector",
+          "knowledge"
+        ],
+        "timeout_max_seconds": 120
+      },
+      "request": {
+        "schema_version": 1,
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "6630923afe3ced7bf87a24675f4a87d18782de2a75871e5bdd9375057e8b022b",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+          "base_commit": ""
+        },
+        "input_digest": "38a7d22f5b6ec047e0f06d4c36186c90cfe61545d02fec2f9bad84c925001637",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "base": {
+          "state": "pinned",
+          "version": "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "a1513c11e81198cac85c4c2b5cfaf6071dffc735c8256778a2f4adb34a9498a6",
+            "snapshot_id": "dadc058373e4c935f15e35ff4a1382cf98158d58690935d8bc3a08b410e47f86",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          }
+        },
+        "new_version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+        "activation": "activate_after_gate",
+        "idempotency_key": "manager-update-689eb0f2ad024fc8b168901c36030cfa",
+        "deadline_seconds": 120
+      },
+      "request_digest": "ac71aa02c92309e6213d21b334ce1f67c5b9024997dedff5a3e3337fd71e2d95",
+      "created_at": 1792080788.612535,
+      "observed_at": 1792080791.698723,
+      "job": {
+        "schema_version": 1,
+        "job_id": "d082c1be218c634833b6b61556a23325",
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "request_digest": "ac71aa02c92309e6213d21b334ce1f67c5b9024997dedff5a3e3337fd71e2d95",
+        "target_version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+        "revision": 7,
+        "state": "succeeded",
+        "phase": "finished",
+        "terminal": true,
+        "build_complete": true,
+        "activated": true,
+        "candidate": {
+          "version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "7dc33f84171cb6e2efef8d911bc636f03f5c4df1d5b4831a8cc628c9db078656",
+            "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "input_digest": "38a7d22f5b6ec047e0f06d4c36186c90cfe61545d02fec2f9bad84c925001637",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370"
+        },
+        "publication": {
+          "base": {
+            "state": "pinned",
+            "version": "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+            "coordinates": {
+              "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+              "dataset_id": "a1513c11e81198cac85c4c2b5cfaf6071dffc735c8256778a2f4adb34a9498a6",
+              "snapshot_id": "dadc058373e4c935f15e35ff4a1382cf98158d58690935d8bc3a08b410e47f86",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            }
+          },
+          "version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "7dc33f84171cb6e2efef8d911bc636f03f5c4df1d5b4831a8cc628c9db078656",
+            "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "published_at": "2026-10-15T16:13:11.458363Z",
+          "receipt_digest": "5848ba6c2fc6c53c74a6db8516f482728b7f8d46faf6ba5f8d69a815af1b6a9d"
+        },
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      },
+      "outcome": "succeeded",
+      "read_receipt": {
+        "at": 1792080791.698723,
+        "coordinates": {
+          "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+          "dataset_id": "7dc33f84171cb6e2efef8d911bc636f03f5c4df1d5b4831a8cc628c9db078656",
+          "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        "pack_digest": "91af9f3c38029de7e2c5809fc8bdf9a8dba458e23c7a401da3002356fb6ef0a8"
+      }
+    },
+    {
+      "id": "873cd97fb9174b4bb84c29e8fbeab210",
+      "cycle_id": "873cd97fb9174b4bb84c29e8fbeab210",
+      "previous_attempt": null,
+      "attempt": 1,
+      "input_id": "122da3aabbde2a387d9d9d9d4213bb839c1042ad6ceaa254be52bfbb8b5229c2",
+      "policy": {
+        "path": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/policies/8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242.json",
+        "digest": "8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242"
+      },
+      "bundle": {
+        "config": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/75c062ece9a697d363318d15ed66c4569eaf06c11c80da8954fdb7f687f1f40e/cks.json",
+        "files": {
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/75c062ece9a697d363318d15ed66c4569eaf06c11c80da8954fdb7f687f1f40e/setup.json": "6f0c84e6f88987ac3b34560060c08718a8ea29791a295a9101c7f16df69296c8",
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/75c062ece9a697d363318d15ed66c4569eaf06c11c80da8954fdb7f687f1f40e/cks.json": "cb3f4c12ff8f2f93dbaa2b0f30a88bc57aba806c38541bc5c60cf96c180bb475"
+        }
+      },
+      "profile": {
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "d9bce0c81d004105f569dca4018e048ceeda25c72a590ae76e0a1a4e032cd41c",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+          "base_commit": ""
+        },
+        "input_digest": "e59b1d1bd6441e7c369eeded271561b9619b6d4f6ea43f24b7b4ba5eb9607bd9",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "observed_base": {
+          "state": "pinned",
+          "version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "7dc33f84171cb6e2efef8d911bc636f03f5c4df1d5b4831a8cc628c9db078656",
+            "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          }
+        },
+        "existing_versions": [
+          "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "manager-7c2dbe794cf8434aa8bc61dc939bf23f"
+        ],
+        "allowed_activation": [
+          "activate_after_gate"
+        ],
+        "required_gates": [
+          "source",
+          "identity",
+          "graph",
+          "vector",
+          "knowledge"
+        ],
+        "timeout_max_seconds": 120
+      },
+      "request": {
+        "schema_version": 1,
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "d9bce0c81d004105f569dca4018e048ceeda25c72a590ae76e0a1a4e032cd41c",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+          "base_commit": ""
+        },
+        "input_digest": "e59b1d1bd6441e7c369eeded271561b9619b6d4f6ea43f24b7b4ba5eb9607bd9",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "base": {
+          "state": "pinned",
+          "version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "7dc33f84171cb6e2efef8d911bc636f03f5c4df1d5b4831a8cc628c9db078656",
+            "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          }
+        },
+        "new_version": "manager-873cd97fb9174b4bb84c29e8fbeab210",
+        "activation": "activate_after_gate",
+        "idempotency_key": "manager-update-873cd97fb9174b4bb84c29e8fbeab210",
+        "deadline_seconds": 120
+      },
+      "request_digest": "de32efa186e01120b9aa3c96dbd671be0afd7397fb4d8cb113d6409f2610fc77",
+      "created_at": 1792080792.71187,
+      "observed_at": 1792080804.039467,
+      "job": {
+        "schema_version": 1,
+        "job_id": "0c9a6e145ee9c6e2a09731817b362f79",
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "request_digest": "de32efa186e01120b9aa3c96dbd671be0afd7397fb4d8cb113d6409f2610fc77",
+        "target_version": "manager-873cd97fb9174b4bb84c29e8fbeab210",
+        "revision": 5,
+        "state": "canceled",
+        "phase": "finished",
+        "terminal": true,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": {
+          "code": "canceled",
+          "retryable": false,
+          "phase": "build_graph"
+        },
+        "serving_adoption": "not_observed"
+      },
+      "outcome": "canceled",
+      "read_receipt": null
+    },
+    {
+      "id": "a0d5b59efc7140e0afa95f65451b3c0a",
+      "cycle_id": "873cd97fb9174b4bb84c29e8fbeab210",
+      "previous_attempt": "873cd97fb9174b4bb84c29e8fbeab210",
+      "attempt": 2,
+      "input_id": "122da3aabbde2a387d9d9d9d4213bb839c1042ad6ceaa254be52bfbb8b5229c2",
+      "policy": {
+        "path": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/policies/8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242.json",
+        "digest": "8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242"
+      },
+      "bundle": {
+        "config": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/75c062ece9a697d363318d15ed66c4569eaf06c11c80da8954fdb7f687f1f40e/cks.json",
+        "files": {
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/75c062ece9a697d363318d15ed66c4569eaf06c11c80da8954fdb7f687f1f40e/setup.json": "6f0c84e6f88987ac3b34560060c08718a8ea29791a295a9101c7f16df69296c8",
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/75c062ece9a697d363318d15ed66c4569eaf06c11c80da8954fdb7f687f1f40e/cks.json": "cb3f4c12ff8f2f93dbaa2b0f30a88bc57aba806c38541bc5c60cf96c180bb475"
+        }
+      },
+      "profile": {
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "d9bce0c81d004105f569dca4018e048ceeda25c72a590ae76e0a1a4e032cd41c",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+          "base_commit": ""
+        },
+        "input_digest": "e59b1d1bd6441e7c369eeded271561b9619b6d4f6ea43f24b7b4ba5eb9607bd9",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "observed_base": {
+          "state": "pinned",
+          "version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "7dc33f84171cb6e2efef8d911bc636f03f5c4df1d5b4831a8cc628c9db078656",
+            "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          }
+        },
+        "existing_versions": [
+          "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+          "manager-873cd97fb9174b4bb84c29e8fbeab210"
+        ],
+        "allowed_activation": [
+          "activate_after_gate"
+        ],
+        "required_gates": [
+          "source",
+          "identity",
+          "graph",
+          "vector",
+          "knowledge"
+        ],
+        "timeout_max_seconds": 120
+      },
+      "request": {
+        "schema_version": 1,
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "d9bce0c81d004105f569dca4018e048ceeda25c72a590ae76e0a1a4e032cd41c",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+          "base_commit": ""
+        },
+        "input_digest": "e59b1d1bd6441e7c369eeded271561b9619b6d4f6ea43f24b7b4ba5eb9607bd9",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "base": {
+          "state": "pinned",
+          "version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "7dc33f84171cb6e2efef8d911bc636f03f5c4df1d5b4831a8cc628c9db078656",
+            "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          }
+        },
+        "new_version": "manager-a0d5b59efc7140e0afa95f65451b3c0a",
+        "activation": "activate_after_gate",
+        "idempotency_key": "manager-update-a0d5b59efc7140e0afa95f65451b3c0a",
+        "deadline_seconds": 120
+      },
+      "request_digest": "9637264b29512dcf71a9ecc92291a7acbdc031937b383ccaca0c6d35a1d0ce18",
+      "created_at": 1792080805.25503,
+      "observed_at": 1792080808.272893,
+      "job": {
+        "schema_version": 1,
+        "job_id": "fa1c68cee75be20179dff8d60ca58791",
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "request_digest": "9637264b29512dcf71a9ecc92291a7acbdc031937b383ccaca0c6d35a1d0ce18",
+        "target_version": "manager-a0d5b59efc7140e0afa95f65451b3c0a",
+        "revision": 7,
+        "state": "succeeded",
+        "phase": "finished",
+        "terminal": true,
+        "build_complete": true,
+        "activated": true,
+        "candidate": {
+          "version": "manager-a0d5b59efc7140e0afa95f65451b3c0a",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "8bd60c997d3b5f48763805792d168d8c8a2d346ae8371ee153c801cd3d0571f7",
+            "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "input_digest": "e59b1d1bd6441e7c369eeded271561b9619b6d4f6ea43f24b7b4ba5eb9607bd9",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370"
+        },
+        "publication": {
+          "base": {
+            "state": "pinned",
+            "version": "manager-689eb0f2ad024fc8b168901c36030cfa",
+            "coordinates": {
+              "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+              "dataset_id": "7dc33f84171cb6e2efef8d911bc636f03f5c4df1d5b4831a8cc628c9db078656",
+              "snapshot_id": "76dd215474421b29d4f6a5a1a7a74629c22d8af6bfa5fc20335ffb471c602c10",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            }
+          },
+          "version": "manager-a0d5b59efc7140e0afa95f65451b3c0a",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "8bd60c997d3b5f48763805792d168d8c8a2d346ae8371ee153c801cd3d0571f7",
+            "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "published_at": "2026-10-15T16:13:28.385353Z",
+          "receipt_digest": "86751e22941185b6c15446bb0679acc0dda30f983115549d1e6d412c7415c04f"
+        },
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      },
+      "outcome": "succeeded",
+      "read_receipt": {
+        "at": 1792080808.272893,
+        "coordinates": {
+          "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+          "dataset_id": "8bd60c997d3b5f48763805792d168d8c8a2d346ae8371ee153c801cd3d0571f7",
+          "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        "pack_digest": "6f8f40ea16209faa8c388a62c2e86a41dd9560e26a859768ce01de5f5478e644"
+      }
+    },
+    {
+      "id": "25b4f405b82248a4bc80616f471ed4b8",
+      "cycle_id": "25b4f405b82248a4bc80616f471ed4b8",
+      "previous_attempt": null,
+      "attempt": 1,
+      "input_id": "ad63db266c6ed76cce4b42800b7856dd9cf3cf5e330f1ac7dbcebe07d1059eb7",
+      "policy": {
+        "path": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/policies/8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242.json",
+        "digest": "8bba00f72e22de16c8800894b20d82a7c534e58ffdbf09270a601723a5228242"
+      },
+      "bundle": {
+        "config": "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/87c6dea3e6d557c83b05a920da43310494f20b6d7d29f20626155c2d32e1d325/cks.json",
+        "files": {
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/87c6dea3e6d557c83b05a920da43310494f20b6d7d29f20626155c2d32e1d325/setup.json": "113ae0de00fab5e4fcb324a45f5ceddc6408a8fa9030d603c2a5f5142c786e79",
+          "/private/tmp/ks-KM043C2-updates-MCP-final-20261016/manager/updates/worker/bundles/87c6dea3e6d557c83b05a920da43310494f20b6d7d29f20626155c2d32e1d325/cks.json": "dcfe85793e72483280aeb3d90edddecc6e42e240292b732302c617414c5422be"
+        }
+      },
+      "profile": {
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "fee321a65b23e855ebb510e1427e59acfc62641a43fc944ba84ebd1c1487c8e9",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "7bac39e4c010b0984927dcaa9ff3acd7e03092318e019addfe141f9824a27d40",
+          "base_commit": ""
+        },
+        "input_digest": "ddacab021cf84da39beb92067801245730b786a0c0da752dfb2759b0fc9d26a7",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "observed_base": {
+          "state": "pinned",
+          "version": "manager-a0d5b59efc7140e0afa95f65451b3c0a",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "8bd60c997d3b5f48763805792d168d8c8a2d346ae8371ee153c801cd3d0571f7",
+            "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          }
+        },
+        "existing_versions": [
+          "manager-689eb0f2ad024fc8b168901c36030cfa",
+          "manager-7c2dbe794cf8434aa8bc61dc939bf23f",
+          "manager-873cd97fb9174b4bb84c29e8fbeab210",
+          "manager-a0d5b59efc7140e0afa95f65451b3c0a"
+        ],
+        "allowed_activation": [
+          "activate_after_gate"
+        ],
+        "required_gates": [
+          "source",
+          "identity",
+          "graph",
+          "vector",
+          "knowledge"
+        ],
+        "timeout_max_seconds": 120
+      },
+      "request": {
+        "schema_version": 1,
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "profile_digest": "fee321a65b23e855ebb510e1427e59acfc62641a43fc944ba84ebd1c1487c8e9",
+        "source_pin": {
+          "mode": "snapshot-only",
+          "snapshot_id": "7bac39e4c010b0984927dcaa9ff3acd7e03092318e019addfe141f9824a27d40",
+          "base_commit": ""
+        },
+        "input_digest": "ddacab021cf84da39beb92067801245730b786a0c0da752dfb2759b0fc9d26a7",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "base": {
+          "state": "pinned",
+          "version": "manager-a0d5b59efc7140e0afa95f65451b3c0a",
+          "coordinates": {
+            "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+            "dataset_id": "8bd60c997d3b5f48763805792d168d8c8a2d346ae8371ee153c801cd3d0571f7",
+            "snapshot_id": "df02454243484abce6596dfa40e458a5fb745a5d9e4599689128751899f1e6d5",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          }
+        },
+        "new_version": "manager-25b4f405b82248a4bc80616f471ed4b8",
+        "activation": "activate_after_gate",
+        "idempotency_key": "manager-update-25b4f405b82248a4bc80616f471ed4b8",
+        "deadline_seconds": 120
+      },
+      "request_digest": "17bb507300f69e4d7ea3c087c77258e42729e73dfa7bab95373b6fe53a957805",
+      "created_at": 1792080808.901345,
+      "observed_at": 1792080810.4445162,
+      "job": {
+        "schema_version": 1,
+        "job_id": "39bf72b7494e247c26ca4a5c1940082d",
+        "project_id": "project-4b8e355768074fe6afc83f6715f07bb6",
+        "profile_id": "profile-675e3eb76939cd71e3330661af7f769c",
+        "request_digest": "17bb507300f69e4d7ea3c087c77258e42729e73dfa7bab95373b6fe53a957805",
+        "target_version": "manager-25b4f405b82248a4bc80616f471ed4b8",
+        "revision": 3,
+        "state": "running",
+        "phase": "build_graph",
+        "terminal": false,
+        "build_complete": false,
+        "activated": false,
+        "candidate": null,
+        "publication": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "error": null,
+        "serving_adoption": "not_observed"
+      },
+      "outcome": null,
+      "read_receipt": null
+    }
+  ],
+  "last_success": "a0d5b59efc7140e0afa95f65451b3c0a",
+  "last_outcome": "a0d5b59efc7140e0afa95f65451b3c0a",
+  "retry_at": null,
+  "last_error": null
+}

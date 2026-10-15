@@ -5,6 +5,9 @@ admission is durable before forwarding and all recovery precedes new collection.
 """
 import copy
 import json
+import os
+import sys
+import threading
 from pathlib import Path
 import signal
 import time
@@ -13,28 +16,18 @@ import uuid
 from manager import Failure,canonical,file_hash,require,strict_read,sync_dir,write_new
 from collection import domain_hash,owned_directory
 from update_contract import bounded,clock
-from update_inputs import load_input,prepare,source_check
+from update_inputs import prepare,source_check
 from update_state import Journal,PRE_ADMISSION_REFUSALS
-from broker import Native,READ,GracefulShutdown
+from broker import Native,GracefulShutdown
 
 
-class Refusal(Failure):
-    def __init__(self,value):
-        self.value=value
-        super().__init__(value['code'])
-
-
-def value(response):
-    payload=response.get('structuredContent')
-    require(isinstance(payload,dict),'native_protocol_invalid')
-    if response.get('isError'):
-        require(isinstance(payload.get('code'),str),'native_protocol_invalid')
-        raise Refusal(payload)
-    return payload
+from update_native import Refusal,value,code_inventory,check_code
+from update_reader import read_observed
 
 
 class Worker:
     def __init__(self,registration,deadline=None):
+        self.code_pin=code_inventory()
         self.journal=Journal(registration,recover=True)
         self.r=self.journal.r
         self.native,self.native_config=None,None
@@ -75,6 +68,7 @@ class Worker:
         return {'config':str(final/'cks.json'),'files':{str(final/name):file_hash(final/name) for name in expected}}
 
     def client(self,bundle):
+        check_code(self.code_pin)
         self.journal.verify_bundle({'bundle':bundle})
         require(self.journal.registration_ok(),'registration_changed')
         if self.native_config!=bundle['config']:
@@ -95,39 +89,10 @@ class Worker:
         return result
 
     def read(self,row,job,prompt=None):
-        candidate=job['candidate'];version=Path(self.r['dataset_root'])/candidate['version']
-        require(candidate['version']==row['request']['new_version'] and version.is_dir() and version.resolve()==version and not version.is_symlink(),'update_candidate_invalid')
-        directory,_=load_input(self.r,row['input_id']);manifest=strict_read(version/'vector/manifest.json',16*1024*1024)
-        setup=strict_read(Path(self.r['state_root'])/'setup.json')
-        config={'version':1,'name':'cks','listen':{'transport':'stdio','mcp_stdio':True},'logging':{'level':'error','mode':'prod'},
-                'sanitize':{'rules_path':str(Path(self.r['state_root'])/'sanitization_rules.yaml'),'default_action':'drop','fail_closed_on_unknown_rule':True},
-                'backends':{'ckg':{'path':str(version/'graph/graph.db'),'source_root':str(directory/'project'),'timeout_ms':5000},
-                            'ckv':{'path':str(version/'vector'),'provider':setup['embedder'],'embed_model':manifest['embedding_model'],
-                                   'embed_dim':setup.get('embed_dim',0),'query_prefix_policy':setup.get('query_prefix_policy','registry'),
-                                   'ollama_url':setup.get('ollama_url','http://localhost:11434')}}}
-        parent=owned_directory(self.journal.directory/'readers',self.r)
-        key=domain_hash('cks.manager-update-reader.v1',config);path=parent/(key+'.json')
-        if path.exists():require(strict_read(path,1024*1024)==config,'update_reader_config_changed')
-        else:
-            require(len(list(parent.glob('*.json')))<129,'update_reader_limit')
-            stage=parent/('.pending-'+uuid.uuid4().hex);write_new(stage,config);stage.rename(path);sync_dir(parent)
-        current=Path(self.r['dataset_root'])/'current'
-        def pointer():
-            if not current.is_symlink():return None
-            target=current.readlink()
-            require(len(target.parts)==1 and target.name not in ('.','..','current'),'update_current_invalid')
-            return target.name
-        before=pointer()
-        reader=Native(self.r,path,request_timeout=self.timeout())
-        try:
-            pack=value(reader.tool(READ,{'prompt':prompt or 'Observed source and knowledge evidence'}))
-            require(pack.get('coordinates')==candidate['coordinates'],'update_read_not_verified')
-        finally:reader.close()
-        after=pointer();self.last_read=copy.deepcopy(pack)
-        # Candidate read is a current observation only while the actual pointer
-        # selects that exact version both before and after the read.
-        coordinates=pack['coordinates'] if before==after==candidate['version'] else None
-        return pack,coordinates
+        check_code(self.code_pin)
+        pack,current=read_observed(self.r,row,job,self.journal.directory/'readers',prompt,self.timeout(),Native)
+        self.last_read=copy.deepcopy(pack)
+        return pack,current
 
     def reconcile(self,at):
         j=self.journal;row=j.row()
@@ -149,6 +114,7 @@ class Worker:
         return self.describe()
 
     def tick(self,trigger='manual',at=None):
+        check_code(self.code_pin)
         at=time.time() if at is None else clock(at)
         j=self.journal
         # Never check a new source or overwrite intent before known/uncertain
@@ -202,20 +168,43 @@ class Worker:
         finally:self.journal.close()
 
 
-def run(registration,trigger,max_iterations,max_seconds,poll_seconds=1):
+def run(registration,trigger,max_iterations,max_seconds,poll_seconds=1,stop_on_stdin_eof=False):
     require(bounded(max_iterations,1,10000) and bounded(max_seconds,1,86400)
-            and type(poll_seconds) in (int,float) and 0.01<=poll_seconds<=60,'update_worker_budget_invalid')
+            and type(poll_seconds) in (int,float) and 0.01<=poll_seconds<=60 and type(stop_on_stdin_eof)is bool,'update_worker_budget_invalid')
     deadline=time.monotonic()+max_seconds
-    worker,previous,stopping=None,{},False
+    worker,previous,stopping,finishing=None,{},False,False
+    watch_done=threading.Event();watch_gate=threading.Lock()
     iterations=0;stop_reason='completed'
     def stop(_number,_frame):
         nonlocal stopping
-        if not stopping:stopping=True;raise GracefulShutdown()
+        if not stopping:
+            stopping=True
+            if not finishing:raise GracefulShutdown()
     try:
         for number in (signal.SIGINT,signal.SIGTERM):previous[number]=signal.signal(number,stop)
+        if stop_on_stdin_eof:
+            # Raw fd reads avoid a daemon holding Python's buffered-stdin lock
+            # during interpreter shutdown. The owner sends no input data.
+            owner_fd=sys.stdin.fileno()
+            def watch_owner():
+                try:
+                    while os.read(owner_fd,4096):
+                        if watch_done.is_set():return
+                except OSError:pass
+                with watch_gate:
+                    if not watch_done.is_set():os.kill(os.getpid(),signal.SIGTERM)
+            threading.Thread(target=watch_owner,daemon=True).start()
         worker=Worker(registration,deadline);iterations=0
         while iterations<max_iterations and time.monotonic()<deadline:
-            worker.tick(trigger)
+            try:worker.tick(trigger)
+            except Failure as error:
+                transient=(trigger in('periodic','change') and str(error)in('source_changed','source_stale')
+                           and not worker.journal.poisoned and worker.journal.state['pending']is None)
+                if not transient:raise
+                # The interval and foreground iteration/time budget bound these
+                # deferred checks. No admitted job/intent is relabeled or lost.
+                print(json.dumps({'schema_version':1,'event':'update_check_deferred','code':str(error),
+                    'project_id':worker.r['project_id'],'ledger_revision':worker.journal.state['revision']},ensure_ascii=False),file=sys.stderr,flush=True)
             # Admission/status polls are one execution obligation. Only a
             # completed or not-due check advances the bounded loop counter.
             if worker.journal.state['pending'] is None:iterations+=1
@@ -227,10 +216,16 @@ def run(registration,trigger,max_iterations,max_seconds,poll_seconds=1):
         if str(error)!='update_worker_budget_reached' and not (time.monotonic()>=deadline and str(error) in ('native_timeout','native_unavailable')):raise
         stop_reason='budget'
     finally:
+        finishing=True
+        with watch_gate:watch_done.set()
         try:
             if worker:worker.close()
         finally:
             for number,handler in previous.items():signal.signal(number,handler)
+    if worker is None and stop_reason=='signal':
+        return {'schema_version':1,'stage':'worker_stopped_before_registration_ready','stop_reason':'signal',
+                'worker_stop_outcome':'closed_before_worker_initialization','scheduler_running':False,
+                'state_not_read_by_process':True,'new_job_admitted_by_this_process':False}
     require(worker is not None,'update_worker_not_started')
     value=worker.describe();value['iterations_completed']=iterations;value['stop_reason']=stop_reason
     value['worker_stop_outcome']='closed_requires_persistence_reconciliation' if worker.journal.poisoned else 'closed_with_pending_intent' if worker.journal.state['pending'] else 'closed'

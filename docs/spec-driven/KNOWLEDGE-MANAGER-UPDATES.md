@@ -199,3 +199,34 @@ C2 설계 목적: 기존 reviewed MCP host가 한 writer lease를 보유하므�
 C1 반복 검증의 최초 실패는 SIGTERM이 Journal commit을 중단해 poisoned 상태가 된 경우였다. 기존 코드는 원래 intent와 자식 정리를 지켰으나 phase=building인 마지막 확인 메모리만 반환해 불확실성을 충분히 설명하지 못했다. 이를 정상 stopped로 바꾸는 추가 write를 하지 않고, 상태 원천과 디스크 재조정 필요를 명시했다. 결과의 disk_state_requires_reconciliation=true이면 state는 마지막 확인 메모리이며, 후속 실행에서 봉인된 디스크 상태와 원래 native job을 재조정한다. 정상 signal/budget 종료의 exit0을 구축 성공·취소 완료·최신 디스크 보장으로 해석하지 않는다. 실제 시험은 두 상태를 구분하고, 취소 판정은 이후 native terminal 결과로만 확인한다. 초기 성공/실패 로그와 보강한 관찰 시각을 보존한다.
 
 같은 불확실성 보고는 외부에서 state revision/checksum이 바뀌거나 디스크 state를 읽을 수 없는 경우에도 적용한다. CAS 불일치 뒤 같은 프로세스가 파일 복구만 가정하고 추가 write를 시도하지 않도록 막는다. 이는 자동 수리/채택이 아니라 원래 상태를 보존한 재조정 요구이며, 기존50개 state 시험 안의 CAS 반례에 이 보고/후속 쓰기 금지를 추가 확인했다.
+
+
+## KM-04.3 C2 갱신 MCP와 완료 판정
+
+KM-04.3 완료: A native 원문 전환 전 확인, B1 durable intent/한 lease/상한, B2 실제 foreground worker, C1 실제 CLI TERM/KILL/budget·저장 중 신호 보고, C2 갱신 MCP 운영 연결을 통합 검증했다. plugin0.6.0은 기존 reviewed 기본18도구를 유지하고 명시 updates 모드에6도구(policy template/configure/status/start/stop/read)를 제공한다. MCP는 별도 소유 worker를 감독하면서 sealed 상태와 지정 retained DB 조회를 계속 처리한다. 부모 EOF/강제 종료는 소유 stdin 종료로 worker에 전달하고, 기록된 과거 PID를 signal하지 않는다. 재시작은 원래 job/요청을 먼저 조정한다.
+
+Python268개(기존224+worker/MCP44), 실제 공개 MCP20항목·222도구호출·3연결(의도한 부모SIGKILL-9/정상EOF0/정상EOF0), 부모 중단2경로의 Native/graph 정리·9초 이후 지연 쓰기 부재/current 보존·2건 연결 재시도 게시를 확인했다. 실제 Claude Code2.1.300의 설치된 plugin/skill/agent를 로컬 시험 응답기에 연결해2회/도구36개·MCP정상 종료0으로 raw source 구축/held조회·같은 job 재시작·periodic no-op·중지를 검증했다. 유료 모델/실제 모델 호출0이며 agent 자율성·검색 품질·독립 수용을 측정했다고 주장하지 않는다. Go/의존/fixture byte가 같은 B2의 Go3862(3844통과18skip)·race836(834통과2skip)을 byte 대조해 참조하며 새 Go 실행으로 세지 않는다. build/fmt/vet/lint·plugin strict·문서132개와 C1 동결 증거16개를 확인했다.
+
+```sh
+CKS_MANAGER_MODE=updates \
+CKS_MANAGER_REGISTRATION=/workspace/manager/acme/registration.json \
+  claude --plugin-dir /workspace/knowledge-system/plugins/knowledge-manager
+python3 plugins/knowledge-manager/scripts/manager.py serve-updates \
+  --registration /workspace/manager/acme/registration.json
+```
+
+두 진입점은 같은 updates 모드다. 초기화/설정은 job을 실행하지 않는다. 실제 도구 alias를 확인하고 template→의도한 policy file 구성→configure→명시 start→status→job ID/expected coordinates를 지정한 read→stop 순서로 사용한다. 새 raw MCP 이름은 cks.manager.update_policy_template/configure/status/start/stop/read이며 legacy mutation이나 metadata reader를 노출하지 않는다. reviewed 기본 모드는 기존18도구·hold-only로 유지한다.
+
+MCP host는 자신의 세션 lease, worker는 기존 한 writer lease를 소유한다. 원래 source에 문서를 쓰지 않고 자동 관찰 입력을 생성한다. 설정/새 실행은 경쟁 writer와 active child를 거부하지만 readonly 상태/retained query는 writer와 경쟁하지 않는다. read는 known successful held/published 자동 job·정확한 candidate 좌표·source/input/model pin·실제 retained graph/vector를 확인하며 current나 다른 프로젝트로 바꿔치기하지 않는다. source 의미 검토/검토된 지식의 무조건 승계나 human approval을 만들지 않는다.
+
+worker stdin은 owner 채널이며 이 옵션은 일반 standalone 실행에 강제하지 않는다. host stop/EOF/parent kill로 채널이 닫히면 worker의 raw-fd watcher가 자신에게 종료 요청을 전달한다. 완료 중에는 새 신호가 owned cleanup을 끊지 않으며 watcher는 정상 종료 뒤 기본 신호 handler를 호출하지 않도록 막는다. host는 소유 Popen만 정리하고 과거 launch PID는 상태 자료로만 표시한다. parent 종료와 native canceled를 혼동하지 않고 pending이면 다음 실행의 actual status/exact replay가 필요하다.
+
+초기43개 중1개에서 파일 수정이 snapshot 수집과 겹쳐 source_changed를 안전하게 감지했지만 periodic worker가 종료됐다. periodic/change의 접수 전 source_changed/source_stale만 다음 interval/iteration·시간 상한 안에서 다시 확인하도록 보완하고 update_check_deferred를 제한된 stderr 진단으로 남긴다. manual 실행, 등록/코드 변경, immutable 입력 손상, 불확실한 접수/저장은 이 예외로 계속하지 않는다. 원래 intent/job/마지막 성공은 보존한다. 재현 반례1개를 추가한 최종44개를 통과했고 최초 실패 로그도 보존한다.
+
+오래 실행 중 Python code byte가 바뀌면 새 작업/조회 실행을 거부하고 기존 owned cleanup과 pending 보존을 수행한다. package 갱신은 재시작 후 원래 요청을 조정하는 방식이다. status는 봉인된 disk의 해당 시점 관찰이며 현재 serving/실제 query 성공을 추정하지 않는다. child의 마지막 확인 memory/저장 불확실성 보고도 구분한다. 전역 OS scheduler/다른 저장소 설치는 하지 않는다.
+
+[갱신 MCP packet](../../system/eval/knowledge-roadmap-2026-10-16/km-04-updates-MCP/manifest.json)을 따른다. C2의 실제 한 session 변경과 periodic restart는 KM-04.3 통합 증거다. KM-04.4의 명시 change trigger·확장 삭제/회수·실패 복구·타 프로젝트 동시 보존 최종 시나리오는 별도로 남겨 이 packet만으로 KM-04 또는 전체 평가를 완료 처리하지 않는다.
+
+전체15/28·기능3/7이다. 다음은 KM-04.4의 지속 periodic/change·두 번 변경·삭제/no-op·실패/복구·이전 snapshot과 다른 프로젝트 보존을 통합 확인하는 단계다. 남은13개는 KM-04.4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+C2 증거 대조에서는 시험 observer가 실제 policy template 객체를 그대로 저장한 뒤 시험 policy를 enabled로 바꾸면서 기록도 바뀌는 문제를 잡았다. 원본 RPC는 disabled/hold를 반환했고 제품 동작은 정상이었다. observer/consumer를 deep copy로 분리하고 raw MCP와 실제 Claude2회를 다시 실행해 원본 응답과 기록을 대조했다. 최종222호출·36도구 결과는 재실행의 실제 횟수이며 반복 status를 새 독립 시험으로 합산하지 않는다. 초기 불일치 관찰/원본 wire와 최초 제품 시험 실패는 별도 보존한다.

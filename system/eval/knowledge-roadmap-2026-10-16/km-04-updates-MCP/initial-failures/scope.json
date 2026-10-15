@@ -1,0 +1,8 @@
+{
+  "initial_cases": 43,
+  "initial_failures": 1,
+  "observation": "A live source edit raced with stable capture. The updater correctly preserved the old DB but exited periodic polling with source_changed.",
+  "fix": "Only periodic/change pre-admission source_changed/source_stale checks defer to a later bounded interval. Preserve intent, successful baseline and safety failures. Emit bounded deferred-check diagnostics.",
+  "final_worker_MCP_cases": 44,
+  "independent_acceptance": false
+}

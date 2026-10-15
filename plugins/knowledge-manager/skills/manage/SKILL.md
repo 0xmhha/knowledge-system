@@ -8,6 +8,19 @@ argument-hint: "<source directory> <dataset directory> <state directory>"
 Manage the selected project's knowledge system. Read the current capability and
 phase boundaries in `${CLAUDE_PLUGIN_ROOT}/README.md` first.
 
+If discovery exposes `cks.manager.update_status`, use updates mode: obtain the
+scoped disabled/hold template, write a policy matching the user's intended scope,
+configure it, and explicitly start the selected enabled trigger with a bounded
+iteration/time budget. Use actual SDK aliases discovered in this session. Poll
+status without treating a spawned process as an accepted/completed job. Select
+`update_read` using a recorded job ID and its exact expected coordinates. Use
+`update_stop` for this host's owned worker; leave pending intent for actual native
+reconciliation and never signal a recorded PID. Source observations are not
+semantic review or human rationale. This mode does not expose the reviewed
+workflow below; do not invent missing aliases.
+
+Otherwise use the default reviewed mode below.
+
 1. Use the source, dataset and state directories the user selected. Registration
    keeps state outside the source and dataset. A generated project ID is stable
    in the registration; a repository name or shared commit is not project identity.
@@ -100,9 +113,8 @@ tracking or design rationale. Honor recorded partial/omitted coverage.
 For machine-observed continuous updates, use the separate explicit CLI workflow
 from the README: `update-policy-template`, `configure-updates`, `update-status`,
 then bounded `run-updates`. These commands do not turn source observations into
-human review. Do not invent an update MCP alias or an installed scheduler. The
-reviewed MCP host must release the shared writer lease before the separate
-foreground worker starts. Default policy is disabled/hold; choose enabled
+human review. Do not invent an update MCP alias or an installed scheduler. The reviewed MCP host must release the shared writer lease before a separate
+foreground worker starts; updates MCP mode owns its supervised worker instead. Default policy is disabled/hold; choose enabled
 triggers and `activate_after_gate` only within the user's intended DB scope.
 On interruption preserve pending state and rerun the same registration so the
 worker can reconcile the original intent before collecting a new source.

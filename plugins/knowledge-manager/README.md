@@ -19,7 +19,8 @@ scripted API. This does not establish real-model or independent semantic quality
 | Adoption-bound DB reader broker | Implemented; actual CLI build/read, normal stop and killed-host recovery verified locally |
 | Observed update inputs and change/deletion/no-op pins | Implemented; raw observations remain semantically unreviewed |
 | Durable policy/intent state, one writer and bounded retry contract | Implemented state foundation; configure/status do not execute jobs |
-| Bounded foreground periodic/change worker | Implemented; sustained polling and actual worker-host kill verification remain KM-04.3 C/04.4 |
+| Bounded foreground periodic/change worker | Implemented; actual CLI stop/kill/budget and recovery verified; sustained final coverage remains separate |
+| Explicit updates MCP mode | Six tools for policy, status, owned worker start/stop and exact retained reads |
 
 The package lives at `plugins/knowledge-manager` in the knowledge-system repo.
 It is loaded locally, without editing global Claude settings or installing into
@@ -283,9 +284,9 @@ uncertain automatic admission or unsettled reviewed job blocks a competing
 writer. Preserve pending requests for exact reconciliation; do not remove state
 or substitute a new idempotency key. The ledger preserves prior success after
 failures, separates held from published, bounds retry/history, and refuses more
-writes after uncertain persistence. Actual foreground build/replay is connected separately below. Sustained
-periodic/host-kill recovery is still pending; state fault tests do not establish
-those outcomes.
+writes after uncertain persistence. Actual foreground build/replay, CLI stop/kill and MCP-parent EOF/kill recovery
+are connected and verified separately below. Final sustained multi-project
+coverage remains separate; state fault tests alone do not establish it.
 
 ## Explicit foreground update execution
 
@@ -317,9 +318,9 @@ MCP broker remains hold-only and shares one writer lease with this worker; close
 that host before starting this separate foreground process.
 
 The default state commands still perform no DB work. `run-updates` is the
-explicit execution entry point. These worker CLI capabilities do not add update
-commands to the reviewed broker's 18-tool MCP surface. Sustained polling and
-actual worker-host SIGKILL recovery remain separate verification steps.
+explicit execution entry point. The reviewed broker retains its 18-tool MCP surface. The separate updates MCP
+mode below supervises a foreground worker while keeping retained reads and
+status available. Final sustained polling coverage remains separate.
 
 
 A signal during a ledger write can leave persistence uncertain even after owned
@@ -330,3 +331,51 @@ disk revision. The stopped CLI reports
 more writes in that process. Restart with the same registration and preserve
 the pending request so the sealed disk state and original native job reconcile.
 A requested-stop exit0 alone proves neither build success nor cancellation.
+
+
+## Updates MCP mode
+
+Select the mode explicitly when loading this plugin. The default `reviewed`
+mode keeps the supplied-review workflow and hold-only maintenance broker.
+
+```sh
+CKS_MANAGER_MODE=updates \
+CKS_MANAGER_REGISTRATION=/workspace/manager/acme/registration.json \
+  claude --plugin-dir /workspace/knowledge-system/plugins/knowledge-manager
+```
+
+`manager.py serve-updates --registration <absolute registration.json>` exposes
+the same mode directly. Initialization starts no DB job. Discover the actual
+Claude aliases for these raw MCP tool names:
+
+| Tool | Effect |
+|---|---|
+| `cks.manager.update_policy_template` | Return the scoped disabled/hold template |
+| `cks.manager.update_configure` | Validate and pin a supplied policy file; no execution |
+| `cks.manager.update_status` | Read the sealed ledger, owned process and pending/last-success facts |
+| `cks.manager.update_start` | Explicitly spawn one bounded worker for an enabled trigger |
+| `cks.manager.update_stop` | End this host's owned worker and wait; never signal a historical PID |
+| `cks.manager.update_read` | Read a retained job with exact expected coordinates and a query |
+
+The worker owns the normal manager writer lease; the MCP supervisor has its
+own session lease and can serve status/retained reads without competing for
+that writer. A second active writer or host is refused. Explicit read selection
+uses a recorded held/published automatic job, its immutable input and coordinates.
+There is no metadata backend or mutable-current fallback. Status is an as-of
+ledger observation, not proof of current publication, a successful query or quality.
+
+The worker's stdin is an owner channel (`--stop-on-stdin-eof`). MCP EOF, requested
+stop and parent death close that channel; the worker then unwinds owned native
+work. Starting a process does not prove that a job was accepted or succeeded.
+Stop/parent exit likewise does not prove native cancellation: pending intent is
+reconciled from disk and actual native status on the next execution. Process
+status reports only children owned by this host; earlier recorded PIDs are
+diagnostics and are never signaled.
+
+Periodic/change mode defers a source edit racing with collection to a later
+bounded check and records `update_check_deferred` diagnostics. It does not use
+that exception for changed registration/code, corrupt inputs or uncertain disk
+writes. A long-lived process refuses new work if manager Python bytes change;
+restart with the same registration to reconcile existing intent. No OS scheduler
+is installed, and session-owned polling ends with that session. Automatic source
+observations remain semantically unreviewed and do not invent human rationale.

@@ -1,0 +1,6 @@
+{
+  "reason": "The test observer stored the same object as its policy template consumer, which changed enabled/activation while configuring its own test policy. Raw MCP responses remained unchanged and the evidence guard rejected the inconsistent observer trace.",
+  "fix": "Deep copy observed results/arguments before consumer mutation; derive an independent test policy copy. Rerun both raw MCP and installed Claude probes.",
+  "product_manager_code_changed_for_this_fix": false,
+  "repeated_status_calls_are_not_additional_independent_cases": true
+}

@@ -2,9 +2,11 @@
 
 사용자가 문서를 직접 작성해야만 DB를 시작할 수 있는 제약을 줄인다. 매니저는 선택한 프로젝트를 등록하고 코드·기존 자료·사용자의 결정을 근거로 지식 초안을 만들며, 검토 상태와 불변 DB 구축·조회·후속 갱신을 연결한다. 문서 작성 자동화가 설계 이유나 사람 승인을 생성해도 된다는 뜻은 아니다. [전체 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다.
 
-## 패키지와 이번 완료 경계
+현재 plugin0.6.0은 reviewed 기본18도구와 명시 updates 모드6도구를 제공한다. KM-03의 수집·검토·reader 계약은 이 문서에서 다루고, KM-04.1–3의 갱신 정책·durable worker·MCP 소유 종료/복구와 실제 Claude 연결은 [지속 갱신 계약](./KNOWLEDGE-MANAGER-UPDATES.md)을 따른다. 아래 단계별 검증 기록은 해당 checkpoint 시점의 범위이며 현재 전체 진행은 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)가 기준이다.
 
-패키지는 [plugins/knowledge-manager](../../plugins/knowledge-manager/README.md)에 둔다. `.claude-plugin/plugin.json`, `.mcp.json`, skill·agent·표준 라이브러리 Python launcher와 등록 스키마를 함께 배포한다. source repository의 AGPL-3.0 조건을 따른다. 등록 절차는 외부 저장소나 전역 Claude 설정을 수정하지 않는다. `--plugin-dir`로 로컬에서 로드하며 plugin 제공 MCP는 등록된 CKS 실행 파일을 stdio로 실행한다. 현재 role은 선택한 adoption의 유지 보수와 실제 scoped reader를 연결하는 broker다.
+## 패키지와 KM-03 완료 경계
+
+패키지는 [plugins/knowledge-manager](../../plugins/knowledge-manager/README.md)에 둔다. `.claude-plugin/plugin.json`, `.mcp.json`, skill·agent·표준 라이브러리 Python launcher와 등록 스키마를 함께 배포한다. source repository의 AGPL-3.0 조건을 따른다. 등록 절차는 외부 저장소나 전역 Claude 설정을 수정하지 않는다. `--plugin-dir`로 로컬에서 로드하며 plugin 제공 MCP는 등록된 CKS 실행 파일을 stdio로 실행한다. reviewed 기본 role은 선택한 adoption의 유지 보수와 실제 scoped reader를 연결하는 broker다.
 
 | 단계 | 구현·검증할 결과 | 이 단계만으로 완료가 아닌 것 |
 |---|---|---|

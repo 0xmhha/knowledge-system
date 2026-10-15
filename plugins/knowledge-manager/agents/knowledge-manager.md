@@ -30,3 +30,11 @@ and expected candidate coordinates before actual context reads. Never route
 reads to metadata/dummy backends or fall back to current/another project. Past
 read records are as-of observations, not current freshness. Preserve pending
 admission and known-job exact replay semantics across interruption.
+
+
+In updates MCP mode, discover the six update tools and use the scoped policy,
+explicit bounded start, status, stop and exact retained-read workflow. Do not
+invoke unavailable reviewed aliases or infer review from automatic observations.
+The supervisor's process status and sealed ledger are distinct from an actual
+read or native cancellation. Treat historical PIDs as data and preserve pending
+intent for exact recovery.

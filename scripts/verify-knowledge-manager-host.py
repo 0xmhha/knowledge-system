@@ -5,6 +5,7 @@ Tests transport/lifecycle, not model intelligence, paid inference or independent
 human acceptance. All sources, fake credentials, signals and state are owned.
 """
 import argparse
+import copy
 import hashlib
 import importlib.util
 import json
@@ -114,7 +115,7 @@ class Actions:
                 name,_,consume,error = self.steps[self.index]
                 require(bool(found[0].get('is_error'))==error,'actual host tool failed/incorrect refusal: '+name)
                 value = tool_value(found[0])
-                self.observed.append({'tool':name,'actual_tool_use_id':self.awaiting,'is_error':error,'value':value})
+                self.observed.append({'tool':name,'actual_tool_use_id':self.awaiting,'is_error':error,'value':copy.deepcopy(value)})
                 write(self.out/'actual-tool-results.json',self.observed)
                 advance = consume(value)
                 self.awaiting=None
@@ -255,7 +256,7 @@ def fixture(root,kind):
             'source_before':{p.relative_to(source).as_posix():sha(p)for p in source.rglob('*')if p.is_file()}}
 
 
-def run_host(cli,subject,case,out,transport):
+def run_host(cli,subject,case,out,transport,actions_factory=Actions,manager_mode='reviewed'):
     out.mkdir()
     (out/'claude-config').mkdir()
     (out/'tmp').mkdir()
@@ -272,7 +273,7 @@ def run_host(cli,subject,case,out,transport):
                 'hooks':{event:[{'hooks':[{'type':'command','command':observer,'timeout':5}],**({'matcher':'*'}if event in ('PreToolUse','PostToolUse')else{})}]for event in ('SessionStart','Stop','PreToolUse','PostToolUse')}}
     write(out/'settings.json',settings)
     env = {'PATH':os.environ.get('PATH','/usr/bin:/bin:/usr/sbin:/sbin'),'CLAUDE_CONFIG_DIR':str(out/'claude-config'),'TMPDIR':str(out/'tmp'),
-           'CKS_MANAGER_REGISTRATION':str(subject['path']),'PYTHONDONTWRITEBYTECODE':'1','ANTHROPIC_API_KEY':'local-fixture-not-a-real-key',
+           'CKS_MANAGER_REGISTRATION':str(subject['path']),'CKS_MANAGER_MODE':manager_mode,'PYTHONDONTWRITEBYTECODE':'1','ANTHROPIC_API_KEY':'local-fixture-not-a-real-key',
            'CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC':'1','DISABLE_TELEMETRY':'1','DISABLE_ERROR_REPORTING':'1','ENABLE_CLAUDEAI_MCP_SERVERS':'false',
            'API_TIMEOUT_MS':'10000','GOTOOLCHAIN':'go1.26.9','GOCACHE':'/private/tmp/ks-corpus-go-cache'}
     if 'HOME'in os.environ:
@@ -283,7 +284,7 @@ def run_host(cli,subject,case,out,transport):
             '--strict-mcp-config','--mcp-config',str(out/'mcp.json'),'--setting-sources','','--settings',str(out/'settings.json'),
             '--permission-mode','manual','--permission-prompts','none','--include-hook-events','--output-format','stream-json','--verbose',
             '--no-session-persistence','--no-chrome','--tools','Skill','--system-prompt','Local scripted transport test only; no real model or independent acceptance.',prompt]
-    actions = Actions(case,subject,out)
+    actions = actions_factory(case,subject,out)
     gateway = transport.Gateway(marker,actions,out)
     actions.gateway=gateway
     with gateway as url:

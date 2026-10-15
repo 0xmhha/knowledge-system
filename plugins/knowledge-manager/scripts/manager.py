@@ -251,6 +251,9 @@ def main():
     doctor.add_argument('--connect',action='store_true')
     launch = commands.add_parser('serve')
     launch.add_argument('--registration',default=os.environ.get('CKS_MANAGER_REGISTRATION'))
+    launch.add_argument('--mode',choices=('reviewed','updates'))
+    update_serve=commands.add_parser('serve-updates')
+    update_serve.add_argument('--registration',default=os.environ.get('CKS_MANAGER_REGISTRATION'))
     collection = commands.add_parser('collect')
     collection.add_argument('--registration',required=True)
     collection.add_argument('--exclude',action='append',default=[])
@@ -309,23 +312,27 @@ def main():
     update_run.add_argument('--max-iterations',type=int,default=1)
     update_run.add_argument('--max-seconds',type=int,default=3600)
     update_run.add_argument('--poll-seconds',type=float,default=1)
+    update_run.add_argument('--stop-on-stdin-eof',action='store_true')
     args = parser.parse_args()
     try:
         if args.operation=='register':
             result = register(args)
         else:
             require(args.registration,'registration_required')
-            # A native admission may own a durable journal before claiming the
-            # dataset root. This fixed read-only probe checks only original
-            # source/input freshness; native maintenance checks DB ownership.
-            r = load_registration(args.registration,check_dataset=args.operation not in ('verify-update-source','run-updates'))
-            if args.operation=='serve':
-                from broker import serve
+            mode='updates'if args.operation=='serve-updates'else(getattr(args,'mode',None)or os.environ.get('CKS_MANAGER_MODE','reviewed'))if args.operation=='serve'else None
+            if mode is not None:require(mode in('reviewed','updates'),'manager_mode_invalid')
+            # Updates diagnostics are read-only; the worker enforces its owned
+            # pending-recovery exception before any DB admission. Reviewed mode
+            # and ordinary writes retain the default dataset owner assertion.
+            r=load_registration(args.registration,check_dataset=args.operation not in('verify-update-source','run-updates','serve-updates')and mode!='updates')
+            if args.operation in('serve','serve-updates'):
+                if mode=='updates':from update_host import serve
+                else:from broker import serve
                 serve(args.registration)
                 return 0
             if args.operation=='run-updates':
                 from update_worker import run
-                result=run(args.registration,args.trigger,args.max_iterations,args.max_seconds,args.poll_seconds)
+                result=run(args.registration,args.trigger,args.max_iterations,args.max_seconds,args.poll_seconds,args.stop_on_stdin_eof)
             elif args.operation in ('configure-updates','update-status'):
                 from update_state import Journal
                 with Journal(args.registration) as journal:
@@ -371,7 +378,7 @@ def main():
                     result = {'schema_version':1,'stage':'current_reviewed_input_not_DB_publication','input_project':str(directory/'project'),'receipt':receipt,'workflow':state}
             else:
                 result = {'schema_version':1,'stage':'registration_verified_not_built','project_id':r['project_id'],'profile_id':r['profile_id'],
-                          'draft_collection':True,'review_workflow':True,'managed_reader_broker':True,'scheduling':False,'model_readiness':'not_measured'}
+                          'draft_collection':True,'review_workflow':True,'managed_reader_broker':True,'scheduling':False,'explicit_foreground_updates':True,'updates_MCP_mode':True,'model_readiness':'not_measured'}
                 if args.connect:
                     result['connection'] = connect(r)
         print(json.dumps(result,ensure_ascii=False))

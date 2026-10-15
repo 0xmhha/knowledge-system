@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'manager-worker-host': {
+        'revision': 'ebec0858', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-04-worker-host',
+        'scope': 'historical_KM04_3_C1_actual_CLI_worker_lifecycle_not_MCP_operation',
+        'scripts': ['check-manager-worker-host-evidence.py', 'test_manager_worker_host_evidence.py'],
+    },
     'manager-update-worker': {
         'revision': 'a801f551', 'folder': 'km-04-worker',
         'scope': 'historical_KM04_3_B2_foreground_native_worker_not_sustained_or_host_kill',
@@ -120,9 +125,9 @@ def verify(checkpoint='journal-foundation', root=ROOT):
     revision = subprocess.check_output(['git', 'rev-parse', selected['revision'] + '^{commit}'], cwd=root, text=True).strip()
     def read(name):
         return subprocess.check_output(['git', 'show', revision + ':' + name], cwd=root)
-    folder = BASE + selected['folder']
+    folder = selected.get('base',BASE) + selected['folder']
     manifest, binding = json.loads(read(folder + '/manifest.json')), json.loads(read(folder + '/source-binding.json'))
-    paths = set(manifest['source_sha256']) | set(binding['approved_input_sha256']) | {'scripts', BASE.rstrip('/'), 'system/contracts/versioned-maintenance'}
+    paths = set(manifest['source_sha256']) | set(binding['approved_input_sha256']) | {'scripts', BASE.rstrip('/'), folder, 'system/contracts/versioned-maintenance'}
     paths.update('docs/spec-driven/' + name for name in ('KNOWLEDGE-ROADMAP-PROGRESS.json', 'KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md',
         'KNOWLEDGE-ROADMAP-TEST-MATRIX.md', 'PROJECT-COLLECTION-ISOLATION.md', 'VERSIONED-MAINTENANCE-CONTRACT.md', 'VERSIONED-MAINTENANCE-RUNTIME.md'))
     for name in paths:

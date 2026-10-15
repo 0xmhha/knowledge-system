@@ -3,6 +3,10 @@ import argparse
 import copy
 import importlib
 import json
+import os
+import select
+import signal
+import subprocess
 from pathlib import Path
 import sys
 import time
@@ -240,9 +244,207 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(self.w.journal.row()['job']['job_id'],accepted[0]['job_id'])
         self.w.tick('manual',11);self.assertEqual(len(self.w.journal.state['attempts']),1)
 
+    def test_new_signal_during_owned_cleanup_does_not_interrupt_quiescence(self):
+        self.close()
+        with state.Journal(self.registration)as j:j.configure(fixture.contract.defaults(self.r))
+        original=worker.Worker.close;closed=[]
+        def finish(instance):
+            signal.raise_signal(signal.SIGTERM)
+            original(instance);closed.append(True)
+        with patch.object(worker.Worker,'close',finish):result=worker.run(self.registration,'manual',1,30,.02)
+        self.assertEqual(closed,[True]);self.assertFalse(result['scheduler_running'])
+        self.assertEqual(result['worker_stop_outcome'],'closed')
+        self.w=worker.Worker(self.registration)
+
+    def test_periodic_capture_race_defers_then_builds_without_losing_baseline(self):
+        self.settled();baseline=self.w.journal.state['last_success'];self.close()
+        self.policy['interval_seconds']=1
+        with state.Journal(self.registration)as j:j.configure(self.policy)
+        original=worker.prepare;calls=[]
+        def changed(*args,**kwargs):
+            calls.append(True)
+            if len(calls)==1:raise manager.Failure('source_changed')
+            return original(*args,**kwargs)
+        with patch.object(worker,'prepare',side_effect=changed):result=worker.run(self.registration,'periodic',80,10,.03)
+        self.assertGreaterEqual(len(calls),2);self.assertIsNotNone(result['state']['last_success'])
+        self.assertTrue(any(row['id']==baseline and row['outcome']=='held'for row in result['state']['attempts']))
+        self.assertEqual(len(result['state']['attempts']),2);self.assertFalse(result['scheduler_running'])
+        self.w=worker.Worker(self.registration)
+
     def test_second_worker_or_reviewed_host_cannot_overlap(self):
         for start in (lambda:worker.Worker(self.registration),lambda:broker.Broker(self.registration)):
             with self.assertRaisesRegex(manager.Failure,'collection_busy'):start()
+
+
+class MCPHostTests(unittest.TestCase):
+    def setUp(self):
+        self.h=None
+        WorkerTests.setUp(self)
+        self.w.close();self.w=None
+        self.policy['interval_seconds']=1
+        with state.Journal(self.registration)as j:j.configure(self.policy)
+        self.host_module=importlib.import_module('update_host')
+        self.h=self.host_module.Host(self.registration)
+
+    def close(self):
+        if getattr(self,'h',None):self.h.close()
+        if getattr(self,'w',None):self.w.close()
+
+    def call(self,operation,args=None):return self.h.call(self.host_module.PREFIX+operation,args or{})
+
+    def wait_success(self,prior=None):
+        end=time.monotonic()+35
+        while True:
+            result=self.call('status')
+            if result['last_success']and result['last_success']['intent_id']!=prior:return result
+            self.assertLess(time.monotonic(),end,result)
+            self.assertIsNone(result['process']['exit_code'],result)
+            time.sleep(.03)
+
+    def metadata(self,operation='serve-updates',env_mode=None):
+        self.h.close()
+        env=os.environ.copy();env.pop('CKS_MANAGER_MODE',None)
+        if env_mode is not None:env['CKS_MANAGER_MODE']=env_mode
+        requests=[{'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-update-mode-test','version':'1'}}},
+                  {'jsonrpc':'2.0','id':2,'method':'tools/list','params':{}}]
+        result=subprocess.run([sys.executable,str(ROOT/'plugins/knowledge-manager/scripts/manager.py'),operation,'--registration',self.registration],
+                    input=b''.join(manager.canonical(r)+b'\n'for r in requests),capture_output=True,timeout=30,env=env)
+        return result,[json.loads(line)for line in result.stdout.splitlines()]
+
+    def test_updates_metadata_exposes_only_six_scoped_tools_and_no_DB(self):
+        definitions=self.host_module.tools();self.assertEqual(len(definitions),6)
+        self.assertTrue(all(t['name'].startswith('cks.manager.update_')for t in definitions))
+        result=self.call('status');self.assertFalse(result['process']['running'])
+        self.assertFalse(result['publication_or_serving_read_inferred']);self.assertFalse(Path(self.r['dataset_root']).exists())
+        template=self.call('policy_template');self.assertFalse(template['enabled']);self.assertEqual(template['activation'],'hold_for_review')
+
+    def test_updates_disabled_policy_refuses_start_without_spawning(self):
+        with state.Journal(self.registration)as j:j.configure(fixture.contract.defaults(self.r))
+        with patch.object(self.host_module.subprocess,'Popen',side_effect=AssertionError('must not spawn')):
+            with self.assertRaisesRegex(manager.Failure,'update_trigger_not_enabled'):self.call('start',{'trigger':'manual'})
+        self.assertFalse(Path(self.r['dataset_root']).exists())
+
+    def test_updates_unknown_fields_and_invalid_budgets_refused(self):
+        for args in ({'trigger':'manual','max_seconds':True},{'trigger':'manual','max_seconds':0},{'trigger':'on_every_word'},
+                     {'trigger':'manual','poll_seconds':float('nan')},{'trigger':'manual','command':['bad']}):
+            with self.subTest(args=args),self.assertRaises(manager.Failure):self.call('start',args)
+        self.assertIsNone(self.h.child)
+
+    def test_updates_foreign_policy_is_not_adopted(self):
+        policy=copy.deepcopy(self.policy);policy['project_id']='foreign';path=self.f.root/'foreign-policy.json';path.write_text(json.dumps(policy))
+        with self.assertRaisesRegex(manager.Failure,'update_project_mismatch'):self.call('configure',{'policy_file':str(path)})
+        self.assertIsNone(self.h.child)
+
+    def test_updates_duplicate_host_uses_its_own_exclusive_session_lease(self):
+        with self.assertRaisesRegex(manager.Failure,'collection_busy'):self.host_module.Host(self.registration)
+        with state.Journal(self.registration):pass
+
+    def test_updates_reviewed_writer_blocks_competing_start(self):
+        reviewed=broker.Broker(self.registration)
+        try:
+            with self.assertRaisesRegex(manager.Failure,'collection_busy'):self.call('start',{'trigger':'manual'})
+        finally:reviewed.close()
+        self.assertIsNone(self.h.child)
+
+    def test_updates_active_child_blocks_second_start_and_reconfigure(self):
+        self.call('start',{'trigger':'periodic','max_seconds':60,'max_iterations':10000,'poll_seconds':.03})
+        original=self.h.child.pid
+        with self.assertRaisesRegex(manager.Failure,'update_worker_already_running'):self.call('start',{'trigger':'manual'})
+        path=self.f.root/'policy.json';path.write_text(json.dumps(self.policy))
+        with self.assertRaisesRegex(manager.Failure,'update_worker_already_running'):self.call('configure',{'policy_file':str(path)})
+        self.assertEqual(self.h.child.pid,original);self.call('stop')
+        self.assertEqual(self.h.child.returncode,0)
+
+    def test_updates_actual_read_while_periodic_writer_and_retained_old_input(self):
+        self.call('start',{'trigger':'periodic','max_seconds':60,'max_iterations':10000,'poll_seconds':.03})
+        first=self.wait_success()['last_success'];job=first['job'];args={'job_id':job['job_id'],'expected_coordinates':job['candidate']['coordinates'],'prompt':'Value observed source'}
+        pack1=self.call('read',args)['pack'];self.assertTrue(any('return 7'in json.dumps(b)for b in pack1['bodies']))
+        with self.assertRaisesRegex(manager.Failure,'collection_busy'):state.Journal(self.registration)
+        self.f.code.write_text('package fixture\nfunc Value()int{return 8}\n')
+        second=self.wait_success(first['intent_id'])['last_success'];fresh=self.call('read',{'job_id':second['job']['job_id'],'expected_coordinates':second['job']['candidate']['coordinates'],'prompt':'Value observed source'})
+        self.assertTrue(any('return 8'in json.dumps(b)for b in fresh['pack']['bodies']))
+        old=self.call('read',args)['pack'];self.assertEqual(old['bodies'],pack1['bodies']);self.assertEqual(old['citations'],pack1['citations'])
+        self.assertFalse(fresh['publication_inferred_from_read']);self.call('stop');self.assertEqual(self.h.child.returncode,0)
+
+    def test_updates_foreign_coordinate_refused_before_opening_reader(self):
+        self.call('start',{'trigger':'manual','max_seconds':60,'poll_seconds':.02})
+        row=self.wait_success()['last_success'];coordinates=copy.deepcopy(row['job']['candidate']['coordinates']);coordinates['project_id']='foreign'
+        with patch.object(self.host_module,'read_observed',side_effect=AssertionError('must not open reader')):
+            with self.assertRaisesRegex(manager.Failure,'update_reader_coordinate_mismatch'):
+                self.call('read',{'job_id':row['job']['job_id'],'expected_coordinates':coordinates,'prompt':'Value'})
+
+    def test_updates_unowned_recorded_pid_is_never_signaled(self):
+        run_id='a'*32;path=self.h.runs/run_id;path.mkdir()
+        manager.write_new(path/'owner.json',{'schema_version':1,'project_id':self.r['project_id'],'token':self.r['token']})
+        manager.write_new(path/'launch.json',{'run_id':run_id,'registration_digest':manager.digest(self.r),'pid':os.getpid()})
+        self.h.last_run=run_id
+        with patch.object(self.host_module.os,'kill',side_effect=AssertionError('never signal recorded PID')):
+            result=self.call('stop')['status']['process']
+        self.assertFalse(result['owned_by_this_host']);self.assertIsNone(result['running']);self.assertTrue(result['previous_unowned_pid_never_signaled'])
+
+    def test_updates_run_history_limit_preserves_old_directories(self):
+        for n in range(128):(self.h.runs/('%032x'%n)).mkdir()
+        with self.assertRaisesRegex(manager.Failure,'update_host_run_limit'):self.call('start',{'trigger':'manual'})
+        self.assertEqual(len([p for p in self.h.runs.iterdir()if p.is_dir()]),128);self.assertIsNone(self.h.child)
+
+    def test_updates_changed_code_blocks_new_work_but_not_safe_stop_status(self):
+        key=next(iter(self.h.code_pin));self.h.code_pin[key]='f'*64
+        with self.assertRaisesRegex(manager.Failure,'manager_code_changed'):self.call('start',{'trigger':'manual'})
+        self.assertEqual(self.call('status')['project_id'],self.r['project_id']);self.call('stop')
+
+    def test_updates_explicit_CLI_mode_metadata_has_six_tools_and_normal_EOF(self):
+        result,frames=self.metadata()
+        self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(frames[0]['result']['serverInfo']['name'],'knowledge-manager-updates')
+        self.assertEqual(len(frames[1]['result']['tools']),6);self.assertFalse(Path(self.r['dataset_root']).exists())
+
+    def test_updates_plugin_environment_selects_same_mode(self):
+        result,frames=self.metadata('serve','updates');self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(frames[0]['result']['serverInfo']['name'],'knowledge-manager-updates');self.assertEqual(len(frames[1]['result']['tools']),6)
+
+    def test_updates_default_reviewed_mode_still_exposes_eighteen_tools(self):
+        result,frames=self.metadata('serve');self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(frames[0]['result']['serverInfo']['name'],'knowledge-manager');self.assertEqual(len(frames[1]['result']['tools']),18)
+
+    def test_updates_invalid_environment_mode_does_not_fall_back(self):
+        result,frames=self.metadata('serve','foreign');self.assertEqual(result.returncode,2);self.assertEqual(frames,[])
+        self.assertEqual(json.loads(result.stderr)['code'],'manager_mode_invalid')
+
+    def test_updates_legacy_mutation_alias_not_available(self):
+        with self.assertRaisesRegex(manager.Failure,'unknown_tool'):self.h.call('cks.dataset.build',{})
+        with self.assertRaisesRegex(manager.Failure,'unknown_tool'):self.h.call('cks.ops.index',{})
+        self.assertFalse(Path(self.r['dataset_root']).exists())
+
+    def test_updates_actual_MCP_start_read_and_EOF_stops_owned_worker(self):
+        self.h.close();process=subprocess.Popen([sys.executable,str(ROOT/'plugins/knowledge-manager/scripts/manager.py'),'serve-updates','--registration',self.registration],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        counter=0
+        def request(method,params):
+            nonlocal counter
+            counter+=1;process.stdin.write(manager.canonical({'jsonrpc':'2.0','id':counter,'method':method,'params':params})+b'\n');process.stdin.flush()
+            self.assertTrue(select.select([process.stdout],[],[],30)[0],'MCP response timeout')
+            frame=json.loads(process.stdout.readline(broker.FRAME_LIMIT+1));self.assertEqual(frame['id'],counter);return frame['result']
+        def tool(operation,args=None):
+            result=request('tools/call',{'name':self.host_module.PREFIX+operation,'arguments':args or{}})
+            self.assertFalse(result.get('isError'),result);return result['structuredContent']
+        try:
+            initialized=request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-live-update-test','version':'1'}})
+            self.assertEqual(initialized['serverInfo']['name'],'knowledge-manager-updates')
+            started=tool('start',{'trigger':'periodic','max_seconds':60,'max_iterations':10000,'poll_seconds':.03})
+            self.assertFalse(started['actual_job_or_read_success_inferred']);run_id=started['process']['run_id'];end=time.monotonic()+35
+            while True:
+                status=tool('status')
+                if status['last_success']:break
+                self.assertLess(time.monotonic(),end,status);time.sleep(.03)
+            job=status['last_success']['job'];pack=tool('read',{'job_id':job['job_id'],'expected_coordinates':job['candidate']['coordinates'],'prompt':'Value observed source'})['pack']
+            self.assertTrue(any('return 7'in json.dumps(body)for body in pack['bodies']))
+            process.stdin.close();self.assertEqual(process.wait(timeout=50),0,process.stderr.read())
+            exit_record=manager.strict_read(Path(self.r['state_root'])/'updates/mcp-host/runs'/run_id/'exit.json')
+            self.assertEqual(exit_record['exit_code'],0)
+        finally:
+            if process.poll()is None:
+                process.stdin.close()
+                try:process.wait(timeout=50)
+                except subprocess.TimeoutExpired:process.kill();process.wait(timeout=10)
+            process.stdout.close();process.stderr.close()
 
 
 if __name__=='__main__':unittest.main(verbosity=2)

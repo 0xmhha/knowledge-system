@@ -84,7 +84,7 @@
 
 - [x] KM-04.1: 수동 갱신, 구성 가능한 정기 실행, 코드/문서 변경 신호의 trigger와 마지막 성공 기준을 설계한다. source commit뿐 아니라 문서·지식 팩·ontology·config/model 변경도 추적한다.
 - [x] KM-04.2: 무변경 no-op·변경/삭제/이름 변경·의미 연결 stale 판정·재검토 필요 범위를 구현한다. 근거가 바뀐 verified 지식의 검토를 무조건 승계하지 않는다. 증분 처리가 불가능한 경로는 새 버전 전체 rebuild로 처리한다.
-- [ ] KM-04.3: 잡 중복/겹침·lease·재시작·누락 실행의 다음 실행 처리·중단·retry/backoff·자원 상한·관측 상태를 구현한다. 활성 데이터는 설정된 gate를 통과한 후보로만 전환한다.
+- [x] KM-04.3: 잡 중복/겹침·lease·재시작·누락 실행의 다음 실행 처리·중단·retry/backoff·자원 상한·관측 상태를 구현한다. 활성 데이터는 설정된 gate를 통과한 후보로만 전환한다.
 - [ ] KM-04.4: 최소 두 번의 실제 내용 변경과 no-op, 실패 후 복구를 연속 실행해 최신 조회·이전 snapshot 재현·원천 삭제/회수 반영과 다른 프로젝트 불변을 확인한다. 실제 주기 trigger 실행 증거를 수동 호출 증거와 분리한다.
 
 완료 결과: 최초 구축 후 지식 DB가 오래된 상태로 방치되지 않고, 갱신 실패가 기존 사용 가능 DB를 깨뜨리지 않는다. 실행 주기·자동 활성화/검토 정책은 설치 설정에 명시한다. 이번 문서 등록은 개인 머신에 scheduler를 설치하거나 유료 모델의 정기 호출을 시작하는 작업이 아니다.
@@ -207,3 +207,12 @@ Python247개(기존224+worker23), 실제 worker14항목·native RPC 관찰97개�
 KM-04.3 C1 실제 foreground 프로세스 중단 검증 완료: 실제 CLI worker의 SIGTERM·SIGKILL·시간 상한3경로를21항목/CLI10회로 검증했다. 지연 중인 실제 native graph를 중단하고 원래 current·intent를 보존하며, native/graph가 실행 중이 아님을 확인하고 예정된8초 지연 쓰기 시점 이후까지 늦은 쓰기가 없음을 관찰했다. 재시작 시 원래 job의 terminal canceled/activated=false를 먼저 조회하고, 같은 input/cycle의 attempt2·새 key/version으로3건 모두 정상 게시/원문 조회에 복구했다. parent 종료 뒤 native 자식의 exit code는 직접 관측할 수 없어0으로 표시하지 않았다. 이는 실제 CLI 프로세스/자식 정리 증거이며 MCP 갱신 운영 연결과 지속 schedule 검증은 별도다. 반복 검증에서 SIGTERM이 상태 저장 중 도착하면 마지막 확인 메모리와 디스크 상태가 다를 수 있는 경계를 발견했다. 자식 종료/intent 보존 후에도 추가 write를 금지하고 last_confirmed_in_process_state·disk_state_requires_reconciliation·closed_requires_persistence_reconciliation을 명시하도록 보완했다. 실제 native 접수 뒤 fsync 중 신호를 재현하는1개를 포함해 Python248개를 새로 검증했다.
 
 [실제 프로세스 증거와 C2 경계](./KNOWLEDGE-MANAGER-UPDATES.md)를 따른다. 전체14/28·기능3/7을 유지한다. 다음은 C2 MCP 세션의 명시 갱신 시작·상태·중지·정확한 DB 조회와 EOF/host 종료 연결이다. 이후 KM-04.4의 실제 지속 periodic/change와 두 번 변경·삭제/no-op·실패 복구·다른 프로젝트 불변을 종합 검증한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-04.3 통합 완료
+
+KM-04.3 완료: A native 원문 전환 전 확인, B1 durable intent/한 lease/상한, B2 실제 foreground worker, C1 실제 CLI TERM/KILL/budget·저장 중 신호 보고, C2 갱신 MCP 운영 연결을 통합 검증했다. plugin0.6.0은 기존 reviewed 기본18도구를 유지하고 명시 updates 모드에6도구(policy template/configure/status/start/stop/read)를 제공한다. MCP는 별도 소유 worker를 감독하면서 sealed 상태와 지정 retained DB 조회를 계속 처리한다. 부모 EOF/강제 종료는 소유 stdin 종료로 worker에 전달하고, 기록된 과거 PID를 signal하지 않는다. 재시작은 원래 job/요청을 먼저 조정한다.
+
+Python268개(기존224+worker/MCP44), 실제 공개 MCP20항목·222도구호출·3연결(의도한 부모SIGKILL-9/정상EOF0/정상EOF0), 부모 중단2경로의 Native/graph 정리·9초 이후 지연 쓰기 부재/current 보존·2건 연결 재시도 게시를 확인했다. 실제 Claude Code2.1.300의 설치된 plugin/skill/agent를 로컬 시험 응답기에 연결해2회/도구36개·MCP정상 종료0으로 raw source 구축/held조회·같은 job 재시작·periodic no-op·중지를 검증했다. 유료 모델/실제 모델 호출0이며 agent 자율성·검색 품질·독립 수용을 측정했다고 주장하지 않는다. Go/의존/fixture byte가 같은 B2의 Go3862(3844통과18skip)·race836(834통과2skip)을 byte 대조해 참조하며 새 Go 실행으로 세지 않는다. build/fmt/vet/lint·plugin strict·문서132개와 C1 동결 증거16개를 확인했다.
+
+[공개 모드·진행/회복 계약](./KNOWLEDGE-MANAGER-UPDATES.md)을 따른다. 전체15/28·기능3/7이다. 다음은 KM-04.4의 지속 periodic/change·두 번 변경·삭제/no-op·실패/복구·이전 snapshot과 다른 프로젝트 보존을 통합 확인하는 단계다. 남은13개는 KM-04.4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
