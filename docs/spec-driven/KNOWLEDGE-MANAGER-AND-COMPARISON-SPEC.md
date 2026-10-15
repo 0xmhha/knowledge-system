@@ -184,3 +184,10 @@ KM-04.3 A 원문 전환 전 확인 완료: operator profile의 선택적 source_
 처음에는 원문 probe가 native 접수 중의 아직 root owner가 없는 소유 journal과 충돌했다. 원문 전용 probe만 읽기 확인과 DB 소유 검증을 분리했고 기본 등록·doctor·prepare·DB 쓰기의 소유 검증은 유지했다. Native 오류의 실제 structuredContent를 읽도록 검증기도 수정했다. 최초 race의 기존 deadline 시험1회 late-writer 실패는5회 반복에서 재현되지 않았다. timer callback 도착만 가정하지 않도록 exec 직전/직후 절대 시각 확인을 보강하고 과거 deadline 거부 시험을 추가했다. 두 경계를 각각5회 확인한 뒤 최종 전체·race를 순차 실행해 실패0을 확인했다. 최초 실패의 단일 원인을 입증했다고 주장하지 않으며 initial-failures의 원자료를 보존한다.
 
 [원문 확인 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-source-check/manifest.json)을 따른다. 현재 소스1,707입력=Go1,258+기타449이며 승인5개는 보존했다. 직전2c03322f의 입력 검증을 동결 snapshot에서 별도 확인했다. A는 native 원문 검사 범위다. KM-04.3의 B durable worker/일정/중복/retry와 C 중단/복구 연결, KM-04.4 실제 주기 실행은 남는다. 전체14/28·기능3/7을 유지한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 다음 B를 진행한다.
+
+
+## KM-04.3 중간 B1 검증
+
+KM-04.3 B1 durable 상태 기반 완료: 정책을 소유 불변 파일로 저장하고, 실제 native inspect 형식의 source/model/input/base와 version/key/deadline을 포함한 정확한 intent를 접수 전에 원자 저장/fsync한다. 기존 reviewed broker와 하나의 writer lease를 공유하고 pending intent·미종결 reviewed job의 교차 실행을 막는다. 응답 손실 후 원래 intent 보존, 단조 job revision·terminal 불변, 현재 좌표/required gate/실제 reader 확인을 성공 조건으로 하고 실패·취소 시 마지막 성공을 보존한다. retry는 같은 cycle/input의 새 key/version으로만 연결하고 상한을 새 cycle로 우회하지 못하게 했다. 저장 불확실성은 프로세스를 중지 상태로 만들고 재시작 때 디스크 상태를 읽는다. 50개 상태·오류 시험과 기존174개가 통과했다. 이 중 실제 CKS inspect/EOF를 확인하지만 상태 전이용 job/read 응답은 통제 관찰이며 자동 DB 실행 증거로 세지 않는다. configure-updates/update-status는 설정·상태만 제공하고 worker나 scheduler를 시작하지 않는다.
+
+[상태/재시도 계약과 검증](./KNOWLEDGE-MANAGER-UPDATES.md)을 따른다. 전체14/28·기능3/7을 유지한다. 다음은 B2 실제 worker·주기/change polling·exact replay와 reader 연결이고 C 실제 강제 종료/복구 및 KM-04.4 연속 주기 검증이 남는다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

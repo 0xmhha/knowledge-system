@@ -15,6 +15,10 @@ import subprocess
 import sys
 import uuid
 
+# Plugin modules and CLI must share the same typed Failure class.
+if __name__=='__main__':
+    sys.modules.setdefault('manager',sys.modules[__name__])
+
 ID = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9._-]{0,63}$')
 REQUIRED = {'cks.dataset.inspect_profile', 'cks.dataset.build', 'cks.dataset.status', 'cks.dataset.cancel'}
 
@@ -294,6 +298,10 @@ def main():
     source_check.add_argument('--registration',required=True)
     source_check.add_argument('--policy-file',required=True)
     source_check.add_argument('--input-id',required=True)
+    for operation in ('configure-updates','update-status'):
+        command=commands.add_parser(operation)
+        command.add_argument('--registration',required=True)
+        if operation=='configure-updates':command.add_argument('--policy-file',required=True)
     args = parser.parse_args()
     try:
         if args.operation=='register':
@@ -308,7 +316,11 @@ def main():
                 from broker import serve
                 serve(args.registration)
                 return 0
-            if args.operation=='update-policy-template':
+            if args.operation in ('configure-updates','update-status'):
+                from update_state import Journal
+                with Journal(args.registration) as journal:
+                    result=journal.configure(strict_read(Path(args.policy_file))) if args.operation=='configure-updates' else journal.describe()
+            elif args.operation=='update-policy-template':
                 from update_contract import defaults
                 result=defaults(r)
             elif args.operation=='prepare-update':

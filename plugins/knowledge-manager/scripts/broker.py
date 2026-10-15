@@ -161,6 +161,8 @@ class Broker:
         self.native,self.reader,self.native_input = None,None,None
         self.closed=False
         try:
+            from update_state import assert_worker_idle
+            assert_worker_idle(self.r)
             self.state = self.load_state()
             self.native = Native(self.r,Path(self.r['state_root'])/'cks.json')
             self.native_tools = {row['name']:row for row in self.native.tools}

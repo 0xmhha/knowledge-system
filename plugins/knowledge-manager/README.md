@@ -18,6 +18,7 @@ scripted API. This does not establish real-model or independent semantic quality
 | Tacit questions, supplied review, filtered input adoption/retraction | Implemented in KM-03.3; external reviewer authentication is separate |
 | Adoption-bound DB reader broker | Implemented; actual CLI build/read, normal stop and killed-host recovery verified locally |
 | Observed update inputs and change/deletion/no-op pins | Implemented; raw observations remain semantically unreviewed |
+| Durable policy/intent state, one writer and bounded retry contract | Implemented state foundation; configure/status do not execute jobs |
 | Regular/change-triggered worker | Remaining KM-04.3–4 |
 
 The package lives at `plugins/knowledge-manager` in the knowledge-system repo.
@@ -265,3 +266,21 @@ a job or a scheduler, approve semantic claims, publish a DB or validate DB healt
 merely because `input_unchanged` is true. Explicit source-contained document,
 knowledge and ontology roots remain raw observed material with separate origins.
 See the [update contract](../../docs/spec-driven/KNOWLEDGE-MANAGER-UPDATES.md).
+
+
+## Durable update configuration (worker connection pending)
+
+`configure-updates --registration <absolute registration.json> --policy-file
+<absolute policy.json>` pins a validated update policy and stores owned state.
+`update-status --registration <absolute registration.json>` reads that state.
+Neither command starts a scheduler, inspects model readiness or builds a DB.
+An enabled policy is configuration only at this checkpoint. Keep the default
+disabled/hold policy until choosing the intended trigger and publication scope.
+
+The state ledger shares the reviewed broker's one-writer lock. A live host,
+uncertain automatic admission or unsettled reviewed job blocks a competing
+writer. Preserve pending requests for exact reconciliation; do not remove state
+or substitute a new idempotency key. The ledger preserves prior success after
+failures, separates held from published, bounds retry/history, and refuses more
+writes after uncertain persistence. Actual worker, replay and periodic/kill
+recovery are still pending; state fault tests do not establish those outcomes.

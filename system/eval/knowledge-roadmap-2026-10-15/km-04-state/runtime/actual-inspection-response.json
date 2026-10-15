@@ -1,0 +1,45 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "scoped dataset maintenance result; inspect structured status"
+    }
+  ],
+  "structuredContent": {
+    "profile": {
+      "project_id": "project-55b2d640cda34207b77ea33c67cb898f",
+      "profile_id": "profile-5616c993cc0a85029be474464f1c55b5",
+      "profile_digest": "30c298a1683b8c40357472d401a350258a31d2282c8c971b06aa5a37472361d5",
+      "source_pin": {
+        "mode": "snapshot-only",
+        "snapshot_id": "90f3acdb2d4321bb39aac1a1c5d629fbdaf1b4c6853cbf360f7a95f5d93598c8",
+        "base_commit": ""
+      },
+      "input_digest": "21fc8b8172868aad48f464289008f5696f7e078d7f5df4877b43ebeaff6494e9",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+      "observed_base": {
+        "state": "absent"
+      },
+      "existing_versions": [],
+      "allowed_activation": [
+        "hold_for_review",
+        "activate_after_gate"
+      ],
+      "required_gates": [
+        "source",
+        "identity",
+        "graph",
+        "vector",
+        "knowledge"
+      ],
+      "timeout_max_seconds": 3600
+    },
+    "capabilities": {
+      "versioned_build": true,
+      "cancel": true,
+      "job_persistence": "durable_journal",
+      "serving_adoption": "not_observed",
+      "input_preparation": "existing_reviewed_or_rendered_inputs"
+    }
+  }
+}

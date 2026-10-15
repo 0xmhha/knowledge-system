@@ -125,3 +125,30 @@ KM-04.3 A 원문 전환 전 확인 완료: operator profile의 선택적 source_
 처음에는 원문 probe가 native 접수 중의 아직 root owner가 없는 소유 journal과 충돌했다. 원문 전용 probe만 읽기 확인과 DB 소유 검증을 분리했고 기본 등록·doctor·prepare·DB 쓰기의 소유 검증은 유지했다. Native 오류의 실제 structuredContent를 읽도록 검증기도 수정했다. 최초 race의 기존 deadline 시험1회 late-writer 실패는5회 반복에서 재현되지 않았다. timer callback 도착만 가정하지 않도록 exec 직전/직후 절대 시각 확인을 보강하고 과거 deadline 거부 시험을 추가했다. 두 경계를 각각5회 확인한 뒤 최종 전체·race를 순차 실행해 실패0을 확인했다. 최초 실패의 단일 원인을 입증했다고 주장하지 않으며 initial-failures의 원자료를 보존한다.
 
 [원문 확인 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-source-check/manifest.json)을 따른다. 현재 소스1,707입력=Go1,258+기타449이며 승인5개는 보존했다. 직전2c03322f의 입력 검증을 동결 snapshot에서 별도 확인했다. A는 native 원문 검사 범위다. KM-04.3의 B durable worker/일정/중복/retry와 C 중단/복구 연결, KM-04.4 실제 주기 실행은 남는다. 전체14/28·기능3/7을 유지한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 다음 B를 진행한다.
+
+
+## KM-04.3 B1 상태 저장과 설정
+
+KM-04.3 B1 durable 상태 기반 완료: 정책을 소유 불변 파일로 저장하고, 실제 native inspect 형식의 source/model/input/base와 version/key/deadline을 포함한 정확한 intent를 접수 전에 원자 저장/fsync한다. 기존 reviewed broker와 하나의 writer lease를 공유하고 pending intent·미종결 reviewed job의 교차 실행을 막는다. 응답 손실 후 원래 intent 보존, 단조 job revision·terminal 불변, 현재 좌표/required gate/실제 reader 확인을 성공 조건으로 하고 실패·취소 시 마지막 성공을 보존한다. retry는 같은 cycle/input의 새 key/version으로만 연결하고 상한을 새 cycle로 우회하지 못하게 했다. 저장 불확실성은 프로세스를 중지 상태로 만들고 재시작 때 디스크 상태를 읽는다. 50개 상태·오류 시험과 기존174개가 통과했다. 이 중 실제 CKS inspect/EOF를 확인하지만 상태 전이용 job/read 응답은 통제 관찰이며 자동 DB 실행 증거로 세지 않는다. configure-updates/update-status는 설정·상태만 제공하고 worker나 scheduler를 시작하지 않는다.
+
+```sh
+python3 plugins/knowledge-manager/scripts/manager.py configure-updates \
+  --registration /workspace/manager/acme/registration.json \
+  --policy-file /workspace/manager-policy/acme.json
+python3 plugins/knowledge-manager/scripts/manager.py update-status \
+  --registration /workspace/manager/acme/registration.json
+```
+
+설정만 저장한 시점에는 DB build나 일정 실행이 없다. 기본 disabled/hold를 유지하며 정책을 enabled로 설정해도 아직 이 단계의 명령은 worker를 시작하지 않는다. 최초 정책의 material root는 실제로 존재해야 한다. 동일한 적용 정책의 root 삭제만 삭제 상태로 허용한다. status는 소유 상태를 표시하고 native model/DB 준비를 측정하지 않는다.
+
+동일 등록의 reviewed broker와 자동 상태 저장은 broker lock을 공유한다. 살아 있는 host는 collection_busy, 디스크에 미확정 자동 intent가 있으면 pending_update_requires_reconciliation으로 reviewed host 실행을 거부한다. reviewed job의 pending 또는 nonterminal 기록도 자동 새 intent를 차단한다. 이미 기록된 작업을 운영자가 조정하지 않고 상태 파일을 삭제하거나 key를 새로 만들어 우회하지 않는다.
+
+상태는 checksum·등록/project/profile/token·엄격한 필드·intent 요청 hash·cycle/attempt 연결·단일 pending·마지막 성공을 검증한다. 최대128개 시도/불확실 임시 파일·4MiB 상태를 제한하고 이전 기록을 지우지 않는다. atomic replace 후 디렉터리 fsync 실패는 새 파일이 보일 수도 있는 불확실 상태다. 같은 프로세스는 후속 write를 거부하고 새 실행은 실제 디스크 상태를 재검증해야 한다. checksum은 로컬 무결성 확인이며 외부 사용자 신원 인증이 아니다.
+
+이 checkpoint는 저장 기반과 관측 계약이다. 원래 source가 달라진 상태의 pending native job 복구, native 접수 직후 root owner 이전 종료, 실제 cancel/EOF/kill과 owned child 정리는 B2/C에서 연결 검증한다. 현재 Journal은 기본 dataset owner 검사를 유지하며 소유가 불명확한 비어 있지 않은 DB를 채택하지 않는다. 프로세스를 중단해도 scheduler가 독립적으로 남아 실행되는 기능은 아직 없다.
+
+실제 별도 프로세스에서 intent를 저장하고 SIGKILL한 뒤10개 항목으로 byte 보존·writer lease 해제·원래 intent 복구·이후 source 변경과의 분리·미확정 상태의 reviewed launcher 차단을 확인했다. CLI3회·native inspect1회/EOF0이며 native build/replay는0회로 별도 기록한다.
+
+[상태 기반 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-state/manifest.json)을 따른다. Go1258개·빌드/의존/fixture byte를 A와 대조해 기존3862사례(3844통과18skip)·race836(834통과2skip)을 참조하고 새 Go 실행으로 세지 않는다. 직전 A는 동결 Git snapshot에서 증거 보호14개를 재검증했다.
+
+전체14/28·기능3/7을 유지한다. 다음은 B2 실제 worker·주기/change polling·exact replay와 reader 연결이고 C 실제 강제 종료/복구 및 KM-04.4 연속 주기 검증이 남는다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
