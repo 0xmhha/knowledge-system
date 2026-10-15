@@ -179,3 +179,23 @@ worker의 시간 상한은 bounded 수집/RPC 단계 사이에 확인하고 know
 [실제 foreground packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-worker/manifest.json)을 따른다. native RPC 관찰은 실제 Native.request 반환을 기록한 것이며 raw stdio 전송을 별도로 녹화했다는 주장은 하지 않는다. mock embedding 결과는 품질/온톨로지 효과나 독립 수용이 아니다.
 
 전체14/28·기능3/7은 유지한다. 다음은 C 실제 foreground worker host 중단/SIGKILL·재시작·기한/잔여 child·MCP host와의 운영 연결이다. 그 다음 KM-04.4의 실제 지속 periodic/change와 두 번 변경·삭제/no-op·실패 복구·다른 프로젝트 불변을 종합 검증한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-04.3 C1 실제 프로세스 중단
+
+KM-04.3 C1 실제 foreground 프로세스 중단 검증 완료: 실제 CLI worker의 SIGTERM·SIGKILL·시간 상한3경로를21항목/CLI10회로 검증했다. 지연 중인 실제 native graph를 중단하고 원래 current·intent를 보존하며, native/graph가 실행 중이 아님을 확인하고 예정된8초 지연 쓰기 시점 이후까지 늦은 쓰기가 없음을 관찰했다. 재시작 시 원래 job의 terminal canceled/activated=false를 먼저 조회하고, 같은 input/cycle의 attempt2·새 key/version으로3건 모두 정상 게시/원문 조회에 복구했다. parent 종료 뒤 native 자식의 exit code는 직접 관측할 수 없어0으로 표시하지 않았다. 이는 실제 CLI 프로세스/자식 정리 증거이며 MCP 갱신 운영 연결과 지속 schedule 검증은 별도다. 반복 검증에서 SIGTERM이 상태 저장 중 도착하면 마지막 확인 메모리와 디스크 상태가 다를 수 있는 경계를 발견했다. 자식 종료/intent 보존 후에도 추가 write를 금지하고 last_confirmed_in_process_state·disk_state_requires_reconciliation·closed_requires_persistence_reconciliation을 명시하도록 보완했다. 실제 native 접수 뒤 fsync 중 신호를 재현하는1개를 포함해 Python248개를 새로 검증했다.
+
+[프로세스 중단 packet](../../system/eval/knowledge-roadmap-2026-10-16/km-04-worker-host/manifest.json)을 따른다. controlled graph wrapper는 실제 엔진을 실행하되 해당3회만8초 지연 후의 쓰기를 예약한다. 시험은 소유 Popen worker만 종료하며, 기록된 PID에는 ps로 상태만 조회하고 재사용/복구된 PID를 kill하지 않는다. native guardian/EOF가 소유 graph를 정리해야 통과한다. 성공 판정은 signal 전송이나 parent exit가 아니라 실제 process 상태·늦은 쓰기 부재·current 보존·원래 native job terminal 상태·재시도 게시/reader를 결합한다.
+
+정상 SIGTERM/시간 상한의 worker 결과는 stopped+pending으로 남기고 canceled 성공으로 추정하지 않았다. SIGKILL은 실제-9이며 manager의 원래 intent를 유지했다. 회복 단계는 원래 job을 canceled로 확인하는 실행과 실제 retry 게시 실행을 분리했다. 늦은 쓰기 관찰은 각 wrapper 시작 후9초까지이며 영구적인 PID 신원/모든 미래 쓰기 불가를 주장하지 않는다. source는 의도한 fixture 변경 외에 문서/semantic review를 받지 않았다.
+
+Go/의존/fixture byte는 B2와 같아 B2의 Go3862(3844통과18skip)·race836(834통과2skip)을 committed 증거로 참조한다. 이 단계에서 새 Go 전체/race 실행으로 합산하지 않는다. plugin0.5.1의 저장 중 신호 불확실성 보고 수정과 회귀1개를 포함한 Python248개는 새 실행으로 검증한다. build/fmt/vet/lint·문서132개와 B2 동결 증거18개를 별도 확인했다.
+
+C2 설계 목적: 기존 reviewed MCP host가 한 writer lease를 보유하므로 별도 foreground worker를 동시에 실행할 수 없다. plugin에서 주기 갱신을 실제 운영하려면 명시 updates host/mode가 같은 소유권 안에서 시작·상태·중지와 retained 조회를 제공해야 한다. 기존 reviewed 기본 mode의 의미/hold-only는 유지하고 updates mode와 start를 명시적으로 선택한다. host가 EOF/신호로 끝나면 갱신 thread/소유 native를 기다려 종료해야 하며 전역 OS scheduler를 설치하지 않는다. 정확한 도구/설정·직렬화/중단/재시작은 C2에서 구현·시험하기 전까지 사용 가능한 기능으로 표시하지 않는다.
+
+전체14/28·기능3/7을 유지한다. 다음은 C2 MCP 세션의 명시 갱신 시작·상태·중지·정확한 DB 조회와 EOF/host 종료 연결이다. 이후 KM-04.4의 실제 지속 periodic/change와 두 번 변경·삭제/no-op·실패 복구·다른 프로젝트 불변을 종합 검증한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+C1 반복 검증의 최초 실패는 SIGTERM이 Journal commit을 중단해 poisoned 상태가 된 경우였다. 기존 코드는 원래 intent와 자식 정리를 지켰으나 phase=building인 마지막 확인 메모리만 반환해 불확실성을 충분히 설명하지 못했다. 이를 정상 stopped로 바꾸는 추가 write를 하지 않고, 상태 원천과 디스크 재조정 필요를 명시했다. 결과의 disk_state_requires_reconciliation=true이면 state는 마지막 확인 메모리이며, 후속 실행에서 봉인된 디스크 상태와 원래 native job을 재조정한다. 정상 signal/budget 종료의 exit0을 구축 성공·취소 완료·최신 디스크 보장으로 해석하지 않는다. 실제 시험은 두 상태를 구분하고, 취소 판정은 이후 native terminal 결과로만 확인한다. 초기 성공/실패 로그와 보강한 관찰 시각을 보존한다.
+
+같은 불확실성 보고는 외부에서 state revision/checksum이 바뀌거나 디스크 state를 읽을 수 없는 경우에도 적용한다. CAS 불일치 뒤 같은 프로세스가 파일 복구만 가정하고 추가 write를 시도하지 않도록 막는다. 이는 자동 수리/채택이 아니라 원래 상태를 보존한 재조정 요구이며, 기존50개 state 시험 안의 CAS 반례에 이 보고/후속 쓰기 금지를 추가 확인했다.

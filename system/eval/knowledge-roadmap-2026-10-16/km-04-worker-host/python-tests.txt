@@ -1,0 +1,302 @@
+SUITE registration
+test_config_byte_change_is_diagnosed (__main__.RegistrationTests.test_config_byte_change_is_diagnosed) ... ok
+test_executable_byte_change_is_diagnosed (__main__.RegistrationTests.test_executable_byte_change_is_diagnosed) ... ok
+test_existing_state_is_not_overwritten (__main__.RegistrationTests.test_existing_state_is_not_overwritten) ... ok
+test_foreign_dataset_owner_is_not_adopted (__main__.RegistrationTests.test_foreign_dataset_owner_is_not_adopted) ... ok
+test_foreign_state_owner_is_diagnosed (__main__.RegistrationTests.test_foreign_state_owner_is_diagnosed) ... ok
+test_linked_config_is_not_read_as_owned_bundle (__main__.RegistrationTests.test_linked_config_is_not_read_as_owned_bundle) ... ok
+test_matching_owner_is_read_without_dataset_modification (__main__.RegistrationTests.test_matching_owner_is_read_without_dataset_modification) ... ok
+test_missing_metadata_tools_is_not_model_ready (__main__.RegistrationTests.test_missing_metadata_tools_is_not_model_ready) ... ok
+test_nonempty_legacy_dataset_is_not_claimed (__main__.RegistrationTests.test_nonempty_legacy_dataset_is_not_claimed) ... ok
+test_overlapping_source_dataset_or_state_is_refused (__main__.RegistrationTests.test_overlapping_source_dataset_or_state_is_refused) ... ok
+test_parent_repointing_is_not_silently_adopted (__main__.RegistrationTests.test_parent_repointing_is_not_silently_adopted) ... ok
+test_register_is_source_read_only_and_does_not_build_dataset (__main__.RegistrationTests.test_register_is_source_read_only_and_does_not_build_dataset) ... ok
+test_registration_checksum_and_duplicate_keys_are_not_trusted (__main__.RegistrationTests.test_registration_checksum_and_duplicate_keys_are_not_trusted) ... ok
+test_same_name_and_source_bytes_do_not_share_project_identity (__main__.RegistrationTests.test_same_name_and_source_bytes_do_not_share_project_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.569s
+
+OK
+SUITE collection
+test_actual_Git_change_is_archived_in_its_own_origin (__main__.CollectionTests.test_actual_Git_change_is_archived_in_its_own_origin) ... ok
+test_actual_native_proposed_overlay_and_idempotent_draft (__main__.CollectionTests.test_actual_native_proposed_overlay_and_idempotent_draft) ... ok
+test_blob_tamper_does_not_replay (__main__.CollectionTests.test_blob_tamper_does_not_replay) ... ok
+test_budget_exceeded_does_not_publish_partial_collection (__main__.CollectionTests.test_budget_exceeded_does_not_publish_partial_collection) ... ok
+test_changed_code_creates_separate_immutable_collection (__main__.CollectionTests.test_changed_code_creates_separate_immutable_collection) ... ok
+test_code_only_evidence_cannot_invent_reported_human_decision (__main__.CollectionTests.test_code_only_evidence_cannot_invent_reported_human_decision) ... ok
+test_collection_lease_refuses_overlap (__main__.CollectionTests.test_collection_lease_refuses_overlap) ... ok
+test_document_free_collection_preserves_source_and_distinguishes_CKS_snapshot (__main__.CollectionTests.test_document_free_collection_preserves_source_and_distinguishes_CKS_snapshot) ... ok
+test_exact_line_hash_and_full_blob_hash (__main__.CollectionTests.test_exact_line_hash_and_full_blob_hash) ... ok
+test_foreign_project_material_is_refused_before_writing_collection (__main__.CollectionTests.test_foreign_project_material_is_refused_before_writing_collection) ... ok
+test_foreign_registration_cannot_reuse_collection (__main__.CollectionTests.test_foreign_registration_cannot_reuse_collection) ... ok
+test_large_line_retains_full_hash_but_limits_preview (__main__.CollectionTests.test_large_line_retains_full_hash_but_limits_preview) ... ok
+test_no_selected_evidence_is_not_a_success (__main__.CollectionTests.test_no_selected_evidence_is_not_a_success) ... ok
+test_old_secret_removed_from_code_does_not_leak_through_Git_diff (__main__.CollectionTests.test_old_secret_removed_from_code_does_not_leak_through_Git_diff) ... ok
+test_parent_escape_or_missing_evidence_is_refused (__main__.CollectionTests.test_parent_escape_or_missing_evidence_is_refused) ... ok
+test_private_paths_content_and_links_are_not_copied (__main__.CollectionTests.test_private_paths_content_and_links_are_not_copied) ... ok
+test_provided_command_report_is_never_executed (__main__.CollectionTests.test_provided_command_report_is_never_executed) ... ok
+test_provided_decision_has_reported_actor_without_human_approval (__main__.CollectionTests.test_provided_decision_has_reported_actor_without_human_approval) ... ok
+test_real_CLI_failure_keeps_structured_project_refusal (__main__.CollectionTests.test_real_CLI_failure_keeps_structured_project_refusal) ... ok
+test_restricted_material_is_not_archived (__main__.CollectionTests.test_restricted_material_is_not_archived) ... ok
+test_source_and_provided_origins_do_not_collide (__main__.CollectionTests.test_source_and_provided_origins_do_not_collide) ... ok
+test_source_change_during_collection_is_refused (__main__.CollectionTests.test_source_change_during_collection_is_refused) ... ok
+test_unchanged_collection_replays_original_observation_time (__main__.CollectionTests.test_unchanged_collection_replays_original_observation_time) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 1.615s
+
+OK
+SUITE review
+test_accepting_two_shared_interpretations_requires_resolution (__main__.ReviewTests.test_accepting_two_shared_interpretations_requires_resolution) ... ok
+test_adoption_replay_checks_seal_and_current_source (__main__.ReviewTests.test_adoption_replay_checks_seal_and_current_source) ... ok
+test_adoption_uses_filtered_copy_and_actual_native_lock (__main__.ReviewTests.test_adoption_uses_filtered_copy_and_actual_native_lock) ... ok
+test_all_claims_need_an_explicit_disposition (__main__.ReviewTests.test_all_claims_need_an_explicit_disposition) ... ok
+test_changed_review_needs_current_revision (__main__.ReviewTests.test_changed_review_needs_current_revision) ... ok
+test_deferred_rejected_excluded_claims_do_not_enter_reviewed_overlay (__main__.ReviewTests.test_deferred_rejected_excluded_claims_do_not_enter_reviewed_overlay) ... ok
+test_deleted_source_cannot_inherit_review (__main__.ReviewTests.test_deleted_source_cannot_inherit_review) ... ok
+test_excluded_private_change_does_not_enter_projection (__main__.ReviewTests.test_excluded_private_change_does_not_enter_projection) ... ok
+test_explicit_separate_interpretation_does_not_make_hypothesis_fact (__main__.ReviewTests.test_explicit_separate_interpretation_does_not_make_hypothesis_fact) ... ok
+test_foreign_project_refused (__main__.ReviewTests.test_foreign_project_refused) ... ok
+test_identical_review_replays_without_new_event (__main__.ReviewTests.test_identical_review_replays_without_new_event) ... ok
+test_invalid_array_input_is_typed_CLI_refusal (__main__.ReviewTests.test_invalid_array_input_is_typed_CLI_refusal) ... ok
+test_journal_owner_mismatch_refused (__main__.ReviewTests.test_journal_owner_mismatch_refused) ... ok
+test_journal_truncation_refused (__main__.ReviewTests.test_journal_truncation_refused) ... ok
+test_missing_reason_refused (__main__.ReviewTests.test_missing_reason_refused) ... ok
+test_nested_source_manifest_name_is_not_confused_with_manager_seal (__main__.ReviewTests.test_nested_source_manifest_name_is_not_confused_with_manager_seal) ... ok
+test_new_Git_commit_requires_new_collection_even_if_selected_bytes_match (__main__.ReviewTests.test_new_Git_commit_requires_new_collection_even_if_selected_bytes_match) ... ok
+test_new_review_supersedes_previous_adoption_for_future_use (__main__.ReviewTests.test_new_review_supersedes_previous_adoption_for_future_use) ... ok
+test_new_selected_file_invalidates_adoption (__main__.ReviewTests.test_new_selected_file_invalidates_adoption) ... ok
+test_no_automatic_approval_provenance (__main__.ReviewTests.test_no_automatic_approval_provenance) ... ok
+test_no_default_reviewer (__main__.ReviewTests.test_no_default_reviewer) ... ok
+test_plan_asks_without_inventing_rationale_or_approval (__main__.ReviewTests.test_plan_asks_without_inventing_rationale_or_approval) ... ok
+test_possible_duplicates_are_not_merged (__main__.ReviewTests.test_possible_duplicates_are_not_merged) ... ok
+test_post_event_sync_failure_replays_existing_event (__main__.ReviewTests.test_post_event_sync_failure_replays_existing_event) ... ok
+test_repeat_identical_claim_ID_has_explicit_occurrence_count (__main__.ReviewTests.test_repeat_identical_claim_ID_has_explicit_occurrence_count) ... ok
+test_restart_after_projection_before_event_recovers_same_candidate (__main__.ReviewTests.test_restart_after_projection_before_event_recovers_same_candidate) ... ok
+test_retraction_blocks_future_use_without_deleting_evidence_or_DB (__main__.ReviewTests.test_retraction_blocks_future_use_without_deleting_evidence_or_DB) ... ok
+test_retraction_needs_actor_reason_and_revision (__main__.ReviewTests.test_retraction_needs_actor_reason_and_revision) ... ok
+test_review_is_append_only_and_draft_stays_proposed (__main__.ReviewTests.test_review_is_append_only_and_draft_stays_proposed) ... ok
+test_shared_evidence_is_candidate_not_proven_contradiction (__main__.ReviewTests.test_shared_evidence_is_candidate_not_proven_contradiction) ... ok
+test_source_change_cannot_inherit_review (__main__.ReviewTests.test_source_change_cannot_inherit_review) ... ok
+test_unpublished_pending_event_is_not_committed (__main__.ReviewTests.test_unpublished_pending_event_is_not_committed) ... ok
+test_unreviewed_and_all_rejected_cannot_adopt (__main__.ReviewTests.test_unreviewed_and_all_rejected_cannot_adopt) ... ok
+test_writer_contention_refused (__main__.ReviewTests.test_writer_contention_refused) ... ok
+test_wrong_claim_subject_refused (__main__.ReviewTests.test_wrong_claim_subject_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 14.167s
+
+OK
+SUITE broker
+test_actual_filtered_profile_inspection_is_project_scoped (__main__.BrokerTests.test_actual_filtered_profile_inspection_is_project_scoped) ... ok
+test_actual_held_build_and_retained_read_have_exact_coordinates (__main__.BrokerTests.test_actual_held_build_and_retained_read_have_exact_coordinates) ... ok
+test_actual_launcher_SIGINT_closes_owned_native_servers_with_zero_exit (__main__.BrokerTests.test_actual_launcher_SIGINT_closes_owned_native_servers_with_zero_exit) ... ok
+test_actual_launcher_SIGTERM_closes_owned_native_servers_with_zero_exit (__main__.BrokerTests.test_actual_launcher_SIGTERM_closes_owned_native_servers_with_zero_exit) ... ok
+test_actual_open_reader_rejects_corrupted_dataset_identity (__main__.BrokerTests.test_actual_open_reader_rejects_corrupted_dataset_identity) ... ok
+test_altered_derived_bundle_is_not_silently_rewritten (__main__.BrokerTests.test_altered_derived_bundle_is_not_silently_rewritten) ... ok
+test_automatic_activation_is_refused (__main__.BrokerTests.test_automatic_activation_is_refused) ... ok
+test_clear_reader_releases_lease_and_requires_explicit_reselection (__main__.BrokerTests.test_clear_reader_releases_lease_and_requires_explicit_reselection) ... ok
+test_default_context_never_reaches_metadata_dummy_backend (__main__.BrokerTests.test_default_context_never_reaches_metadata_dummy_backend) ... ok
+test_duplicate_JSON_keys_and_nonfinite_numbers_are_refused (__main__.BrokerTests.test_duplicate_JSON_keys_and_nonfinite_numbers_are_refused) ... ok
+test_foreign_project_or_profile_is_refused_before_native_call (__main__.BrokerTests.test_foreign_project_or_profile_is_refused_before_native_call) ... ok
+test_input_switch_is_blocked_by_an_unfinished_observed_job (__main__.BrokerTests.test_input_switch_is_blocked_by_an_unfinished_observed_job) ... ok
+test_known_job_resumes_original_request_after_source_drift (__main__.BrokerTests.test_known_job_resumes_original_request_after_source_drift) ... ok
+test_legacy_mutation_tool_is_unavailable (__main__.BrokerTests.test_legacy_mutation_tool_is_unavailable) ... ok
+test_lost_admission_reply_keeps_pending_and_exact_replay_recovers (__main__.BrokerTests.test_lost_admission_reply_keeps_pending_and_exact_replay_recovers) ... ok
+test_metadata_only_exposes_scoped_surfaces_without_original_build (__main__.BrokerTests.test_metadata_only_exposes_scoped_surfaces_without_original_build) ... ok
+test_missing_version_is_refused_without_selecting_current (__main__.BrokerTests.test_missing_version_is_refused_without_selecting_current) ... ok
+test_native_invalid_build_request_clears_known_refusal_without_admission (__main__.BrokerTests.test_native_invalid_build_request_clears_known_refusal_without_admission) ... ok
+test_original_unfiltered_profile_cannot_be_inspected_or_built (__main__.BrokerTests.test_original_unfiltered_profile_cannot_be_inspected_or_built) ... ok
+test_other_adoption_cannot_select_previous_jobs_coordinates (__main__.BrokerTests.test_other_adoption_cannot_select_previous_jobs_coordinates) ... ok
+test_pending_uncertain_admission_blocks_switch_to_another_valid_input (__main__.BrokerTests.test_pending_uncertain_admission_blocks_switch_to_another_valid_input) ... ok
+test_restart_rechecks_persisted_input_job_and_reader_before_read (__main__.BrokerTests.test_restart_rechecks_persisted_input_job_and_reader_before_read) ... ok
+test_resume_cannot_admit_changed_request (__main__.BrokerTests.test_resume_cannot_admit_changed_request) ... ok
+test_retired_input_status_is_explicitly_as_of_until_rechecked (__main__.BrokerTests.test_retired_input_status_is_explicitly_as_of_until_rechecked) ... ok
+test_retracted_input_cannot_keep_serving_as_current_manager_input (__main__.BrokerTests.test_retracted_input_cannot_keep_serving_as_current_manager_input) ... ok
+test_second_broker_cannot_take_the_same_local_owner_lease (__main__.BrokerTests.test_second_broker_cannot_take_the_same_local_owner_lease) ... ok
+test_source_drift_refuses_reader_and_new_build_but_preserves_status (__main__.BrokerTests.test_source_drift_refuses_reader_and_new_build_but_preserves_status) ... ok
+test_state_checksum_or_foreign_identity_is_refused_on_restart (__main__.BrokerTests.test_state_checksum_or_foreign_identity_is_refused_on_restart) ... ok
+test_uncertain_state_save_poison_and_restart_revalidation (__main__.BrokerTests.test_uncertain_state_save_poison_and_restart_revalidation) ... ok
+test_unknown_manager_parameters_are_not_ignored (__main__.BrokerTests.test_unknown_manager_parameters_are_not_ignored) ... ok
+test_wrong_candidate_coordinates_are_not_a_fallback (__main__.BrokerTests.test_wrong_candidate_coordinates_are_not_a_fallback) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 57.309s
+
+OK
+SUITE update_contract
+test_boolean_is_not_duration_or_budget (__main__.UpdateContractTests.test_boolean_is_not_duration_or_budget) ... ok
+test_change_is_bounded_polling_not_every_call (__main__.UpdateContractTests.test_change_is_bounded_polling_not_every_call) ... ok
+test_changed_registration (__main__.UpdateContractTests.test_changed_registration) ... ok
+test_clock_skew_and_restart_missed_tick (__main__.UpdateContractTests.test_clock_skew_and_restart_missed_tick) ... ok
+test_context_explicit_public_file (__main__.UpdateContractTests.test_context_explicit_public_file) ... ok
+test_context_link_or_missing_rejected (__main__.UpdateContractTests.test_context_link_or_missing_rejected) ... ok
+test_defaults_disabled_and_hold (__main__.UpdateContractTests.test_defaults_disabled_and_hold) ... ok
+test_defaults_roundtrip_JSON (__main__.UpdateContractTests.test_defaults_roundtrip_JSON) ... ok
+test_disabled_and_unselected_trigger (__main__.UpdateContractTests.test_disabled_and_unselected_trigger) ... ok
+test_exact_project_and_profile (__main__.UpdateContractTests.test_exact_project_and_profile) ... ok
+test_explicit_internal_knowledge_corpus_allowed (__main__.UpdateContractTests.test_explicit_internal_knowledge_corpus_allowed) ... ok
+test_failed_missing_or_skipped_required_gate (__main__.UpdateContractTests.test_failed_missing_or_skipped_required_gate) ... ok
+test_foreign_or_malformed_candidate (__main__.UpdateContractTests.test_foreign_or_malformed_candidate) ... ok
+test_held_not_published (__main__.UpdateContractTests.test_held_not_published) ... ok
+test_invalid_retry_range (__main__.UpdateContractTests.test_invalid_retry_range) ... ok
+test_material_overlap_duplicate_or_private_rejected (__main__.UpdateContractTests.test_material_overlap_duplicate_or_private_rejected) ... ok
+test_material_source_or_foreign_root_rejected (__main__.UpdateContractTests.test_material_source_or_foreign_root_rejected) ... ok
+test_material_symlink_rejected (__main__.UpdateContractTests.test_material_symlink_rejected) ... ok
+test_nonfinite_clock_rejected (__main__.UpdateContractTests.test_nonfinite_clock_rejected) ... ok
+test_nonterminal_canceled_or_failed_is_not_success (__main__.UpdateContractTests.test_nonterminal_canceled_or_failed_is_not_success) ... ok
+test_periodic_first_then_boundary (__main__.UpdateContractTests.test_periodic_first_then_boundary) ... ok
+test_policy_normalized_without_mutating_input (__main__.UpdateContractTests.test_policy_normalized_without_mutating_input) ... ok
+test_retry_backoff_bound_and_exhaustion (__main__.UpdateContractTests.test_retry_backoff_bound_and_exhaustion) ... ok
+test_success_requires_observed_exact_current (__main__.UpdateContractTests.test_success_requires_observed_exact_current) ... ok
+test_trigger_duplicates_and_unknown (__main__.UpdateContractTests.test_trigger_duplicates_and_unknown) ... ok
+test_unbounded_budget (__main__.UpdateContractTests.test_unbounded_budget) ... ok
+test_unknown_field (__main__.UpdateContractTests.test_unknown_field) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.038s
+
+OK
+SUITE update_inputs
+test_CLI_policy_template_and_preparation (__main__.UpdateInputTests.test_CLI_policy_template_and_preparation) ... ok
+test_actual_native_validate_lock_recheck_succeed (__main__.UpdateInputTests.test_actual_native_validate_lock_recheck_succeed) ... ok
+test_added_modified_and_deleted_sets (__main__.UpdateInputTests.test_added_modified_and_deleted_sets) ... ok
+test_ambiguous_same_bytes_moves_not_paired (__main__.UpdateInputTests.test_ambiguous_same_bytes_moves_not_paired) ... ok
+test_changed_source_during_multi_root_capture_refused (__main__.UpdateInputTests.test_changed_source_during_multi_root_capture_refused) ... ok
+test_changed_source_during_native_projection_refused (__main__.UpdateInputTests.test_changed_source_during_native_projection_refused) ... ok
+test_document_free_preparation_never_writes_source_review_or_DB (__main__.UpdateInputTests.test_document_free_preparation_never_writes_source_review_or_DB) ... ok
+test_empty_material_deletion_drops_latest_text (__main__.UpdateInputTests.test_empty_material_deletion_drops_latest_text) ... ok
+test_exact_input_replay_does_not_rerun_native_projection (__main__.UpdateInputTests.test_exact_input_replay_does_not_rerun_native_projection) ... ok
+test_exact_repeat_reuses_immutable_input_and_original_time (__main__.UpdateInputTests.test_exact_repeat_reuses_immutable_input_and_original_time) ... ok
+test_excluded_bytes_do_not_change_selected_input (__main__.UpdateInputTests.test_excluded_bytes_do_not_change_selected_input) ... ok
+test_excluded_private_and_sensitive_content_not_adopted (__main__.UpdateInputTests.test_excluded_private_and_sensitive_content_not_adopted) ... ok
+test_explicit_ontology_bytes_change_without_Git_change (__main__.UpdateInputTests.test_explicit_ontology_bytes_change_without_Git_change) ... ok
+test_failed_or_canceled_job_cannot_be_noop (__main__.UpdateInputTests.test_failed_or_canceled_job_cannot_be_noop) ... ok
+test_foreign_provided_record_refused (__main__.UpdateInputTests.test_foreign_provided_record_refused) ... ok
+test_foreign_registration_cannot_load_input (__main__.UpdateInputTests.test_foreign_registration_cannot_load_input) ... ok
+test_generated_knowledge_never_invents_review_or_decision (__main__.UpdateInputTests.test_generated_knowledge_never_invents_review_or_decision) ... ok
+test_hardlinked_input_refused (__main__.UpdateInputTests.test_hardlinked_input_refused) ... ok
+test_input_blob_corruption_refused (__main__.UpdateInputTests.test_input_blob_corruption_refused) ... ok
+test_input_extra_file_or_symlink_refused (__main__.UpdateInputTests.test_input_extra_file_or_symlink_refused) ... ok
+test_material_secret_and_non_UTF8_not_copied (__main__.UpdateInputTests.test_material_secret_and_non_UTF8_not_copied) ... ok
+test_mtime_alone_is_not_new_input (__main__.UpdateInputTests.test_mtime_alone_is_not_new_input) ... ok
+test_native_failure_never_becomes_prepared_input (__main__.UpdateInputTests.test_native_failure_never_becomes_prepared_input) ... ok
+test_new_observation_does_not_make_existing_review_fresh (__main__.UpdateInputTests.test_new_observation_does_not_make_existing_review_fresh) ... ok
+test_noop_model_source_input_and_wrong_reader_rejected (__main__.UpdateInputTests.test_noop_model_source_input_and_wrong_reader_rejected) ... ok
+test_noop_requires_input_job_pins_and_actual_read (__main__.UpdateInputTests.test_noop_requires_input_job_pins_and_actual_read) ... ok
+test_old_snapshot_remains_exact_after_live_change (__main__.UpdateInputTests.test_old_snapshot_remains_exact_after_live_change) ... ok
+test_policy_change_changes_identity (__main__.UpdateInputTests.test_policy_change_changes_identity) ... ok
+test_previously_selected_removed_material_root_is_explicit_deletion (__main__.UpdateInputTests.test_previously_selected_removed_material_root_is_explicit_deletion) ... ok
+test_same_bytes_move_is_only_candidate (__main__.UpdateInputTests.test_same_bytes_move_is_only_candidate) ... ok
+test_supplied_context_change_has_distinct_origin (__main__.UpdateInputTests.test_supplied_context_change_has_distinct_origin) ... ok
+test_total_budget_applies_across_all_roots (__main__.UpdateInputTests.test_total_budget_applies_across_all_roots) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 17.836s
+
+OK
+SUITE source_check
+test_actual_probe_refuses_changed_original (__main__.SourceCheckTests.test_actual_probe_refuses_changed_original) ... ok
+test_actual_source_probe_succeeds_without_dataset_or_source_writes (__main__.SourceCheckTests.test_actual_source_probe_succeeds_without_dataset_or_source_writes) ... ok
+test_descriptor_binds_actual_interpreter_code_policy_input_and_registration (__main__.SourceCheckTests.test_descriptor_binds_actual_interpreter_code_policy_input_and_registration) ... ok
+test_external_policy_path_not_implicitly_adopted (__main__.SourceCheckTests.test_external_policy_path_not_implicitly_adopted) ... ok
+test_foreign_project_or_input_not_adopted (__main__.SourceCheckTests.test_foreign_project_or_input_not_adopted) ... ok
+test_old_policy_input_binding_cannot_be_relabelled (__main__.SourceCheckTests.test_old_policy_input_binding_cannot_be_relabelled) ... ok
+test_pinned_policy_count_is_bounded_without_removing_prior_records (__main__.SourceCheckTests.test_pinned_policy_count_is_bounded_without_removing_prior_records) ... ok
+test_policy_file_bytes_cannot_change_under_its_identity (__main__.SourceCheckTests.test_policy_file_bytes_cannot_change_under_its_identity) ... ok
+test_policy_is_immutable_normalized_and_does_not_start_worker (__main__.SourceCheckTests.test_policy_is_immutable_normalized_and_does_not_start_worker) ... ok
+test_readonly_probe_can_check_source_during_native_admission (__main__.SourceCheckTests.test_readonly_probe_can_check_source_during_native_admission) ... ok
+test_symlinked_policy_not_adopted (__main__.SourceCheckTests.test_symlinked_policy_not_adopted) ... ok
+test_unknown_dataset_still_blocks_normal_registration_and_preparation (__main__.SourceCheckTests.test_unknown_dataset_still_blocks_normal_registration_and_preparation) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 6.389s
+
+OK
+SUITE update_state
+test_admission_ambiguity_preserves_original_request_and_blocks_new_intent (__main__.UpdateStateTests.test_admission_ambiguity_preserves_original_request_and_blocks_new_intent) ... ok
+test_broker_and_worker_share_one_live_writer_lease (__main__.UpdateStateTests.test_broker_and_worker_share_one_live_writer_lease) ... ok
+test_bundle_changed_or_foreign_path_refused_before_intent (__main__.UpdateStateTests.test_bundle_changed_or_foreign_path_refused_before_intent) ... ok
+test_cancel_is_distinct_failure_and_retry_bounded (__main__.UpdateStateTests.test_cancel_is_distinct_failure_and_retry_bounded) ... ok
+test_candidate_model_pin_mismatch_not_success (__main__.UpdateStateTests.test_candidate_model_pin_mismatch_not_success) ... ok
+test_changed_input_is_new_cycle_not_relabelled_retry (__main__.UpdateStateTests.test_changed_input_is_new_cycle_not_relabelled_retry) ... ok
+test_changed_model_or_input_cannot_noop (__main__.UpdateStateTests.test_changed_model_or_input_cannot_noop) ... ok
+test_cli_configuration_and_status_do_not_start_native_or_scheduler (__main__.UpdateStateTests.test_cli_configuration_and_status_do_not_start_native_or_scheduler) ... ok
+test_cli_typed_failure_is_json_without_traceback (__main__.UpdateStateTests.test_cli_typed_failure_is_json_without_traceback) ... ok
+test_closed_journal_cannot_write (__main__.UpdateStateTests.test_closed_journal_cannot_write) ... ok
+test_configuration_pins_policy_without_build_scheduler_or_source_writes (__main__.UpdateStateTests.test_configuration_pins_policy_without_build_scheduler_or_source_writes) ... ok
+test_cross_project_read_or_candidate_input_refused (__main__.UpdateStateTests.test_cross_project_read_or_candidate_input_refused) ... ok
+test_default_disabled_does_not_start_check (__main__.UpdateStateTests.test_default_disabled_does_not_start_check) ... ok
+test_exact_intent_is_durable_before_any_admission (__main__.UpdateStateTests.test_exact_intent_is_durable_before_any_admission) ... ok
+test_exhausted_cycle_blocks_further_same_input_retry (__main__.UpdateStateTests.test_exhausted_cycle_blocks_further_same_input_retry) ... ok
+test_external_current_change_invalidates_published_noop (__main__.UpdateStateTests.test_external_current_change_invalidates_published_noop) ... ok
+test_external_state_replacement_is_compare_and_swap_failure (__main__.UpdateStateTests.test_external_state_replacement_is_compare_and_swap_failure) ... ok
+test_failed_job_cannot_claim_activation (__main__.UpdateStateTests.test_failed_job_cannot_claim_activation) ... ok
+test_failure_does_not_erase_last_success (__main__.UpdateStateTests.test_failure_does_not_erase_last_success) ... ok
+test_fsync_after_replace_failure_requires_restart_reconciliation (__main__.UpdateStateTests.test_fsync_after_replace_failure_requires_restart_reconciliation) ... ok
+test_held_noop_never_claims_publication (__main__.UpdateStateTests.test_held_noop_never_claims_publication) ... ok
+test_held_success_requires_fresh_read_not_only_completed_metadata (__main__.UpdateStateTests.test_held_success_requires_fresh_read_not_only_completed_metadata) ... ok
+test_history_limit_does_not_delete_or_overwrite_prior_intents (__main__.UpdateStateTests.test_history_limit_does_not_delete_or_overwrite_prior_intents) ... ok
+test_intent_commit_failure_does_not_produce_forwardable_intent (__main__.UpdateStateTests.test_intent_commit_failure_does_not_produce_forwardable_intent) ... ok
+test_intent_copies_actual_native_inspection_wire_fields (__main__.UpdateStateTests.test_intent_copies_actual_native_inspection_wire_fields) ... ok
+test_missing_required_gate_not_success (__main__.UpdateStateTests.test_missing_required_gate_not_success) ... ok
+test_native_job_identity_cannot_change (__main__.UpdateStateTests.test_native_job_identity_cannot_change) ... ok
+test_new_cycle_cannot_evade_same_input_retry_budget (__main__.UpdateStateTests.test_new_cycle_cannot_evade_same_input_retry_budget) ... ok
+test_nonterminal_ack_never_becomes_success (__main__.UpdateStateTests.test_nonterminal_ack_never_becomes_success) ... ok
+test_noop_refreshes_validated_read_receipt_without_new_attempt (__main__.UpdateStateTests.test_noop_refreshes_validated_read_receipt_without_new_attempt) ... ok
+test_noop_requires_reader_and_native_pins (__main__.UpdateStateTests.test_noop_requires_reader_and_native_pins) ... ok
+test_pending_file_budget_never_discards_uncertain_receipts (__main__.UpdateStateTests.test_pending_file_budget_never_discards_uncertain_receipts) ... ok
+test_pending_policy_reconfiguration_is_refused (__main__.UpdateStateTests.test_pending_policy_reconfiguration_is_refused) ... ok
+test_policy_bytes_changed_under_owned_digest_refused (__main__.UpdateStateTests.test_policy_bytes_changed_under_owned_digest_refused) ... ok
+test_publication_requires_actual_current_coordinates (__main__.UpdateStateTests.test_publication_requires_actual_current_coordinates) ... ok
+test_released_pending_worker_blocks_reviewed_broker_before_native_start (__main__.UpdateStateTests.test_released_pending_worker_blocks_reviewed_broker_before_native_start) ... ok
+test_removed_material_only_allowed_for_already_applied_policy (__main__.UpdateStateTests.test_removed_material_only_allowed_for_already_applied_policy) ... ok
+test_retry_deadline_survives_restart_and_clock_skew (__main__.UpdateStateTests.test_retry_deadline_survives_restart_and_clock_skew) ... ok
+test_retry_uses_new_key_and_links_exact_failed_cycle (__main__.UpdateStateTests.test_retry_uses_new_key_and_links_exact_failed_cycle) ... ok
+test_same_revision_different_result_and_regression_refused (__main__.UpdateStateTests.test_same_revision_different_result_and_regression_refused) ... ok
+test_saved_state_corruption_and_duplicate_keys_refused (__main__.UpdateStateTests.test_saved_state_corruption_and_duplicate_keys_refused) ... ok
+test_state_symlink_or_hardlink_refused (__main__.UpdateStateTests.test_state_symlink_or_hardlink_refused) ... ok
+test_terminal_result_cannot_reopen_or_mutate (__main__.UpdateStateTests.test_terminal_result_cannot_reopen_or_mutate) ... ok
+test_unknown_nonempty_dataset_still_blocks_journal_open (__main__.UpdateStateTests.test_unknown_nonempty_dataset_still_blocks_journal_open) ... ok
+test_unresolved_reviewed_broker_jobs_block_update_intent (__main__.UpdateStateTests.test_unresolved_reviewed_broker_jobs_block_update_intent) ... ok
+test_unsettled_known_reviewed_job_blocks_automatic_check (__main__.UpdateStateTests.test_unsettled_known_reviewed_job_blocks_automatic_check) ... ok
+test_valid_checksum_cannot_drop_pending_obligation (__main__.UpdateStateTests.test_valid_checksum_cannot_drop_pending_obligation) ... ok
+test_valid_checksum_cannot_rewrite_request_without_matching_digest (__main__.UpdateStateTests.test_valid_checksum_cannot_rewrite_request_without_matching_digest) ... ok
+test_valid_checksum_foreign_owner_or_unknown_field_refused (__main__.UpdateStateTests.test_valid_checksum_foreign_owner_or_unknown_field_refused) ... ok
+test_write_failure_poisons_process_without_forwarding_any_job (__main__.UpdateStateTests.test_write_failure_poisons_process_without_forwarding_any_job) ... ok
+
+----------------------------------------------------------------------
+Ran 50 tests in 41.536s
+
+OK
+SUITE update_worker
+test_actual_held_build_and_noop_use_real_reader_not_metadata (__main__.WorkerTests.test_actual_held_build_and_noop_use_real_reader_not_metadata) ... ok
+test_actual_lost_admission_response_replays_same_key_after_restart (__main__.WorkerTests.test_actual_lost_admission_response_replays_same_key_after_restart) ... ok
+test_actual_publication_observes_current_and_exact_candidate_read (__main__.WorkerTests.test_actual_publication_observes_current_and_exact_candidate_read) ... ok
+test_actual_run_CLI_reports_observed_builds_without_ledger_only_claim (__main__.WorkerTests.test_actual_run_CLI_reports_observed_builds_without_ledger_only_claim) ... ok
+test_actual_source_change_rebuilds_without_semantic_review (__main__.WorkerTests.test_actual_source_change_rebuilds_without_semantic_review) ... ok
+test_ambiguous_native_persistence_refusal_preserves_pending_request (__main__.WorkerTests.test_ambiguous_native_persistence_refusal_preserves_pending_request) ... ok
+test_bounded_run_waits_for_one_actual_completed_cycle_and_stops (__main__.WorkerTests.test_bounded_run_waits_for_one_actual_completed_cycle_and_stops) ... ok
+test_canceled_actual_job_gets_distinct_bounded_retry_attempt (__main__.WorkerTests.test_canceled_actual_job_gets_distinct_bounded_retry_attempt) ... ok
+test_changed_bundle_bytes_refuse_exact_replay_before_native (__main__.WorkerTests.test_changed_bundle_bytes_refuse_exact_replay_before_native) ... ok
+test_changed_registration_or_binary_is_not_recovery_permission (__main__.WorkerTests.test_changed_registration_or_binary_is_not_recovery_permission) ... ok
+test_disabled_policy_never_opens_native_or_creates_DB (__main__.WorkerTests.test_disabled_policy_never_opens_native_or_creates_DB) ... ok
+test_expired_worker_budget_stops_before_input_projection_or_native (__main__.WorkerTests.test_expired_worker_budget_stops_before_input_projection_or_native) ... ok
+test_intent_save_failure_prevents_native_build_forward (__main__.WorkerTests.test_intent_save_failure_prevents_native_build_forward) ... ok
+test_invalid_worker_budgets_do_not_open_registration (__main__.WorkerTests.test_invalid_worker_budgets_do_not_open_registration) ... ok
+test_known_pending_job_is_checked_before_changed_live_source (__main__.WorkerTests.test_known_pending_job_is_checked_before_changed_live_source) ... ok
+test_lone_lock_without_prior_intent_cannot_bypass_owner_check (__main__.WorkerTests.test_lone_lock_without_prior_intent_cannot_bypass_owner_check) ... ok
+test_partial_native_lock_recovery_is_only_for_prior_unobserved_intent (__main__.WorkerTests.test_partial_native_lock_recovery_is_only_for_prior_unobserved_intent) ... ok
+test_periodic_and_change_poll_not_due_do_not_open_native (__main__.WorkerTests.test_periodic_and_change_poll_not_due_do_not_open_native) ... ok
+test_retry_deadline_overrides_long_periodic_check_interval (__main__.WorkerTests.test_retry_deadline_overrides_long_periodic_check_interval) ... ok
+test_second_worker_or_reviewed_host_cannot_overlap (__main__.WorkerTests.test_second_worker_or_reviewed_host_cannot_overlap) ... ok
+test_signal_during_state_replace_reports_persistence_uncertainty (__main__.WorkerTests.test_signal_during_state_replace_reports_persistence_uncertainty) ... ok
+test_source_drift_before_forward_is_typed_refusal_not_unknown_admission (__main__.WorkerTests.test_source_drift_before_forward_is_typed_refusal_not_unknown_admission) ... ok
+test_typed_refusal_retry_budget_cannot_be_reset_after_restart (__main__.WorkerTests.test_typed_refusal_retry_budget_cannot_be_reset_after_restart) ... ok
+test_unknown_nonempty_root_is_not_adopted_by_recovery_mode (__main__.WorkerTests.test_unknown_nonempty_root_is_not_adopted_by_recovery_mode) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 58.465s
+
+OK

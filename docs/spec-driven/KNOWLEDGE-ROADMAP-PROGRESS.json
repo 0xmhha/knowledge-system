@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "document_date": "2026-10-15",
+  "document_date": "2026-10-16",
   "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
   "scope_status": "user_requested_features_with_implementation_in_progress",
   "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
@@ -216,7 +216,7 @@
       "scope": "continuous_updates",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "KM04_3_A_B1_B2_foreground_worker_verified_C_actual_host_recovery_pending",
+      "design_status": "KM04_3_A_B1_B2_C1_actual_CLI_lifecycle_verified_C2_MCP_operation_pending",
       "depends_on": [
         "KM-03"
       ],
@@ -226,9 +226,10 @@
         "system/eval/knowledge-roadmap-2026-10-15/km-04-inputs/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-15/km-04-source-check/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-15/km-04-state/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-15/km-04-worker/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-worker/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-04-worker-host/manifest.json"
       ],
-      "verification": "KM04_1_2_complete_KM04_3_B2_native14_RPC97_jobs6_EOF16_python247_freshGo3862_race836_C_pending",
+      "verification": "KM04_1_2_complete_C1_actual_CLI21_3process_cases_10commands_3recoveries_freshPython248_persistence_signal_fix_GoB2ref",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -265,11 +266,13 @@
       "execution_stages": {
         "policy_trigger_success_contract": "verified_27_cases",
         "automatic_observation_projection": "verified_32_cases_actual_manual_4DB_16_checks_11EOF0_82calls",
-        "durable_worker": "B1_state_B2_actual_foreground_worker_verified_C_actual_host_kill_and_operation_pending",
+        "durable_worker": "B2_foreground_C1_actual_CLI_stop_kill_budget_verified_C2_MCP_operation_pending",
         "actual_periodic_execution": "not_started",
         "native_original_source_publication_check": "actual14_3jobs_2publications_1stale_refusal_90calls_5EOF0_no_independent_acceptance",
         "durable_state_foundation": "50_fault_contract_cases_with_one_actual_native_inspection_no_native_job_execution",
-        "foreground_worker": "actual14_native_RPC97_jobs6_publications4_failure1_canceled_exact_replay1_EOF16_0"
+        "foreground_worker": "actual14_native_RPC97_jobs6_publications4_failure1_canceled_exact_replay1_EOF16_0",
+        "actual_CLI_worker_lifecycle": "21checks_10CLI_TERM_KILL_budget_owned_quiescence_no_late_writes_3linked_recovery_publications",
+        "persistence_signal_reporting": "explicit_last_confirmed_memory_and_disk_reconciliation_required_verified_after_actual_admission_fsync_interrupt"
       }
     },
     {

@@ -240,6 +240,8 @@ class UpdateStateTests(unittest.TestCase):
     def test_external_state_replacement_is_compare_and_swap_failure(self):
         self.rewrite(lambda s:s.update(revision=s['revision']+1))
         with self.assertRaisesRegex(manager.Failure,'update_state_changed'):self.j.block('controlled_failure')
+        self.assertTrue(self.j.describe()['disk_state_requires_reconciliation'])
+        with self.assertRaisesRegex(manager.Failure,'update_reconciliation_required'):self.j.block('second_write')
 
     def test_write_failure_poisons_process_without_forwarding_any_job(self):
         before=copy.deepcopy(self.j.state)

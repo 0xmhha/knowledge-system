@@ -233,4 +233,5 @@ def run(registration,trigger,max_iterations,max_seconds,poll_seconds=1):
             for number,handler in previous.items():signal.signal(number,handler)
     require(worker is not None,'update_worker_not_started')
     value=worker.describe();value['iterations_completed']=iterations;value['stop_reason']=stop_reason
+    value['worker_stop_outcome']='closed_requires_persistence_reconciliation' if worker.journal.poisoned else 'closed_with_pending_intent' if worker.journal.state['pending'] else 'closed'
     return value

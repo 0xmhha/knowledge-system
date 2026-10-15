@@ -494,7 +494,7 @@ def serve(registration):
             method,params = request['method'],request.get('params',{})
             try:
                 if method=='initialize':
-                    value = {'protocolVersion':'2024-11-05','capabilities':{'tools':{}},'serverInfo':{'name':'knowledge-manager','version':'0.5.0'}}
+                    value = {'protocolVersion':'2024-11-05','capabilities':{'tools':{}},'serverInfo':{'name':'knowledge-manager','version':'0.5.1'}}
                 elif method=='ping':
                     value = {}
                 elif method=='tools/list':

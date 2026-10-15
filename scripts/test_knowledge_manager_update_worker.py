@@ -220,6 +220,26 @@ class WorkerTests(unittest.TestCase):
         self.assertFalse((Path(self.r['state_root'])/'updates/inputs').exists())
         self.w.deadline=None
 
+    def test_signal_during_state_replace_reports_persistence_uncertainty(self):
+        real_sync=state.sync_dir;original=self.w.tool;accepted=[];injected=[]
+        def observe(bundle,name,args):
+            result=original(bundle,name,args)
+            if name=='cks.dataset.build':accepted.append(result)
+            return result
+        def interrupt(path):
+            if accepted and not injected:
+                injected.append(True);raise broker.GracefulShutdown()
+            return real_sync(path)
+        with patch.object(self.w,'tool',side_effect=observe),patch.object(state,'sync_dir',side_effect=interrupt):
+            with self.assertRaises(broker.GracefulShutdown):self.w.tick('manual',10)
+        self.assertTrue(self.w.journal.poisoned);self.close();output=self.w.describe()
+        self.assertTrue(output['disk_state_requires_reconciliation'])
+        self.assertEqual(output['state_snapshot_origin'],'last_confirmed_in_process_state')
+        self.assertFalse(output['scheduler_running']);self.assertIsNotNone(output['state']['pending'])
+        self.reopen();self.assertFalse(self.w.describe()['disk_state_requires_reconciliation'])
+        self.assertEqual(self.w.journal.row()['job']['job_id'],accepted[0]['job_id'])
+        self.w.tick('manual',11);self.assertEqual(len(self.w.journal.state['attempts']),1)
+
     def test_second_worker_or_reviewed_host_cannot_overlap(self):
         for start in (lambda:worker.Worker(self.registration),lambda:broker.Broker(self.registration)):
             with self.assertRaisesRegex(manager.Failure,'collection_busy'):start()

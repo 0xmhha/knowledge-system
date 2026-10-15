@@ -1,0 +1,21 @@
+PASS: baseline actual CLI publishes a healthy retained DB
+PASS: sigterm: actual immutable candidate build starts with durable intent
+PASS: sigterm: actual worker exits according to requested lifecycle
+PASS: sigterm: normal stop reports pending reconciliation not canceled success
+PASS: sigterm: native and graph quiesce without late writes or current swap
+PASS: sigterm: exact intent survives without a second admission
+PASS: sigterm: restart observes original terminal cancellation before any new source
+PASS: sigterm: linked bounded retry publishes and reads new actual code
+PASS: sigkill: actual immutable candidate build starts with durable intent
+PASS: sigkill: actual worker exits according to requested lifecycle
+PASS: sigkill: native and graph quiesce without late writes or current swap
+PASS: sigkill: exact intent survives without a second admission
+PASS: sigkill: restart observes original terminal cancellation before any new source
+PASS: sigkill: linked bounded retry publishes and reads new actual code
+PASS: budget: actual immutable candidate build starts with durable intent
+PASS: budget: actual worker exits according to requested lifecycle
+PASS: budget: normal stop reports pending reconciliation not canceled success
+PASS: budget: native and graph quiesce without late writes or current swap
+PASS: budget: exact intent survives without a second admission
+PASS: budget: restart observes original terminal cancellation before any new source
+PASS: budget: linked bounded retry publishes and reads new actual code

@@ -200,3 +200,10 @@ KM-04.3 B2 foreground worker 연결 완료: 명시 enabled 정책의 manual/peri
 Python247개(기존224+worker23), 실제 worker14항목·native RPC 관찰97개·6job(게시4/의도한 실패1/응답 손실 후 같은 job 취소 복구1)·16연결 EOF0을 통과했다. v1 게시/조회→무변경→code8/원문 삭제 v2→보존 v1 조회→code9 엔진 실패/current 보존→due periodic retry2 복구 게시→code10 접수 응답 손실/정상 EOF→code11 변경 후 원래 job 먼저 복구→별도 code11 게시를 검증했다. periodic due retry는 실제 관찰이지만 지속 schedule/실제 worker host SIGKILL은 아직 미검증이다. Go 전체3862(3844통과18skip)와 관련6패키지 race836(834통과2skip)을 새로 실행했다. build/fmt/vet/lint·문서132개와 직전 B1 동결 증거16개를 확인했다. 표준 manager-test에 갱신5개 suite를 추가했으며 원격 CI 통과를 주장하지 않는다.
 
 [foreground 실행/경계](./KNOWLEDGE-MANAGER-UPDATES.md)를 따른다. 전체14/28·기능3/7은 유지한다. 다음은 C 실제 foreground worker host 중단/SIGKILL·재시작·기한/잔여 child·MCP host와의 운영 연결이다. 그 다음 KM-04.4의 실제 지속 periodic/change와 두 번 변경·삭제/no-op·실패 복구·다른 프로젝트 불변을 종합 검증한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-04.3 중간 C1 검증
+
+KM-04.3 C1 실제 foreground 프로세스 중단 검증 완료: 실제 CLI worker의 SIGTERM·SIGKILL·시간 상한3경로를21항목/CLI10회로 검증했다. 지연 중인 실제 native graph를 중단하고 원래 current·intent를 보존하며, native/graph가 실행 중이 아님을 확인하고 예정된8초 지연 쓰기 시점 이후까지 늦은 쓰기가 없음을 관찰했다. 재시작 시 원래 job의 terminal canceled/activated=false를 먼저 조회하고, 같은 input/cycle의 attempt2·새 key/version으로3건 모두 정상 게시/원문 조회에 복구했다. parent 종료 뒤 native 자식의 exit code는 직접 관측할 수 없어0으로 표시하지 않았다. 이는 실제 CLI 프로세스/자식 정리 증거이며 MCP 갱신 운영 연결과 지속 schedule 검증은 별도다. 반복 검증에서 SIGTERM이 상태 저장 중 도착하면 마지막 확인 메모리와 디스크 상태가 다를 수 있는 경계를 발견했다. 자식 종료/intent 보존 후에도 추가 write를 금지하고 last_confirmed_in_process_state·disk_state_requires_reconciliation·closed_requires_persistence_reconciliation을 명시하도록 보완했다. 실제 native 접수 뒤 fsync 중 신호를 재현하는1개를 포함해 Python248개를 새로 검증했다.
+
+[실제 프로세스 증거와 C2 경계](./KNOWLEDGE-MANAGER-UPDATES.md)를 따른다. 전체14/28·기능3/7을 유지한다. 다음은 C2 MCP 세션의 명시 갱신 시작·상태·중지·정확한 DB 조회와 EOF/host 종료 연결이다. 이후 KM-04.4의 실제 지속 periodic/change와 두 번 변경·삭제/no-op·실패 복구·다른 프로젝트 불변을 종합 검증한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

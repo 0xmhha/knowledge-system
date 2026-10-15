@@ -22,7 +22,7 @@
 | KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 완료 | 실제 CLI8회·도구68개, manager103·native3·증거16, 정상 종료0·중단/복구 |
 | KM-04.1 | 수동·정기·변경 trigger와 성공 기준 | 완료 | 정책/시각/성공27개·증거10개; 실제 scheduler 미실행 |
 | KM-04.2 | 변경/삭제/no-op/stale와 재검토 | 완료 | 입력32·정책27·manager103·실제4DB/16항목·82호출/11EOF0·증거14; 수동 |
-| KM-04.3 | 중복·lease·재시작·retry·자원 상한 | 진행 중 | A/B1/B2 foreground 완료; Python247·실제14/97RPC/6job/16EOF0·fresh Go3862/race836; C host kill·지속 schedule 남음 |
+| KM-04.3 | 중복·lease·재시작·retry·자원 상한 | 진행 중 | A/B1/B2 완료; C1 실제CLI21/10회·TERM/KILL/budget·3복구·Python248/저장 신호 보고 완료; C2 MCP 운영/지속 schedule 남음 |
 | KM-04.4 | 두 번 변경+no-op+실패 복구·실제 주기 실행 | 미착수 | 미실행 |
 | KM-05.1 | 산업 개념·정의·별칭·비교 축 | 미착수 | 미실행 |
 | KM-05.2 | 공통 개념과 프로젝트별 코드/정책/시험 연결 | 미착수 | 미실행 |

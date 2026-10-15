@@ -320,3 +320,13 @@ The default state commands still perform no DB work. `run-updates` is the
 explicit execution entry point. These worker CLI capabilities do not add update
 commands to the reviewed broker's 18-tool MCP surface. Sustained polling and
 actual worker-host SIGKILL recovery remain separate verification steps.
+
+
+A signal during a ledger write can leave persistence uncertain even after owned
+native cleanup. `disk_state_requires_reconciliation=true` explicitly marks
+`state` as `last_confirmed_in_process_state`; it is not a promise about the newest
+disk revision. The stopped CLI reports
+`worker_stop_outcome=closed_requires_persistence_reconciliation` and performs no
+more writes in that process. Restart with the same registration and preserve
+the pending request so the sealed disk state and original native job reconcile.
+A requested-stop exit0 alone proves neither build success nor cancellation.

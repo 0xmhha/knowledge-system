@@ -178,8 +178,14 @@ class Journal:
     def commit(self,next_state):
         require(not self.closed and not self.poisoned,'update_reconciliation_required')
         require(self.registration_ok(),'registration_changed')
-        current=read_state(self.path,self.r) if self.path.exists() or self.path.is_symlink() else None
-        require((domain_hash(DOMAIN,current) if current else None)==self.disk_checksum,'update_state_changed')
+        try:
+            current=read_state(self.path,self.r) if self.path.exists() or self.path.is_symlink() else None
+        except BaseException:
+            self.poisoned=True
+            raise
+        if (domain_hash(DOMAIN,current) if current else None)!=self.disk_checksum:
+            self.poisoned=True
+            require(False,'update_state_changed')
         value=copy.deepcopy(next_state);value['revision']=self.state['revision']+1;validate_state(value,self.r)
         envelope={'state':value,'checksum':domain_hash(DOMAIN,value)}
         require(len(canonical(envelope))<STATE_LIMIT,'update_history_limit')
@@ -335,6 +341,7 @@ class Journal:
 
     def describe(self):
         return {'schema_version':1,'stage':'durable_update_state_not_worker_execution','state':copy.deepcopy(self.state),
+                'state_snapshot_origin':'last_confirmed_in_process_state','disk_state_requires_reconciliation':self.poisoned,
                 'scheduler_running':False,'native_job_executed_by_this_module':False,'independent_acceptance':False}
 
     def close(self):

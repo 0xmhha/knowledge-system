@@ -107,3 +107,8 @@ triggers and `activate_after_gate` only within the user's intended DB scope.
 On interruption preserve pending state and rerun the same registration so the
 worker can reconcile the original intent before collecting a new source.
 Report actual job/read/current results and pending or retry state separately.
+
+If `disk_state_requires_reconciliation=true`, report the state as the last
+confirmed in-process snapshot, preserve pending intent, and reconcile from disk
+on restart. Do not call this a current durable result or infer cancellation
+from a normal requested-stop exit code.

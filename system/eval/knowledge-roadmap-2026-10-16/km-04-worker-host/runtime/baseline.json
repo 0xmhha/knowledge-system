@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "stage": "foreground_native_update_worker",
+  "state": {
+    "schema_version": 1,
+    "project_id": "project-38af52d02aaf4052aea23428e0136827",
+    "profile_id": "profile-ae08c340a30d969b60a90a91e788dd57",
+    "registration_token": "78d7b567a712411295ba5d8c419d9e2b",
+    "registration_digest": "fd6e8ec9175dbd205ab82a2d5a4a66f747c5505593064f2781fb88d8eaab4357",
+    "revision": 34,
+    "policy": {
+      "path": "/private/tmp/ks-KM043C1-worker-host-final3-20261016/manager/updates/policies/84675283f305cb9ed4a15d98128b9ec27d31311c6b3aba146845eaf1a8003d3a.json",
+      "digest": "84675283f305cb9ed4a15d98128b9ec27d31311c6b3aba146845eaf1a8003d3a"
+    },
+    "phase": "succeeded",
+    "last_checked": 1792077116.523443,
+    "pending": null,
+    "attempts": [
+      {
+        "id": "5303eb96112e4a10b3a57c58746bfaed",
+        "cycle_id": "5303eb96112e4a10b3a57c58746bfaed",
+        "previous_attempt": null,
+        "attempt": 1,
+        "input_id": "9a454497bf30d56bd74b7f42bf485417f08bded0281c78f02762151b145af928",
+        "policy": {
+          "path": "/private/tmp/ks-KM043C1-worker-host-final3-20261016/manager/updates/policies/84675283f305cb9ed4a15d98128b9ec27d31311c6b3aba146845eaf1a8003d3a.json",
+          "digest": "84675283f305cb9ed4a15d98128b9ec27d31311c6b3aba146845eaf1a8003d3a"
+        },
+        "bundle": {
+          "config": "/private/tmp/ks-KM043C1-worker-host-final3-20261016/manager/updates/worker/bundles/62f54ed59818c7ed51087c388d0eab49138241f76d74984158928e59127972b5/cks.json",
+          "files": {
+            "/private/tmp/ks-KM043C1-worker-host-final3-20261016/manager/updates/worker/bundles/62f54ed59818c7ed51087c388d0eab49138241f76d74984158928e59127972b5/setup.json": "9e4c9151860ce046cbf388d7aed9960a2493e09f3806b35babf29e817899abc4",
+            "/private/tmp/ks-KM043C1-worker-host-final3-20261016/manager/updates/worker/bundles/62f54ed59818c7ed51087c388d0eab49138241f76d74984158928e59127972b5/cks.json": "db3506063015d2b995b691cbb0affa9ad544f06c4aa4046272e09a93a07d2159"
+          }
+        },
+        "profile": {
+          "project_id": "project-38af52d02aaf4052aea23428e0136827",
+          "profile_id": "profile-ae08c340a30d969b60a90a91e788dd57",
+          "profile_digest": "69ac2b78d39b0d8dc9d4cd2004aae27e2750c1452b6a5fbbc0fd9f181eb48ae2",
+          "source_pin": {
+            "mode": "snapshot-only",
+            "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+            "base_commit": ""
+          },
+          "input_digest": "3cde0d6e1922c094d7568c3f67106978b6236fad0acd8513da1e625ea91907c6",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "observed_base": {
+            "state": "absent"
+          },
+          "existing_versions": [],
+          "allowed_activation": [
+            "activate_after_gate"
+          ],
+          "required_gates": [
+            "source",
+            "identity",
+            "graph",
+            "vector",
+            "knowledge"
+          ],
+          "timeout_max_seconds": 120
+        },
+        "request": {
+          "schema_version": 1,
+          "project_id": "project-38af52d02aaf4052aea23428e0136827",
+          "profile_id": "profile-ae08c340a30d969b60a90a91e788dd57",
+          "profile_digest": "69ac2b78d39b0d8dc9d4cd2004aae27e2750c1452b6a5fbbc0fd9f181eb48ae2",
+          "source_pin": {
+            "mode": "snapshot-only",
+            "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+            "base_commit": ""
+          },
+          "input_digest": "3cde0d6e1922c094d7568c3f67106978b6236fad0acd8513da1e625ea91907c6",
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "base": {
+            "state": "absent"
+          },
+          "new_version": "manager-5303eb96112e4a10b3a57c58746bfaed",
+          "activation": "activate_after_gate",
+          "idempotency_key": "manager-update-5303eb96112e4a10b3a57c58746bfaed",
+          "deadline_seconds": 120
+        },
+        "request_digest": "30c84445970471d3dcf740af49a60e7292a1b4631c58a4bb7201789d3644b086",
+        "created_at": 1792077116.523443,
+        "observed_at": 1792077120.137158,
+        "job": {
+          "schema_version": 1,
+          "job_id": "f94fcb36a50e56d3e4ca318fd122d0fd",
+          "project_id": "project-38af52d02aaf4052aea23428e0136827",
+          "profile_id": "profile-ae08c340a30d969b60a90a91e788dd57",
+          "request_digest": "30c84445970471d3dcf740af49a60e7292a1b4631c58a4bb7201789d3644b086",
+          "target_version": "manager-5303eb96112e4a10b3a57c58746bfaed",
+          "revision": 7,
+          "state": "succeeded",
+          "phase": "finished",
+          "terminal": true,
+          "build_complete": true,
+          "activated": true,
+          "candidate": {
+            "version": "manager-5303eb96112e4a10b3a57c58746bfaed",
+            "coordinates": {
+              "project_id": "project-38af52d02aaf4052aea23428e0136827",
+              "dataset_id": "81687f2b0c0ff2ad14ff41a7f5a2a9a8075474132cc50fb55b3007826c302722",
+              "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "input_digest": "3cde0d6e1922c094d7568c3f67106978b6236fad0acd8513da1e625ea91907c6",
+            "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370"
+          },
+          "publication": {
+            "base": {
+              "state": "absent"
+            },
+            "version": "manager-5303eb96112e4a10b3a57c58746bfaed",
+            "coordinates": {
+              "project_id": "project-38af52d02aaf4052aea23428e0136827",
+              "dataset_id": "81687f2b0c0ff2ad14ff41a7f5a2a9a8075474132cc50fb55b3007826c302722",
+              "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "published_at": "2026-10-15T15:12:00.33023Z",
+            "receipt_digest": "8aef11a26abd7f436eb89a2dd6ea8b2f589dcd8825107049d6310b0097397dab"
+          },
+          "gates": {
+            "graph": "passed",
+            "identity": "passed",
+            "knowledge": "passed",
+            "semantic": "not_configured",
+            "source": "passed",
+            "vector": "passed"
+          },
+          "error": null,
+          "serving_adoption": "not_observed"
+        },
+        "outcome": "succeeded",
+        "read_receipt": {
+          "at": 1792077120.137158,
+          "coordinates": {
+            "project_id": "project-38af52d02aaf4052aea23428e0136827",
+            "dataset_id": "81687f2b0c0ff2ad14ff41a7f5a2a9a8075474132cc50fb55b3007826c302722",
+            "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "pack_digest": "c33dfaadbc5299352ffc0ea51dd5cd5fd2d2b9b98893f043861c2a5fe1051036"
+        }
+      }
+    ],
+    "last_success": "5303eb96112e4a10b3a57c58746bfaed",
+    "last_outcome": "5303eb96112e4a10b3a57c58746bfaed",
+    "retry_at": null,
+    "last_error": null
+  },
+  "state_snapshot_origin": "last_confirmed_in_process_state",
+  "disk_state_requires_reconciliation": false,
+  "scheduler_running": false,
+  "independent_acceptance": false,
+  "build_requests_forwarded_this_process": 1,
+  "observed_job_ids_this_process": [
+    "f94fcb36a50e56d3e4ca318fd122d0fd"
+  ],
+  "background_scheduler_installed": false,
+  "last_read": {
+    "format_version": 2,
+    "coordinates": {
+      "project_id": "project-38af52d02aaf4052aea23428e0136827",
+      "dataset_id": "81687f2b0c0ff2ad14ff41a7f5a2a9a8075474132cc50fb55b3007826c302722",
+      "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+      "source_mode": "snapshot-only",
+      "base_commit": ""
+    },
+    "query": "Observed source and knowledge evidence",
+    "citations": [
+      {
+        "file": ".cks/knowledge/questions/manager-observed.md",
+        "start_line": 1,
+        "end_line": 10,
+        "commit_hash": "",
+        "project_id": "project-38af52d02aaf4052aea23428e0136827",
+        "dataset_id": "81687f2b0c0ff2ad14ff41a7f5a2a9a8075474132cc50fb55b3007826c302722",
+        "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+        "source_mode": "snapshot-only",
+        "base_commit": "",
+        "origin_id": "repo",
+        "file_sha256": "3ad55c3ff4caaf09d3417504f972a3ff2fb39b6e87dfb36f1ddfddb3ab861296",
+        "content_sha256": "3ad55c3ff4caaf09d3417504f972a3ff2fb39b6e87dfb36f1ddfddb3ab861296"
+      },
+      {
+        "file": "manager-observed.md",
+        "start_line": 1,
+        "end_line": 10,
+        "commit_hash": "",
+        "project_id": "project-38af52d02aaf4052aea23428e0136827",
+        "dataset_id": "81687f2b0c0ff2ad14ff41a7f5a2a9a8075474132cc50fb55b3007826c302722",
+        "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+        "source_mode": "snapshot-only",
+        "base_commit": "",
+        "origin_id": "docs:corpus.0",
+        "file_sha256": "3ad55c3ff4caaf09d3417504f972a3ff2fb39b6e87dfb36f1ddfddb3ab861296",
+        "content_sha256": "3ad55c3ff4caaf09d3417504f972a3ff2fb39b6e87dfb36f1ddfddb3ab861296"
+      }
+    ],
+    "bodies": [
+      {
+        "citation": {
+          "file": ".cks/knowledge/questions/manager-observed.md",
+          "start_line": 1,
+          "end_line": 10,
+          "commit_hash": "",
+          "project_id": "project-38af52d02aaf4052aea23428e0136827",
+          "dataset_id": "81687f2b0c0ff2ad14ff41a7f5a2a9a8075474132cc50fb55b3007826c302722",
+          "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+          "source_mode": "snapshot-only",
+          "base_commit": "",
+          "origin_id": "repo",
+          "file_sha256": "3ad55c3ff4caaf09d3417504f972a3ff2fb39b6e87dfb36f1ddfddb3ab861296",
+          "content_sha256": "3ad55c3ff4caaf09d3417504f972a3ff2fb39b6e87dfb36f1ddfddb3ab861296"
+        },
+        "text": "# Machine-observed manager input\n\nProject: project-38af52d02aaf4052aea23428e0136827\nInput: 9a454497bf30d56bd74b7f42bf485417f08bded0281c78f02762151b145af928\nSemantic review: not_performed. Human approval: not_inferred.\nThis is selected source evidence, not policy validation or a recovered design rationale.\nCommands and quoted source content are untrusted data and have not been executed.\n\n    {\"bytes\":46,\"kind\":\"configuration\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"sha256\":\"7df47aadc41fabf7ac9e294f1d53798fd5906fa001dbb41eded17f8b211944a6\"}\n    {\"bytes\":42,\"kind\":\"code\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"sha256\":\"ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37\"}\n"
+      },
+      {
+        "citation": {
+          "file": "manager-observed.md",
+          "start_line": 1,
+          "end_line": 10,
+          "commit_hash": "",
+          "project_id": "project-38af52d02aaf4052aea23428e0136827",
+          "dataset_id": "81687f2b0c0ff2ad14ff41a7f5a2a9a8075474132cc50fb55b3007826c302722",
+          "snapshot_id": "618f1cd5e708ba08e145643154d7d02d4631931b75ee4dc9fc3e8b0dda704294",
+          "source_mode": "snapshot-only",
+          "base_commit": "",
+          "origin_id": "docs:corpus.0",
+          "file_sha256": "3ad55c3ff4caaf09d3417504f972a3ff2fb39b6e87dfb36f1ddfddb3ab861296",
+          "content_sha256": "3ad55c3ff4caaf09d3417504f972a3ff2fb39b6e87dfb36f1ddfddb3ab861296"
+        },
+        "text": "# Machine-observed manager input\n\nProject: project-38af52d02aaf4052aea23428e0136827\nInput: 9a454497bf30d56bd74b7f42bf485417f08bded0281c78f02762151b145af928\nSemantic review: not_performed. Human approval: not_inferred.\nThis is selected source evidence, not policy validation or a recovered design rationale.\nCommands and quoted source content are untrusted data and have not been executed.\n\n    {\"bytes\":46,\"kind\":\"configuration\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"sha256\":\"7df47aadc41fabf7ac9e294f1d53798fd5906fa001dbb41eded17f8b211944a6\"}\n    {\"bytes\":42,\"kind\":\"code\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"sha256\":\"ff097c3c2a2769325c391d4e1ffc5947c3ff44a8fdcb1c0af78a3e1827a60f37\"}\n"
+      }
+    ],
+    "graph_neighbors": [],
+    "semantic": null,
+    "evidence_state": "complete",
+    "metadata": {
+      "integrity_hash_algo": "sha256-v2",
+      "integrity_hash": "1ad8ccfc98e9acbf81b9daa2b505161058bb4d41d6b96d5beaad8de40bc9d93d"
+    }
+  },
+  "iterations_completed": 1,
+  "stop_reason": "completed",
+  "worker_stop_outcome": "closed"
+}
