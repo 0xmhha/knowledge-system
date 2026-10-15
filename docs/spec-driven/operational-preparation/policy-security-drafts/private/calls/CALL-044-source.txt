@@ -1,0 +1,21 @@
+func (g *GoToolchain) goTool(command string, args ...string) *exec.Cmd {
+	if g.Root == "" {
+		g.Root = runtime.GOROOT()
+	}
+	tool := exec.Command(filepath.Join(g.Root, "bin", "go"), command) // nolint: gosec
+	tool.Args = append(tool.Args, args...)
+	tool.Env = append(tool.Env, "GOROOT="+g.Root)
+
+	// Forward environment variables to the tool, but skip compiler target settings.
+	// TODO: what about GOARM?
+	skip := map[string]struct{}{"GOROOT": {}, "GOARCH": {}, "GOOS": {}, "GOBIN": {}, "CC": {}}
+	for _, e := range os.Environ() {
+		if i := strings.IndexByte(e, '='); i >= 0 {
+			if _, ok := skip[e[:i]]; ok {
+				continue
+			}
+		}
+		tool.Env = append(tool.Env, e)
+	}
+	return tool
+}

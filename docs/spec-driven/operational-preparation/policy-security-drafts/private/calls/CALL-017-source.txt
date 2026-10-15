@@ -1,0 +1,14 @@
+func fileInfo(file string) (*info, error) {
+	info := &info{file: file, Year: int64(time.Now().Year())}
+	cmd := exec.Command("git", "log", "--follow", "--find-renames=80", "--find-copies=80", "--pretty=format:%ai", "--", file)
+	err := doLines(cmd, func(line string) {
+		y, err := strconv.ParseInt(line[:4], 10, 64)
+		if err != nil {
+			fmt.Printf("cannot parse year: %q", line[:4])
+		}
+		if y < info.Year {
+			info.Year = y
+		}
+	})
+	return info, err
+}

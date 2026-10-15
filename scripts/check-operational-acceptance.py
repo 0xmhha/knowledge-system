@@ -225,6 +225,18 @@ def check(root, protocol, ledger, require_frozen=False):
                     raise ValueError("adopted source/host scope is unbound")
         except (OSError, ValueError, KeyError, TypeError, StopIteration) as exc:
             errors.append("local host readiness invalid: " + str(exc))
+    source_preparation = protocol.get("policy_security_input_preparation")
+    if source_preparation != ledger.get("policy_security_input_preparation"):
+        errors.append("protocol/ledger policy-security preparation references differ")
+    if source_preparation is not None:
+        if not file_hash(source_preparation.get("manifest"), source_preparation.get("manifest_sha256")):
+            errors.append("policy-security preparation manifest binding differs")
+        else:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("source_packet_check", Path(__file__).with_name("check-policy-security-preparation.py"))
+            packet_check = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(packet_check)
+            errors.extend(packet_check.check((root / source_preparation["manifest"]).parent, root))
     for row in requirements:
         if row.get("decision_status") != "approved" or not human_receipt(row.get("receipt"), digest):
             pending.append(row.get("id", "unknown freeze requirement"))

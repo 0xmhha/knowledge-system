@@ -28,3 +28,7 @@
 현재 문서 목록과 역할은 [catalog](../DOCUMENTATION-CATALOG.json), 삭제 경로와 SHA는 [정리 목록](../DOCUMENTATION-CLEANUP.json)에 있다. CLI/도구/링크는 `make docs-check`, 완료 조건은 `make refactoring-check`로 확인한다. 시험 통과, source alignment, 검토된 관계, 사람 수용과 품질 판정은 분리한다.
 
 다음 필수 작업은 N16 재개 여부 결정이다. 사용자가 보류를 유지하는 동안 키 생성·배포·선택 기능 기본 활성화를 수행하지 않는다. 새 후속 작업은 남은 목록의 별도 범위를 명시하고 승인·입력·완료 기준을 고정해 진행한다.
+
+## 정책·보안 입력 준비 추가
+
+[검토 자료](./POLICY-SECURITY-INPUT-REVIEW.md)에 기존 project 정책42개/참조146개와 source-only query12개, 두 지원 규칙 관련 호출68개를 기록했다. source 이름 힌트140개·미연결6개는 실제 graph 판정이 아니다. 두 command 인자 힌트는 build 지원 코드이고 conversion-error 힌트는0이다. WI-2의 새 독립 양성·음성 기준을 충족하지 못하므로 actual detector/품질을 통과시키지 않는다. 수동 security metadata4개도 취약점/자동 rule 정답이 아니다. public/private를 분리했고 과거 질문에 나온 splitAndTrim은 제외했다. reviewer·모델/비용 지정과 독립 gold/family/split 채택은 미결이며 단계0 preparing·운영 수용0/9를 유지한다.

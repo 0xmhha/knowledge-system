@@ -84,3 +84,7 @@ known-command/tool guard를 네트워크 sandbox로 간주하지 않으며 격�
 [격리 채택·연결 명세](./ISOLATED-HOST-ADOPTION.md)의 source 채택과 실제 CLI/로컬 스크립트 응답기5개 사례를 검증했다. coding-agent는 SessionStart 보완 b7e7868, ChainBench는 bdf5ad27이며 source·binary·설정·hook 입력·MCP frame·종료를 결속했다. strict MCP alias와 알려진 게시 거부, Stop 단일 재진입, host 취소/서버 종료를 확인했다.
 
 전체 실제 agent/model/CKS/노드 pilot은 여전히 미실행이다. source/로컬 host 사전 검증만 별도 준비 기록으로 채택하며 단계0 preparing·동결 전 execution_allowed=false·운영/품질/독립 수용0/9를 유지한다. 다음은 reviewer·모델/비용·자원·새 gold/case/family·DEV/FINAL·기준을 확정하는 것이다.
+
+## 정책·보안 source 준비의 판정 범위
+
+[정책·보안 입력 검토](./POLICY-SECURITY-INPUT-REVIEW.md)는 기존 YAML 참조와 source 구문,12개 질의·수동 annotation 초안을 준비한다. 새 정답·독립 사실군·실제 graph/detector 실행으로 간주하지 않는다. stage0에서 독립 검토자와 project/controlled 분모·표본 부족 처리·family/split을 채택해야 한다. 단순 이름 중복 필터는 의미상 독립성이나 FINAL 봉인을 증명하지 않는다. source packet과 public/private 누출·조기 승인/채점/graph 승격을 검사하며 실행/수용0/9를 유지한다.

@@ -61,7 +61,7 @@
     {
       "id": "F-07",
       "topic": "new_inputs_gold_and_holdout",
-      "preparation_status": "source_candidates_and_ai_review_drafts_prepared_independent_gold_pending",
+      "preparation_status": "source_review_annotation_and_rule_census_drafts_prepared_independent_gold_pending",
       "decision_status": "pending",
       "receipt": null
     },
@@ -277,7 +277,7 @@
     },
     {
       "id": "WI-2",
-      "status": "not_prepared",
+      "status": "source_syntax_census_only_independent_cases_not_prepared",
       "requirements_proposal": {
         "new_positive_cases_per_supported_rule_min": 10,
         "new_negative_cases_per_supported_rule_min": 10,
@@ -304,7 +304,12 @@
       "gold_manifest_sha256": null,
       "review_receipt": null,
       "final_minimum_independent_units": null,
-      "dev_sample_allocation": null
+      "dev_sample_allocation": null,
+      "preparation_reference": {
+        "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+        "kind": "source_drafts_not_gold_or_runtime"
+      }
     },
     {
       "id": "WI-C",
@@ -366,7 +371,7 @@
     },
     {
       "id": "WI-SP",
-      "status": "not_prepared",
+      "status": "source_queries_and_annotation_drafts_not_reviewed",
       "requirements_proposal": {
         "independent_symbols_min": 12,
         "policy_symbols_min": 4,
@@ -397,7 +402,12 @@
       "gold_manifest_sha256": null,
       "review_receipt": null,
       "final_minimum_independent_units": null,
-      "dev_sample_allocation": null
+      "dev_sample_allocation": null,
+      "preparation_reference": {
+        "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+        "kind": "source_drafts_not_gold_or_runtime"
+      }
     }
   ],
   "case_record_required_fields": [
@@ -675,5 +685,10 @@
     "scope": "owned_local_session_only",
     "manifest": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json",
     "manifest_sha256": "741fb22917ab562697cf7b0ecc973e13ed4e4f3533ac549868f4b3aeb11df42e"
+  },
+  "policy_security_input_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+    "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+    "kind": "source_drafts_not_gold_or_runtime"
   }
 }

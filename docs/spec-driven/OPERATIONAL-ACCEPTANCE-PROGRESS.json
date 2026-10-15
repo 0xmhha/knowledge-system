@@ -235,7 +235,8 @@
         "review_draft_packet": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md",
         "chainbench_readiness_fix": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
         "coding_agent_readiness_fix": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json",
-        "isolated_host_connection": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json"
+        "isolated_host_connection": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json",
+        "policy_security_source_preparation": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json"
       },
       "completed_preparation": [
         "read_only_source_inventory",
@@ -249,7 +250,8 @@
         "stop_reentry_and_unmasked_shutdown_completion_requirements",
         "chainbench_stdio_readiness_patch_with_isolated_state_and_controlled_regression",
         "coding_agent_evaluation_only_exit_and_stop_reentry_controlled_regression",
-        "adopted_consumer_sources_and_actual_cli_local_scripted_connection_five_cases"
+        "adopted_consumer_sources_and_actual_cli_local_scripted_connection_five_cases",
+        "existing_policy_reference_inventory_rule_call_census_and_twelve_source_queries"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -265,12 +267,12 @@
         "date": "2026-10-15",
         "kind": "preparation_only_not_runtime_or_independent_acceptance",
         "guard_regression_tests": {
-          "passed": 30,
+          "passed": 31,
           "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_operational_acceptance.py"
         },
         "documentation_contract_tests_passed": 20,
         "package_notice_tests_passed": 3,
-        "live_document_check_count": 117,
+        "live_document_check_count": 118,
         "require_frozen_rejected_with_exit": 1,
         "original_source_completion_guard": "pass",
         "verified_original_bindings": 2069,
@@ -289,7 +291,9 @@
         "actual_cli_sessions_with_local_scripted_api": 10,
         "final_local_cli_connection_cases": 5,
         "actual_agent_role_pipeline_sessions": 0,
-        "real_model_inference": "not_run"
+        "real_model_inference": "not_run",
+        "source_inventory_tests_passed": 8,
+        "source_packet_tests_passed": 8
       },
       "candidate_counts": {
         "source_functions": 40,
@@ -299,7 +303,11 @@
         "approved_cases": 0,
         "gold_records": 0,
         "ai_review_rubric_drafts": 10,
-        "non_exhaustive_value_control_draft_functions": 3
+        "non_exhaustive_value_control_draft_functions": 3,
+        "policy_security_source_queries": 12,
+        "manual_security_overlay_proposals": 4,
+        "rule_source_call_records": 68,
+        "rule_positive_gold_cases": 0
       }
     },
     {
@@ -374,5 +382,10 @@
     "scope": "owned_local_session_only",
     "manifest": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json",
     "manifest_sha256": "741fb22917ab562697cf7b0ecc973e13ed4e4f3533ac549868f4b3aeb11df42e"
+  },
+  "policy_security_input_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+    "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+    "kind": "source_drafts_not_gold_or_runtime"
   }
 }

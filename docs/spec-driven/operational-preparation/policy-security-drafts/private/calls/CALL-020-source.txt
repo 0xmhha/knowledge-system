@@ -1,0 +1,24 @@
+func block(ctx *cli.Context) error {
+	num, err := strconv.ParseUint(ctx.Args().First(), 10, 64)
+	if err != nil {
+		return fmt.Errorf("invalid block number: %w", err)
+	}
+	e, err := open(ctx, num/uint64(ctx.Int(eraSizeFlag.Name)))
+	if err != nil {
+		return fmt.Errorf("error opening era1: %w", err)
+	}
+	defer e.Close()
+	// Read block with number.
+	block, err := e.GetBlockByNumber(num)
+	if err != nil {
+		return fmt.Errorf("error reading block %d: %w", num, err)
+	}
+	// Convert block to JSON and print.
+	val := ethapi.RPCMarshalBlock(block, ctx.Bool(txsFlag.Name), ctx.Bool(txsFlag.Name), params.MainnetChainConfig)
+	b, err := json.MarshalIndent(val, "", "  ")
+	if err != nil {
+		return fmt.Errorf("error marshaling json: %w", err)
+	}
+	fmt.Println(string(b))
+	return nil
+}

@@ -1,0 +1,189 @@
+package main
+
+// Source-only syntax inventory. Never invokes CKG/rules or proves data flow.
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/format"
+	"go/parser"
+	"go/token"
+	"os"
+	"strconv"
+	"strings"
+)
+
+type Input struct{ Path, Source, Blob string }
+
+func text(fs *token.FileSet, n ast.Node) string {
+	var b bytes.Buffer
+	if n != nil {
+		format.Node(&b, fs, n)
+	}
+	return b.String()
+}
+func receiver(n ast.Expr) string {
+	switch t := n.(type) {
+	case *ast.StarExpr:
+		return receiver(t.X)
+	case *ast.IndexExpr:
+		return receiver(t.X)
+	case *ast.IndexListExpr:
+		return receiver(t.X)
+	default:
+		return text(token.NewFileSet(), n)
+	}
+}
+func main() {
+	var files []Input
+	if e := json.NewDecoder(os.Stdin).Decode(&files); e != nil {
+		panic(e)
+	}
+	symbols := []map[string]any{}
+	calls := []map[string]any{}
+	generated := []string{}
+	for _, in := range files {
+		fs := token.NewFileSet()
+		f, e := parser.ParseFile(fs, in.Path, in.Source, parser.ParseComments)
+		if e != nil {
+			panic(e)
+		}
+		if ast.IsGenerated(f) {
+			generated = append(generated, in.Path)
+			continue
+		}
+		raw := []byte(in.Source)
+		imports := map[string]string{}
+		for _, i := range f.Imports {
+			p, _ := strconv.Unquote(i.Path.Value)
+			name := p[strings.LastIndex(p, "/")+1:]
+			if i.Name != nil {
+				name = i.Name.Name
+			}
+			imports[name] = p
+		}
+		loc := func(n ast.Node) map[string]any {
+			a, b := fs.Position(n.Pos()), fs.Position(n.End())
+			return map[string]any{"path": in.Path, "start_line": a.Line, "end_line": b.Line, "start_byte": a.Offset, "end_byte_exclusive": b.Offset, "span_sha256": fmt.Sprintf("%x", sha256.Sum256(raw[a.Offset:b.Offset])), "file_sha256": fmt.Sprintf("%x", sha256.Sum256(raw)), "git_blob": in.Blob}
+		}
+		add := func(name, kind string, n ast.Node) {
+			r := loc(n)
+			r["source_name_hint"] = f.Name.Name + "." + name
+			r["kind"] = kind
+			symbols = append(symbols, r)
+		}
+		for _, decl := range f.Decls {
+			if g, ok := decl.(*ast.GenDecl); ok {
+				for _, sp := range g.Specs {
+					switch x := sp.(type) {
+					case *ast.TypeSpec:
+						add(x.Name.Name, "type", x)
+						if st, ok := x.Type.(*ast.StructType); ok {
+							for _, field := range st.Fields.List {
+								for _, name := range field.Names {
+									add(x.Name.Name+"."+name.Name, "field", field)
+								}
+							}
+						}
+					case *ast.ValueSpec:
+						for _, name := range x.Names {
+							add(name.Name, g.Tok.String(), x)
+						}
+					}
+				}
+			}
+			fn, ok := decl.(*ast.FuncDecl)
+			if !ok {
+				continue
+			}
+			name := fn.Name.Name
+			kind := "function"
+			if fn.Recv != nil {
+				name = receiver(fn.Recv.List[0].Type) + "." + name
+				kind = "method"
+			}
+			add(name, kind, fn)
+			if fn.Body == nil {
+				continue
+			}
+			params := map[string]string{}
+			for _, field := range fn.Type.Params.List {
+				for _, n := range field.Names {
+					params[n.Name] = text(fs, field.Type)
+				}
+			}
+			assignments := map[*ast.CallExpr][]string{}
+			returns := []string{}
+			// Metadata includes nested closures; it does not resolve their lexical scope.
+			ast.Inspect(fn.Body, func(n ast.Node) bool {
+				switch x := n.(type) {
+				case *ast.AssignStmt:
+					if len(x.Rhs) == 1 {
+						if c, ok := x.Rhs[0].(*ast.CallExpr); ok {
+							lhs := []string{}
+							for _, v := range x.Lhs {
+								lhs = append(lhs, text(fs, v))
+							}
+							assignments[c] = lhs
+						}
+					}
+				case *ast.ReturnStmt:
+					for _, v := range x.Results {
+						if id, ok := v.(*ast.Ident); ok {
+							returns = append(returns, id.Name)
+						}
+					}
+				}
+				return true
+			})
+			ast.Inspect(fn.Body, func(n ast.Node) bool {
+				c, ok := n.(*ast.CallExpr)
+				if !ok {
+					return true
+				}
+				sel, ok := c.Fun.(*ast.SelectorExpr)
+				if !ok {
+					return true
+				}
+				pkg, ok := sel.X.(*ast.Ident)
+				if !ok {
+					return true
+				}
+				imported := imports[pkg.Name]
+				wanted := (imported == "os/exec" && (sel.Sel.Name == "Command" || sel.Sel.Name == "CommandContext")) || (imported == "strconv" && (sel.Sel.Name == "Atoi" || sel.Sel.Name == "ParseInt" || sel.Sel.Name == "ParseUint"))
+				if !wanted {
+					return true
+				}
+				row := loc(c)
+				row["import_path_spelling"] = imported
+				row["import_alias"] = pkg.Name
+				row["callee"] = sel.Sel.Name
+				row["enclosing_function"] = f.Name.Name + "." + name
+				row["function_start_line"] = fs.Position(fn.Pos()).Line
+				row["function_end_line"] = fs.Position(fn.End()).Line
+				row["function_start_byte"] = fs.Position(fn.Pos()).Offset
+				row["function_end_byte_exclusive"] = fs.Position(fn.End()).Offset
+				row["named_parameters"] = params
+				row["assignment_lhs"] = assignments[c]
+				row["explicit_return_identifier_spellings"] = returns
+				args := []map[string]string{}
+				for _, arg := range c.Args {
+					k := "other"
+					if _, ok := arg.(*ast.Ident); ok {
+						k = "identifier"
+					}
+					args = append(args, map[string]string{"text": text(fs, arg), "kind": k})
+				}
+				row["arguments"] = args
+				row["semantic_binding"] = "unresolved_including_import_shadowing_and_closures"
+				calls = append(calls, row)
+				return true
+			})
+		}
+	}
+	if e := json.NewEncoder(os.Stdout).Encode(map[string]any{"symbols": symbols, "calls": calls, "generated_files_skipped": generated}); e != nil {
+		panic(e)
+	}
+}

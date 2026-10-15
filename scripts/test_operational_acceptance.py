@@ -61,6 +61,12 @@ class PreparationGuardTests(unittest.TestCase):
             rows[0]["adopted_commit"] = "0" * 40
         self.assertTrue(self.errors())
 
+    def test_policy_security_source_preparation_reference_cannot_disappear(self):
+        if "policy_security_input_preparation" not in self.protocol:
+            self.skipTest("source packet not recorded")
+        self.ledger.pop("policy_security_input_preparation")
+        self.assertTrue(self.errors())
+
     def test_hash_tampering_is_rejected(self):
         self.protocol["source_inventory_sha256"] = "0" * 64
         self.assertTrue(self.errors())

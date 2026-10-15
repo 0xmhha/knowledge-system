@@ -1,0 +1,14 @@
+func readDefaultInt(def int) int {
+	for {
+		text := promptInput("> ")
+		if text = strings.TrimSpace(text); text == "" {
+			return def
+		}
+		val, err := strconv.Atoi(strings.TrimSpace(text))
+		if err != nil {
+			log.Error("Invalid input, expected integer", "err", err)
+			continue
+		}
+		return val
+	}
+}

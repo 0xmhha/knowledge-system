@@ -1,0 +1,16 @@
+func mailmapLookup(authors []string) []string {
+	if len(authors) == 0 {
+		return nil
+	}
+	cmds := []string{"check-mailmap", "--"}
+	cmds = append(cmds, authors...)
+	cmd := exec.Command("git", cmds...)
+	var translated []string
+	err := doLines(cmd, func(line string) {
+		translated = append(translated, line)
+	})
+	if err != nil {
+		log.Fatalln("error translating authors:", err)
+	}
+	return translated
+}

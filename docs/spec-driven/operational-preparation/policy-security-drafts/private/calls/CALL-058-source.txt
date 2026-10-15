@@ -1,0 +1,22 @@
+func NewMsgFilters(filterParam string) (MsgFilters, error) {
+	filters := make(MsgFilters)
+	for _, filter := range strings.Split(filterParam, "-") {
+		proto, codes, found := strings.Cut(filter, ":")
+		if !found || proto == "" || codes == "" {
+			return nil, fmt.Errorf("invalid message filter: %s", filter)
+		}
+
+		for _, code := range strings.Split(codes, ",") {
+			if code == "*" || code == "-1" {
+				filters[MsgFilter{Proto: proto, Code: -1}] = struct{}{}
+				continue
+			}
+			n, err := strconv.ParseUint(code, 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("invalid message code: %s", code)
+			}
+			filters[MsgFilter{Proto: proto, Code: int64(n)}] = struct{}{}
+		}
+	}
+	return filters, nil
+}
