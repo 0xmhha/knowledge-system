@@ -343,7 +343,7 @@
       "scope": "cross_project_comparison",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "KM06_2_actual_readonly_comparison_MCP_complete_partial_failure_next",
+      "design_status": "KM06_3_comparison_partial_failure_budget_shutdown_complete_real_projects_next",
       "depends_on": [
         "KM-01",
         "KM-05"
@@ -351,9 +351,10 @@
       "evidence": [
         "docs/spec-driven/COMPARISON-MCP-CONTRACT.md",
         "system/eval/knowledge-roadmap-2026-10-16/km-06-contract/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-16/km-06-runtime/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-runtime/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-failures/manifest.json"
       ],
-      "verification": "actual_native_mock2DB_12checks_9tools_2EOF0_comparison171_full_Go_race7_no_real_chain_or_quality_acceptance",
+      "verification": "comparison192_final_archive_recheck_conflict_no_fallback_request_deadline_close_native21checks_18calls_3EOF0_SIGTERM0_full_Go_race7",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -374,8 +375,11 @@
         },
         {
           "id": "KM-06.3",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         },
         {
           "id": "KM-06.4",
@@ -592,7 +596,7 @@
     "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
     "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
   },
-  "completed_subtasks": 22,
+  "completed_subtasks": 23,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
   "manager_host_validation": {
     "packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json",

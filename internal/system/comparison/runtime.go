@@ -29,16 +29,17 @@ type runtimePin struct {
 }
 
 type ComparisonRuntime struct {
-	mu       sync.RWMutex
-	closed   bool
-	name     string
-	catalog  collection.Catalog
-	scheme   *Scheme
-	protocol *ComparisonProtocol
-	bindings BindingDocument
-	reviews  MappingReviewDocument
-	cleaner  *sanitize.Engine
-	now      func() time.Time
+	mu         sync.RWMutex
+	closed     bool
+	name       string
+	catalog    collection.Catalog
+	scheme     *Scheme
+	protocol   *ComparisonProtocol
+	bindings   BindingDocument
+	reviews    MappingReviewDocument
+	cleaner    *sanitize.Engine
+	now        func() time.Time
+	openReader func(context.Context, collection.Catalog, *Scheme, *sanitize.Engine) (*MappingReader, error)
 }
 
 func readComparisonInput(name string) ([]byte, error) {
@@ -159,7 +160,7 @@ func OpenComparisonRuntime(ctx context.Context, path string) (*ComparisonRuntime
 	if name == "" {
 		name = "cks-comparison"
 	}
-	return &ComparisonRuntime{name: name, catalog: catalog, scheme: scheme, protocol: protocol, bindings: bindings, reviews: reviews, cleaner: cleaner, now: time.Now}, nil
+	return &ComparisonRuntime{name: name, catalog: catalog, scheme: scheme, protocol: protocol, bindings: bindings, reviews: reviews, cleaner: cleaner, now: time.Now, openReader: NewMappingReader}, nil
 }
 func (s *ComparisonRuntime) Close() error {
 	s.mu.Lock()
@@ -254,6 +255,8 @@ type ComparisonBundle struct {
 	UsedCitations     int                   `json:"used_citations"`
 	CompletenessScope string                `json:"completeness_scope"`
 	FinalAssessment   string                `json:"final_assessment"`
+	OmittedCandidates int                   `json:"omitted_candidates"`
+	CandidateState    string                `json:"candidate_state"`
 }
 
 func (s *ComparisonRuntime) memberCatalog(collectionID string, coords contract.V2Coordinates) collection.Catalog {
@@ -295,6 +298,7 @@ func (s *ComparisonRuntime) Extract(ctx context.Context, data []byte) (Compariso
 	defer cancel()
 	result := ComparisonBundle{SchemaVersion: 1, State: "complete", ProfileDigest: selected.ProfileDigest, CatalogDigest: selected.CatalogDigest, CollectionID: selected.CollectionID, Mode: "comparison", Concept: selected.Concept, Facets: selected.Facets, AsOf: selected.AsOf.UTC().Format(time.RFC3339Nano), Question: selected.Question, Groups: []ComparisonGroup{}, Candidates: []ComparisonCandidate{}, CompletenessScope: "requested_project_facet_rows_only_not_all_project_evidence", FinalAssessment: "LLM_or_user_evaluates_tradeoffs_from_cited_evidence"}
 	safe := &MappingReader{cleaner: s.cleaner}
+	readers := make([]*MappingReader, 0, len(selected.Participants))
 	for _, participant := range selected.Participants {
 		if err := ctx.Err(); err != nil {
 			return ComparisonBundle{}, err
@@ -306,9 +310,13 @@ func (s *ComparisonRuntime) Extract(ctx context.Context, data []byte) (Compariso
 		display := participant
 		display.Scope = scope
 		group := ComparisonGroup{Participant: display, State: "complete", Cells: []CoverageResult{}}
-		reader, openErr := NewMappingReader(ctx, s.memberCatalog(selected.CollectionID, participant.Scope.Coordinates), s.scheme, s.cleaner)
+		reader, openErr := s.openReader(ctx, s.memberCatalog(selected.CollectionID, participant.Scope.Coordinates), s.scheme, s.cleaner)
+		readers = append(readers, reader)
 		if reader != nil {
 			defer func() { _ = reader.Close() }()
+		}
+		if err := ctx.Err(); err != nil {
+			return ComparisonBundle{}, err
 		}
 		for _, facet := range selected.Facets {
 			var cell CoverageResult
@@ -337,6 +345,34 @@ func (s *ComparisonRuntime) Extract(ctx context.Context, data []byte) (Compariso
 		}
 		result.Groups = append(result.Groups, group)
 	}
+	// Later participants may expose a concurrent change to an earlier archive.
+	// Verify every selected reader again before releasing any source evidence.
+	for i, reader := range readers {
+		if err := ctx.Err(); err != nil {
+			return ComparisonBundle{}, err
+		}
+		if reader == nil {
+			continue
+		}
+		if err := reader.verifyCoverageArchive(ctx, selected.CollectionID, selected.Participants[i].Scope.Coordinates); err != nil {
+			if ctx.Err() != nil {
+				return ComparisonBundle{}, ctx.Err()
+			}
+			group := &result.Groups[i]
+			group.State, result.State = "partial", "partial"
+			for j := range group.Cells {
+				cell := &group.Cells[j]
+				body, cites := cellCost(*cell)
+				result.UsedBodyBytes -= body
+				result.UsedCitations -= cites
+				cell.State, cell.ArchiveVerified = "unavailable", false
+				cell.UnreviewedCandidatesIncluded = false
+				cell.Mappings = []AssessedBinding{}
+				cell.Reasons = append(cell.Reasons, "selected_archive_failed_final_verification")
+			}
+		}
+	}
+	result.CandidateState = "complete"
 	// Candidates only describe explicit mappings and differing evidence/conditions.
 	// They contain mapping reasons/digests from both scopes, never an automatic
 	// behavioral equivalence, performance or superiority conclusion.
@@ -363,6 +399,17 @@ func (s *ComparisonRuntime) Extract(ctx context.Context, data []byte) (Compariso
 						candidate.Evidence = append(candidate.Evidence, proof)
 					}
 				}
+				// Count every emitted citation object, including candidate proofs.
+				cost := 0
+				for _, proof := range candidate.Evidence {
+					cost += len(proof.Citations)
+				}
+				if cost > selected.Budget.MaxCitations-result.UsedCitations {
+					result.OmittedCandidates++
+					result.CandidateState, result.State = "budget_exceeded", "partial"
+					continue
+				}
+				result.UsedCitations += cost
 				result.Candidates = append(result.Candidates, candidate)
 			}
 		}

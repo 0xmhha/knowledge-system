@@ -1,6 +1,6 @@
 # 읽기 전용 다중 프로젝트 비교 MCP 계약
 
-KM-06.1–2의 요청/설정 계약·실제 공개 읽기 전용 MCP·근거 행렬을 구현했다. 부분 실패/종료 보호의 확대 검증과 실제 프로젝트 비교는 KM-06.3–4다. [공통 개념/연결](./INDUSTRY-CONCEPT-COMPARISON.md), [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다.
+KM-06.1–3의 요청/설정 계약·실제 공개 읽기 전용 MCP·근거 행렬·부분 실패/종료 보호를 구현했다. 실제 프로젝트 비교는 KM-06.4다. [공통 개념/연결](./INDUSTRY-CONCEPT-COMPARISON.md), [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다.
 
 ## 목적과 경계
 
@@ -27,7 +27,7 @@ catalog digest는 기존 canonical collection 계약을 재사용한다. runtime
 | facets | 해당 개념에 정의된1–8개 축; 중복/unknown 거부 |
 | question | 선택적4KiB 이하 의도 텍스트; 실행 지시/자동 사실 해석으로 사용하지 않음 |
 | as_of | 명시 RFC3339; 서버 시각 이후 미래나 잘못된 시각 거부 |
-| budget | body byte1–262144, citation1–128, timeout1–30000ms |
+| budget | source body byte1–262144, 응답의 cell와 후보 proof를 합한 citation 객체1–128, timeout1–30000ms |
 | include_proposed | 기본 false; 명시 true에서만 근거/경고를 가진 미검토 후보 허용 |
 
 기본 예산 생성기는 위 최대값을 반환한다. 요청은 양수 상한을 명시하고0·초과·형식 오류를 거부한다. 누락된 참여자/개념을 자연어 일부 문자열에서 추측하지 않는다. metadata의 unknown 용어·복수 별칭 후보는 describe에서 선택해야 한다. 같은 프로젝트라도 다른 scope를 명시했다면 비교할 수 있다. 다른 collection의 멤버는 그 프로젝트가 설정에 있다는 이유로 선택할 수 없다.
@@ -38,7 +38,7 @@ catalog digest는 기존 canonical collection 계약을 재사용한다. runtime
 
 구현한 KM-06.2는 각 participant/facet에 공통 정의·로컬 구현/정책·source 종류·인용·mapping 이유/검토·조건·unknown을 분리한 행렬을 제공한다. 공통/차이 후보에는 양쪽 프로젝트의 근거와 이유를 요구하며 동일 용어나 source text가 행동 동일성을 증명한다고 주장하지 않는다. 기본은 현재 recorded review가 있는 자료이고 명시 후보 모드는 proposed를 유지한다.
 
-KM-06.3은 한 프로젝트의 source 부재/손상과 다른 프로젝트의 정상 결과를 분리한다. 전체 profile/catalog 형상과 membership을 먼저 검증한 후 선택 버전별로 reader를 열어 한 실패가 시작 시 전체를 막지 않도록 한다. 등록 밖 경로/프로젝트로 fallback하지 않는다. 같은 project/scope의 상충은 유지하고 다른 프로젝트의 차이는 한 내부 모순으로 만들지 않는다. 요청 예산/기한·응답 byte와 인용 상한·reader lease·EOF/신호 정리를 검증한다. 부분 실패/누락/초과를 조용히 숨기거나 자료 완전성으로 표현하지 않는다.
+구현한 KM-06.3은 한 프로젝트의 source 부재/손상과 다른 프로젝트의 정상 결과를 분리한다. 전체 profile/catalog 형상과 membership을 먼저 검증한 후 선택 버전별로 reader를 열어 한 실패가 시작 시 전체를 막지 않도록 한다. 등록 밖 경로/프로젝트로 fallback하지 않는다. 같은 project/scope의 상충은 유지하고 다른 프로젝트의 차이는 한 내부 모순으로 만들지 않는다. 요청 예산/기한·응답 byte와 인용 상한·reader lease·EOF/신호 정리를 검증한다. 부분 실패/누락/초과를 조용히 숨기거나 자료 완전성으로 표현하지 않는다.
 
 KM-06.4는 둘 이상의 실제 로컬 프로젝트를 고정 버전/범위로 DB화해 staking/정책·consensus/finality·mempool/ordering 자료를 공개 도구로 확인한다. 임시 복제본에서 작업하고 원본 프로젝트는 수정하지 않는다. 모의 embedding의 lifecycle/transport 결과를 실제 품질로 확대하지 않는다. 실제 모델 비용·사람/독립 수용을 임의 생성하지 않는다.
 
@@ -59,3 +59,12 @@ KM-06.2 완료: 고정된 로컬 profile/catalog·선택 pack/연결/검토·정
 비교171개(계약167+runtime4), 전체 Go4033(4015통과18skip)·race1007(1005통과2skip,7패키지)·빌드/fmt/vet/lint·문서134개를 검증했다. 실제 native mock2DB 구축 후12항목·9도구호출·2세션 EOF0이며 유료 모델0이다. 통제 source fixture의 실제 조회/transport 검증이며 실제 체인 비교·의미 품질/독립 수용은 아니다.
 
 [동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-06-runtime/manifest.json)를 따른다. 프로필 경로 canonicalization fixture 오류와 native 검증기 vector manifest 파일명 오류도 초기 실패로 보존했다. 전체22/28·기능5/7이다. 다음은 KM-06.3 부분 실패·상충/누락·기한/예산·reader/종료 보호의 완성이다. 남은6개는 KM-06.3–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-06.3 완료 기록
+
+KM-06.3 완료: 모든 참여자를 읽은 뒤 응답 직전에 각 archive를 다시 검증한다. 뒤 프로젝트를 여는 동안 앞 archive가 바뀌면 해당 프로젝트의 본문/인용·후보만 폐기하고 나머지 프로젝트와 명시 좌표는 보존한다. 같은 scope의 적용/비적용 상충과 다른 프로젝트의 차이, 미수집/unknown/손상 상태를 구분한다. 후보 proof의 복사 인용까지 max_citations에 포함하며 예산에 맞지 않으면 후보 전체를 제외하고 omitted_candidates/candidate_state로 알린다. 요청 기한/취소에는 이전 부분 성공을 공개하지 않고 Close는 진행 중 reader 정리를 기다린다.
+
+비교192개(기존171+보호21,47개 상위), 전체 Go4054(4036통과18skip)·race1028(1026통과2skip,7패키지)·빌드/fmt/vet/lint·문서134개를 검증했다. 실제 mock2DB·기반12+보호9항목·18도구호출·4세션(EOF3개와 입력이 열린 SIGTERM1개 모두 exit0)이다. 원문 손상 후 정확히 복구했고 DB/manifest/profile/catalog/binding 전체 hash를 보존했다. 실제 체인 비교·의미 품질/독립 수용은 아니다.
+
+[동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-06-failures/manifest.json)를 따른다. body 예산은 출력 cell source 본문 byte 합계이고 citation 예산은 cell와 후보 proof의 모든 인용 객체 합계다. 응답 전체8MiB 상한을 넘으면 오류로 거부한다. 제외된 후보가 없는 complete도 전체 프로젝트 근거 완전성이나 source 품질을 뜻하지 않는다. 전체23/28·기능5/7이다. 다음은 KM-06.4 둘 이상 실제 프로젝트의 고정 DB·staking/정책·consensus/finality·mempool/ordering 비교 검증이다. 남은5개는 KM-06.4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

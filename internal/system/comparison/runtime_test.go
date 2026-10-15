@@ -100,7 +100,7 @@ func TestRuntimeLoadsPinnedInputsAndReturnsProjectFacetMatrix(t *testing.T) {
 		t.Fatal("configured metadata became serving readiness")
 	}
 	result := executeFixture(t, r, q)
-	if result.Mode != "comparison" || len(result.Groups) != 2 || result.State != "partial" || result.UsedBodyBytes == 0 || result.UsedCitations != 10 || len(result.Candidates) == 0 {
+	if result.Mode != "comparison" || len(result.Groups) != 2 || result.State != "partial" || result.UsedBodyBytes == 0 || result.UsedCitations != 20 || len(result.Candidates) == 0 {
 		t.Fatalf("incomplete matrix %+v", result)
 	}
 	for i, group := range result.Groups {
