@@ -1,8 +1,8 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-16 현재 KM-01–04를 완료했다. 전체28개 중19개 완료·3개 진행 중(OE-01.1–3)·6개 미착수다. 다음은 KM-05.4 지원/적용 범위 검증이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
+2026-10-16 현재 KM-01–05를 완료했다. 전체28개 중20개 완료·3개 진행 중(OE-01.1–3)·5개 미착수다. 다음은 KM-06.1 공개 비교 요청 계약이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
 
-표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는4/7이다.
+표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는5/7이다.
 
 ## 전체28개 세부 작업과 시험 단계
 
@@ -27,7 +27,7 @@
 | KM-05.1 | 산업 개념·정의·별칭·비교 축 | 완료 | 선택형 팩8개념/26축·한영/모호성·버전 pin29사례·새 전체Go/race7패키지 검증 |
 | KM-05.2 | 공통 개념과 프로젝트별 코드/정책/시험 연결 | 완료 | 비교59개(어휘29+연결30)·실제 보관 원문3프로젝트/5종류·committed/working-tree·전체Go/race7 검증 |
 | KM-05.3 | exact/close/broader 등의 검토·버전 의미 | 완료 | 정책34개·비교93개·정족수/회수/상충/미래·source/pack 변경 stale·과거 버전·키 별칭 거부 |
-| KM-05.4 | 비적용/미수집/미지원·L1/L2·network 차이 | 미착수 | 미실행 |
+| KM-05.4 | 비적용/미수집/미지원·L1/L2·network 차이 | 완료 | 적용/지원24개·비교117개·Rust text/AST·L1/L2·정책 차이/내부상충·선언/미결정·schema1/2·손상 |
 | KM-06.1 | 명시 버전·개념·축·시점·상한의 비교 요청 | 미착수 | 미실행 |
 | KM-06.2 | 프로젝트별 근거 행렬/bundle | 미착수 | 미실행 |
 | KM-06.3 | 상충·누락·자료 부족·부분 실패 상태 | 미착수 | 미실행 |
@@ -610,3 +610,24 @@ KM-05.2 완료: 명시 common concept/version/digest와 프로젝트·버전·ne
 KM-05.3 완료: exact/close/broader/narrower/related를 local→shared 직접 관계로 고정하고 entity 동일시/자동 전이를 금지했다. 정확 source/해석/팩 pin의 검토 기록, 중복 검토자 정족수·최신 판정·회수·충돌·미래 시각·stale와 과거 버전 보존을 구현했다. 공개용 reader는 보관 원문을 재확인하며 승인 기록으로 손상을 우회하지 않는다. 검토자 label은 인증된 신원이 아니고 실제 사람 승인은 생성하지 않았다. 입력 필드의 대소문자/유니코드 별칭 덮기도 재현·거부했다.
 
 전체19/28·기능4/7이다. 다음은 KM-05.4의 비적용/미수집/미지원·역할/산업/network/config 차이 검증이다. 남은9개는 KM-05.4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+## KM-05.4 적용·지원 범위 시험 목록
+
+기존93개에 아래24개를 더한 비교 패키지117개다. source archive/fixture identity 기반이며 실제 graph/vector 색인 또는 산업 사실의 독립 정답 수가 아니다. 최종 전체 회귀 이후 완료로 확정한다.
+
+| 상위 시험 | 하위 포함 실행 수 | 경계 |
+|---|---|---|
+| TestCoverageSeparatesCollectionUnknownCapabilityAndScope | 13 | 12개 미수집/미검토/동일·유사 후보/누락 축/network/config/산업/역할/capability |
+| TestApplicabilityDeclarationRequiresVersionedSourceAndReview | 1 | 출처 있는 비적용·schema2·기본 미검토 숨김·명시 후보/기록 승인·상태 변경 digest·code-only 거부 |
+| TestCoverageWithinProjectConflictDoesNotFlattenProjectDifferences | 1 | 같은 project/scope의 반대 선언과 다른 프로젝트의 정책 차이 분리 |
+| TestRustTextAndL2OrderingRemainDistinctFromUnsupportedASTOrConsensus | 1 | Rust 보관 원문 가능·AST 미지원·L2 ordering/L1 consensus 분리 |
+| TestSchema1DigestAndCrossScopeRejectionsStayStable | 1 | schema1 digest byte 호환·foreign target/없는 facet 거부 |
+| TestCoverageDiscardsEvidenceWhenRetainedArchiveBecomesUnavailable | 1 | 보관 손상 시 원문/정상 상태 반환 금지 |
+| TestDeclaredUnknownAndRejectedReviewsNeverBecomeFeatureAbsence | 6 | 5개 미결정·기록 검토·거부/철회/상충은 기능 부재가 아님 |
+
+
+## KM-05.4 완료 기록
+
+KM-05.4 완료: exact/similar 후보·incomparable·not_collected·unknown·unsupported·not_applicable·conflict·unavailable을 분리했다. 다른 산업/역할·L1 consensus/L2 sequencing·network/config를 구분하고, Rust 원문 읽기와 Rust AST 미지원을 혼동하지 않는다. 비적용/미결정 선언은 source/조건/검토와 함께 처리하며 검색 무응답·거부/회수를 기능 부재로 바꾸지 않는다. schema2 선언을 digest에 포함하고 기존 schema1 식별값은 유지했다. 상충은 같은 프로젝트/조건 안에서만 판단하며 보관 손상은 결과를 폐기한다.
+
+전체20/28·기능5/7 완료다. 다음은 KM-06.1 비교 요청·MCP 계약 설계다. 남은8개는 KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

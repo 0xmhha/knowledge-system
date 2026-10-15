@@ -1,6 +1,6 @@
 # 산업 개념과 프로젝트별 비교 근거
 
-현재 KM-05.1의 선택형 공통 어휘와 KM-05.2의 프로젝트별 원문 연결을 구현했다. 직접 매핑의 검토/회수·버전/stale 정책도 구현했다. 지원/적용 범위·비교 MCP·실제 다중 프로젝트 품질은 다음 단계에서 검증한다. [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+현재 KM-05.1–4의 공통 어휘·프로젝트 원문 연결·직접 매핑 검토/회수·버전/stale·지원/적용 범위를 구현했다. 비교 MCP·실제 다중 프로젝트 품질은 다음 단계에서 검증한다. [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 목적과 기존 계층
 
@@ -100,3 +100,24 @@ withdrawn은 그 검토자 ID의 앞선 투표만 회수한다. 다른 검토자
 KM-05.3 완료: exact/close/broader/narrower/related를 local→shared 직접 관계로 고정하고 entity 동일시/자동 전이를 금지했다. 정확 source/해석/팩 pin의 검토 기록, 중복 검토자 정족수·최신 판정·회수·충돌·미래 시각·stale와 과거 버전 보존을 구현했다. 공개용 reader는 보관 원문을 재확인하며 승인 기록으로 손상을 우회하지 않는다. 검토자 label은 인증된 신원이 아니고 실제 사람 승인은 생성하지 않았다. 입력 필드의 대소문자/유니코드 별칭 덮기도 재현·거부했다.
 
 비교 패키지93개(어휘29+연결30+검토34), 전체 Go3955(3937통과18skip)·race929(927통과2skip)·빌드/fmt/vet/lint·문서133개를 검증했다. 초기 필드 alias 덮기 실패 원자료를 보존하며 source payload의 UTF-8을 제한하지 않는다. [동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-05-mapping-review/manifest.json)를 따른다. 전체19/28·기능4/7이다. 다음은 KM-05.4의 비적용/미수집/미지원·역할/산업/network/config 차이 검증이다. 남은9개는 KM-05.4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+## KM-05.4 적용·지원 범위 실행 계획
+
+프로젝트마다 명시한 industry·project/version·network/config/component role/관찰 시점의 scope를 사용한다. 비교 대상은 이 scope와 공통 concept key/축을 고정한다. network 이름이 서로 다르다는 이유로 다른 체인의 자료를 한 scope로 합치지 않고, 비교 조건을 각각 표시한다. 선택 산업/역할이 개념 정의 밖이면 incomparable이며 모든 체인에 staking이나 동일한 consensus가 있다고 가정하지 않는다. L2 sequencing을 L1 consensus로 자동 동일시하지 않는다.
+
+상태는 exact/similar 매핑 후보, incomparable, not_collected, unknown, unsupported, not_applicable, conflict, unavailable을 구분한다. not_collected는 **해당 비교용 매핑 모음에 지정 scope/개념/축의 자료가 없음**이며 프로젝트 전체가 미수집되었거나 기능이 없다는 뜻이 아니다. facet 자료가 없거나 검토가 안 된 연결은 unknown으로 남긴다. unsupported는 **이 비교 reader의 분석 capability**이며 프로젝트가 그 기능을 지원하지 않는다는 판정이 아니다. 최초 reader의 지원 capability는 retained-source이며 Rust AST·실행 성능 측정 등을 제공한다고 주장하지 않는다.
+
+명시적 not_applicable은 보관된 문서/정책/설정의 출처와 정확 조건을 가진 선언으로만 받는다. 이를 표현하는 optional applicability 필드는 새 BindingDocument schema2에서만 허용하고 기존 schema1 입력/빈 필드 digest를 보존한다. 값은 applicable/unknown/not_applicable이며 BindingDigest와 검토 target에 포함한다. 상태만 바꿔 과거 승인을 재사용하지 않는다. 선언은 근거가 연결된 facet 범위에만 적용하며 코드 검색 무응답에서 기능 부재를 만들지 않는다. 원문/조건 해석의 검토는 기존 기록 계약을 사용하고 실제 사람 승인을 생성하지 않는다.
+
+기본 경로는 현재 유효한 recorded review만 적용하고, 명시 include_proposed에서만 미검토 후보를 근거/경고와 함께 제공한다. rejected/withdrawn/disputed를 승인된 매핑으로 사용하지 않는다. 같은 프로젝트·조건의 상반 적용 선언은 conflict로 남긴다. 서로 다른 프로젝트의 정책 차이는 각각의 결과이며 한 프로젝트 내부 conflict로 만들지 않는다. 필요한 source가 손상/누락되면 unavailable이며 정상 근거로 바꿔치기하지 않는다.
+
+검증 범위는 같은/다른 이름, 기능 미결정/비적용과 출처 누락 거부, 산업/역할·L1/L2·여러 network/config, 미지원 AST와 가능한 원문 읽기, 누락 facet/검토·상충·예산/손상 경계를 포함한다. 실제 프로젝트 비교 MCP는 KM-06, 효과/오매핑 평가는 OE-01에 남긴다.
+
+
+## KM-05.4 완료 기록
+
+KM-05.4 완료: exact/similar 후보·incomparable·not_collected·unknown·unsupported·not_applicable·conflict·unavailable을 분리했다. 다른 산업/역할·L1 consensus/L2 sequencing·network/config를 구분하고, Rust 원문 읽기와 Rust AST 미지원을 혼동하지 않는다. 비적용/미결정 선언은 source/조건/검토와 함께 처리하며 검색 무응답·거부/회수를 기능 부재로 바꾸지 않는다. schema2 선언을 digest에 포함하고 기존 schema1 식별값은 유지했다. 상충은 같은 프로젝트/조건 안에서만 판단하며 보관 손상은 결과를 폐기한다.
+
+비교117개(어휘29+연결30+검토34+적용/지원24), 전체 Go3979(3961통과18skip)·race953(951통과2skip)·빌드/fmt/vet/lint·문서133개를 검증했다. 실제 retained source와 fixture identity manifest의 library 범위이며 실제 graph/vector 색인·공개 비교 MCP·산업 사실의 독립 수용은 아니다. [동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-05-applicability/manifest.json)를 따른다. 전체20/28·기능5/7 완료다. 다음은 KM-06.1 비교 요청·MCP 계약 설계다. 남은8개는 KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+정의의 positive 역할 밖이어도 해당 facet의 명시적 비적용 선언은 근거와 함께 검토할 수 있다. 이것은 그 역할의 긍정 구현을 비교 가능하다고 만드는 예외가 아니다. schema2의 빈 연결 모음은 not_collected를 표현하며 schema1의 기존 엄격 계약은 유지한다.

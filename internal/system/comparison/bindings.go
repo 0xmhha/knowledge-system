@@ -38,14 +38,15 @@ type BindingEvidence struct {
 // ProjectBinding is a proposed interpretation with exact source anchors.
 // Source integrity does not approve the proposed mapping semantics.
 type ProjectBinding struct {
-	ID           string                 `json:"id"`
-	Concept      ConceptKey             `json:"concept"`
-	Coordinates  contract.V2Coordinates `json:"coordinates"`
-	Conditions   Conditions             `json:"conditions"`
-	LocalConcept string                 `json:"local_concept"`
-	Mapping      string                 `json:"mapping"`
-	Reason       string                 `json:"reason"`
-	Evidence     []BindingEvidence      `json:"evidence"`
+	Applicability string                 `json:"applicability,omitempty"`
+	ID            string                 `json:"id"`
+	Concept       ConceptKey             `json:"concept"`
+	Coordinates   contract.V2Coordinates `json:"coordinates"`
+	Conditions    Conditions             `json:"conditions"`
+	LocalConcept  string                 `json:"local_concept"`
+	Mapping       string                 `json:"mapping"`
+	Reason        string                 `json:"reason"`
+	Evidence      []BindingEvidence      `json:"evidence"`
 }
 
 type BindingDocument struct {
@@ -59,6 +60,7 @@ type ObservedBindingEvidence struct {
 }
 
 type ObservedBinding struct {
+	Applicability string                    `json:"applicability,omitempty"`
 	BindingID     string                    `json:"binding_id"`
 	BindingDigest string                    `json:"binding_digest"`
 	Concept       ConceptKey                `json:"concept"`
@@ -102,6 +104,11 @@ func (s *Scheme) validateBinding(b ProjectBinding) error {
 	default:
 		return ErrBindingInvalid
 	}
+	switch b.Applicability {
+	case "", "applicable", "unknown", "not_applicable":
+	default:
+		return ErrBindingInvalid
+	}
 	allowed := map[string]bool{}
 	for _, f := range selected.View.Facets {
 		allowed[f.ID] = true
@@ -135,6 +142,15 @@ func (s *Scheme) validateBinding(b ProjectBinding) error {
 		}
 		ids[e.ID], refs[c.KeyV2()] = true, true
 	}
+	if b.Applicability == "not_applicable" {
+		declared := false
+		for _, e := range b.Evidence {
+			declared = declared || e.Kind == "document" || e.Kind == "policy" || e.Kind == "configuration"
+		}
+		if !declared {
+			return ErrBindingInvalid
+		}
+	}
 	return nil
 }
 func annotation(s string) bool { return strings.TrimSpace(s) != "" && len(s) <= 4096 }
@@ -149,7 +165,7 @@ func hash64(s string) bool {
 
 func (s *Scheme) DecodeBindings(data []byte) (BindingDocument, error) {
 	var d BindingDocument
-	if strictJSON(data, &d) != nil || d.SchemaVersion != 1 || len(d.Bindings) == 0 || len(d.Bindings) > 128 {
+	if strictJSON(data, &d) != nil || (d.SchemaVersion != 1 && d.SchemaVersion != 2) || d.SchemaVersion == 1 && len(d.Bindings) == 0 || len(d.Bindings) > 128 {
 		return BindingDocument{}, ErrBindingInvalid
 	}
 	type scopedID struct {
@@ -160,7 +176,7 @@ func (s *Scheme) DecodeBindings(data []byte) (BindingDocument, error) {
 	}
 	seen := map[scopedID]bool{}
 	for _, b := range d.Bindings {
-		if s.validateBinding(b) != nil {
+		if s.validateBinding(b) != nil || d.SchemaVersion == 1 && b.Applicability != "" {
 			return BindingDocument{}, ErrBindingInvalid
 		}
 		scope := b.Conditions
@@ -270,7 +286,7 @@ func (r *MappingReader) ReadBinding(ctx context.Context, collectionID string, b 
 		}
 		*p = value
 	}
-	observed := ObservedBinding{BindingID: b.ID, BindingDigest: digest, Concept: b.Concept, Coordinates: b.Coordinates, Conditions: conditions, LocalConcept: local, Mapping: b.Mapping, Reason: reason, ReviewState: "proposed", Verification: "archived_source_hash_and_span_only", Evidence: []ObservedBindingEvidence{}, Warnings: []string{"mapping_semantics_not_reviewed", "evidence_kind_is_declared_not_inferred", "test_source_is_not_test_execution"}}
+	observed := ObservedBinding{Applicability: b.Applicability, BindingID: b.ID, BindingDigest: digest, Concept: b.Concept, Coordinates: b.Coordinates, Conditions: conditions, LocalConcept: local, Mapping: b.Mapping, Reason: reason, ReviewState: "proposed", Verification: "archived_source_hash_and_span_only", Evidence: []ObservedBindingEvidence{}, Warnings: []string{"mapping_semantics_not_reviewed", "evidence_kind_is_declared_not_inferred", "test_source_is_not_test_execution"}}
 	for _, e := range b.Evidence {
 		e.Facets = append([]string(nil), e.Facets...)
 		observed.Evidence = append(observed.Evidence, ObservedBindingEvidence{Reference: e, Body: body[e.Citation]})
