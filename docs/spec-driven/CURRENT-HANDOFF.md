@@ -33,3 +33,8 @@ KM-06.3 완료: 모든 참여자를 읽은 뒤 응답 직전에 각 archive를 �
 [OE-01 단일 프로젝트 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은384회 실패/누락0·인용3,616개 원문 일치, 활성288회 no_match·순위 차이0이었다. 별도 정확 용어8회도 최종 boost0이다. 기본 off·quality=inconclusive를 유지한다. KM-04.4에서 단독 합성 대문자 식별자 질의가 비고 같은 자료가 자연어 질의에 나타난 사례도 OE-01 질의 해석/회수율 후보로 보존했다. 새 기능 구현이나 계획 승인을 독립 정답·품질 승인으로 바꾸지 않는다.
 
 이전 단계의 상세 기록은 각 명세의 checkpoint 절과 서명 커밋·동결 증거 packet에 남긴다. 현재 상태는 이 문서 첫 표와 전용 원장을 우선한다.
+
+
+## 진행 중인 실제 프로젝트 실행
+
+KM-06.4는 go-stablenet0bf2f4d1/go-wemix1350376a의 소유 복제본에서 committed source·native graph/vector를 구축 중이다. 준비 스크립트는 scripts/prepare-real-comparison.py이고 런타임 경로는 /private/tmp/ks-KM064-real-native-second-20261016, 로그는 /private/tmp/ks-KM064-real-build-second.txt다. 최초 manager 수집 상한 실패와 native API 경로를 [준비 기록](../../system/eval/knowledge-roadmap-2026-10-16/km-06-real-preparation/preparation.json)에 보존했다. 구축 summary/fixtures가 실제 성공한 뒤 scripts/verify-real-project-comparison.py로6개 개념/정책·원문/인용·누락/부분 실패/범위/예산을 검증한다. binary가 결속되어 있으므로 실행 중 bin을 재빌드하지 않는다. 미검증 스크립트를 구현 완료나 독립 품질 수용으로 세지 않는다.

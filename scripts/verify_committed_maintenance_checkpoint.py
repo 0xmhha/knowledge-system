@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'comparison-failures': {
+        'revision': 'dd554e79', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-06-failures',
+        'scope': 'historical_KM06_3_actual_owned_partial_failure_budget_signal_not_real_projects',
+        'scripts': ['check-comparison-failure-evidence.py', 'test_comparison_failure_evidence.py'],
+    },
     'comparison-runtime': {
         'revision': '5f721674', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-06-runtime',
         'scope': 'historical_KM06_2_actual_owned_fixture_source_MCP_not_real_project_quality',

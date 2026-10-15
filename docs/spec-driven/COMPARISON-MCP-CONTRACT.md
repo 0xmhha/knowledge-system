@@ -68,3 +68,10 @@ KM-06.3 완료: 모든 참여자를 읽은 뒤 응답 직전에 각 archive를 �
 비교192개(기존171+보호21,47개 상위), 전체 Go4054(4036통과18skip)·race1028(1026통과2skip,7패키지)·빌드/fmt/vet/lint·문서134개를 검증했다. 실제 mock2DB·기반12+보호9항목·18도구호출·4세션(EOF3개와 입력이 열린 SIGTERM1개 모두 exit0)이다. 원문 손상 후 정확히 복구했고 DB/manifest/profile/catalog/binding 전체 hash를 보존했다. 실제 체인 비교·의미 품질/독립 수용은 아니다.
 
 [동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-06-failures/manifest.json)를 따른다. body 예산은 출력 cell source 본문 byte 합계이고 citation 예산은 cell와 후보 proof의 모든 인용 객체 합계다. 응답 전체8MiB 상한을 넘으면 오류로 거부한다. 제외된 후보가 없는 complete도 전체 프로젝트 근거 완전성이나 source 품질을 뜻하지 않는다. 전체23/28·기능5/7이다. 다음은 KM-06.4 둘 이상 실제 프로젝트의 고정 DB·staking/정책·consensus/finality·mempool/ordering 비교 검증이다. 남은5개는 KM-06.4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-06.4 실제 프로젝트 검증 진행 중
+
+go-stablenet의0bf2f4d1과 go-wemix의1350376a를 별도 소유 복제본으로 고정해 기존 버전 DB API로 committed source·graph/vector DB를 구축 중이다. mock embedding은 source/transport 검증용이며 의미 품질 시험으로 세지 않는다. 원본 저장소는 수정하지 않는다. 매니저 초안 수집의 기본2MiB 상한에 걸린 초기 시도와 검증기 import 오류도 [준비 기록](../../system/eval/knowledge-roadmap-2026-10-16/km-06-real-preparation/preparation.json)에 보존한다. 기존 native 원문 캡처의32MiB 경로를 사용하며 비교·수용 성공을 미리 기록하지 않는다.
+
+6개 질의는 staking·staking-policy·consensus·finality·mempool-admission·transaction-ordering이다. 소스에서 선택한 WBFT/Clique 구현의 미검토 후보이며 실제 네트워크·정책·finality나 staking의 존재를 추정하지 않는다. 근거/인용 분리·누락 축·오매핑·부분 실패·예산/접근 범위·원본/DB 보존 검증을 마칠 때까지 KM-06.4는 진행 중이고 전체23/28·기능5/7을 유지한다.
