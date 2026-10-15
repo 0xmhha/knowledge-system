@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "user_authorized_source_pinned_evaluation_overlay_adoption",
+  "recorded_at": "2026-10-15T14:14:38.205547+00:00",
+  "decision": "approved",
+  "reviewer_name": null,
+  "actor": "user_in_current_conversation",
+  "response_source": {
+    "kind": "human_response",
+    "question_item_id": [
+      "request_user_input_async",
+      "call_f1bc43d5c0cc41c4b1a92cce91d200e3",
+      0
+    ],
+    "answer": "새 평가용 overlay로 채택 (권고)"
+  },
+  "scope": "existing_separate_source_pinned_local_evaluation_profile_selection_only",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "policy": {
+    "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+    "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a"
+  },
+  "profile": {
+    "path": "projects/stablenet/evaluation/policy-0bf2f4d1.profile.json",
+    "sha256": "01217ef79a47efae75c0183c99f0f90536357e0e29b0e30125034fac312b4201"
+  },
+  "baseline_policy": {
+    "path": "projects/stablenet/policies/graph.yaml",
+    "sha256": "40c38baa8e1761a9f75c92f1ef8d8262f5148e6840c60dbb98a6710096a3ddbb",
+    "modified": false
+  },
+  "existing_local_verification": {
+    "manifest": "system/eval/operational-preparation-2026-10-15/adopted-policy/manifest.json",
+    "sha256": "a3277936dfc84a865fedb8bfa5799a9f5c36022d6690f66209b005adeac4a37b",
+    "recheck_exit_code": 0,
+    "recheck_stdout_sha256": "5fac702c1958c1c7c30beaaad46b52fd4b91d80d195c12133c4298f0ec147481"
+  },
+  "corrections": [
+    {
+      "policy_id": "A10.codegen.contract_regen_procedure",
+      "old": "compiler.Compile",
+      "new": "compile.Compile"
+    },
+    {
+      "policy_id": "A10.codegen.contract_regen_procedure",
+      "old": "compiler.compiledTy.ExportContractCode",
+      "new": "compile.compiledTy.ExportContractCode"
+    },
+    {
+      "policy_id": "A10.codegen.contract_regen_procedure",
+      "old": "compiler.solcVersion",
+      "new": "compile.solcVersion"
+    },
+    {
+      "policy_id": "A11.txpool.type_taxonomy_admission",
+      "old": "types.ErrInvalidFeePayer",
+      "new": "txpool.ErrInvalidFeePayer"
+    },
+    {
+      "policy_id": "A13.sealing.reorg_serialization",
+      "old": "legacypool.queueTxEvent",
+      "new": "legacypool.LegacyPool.queueTxEvent"
+    },
+    {
+      "policy_id": "A3.validator_set.epoch_transition",
+      "old": "engine.Engine.GetValidators",
+      "new": "wbftengine.Engine.GetValidators"
+    },
+    {
+      "policy_id": "A4.system_contracts.build_deploy_pipeline",
+      "old": "compiler.solcVersion",
+      "new": "compile.solcVersion"
+    }
+  ],
+  "production_activated": false,
+  "independent_gold_or_quality_acceptance": "not_granted_by_this_response",
+  "original_YAML_reviewer_or_approval_fields_modified": false,
+  "generator_regeneration_fix_complete": false,
+  "original_approved_input_snapshots_modified": false
+}

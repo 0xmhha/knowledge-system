@@ -1,5 +1,7 @@
 # 고정 소스용 정책 수정 적용·조회 검증
 
+2026-10-15 사용자 응답 “새 평가용 overlay로 채택 (권고)”에 따라 아래7건 수정이 적용된 기존 별도 평가 profile의 선택을 승인 기록으로 확정했다. [승인 영수증](../../system/eval/operational-preparation-2026-10-15/adopted-policy-user-approval/receipt.json)에 질문 ID·정확한 응답·source/policy/profile hash와7개 참조를 보존했다. 기존 평가 근거를 다시 검사해 통과했으며 원본 YAML의 reviewer/approval, 운영 current, 독립 gold/품질 수용은 변경하지 않았다. 생성기 재생성 보완은 별도 잔여다.
+
 2026-10-15. [정책 참조 진단](./POLICY-REFERENCE-DIAGNOSIS.md)의 수정7건을 [별도 평가 정책](../../projects/stablenet/evaluation/policy-0bf2f4d1.yaml)과 [profile](../../projects/stablenet/evaluation/policy-0bf2f4d1.profile.json)로 채택했다. 실제 CKG build→SQLite 저장→공개 CKS stdio 도구까지 검증했다. 원래 정책·domain entry·과거 source-bound packet·운영 current는 변경하지 않았다. 새 평가 profile의 로컬 적용 완료이며 전체 정책 의미의 독립 수용·온톨로지 효과·자동 재생성 수정은 완료가 아니다.
 
 ## 실행 범위와 결과
@@ -37,8 +39,8 @@ CKV는 mock이며 이 도구는 graph annotation 경로만 사용했다. 임베�
 - 미완료: 원래 domain sync의 일반적인 source-aware 재생성 수정, 정식 독립 의미 수용, ontology 효과 측정.
 - 다음: 아래 OE-01 자료를 사용해 보관 원문의 ontology 적합성과 별도 semantic DB 후보를 준비한다. 기존 DB에 의미 데이터를 사후 삽입하거나 current를 바꾸지 않는다.
 
-## OE-01 개발 입력 준비
+## 초기 OE-01 개발 입력 준비 기록
 
 [질문12개](./operational-preparation/ontology-effect-dev/requests.json)는 WBFT4개 family 제안의 검색 질문8개와 unknown/다른 프로젝트/성능/버전 제어 질문4개다. [비공개 검토 초안](./operational-preparation/ontology-effect-dev/private-review.json)은 정답을 아직 작성하지 않았고 기존 WBFT pilot과 의미 중복을 미검토로 기록했다. 새 독립 FINAL이나12개 독립 표본이 아니다. [실행 초안](./operational-preparation/ontology-effect-dev/execution-draft.json)은 동일 corpus에서 off/concept_text/relations/combined를 비교하도록 한다. 반복·채점 근거·기준을 고정하기 전에는 효과를 채점하지 않는다.
 
-기존 retained corpus dataset474440d4의 project/source pin은 승인된 ontology4개 정의와 일치한다. 그러나 이 버전에는 semantic DB가 없다. 승인 정의의 retained-source 포함 여부·정합과 코드 관계 상태를 확인한 뒤 소유한 별도 경로에서 semantic 후보를 만들어야 한다. 승인된 정의가 있다는 사실만으로 구현 관계나 품질 개선을 만들어 넣지 않는다. 현재 OE-01은 입력 준비 중이며 효과 미실행, 새7개 작업 완료는0/7이다.
+기존 retained corpus dataset474440d4의 project/source pin은 승인된 ontology4개 정의와 일치한다. 그러나 이 버전에는 semantic DB가 없다. 승인 정의의 retained-source 포함 여부·정합과 코드 관계 상태를 확인한 뒤 소유한 별도 경로에서 semantic 후보를 만들어야 한다. 승인된 정의가 있다는 사실만으로 구현 관계나 품질 개선을 만들어 넣지 않는다. 이 문단은 초기 준비 시점의 기록이다. 이후 로컬384회·별도 진단8회의 관찰은 [OE-01 관찰 기록](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)에 있고 품질은 inconclusive다. 최신 전체 진행은 [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
