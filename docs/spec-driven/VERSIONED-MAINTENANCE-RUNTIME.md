@@ -83,3 +83,21 @@ A의 [중간 검증 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02
 Go 시험은 maintenance package123개와 관련5패키지714사례(712통과·2skip)를 포함한다. 고의 graph 실패를 기존 실제 orchestration에서 실행하고, 실패 결과의 재시작 재조회·source/profile 변경 뒤 replay·취소 응답 전 기록·접수 rename 전/후 오류 시 미실행·단독 소유·불확실한 상태 응답 거부를 확인했다. 이 고의 실패 fixture는 실제 성공 DB/모델 품질 검증을 대신하지 않는다. 전체 Go는3,745사례=3,726통과+19skip이며 build/fmt/lint와 기존 공개 MCP28항목/정상 EOF5개도 통과했다.
 
 [비공개 B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-service/manifest.json)을 `check-maintenance-durable-service-evidence.py`와 `test_maintenance_durable_service_evidence.py`로 검증한다. 과거 A는 `verify_committed_maintenance_checkpoint.py --checkpoint journal-foundation`으로fff83134 snapshot에서 별도로 검사한다.
+
+
+### C 중간 검증 완료: publication 이력과 취소 의도
+
+관리 root의 모든 정상 pointer writer는 같은 lock 아래에서 이전 pending intent를 먼저 정리한다. 새 전환은 원래 base/전체 identity·target/전체 identity·operation ID와 시작 시각을 기록하고, current의 durable 교체 뒤 immutable committed history를 남긴다. 다음 일반 전환·reviewed 전환·rollback도 이 경로를 사용한다. 이전 history는 이후 current 변경이나 GC와 구분하며 자동 rollback하지 않는다. 관리되지 않은 기존 root에는 이 기록을 강제로 만들지 않는다.
+
+job의 operation ID와 원래 source/input/model/base/후보가 모두 맞는 history만 succeeded receipt로 연결한다. pending 상태에서 현재 값이 예상 base/target 어느 쪽과도 맞지 않거나 metadata가 손상되면 다른 writer도 정합을 추정해서 진행하지 않는다. 강제 종료 전후19개 setup 시험은 실제 pointer 교체·프로세스 kill과 이후 CLI 전환/rollback 후 이력 보존을 확인했다.
+
+비공개 service는 취소 의도를 optional record field로 따로 보존한다. 이전 private A/B의 cancel_requested record도 recovering으로 이행하기 전에 의도를 보존하고, 되돌리거나 성공으로 바꾸지 않는다. 별도 복구 대기는 context 종료에 맞춰 정리하며 저장된 완료 gate·정확한 history가 있을 때만 종료 상태를 기록한다. 성공 history와 accepted cancel이 충돌하면 자동으로 성공 처리하지 않는다. 하위 작업 종료가 아직 확인되지 않은 pre-gate 작업은 D까지 recovering으로 유지한다.
+
+service 결합 시험에는 합성 history가 포함된다. 이는 정확한 join·취소·상태 정책을 분리 검증하며 실제 DB 게시 증거로 세지 않는다. 실제 생산 경로의 pointer/kill 시험과, 기존 실제 CKG/CKV·MCP 회귀를 별도로 검증한다. 공개 durable 연결과 실제 host의 재시작/하위 작업 종료는 D/E 완료 전까지 보류한다. 전체 세부 완료 수는6/28로 유지한다.
+
+
+C의 실제 보관 held DB 검사까지 통과했다. source-bound KM-02.2 fixture의 실제 CKG/CKV SQLite·원문·hold marker를 소유한 임시 경로로 복원해 검증했으며, 새 current를 만들지 않고 held_for_review로 복구했다. 합성 history 시험과 이 실제 보관 DB 검사를 구분한다. 기존 공개 실제 구축 회귀28항목은 새 shared history의 operation ID·identity·base·receipt 시각까지 원시 자료로 대조했다.
+
+최종 C 검증은 maintenance race141개, 관련5패키지751사례(749통과·2skip), 전체 Go3,782사례(3,763통과·19skip), build/fmt/lint·문서 계약, 증거 보호14개다. [C packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-publication-recovery/manifest.json)의 `check-maintenance-publication-evidence.py`·`test_maintenance_publication_evidence.py`는 다른 프로젝트로 재서명한 실제 history와 private/합성/공개 완료의 혼동을 거부한다.
+
+다음 D는 부모 강제 종료 때 실제 하위 명령·descendant와 writer 소유를 다룬다. 부모 생존 pipe와 절대 deadline을 보는 감독 경로, 하위 실행 동안의 기존 mutation lock lease, 안전하게 결속한 staging 정리를 구현·검증한다. 종료가 확인되지 않은 pre-gate 작업은 계속 recovering으로 두며 PID만 보고 다른 프로세스를 종료하지 않는다. D/E의 실제 host 전체 검증 전까지 공개 New는 메모리 모드이고 job_persistence도 process_lifetime이다. C 중간 검증을 KM-02.3 전체 완료로 올리지 않는다.

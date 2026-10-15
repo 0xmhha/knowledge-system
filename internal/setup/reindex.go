@@ -338,6 +338,10 @@ func withPromotionLock(dataset string, action func() (string, error)) (string, e
 // Retain the old pointer lock as an additional upgrade boundary. Reindex
 // already owns the dataset lock when it calls this private function.
 func withPointerLock(dataset string, action func() (string, error)) (string, error) {
+	return withPointerLockContext(context.Background(), dataset, action)
+}
+
+func withPointerLockContext(ctx context.Context, dataset string, action func() (string, error)) (string, error) {
 	fd, err := unix.Open(filepath.Join(dataset, ".promotion.lock"), unix.O_CREAT|unix.O_RDWR|unix.O_NOFOLLOW|unix.O_CLOEXEC, 0o600)
 	if err != nil {
 		return "", fmt.Errorf("promote: open promotion lock: %w", err)
@@ -352,6 +356,9 @@ func withPointerLock(dataset string, action func() (string, error)) (string, err
 	}
 	// Unlock is best-effort: closing fd (deferred above) releases the lock anyway.
 	defer func() { _ = unix.Flock(fd, unix.LOCK_UN) }()
+	if err := reconcileManagedPublicationLocked(ctx, dataset); err != nil {
+		return "", fmt.Errorf("%w: %w", ErrPublicationUnresolved, err)
+	}
 	return action()
 }
 
@@ -424,6 +431,10 @@ func promoteLockedContext(ctx context.Context, dataset, version string, reviewed
 	if err := flushCandidateContext(ctx, vdir); err != nil {
 		return prev, fmt.Errorf("promote: candidate persistence: %w", err)
 	}
+	proof, err := beginManagedPublication(ctx, dataset, version, prev, targetIdentity)
+	if err != nil {
+		return prev, err
+	}
 	// Keep the existing rollback reference until this swap has become durable.
 	if prev != version {
 		if err := recordRollbackTargets(dataset, prev, true); err != nil {
@@ -459,6 +470,11 @@ func promoteLockedContext(ctx context.Context, dataset, version string, reviewed
 			return prev, fmt.Errorf("%w: %v", ErrDurabilityUncertain, err)
 		}
 	}
+	if proof != nil {
+		if _, err := finishManagedPublication(dataset, *proof, "committed"); err != nil {
+			return prev, fmt.Errorf("%w: %w", ErrDurabilityUncertain, err)
+		}
+	}
 	return prev, nil
 }
 
@@ -470,6 +486,9 @@ func Rollback(dataset, version string) error {
 
 // GateOptions parameterizes the pre-promote gate suite.
 type GateOptions struct {
+	// PublicationID binds a scoped job to the durable managed transition.
+	// Empty uses a fresh CLI history ID on managed roots; legacy roots stay unchanged.
+	PublicationID string
 	// Scoped callers recheck mutable request pins while the dataset lock is
 	// held. Nil preserves the existing CLI behavior.
 	BeforeCandidate func(context.Context) error
@@ -858,7 +877,10 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		return nil
 	}
 
-	prev, err := withPointerLock(dataset, func() (string, error) {
+	if gopt.PublicationID != "" {
+		ctx = context.WithValue(ctx, managedPublicationKey{}, gopt.PublicationID)
+	}
+	prev, err := withPointerLockContext(ctx, dataset, func() (string, error) {
 		if gopt.Publish != nil {
 			return gopt.Publish(ctx, func() (string, error) { return promoteLockedContext(ctx, dataset, version, false) })
 		}

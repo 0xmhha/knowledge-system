@@ -22,6 +22,7 @@ type job struct {
 	journal           *journalStore
 	record            *journalRecord
 	persistenceFailed bool
+	recoveryStarted   bool
 }
 
 type Service struct {
@@ -83,6 +84,13 @@ func newService(profiles []Profile, self string, durable bool) (*Service, error)
 			s.Close()
 			return nil, err
 		}
+	}
+	if durable {
+		s.mu.Lock()
+		for _, j := range s.jobs {
+			s.startRecoveryLocked(s.profiles[j.request.ProfileID], j)
+		}
+		s.mu.Unlock()
 	}
 	return s, nil
 }
@@ -301,6 +309,8 @@ func (s *Service) Build(ctx context.Context, request BuildRequest) (JobStatus, e
 		s.mu.Lock()
 		if snapshot(j).Terminal {
 			delete(s.busy, p.out)
+		} else {
+			s.startRecoveryLocked(p, j)
 		}
 		s.mu.Unlock()
 	}()
@@ -346,7 +356,7 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 		j.status.Revision++
 		return j.persistLocked()
 	}
-	gates := setup.GateOptions{GraphBin: value.options.GraphBin, Src: value.options.Src, ExpectedSourceCommit: value.source.SourceCommit,
+	gates := setup.GateOptions{PublicationID: j.requestID(), GraphBin: value.options.GraphBin, Src: value.options.Src, ExpectedSourceCommit: value.source.SourceCommit,
 		ExpectedSourceSnapshot: value.source, ExpectedInputDigest: r.InputDigest, ExpectedDatasetID: value.identity.DatasetID, ExternalOrigins: value.options.ExternalOrigins,
 		HoldForReview: r.Activation == "hold_for_review", BeforeCandidate: func(ctx context.Context) error {
 			if err := validate(ctx, true); err != nil {
@@ -377,13 +387,15 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 		if err != nil {
 			return previous, err
 		}
-		publishedAt := time.Now().UTC().Format(time.RFC3339Nano)
-		body := map[string]any{"base": r.Base, "version": r.NewVersion, "coordinates": j.status.Candidate.Coordinates, "published_at": publishedAt}
-		receipt, err := Digest(body, "cks.dataset-publication.v1")
+		proof, err := setup.ReadManagedPublication(p.out, j.status.JobID)
 		if err != nil {
-			return previous, err
+			return previous, errors.Join(setup.ErrDurabilityUncertain, err)
 		}
-		j.status.Publication = &Publication{Base: r.Base, Version: r.NewVersion, Coordinates: j.status.Candidate.Coordinates, PublishedAt: publishedAt, ReceiptDigest: receipt}
+		publication, err := publicationFromProof(r, j.status.JobID, value.identity.DatasetID, j.status.Candidate, proof)
+		if err != nil {
+			return previous, errors.Join(setup.ErrPublicationUnresolved, err)
+		}
+		j.status.Publication = publication
 		j.status.State, j.status.Phase, j.status.Terminal, j.status.Activated = "succeeded", "finished", true, true
 		j.status.Revision++
 		return previous, j.persistLocked()
@@ -412,7 +424,7 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 	if j.status.Terminal || j.persistenceFailed {
 		return
 	}
-	if errors.Is(err, setup.ErrDurabilityUncertain) {
+	if errors.Is(err, setup.ErrDurabilityUncertain) || errors.Is(err, setup.ErrPublicationUnresolved) {
 		// current may already have changed. Publication reconciliation must
 		// settle this before reporting failure/cancellation or admitting a
 		// replacement writer. C–E will provide the durable proof/recovery.

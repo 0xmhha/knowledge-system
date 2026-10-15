@@ -14,7 +14,7 @@
 | KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 완료 | 실제4DB·최종52항목 통과; 동일 원문 fork·모델 분리·쓰기18건 거부·rollback/GC/재시작 보존 |
 | KM-02.1 | legacy/versioned capability와 새 요청·상태 계약 | 완료 | [계약](./VERSIONED-MAINTENANCE-CONTRACT.md)·schema·101사례 통과; 새 공개 실행은 .2–04 |
 | KM-02.2 | 비동기 build/status/cancel과 정합 gate | 완료 | [공개 실행](./VERSIONED-MAINTENANCE-RUNTIME.md)28항목·실제 retained 조회2건·EOF5개·전체 Go/race·증거 보호10개 통과 |
-| KM-02.3 | idempotency/lock/중단/실패/rollback | 진행 중 | private A/B 기반·service race123개 통과; 공개 영속·publication/하위 실행 복구는 미구현·미검증 |
+| KM-02.3 | idempotency/lock/중단/실패/rollback | 진행 중 | private A–C·shared 전환 이력·race141개 통과; 하위 실행 종료 D·공개 영속 연결 E는 미구현·미검증 |
 | KM-02.4 | 공개 도구의 잘못된 대상·부분 실패·취소 보호 | 미착수 | 미실행 |
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 미착수 | 미실행 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 미착수 | 미실행 |
@@ -306,3 +306,23 @@ A 단계의 [검증 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02
 [실행 명세](./VERSIONED-MAINTENANCE-RUNTIME.md)의 B 범위와 [B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-service/manifest.json)을 따른다. 다음은 취소 의도 결속과 publication 전후 이력 정합(C), 하위 프로세스 소유/중단(D), 실제 공개 복구·read lease/rollback/GC 검증(E)이다. 현재 전체6개 완료·4개 진행 중·18개 미착수다. 이후 KM-02.4 → KM-03 → KM-04 → KM-05 → KM-06 → OE-01 확대/다중 프로젝트 평가를 진행한다. 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다.
 
 B 증거 보호13개도 통과했다. 실제 공개 회귀는81개 도구 호출·전체90개 wire쌍이며 고정28개 항목과 별도로 센다. 현재 소스 결속은1,668입력(유지 Go1,239개·기타429개)이며 기존 승인/완료 상태는 바꾸지 않는다.
+
+
+## KM-02.3 중간 단계 C: shared 전환 이력과 비공개 복구
+
+| 검증 | 결과·한계 |
+|---|---|
+| 실제 pointer/강제 종료/후속 writer | setup19사례 통과; 5개 지점의 실제 프로세스 kill·일반 전환·rollback 후 기존 이력 보존·손상 거부 |
+| 비공개 복구·기존 maintenance | maintenance race141사례 통과; job/source/model/base 결속·취소 의도·여러 재시작·충돌 보류 |
+| 실제 보관 held DB | 기존 source-bound SQLite·원문·hold marker 검사 뒤 held 복구; current 미발행 |
+| 합성 history 정책 시험 | 별도 unit scope; 실제 DB 게시로 집계하지 않음 |
+| 전체 Go | 3,782사례=3,763통과+19skip·실패0 |
+| 관련5패키지 race | 751사례=749통과+2skip·실패0; 위141개와 setup19개 포함 |
+| 공개 기존 동작 회귀 | 28항목·97도구호출·106wire쌍·5개 정상 EOF; shared history와 실제 receipt도 대조 |
+| 증거 보호 | 14개 통과; 외부 project로 재서명한 실제 history·합성 승격·D/E 완료 과장 거부 |
+| build/fmt/vet/lint/경계/문서 | 통과; 문서 계약20개·안내3개·live 문서127개 |
+| 공개 durable·pre-gate child 종료 | D/E 미구현·미검증; KM-02.3 완료 아님 |
+
+[C packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-publication-recovery/manifest.json)에 전체 시험 목록·원시 protocol·실제 pointer history를 보존한다. 현재 소스 결속1,674입력은 유지 Go1,244개·기타430개이며, 실제 held DB 검사에 사용한 기존 immutable fixture도 포함한다. 기존5개 approved input과 승인/완료 상태는 바꾸지 않는다.
+
+현재 전체6개 완료·4개 진행 중·18개 미착수다. 다음은 D의 부모 생존/deadline 감독·하위 writer lease·안전한 staging 정리, 이후 E의 실제 공개 재시작·lease/rollback/GC 검증이다. 그 뒤 KM-02.4 → KM-03.1–4 → KM-04.1–4 → KM-05.1–4 → KM-06.1–4 → OE-01.1–4를 진행한다. 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.

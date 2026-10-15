@@ -24,7 +24,10 @@ type journalRecord struct {
 	ExpectedDatasetID string         `json:"expected_dataset_id"`
 	CreatedAt         string         `json:"created_at"`
 	DeadlineAt        string         `json:"deadline_at"`
-	Status            JobStatus      `json:"status"`
+	// Optional for compatibility with private A/B records. Once set, this
+	// intent survives the public status changing to recovering.
+	CancelRequested bool      `json:"cancel_requested,omitempty"`
+	Status          JobStatus `json:"status"`
 }
 
 type journalEnvelope struct {
@@ -58,6 +61,9 @@ func validateRecord(r journalRecord) error {
 		!hashPattern.MatchString(r.ExpectedDatasetID) || !validJournalProfile(r.Profile) || checkRequest(r.Request, r.Profile, true) != nil ||
 		ValidateStatus(r.Status, r.Request, r.Profile) != nil ||
 		(r.Status.Candidate != nil && r.Status.Candidate.Coordinates.DatasetID != r.ExpectedDatasetID) {
+		return reject("reconcile_required")
+	}
+	if r.CancelRequested && slices.Contains([]string{"queued", "running", "succeeded", "held_for_review"}, r.Status.State) {
 		return reject("reconcile_required")
 	}
 	return nil
@@ -256,6 +262,10 @@ func (s *journalStore) save(value journalRecord) error {
 		return reject("idempotency_conflict")
 	}
 	if old, exists := s.records[id]; exists {
+		if (old.CancelRequested && !value.CancelRequested) ||
+			(!old.CancelRequested && value.CancelRequested && old.Status.State != "cancel_requested" && value.Status.State != "cancel_requested") {
+			return reject("reconcile_required")
+		}
 		if !equalJSON(old.Request, value.Request) || !equalJSON(old.Profile, value.Profile) || old.ExpectedDatasetID != value.ExpectedDatasetID ||
 			old.CreatedAt != value.CreatedAt || old.DeadlineAt != value.DeadlineAt || validateJournalUpdate(old.Status, value.Status) != nil {
 			return reject("reconcile_required")

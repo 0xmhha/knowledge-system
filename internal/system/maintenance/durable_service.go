@@ -24,6 +24,9 @@ func (j *job) persistLocked() error {
 	}
 	next := cloneRecord(*j.record)
 	next.Status = cloneStatus(j.status)
+	if j.status.State == "cancel_requested" {
+		next.CancelRequested = true
+	}
 	if err := j.journal.save(next); err != nil {
 		j.status = cloneStatus(j.record.Status)
 		if !j.status.Terminal {
@@ -75,8 +78,14 @@ func (s *Service) loadJournals() error {
 				return reject("reconcile_required")
 			}
 			r := cloneRecord(row)
+			if r.Status.State == "cancel_requested" {
+				r.CancelRequested = true
+			}
 			j := &job{request: r.Request, status: cloneStatus(r.Status), cancel: func() {}, journal: store, record: &r}
 			if !j.status.Terminal {
+				if s.busy[p.out] {
+					return reject("reconcile_required")
+				}
 				if j.status.State != "recovering" {
 					j.status.State, j.status.Phase = "recovering", "reconcile"
 					j.status.Revision++

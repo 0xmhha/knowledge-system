@@ -19,7 +19,13 @@ BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
     'journal-foundation': {
         'revision': 'fff83134', 'folder': 'km-02-journal-foundation',
+        'scope': 'historical_KM02_3_A_private_foundation_and_process_compatibility_only',
         'scripts': ['check-maintenance-journal-foundation.py', 'test_maintenance_journal_foundation.py'],
+    },
+    'private-service': {
+        'revision': '29169b2b', 'folder': 'km-02-durable-service',
+        'scope': 'historical_KM02_3_B_private_service_and_process_compatibility_only',
+        'scripts': ['check-maintenance-durable-service-evidence.py', 'test_maintenance_durable_service_evidence.py'],
     },
 }
 
@@ -61,7 +67,7 @@ def verify(checkpoint='journal-foundation', root=ROOT):
                              'stdout_sha256': hashlib.sha256(result.stdout).hexdigest(), 'stderr': result.stderr.decode().strip()})
             if result.returncode:
                 raise ValueError('historical checkpoint proof failed: ' + result.stdout.decode() + result.stderr.decode())
-    return {'scope': 'historical_KM02_3_A_private_foundation_and_process_compatibility_only', 'revision': revision,
+    return {'scope': selected['scope'], 'revision': revision,
             'manifest_sha256': hashlib.sha256(read(folder + '/manifest.json')).hexdigest(),
             'verification_exit_code': 0, 'checks': receipts, 'current_Go_validation_reused': False}
 
