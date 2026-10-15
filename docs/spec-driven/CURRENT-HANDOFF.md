@@ -1,9 +1,11 @@
 # 현재 인수인계
 
-최신 진행: [정책 overlay 적용 검증](./POLICY-OVERLAY-ADOPTION.md)에서 별도 source0bf2f4d1 profile로 실제 graph125,089node/176,822edge·정책42/연결146·CKS24도구호출을 확인했다. 수정7건의 source/canonical parity와 음성3개를 통과했고 기존 원본/운영 current는 보존했다. 일반 domain sync는 여전히 기존 정책을 재생성하므로 생성기 수정은 미완료다. [OE-01 단일 프로젝트 개발 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은 source baca2869의 별도 복제본에서384회 실패/누락0·인용3,616개 검증을 마쳤다. 활성288회 no_match·순위 차이0, 정확 용어의 별도 진단8회는 매칭/정의 검색 동작·최종 boost0이다. 기본 off·품질 inconclusive·새 기능 완료0/7·기존 독립 수용0/9를 유지한다. 다음은 KM-01 scope/key 조사와 collection 격리 계약이다.
+최신 단계: [KM-01 공통 격리 계층](./PROJECT-COLLECTION-ISOLATION.md)의 catalog·구현/비교 reader를 추가했다. 동일 commit fork, 두 버전, warm 오응답, 재시작, 원문 손상, GC/rollback 호환의17개 시험/하위40사례가 race 모드에서 통과했다. KM-01.1/02 완료, .3/04와 전체 KM-01은 진행 중이다. 공개 CLI/MCP·실제 graph/vector/쓰기 연결을 완료로 세지 않는다. 다음은 실제 backend·공개 조회 adapter 연결이다. [전체 작업·시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 함께 갱신한다.
+
+최신 진행: [정책 overlay 적용 검증](./POLICY-OVERLAY-ADOPTION.md)에서 별도 source0bf2f4d1 profile로 실제 graph125,089node/176,822edge·정책42/연결146·CKS24도구호출을 확인했다. 수정7건의 source/canonical parity와 음성3개를 통과했고 기존 원본/운영 current는 보존했다. 일반 domain sync는 여전히 기존 정책을 재생성하므로 생성기 수정은 미완료다. [OE-01 단일 프로젝트 개발 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은 source baca2869의 별도 복제본에서384회 실패/누락0·인용3,616개 검증을 마쳤다. 활성288회 no_match·순위 차이0, 정확 용어의 별도 진단8회는 매칭/정의 검색 동작·최종 boost0이다. 기본 off·품질 inconclusive·새 기능 완료0/7·기존 독립 수용0/9를 유지한다. KM-01의 최신 상태는 위 최신 단계와 시험표를 따른다.
 
 
-2026-10-15 최신 우선 범위: [지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json). 온톨로지 효과 평가 OE-01을 우선 필수 검증으로 채택했다. KM-01 프로젝트 격리, KM-02 버전 DB 운영 도구, KM-03 Claude 매니저 플러그인, KM-04 주기 갱신, KM-05 공통 개념 매핑, KM-06 비교 근거 MCP를 요구로 등록했다.7개/하위28개의 완료는0이며 OE-01 로컬 개발 관찰만 수행했고 확대·독립 품질·다중 프로젝트 평가는 남는다. 나머지는 미착수이고 설계 초안이다. 기존 WI-5는 KM-03/04로 구체화하여 중복 집계하지 않는다. 기존 선택 후속13개 중 ontology 평가는 OE-01로 이동했으므로 선택 후보는12개다.
+2026-10-15 최신 우선 범위: [지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json). 온톨로지 효과 평가 OE-01을 우선 필수 검증으로 채택했다. KM-01 프로젝트 격리, KM-02 버전 DB 운영 도구, KM-03 Claude 매니저 플러그인, KM-04 주기 갱신, KM-05 공통 개념 매핑, KM-06 비교 근거 MCP를 요구로 등록했다.7개/하위28개의 완료는0이며 OE-01 로컬 개발 관찰만 수행했고 확대·독립 품질·다중 프로젝트 평가는 남는다. KM-01은 조사·계약 기반을 구현했고 KM-02~06은 미착수다. 기존 WI-5는 KM-03/04로 구체화하여 중복 집계하지 않는다. 기존 선택 후속13개 중 ontology 평가는 OE-01로 이동했으므로 선택 후보는12개다.
 
 로컬 개발·도구/회귀 검증은 정식 독립 수용의 단계0 동결·담당자·유료 모델 지정 없이 계속한다. 실제 모델 실행/독립 수용에 해당 조건을 적용한다. 정책 연결7건의 로컬 보완과 OE-01 첫 개발 관찰을 마쳤다. 다음 확장 경로는 KM-01→02→03→04와 KM-05→06 후 다중 프로젝트 평가다. 원래9개 구현/독립 수용 원장은 별도로 유지한다.
 

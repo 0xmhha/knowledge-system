@@ -1,0 +1,49 @@
+[
+  {
+    "label": "build",
+    "command": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.970896583050489
+  },
+  {
+    "label": "fmt",
+    "command": [
+      "make",
+      "fmt-check"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.24649929208680987
+  },
+  {
+    "label": "lint",
+    "command": [
+      "make",
+      "lint",
+      "GOLANGCI_LINT=/Users/kevin/.gvm/pkgsets/go1.26.8/global/bin/golangci-lint"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 11.67731983307749
+  },
+  {
+    "label": "old_source_binding",
+    "command": [
+      "python3",
+      "/private/tmp/ks-sp-verify-git.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.4134725001640618
+  },
+  {
+    "label": "ontology_observation",
+    "command": [
+      "python3",
+      "scripts/check-ontology-effect-dev.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.4078522911295295
+  }
+]

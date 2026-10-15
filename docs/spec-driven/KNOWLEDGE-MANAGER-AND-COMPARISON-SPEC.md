@@ -55,8 +55,8 @@
 
 ### KM-01 — 프로젝트 격리와 collection 스키마 · 우선순위 P0
 
-- [ ] KM-01.1: 기존 graph/vector/semantic/지식 팩·DB 쓰기·조회·cache/dedup·인용의 scope와 key를 조사하고, 재사용/결손 표와 migration 설계를 기록한다.
-- [ ] KM-01.2: Project/ProjectVersion/Collection과 scope 결속 계약을 구현한다. 동일 이름·경로·symbol·import path·commit인 별도 프로젝트/포크를 자동 합치지 않는다.
+- [x] KM-01.1: 기존 graph/vector/semantic/지식 팩·DB 쓰기·조회·cache/dedup·인용의 scope와 key를 조사하고, 재사용/결손 표와 migration 설계를 기록한다.
+- [x] KM-01.2: Project/ProjectVersion/Collection과 scope 결속 계약을 구현한다. 동일 이름·경로·symbol·import path·commit인 별도 프로젝트/포크를 자동 합치지 않는다.
 - [ ] KM-01.3: 구현 질의와 비교 질의를 분리한다. 누락/불일치 target, 허용되지 않은 cross-project endpoint·다른 버전 join은 명시 거부/unknown으로 처리한다.
 - [ ] KM-01.4: 동명 두 프로젝트·동일 코드 포크·한 프로젝트 두 버전·중복 등록·재시작·cache warm 상태의 반례로 조회/쓰기/인용 혼입0을 검증한다. 기존 단일 프로젝트 read/rollback 호환 증거도 남긴다.
 
@@ -122,7 +122,7 @@
 
 2026-10-15 진행: [수정 정책의 로컬 적용 검증](./POLICY-OVERLAY-ADOPTION.md)을 완료했다. 원래 생성기는 아직 기존 잘못된 이름을 재생성하므로 이 부분을 해결 완료로 세지 않는다. [OE-01 첫 개발 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은 질문12개/4모드384회와 별도 정확 용어8회를 수행했다. 실패/누락0과 인용3,616개의 원문 일치를 확인했지만 활성288회 no_match·최종 순위 차이0이다. 독립 정답·평가 범위 확대와 자연어 개념 해석/검토된 구현 연결·다중 프로젝트 평가는 남는다. 새7개 완료는0/7이다.
 
-정책 참조7건 보완과 OE-01 첫 개발 관찰을 기록했다. 다음은 KM-01의 scope/key 조사·collection 격리 계약이며, OE-01의 남은 평가와 생성기 보완도 유지한다. 확장 구현 경로는 KM-01 → KM-02 → KM-03 → KM-04이며 KM-05는 격리 계약 이후 진행할 수 있다. KM-06 뒤 OE-01 다중 프로젝트 평가를 수행한다. 고정 임계치·수집할 실제 프로젝트/버전·플러그인 저장소·실행 주기는 각 세부 설계에서 확정한다. 정하지 않은 값을 임의로 완료 근거에 넣지 않는다.
+정책 참조7건 보완과 OE-01 첫 개발 관찰을 기록했다. [KM-01 조사·catalog/읽기 공통 계층](./PROJECT-COLLECTION-ISOLATION.md)의40개 fixture/race 사례를 통과해 KM-01.1/02를 완료했다. 공개 adapter·실제 backend/쓰기 검증은 남아 KM-01 전체는 진행 중이다. 다음은 KM-01.3의 실제 backend·공개 조회 연결이며, OE-01의 남은 평가와 생성기 보완도 유지한다. 확장 구현 경로는 KM-01 → KM-02 → KM-03 → KM-04이며 KM-05는 격리 계약 이후 진행할 수 있다. KM-06 뒤 OE-01 다중 프로젝트 평가를 수행한다. 고정 임계치·수집할 실제 프로젝트/버전·플러그인 저장소·실행 주기는 각 세부 설계에서 확정한다. 정하지 않은 값을 임의로 완료 근거에 넣지 않는다.
 
 각 하위 작업은 목적·설계·코드 변경·적절한 검증·원자료/한계 링크를 기록한 뒤에만 완료로 전환한다. 문서 작성은 기능 구현 완료가 아니며, feature scope 채택과 입력 정답 승인·사람의 독립 수용은 다르다. 기존 WI9개 구현 원장과 과거 source-bound packet은 변경하지 않는다. 기존9개 운영 검증은 별도 범위이며 새7개와 분모를 합치지 않는다.
 
@@ -133,3 +133,5 @@
 온톨로지는 공통 개념·관계와 프로젝트별 표현을 연결해 비교 자료를 조직하는 기반으로 적합하다. [W3C SKOS mapping properties](https://www.w3.org/TR/skos-reference/#mapping)도 개념 체계 사이의 exact/close/상하위/관련 매핑을 구분한다. 이 설계는 그 구분을 참고하며 현행 저장소가 SKOS/OWL reasoner를 구현했다고 주장하지 않는다. [open-world 설명](https://www.w3.org/TR/skos-reference/)은 자료가 빠졌다는 사실만으로 없다고 결론내리지 않는 근거다.
 
 [Ethereum optimistic rollup 설명](https://ethereum.org/en/developers/docs/scaling/optimistic-rollups/)에서 sequencer의 거래 순서 결정과 L1 제출을 구분하듯, 비교 축도 공통 개념 아래에서 역할·가정·적용 범위를 보존한다. 온톨로지 자체가 source extraction·프로젝트별 mapping·비교 API 또는 검증된 장단점 판정을 자동 제공하는 것은 아니다. 이 작업표는 그 연결 기능을 구현 대상으로 명시한다.
+
+전체28개 세부 작업과 이번17개 시험의 상태는 [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)에서 함께 확인한다. 전체 작업 완료와 공통 계층 fixture 통과를 구분한다.
