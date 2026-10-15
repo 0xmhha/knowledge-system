@@ -1,6 +1,6 @@
-# KM-02.2 공개 버전 DB 구축·상태·취소
+# KM-02 공개 버전 DB 구축·상태·취소
 
-관리 플러그인이 작업 접수를 DB 구축 완료로 오인하지 않도록, 등록된 프로젝트의 불변 후보 구축과 실제 활성화를 구분한다. [요청·상태 계약](./VERSIONED-MAINTENANCE-CONTRACT.md)의 공개 실행 연결이며, 영속 작업/재시작 복구는 KM-02.3에서 별도로 구현한다. 전체 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+관리 플러그인이 작업 접수를 DB 구축 완료로 오인하지 않도록, 등록된 프로젝트의 불변 후보 구축과 실제 활성화를 구분한다. [요청·상태 계약](./VERSIONED-MAINTENANCE-CONTRACT.md)의 공개 실행 연결이다. KM-02.3 E1까지 영속 작업·실제 host 재시작을 검증했으며 E2 read lease/rollback/GC는 별도 검증 중이다. 전체 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 등록과 공개 도구
 
@@ -37,7 +37,7 @@ inspect는 읽기 작업이며 output을 생성하지 않는다. build는 immuta
 
 ## 이번 단계의 지원 범위
 
-작업 registry와 동일 key replay는 **프로세스 수명 동안**만 유지한다. 응답 capability는 `job_persistence=process_lifetime`, `serving_adoption=not_observed`, `input_preparation=existing_reviewed_or_rendered_inputs`다. profile 최대32개·프로세스당 작업 기록 최대128개로 제한하며 초과 시 거부한다. 실행 중 작업은 서버 종료 시 취소·정리하고 기다린다. 재시작 후 job을 복원하거나 성공으로 추정하지 않는다. durable journal·cross-process replay·publication 장애 복구는 KM-02.3의 완료 기준이다.
+공개 작업 registry와 동일 key replay는 소유 root의 durable journal로 보존한다. 응답 capability는 `job_persistence=durable_journal`, `serving_adoption=not_observed`, `input_preparation=existing_reviewed_or_rendered_inputs`다. profile 최대32개·접수 기록 최대128개로 제한하며 초과 시 거부한다. 프로세스 재시작은 terminal snapshot과 원래 요청을 복원한다. 미종료 작업은 recovering에서 writer 소유·publication 이력·소유 scratch를 확인하고 종료 상태를 결정하며, 같은 구축을 자동 재실행하지 않는다. 저장 실패가 불확실하면 stale 상태를 응답하지 않고 reconcile_required로 거부한다. 정상 종료는 실행 중 작업의 취소 의도를 먼저 저장하고 하위 종료·정리를 기다린다. 강제 종료·취소·EOF의 실제 host 검증은 E1에서 수행했으며 E2의 read lease/rollback/GC 통합 검증까지 KM-02.3 전체는 진행 중이다.
 
 등록한 profile의 현재 접근 범위를 먼저 확인한 뒤 scoped key를 재조회한다. 같은 key/요청이면 source/current/version이 바뀌어도 같은 작업을 돌려주며, 같은 key의 다른 요청은 `idempotency_conflict`다. 새 요청은 source·profile·입력·embedding·base·기존 version을 모두 검사한다. 작업 제한 시간은 caller deadline과 profile 상한 중 허용된 범위이며 기존 하위 프로세스의 취소 경로를 사용한다.
 
@@ -45,7 +45,7 @@ activation receipt는 과거 전환의 증거이며 현재 모든 reader가 새 
 
 ## 검증과 원자료
 
-재현 진입점은 `python3 scripts/verify-versioned-maintenance.py --out /private/tmp/<new-owned-directory>`다. 실제 CKG/CKV와 stdio MCP, 두 소유 프로젝트, deterministic mock embedding을 사용한다. 유료 모델 호출·독립 수용·검색 품질 판단은 포함하지 않는다.
+현재 공개 durable host 재현 진입점은 `python3 scripts/verify-durable-maintenance.py --out /private/tmp/<new-owned-directory>`다. 이전 process-lifetime 실행 진입점은 당시 Git snapshot에서만 재현한다. 실제 CKG/CKV와 stdio MCP, 두 소유 프로젝트, deterministic mock embedding을 사용한다. 유료 모델 호출·독립 수용·검색 품질 판단은 포함하지 않는다.
 
 최종 공개 시험28항목은 기본33도구 호환·4도구 opt-in/schema·inspect 무변경·stale profile/source/input/model·경로 주입/타 프로젝트 거부·첫 구축/게시·replay/conflict·타 작업 조회/취소 거부·게시 후 취소·두 프로젝트 held·이전 DB 보존·stale base·두 번째 게시·실행 중 writer 충돌/취소·종료 snapshot·재연결 범위·이전/새 버전 실제 조회·다섯 연결 EOF를 확인한다. polling 횟수는 실행 시간에 따라 달라지므로 고정 시험 수와 합치지 않는다.
 
@@ -127,3 +127,19 @@ D2에서는 새 protocol의 pre-gate 작업을 writer 종료·소유 scratch 정
 소유 경로 시험은 실제 프로세스를 기록/디렉터리/marker/자료 작성 경계에서 강제 종료한 뒤 정리한다. 다른 프로젝트·snapshot·dataset·operation·marker·링크·경로 이탈 자료가 보존되는지도 확인한다. 서비스 시험은 writer lock을 잡은 동안 새 v2도 recovering이며, 해제 후에만 scratch 정리와 interrupted를 확정하고 v1은 계속 보류함을 확인한다. 취소된 context가 정리를 중간 완료로 위장하지 않으며 새 복구 context로 정리할 수 있다.
 
 [정리 checkpoint packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-owned-staging/manifest.json)은 해당 실행의 전체 Go/race·공개 실제 28항목과 결속한다. `check-maintenance-staging-evidence.py`와 `test_maintenance_staging_evidence.py`로 부분 완료의 범위와 원자료 변조를 검사한다. 공개 서비스는 아직 process-lifetime이고 E의 실제 durable 재시작·read lease/rollback/GC는 미완료다. KM-02.3 전체와 완료 수6/28은 그대로 유지한다.
+
+
+### E 실행 기준: 공개 영속 연결의 수용 조건
+
+다음 변경은 public New를 journal/recovery 경로에 연결하고 capability를 `durable_journal`로 바꾸는 후보 구현이다. 이 문단은 검증 완료 선언이 아니다. 실제 CKS stdio에서 (1) 접수된 원래 요청과 terminal snapshot의 재시작 보존, (2) 부모 강제 종료 후 하위 writer 종료·owned scratch 정리·interrupted 복구, (3) 취소 의도의 재시작 보존과 publication 부재, (4) 같은 요청 replay/다른 fingerprint 거부, (5) read lease와 rollback/GC가 과거 publication receipt를 바꾸지 않음을 검증해야 한다. 기본 미등록33도구와 두 프로젝트 격리, 오류·timeout·EOF 계약을 유지해야 한다. mock embedding만 사용하며 유료 모델/독립 수용/온톨로지 효과 완료로 세지 않는다.
+
+
+### E1 검증 완료: 실제 공개 영속 host와 정상 종료 수정
+
+공개 New를 durable journal/recovery에 연결했다. 실제 CKS·CKG·CKV, 프로젝트2개, stdio9연결에서43개 고정 항목을 통과했다. 고의 SIGKILL2개는 -9이며 나머지 EOF7개는0이다. 실제 graph child가 시작된 뒤 부모를 종료해 interrupted 복구와 scratch 정리를 확인했다. 별도 취소 접수 직후 부모를 종료해 canceled·publication 부재를 확인했다. 기존 v1/v3의 정확한 source/DB 조회와 terminal replay는 이전과 같고 다른 프로젝트의 상태를 읽지 못한다.
+
+정상 EOF 시험은 처음에 실패했다. 실행 중 작업이 running에서 canceled로 바로 저장하려 해 계약이 거부했고, 재시작에서 interrupted로 보였다. Close가 cancel_requested를 먼저 영속 기록한 뒤 context를 종료하도록 고쳤다. recovering/terminal 작업은 종료 시 임의로 바꾸지 않는다. 실제 재시험과 별도 Go 회귀는 canceled terminal snapshot·원래 key replay 보존을 확인했다.
+
+최종 E1은 전체 Go3,812사례(3,793통과·19skip), 관련6패키지 race786사례(784통과·2skip), build/fmt/vet/lint·문서 계약과43개 실제 host 항목을 통과했다. [E1 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json)은 raw wire·실제 fixture·새 Go 결과를 보관한다. `check-maintenance-durable-host-evidence.py`와 `test_maintenance_durable_host_evidence.py`는 강제 종료/취소/EOF 증거의 누락과 E2 완료 조작을 거부한다. D2의 당시 ed74cd7f snapshot 검증은 현재 코드의 Go 결과를 대체하지 않는다.
+
+E2 실제 read lease/rollback/GC 통합 검증은 남아 있다. 공개 연결이 영속화되었다는 사실만으로 KM-02.3 전체를 완료 처리하지 않는다. 전체 완료 수6/28을 유지한다.

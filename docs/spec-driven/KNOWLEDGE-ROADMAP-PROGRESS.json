@@ -87,7 +87,7 @@
       "scope": "versioned_maintenance_tools",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "public_scoped_runtime_locally_verified_process_lifetime_durable_recovery_pending",
+      "design_status": "public_durable_host_E1_verified_E2_readlease_rollback_GC_pending",
       "depends_on": [
         "KM-01"
       ],
@@ -95,9 +95,10 @@
         "docs/spec-driven/VERSIONED-MAINTENANCE-CONTRACT.md",
         "system/eval/knowledge-roadmap-2026-10-15/km-02-contract/manifest.json",
         "docs/spec-driven/VERSIONED-MAINTENANCE-RUNTIME.md",
-        "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json"
       ],
-      "verification": "design101_actual_public_runtime28_fresh_Go3646_pass19_skip_race632_pass2_skip_evidence_guard10",
+      "verification": "E1_actual_public_host43_fresh_Go3793_pass19_skip_related_race784_pass2_skip",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -133,11 +134,11 @@
         "capability_audit": "verified_current_MCP35_CLI_help_and_source",
         "design_schema_and_lifecycle": "verified_101_cases",
         "public_versioned_build_status_cancel": "verified_actual_public_28_checks_5_clean_EOF_sessions",
-        "durable_jobs_idempotency_crash_recovery": "A_B_C_D1_D2_verified_E_actual_public_durable_recovery_rollback_readlease_GC_pending",
+        "durable_jobs_idempotency_crash_recovery": "A_B_C_D1_D2_E1_verified_E2_actual_readlease_rollback_GC_pending",
         "real_public_maintenance_evaluation": "local_lifecycle_and_retained_v2_reads_only_mock_embedding_not_quality_or_independent_acceptance"
       },
       "remaining": [
-        "KM-02.3 E verify actual public durable restart/replay, interruption/cancellation, rollback/read lease/GC before enabling durable mode",
+        "KM-02.3 E2 verify actual public read lease, rollback and GC integration without changing historical publication receipts",
         "KM-02.4 verify public cross-project and partial-failure/cancel/shutdown controls"
       ]
     },

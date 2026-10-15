@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'owned-staging': {
+        'revision': 'ed74cd7f', 'folder': 'km-02-owned-staging',
+        'scope': 'historical_KM02_3_D2_owned_staging_process_compatibility_only',
+        'scripts': ['check-maintenance-staging-evidence.py', 'test_maintenance_staging_evidence.py'],
+    },
     'command-supervision': {
         'revision': '1283a22c', 'folder': 'km-02-command-supervision',
         'scope': 'historical_KM02_3_D1_parent_deadline_supervision_process_compatibility_only',

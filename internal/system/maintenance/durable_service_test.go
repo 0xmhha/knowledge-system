@@ -250,8 +250,8 @@ func TestPrivateDurableFailurePersistsThroughActualAdmissionAndRestart(t *testin
 	if err != nil {
 		t.Fatal(err)
 	}
-	if inspection.Capabilities.JobPersistence != "journal_recovery_incomplete" {
-		t.Fatal("private partial implementation claimed completed recovery")
+	if inspection.Capabilities.JobPersistence != "durable_journal" {
+		t.Fatal("durable capability differs")
 	}
 	request := requestForInspection(inspection.Profile)
 	status, err := service.Build(context.Background(), request)

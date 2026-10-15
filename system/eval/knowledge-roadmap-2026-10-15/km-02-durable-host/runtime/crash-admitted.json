@@ -1,0 +1,78 @@
+{
+  "request": {
+    "schema_version": 1,
+    "project_id": "project-b",
+    "profile_id": "project-b-default",
+    "profile_digest": "9ebabec6a327e169e277ce2b27a50869ecec46fdb7dfae2f4f7594816cd0797f",
+    "source_pin": {
+      "mode": "snapshot-only",
+      "snapshot_id": "bfe036000bc88ca1ed264730cac1707fb81cfbb84bcd9479ade4d0107ad825df",
+      "base_commit": ""
+    },
+    "input_digest": "f9a71387edb9f13f241928cf1d94dcb87af4269c02c5e552a24b9587714da70b",
+    "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+    "base": {
+      "state": "absent"
+    },
+    "new_version": "v3",
+    "activation": "activate_after_gate",
+    "idempotency_key": "owned-request-key-project-b-v3",
+    "deadline_seconds": 120
+  },
+  "profile": {
+    "project_id": "project-b",
+    "profile_id": "project-b-default",
+    "profile_digest": "9ebabec6a327e169e277ce2b27a50869ecec46fdb7dfae2f4f7594816cd0797f",
+    "source_pin": {
+      "mode": "snapshot-only",
+      "snapshot_id": "bfe036000bc88ca1ed264730cac1707fb81cfbb84bcd9479ade4d0107ad825df",
+      "base_commit": ""
+    },
+    "input_digest": "f9a71387edb9f13f241928cf1d94dcb87af4269c02c5e552a24b9587714da70b",
+    "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+    "observed_base": {
+      "state": "absent"
+    },
+    "existing_versions": [
+      "v1",
+      "v2"
+    ],
+    "allowed_activation": [
+      "hold_for_review",
+      "activate_after_gate"
+    ],
+    "required_gates": [
+      "source",
+      "identity",
+      "graph",
+      "vector"
+    ],
+    "timeout_max_seconds": 120
+  },
+  "status": {
+    "schema_version": 1,
+    "job_id": "8206c8b75ae6598fbad34465bb9006c5",
+    "project_id": "project-b",
+    "profile_id": "project-b-default",
+    "request_digest": "33bae2575cabb8077e1ebf08b37bac66d4a0e621e977903fa228e2663f44c4df",
+    "target_version": "v3",
+    "revision": 3,
+    "state": "running",
+    "phase": "build_graph",
+    "terminal": false,
+    "build_complete": false,
+    "activated": false,
+    "candidate": null,
+    "publication": null,
+    "gates": {
+      "graph": "not_run",
+      "identity": "not_run",
+      "knowledge": "not_configured",
+      "semantic": "not_configured",
+      "source": "not_run",
+      "vector": "not_run"
+    },
+    "error": null,
+    "serving_adoption": "not_observed"
+  }
+}

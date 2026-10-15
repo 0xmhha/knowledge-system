@@ -41,9 +41,8 @@ type Service struct {
 }
 
 func New(profiles []Profile, self string) (*Service, error) {
-	// Keep the public surface process-lifetime until publication and child
-	// ownership recovery pass KM-02.3 C–E.
-	return newService(profiles, self, false)
+	// Public jobs persist their admission, publication and recovery decisions.
+	return newService(profiles, self, true)
 }
 
 func newDurableService(profiles []Profile, self string) (*Service, error) {
@@ -130,7 +129,7 @@ func (s *Service) Inspect(ctx context.Context, r ProfileRequest) (Inspection, er
 	}
 	persistence := "process_lifetime"
 	if s.durable {
-		persistence = "journal_recovery_incomplete"
+		persistence = "durable_journal"
 	}
 	return Inspection{Profile: value.view, Capabilities: Capabilities{VersionedBuild: true, Cancel: true, JobPersistence: persistence, ServingAdoption: "not_observed", InputPreparation: "existing_reviewed_or_rendered_inputs"}}, nil
 }
@@ -241,8 +240,7 @@ func (s *Service) Build(ctx context.Context, request BuildRequest) (JobStatus, e
 	if err != nil {
 		return JobStatus{}, reject("invalid_request")
 	}
-	// Replay must precede mutable source/current checks. This registry's scope
-	// is explicitly process-lifetime until the durable KM-02.3 stage.
+	// Replay uses the admitted durable request before mutable source/current checks.
 	s.mu.Lock()
 	if id := s.keys[key(request)]; id != "" {
 		j := s.jobs[id]
@@ -476,6 +474,18 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 func (s *Service) Close() {
 	s.mu.Lock()
 	s.closed = true
+	// Persist the shutdown cancellation boundary before stopping execution.
+	// A running -> canceled jump is invalid; missing intent would recover as
+	// interrupted despite a clean EOF. Never rewrite recovering/terminal jobs.
+	for _, j := range s.jobs {
+		j.mu.Lock()
+		if !j.status.Terminal && !j.persistenceFailed && (j.status.State == "queued" || j.status.State == "running") {
+			j.status.State = "cancel_requested"
+			j.status.Revision++
+			_ = j.persistLocked()
+		}
+		j.mu.Unlock()
+	}
 	s.cancel()
 	s.mu.Unlock()
 	s.wg.Wait()

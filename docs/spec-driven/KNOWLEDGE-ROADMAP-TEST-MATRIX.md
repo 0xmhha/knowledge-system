@@ -356,3 +356,18 @@ B 증거 보호13개도 통과했다. 실제 공개 회귀는81개 도구 호출
 | build/fmt/vet/lint·문서 | 통과 | 현재 코드/명령 계약 |
 
 [D2 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-owned-staging/manifest.json)과 [실행 명세](./VERSIONED-MAINTENANCE-RUNTIME.md)를 따른다. 현재 소스1,682입력은 유지 Go1,252개·기타430개이며 원래 승인5개 입력은 바꾸지 않는다. D1은1283a22c 당시 snapshot에서 검증하고 현재 Go 결과를 재사용하지 않는다. 다음은 E 실제 공개 durable 재시작/replay·취소/중단·rollback/read lease/GC이며 KM-02.3은 진행 중, 완료 수6/28이다. 이후 KM-02.4, KM-03.1–4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4를 진행한다. 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.
+
+
+## KM-02.3 중간 E1: 공개 durable host 연결
+
+| 검증 | 결과 | 경계 |
+|---|---|---|
+| 실제 CKS·CKG·CKV/MCP | 43고정 항목 통과 | mock embedding, 품질/독립 수용 아님 |
+| 실제 graph 중 부모 SIGKILL | 2회 -9 | interrupted와 accepted cancel의 canceled를 구분 |
+| 나머지 연결 EOF | 7회0 | 활성 하위 작업의 취소 의도를 먼저 저장·정리 대기 |
+| 원래 요청 replay/terminal | 재시작 후 불변 | mutable source/base 변경에도 다시 구축하지 않음 |
+| 전체 Go | 3,812사례: 3,793통과·19skip | 현재 소스 |
+| 관련6패키지 race | 786사례: 784통과·2skip | 정상 종료 수정 회귀 포함 |
+| build/fmt/vet/lint·문서 | 통과 | 현재 명령 계약 |
+
+[E1 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json)과 실행 명세를 따른다. 소스1,683입력은 유지 Go1,253개·기타430개이며 승인5개 입력은 그대로다. E2 실제 read lease/rollback/GC와 과거 publication 이력 보존은 미실행이며 세부6/28을 유지한다. 다음 E2 → KM-02.4 → KM-03.1–4 → KM-04.1–4 → KM-05.1–4 → KM-06.1–4 → OE-01.1–4이며 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.

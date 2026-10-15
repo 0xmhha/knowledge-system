@@ -89,3 +89,5 @@ WI-5의 기존 수집→ingest→검토→승격/회수→색인 검증 목적�
 과거 재감사의 구현 부족분은 [감사 기록](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md)에 남긴다. 최신9/9 구현을 과거 표로 되돌리지 않는다. 일반 검증 체크리스트의 빈 체크박스는 매 변경의 절차이며 프로젝트 잔여 기능으로 집계하지 않는다. 기존 worksheet catalog·pinned v2 쓰기 거부·온톨로지 MCP·정책/보안 질의를 새 미구현 항목으로 재등록하지 않는다.
 
 현재 KM-02.3 A–D2는 로컬 검증했으며 다음은 E 실제 공개 durable host 재시작/replay·취소/중단·rollback/read lease/GC와 공개 연결이다. 세부6/28 완료를 유지한다. 전체 Go3,792통과·19skip, 관련 race783통과·2skip, 실제 공개28항목과 build/fmt/lint를 확인했다. [전체 시험표](./spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 원장에 따라 미완료 작업을 이어간다.
+
+E1 실제 공개 durable host43항목과 정상 EOF 취소 의도 저장 수정을 검증했다. capability는 durable_journal이며 전체 Go3,793통과·19skip, 관련 race784통과·2skip, build/fmt/lint를 통과했다. E2 실제 read lease/rollback/GC 통합 검증이 남아 KM-02.3과 전체 완료 수6/28은 유지한다. 다음은 E2다.

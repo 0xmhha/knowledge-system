@@ -137,3 +137,5 @@
 전체28개 세부 작업과 이번17개 시험의 상태는 [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)에서 함께 확인한다. 전체 작업 완료와 공통 계층 fixture 통과를 구분한다.
 
 KM-02.3 중간 A–D2는 private journal·접수/replay·publication 이력·하위 실행 감독·소유 scratch 정리까지 검증했다. 새 v2 protocol의 실행 종료는 writer lease 해제와 exact owner 정리 후에만 판정한다. 공개 durable 연결과 E 실제 host 재시작·rollback/read lease/GC는 아직 남아 있어 KM-02.3을 체크하지 않는다. 상세 검증과 원자료는 실행 명세/시험표를 따른다.
+
+E1 실제 공개 durable host43항목과 정상 EOF 취소 의도 저장 수정을 검증했다. capability는 durable_journal이며 전체 Go3,793통과·19skip, 관련 race784통과·2skip, build/fmt/lint를 통과했다. E2 실제 read lease/rollback/GC 통합 검증이 남아 KM-02.3과 전체 완료 수6/28은 유지한다. 다음은 E2다.
