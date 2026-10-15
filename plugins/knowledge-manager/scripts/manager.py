@@ -268,6 +268,21 @@ def main():
     draft_status = commands.add_parser('draft-status')
     draft_status.add_argument('--registration',required=True)
     draft_status.add_argument('--draft-id',required=True)
+    for operation in ('review-plan','review-status'):
+        command = commands.add_parser(operation)
+        command.add_argument('--registration',required=True)
+        command.add_argument('--draft-id',required=True)
+    for operation,flag in (('review','review-file'),('retract','retraction-file')):
+        command = commands.add_parser(operation)
+        command.add_argument('--registration',required=True)
+        command.add_argument('--'+flag,required=True)
+    adoption = commands.add_parser('adopt')
+    adoption.add_argument('--registration',required=True)
+    adoption.add_argument('--draft-id',required=True)
+    adoption.add_argument('--review-revision',required=True)
+    adopted_status = commands.add_parser('adoption-status')
+    adopted_status.add_argument('--registration',required=True)
+    adopted_status.add_argument('--adoption-id',required=True)
     args = parser.parse_args()
     try:
         if args.operation=='register':
@@ -289,9 +304,24 @@ def main():
                 else:
                     directory,content = load_draft(r,args.draft_id)
                     result = {'schema_version':1,'stage':'draft_proposed','draft_dir':str(directory),'draft':content}
+            elif args.operation in ('review-plan','review-status','review','adopt','retract','adoption-status'):
+                from review import plan,status,record_review,adopt,retract,active_adoption
+                if args.operation=='review-plan':
+                    result = plan(r,args.draft_id)
+                elif args.operation=='review-status':
+                    result = status(r,args.draft_id)
+                elif args.operation=='review':
+                    result = record_review(r,args.review_file)
+                elif args.operation=='adopt':
+                    result = adopt(r,args.draft_id,args.review_revision)
+                elif args.operation=='retract':
+                    result = retract(r,args.retraction_file)
+                else:
+                    directory,receipt,state = active_adoption(r,args.adoption_id)
+                    result = {'schema_version':1,'stage':'current_reviewed_input_not_DB_publication','input_project':str(directory/'project'),'receipt':receipt,'workflow':state}
             else:
                 result = {'schema_version':1,'stage':'registration_verified_not_built','project_id':r['project_id'],'profile_id':r['profile_id'],
-                          'draft_collection':True,'review_workflow':False,'managed_reader_broker':False,'scheduling':False,'model_readiness':'not_measured'}
+                          'draft_collection':True,'review_workflow':True,'managed_reader_broker':False,'scheduling':False,'model_readiness':'not_measured'}
                 if args.connect:
                     result['connection'] = connect(r)
         print(json.dumps(result,ensure_ascii=False))

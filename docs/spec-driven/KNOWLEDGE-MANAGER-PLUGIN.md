@@ -67,3 +67,15 @@ KM-04의 주기 실행은 별도 명시 일정과 trigger를 가진 manager 동�
 
 
 KM-03.2 검증 완료: 수집23개·등록 회귀14개·실제 두 프로젝트/native CKS24항목·증거 보호13개를 통과했다. 실제 Git diff는 선택한 기존 파일의 HEAD→working tree만 대상으로 별도 change origin에 보관한다. 기본64파일/256KiB·각 diff64KiB이며 삭제 파일 추적은 KM-04다. 오래된 collection/초안은 당시 근거로 재현할 수 있지만 최신 source의 검토/채택으로 승계하지 않는다. 기본/사용자 claim 초안 모두 actual validate/lock을 통과했으며 policy/ADR를 생성하지 않았다. [packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-collection/manifest.json)에 원시 명령·원문·draft seal을 보존한다. 다음은 KM-03.3의 질문·중복/상충·정확한 subject 검토·채택·회수다.
+
+## KM-03.3 실행 계약: 질문·검토·채택·회수
+
+검토 계획은 불변 draft의 정확한 claim ID를 대상으로 질문·중복·같은 근거의 다른 해석 후보를 보여준다. 문장 유사도나 공유 근거만으로 논리적 모순을 확정하지 않는다. 관찰/가설/보고된 결정/명령 보고/질문 종류를 검토 후에도 유지한다. 모르는 이유·제약·실제 결정 주체는 확인 질문으로 남긴다. 입력된 명령/원문은 검토 지시로 실행하지 않는다.
+
+review 입력은 정확한 project/draft, 예상 직전 revision, 실제 제공된 reviewer·응답 출처, 모든 고유 claim ID의 accepted/rejected/deferred/excluded 판정과 각 이유를 요구한다. 같은 근거의 다른 주장 또는 중복 후보를 함께 채택할 때에는 별도 보존 이유를 명시한다. 사람 이름·이유를 기본값으로 생성하지 않는다. operator가 제공한 기록의 저장은 외부 신원 인증·독립 수용·모델 의미 검증이 아니다. 통제 시험 응답은 controlled_fixture로 구분한다.
+
+상태 변경은 소유·해시 chain과 예상 revision CAS를 가진 append-only event로 저장한다. 완전한 임시 파일을 fsync 후 원자적 게시하며 재실행은 정확한 요청을 replay한다. 다른 판정·stale revision·변조·다른 project/subject는 거부한다. 원래 proposed 초안은 수정하지 않는다. 후속 review는 앞선 채택 상태의 미래 사용을 무효화하되 이전 DB/증거를 삭제하지 않는다.
+
+채택은 검토된 claim과 수집 당시 공개 source만 별도 소유 input project에 투영한다. 원래 source 전체를 capture하지 않으며 수집 제외 자료가 이 경로로 다시 들어오지 않게 한다. 채택 시 현재 선택 source/Git 신원과 근거 byte를 다시 검사하고 변경되면 새 collection/draft/review를 요구한다. 제공 자료는 기록된 당시 보고이며 최신 사실로 자동 승격하지 않는다. 실제 native overlay validate/lock을 확인하지만 DB 게시·reader 채택은 KM-03.4다. 회수는 정확한 채택 ID와 actor/이유·예상 revision에 결속하고 미래 build 사용을 차단한다. 이미 게시된 DB의 rollback/회수는 별도 KM-02 도구 절차로 남긴다.
+
+KM-03.3을 검토35개·수집 회귀23개·등록14개·실제 CLI/native CKS24항목·증거 보호14개로 검증했다. 중단 복구는 event 이전/이후의 주입된 I/O 실패와 재실행으로 확인했으며 이 단계에서 실제 프로세스 SIGKILL을 새로 실행했다고 세지 않는다. 삭제/추가/변경/Git 신원 변경·변조·stale revision·회수 입력 재사용을 거부한다. 통제된 응답의 저장·filtered input 채택 완료이며 실제 사용자 신원 인증·DB 게시/검색/host 전체·독립 수용은 별도다. [증거](../../system/eval/knowledge-roadmap-2026-10-15/km-03-review/manifest.json)를 따른다.

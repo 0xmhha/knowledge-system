@@ -3,8 +3,8 @@
 This Claude Code plugin is the project-scoped manager entry point. Users select
 a source and storage locations; they do not need to write source documentation.
 The package implements registration, diagnosis and bounded evidence collections
-with proposed knowledge drafts. Review/adoption and actual host end-to-end
-management remain separate stages.
+with proposed knowledge drafts, explicit supplied review records and filtered
+input adoption/retraction. Actual host end-to-end management remains separate.
 
 | Capability | Current state |
 |---|---|
@@ -13,7 +13,7 @@ management remain separate stages.
 | Actual MCP initialization and four maintenance tool discovery | Implemented; model inspection not implied |
 | Maintenance launcher | Implemented; exposes the configured CKS server |
 | Source/hash/line evidence collection and proposed native overlay | Implemented in KM-03.2 |
-| Tacit knowledge review/adoption/retraction | Planned in KM-03.3 |
+| Tacit questions, supplied review, filtered input adoption/retraction | Implemented in KM-03.3; external reviewer authentication is separate |
 | Managed DB reader broker and full Claude host workflow | Planned in KM-03.4 |
 | Regular/change-triggered updates | Planned in KM-04 |
 
@@ -129,5 +129,56 @@ or design decisions. Seed coverage is explicit. The isolated draft project has
 a real native `.cks/knowledge` overlay and passes actual CKS validate/lock.
 Original source, dataset and global configuration remain unchanged. An existing
 draft replays only after its owned content seal is checked. Use `draft-status`
-with the returned draft ID to inspect it. Review, source adoption, retrieval
-integration and the managed reader broker remain KM-03.3/04 requirements.
+with the returned draft ID to inspect it. Use the explicit review workflow below. Original source adoption, retrieval
+integration and the managed reader broker remain separate boundaries.
+
+
+## Ask, record an actual response, adopt selected input, withdraw it
+
+Run `review-plan --registration <registration.json> --draft-id <draft-id>`.
+It lists exact claim/evidence IDs, questions, possible duplicates and shared
+source interpretations. It does not infer answers or prove contradictions.
+Ask only missing facts that affect the knowledge. Leave missing reasons unknown.
+
+`review --registration <registration.json> --review-file <absolute-response.json>`
+accepts a JSON object with these fields:
+
+- `schema_version: 1`, exact `project_id`, `draft_id`, `expected_revision`
+  (`null` before the first event; otherwise the current revision).
+- `reviewer`: the actual identity supplied by the responding operator. No default.
+- `response_source`: `kind` (`human_response`, or `controlled_fixture` for tests)
+  and a real `reference` to the response. Do not invent either field.
+- `decisions`: every unique `claim_id`, a `disposition` (`accepted`, `rejected`,
+  `deferred`, `excluded`) and a nonempty `reason` supplied for that claim.
+- `resolutions`: for each duplicate/shared-interpretation pair accepted together,
+  sorted `claim_ids`, `disposition: keep_separate`, and the explicit reason.
+  Use an empty array when there is no such pair.
+
+The owner/hash chain is a local integrity boundary, not external identity
+verification. A stored supplied response is not independent human acceptance.
+A reviewed hypothesis stays a hypothesis. The original draft remains proposed;
+review events are separate immutable records. The same exact request replays its
+original event; changed intent must use the current revision. Inspect
+`review-status --registration <registration.json> --draft-id <draft-id>`.
+
+`adopt --registration <registration.json> --draft-id <draft-id>
+--review-revision <current-reviewed-revision>` creates an owned input project.
+It copies only collected public repository files and the accepted observations,
+rechecks selected source/Git bytes and actually validates/locks the native
+overlay. Rejected/deferred/excluded claims do not enter its reviewed knowledge
+note. Excluded source is not recaptured from the original tree. The original
+project and dataset remain unchanged. This is an input projection, not DB
+publication, engine-verified policy/ADR, or successful retrieval. Provided
+material remains an as-of report. Source drift needs a new collection/draft and
+review. Check `adoption-status --registration <registration.json>
+--adoption-id <id>` before any future build; stale, superseded, tampered and
+withdrawn inputs are refused.
+
+`retract --registration <registration.json> --retraction-file <absolute.json>`
+requires `schema_version: 1`, exact `project_id`, `adoption_id`,
+`expected_revision`, actual supplied `actor`, `reason`, and `response_source`
+as above. It records withdrawal and blocks future use without deleting evidence.
+It does not roll back a published dataset; that requires its separate explicit
+maintenance procedure. A new review supersedes previous input selection; it
+cannot silently inherit old approval. No scheduler, reader broker or automatic
+DB activation is introduced by review/adoption.

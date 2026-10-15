@@ -21,4 +21,6 @@ fallback to another project, legacy mutation tools or direct database edits.
 Never invent human approval, reviewer identity, successful test results or
 ontology quality. Report the actual stage, verification results, next step and
 all remaining stages. Current package boundaries are authoritative: do not claim
-unimplemented collection/review/reader/scheduler capabilities are available.
+unimplemented reader/scheduler capabilities are available. Supplied review
+records must come from actual responses; controlled fixture responses are tests.
+Input adoption is a filtered, reviewed projection, not a dataset publication.

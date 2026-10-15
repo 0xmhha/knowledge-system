@@ -303,7 +303,7 @@ def load_collection(r,collection_id):
     return directory,c
 
 
-def collect(args,r):
+def gather(args,r):
     require(1<=args.max_files<=10000 and 1<=args.max_file_bytes<=8*1024*1024 and 1<=args.max_total_bytes<=256*1024*1024,'collection_limit')
     patterns = sorted(set(args.exclude or []))
     require(len(patterns)<=64 and all(isinstance(p,str)and 0<len(p)<=256 and not p.startswith('/')and '..'not in p.split('/')and '\x00'not in p for p in patterns),'exclusion_invalid')
@@ -350,6 +350,15 @@ def collect(args,r):
     records.sort(key=lambda row:(row['origin_id'],row['path']))
     recipe = {'schema_version':1,'project_id':r['project_id'],'collector_version':VERSION,'source_files':records,'git':before_git,
               'policy':{'exclude':patterns,'max_files':args.max_files,'max_file_bytes':args.max_file_bytes,'max_total_bytes':args.max_total_bytes,'supported_text_only':True,'built_in_exclusions_version':1,'max_diff_files':getattr(args,'max_diff_files',64),'max_diff_bytes':getattr(args,'max_diff_bytes',256*1024)}}
+    coverage = {'selected_source_files_complete':True,'git_changes':change_coverage,'whole_project_semantics_verified':False,'excluded_counts':excluded,'file_count':len(records)}
+    return recipe,coverage,contents
+
+
+def collect(args,r):
+    recipe,coverage,contents = gather(args,r)
+    records = recipe['source_files']
+    source = Path(r['source_root'])
+    before_git = recipe['git']
     cid = domain_hash('cks.manager-collection.v1',recipe)
     parent = owned_directory(Path(r['state_root'])/'collections',r)
     with writer(parent):
@@ -368,7 +377,7 @@ def collect(args,r):
                 write_bytes(path,data)
         c = {'schema_version':1,'project_id':r['project_id'],'collection_id':cid,'registration_token':r['token'],'source_root':str(source),'collected_at':now(),
              'generated_by':{'tool':'knowledge-manager-collector','version':VERSION},'files':records,'recipe':recipe,
-             'coverage':{'selected_source_files_complete':True,'git_changes':change_coverage,'whole_project_semantics_verified':False,'excluded_counts':excluded,'file_count':len(records)},'cks_snapshot_id':None,'git':before_git}
+             'coverage':coverage,'cks_snapshot_id':None,'git':before_git}
         sealed = {'collection':c,'checksum':domain_hash('cks.manager-collection-manifest.v1',c)}
         require(len(json.dumps(sealed,ensure_ascii=False,indent=2).encode())<16*1024*1024,'collection_limit')
         write_new(stage/'manifest.json',sealed)
