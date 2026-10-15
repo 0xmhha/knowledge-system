@@ -97,7 +97,7 @@ func newExportCmd(project *string) *cobra.Command {
 }
 
 func newSyncCmd(project *string) *cobra.Command {
-	var ckvOut, ckgOut string
+	var ckvOut, ckgOut, codeRoot string
 	cmd := &cobra.Command{
 		Use:   "sync",
 		Short: "Derive the ckv/ckg policy views from the verified entries",
@@ -106,11 +106,15 @@ func newSyncCmd(project *string) *cobra.Command {
 			if err := requireProject(project); err != nil {
 				return err
 			}
-			return runSync(*project, ckvOut, ckgOut)
+			if codeRoot == "" {
+				return runSync(*project, ckvOut, ckgOut)
+			}
+			return runSourceSync(*project, ckvOut, ckgOut, codeRoot)
 		},
 	}
 	cmd.Flags().StringVar(&ckvOut, "ckv-out", "", "write the ckv view here (default: stdout)")
 	cmd.Flags().StringVar(&ckgOut, "ckg-out", "", "write the ckg policy view here (default: stdout)")
+	cmd.Flags().StringVar(&codeRoot, "code-root", "", "explicit Go source tree: require each policy anchor to resolve uniquely in its declared file before writing either view")
 	return cmd
 }
 

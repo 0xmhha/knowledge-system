@@ -32,12 +32,21 @@ import (
 )
 
 func runSync(entriesDir, ckvOut, ckgOut string) error {
+	return runSourceSync(entriesDir, ckvOut, ckgOut, "")
+}
+
+func runSourceSync(entriesDir, ckvOut, ckgOut, codeRoot string) error {
 	proj, err := inventory.LoadProject(entriesDir)
 	if err != nil {
 		return fmt.Errorf("load project %q: %w", entriesDir, err)
 	}
 	entries := verifiedEntries(proj)
 	ckv, ckg := deriveViews(entries)
+	if codeRoot != "" {
+		if err := resolveSourcePolicies(entries, &ckg, codeRoot); err != nil {
+			return err
+		}
+	}
 
 	// The labels name the view, not the file it lands in: the filename is the
 	// pack's to choose, and emit prints the path alongside.

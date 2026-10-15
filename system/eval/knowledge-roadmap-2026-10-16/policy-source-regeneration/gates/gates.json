@@ -1,0 +1,57 @@
+{
+  "module": {
+    "exit_code": 0,
+    "command": [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./..."
+    ],
+    "elapsed_seconds": 304.42383204074576
+  },
+  "race": {
+    "exit_code": 0,
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=1",
+      "-json",
+      "./cmd/cks/domaincli",
+      "./cmd/cks/mcpcli",
+      "./cmd/cks/setupcli",
+      "./internal/setup",
+      "./internal/system/comparison",
+      "./internal/system/config",
+      "./internal/system/maintenance",
+      "./internal/system/mcp"
+    ],
+    "elapsed_seconds": 62.99208187498152
+  },
+  "build": {
+    "exit_code": 0,
+    "command": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "elapsed_seconds": 4.936601624824107
+  },
+  "fmt": {
+    "exit_code": 0,
+    "command": [
+      "make",
+      "fmt-check"
+    ],
+    "elapsed_seconds": 0.2182260830886662
+  },
+  "lint": {
+    "exit_code": 0,
+    "command": [
+      "make",
+      "lint"
+    ],
+    "elapsed_seconds": 14.853712290991098
+  }
+}

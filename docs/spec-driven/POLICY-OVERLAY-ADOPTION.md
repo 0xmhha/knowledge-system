@@ -1,6 +1,6 @@
 # 고정 소스용 정책 수정 적용·조회 검증
 
-2026-10-15 사용자 응답 “새 평가용 overlay로 채택 (권고)”에 따라 아래7건 수정이 적용된 기존 별도 평가 profile의 선택을 승인 기록으로 확정했다. [승인 영수증](../../system/eval/operational-preparation-2026-10-15/adopted-policy-user-approval/receipt.json)에 질문 ID·정확한 응답·source/policy/profile hash와7개 참조를 보존했다. 기존 평가 근거를 다시 검사해 통과했으며 원본 YAML의 reviewer/approval, 운영 current, 독립 gold/품질 수용은 변경하지 않았다. 생성기 재생성 보완은 별도 잔여다.
+2026-10-15 사용자 응답 “새 평가용 overlay로 채택 (권고)”에 따라 아래7건 수정이 적용된 기존 별도 평가 profile의 선택을 승인 기록으로 확정했다. [승인 영수증](../../system/eval/operational-preparation-2026-10-15/adopted-policy-user-approval/receipt.json)에 질문 ID·정확한 응답·source/policy/profile hash와7개 참조를 보존했다. 기존 평가 근거를 다시 검사해 통과했으며 원본 YAML의 reviewer/approval, 운영 current, 독립 gold/품질 수용은 변경하지 않았다. 생성기 재생성은 후속 명시적 소스 대조 경로에서 보완했다. 원래 entry의 잘못된 파일 위치는 원본에 남기고 평가 사본에서만 수정했다.
 
 2026-10-15. [정책 참조 진단](./POLICY-REFERENCE-DIAGNOSIS.md)의 수정7건을 [별도 평가 정책](../../projects/stablenet/evaluation/policy-0bf2f4d1.yaml)과 [profile](../../projects/stablenet/evaluation/policy-0bf2f4d1.profile.json)로 채택했다. 실제 CKG build→SQLite 저장→공개 CKS stdio 도구까지 검증했다. 원래 정책·domain entry·과거 source-bound packet·운영 current는 변경하지 않았다. 새 평가 profile의 로컬 적용 완료이며 전체 정책 의미의 독립 수용·온톨로지 효과·자동 재생성 수정은 완료가 아니다.
 
@@ -25,9 +25,9 @@ CKV는 mock이며 이 도구는 graph annotation 경로만 사용했다. 임베�
 
 ## 재생성 문제는 별도 잔여
 
-실제 `cks domain sync`도 실행했다. 결과는 기존 정책을 byte 단위로 그대로 재생성하며 수정 정책은 생성하지 못한다. 현재 생성기의 package 이름 추정은 디렉터리 basename을 사용한다. compiler 디렉터리의 package compile, engine 디렉터리의 package wbftengine 같은 경우를 놓친다. 명시 receiver 누락과 이 source pin에서 파일이 다른 ErrInvalidFeePayer anchor도 별도 확인이 필요하다.
+당시 무소스 `cks domain sync`도 실행했다. 결과는 기존 정책을 byte 단위로 그대로 재생성하며 수정 정책은 생성하지 못했다. 당시 생성기의 package 이름 추정은 디렉터리 basename을 사용한다. compiler 디렉터리의 package compile, engine 디렉터리의 package wbftengine 같은 경우를 놓친다. 명시 receiver 누락과 이 source pin에서 파일이 다른 ErrInvalidFeePayer anchor도 별도 확인이 필요하다.
 
-따라서 수정 YAML을 원래 generated 정책 위에 덮어써 다음 setup에서 freshness 오류가 나게 만들지 않았다. 새 profile은 `domain_sync_managed=false`인 명시적인 로컬 평가 입력이다. 기존 setup.yaml의 기본 정책 선택은 유지한다. 후속 생성기 보완에서는 source pin·anchor file·receiver를 실제 선언과 대조하고, 잘못된/모호한 anchor는 경고/거부하며 재생성 결과가 올바른 정책과 일치하는지 검증해야 한다. 명시 qname만 적으면 항상 해결된다고 가정하지 않는다. 현재 함수는 다른 package prefix를 다시 붙일 수 있다.
+따라서 수정 YAML을 원래 generated 정책 위에 덮어써 다음 setup에서 freshness 오류가 나게 만들지 않았다. 새 profile은 `domain_sync_managed=false`인 명시적인 로컬 평가 입력이다. 기존 setup.yaml의 기본 정책 선택은 유지한다. 이 때문에 후속 요구를 source pin·anchor file·receiver 선언 대조, 잘못된/모호한 anchor 거부와 올바른 정책 재생성 검증으로 정했다. 기존 무소스 함수는 다른 package prefix를 다시 붙일 수 있다. 아래 소스 대조 완료 기록과 구분한다.
 
 ## 검증 이력과 완료 경계
 
@@ -44,3 +44,22 @@ CKV는 mock이며 이 도구는 graph annotation 경로만 사용했다. 임베�
 [질문12개](./operational-preparation/ontology-effect-dev/requests.json)는 WBFT4개 family 제안의 검색 질문8개와 unknown/다른 프로젝트/성능/버전 제어 질문4개다. [비공개 검토 초안](./operational-preparation/ontology-effect-dev/private-review.json)은 정답을 아직 작성하지 않았고 기존 WBFT pilot과 의미 중복을 미검토로 기록했다. 새 독립 FINAL이나12개 독립 표본이 아니다. [실행 초안](./operational-preparation/ontology-effect-dev/execution-draft.json)은 동일 corpus에서 off/concept_text/relations/combined를 비교하도록 한다. 반복·채점 근거·기준을 고정하기 전에는 효과를 채점하지 않는다.
 
 기존 retained corpus dataset474440d4의 project/source pin은 승인된 ontology4개 정의와 일치한다. 그러나 이 버전에는 semantic DB가 없다. 승인 정의의 retained-source 포함 여부·정합과 코드 관계 상태를 확인한 뒤 소유한 별도 경로에서 semantic 후보를 만들어야 한다. 승인된 정의가 있다는 사실만으로 구현 관계나 품질 개선을 만들어 넣지 않는다. 이 문단은 초기 준비 시점의 기록이다. 이후 로컬384회·별도 진단8회의 관찰은 [OE-01 관찰 기록](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)에 있고 품질은 inconclusive다. 최신 전체 진행은 [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+
+
+## 생성기 보완 실행 계약 (2026-10-16)
+
+현재 상태: 완료(명시적 소스 대조 경로, 운영 profile은 미전환). 기존 무소스 sync와 승인 overlay 원본은 유지하고, 명시적인 `cks domain sync --code-root <source>` 경로를 추가한다. 실제 Go package 선언·함수/receiver·type/const/var 정의를 해당 anchor 파일에서 대조한다. receiver 없는 이름은 해당 파일에서 유일할 때만 보완한다. 다른 파일에 있는 이름·모호한 이름·외부 경로·손상된 소스는 두 출력 쓰기 전에 거부한다. 폴더 basename이나 다른 파일의 동명 함수로 대체하지 않는다. loc anchor는 명시 enclosing symbol/범위를 대조하며 def line은 기존 advisory 의미를 유지한다.
+
+완료 기준은 고정 소스의 원래 오류 재현, 읽기 전용 원본 보존, 소유 평가용 entries의 잘못된 파일1개만 명시 수정 후7개 참조의 승인 overlay와 일치, 실제 graph 저장/공개 CKS 연결 재검증, 모호성/오파일/출력 보존 회귀와 새로운 전체 Go/race·빌드/fmt/vet/lint·문서 검사 통과다. 이는 생성기의 source-name 정합성 검증이며 정책 내용의 사람/독립 품질 승인이나 운영 채택이 아니다.
+
+## 소스 대조 정책 생성기 보완 완료 (2026-10-16)
+
+명시적 `cks domain sync --code-root <source>`는 폴더 이름 대신 실제 Go 선언을 읽어 package·receiver·type/field/const/var/interface 이름을 해당 anchor 파일에서 대조한다. receiver 없는 이름은 해당 파일에서 유일할 때만 보완하고, 오파일/모호한 이름/외부·symlink 경로/손상된 소스는 두 출력을 쓰기 전에 거부한다. symbol이 없는 파일/행 전용 anchor는 새 정책 연결로 만들지 않는다. 기존 무소스 sync는 이전 결과를 보존한다. 이 경로는 명시적 옵션이며 기존 setup/운영 profile을 자동으로 전환하지 않는다.
+
+고정 소스0bf2f4d1에서 원래 ErrInvalidFeePayer 파일 참조는 거부되고 두 기존 출력은 보존됐다. 소유 평가 사본의 해당 anchor 파일만 core/txpool/errors.go로 수정한 후, 승인 overlay와 같은42개 정책·146개 연결을 재생성했다. 생성기는 참조를 결정적으로 정렬하므로 승인 overlay의 기존 목록 순서와 byte는 일부 다르지만, 모든 정책 필드와 정렬한 governs 목록은 같다. 원본 entry·정책·승인 overlay와 원본 소스 HEAD/status를 보존했다. 원래 entry의 잘못된 파일 위치를 조용히 찾아 옮기거나 원본 설명/검토 승인을 변경하지 않았다.
+
+새 생성 결과로 실제 graph를 구축하고146개 연결을 고정 AST 위치와 대조했다. 수정7개에 대해 공개 CKS 일반·소스/snapshot pin·canonical ID 조회21회, 잘못된 pin2개·assembler 혼입1개 거부/빈 결과까지 총24회 도구 조회와26쌍 원시 요청/응답을 검증했다. CKS는 EOF0으로 종료했다.843개 파일이 graph에 선택됐고 parse error0이다. source corpus는882개 비시험 Git Go blob이며 대상 프로젝트 코드를 실행하거나 실제 LLM/유료 모델을 호출하지 않았다.
+
+함수뿐 아니라 실제 정책의 구조체 필드·인터페이스도 확인했다. 초기 진단의 필드 누락과 정책 연결을 요청하지 않는 loc anchor 처리, CLI 오류 정제 정책에 대한 평가 도구의 가정을 수정한 이력은 최종 통과와 구분해 보존한다. 원자료 재계산/반례·새 전체 Go/race·빌드/fmt/vet/lint·문서 검증은 [증거](../../system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json)를 따른다. 이는 source-name 연결 정합성의 개발 검증이며 정책 의미의 사람/독립 수용이나 운영 채택이 아니다.
+
+현재 로컬 로드맵28/28·기능7/7과 별도 생성기 보완을 완료했다. 남은 별도 범위는 운영·독립 수용9개와 선택 후속12개다. 다음은 독립 평가를 실제로 수행할 경우 해당 입력·검토/실행 범위·필요한 실제 모델 조건을 고정하는 단계이며, 로컬 검증을 그 승인/수용으로 대신하지 않는다.

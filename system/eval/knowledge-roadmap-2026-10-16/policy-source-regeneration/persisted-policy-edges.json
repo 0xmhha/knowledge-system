@@ -1,0 +1,1024 @@
+[
+  {
+    "id": "d5d3ade576d59a58",
+    "qualified_name": "core.Core.currentMutex",
+    "file_path": "consensus/wbft/core/core.go",
+    "start_line": 106,
+    "dst": "policy:A1.concurrency.core_lock_discipline"
+  },
+  {
+    "id": "96cb75fbf5241e20",
+    "qualified_name": "core.priorState",
+    "file_path": "consensus/wbft/core/priorstate.go",
+    "start_line": 28,
+    "dst": "policy:A1.concurrency.core_lock_discipline"
+  },
+  {
+    "id": "64e2bc12666b3cd6",
+    "qualified_name": "core.Core.startNewRound",
+    "file_path": "consensus/wbft/core/core.go",
+    "start_line": 161,
+    "dst": "policy:A1.wbft_core.consensus_flow_architecture"
+  },
+  {
+    "id": "9c5efdc57601a2ef",
+    "qualified_name": "core.Core.handleCommitMsg",
+    "file_path": "consensus/wbft/core/commit.go",
+    "start_line": 90,
+    "dst": "policy:A1.wbft_core.message_handlers"
+  },
+  {
+    "id": "96e2513c9bd621a6",
+    "qualified_name": "core.Core.handlePrepareMsg",
+    "file_path": "consensus/wbft/core/prepare.go",
+    "start_line": 87,
+    "dst": "policy:A1.wbft_core.message_handlers"
+  },
+  {
+    "id": "e6a0c5ee77910d20",
+    "qualified_name": "core.Core.handlePreprepareMsg",
+    "file_path": "consensus/wbft/core/preprepare.go",
+    "start_line": 113,
+    "dst": "policy:A1.wbft_core.message_handlers"
+  },
+  {
+    "id": "96e2513c9bd621a6",
+    "qualified_name": "core.Core.handlePrepareMsg",
+    "file_path": "consensus/wbft/core/prepare.go",
+    "start_line": 87,
+    "dst": "policy:A1.wbft_core.quorum_calc"
+  },
+  {
+    "id": "d40d2cc0a9d8590c",
+    "qualified_name": "validator.defaultSet.F",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 222,
+    "dst": "policy:A1.wbft_core.quorum_calc"
+  },
+  {
+    "id": "90591deae205962f",
+    "qualified_name": "validator.defaultSet.QuorumSize",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 226,
+    "dst": "policy:A1.wbft_core.quorum_calc"
+  },
+  {
+    "id": "8b42a4f73e8d32b1",
+    "qualified_name": "wbft.ValidatorSet",
+    "file_path": "consensus/wbft/types.go",
+    "start_line": 216,
+    "dst": "policy:A1.wbft_core.quorum_calc"
+  },
+  {
+    "id": "7bd757b896ad9cd6",
+    "qualified_name": "core.Core.broadcastNextRoundChange",
+    "file_path": "consensus/wbft/core/roundchange.go",
+    "start_line": 40,
+    "dst": "policy:A1.wbft_core.round_change_protocol"
+  },
+  {
+    "id": "7869c02bb67949fc",
+    "qualified_name": "core.Core.broadcastRoundChange",
+    "file_path": "consensus/wbft/core/roundchange.go",
+    "start_line": 52,
+    "dst": "policy:A1.wbft_core.round_change_protocol"
+  },
+  {
+    "id": "d199d10f1ddc963a",
+    "qualified_name": "core.Core.handleRoundChangeMsg",
+    "file_path": "consensus/wbft/core/roundchange.go",
+    "start_line": 103,
+    "dst": "policy:A1.wbft_core.round_change_protocol"
+  },
+  {
+    "id": "72ecf523a666b343",
+    "qualified_name": "messages.RoundChange",
+    "file_path": "consensus/wbft/messages/roundchange.go",
+    "start_line": 37,
+    "dst": "policy:A1.wbft_core.round_change_protocol"
+  },
+  {
+    "id": "b18c0be7a14607ca",
+    "qualified_name": "messages.SignedRoundChangePayload",
+    "file_path": "consensus/wbft/messages/roundchange.go",
+    "start_line": 64,
+    "dst": "policy:A1.wbft_core.round_change_protocol"
+  },
+  {
+    "id": "ff9ffa92eee21ceb",
+    "qualified_name": "compile.Compile",
+    "file_path": "systemcontracts/compile/compiler/compiler.go",
+    "start_line": 40,
+    "dst": "policy:A10.codegen.contract_regen_procedure"
+  },
+  {
+    "id": "f95df2bb950c9283",
+    "qualified_name": "compile.compiledTy.ExportContractCode",
+    "file_path": "systemcontracts/compile/compiler/compiler.go",
+    "start_line": 123,
+    "dst": "policy:A10.codegen.contract_regen_procedure"
+  },
+  {
+    "id": "cc3808c2f06811d0",
+    "qualified_name": "compile.solcVersion",
+    "file_path": "systemcontracts/compile/compiler/compiler.go",
+    "start_line": 37,
+    "dst": "policy:A10.codegen.contract_regen_procedure"
+  },
+  {
+    "id": "ace58373e2c797b4",
+    "qualified_name": "vm.EVM.Call",
+    "file_path": "core/vm/evm.go",
+    "start_line": 195,
+    "dst": "policy:A11.state_transition.blacklist_check_points"
+  },
+  {
+    "id": "c0c20b2affa34f5c",
+    "qualified_name": "params.ChainConfig.AnzeonEnabled",
+    "file_path": "params/config.go",
+    "start_line": 1085,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "0fedcb9b633248ff",
+    "qualified_name": "params.ChainConfig.IsApplepie",
+    "file_path": "params/config.go",
+    "start_line": 1038,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "cbf7cc2bf5d087b5",
+    "qualified_name": "txpool.ErrInvalidFeePayer",
+    "file_path": "core/txpool/errors.go",
+    "start_line": 69,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "10b48bf7c6b2ee82",
+    "qualified_name": "txpool.ValidateTransaction",
+    "file_path": "core/txpool/validation.go",
+    "start_line": 55,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "091d618b521aac90",
+    "qualified_name": "types.FeeDelegateDynamicFeeTx",
+    "file_path": "core/types/tx_fee_delegation.go",
+    "start_line": 27,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "aeb0a76db4588203",
+    "qualified_name": "types.FeeDelegateDynamicFeeTx.txType",
+    "file_path": "core/types/tx_fee_delegation.go",
+    "start_line": 116,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "9ddcd18d2018f7d8",
+    "qualified_name": "types.FeePayer",
+    "file_path": "core/types/transaction_signing.go",
+    "start_line": 161,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "e96484e6d4c3ad84",
+    "qualified_name": "types.LegacyTxType",
+    "file_path": "core/types/transaction.go",
+    "start_line": 48,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "b96b530a30cbc429",
+    "qualified_name": "types.SetCodeTx.txType",
+    "file_path": "core/types/tx_setcode.go",
+    "start_line": 186,
+    "dst": "policy:A11.txpool.type_taxonomy_admission"
+  },
+  {
+    "id": "162ffc5d7704d2cd",
+    "qualified_name": "types.WBFTAggregatedSeal",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 52,
+    "dst": "policy:A12.seals.bls_seal_scheme"
+  },
+  {
+    "id": "ec8c6d83a7e23182",
+    "qualified_name": "types.WBFTExtra",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 81,
+    "dst": "policy:A12.seals.bls_seal_scheme"
+  },
+  {
+    "id": "81f6485a8e645d59",
+    "qualified_name": "types.WBFTExtra.PrevCommittedSeal",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 86,
+    "dst": "policy:A12.seals.bls_seal_scheme"
+  },
+  {
+    "id": "0ad5119fc61abf38",
+    "qualified_name": "types.FeeDelegateDynamicFeeTx.FeePayer",
+    "file_path": "core/types/tx_fee_delegation.go",
+    "start_line": 29,
+    "dst": "policy:A12.seals.feepayer_sighash"
+  },
+  {
+    "id": "aad11b9c88bcdd8a",
+    "qualified_name": "types.FeeDelegateDynamicFeeTx.setSignatureValues",
+    "file_path": "core/types/tx_fee_delegation.go",
+    "start_line": 147,
+    "dst": "policy:A12.seals.feepayer_sighash"
+  },
+  {
+    "id": "876fcbac03815639",
+    "qualified_name": "types.FeeDelegateDynamicFeeTx.sigHash",
+    "file_path": "core/types/tx_fee_delegation.go",
+    "start_line": 158,
+    "dst": "policy:A12.seals.feepayer_sighash"
+  },
+  {
+    "id": "5feceae25a19769b",
+    "qualified_name": "legacypool.LegacyPool.loop",
+    "file_path": "core/txpool/legacypool/legacypool.go",
+    "start_line": 373,
+    "dst": "policy:A13.sealing.reorg_serialization"
+  },
+  {
+    "id": "ddc421db691255f8",
+    "qualified_name": "legacypool.LegacyPool.queueTxEvent",
+    "file_path": "core/txpool/legacypool/legacypool.go",
+    "start_line": 1284,
+    "dst": "policy:A13.sealing.reorg_serialization"
+  },
+  {
+    "id": "60f4cfeb873c46f9",
+    "qualified_name": "backend.Backend.Finalize",
+    "file_path": "consensus/wbft/backend/engine.go",
+    "start_line": 174,
+    "dst": "policy:A14.foundations.base_fee_redistribution"
+  },
+  {
+    "id": "c8bd5e04c8488c0e",
+    "qualified_name": "validator.defaultSet",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 61,
+    "dst": "policy:A14.foundations.equal_power"
+  },
+  {
+    "id": "90591deae205962f",
+    "qualified_name": "validator.defaultSet.QuorumSize",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 226,
+    "dst": "policy:A14.foundations.equal_power"
+  },
+  {
+    "id": "57fd91f6e1307c95",
+    "qualified_name": "validator.defaultValidator",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 32,
+    "dst": "policy:A14.foundations.equal_power"
+  },
+  {
+    "id": "47a0dd9c79fa73bf",
+    "qualified_name": "core.BlockChain.forker",
+    "file_path": "core/blockchain.go",
+    "start_line": 260,
+    "dst": "policy:A14.foundations.instant_finality_inert_reorg"
+  },
+  {
+    "id": "4c7961fd47d9c194",
+    "qualified_name": "core.ForkChoice.ReorgNeeded",
+    "file_path": "core/forkchoice.go",
+    "start_line": 77,
+    "dst": "policy:A14.foundations.instant_finality_inert_reorg"
+  },
+  {
+    "id": "96e2513c9bd621a6",
+    "qualified_name": "core.Core.handlePrepareMsg",
+    "file_path": "consensus/wbft/core/prepare.go",
+    "start_line": 87,
+    "dst": "policy:A14.theory.3f1_intersection"
+  },
+  {
+    "id": "d40d2cc0a9d8590c",
+    "qualified_name": "validator.defaultSet.F",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 222,
+    "dst": "policy:A14.theory.3f1_intersection"
+  },
+  {
+    "id": "90591deae205962f",
+    "qualified_name": "validator.defaultSet.QuorumSize",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 226,
+    "dst": "policy:A14.theory.3f1_intersection"
+  },
+  {
+    "id": "96e2513c9bd621a6",
+    "qualified_name": "core.Core.handlePrepareMsg",
+    "file_path": "consensus/wbft/core/prepare.go",
+    "start_line": 87,
+    "dst": "policy:A14.theory.equivocation"
+  },
+  {
+    "id": "e6a0c5ee77910d20",
+    "qualified_name": "core.Core.handlePreprepareMsg",
+    "file_path": "consensus/wbft/core/preprepare.go",
+    "start_line": 113,
+    "dst": "policy:A14.theory.equivocation"
+  },
+  {
+    "id": "4e9a36c9114c2b42",
+    "qualified_name": "core.Core.roundChangeTimer",
+    "file_path": "consensus/wbft/core/core.go",
+    "start_line": 110,
+    "dst": "policy:A14.theory.flp_partial_synchrony"
+  },
+  {
+    "id": "90591deae205962f",
+    "qualified_name": "validator.defaultSet.QuorumSize",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 226,
+    "dst": "policy:A14.theory.flp_partial_synchrony"
+  },
+  {
+    "id": "e6a0c5ee77910d20",
+    "qualified_name": "core.Core.handlePreprepareMsg",
+    "file_path": "consensus/wbft/core/preprepare.go",
+    "start_line": 113,
+    "dst": "policy:A14.theory.justification_locking"
+  },
+  {
+    "id": "ab4cc1d0be637079",
+    "qualified_name": "types.ExtractWBFTExtra",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 251,
+    "dst": "policy:A2.block_encoding.filtered_header_hash"
+  },
+  {
+    "id": "15717947743e03eb",
+    "qualified_name": "types.WBFTFilteredHeader",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 263,
+    "dst": "policy:A2.block_encoding.filtered_header_hash"
+  },
+  {
+    "id": "a8832bc55620d796",
+    "qualified_name": "types.WBFTFilteredHeaderWithRound",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 269,
+    "dst": "policy:A2.block_encoding.filtered_header_hash"
+  },
+  {
+    "id": "fdab5a68edb87f29",
+    "qualified_name": "types.Candidate",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 94,
+    "dst": "policy:A2.block_encoding.wbft_extra_struct"
+  },
+  {
+    "id": "be46be94ae1457e2",
+    "qualified_name": "types.EpochInfo",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 99,
+    "dst": "policy:A2.block_encoding.wbft_extra_struct"
+  },
+  {
+    "id": "46f76aa24abbece1",
+    "qualified_name": "types.IstanbulExtraSeal",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 35,
+    "dst": "policy:A2.block_encoding.wbft_extra_struct"
+  },
+  {
+    "id": "4e2d13d7a27c17b6",
+    "qualified_name": "types.IstanbulExtraVanity",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 34,
+    "dst": "policy:A2.block_encoding.wbft_extra_struct"
+  },
+  {
+    "id": "e2d57a35cd219312",
+    "qualified_name": "types.SealerSet",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 290,
+    "dst": "policy:A2.block_encoding.wbft_extra_struct"
+  },
+  {
+    "id": "162ffc5d7704d2cd",
+    "qualified_name": "types.WBFTAggregatedSeal",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 52,
+    "dst": "policy:A2.block_encoding.wbft_extra_struct"
+  },
+  {
+    "id": "ec8c6d83a7e23182",
+    "qualified_name": "types.WBFTExtra",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 81,
+    "dst": "policy:A2.block_encoding.wbft_extra_struct"
+  },
+  {
+    "id": "39ef646a6151f076",
+    "qualified_name": "params.DefaultAnzeonConfig",
+    "file_path": "params/config_wbft.go",
+    "start_line": 210,
+    "dst": "policy:A3.timing.wbft_config_defaults"
+  },
+  {
+    "id": "33fdb2b166bc7db0",
+    "qualified_name": "params.WBFTConfig",
+    "file_path": "params/config_wbft.go",
+    "start_line": 186,
+    "dst": "policy:A3.timing.wbft_config_defaults"
+  },
+  {
+    "id": "2d30f6bda9722c09",
+    "qualified_name": "wbft.Config.GetConfig",
+    "file_path": "consensus/wbft/config.go",
+    "start_line": 161,
+    "dst": "policy:A3.timing.wbft_config_defaults"
+  },
+  {
+    "id": "b2f119871188c3e7",
+    "qualified_name": "wbft.DefaultConfig",
+    "file_path": "consensus/wbft/config.go",
+    "start_line": 116,
+    "dst": "policy:A3.timing.wbft_config_defaults"
+  },
+  {
+    "id": "3619d3f5098d6165",
+    "qualified_name": "backend.Backend.GetValidatorsForVerifying",
+    "file_path": "consensus/wbft/backend/engine.go",
+    "start_line": 420,
+    "dst": "policy:A3.validator_set.epoch_transition"
+  },
+  {
+    "id": "695822a2c0a6cb57",
+    "qualified_name": "params.WBFTConfig.EpochLength",
+    "file_path": "params/config_wbft.go",
+    "start_line": 189,
+    "dst": "policy:A3.validator_set.epoch_transition"
+  },
+  {
+    "id": "be46be94ae1457e2",
+    "qualified_name": "types.EpochInfo",
+    "file_path": "core/types/istanbul.go",
+    "start_line": 99,
+    "dst": "policy:A3.validator_set.epoch_transition"
+  },
+  {
+    "id": "1fe5cf7a84dc76c9",
+    "qualified_name": "wbftengine.Engine.GetValidators",
+    "file_path": "consensus/wbft/engine/engine.go",
+    "start_line": 1097,
+    "dst": "policy:A3.validator_set.epoch_transition"
+  },
+  {
+    "id": "882be5a752eade51",
+    "qualified_name": "validator.NewSet",
+    "file_path": "consensus/wbft/validator/validator.go",
+    "start_line": 35,
+    "dst": "policy:A3.validator_set.set_construction"
+  },
+  {
+    "id": "ceabcd05218d31c2",
+    "qualified_name": "validator.NewSetByValidators",
+    "file_path": "consensus/wbft/validator/validator.go",
+    "start_line": 43,
+    "dst": "policy:A3.validator_set.set_construction"
+  },
+  {
+    "id": "f23066f8838fdf47",
+    "qualified_name": "validator.defaultSet.CalcProposer",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 140,
+    "dst": "policy:A3.validator_set.set_construction"
+  },
+  {
+    "id": "90591deae205962f",
+    "qualified_name": "validator.defaultSet.QuorumSize",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 226,
+    "dst": "policy:A3.validator_set.set_construction"
+  },
+  {
+    "id": "b2317b5e1f00fb2b",
+    "qualified_name": "validator.newDefaultSet",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 71,
+    "dst": "policy:A3.validator_set.set_construction"
+  },
+  {
+    "id": "cdf02caac0229237",
+    "qualified_name": "validator.roundRobinProposer",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 158,
+    "dst": "policy:A3.validator_set.set_construction"
+  },
+  {
+    "id": "23944cbc554d0e25",
+    "qualified_name": "validator.stickyProposer",
+    "file_path": "consensus/wbft/validator/default.go",
+    "start_line": 172,
+    "dst": "policy:A3.validator_set.set_construction"
+  },
+  {
+    "id": "7f7694cb3604e3ea",
+    "qualified_name": "systemcontracts.GetMaxMinterAllowance",
+    "file_path": "systemcontracts/gov_master_minter.go",
+    "start_line": 192,
+    "dst": "policy:A4.gov_minter.mint_proposal_allowance"
+  },
+  {
+    "id": "c6b6a6a85cfec803",
+    "qualified_name": "systemcontracts.GetMintProposalAmount",
+    "file_path": "systemcontracts/gov_minter.go",
+    "start_line": 122,
+    "dst": "policy:A4.gov_minter.mint_proposal_allowance"
+  },
+  {
+    "id": "6788d5abfcdd3da5",
+    "qualified_name": "systemcontracts.IsMinter",
+    "file_path": "systemcontracts/gov_master_minter.go",
+    "start_line": 166,
+    "dst": "policy:A4.gov_minter.mint_proposal_allowance"
+  },
+  {
+    "id": "0edac6845425d689",
+    "qualified_name": "systemcontracts.MintProof",
+    "file_path": "systemcontracts/gov_minter.go",
+    "start_line": 61,
+    "dst": "policy:A4.gov_minter.mint_proposal_allowance"
+  },
+  {
+    "id": "5bb5f96bfd92fe6a",
+    "qualified_name": "systemcontracts.initializeMasterMinter",
+    "file_path": "systemcontracts/gov_master_minter.go",
+    "start_line": 59,
+    "dst": "policy:A4.gov_minter.mint_proposal_allowance"
+  },
+  {
+    "id": "e22829b704531f55",
+    "qualified_name": "systemcontracts.CalculateMappingSlot",
+    "file_path": "systemcontracts/stateutil.go",
+    "start_line": 31,
+    "dst": "policy:A4.gov_validator.genesis_initialization"
+  },
+  {
+    "id": "0bef00ea016e60cf",
+    "qualified_name": "systemcontracts.MakeMultipleParam",
+    "file_path": "systemcontracts/gov_validator.go",
+    "start_line": 186,
+    "dst": "policy:A4.gov_validator.genesis_initialization"
+  },
+  {
+    "id": "df59c05b1fe8f7c6",
+    "qualified_name": "systemcontracts.initializeValidator",
+    "file_path": "systemcontracts/gov_validator.go",
+    "start_line": 52,
+    "dst": "policy:A4.gov_validator.genesis_initialization"
+  },
+  {
+    "id": "d0f0327ac64a66d4",
+    "qualified_name": "params.DefaultGovCouncilAddress",
+    "file_path": "params/config_wbft.go",
+    "start_line": 44,
+    "dst": "policy:A4.system_contracts.addresses"
+  },
+  {
+    "id": "d9201210457cc60e",
+    "qualified_name": "params.DefaultGovMasterMinterAddress",
+    "file_path": "params/config_wbft.go",
+    "start_line": 38,
+    "dst": "policy:A4.system_contracts.addresses"
+  },
+  {
+    "id": "e48cd42211201841",
+    "qualified_name": "params.DefaultGovMinterAddress",
+    "file_path": "params/config_wbft.go",
+    "start_line": 41,
+    "dst": "policy:A4.system_contracts.addresses"
+  },
+  {
+    "id": "05ac87b619adf6b5",
+    "qualified_name": "params.DefaultGovValidatorAddress",
+    "file_path": "params/config_wbft.go",
+    "start_line": 35,
+    "dst": "policy:A4.system_contracts.addresses"
+  },
+  {
+    "id": "4915f316b5bc9659",
+    "qualified_name": "params.DefaultNativeCoinAdapterAddress",
+    "file_path": "params/config_wbft.go",
+    "start_line": 32,
+    "dst": "policy:A4.system_contracts.addresses"
+  },
+  {
+    "id": "ab47f625dd8172c0",
+    "qualified_name": "params.NativeCoinManagerAddress",
+    "file_path": "params/protocol_params.go",
+    "start_line": 219,
+    "dst": "policy:A4.system_contracts.addresses"
+  },
+  {
+    "id": "cc3808c2f06811d0",
+    "qualified_name": "compile.solcVersion",
+    "file_path": "systemcontracts/compile/compiler/compiler.go",
+    "start_line": 37,
+    "dst": "policy:A4.system_contracts.build_deploy_pipeline"
+  },
+  {
+    "id": "13e399b45626f262",
+    "qualified_name": "core.InjectContracts",
+    "file_path": "core/genesis.go",
+    "start_line": 735,
+    "dst": "policy:A4.system_contracts.build_deploy_pipeline"
+  },
+  {
+    "id": "06fcda79f6aafc4d",
+    "qualified_name": "systemcontracts.GetSystemContractsTransition",
+    "file_path": "systemcontracts/systemcontracts.go",
+    "start_line": 78,
+    "dst": "policy:A4.system_contracts.build_deploy_pipeline"
+  },
+  {
+    "id": "e2f10600a16ff0e7",
+    "qualified_name": "systemcontracts.SystemContractCodes",
+    "file_path": "systemcontracts/contracts.go",
+    "start_line": 55,
+    "dst": "policy:A4.system_contracts.build_deploy_pipeline"
+  },
+  {
+    "id": "63a6011a65a7a750",
+    "qualified_name": "systemcontracts.GetBurnBalance",
+    "file_path": "systemcontracts/gov_minter.go",
+    "start_line": 130,
+    "dst": "policy:A4.system_contracts.gov_minter"
+  },
+  {
+    "id": "c6b6a6a85cfec803",
+    "qualified_name": "systemcontracts.GetMintProposalAmount",
+    "file_path": "systemcontracts/gov_minter.go",
+    "start_line": 122,
+    "dst": "policy:A4.system_contracts.gov_minter"
+  },
+  {
+    "id": "2e8dfa6fbd7e71fb",
+    "qualified_name": "systemcontracts.GovMinterContractV1",
+    "file_path": "systemcontracts/contracts.go",
+    "start_line": 44,
+    "dst": "policy:A4.system_contracts.gov_minter"
+  },
+  {
+    "id": "3f66ce9677ec2111",
+    "qualified_name": "systemcontracts.GovMinterContractV2",
+    "file_path": "systemcontracts/contracts.go",
+    "start_line": 53,
+    "dst": "policy:A4.system_contracts.gov_minter"
+  },
+  {
+    "id": "0e236f07825d5a9e",
+    "qualified_name": "systemcontracts.initializeMinter",
+    "file_path": "systemcontracts/gov_minter.go",
+    "start_line": 87,
+    "dst": "policy:A4.system_contracts.gov_minter"
+  },
+  {
+    "id": "ecdf094081c2f71a",
+    "qualified_name": "systemcontracts.CalculateDynamicSlot",
+    "file_path": "systemcontracts/stateutil.go",
+    "start_line": 40,
+    "dst": "policy:A4.system_contracts.storage_slot_layout"
+  },
+  {
+    "id": "e22829b704531f55",
+    "qualified_name": "systemcontracts.CalculateMappingSlot",
+    "file_path": "systemcontracts/stateutil.go",
+    "start_line": 31,
+    "dst": "policy:A4.system_contracts.storage_slot_layout"
+  },
+  {
+    "id": "75073563f59db328",
+    "qualified_name": "systemcontracts.EnumerableSet",
+    "file_path": "systemcontracts/stateutil.go",
+    "start_line": 56,
+    "dst": "policy:A4.system_contracts.storage_slot_layout"
+  },
+  {
+    "id": "eae6f83c4a4811cb",
+    "qualified_name": "types.AccountExtraMaskAuthorized",
+    "file_path": "core/types/state_account_extra.go",
+    "start_line": 36,
+    "dst": "policy:A5.account_extra.bit_layout"
+  },
+  {
+    "id": "4da80e59b2e7d949",
+    "qualified_name": "types.AccountExtraMaskBlacklisted",
+    "file_path": "core/types/state_account_extra.go",
+    "start_line": 33,
+    "dst": "policy:A5.account_extra.bit_layout"
+  },
+  {
+    "id": "228c8374b0acdc45",
+    "qualified_name": "types.AccountExtraValidMask",
+    "file_path": "core/types/state_account_extra.go",
+    "start_line": 45,
+    "dst": "policy:A5.account_extra.bit_layout"
+  },
+  {
+    "id": "da3bffe8dc43d3b5",
+    "qualified_name": "types.IsAuthorized",
+    "file_path": "core/types/state_account_extra.go",
+    "start_line": 87,
+    "dst": "policy:A5.account_extra.bit_layout"
+  },
+  {
+    "id": "30e15d6d71383f4c",
+    "qualified_name": "types.IsBlacklisted",
+    "file_path": "core/types/state_account_extra.go",
+    "start_line": 72,
+    "dst": "policy:A5.account_extra.bit_layout"
+  },
+  {
+    "id": "51e5ae28241df281",
+    "qualified_name": "vm.canRunCoinManger",
+    "file_path": "core/vm/native_manager.go",
+    "start_line": 463,
+    "dst": "policy:A5.native_coin.issuance_burn_flow"
+  },
+  {
+    "id": "af7fba1342f81022",
+    "qualified_name": "vm.coinManagerBurn.Run",
+    "file_path": "core/vm/native_manager.go",
+    "start_line": 225,
+    "dst": "policy:A5.native_coin.issuance_burn_flow"
+  },
+  {
+    "id": "e0f9120b4da7daaa",
+    "qualified_name": "vm.coinManagerMint.CanRun",
+    "file_path": "core/vm/native_manager.go",
+    "start_line": 199,
+    "dst": "policy:A5.native_coin.issuance_burn_flow"
+  },
+  {
+    "id": "ade38866cca7c717",
+    "qualified_name": "vm.coinManagerMint.Run",
+    "file_path": "core/vm/native_manager.go",
+    "start_line": 202,
+    "dst": "policy:A5.native_coin.issuance_burn_flow"
+  },
+  {
+    "id": "0867e2311b5bc711",
+    "qualified_name": "vm.coinManagerTransfer.Run",
+    "file_path": "core/vm/native_manager.go",
+    "start_line": 259,
+    "dst": "policy:A5.native_coin.issuance_burn_flow"
+  },
+  {
+    "id": "a83c6e1965c454c0",
+    "qualified_name": "gasprice.AnzeonTipEnv",
+    "file_path": "eth/gasprice/anzeon.go",
+    "start_line": 31,
+    "dst": "policy:A6.anzeon_gas.tip_override"
+  },
+  {
+    "id": "50fc78ba34786a80",
+    "qualified_name": "gasprice.AnzeonTipEnv.GetAnzeonTipCap",
+    "file_path": "eth/gasprice/anzeon.go",
+    "start_line": 90,
+    "dst": "policy:A6.anzeon_gas.tip_override"
+  },
+  {
+    "id": "82199a3d3018da03",
+    "qualified_name": "gasprice.AnzeonTipEnv.IsAnzeon",
+    "file_path": "eth/gasprice/anzeon.go",
+    "start_line": 71,
+    "dst": "policy:A6.anzeon_gas.tip_override"
+  },
+  {
+    "id": "49829d70057c40f5",
+    "qualified_name": "gasprice.AnzeonTipEnv.SetCurrentBlock",
+    "file_path": "eth/gasprice/anzeon.go",
+    "start_line": 50,
+    "dst": "policy:A6.anzeon_gas.tip_override"
+  },
+  {
+    "id": "78de3a58ae91da7f",
+    "qualified_name": "types.FeeDelegateDynamicFeeTx.rawFeePayerSignatureValues",
+    "file_path": "core/types/tx_fee_delegation.go",
+    "start_line": 128,
+    "dst": "policy:A6.fee_delegation.signing_model"
+  },
+  {
+    "id": "98a9abf4aa228043",
+    "qualified_name": "types.FeeDelegateDynamicFeeTx.rawSignatureValues",
+    "file_path": "core/types/tx_fee_delegation.go",
+    "start_line": 143,
+    "dst": "policy:A6.fee_delegation.signing_model"
+  },
+  {
+    "id": "aad11b9c88bcdd8a",
+    "qualified_name": "types.FeeDelegateDynamicFeeTx.setSignatureValues",
+    "file_path": "core/types/tx_fee_delegation.go",
+    "start_line": 147,
+    "dst": "policy:A6.fee_delegation.signing_model"
+  },
+  {
+    "id": "6811b18d5c68e1e0",
+    "qualified_name": "ethconfig.SetConfigFromChainConfig",
+    "file_path": "eth/ethconfig/config.go",
+    "start_line": 213,
+    "dst": "policy:A7.hardfork.add_new_fork_procedure"
+  },
+  {
+    "id": "5b88c5d2ce0eee2d",
+    "qualified_name": "params.ChainConfig",
+    "file_path": "params/config.go",
+    "start_line": 785,
+    "dst": "policy:A7.hardfork.add_new_fork_procedure"
+  },
+  {
+    "id": "29be4c3b81c90298",
+    "qualified_name": "params.ChainConfig.CheckConfigForkOrder",
+    "file_path": "params/config.go",
+    "start_line": 1155,
+    "dst": "policy:A7.hardfork.add_new_fork_procedure"
+  },
+  {
+    "id": "7f0d2864dbc2d72b",
+    "qualified_name": "params.ChainConfig.CollectUpgrades",
+    "file_path": "params/config.go",
+    "start_line": 1108,
+    "dst": "policy:A7.hardfork.add_new_fork_procedure"
+  },
+  {
+    "id": "0251b3bd1276707f",
+    "qualified_name": "vm.ActiveNativeManagers",
+    "file_path": "core/vm/native_manager.go",
+    "start_line": 124,
+    "dst": "policy:A7.hardfork.add_new_fork_procedure"
+  },
+  {
+    "id": "185400c0f952d785",
+    "qualified_name": "core.DefaultStableNetMainnetGenesisBlock",
+    "file_path": "core/genesis.go",
+    "start_line": 617,
+    "dst": "policy:A8.genesis.bootstrap_architecture"
+  },
+  {
+    "id": "d10002e4d3245e11",
+    "qualified_name": "core.Genesis.Commit",
+    "file_path": "core/genesis.go",
+    "start_line": 575,
+    "dst": "policy:A8.genesis.bootstrap_architecture"
+  },
+  {
+    "id": "de42c8774e601e1f",
+    "qualified_name": "core.Genesis.ToBlock",
+    "file_path": "core/genesis.go",
+    "start_line": 510,
+    "dst": "policy:A8.genesis.bootstrap_architecture"
+  },
+  {
+    "id": "13e399b45626f262",
+    "qualified_name": "core.InjectContracts",
+    "file_path": "core/genesis.go",
+    "start_line": 735,
+    "dst": "policy:A8.genesis.bootstrap_architecture"
+  },
+  {
+    "id": "18c7de753802efdc",
+    "qualified_name": "core.SetupGenesisBlockWithOverride",
+    "file_path": "core/genesis.go",
+    "start_line": 282,
+    "dst": "policy:A8.genesis.bootstrap_architecture"
+  },
+  {
+    "id": "d8ec7f9ddd6be600",
+    "qualified_name": "core.initializeAnzeonGenesis",
+    "file_path": "core/genesis.go",
+    "start_line": 242,
+    "dst": "policy:A8.genesis.bootstrap_architecture"
+  },
+  {
+    "id": "c226f42c65df56b1",
+    "qualified_name": "core.validateAnzeonGenesisConfig",
+    "file_path": "core/genesis.go",
+    "start_line": 231,
+    "dst": "policy:A8.genesis.bootstrap_architecture"
+  },
+  {
+    "id": "13e399b45626f262",
+    "qualified_name": "core.InjectContracts",
+    "file_path": "core/genesis.go",
+    "start_line": 735,
+    "dst": "policy:A8.genesis.inject_contracts_two_phase"
+  },
+  {
+    "id": "db4ed41b923dfaf4",
+    "qualified_name": "core.applyUpgradeOverlay",
+    "file_path": "core/genesis.go",
+    "start_line": 774,
+    "dst": "policy:A8.genesis.inject_contracts_two_phase"
+  },
+  {
+    "id": "7f0d2864dbc2d72b",
+    "qualified_name": "params.ChainConfig.CollectUpgrades",
+    "file_path": "params/config.go",
+    "start_line": 1108,
+    "dst": "policy:A8.genesis.inject_contracts_two_phase"
+  },
+  {
+    "id": "06fcda79f6aafc4d",
+    "qualified_name": "systemcontracts.GetSystemContractsTransition",
+    "file_path": "systemcontracts/systemcontracts.go",
+    "start_line": 78,
+    "dst": "policy:A8.genesis.inject_contracts_two_phase"
+  },
+  {
+    "id": "d8ec7f9ddd6be600",
+    "qualified_name": "core.initializeAnzeonGenesis",
+    "file_path": "core/genesis.go",
+    "start_line": 242,
+    "dst": "policy:A8.genesis.json_authoring_checklist"
+  },
+  {
+    "id": "c226f42c65df56b1",
+    "qualified_name": "core.validateAnzeonGenesisConfig",
+    "file_path": "core/genesis.go",
+    "start_line": 231,
+    "dst": "policy:A8.genesis.json_authoring_checklist"
+  },
+  {
+    "id": "9e0f4ab5048c9634",
+    "qualified_name": "eth.Istanbul100",
+    "file_path": "eth/quorum_protocol.go",
+    "start_line": 39,
+    "dst": "policy:A9.istanbul_p2p.protocol_architecture"
+  },
+  {
+    "id": "bd6f79a0136dd873",
+    "qualified_name": "eth.quorumConsensusProtocolName",
+    "file_path": "eth/quorum_protocol.go",
+    "start_line": 41,
+    "dst": "policy:A9.istanbul_p2p.protocol_architecture"
+  },
+  {
+    "id": "f69abf8c5313ed99",
+    "qualified_name": "backend.API.GetCommitSignersFromBlock",
+    "file_path": "consensus/wbft/backend/api.go",
+    "start_line": 90,
+    "dst": "policy:A9.istanbul_rpc.api_reference"
+  },
+  {
+    "id": "b1a72453d23496c3",
+    "qualified_name": "backend.API.GetCommitSignersFromBlockByHash",
+    "file_path": "consensus/wbft/backend/api.go",
+    "start_line": 107,
+    "dst": "policy:A9.istanbul_rpc.api_reference"
+  },
+  {
+    "id": "e2c92013e91ddde2",
+    "qualified_name": "backend.API.GetValidators",
+    "file_path": "consensus/wbft/backend/api.go",
+    "start_line": 136,
+    "dst": "policy:A9.istanbul_rpc.api_reference"
+  },
+  {
+    "id": "b28b13d8d1600a65",
+    "qualified_name": "backend.API.GetValidatorsAtHash",
+    "file_path": "consensus/wbft/backend/api.go",
+    "start_line": 156,
+    "dst": "policy:A9.istanbul_rpc.api_reference"
+  },
+  {
+    "id": "0dd912ae27a3131a",
+    "qualified_name": "backend.API.NodeAddress",
+    "file_path": "consensus/wbft/backend/api.go",
+    "start_line": 84,
+    "dst": "policy:A9.istanbul_rpc.api_reference"
+  },
+  {
+    "id": "ba159e3b50baca08",
+    "qualified_name": "backend.API.Status",
+    "file_path": "consensus/wbft/backend/api.go",
+    "start_line": 169,
+    "dst": "policy:A9.istanbul_rpc.api_reference"
+  },
+  {
+    "id": "5f0baa932d437a2a",
+    "qualified_name": "backend.BlockSigners",
+    "file_path": "consensus/wbft/backend/api.go",
+    "start_line": 46,
+    "dst": "policy:A9.istanbul_rpc.api_reference"
+  },
+  {
+    "id": "78bebb71abf55751",
+    "qualified_name": "backend.Status",
+    "file_path": "consensus/wbft/backend/api.go",
+    "start_line": 76,
+    "dst": "policy:A9.istanbul_rpc.api_reference"
+  }
+]

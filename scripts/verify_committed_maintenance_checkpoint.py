@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'ontology-mapping-effect': {
+        'revision': '56c59c88', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'oe-04-mapping-effect',
+        'scope': 'historical_OE01_4_completed_bounded_local_roadmap_not_independent_quality',
+        'scripts': ['check-multiproject-mapping-effect.py', 'test_multiproject_mapping_effect.py'],
+    },
     'ontology-expanded-score': {
         'revision': 'c0c77897', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'oe-03-score',
         'scope': 'historical_OE01_3_bounded_function_retrieval_cost_not_independent_quality',

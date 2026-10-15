@@ -1,0 +1,86 @@
+.E.FEFEF....F.
+======================================================================
+ERROR: test_no_reuse_of_prior_Go (__main__.AdoptionTests.test_no_reuse_of_prior_Go)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 85, in test_no_reuse_of_prior_Go
+    self.mutate('validation.json',lambda d:d.update(current_Go_validation_reused=True))
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 25, in mutate
+    d = json.loads(p.read_text())
+                   ^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1058, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/ks-adopted-policy-tests-fieo8mzt/packet/validation.json'
+
+======================================================================
+ERROR: test_original_inputs_must_be_preserved (__main__.AdoptionTests.test_original_inputs_must_be_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 89, in test_original_inputs_must_be_preserved
+    self.mutate('preservation-after.json',lambda d:d.update(original_changed=True))
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 25, in mutate
+    d = json.loads(p.read_text())
+                   ^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1058, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/ks-adopted-policy-tests-n081kbnb/packet/preservation-after.json'
+
+======================================================================
+ERROR: test_owned_entry_cannot_gain_approval (__main__.AdoptionTests.test_owned_entry_cannot_gain_approval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 98, in test_owned_entry_cannot_gain_approval
+    p.write_text(p.read_text()+'\nreviewer: invented\n')
+                 ^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1058, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/ks-adopted-policy-tests-mtrke23i/packet/owned-corrected-A11.yaml.txt'
+
+======================================================================
+FAIL: test_original_approval_cannot_be_invented (__main__.AdoptionTests.test_original_approval_cannot_be_invented)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 94, in test_original_approval_cannot_be_invented
+    self.assertTrue(guard.check(self.folder))
+AssertionError: [] is not true
+
+======================================================================
+FAIL: test_output_refusal_cannot_be_hidden (__main__.AdoptionTests.test_output_refusal_cannot_be_hidden)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 78, in test_output_refusal_cannot_be_hidden
+    self.assertTrue(guard.check(self.folder))
+AssertionError: [] is not true
+
+======================================================================
+FAIL: test_rehashed_generator_fix_claim_is_rejected (__main__.AdoptionTests.test_rehashed_generator_fix_claim_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 51, in test_rehashed_generator_fix_claim_is_rejected
+    self.assertTrue(guard.check(self.folder))
+AssertionError: [] is not true
+
+======================================================================
+FAIL: test_source_mode_must_be_explicit (__main__.AdoptionTests.test_source_mode_must_be_explicit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_source_policy_regeneration.py", line 82, in test_source_mode_must_be_explicit
+    self.assertTrue(guard.check(self.folder))
+AssertionError: [] is not true
+
+----------------------------------------------------------------------
+Ran 14 tests in 1.046s
+
+FAILED (failures=4, errors=3)

@@ -18,7 +18,7 @@
 
 2026-10-15 사용자 추가 요청을 [지식 매니저·비교 명세](./spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 진행 원장](./spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json)에 반영했다. 신규 기능 전체 완료는6/7이며 세부 작업은28개 중27개 완료다. OE-01의 단일 프로젝트 개발 관찰384회와 별도 진단8회를 실행했고 KM-01의4/4세부 작업과 로컬 격리 검증을 완료했다. KM-02의4/4와 실제 공개 실패36항목까지 완료했다. KM-03의4/4와 실제 Claude Code8회·도구68개·종료/복구 검증을 완료했고 KM-04의4/4와 두 프로젝트 실제 periodic/change·삭제·실패/재시도·보존 검증을 완료했고 KM-05의4/4도 완료했다. KM-06의4/4도 실제2프로젝트 비교까지 완료했다. 독립 품질·확대 범위·다중 프로젝트 평가는 남는다. 문서 등록이나 준비 검증을 기능 완료로 세지 않는다.
 
-전체28/28·기능7/7이다. 28개 로컬 구현/개발 검증을 완료했고 다음 별도 보완은 정책 생성기의 참조 재생성이다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 실제 LLM 답변·독립 정답·운영 활성화는 미실행/미승인 상태로 보존한다.
+전체28/28·기능7/7이다. 28개 로컬 구현/개발 검증을 완료했고 별도 생성기의 명시적 소스 대조 보완도 완료했다. 남은 별도 범위는 운영/독립 수용9개와 선택 후속12개다. 실제 LLM 답변·독립 정답·운영 활성화는 미실행/미승인 상태로 보존한다.
 
 | 우선순위 | ID | 작업과 기대 결과 | 상태 |
 |---|---|---|---|
@@ -30,11 +30,11 @@
 | P1 | KM-05 | 산업 공통 개념과 프로젝트별 근거 매핑. 같은 용어/다른 의미와 같은 역할/다른 용어 구분 | 완료: 어휘29+원문 연결30+검토34+적용/지원24=117사례; 실제 공개 비교는 KM-06 |
 | P1 | KM-06 | 프로젝트별 staking·합의·mempool 등의 비교 근거를 구조화하여 MCP/LLM에 제공 | 완료: 4/4·읽기 전용2도구·비교192개·실제2프로젝트6개념40셀/22항목19호출/3EOF0·부분 실패/원본 보존 |
 
-[정책 참조 수정 overlay](./spec-driven/POLICY-OVERLAY-ADOPTION.md)는 사용자 채택 승인과 로컬 연결 검증을 마쳤다. 원래 생성기가 기존 참조를 재생성하는 문제는 별도 보완 대상이다. 원본 정책·독립 정답/품질 승인은 변경하지 않는다.
+[정책 참조 수정 overlay](./spec-driven/POLICY-OVERLAY-ADOPTION.md)는 사용자 채택 승인과 로컬 연결 검증을 마쳤다. 원래 생성기가 기존 참조를 재생성하는 문제는 명시적 소스 대조 경로에서 보완했다. 잘못된 원본 anchor 파일은 거부하며 소유 평가 사본에서만 수정했다. 원본 정책·독립 정답/품질 승인은 변경하지 않는다.
 
 [온톨로지 개발 관찰](./spec-driven/ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은384회 실패/누락0·인용3,616개 원문 일치였지만 활성288회 no_match·순위 변화0이고 별도 정확 용어8회도 최종 boost0이다. 후속512회 함수 과제와 실제2프로젝트 매핑 입력 효과까지 관찰했다. 독립 의미/답변 정답과 품질 수용은 별도다. 기본 off·quality=inconclusive를 유지한다.
 
-현재 구현/시험은 [전체28개 시험표](./spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md)를 따른다. 매니저는 수동 문서가 없어도 수집·근거 있는 초안·검토·DB 구축·지속 갱신을 지원한다. 선택형 산업 팩과 원문 매핑을 구현했고, 비교 MCP의 요청·행렬·부분 실패 보호와 실제2프로젝트 비교까지 완료했다. OE-01의 확대512회/다중 프로젝트 개발 관찰도 완료했으며, 다음 별도 보완은 정책 참조 생성기다. 관찰하지 못한 설계 의도나 실제 성능·보안성·우월성을 사실로 만들지 않는다.
+현재 구현/시험은 [전체28개 시험표](./spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md)를 따른다. 매니저는 수동 문서가 없어도 수집·근거 있는 초안·검토·DB 구축·지속 갱신을 지원한다. 선택형 산업 팩과 원문 매핑을 구현했고, 비교 MCP의 요청·행렬·부분 실패 보호와 실제2프로젝트 비교까지 완료했다. OE-01의 확대512회/다중 프로젝트 개발 관찰과 명시적 소스 대조 생성기 보완도 완료했다. 다음 별도 범위는 운영·독립 수용이다. 관찰하지 못한 설계 의도나 실제 성능·보안성·우월성을 사실로 만들지 않는다.
 
 로컬 설계·개발·회귀/도구 검증은 독립 평가 담당자·유료 모델/비용 지정 없이 진행한다. 해당 지정은 실제 모델을 호출하거나 독립 수용을 판정하는 범위에 적용한다. 아래9개 정식 평가 계획의 미동결이 이 개발 경로 전체를 차단하지 않는다.
 
@@ -44,7 +44,7 @@ WI-5의 기존 수집→ingest→검토→승격/회수→색인 검증 목적�
 
 ## 구현 후 남은 운영·독립 수용 검증
 
-[대상·완료 기준 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)과 [별도 검증 원장](./spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 로컬 Go pilot 후보·항목별 입력/제안 gate·필요 receipt를 정리했다. 계획은 draft이며 실행/수용은0/9다. [실행 protocol·동결 체크리스트](./spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.md)와 source inventory를 준비했고 단계0은 preparing이다. 함수40개·review10개·확장 intent20개 source 후보와4개 미해결 실행 recipe를 추가했다. [review/정답 초안](./spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)은10개 rubric45anchor·3개 비완전 값/제어 초안이며 독립 채택은0이다. [ChainBench 종료·시험 상태 격리 보완](./spec-driven/OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)은 후보 코드·개발 검증 완료이며 실제 설치/노드 검증은 남는다. coding-agent 게시 전 종료·Stop 재진입도 OP-CA-01 후보 b6e2abdc에서 개발 검증을 완료했다. 두 소비자는 [격리 host 채택·연결](./spec-driven/ISOLATED-HOST-ADOPTION.md) 범위에서 검증했다. coding-agent는 SessionStart를 보완한 b7e7868, ChainBench는 bdf5ad27을 채택했고 실제 CLI2.1.300의 로컬 시험 응답기 사례5/5를 통과했다. 실제 모델·전체 역할·CKS·노드 검증은 남는다. [정책·보안 입력 검토 자료](./spec-driven/POLICY-SECURITY-INPUT-REVIEW.md)에 기존 정책42개·참조146개, source 호출68개와 query 후보12개를 추가했다. 수동 보안4개는 미승인 metadata 제안이며 독립 gold는0이다. [실제 프런트엔드 진단](./spec-driven/POLICY-REFERENCE-DIAGNOSIS.md)에서6개 미연결과 경고 없이 다른 함수에 붙는1개를 확인했다. 수정7개는 별도 평가 profile에서 실제 graph 저장·CKS 조회까지 검증했다. 원본·운영 설정은 그대로이며 독립 의미 수용과 생성기 보완은 남는다. 다음 개발 경로는 위 우선 작업표를 따른다. 정식 독립 평가를 실행할 때에는 별도로 입력·검토자·모델/비용·범위/기준을 고정한다.
+[대상·완료 기준 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)과 [별도 검증 원장](./spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 로컬 Go pilot 후보·항목별 입력/제안 gate·필요 receipt를 정리했다. 계획은 draft이며 실행/수용은0/9다. [실행 protocol·동결 체크리스트](./spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.md)와 source inventory를 준비했고 단계0은 preparing이다. 함수40개·review10개·확장 intent20개 source 후보와4개 미해결 실행 recipe를 추가했다. [review/정답 초안](./spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)은10개 rubric45anchor·3개 비완전 값/제어 초안이며 독립 채택은0이다. [ChainBench 종료·시험 상태 격리 보완](./spec-driven/OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)은 후보 코드·개발 검증 완료이며 실제 설치/노드 검증은 남는다. coding-agent 게시 전 종료·Stop 재진입도 OP-CA-01 후보 b6e2abdc에서 개발 검증을 완료했다. 두 소비자는 [격리 host 채택·연결](./spec-driven/ISOLATED-HOST-ADOPTION.md) 범위에서 검증했다. coding-agent는 SessionStart를 보완한 b7e7868, ChainBench는 bdf5ad27을 채택했고 실제 CLI2.1.300의 로컬 시험 응답기 사례5/5를 통과했다. 실제 모델·전체 역할·CKS·노드 검증은 남는다. [정책·보안 입력 검토 자료](./spec-driven/POLICY-SECURITY-INPUT-REVIEW.md)에 기존 정책42개·참조146개, source 호출68개와 query 후보12개를 추가했다. 수동 보안4개는 미승인 metadata 제안이며 독립 gold는0이다. [실제 프런트엔드 진단](./spec-driven/POLICY-REFERENCE-DIAGNOSIS.md)에서6개 미연결과 경고 없이 다른 함수에 붙는1개를 확인했다. 수정7개는 별도 평가 profile에서 실제 graph 저장·CKS 조회까지 검증했다. 원본·운영 설정은 그대로이며 독립 의미 수용은 남고 명시적 소스 대조 생성기 보완은 완료했다. 다음 개발 경로는 위 우선 작업표를 따른다. 정식 독립 평가를 실행할 때에는 별도로 입력·검토자·모델/비용·범위/기준을 고정한다.
 
 9개 모두 독립 수용 상태는 not_recorded다. controlled fixture·공개 MCP 실행·CI 통과는 기록된 구현 검증이며, 실제 host/체인/전체 프로젝트·독립 검토자의 수용 기록은 각 범위를 먼저 확정해 진행한다.
 
@@ -90,7 +90,7 @@ WI-5의 기존 수집→ingest→검토→승격/회수→색인 검증 목적�
 
 ## 다음 순서와 중복 집계 방지
 
-문서의 옛 WI 잔여표 정리는 완료했다. 위 로컬 로드맵28개는 완료했다. 정책 생성기 참조 보완을 별도로 추적하며, 독립 수용과 선택 후속은 승인된 실행 범위를 먼저 정한다. [운영·독립 수용 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)의 단계0 동결과9개 정식 검증은 별도 경로다. WI-5는 KM-03/04에 통합 집계하며 저장소 지정이 가능한 로컬 개발 전체를 중단시키지 않는다.
+문서의 옛 WI 잔여표 정리는 완료했다. 위 로컬 로드맵28개는 완료했다. 별도 정책 생성기 보완도 완료했고, 독립 수용과 선택 후속은 승인된 실행 범위를 먼저 정한다. [운영·독립 수용 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)의 단계0 동결과9개 정식 검증은 별도 경로다. WI-5는 KM-03/04에 통합 집계하며 저장소 지정이 가능한 로컬 개발 전체를 중단시키지 않는다.
 
 과거 재감사의 구현 부족분은 [감사 기록](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md)에 남긴다. 최신9/9 구현을 과거 표로 되돌리지 않는다. 일반 검증 체크리스트의 빈 체크박스는 매 변경의 절차이며 프로젝트 잔여 기능으로 집계하지 않는다. 기존 worksheet catalog·pinned v2 쓰기 거부·온톨로지 MCP·정책/보안 질의를 새 미구현 항목으로 재등록하지 않는다.
 
@@ -109,23 +109,14 @@ KM-03.4 중간 A: 일반 검토 문서 입력을 실제 공개 build/retained re
 
 KM-03.4 중간 B: 실제 manager18도구·broker29시험·actual stdio26항목/3 EOF0·수집23·등록14·native3·증거14개를 검증했다. filtered input→공개 build→후보 원문/인용·드리프트/손상/회수/재시작을 연결했다. Go는 A와 동일한1256개와 의존/fixture byte를 확인한 뒤 참조했다. C 실제 Claude host가 남아 전체11/28·기능2/7이다. 다음은 C→KM-04→KM-05→KM-06→OE-01이며 남은17개와 별도 후속 범위를 위 목록대로 추적한다.
 
-## OE-01.4 실제 다중 프로젝트 매핑 효과 평가
+## 소스 대조 정책 생성기 보완 완료 (2026-10-16)
 
-동일한 실제 go-stablenet/go-wemix 보관 DB와6개 개념·40개 프로젝트/축 셀을 대상으로, binding 입력만 뺀 기준선과 고정된 제안 매핑7개를 비교했다. 양쪽 모두 include_proposed=true이며 기본 검토 필터는 별도 확인했다. 프로토콜을 호출 전에 저장하고 순서를 교대해2회 반복했다. 24개 행렬+describe2개+기본 필터1개=도구27호출, 검증18항목, 두 연결 EOF0이다. 반복80셀을 독립 사실80개로 세지 않고 arm별 고유40셀로 보고한다.
+명시적 `cks domain sync --code-root <source>`는 폴더 이름 대신 실제 Go 선언을 읽어 package·receiver·type/field/const/var/interface 이름을 해당 anchor 파일에서 대조한다. receiver 없는 이름은 해당 파일에서 유일할 때만 보완하고, 오파일/모호한 이름/외부·symlink 경로/손상된 소스는 두 출력을 쓰기 전에 거부한다. symbol이 없는 파일/행 전용 anchor는 새 정책 연결로 만들지 않는다. 기존 무소스 sync는 이전 결과를 보존한다. 이 경로는 명시적 옵션이며 기존 setup/운영 profile을 자동으로 전환하지 않는다.
 
-| 관측값 | 매핑 없는 기준선 | 제안 매핑 입력 |
-|---|---:|---:|
-| 고유 프로젝트/축 셀 | 40 | 40 |
-| 원문 근거가 있는 셀 | 0 (0%) | 8 (20%) |
-| 선언된 exact/similar/not_applicable 셀 | 0 | 7 (17.5%, 모두 similar) |
-| unknown | 0 | 18 |
-| not_collected | 40 | 15 |
-| 검증한 셀 인용 | 0 | 9 |
-| 양쪽 근거가 있는 비교 후보 | 0 | 3 |
-| 검사한 프로젝트 그룹 / 혼입 | 12 / 0 | 12 / 0 |
+고정 소스0bf2f4d1에서 원래 ErrInvalidFeePayer 파일 참조는 거부되고 두 기존 출력은 보존됐다. 소유 평가 사본의 해당 anchor 파일만 core/txpool/errors.go로 수정한 후, 승인 overlay와 같은42개 정책·146개 연결을 재생성했다. 생성기는 참조를 결정적으로 정렬하므로 승인 overlay의 기존 목록 순서와 byte는 일부 다르지만, 모든 정책 필드와 정렬한 governs 목록은 같다. 원본 entry·정책·승인 overlay와 원본 소스 HEAD/status를 보존했다. 원래 entry의 잘못된 파일 위치를 조용히 찾아 옮기거나 원본 설명/검토 승인을 변경하지 않았다.
 
-9개 인용의 프로젝트·버전·source mode·원문/범위 hash·본문을 검증했다. 근거0개인 기준선의 source accuracy는 측정 불가(null)다. 처리군의 원문 일치100%는 hash/body 무결성 범위이며 의미 정확도100%가 아니다. 두 arm은 동일한 scope 격리 장치를 사용하므로 혼입0을 매핑만의 효과로 돌리지 않는다. finality 근거1셀은 unknown을 유지하며, staking/정책 미수집을 기능 부재로 단정하지 않는다. 기본 reviewed-only 요청에는 미검토 매핑이 나타나지 않는다. DB/source/config 전후 byte는 동일하다.
+새 생성 결과로 실제 graph를 구축하고146개 연결을 고정 AST 위치와 대조했다. 수정7개에 대해 공개 CKS 일반·소스/snapshot pin·canonical ID 조회21회, 잘못된 pin2개·assembler 혼입1개 거부/빈 결과까지 총24회 도구 조회와26쌍 원시 요청/응답을 검증했다. CKS는 EOF0으로 종료했다.843개 파일이 graph에 선택됐고 parse error0이다. source corpus는882개 비시험 Git Go blob이며 대상 프로젝트 코드를 실행하거나 실제 LLM/유료 모델을 호출하지 않았다.
 
-매핑은 평가자가 원문을 보고 선별한 제안 입력이다. 따라서 이 결과는 **연결 주석을 추가하면 비교 가능한 원문을 구조적으로 모을 수 있다**는 제한된 관찰이며, 온톨로지 어휘 자체의 인과 효과·독립 holdout·자연어 의도 해석·LLM 답변 품질·실제 네트워크 성능 평가가 아니다. 기존 단일 프로젝트 분석과 함께 기본 off·quality=inconclusive를 유지한다. 사람의 매핑/정답 승인과 정식 독립 수용은 기록하지 않았다.
+함수뿐 아니라 실제 정책의 구조체 필드·인터페이스도 확인했다. 초기 진단의 필드 누락과 정책 연결을 요청하지 않는 loc anchor 처리, CLI 오류 정제 정책에 대한 평가 도구의 가정을 수정한 이력은 최종 통과와 구분해 보존한다. 원자료 재계산/반례·새 전체 Go/race·빌드/fmt/vet/lint·문서 검증은 [증거](../system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json)를 따른다. 이는 source-name 연결 정합성의 개발 검증이며 정책 의미의 사람/독립 수용이나 운영 채택이 아니다.
 
-[원자료와 검증](../system/eval/knowledge-roadmap-2026-10-16/oe-04-mapping-effect/manifest.json)에 protocol·원시 요청/응답·소스·재계산/반례 시험을 보존한다. 로드맵 **28/28·기능7/7의 로컬 구현/명시된 개발 검증을 완료**했다. 정책 생성기 보완, 운영·독립 수용9개, 선택 후속12개는 별도 범위다. 유료 모델·운영 활성화·외부 게시 승인을 이 완료로 대신하지 않는다.
+현재 로컬 로드맵28/28·기능7/7과 별도 생성기 보완을 완료했다. 남은 별도 범위는 운영·독립 수용9개와 선택 후속12개다. 다음은 독립 평가를 실제로 수행할 경우 해당 입력·검토/실행 범위·필요한 실제 모델 조건을 고정하는 단계이며, 로컬 검증을 그 승인/수용으로 대신하지 않는다.
