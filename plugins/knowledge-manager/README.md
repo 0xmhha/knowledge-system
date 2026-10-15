@@ -5,7 +5,8 @@ a source and storage locations; they do not need to write source documentation.
 The package implements registration, diagnosis and bounded evidence collections
 with proposed knowledge drafts, explicit supplied review records and filtered
 input adoption/retraction and an adoption-bound maintenance/reader broker.
-Actual Claude host end-to-end verification remains separate.
+Actual Claude Code transport and lifecycle have been verified with a local
+scripted API. This does not establish real-model or independent semantic quality.
 
 | Capability | Current state |
 |---|---|
@@ -15,7 +16,7 @@ Actual Claude host end-to-end verification remains separate.
 | Scoped manager launcher | 18 tools: four native maintenance, 13 manager, one actual pinned reader |
 | Source/hash/line evidence collection and proposed native overlay | Implemented in KM-03.2 |
 | Tacit questions, supplied review, filtered input adoption/retraction | Implemented in KM-03.3; external reviewer authentication is separate |
-| Adoption-bound DB reader broker | Implemented in KM-03.4 B; actual Claude host workflow remains C |
+| Adoption-bound DB reader broker | Implemented; actual CLI build/read, normal stop and killed-host recovery verified locally |
 | Regular/change-triggered updates | Planned in KM-04 |
 
 The package lives at `plugins/knowledge-manager` in the knowledge-system repo.
@@ -236,3 +237,16 @@ its own field; a broker's validated read does not rewrite a publication receipt.
 `doctor --connect` still probes native maintenance metadata only. It is not a
 broker read or model-readiness test, and a running broker may own that same
 journal; use its existing session rather than forcing a second writer.
+
+
+## Host lifecycle verification
+
+The local controlled suite ran Claude Code 2.1.300 eight times and compared
+68 actual tool results to native MCP responses. It covers source collection,
+supplied review/adoption, held builds and exact dataset reads, restart, missing
+engines, insufficient evidence, normal stop during a build and killed-host
+recovery. SIGINT/SIGTERM close owned children gracefully; a failed child exit
+remains a failure. Run `make manager-test` for 103 current unit regressions.
+This target is wired into CI; the checkpoint records its local execution.
+See the [host packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json).
+No real-model call, semantic approval or automatic publication is inferred.

@@ -4,7 +4,7 @@
   "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
   "scope_status": "user_requested_features_with_implementation_in_progress",
   "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
-  "implementation_completed": 2,
+  "implementation_completed": 3,
   "total_work_items": 7,
   "total_subtasks": 28,
   "implementation_or_runtime_changed_by_this_documentation": false,
@@ -151,8 +151,8 @@
       "priority": "P0",
       "scope": "knowledge_manager_plugin",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "in_progress",
-      "design_status": "KM03_4_A_B_locally_verified_C_actual_Claude_host_pending",
+      "status": "complete",
+      "design_status": "locally_verified_actual_Claude_host_transport_and_lifecycle_model_quality_separate",
       "depends_on": [
         "KM-02"
       ],
@@ -163,9 +163,10 @@
         "system/eval/knowledge-roadmap-2026-10-15/km-03-collection/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-15/km-03-review/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-15/km-03-document-index/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-15/km-03-broker/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-broker/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json"
       ],
-      "verification": "registration14_collection23_review35_actual_review_adoption_retraction24_evidence14_not_authenticated_human_or_DB_reader",
+      "verification": "actual_Claude_Code_8_runs_68_native_tool_results_manager103_native3_host_evidence16_fresh_Go3838_race812",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -194,19 +195,18 @@
         },
         {
           "id": "KM-03.4",
-          "status": "in_progress",
+          "status": "complete",
           "evidence": [
-            "docs/spec-driven/KNOWLEDGE-MANAGER-PLUGIN.md"
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
           ]
         }
       ],
-      "remaining": [
-        "KM-03.4 actual Claude host full build/query reader binding and failure recovery"
-      ],
+      "remaining": [],
       "execution_stages": {
         "A_reviewed_document_indexing": "verified_actual_public_14_checks_3_clean_EOF_current_Go3838_race812",
         "B_adoption_bound_maintenance_and_reader": "verified_actual_proxy26_3_clean_EOF_broker29_collection23_registration14_native3",
-        "C_actual_Claude_host_end_to_end": "not_started"
+        "C_actual_Claude_host_end_to_end": "verified_actual_installed_CLI_8_runs_68_tools_local_scripted_API_no_paid_model_normal_exit0_kill_and_recovery"
       }
     },
     {
@@ -529,6 +529,15 @@
     "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
     "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
   },
-  "completed_subtasks": 11,
-  "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+  "completed_subtasks": 12,
+  "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
+  "manager_host_validation": {
+    "packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json",
+    "actual_CLI_runs": 8,
+    "actual_tool_results": 68,
+    "manager_unit_tests": 103,
+    "evidence_tests": 16,
+    "real_model_calls": 0,
+    "independent_acceptance": false
+  }
 }

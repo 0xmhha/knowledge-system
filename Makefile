@@ -1,4 +1,4 @@
-.PHONY: all build test test-race vet fmt fmt-check lint tidy clean vuln boundaries docs-check refactoring-check build-bins install-hooks sync-domain-artifacts check-domain-artifacts setup-tool-test golangci
+.PHONY: all build test test-race manager-test vet fmt fmt-check lint tidy clean vuln boundaries docs-check refactoring-check build-bins install-hooks sync-domain-artifacts check-domain-artifacts setup-tool-test golangci
 
 GO ?= go
 
@@ -17,6 +17,15 @@ test:
 
 test-race:
 	$(GO) test -race ./...
+
+# Standard-library manager regressions use actual CKS binaries and owned
+# mock datasets. Claude Code, paid models and external Python packages are not
+# required; actual host/quality evaluations remain separate opt-in evidence.
+manager-test: build-bins
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_registration.py
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_collection.py
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_review.py
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_broker.py
 
 vet:
 	$(GO) vet ./...

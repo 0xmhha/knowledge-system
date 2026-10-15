@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-host.py", line 377, in <module>
+    main()
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-host.py", line 359, in main
+    observations.append(run_host(args.claude,subject,case,out/case,transport))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-host.py", line 327, in run_host
+    require(p.returncode==(-9 if case=='kill'else 0)and actions.fault is None and actions.done and (case=='missing'or actions.index==len(actions.steps)),
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-host.py", line 30, in require
+    raise ValueError(message)
+ValueError: actual host workflow failed: actual tool result did not contain a manager/native response

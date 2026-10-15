@@ -1,8 +1,8 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 KM-01·KM-02와 KM-03.1–03을 완료했다. 전체28개 중11개 완료·4개 진행 중(KM-03.4, OE-01.1–03)·13개 미착수다. 다음은 KM-03.4 실제 Claude host/managed reader와 구축·조회 연결이다. [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [별도 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 KM-01·KM-02·KM-03을 완료했다. 전체28개 중12개 완료·3개 진행 중(OE-01.1–03)·13개 미착수다. 다음은 KM-04.1의 정기/변경 갱신 계약이다. [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [별도 작업표](../REMAINING-WORK.md)를 따른다.
 
-표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는2/7이다.
+표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는3/7이다.
 
 ## 전체28개 세부 작업과 시험 단계
 
@@ -19,7 +19,7 @@
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 완료 | 등록14·native3·실제 metadata bootstrap9·증거10; 초안/검토/reader 미구현 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 완료 | 수집23·등록14·실제 Git/CKS native 초안24·증거13; 사람 검토/DB 조회 아님 |
 | KM-03.3 | 암묵지 질문·불확실성·검토/채택/회수 | 완료 | 검토35·수집23·등록14·실제 CLI/native24·증거14; 통제 응답, DB 조회/신원 인증 아님 |
-| KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 진행 중 | A 문서 색인14/B 실제 broker26·unit29·native3·증거14 완료; C 실제 Claude host 남음 |
+| KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 완료 | 실제 CLI8회·도구68개, manager103·native3·증거16, 정상 종료0·중단/복구 |
 | KM-04.1 | 수동·정기·변경 trigger와 성공 기준 | 미착수 | 미실행 |
 | KM-04.2 | 변경/삭제/no-op/stale와 재검토 | 미착수 | 미실행 |
 | KM-04.3 | 중복·lease·재시작·retry·자원 상한 | 미착수 | 미실행 |
@@ -114,7 +114,7 @@
 | 실제 CKG/CKV와 프로젝트별 provider 설정·공개 scope 오류/인용 | 이번 범위 통과 | KM-01.3 완료 |
 | 동일 바이트 fork 실제 DB·서로 다른 embedding 구성·cache 반복 | 실제4DB·프로토콜52항목 통과 | KM-01 완료 |
 | 공개 쓰기 도구 전체 표면·다른 project/version DB와 current 보존 | 공개 CKS 변경3도구/18건 거부·보존 통과; 새 version-aware 쓰기 남음 | KM-02.3/04 |
-| 실제 Claude 매니저 host·등록/구축/실패 복구·갱신 | 미구현·미실행 | KM-02/03/04 |
+| 실제 Claude 매니저 host·등록/구축/실패 복구·갱신 | KM-03 실제 로컬 연결 완료; 정기 갱신 미실행 | KM-04 |
 | 산업 개념 매핑·비교 행렬·실제 프로젝트 비교 | 미구현·미실행 | KM-05/06 |
 | 자연어·검토된 구현 관계·다중 프로젝트 ontology 효과 | 로컬 단일 프로젝트 관찰만 완료 | OE-01 후속 |
 
@@ -502,3 +502,19 @@ KM-02.3 완료로 전체7/28이며 다음은 KM-02.4의 공개 잘못된 대상/
 | 별도 gate | build/fmt/vet/lint·문서131개·증거14개 | 독립 수용/품질 아님 |
 
 [B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-broker/manifest.json)과 [계약](./KNOWLEDGE-MANAGER-PLUGIN.md)을 따른다. 소스1,703입력=Go1,256개+기타447개이며 원래 승인5개는 그대로다. A는bb71aae3 snapshot에서 검증했다. 초기 native SDK `isError:false` 생략에 대한 시험 단언 오류는 initial-failures에 보존했다. B만 완료했으므로 전체11/28·기능2/7을 유지한다. 남은17개는 KM-03.4(C 실제 Claude host), KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.
+
+## KM-03.4 C: 실제 host·종료·복구
+
+KM-03.4 C 완료: 실제 설치 Claude Code2.1.300을8회 실행해68개 도구 결과를 원시 MCP·실제 API 입력과 대조했다. 문서 없는 입력의 수집→제공 검토→filtered adoption→held build→실제 원문/인용과 재시작 조회, 근거 부족·타 프로젝트 거부, 엔진 누락, 진행 중 정상 종료·host 강제 중단 후 durable 취소/exact replay/새 구축·조회를 확인했다. 정상 매니저 종료는 모두0이며 엔진 누락의 시작 거부2회(각2)와 의도한 host SIGKILL1회(-9)는 별도로 보존했다. 실제 SDK SIGINT에서 매니저가-2로 끝나던 문제를 graceful 종료로 수정하고 SIGINT/SIGTERM 회귀를 추가했다. 등록14·수집23·검토35·broker31의103개를 CI manager-test 진입점에 연결했고 로컬 실행을 통과했다. 원격 CI 실행으로 주장하지 않는다. 전체 Go3,838사례(3,820통과·18skip), 관련6패키지 race812(810통과·2skip)를 새로 실행했으며 build/fmt/vet/lint·문서와 native strict3개·증거 보호16개를 통과했다.
+
+| 실제 host 사례 | 결과 | 범위 |
+|---|---|---|
+| full / restart |18+2개 도구, held 후보 원문·인용 일치 | 게시·모델 품질 아님 |
+| insufficient |1개 실제 도구가 근거 부족 거부 | 지식 발명 없음 |
+| missing engine |2회 시작 거부·MCP failed | 정상 종료 실패와 분리 |
+| active-stop / recovery |12+12개 도구·취소 이력과 exact replay·새 구축/조회 | 실제 정상 host 종료 |
+| killed host / recovery |12+11개 도구·매니저/graph 정리·새 구축/조회 | host만 SIGKILL, 매니저0 |
+
+로컬 시험 응답기는 실제 host가 호출할 동작만 제공하고 MCP 결과는 실제 매니저/CKS에서 받았다. 모델 호출·비용은0이며 자율 에이전트 성능·의미 품질·독립 사람 수용을 판정하지 않았다. strict MCP fixture는 plugin 선언의 실제 launcher를 명시 연결했다. 처음의 strict discovery 설정·실제 SIGINT 종료 오류·시험 parser/retry 단언 및 test-only ResourceWarning은 initial-failures에 보존했다. 원본 source와 기존 current는 수정하지 않았다.
+
+[C packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json)에 새 Go 원시 결과·전체 사례 목록·103개 로그·8회 raw trace를 보존한다. 현재 소스1,703입력=Go1,256+기타447이며 승인5입력은 그대로다. B는c51f7423 snapshot에서 검증했다. 전체12/28·기능3/7 완료다. 남은16개는 KM-04.1–4(정기/변경 갱신), KM-05.1–4(공통 개념 매핑), KM-06.1–4(비교 근거 MCP), OE-01.1–4(온톨로지 효과 평가)다. 다음은 KM-04.1의 trigger·성공 기준·변경 pin 설계다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 이어간다.

@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import queue
 import re
+import signal
 import subprocess
 import sys
 import threading
@@ -463,9 +464,21 @@ class Broker:
         require(not failed,'native_shutdown_failed')
 
 
+class GracefulShutdown(BaseException):
+    """A host lifecycle signal; unwind owned work before returning success."""
+
+
 def serve(registration):
-    broker = Broker(registration)
+    broker,previous,stopping = None,{},False
+    def stop(_number,_frame):
+        nonlocal stopping
+        if not stopping:
+            stopping=True
+            raise GracefulShutdown()
     try:
+        for number in (signal.SIGINT,signal.SIGTERM):
+            previous[number]=signal.signal(number,stop)
+        broker = Broker(registration)
         while True:
             data = sys.stdin.buffer.readline(2*1024*1024+1)
             if not data:
@@ -478,7 +491,7 @@ def serve(registration):
             method,params = request['method'],request.get('params',{})
             try:
                 if method=='initialize':
-                    value = {'protocolVersion':'2024-11-05','capabilities':{'tools':{}},'serverInfo':{'name':'knowledge-manager','version':'0.4.0'}}
+                    value = {'protocolVersion':'2024-11-05','capabilities':{'tools':{}},'serverInfo':{'name':'knowledge-manager','version':'0.4.1'}}
                 elif method=='ping':
                     value = {}
                 elif method=='tools/list':
@@ -493,5 +506,12 @@ def serve(registration):
                 value = failure('operation_failed')
             sys.stdout.buffer.write(canonical({'jsonrpc':'2.0','id':request['id'],'result':value})+b'\n')
             sys.stdout.buffer.flush()
+    except GracefulShutdown:
+        pass
     finally:
-        broker.close()
+        try:
+            if broker:
+                broker.close()
+        finally:
+            for number,handler in previous.items():
+                signal.signal(number,handler)

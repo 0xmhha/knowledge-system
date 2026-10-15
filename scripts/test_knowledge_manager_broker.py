@@ -4,6 +4,7 @@ import copy
 import importlib
 import importlib.util
 import json
+import signal
 from pathlib import Path
 import sys
 import time
@@ -205,6 +206,33 @@ class BrokerTests(unittest.TestCase):
     def test_second_broker_cannot_take_the_same_local_owner_lease(self):
         with self.assertRaisesRegex(manager.Failure,'collection_busy'):
             broker.Broker(self.f.registration)
+
+    def signal_exit(self,number):
+        self.b.close()
+        spec = importlib.util.spec_from_file_location('signal_broker_client',ROOT/'scripts/eval-value-dependencies.py')
+        client_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(client_module)
+        folder = self.f.root/('signal-'+str(number))
+        folder.mkdir()
+        client = client_module.Client(None,None,folder,command=[sys.executable,str(ROOT/'plugins/knowledge-manager/scripts/manager.py'),'serve','--registration',str(self.f.registration)])
+        def cleanup():
+            try:
+                client.close()
+            finally:
+                client.proc.stdout.close()
+        self.addCleanup(cleanup)
+        reply = client.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-signal-test','version':'1'}})
+        self.assertNotIn('error',reply)
+        self.assertEqual(len(client.request('tools/list',{})['result']['tools']),18)
+        client.proc.send_signal(number)
+        self.assertEqual(client.proc.wait(timeout=20),0)
+        cleanup()
+
+    def test_actual_launcher_SIGINT_closes_owned_native_servers_with_zero_exit(self):
+        self.signal_exit(signal.SIGINT)
+
+    def test_actual_launcher_SIGTERM_closes_owned_native_servers_with_zero_exit(self):
+        self.signal_exit(signal.SIGTERM)
 
     def test_uncertain_state_save_poison_and_restart_revalidation(self):
         adopted = self.f.adopted()

@@ -15,7 +15,7 @@ spec.loader.exec_module(manager)
 
 class RegistrationTests(unittest.TestCase):
     def setUp(self):
-        temp = tempfile.TemporaryDirectory(prefix='ks-manager-registration-',dir='/private/tmp')
+        temp = tempfile.TemporaryDirectory(prefix='ks-manager-registration-',dir=str(Path(tempfile.gettempdir()).resolve()))
         self.addCleanup(temp.cleanup)
         self.root = Path(temp.name).resolve()
         self.source = self.root/'source'

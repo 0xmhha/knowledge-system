@@ -1,0 +1,14 @@
+PASS: actual Claude host full
+PASS: actual Claude host persisted reader restart
+PASS: actual Claude host insufficient
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-host.py", line 383, in <module>
+    main()
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-host.py", line 365, in main
+    observations.append(run_host(args.claude,subject,case,out/case,transport))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-host.py", line 336, in run_host
+    require(len(exits)==1 and exits[0]['exit_code']==(2 if case=='missing'else 0)and exits[0]['forced_kill']is False,'owned manager shutdown failed: '+str(exits))
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-host.py", line 30, in require
+    raise ValueError(message)
+ValueError: owned manager shutdown failed: [{'kind': 'exit', 'time': 1792068520.349592, 'child_pid': 26033, 'exit_code': 2, 'forced_kill': False}, {'kind': 'exit', 'time': 1792068521.5668638, 'child_pid': 26139, 'exit_code': 2, 'forced_kill': False}]

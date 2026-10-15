@@ -19,7 +19,7 @@ review = importlib.import_module('review')
 
 class ReviewTests(unittest.TestCase):
     def setUp(self):
-        tmp = tempfile.TemporaryDirectory(prefix='ks-manager-review-',dir='/private/tmp')
+        tmp = tempfile.TemporaryDirectory(prefix='ks-manager-review-',dir=str(Path(tempfile.gettempdir()).resolve()))
         self.addCleanup(tmp.cleanup)
         self.root = Path(tmp.name).resolve()
         self.source = self.root/'source'

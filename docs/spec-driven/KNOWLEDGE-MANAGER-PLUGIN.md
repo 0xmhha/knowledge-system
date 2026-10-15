@@ -104,3 +104,12 @@ B 실행 계약: plugin MCP는 `cks.dataset`4개·`cks.manager`13개·실제 sco
 KM-03.4 B 완료: broker29·수집23·등록14·실제 stdio launcher26항목/3연결 EOF0·native strict package/skill/agent3개·증거 보호14개를 검증했다. 실제 MCP 도구로 수집→근거→초안→질문/제공 검토→filtered adoption 선택→공개 build/status→정확한 후보 reader→실제 원문/인용→재시작→회수를 연결했다. 입력/좌표 불일치·원문 변경·이미 열린 reader의 신원 손상·회수 후 재시작도 거부했다. 접수 응답 손실·불확실한 저장의 보수적 복구는 unit 주입 시험이며 실제 host kill 검증은 C다. Go1,256개·의존/fixture byte가 A와 같아 전체3820통과/18skip·race810통과/2skip을 참조했다. 이번 Go를 새로 실행한 것으로 세지 않는다. [B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-broker/manifest.json)을 따른다.
 
 전체11/28·기능2/7이며 다음은 C의 실제 설치 Claude Code와 로컬 시험 응답기를 연결하는 검증이다. 실제 모델 품질·독립 수용은 별도다. KM-03.4 또는 KM-03 전체는 C 검증 전에 완료로 표시하지 않는다.
+
+
+## KM-03.4 C 검증 완료
+
+KM-03.4 C 완료: 실제 설치 Claude Code2.1.300을8회 실행해68개 도구 결과를 원시 MCP·실제 API 입력과 대조했다. 문서 없는 입력의 수집→제공 검토→filtered adoption→held build→실제 원문/인용과 재시작 조회, 근거 부족·타 프로젝트 거부, 엔진 누락, 진행 중 정상 종료·host 강제 중단 후 durable 취소/exact replay/새 구축·조회를 확인했다. 정상 매니저 종료는 모두0이며 엔진 누락의 시작 거부2회(각2)와 의도한 host SIGKILL1회(-9)는 별도로 보존했다. 실제 SDK SIGINT에서 매니저가-2로 끝나던 문제를 graceful 종료로 수정하고 SIGINT/SIGTERM 회귀를 추가했다. 등록14·수집23·검토35·broker31의103개를 CI manager-test 진입점에 연결했고 로컬 실행을 통과했다. 원격 CI 실행으로 주장하지 않는다. 전체 Go3,838사례(3,820통과·18skip), 관련6패키지 race812(810통과·2skip)를 새로 실행했으며 build/fmt/vet/lint·문서와 native strict3개·증거 보호16개를 통과했다.
+
+로컬 시험 응답기는 실제 host가 호출할 동작만 제공하고 MCP 결과는 실제 매니저/CKS에서 받았다. 모델 호출·비용은0이며 자율 에이전트 성능·의미 품질·독립 사람 수용을 판정하지 않았다. strict MCP fixture는 plugin 선언의 실제 launcher를 명시 연결했다. 처음의 strict discovery 설정·실제 SIGINT 종료 오류·시험 parser/retry 단언 및 test-only ResourceWarning은 initial-failures에 보존했다. 원본 source와 기존 current는 수정하지 않았다.
+
+[C packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json)을 따른다. 전체12/28·기능3/7 완료다. 남은16개는 KM-04.1–4(정기/변경 갱신), KM-05.1–4(공통 개념 매핑), KM-06.1–4(비교 근거 MCP), OE-01.1–4(온톨로지 효과 평가)다. 다음은 KM-04.1의 trigger·성공 기준·변경 pin 설계다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 이어간다.

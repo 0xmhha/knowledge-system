@@ -18,7 +18,7 @@ collection = importlib.import_module('collection')
 
 class CollectionTests(unittest.TestCase):
     def setUp(self):
-        tmp = tempfile.TemporaryDirectory(prefix='ks-manager-collect-',dir='/private/tmp')
+        tmp = tempfile.TemporaryDirectory(prefix='ks-manager-collect-',dir=str(Path(tempfile.gettempdir()).resolve()))
         self.addCleanup(tmp.cleanup)
         self.root = Path(tmp.name).resolve()
         self.source = self.root/'source'

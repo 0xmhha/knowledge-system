@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'manager-broker': {
+        'revision': 'c51f7423', 'folder': 'km-03-broker',
+        'scope': 'historical_KM03_4_B_scoped_broker_not_actual_Claude_host',
+        'scripts': ['check-knowledge-manager-broker-evidence.py', 'test_knowledge_manager_broker_evidence.py'],
+    },
     'manager-document-index': {
         'revision': 'bb71aae3', 'folder': 'km-03-document-index',
         'scope': 'historical_KM03_4_A_native_document_index_not_manager_broker_or_host',

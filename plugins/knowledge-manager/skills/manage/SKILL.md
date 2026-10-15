@@ -89,8 +89,9 @@ it on every use/restart. `clear_reader` releases the lease without deleting data
 Use `cks.manager.status` for stage/pending intent and the existing native status
 for the job. They do not authenticate reviewers or rewrite publication history.
 
-Scheduling and actual Claude host end-to-end verification remain later stages.
-Do not invent scheduling commands or model/quality acceptance.
+Scheduling remains a later stage. Verify the actual host/session capabilities
+separately; a controlled local transport proof is not model autonomy or
+independent quality acceptance. Do not invent scheduling commands or results.
 
 Git change evidence uses a separate `change` origin. Its selected existing-file,
 HEAD-to-working-tree scope and explicit limits do not prove complete deletion
