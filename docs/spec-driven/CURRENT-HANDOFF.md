@@ -1,6 +1,6 @@
 # 현재 인수인계
 
-2026-10-16 기준 지식 매니저·프로젝트 비교 로드맵은 **23/28 세부 작업·5/7 기능 완료**다. 사용자가 멈추라고 하기 전까지 남은 작업을 순서대로 구현·검증하고 단계별 서명 로컬 커밋으로 보존한다. 각 완료 단계마다 현재 단계·검증 결과·다음 작업·남은 전체 범위를 화면 로그와 문서에 기록한다. 세부 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+2026-10-16 기준 지식 매니저·프로젝트 비교 로드맵은 **24/28 세부 작업·6/7 기능 완료**다. 사용자가 멈추라고 하기 전까지 남은 작업을 순서대로 구현·검증하고 단계별 서명 로컬 커밋으로 보존한다. 각 완료 단계마다 현재 단계·검증 결과·다음 작업·남은 전체 범위를 화면 로그와 문서에 기록한다. 세부 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 현재 구현과 다음 단계
 
@@ -11,16 +11,16 @@
 | KM-03 Claude 매니저 | 4/4 완료 | 등록·문서 없는 수집/초안·검토/회수·실제 설치 CLI8회/68도구; 로컬 시험 응답기 |
 | KM-04 지속 갱신 | 4/4 완료 | 실제 periodic/change2프로젝트·20항목·221호출·2EOF0·삭제/no-op·실패/연결 retry·타 DB/인용 보존 |
 | KM-05 공통 개념/연결 | 4/4 완료 | 공통 어휘·원문 연결·직접 매핑 검토/회수·적용/지원·L1/L2/network/산업 차이 |
-| KM-06 비교 근거 MCP | 3/4 완료 | 비교192개·실제21항목18호출·3EOF0/SIGTERM0·부분 실패/최종 재검증/예산; 실제 프로젝트 비교 다음 |
+| KM-06 비교 근거 MCP | 4/4 완료 | 실제 go-stablenet/go-wemix4243파일·6개념40셀·22항목19호출·3EOF0·오매핑/범위/예산/원본 보존 |
 | OE-01 온톨로지 효과 | 0/4 완료,3개 진행 중 | 단일 프로젝트 개발 관찰384회+진단8회; 확대/독립 정답·다중 프로젝트 평가 필요 |
 
-KM-06.3 완료: 모든 참여자를 읽은 뒤 응답 직전에 각 archive를 다시 검증한다. 뒤 프로젝트를 여는 동안 앞 archive가 바뀌면 해당 프로젝트의 본문/인용·후보만 폐기하고 나머지 프로젝트와 명시 좌표는 보존한다. 같은 scope의 적용/비적용 상충과 다른 프로젝트의 차이, 미수집/unknown/손상 상태를 구분한다. 후보 proof의 복사 인용까지 max_citations에 포함하며 예산에 맞지 않으면 후보 전체를 제외하고 omitted_candidates/candidate_state로 알린다. 요청 기한/취소에는 이전 부분 성공을 공개하지 않고 Close는 진행 중 reader 정리를 기다린다.
+KM-06.4 완료: go-stablenet0bf2f4d1의committed 원문2,224파일과 go-wemix1350376a의working-tree 원문2,019파일로 실제 native graph/vector DB를 구축했다. go-wemix의 cmd/gwemix→geth alias만 소유 복제본에서 제외하고 BaseCommit·제외 목록·준비 Git 상태를 기록했다. 비교하는7개 Go 파일은 원본 커밋 바이트와 동일하며 원본 저장소는 변경하지 않았다. 모든 매핑은 미검토 후보다.6개 개념·40개 프로젝트/축 셀에서7개similar·18개unknown·15개not_collected를 관찰했다. 이는 선택한 매핑/근거의 범위이며 실제 네트워크나 기능 부재·finality·TPS·보안성·우월성의 판정이 아니다.
 
-전체23/28·기능5/7이다. 다음은 KM-06.4 둘 이상 실제 프로젝트의 고정 DB·staking/정책·consensus/finality·mempool/ordering 비교 검증이다. 남은5개는 KM-06.4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+전체24/28·기능6/7이다. 다음은 OE-01.1의 새 질문·기대 근거·평가 범위/분모 고정이다. 남은4개는 OE-01.1 질문/기대 근거, OE-01.2 동일 자료4모드, OE-01.3 근거·순위·unknown·지연/비용, OE-01.4 다중 프로젝트 매핑/오인/누락 효과 평가다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지하며 단계별 서명 로컬 커밋으로 계속한다.
 
 ## 검증과 현재 제한
 
-비교192개(기존171+보호21,47개 상위), 전체 Go4054(4036통과18skip)·race1028(1026통과2skip,7패키지)·빌드/fmt/vet/lint·문서134개를 검증했다. 실제 mock2DB·기반12+보호9항목·18도구호출·4세션(EOF3개와 입력이 열린 SIGTERM1개 모두 exit0)이다. 원문 손상 후 정확히 복구했고 DB/manifest/profile/catalog/binding 전체 hash를 보존했다. 실제 체인 비교·의미 품질/독립 수용은 아니다. [공개 비교 계약](./COMPARISON-MCP-CONTRACT.md)을 따른다.
+실제 비교MCP22항목·19도구호출·3EOF0, 원문/범위 hash와 본문·프로젝트/모드별 인용·양쪽 후보·기본 미검토 제외·live 소스 삭제 후 동일 응답·한쪽 archive 누락/오매핑·범위/예산 거부·원본/DB 보존을 검증했다. 새 Go 변경이 없음을1273개 Go와 모든 결속 입력의 hash로 확인해 직전 전체Go4054(4036통과18skip)·race1028(1026통과2skip,7패키지)·빌드/fmt/vet/lint 결과를 재사용했다. 새 실제 corpus/MCP 시험과 과거 Go 실행을 구분한다. 유료 모델 호출0이며 ontology 효과/독립 품질 수용은 아니다. [검증 자료](../../system/eval/knowledge-roadmap-2026-10-16/km-06-real-projects/manifest.json)를 따른다.
 
 매니저 plugin0.6.0은 reviewed 기본18도구와 명시 updates6도구를 제공한다. 실제 Claude Code2.1.300과의 갱신 연결2회/36도구도 로컬 시험 응답기로 검증했다. 실제 모델 호출/비용0이며 agent 자율성·답변 품질은 측정하지 않았다. 개인 머신에 서비스나 OS scheduler를 설치하지 않았고 명시 foreground worker가 실행 중인 동안만 주기/변경 polling이 동작한다.
 
@@ -33,8 +33,3 @@ KM-06.3 완료: 모든 참여자를 읽은 뒤 응답 직전에 각 archive를 �
 [OE-01 단일 프로젝트 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은384회 실패/누락0·인용3,616개 원문 일치, 활성288회 no_match·순위 차이0이었다. 별도 정확 용어8회도 최종 boost0이다. 기본 off·quality=inconclusive를 유지한다. KM-04.4에서 단독 합성 대문자 식별자 질의가 비고 같은 자료가 자연어 질의에 나타난 사례도 OE-01 질의 해석/회수율 후보로 보존했다. 새 기능 구현이나 계획 승인을 독립 정답·품질 승인으로 바꾸지 않는다.
 
 이전 단계의 상세 기록은 각 명세의 checkpoint 절과 서명 커밋·동결 증거 packet에 남긴다. 현재 상태는 이 문서 첫 표와 전용 원장을 우선한다.
-
-
-## 진행 중인 실제 프로젝트 실행
-
-KM-06.4는 go-stablenet0bf2f4d1/go-wemix1350376a의 소유 복제본에서 committed source·native graph/vector를 구축 중이다. 준비 스크립트는 scripts/prepare-real-comparison.py이고 런타임 경로는 /private/tmp/ks-KM064-real-native-second-20261016, 로그는 /private/tmp/ks-KM064-real-build-second.txt다. 최초 manager 수집 상한 실패와 native API 경로를 [준비 기록](../../system/eval/knowledge-roadmap-2026-10-16/km-06-real-preparation/preparation.json)에 보존했다. 구축 summary/fixtures가 실제 성공한 뒤 scripts/verify-real-project-comparison.py로6개 개념/정책·원문/인용·누락/부분 실패/범위/예산을 검증한다. binary가 결속되어 있으므로 실행 중 bin을 재빌드하지 않는다. 미검증 스크립트를 구현 완료나 독립 품질 수용으로 세지 않는다.

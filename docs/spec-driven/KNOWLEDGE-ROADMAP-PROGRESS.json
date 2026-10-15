@@ -4,7 +4,7 @@
   "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
   "scope_status": "user_requested_features_with_implementation_in_progress",
   "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
-  "implementation_completed": 5,
+  "implementation_completed": 6,
   "total_work_items": 7,
   "total_subtasks": 28,
   "implementation_or_runtime_changed_by_this_documentation": false,
@@ -342,8 +342,8 @@
       "priority": "P1",
       "scope": "cross_project_comparison",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "in_progress",
-      "design_status": "KM06_3_comparison_partial_failure_budget_shutdown_complete_real_projects_next",
+      "status": "complete",
+      "design_status": "locally_verified_explicit_readonly_real_project_comparison",
       "depends_on": [
         "KM-01",
         "KM-05"
@@ -352,9 +352,10 @@
         "docs/spec-driven/COMPARISON-MCP-CONTRACT.md",
         "system/eval/knowledge-roadmap-2026-10-16/km-06-contract/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-16/km-06-runtime/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-16/km-06-failures/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-failures/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-real-projects/manifest.json"
       ],
-      "verification": "comparison192_final_archive_recheck_conflict_no_fallback_request_deadline_close_native21checks_18calls_3EOF0_SIGTERM0_full_Go_race7",
+      "verification": "request50_comparison192_actual_go_stablenet2224_go_wemix2019_source_files_6concepts40cells22checks19MCP_3EOF0_proposed_mappings_not_quality",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -383,8 +384,11 @@
         },
         {
           "id": "KM-06.4",
-          "status": "in_progress",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         }
       ]
     },
@@ -596,7 +600,7 @@
     "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
     "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
   },
-  "completed_subtasks": 23,
+  "completed_subtasks": 24,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
   "manager_host_validation": {
     "packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json",

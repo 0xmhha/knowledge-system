@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "state": "partial",
+  "profile_digest": "89995bc406ad956995dfc94ae39b992311df00ba64ca3a56ea4003d07040a157",
+  "catalog_digest": "51d1f9081989af8872309faa01ddfce0a3e87c254f12c1f3358347d8710c1883",
+  "collection_id": "real-chains",
+  "mode": "comparison",
+  "concept": {
+    "key": {
+      "pack_id": "industry.blockchain",
+      "version": "1.0.0",
+      "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+      "concept_id": "finality"
+    },
+    "definition": "The stated condition under which a ledger decision is treated as irreversible or subject to specified rollback assumptions.",
+    "view": {
+      "id": "finality",
+      "aliases": [
+        "finality",
+        "최종성",
+        "finalisation",
+        "finalization"
+      ],
+      "includes": [
+        "finality conditions and reorganization handling"
+      ],
+      "excludes": [
+        "block production or an unstated performance guarantee"
+      ],
+      "applicable_roles": [
+        "l1",
+        "l2"
+      ],
+      "facets": [
+        {
+          "id": "condition",
+          "question": "What event or threshold establishes finality?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "rollback",
+          "question": "Under what explicit conditions can a finalized or accepted history change?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "settlement",
+          "question": "For L2, which settlement conditions are separate from local acceptance?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        }
+      ]
+    }
+  },
+  "facets": [
+    "condition",
+    "rollback",
+    "settlement"
+  ],
+  "as_of": "2026-10-15T19:49:01Z",
+  "question": "고정 원문으로 finality 근거와 모르는 부분을 프로젝트별로 비교한다.",
+  "groups": [
+    {
+      "participant": {
+        "scope_id": "9c9b8751646eb1eda07ddf2b25086e65cfe1351360e56b7f7da2a17b11a7eb3c",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-stablenet",
+            "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+            "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "wbft-source-excerpts-no-live-network",
+            "component_role": "l1",
+            "observed_at": "2026-10-15T19:48:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "finality"
+          },
+          "facet": "condition",
+          "state": "unknown",
+          "reasons": [
+            "provided_mapping_leaves_this_facet_undecided"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "applicability": "unknown",
+                "binding_id": "finality",
+                "binding_digest": "475af43c28a05e08f263e8f7be016d0a76f7c33f916ecdb90ab03fc83b697db5",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "finality"
+                },
+                "coordinates": {
+                  "project_id": "comparison-go-stablenet",
+                  "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                  "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                },
+                "conditions": {
+                  "network": "not-selected-source-study",
+                  "configuration": "wbft-source-excerpts-no-live-network",
+                  "component_role": "l1",
+                  "observed_at": "2026-10-15T19:48:59+00:00"
+                },
+                "local_concept": "go-stablenet finality source excerpts",
+                "mapping": "related",
+                "reason": "WBFT quorum dispatch and committed-state excerpt only. It does not establish irreversibility, rollback or L2 settlement; applicability remains unknown and the mapping is not human reviewed.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "source-1",
+                      "kind": "code",
+                      "facets": [
+                        "condition"
+                      ],
+                      "citation": {
+                        "file": "consensus/wbft/core/commit.go",
+                        "start_line": 122,
+                        "end_line": 138,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "comparison-go-stablenet",
+                        "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                        "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "70203895ba56ed36ce1a0e70e6addb3d1a1965c87a056acedad078cdc00be114",
+                        "content_sha256": "20e03a92f1252e72e2ab842f7b7938948e1f58381937e1a4bec363124e8401dc"
+                      }
+                    },
+                    "body": "\t// If we reached threshold\n\tif c.current.WBFTCommits.Size() >= c.valSet.QuorumSize() {\n\t\tlogger.Info(\"WBFT: received quorum of COMMIT messages\")\n\t\tc.commitWBFT()\n\t} else {\n\t\tlogger.Trace(\"WBFT: accepted new COMMIT messages\")\n\t}\n\n\treturn nil\n}\n\n// commitWBFT is called once quorum of commits is reached\n// - computes committedSeals from each received commit messages\n// - then commits block proposal to database with committed seals\n// - broadcast round change\nfunc (c *Core) commitWBFT() {\n\tc.setState(StateCommitted)\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "related",
+                "direction": "local_to_shared",
+                "meaning": "The roles are relevant to compare without asserting inclusion or equivalence.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "finality"
+          },
+          "facet": "rollback",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "finality"
+          },
+          "facet": "settlement",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    },
+    {
+      "participant": {
+        "scope_id": "26573c59af384727efb3d96bcd44940b322df9862147ff2484444e58b3c21f68",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-wemix",
+            "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+            "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+            "source_mode": "working-tree",
+            "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "clique-source-excerpts-no-live-network",
+            "component_role": "l1",
+            "observed_at": "2026-10-15T19:48:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "finality"
+          },
+          "facet": "condition",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "finality"
+          },
+          "facet": "rollback",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "finality"
+          },
+          "facet": "settlement",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    }
+  ],
+  "candidates": [],
+  "used_body_bytes": 519,
+  "used_citations": 1,
+  "completeness_scope": "requested_project_facet_rows_only_not_all_project_evidence",
+  "final_assessment": "LLM_or_user_evaluates_tradeoffs_from_cited_evidence",
+  "omitted_candidates": 0,
+  "candidate_state": "complete"
+}

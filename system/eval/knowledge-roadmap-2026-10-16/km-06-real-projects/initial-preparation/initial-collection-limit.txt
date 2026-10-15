@@ -1,0 +1,25 @@
+PINNED: go-stablenet 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-real-comparison.py", line 49, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-real-comparison.py", line 38, in main
+    worker.tick();success=worker.journal.state['last_success'];rows=worker.journal.state['attempts'];latest=rows[-1]if rows else None
+    ^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/update_worker.py", line 127, in tick
+    prepared=prepare(j.policy(),self.r,baseline['input_id'] if baseline else None,allow_missing_material=True,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/update_inputs.py", line 172, in prepare
+    captured,contents=capture(policy,r,allow_missing_material,deadline)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/update_inputs.py", line 71, in capture
+    recipe,coverage,contents=gather(args,r)
+                             ^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/collection.py", line 317, in gather
+    data = source_bytes(source,name,args.max_file_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/collection.py", line 60, in source_bytes
+    require(before.st_size<=limit,'collection_limit')
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py", line 33, in require
+    raise Failure(code)
+manager.Failure: collection_limit

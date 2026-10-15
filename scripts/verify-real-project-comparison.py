@@ -5,6 +5,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import stat
 import subprocess
@@ -42,8 +43,9 @@ def main():
         result={}
         for f in fixtures:
             version=Path(f['version']);manager.require(version.is_relative_to(prepared),'owned_dataset_required')
-            for p in list((version/'sources').rglob('*'))+[version/n for n in('dataset.json','graph/graph.db','graph/manifest.json','vector/vector.db','vector/manifest.json')]:
+            for p in list((version/'sources').rglob('*'))+[version/n for n in('dataset-identity.json','reader-protocol.json','graph/graph.db','graph/manifest.json','vector/vector.db','vector/manifest.json')]:
                 if p.is_file():result[p.relative_to(prepared).as_posix()]=sha(p.read_bytes())
+            result[(version.parent/'current').relative_to(prepared).as_posix()+'#target']=os.readlink(version.parent/'current')
         return result
     before=inventory();write('before.json',before)
     catalog={'schema_version':1,'projects':[{'id':f['coordinates']['project_id'],'name':f['project']}for f in fixtures],'versions':[{'coordinates':f['coordinates'],'version_dir':f['version'],'origins':f['origins']}for f in fixtures],'collections':[{'id':'real-chains','members':[f['coordinates']for f in fixtures]}]};write('catalog.json',catalog)
@@ -63,13 +65,13 @@ def main():
     first=connect('bootstrap-session',out/'profile-bootstrap.json')
     try:d=tool(first,'describe');write('initial-description.json',d)
     finally:first.close();first.proc.stdout.close()
-    definitions={c['key']['concept_id']:c for c in d['concepts']};bindings=[]
+    definitions={c['key']['concept_id']:c for c in d['concepts']};bindings=[];origin_equal={}
     for f in fixtures:
-        version=Path(f['version']);manifest=json.loads((version/'sources/manifest.json').read_text());manager.require(f['coordinates']['source_mode']=='committed'and f['coordinates']['base_commit']==f['source_commit'],'actual_source_commit_lost')
+        version=Path(f['version']);manifest=json.loads((version/'sources/manifest.json').read_text());manager.require(f['coordinates']['source_mode']in('committed','working-tree')and f['coordinates']['base_commit']==f['source_commit'],'actual_source_commit_lost')
         for concept,anchors in ANCHORS[f['project']].items():
             refs=[]
             for i,(filename,start,end,marker,facets)in enumerate(anchors):
-                record=next(r for r in manifest['files']if r['origin_id']=='repo'and r['path']==filename);source=(version/'sources/blobs'/record['sha256']).read_bytes();body=b''.join(source.splitlines(keepends=True)[start-1:end]);manager.require(sha(source)==record['sha256']and marker in body.decode()and end-start<256,'pinned_source_anchor_mismatch');citation={**f['coordinates'],'file':filename,'start_line':start,'end_line':end,'commit_hash':f['source_commit'],'origin_id':'repo','file_sha256':record['sha256'],'content_sha256':sha(body)};refs.append({'id':'source-'+str(i+1),'kind':'code','facets':facets,'citation':citation})
+                record=next(r for r in manifest['files']if r['origin_id']=='repo'and r['path']==filename);source=(version/'sources/blobs'/record['sha256']).read_bytes();original_source=subprocess.check_output(['git','-C',f['original_root'],'show',f['source_commit']+':'+filename]);manager.require(source==original_source,'compared_code_differs_from_original_commit');origin_equal[f['project']+':'+filename]={'source_commit':f['source_commit'],'source_mode':f['coordinates']['source_mode'],'original_sha256':sha(original_source),'retained_sha256':sha(source),'equal':True};write('source-equality.json',origin_equal);body=b''.join(source.splitlines(keepends=True)[start-1:end]);manager.require(sha(source)==record['sha256']and marker in body.decode()and end-start<256,'pinned_source_anchor_mismatch');citation={**f['coordinates'],'file':filename,'start_line':start,'end_line':end,'commit_hash':f['source_commit']if f['coordinates']['source_mode']=='committed'else'','origin_id':'repo','file_sha256':record['sha256'],'content_sha256':sha(body)};refs.append({'id':'source-'+str(i+1),'kind':'code','facets':facets,'citation':citation})
             reason='Proposed mapping of pinned '+f['project']+' '+concept+' source excerpts for an unexecuted study; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.'
             b={'id':concept,'concept':definitions[concept]['key'],'coordinates':f['coordinates'],'conditions':f['conditions']['l1'],'local_concept':f['project']+' '+concept+' source excerpts','mapping':'close','reason':reason,'evidence':refs}
             if concept=='finality':b.update(mapping='related',applicability='unknown',reason='WBFT quorum dispatch and committed-state excerpt only. It does not establish irreversibility, rollback or L2 settlement; applicability remains unknown and the mapping is not human reviewed.')
@@ -87,7 +89,7 @@ def main():
                     for mapping in cell['mappings']:
                         manager.require(mapping['binding']['review_state']=='proposed'and mapping['review']['reviewer_identity_authenticated']is False,'invented_human_mapping_review')
                         for e in mapping['binding']['evidence']:
-                            cite=e['reference']['citation'];manager.require(all(cite[k]==v for k,v in f['coordinates'].items())and cite['commit_hash']==f['source_commit'],'foreign_project_or_commit');source=(Path(f['version'])/'sources/blobs'/cite['file_sha256']).read_bytes();body=b''.join(source.splitlines(keepends=True)[cite['start_line']-1:cite['end_line']]);manager.require(sha(source)==cite['file_sha256']and sha(body)==cite['content_sha256']and e['body']==body.decode(),'retained_body_or_hash_mismatch')
+                            cite=e['reference']['citation'];manager.require(all(cite[k]==v for k,v in f['coordinates'].items())and cite['commit_hash']==(f['source_commit']if f['coordinates']['source_mode']=='committed'else''),'foreign_project_or_commit');source=(Path(f['version'])/'sources/blobs'/cite['file_sha256']).read_bytes();body=b''.join(source.splitlines(keepends=True)[cite['start_line']-1:cite['end_line']]);manager.require(sha(source)==cite['file_sha256']and sha(body)==cite['content_sha256']and e['body']==body.decode(),'retained_body_or_hash_mismatch')
             check('actual pinned source matrix and project citation separation '+concept,True)
         check('staking and staking policy absence of collected mapping is not feature absence',all(cell['state']=='not_collected'and not cell['mappings']for key in('staking','staking-policy')for g in matrices[key]['groups']for cell in g['cells']))
         check('finality is not inferred from commit transition or Finalize name',matrices['finality']['groups'][0]['cells'][0]['state']=='unknown'and len(matrices['finality']['groups'][0]['cells'][0]['mappings'])==1 and all(cell['state']=='not_collected'for cell in matrices['finality']['groups'][1]['cells']))
@@ -115,8 +117,8 @@ def main():
     after=inventory();write('after.json',after);check('actual DBs and complete retained archives unchanged after comparisons and controlled recovery',before==after)
     originals=[]
     for f in fixtures:
-        repo=Path(f['original_root']);head=subprocess.check_output(['git','-C',str(repo),'rev-parse','HEAD']).decode().strip();status=subprocess.check_output(['git','-C',str(repo),'status','--porcelain=v1']).decode().strip();manager.require(head==f['source_commit']and not status,'original_project_changed');manager.require(not subprocess.check_output(['git','-C',f['owned_clone'],'status','--porcelain=v1']).strip(),'owned_clone_not_restored');originals.append({'project':f['project'],'source_root':str(repo),'head':head,'status':status})
-    write('original-after.json',originals);check('both original projects and restored clones stay at pinned clean commit',True);check('three actual comparison sessions close with EOF0',len(sessions)==3 and all(c.proc.returncode==0 for c in sessions))
+        repo=Path(f['original_root']);head=subprocess.check_output(['git','-C',str(repo),'rev-parse','HEAD']).decode().strip();status=subprocess.check_output(['git','-C',str(repo),'status','--porcelain=v1']).decode().strip();manager.require(head==f['source_commit']and not status,'original_project_changed');manager.require(subprocess.check_output(['git','-C',f['owned_clone'],'status','--porcelain=v1']).decode().strip()==f.get('prepared_git_status',''),'owned_clone_not_restored');originals.append({'project':f['project'],'source_root':str(repo),'head':head,'status':status})
+    write('original-after.json',originals);check('both original projects stay clean and owned clones return to declared prepared scope',True);check('three actual comparison sessions close with EOF0',len(sessions)==3 and all(c.proc.returncode==0 for c in sessions))
     write('queries.json',queries);write('summary.json',{'schema_version':1,'checks':len(checks),'actual_tool_calls':len(calls),'actual_comparison_MCP_sessions':len(sessions),'EOF_exit_codes':[c.proc.returncode for c in sessions],'actual_native_project_datasets':len(fixtures),'source_commits':{f['project']:f['source_commit']for f in fixtures},'concept_queries':CONCEPTS,'paid_model_calls':0,'mapping_review':'proposed_not_human_authenticated','live_network_policy_or_behavior_measured':False,'semantic_quality_or_independent_acceptance':False,'scope':'KM06_4_actual_pinned_project_source_comparison_not_quality_or_OE_effect'})
     review=['# 실제 프로젝트 비교 자료','','고정 원문의 source excerpt 비교다. 명시한 WBFT/Clique 구현을 실행하거나 실제 네트워크의 정책·staking·finality·성능을 판정한 결과가 아니다. 모든 매핑은 미검토 후보다.','','| 공통 개념 | go-stablenet | go-wemix |','|---|---|---|']
     for key in CONCEPTS:
