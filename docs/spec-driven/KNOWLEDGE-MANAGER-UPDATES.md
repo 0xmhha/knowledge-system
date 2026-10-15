@@ -80,3 +80,28 @@ configured gate를 통과하기 전 활성화하지 않는다. source/model/기�
 KM-04.1 완료: 명시 정책·수동/정기/변경 polling·clock skew/놓친 일정 합치기·등록/프로젝트/명시 corpus 범위·재시도 상한·required gate와 held/게시 성공 계약을27개 반례로 검증했다. 문서 없는 source의 자동 관찰 입력과 사람의 의미 검토를 분리하고 변경된 verified 지식의 무조건 승계를 금지했다. 이 단계는 설계/정책 판정이며 scheduler 실행·자동 DB 갱신 완료가 아니다. build/fmt/vet/lint·문서132개·증거 보호10개를 통과했다. Go/의존/fixture byte가 C와 같아3,820통과·18skip 및 race810통과·2skip의 committed 원자료를 참조했으며 새 Go 실행으로 세지 않는다.
 
 [정책 계약 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-contract/manifest.json)을 따른다. 전체13/28·기능3/7이다. 다음은 KM-04.2의 변경/삭제/no-op·자동 관찰 입력 구현이다. 남은15개는 KM-04.2–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 계속한다.
+
+
+## 변경·자동 관찰 입력 사용
+
+정책 초안은 아래 명령의 JSON 결과로 시작한다. 기본 enabled=false·hold_for_review이며 이는 일정 설정이나 작업 접수가 아니다. 원하는 공개 범위와 상한을 명시한 정책 파일을 제공한다.
+
+```sh
+python3 plugins/knowledge-manager/scripts/manager.py update-policy-template \
+  --registration /workspace/manager/acme/registration.json
+python3 plugins/knowledge-manager/scripts/manager.py prepare-update \
+  --registration /workspace/manager/acme/registration.json \
+  --policy-file /workspace/manager-policy/acme.json \
+  --previous-input <previous-input-id>
+```
+
+prepare-update는 선택 원문의 immutable 관찰 입력을 만들고 변경을 반환한다. 기존 입력이 없으면 previous-input을 생략한다. 생성된 source 사본과 기계 지식에 실제 CKS knowledge init/validate/lock/validate를 수행한다. 원래 프로젝트·review workflow·dataset은 변경하지 않는다. input_unchanged는 DB no-op 성공이 아니며 DB_health_or_noop_verified=false다. 실제 native inspect/status·현재 model/source/input pin·required gate와 정확한 reader 결과를 다시 확인한 뒤에만 worker가 no-op으로 사용할 수 있다.
+
+명시 corpus의 마지막 파일이 삭제되면 새 입력에서 해당 원문을 제거한다. 이미 적용된 정책의 root 자체가 삭제된 경우만 worker가 이전 정책과 대조해 삭제로 추적하도록 허용한다. 최초/임의 정책에 없는 디렉터리를 자동 채택하지 않는다. 전체 원문이 사라져 수집할 source가 없으면 이전 DB를 보존하고 근거 부족으로 거부한다.
+
+
+## KM-04.2 검증 기록
+
+KM-04.2 완료: 자동 관찰 입력·선택 파일의 추가/수정/삭제·same-byte rename 후보·명시 knowledge/ontology 원문·제공 기록·검토 stale/no-op pin을 구현했다. 사용자 source에 문서를 쓰거나 review/human_response를 만들지 않고 native knowledge init/validate/lock/validate를 수행한다. 정책27·입력32·기존 manager103의162개와 실제 공개 MCP16항목·4개 held DB·82호출·11연결 EOF0·증거 보호14개를 검증했다. 실제 두 번 변경·삭제 후 최신 원문/인용과 이전 snapshot/타 프로젝트 DB 보존, 실제 inspect/status/reader가 있는 무변경 판정을 확인했다. 메타데이터/input equality만으로 DB no-op을 승인하지 않는다. 이 실행은 수동 검증이며 주기 worker 검증이 아니다. build/fmt/vet/lint·문서132개를 통과했고 Go1256개·의존/fixture byte가 C와 같아 원래3,820통과/18skip·race810통과/2skip을 참조했다. 새 Go 실행으로 세지 않는다.
+
+[관찰 입력 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-inputs/manifest.json)을 따른다. 전체14/28·기능3/7이며 다음은 KM-04.3의 durable intent·한 writer·재시작/retry·실제 worker와 gated 전환이다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도 유지하며 멈추라는 요청 전까지 단계별 서명 커밋으로 계속한다.

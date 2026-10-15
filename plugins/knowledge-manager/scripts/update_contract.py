@@ -25,7 +25,7 @@ def bounded(value, low, high):
     return type(value) is int and low <= value <= high
 
 
-def validate(value, registration):
+def validate(value, registration, allow_missing_material=False):
     template=defaults(registration)
     require(isinstance(value,dict) and set(value)==set(template),'update_policy_invalid')
     require(type(value['schema_version']) is int and value['schema_version']==1,'update_policy_invalid')
@@ -59,7 +59,7 @@ def validate(value, registration):
                 and isinstance(material['id'],str) and re.fullmatch('[a-z][a-z0-9_-]{0,31}',material['id'])
                 and material['role'] in ('document','knowledge','ontology') and isinstance(material['root'],str),'update_material_invalid')
         path=Path(material['root'])
-        require(path.is_absolute() and str(path)==str(path.resolve()) and path.is_dir() and path!=source
+        require(path.is_absolute() and str(path)==str(path.resolve()) and (path.is_dir() or allow_missing_material and not path.exists()) and path!=source
                 and path.is_relative_to(source) and not path.is_symlink() and material['id'] not in ids
                 and not any(path.is_relative_to(old) or old.is_relative_to(path) for old in roots),'update_material_invalid')
         require(not any(part in SKIP_DIRS- {'.cks'} or any(fnmatch.fnmatchcase(part.lower(),pattern) for pattern in SECRET_NAMES)

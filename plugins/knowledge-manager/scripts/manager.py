@@ -283,6 +283,12 @@ def main():
     adopted_status = commands.add_parser('adoption-status')
     adopted_status.add_argument('--registration',required=True)
     adopted_status.add_argument('--adoption-id',required=True)
+    update_policy = commands.add_parser('update-policy-template')
+    update_policy.add_argument('--registration',required=True)
+    update_input = commands.add_parser('prepare-update')
+    update_input.add_argument('--registration',required=True)
+    update_input.add_argument('--policy-file',required=True)
+    update_input.add_argument('--previous-input')
     args = parser.parse_args()
     try:
         if args.operation=='register':
@@ -294,7 +300,13 @@ def main():
                 from broker import serve
                 serve(args.registration)
                 return 0
-            if args.operation in ('collect','evidence','draft','draft-status'):
+            if args.operation=='update-policy-template':
+                from update_contract import defaults
+                result=defaults(r)
+            elif args.operation=='prepare-update':
+                from update_inputs import prepare
+                result=prepare(strict_read(Path(args.policy_file)),r,args.previous_input)
+            elif args.operation in ('collect','evidence','draft','draft-status'):
                 from collection import collect,evidence,draft,load_draft
                 if args.operation=='collect':
                     result = collect(args,r)

@@ -17,7 +17,8 @@ scripted API. This does not establish real-model or independent semantic quality
 | Source/hash/line evidence collection and proposed native overlay | Implemented in KM-03.2 |
 | Tacit questions, supplied review, filtered input adoption/retraction | Implemented in KM-03.3; external reviewer authentication is separate |
 | Adoption-bound DB reader broker | Implemented; actual CLI build/read, normal stop and killed-host recovery verified locally |
-| Regular/change-triggered updates | Planned in KM-04 |
+| Observed update inputs and change/deletion/no-op pins | Implemented; raw observations remain semantically unreviewed |
+| Regular/change-triggered worker | Remaining KM-04.3–4 |
 
 The package lives at `plugins/knowledge-manager` in the knowledge-system repo.
 It is loaded locally, without editing global Claude settings or installing into
@@ -250,3 +251,17 @@ remains a failure. Run `make manager-test` for 103 current unit regressions.
 This target is wired into CI; the checkpoint records its local execution.
 See the [host packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json).
 No real-model call, semantic approval or automatic publication is inferred.
+
+
+## Prepare an observed update
+
+Use `manager.py update-policy-template --registration <absolute-registration>`
+to obtain the disabled, hold-only default policy. Provide an explicit policy
+file to `manager.py prepare-update --registration <absolute-registration>
+--policy-file <absolute-policy>` and optionally `--previous-input <input-id>`.
+This creates an immutable filtered source/knowledge input and reports additions,
+changes, deletions and unambiguous same-byte rename candidates. It does not start
+a job or a scheduler, approve semantic claims, publish a DB or validate DB health
+merely because `input_unchanged` is true. Explicit source-contained document,
+knowledge and ontology roots remain raw observed material with separate origins.
+See the [update contract](../../docs/spec-driven/KNOWLEDGE-MANAGER-UPDATES.md).

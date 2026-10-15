@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "name": "cks",
+  "listen": {
+    "transport": "stdio",
+    "mcp_stdio": true
+  },
+  "logging": {
+    "level": "error",
+    "mode": "prod"
+  },
+  "sanitize": {
+    "rules_path": "/private/tmp/ks-KM042-inputs-final-20261015/manager-b/sanitization_rules.yaml"
+  },
+  "maintenance": {
+    "profiles": [
+      {
+        "id": "profile-cf20350ee6a53910723fe3be1e55080b",
+        "project_id": "project-0b4d34c30d544412951865a9e90609f5",
+        "setup_config": "/private/tmp/ks-KM042-inputs-final-20261015/other-v1-setup.json",
+        "allowed_activation": [
+          "hold_for_review"
+        ],
+        "timeout_seconds": 120
+      }
+    ]
+  }
+}

@@ -337,7 +337,7 @@ def gather(args,r):
     extra,extra_contents,_ = provided_records(args.context_file,r,args.max_file_bytes)
     records.extend(extra)
     contents.extend(extra_contents)
-    require(records,'insufficient_evidence')
+    require(records or getattr(args,'allow_empty',False),'insufficient_evidence')
     require(len(records)<=args.max_files and total+sum(len(data)for _,_,data in extra_contents)+sum(len(data)for _,_,data in change_contents)<=args.max_total_bytes,'collection_limit')
     after_names,_ = selection(source,patterns,args.max_files*20)
     require(after_names==names and git_metadata(source)==before_git,'source_changed')

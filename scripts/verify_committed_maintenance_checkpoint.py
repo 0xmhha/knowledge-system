@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'manager-update-contract': {
+        'revision': '7268ac7f', 'folder': 'km-04-contract',
+        'scope': 'historical_KM04_1_policy_design_not_scheduler_runtime',
+        'scripts': ['check-knowledge-manager-update-contract-evidence.py', 'test_knowledge_manager_update_contract_evidence.py'],
+    },
     'manager-host': {
         'revision': 'cea1c943', 'folder': 'km-03-host',
         'scope': 'historical_KM03_complete_actual_local_Claude_transport_not_model_quality',

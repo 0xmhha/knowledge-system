@@ -216,15 +216,16 @@
       "scope": "continuous_updates",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "KM04_1_policy_trigger_success_contract_verified_runtime_pending",
+      "design_status": "KM04_2_observed_input_change_delete_noop_pins_verified_worker_pending",
       "depends_on": [
         "KM-03"
       ],
       "evidence": [
         "docs/spec-driven/KNOWLEDGE-MANAGER-UPDATES.md",
-        "system/eval/knowledge-roadmap-2026-10-15/km-04-contract/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-contract/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-inputs/manifest.json"
       ],
-      "verification": "policy_contract27_evidence10_contract_only_not_scheduler_runtime",
+      "verification": "unit162_actual_manual_native16_4DB_82calls_11EOF0_evidence14_not_periodic_worker",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -237,8 +238,11 @@
         },
         {
           "id": "KM-04.2",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         },
         {
           "id": "KM-04.3",
@@ -252,13 +256,12 @@
         }
       ],
       "remaining": [
-        "KM-04.2 change/deletion/no-op and observed input projection",
         "KM-04.3 durable scheduling intent/lease/retry/recovery",
         "KM-04.4 actual sequential and periodic verification"
       ],
       "execution_stages": {
         "policy_trigger_success_contract": "verified_27_cases",
-        "automatic_observation_projection": "not_started",
+        "automatic_observation_projection": "verified_32_cases_actual_manual_4DB_16_checks_11EOF0_82calls",
         "durable_worker": "not_started",
         "actual_periodic_execution": "not_started"
       }
@@ -546,7 +549,7 @@
     "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
     "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
   },
-  "completed_subtasks": 13,
+  "completed_subtasks": 14,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
   "manager_host_validation": {
     "packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json",

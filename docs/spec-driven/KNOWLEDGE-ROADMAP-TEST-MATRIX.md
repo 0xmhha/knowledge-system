@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 KM-01·02·03과 KM-04.1을 완료했다. 전체28개 중13개 완료·3개 진행 중(OE-01.1–03)·12개 미착수다. 다음은 KM-04.2의 변경/삭제/no-op과 자동 관찰 입력이다. [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 KM-01·02·03과 KM-04.1–2를 완료했다. 전체28개 중14개 완료·3개 진행 중(OE-01.1–03)·11개 미착수다. 다음은 KM-04.3 worker·중복/재시작·retry·전환이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [작업표](../REMAINING-WORK.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는3/7이다.
 
@@ -21,7 +21,7 @@
 | KM-03.3 | 암묵지 질문·불확실성·검토/채택/회수 | 완료 | 검토35·수집23·등록14·실제 CLI/native24·증거14; 통제 응답, DB 조회/신원 인증 아님 |
 | KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 완료 | 실제 CLI8회·도구68개, manager103·native3·증거16, 정상 종료0·중단/복구 |
 | KM-04.1 | 수동·정기·변경 trigger와 성공 기준 | 완료 | 정책/시각/성공27개·증거10개; 실제 scheduler 미실행 |
-| KM-04.2 | 변경/삭제/no-op/stale와 재검토 | 미착수 | 미실행 |
+| KM-04.2 | 변경/삭제/no-op/stale와 재검토 | 완료 | 입력32·정책27·manager103·실제4DB/16항목·82호출/11EOF0·증거14; 수동 |
 | KM-04.3 | 중복·lease·재시작·retry·자원 상한 | 미착수 | 미실행 |
 | KM-04.4 | 두 번 변경+no-op+실패 복구·실제 주기 실행 | 미착수 | 미실행 |
 | KM-05.1 | 산업 개념·정의·별칭·비교 축 | 미착수 | 미실행 |
@@ -524,3 +524,9 @@ KM-03.4 C 완료: 실제 설치 Claude Code2.1.300을8회 실행해68개 도구 
 KM-04.1 완료: 명시 정책·수동/정기/변경 polling·clock skew/놓친 일정 합치기·등록/프로젝트/명시 corpus 범위·재시도 상한·required gate와 held/게시 성공 계약을27개 반례로 검증했다. 문서 없는 source의 자동 관찰 입력과 사람의 의미 검토를 분리하고 변경된 verified 지식의 무조건 승계를 금지했다. 이 단계는 설계/정책 판정이며 scheduler 실행·자동 DB 갱신 완료가 아니다. build/fmt/vet/lint·문서132개·증거 보호10개를 통과했다. Go/의존/fixture byte가 C와 같아3,820통과·18skip 및 race810통과·2skip의 committed 원자료를 참조했으며 새 Go 실행으로 세지 않는다.
 
 [정책 계약 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-contract/manifest.json)에27개 전체 사례 이름·실행 로그와 실제 host C의 동결 검증을 보존한다. 소스1,704입력=Go1,256+기타448, 원래 승인5개는 보존한다. 전체13/28·기능3/7이다. 다음은 KM-04.2의 변경/삭제/no-op·자동 관찰 입력 구현이다. 남은15개는 KM-04.2–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 계속한다.
+
+## KM-04.2 원문 변경/삭제와 자동 관찰 입력
+
+KM-04.2 완료: 자동 관찰 입력·선택 파일의 추가/수정/삭제·same-byte rename 후보·명시 knowledge/ontology 원문·제공 기록·검토 stale/no-op pin을 구현했다. 사용자 source에 문서를 쓰거나 review/human_response를 만들지 않고 native knowledge init/validate/lock/validate를 수행한다. 정책27·입력32·기존 manager103의162개와 실제 공개 MCP16항목·4개 held DB·82호출·11연결 EOF0·증거 보호14개를 검증했다. 실제 두 번 변경·삭제 후 최신 원문/인용과 이전 snapshot/타 프로젝트 DB 보존, 실제 inspect/status/reader가 있는 무변경 판정을 확인했다. 메타데이터/input equality만으로 DB no-op을 승인하지 않는다. 이 실행은 수동 검증이며 주기 worker 검증이 아니다. build/fmt/vet/lint·문서132개를 통과했고 Go1256개·의존/fixture byte가 C와 같아 원래3,820통과/18skip·race810통과/2skip을 참조했다. 새 Go 실행으로 세지 않는다.
+
+[관찰 입력 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-inputs/manifest.json)에162개 로그·59개 새 계약/입력 사례 전체 이름,4DB의 실제 MCP 원시 입출력과 소유 fixture를 보존했다. 소스1,705입력=Go1,256+기타449이며 승인5개는 보존했다. 기존 검토의 실제 collection_stale에 대한 초기 시험 단언 이름 불일치는 initial-failures에 남겼다. 전체14/28·기능3/7이며 다음은 KM-04.3의 durable intent·한 writer·재시작/retry·실제 worker와 gated 전환이다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도 유지하며 멈추라는 요청 전까지 단계별 서명 커밋으로 계속한다.
