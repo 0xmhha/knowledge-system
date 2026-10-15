@@ -147,6 +147,31 @@ def check(root, protocol, ledger, require_frozen=False):
                 errors.append("preparation reference missing or hash differs: " + field)
     if protocol.get("review_draft_packet") is not None:
         errors.extend(check_review_draft_packet(root, protocol["review_draft_packet"]))
+    patches = protocol.get("readiness_candidate_patches", [])
+    if patches != ledger.get("readiness_fixes", []):
+        errors.append("protocol/ledger readiness patch references differ")
+    for patch in patches:
+        if not file_hash(patch.get("manifest"), patch.get("manifest_sha256")):
+            errors.append("readiness patch manifest missing or hash differs")
+            continue
+        manifest_path = root / patch["manifest"]
+        manifest = json.loads(manifest_path.read_text())
+        if manifest.get("candidate_commit") != patch.get("candidate_commit"):
+            errors.append("readiness candidate source identities differ")
+        for record in (patch, manifest):
+            if (record.get("operational_gate") != "not_run" or record.get("quality_gate") != "not_run"
+                    or record.get("independent_acceptance") != "not_recorded"):
+                errors.append("controlled readiness patch promoted to operational or independent acceptance")
+        if manifest.get("kind") != "controlled_development_regression_not_operational_independent_acceptance":
+            errors.append("readiness patch evidence kind differs")
+        for artifact in manifest.get("artifacts", []):
+            path = manifest_path.parent / artifact["path"]
+            if not path.resolve().is_relative_to(manifest_path.parent.resolve()):
+                errors.append("readiness artifact path escapes packet")
+                continue
+            relative = path.relative_to(root).as_posix()
+            if not file_hash(relative, artifact.get("sha256")):
+                errors.append("readiness artifact missing or hash differs")
     for row in requirements:
         if row.get("decision_status") != "approved" or not human_receipt(row.get("receipt"), digest):
             pending.append(row.get("id", "unknown freeze requirement"))

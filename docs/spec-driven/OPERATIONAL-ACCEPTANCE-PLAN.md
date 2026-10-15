@@ -1,6 +1,6 @@
 # 운영·독립 수용 검증 계획
 
-문서 최종 정리 기준일: 2026-10-15 Asia/Seoul. source 후보 관측은2026-10-14에 수행했다. **계획 초안**이며 검증 실행·새 정답·수치 기준 승인·독립 수용은 아직 수행하지 않았다. [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)의9/9 implemented와 독립 수용 not_recorded는 유지한다. 준비/실행/판정 상태는 [별도 검증 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)으로 추적한다. [source 정답·리뷰 초안](./OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)을 작성했으며 독립 채택과 실제 실행은 미완료다.
+문서 최종 정리 기준일: 2026-10-15 Asia/Seoul. source 후보 관측은2026-10-14에 수행했다. **계획 초안**이며 검증 실행·새 정답·수치 기준 승인·독립 수용은 아직 수행하지 않았다. [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)의9/9 implemented와 독립 수용 not_recorded는 유지한다. 준비/실행/판정 상태는 [별도 검증 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)으로 추적한다. [source 정답·리뷰 초안](./OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)을 작성했으며 독립 채택과 실제 실행은 미완료다. [ChainBench 준비 보완](./OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)의 새 source 후보와 개발 회귀검증은 별도 기록한다.
 
 ## 첫 검증 대상과 적용 범위
 
@@ -15,7 +15,7 @@
 | 임베딩 | 기존에 선택한 BGE-M3/native1024를 후보로 유지 | 실제 server/provider/version·완전한 digest·차원·전처리·모델/데이터 신원; source 기록을 현재 runtime 실측으로 대체하지 않음 |
 | LLM·검토자 | 새 provider/model/budget·독립 사람 검토자는 미지정 | host의 실제 요청/응답·모델 식별·토큰/시간/비용·검토자 역할/독립성 선언 |
 
-위 source 조회와 source schema33개 확인은 **준비 관측**이다. 설치·서비스 가능성·외부 저장소 반영·모델 runtime 또는 사람 수용을 확인한 것은 아니다. 원문 source 경로와 후보 checkout은 JSON에 기록한다. 실행 디렉터리·node·서비스 포인터는 아직 만들거나 변경하지 않았다.
+위 source 조회와 source schema33개 확인은 **준비 관측**이다. 설치·서비스 가능성·외부 저장소 반영·모델 runtime 또는 사람 수용을 확인한 것은 아니다. 원문 source 경로와 후보 checkout은 JSON에 기록한다. 독립 운영평가용 go-stablenet 실행 복제본·node·운영 서비스 포인터는 아직 만들거나 변경하지 않았다. 별도 ChainBench source 개발 checkout과 소유한 회귀시험 디렉터리는 준비 보완 기록에서 구분한다.
 
 ## 범위와 운영 연결의 완료 정의
 

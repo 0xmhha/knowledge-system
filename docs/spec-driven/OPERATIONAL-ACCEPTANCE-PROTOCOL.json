@@ -73,7 +73,9 @@
       "receipt": null,
       "remaining_source_risks": [
         "auto_stop_hook_reentry_before_publication_boundary",
-        "chainbench_stdio_sigterm_exit_unverified"
+        "chainbench_candidate_not_adopted_or_installed",
+        "chainbench_real_node_active_cleanup_unverified",
+        "other_platform_stdio_shutdown_unmeasured"
       ]
     }
   ],
@@ -493,7 +495,8 @@
         "toolchain_and_build_dependency_pins",
         "build_timeout",
         "signal_context_and_unmasked_exit_cleanup_verification"
-      ]
+      ],
+      "candidate_source_override_proposal": "bdf5ad2758662310b23c508e61b13ee318e92b40"
     },
     {
       "id": "SERVE-CKS",
@@ -552,7 +555,8 @@
         "CLAUDE_CONFIG_DIR",
         "ANTHROPIC_API_KEY",
         "CKS_MCP_URL",
-        "CHAINBENCH_DIR"
+        "CHAINBENCH_DIR",
+        "CHAINBENCH_DATA_ROOT"
       ],
       "timeout_seconds": null,
       "remaining": [
@@ -579,7 +583,8 @@
         "manual_completed_state",
         "skipped_evaluator_or_hook",
         "suppressed_error_as_success"
-      ]
+      ],
+      "owned_state_root_status": "candidate_support_implemented_runtime_recipe_not_frozen"
     }
   ],
   "owned_resources": [],
@@ -633,5 +638,19 @@
     "review_cases": 10,
     "value_control_anchor_functions": 3,
     "approved_gold_records": 0
-  }
+  },
+  "readiness_candidate_patches": [
+    {
+      "id": "OP-CB-01",
+      "component": "chainbench",
+      "status": "implemented_controlled_checks_passed",
+      "manifest": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
+      "manifest_sha256": "d6bef9e2cea8711e10acd36cf43038b218ba3394d359393a9aa39a715c628452",
+      "candidate_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "candidate_adoption": "pending",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded"
+    }
+  ]
 }

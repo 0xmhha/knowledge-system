@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-14T23:57:23.201836+00:00",
+  "kind": "controlled_development_regression_not_operational_independent_acceptance",
+  "fix_id": "OP-CB-01",
+  "status": "implemented_controlled_checks_passed",
+  "owner": "chainbench",
+  "source_path": "/private/tmp/ks-op-chainbench-shutdown",
+  "branch": "codex/mcp-graceful-shutdown",
+  "base_commit": "df464d4b97fde4ab308c5c422024dc80518e5956",
+  "candidate_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+  "candidate_tree": "6d9cc57a4c4e8705e49b11e0f8e31f5adf67d8e8",
+  "checkout_clean": true,
+  "candidate_adoption": "pending",
+  "publication": "not_pushed_or_pr_created",
+  "installation": "not_measured",
+  "operational_gate": "not_run",
+  "quality_gate": "not_run",
+  "independent_acceptance": "not_recorded",
+  "scope": [
+    "cooperative stdio request cancellation on EOF/SIGINT/SIGTERM",
+    "pollable owned Unix descriptor copies and restored status flags",
+    "explicit absolute CHAINBENCH_DATA_ROOT for isolated default assets and locks",
+    "preserve request order and real transport failures"
+  ],
+  "limits": [
+    "Darwin arm64 controlled regression; not a platform-wide guarantee",
+    "active handler and blocked-output subprocesses are fixtures, not actual node operations",
+    "cooperation required; does not forcibly preempt handlers that ignore cancellation",
+    "metadata tool schemas unchanged is not installed host integration or retrieval quality proof",
+    "EOF cancels active requests; isError cancellation responses are not successful tool completions"
+  ],
+  "changed_sources": [
+    {
+      "path": "README.md",
+      "git_blob": "5479b25d8ab03a31ece08a69537d08eac1983fb2",
+      "sha256": "d5388307e3b4f55fcb5ee084f37791de6dcfb415c140858692695b6f7016a8be"
+    },
+    {
+      "path": "cmd/chainbench-mcp/main.go",
+      "git_blob": "755876cc6650b7d3d474113d5cd3cad597e18a3a",
+      "sha256": "fd5e9545c2b3bc8eaf7f4a09a9344989758c8c7a0cb3079e1b5b2702a2b65519"
+    },
+    {
+      "path": "cmd/chainbench-mcp/main_test.go",
+      "git_blob": "2675f45aacad514afecc91723e7d8a789ca72a4a",
+      "sha256": "13401f19d7bee4aeed6493da7e0450e53751d9fc784e55879ce100635b1d7690"
+    },
+    {
+      "path": "cmd/chainbench-mcp/stdio_other.go",
+      "git_blob": "b93f4ed5c6feaafd3a71bbc3953397da64dabb77",
+      "sha256": "64a93486e7b922831df5d64fb26651cff69a260792b042b6c6d16eac8e26ba6f"
+    },
+    {
+      "path": "cmd/chainbench-mcp/stdio_unix.go",
+      "git_blob": "ab121f646f2107c4ff3c42e566b67e4a4111d293",
+      "sha256": "4ce0848c25aefb87f573f03799063cb3be7e6374fa5d947b227b4aa24326aa24"
+    },
+    {
+      "path": "cmd/chainbench-mcp/stdio_unix_test.go",
+      "git_blob": "7fc842d98b2259868965e3006333c85b714010f5",
+      "sha256": "d11c566aceb1c5dffeaf6105cc0dd064349262a693cfde6d9a5a7d10539ca112"
+    },
+    {
+      "path": "cmd/chainbench/chaincmd/chain_test.go",
+      "git_blob": "409ac3a1a6eb332fea5175c335dbc0e8b2f27b19",
+      "sha256": "9a48e068d35733a6714101ed58abed665601fc185e87e77c678c424beb3b3788"
+    },
+    {
+      "path": "cmd/chainbench/chaincmd/equivalence_test.go",
+      "git_blob": "460b908caeaf432bce4bc3fa956cb18a4bc06fcb",
+      "sha256": "e048e1bedfaa9a404fca4a5ef813d0ec20b924ea89ccb4ff06de8a36b04ca4f4"
+    },
+    {
+      "path": "cmd/chainbench/resourcecmd/parity_test.go",
+      "git_blob": "18bafa5972a17b2a94de6e44e478c4f61a8f2a34",
+      "sha256": "e98808fd061b11e0acce6c618ec4fc90ddce8e65bf59b85ae655d29153fed367"
+    },
+    {
+      "path": "cmd/chainbench/resourcecmd/resource_test.go",
+      "git_blob": "6674404b417120278ae8db28858137943c833433",
+      "sha256": "4cbe3fab06948f34590bdc2010d0425feeea810999e9f3ea6cf91496cb14c2a2"
+    },
+    {
+      "path": "docs/dev/architecture/package-tree.md",
+      "git_blob": "03478a57f410f9631d24d137e2dd9fe5d75ed8df",
+      "sha256": "6066abac59c809731efda362f51b0227f545d4547de4078e3522b78ccb764f91"
+    },
+    {
+      "path": "internal/chainsetup/resume_test.go",
+      "git_blob": "4f9c740dfc7ac3dac0c94c0084fe992cb2668cbb",
+      "sha256": "bcefbf656c52b9320748a9e1c1889af79c253b205bc62453aa1dd5ede78b5c87"
+    },
+    {
+      "path": "internal/chainsetup/stale_test.go",
+      "git_blob": "dac43f30342131acaefc3a1002fbade291ca3025",
+      "sha256": "c9e581f4f2ecc960612c7bd16430d81fdbf1227ea242150ba9a8ebdfc9ab34de"
+    },
+    {
+      "path": "internal/core/home/home.go",
+      "git_blob": "6a0a94a8bc1e54f47c303fd70ab9a328956a7887",
+      "sha256": "e4b7df451b782761280145c1a7e222dee9f8b5de3f7d02afb5699f3557350540"
+    },
+    {
+      "path": "internal/core/home/home_test.go",
+      "git_blob": "09123b2ef31593f1efa976dab8ebf1779c01e5ba",
+      "sha256": "a3c4a14816c75ff2d633bbf052b0d4588d0ea8a56f681e758b56acd30bd79313"
+    }
+  ],
+  "checks": {
+    "build": "pass",
+    "fmt": "pass",
+    "vet": "pass",
+    "lint": {
+      "status": "pass",
+      "version": "v2.12.2",
+      "issues": 0
+    },
+    "full_go_tests": {
+      "status": "pass",
+      "ok_packages": 66,
+      "no_test_packages": 13
+    },
+    "target_race_tests": {
+      "status": "pass",
+      "top_level_pass_entries": 11,
+      "includes_helper_entry": true,
+      "signal_cases": 9,
+      "signal_case_counts": {
+        "idle_SIGTERM": 3,
+        "cooperative_active_SIGTERM": 3,
+        "blocked_output_SIGTERM": 3
+      },
+      "forced_kills_final": 0
+    },
+    "actual_binary_metadata": {
+      "status": "pass",
+      "modes": {
+        "EOF": 3,
+        "idle_SIGTERM": 3,
+        "idle_SIGINT": 1
+      },
+      "tool_schema_count": 81,
+      "tool_schema_equal_baseline": true,
+      "binary_sha256": "1f388f060ff3d044544e0b47c89f7a6fa2debe3b1c4229e69601208418071011"
+    },
+    "bundle_recovery": "pass"
+  },
+  "failed_attempts_preserved": [
+    {
+      "file": "before.json",
+      "outcome": "baseline idle SIGTERM exit -15"
+    },
+    {
+      "file": "target-tests-attempt1.log",
+      "outcome": "first patch unit tests passed but 9 subprocesses needed forced cleanup; not counted as graceful"
+    },
+    {
+      "file": "full-tests.log",
+      "outcome": "sandbox localhost/global state restrictions and stale generated architecture figures; failed"
+    },
+    {
+      "file": "full-tests-isolated.log",
+      "outcome": "three old tests expected HOME-based fixtures; failed until switched to explicit owned root"
+    }
+  ],
+  "real_node_operations": 0,
+  "model_calls": 0,
+  "runtime_execution_receipts_added_to_acceptance": 0,
+  "recovery": {
+    "bundle": "chainbench.bundle",
+    "required_base_commit": "df464d4b97fde4ab308c5c422024dc80518e5956",
+    "base_packet": "system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/sources/chainbench.bundle",
+    "patch": "change.patch",
+    "recovered_revision": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+    "evidence": "recovery.txt"
+  },
+  "artifacts": [
+    {
+      "path": "after-metadata-precommit.json",
+      "sha256": "10afaaf016137424b7c998eecdfda670ca015b67ec93b2bed73eb9573badbb9b",
+      "bytes": 390681
+    },
+    {
+      "path": "after-metadata.json",
+      "sha256": "bf60222033a544d544a9bdcbb36b1201ef1410b191a22f0a77fd59921c5e3c02",
+      "bytes": 390640
+    },
+    {
+      "path": "before-metadata.json",
+      "sha256": "b42ac14994b723b209ed457c8213cf11af724cfffd6f6dd1763d39d19a10a800",
+      "bytes": 54111
+    },
+    {
+      "path": "before.json",
+      "sha256": "3974ea9565398c8734e05c8eec0b1602b1d0efda438f809cb6e4f7a2070c8918",
+      "bytes": 641
+    },
+    {
+      "path": "build-committed.log",
+      "sha256": "39b1413757415e0e1da7be32ce1673098d5c98d558c15fcf4230d20796b5eeea",
+      "bytes": 268
+    },
+    {
+      "path": "buildinfo.txt",
+      "sha256": "ca78ec5fe26dc4bcb46c9d66306797e9a1b563b9993f0c59ed1708fd93ac26b0",
+      "bytes": 1233
+    },
+    {
+      "path": "chainbench.bundle",
+      "sha256": "49b2834331bb35450507b13bc396081acfb35fed0a491ec85557359dc9833525",
+      "bytes": 9501
+    },
+    {
+      "path": "change.patch",
+      "sha256": "66c6d950e7b6b1a8da181edc2233bcc90c5112bb074caab1d87dc9716c657e00",
+      "bytes": 30084
+    },
+    {
+      "path": "fmt-vet-final.log",
+      "sha256": "685d158f951e3eb11749d2e519a64eba4f57dcc93cd562eaee2cc9457f72846e",
+      "bytes": 13
+    },
+    {
+      "path": "full-tests-final.log",
+      "sha256": "528e1b3b3196bb0de867266d09ea62b6fe67970fe7de060156ade856154a891f",
+      "bytes": 5269
+    },
+    {
+      "path": "full-tests-isolated.log",
+      "sha256": "52b66f6e57dbdda8af2c116fc7850aecf9d359e571a970cfc2af0a7fd791acca",
+      "bytes": 6838
+    },
+    {
+      "path": "full-tests.log",
+      "sha256": "4b0cd8e7bcd2227d786bf64798341ff58ea01d39d9431669205fe2f82aad8aa9",
+      "bytes": 48372
+    },
+    {
+      "path": "ks-probe-chainbench-stdio.py",
+      "sha256": "ed826a29549c4e246d12c58a6e46981633b5b8300f5d93d584286af793b6e56a",
+      "bytes": 2663
+    },
+    {
+      "path": "ks-run-chainbench-check.py",
+      "sha256": "6ee82a6f4f0995ae170df49c3be35fa9cd4122a1356bd2453694b71826b506e1",
+      "bytes": 726
+    },
+    {
+      "path": "lint-final2.log",
+      "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
+      "bytes": 10
+    },
+    {
+      "path": "recovery.txt",
+      "sha256": "17bdcb75bd56b4d0d6f190de94182ef410d41fa29fae4980f6f76dc900bcd0f2",
+      "bytes": 147
+    },
+    {
+      "path": "target-tests-attempt1.log",
+      "sha256": "c7b091a4e9062e0bc6aaa142cc2671efc408100a8151dccb3b57c11b1ea744e8",
+      "bytes": 2401
+    },
+    {
+      "path": "target-tests-attempt2.log",
+      "sha256": "b24edae43e593a85dc37ed8feb789eb4c5dafe9419dc0a028b45182822ee8351",
+      "bytes": 2734
+    },
+    {
+      "path": "target-tests-final.log",
+      "sha256": "76902a01b5606b3c3b1b546e181ebb226e01652b7308d341c54858a5dd0f871d",
+      "bytes": 2960
+    }
+  ]
+}

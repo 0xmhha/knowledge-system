@@ -171,6 +171,16 @@ class PreparationGuardTests(unittest.TestCase):
         errors = self.mutated_packet_errors("private", mutate)
         self.assertTrue(any("anchor bytes/hash" in e for e in errors))
 
+    def test_readiness_manifest_hash_tampering_is_rejected(self):
+        self.protocol["readiness_candidate_patches"][0]["manifest_sha256"] = "0" * 64
+        self.ledger["readiness_fixes"] = copy.deepcopy(self.protocol["readiness_candidate_patches"])
+        self.assertTrue(any("patch manifest" in e for e in self.errors()))
+
+    def test_controlled_source_patch_is_not_operational_acceptance(self):
+        self.protocol["readiness_candidate_patches"][0]["operational_gate"] = "pass"
+        self.ledger["readiness_fixes"] = copy.deepcopy(self.protocol["readiness_candidate_patches"])
+        self.assertTrue(any("readiness patch promoted" in e for e in self.errors()))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,7 +6,7 @@
   "scope": "proposed isolated local Go pilot; no automatic external publication, deployment or production-global acceptance",
   "plan_status": "draft_for_review",
   "execution_status": "not_started",
-  "observations_kind": "source_only_not_runtime_acceptance",
+  "observations_kind": "preparation_source_and_controlled_regression_not_operational_acceptance",
   "source_observations": {
     "knowledge_system": {
       "source_commit": "ad52d9562ef33a0d0c8bc6cd510033ee39c862ac",
@@ -232,7 +232,8 @@
           "sha256": "1b0716c59cd8b5704b9e45e5b6bee4cc7d19c6a15ee09e9673ad2a99756e12e8",
           "kind": "preparation_only"
         },
-        "review_draft_packet": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md"
+        "review_draft_packet": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md",
+        "chainbench_readiness_fix": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json"
       },
       "completed_preparation": [
         "read_only_source_inventory",
@@ -243,7 +244,8 @@
         "draft_runtime_recipes_and_boundary_risks",
         "public_review_inputs_and_separate_ai_rubric_drafts",
         "non_exhaustive_value_control_anchor_drafts",
-        "stop_reentry_and_unmasked_shutdown_completion_requirements"
+        "stop_reentry_and_unmasked_shutdown_completion_requirements",
+        "chainbench_stdio_readiness_patch_with_isolated_state_and_controlled_regression"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -259,12 +261,12 @@
         "date": "2026-10-15",
         "kind": "preparation_only_not_runtime_or_independent_acceptance",
         "guard_regression_tests": {
-          "passed": 26,
+          "passed": 28,
           "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_operational_acceptance.py"
         },
         "documentation_contract_tests_passed": 20,
         "package_notice_tests_passed": 3,
-        "live_document_check_count": 115,
+        "live_document_check_count": 116,
         "require_frozen_rejected_with_exit": 1,
         "original_source_completion_guard": "pass",
         "verified_original_bindings": 2069,
@@ -328,5 +330,19 @@
     "llm_cost_limit": null
   },
   "protocol_draft": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.json",
-  "source_preparation_inventory": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-SOURCE-INVENTORY.json"
+  "source_preparation_inventory": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-SOURCE-INVENTORY.json",
+  "readiness_fixes": [
+    {
+      "id": "OP-CB-01",
+      "component": "chainbench",
+      "status": "implemented_controlled_checks_passed",
+      "manifest": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
+      "manifest_sha256": "d6bef9e2cea8711e10acd36cf43038b218ba3394d359393a9aa39a715c628452",
+      "candidate_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "candidate_adoption": "pending",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded"
+    }
+  ]
 }
