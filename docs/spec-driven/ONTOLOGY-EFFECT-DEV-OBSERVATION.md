@@ -1,6 +1,6 @@
 # 온톨로지 효과 개발 평가
 
-2026-10-16 현재 OE-01.1–2의 입력/기준 고정과 실제512회 수집을 완료했다. 효과 분석은 다음 단계이며 기존 기본 off·quality=inconclusive를 유지한다. [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+2026-10-16 현재 OE-01.1–3의 입력 고정·실제512회 실행·효과/비용 분석을 마쳤다. 유한 함수 과제의 소폭 이득은 영어 질문1개에 한정됐고 범위 제어의 매칭과 지연/비용 증가도 관찰했다. 기본 off·quality=inconclusive를 유지한다. [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 현재 확대 평가 설계
 
@@ -69,3 +69,19 @@ OE-01.2 완료: 사전 등록16질문×4모드×8호출=512회를 실제 로컬 
 인용4896개·본문4896개·원문 blob65개를 검증했고 실패/누락0이다. 실제 API 20420개를 metadata/준비/질문-arm별로 기록했다. 기본 off·quality=inconclusive와 사람/독립 gold0·실제 LLM 답변0·유료 모델0을 유지한다. 초기 off 기본값 정규화 오류와 계측 로그 전체 재작성에 따른 제어 중단을 별도로 보존했다. 초기 지연/부분 실행은 본512회 지표에 합산하지 않는다.
 
 [동결 실행 증거](../../system/eval/knowledge-roadmap-2026-10-16/oe-02-capture/manifest.json)를 따른다. 전체26/28·기능6/7이다. 다음은 OE-01.3의 고정 함수 회수 precision/recall·순위·ontology 의도 범위/unknown·warm 지연/API 호출/관측 비용 재계산이다. 남은2개는 OE-01.3 분석, OE-01.4 다중 프로젝트 매핑/오인/누락 효과 평가다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다.
+
+
+## OE-01.3 확대 평가 결과
+
+OE-01.3 완료: 고정512회 원자료에서 유한한 완전 함수 찾기 과제의 precision/recall·순위·의도한 ontology 개념/범위 진단·warm 지연·실제 로컬 API 호출/서버 token 수를 재계산했다.5사실군 평균 recall은 off54.44%→concept_text/combined56.67%, precision12.87%→13.54%, MRR0.4612→0.4862다. 개선은 EX-08 영어 메시지 처리 질문1개에서 prepare만 회수하던 결과에 commit이 추가된 것으로 한정된다. 나머지13개 채점 질문의 지표는 같았다. hit@10은68.33%로 동일하다. 일반 행동/정책의 semantic relevance나 답변 정확도로 확대하지 않는다.
+
+| 모드 | 함수 P@10·5사실군 평균 | 함수 recall@10 | MRR@10 | warm p95 | embedding API/서버 prompt tokens |
+|---|---|---|---|---|---|
+| off | 0.1287 | 0.5444 | 0.4612 | 583.1ms | 1584/31536 |
+| concept_text | 0.1354 | 0.5667 | 0.4862 | 736.2ms | 1664/56112 |
+| relations | 0.1287 | 0.5444 | 0.4612 | 607.4ms | 1584/31536 |
+| combined | 0.1354 | 0.5667 | 0.4862 | 697.4ms | 1664/56112 |
+
+각 arm의 warm80개 p95는 off583.1ms, concept_text736.2ms(1.263배), relations607.4ms(1.042배), combined697.4ms(1.196배)다. capture batch embedding API는 off/relations1584개·31536서버 prompt tokens, concept_text/combined1664개·56112tokens다. 준비/모델 확인도 포함한 도구 실행 batch 비용이며8호출×16질문의512개 독립 사실이 아니다. 토큰은 서버 보고값이고 금액/전력/하드웨어 비용은 추정하지 않았다. 유료/LLM 답변0이다. 활성 모드는 의도 개념13질문 중9개를 매칭했고, scope 의도 진단3질문 중 외부 go-wemix 대상 EX-16에도 WBFT quorum을 매칭했다. relations는 검토된 구현 연결0·rank 변화0이다. 정의 검색/combined의 최종 인용 순서는32짝 중18짝에서 달랐지만 함수 회수 이득은1질문뿐이다. 작은 source-derived 개발 표본과 지연 관찰로 기본 off·quality=inconclusive를 유지한다.
+
+[재계산·원자료](../../system/eval/knowledge-roadmap-2026-10-16/oe-03-score/manifest.json)를 보존한다. 검색의 source-defined 함수 기준과 일반 질문의 의미 정답은 다르며 EX-15/16의 전체 source relevance는 미채점이다. EX-16의 용어 매칭은 선언한 의도 범위와의 불일치 관찰이며 사람 판정 false-positive율이나 실제 답변 오류로 부르지 않는다. 더 많은 정의/검토된 구현 연결·문맥 구분·독립 평가가 필요하다. 전체27/28·기능6/7이다. 다음이자 마지막 세부 작업은 OE-01.4의 실제2프로젝트 공통 개념 매핑 효과·오인/누락 평가다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 실제 LLM 답변·독립 정답·운영 활성화는 미실행/미승인 상태로 보존한다.

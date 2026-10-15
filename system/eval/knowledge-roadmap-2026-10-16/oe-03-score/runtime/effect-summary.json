@@ -1,0 +1,308 @@
+{
+  "verification": {
+    "actual_capture_calls": 512,
+    "question_count": 16,
+    "fact_families": 5,
+    "scored_questions": 14,
+    "function_units": 11,
+    "readiness_calls": 4,
+    "capture_sessions_closed": 64,
+    "readiness_sessions_EOF0": 4,
+    "missing_slots": 0,
+    "failed_calls": 0,
+    "citations_verified": 4896,
+    "bodies_verified": 4896,
+    "source_blobs_verified": 65,
+    "meter_requests": 20420,
+    "meter_active_at_exit": 0,
+    "source_preserved": true,
+    "semantic_quality_acceptance": false,
+    "independent_acceptance": false,
+    "LLM_answer_calls": 0,
+    "paid_model_calls": 0
+  },
+  "metric_scope": "source-defined finite complete-function retrieval; not general behavior/policy or answer relevance",
+  "human_or_independent_gold": false,
+  "query_variants_are_not_independent_facts": true,
+  "arms": {
+    "off": {
+      "question_macro": {
+        "precision_at10": 0.11666666666666667,
+        "recall_at10": 0.47619047619047616,
+        "hit_at10": 0.6428571428571429,
+        "reciprocal_rank_at10": 0.4048469387755102
+      },
+      "family_macro": {
+        "precision_at10": 0.1287037037037037,
+        "recall_at10": 0.5444444444444444,
+        "hit_at10": 0.6833333333333333,
+        "reciprocal_rank_at10": 0.4611904761904762
+      },
+      "families": {
+        "quorum": {
+          "precision_at10": 0.10277777777777777,
+          "recall_at10": 0.5,
+          "hit_at10": 0.75,
+          "reciprocal_rank_at10": 0.75
+        },
+        "round-change": {
+          "precision_at10": 0.0,
+          "recall_at10": 0.0,
+          "hit_at10": 0.0,
+          "reciprocal_rank_at10": 0
+        },
+        "message-handlers": {
+          "precision_at10": 0.17407407407407408,
+          "recall_at10": 0.5555555555555556,
+          "hit_at10": 1.0,
+          "reciprocal_rank_at10": 0.15595238095238095
+        },
+        "current-lock": {
+          "precision_at10": 0.16666666666666666,
+          "recall_at10": 0.6666666666666666,
+          "hit_at10": 0.6666666666666666,
+          "reciprocal_rank_at10": 0.4
+        },
+        "validator-lock": {
+          "precision_at10": 0.2,
+          "recall_at10": 1.0,
+          "hit_at10": 1.0,
+          "reciprocal_rank_at10": 1.0
+        }
+      },
+      "warm_observations": 80,
+      "warm_p50_ms": 497.418833,
+      "warm_p95_ms": 583.08654165,
+      "ontology_states": {
+        "off": 128
+      },
+      "API_requests_in_capture_batches": 4784,
+      "embedding_API_requests_in_capture_batches": 1584,
+      "server_reported_prompt_tokens": 31536,
+      "embedding_responses_missing_token_usage": 0,
+      "cloud_model_API_calls": 0,
+      "local_electricity_hardware_cost": "not_measured",
+      "actual_text_search_calls_all_phases": 0,
+      "boosted_citations_all_phases": 0,
+      "applied_relations_all_phases": 0,
+      "final_citation_order_changes_vs_off": 0,
+      "paired_retrieval_comparisons": 32,
+      "intended_concept_match_observations": 0,
+      "intended_concept_observations": 26,
+      "out_of_intent_control_match_observations": 0,
+      "out_of_intent_control_observations": 6,
+      "ontology_scope_metric": "declared intent diagnostic, not human-adjudicated semantic false-positive rate"
+    },
+    "concept_text": {
+      "question_macro": {
+        "precision_at10": 0.12380952380952381,
+        "recall_at10": 0.5,
+        "hit_at10": 0.6428571428571429,
+        "reciprocal_rank_at10": 0.4316326530612245
+      },
+      "family_macro": {
+        "precision_at10": 0.13537037037037036,
+        "recall_at10": 0.5666666666666667,
+        "hit_at10": 0.6833333333333333,
+        "reciprocal_rank_at10": 0.4861904761904762
+      },
+      "families": {
+        "quorum": {
+          "precision_at10": 0.10277777777777777,
+          "recall_at10": 0.5,
+          "hit_at10": 0.75,
+          "reciprocal_rank_at10": 0.75
+        },
+        "round-change": {
+          "precision_at10": 0.0,
+          "recall_at10": 0.0,
+          "hit_at10": 0.0,
+          "reciprocal_rank_at10": 0
+        },
+        "message-handlers": {
+          "precision_at10": 0.2074074074074074,
+          "recall_at10": 0.6666666666666666,
+          "hit_at10": 1.0,
+          "reciprocal_rank_at10": 0.28095238095238095
+        },
+        "current-lock": {
+          "precision_at10": 0.16666666666666666,
+          "recall_at10": 0.6666666666666666,
+          "hit_at10": 0.6666666666666666,
+          "reciprocal_rank_at10": 0.4
+        },
+        "validator-lock": {
+          "precision_at10": 0.2,
+          "recall_at10": 1.0,
+          "hit_at10": 1.0,
+          "reciprocal_rank_at10": 1.0
+        }
+      },
+      "warm_observations": 80,
+      "warm_p50_ms": 551.031792,
+      "warm_p95_ms": 736.2133496999999,
+      "ontology_states": {
+        "active": 80,
+        "no_match": 48
+      },
+      "API_requests_in_capture_batches": 5024,
+      "embedding_API_requests_in_capture_batches": 1664,
+      "server_reported_prompt_tokens": 56112,
+      "embedding_responses_missing_token_usage": 0,
+      "cloud_model_API_calls": 0,
+      "local_electricity_hardware_cost": "not_measured",
+      "actual_text_search_calls_all_phases": 80,
+      "boosted_citations_all_phases": 576,
+      "applied_relations_all_phases": 0,
+      "final_citation_order_changes_vs_off": 18,
+      "paired_retrieval_comparisons": 32,
+      "intended_concept_match_observations": 18,
+      "intended_concept_observations": 26,
+      "out_of_intent_control_match_observations": 2,
+      "out_of_intent_control_observations": 6,
+      "ontology_scope_metric": "declared intent diagnostic, not human-adjudicated semantic false-positive rate"
+    },
+    "relations": {
+      "question_macro": {
+        "precision_at10": 0.11666666666666667,
+        "recall_at10": 0.47619047619047616,
+        "hit_at10": 0.6428571428571429,
+        "reciprocal_rank_at10": 0.4048469387755102
+      },
+      "family_macro": {
+        "precision_at10": 0.1287037037037037,
+        "recall_at10": 0.5444444444444444,
+        "hit_at10": 0.6833333333333333,
+        "reciprocal_rank_at10": 0.4611904761904762
+      },
+      "families": {
+        "quorum": {
+          "precision_at10": 0.10277777777777777,
+          "recall_at10": 0.5,
+          "hit_at10": 0.75,
+          "reciprocal_rank_at10": 0.75
+        },
+        "round-change": {
+          "precision_at10": 0.0,
+          "recall_at10": 0.0,
+          "hit_at10": 0.0,
+          "reciprocal_rank_at10": 0
+        },
+        "message-handlers": {
+          "precision_at10": 0.17407407407407408,
+          "recall_at10": 0.5555555555555556,
+          "hit_at10": 1.0,
+          "reciprocal_rank_at10": 0.15595238095238095
+        },
+        "current-lock": {
+          "precision_at10": 0.16666666666666666,
+          "recall_at10": 0.6666666666666666,
+          "hit_at10": 0.6666666666666666,
+          "reciprocal_rank_at10": 0.4
+        },
+        "validator-lock": {
+          "precision_at10": 0.2,
+          "recall_at10": 1.0,
+          "hit_at10": 1.0,
+          "reciprocal_rank_at10": 1.0
+        }
+      },
+      "warm_observations": 80,
+      "warm_p50_ms": 503.49537499999997,
+      "warm_p95_ms": 607.38904585,
+      "ontology_states": {
+        "active": 80,
+        "no_match": 48
+      },
+      "API_requests_in_capture_batches": 4784,
+      "embedding_API_requests_in_capture_batches": 1584,
+      "server_reported_prompt_tokens": 31536,
+      "embedding_responses_missing_token_usage": 0,
+      "cloud_model_API_calls": 0,
+      "local_electricity_hardware_cost": "not_measured",
+      "actual_text_search_calls_all_phases": 0,
+      "boosted_citations_all_phases": 0,
+      "applied_relations_all_phases": 0,
+      "final_citation_order_changes_vs_off": 0,
+      "paired_retrieval_comparisons": 32,
+      "intended_concept_match_observations": 18,
+      "intended_concept_observations": 26,
+      "out_of_intent_control_match_observations": 2,
+      "out_of_intent_control_observations": 6,
+      "ontology_scope_metric": "declared intent diagnostic, not human-adjudicated semantic false-positive rate"
+    },
+    "combined": {
+      "question_macro": {
+        "precision_at10": 0.12380952380952381,
+        "recall_at10": 0.5,
+        "hit_at10": 0.6428571428571429,
+        "reciprocal_rank_at10": 0.4316326530612245
+      },
+      "family_macro": {
+        "precision_at10": 0.13537037037037036,
+        "recall_at10": 0.5666666666666667,
+        "hit_at10": 0.6833333333333333,
+        "reciprocal_rank_at10": 0.4861904761904762
+      },
+      "families": {
+        "quorum": {
+          "precision_at10": 0.10277777777777777,
+          "recall_at10": 0.5,
+          "hit_at10": 0.75,
+          "reciprocal_rank_at10": 0.75
+        },
+        "round-change": {
+          "precision_at10": 0.0,
+          "recall_at10": 0.0,
+          "hit_at10": 0.0,
+          "reciprocal_rank_at10": 0
+        },
+        "message-handlers": {
+          "precision_at10": 0.2074074074074074,
+          "recall_at10": 0.6666666666666666,
+          "hit_at10": 1.0,
+          "reciprocal_rank_at10": 0.28095238095238095
+        },
+        "current-lock": {
+          "precision_at10": 0.16666666666666666,
+          "recall_at10": 0.6666666666666666,
+          "hit_at10": 0.6666666666666666,
+          "reciprocal_rank_at10": 0.4
+        },
+        "validator-lock": {
+          "precision_at10": 0.2,
+          "recall_at10": 1.0,
+          "hit_at10": 1.0,
+          "reciprocal_rank_at10": 1.0
+        }
+      },
+      "warm_observations": 80,
+      "warm_p50_ms": 552.096417,
+      "warm_p95_ms": 697.4094693999999,
+      "ontology_states": {
+        "active": 80,
+        "no_match": 48
+      },
+      "API_requests_in_capture_batches": 5024,
+      "embedding_API_requests_in_capture_batches": 1664,
+      "server_reported_prompt_tokens": 56112,
+      "embedding_responses_missing_token_usage": 0,
+      "cloud_model_API_calls": 0,
+      "local_electricity_hardware_cost": "not_measured",
+      "actual_text_search_calls_all_phases": 80,
+      "boosted_citations_all_phases": 576,
+      "applied_relations_all_phases": 0,
+      "final_citation_order_changes_vs_off": 18,
+      "paired_retrieval_comparisons": 32,
+      "intended_concept_match_observations": 18,
+      "intended_concept_observations": 26,
+      "out_of_intent_control_match_observations": 2,
+      "out_of_intent_control_observations": 6,
+      "ontology_scope_metric": "declared intent diagnostic, not human-adjudicated semantic false-positive rate"
+    }
+  },
+  "quality_acceptance": false,
+  "independent_acceptance": false,
+  "default_recommendation": "keep_off_pending_reviewed_links_and_broader_independent_evidence",
+  "LLM_answer_quality": null
+}
