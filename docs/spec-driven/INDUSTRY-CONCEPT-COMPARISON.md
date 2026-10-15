@@ -1,6 +1,6 @@
 # 산업 개념과 프로젝트별 비교 근거
 
-현재 구현은 KM-05.1의 선택형 공통 어휘다. 프로젝트별 구현 연결·검토/버전 처리·비교 MCP·실제 다중 프로젝트 품질은 다음 단계에서 검증한다. [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+현재 KM-05.1의 선택형 공통 어휘와 KM-05.2의 프로젝트별 원문 연결을 구현했다. 검토/버전 처리·비교 MCP·실제 다중 프로젝트 품질은 다음 단계에서 검증한다. [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 목적과 기존 계층
 
@@ -54,3 +54,26 @@ KM-05.1 완료: 기존 knowledgepack loader를 재사용한 선택형 industry.b
 [동결 원자료](../../system/eval/knowledge-roadmap-2026-10-16/km-05-scheme/manifest.json)를 따른다. 전체17/28·기능4/7이다. 다음은 KM-05.2의 프로젝트별 코드·문서·설정/정책·테스트 근거 연결이다. 남은11개는 KM-05.2–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
 
 최종 소스의 전체 Go3891실행(3873통과18skip,136패키지)과 race865실행(863통과2skip,7패키지)을 별도 순차 실행했다. 초기 lint1건의 표현을 수정하고 기존 resolver의 의존/타입/상속 검사도 연결한 뒤 전체 시험을 재실행했다. 초기 실패 로그를 보존하며 skip을 통과로 합산하지 않는다.
+
+## KM-05.2 프로젝트 연결 계약과 실행 계획
+
+공통 어휘가 존재하는 것과 각 프로젝트의 역할이 그 개념에 해당한다는 판정은 다르다. ProjectBinding은 정확 concept key, 전체 V2Coordinates, network/configuration/component_role/observed_at, 로컬 역할 이름, 직접 mapping 종류와 이유, 근거 목록을 받는다. 다른 이름의 같은 역할과 같은 이름의 다른 역할을 모두 표현한다. 문자열 label로 자동 매핑하거나 프로젝트를 합치지 않는다.
+
+binding ID는 `{coordinates, conditions, concept key, local binding id}` 범위 안에서만 유일하다. 같은 ID가 다른 프로젝트·버전·network/config/역할에 존재해도 충돌하지 않는다. 동일한 관찰 시각의 timezone 표현만 다른 중복은 거부한다. BindingDigest는 해석·조건·모든 원문 좌표/hash를 포함한다. 의미 승인이나 서명은 아니다. 원문·조건·매핑이 바뀌면 새 digest이며 검토 승계를 주장하지 않는다.
+
+BindingDocument는 schema version1, 최대128개 연결, 최대1MiB의 엄격 JSON이다. 개별 연결은 기존 v2 예산과 같은 최대12개 원문 근거를 받는다. 각 근거는 고유 ID, code/document/configuration/policy/test 종류, 해당 공통 개념의 facet 집합과 전체 CitationV2다. span은 최대256줄이며 기본 source/body byte 예산도 지킨다. 없는 축·공통 팩 버전/digest 불일치·타 프로젝트/버전·범위 밖 origin·경로 탈출·누락 조건·중복을 거부한다. 검토 상태 필드를 입력에 끼워 넣어 verified로 만드는 경로는 없다.
+
+MappingReader는 기존 collection session의 명시 catalog/member/target 검증과 reader lease를 재사용한다. evidencev2.BuildFromRefs가 지정된 retained archive의 실제 줄·파일/hash를 읽고 정화한 뒤 collection이 결과와 원문을 다시 대조한다. 라이브 checkout이나 current를 대신 선택하지 않는다. 누락·hash 불일치·정화 drop·예산으로 근거가 누락되면 완전한 연결 응답을 만들지 않는다. 공개 응답의 역할 이름·이유·조건 문자열도 정화한다. 요청 slice와 반환 slice의 소유권을 분리한다.
+
+커밋된 원문의 citation.commit_hash는 base_commit과 같고, working-tree와 snapshot-only의 citation.commit_hash는 빈 값이다. working-tree는 base_commit을 별도 보존한다. 기존 보관 원천 계약과 다른 커밋 신원을 만들어 넣지 않는다.
+
+응답은 review_state=proposed, verification=archived_source_hash_and_span_only를 명시한다. 근거 종류·관찰 조건·매핑 이유는 제공된 해석이며 파일 hash 일치가 이 해석의 의미적 옳음을 승인하지 않는다. policy로 분류한 문서도 승인된 규범으로 승격하지 않고, test source도 실제 시험 실행 통과로 표시하지 않는다. 실제 사람 검토와 변경/stale/회수는 KM-05.3에서 별도로 처리한다.
+
+검증은 실제 retained source archive와 fixture identity manifest를 이용한다. graph/vector 인덱싱이나 공개 MCP의 완료 근거로 확대하지 않는다. 서로 다른 역할의3개 프로젝트,5개 근거 종류, committed/미커밋 working-tree/snapshot-only, 해시·범위·정화·라이브 변경/보관 손상 경계를 확인한다. 실제 다중 프로젝트 DB/공개 도구는 KM-06.4에 남긴다.
+
+
+## KM-05.2 완료 기록
+
+KM-05.2 완료: 명시 common concept/version/digest와 프로젝트·버전·network/config/역할/관찰 시점에 결속한 원문 연결을 구현했다. 서로 다른 이름의 같은 역할과 같은 이름의 다른 역할을3개 프로젝트의5종류 원문으로 검증하고, 동일 로컬ID를 서로 다른 scope에 보존했다. 기존 collection reader lease·target 검증과 retained evidence 정화/재검증을 재사용한다. code/document/configuration/policy/test와 원문 hash/span을 구분하며 모든 연결은 proposed다. 실제 사람 승인·그래프/벡터 검색 품질·공개 비교 MCP는 완료로 세지 않는다.
+
+비교 패키지59개(어휘29+연결30)와 최종 전체 Go3921(3903통과18skip)·race895(893통과2skip)를 검증했다. 초기 손상 fixture의 읽기 전용 권한 문제와 working-tree commit/base 검증 오류의 실패 원자료를 보존했다. 전체 소스 재검증 이후 완료로 표시한다. [동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-05-bindings/manifest.json)를 따른다. 전체18/28·기능4/7이다. 다음은 KM-05.3의 직접 매핑 의미·검토/회수·버전/stale 정책이다. 남은10개는 KM-05.3–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

@@ -1,59 +1,37 @@
 # 현재 인수인계
 
-최신 단계: KM-05.1 완료: 기존 knowledgepack loader를 재사용한 선택형 industry.blockchain1.0.0 팩에8개념·26비교 축을 추가했다. 한영 별칭·포함/제외·역할/버전/network/config/시점 조건, 정확 byte pin과 unknown/ambiguous 계약을29개 Go 사례로 검증했다. 단어의 exact_term 일치를 구현 매핑 승인이나 project/entity 동일성으로 해석하지 않는다. 공통 core20·운영 dataset·기본 자동 선택은 변경하지 않았다. 프로젝트 연결·비교 MCP·ontology 품질은 남는다. 전체17/28·기능4/7이다. 다음은 KM-05.2의 프로젝트별 코드·문서·설정/정책·테스트 근거 연결이다. 남은11개는 KM-05.2–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+2026-10-16 기준 지식 매니저·프로젝트 비교 로드맵은 **18/28 세부 작업·4/7 기능 완료**다. 사용자가 멈추라고 하기 전까지 남은 작업을 순서대로 구현·검증하고 단계별 서명 로컬 커밋으로 보존한다. 각 완료 단계마다 현재 단계·검증 결과·다음 작업·남은 전체 범위를 화면 로그와 문서에 기록한다. 세부 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
-최신 단계: KM-04.4 완료: 실제 두 프로젝트에서20항목·MCP221호출·정상 EOF2개를 검증했다. A는 periodic/change로7→8→9→10을 게시하고 문서·명시 ontology 원자료 root 삭제와 제공 메모 교체를 반영했다. 실제 graph 실패1건은 current/마지막 성공을 보존했고 같은 입력의 연결된 attempt2가 복구했다. no-op은 중복 job을 만들지 않았고 v1 코드/삭제된 자료의 당시 인용을 계속 조회했다. 동명 module/Value를 가진 B의 DB 전체 파일 hash·current·실제 본문/인용은 불변이었다. 비공개 자료 제외·자동 의미/사람 검토 미생성도 확인했다. 이는 mock embedding의 실제 lifecycle 검증이며 검색 품질·온톨로지 효과·독립 수용은 별도다. 전체16/28·기능4/7 완료다. 다음은 KM-05.1의 산업 개념·정의·별칭·포함/제외·비교 축 설계다. 남은12개는 KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 계속한다.
+## 현재 구현과 다음 단계
 
-최신 단계: KM-04.3 완료: A native 원문 전환 전 확인, B1 durable intent/한 lease/상한, B2 실제 foreground worker, C1 실제 CLI TERM/KILL/budget·저장 중 신호 보고, C2 갱신 MCP 운영 연결을 통합 검증했다. plugin0.6.0은 기존 reviewed 기본18도구를 유지하고 명시 updates 모드에6도구(policy template/configure/status/start/stop/read)를 제공한다. MCP는 별도 소유 worker를 감독하면서 sealed 상태와 지정 retained DB 조회를 계속 처리한다. 부모 EOF/강제 종료는 소유 stdin 종료로 worker에 전달하고, 기록된 과거 PID를 signal하지 않는다. 재시작은 원래 job/요청을 먼저 조정한다. Python268개(기존224+worker/MCP44), 실제 공개 MCP20항목·222도구호출·3연결(의도한 부모SIGKILL-9/정상EOF0/정상EOF0), 부모 중단2경로의 Native/graph 정리·9초 이후 지연 쓰기 부재/current 보존·2건 연결 재시도 게시를 확인했다. 실제 Claude Code2.1.300의 설치된 plugin/skill/agent를 로컬 시험 응답기에 연결해2회/도구36개·MCP정상 종료0으로 raw source 구축/held조회·같은 job 재시작·periodic no-op·중지를 검증했다. 유료 모델/실제 모델 호출0이며 agent 자율성·검색 품질·독립 수용을 측정했다고 주장하지 않는다. Go/의존/fixture byte가 같은 B2의 Go3862(3844통과18skip)·race836(834통과2skip)을 byte 대조해 참조하며 새 Go 실행으로 세지 않는다. build/fmt/vet/lint·plugin strict·문서132개와 C1 동결 증거16개를 확인했다. 전체15/28·기능3/7이다. 다음은 KM-04.4의 지속 periodic/change·두 번 변경·삭제/no-op·실패/복구·이전 snapshot과 다른 프로젝트 보존을 통합 확인하는 단계다. 남은13개는 KM-04.4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+| 기능 | 상태 | 확인한 범위 |
+|---|---|---|
+| KM-01 프로젝트 격리 | 4/4 완료 | 실제4DB·동명/포크/버전·인용·공개 읽기/쓰기 거부·rollback/GC |
+| KM-02 버전 DB 운영 | 4/4 완료 | 공개 build/status/cancel·영속 job/재시작·유지/실패 matrix |
+| KM-03 Claude 매니저 | 4/4 완료 | 등록·문서 없는 수집/초안·검토/회수·실제 설치 CLI8회/68도구; 로컬 시험 응답기 |
+| KM-04 지속 갱신 | 4/4 완료 | 실제 periodic/change2프로젝트·20항목·221호출·2EOF0·삭제/no-op·실패/연결 retry·타 DB/인용 보존 |
+| KM-05 공통 개념/연결 | 2/4 완료 | 선택형 팩8개념/26축·한영 모호성, 프로젝트별 proposed 원문 연결; 검토/버전 정책 다음 |
+| KM-06 비교 근거 MCP | 0/4 미착수 | 명시 참여자/조건/예산·행렬·부분 실패·실제 프로젝트 비교 필요 |
+| OE-01 온톨로지 효과 | 0/4 완료,3개 진행 중 | 단일 프로젝트 개발 관찰384회+진단8회; 확대/독립 정답·다중 프로젝트 평가 필요 |
 
-직전 C1 기록: KM-04.3 C1 실제 foreground 프로세스 중단 검증 완료: 실제 CLI worker의 SIGTERM·SIGKILL·시간 상한3경로를21항목/CLI10회로 검증했다. 지연 중인 실제 native graph를 중단하고 원래 current·intent를 보존하며, native/graph가 실행 중이 아님을 확인하고 예정된8초 지연 쓰기 시점 이후까지 늦은 쓰기가 없음을 관찰했다. 재시작 시 원래 job의 terminal canceled/activated=false를 먼저 조회하고, 같은 input/cycle의 attempt2·새 key/version으로3건 모두 정상 게시/원문 조회에 복구했다. parent 종료 뒤 native 자식의 exit code는 직접 관측할 수 없어0으로 표시하지 않았다. 이는 실제 CLI 프로세스/자식 정리 증거이며 MCP 갱신 운영 연결과 지속 schedule 검증은 별도다. 반복 검증에서 SIGTERM이 상태 저장 중 도착하면 마지막 확인 메모리와 디스크 상태가 다를 수 있는 경계를 발견했다. 자식 종료/intent 보존 후에도 추가 write를 금지하고 last_confirmed_in_process_state·disk_state_requires_reconciliation·closed_requires_persistence_reconciliation을 명시하도록 보완했다. 실제 native 접수 뒤 fsync 중 신호를 재현하는1개를 포함해 Python248개를 새로 검증했다. 전체14/28·기능3/7을 유지한다. 다음은 C2 MCP 세션의 명시 갱신 시작·상태·중지·정확한 DB 조회와 EOF/host 종료 연결이다. 이후 KM-04.4의 실제 지속 periodic/change와 두 번 변경·삭제/no-op·실패 복구·다른 프로젝트 불변을 종합 검증한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+최신 KM-05.2는3개 통제 프로젝트의5종류 원문(code/document/configuration/policy/test), 같은 이름/다른 역할과 다른 이름/같은 역할, 같은 로컬ID의 project/version/network 격리를 검증했다. collection reader lease·명시 target·retained evidence 정화/재검증을 재사용한다. 라이브 checkout/current로 대체하지 않고 committed/미커밋 working-tree/snapshot-only의 commit/base 의미를 보존한다. 연결의 review_state는 proposed이며 원문 hash 일치가 의미 승인·정책 내용 승인·시험 실행 통과를 뜻하지 않는다. [연결 계약](./INDUSTRY-CONCEPT-COMPARISON.md)과 [증거](../../system/eval/knowledge-roadmap-2026-10-16/km-05-bindings/manifest.json)를 따른다.
 
-직전 B2 기록: KM-04.3 B2 foreground worker 연결 완료: 명시 enabled 정책의 manual/periodic/change polling을 bounded run-updates로 실행한다. immutable 관찰 입력과 원문 source_check를 native profile에 결속하고 intent fsync 후 실제 build/status/read를 연결했다. 미확정 접수는 같은 config/request/key로 replay하고 known job은 source 재수집 전에 조회한다. 명확한 접수 전 거부와 불확실한 transport/persistence를 구분하며 실패·취소·refusal은 같은 cycle/input의 새 version/key로 제한 재시도한다. 실제 current와 retained reader를 확인해야 게시/무변경 성공으로 판정한다. 기존18도구 reviewed MCP broker는 hold-only이며 별도 foreground worker와 하나의 writer lease를 공유한다. Python247개(기존224+worker23), 실제 worker14항목·native RPC 관찰97개·6job(게시4/의도한 실패1/응답 손실 후 같은 job 취소 복구1)·16연결 EOF0을 통과했다. v1 게시/조회→무변경→code8/원문 삭제 v2→보존 v1 조회→code9 엔진 실패/current 보존→due periodic retry2 복구 게시→code10 접수 응답 손실/정상 EOF→code11 변경 후 원래 job 먼저 복구→별도 code11 게시를 검증했다. periodic due retry는 실제 관찰이지만 지속 schedule/실제 worker host SIGKILL은 아직 미검증이다. Go 전체3862(3844통과18skip)와 관련6패키지 race836(834통과2skip)을 새로 실행했다. build/fmt/vet/lint·문서132개와 직전 B1 동결 증거16개를 확인했다. 표준 manager-test에 갱신5개 suite를 추가했으며 원격 CI 통과를 주장하지 않는다. 전체14/28·기능3/7은 유지한다. 다음은 C 실제 foreground worker host 중단/SIGKILL·재시작·기한/잔여 child·MCP host와의 운영 연결이다. 그 다음 KM-04.4의 실제 지속 periodic/change와 두 번 변경·삭제/no-op·실패 복구·다른 프로젝트 불변을 종합 검증한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+다음은 **KM-05.3 직접 매핑 의미·검토/회수·버전/stale 정책**이다. exact/close/broader/narrower/related의 방향·범위를 명시하고 의미 유사성을 entity 동일성으로 바꾸거나 관계를 자동 전이하지 않는다. 실제 사람 검토를 생성하지 않는다. 그 다음 KM-05.4의 비적용/미수집/미지원·L1/L2/network 차이, KM-06 공개 비교, OE-01 확대/다중 프로젝트 효과 평가 순서로 진행한다.
 
-직전 B1 기록: KM-04.3 B1 durable 상태 기반 완료: 정책을 소유 불변 파일로 저장하고, 실제 native inspect 형식의 source/model/input/base와 version/key/deadline을 포함한 정확한 intent를 접수 전에 원자 저장/fsync한다. 기존 reviewed broker와 하나의 writer lease를 공유하고 pending intent·미종결 reviewed job의 교차 실행을 막는다. 응답 손실 후 원래 intent 보존, 단조 job revision·terminal 불변, 현재 좌표/required gate/실제 reader 확인을 성공 조건으로 하고 실패·취소 시 마지막 성공을 보존한다. retry는 같은 cycle/input의 새 key/version으로만 연결하고 상한을 새 cycle로 우회하지 못하게 했다. 저장 불확실성은 프로세스를 중지 상태로 만들고 재시작 때 디스크 상태를 읽는다. 50개 상태·오류 시험과 기존174개가 통과했다. 이 중 실제 CKS inspect/EOF를 확인하지만 상태 전이용 job/read 응답은 통제 관찰이며 자동 DB 실행 증거로 세지 않는다. configure-updates/update-status는 설정·상태만 제공하고 worker나 scheduler를 시작하지 않는다. 전체14/28·기능3/7을 유지한다. 다음은 B2 실제 worker·주기/change polling·exact replay와 reader 연결이고 C 실제 강제 종료/복구 및 KM-04.4 연속 주기 검증이 남는다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+남은 전체10개는 **KM-05.3–4, KM-06.1–4, OE-01.1–4**다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도이며 [남은 작업](../REMAINING-WORK.md)에 유지한다.
 
-직전 A 기록: KM-04.3 A 원문 전환 전 확인 완료: operator profile의 선택적 source_check로 실제 Python/코드·소유 정책/등록/불변 입력을 고정하고 admission/후보 완료/게시 pointer lock 안에서 원래 source fingerprint를 재확인한다. 실제 MCP14항목·90호출·3개 job에서 v1 게시→v2 원문 변경으로 게시 거부/current·기존 reader 보존→v3 복구 게시/조회와5연결 EOF0을 확인했다. Go 전체3,862사례(3,844통과·18skip), 관련6패키지 race836(834통과·2skip)을 새로 실행했고 Python174개·증거 보호14개·build/fmt/vet/lint·문서132개를 통과했다. 추가 source-check23사례와 이미 지난 deadline1사례는 전체/race 분모 안에 포함하며 중복 합산하지 않는다. 처음에는 원문 probe가 native 접수 중의 아직 root owner가 없는 소유 journal과 충돌했다. 원문 전용 probe만 읽기 확인과 DB 소유 검증을 분리했고 기본 등록·doctor·prepare·DB 쓰기의 소유 검증은 유지했다. Native 오류의 실제 structuredContent를 읽도록 검증기도 수정했다. 최초 race의 기존 deadline 시험1회 late-writer 실패는5회 반복에서 재현되지 않았다. timer callback 도착만 가정하지 않도록 exec 직전/직후 절대 시각 확인을 보강하고 과거 deadline 거부 시험을 추가했다. 두 경계를 각각5회 확인한 뒤 최종 전체·race를 순차 실행해 실패0을 확인했다. 최초 실패의 단일 원인을 입증했다고 주장하지 않으며 initial-failures의 원자료를 보존한다. A는 native 원문 검사 범위다. KM-04.3의 B durable worker/일정/중복/retry와 C 중단/복구 연결, KM-04.4 실제 주기 실행은 남는다. 전체14/28·기능3/7을 유지한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 다음 B를 진행한다.
+## 검증과 현재 제한
 
-추가 사용자 결정: 정책 참조 수정7건을 기존 별도 평가 overlay로 채택 승인했다. [정확한 응답과 hash 영수증](../../system/eval/operational-preparation-2026-10-15/adopted-policy-user-approval/receipt.json)을 따르며 독립 정답/품질 수용·원본 정책 metadata·운영 current·생성기 완료 상태는 바꾸지 않았다.
-최신 진행: [정책 overlay 적용 검증](./POLICY-OVERLAY-ADOPTION.md)에서 별도 source0bf2f4d1 profile로 실제 graph125,089node/176,822edge·정책42/연결146·CKS24도구호출을 확인했다. 수정7건의 source/canonical parity와 음성3개를 통과했고 기존 원본/운영 current는 보존했다. 일반 domain sync는 여전히 기존 정책을 재생성하므로 생성기 수정은 미완료다. [OE-01 단일 프로젝트 개발 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은 source baca2869의 별도 복제본에서384회 실패/누락0·인용3,616개 검증을 마쳤다. 활성288회 no_match·순위 차이0, 정확 용어의 별도 진단8회는 매칭/정의 검색 동작·최종 boost0이다. 기본 off·품질 inconclusive·새 기능 완료1/7·기존 독립 수용0/9를 유지한다. KM-01의 최신 상태는 위 최신 단계와 시험표를 따른다.
+KM-05.2의 최종 소스로 전체 Go3921실행(3903통과18skip,136패키지)과 race895실행(893통과2skip,7패키지)을 순차 검증했다. 비교 패키지는 어휘29+연결30=59개다. 빌드·fmt·vet·lint와 문서133개를 확인했다. 초기 읽기 전용 손상 fixture 오류와 working-tree 인용 검증 오류의 원자료를 보존하고 수정 후 전체 소스로 재검증했다. 이 단계는 실제 retained source archive와 fixture identity manifest를 사용한 library 검증이다. 실제 graph/vector 검색·공개 비교 MCP·산업 사실의 독립 품질 수용으로 확대하지 않는다.
 
+매니저 plugin0.6.0은 reviewed 기본18도구와 명시 updates6도구를 제공한다. 실제 Claude Code2.1.300과의 갱신 연결2회/36도구도 로컬 시험 응답기로 검증했다. 실제 모델 호출/비용0이며 agent 자율성·답변 품질은 측정하지 않았다. 개인 머신에 서비스나 OS scheduler를 설치하지 않았고 명시 foreground worker가 실행 중인 동안만 주기/변경 polling이 동작한다.
 
-초기 범위 등록 당시 기록(최신 상태는 위 참조): [지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json). 온톨로지 효과 평가 OE-01을 우선 필수 검증으로 채택했다. KM-01 프로젝트 격리, KM-02 버전 DB 운영 도구, KM-03 Claude 매니저 플러그인, KM-04 주기 갱신, KM-05 공통 개념 매핑, KM-06 비교 근거 MCP를 요구로 등록했다.신규 기능 전체 완료는1/7이고 하위28개 중6개를 완료했으며 OE-01 로컬 개발 관찰만 수행했고 확대·독립 품질·다중 프로젝트 평가는 남는다. KM-01은 최종 격리 검증까지 완료했고 KM-02는 계약 설계·공개 실행28항목을 완료했고 영속성·공개 실패 경계는 남는다. KM-03~06은 미착수다. 기존 WI-5는 KM-03/04로 구체화하여 중복 집계하지 않는다. 기존 선택 후속13개 중 ontology 평가는 OE-01로 이동했으므로 선택 후보는12개다.
+원래 독립 수용의 단계0·담당자·실제 모델/인증/비용 지정은 로컬 개발을 막는 요건이 아니다. 유료 모델·독립 수용·외부 게시에는 해당 실행 범위가 별도로 필요하다. 이번 지속 작업은 단계별 로컬 커밋 범위다. 푸시/PR·전역 설치·운영 current 변경을 완료로 추정하지 않는다.
 
-로컬 개발·도구/회귀 검증은 정식 독립 수용의 단계0 동결·담당자·유료 모델 지정 없이 계속한다. 실제 모델 실행/독립 수용에 해당 조건을 적용한다. 정책 연결7건의 로컬 보완과 OE-01 첫 개발 관찰을 마쳤다. 다음 확장 경로는 KM-01→02→03→04와 KM-05→06 후 다중 프로젝트 평가다. 원래9개 구현/독립 수용 원장은 별도로 유지한다.
+## 보존할 결정과 품질 관찰
 
+정책 참조 수정7건은 별도 평가 overlay로 사용자 채택 승인을 기록했다. [승인 영수증](../../system/eval/operational-preparation-2026-10-15/adopted-policy-user-approval/receipt.json)과 [적용 검증](./POLICY-OVERLAY-ADOPTION.md)을 따른다. 원본 정책·원래 승인 입력은 보존한다. 일반 domain sync가 기존 잘못된 참조를 재생성하는 문제는 아직 별도 보완 대상이다.
 
-2026-10-14 통합 확인 기준은 main a214fbb18039f2e63ee93c0f073bfb1b61c3e716이다. [PR #102](https://github.com/0xmhha/knowledge-system/pull/102)는 head e77e59b8의 [CI5/5](https://github.com/0xmhha/knowledge-system/actions/runs/38565382940) 통과 후 스쿼시 머지됐다. 통합 시 로컬 main/원격 main·PR tree 동일성·clean worktree·기록된 source/evidence guard를 확인했다. 현재 checkout은 `git status --short --branch`로 확인하며 고정한 통합 commit을 미래의 실시간 HEAD로 해석하지 않는다.
+[OE-01 단일 프로젝트 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은384회 실패/누락0·인용3,616개 원문 일치, 활성288회 no_match·순위 차이0이었다. 별도 정확 용어8회도 최종 boost0이다. 기본 off·quality=inconclusive를 유지한다. KM-04.4에서 단독 합성 대문자 식별자 질의가 비고 같은 자료가 자연어 질의에 나타난 사례도 OE-01 질의 해석/회수율 후보로 보존했다. 새 기능 구현이나 계획 승인을 독립 정답·품질 승인으로 바꾸지 않는다.
 
-## 현재 완료와 남은 범위
-
-- 상위 WI-V1/V2/3/4/1/2/C/6/SP는 구현·명시 검증9/9 완료다.9개 운영·사람 독립 수용은 not_recorded이며 [전체 작업표](../REMAINING-WORK.md)에 별도 기록한다.
-- WI-5는 KM-03/04로 구체화했고 중복 집계하지 않는다. 별도 선택 후속은12개이며 기능별 범위 결정이 필요하다.
-- go-stablenet 출처 매핑·42질문 재평가·SNK06 범위 검토3/3, 서버 종료 SD-01–04는4/4 완료다. 원래 SNK06 실패·과거 종료 오류는 보존한다. [비교/종료 작업표](./GO-STABLENET-DATASET-COMPARISON.md)를 따른다.
-- coding-agent·ChainBench의 원본 commit/patch/bundle은 구현 packet에 보존한다. knowledge-system 머지로 다른 저장소 게시·설치·운영 상태를 완료 처리하지 않는다.
-
-문서 정리는 [PR #103](https://github.com/0xmhha/knowledge-system/pull/103)에서 CI5/5 후 스쿼시 머지됐고 main ad52d956 동기화·기록된 source/evidence guard를 확인했다. [운영·독립 수용 계획](./OPERATIONAL-ACCEPTANCE-PLAN.md)은 로컬 Go pilot 대상·9개 항목의 입력/완료 gate·판정/증거 규칙을 정리한 draft다. [별도 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)의 실행/수용은0/9이며 단계0은 preparing이고 단계1–4는 미실행이다. [실행 protocol·동결 체크리스트](./OPERATIONAL-ACCEPTANCE-PROTOCOL.md)와 읽기 전용 source inventory를 준비했다. source-only 함수40개·review10개·확장 intent20개 후보, CLI metadata와4개 미해결 runtime recipe를 추가했다. [검토 자료](./OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)에10개 review rubric45anchor와3개 비완전 값/제어 초안을 추가했으며 독립 gold 채택은0이다. stress 예제 대신 실제 worker를 review 대상으로 제안했고 auto Stop 재진입·게시 전 종료는 OP-CA-01 후보 b6e2abdc에서 개발 검증했으며 로컬 실제 host 연결은 [격리 채택 기록](./ISOLATED-HOST-ADOPTION.md)의5개 사례로 검증했다. 실제 모델·전체 역할·노드 수용은 미실행이다. 실제 결함/증상·rule/annotation 정답·seed 입력은 미준비다. local bugfix는 auto_merge=false여도 push/PR로 이어지므로 기본 게시 경로와 별도로 evaluation_only 정책이 필요하며 [ChainBench 종료/상태 격리 보완](./OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)은 새 후보 bdf5ad27에서 build·전체test·fmt/vet·lint·stdio 회귀시험을 통과했다. source/patch/bundle은 primary에 보존했고 외부 게시·설치·실제 노드 cleanup은 미확인이다. 두 소비자의 로컬 채택 source는 coding-agent b7e7868·ChainBench bdf5ad27이며 실제 CLI2.1.300을 로컬 응답기에 연결했다. 다음은 담당·모델/한도 지정, 새 gold/입력 검토·실제 모델/노드 준비와 단계0 동결이다. 구현 상세는 [현재 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md), evidence revision·SHA·owner commit은 [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)에 있다.
-
-## 먼저 읽을 문서
-
-1. [남은 전체 작업](../REMAINING-WORK.md): N16 보류·태그/배포 보류와 별도 후속 범위.
-2. [목적과 범위](./PURPOSE-AND-SCOPE.md): 초기 요구사항과 외부 WI10개 책임.
-3. [현재 아키텍처](../ARCHITECTURE.md), [온톨로지 MCP](../../system/docs/ontology-mcp.md).
-4. [실행 명세](./REFACTORING-EXECUTION-SPEC.md), [진행 원장](./REFACTORING-PROGRESS.json).
-5. [평가 상태](./EVALUATION-STATUS.md), [출시 정책](./RELEASE-POLICY.md).
-
-기존17/18·온톨로지4/4 완료는 기록된 수용 범위다. 독립 온톨로지 품질은inconclusive, 성능수용false, 온톨로지off·knowledge opt-in·타입 선언off를 유지한다. WBFT trace의 missing_code와 acceptance_evaluated=false를 테스트/기준 통과로 설명하지 않는다.
-
-## 변경과 검증 원칙
-
-원장 각 task의 revision에서 근거를 읽는다. 문서 정리에서 삭제된 준비·완료 보고서는 [복구 방법](./EVIDENCE-RECOVERY.md)을 따른다. 기존 증거 branch/commit과 원래 승인 입력·capture·gold·protocol·원문·raw 결과를 보존하며 다시 작성하지 않는다. 사용자 .claude/와 logs 자료는 접근하지 않는다.
-
-현재 문서 목록과 역할은 [catalog](../DOCUMENTATION-CATALOG.json), 삭제 경로와 SHA는 [정리 목록](../DOCUMENTATION-CLEANUP.json)에 있다. CLI/도구/링크는 `make docs-check`, 완료 조건은 `make refactoring-check`로 확인한다. 시험 통과, source alignment, 검토된 관계, 사람 수용과 품질 판정은 분리한다.
-
-다음 필수 작업은 N16 재개 여부 결정이다. 사용자가 보류를 유지하는 동안 키 생성·배포·선택 기능 기본 활성화를 수행하지 않는다. 새 후속 작업은 남은 목록의 별도 범위를 명시하고 승인·입력·완료 기준을 고정해 진행한다.
-
-## 정책·보안 입력 준비 추가
-
-후속 [정책 참조 연결 진단](./POLICY-REFERENCE-DIAGNOSIS.md)은 실제 CKG AST 프런트엔드와 policy resolver에서 기존6개 경고 및 경고 없는 잘못된 함수 연결1개를 확인했다. 수정7개 사본에서는146개 연결·경고0개다. 원본 source-bound YAML/기존 packet은 그대로이며 새 overlay 채택·실제 index/MCP·독립 의미 검토는 남는다. 이 진단의 source pin·raw 출력·도구·실패 이력은 별도 manifest에 결속한다. 단계0 preparing·운영 수용0/9를 유지한다.
-
-[검토 자료](./POLICY-SECURITY-INPUT-REVIEW.md)에 기존 project 정책42개/참조146개와 source-only query12개, 두 지원 규칙 관련 호출68개를 기록했다. source 이름 힌트140개·미연결6개는 실제 graph 판정이 아니다. 두 command 인자 힌트는 build 지원 코드이고 conversion-error 힌트는0이다. WI-2의 새 독립 양성·음성 기준을 충족하지 못하므로 actual detector/품질을 통과시키지 않는다. 수동 security metadata4개도 취약점/자동 rule 정답이 아니다. public/private를 분리했고 과거 질문에 나온 splitAndTrim은 제외했다. reviewer·모델/비용 지정과 독립 gold/family/split 채택은 미결이며 단계0 preparing·운영 수용0/9를 유지한다.
+이전 단계의 상세 기록은 각 명세의 checkpoint 절과 서명 커밋·동결 증거 packet에 남긴다. 현재 상태는 이 문서 첫 표와 전용 원장을 우선한다.

@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-16 현재 KM-01–04를 완료했다. 전체28개 중17개 완료·3개 진행 중(OE-01.1–3)·8개 미착수다. 다음은 KM-05.2 프로젝트별 근거 연결이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
+2026-10-16 현재 KM-01–04를 완료했다. 전체28개 중18개 완료·3개 진행 중(OE-01.1–3)·7개 미착수다. 다음은 KM-05.3 매핑 검토/버전 정책이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는4/7이다.
 
@@ -25,7 +25,7 @@
 | KM-04.3 | 중복·lease·재시작·retry·자원 상한 | 완료 | A/B1/B2/C1/C2 통합; Python268·공개MCP20/222호출·실제Claude2회/36도구·EOF/kill/exact 복구; .4 별도 |
 | KM-04.4 | 두 번 변경+no-op+실패 복구·실제 주기 실행 | 완료 | 실제2프로젝트·20항목·221호출·2EOF0·문서/자료 삭제·메모 교체·graph 실패/연결 retry·타 DB hash/인용 불변 |
 | KM-05.1 | 산업 개념·정의·별칭·비교 축 | 완료 | 선택형 팩8개념/26축·한영/모호성·버전 pin29사례·새 전체Go/race7패키지 검증 |
-| KM-05.2 | 공통 개념과 프로젝트별 코드/정책/시험 연결 | 미착수 | 미실행 |
+| KM-05.2 | 공통 개념과 프로젝트별 코드/정책/시험 연결 | 완료 | 비교59개(어휘29+연결30)·실제 보관 원문3프로젝트/5종류·committed/working-tree·전체Go/race7 검증 |
 | KM-05.3 | exact/close/broader 등의 검토·버전 의미 | 미착수 | 미실행 |
 | KM-05.4 | 비적용/미수집/미지원·L1/L2·network 차이 | 미착수 | 미실행 |
 | KM-06.1 | 명시 버전·개념·축·시점·상한의 비교 요청 | 미착수 | 미실행 |
@@ -567,3 +567,25 @@ KM-04.4 완료: 실제 두 프로젝트에서20항목·MCP221호출·정상 EOF2
 KM-05.1 완료: 기존 knowledgepack loader를 재사용한 선택형 industry.blockchain1.0.0 팩에8개념·26비교 축을 추가했다. 한영 별칭·포함/제외·역할/버전/network/config/시점 조건, 정확 byte pin과 unknown/ambiguous 계약을29개 Go 사례로 검증했다. 단어의 exact_term 일치를 구현 매핑 승인이나 project/entity 동일성으로 해석하지 않는다. 공통 core20·운영 dataset·기본 자동 선택은 변경하지 않았다. 프로젝트 연결·비교 MCP·ontology 품질은 남는다.
 
 전체17/28·기능4/7이다. 다음은 KM-05.2의 프로젝트별 코드·문서·설정/정책·테스트 근거 연결이다. 남은11개는 KM-05.2–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+## KM-05.2 프로젝트 연결 시험 목록
+
+공통 어휘29개에 아래30개를 더한 비교 패키지59개다. 최종 전체 실행이 끝나기 전에는 세부 작업 완료로 확정하지 않는다. 원문 보관 fixture를 실제 graph/vector 검색 품질로 확대하지 않는다.
+
+| 상위 시험 | 하위 포함 실행 수 | 경계 |
+|---|---|---|
+| TestDifferentNamesMapToSeparateProposedSourceGroups | 1 | Stake/Bond·각5종류 원문·프로젝트별 인용·proposed |
+| TestBindingSchemaRejectsUnscopedOrInventedClaims | 21 | 20개 schema/scope/hash/facet 거부와 중복·가짜 verified JSON |
+| TestForgedHashAndWrongCollectionReturnNoEvidence | 1 | 재서명 hash·미선택 collection·취소·종료 이후 조회 거부 |
+| TestMappingAnnotationsAreSanitizedAndDigestTracksInterpretation | 1 | 역할/이유/조건 정화·변경 digest·반환 slice 격리 |
+| TestSameLocalNameDoesNotChooseTheSameCommonConcept | 1 | 같은 Stake 이름의 stake commitment/validator identity 역할 분리 |
+| TestBindingReadsRetainedSourceAndRejectsArchiveCorruption | 1 | live 변경 이후 당시 원문 유지·보관 blob 손상 거부 |
+| TestBindingsKeepCommittedAndWorkingTreeCitationSemantics | 3 | committed/미커밋 원문의 commit/base 구분 |
+| TestBindingIDsAreScopedByProjectVersionAndConditions | 1 | 같은 로컬ID·다른 프로젝트/network·동일 시각 표현 중복 |
+
+
+## KM-05.2 완료 기록
+
+KM-05.2 완료: 명시 common concept/version/digest와 프로젝트·버전·network/config/역할/관찰 시점에 결속한 원문 연결을 구현했다. 서로 다른 이름의 같은 역할과 같은 이름의 다른 역할을3개 프로젝트의5종류 원문으로 검증하고, 동일 로컬ID를 서로 다른 scope에 보존했다. 기존 collection reader lease·target 검증과 retained evidence 정화/재검증을 재사용한다. code/document/configuration/policy/test와 원문 hash/span을 구분하며 모든 연결은 proposed다. 실제 사람 승인·그래프/벡터 검색 품질·공개 비교 MCP는 완료로 세지 않는다.
+
+전체18/28·기능4/7이다. 다음은 KM-05.3의 직접 매핑 의미·검토/회수·버전/stale 정책이다. 남은10개는 KM-05.3–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

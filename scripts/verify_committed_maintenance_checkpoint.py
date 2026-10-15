@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'industry-scheme': {
+        'revision': 'f597c04a', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-05-scheme',
+        'scope': 'historical_KM05_1_optional_vocabulary_not_project_mapping',
+        'scripts': ['check-industry-scheme-evidence.py', 'test_industry_scheme_evidence.py'],
+    },
     'manager-periodic': {
         'revision': '2f9ddb52', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-04-periodic',
         'scope': 'historical_KM04_complete_actual_two_project_periodic_lifecycle_not_quality',
