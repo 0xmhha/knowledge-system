@@ -52,6 +52,8 @@ var ToolNameHealth = toolName("ops.health")
 // the slim tool surface deliberately resists envelope sprawl (envelope/auth
 // fields belong to a later policy layer, not here).
 type Deps struct {
+	// Optional collection tools; absent preserves the single-dataset schema.
+	Collection *CollectionService
 	// Optional out-of-band experiment recorder; never changes a tool result.
 	BackendMeasurements *backendmeasure.Recorder
 	// Composer drives cks.context.get_for_task. Must be non-nil.
@@ -138,6 +140,9 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 
 	registerGetForTask(s, d)
 	registerGetForTaskV2(s, d)
+	if d.Collection != nil {
+		registerCollection(s, d.Collection)
+	}
 	registerLabelSuspects(s, d)
 	registerSemanticStatus(s, d)
 	registerSemanticReads(s, d)

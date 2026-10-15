@@ -1,6 +1,6 @@
 # KM-01 프로젝트·버전 격리와 collection 기반
 
-2026-10-15 구현 범위는 immutable catalog와 구현/비교 읽기의 공통 Go 계층이다. 여러 프로젝트의 DB를 물리적으로 합치지 않고 각 pinned DB를 명시적 collection으로 묶는다. 새 CLI/MCP 공개 도구, DB 구축·갱신 쓰기, 산업별 비교는 아직 연결하지 않았다. 명세의 KM-01.1/02는 완료하고, 공개 경로와 실제 쓰기·비교 검증이 필요한 KM-01.3/04 및 KM-01 전체는 진행 중이다.
+2026-10-15 현재 immutable catalog·구현/비교 reader를 실제 CKG/CKV backend와 선택적 MCP 조회 도구에 연결했다. 여러 프로젝트의 DB를 물리적으로 합치지 않고 각 pinned DB를 명시적 collection으로 묶는다. KM-01.1/02/03은 완료했고 최종 반례 시험 KM-01.4와 KM-01 전체는 진행 중이다. DB 구축·갱신 쓰기와 산업 개념별 비교는 각각 KM-02와 KM-05/06에서 구현한다.
 
 상태는 [기능 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다. 구현은 [catalog](../../internal/system/collection/catalog.go)와 [session](../../internal/system/collection/session.go), 시험은 [collection_test.go](../../internal/system/collection/collection_test.go)다.
 
@@ -18,7 +18,7 @@
 | archive 검증 cache | [identity cache](../../internal/setup/identity_cache.go)는 절대 버전 경로와 파일 fingerprint를 사용. [request verification](../../internal/setup/request_verification.go)은 요청 내 재사용 후 재검증 | 세션의 고정 버전과 기존 before/after 검증을 사용. 비교의 마지막에도 모든 참여 버전을 재확인 |
 | embedding LRU | [cache](../../internal/vector/embed/cache/lru.go)는 embedder 인스턴스 내 텍스트→벡터. 출처/검색 결과 cache가 아님 | 벡터 재사용과 출처 결과 격리를 구분. 기존 LRU를 collection 조회 cache로 간주하지 않음 |
 | DB 쓰기/전환 | [setup](../../internal/system/mcp/setup_tool.go), [reindex](../../internal/system/mcp/reindex_tool.go)의 legacy 제한. version CLI의 writer/promotion/reader lease는 별도 계약 | 기존 pinned 쓰기 거부 유지. collection은 읽기 전용이며 새 version-aware 쓰기는 KM-02에서 연결 |
-| export/history/새 MCP | 기존 단일 버전 검증을 전제한 개별 표면 | 향후 adapter가 같은 scope를 전달하고 공개 응답/쓰기에서도 반례 시험해야 함. 이번 공통 계층 통과만으로 모두 연결됐다고 표시하지 않음 |
+| export/history/새 MCP | 기존 단일 버전 검증을 전제한 개별 표면 | 향후 adapter가 같은 scope를 전달하고 공개 응답/쓰기에서도 반례 시험해야 함. 연결한 collection 조회 외의 모든 표면까지 검증됐다고 표시하지 않음 |
 
 ## 선택한 계약
 
@@ -46,10 +46,30 @@ ScopedRef는 전체 좌표+origin+상대 path+local ID로 키를 만든다. Scop
 
 기존 graph/vector/semantic DB·identity·원문·도구 DTO는 변경하지 않았다. 새 catalog는 별도 설정이다. 기존 stable project ID를 사용하고 InspectVersionIdentity로 확인한 pinned 버전만 등록한다. legacy DB는 기존 경로로 읽고, collection에 넣으려면 정상적인 versioned build가 필요하다. 현재 저장된 DB의 ID를 새 catalog에 맞춰 직접 고치지 않는다.
 
-현재 구현은 아직 CLI/MCP가 호출하지 않는 기반이다. KM-01.3/04의 공개 adapter·실제 backend 쓰기/조회/캐시 검증을 남긴다. 다음 작업은 KM-01.3의 실제 backend·공개 조회 adapter 연결이다. 이후 KM-02.1의 version-aware 도구 capability/요청 설계로 이어간다. 산업 공통 개념/프로젝트 매핑은 KM-05, 비교 자료 수집은 KM-06이다.
+현재 `cks mcp`는 collection 설정이 있을 때 공개 조회 adapter를 연결한다. 다음은 KM-01.4의 동일 바이트 fork·서로 다른 embedding 구성·공개 쓰기 표면 전체 반례 검증이다. 이후 KM-02.1의 version-aware 도구 capability/요청 설계로 이어간다. 산업 공통 개념/프로젝트 매핑은 KM-05, 비교 자료 수집은 KM-06이다.
+
+## MCP 연결과 설정
+
+기본 단일 프로젝트 도구33개를 유지한다. 상위 CKS 설정에 아래 선택 항목을 추가하면 `cks.collection.status`, `cks.collection.get_context` 두 읽기 도구가 추가되어35개가 된다. [연결 코드](../../cmd/cks/mcpcli/collection.go), [공개 도구](../../internal/system/mcp/collection.go), [설정 검증](../../internal/system/config/collection.go)을 따른다.
+
+```yaml
+collection:
+  catalog_path: /absolute/catalog.json
+  member_configs:
+    - /absolute/project-a-v1.yaml
+    - /absolute/project-b-v1.yaml
+```
+
+각 member는 기존 CKS 설정이며 graph는 `<version>/graph/graph.db`, vector는 같은 `<version>/vector`여야 한다. catalog의 immutable 버전마다 정확히 하나의 설정을 지정한다. `current`, 경로 불일치·중복·누락, 중첩 collection, 상위와 다른 sanitizer, 실제 backend 또는 embedding identity 검증 실패는 시작 단계에서 거부한다. member마다 자신의 model/provider·source root·vocab·semantic/ontology·retrieval 설정을 사용한다. 모든 member는 같은 sanitizer를 사용하며 서버 시작 전에 archive와 manifest를 확인하고 reader lease를 잡는다. caller는 경로나 provider를 도구 인자로 선택할 수 없다.
+
+`cks.collection.status`는 `configured` 상태, catalog digest, collection별 전체 좌표와 member 수, `write_enabled=false`를 제공한다. 로컬 경로를 공개하지 않으며 검색 품질이나 운영 준비 완료 판정이 아니다.
+
+`cks.collection.get_context`는 `catalog_digest`, `collection_id`, `mode`, `query`와 전체 V2 좌표를 받는다. `implementation`은 `target` 하나, `comparison`은 `participants`2–16개를 요구한다. 결과는 선택한 좌표별 `groups[].evidence`이며 평탄하게 합치지 않는다. 각 member의 기존 V2 조회 경로를 실행하고 collection reader가 인용·정제 본문·해시를 다시 확인한다. 한 member라도 실패하면 전체를 거부하며 부분 그룹을 공개하지 않는다. 잘못된 scope·오래된 digest·누락 target·미지원 mode는 명시 오류이고 기본 대상 추론은 하지 않는다.
+
+등록된 프로젝트의 근거를 분리해서 가져오는 단계다. 산업 개념의 동등성 판정, 장단점 평가, 새로운 version-aware 쓰기, 실제 매니저 플러그인 연결은 이후 작업이다. 기본 도구가 제공하는 기존 단일 프로젝트 기능과 collection 조회를 구분한다.
 
 ## 현재 검증 범위
 
-새 패키지의 race 시험17개(하위 사례 포함40개)를 통과했다. 동일 커밋의 두 실제 Git fixture와 retained source를 사용했다. graph/vector manifest는 fixture이며 실제 그래프 검색이나 embedding 모델 효과를 검증한 것은 아니다. 기존 rollback/read/GC 함수와의 fixture 호환을 시험했다. 기존 공개 CLI/MCP의 다중 프로젝트 연결, 실제 DB 쓰기 및 실제 프로젝트 비교는 미실행이다. 전체 목록과 저장한 원자료는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다.
+이전 기반 packet은17개 상위 시험/하위40사례의 fixture·race 검증을 보존한다. 이번 [공개 조회 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/manifest.json)은 실제 CKG/CKV DB3개와 mock embedding으로 수행한24개 확인 항목, MCP 도구21호출/요청·응답26쌍, 정상 EOF 종료3회를 보존한다. 같은 이름·module·함수의 두 프로젝트, A의 두 버전, 교대/warm 조회, 명시 비교, 잘못된 scope7종과 시작 거부6종, 원문 손상·복원, pinned reindex 거부, 재시작과 기본33도구 호환을 검증했다. DB/manifest18파일과 current 포인터2개가 그대로임을 확인했다.
 
-최종 전체 모듈은3,605개 중3,586개 통과·19개 명시적 skip·실패0이다. 빌드·fmt·lint·문서 gate와 작업표 허위 완료 방지7개도 통과했다. 전체 시험의 skip·fixture 범위·공개 미연결을 통과로 바꾸지 않는다.
+전체 모듈은3,619개 중3,600개 통과·19개 명시적 skip·실패0이다. 관련4패키지 race는444개 통과·2개 skip·실패0이며 기반40사례도 포함한다. 새 상위 시험6개/하위 포함14사례는 모두 통과했다. mock 검색의 인용/출처 격리 증거이며 실제 embedding 검색 품질·산업 비교·독립 수용을 통과시킨 것이 아니다. 전체 목록과 gate는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다.

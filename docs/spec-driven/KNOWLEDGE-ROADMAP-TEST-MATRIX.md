@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 단계는 KM-01 공통 격리 계층 검증이다. 완료한 설계/계약과 아직 연결하지 않은 공개 기능을 분리한다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 단계는 KM-01.3 실제 backend·공개 MCP 조회 연결 완료다. 최종 반례 시험 KM-01.4는 진행 중이며 전체28개 중3개 완료·4개 진행 중·21개 미착수다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는0/7이다.
 
@@ -10,8 +10,8 @@
 |---|---|---|---|
 | KM-01.1 | 신원·key·cache·join·쓰기 조사와 이행 설계 | 완료 | [재사용/결손 표](./PROJECT-COLLECTION-ISOLATION.md) 작성·코드 대조 |
 | KM-01.2 | Project/Version/Collection과 고정 scope 계약 | 완료 | catalog·fork·두 버전·직렬화/재시작 시험 통과 |
-| KM-01.3 | 구현 대상 제한·명시 비교·잘못된 scope 거부 | 진행 중 | 공통 reader 시험 통과; CLI/MCP adapter 미연결 |
-| KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 진행 중 | 기반40사례 통과; 실제 backend/공개 도구 쓰기·혼입 시험 미실행 |
+| KM-01.3 | 구현 대상 제한·명시 비교·잘못된 scope 거부 | 완료 | 실제 CKG/CKV3DB·공개 MCP24항목 통과; 원시 응답/인용 재검증 |
+| KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 진행 중 | 기반40사례·공개 조회24항목 통과; 동일 바이트 fork·다른 embedding 구성·공개 쓰기 전체 표면 남음 |
 | KM-02.1 | legacy/versioned capability와 새 요청·상태 계약 | 미착수 | 미실행 |
 | KM-02.2 | 비동기 build/status/cancel과 정합 gate | 미착수 | 미실행 |
 | KM-02.3 | idempotency/lock/중단/실패/rollback | 미착수 | 미실행 |
@@ -63,37 +63,76 @@
 
 초기 fixture의 commit manifest 누락, 작성 중 unused import, 읽기 전용 blob의 손상 재현 실패도 원자료에 보존한다. 최종 통과 로그와 구분한다.
 
-## 공개 경로로 넘어갈 때 남은 시험
+## 이번 공개 MCP 검증 전체 목록
+
+실제 graph/vector DB3개를 새로 만들고 MCP 프로세스3개를 실행했다. embedding은 `mock-feature-hash-v1`/64차원이며 유료 모델 호출0회다. 도구21호출 중12개 성공·9개 의도한 오류, 총26개 요청·응답이다. 성공한14개 evidence pack의 좌표·인용·보관 원문/범위 해시·본문·integrity를 재검증했다. 아래24개는 이21호출과 시작 거부·보존 검사를 묶은 항목으로 서로 더하지 않는다.
+
+| 순서 | 확인 항목 | 결과 |
+|---|---|---|
+| 1 | 다른 프로젝트 vector index 설정 시작 거부 | 통과 |
+| 2 | 중첩 collection 설정 시작 거부 | 통과 |
+| 3 | 다른 sanitizer 설정 시작 거부 | 통과 |
+| 4 | 사용 불가 embedding model 시작 거부 | 통과 |
+| 5 | member profile 누락 시작 거부 | 통과 |
+| 6 | mutable current 경로 시작 거부 | 통과 |
+| 7 | A 이전 버전101 조회 | 통과 |
+| 8 | B 버전202 조회 | 통과 |
+| 9 | A 새 버전303 조회 | 통과 |
+| 10 | B 재조회·warm 분리 | 통과 |
+| 11 | A 이전 버전 재조회·warm 분리 | 통과 |
+| 12 | 세 버전 명시 비교·각 그룹 분리 | 통과 |
+| 13 | target 누락 거부 | 통과 |
+| 14 | 오래된 catalog digest 거부 | 통과 |
+| 15 | 다른 project 좌표 거부 | 통과 |
+| 16 | 다른 snapshot 좌표 거부 | 통과 |
+| 17 | 없는 collection 거부 | 통과 |
+| 18 | caller config 경로 주입 거부 | 통과 |
+| 19 | 미지원 mode 거부 | 통과 |
+| 20 | B 원문 손상 시 비교 전체 거부·A 정상 유지 | 통과 |
+| 21 | 원문 복원 후 비교 회복 | 통과 |
+| 22 | 기존 pinned reindex 거부·job 미생성 | 통과 |
+| 23 | 재시작·current/소스가 새 버전이어도 이전 버전 유지 | 통과 |
+| 24 | 기본33도구·기존 단일 프로젝트 V2 호환 | 통과 |
+
+새 Go 상위 시험6개, 하위 사례 포함14개가 모두 통과했다.
+
+| 시험 | 검증 내용 | 결과 |
+|---|---|---|
+| TestCollectionConfigValidation | 비활성 기본값·절대 경로·중복·누락 등8개 설정 사례 | 통과 |
+| TestCollectionConfigKnownFieldsRemainStrict | YAML unknown 필드 거부 | 통과 |
+| TestCollectionToolsAreOptInAndReadOnly | 기본 도구 불변·선택2도구·schema와 readOnly | 통과 |
+| TestCollectionServiceUsesExistingV2AndClosesOnce | 기존 V2 경로·대상/인용·종료 후 거부·중복 close | 통과 |
+| TestCollectionFactoryFailureClosesOpenedBackend | 부분 backend 실패 자원 정리 | 통과 |
+| TestCollectionPublicUnknownAndMissingTargetsAreRejected | 공개 unknown 필드·target 누락 거부 | 통과 |
+
+## 남은 격리·기능 시험
 
 | 검증 대상 | 현재 상태 | 연결 작업 |
 |---|---|---|
-| 실제 CKG/CKV 검색과 project별 provider 구성 | 미실행 | KM-01.3/04와 공개 adapter |
-| CLI/MCP의 scope 요청·오류·최종 인용 분리 | 미연결·미실행 | KM-01.3/04, KM-02/KM-06 |
-| 다른 프로젝트/버전의 DB 쓰기 및 current 불변 | 미연결·미실행 | KM-02.3/04 |
-| 실제 host 재시작·검색 cache 옵션/권한 전체 key | 미실행 | 공개 adapter와 KM-03 |
-| 등록된 collection으로 산업 개념 비교 | 미구현·미실행 | KM-05/06 |
-| 자연어 표현·검토된 구현 관계 보완 후 ontology 효과 | 미실행 | OE-01 후속·KM-05 |
+| 실제 CKG/CKV와 프로젝트별 provider 설정·공개 scope 오류/인용 | 이번 범위 통과 | KM-01.3 완료 |
+| 동일 바이트 fork 실제 DB·서로 다른 embedding 구성·cache 반복 | 기반 시험만 통과, 공개 확장 남음 | KM-01.4 |
+| 공개 쓰기 도구 전체 표면·다른 project/version DB와 current 보존 | pinned reindex1개 거부 통과, 전체 남음 | KM-01.4 및 KM-02.3/04 |
+| 실제 Claude 매니저 host·등록/구축/실패 복구·갱신 | 미구현·미실행 | KM-02/03/04 |
+| 산업 개념 매핑·비교 행렬·실제 프로젝트 비교 | 미구현·미실행 | KM-05/06 |
+| 자연어·검토된 구현 관계·다중 프로젝트 ontology 효과 | 로컬 단일 프로젝트 관찰만 완료 | OE-01 후속 |
 
 ## 전체 검증 gate와 기록
 
-[validation 원자료](../../system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/validation.json)와 [Go 시험 전체3,605개 목록](../../system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/test-inventory.json)에 종료코드·사례별 상태를 보존했다. 아래 모듈 분모에 collection 사례가 이미 포함되므로40개를 다시 더하지 않는다.
+[최신 validation](../../system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/validation.json), [Go 시험 전체3,619개와 race446개 목록](../../system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/test-inventory.json), [원시 응답·소스 manifest](../../system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/manifest.json)을 함께 보존한다. 기반40사례·신규14사례는 전체 Go/race 분모에 이미 포함된다.
 
 | 최종 gate | 결과 |
 |---|---|
 | 전체 모듈 빌드 | 통과 |
-| 전체 Go 시험 | 3,586개 통과·19개 명시적 skip·실패0 (총3,605개) |
-| collection race | 17개 상위 시험/40사례 통과·skip0 |
-| fmt | 통과 |
-| lint·vet·engine 경계 | 통과, lint0 issues |
-| 문서 | 125개, 문서 계약20개·패키지 안내3개 통과 |
-| 작업표 허위 완료 방지 | 7개 시험 통과 |
-| 기존 source/input/bundle 바이트 결속 | 2,069개 통과 |
-| 새 Go 파일을 포함한 기존 소스목록 guard | 1,647개 결속, 검사 통과 |
+| 전체 Go 시험 | 3,600개 통과·19개 명시적 skip·실패0 (총3,619개) |
+| 관련4패키지 race | 444개 통과·2개 명시적 skip·실패0 (총446개) |
+| 기반 collection race 포함 | 17개 상위 시험/40사례 통과·skip0 |
+| 실제 DB·공개 MCP | 24항목·21도구호출·26요청/응답·정상 EOF3회 통과 |
+| fmt·전체 lint·vet·engine 경계·문서 | 통과; lint0 issues·문서125개·계약20개·패키지 안내3개 |
+| 작업표 허위 완료 방지 | 기존7개·새 공개 증거8개 통과 |
+| 기존 소스목록 갱신 | 1,652개 현재 바이트 결속 작성; 커밋 후 guard 대기 |
 
-전체 모듈에서 skip된19개는 실제 모델/자체 graph/특정 플랫폼·환경 지정 등이 필요한 기존 조건부 시험이며 통과로 세지 않았다. 목록에19개 모두 `state=skip`으로 보존한다. Go가 package skip으로 보고한12개 패키지는 별도 집계한다.
+전체 모듈의19개 skip과 관련 race의2개 skip은 명시적인 기존 환경 조건이며 통과로 세지 않는다. 각 이름·패키지·상태는 전체 시험 목록에 보존했다. package skip12개도 별도 집계한다. 이전 [기반 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json)의3,605개/공개 미연결 기록은 당시 범위를 보존하며 최신 상태는 이번 packet을 따른다. 처음 fixture의 model 이름을 잘못 지정해 시작이 거부된 이력도 `initial-failure/`에 보존했다.
 
-[증거 manifest](../../system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json)는 실행 로그·전체 시험 목록과 소스를 결속한다. 기존 source 목록에는 새 Go3개를 추가한 [별도 바이트 결속](../../system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/source-binding.json)을 만들고 이전 승인·완료 판정은 유지한다. [이전 ontology 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)의384회 및 별도8회와 이번 collection 시험 분모는 합치지 않는다.
+실제 DB/manifest18파일과 current 포인터2개가 그대로임을 확인했다. 원문 손상은 소유한 fixture에서 재현하고 정확히 복구했다. 유효한 조회 근거14팩을 검증한 사실과 검색 품질·독립 수용은 분리한다. ontology의384회 관찰과 별도8회 진단에 이번 분모를 합치지 않는다.
 
-다음은 KM-01.3의 실제 backend·공개 조회 adapter 연결과 경계 검증이다. 이후 KM-02.1의 version-aware 도구 계약으로 이어간다. 신규 기능7개 외의 운영·독립 수용9개와 선택 후속12개는 [전체 작업표](../REMAINING-WORK.md)에 그대로 유지한다.
-
-소스 결속 갱신을 완료했다. [별도 검사 기록](../../system/eval/knowledge-roadmap-2026-10-15/km-01-source-binding-update/receipt.json)은 구현 커밋을 참조하며, 기존 원장의 나머지 필드·승인·완료 판정이 그대로임을 확인한다. 기반 packet의 `pending committed manifest`는 첫 커밋 시점의 기록이며 현재 상태는 이 후속 기록을 따른다.
+다음은 KM-01.4의 최종 격리 반례 검증이다. 이후 KM-02.1의 version-aware 도구 계약으로 이어간다. 신규7개 기능 외의 생성기 보완·운영/독립 수용9개·선택 후속12개는 [전체 작업표](../REMAINING-WORK.md)에 유지한다.

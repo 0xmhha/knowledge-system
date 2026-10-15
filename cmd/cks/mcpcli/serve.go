@@ -317,6 +317,14 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 			Jobs:         jobs,
 		},
 	}
+	collections, err := buildCollection(ctx, cfg, ruleset, evidenceSanitizer, fp)
+	if err != nil {
+		return fmt.Errorf("config_invalid: collection backends could not be verified: %w", err)
+	}
+	if collections != nil {
+		defer func() { _ = collections.Close() }()
+		deps.Collection = collections
+	}
 	if cfg.Listen.ResolvedTransport() == "http" {
 		name := cfg.Name // already defaulted to the namespace root above
 		log.Printf("cks-mcp[%s]: serving Streamable HTTP on %s (allow_remote=%v, allowed_cidrs=%v)",

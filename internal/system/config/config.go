@@ -46,16 +46,17 @@ type Config struct {
 	Name string `yaml:"name"`
 	// Description is optional human-facing metadata (e.g. "go-stablenet pr-77-2
 	// flow index") surfaced in cks.ops.health alongside Name.
-	Description string          `yaml:"description"`
-	Backends    BackendsConfig  `yaml:"backends"`
-	Listen      ListenConfig    `yaml:"listen"`
-	Logging     LoggingConfig   `yaml:"logging"`
-	Sanitize    SanitizeConfig  `yaml:"sanitize"`
-	Vocab       VocabConfig     `yaml:"vocab"`
-	Domain      DomainConfig    `yaml:"domain"`
-	Semantic    SemanticConfig  `yaml:"semantic"`
-	Service     ServiceConfig   `yaml:"service"`
-	Retrieval   RetrievalConfig `yaml:"retrieval,omitempty"`
+	Description string           `yaml:"description"`
+	Backends    BackendsConfig   `yaml:"backends"`
+	Listen      ListenConfig     `yaml:"listen"`
+	Logging     LoggingConfig    `yaml:"logging"`
+	Sanitize    SanitizeConfig   `yaml:"sanitize"`
+	Vocab       VocabConfig      `yaml:"vocab"`
+	Domain      DomainConfig     `yaml:"domain"`
+	Semantic    SemanticConfig   `yaml:"semantic"`
+	Service     ServiceConfig    `yaml:"service"`
+	Retrieval   RetrievalConfig  `yaml:"retrieval,omitempty"`
+	Collection  CollectionConfig `yaml:"collection,omitempty"`
 }
 
 // RetrievalConfig pins the shared top-K for raw recall and optional concept
@@ -320,6 +321,9 @@ func LoadBytes(data []byte) (*Config, error) {
 func (c *Config) Validate() error {
 	if c == nil {
 		return fmt.Errorf("config: nil")
+	}
+	if err := c.Collection.Validate(); err != nil {
+		return err
 	}
 	if c.Retrieval.RecallK < 0 || c.Retrieval.RecallK > 1000 {
 		return errors.New("config: retrieval.recall_k must be 0 (default 20) or 1..1000")
