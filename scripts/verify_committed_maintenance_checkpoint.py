@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'ontology-expanded-protocol': {
+        'revision': 'f73b9e36', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'oe-01-protocol',
+        'scope': 'historical_OE01_1_preregistered_function_retrieval_inputs_no_new_query_or_quality_claim',
+        'scripts': ['check-ontology-expanded-protocol.py', 'test_ontology_expanded_protocol.py'],
+    },
     'real-project-comparison': {
         'revision': 'efd43995', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-06-real-projects',
         'scope': 'historical_KM06_complete_actual_real_project_source_MCP_not_ontology_quality_effect',

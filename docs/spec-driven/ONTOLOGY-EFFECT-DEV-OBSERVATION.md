@@ -1,6 +1,6 @@
 # 온톨로지 효과 개발 평가
 
-2026-10-16 현재 OE-01.1의 확대 입력/기준을 고정했다. 새 실행/효과 판정은 다음 단계이며 기존 기본 off·quality=inconclusive를 유지한다. [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+2026-10-16 현재 OE-01.1–2의 입력/기준 고정과 실제512회 수집을 완료했다. 효과 분석은 다음 단계이며 기존 기본 off·quality=inconclusive를 유지한다. [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 현재 확대 평가 설계
 
@@ -10,7 +10,7 @@ source commit baca2869·동일 비시험 Go882개·승인 정의4개/검토된 �
 
 [사전 등록 입력](../../system/eval/knowledge-roadmap-2026-10-16/oe-01-protocol/manifest.json)을 실행 전에 서명 커밋으로 고정한다. 공개 요청에는 질문과 explain_ontology만 보내며 private 함수 기준·기대 concept/정답은 전달하지 않는다. 함수 찾기의 source-defined 유한 기준이며 일반 semantic relevance/행동 정답·독립 품질 승인과 구분한다. 실제 LLM 답변은 호출하지 않는다.
 
-전체25/28·기능6/7이다. 다음은 OE-01.2의 고정512회4모드 실행이다. 남은3개는 OE-01.2 동일 자료4모드, OE-01.3 함수 근거·순위·ontology 범위/unknown·지연/API 호출/관측 비용, OE-01.4 다중 프로젝트 매핑/오인/누락 효과 평가다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 기본 off·quality=inconclusive는 실제 품질 승인 없이 바꾸지 않는다.
+전체26/28·기능6/7이다. 다음은 OE-01.3의 고정 함수 회수 precision/recall·순위·ontology 의도 범위/unknown·warm 지연/API 호출/관측 비용 재계산이다. 남은2개는 OE-01.3 분석, OE-01.4 다중 프로젝트 매핑/오인/누락 효과 평가다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다.
 
 ## 이전2026-10-15 단일 프로젝트 관찰
 
@@ -60,3 +60,12 @@ off 외3개 모드는 `wbft-quorum`1개를 매칭했다. concept_text/combined�
 ## 현재 단계와 보존 범위
 
 이전384회·별도8회·원자료/소스 검사와52세션 EOF0는 당시 단일 프로젝트 개발 관찰의 범위다. 현재 확대한 입력과 결과를 같은 분모로 합산하지 않는다. 이전 상세 입력·오류·정제/인용 검증은 위 동결 packet에 보존했다. 현재는 OE-01.1만 완료했고 새512회 실행과 다중 프로젝트 효과 평가가 남는다.
+
+
+## OE-01.2 실제512회 수집
+
+OE-01.2 완료: 사전 등록16질문×4모드×8호출=512회를 실제 로컬 BGE-M3로 수집했다.4개 readiness와64개 capture 세션의 종료, 질문/모드/단계/반복 슬롯·설정/바이너리·source/snapshot·인용/본문/무결성 hash를 검증했다. 검토된 정의4개/구현 연결0개를 보존하고, mode 외 설정은 동일하다. 원본 graph/vector/source·의미 DB·바이너리·모델/서버가 전후 동일하며 소유 loopback API 계측기는 진행 중 요청0으로 종료했다. 이 단계는 실행/원문 검증이며 효과 점수나 품질 수용이 아니다.
+
+인용4896개·본문4896개·원문 blob65개를 검증했고 실패/누락0이다. 실제 API 20420개를 metadata/준비/질문-arm별로 기록했다. 기본 off·quality=inconclusive와 사람/독립 gold0·실제 LLM 답변0·유료 모델0을 유지한다. 초기 off 기본값 정규화 오류와 계측 로그 전체 재작성에 따른 제어 중단을 별도로 보존했다. 초기 지연/부분 실행은 본512회 지표에 합산하지 않는다.
+
+[동결 실행 증거](../../system/eval/knowledge-roadmap-2026-10-16/oe-02-capture/manifest.json)를 따른다. 전체26/28·기능6/7이다. 다음은 OE-01.3의 고정 함수 회수 precision/recall·순위·ontology 의도 범위/unknown·warm 지연/API 호출/관측 비용 재계산이다. 남은2개는 OE-01.3 분석, OE-01.4 다중 프로젝트 매핑/오인/누락 효과 평가다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다.
