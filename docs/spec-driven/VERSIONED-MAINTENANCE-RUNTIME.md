@@ -60,13 +60,26 @@ activation receipt는 과거 전환의 증거이며 현재 모든 reader가 새 
 | A: 저장 상태/record 적합성 | 기반 구현·로컬 검증 | 기존 설계의 상태28·전이12·관찰8사례를 Go로 대조. source/input/model/base와 후보·필수 gate·실제 receipt가 맞아야 성공 기록 허용 |
 | A: 원자적 journal·단독 writer | 기반 구현·로컬 검증 | file sync→rename→directory sync, scoped owner/key·checksum·최대128기록. 오류 뒤 stale 메모리를 내보내지 않고 owner lock을 유지한 채 재조정 요구 |
 | A: 기록 교체 전후 owner 종료 | 기반 구현·로컬 검증 | 소유한 별도 시험 프로세스를 즉시 종료하고 재열기. 온전한 이전/새 record·자동 flock 해제 확인. **DB 구축 프로세스 복구 시험과 별개** |
-| B: 공개 접수/상태/취소·재시작 연결 | 미구현 | queued와 key를 durable 저장한 뒤 접수 응답. 각 변경 저장 실패는 공개 성공으로 표시하지 않는다. 원래 접수 pin으로 replay하고 현재 접근 scope를 먼저 확인 |
+| B: 접수/상태/취소·재시작 연결 | 비공개 service 구현·로컬 검증; 공개 연결 보류 | queued와 key를 durable 저장한 뒤 접수 응답. 각 변경 저장 실패는 공개 성공으로 표시하지 않는다. 원래 접수 pin으로 replay하고 현재 접근 scope를 먼저 확인 |
 | C: 활성화 전후 장애와 증거 | 미구현 | 기존 dataset/pointer lock 안에서 publication intent/결과를 남기고 재시작 시 정합 확인. 이후 정상 전환/rollback으로 current가 이동해도 이전 성공 이력을 잃지 않아야 함 |
 | D: 중단된 하위 프로세스·시간 상한 | 미구현 | 부모 강제 종료 시 실제 하위 작업 중단/정리와 writer 소유가 끝났는지 확인한 뒤 interrupted/canceled 판정. PID 재사용만 보고 남의 프로세스를 종료하지 않음 |
 | E: 공개 복구·읽기/rollback/GC 회귀 | 미실행 | 두 프로젝트의 중복·timeout·부분 실패·publication 전후 종료·재시작, 기존 reader pin/rollback/GC 보존을 실제 MCP에서 확인 |
 
 A 기반은 maintenance package race114개와 전체 Go3,715통과/19skip·build/fmt/lint로 검증했다. 기존 공개 동작28항목도 다시 통과했고 연결5개가 정상 종료했다. 모든 기록 파일은 private store 시험이며 운영 DB나 개인 세션 자료를 입력으로 사용하지 않는다. `verify_committed_maintenance_runtime.py`는 이전 KM-02.2 증거를31c1f30d snapshot에서 확인하므로 새 Go 변경을 과거 시험으로 통과 처리하지 않는다.
 
-다음은 B의 service 연결이며 C/D의 commit 경계·하위 실행 소유까지 구현·검증하기 전에는 job_persistence를 durable로 바꾸지 않는다. KM-02.3과 KM-02.4 모두 아직 완료가 아니다.
+B의 비공개 service를 검증했다. 다음은 C/D의 commit 경계·하위 실행 소유와 E의 실제 공개 복구이며, 이 검증 전에는 공개 job_persistence를 durable로 바꾸지 않는다. KM-02.3과 KM-02.4 모두 아직 완료가 아니다.
 
 A의 [중간 검증 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-journal-foundation/manifest.json)은 공개 기존 동작28항목을 재실행한 원시 wire와 새로운 Go/race 기록을 함께 보존한다. `check-maintenance-journal-foundation.py`와 `test_maintenance_journal_foundation.py`의13개 검사는 기존 공개 증거 보호와 함께 private 저장기 시험이 KM-02.3 전체 완료로 승격되는 것을 거부한다. 관련5패키지 race는703사례(701통과·2skip)이며 maintenance114사례를 포함하므로 두 수를 더하지 않는다.
+
+
+### B 중간 검증: 비공개 service의 durable 접수·재조회
+
+`newDurableService`는 시험에서만 연결한다. 공개 `New`와 MCP 설정은 여전히 process_lifetime이며, 비공개 inspect도 `journal_recovery_incomplete`로 한계를 표시한다. 종료 작업은 저장한 상태 그대로 복원하고, 기존 key의 재조회는 현재 source/model/base 점검보다 먼저 수행한다. 이전 작업의 pin을 현재 입력으로 바꿔서 다시 구축하지 않는다. 잘못된 project/profile과 같은 key의 다른 fingerprint는 거부한다.
+
+새 작업은 기존 dataset mutation lock으로 소유·pin을 다시 확인한 뒤 queued/key를 기록하고, 그 기록이 성공한 후에만 실행/응답한다. 취소도 cancel_requested 기록 후 요청을 인정한다. 기록 교체 결과가 불확실하면 실행을 중단하고 registry owner를 유지한다. 이때 임의의 recovering revision을 응답하지 않으며 `reconcile_required` 오류를 반환한다. 따라서 재시작에서 같은 revision의 본문이 바뀌거나 관찰 번호가 역행하지 않는다.
+
+재시작한 미종료 작업은 recovering으로 저장하고 해당 root의 새 실행을 막는다. 완료/취소/중단을 아직 추정하지 않는다. C/D는 recovering과 별도로 취소 의도를 보존하고, 실제 publication 이력·기존 writer lock·하위 실행 소유를 판정해야 한다. 비공개 registry는 root당 coordinator 하나가 OS lock으로 소유하며 두 번째 소유자는 writer_busy로 거부한다. reader의 dataset pin과는 별개다.
+
+Go 시험은 maintenance package123개와 관련5패키지714사례(712통과·2skip)를 포함한다. 고의 graph 실패를 기존 실제 orchestration에서 실행하고, 실패 결과의 재시작 재조회·source/profile 변경 뒤 replay·취소 응답 전 기록·접수 rename 전/후 오류 시 미실행·단독 소유·불확실한 상태 응답 거부를 확인했다. 이 고의 실패 fixture는 실제 성공 DB/모델 품질 검증을 대신하지 않는다. 전체 Go는3,745사례=3,726통과+19skip이며 build/fmt/lint와 기존 공개 MCP28항목/정상 EOF5개도 통과했다.
+
+[비공개 B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-service/manifest.json)을 `check-maintenance-durable-service-evidence.py`와 `test_maintenance_durable_service_evidence.py`로 검증한다. 과거 A는 `verify_committed_maintenance_checkpoint.py --checkpoint journal-foundation`으로fff83134 snapshot에서 별도로 검사한다.

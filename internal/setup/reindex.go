@@ -84,7 +84,7 @@ func acquireReindexLock(dataset string) (*reindexLock, error) {
 		return nil, fmt.Errorf("reindex: mutation lock must be a regular file with one link")
 	}
 	if err := unix.Flock(fd, unix.LOCK_EX|unix.LOCK_NB); err != nil {
-		return nil, fmt.Errorf("reindex: another reindex or promotion is in progress")
+		return nil, fmt.Errorf("reindex: another reindex or promotion is in progress: %w", ErrDatasetWriterBusy)
 	}
 	// The acquired OS lock settles modern ownership. A pre-upgrade live PID
 	// is still protected regardless of timestamp; never unlink its inode.

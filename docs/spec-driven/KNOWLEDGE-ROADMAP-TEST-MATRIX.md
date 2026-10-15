@@ -14,7 +14,7 @@
 | KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 완료 | 실제4DB·최종52항목 통과; 동일 원문 fork·모델 분리·쓰기18건 거부·rollback/GC/재시작 보존 |
 | KM-02.1 | legacy/versioned capability와 새 요청·상태 계약 | 완료 | [계약](./VERSIONED-MAINTENANCE-CONTRACT.md)·schema·101사례 통과; 새 공개 실행은 .2–04 |
 | KM-02.2 | 비동기 build/status/cancel과 정합 gate | 완료 | [공개 실행](./VERSIONED-MAINTENANCE-RUNTIME.md)28항목·실제 retained 조회2건·EOF5개·전체 Go/race·증거 보호10개 통과 |
-| KM-02.3 | idempotency/lock/중단/실패/rollback | 진행 중 | private journal·상태 적합성 기반 race114개 통과; 공개 영속/복구 미구현·미검증 |
+| KM-02.3 | idempotency/lock/중단/실패/rollback | 진행 중 | private A/B 기반·service race123개 통과; 공개 영속·publication/하위 실행 복구는 미구현·미검증 |
 | KM-02.4 | 공개 도구의 잘못된 대상·부분 실패·취소 보호 | 미착수 | 미실행 |
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 미착수 | 미실행 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 미착수 | 미실행 |
@@ -288,3 +288,21 @@ KM-02.1 당시 설계 적합성·증거 검사는 `python3 scripts/check-version
 다음은 [실행 명세의 B–E](./VERSIONED-MAINTENANCE-RUNTIME.md)에 따라 공개 service의 durable 접수·replay, publication 전후 증거, 하위 프로세스 소유/중단, 실제 MCP 복구와 rollback/GC/read lease를 연결·검증한다. 이 단계의 기록 저장기 시험을 공개 복구나 독립 수용으로 올리지 않는다.
 
 A 단계의 [검증 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-journal-foundation/manifest.json)에 새 전체 시험 목록·원시 wire를 보존한다. 공개 동작 재실행은112개 도구 호출·121개 전체 wire쌍이며 polling 횟수는 고정28개 항목과 별도다. 현재 소스 결속은1,664입력(유지 Go1,235개·기타429개)이다.
+
+
+## KM-02.3 중간 단계 B: 비공개 service 연결
+
+| 검증 | 결과·한계 |
+|---|---|
+| maintenance package race | 123사례 통과; 기존 A114개 포함 |
+| 기존 전환 경로 포함 관련5패키지 race | 714사례=712통과+2skip·실패0 |
+| 전체 Go | 3,745사례=3,726통과+19skip·실패0 |
+| 비공개 durable service | 기록한 종료 상태 재시작/replay, changed pin 재조회, key 충돌·타 프로젝트 거부, coordinator owner, 취소 전 기록·불확실한 snapshot 거부 |
+| 실제 orchestration의 고의 graph 실패 | 실패 상태 보존·current 미발행·재시작 같은 결과; 성공 DB 검증을 대신하지 않음 |
+| 최초 접수 rename 전/후 기록 오류 | 접수 성공 미응답·graph 미실행, 재시작에서 온전한 없음/queued 기록만 복원 |
+| 공개 기존 동작 | 28항목·EOF5개 재검증; 공개 persistence는 여전히 process_lifetime |
+| 공개 재시작·publication 장애·하위 작업 정리 | C–E 미구현·미실행; KM-02.3 완료 아님 |
+
+[실행 명세](./VERSIONED-MAINTENANCE-RUNTIME.md)의 B 범위와 [B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-service/manifest.json)을 따른다. 다음은 취소 의도 결속과 publication 전후 이력 정합(C), 하위 프로세스 소유/중단(D), 실제 공개 복구·read lease/rollback/GC 검증(E)이다. 현재 전체6개 완료·4개 진행 중·18개 미착수다. 이후 KM-02.4 → KM-03 → KM-04 → KM-05 → KM-06 → OE-01 확대/다중 프로젝트 평가를 진행한다. 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다.
+
+B 증거 보호13개도 통과했다. 실제 공개 회귀는81개 도구 호출·전체90개 wire쌍이며 고정28개 항목과 별도로 센다. 현재 소스 결속은1,668입력(유지 Go1,239개·기타429개)이며 기존 승인/완료 상태는 바꾸지 않는다.

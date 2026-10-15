@@ -15,10 +15,13 @@ import (
 )
 
 type job struct {
-	mu      sync.Mutex
-	status  JobStatus
-	request BuildRequest
-	cancel  context.CancelFunc
+	mu                sync.Mutex
+	status            JobStatus
+	request           BuildRequest
+	cancel            context.CancelFunc
+	journal           *journalStore
+	record            *journalRecord
+	persistenceFailed bool
 }
 
 type Service struct {
@@ -32,14 +35,26 @@ type Service struct {
 	wg       sync.WaitGroup
 	self     string
 	closed   bool
+	durable  bool
+	journals map[string]*journalStore
 }
 
 func New(profiles []Profile, self string) (*Service, error) {
+	// Keep the public surface process-lifetime until publication and child
+	// ownership recovery pass KM-02.3 C–E.
+	return newService(profiles, self, false)
+}
+
+func newDurableService(profiles []Profile, self string) (*Service, error) {
+	return newService(profiles, self, true)
+}
+
+func newService(profiles []Profile, self string, durable bool) (*Service, error) {
 	if len(profiles) > 32 {
 		return nil, reject("unsupported_capability")
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	s := &Service{profiles: map[string]registered{}, jobs: map[string]*job{}, keys: map[string]string{}, busy: map[string]bool{}, ctx: ctx, cancel: cancel, self: self}
+	s := &Service{profiles: map[string]registered{}, jobs: map[string]*job{}, keys: map[string]string{}, busy: map[string]bool{}, ctx: ctx, cancel: cancel, self: self, durable: durable, journals: map[string]*journalStore{}}
 	for _, spec := range profiles {
 		if err := spec.Validate(); err != nil {
 			cancel()
@@ -62,6 +77,12 @@ func New(profiles []Profile, self string) (*Service, error) {
 		}
 		spec.AllowedActivation = append([]string{}, spec.AllowedActivation...)
 		s.profiles[spec.ID] = registered{spec: spec, src: o.Src, out: o.Out}
+	}
+	if durable {
+		if err := s.loadJournals(); err != nil {
+			s.Close()
+			return nil, err
+		}
 	}
 	return s, nil
 }
@@ -99,13 +120,41 @@ func (s *Service) Inspect(ctx context.Context, r ProfileRequest) (Inspection, er
 	if err != nil {
 		return Inspection{}, err
 	}
-	return Inspection{Profile: value.view, Capabilities: Capabilities{VersionedBuild: true, Cancel: true, JobPersistence: "process_lifetime", ServingAdoption: "not_observed", InputPreparation: "existing_reviewed_or_rendered_inputs"}}, nil
+	persistence := "process_lifetime"
+	if s.durable {
+		persistence = "journal_recovery_incomplete"
+	}
+	return Inspection{Profile: value.view, Capabilities: Capabilities{VersionedBuild: true, Cancel: true, JobPersistence: persistence, ServingAdoption: "not_observed", InputPreparation: "existing_reviewed_or_rendered_inputs"}}, nil
 }
 
 func snapshot(j *job) JobStatus {
 	j.mu.Lock()
 	defer j.mu.Unlock()
 	return cloneStatus(j.status)
+}
+
+func statusResult(j *job) (JobStatus, error) {
+	j.mu.Lock()
+	defer j.mu.Unlock()
+	if j.persistenceFailed {
+		// The disk may contain either revision after an uncertain write.
+		// Never emit a fabricated recovering revision that a restart could
+		// rewind or replace with a different body at the same revision.
+		return JobStatus{}, &Error{Code: "reconcile_required", Phase: "reconcile"}
+	}
+	return cloneStatus(j.status), nil
+}
+
+func replayResult(j *job, digest string) (JobStatus, error) {
+	j.mu.Lock()
+	defer j.mu.Unlock()
+	if j.status.RequestDigest != digest {
+		return JobStatus{}, reject("idempotency_conflict")
+	}
+	if j.persistenceFailed {
+		return JobStatus{}, &Error{Code: "reconcile_required", Phase: "reconcile"}
+	}
+	return cloneStatus(j.status), nil
 }
 
 func cloneStatus(value JobStatus) JobStatus {
@@ -134,7 +183,7 @@ func (s *Service) Status(r JobReference) (JobStatus, error) {
 	if err != nil {
 		return JobStatus{}, err
 	}
-	return snapshot(j), nil
+	return statusResult(j)
 }
 
 func (s *Service) Cancel(r JobReference) (CancelResult, error) {
@@ -144,8 +193,13 @@ func (s *Service) Cancel(r JobReference) (CancelResult, error) {
 	}
 	j.mu.Lock()
 	defer j.mu.Unlock()
+	if j.persistenceFailed {
+		return CancelResult{}, &Error{Code: "reconcile_required", Phase: "reconcile"}
+	}
 	decision := "accepted"
 	switch {
+	case j.status.State == "recovering":
+		decision = "reconcile_required"
 	case j.status.Activated:
 		decision = "too_late"
 	case j.status.Terminal:
@@ -155,6 +209,9 @@ func (s *Service) Cancel(r JobReference) (CancelResult, error) {
 	default:
 		j.status.State = "cancel_requested"
 		j.status.Revision++
+		if err := j.persistLocked(); err != nil {
+			return CancelResult{}, err
+		}
 		j.cancel()
 	}
 	return CancelResult{Decision: decision, Status: cloneStatus(j.status)}, nil
@@ -182,10 +239,7 @@ func (s *Service) Build(ctx context.Context, request BuildRequest) (JobStatus, e
 	if id := s.keys[key(request)]; id != "" {
 		j := s.jobs[id]
 		s.mu.Unlock()
-		if j.status.RequestDigest != digest {
-			return JobStatus{}, reject("idempotency_conflict")
-		}
-		return snapshot(j), nil
+		return replayResult(j, digest)
 	}
 	s.mu.Unlock()
 	bounded, cancel := context.WithTimeout(ctx, 30*time.Second)
@@ -204,10 +258,7 @@ func (s *Service) Build(ctx context.Context, request BuildRequest) (JobStatus, e
 	}
 	if id := s.keys[key(request)]; id != "" {
 		j := s.jobs[id]
-		if j.status.RequestDigest != digest {
-			return JobStatus{}, reject("idempotency_conflict")
-		}
-		return snapshot(j), nil
+		return replayResult(j, digest)
 	}
 	if s.busy[p.out] {
 		return JobStatus{}, reject("writer_busy")
@@ -219,11 +270,27 @@ func (s *Service) Build(ctx context.Context, request BuildRequest) (JobStatus, e
 	if _, err := rand.Read(random[:]); err != nil {
 		return JobStatus{}, reject("operation_failed")
 	}
-	jobCtx, stop := context.WithTimeout(s.ctx, time.Duration(request.DeadlineSeconds)*time.Second)
+	created := time.Now().UTC()
+	deadline := created.Add(time.Duration(request.DeadlineSeconds) * time.Second)
+	jobCtx, stop := context.WithDeadline(s.ctx, deadline)
 	j := &job{request: request, cancel: stop, status: JobStatus{SchemaVersion: 1, JobID: hex.EncodeToString(random[:]), ProjectID: request.ProjectID, ProfileID: request.ProfileID, RequestDigest: digest, TargetVersion: request.NewVersion,
 		Revision: 1, State: "queued", Phase: "accepted", ServingAdoption: "not_observed", Gates: map[string]string{"source": "not_run", "identity": "not_run", "graph": "not_run", "vector": "not_run", "knowledge": "not_configured", "semantic": "not_configured"}}}
 	for _, gate := range prepared.view.RequiredGates {
 		j.status.Gates[gate] = "not_run"
+	}
+	if s.durable {
+		store, err := s.ensureJournal(ctx, p, prepared, request)
+		if err != nil {
+			stop()
+			return JobStatus{}, err
+		}
+		record := journalRecord{SchemaVersion: 1, Request: request, Profile: prepared.view, ExpectedDatasetID: prepared.identity.DatasetID,
+			CreatedAt: created.Format(time.RFC3339Nano), DeadlineAt: deadline.Format(time.RFC3339Nano), Status: cloneStatus(j.status)}
+		if err := store.save(record); err != nil {
+			stop()
+			return JobStatus{}, err
+		}
+		j.journal, j.record = store, &record
 	}
 	s.jobs[j.status.JobID], s.keys[key(request)], s.busy[p.out] = j, j.status.JobID, true
 	s.wg.Add(1)
@@ -232,16 +299,18 @@ func (s *Service) Build(ctx context.Context, request BuildRequest) (JobStatus, e
 		defer stop()
 		s.execute(jobCtx, p, prepared, j)
 		s.mu.Lock()
-		delete(s.busy, p.out)
+		if snapshot(j).Terminal {
+			delete(s.busy, p.out)
+		}
 		s.mu.Unlock()
 	}()
-	return snapshot(j), nil
+	return statusResult(j)
 }
 
 func (j *job) phase(phase string) {
 	j.mu.Lock()
 	defer j.mu.Unlock()
-	if j.status.Terminal || j.status.Phase == phase {
+	if j.status.Terminal || j.persistenceFailed || j.status.Phase == phase {
 		return
 	}
 	j.status.Phase = phase
@@ -249,6 +318,7 @@ func (j *job) phase(phase string) {
 	if j.status.State != "cancel_requested" {
 		j.status.State = "running"
 	}
+	_ = j.persistLocked()
 }
 
 func (s *Service) execute(ctx context.Context, p registered, value prepared, j *job) {
@@ -274,7 +344,7 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 		}
 		j.status.BuildComplete = true
 		j.status.Revision++
-		return nil
+		return j.persistLocked()
 	}
 	gates := setup.GateOptions{GraphBin: value.options.GraphBin, Src: value.options.Src, ExpectedSourceCommit: value.source.SourceCommit,
 		ExpectedSourceSnapshot: value.source, ExpectedInputDigest: r.InputDigest, ExpectedDatasetID: value.identity.DatasetID, ExternalOrigins: value.options.ExternalOrigins,
@@ -316,7 +386,7 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 		j.status.Publication = &Publication{Base: r.Base, Version: r.NewVersion, Coordinates: j.status.Candidate.Coordinates, PublishedAt: publishedAt, ReceiptDigest: receipt}
 		j.status.State, j.status.Phase, j.status.Terminal, j.status.Activated = "succeeded", "finished", true, true
 		j.status.Revision++
-		return previous, nil
+		return previous, j.persistLocked()
 	}
 	err := setup.Reindex(ctx, value.options, r.NewVersion, gates, setup.SubprocessRunner{}, func(event setup.Event) {
 		if event.Type != "start" && event.Type != "done" {
@@ -339,7 +409,16 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 	}
 	j.mu.Lock()
 	defer j.mu.Unlock()
-	if j.status.Terminal {
+	if j.status.Terminal || j.persistenceFailed {
+		return
+	}
+	if errors.Is(err, setup.ErrDurabilityUncertain) {
+		// current may already have changed. Publication reconciliation must
+		// settle this before reporting failure/cancellation or admitting a
+		// replacement writer. C–E will provide the durable proof/recovery.
+		j.status.State, j.status.Phase = "recovering", "reconcile"
+		j.status.Revision++
+		_ = j.persistLocked()
 		return
 	}
 	if err == nil {
@@ -353,6 +432,9 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 		if errors.As(err, &safe) {
 			code = safe.Code
 		}
+		if errors.Is(err, setup.ErrDatasetWriterBusy) {
+			code = "writer_busy"
+		}
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			code = "deadline_exceeded"
 		}
@@ -362,10 +444,11 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 		default:
 			j.status.State = "failed"
 		}
-		j.status.Error = &Error{Code: code, Phase: j.status.Phase}
+		j.status.Error = &Error{Code: code, Retryable: code == "writer_busy", Phase: j.status.Phase}
 	}
 	j.status.Phase, j.status.Terminal = "finished", true
 	j.status.Revision++
+	_ = j.persistLocked()
 }
 
 func (s *Service) Close() {
@@ -374,4 +457,7 @@ func (s *Service) Close() {
 	s.cancel()
 	s.mu.Unlock()
 	s.wg.Wait()
+	for _, store := range s.journals {
+		store.close()
+	}
 }
