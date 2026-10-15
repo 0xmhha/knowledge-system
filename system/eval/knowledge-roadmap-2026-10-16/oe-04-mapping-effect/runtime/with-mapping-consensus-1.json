@@ -1,0 +1,671 @@
+{
+  "schema_version": 1,
+  "state": "partial",
+  "profile_digest": "89995bc406ad956995dfc94ae39b992311df00ba64ca3a56ea4003d07040a157",
+  "catalog_digest": "51d1f9081989af8872309faa01ddfce0a3e87c254f12c1f3358347d8710c1883",
+  "collection_id": "real-chains",
+  "mode": "comparison",
+  "concept": {
+    "key": {
+      "pack_id": "industry.blockchain",
+      "version": "1.0.0",
+      "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+      "concept_id": "consensus"
+    },
+    "definition": "The protocol by which participants agree on a shared ledger history under stated assumptions.",
+    "view": {
+      "id": "consensus",
+      "aliases": [
+        "consensus",
+        "합의",
+        "합의 알고리즘",
+        "검증"
+      ],
+      "includes": [
+        "agreement participants, quorum and fault assumptions"
+      ],
+      "excludes": [
+        "L2 sequencer ordering alone is not L1 consensus"
+      ],
+      "applicable_roles": [
+        "l1",
+        "rollup-consensus"
+      ],
+      "facets": [
+        {
+          "id": "participants",
+          "question": "Who participates and how are participants selected?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "quorum",
+          "question": "What quorum or voting condition decides a block?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "fault-assumptions",
+          "question": "Which fault and network assumptions are explicitly stated?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        }
+      ]
+    }
+  },
+  "facets": [
+    "participants",
+    "quorum",
+    "fault-assumptions"
+  ],
+  "as_of": "2026-10-15T19:49:01Z",
+  "question": "고정 원문으로 consensus 근거와 모르는 부분을 프로젝트별로 비교한다.",
+  "groups": [
+    {
+      "participant": {
+        "scope_id": "9c9b8751646eb1eda07ddf2b25086e65cfe1351360e56b7f7da2a17b11a7eb3c",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-stablenet",
+            "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+            "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "wbft-source-excerpts-no-live-network",
+            "component_role": "l1",
+            "observed_at": "2026-10-15T19:48:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "consensus"
+          },
+          "facet": "participants",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "consensus",
+                "binding_digest": "62c6058518e0d6842ce6f0c835f50498e596baf7b227a9dfdbedfd69bb5e0d5c",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "consensus"
+                },
+                "coordinates": {
+                  "project_id": "comparison-go-stablenet",
+                  "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                  "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                },
+                "conditions": {
+                  "network": "not-selected-source-study",
+                  "configuration": "wbft-source-excerpts-no-live-network",
+                  "component_role": "l1",
+                  "observed_at": "2026-10-15T19:48:59+00:00"
+                },
+                "local_concept": "go-stablenet consensus source excerpts",
+                "mapping": "close",
+                "reason": "Proposed mapping of pinned go-stablenet consensus source excerpts for an unexecuted study; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "source-1",
+                      "kind": "code",
+                      "facets": [
+                        "participants"
+                      ],
+                      "citation": {
+                        "file": "consensus/wbft/validator/default.go",
+                        "start_line": 97,
+                        "end_line": 111,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "comparison-go-stablenet",
+                        "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                        "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+                        "content_sha256": "c134e5e4f52004dd74ad53848cdc869aa8f13b8a14ff78a5a9149ba92dc9fd5c"
+                      }
+                    },
+                    "body": "func (valSet *defaultSet) List() []wbft.Validator {\n\tvalSet.validatorMu.RLock()\n\tdefer valSet.validatorMu.RUnlock()\n\treturn valSet.validators\n}\n\nfunc (valSet *defaultSet) AddressList() []common.Address {\n\tvalSet.validatorMu.RLock()\n\tdefer valSet.validatorMu.RUnlock()\n\tresult := make([]common.Address, len(valSet.validators))\n\tfor i, v := range valSet.validators {\n\t\tresult[i] = v.Address()\n\t}\n\treturn result\n}\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "consensus"
+          },
+          "facet": "quorum",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "consensus",
+                "binding_digest": "62c6058518e0d6842ce6f0c835f50498e596baf7b227a9dfdbedfd69bb5e0d5c",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "consensus"
+                },
+                "coordinates": {
+                  "project_id": "comparison-go-stablenet",
+                  "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                  "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                },
+                "conditions": {
+                  "network": "not-selected-source-study",
+                  "configuration": "wbft-source-excerpts-no-live-network",
+                  "component_role": "l1",
+                  "observed_at": "2026-10-15T19:48:59+00:00"
+                },
+                "local_concept": "go-stablenet consensus source excerpts",
+                "mapping": "close",
+                "reason": "Proposed mapping of pinned go-stablenet consensus source excerpts for an unexecuted study; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "source-2",
+                      "kind": "code",
+                      "facets": [
+                        "quorum"
+                      ],
+                      "citation": {
+                        "file": "consensus/wbft/validator/default.go",
+                        "start_line": 222,
+                        "end_line": 229,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "comparison-go-stablenet",
+                        "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                        "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+                        "content_sha256": "a5a5a9c482370ef8b0e33066b884c984bbf059b55ac4ae3b440263fdd7703430"
+                      }
+                    },
+                    "body": "func (valSet *defaultSet) F() float64 { return float64(valSet.Size()-1) / 3 }\n\nfunc (valSet *defaultSet) Policy() wbft.ProposerPolicy { return *valSet.policy }\n\nfunc (valSet *defaultSet) QuorumSize() int {\n\t//c.currentLogger(true, nil).Trace(\"WBFT: confirmation Formula used ceil(2N/3)\")\n\treturn int(math.Ceil(float64(valSet.Size()) - valSet.F()))\n}\n"
+                  },
+                  {
+                    "reference": {
+                      "id": "source-3",
+                      "kind": "code",
+                      "facets": [
+                        "quorum"
+                      ],
+                      "citation": {
+                        "file": "consensus/wbft/core/commit.go",
+                        "start_line": 90,
+                        "end_line": 131,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "comparison-go-stablenet",
+                        "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                        "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "70203895ba56ed36ce1a0e70e6addb3d1a1965c87a056acedad078cdc00be114",
+                        "content_sha256": "f6d43002b5c5798f295e3273ab3139e76e6ed4ac535f290bd4ad8bd3cfa205c0"
+                      }
+                    },
+                    "body": "func (c *Core) handleCommitMsg(commit *wbfmessage.Commit) error {\n\tlogger := c.currentLogger(true, commit)\n\n\tlogger.Debug(\"WBFT: handle COMMIT message\", \"commits.count\", c.current.WBFTCommits.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Check digest\n\tif commit.Digest != c.current.Proposal().Hash() {\n\t\tlogger.Warn(\"WBFT: invalid COMMIT message digest\", \"digest\", commit.Digest, \"proposal\", c.current.Proposal().Hash().String())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Check commitSeal\n\tblock, ok := c.current.Proposal().(*types.Block)\n\tif !ok {\n\t\tlogger.Warn(\"WBFT: failed to cast proposal from COMMIT message to *types.Block\")\n\t\treturn errInvalidMessage\n\t}\n\n\tif verifySeal(c.valSet, block.Header(), uint32(commit.CommonPayload.Round.Uint64()), SealTypeCommit,\n\t\tcommit.CommitSeal, commit.Source()) != nil {\n\t\tlogger.Warn(\"WBFT: failed to verify seal from COMMIT message\", \"number\", block.Header().Number, \"from\", commit.Source())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Add to received msgs\n\tif err := c.current.WBFTCommits.Add(commit); err != nil {\n\t\tc.logger.Error(\"WBFT: failed to save COMMIT message\", \"err\", err)\n\t\treturn err\n\t}\n\n\tlogger = logger.New(\"commits.count\", c.current.WBFTCommits.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// If we reached threshold\n\tif c.current.WBFTCommits.Size() >= c.valSet.QuorumSize() {\n\t\tlogger.Info(\"WBFT: received quorum of COMMIT messages\")\n\t\tc.commitWBFT()\n\t} else {\n\t\tlogger.Trace(\"WBFT: accepted new COMMIT messages\")\n\t}\n\n\treturn nil\n}\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "consensus"
+          },
+          "facet": "fault-assumptions",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    },
+    {
+      "participant": {
+        "scope_id": "26573c59af384727efb3d96bcd44940b322df9862147ff2484444e58b3c21f68",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-wemix",
+            "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+            "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+            "source_mode": "working-tree",
+            "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "clique-source-excerpts-no-live-network",
+            "component_role": "l1",
+            "observed_at": "2026-10-15T19:48:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "consensus"
+          },
+          "facet": "participants",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "consensus",
+                "binding_digest": "a4daa91522303a5d28b8eb1e83cd711184f7d1e4fee19327541b6d0b6c06ff29",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "consensus"
+                },
+                "coordinates": {
+                  "project_id": "comparison-go-wemix",
+                  "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+                  "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+                  "source_mode": "working-tree",
+                  "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+                },
+                "conditions": {
+                  "network": "not-selected-source-study",
+                  "configuration": "clique-source-excerpts-no-live-network",
+                  "component_role": "l1",
+                  "observed_at": "2026-10-15T19:48:59+00:00"
+                },
+                "local_concept": "go-wemix consensus source excerpts",
+                "mapping": "close",
+                "reason": "Proposed mapping of pinned go-wemix consensus source excerpts for an unexecuted study; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "source-1",
+                      "kind": "code",
+                      "facets": [
+                        "participants"
+                      ],
+                      "citation": {
+                        "file": "consensus/clique/clique.go",
+                        "start_line": 462,
+                        "end_line": 495,
+                        "commit_hash": "",
+                        "project_id": "comparison-go-wemix",
+                        "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+                        "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+                        "source_mode": "working-tree",
+                        "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc",
+                        "origin_id": "repo",
+                        "file_sha256": "b8e0de7435ba60a6a879469d8daa3257bdfc19c6172c9141f282a565bc935f1f",
+                        "content_sha256": "07ac18a0199442048ee61869115359ea58ad405d7f77c46f7711194656a8eb52"
+                      }
+                    },
+                    "body": "func (c *Clique) verifySeal(snap *Snapshot, header *types.Header, parents []*types.Header) error {\n\t// Verifying the genesis block is not supported\n\tnumber := header.Number.Uint64()\n\tif number == 0 {\n\t\treturn errUnknownBlock\n\t}\n\t// Resolve the authorization key and check against signers\n\tsigner, err := ecrecover(header, c.signatures)\n\tif err != nil {\n\t\treturn err\n\t}\n\tif _, ok := snap.Signers[signer]; !ok {\n\t\treturn errUnauthorizedSigner\n\t}\n\tfor seen, recent := range snap.Recents {\n\t\tif recent == signer {\n\t\t\t// Signer is among recents, only fail if the current block doesn't shift it out\n\t\t\tif limit := uint64(len(snap.Signers)/2 + 1); seen > number-limit {\n\t\t\t\treturn errRecentlySigned\n\t\t\t}\n\t\t}\n\t}\n\t// Ensure that the difficulty corresponds to the turn-ness of the signer\n\tif !c.fakeDiff {\n\t\tinturn := snap.inturn(header.Number.Uint64(), signer)\n\t\tif inturn && header.Difficulty.Cmp(diffInTurn) != 0 {\n\t\t\treturn errWrongDifficulty\n\t\t}\n\t\tif !inturn && header.Difficulty.Cmp(diffNoTurn) != 0 {\n\t\t\treturn errWrongDifficulty\n\t\t}\n\t}\n\treturn nil\n}\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "consensus"
+          },
+          "facet": "quorum",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "consensus"
+          },
+          "facet": "fault-assumptions",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "different_evidence_or_conditions_candidate",
+      "facet": "participants",
+      "participants": [
+        "9c9b8751646eb1eda07ddf2b25086e65cfe1351360e56b7f7da2a17b11a7eb3c",
+        "26573c59af384727efb3d96bcd44940b322df9862147ff2484444e58b3c21f68"
+      ],
+      "binding_digests": [
+        "62c6058518e0d6842ce6f0c835f50498e596baf7b227a9dfdbedfd69bb5e0d5c",
+        "a4daa91522303a5d28b8eb1e83cd711184f7d1e4fee19327541b6d0b6c06ff29"
+      ],
+      "evidence": [
+        {
+          "scope_id": "9c9b8751646eb1eda07ddf2b25086e65cfe1351360e56b7f7da2a17b11a7eb3c",
+          "binding_digest": "62c6058518e0d6842ce6f0c835f50498e596baf7b227a9dfdbedfd69bb5e0d5c",
+          "citations": [
+            {
+              "file": "consensus/wbft/validator/default.go",
+              "start_line": 97,
+              "end_line": 111,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+              "content_sha256": "c134e5e4f52004dd74ad53848cdc869aa8f13b8a14ff78a5a9149ba92dc9fd5c"
+            }
+          ]
+        },
+        {
+          "scope_id": "26573c59af384727efb3d96bcd44940b322df9862147ff2484444e58b3c21f68",
+          "binding_digest": "a4daa91522303a5d28b8eb1e83cd711184f7d1e4fee19327541b6d0b6c06ff29",
+          "citations": [
+            {
+              "file": "consensus/clique/clique.go",
+              "start_line": 462,
+              "end_line": 495,
+              "commit_hash": "",
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc",
+              "origin_id": "repo",
+              "file_sha256": "b8e0de7435ba60a6a879469d8daa3257bdfc19c6172c9141f282a565bc935f1f",
+              "content_sha256": "07ac18a0199442048ee61869115359ea58ad405d7f77c46f7711194656a8eb52"
+            }
+          ]
+        }
+      ],
+      "reasons": [
+        "Proposed mapping of pinned go-stablenet consensus source excerpts for an unexecuted study; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+        "Proposed mapping of pinned go-wemix consensus source excerpts for an unexecuted study; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown."
+      ]
+    }
+  ],
+  "used_body_bytes": 3283,
+  "used_citations": 6,
+  "completeness_scope": "requested_project_facet_rows_only_not_all_project_evidence",
+  "final_assessment": "LLM_or_user_evaluates_tradeoffs_from_cited_evidence",
+  "omitted_candidates": 0,
+  "candidate_state": "complete"
+}

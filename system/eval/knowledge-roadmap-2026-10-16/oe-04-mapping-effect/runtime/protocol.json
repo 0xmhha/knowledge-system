@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "stage": "registered_before_calls",
+  "baseline": "same concept scheme/source/catalog/scopes without project binding input",
+  "treatment": "same source with frozen7 proposed project mappings; include_proposed true in both arms",
+  "concepts": [
+    "staking",
+    "staking-policy",
+    "consensus",
+    "finality",
+    "mempool-admission",
+    "transaction-ordering"
+  ],
+  "project_count": 2,
+  "unique_project_facet_cells_per_arm": 40,
+  "repetitions": 2,
+  "planned_matrix_calls": 24,
+  "embedding": "mock datasets; source-only lookup, no new embedding calls",
+  "independent_quality_gold": false,
+  "human_mapping_approval": false,
+  "default_mode_changed": false,
+  "expected_source_sets": "input-curated mapping coverage only; observed binding absence is not feature absence",
+  "limitations": [
+    "hand-curated source mappings add prior annotation; not causal benefit of ontology vocabulary alone",
+    "same requested scopes/typed identity protection in both arms; zero project error cannot be attributed solely to mappings",
+    "in-sample source/function associations, not independent holdout or general semantic/answer quality",
+    "no natural-language concept selector or real LLM analyst is evaluated",
+    "same40cells repeated twice remain40unique units, not80 independent facts"
+  ],
+  "profile_without_binding_sha256": "d28fd996f693967ba6ca7f659104f1d7814395e531863b4b65d76aa97367e8a2",
+  "profile_with_binding_sha256": "86a9afe343a633a213d7e900863ce794a1b9eea60c38227181fdd46dfaab3134",
+  "frozen_binding_sha256": "cd0751a7b8c6c66773133d38433ffd8c6c7f2aecc758b9517596ed98aac20292",
+  "queries_sha256": "d64cae59b1617c13fb36f298bcb48b6924bc9f72dba709bfe55299c4ef99a0b4",
+  "registered_at": "2026-10-15T21:00:14+00:00"
+}

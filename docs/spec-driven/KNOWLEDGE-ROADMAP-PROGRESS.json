@@ -2,9 +2,9 @@
   "schema_version": 1,
   "document_date": "2026-10-16",
   "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
-  "scope_status": "user_requested_features_with_implementation_in_progress",
+  "scope_status": "user_requested_local_implementation_and_bounded_effect_studies_complete_independent_acceptance_separate",
   "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
-  "implementation_completed": 6,
+  "implementation_completed": 7,
   "total_work_items": 7,
   "total_subtasks": 28,
   "implementation_or_runtime_changed_by_this_documentation": false,
@@ -398,8 +398,8 @@
       "priority": "P0",
       "scope": "ontology_effect_evaluation",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "in_progress",
-      "design_status": "expanded_function_retrieval_effect_described_keep_off_multiproject_next",
+      "status": "complete",
+      "design_status": "bounded_source_retrieval_and_explicit_mapping_effect_evaluated_quality_inconclusive",
       "depends_on": [],
       "evidence": [
         "docs/spec-driven/operational-preparation/ontology-effect-dev/manifest.json",
@@ -407,9 +407,10 @@
         "docs/spec-driven/ONTOLOGY-EFFECT-DEV-OBSERVATION.md",
         "system/eval/knowledge-roadmap-2026-10-16/oe-01-protocol/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-16/oe-02-capture/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-16/oe-03-score/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-16/oe-03-score/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/oe-04-mapping-effect/manifest.json"
       ],
-      "verification": "512_source_verified_family_macro5_recall54_44_to56_67_MRR0_4612_to0_4862_benefitEX08_only_foreign_intentEX16_mismatch_local_API_and_latency_measured_keep_off_quality_inconclusive",
+      "verification": "expanded512_function_tasks_plus_real2project_no_mapping_baseline_18checks_27tools_2EOF_source_recomputed_not_independent_quality",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -438,22 +439,24 @@
         },
         {
           "id": "OE-01.4",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         }
       ],
       "execution_stages": {
-        "single_project": "descriptive_observation_complete_extended_quality_validation_pending",
-        "multi_project": "not_started",
+        "single_project": "complete_bounded_function_retrieval_effect_default_off_quality_inconclusive",
+        "multi_project": "complete_explicit_annotation_input_40cells_8source_3candidates_not_vocabulary_alone",
         "multi_project_depends_on": [
           "KM-05",
           "KM-06"
         ]
       },
       "remaining_preparation": [
-        "independently reviewed complete relevant-evidence sets and English/ambiguity coverage",
-        "natural-language concept interpretation and verified implementation links",
-        "multi-project mapping/comparison after KM-05/KM-06"
+        "independent semantic/answer-quality gold and reviewer adoption remain a separate acceptance scope",
+        "reviewed implementation links and natural-language project intent remain unevaluated; no default activation"
       ],
       "local_observation": {
         "planned_calls": 384,
@@ -468,8 +471,9 @@
         "post_observation_exact_term_probe_calls": 8,
         "post_observation_probe_final_boosts": 0,
         "quality_verdict": "inconclusive",
-        "full_OE01_complete": false,
-        "manifest": "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json"
+        "full_OE01_complete": true,
+        "manifest": "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json",
+        "full_OE01_complete_scope": "bounded local studies only; old384call observation not retroactively expanded"
       }
     }
   ],
@@ -602,7 +606,7 @@
     "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
     "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
   },
-  "completed_subtasks": 27,
+  "completed_subtasks": 28,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
   "manager_host_validation": {
     "packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json",
@@ -624,5 +628,22 @@
     ],
     "real_model_calls": 0,
     "independent_acceptance": false
+  },
+  "mapping_effect_validation": {
+    "packet": "system/eval/knowledge-roadmap-2026-10-16/oe-04-mapping-effect/manifest.json",
+    "checks": 18,
+    "tool_calls": 27,
+    "unique_cells_per_arm": 40,
+    "source_cells_without_mapping": 0,
+    "source_cells_with_mapping": 8,
+    "declared_mapping_cells": 7,
+    "unknown_cells": 18,
+    "not_collected_cells": 15,
+    "two_sided_candidates": 3,
+    "EOF_exit_codes": [
+      0,
+      0
+    ],
+    "independent_quality_acceptance": false
   }
 }

@@ -1,7 +1,7 @@
 """Current roadmap regression entrypoint; retain the frozen foundation suite.
 
 Earlier tests selected KM-01 and KM-03.1, which are now complete.
-Keep all seven checks but choose an actually unfinished feature/task each time.
+Keep all seven checks, using a consistent synthetic pending task after closure.
 The original script and its source-bound evidence remain immutable.
 """
 import importlib.util
@@ -15,7 +15,36 @@ spec.loader.exec_module(foundation)
 
 
 class CurrentRoadmapTests(foundation.RoadmapTests):
+    def pending_fixture(self):
+        data = json.loads((self.root / 'docs/spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json').read_text())
+        pending = [s['id'] for i in data['items'] for s in i['subtasks'] if s['status'] != 'complete']
+        if pending:
+            return pending[0]
+        # Only the disposable test tree is changed. Prove the pending baseline
+        # is valid before testing an inconsistent promotion of any one view.
+        item = data['items'][-1]
+        task = item['subtasks'][-1]
+        task['status'] = 'not_started'
+        item['status'] = 'in_progress'
+        data['completed_subtasks'] -= 1
+        data['implementation_completed'] -= 1
+        (self.root / 'docs/spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json').write_text(json.dumps(data))
+        qid = task['id']
+        path = self.root / data['spec']
+        path.write_text(path.read_text().replace('- [x] ' + qid + ':', '- [ ] ' + qid + ':'))
+        path = self.root / data['test_matrix']
+        lines = path.read_text().replace('전체 완료는7/7', '전체 완료는6/7').splitlines()
+        for index, line in enumerate(lines):
+            parts = line.split('|')
+            if len(parts) >= 6 and parts[1].strip() == qid:
+                parts[3] = ' 미착수 '
+                lines[index] = '|'.join(parts)
+        path.write_text('\n'.join(lines) + '\n')
+        self.assertEqual(foundation.guard.check(self.folder, self.root), [])
+        return qid
+
     def test_partial_feature_cannot_be_marked_complete(self):
+        self.pending_fixture()
         def promote(data):
             unfinished = next(item for item in data['items'] if any(s['status'] != 'complete' for s in item['subtasks']))
             unfinished['status'] = 'complete'
@@ -24,8 +53,7 @@ class CurrentRoadmapTests(foundation.RoadmapTests):
 
 
     def unfinished_id(self):
-        data = json.loads((self.root / 'docs/spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json').read_text())
-        return next(s['id'] for item in data['items'] for s in item['subtasks'] if s['status'] != 'complete')
+        return self.pending_fixture()
 
     def test_unfinished_checkbox_cannot_be_ticked(self):
         qid = self.unfinished_id()
