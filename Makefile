@@ -26,6 +26,11 @@ manager-test: build-bins
 	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_collection.py
 	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_review.py
 	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_broker.py
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_update_contract.py
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_update_inputs.py
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_source_check.py
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_update_state.py
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_update_worker.py
 
 vet:
 	$(GO) vet ./...

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Owned project registration/diagnosis and CKS maintenance launcher.
+"""Owned project registration, scoped readers and explicit managed updates.
 
-No database writes, source edits, model calls or global plugin installation.
+Registration/diagnosis do not build. The configured foreground worker forwards
+versioned native jobs; it never edits source or installs a global scheduler.
 """
 import argparse
 import hashlib
@@ -302,6 +303,12 @@ def main():
         command=commands.add_parser(operation)
         command.add_argument('--registration',required=True)
         if operation=='configure-updates':command.add_argument('--policy-file',required=True)
+    update_run=commands.add_parser('run-updates')
+    update_run.add_argument('--registration',required=True)
+    update_run.add_argument('--trigger',choices=('manual','periodic','change'),default='manual')
+    update_run.add_argument('--max-iterations',type=int,default=1)
+    update_run.add_argument('--max-seconds',type=int,default=3600)
+    update_run.add_argument('--poll-seconds',type=float,default=1)
     args = parser.parse_args()
     try:
         if args.operation=='register':
@@ -311,12 +318,15 @@ def main():
             # A native admission may own a durable journal before claiming the
             # dataset root. This fixed read-only probe checks only original
             # source/input freshness; native maintenance checks DB ownership.
-            r = load_registration(args.registration,check_dataset=args.operation!='verify-update-source')
+            r = load_registration(args.registration,check_dataset=args.operation not in ('verify-update-source','run-updates'))
             if args.operation=='serve':
                 from broker import serve
                 serve(args.registration)
                 return 0
-            if args.operation in ('configure-updates','update-status'):
+            if args.operation=='run-updates':
+                from update_worker import run
+                result=run(args.registration,args.trigger,args.max_iterations,args.max_seconds,args.poll_seconds)
+            elif args.operation in ('configure-updates','update-status'):
                 from update_state import Journal
                 with Journal(args.registration) as journal:
                     result=journal.configure(strict_read(Path(args.policy_file))) if args.operation=='configure-updates' else journal.describe()

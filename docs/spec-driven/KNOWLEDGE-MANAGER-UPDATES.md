@@ -152,3 +152,30 @@ python3 plugins/knowledge-manager/scripts/manager.py update-status \
 [상태 기반 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-state/manifest.json)을 따른다. Go1258개·빌드/의존/fixture byte를 A와 대조해 기존3862사례(3844통과18skip)·race836(834통과2skip)을 참조하고 새 Go 실행으로 세지 않는다. 직전 A는 동결 Git snapshot에서 증거 보호14개를 재검증했다.
 
 전체14/28·기능3/7을 유지한다. 다음은 B2 실제 worker·주기/change polling·exact replay와 reader 연결이고 C 실제 강제 종료/복구 및 KM-04.4 연속 주기 검증이 남는다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-04.3 B2 foreground worker
+
+KM-04.3 B2 foreground worker 연결 완료: 명시 enabled 정책의 manual/periodic/change polling을 bounded run-updates로 실행한다. immutable 관찰 입력과 원문 source_check를 native profile에 결속하고 intent fsync 후 실제 build/status/read를 연결했다. 미확정 접수는 같은 config/request/key로 replay하고 known job은 source 재수집 전에 조회한다. 명확한 접수 전 거부와 불확실한 transport/persistence를 구분하며 실패·취소·refusal은 같은 cycle/input의 새 version/key로 제한 재시도한다. 실제 current와 retained reader를 확인해야 게시/무변경 성공으로 판정한다. 기존18도구 reviewed MCP broker는 hold-only이며 별도 foreground worker와 하나의 writer lease를 공유한다.
+
+Python247개(기존224+worker23), 실제 worker14항목·native RPC 관찰97개·6job(게시4/의도한 실패1/응답 손실 후 같은 job 취소 복구1)·16연결 EOF0을 통과했다. v1 게시/조회→무변경→code8/원문 삭제 v2→보존 v1 조회→code9 엔진 실패/current 보존→due periodic retry2 복구 게시→code10 접수 응답 손실/정상 EOF→code11 변경 후 원래 job 먼저 복구→별도 code11 게시를 검증했다. periodic due retry는 실제 관찰이지만 지속 schedule/실제 worker host SIGKILL은 아직 미검증이다. Go 전체3862(3844통과18skip)와 관련6패키지 race836(834통과2skip)을 새로 실행했다. build/fmt/vet/lint·문서132개와 직전 B1 동결 증거16개를 확인했다. 표준 manager-test에 갱신5개 suite를 추가했으며 원격 CI 통과를 주장하지 않는다.
+
+```sh
+python3 plugins/knowledge-manager/scripts/manager.py run-updates \
+  --registration /workspace/manager/acme/registration.json \
+  --trigger periodic --max-iterations 10000 --max-seconds 3600
+```
+
+기본 trigger는 manual·max-iterations1·max-seconds3600이다. policy가 disabled이거나 해당 trigger를 허용하지 않으면 job을 접수하지 않는다. change는 파일 감시 daemon이 아닌 주기 polling이다. iteration은 완료/미도래 check 횟수이고 pending job의 status poll은 새 실행으로 세지 않는다. retry_at은 일반 interval보다 먼저 도래할 수 있으며 미래 시각/backward clock에서는 무리하게 당겨 실행하지 않는다. 입력 변경 시 실패 cycle을 새 입력으로 재표기하지 않고 별도 cycle을 생성한다.
+
+worker의 시간 상한은 bounded 수집/RPC 단계 사이에 확인하고 knowledge subprocess와 RPC timeout에도 전달한다. native의 job deadline은 별도로 적용한다. EOF로 native를 닫을 때는 기존20초+terminate10초+kill10초의 child 종료 grace를 기다린다. SIGINT/TERM은 foreground loop를 해제하고 정상 EOF/cancellation 정리를 시도한다. job이 pending이면 manager state는 stopped와 원래 intent를 남기며 실제 canceled 여부는 다음 실행의 native status/replay로 확인한다. 이 설계 연결을 실제 host SIGKILL/잔여 child와 종합 검증하는 단계는 C다.
+
+소유 root가 아직 기록되기 전 native lock을 남긴 매우 이른 접수 중단은, 기존 소유 상태에 한 번도 job을 관측하지 않은 intent가 있고 dataset에는 regular/single-link .reindex.lock 하나만 있는 경우에만 recovery 경로로 읽는다. Python이 DB owner를 쓰거나 unknown nonempty root를 채택하지 않는다. 원래 config/입력/등록/binary 검증과 native lock·admission을 다시 통과해야 root owner가 기록된다. 기본 등록/doctor/prepare-update/상태 CLI의 소유 검사는 유지한다. 이 좁은 상태는 주입 시험이며 실제 해당 시점의 host kill 증거로 세지 않는다.
+
+명확한 source/input/profile/embedding/base stale·writer_busy 등의 접수 전 typed 거부만 refused로 종결한다. reconcile_required/operation_failed와 통신 불확실성은 pending을 유지하고 새 key 접수를 막는다. 원래 source가 나중에 바뀌어도 native의 이전 job 조회/exact replay를 먼저 수행한다. 게시 성공은 실제 current pointer가 후보를 선택한 상태에서 실제 reader의 좌표를 확인해야 한다. held를 published로 바꾸거나 metadata backend를 reader로 사용하지 않는다.
+
+초기 worker20개 중2개는 기본 integrity probe의 일반 질문에서 특정 Value 원문을 기대해 실패했다. 기본 probe와 명시적인 Value 원문 조회를 분리하고 실제 body/citation을 재검증했다. 초기 실패 로그를 보존하며 원문 내용 검증을 제거하거나 구축 metadata만으로 통과시키지 않았다. 최종23개는 이 경계에 refusal 상한·CLI 보고·수집 전 budget을 더한 결과다.
+
+[실제 foreground packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-worker/manifest.json)을 따른다. native RPC 관찰은 실제 Native.request 반환을 기록한 것이며 raw stdio 전송을 별도로 녹화했다는 주장은 하지 않는다. mock embedding 결과는 품질/온톨로지 효과나 독립 수용이 아니다.
+
+전체14/28·기능3/7은 유지한다. 다음은 C 실제 foreground worker host 중단/SIGKILL·재시작·기한/잔여 child·MCP host와의 운영 연결이다. 그 다음 KM-04.4의 실제 지속 periodic/change와 두 번 변경·삭제/no-op·실패 복구·다른 프로젝트 불변을 종합 검증한다. 남은14개는 KM-04.3–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

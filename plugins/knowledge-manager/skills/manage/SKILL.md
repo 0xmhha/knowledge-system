@@ -96,3 +96,14 @@ independent quality acceptance. Do not invent scheduling commands or results.
 Git change evidence uses a separate `change` origin. Its selected existing-file,
 HEAD-to-working-tree scope and explicit limits do not prove complete deletion
 tracking or design rationale. Honor recorded partial/omitted coverage.
+
+For machine-observed continuous updates, use the separate explicit CLI workflow
+from the README: `update-policy-template`, `configure-updates`, `update-status`,
+then bounded `run-updates`. These commands do not turn source observations into
+human review. Do not invent an update MCP alias or an installed scheduler. The
+reviewed MCP host must release the shared writer lease before the separate
+foreground worker starts. Default policy is disabled/hold; choose enabled
+triggers and `activate_after_gate` only within the user's intended DB scope.
+On interruption preserve pending state and rerun the same registration so the
+worker can reconcile the original intent before collecting a new source.
+Report actual job/read/current results and pending or retry state separately.

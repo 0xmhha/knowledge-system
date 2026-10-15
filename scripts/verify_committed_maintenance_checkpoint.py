@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'manager-update-state': {
+        'revision': 'd00224a5', 'folder': 'km-04-state',
+        'scope': 'historical_KM04_3_B1_durable_ledger_not_native_worker',
+        'scripts': ['check-manager-update-state-evidence.py', 'test_manager_update_state_evidence.py'],
+    },
     'manager-source-check': {
         'revision': '8bfe40e8', 'folder': 'km-04-source-check',
         'scope': 'historical_KM04_3_A_native_original_source_boundary_not_worker',

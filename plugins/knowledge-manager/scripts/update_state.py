@@ -8,11 +8,13 @@ from pathlib import Path
 import re
 import uuid
 
-from manager import canonical, digest, file_hash, load_registration, require, strict_read, sync_dir, write_new
+from manager import Failure, canonical, digest, file_hash, load_registration, require, strict_read, sync_dir, write_new
 from collection import domain_hash, owned_directory, writer
 from update_contract import clock, completed, due, retry_delay, validate
 from update_inputs import load_input, may_skip, pin_policy
 
+PRE_ADMISSION_REFUSALS = frozenset(('source_stale','input_stale','profile_stale','embedding_stale','base_stale',
+    'version_exists','writer_busy','unsupported_capability','project_mismatch','profile_unknown','invalid_request'))
 LIMIT = 128
 STATE_LIMIT = 4*1024*1024
 DOMAIN = 'cks.manager-update-state.v1'
@@ -47,7 +49,7 @@ def validate_state(state,r):
     ids,keys,versions=set(),set(),set()
     previous={}
     for row in state['attempts']:
-        require(isinstance(row,dict) and set(row)=={'id','cycle_id','previous_attempt','attempt','input_id','policy','bundle',
+        require(isinstance(row,dict) and set(row)-{'admission_error'}=={'id','cycle_id','previous_attempt','attempt','input_id','policy','bundle',
                 'profile','request','request_digest','created_at','observed_at','job','outcome','read_receipt'},'update_state_invalid')
         require(isinstance(row['id'],str) and re.fullmatch('[0-9a-f]{32}',row['id']) and row['id'] not in ids
                 and isinstance(row['cycle_id'],str) and re.fullmatch('[0-9a-f]{32}',row['cycle_id'])
@@ -84,11 +86,17 @@ def validate_state(state,r):
             require(row['attempt']==1 and row['cycle_id']==row['id'],'update_state_invalid')
         else:
             require(prior in previous,'update_state_invalid');old=previous[prior]
-            require(old['outcome'] in ('failed','canceled') and old['input_id']==row['input_id'] and old['policy']==policy
+            require(old['outcome'] in ('failed','canceled','refused') and old['input_id']==row['input_id'] and old['policy']==policy
                     and old['cycle_id']==row['cycle_id'] and old['attempt']+1==row['attempt'],'update_state_invalid')
         if row['job'] is not None:validate_job(row,row['job'],r)
-        require(row['outcome'] in (None,'held','succeeded','failed','canceled'),'update_state_invalid')
-        if row['outcome'] is not None:
+        require(row['outcome'] in (None,'held','succeeded','failed','canceled','refused'),'update_state_invalid')
+        if row['outcome']=='refused':
+            require(row['job'] is None and isinstance(row.get('admission_error'),dict)
+                    and set(row['admission_error'])=={'at','code'} and row['admission_error']['code'] in PRE_ADMISSION_REFUSALS,'update_state_invalid')
+            clock(row['admission_error']['at'])
+        else:
+            require('admission_error' not in row,'update_state_invalid')
+        if row['outcome'] is not None and row['outcome']!='refused':
             require(row['job'] is not None and row['job']['terminal'] is True,'update_state_invalid')
             if row['outcome'] in ('held','succeeded'):
                 require(isinstance(row['read_receipt'],dict) and set(row['read_receipt'])=={'at','coordinates','pack_digest'}
@@ -129,9 +137,22 @@ def assert_worker_idle(r):
 
 
 class Journal:
-    def __init__(self,registration):
+    def __init__(self,registration,recover=False):
         self.registration=str(Path(registration).resolve())
-        self.r=load_registration(self.registration)
+        self.r=load_registration(self.registration,check_dataset=not recover)
+        self.recovery_lock_root=False
+        if recover:
+            try:load_registration(self.registration)
+            except (Failure,OSError,ValueError,KeyError,TypeError):
+                # Only a previously stored, never-observed admission may have
+                # left native's lone persistent mutation-lock inode. No data
+                # or unknown nonempty root is adopted, and Python never claims it.
+                path=Path(self.r['state_root'])/'updates/worker/state.json'
+                require(path.resolve()==path,'update_state_invalid')
+                prior=read_state(path,self.r)
+                require(prior['attempts'] and prior['last_success'] is None
+                        and all(row['job'] is None for row in prior['attempts']) and self.lone_native_lock(),'update_recovery_owner_required')
+                self.recovery_lock_root=True
         broker=owned_directory(Path(self.r['state_root'])/'broker',self.r)
         self.lease=writer(broker);self.lease.__enter__();self.closed=False;self.poisoned=False
         try:
@@ -142,9 +163,21 @@ class Journal:
         except BaseException:
             self.close();raise
 
+    def lone_native_lock(self):
+        root=Path(self.r['dataset_root']);path=root/'.reindex.lock'
+        return (root.is_dir() and root.resolve()==root and set(p.name for p in root.iterdir())=={'.reindex.lock'}
+                and path.is_file() and not path.is_symlink() and path.stat().st_nlink==1 and path.stat().st_size<4096)
+
+    def registration_ok(self):
+        try:return load_registration(self.registration)==self.r
+        except (Failure,OSError,ValueError,KeyError,TypeError):
+            if not self.recovery_lock_root:raise
+            require(self.recovery_lock_root and self.lone_native_lock(),'update_recovery_owner_required')
+            return load_registration(self.registration,check_dataset=False)==self.r
+
     def commit(self,next_state):
         require(not self.closed and not self.poisoned,'update_reconciliation_required')
-        require(load_registration(self.registration)==self.r,'registration_changed')
+        require(self.registration_ok(),'registration_changed')
         current=read_state(self.path,self.r) if self.path.exists() or self.path.is_symlink() else None
         require((domain_hash(DOMAIN,current) if current else None)==self.disk_checksum,'update_state_changed')
         value=copy.deepcopy(next_state);value['revision']=self.state['revision']+1;validate_state(value,self.r)
@@ -190,8 +223,9 @@ class Journal:
     def checking(self,trigger,at):
         require(self.state['pending'] is None,'pending_update_requires_reconciliation');self.broker_idle()
         policy=self.policy();decision=due(policy,trigger,at,self.state['last_checked'])
-        if self.state['retry_at'] is not None and at<self.state['retry_at']:
-            decision['due']=False;decision['retry_at']=self.state['retry_at']
+        if self.state['retry_at'] is not None:
+            decision['retry_at']=self.state['retry_at']
+            decision['due']=bool(policy['enabled'] and trigger in policy['triggers'] and at>=self.state['retry_at'])
         if decision['due']:
             next_state=copy.deepcopy(self.state);next_state.update(phase='checking',last_checked=at,last_error=None)
             self.commit(next_state)
@@ -215,11 +249,11 @@ class Journal:
         policy=self.policy();_,captured=load_input(self.r,input_id)
         require(captured['identity']['policy_digest']==self.state['policy']['digest'],'update_policy_changed')
         last=self.row(self.state['last_outcome']) if self.state['last_outcome'] else None
-        if last and last['outcome'] in ('failed','canceled') and last['input_id']==input_id and last['policy']==self.state['policy']:
+        if last and last['outcome'] in ('failed','canceled','refused') and last['input_id']==input_id and last['policy']==self.state['policy']:
             require(previous_attempt==last['id'],'update_retry_requires_prior_attempt')
         identifier=uuid.uuid4().hex;prior=self.row(previous_attempt) if previous_attempt is not None else None
         if prior is not None:
-            require(self.state['retry_at'] is not None and at>=self.state['retry_at'] and prior['outcome'] in ('failed','canceled')
+            require(self.state['retry_at'] is not None and at>=self.state['retry_at'] and prior['outcome'] in ('failed','canceled','refused')
                     and prior['id']==self.state['last_outcome'] and prior['policy']==self.state['policy'] and prior['input_id']==input_id
                     and prior['attempt']<policy['retry']['max_attempts'],'update_retry_invalid')
         request={'schema_version':1,'project_id':self.r['project_id'],'profile_id':self.r['profile_id'],
@@ -244,6 +278,17 @@ class Journal:
                     and (not before['terminal'] or before==job),'update_job_regressed')
         next_state=copy.deepcopy(self.state);record=next(r for r in next_state['attempts'] if r['id']==row['id'])
         record.update(job=copy.deepcopy(job),observed_at=at);next_state.update(phase='building')
+        return self.commit(next_state)
+
+    def refuse(self,code,at):
+        """A typed pre-admission refusal, never an ambiguous I/O outcome."""
+        clock(at);require(code in PRE_ADMISSION_REFUSALS,'update_admission_uncertain')
+        row=self.row();require(row['job'] is None,'update_known_job_requires_status')
+        policy=self.policy();delay=retry_delay(policy,row['attempt'])
+        next_state=copy.deepcopy(self.state);record=next(r for r in next_state['attempts'] if r['id']==row['id'])
+        record.update(outcome='refused',admission_error={'at':at,'code':code},observed_at=at)
+        next_state.update(pending=None,last_outcome=row['id'],phase='blocked' if delay is None else 'retry_wait',
+                          retry_at=None if delay is None else at+delay,last_error={'code':'retry_exhausted' if delay is None else code})
         return self.commit(next_state)
 
     def settle(self,at,current_coordinates=None,read_pack=None):

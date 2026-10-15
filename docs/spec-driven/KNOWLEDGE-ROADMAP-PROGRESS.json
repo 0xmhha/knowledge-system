@@ -216,7 +216,7 @@
       "scope": "continuous_updates",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "KM04_3_A_source_check_B1_durable_state_verified_B2_worker_C_recovery_pending",
+      "design_status": "KM04_3_A_B1_B2_foreground_worker_verified_C_actual_host_recovery_pending",
       "depends_on": [
         "KM-03"
       ],
@@ -225,9 +225,10 @@
         "system/eval/knowledge-roadmap-2026-10-15/km-04-contract/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-15/km-04-inputs/manifest.json",
         "system/eval/knowledge-roadmap-2026-10-15/km-04-source-check/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-15/km-04-state/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-state/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-worker/manifest.json"
       ],
-      "verification": "KM04_1_2_complete_KM04_3_A_native_verified_B1_state50_existing174_Go_A_immutable_reference_not_worker",
+      "verification": "KM04_1_2_complete_KM04_3_B2_native14_RPC97_jobs6_EOF16_python247_freshGo3862_race836_C_pending",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -264,10 +265,11 @@
       "execution_stages": {
         "policy_trigger_success_contract": "verified_27_cases",
         "automatic_observation_projection": "verified_32_cases_actual_manual_4DB_16_checks_11EOF0_82calls",
-        "durable_worker": "B1_state_intent_lease_retry_verified_B2_native_worker_C_recovery_pending",
+        "durable_worker": "B1_state_B2_actual_foreground_worker_verified_C_actual_host_kill_and_operation_pending",
         "actual_periodic_execution": "not_started",
         "native_original_source_publication_check": "actual14_3jobs_2publications_1stale_refusal_90calls_5EOF0_no_independent_acceptance",
-        "durable_state_foundation": "50_fault_contract_cases_with_one_actual_native_inspection_no_native_job_execution"
+        "durable_state_foundation": "50_fault_contract_cases_with_one_actual_native_inspection_no_native_job_execution",
+        "foreground_worker": "actual14_native_RPC97_jobs6_publications4_failure1_canceled_exact_replay1_EOF16_0"
       }
     },
     {

@@ -1,0 +1,41 @@
+test_actual_held_build_and_noop_use_real_reader_not_metadata (__main__.WorkerTests.test_actual_held_build_and_noop_use_real_reader_not_metadata) ... FAIL
+test_actual_lost_admission_response_replays_same_key_after_restart (__main__.WorkerTests.test_actual_lost_admission_response_replays_same_key_after_restart) ... ok
+test_actual_publication_observes_current_and_exact_candidate_read (__main__.WorkerTests.test_actual_publication_observes_current_and_exact_candidate_read) ... ok
+test_actual_source_change_rebuilds_without_semantic_review (__main__.WorkerTests.test_actual_source_change_rebuilds_without_semantic_review) ... FAIL
+test_ambiguous_native_persistence_refusal_preserves_pending_request (__main__.WorkerTests.test_ambiguous_native_persistence_refusal_preserves_pending_request) ... ok
+test_bounded_run_waits_for_one_actual_completed_cycle_and_stops (__main__.WorkerTests.test_bounded_run_waits_for_one_actual_completed_cycle_and_stops) ... ok
+test_canceled_actual_job_gets_distinct_bounded_retry_attempt (__main__.WorkerTests.test_canceled_actual_job_gets_distinct_bounded_retry_attempt) ... ok
+test_changed_bundle_bytes_refuse_exact_replay_before_native (__main__.WorkerTests.test_changed_bundle_bytes_refuse_exact_replay_before_native) ... ok
+test_changed_registration_or_binary_is_not_recovery_permission (__main__.WorkerTests.test_changed_registration_or_binary_is_not_recovery_permission) ... ok
+test_disabled_policy_never_opens_native_or_creates_DB (__main__.WorkerTests.test_disabled_policy_never_opens_native_or_creates_DB) ... ok
+test_intent_save_failure_prevents_native_build_forward (__main__.WorkerTests.test_intent_save_failure_prevents_native_build_forward) ... ok
+test_invalid_worker_budgets_do_not_open_registration (__main__.WorkerTests.test_invalid_worker_budgets_do_not_open_registration) ... ok
+test_known_pending_job_is_checked_before_changed_live_source (__main__.WorkerTests.test_known_pending_job_is_checked_before_changed_live_source) ... ok
+test_lone_lock_without_prior_intent_cannot_bypass_owner_check (__main__.WorkerTests.test_lone_lock_without_prior_intent_cannot_bypass_owner_check) ... ok
+test_partial_native_lock_recovery_is_only_for_prior_unobserved_intent (__main__.WorkerTests.test_partial_native_lock_recovery_is_only_for_prior_unobserved_intent) ... ok
+test_periodic_and_change_poll_not_due_do_not_open_native (__main__.WorkerTests.test_periodic_and_change_poll_not_due_do_not_open_native) ... ok
+test_retry_deadline_overrides_long_periodic_check_interval (__main__.WorkerTests.test_retry_deadline_overrides_long_periodic_check_interval) ... ok
+test_second_worker_or_reviewed_host_cannot_overlap (__main__.WorkerTests.test_second_worker_or_reviewed_host_cannot_overlap) ... ok
+test_source_drift_before_forward_is_typed_refusal_not_unknown_admission (__main__.WorkerTests.test_source_drift_before_forward_is_typed_refusal_not_unknown_admission) ... ok
+test_unknown_nonempty_root_is_not_adopted_by_recovery_mode (__main__.WorkerTests.test_unknown_nonempty_root_is_not_adopted_by_recovery_mode) ... ok
+
+======================================================================
+FAIL: test_actual_held_build_and_noop_use_real_reader_not_metadata (__main__.WorkerTests.test_actual_held_build_and_noop_use_real_reader_not_metadata)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_knowledge_manager_update_worker.py", line 53, in test_actual_held_build_and_noop_use_real_reader_not_metadata
+    self.assertTrue(any('return 7'in json.dumps(body) for body in self.w.last_read['bodies']))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_actual_source_change_rebuilds_without_semantic_review (__main__.WorkerTests.test_actual_source_change_rebuilds_without_semantic_review)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_knowledge_manager_update_worker.py", line 68, in test_actual_source_change_rebuilds_without_semantic_review
+    self.assertTrue(any('return 8'in json.dumps(b) for b in self.w.last_read['bodies']))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 20 tests in 49.876s
+
+FAILED (failures=2)

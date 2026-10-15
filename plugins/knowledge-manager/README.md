@@ -19,7 +19,7 @@ scripted API. This does not establish real-model or independent semantic quality
 | Adoption-bound DB reader broker | Implemented; actual CLI build/read, normal stop and killed-host recovery verified locally |
 | Observed update inputs and change/deletion/no-op pins | Implemented; raw observations remain semantically unreviewed |
 | Durable policy/intent state, one writer and bounded retry contract | Implemented state foundation; configure/status do not execute jobs |
-| Regular/change-triggered worker | Remaining KM-04.3–4 |
+| Bounded foreground periodic/change worker | Implemented; sustained polling and actual worker-host kill verification remain KM-04.3 C/04.4 |
 
 The package lives at `plugins/knowledge-manager` in the knowledge-system repo.
 It is loaded locally, without editing global Claude settings or installing into
@@ -68,8 +68,9 @@ Keep held candidates, publication and a validated actual read separate.
 Stop diagnosis on missing binaries, a changed registration/config/engine,
 foreign project owner, unsafe/overlapping paths, missing maintenance tools or
 unsupported source/model capability. Never repair it by calling legacy index
-mutations. No background hook, scheduler, automatic publication or global
-installation is enabled by this package.
+mutations. No background hook, OS scheduler or global installation is enabled by this
+package. Foreground updates require explicit policy and execution; the reviewed
+MCP broker does not authorize automatic publication.
 
 The layout and local loading follow the [official plugin reference](https://code.claude.com/docs/en/plugins-reference)
 and [plugin creation guide](https://code.claude.com/docs/en/plugins-create).
@@ -268,13 +269,13 @@ knowledge and ontology roots remain raw observed material with separate origins.
 See the [update contract](../../docs/spec-driven/KNOWLEDGE-MANAGER-UPDATES.md).
 
 
-## Durable update configuration (worker connection pending)
+## Durable update configuration
 
 `configure-updates --registration <absolute registration.json> --policy-file
 <absolute policy.json>` pins a validated update policy and stores owned state.
 `update-status --registration <absolute registration.json>` reads that state.
 Neither command starts a scheduler, inspects model readiness or builds a DB.
-An enabled policy is configuration only at this checkpoint. Keep the default
+An enabled policy is configuration only until explicit `run-updates`. Keep the default
 disabled/hold policy until choosing the intended trigger and publication scope.
 
 The state ledger shares the reviewed broker's one-writer lock. A live host,
@@ -282,5 +283,40 @@ uncertain automatic admission or unsettled reviewed job blocks a competing
 writer. Preserve pending requests for exact reconciliation; do not remove state
 or substitute a new idempotency key. The ledger preserves prior success after
 failures, separates held from published, bounds retry/history, and refuses more
-writes after uncertain persistence. Actual worker, replay and periodic/kill
-recovery are still pending; state fault tests do not establish those outcomes.
+writes after uncertain persistence. Actual foreground build/replay is connected separately below. Sustained
+periodic/host-kill recovery is still pending; state fault tests do not establish
+those outcomes.
+
+## Explicit foreground update execution
+
+After `configure-updates`, run a bounded foreground worker explicitly:
+
+```sh
+python3 plugins/knowledge-manager/scripts/manager.py run-updates \
+  --registration /workspace/manager/acme/registration.json \
+  --trigger periodic --max-iterations 10000 --max-seconds 3600
+```
+
+`manual`, `periodic` and `change` must be selected in the pinned enabled policy.
+Change detection uses bounded polling. The loop does not install an OS scheduler
+or keep running after the process ends. `max-iterations` counts completed or
+not-due checks, including no-ops, rather than native job-status polls. The time
+budget is checked between bounded collection/RPC steps, passed to knowledge
+commands and RPC waits; owned child shutdown has its separate bounded grace.
+Signals stop the foreground loop and wait for native EOF/cancellation. A pending
+intent is preserved as stopped for next-start reconciliation, not reported as a
+completed cancellation solely because EOF returned.
+
+The worker first resolves any pending request through its original immutable
+config and exact request/key. Known jobs are queried before a changed live source
+is collected. Typed pre-admission refusals have a bounded retry record;
+transport/persistence ambiguity preserves the pending obligation. Held builds,
+published candidates and an actual coordinate-checked read stay distinct. Only
+an explicit `activate_after_gate` policy allows native publication. The reviewed
+MCP broker remains hold-only and shares one writer lease with this worker; close
+that host before starting this separate foreground process.
+
+The default state commands still perform no DB work. `run-updates` is the
+explicit execution entry point. These worker CLI capabilities do not add update
+commands to the reviewed broker's 18-tool MCP surface. Sustained polling and
+actual worker-host SIGKILL recovery remain separate verification steps.

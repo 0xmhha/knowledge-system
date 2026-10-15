@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import time
 import uuid
 
 from manager import Failure, canonical, digest, file_hash, load_registration, require, strict_read, sync_dir, write_new
@@ -55,7 +56,15 @@ def source_check(r,policy_path,input_id):
             'pinned_files':{str(file):file_hash(file)for file in files},'timeout_seconds':60}
 
 
-def capture(policy,r,allow_missing_material=False):
+def budget(deadline):
+    if deadline is not None:
+        require(time.monotonic()<deadline,'update_worker_budget_reached')
+        return max(0.001,deadline-time.monotonic())
+    return 30
+
+
+def capture(policy,r,allow_missing_material=False,deadline=None):
+    budget(deadline)
     policy=validate(policy,r,allow_missing_material=allow_missing_material)
     settings=policy['collection']
     args=argparse.Namespace(**{k:settings[k]for k in ('exclude','context_file','max_files','max_file_bytes','max_total_bytes')},max_diff_files=0,max_diff_bytes=0)
@@ -64,6 +73,7 @@ def capture(policy,r,allow_missing_material=False):
     scopes=[{'origin_id':'repo','root':r['source_root'],'role':'repository','git':recipe['git'],'coverage':coverage}]
     checks=[(args,r,recipe)]
     for material in settings['materials']:
+        budget(deadline)
         origin='material:'+material['id']
         if not Path(material['root']).exists():
             require(allow_missing_material,'update_material_invalid')
@@ -80,6 +90,7 @@ def capture(policy,r,allow_missing_material=False):
     require(any(row['origin_id']=='repo'for row in records),'insufficient_source_for_update')
     # The first root must remain stable while later roots/material are read.
     for arg,registration,expected in checks:
+        budget(deadline)
         after,_,_=gather(arg,registration)
         require(after==expected,'source_changed')
     policy=validate(policy,r,allow_missing_material=allow_missing_material)
@@ -154,10 +165,11 @@ def load_input(r,input_id):
     return directory,captured
 
 
-def prepare(policy,r,previous_input=None,allow_missing_material=False):
-    require(load_registration(str(Path(r['state_root'])/'registration.json'))==r,'registration_changed')
+def prepare(policy,r,previous_input=None,allow_missing_material=False,check_dataset=True,deadline=None):
+    budget(deadline)
+    require(load_registration(str(Path(r['state_root'])/'registration.json'),check_dataset=check_dataset)==r,'registration_changed')
     before=load_input(r,previous_input)[1]if previous_input else None
-    captured,contents=capture(policy,r,allow_missing_material)
+    captured,contents=capture(policy,r,allow_missing_material,deadline)
     change=differences(before,captured)
     parent=owned_directory(Path(r['state_root'])/'updates',r)
     inputs=owned_directory(parent/'inputs',r)
@@ -171,13 +183,17 @@ def prepare(policy,r,previous_input=None,allow_missing_material=False):
             project=stage/'project';project.mkdir(mode=0o700)
             blobs=stage/'blobs';blobs.mkdir(mode=0o700)
             for origin,name,data in contents:
+                budget(deadline)
                 path=blobs/checksum(data)
                 if not path.exists():write_bytes(path,data)
                 if origin=='repo':write_bytes(project/name,data)
             commands=[]
             def native(operation,*extra):
                 argv=[r['binaries']['cks']['path'],'knowledge','--project-root',str(project),operation,*extra]
-                result=subprocess.run(argv,capture_output=True,timeout=30)
+                try:result=subprocess.run(argv,capture_output=True,timeout=min(30,budget(deadline)))
+                except subprocess.TimeoutExpired:
+                    budget(deadline)
+                    raise
                 commands.append({'operation':operation,'exit_code':result.returncode,'stdout':result.stdout.decode(),'stderr':result.stderr.decode()})
                 require(result.returncode==0,'native_update_input_invalid')
             native('init','--project-id',r['project_id'])
@@ -198,7 +214,7 @@ def prepare(policy,r,previous_input=None,allow_missing_material=False):
                 text='\n'.join(header)+'\n'+'\n'.join('    '+line for line in data.decode().splitlines())+'\n'
                 write_bytes(extra/(str(index)+'.md'),text.encode())
             native('validate');native('lock');native('validate')
-            require(capture(policy,r,allow_missing_material)[0]['input_id']==captured['input_id'],'source_changed')
+            require(capture(policy,r,allow_missing_material,deadline)[0]['input_id']==captured['input_id'],'source_changed')
             write_new(stage/'capture.json',captured)
             write_new(stage/'native-commands.json',commands)
             payload={'schema_version':1,'project_id':r['project_id'],'registration_token':r['token'],
@@ -208,7 +224,7 @@ def prepare(policy,r,previous_input=None,allow_missing_material=False):
             sync_dir(stage);stage.rename(final);sync_dir(inputs)
     load_input(r,captured['input_id'])
     # Replayed inputs are still checked against the current source before use.
-    require(capture(policy,r,allow_missing_material)[0]['input_id']==captured['input_id'],'source_changed')
+    require(capture(policy,r,allow_missing_material,deadline)[0]['input_id']==captured['input_id'],'source_changed')
     return {'schema_version':1,'stage':'observed_input_prepared_not_DB_built','project_id':r['project_id'],
             'input_id':captured['input_id'],'input_project':str(final/'project'),'material_corpus':str(final/'materials'),
             'material_documents':len(list((final/'materials').glob('*.md'))),'change':change,

@@ -46,8 +46,9 @@ def failure(code):
 
 
 class Native:
-    def __init__(self,r,config):
+    def __init__(self,r,config,request_timeout=120):
         self.id,self.closed = 0,False
+        self.request_timeout=request_timeout
         self.frames = queue.Queue(maxsize=4)
         self.child = subprocess.Popen([r['binaries']['cks']['path'],'mcp','--config',str(config)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
         def read():
@@ -82,7 +83,7 @@ class Native:
         try:
             self.child.stdin.write(canonical(request)+b'\n')
             self.child.stdin.flush()
-            deadline = time.monotonic()+120
+            deadline = time.monotonic()+self.request_timeout
             while True:
                 remaining = deadline-time.monotonic()
                 require(remaining>0,'native_timeout')
@@ -493,7 +494,7 @@ def serve(registration):
             method,params = request['method'],request.get('params',{})
             try:
                 if method=='initialize':
-                    value = {'protocolVersion':'2024-11-05','capabilities':{'tools':{}},'serverInfo':{'name':'knowledge-manager','version':'0.4.1'}}
+                    value = {'protocolVersion':'2024-11-05','capabilities':{'tools':{}},'serverInfo':{'name':'knowledge-manager','version':'0.5.0'}}
                 elif method=='ping':
                     value = {}
                 elif method=='tools/list':
