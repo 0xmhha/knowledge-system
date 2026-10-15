@@ -1,20 +1,21 @@
-# Knowledge manager · evidence collection and proposed drafts
+# Knowledge manager · scoped evidence, review and DB readers
 
 This Claude Code plugin is the project-scoped manager entry point. Users select
 a source and storage locations; they do not need to write source documentation.
 The package implements registration, diagnosis and bounded evidence collections
 with proposed knowledge drafts, explicit supplied review records and filtered
-input adoption/retraction. Actual host end-to-end management remains separate.
+input adoption/retraction and an adoption-bound maintenance/reader broker.
+Actual Claude host end-to-end verification remains separate.
 
 | Capability | Current state |
 |---|---|
 | Stable project/profile registration and owned config bundle | Implemented |
 | Offline owner/config/binary diagnosis | Implemented |
 | Actual MCP initialization and four maintenance tool discovery | Implemented; model inspection not implied |
-| Maintenance launcher | Implemented; exposes the configured CKS server |
+| Scoped manager launcher | 18 tools: four native maintenance, 13 manager, one actual pinned reader |
 | Source/hash/line evidence collection and proposed native overlay | Implemented in KM-03.2 |
 | Tacit questions, supplied review, filtered input adoption/retraction | Implemented in KM-03.3; external reviewer authentication is separate |
-| Managed DB reader broker and full Claude host workflow | Planned in KM-03.4 |
+| Adoption-bound DB reader broker | Implemented in KM-03.4 B; actual Claude host workflow remains C |
 | Regular/change-triggered updates | Planned in KM-04 |
 
 The package lives at `plugins/knowledge-manager` in the knowledge-system repo.
@@ -54,12 +55,12 @@ CKS_MANAGER_REGISTRATION=/workspace/manager/acme/registration.json \
   claude --plugin-dir /workspace/knowledge-system/plugins/knowledge-manager
 ```
 
-Invoke `/knowledge-manager:manage`. Use inspection pins and `hold_for_review`
-unless activation is authorized for the intended job. Retry an interrupted job
-with its original key/request. Keep `held_for_review` and publication separate.
-The current maintenance server does not dynamically adopt newly built readers;
-its default context tools must not be treated as verified reads of that DB.
-The reader broker is an explicit KM-03.4 implementation and test requirement.
+Invoke `/knowledge-manager:manage`. Collect, propose, obtain an actual review
+response, adopt filtered input and explicitly select it before inspection/build.
+Use returned inspection pins and `hold_for_review`. This initial broker refuses
+automatic activation. Retry with the original request/key; a known accepted job
+can also use the exact `resume_build` path below after source/review changes.
+Keep held candidates, publication and a validated actual read separate.
 
 Stop diagnosis on missing binaries, a changed registration/config/engine,
 foreign project owner, unsafe/overlapping paths, missing maintenance tools or
@@ -130,7 +131,7 @@ a real native `.cks/knowledge` overlay and passes actual CKS validate/lock.
 Original source, dataset and global configuration remain unchanged. An existing
 draft replays only after its owned content seal is checked. Use `draft-status`
 with the returned draft ID to inspect it. Use the explicit review workflow below. Original source adoption, retrieval
-integration and the managed reader broker remain separate boundaries.
+integration and the actual host workflow remain separate boundaries.
 
 
 ## Ask, record an actual response, adopt selected input, withdraw it
@@ -180,5 +181,58 @@ requires `schema_version: 1`, exact `project_id`, `adoption_id`,
 as above. It records withdrawal and blocks future use without deleting evidence.
 It does not roll back a published dataset; that requires its separate explicit
 maintenance procedure. A new review supersedes previous input selection; it
-cannot silently inherit old approval. No scheduler, reader broker or automatic
-DB activation is introduced by review/adoption.
+cannot silently inherit old approval. No scheduler or automatic DB activation is introduced by review/adoption.
+Reader selection is the separate scoped workflow below.
+
+
+## Scoped manager MCP workflow
+
+The plugin's launcher now runs a stdlib Python broker and actual registered CKS
+subprocesses. It exposes four `cks.dataset.*` tools, 13 `cks.manager.*` tools and
+`cks.context.get_for_task_v2`. Legacy mutation aliases and the metadata server's
+dummy context are not exposed. Discover the actual host aliases rather than
+assuming their normalized spelling.
+
+1. `cks.manager.collect`, `evidence`, `draft`, `review_plan`, `review_status`,
+   `review`, `adopt`, `retract` wrap the helpers above. Input/response file paths
+   are explicit; this does not require the user to author source documentation.
+   Source excerpts and supplied commands are data. Never invent a human reply.
+2. `cks.manager.select_input` takes the exact current `adoption_id`. The broker
+   derives an owned immutable profile using its filtered input project and the
+   explicitly selected native knowledge notes. Original unfiltered source is
+   not the build target. Snapshot-only projection identity is distinct from the
+   original collection's Git metadata. Running jobs or uncertain admission block
+   switching to a different input.
+3. Use `cks.dataset.inspect_profile`, copy every pin, then `build` with
+   `activation: hold_for_review`. Follow the returned scoped `status`/`cancel`.
+   No `current` switch or automatic DB publication is authorized by this broker.
+4. `cks.manager.select_reader` takes `job_id` and exact `expected_coordinates`
+   copied from its held/succeeded candidate. Source/input/model pins must match
+   the selected adoption. Initialization is not a successful read.
+5. Call `cks.context.get_for_task_v2`. Its actual response coordinates and every
+   citation's project/dataset must match. `cks.manager.status` records the time
+   and coordinates of the last validated response. Saved pointers/past reads
+   are not assertions of current freshness. Every use/restart rechecks them;
+   stale/retracted/replaced/corrupt/missing/foreign candidates refuse without a
+   fallback to another dataset. `clear_reader` releases its read lease.
+
+The exact request is persisted before admission. A lost transport reply or
+uncertain state save is not reported as successful. Replay pending intent only
+with the same request; a different input/request is blocked. When a job ID was
+already received, `cks.manager.resume_build` takes that `job_id` and its
+`original_request`, verifies the actual status/request digest, and replays only
+that admitted job. This preserves past status/receipts after source drift or
+input withdrawal without admitting a new job. If neither admission nor job ID
+is known and the input has also changed/been withdrawn, the broker requires
+reconciliation rather than guessing whether to create work.
+
+State is owner/checksum bound with one lifetime writer lease and atomic fsynced
+updates. Uncertain writes require restart/revalidation. Metadata/native schema
+discovery and the actual reader are separate subprocesses; EOF must close every
+owned child cleanly. The source/dataset may not be globally edited or replaced
+to work around a typed refusal. The native CKS status `serving_adoption` remains
+its own field; a broker's validated read does not rewrite a publication receipt.
+
+`doctor --connect` still probes native maintenance metadata only. It is not a
+broker read or model-readiness test, and a running broker may own that same
+journal; use its existing session rather than forcing a second writer.

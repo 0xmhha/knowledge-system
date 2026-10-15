@@ -21,6 +21,12 @@ fallback to another project, legacy mutation tools or direct database edits.
 Never invent human approval, reviewer identity, successful test results or
 ontology quality. Report the actual stage, verification results, next step and
 all remaining stages. Current package boundaries are authoritative: do not claim
-unimplemented reader/scheduler capabilities are available. Supplied review
+unimplemented scheduler or actual host/model verification is complete. Supplied review
 records must come from actual responses; controlled fixture responses are tests.
 Input adoption is a filtered, reviewed projection, not a dataset publication.
+
+Select filtered input explicitly before maintenance. Select an exact scoped job
+and expected candidate coordinates before actual context reads. Never route
+reads to metadata/dummy backends or fall back to current/another project. Past
+read records are as-of observations, not current freshness. Preserve pending
+admission and known-job exact replay semantics across interruption.

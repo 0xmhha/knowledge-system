@@ -1,0 +1,2323 @@
+[
+  {
+    "session": "manager-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "Value"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"reader_selection_required\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "reader_selection_required"
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"adoption_required\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "adoption_required"
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.collect",
+    "arguments": {
+      "exclude": [
+        "private/**"
+      ],
+      "context_file": "/private/tmp/ks-KM034B-broker-final-20261015/prepared/provided.json"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"stage\": \"collection_replayed\", \"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"collection_dir\": \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/manager-a/collections/dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"files\": 5, \"paid_model_calls\": 0}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "collection_dir": "/private/tmp/ks-KM034B-broker-final-20261015/prepared/manager-a/collections/dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+        "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+        "files": 5,
+        "paid_model_calls": 0,
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "schema_version": 1,
+        "stage": "collection_replayed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.evidence",
+    "arguments": {
+      "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+      "path": "value.go",
+      "start_line": 3,
+      "end_line": 3
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"evidence\": {\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"origin_id\": \"repo\", \"path\": \"value.go\", \"start_line\": 3, \"end_line\": 3, \"file_sha256\": \"8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658\", \"content_sha256\": \"366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca\", \"source_kind\": \"code\", \"collected_at\": \"2026-10-15T12:14:17.451384Z\", \"source_actor\": null, \"source_recorded_at\": null, \"content_role\": \"untrusted_source_data\", \"reported_not_reexecuted\": false, \"evidence_id\": \"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"}, \"text\": \"func Value() int { return 7 }\\n\", \"text_preview_sha256\": \"366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca\", \"text_truncated\": false}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "evidence": {
+          "collected_at": "2026-10-15T12:14:17.451384Z",
+          "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+          "content_role": "untrusted_source_data",
+          "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+          "end_line": 3,
+          "evidence_id": "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814",
+          "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+          "origin_id": "repo",
+          "path": "value.go",
+          "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+          "reported_not_reexecuted": false,
+          "source_actor": null,
+          "source_kind": "code",
+          "source_recorded_at": null,
+          "start_line": 3
+        },
+        "text": "func Value() int { return 7 }\n",
+        "text_preview_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+        "text_truncated": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.draft",
+    "arguments": {
+      "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+      "claims_file": "/private/tmp/ks-KM034B-broker-final-20261015/prepared/claims.json"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"stage\": \"draft_replayed\", \"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"draft_id\": \"4a7e51c3ab49b704ab8a86c1b61baa139d3066a8202f624b475a1b4a9393659e\", \"draft_dir\": \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/manager-a/drafts/4a7e51c3ab49b704ab8a86c1b61baa139d3066a8202f624b475a1b4a9393659e\", \"claims\": 7, \"paid_model_calls\": 0}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "claims": 7,
+        "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+        "draft_dir": "/private/tmp/ks-KM034B-broker-final-20261015/prepared/manager-a/drafts/4a7e51c3ab49b704ab8a86c1b61baa139d3066a8202f624b475a1b4a9393659e",
+        "draft_id": "4a7e51c3ab49b704ab8a86c1b61baa139d3066a8202f624b475a1b4a9393659e",
+        "paid_model_calls": 0,
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "schema_version": 1,
+        "stage": "draft_replayed"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.review_plan",
+    "arguments": {
+      "draft_id": "4a7e51c3ab49b704ab8a86c1b61baa139d3066a8202f624b475a1b4a9393659e"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"draft_id\": \"4a7e51c3ab49b704ab8a86c1b61baa139d3066a8202f624b475a1b4a9393659e\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"as_of\": \"immutable_collection_not_current_source_verification\", \"revision\": \"a6ee2dacfd40e3351f379e9625308a817e70206ad9718f9a0e730c799949e43a\", \"questions\": [{\"claim_id\": \"9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee\", \"kind\": \"fact\", \"question\": \"Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown.\", \"evidence_ids\": [\"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"], \"answer_status\": \"not_provided\"}, {\"claim_id\": \"b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632\", \"kind\": \"hypothesis\", \"question\": \"What observation supports or refutes this hypothesis? Keep it a hypothesis until reviewed.\", \"evidence_ids\": [\"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"], \"answer_status\": \"not_provided\"}, {\"claim_id\": \"1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef\", \"kind\": \"reported_decision\", \"question\": \"Does the reported decision apply to this project/version, and who actually provided its rationale?\", \"evidence_ids\": [\"6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c\"], \"answer_status\": \"not_provided\"}, {\"claim_id\": \"44938f74f8ad458223721bad6f45844e805a6132cfa8371258bc3e39d9518875\", \"kind\": \"troubleshooting\", \"question\": \"Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown.\", \"evidence_ids\": [\"737cc1fd420a3f0f443541e7aee7346f4318431b145f00d8c69964b4bdc5f985\"], \"answer_status\": \"not_provided\"}, {\"claim_id\": \"46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017\", \"kind\": \"reported_command_result\", \"question\": \"What environment/version produced this supplied result? It has not been executed by the manager.\", \"evidence_ids\": [\"30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0\"], \"answer_status\": \"not_provided\"}, {\"claim_id\": \"d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0\", \"kind\": \"question\", \"question\": \"Which constraints explain choosing 7?\", \"evidence_ids\": [\"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"], \"answer_status\": \"not_provided\"}, {\"claim_id\": \"4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568\", \"kind\": \"fact\", \"question\": \"Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown.\", \"evidence_ids\": [\"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"], \"answer_status\": \"not_provided\"}], \"possible_duplicates\": [{\"claim_ids\": [\"4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568\", \"9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee\"], \"classification\": \"possible_duplicate_not_automatically_merged\"}], \"shared_evidence_interpretations\": [{\"claim_ids\": [\"9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee\", \"b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632\"], \"classification\": \"shared_evidence_distinct_interpretations_not_proven_contradiction\"}, {\"claim_ids\": [\"9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee\", \"d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0\"], \"classification\": \"shared_evidence_distinct_interpretations_not_proven_contradiction\"}, {\"claim_ids\": [\"b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632\", \"d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0\"], \"classification\": \"shared_evidence_distinct_interpretations_not_proven_contradiction\"}, {\"claim_ids\": [\"4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568\", \"b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632\"], \"classification\": \"shared_evidence_distinct_interpretations_not_proven_contradiction\"}, {\"claim_ids\": [\"4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568\", \"d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0\"], \"classification\": \"shared_evidence_distinct_interpretations_not_proven_contradiction\"}], \"duplicate_claim_occurrences\": 0, \"claims\": [{\"claim_id\": \"9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee\", \"kind\": \"fact\", \"statement\": \"The recorded code returns 7.\", \"status\": \"proposed\", \"evidence\": [{\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"origin_id\": \"repo\", \"path\": \"value.go\", \"start_line\": 3, \"end_line\": 3, \"file_sha256\": \"8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658\", \"content_sha256\": \"366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca\", \"source_kind\": \"code\", \"collected_at\": \"2026-10-15T12:14:17.451384Z\", \"source_actor\": null, \"source_recorded_at\": null, \"content_role\": \"untrusted_source_data\", \"reported_not_reexecuted\": false, \"evidence_id\": \"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"}]}, {\"claim_id\": \"b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632\", \"kind\": \"hypothesis\", \"statement\": \"The reason for choosing 7 remains unknown.\", \"status\": \"proposed\", \"evidence\": [{\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"origin_id\": \"repo\", \"path\": \"value.go\", \"start_line\": 3, \"end_line\": 3, \"file_sha256\": \"8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658\", \"content_sha256\": \"366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca\", \"source_kind\": \"code\", \"collected_at\": \"2026-10-15T12:14:17.451384Z\", \"source_actor\": null, \"source_recorded_at\": null, \"content_role\": \"untrusted_source_data\", \"reported_not_reexecuted\": false, \"evidence_id\": \"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"}]}, {\"claim_id\": \"1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef\", \"kind\": \"reported_decision\", \"statement\": \"The fixture owner reports choosing a bounded queue.\", \"status\": \"proposed\", \"evidence\": [{\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"origin_id\": \"provided\", \"path\": \"provided/record-1.json\", \"start_line\": 1, \"end_line\": 5, \"file_sha256\": \"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\", \"content_sha256\": \"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\", \"source_kind\": \"provided_decision\", \"collected_at\": \"2026-10-15T12:14:17.451384Z\", \"source_actor\": \"reported-owner\", \"source_recorded_at\": null, \"content_role\": \"untrusted_source_data\", \"reported_not_reexecuted\": true, \"evidence_id\": \"6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c\"}]}, {\"claim_id\": \"44938f74f8ad458223721bad6f45844e805a6132cfa8371258bc3e39d9518875\", \"kind\": \"troubleshooting\", \"statement\": \"The supplied incident report observed saturation.\", \"status\": \"proposed\", \"evidence\": [{\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"origin_id\": \"provided\", \"path\": \"provided/record-2.json\", \"start_line\": 1, \"end_line\": 4, \"file_sha256\": \"085e47258a4cb490138f2b603bb7a5aa2715504fa655d3cfd9bbce5482645b71\", \"content_sha256\": \"085e47258a4cb490138f2b603bb7a5aa2715504fa655d3cfd9bbce5482645b71\", \"source_kind\": \"provided_troubleshooting\", \"collected_at\": \"2026-10-15T12:14:17.451384Z\", \"source_actor\": null, \"source_recorded_at\": null, \"content_role\": \"untrusted_source_data\", \"reported_not_reexecuted\": true, \"evidence_id\": \"737cc1fd420a3f0f443541e7aee7346f4318431b145f00d8c69964b4bdc5f985\"}]}, {\"claim_id\": \"46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017\", \"kind\": \"reported_command_result\", \"statement\": \"The supplied command result was not reexecuted.\", \"status\": \"proposed\", \"evidence\": [{\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"origin_id\": \"provided\", \"path\": \"provided/record-3.json\", \"start_line\": 1, \"end_line\": 9, \"file_sha256\": \"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\", \"content_sha256\": \"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\", \"source_kind\": \"provided_command_result\", \"collected_at\": \"2026-10-15T12:14:17.451384Z\", \"source_actor\": null, \"source_recorded_at\": null, \"content_role\": \"untrusted_source_data\", \"reported_not_reexecuted\": true, \"evidence_id\": \"30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0\"}]}, {\"claim_id\": \"d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0\", \"kind\": \"question\", \"statement\": \"Which constraints explain choosing 7?\", \"status\": \"proposed\", \"evidence\": [{\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"origin_id\": \"repo\", \"path\": \"value.go\", \"start_line\": 3, \"end_line\": 3, \"file_sha256\": \"8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658\", \"content_sha256\": \"366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca\", \"source_kind\": \"code\", \"collected_at\": \"2026-10-15T12:14:17.451384Z\", \"source_actor\": null, \"source_recorded_at\": null, \"content_role\": \"untrusted_source_data\", \"reported_not_reexecuted\": false, \"evidence_id\": \"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"}]}, {\"claim_id\": \"4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568\", \"kind\": \"fact\", \"statement\": \"The recorded CODE returns 7.\", \"status\": \"proposed\", \"evidence\": [{\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"collection_id\": \"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\", \"origin_id\": \"repo\", \"path\": \"value.go\", \"start_line\": 3, \"end_line\": 3, \"file_sha256\": \"8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658\", \"content_sha256\": \"366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca\", \"source_kind\": \"code\", \"collected_at\": \"2026-10-15T12:14:17.451384Z\", \"source_actor\": null, \"source_recorded_at\": null, \"content_role\": \"untrusted_source_data\", \"reported_not_reexecuted\": false, \"evidence_id\": \"aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814\"}]}], \"review_authentication\": \"not_performed\", \"human_approval\": \"not_inferred\", \"db_adoption\": \"not_run\"}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "as_of": "immutable_collection_not_current_source_verification",
+        "claims": [
+          {
+            "claim_id": "9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee",
+            "evidence": [
+              {
+                "collected_at": "2026-10-15T12:14:17.451384Z",
+                "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+                "content_role": "untrusted_source_data",
+                "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+                "end_line": 3,
+                "evidence_id": "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814",
+                "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+                "origin_id": "repo",
+                "path": "value.go",
+                "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+                "reported_not_reexecuted": false,
+                "source_actor": null,
+                "source_kind": "code",
+                "source_recorded_at": null,
+                "start_line": 3
+              }
+            ],
+            "kind": "fact",
+            "statement": "The recorded code returns 7.",
+            "status": "proposed"
+          },
+          {
+            "claim_id": "b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632",
+            "evidence": [
+              {
+                "collected_at": "2026-10-15T12:14:17.451384Z",
+                "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+                "content_role": "untrusted_source_data",
+                "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+                "end_line": 3,
+                "evidence_id": "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814",
+                "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+                "origin_id": "repo",
+                "path": "value.go",
+                "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+                "reported_not_reexecuted": false,
+                "source_actor": null,
+                "source_kind": "code",
+                "source_recorded_at": null,
+                "start_line": 3
+              }
+            ],
+            "kind": "hypothesis",
+            "statement": "The reason for choosing 7 remains unknown.",
+            "status": "proposed"
+          },
+          {
+            "claim_id": "1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef",
+            "evidence": [
+              {
+                "collected_at": "2026-10-15T12:14:17.451384Z",
+                "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+                "content_role": "untrusted_source_data",
+                "content_sha256": "ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb",
+                "end_line": 5,
+                "evidence_id": "6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c",
+                "file_sha256": "ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb",
+                "origin_id": "provided",
+                "path": "provided/record-1.json",
+                "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+                "reported_not_reexecuted": true,
+                "source_actor": "reported-owner",
+                "source_kind": "provided_decision",
+                "source_recorded_at": null,
+                "start_line": 1
+              }
+            ],
+            "kind": "reported_decision",
+            "statement": "The fixture owner reports choosing a bounded queue.",
+            "status": "proposed"
+          },
+          {
+            "claim_id": "44938f74f8ad458223721bad6f45844e805a6132cfa8371258bc3e39d9518875",
+            "evidence": [
+              {
+                "collected_at": "2026-10-15T12:14:17.451384Z",
+                "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+                "content_role": "untrusted_source_data",
+                "content_sha256": "085e47258a4cb490138f2b603bb7a5aa2715504fa655d3cfd9bbce5482645b71",
+                "end_line": 4,
+                "evidence_id": "737cc1fd420a3f0f443541e7aee7346f4318431b145f00d8c69964b4bdc5f985",
+                "file_sha256": "085e47258a4cb490138f2b603bb7a5aa2715504fa655d3cfd9bbce5482645b71",
+                "origin_id": "provided",
+                "path": "provided/record-2.json",
+                "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+                "reported_not_reexecuted": true,
+                "source_actor": null,
+                "source_kind": "provided_troubleshooting",
+                "source_recorded_at": null,
+                "start_line": 1
+              }
+            ],
+            "kind": "troubleshooting",
+            "statement": "The supplied incident report observed saturation.",
+            "status": "proposed"
+          },
+          {
+            "claim_id": "46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017",
+            "evidence": [
+              {
+                "collected_at": "2026-10-15T12:14:17.451384Z",
+                "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+                "content_role": "untrusted_source_data",
+                "content_sha256": "a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c",
+                "end_line": 9,
+                "evidence_id": "30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0",
+                "file_sha256": "a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c",
+                "origin_id": "provided",
+                "path": "provided/record-3.json",
+                "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+                "reported_not_reexecuted": true,
+                "source_actor": null,
+                "source_kind": "provided_command_result",
+                "source_recorded_at": null,
+                "start_line": 1
+              }
+            ],
+            "kind": "reported_command_result",
+            "statement": "The supplied command result was not reexecuted.",
+            "status": "proposed"
+          },
+          {
+            "claim_id": "d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0",
+            "evidence": [
+              {
+                "collected_at": "2026-10-15T12:14:17.451384Z",
+                "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+                "content_role": "untrusted_source_data",
+                "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+                "end_line": 3,
+                "evidence_id": "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814",
+                "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+                "origin_id": "repo",
+                "path": "value.go",
+                "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+                "reported_not_reexecuted": false,
+                "source_actor": null,
+                "source_kind": "code",
+                "source_recorded_at": null,
+                "start_line": 3
+              }
+            ],
+            "kind": "question",
+            "statement": "Which constraints explain choosing 7?",
+            "status": "proposed"
+          },
+          {
+            "claim_id": "4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568",
+            "evidence": [
+              {
+                "collected_at": "2026-10-15T12:14:17.451384Z",
+                "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+                "content_role": "untrusted_source_data",
+                "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+                "end_line": 3,
+                "evidence_id": "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814",
+                "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+                "origin_id": "repo",
+                "path": "value.go",
+                "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+                "reported_not_reexecuted": false,
+                "source_actor": null,
+                "source_kind": "code",
+                "source_recorded_at": null,
+                "start_line": 3
+              }
+            ],
+            "kind": "fact",
+            "statement": "The recorded CODE returns 7.",
+            "status": "proposed"
+          }
+        ],
+        "collection_id": "dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8",
+        "db_adoption": "not_run",
+        "draft_id": "4a7e51c3ab49b704ab8a86c1b61baa139d3066a8202f624b475a1b4a9393659e",
+        "duplicate_claim_occurrences": 0,
+        "human_approval": "not_inferred",
+        "possible_duplicates": [
+          {
+            "claim_ids": [
+              "4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568",
+              "9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee"
+            ],
+            "classification": "possible_duplicate_not_automatically_merged"
+          }
+        ],
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "questions": [
+          {
+            "answer_status": "not_provided",
+            "claim_id": "9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee",
+            "evidence_ids": [
+              "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814"
+            ],
+            "kind": "fact",
+            "question": "Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown."
+          },
+          {
+            "answer_status": "not_provided",
+            "claim_id": "b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632",
+            "evidence_ids": [
+              "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814"
+            ],
+            "kind": "hypothesis",
+            "question": "What observation supports or refutes this hypothesis? Keep it a hypothesis until reviewed."
+          },
+          {
+            "answer_status": "not_provided",
+            "claim_id": "1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef",
+            "evidence_ids": [
+              "6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c"
+            ],
+            "kind": "reported_decision",
+            "question": "Does the reported decision apply to this project/version, and who actually provided its rationale?"
+          },
+          {
+            "answer_status": "not_provided",
+            "claim_id": "44938f74f8ad458223721bad6f45844e805a6132cfa8371258bc3e39d9518875",
+            "evidence_ids": [
+              "737cc1fd420a3f0f443541e7aee7346f4318431b145f00d8c69964b4bdc5f985"
+            ],
+            "kind": "troubleshooting",
+            "question": "Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown."
+          },
+          {
+            "answer_status": "not_provided",
+            "claim_id": "46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017",
+            "evidence_ids": [
+              "30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0"
+            ],
+            "kind": "reported_command_result",
+            "question": "What environment/version produced this supplied result? It has not been executed by the manager."
+          },
+          {
+            "answer_status": "not_provided",
+            "claim_id": "d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0",
+            "evidence_ids": [
+              "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814"
+            ],
+            "kind": "question",
+            "question": "Which constraints explain choosing 7?"
+          },
+          {
+            "answer_status": "not_provided",
+            "claim_id": "4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568",
+            "evidence_ids": [
+              "aa195ae4091465d5ee6570d6fc4ef5b761a56a7420a9e6f35d4151ef4467f814"
+            ],
+            "kind": "fact",
+            "question": "Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown."
+          }
+        ],
+        "review_authentication": "not_performed",
+        "revision": "a6ee2dacfd40e3351f379e9625308a817e70206ad9718f9a0e730c799949e43a",
+        "schema_version": 1,
+        "shared_evidence_interpretations": [
+          {
+            "claim_ids": [
+              "9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee",
+              "b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632"
+            ],
+            "classification": "shared_evidence_distinct_interpretations_not_proven_contradiction"
+          },
+          {
+            "claim_ids": [
+              "9825207abf1035920f82b72aab372629e6d753b6405fcf0ccc19864c0cd081ee",
+              "d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0"
+            ],
+            "classification": "shared_evidence_distinct_interpretations_not_proven_contradiction"
+          },
+          {
+            "claim_ids": [
+              "b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632",
+              "d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0"
+            ],
+            "classification": "shared_evidence_distinct_interpretations_not_proven_contradiction"
+          },
+          {
+            "claim_ids": [
+              "4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568",
+              "b50aa04e70605492804e57f8893092ce16f3164a669b3760cb73fd54a4846632"
+            ],
+            "classification": "shared_evidence_distinct_interpretations_not_proven_contradiction"
+          },
+          {
+            "claim_ids": [
+              "4a69e88fae3e1bcdb0a993f9c0cad1c1af3ba1cbe5aa1075c0fb143ddda3f568",
+              "d90b8e62d114cfcc65a5afca197e98400d45a222e0f5ad0f85c8c021c56561f0"
+            ],
+            "classification": "shared_evidence_distinct_interpretations_not_proven_contradiction"
+          }
+        ]
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.review",
+    "arguments": {
+      "response_file": "/private/tmp/ks-KM034B-broker-final-20261015/response.json"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"stage\": \"review_recorded\", \"review_revision\": \"938b40e70d2e3ba55a9eb11cb89ff28b41a307664e3480d98cb8456a33fae8d0\", \"current_revision\": \"938b40e70d2e3ba55a9eb11cb89ff28b41a307664e3480d98cb8456a33fae8d0\", \"review_authentication\": \"not_performed\", \"db_adoption\": \"not_run\"}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "current_revision": "938b40e70d2e3ba55a9eb11cb89ff28b41a307664e3480d98cb8456a33fae8d0",
+        "db_adoption": "not_run",
+        "review_authentication": "not_performed",
+        "review_revision": "938b40e70d2e3ba55a9eb11cb89ff28b41a307664e3480d98cb8456a33fae8d0",
+        "schema_version": 1,
+        "stage": "review_recorded"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.adopt",
+    "arguments": {
+      "draft_id": "4a7e51c3ab49b704ab8a86c1b61baa139d3066a8202f624b475a1b4a9393659e",
+      "review_revision": "938b40e70d2e3ba55a9eb11cb89ff28b41a307664e3480d98cb8456a33fae8d0"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"stage\": \"input_adopted_not_DB_published\", \"adoption_id\": \"be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06\", \"review_revision\": \"938b40e70d2e3ba55a9eb11cb89ff28b41a307664e3480d98cb8456a33fae8d0\", \"input_project\": \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/manager-a/adoptions/be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06/project\", \"scope\": \"reviewed_filtered_input_not_DB_publication\", \"revision\": \"ccfc82a3c4a1f1c3c5f037174bc0bc95f9877209d00c1cb41267beada9d88151\"}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "adoption_id": "be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06",
+        "input_project": "/private/tmp/ks-KM034B-broker-final-20261015/prepared/manager-a/adoptions/be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06/project",
+        "review_revision": "938b40e70d2e3ba55a9eb11cb89ff28b41a307664e3480d98cb8456a33fae8d0",
+        "revision": "ccfc82a3c4a1f1c3c5f037174bc0bc95f9877209d00c1cb41267beada9d88151",
+        "schema_version": 1,
+        "scope": "reviewed_filtered_input_not_DB_publication",
+        "stage": "input_adopted_not_DB_published"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.select_input",
+    "arguments": {
+      "adoption_id": "be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"profile_id\": \"profile-5d1ceabafa926a044cbe50687389a59c\", \"revision\": 1, \"selected_input\": \"be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06\", \"reader_selection\": null, \"last_validated_read\": null, \"pending_build\": null, \"jobs\": {}, \"activation_policy\": \"hold_for_review_only\", \"selection_rechecked_on_use\": true, \"actual_Claude_host_workflow_verified\": false, \"independent_acceptance\": false}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "activation_policy": "hold_for_review_only",
+        "actual_Claude_host_workflow_verified": false,
+        "independent_acceptance": false,
+        "jobs": {},
+        "last_validated_read": null,
+        "pending_build": null,
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "reader_selection": null,
+        "revision": 1,
+        "schema_version": 1,
+        "selected_input": "be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06",
+        "selection_rechecked_on_use": true
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "capabilities": {
+          "cancel": true,
+          "input_preparation": "existing_reviewed_or_rendered_inputs",
+          "job_persistence": "durable_journal",
+          "serving_adoption": "not_observed",
+          "versioned_build": true
+        },
+        "profile": {
+          "allowed_activation": [
+            "hold_for_review"
+          ],
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "existing_versions": [],
+          "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+          "observed_base": {
+            "state": "absent"
+          },
+          "profile_digest": "481e422a8ac43483d0a2ead21b85a9e5937808d3e5e8764bc39c9e7d92550ce7",
+          "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+          "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+          "required_gates": [
+            "source",
+            "identity",
+            "graph",
+            "vector",
+            "knowledge"
+          ],
+          "source_pin": {
+            "base_commit": "",
+            "mode": "snapshot-only",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3"
+          },
+          "timeout_max_seconds": 3600
+        }
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.inspect_profile",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "foreign-project",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"project_or_profile_mismatch\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "project_or_profile_mismatch"
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.build",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "profile_digest": "481e422a8ac43483d0a2ead21b85a9e5937808d3e5e8764bc39c9e7d92550ce7",
+      "source_pin": {
+        "base_commit": "",
+        "mode": "snapshot-only",
+        "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3"
+      },
+      "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+      "base": {
+        "state": "absent"
+      },
+      "new_version": "broker-reviewed-v1",
+      "activation": "activate_after_gate",
+      "idempotency_key": "owned-manager-proxy-0001",
+      "deadline_seconds": 120
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"activation_not_authorized\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "activation_not_authorized"
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.build",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "profile_digest": "481e422a8ac43483d0a2ead21b85a9e5937808d3e5e8764bc39c9e7d92550ce7",
+      "source_pin": {
+        "base_commit": "",
+        "mode": "snapshot-only",
+        "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3"
+      },
+      "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+      "base": {
+        "state": "absent"
+      },
+      "new_version": "broker-reviewed-v1",
+      "activation": "hold_for_review",
+      "idempotency_key": "owned-manager-proxy-0001",
+      "deadline_seconds": 120
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "accepted",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 1,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "queued",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "capture",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 2,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "build_graph",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 3,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "build_graph",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 3,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "build_vector",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 4,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "build_vector",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 4,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "build_vector",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 4,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "build_vector",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 4,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "build_vector",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 4,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": false,
+        "candidate": null,
+        "error": null,
+        "gates": {
+          "graph": "not_run",
+          "identity": "not_run",
+          "knowledge": "not_run",
+          "semantic": "not_configured",
+          "source": "not_run",
+          "vector": "not_run"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "build_vector",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 4,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "running",
+        "target_version": "broker-reviewed-v1",
+        "terminal": false
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": true,
+        "candidate": {
+          "coordinates": {
+            "base_commit": "",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only"
+          },
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+          "version": "broker-reviewed-v1"
+        },
+        "error": null,
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "finished",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 6,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "held_for_review",
+        "target_version": "broker-reviewed-v1",
+        "terminal": true
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.select_reader",
+    "arguments": {
+      "job_id": "8f0d60e2742c501267432df04a55cca6",
+      "expected_coordinates": {
+        "base_commit": "",
+        "dataset_id": "0000000000000000000000000000000000000000000000000000000000000000",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+        "source_mode": "snapshot-only"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"candidate_input_mismatch\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "candidate_input_mismatch"
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.select_reader",
+    "arguments": {
+      "job_id": "8f0d60e2742c501267432df04a55cca6",
+      "expected_coordinates": {
+        "base_commit": "",
+        "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+        "source_mode": "snapshot-only"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"stage\": \"reader_initialized_unqueried\", \"coordinates\": {\"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"dataset_id\": \"5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c\", \"snapshot_id\": \"14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3\", \"source_mode\": \"snapshot-only\", \"base_commit\": \"\"}, \"candidate_state\": \"held_for_review\", \"DB_publication_inferred\": false, \"serving_read_observed\": false}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "DB_publication_inferred": false,
+        "candidate_state": "held_for_review",
+        "coordinates": {
+          "base_commit": "",
+          "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+          "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+          "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+          "source_mode": "snapshot-only"
+        },
+        "schema_version": 1,
+        "serving_read_observed": false,
+        "stage": "reader_initialized_unqueried"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "bounded queue fixture owner reports"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "v2 evidence pack",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "bodies": [
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 25,
+              "file": "manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "docs:corpus.0",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 9
+            },
+            "text": "## 1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef\n\nKind: reported_decision\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The fixture owner reports choosing a bounded queue.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"end_line\":5,\"evidence_id\":\"6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c\",\"file_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"origin_id\":\"provided\",\"path\":\"provided/record-1.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":\"reported-owner\",\"source_kind\":\"provided_decision\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"decision\",\n      \"text\": \"The fixture owner reports choosing a bounded queue.\",\n      \"actor\": \"reported-owner\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 1,
+              "file": "value.go",
+              "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 1
+            },
+            "text": "package fixture\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 25,
+              "file": ".cks/knowledge/questions/manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 9
+            },
+            "text": "## 1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef\n\nKind: reported_decision\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The fixture owner reports choosing a bounded queue.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"end_line\":5,\"evidence_id\":\"6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c\",\"file_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"origin_id\":\"provided\",\"path\":\"provided/record-1.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":\"reported-owner\",\"source_kind\":\"provided_decision\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"decision\",\n      \"text\": \"The fixture owner reports choosing a bounded queue.\",\n      \"actor\": \"reported-owner\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 62,
+              "file": ".cks/knowledge/questions/manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 42
+            },
+            "text": "## 46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017\n\nKind: reported_command_result\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The supplied command result was not reexecuted.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"end_line\":9,\"evidence_id\":\"30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0\",\"file_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"origin_id\":\"provided\",\"path\":\"provided/record-3.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":null,\"source_kind\":\"provided_command_result\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"command_result\",\n      \"command\": [\n        \"touch\",\n        \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/reported-command-not-executed\"\n      ],\n      \"exit_code\": 0,\n      \"stdout\": \"Supplied command report; not executed.\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 62,
+              "file": "manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "docs:corpus.0",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 42
+            },
+            "text": "## 46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017\n\nKind: reported_command_result\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The supplied command result was not reexecuted.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"end_line\":9,\"evidence_id\":\"30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0\",\"file_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"origin_id\":\"provided\",\"path\":\"provided/record-3.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":null,\"source_kind\":\"provided_command_result\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"command_result\",\n      \"command\": [\n        \"touch\",\n        \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/reported-command-not-executed\"\n      ],\n      \"exit_code\": 0,\n      \"stdout\": \"Supplied command report; not executed.\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 3,
+              "file": "value.go",
+              "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 3
+            },
+            "text": "func Value() int { return 7 }\n"
+          }
+        ],
+        "citations": [
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 25,
+            "file": "manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "docs:corpus.0",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 9
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 1,
+            "file": "value.go",
+            "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 1
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 25,
+            "file": ".cks/knowledge/questions/manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 9
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 62,
+            "file": ".cks/knowledge/questions/manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 42
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 62,
+            "file": "manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "docs:corpus.0",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 42
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 3,
+            "file": "value.go",
+            "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 3
+          }
+        ],
+        "coordinates": {
+          "base_commit": "",
+          "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+          "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+          "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+          "source_mode": "snapshot-only"
+        },
+        "evidence_state": "complete",
+        "format_version": 2,
+        "graph_neighbors": [],
+        "metadata": {
+          "integrity_hash": "eb3baa0e832710c14935397bf3f82459fdddbe967dbb697c3c85acbccdb551c1",
+          "integrity_hash_algo": "sha256-v2"
+        },
+        "query": "bounded queue fixture owner reports",
+        "semantic": null
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-session",
+    "tool": "cks.manager.status",
+    "arguments": {},
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"profile_id\": \"profile-5d1ceabafa926a044cbe50687389a59c\", \"revision\": 15, \"selected_input\": \"be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06\", \"reader_selection\": {\"adoption_id\": \"be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06\", \"job_id\": \"8f0d60e2742c501267432df04a55cca6\", \"expected_coordinates\": {\"base_commit\": \"\", \"dataset_id\": \"5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c\", \"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"snapshot_id\": \"14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3\", \"source_mode\": \"snapshot-only\"}}, \"last_validated_read\": {\"at\": \"2026-10-15T12:14:24.735613Z\", \"coordinates\": {\"base_commit\": \"\", \"dataset_id\": \"5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c\", \"project_id\": \"project-cc03f3db6dbe447bb5cad8a673c92bc3\", \"snapshot_id\": \"14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3\", \"source_mode\": \"snapshot-only\"}, \"job_id\": \"8f0d60e2742c501267432df04a55cca6\", \"candidate_publication_inferred\": false}, \"pending_build\": null, \"jobs\": {\"8f0d60e2742c501267432df04a55cca6\": {\"terminal\": true, \"state\": \"held_for_review\"}}, \"activation_policy\": \"hold_for_review_only\", \"selection_rechecked_on_use\": true, \"actual_Claude_host_workflow_verified\": false, \"independent_acceptance\": false}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "activation_policy": "hold_for_review_only",
+        "actual_Claude_host_workflow_verified": false,
+        "independent_acceptance": false,
+        "jobs": {
+          "8f0d60e2742c501267432df04a55cca6": {
+            "state": "held_for_review",
+            "terminal": true
+          }
+        },
+        "last_validated_read": {
+          "at": "2026-10-15T12:14:24.735613Z",
+          "candidate_publication_inferred": false,
+          "coordinates": {
+            "base_commit": "",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only"
+          },
+          "job_id": "8f0d60e2742c501267432df04a55cca6"
+        },
+        "pending_build": null,
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "reader_selection": {
+          "adoption_id": "be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06",
+          "expected_coordinates": {
+            "base_commit": "",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only"
+          },
+          "job_id": "8f0d60e2742c501267432df04a55cca6"
+        },
+        "revision": 15,
+        "schema_version": 1,
+        "selected_input": "be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06",
+        "selection_rechecked_on_use": true
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "bounded queue fixture owner reports"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "v2 evidence pack",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "bodies": [
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 25,
+              "file": "manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "docs:corpus.0",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 9
+            },
+            "text": "## 1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef\n\nKind: reported_decision\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The fixture owner reports choosing a bounded queue.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"end_line\":5,\"evidence_id\":\"6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c\",\"file_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"origin_id\":\"provided\",\"path\":\"provided/record-1.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":\"reported-owner\",\"source_kind\":\"provided_decision\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"decision\",\n      \"text\": \"The fixture owner reports choosing a bounded queue.\",\n      \"actor\": \"reported-owner\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 1,
+              "file": "value.go",
+              "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 1
+            },
+            "text": "package fixture\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 25,
+              "file": ".cks/knowledge/questions/manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 9
+            },
+            "text": "## 1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef\n\nKind: reported_decision\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The fixture owner reports choosing a bounded queue.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"end_line\":5,\"evidence_id\":\"6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c\",\"file_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"origin_id\":\"provided\",\"path\":\"provided/record-1.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":\"reported-owner\",\"source_kind\":\"provided_decision\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"decision\",\n      \"text\": \"The fixture owner reports choosing a bounded queue.\",\n      \"actor\": \"reported-owner\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 62,
+              "file": ".cks/knowledge/questions/manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 42
+            },
+            "text": "## 46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017\n\nKind: reported_command_result\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The supplied command result was not reexecuted.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"end_line\":9,\"evidence_id\":\"30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0\",\"file_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"origin_id\":\"provided\",\"path\":\"provided/record-3.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":null,\"source_kind\":\"provided_command_result\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"command_result\",\n      \"command\": [\n        \"touch\",\n        \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/reported-command-not-executed\"\n      ],\n      \"exit_code\": 0,\n      \"stdout\": \"Supplied command report; not executed.\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 62,
+              "file": "manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "docs:corpus.0",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 42
+            },
+            "text": "## 46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017\n\nKind: reported_command_result\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The supplied command result was not reexecuted.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"end_line\":9,\"evidence_id\":\"30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0\",\"file_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"origin_id\":\"provided\",\"path\":\"provided/record-3.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":null,\"source_kind\":\"provided_command_result\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"command_result\",\n      \"command\": [\n        \"touch\",\n        \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/reported-command-not-executed\"\n      ],\n      \"exit_code\": 0,\n      \"stdout\": \"Supplied command report; not executed.\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 3,
+              "file": "value.go",
+              "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 3
+            },
+            "text": "func Value() int { return 7 }\n"
+          }
+        ],
+        "citations": [
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 25,
+            "file": "manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "docs:corpus.0",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 9
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 1,
+            "file": "value.go",
+            "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 1
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 25,
+            "file": ".cks/knowledge/questions/manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 9
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 62,
+            "file": ".cks/knowledge/questions/manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 42
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 62,
+            "file": "manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "docs:corpus.0",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 42
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 3,
+            "file": "value.go",
+            "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 3
+          }
+        ],
+        "coordinates": {
+          "base_commit": "",
+          "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+          "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+          "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+          "source_mode": "snapshot-only"
+        },
+        "evidence_state": "complete",
+        "format_version": 2,
+        "graph_neighbors": [],
+        "metadata": {
+          "integrity_hash": "eb3baa0e832710c14935397bf3f82459fdddbe967dbb697c3c85acbccdb551c1",
+          "integrity_hash_algo": "sha256-v2"
+        },
+        "query": "bounded queue fixture owner reports",
+        "semantic": null
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "bounded queue"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"collection_stale\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "collection_stale"
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.dataset.build",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "profile_digest": "481e422a8ac43483d0a2ead21b85a9e5937808d3e5e8764bc39c9e7d92550ce7",
+      "source_pin": {
+        "base_commit": "",
+        "mode": "snapshot-only",
+        "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3"
+      },
+      "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+      "base": {
+        "state": "absent"
+      },
+      "new_version": "broker-reviewed-v1",
+      "activation": "hold_for_review",
+      "idempotency_key": "owned-manager-proxy-0001",
+      "deadline_seconds": 120
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"collection_stale\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "collection_stale"
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.dataset.status",
+    "arguments": {
+      "schema_version": 1,
+      "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+      "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+      "job_id": "8f0d60e2742c501267432df04a55cca6"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": true,
+        "candidate": {
+          "coordinates": {
+            "base_commit": "",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only"
+          },
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+          "version": "broker-reviewed-v1"
+        },
+        "error": null,
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "finished",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 6,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "held_for_review",
+        "target_version": "broker-reviewed-v1",
+        "terminal": true
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.manager.resume_build",
+    "arguments": {
+      "job_id": "8f0d60e2742c501267432df04a55cca6",
+      "original_request": {
+        "schema_version": 1,
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "profile_digest": "481e422a8ac43483d0a2ead21b85a9e5937808d3e5e8764bc39c9e7d92550ce7",
+        "source_pin": {
+          "base_commit": "",
+          "mode": "snapshot-only",
+          "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3"
+        },
+        "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "base": {
+          "state": "absent"
+        },
+        "new_version": "broker-reviewed-v1",
+        "activation": "hold_for_review",
+        "idempotency_key": "owned-manager-proxy-0001",
+        "deadline_seconds": 120
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": true,
+        "candidate": {
+          "coordinates": {
+            "base_commit": "",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only"
+          },
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+          "version": "broker-reviewed-v1"
+        },
+        "error": null,
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "finished",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 6,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "held_for_review",
+        "target_version": "broker-reviewed-v1",
+        "terminal": true
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.manager.resume_build",
+    "arguments": {
+      "job_id": "8f0d60e2742c501267432df04a55cca6",
+      "original_request": {
+        "schema_version": 1,
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "profile_digest": "481e422a8ac43483d0a2ead21b85a9e5937808d3e5e8764bc39c9e7d92550ce7",
+        "source_pin": {
+          "base_commit": "",
+          "mode": "snapshot-only",
+          "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3"
+        },
+        "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "base": {
+          "state": "absent"
+        },
+        "new_version": "different-intent",
+        "activation": "hold_for_review",
+        "idempotency_key": "owned-manager-proxy-0001",
+        "deadline_seconds": 120
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"original_request_mismatch\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "original_request_mismatch"
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "bounded queue"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "code=reindex_required: A pinned retained dataset is required.",
+          "type": "text"
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "reindex_required",
+        "message": "A pinned retained dataset is required."
+      }
+    },
+    "expected_error": true
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "bounded queue fixture owner reports"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "v2 evidence pack",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "bodies": [
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 25,
+              "file": "manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "docs:corpus.0",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 9
+            },
+            "text": "## 1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef\n\nKind: reported_decision\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The fixture owner reports choosing a bounded queue.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"end_line\":5,\"evidence_id\":\"6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c\",\"file_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"origin_id\":\"provided\",\"path\":\"provided/record-1.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":\"reported-owner\",\"source_kind\":\"provided_decision\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"decision\",\n      \"text\": \"The fixture owner reports choosing a bounded queue.\",\n      \"actor\": \"reported-owner\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 1,
+              "file": "value.go",
+              "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 1
+            },
+            "text": "package fixture\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 25,
+              "file": ".cks/knowledge/questions/manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 9
+            },
+            "text": "## 1327e01aaaa8c4b53948596cfbdc6225c9272999fdb0d18357e74f10e5b9fdef\n\nKind: reported_decision\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The fixture owner reports choosing a bounded queue.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"end_line\":5,\"evidence_id\":\"6fb0e9c4a833ec123f9c57ad01e96e7b94b0dd89c8c52081a1a36530e5ee2a0c\",\"file_sha256\":\"ea5c747f74e1aa95269e42c964eee839384c91fb236cd5218b82d67ec4010fbb\",\"origin_id\":\"provided\",\"path\":\"provided/record-1.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":\"reported-owner\",\"source_kind\":\"provided_decision\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"decision\",\n      \"text\": \"The fixture owner reports choosing a bounded queue.\",\n      \"actor\": \"reported-owner\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 62,
+              "file": ".cks/knowledge/questions/manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 42
+            },
+            "text": "## 46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017\n\nKind: reported_command_result\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The supplied command result was not reexecuted.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"end_line\":9,\"evidence_id\":\"30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0\",\"file_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"origin_id\":\"provided\",\"path\":\"provided/record-3.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":null,\"source_kind\":\"provided_command_result\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"command_result\",\n      \"command\": [\n        \"touch\",\n        \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/reported-command-not-executed\"\n      ],\n      \"exit_code\": 0,\n      \"stdout\": \"Supplied command report; not executed.\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 62,
+              "file": "manager-reviewed.md",
+              "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+              "origin_id": "docs:corpus.0",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 42
+            },
+            "text": "## 46c0725c5764e2c432b94d5c83b4cc106e493694eac8e6d668c4ba0dce1dc017\n\nKind: reported_command_result\n\nSupplied reviewer: explicit-fixture-reviewer\n\n    The supplied command result was not reexecuted.\n    Review reason: Controlled integration response for this exact claim.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:14:17.451384Z\",\"collection_id\":\"dd57fa00f8cfa478eea31a0ae6bce74d54a029243588c7a1ae0ea1152fe232e8\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"end_line\":9,\"evidence_id\":\"30705df9be486c23e863c91ac37adb980e17bd0b1c924097d6a3d87edae024b0\",\"file_sha256\":\"a2082715a634babcd77feda8e3ef6fbb9596d981ca537b4e427d67a2dc41381c\",\"origin_id\":\"provided\",\"path\":\"provided/record-3.json\",\"project_id\":\"project-cc03f3db6dbe447bb5cad8a673c92bc3\",\"reported_not_reexecuted\":true,\"source_actor\":null,\"source_kind\":\"provided_command_result\",\"source_recorded_at\":null,\"start_line\":1}\n\n    {\n      \"kind\": \"command_result\",\n      \"command\": [\n        \"touch\",\n        \"/private/tmp/ks-KM034B-broker-final-20261015/prepared/reported-command-not-executed\"\n      ],\n      \"exit_code\": 0,\n      \"stdout\": \"Supplied command report; not executed.\"\n    }\n\n"
+          },
+          {
+            "citation": {
+              "base_commit": "",
+              "commit_hash": "",
+              "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+              "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+              "end_line": 3,
+              "file": "value.go",
+              "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+              "origin_id": "repo",
+              "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+              "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+              "source_mode": "snapshot-only",
+              "start_line": 3
+            },
+            "text": "func Value() int { return 7 }\n"
+          }
+        ],
+        "citations": [
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 25,
+            "file": "manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "docs:corpus.0",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 9
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 1,
+            "file": "value.go",
+            "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 1
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "0057a2ddf8d9cea6b8aadba43739ae5a579be4033f57daf62b6b20d4f74fd066",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 25,
+            "file": ".cks/knowledge/questions/manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 9
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 62,
+            "file": ".cks/knowledge/questions/manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 42
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "87230e9fc1771254467e40554b6947ca2e62377bf8a7940cd673f6289d3fbe9d",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 62,
+            "file": "manager-reviewed.md",
+            "file_sha256": "3472898cde2abc22690e3196b10dc73a46364383ea868c0e8df16976953b833b",
+            "origin_id": "docs:corpus.0",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 42
+          },
+          {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "366bf1e2c6231e3be5df1b1ebc22f058d4d7722bd93bd604a5e081d104fa4aca",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "end_line": 3,
+            "file": "value.go",
+            "file_sha256": "8b4207c54111bc58c90db56d9a95eabf266fd39cbb0a448aa7da6fe8c69f9658",
+            "origin_id": "repo",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only",
+            "start_line": 3
+          }
+        ],
+        "coordinates": {
+          "base_commit": "",
+          "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+          "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+          "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+          "source_mode": "snapshot-only"
+        },
+        "evidence_state": "complete",
+        "format_version": 2,
+        "graph_neighbors": [],
+        "metadata": {
+          "integrity_hash": "eb3baa0e832710c14935397bf3f82459fdddbe967dbb697c3c85acbccdb551c1",
+          "integrity_hash_algo": "sha256-v2"
+        },
+        "query": "bounded queue fixture owner reports",
+        "semantic": null
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.manager.retract",
+    "arguments": {
+      "response_file": "/private/tmp/ks-KM034B-broker-final-20261015/retraction.json"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"stage\": \"input_retracted_DB_rollback_not_run\", \"revision\": \"801c3dc67d7eda04c27b414fa24da9e3845fac258c3c7fb30c1fa677fec6c864\", \"adoption_id\": \"be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06\"}",
+          "type": "text"
+        }
+      ],
+      "isError": false,
+      "structuredContent": {
+        "adoption_id": "be4026ea2af0aa460c28c4efcc6000bf93f3f8da79706892c0edbbe290cd4c06",
+        "revision": "801c3dc67d7eda04c27b414fa24da9e3845fac258c3c7fb30c1fa677fec6c864",
+        "schema_version": 1,
+        "stage": "input_retracted_DB_rollback_not_run"
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "bounded queue"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"adoption_not_current\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "adoption_not_current"
+  },
+  {
+    "session": "manager-restart-session",
+    "tool": "cks.manager.resume_build",
+    "arguments": {
+      "job_id": "8f0d60e2742c501267432df04a55cca6",
+      "original_request": {
+        "schema_version": 1,
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "profile_digest": "481e422a8ac43483d0a2ead21b85a9e5937808d3e5e8764bc39c9e7d92550ce7",
+        "source_pin": {
+          "base_commit": "",
+          "mode": "snapshot-only",
+          "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3"
+        },
+        "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "base": {
+          "state": "absent"
+        },
+        "new_version": "broker-reviewed-v1",
+        "activation": "hold_for_review",
+        "idempotency_key": "owned-manager-proxy-0001",
+        "deadline_seconds": 120
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "text": "scoped dataset maintenance result; inspect structured status",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "activated": false,
+        "build_complete": true,
+        "candidate": {
+          "coordinates": {
+            "base_commit": "",
+            "dataset_id": "5b07963b8660ca53b730d3c175864410536189c0cb92fcb0c43890538b6c137c",
+            "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+            "snapshot_id": "14815a645eb409565b811e38e64b5b0c089e806e1cacf4455902b4241e22cef3",
+            "source_mode": "snapshot-only"
+          },
+          "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+          "input_digest": "8990dffb436975844b377600c669e4d3cdae13966082efa2bfd670410072f7ec",
+          "version": "broker-reviewed-v1"
+        },
+        "error": null,
+        "gates": {
+          "graph": "passed",
+          "identity": "passed",
+          "knowledge": "passed",
+          "semantic": "not_configured",
+          "source": "passed",
+          "vector": "passed"
+        },
+        "job_id": "8f0d60e2742c501267432df04a55cca6",
+        "phase": "finished",
+        "profile_id": "profile-5d1ceabafa926a044cbe50687389a59c",
+        "project_id": "project-cc03f3db6dbe447bb5cad8a673c92bc3",
+        "publication": null,
+        "request_digest": "6e59d32c4b8855e411b512ce403a3b086c57b876d2a209d971aa0d84eb0cb665",
+        "revision": 6,
+        "schema_version": 1,
+        "serving_adoption": "not_observed",
+        "state": "held_for_review",
+        "target_version": "broker-reviewed-v1",
+        "terminal": true
+      }
+    },
+    "expected_error": null
+  },
+  {
+    "session": "manager-retired-restart-session",
+    "tool": "cks.context.get_for_task_v2",
+    "arguments": {
+      "prompt": "bounded queue"
+    },
+    "response": {
+      "content": [
+        {
+          "text": "{\"schema_version\": 1, \"code\": \"adoption_not_current\"}",
+          "type": "text"
+        }
+      ],
+      "isError": true
+    },
+    "expected_error": "adoption_not_current"
+  }
+]

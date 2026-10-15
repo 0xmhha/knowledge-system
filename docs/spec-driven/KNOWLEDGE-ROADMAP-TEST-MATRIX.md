@@ -19,7 +19,7 @@
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 완료 | 등록14·native3·실제 metadata bootstrap9·증거10; 초안/검토/reader 미구현 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 완료 | 수집23·등록14·실제 Git/CKS native 초안24·증거13; 사람 검토/DB 조회 아님 |
 | KM-03.3 | 암묵지 질문·불확실성·검토/채택/회수 | 완료 | 검토35·수집23·등록14·실제 CLI/native24·증거14; 통제 응답, DB 조회/신원 인증 아님 |
-| KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 진행 중 | A 실제 문서 색인/원문14·새 전체 Go3838/race812·증거14; B broker/C 실제 host 남음 |
+| KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 진행 중 | A 문서 색인14/B 실제 broker26·unit29·native3·증거14 완료; C 실제 Claude host 남음 |
 | KM-04.1 | 수동·정기·변경 trigger와 성공 기준 | 미착수 | 미실행 |
 | KM-04.2 | 변경/삭제/no-op/stale와 재검토 | 미착수 | 미실행 |
 | KM-04.3 | 중복·lease·재시작·retry·자원 상한 | 미착수 | 미실행 |
@@ -484,3 +484,21 @@ KM-02.3 완료로 전체7/28이며 다음은 KM-02.4의 공개 잘못된 대상/
 | 별도 gate | build/fmt/vet/lint·문서131개·증거14개 | 독립 수용 아님 |
 
 [A packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-document-index/manifest.json)과 [계약](./KNOWLEDGE-MANAGER-PLUGIN.md)을 따른다. 소스1,702입력=유지 Go1,256개+기타446개이며 승인5개는 그대로다. 초기 개발 실패와 최종 통과의 raw 결과를 구분해 보존했다. 이전 review checkpoint는3d39801c snapshot에서 검증했다. A만 완료했으므로 전체11/28·기능2/7을 유지한다. 남은17개는 KM-03.4(B adoption-bound 유지 보수/reader, C 실제 host), KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 정책 생성기·운영/독립 수용9개·선택 후속12개도 별도로 유지한다.
+
+
+## KM-03.4 중간 B: 실제 매니저 도구·adoption-bound reader
+
+| 검증 | 결과 | 경계 |
+|---|---|---|
+| broker unit | 29개 통과 | 실제 CKS·scope·source/회수/손상·CAS/lease·응답 손실 주입 |
+| 수집/등록 회귀 | 23개/14개 통과 | 기존 owner/해시/typed refusal 유지 |
+| 실제 plugin stdio | 26항목·3연결 EOF0 | 18도구; legacy ops/dummy context 미노출 |
+| 실제 매니저 도구 연결 | collect/evidence/draft/review/adopt/select/build/status/reader/retract | 통제 응답·mock·DB 게시 없음 |
+| 선택·조회 | adoption/source/input/model/job/후보 좌표 일치 | 초기화와 실제 읽기 관찰 분리 |
+| 드리프트/회수/재시작 | 새 사용 거부·기존 admitted job만 exact resume | 새 요청으로 바꾸거나 current로 fallback 없음 |
+| 열린 reader 손상 | dataset identity 손상 거부 | fixture 복구 후 같은 좌표 확인 |
+| native CLI | strict manifest/skill/agent3개 통과 | 실제 Claude host 모델 흐름은 C |
+| Go proof | A의1256 Go·의존/fixture byte 동일 후 참조 | 전체3820통과/18skip·race810통과/2skip, 새 실행 아님 |
+| 별도 gate | build/fmt/vet/lint·문서131개·증거14개 | 독립 수용/품질 아님 |
+
+[B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-broker/manifest.json)과 [계약](./KNOWLEDGE-MANAGER-PLUGIN.md)을 따른다. 소스1,703입력=Go1,256개+기타447개이며 원래 승인5개는 그대로다. A는bb71aae3 snapshot에서 검증했다. 초기 native SDK `isError:false` 생략에 대한 시험 단언 오류는 initial-failures에 보존했다. B만 완료했으므로 전체11/28·기능2/7을 유지한다. 남은17개는 KM-03.4(C 실제 Claude host), KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.

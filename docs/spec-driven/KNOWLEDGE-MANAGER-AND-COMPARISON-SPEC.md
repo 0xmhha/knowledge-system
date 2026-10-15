@@ -149,3 +149,6 @@ KM-03.3 완료: 질문·중복/공유 근거 해석 후보, 정확한 subject의
 
 
 KM-03.4 A 중간 완료: 검토 문서의 명시 색인·별도 retained origin과 held 후보 실제 원문/인용14항목을 검증했다. 새 전체 Go3,820통과/18skip·race810통과/2skip이며 과거 Go를 재사용하지 않았다. [A packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-document-index/manifest.json)을 따른다. B의 adoption-bound profile/reader와 C 실제 Claude host는 남아 KM-03.4 체크박스는 미완료, 전체11/28·기능2/7이다.
+
+
+KM-03.4 B 중간 완료: 실제 scoped plugin18도구를 구현하고29 unit·26 actual proxy 항목/3 EOF0·수집23·등록14·native3·증거14개를 검증했다. 검토 입력과 정확한 후보 reader를 연결하고 drift/손상/회수/재시작 거부·known-job exact resume를 확인했다. Go는 A와 byte 동일 후 참조했다. [B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-broker/manifest.json)을 따른다. C의 실제 Claude host는 남아 KM-03.4는 진행 중, 전체11/28·기능2/7을 유지한다.

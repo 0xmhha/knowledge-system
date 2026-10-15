@@ -4,7 +4,7 @@
 
 ## 패키지와 이번 완료 경계
 
-패키지는 [plugins/knowledge-manager](../../plugins/knowledge-manager/README.md)에 둔다. `.claude-plugin/plugin.json`, `.mcp.json`, skill·agent·표준 라이브러리 Python launcher와 등록 스키마를 함께 배포한다. source repository의 AGPL-3.0 조건을 따른다. 등록 절차는 외부 저장소나 전역 Claude 설정을 수정하지 않는다. `--plugin-dir`로 로컬에서 로드하며 plugin 제공 MCP는 등록된 CKS 실행 파일을 stdio로 실행한다. 현재 role은 유지 보수 서버의 기존 도구를 연결한다.
+패키지는 [plugins/knowledge-manager](../../plugins/knowledge-manager/README.md)에 둔다. `.claude-plugin/plugin.json`, `.mcp.json`, skill·agent·표준 라이브러리 Python launcher와 등록 스키마를 함께 배포한다. source repository의 AGPL-3.0 조건을 따른다. 등록 절차는 외부 저장소나 전역 Claude 설정을 수정하지 않는다. `--plugin-dir`로 로컬에서 로드하며 plugin 제공 MCP는 등록된 CKS 실행 파일을 stdio로 실행한다. 현재 role은 선택한 adoption의 유지 보수와 실제 scoped reader를 연결하는 broker다.
 
 | 단계 | 구현·검증할 결과 | 이 단계만으로 완료가 아닌 것 |
 |---|---|---|
@@ -91,4 +91,16 @@ A만으로 KM-03.4 또는 KM-03 전체를 완료로 표시하지 않는다. 문�
 
 KM-03.4 A 완료: `document_corpora`를 명시한 실제 profile에서 매니저가 만든 검토 지식을 구축하고 held 후보의 원문/인용을 조회했다. 별도 docs origin의 정확한 byte·제외 자료 미혼입·live 입력 삭제 후 저장 원문 보존·durable replay·3연결 EOF0을14항목으로 검증했다. 전체 Go를 새 `-count=1`로3,838사례(3,820통과·18skip), 관련6패키지 race812사례(810통과·2skip) 실행했다. 새26사례는 위 전체/race 분모에 포함하며 별도로 더하지 않는다. build/fmt/vet/lint·문서131개·증거 보호14개를 통과했다. 초기 미사용 import/임시 경로 canonical fixture/required gate 단언 실패는 [packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-document-index/manifest.json)의 initial-failures에 보존했다. 실 운영 자료나 게시 current를 수정하지 않았다.
 
-현재 plugin launcher는 여전히 원래 유지 보수 서버이며 B의 adoption-bound profile/reader broker와 C의 실제 Claude host 전체 흐름은 미완료다. A의 native reader 증거를 그 둘의 완료로 세지 않는다. 전체11/28·기능2/7을 유지하고 B→C→KM-04로 진행한다.
+A 검증 당시 plugin launcher는 원래 유지 보수 서버였으며 그 증거만으로 B/C를 완료로 세지 않았다. 최신 B 상태는 아래 검증 완료 기록을 따른다. C의 실제 Claude host 전체 흐름은 남는다. 전체11/28·기능2/7을 유지하고 B→C→KM-04로 진행한다.
+
+
+B 실행 계약: plugin MCP는 `cks.dataset`4개·`cks.manager`13개·실제 scoped `cks.context.get_for_task_v2`1개를 제공한다. 원래 metadata 서버의 dummy context와 legacy ops를 노출하지 않는다. 최초에는 collection/draft/review 등의 준비 도구와 metadata만 사용하고 `select_input`으로 정확한 현재 adoption을 선택하기 전 inspect/build를 거부한다. 공개 입력 파일을 사용자가 직접 작성할 선행 조건은 없으며 매니저 도구가 source를 읽고 제안/질문을 만든다. 검토 응답은 실제 제공된 내용만 기록한다.
+
+선택은 소유 token·checksum·원자적 fsync state로 저장하며 writer 한 개만 허용한다. 실행 중인 관찰 작업이나 접수 불확실 pending intent가 있으면 다른 입력으로 바꾸지 않는다. 최초 배포 경로는 hold_for_review만 허용한다. 입력 검토를 DB 게시 승인으로 승계하지 않는다. 접수 전에 exact request를 저장하며 응답/저장 I/O가 불확실하면 성공을 추정하지 않는다. 원래 요청으로만 재실행하고, 이미 받은 job ID가 있으면 `resume_build`가 원래 request digest를 실제 scoped status와 비교한 뒤 접수된 같은 작업만 replay한다. 원문/검토가 바뀌어도 과거 상태/receipt를 읽을 수 있으나 새 요청/조회에 과거 승인을 붙이지 않는다. 접수 결과도 job ID도 모르는 상태에서 원문/검토까지 바뀌면 자동 재접수하지 않고 reconciliation을 요구한다.
+
+`select_reader`는 현재 adoption·실제 status의 held/succeeded 후보·예상 좌표·다시 inspect한 source/input/model pin이 일치해야 한다. 초기화는 아직 조회가 아니며, 실제 응답의 좌표/인용을 확인한 때만 관찰 시점을 저장한다. 저장 selection/과거 관찰은 현재 검증 결과가 아니고 매 사용·재시작 때 다시 검사한다. 회수/대체·원문 변경·손상/삭제·타 프로젝트/후보는 fallback 없이 거부한다. `clear_reader`는 lease만 해제한다. stdout은 JSON-RPC만 사용하고 부모 EOF는 소유 CKS reader/유지 보수 child를 실제 종료한다. child EOF 실패를 정상 종료로 숨기지 않는다. B는 actual proxy 범위로 검증했으며 C 실제 Claude host·유료 모델 품질·독립 수용으로 확대하지 않는다.
+
+
+KM-03.4 B 완료: broker29·수집23·등록14·실제 stdio launcher26항목/3연결 EOF0·native strict package/skill/agent3개·증거 보호14개를 검증했다. 실제 MCP 도구로 수집→근거→초안→질문/제공 검토→filtered adoption 선택→공개 build/status→정확한 후보 reader→실제 원문/인용→재시작→회수를 연결했다. 입력/좌표 불일치·원문 변경·이미 열린 reader의 신원 손상·회수 후 재시작도 거부했다. 접수 응답 손실·불확실한 저장의 보수적 복구는 unit 주입 시험이며 실제 host kill 검증은 C다. Go1,256개·의존/fixture byte가 A와 같아 전체3820통과/18skip·race810통과/2skip을 참조했다. 이번 Go를 새로 실행한 것으로 세지 않는다. [B packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-broker/manifest.json)을 따른다.
+
+전체11/28·기능2/7이며 다음은 C의 실제 설치 Claude Code와 로컬 시험 응답기를 연결하는 검증이다. 실제 모델 품질·독립 수용은 별도다. KM-03.4 또는 KM-03 전체는 C 검증 전에 완료로 표시하지 않는다.

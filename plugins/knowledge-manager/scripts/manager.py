@@ -291,8 +291,9 @@ def main():
             require(args.registration,'registration_required')
             r = load_registration(args.registration)
             if args.operation=='serve':
-                binary = r['binaries']['cks']['path']
-                os.execv(binary,[binary,'mcp','--config',str(Path(r['state_root'])/'cks.json')])
+                from broker import serve
+                serve(args.registration)
+                return 0
             if args.operation in ('collect','evidence','draft','draft-status'):
                 from collection import collect,evidence,draft,load_draft
                 if args.operation=='collect':
@@ -321,7 +322,7 @@ def main():
                     result = {'schema_version':1,'stage':'current_reviewed_input_not_DB_publication','input_project':str(directory/'project'),'receipt':receipt,'workflow':state}
             else:
                 result = {'schema_version':1,'stage':'registration_verified_not_built','project_id':r['project_id'],'profile_id':r['profile_id'],
-                          'draft_collection':True,'review_workflow':True,'managed_reader_broker':False,'scheduling':False,'model_readiness':'not_measured'}
+                          'draft_collection':True,'review_workflow':True,'managed_reader_broker':True,'scheduling':False,'model_readiness':'not_measured'}
                 if args.connect:
                     result['connection'] = connect(r)
         print(json.dumps(result,ensure_ascii=False))

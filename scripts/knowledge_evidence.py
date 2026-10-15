@@ -3,6 +3,7 @@ import gzip
 import hashlib
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 
 
@@ -88,4 +89,38 @@ def current_go(root,folder,validation,binding):
         require(validation['commands'][label]['exit_code']==0 and '-count=1'in validation['commands'][label]['argv'],'current Go command failed/cached')
     require(validation['commands']['module']['argv'][-1]=='./...'and '-race'in validation['commands']['race']['argv']
             and validation['race']['packages']==6,'Go execution scope reduced')
+    return roadmap
+
+
+def unchanged_document_index_go(root,validation):
+    """Reuse A's new Go run only when all Go/dependency/fixture inputs match."""
+    ref = validation['Go_reference']
+    require(ref['revision'].startswith('bb71aae3'),'unexpected Go reference')
+    path = Path(ref['manifest'])
+    require(not path.is_absolute()and '..'not in path.parts,'unsafe Go reference')
+    body = (root/path).read_bytes()
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+    manifest = json.loads(body)
+    folder = root/path.parent
+    binding_data = (folder/'source-binding.json').read_bytes()
+    require(sha(binding_data)==next(r['sha256']for r in manifest['artifacts']if r['path']=='source-binding.json'),'Go source manifest changed')
+    binding = json.loads(binding_data)
+    # Plugin Python/skills are independently verified by each new checkpoint.
+    # They are not inputs to Go compilation/tests; all other prior bound
+    # dependencies, approved fixtures and the entire maintained Go set remain.
+    for name,digest in {**binding['source_sha256'],**binding['approved_input_sha256']}.items():
+        if not name.startswith('plugins/knowledge-manager/'):
+            require(sha((root/name).read_bytes())==digest,'Go/dependency/fixture input changed')
+    expected = {n for n in binding['source_sha256']if n.endswith('.go')and n.startswith(('cmd/','internal/','pkg/'))}
+    actual = {p.relative_to(root).as_posix()for d in ('cmd','internal','pkg')for p in(root/d).rglob('*.go')if p.is_file()}
+    require(expected==actual and len(actual)==ref['maintained_Go_files_equal']==1256,'Go files added or removed')
+    spec = importlib.util.spec_from_file_location('reused_document_go_roadmap',root/'scripts/check-knowledge-roadmap.py')
+    roadmap = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(roadmap)
+    for label in ('module','race'):
+        data = (folder/(label+'.jsonl.gz')).read_bytes()
+        require(sha(data)==next(r['sha256']for r in manifest['artifacts']if r['path']==label+'.jsonl.gz'),'Go raw proof changed')
+        counts,_ = roadmap.test_inventory(gzip.decompress(data))
+        require(counts==validation[label]and counts['failed_tests']==counts['failed_packages']==0,'Go proof counts/skip changed')
+    require(validation['current_Go_validation_reused']is True and validation['Go_inputs_unchanged']is True,'referenced Go presented as fresh run')
     return roadmap

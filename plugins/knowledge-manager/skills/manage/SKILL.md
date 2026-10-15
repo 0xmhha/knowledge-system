@@ -23,10 +23,17 @@ phase boundaries in `${CLAUDE_PLUGIN_ROOT}/README.md` first.
    the workflow; do not bypass them with a legacy operation or direct DB writes.
 4. Launch Claude with this plugin and `CKS_MANAGER_REGISTRATION` set to that
    registration. Discover the actual MCP aliases. Use the registered
+   manager collection/draft/review/adoption tools first. Explicitly select the
+   current filtered adoption with `cks.manager.select_input`; do not inspect or
+   build the original unfiltered registration source. Then use the registered
    `cks.dataset.inspect_profile`, `cks.dataset.build`, `cks.dataset.status`,
    `cks.dataset.cancel` contracts. Copy all source/input/model/profile/base pins
-   from the current inspection. Use a fresh version/key for a new intended build;
-   after interruption replay the original request/key, not a new guessed request.
+   from the current inspection and use `hold_for_review`; this broker does not
+   authorize automatic activation. Use a fresh version/key for new intent.
+   After interruption replay the original request/key. For an already observed
+   job, `resume_build` verifies its exact original request digest before replay.
+   Pending/unknown admission is a reconciliation state, not permission to create
+   work with a different key/input.
 5. Treat accepted/queued/cancel_requested/recovering/held_for_review as distinct
    from succeeded/activated. A past publication receipt is not serving adoption.
    On cancellation poll until actual termination; do not say canceled on receipt
@@ -70,9 +77,20 @@ unfiltered source. Use `retract` only with supplied actor/reason/response and th
 exact adoption/current revision. It withdraws future input use; published DB
 rollback remains a separate explicit maintenance action.
 
-The managed reader broker and scheduling remain unimplemented. Maintenance
-context tools are not verified reads of the managed DB. Do not invent reader or
-scheduling commands, and record missing capabilities without dummy evidence.
+For an actual DB read, use `cks.manager.select_reader` with the exact scoped
+job ID and candidate coordinates. It must match the selected adoption and the
+current source/input/model pins. Held candidates remain held. Initialization
+alone is not observed serving; only the actual `cks.context.get_for_task_v2`
+response supplies bodies/citations. Check its coordinates/project/dataset and
+preserve refusals for drift, withdrawal, superseded input, corruption, missing
+versions or foreign candidates. No metadata/dummy/current fallback is allowed.
+A saved selection or past validated read is an as-of record; the broker rechecks
+it on every use/restart. `clear_reader` releases the lease without deleting data.
+Use `cks.manager.status` for stage/pending intent and the existing native status
+for the job. They do not authenticate reviewers or rewrite publication history.
+
+Scheduling and actual Claude host end-to-end verification remain later stages.
+Do not invent scheduling commands or model/quality acceptance.
 
 Git change evidence uses a separate `change` origin. Its selected existing-file,
 HEAD-to-working-tree scope and explicit limits do not prove complete deletion

@@ -100,3 +100,5 @@ KM-03.2 수집23·등록14·실제 두 프로젝트/Git/native 초안24항목·�
 KM-03.3을 검토35·수집23·등록14·실제 CLI/native24항목·증거14개로 완료했다. 전체11/28·기능2/7이며 남은17개는 KM-03.4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 다음은 KM-03.4다. 통제 응답과 filtered input 채택을 실제 사람 인증·DB 게시·검색으로 확대하지 않는다.
 
 KM-03.4 중간 A: 일반 검토 문서 입력을 실제 공개 build/retained reader에 연결해14항목·3연결 EOF0을 검증했다. 새 전체 Go3820통과/18skip·race810통과/2skip과 build/fmt/vet/lint·문서·증거14개를 통과했다. B adoption-bound 유지 보수/reader와 C 실제 Claude host는 남아 전체11/28·기능2/7을 유지한다. 다음은 B→C이며 남은17개와 별도 후속 범위를 위 목록대로 추적한다.
+
+KM-03.4 중간 B: 실제 manager18도구·broker29시험·actual stdio26항목/3 EOF0·수집23·등록14·native3·증거14개를 검증했다. filtered input→공개 build→후보 원문/인용·드리프트/손상/회수/재시작을 연결했다. Go는 A와 동일한1256개와 의존/fixture byte를 확인한 뒤 참조했다. C 실제 Claude host가 남아 전체11/28·기능2/7이다. 다음은 C→KM-04→KM-05→KM-06→OE-01이며 남은17개와 별도 후속 범위를 위 목록대로 추적한다.
