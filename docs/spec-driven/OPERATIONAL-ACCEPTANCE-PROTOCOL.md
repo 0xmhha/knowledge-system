@@ -1,5 +1,7 @@
 # 운영 검증 실행 protocol과 동결 준비
 
+정책 입력의 후속 [실제 AST 프런트엔드/연결기 진단](./POLICY-REFERENCE-DIAGNOSIS.md)에서 기존6개 경고와 경고 없는 다른 함수 연결1개를 재현했다. 수정7개 사본은146개 연결·경고0개이며 새 평가 overlay 채택은 미정이다. 원본 source-bound 입력·과거 packet·gold·동결 상태는 변경하지 않았다. 이 진단은 stage0 준비 근거이며 실제 설치/index/MCP·독립 정책 의미·품질 수용을 대신하지 않는다.
+
 2026-10-15. 단계0은 **preparing**이다. [계획](./OPERATIONAL-ACCEPTANCE-PLAN.md)의 대상·기준을 [실행용 JSON](./OPERATIONAL-ACCEPTANCE-PROTOCOL.json)으로 옮겼고, [진행 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 준비 근거를 연결했다. source 입력 후보와 runtime recipe 초안을 준비했으며 새 정답·검토 승인·확정된 실행 recipe가 없어 실행 허용은 false, 동결 기록은 null이다.
 
 ## 이번에 확인한 준비 근거

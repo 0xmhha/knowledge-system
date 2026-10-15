@@ -1,0 +1,107 @@
+// Preparation probe: actual CKG AST frontend + policy resolver, no package load/index/model.
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"sort"
+
+	golang "github.com/0xmhha/knowledge-system/internal/graph/parse/golang"
+	"github.com/0xmhha/knowledge-system/pkg/graph/policy"
+	"github.com/0xmhha/knowledge-system/pkg/graph/types"
+)
+
+type sourceFile struct{ Path, Source string }
+type input struct {
+	Files                          []sourceFile
+	OriginalPolicy, ProposedPolicy string
+}
+type match struct {
+	ID        string         `json:"id"`
+	Type      types.NodeType `json:"type"`
+	QName     string         `json:"qualified_name"`
+	Path      string         `json:"path"`
+	Line      int            `json:"line"`
+	StartByte int            `json:"start_byte"`
+	EndByte   int            `json:"end_byte"`
+}
+type reference struct {
+	Policy  string  `json:"policy_id"`
+	Target  string  `json:"target"`
+	Matches []match `json:"matches"`
+}
+type resolution struct {
+	References []reference          `json:"references"`
+	Result     policy.ResolveResult `json:"result"`
+}
+
+func resolve(f *policy.File, nodes []types.Node, path string) resolution {
+	byName := map[string][]match{}
+	for _, n := range nodes {
+		byName[n.QualifiedName] = append(byName[n.QualifiedName], match{n.ID, n.Type, n.QualifiedName, n.FilePath, n.StartLine, n.StartByte, n.EndByte})
+	}
+	out := resolution{References: []reference{}, Result: policy.Resolve(f, nodes, path)}
+	for _, p := range f.Policies {
+		for _, target := range p.Governs {
+			matches := byName[target]
+			if matches == nil {
+				matches = []match{}
+			}
+			out.References = append(out.References, reference{p.ID, target, matches})
+		}
+	}
+	return out
+}
+func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+func run() error {
+	var in input
+	if err := json.NewDecoder(os.Stdin).Decode(&in); err != nil {
+		return err
+	}
+	before, err := policy.LoadFromFile(in.OriginalPolicy)
+	if err != nil {
+		return err
+	}
+	after, err := policy.LoadFromFile(in.ProposedPolicy)
+	if err != nil {
+		return err
+	}
+	sort.Slice(in.Files, func(i, j int) bool { return in.Files[i].Path < in.Files[j].Path })
+	p := golang.New("/source")
+	nodes := []types.Node{}
+	skipped := []string{}
+	for _, f := range in.Files {
+		src := []byte(f.Source)
+		parsed, err := parser.ParseFile(token.NewFileSet(), f.Path, src, parser.ParseComments)
+		if err != nil {
+			return err
+		}
+		if ast.IsGenerated(parsed) {
+			skipped = append(skipped, f.Path)
+			continue
+		}
+		r, err := p.ParseFile(filepath.Join("/source", f.Path), src)
+		if err != nil {
+			return err
+		}
+		nodes = append(nodes, r.Nodes...)
+	}
+	return json.NewEncoder(os.Stdout).Encode(map[string]any{
+		"kind":              "ckg_ast_frontend_and_policy_resolver_preparation_only",
+		"source_file_count": len(in.Files), "generated_skipped": skipped, "code_node_count": len(nodes),
+		"original":   resolve(before, nodes, "original-policy.yaml"),
+		"proposed":   resolve(after, nodes, "proposed-policy.yaml"),
+		"type_aware": false, "index_persisted": false, "model_executed": false,
+		"approved": false, "gold_records": 0, "independent_acceptance": "not_recorded",
+	})
+}

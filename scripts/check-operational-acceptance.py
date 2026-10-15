@@ -237,6 +237,19 @@ def check(root, protocol, ledger, require_frozen=False):
             packet_check = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(packet_check)
             errors.extend(packet_check.check((root / source_preparation["manifest"]).parent, root))
+    diagnosis = protocol.get("policy_reference_diagnosis")
+    if diagnosis != ledger.get("policy_reference_diagnosis"):
+        errors.append("protocol/ledger policy-reference diagnosis references differ")
+    if diagnosis is not None:
+        if (diagnosis.get("kind") != "unapproved_unapplied_ast_probe_only"
+                or not file_hash(diagnosis.get("manifest"), diagnosis.get("manifest_sha256"))):
+            errors.append("policy-reference diagnosis scope or manifest binding differs")
+        else:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("policy_diagnosis_check", Path(__file__).with_name("check-policy-reference-diagnosis.py"))
+            checker = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(checker)
+            errors.extend(checker.check((root / diagnosis["manifest"]).parent, root))
     for row in requirements:
         if row.get("decision_status") != "approved" or not human_receipt(row.get("receipt"), digest):
             pending.append(row.get("id", "unknown freeze requirement"))

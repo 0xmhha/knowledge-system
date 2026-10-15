@@ -71,6 +71,19 @@ class PreparationGuardTests(unittest.TestCase):
         self.protocol["source_inventory_sha256"] = "0" * 64
         self.assertTrue(self.errors())
 
+    def test_policy_reference_diagnosis_cannot_claim_approved_scope(self):
+        if 'policy_reference_diagnosis' not in self.protocol:
+            self.skipTest('diagnosis not yet recorded')
+        for value in (self.protocol, self.ledger):
+            value['policy_reference_diagnosis']['kind'] = 'approved_operational_acceptance'
+        self.assertTrue(self.errors())
+
+    def test_policy_reference_diagnosis_reference_cannot_disappear(self):
+        if 'policy_reference_diagnosis' not in self.protocol:
+            self.skipTest('diagnosis not yet recorded')
+        self.ledger.pop('policy_reference_diagnosis')
+        self.assertTrue(self.errors())
+
     def test_missing_requirement_cannot_disappear(self):
         self.protocol["freeze_requirements"].pop()
         self.assertTrue(self.errors())

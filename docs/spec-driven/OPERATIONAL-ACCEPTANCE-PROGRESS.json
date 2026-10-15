@@ -236,7 +236,8 @@
         "chainbench_readiness_fix": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
         "coding_agent_readiness_fix": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json",
         "isolated_host_connection": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json",
-        "policy_security_source_preparation": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json"
+        "policy_security_source_preparation": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "policy_reference_diagnosis": "docs/spec-driven/operational-preparation/policy-reference-diagnosis/manifest.json"
       },
       "completed_preparation": [
         "read_only_source_inventory",
@@ -251,7 +252,8 @@
         "chainbench_stdio_readiness_patch_with_isolated_state_and_controlled_regression",
         "coding_agent_evaluation_only_exit_and_stop_reentry_controlled_regression",
         "adopted_consumer_sources_and_actual_cli_local_scripted_connection_five_cases",
-        "existing_policy_reference_inventory_rule_call_census_and_twelve_source_queries"
+        "existing_policy_reference_inventory_rule_call_census_and_twelve_source_queries",
+        "actual_ast_frontend_policy_reference_diagnosis_and_seven_unapplied_corrections"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -293,7 +295,18 @@
         "actual_agent_role_pipeline_sessions": 0,
         "real_model_inference": "not_run",
         "source_inventory_tests_passed": 8,
-        "source_packet_tests_passed": 8
+        "source_packet_tests_passed": 8,
+        "policy_reference_diagnosis": {
+          "kind": "local_ast_probe_not_operational_acceptance",
+          "original_edges": 140,
+          "original_warnings": 6,
+          "proposed_edges": 146,
+          "proposed_warnings": 0,
+          "unapproved_corrections": 7,
+          "tests_passed": 13,
+          "original_overlay_modified": false,
+          "runtime_index_or_model_executed": false
+        }
       },
       "candidate_counts": {
         "source_functions": 40,
@@ -387,5 +400,10 @@
     "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
     "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
     "kind": "source_drafts_not_gold_or_runtime"
+  },
+  "policy_reference_diagnosis": {
+    "manifest": "docs/spec-driven/operational-preparation/policy-reference-diagnosis/manifest.json",
+    "manifest_sha256": "480d412e3fdcc854866e04e5c0fb009f8b14049ae8a4132c3a72ce054d0d0f04",
+    "kind": "unapproved_unapplied_ast_probe_only"
   }
 }

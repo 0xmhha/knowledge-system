@@ -31,4 +31,6 @@
 
 ## 정책·보안 입력 준비 추가
 
+후속 [정책 참조 연결 진단](./POLICY-REFERENCE-DIAGNOSIS.md)은 실제 CKG AST 프런트엔드와 policy resolver에서 기존6개 경고 및 경고 없는 잘못된 함수 연결1개를 확인했다. 수정7개 사본에서는146개 연결·경고0개다. 원본 source-bound YAML/기존 packet은 그대로이며 새 overlay 채택·실제 index/MCP·독립 의미 검토는 남는다. 이 진단의 source pin·raw 출력·도구·실패 이력은 별도 manifest에 결속한다. 단계0 preparing·운영 수용0/9를 유지한다.
+
 [검토 자료](./POLICY-SECURITY-INPUT-REVIEW.md)에 기존 project 정책42개/참조146개와 source-only query12개, 두 지원 규칙 관련 호출68개를 기록했다. source 이름 힌트140개·미연결6개는 실제 graph 판정이 아니다. 두 command 인자 힌트는 build 지원 코드이고 conversion-error 힌트는0이다. WI-2의 새 독립 양성·음성 기준을 충족하지 못하므로 actual detector/품질을 통과시키지 않는다. 수동 security metadata4개도 취약점/자동 rule 정답이 아니다. public/private를 분리했고 과거 질문에 나온 splitAndTrim은 제외했다. reviewer·모델/비용 지정과 독립 gold/family/split 채택은 미결이며 단계0 preparing·운영 수용0/9를 유지한다.
