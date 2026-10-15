@@ -82,7 +82,7 @@
 
 ### KM-04 — 매니저의 지속·주기 갱신 · P0, KM-03 의존
 
-- [ ] KM-04.1: 수동 갱신, 구성 가능한 정기 실행, 코드/문서 변경 신호의 trigger와 마지막 성공 기준을 설계한다. source commit뿐 아니라 문서·지식 팩·ontology·config/model 변경도 추적한다.
+- [x] KM-04.1: 수동 갱신, 구성 가능한 정기 실행, 코드/문서 변경 신호의 trigger와 마지막 성공 기준을 설계한다. source commit뿐 아니라 문서·지식 팩·ontology·config/model 변경도 추적한다.
 - [ ] KM-04.2: 무변경 no-op·변경/삭제/이름 변경·의미 연결 stale 판정·재검토 필요 범위를 구현한다. 근거가 바뀐 verified 지식의 검토를 무조건 승계하지 않는다. 증분 처리가 불가능한 경로는 새 버전 전체 rebuild로 처리한다.
 - [ ] KM-04.3: 잡 중복/겹침·lease·재시작·누락 실행의 다음 실행 처리·중단·retry/backoff·자원 상한·관측 상태를 구현한다. 활성 데이터는 설정된 gate를 통과한 후보로만 전환한다.
 - [ ] KM-04.4: 최소 두 번의 실제 내용 변경과 no-op, 실패 후 복구를 연속 실행해 최신 조회·이전 snapshot 재현·원천 삭제/회수 반영과 다른 프로젝트 불변을 확인한다. 실제 주기 trigger 실행 증거를 수동 호출 증거와 분리한다.
@@ -161,3 +161,10 @@ KM-03.4 C 완료: 실제 설치 Claude Code2.1.300을8회 실행해68개 도구 
 로컬 시험 응답기는 실제 host가 호출할 동작만 제공하고 MCP 결과는 실제 매니저/CKS에서 받았다. 모델 호출·비용은0이며 자율 에이전트 성능·의미 품질·독립 사람 수용을 판정하지 않았다. strict MCP fixture는 plugin 선언의 실제 launcher를 명시 연결했다. 처음의 strict discovery 설정·실제 SIGINT 종료 오류·시험 parser/retry 단언 및 test-only ResourceWarning은 initial-failures에 보존했다. 원본 source와 기존 current는 수정하지 않았다.
 
 [C packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json)을 따른다. 전체12/28·기능3/7 완료다. 남은16개는 KM-04.1–4(정기/변경 갱신), KM-05.1–4(공통 개념 매핑), KM-06.1–4(비교 근거 MCP), OE-01.1–4(온톨로지 효과 평가)다. 다음은 KM-04.1의 trigger·성공 기준·변경 pin 설계다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 이어간다.
+
+
+## KM-04.1 계약 검증 완료
+
+KM-04.1 완료: 명시 정책·수동/정기/변경 polling·clock skew/놓친 일정 합치기·등록/프로젝트/명시 corpus 범위·재시도 상한·required gate와 held/게시 성공 계약을27개 반례로 검증했다. 문서 없는 source의 자동 관찰 입력과 사람의 의미 검토를 분리하고 변경된 verified 지식의 무조건 승계를 금지했다. 이 단계는 설계/정책 판정이며 scheduler 실행·자동 DB 갱신 완료가 아니다. build/fmt/vet/lint·문서132개·증거 보호10개를 통과했다. Go/의존/fixture byte가 C와 같아3,820통과·18skip 및 race810통과·2skip의 committed 원자료를 참조했으며 새 Go 실행으로 세지 않는다.
+
+[지속 갱신 계약](./KNOWLEDGE-MANAGER-UPDATES.md)과 [정책 계약 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-contract/manifest.json)을 따른다. 전체13/28·기능3/7이다. 다음은 KM-04.2의 변경/삭제/no-op·자동 관찰 입력 구현이다. 남은15개는 KM-04.2–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 계속한다.

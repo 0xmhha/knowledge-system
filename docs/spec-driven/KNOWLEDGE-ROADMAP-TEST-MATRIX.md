@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 KM-01·KM-02·KM-03을 완료했다. 전체28개 중12개 완료·3개 진행 중(OE-01.1–03)·13개 미착수다. 다음은 KM-04.1의 정기/변경 갱신 계약이다. [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [별도 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 KM-01·02·03과 KM-04.1을 완료했다. 전체28개 중13개 완료·3개 진행 중(OE-01.1–03)·12개 미착수다. 다음은 KM-04.2의 변경/삭제/no-op과 자동 관찰 입력이다. [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [작업표](../REMAINING-WORK.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는3/7이다.
 
@@ -20,7 +20,7 @@
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 완료 | 수집23·등록14·실제 Git/CKS native 초안24·증거13; 사람 검토/DB 조회 아님 |
 | KM-03.3 | 암묵지 질문·불확실성·검토/채택/회수 | 완료 | 검토35·수집23·등록14·실제 CLI/native24·증거14; 통제 응답, DB 조회/신원 인증 아님 |
 | KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 완료 | 실제 CLI8회·도구68개, manager103·native3·증거16, 정상 종료0·중단/복구 |
-| KM-04.1 | 수동·정기·변경 trigger와 성공 기준 | 미착수 | 미실행 |
+| KM-04.1 | 수동·정기·변경 trigger와 성공 기준 | 완료 | 정책/시각/성공27개·증거10개; 실제 scheduler 미실행 |
 | KM-04.2 | 변경/삭제/no-op/stale와 재검토 | 미착수 | 미실행 |
 | KM-04.3 | 중복·lease·재시작·retry·자원 상한 | 미착수 | 미실행 |
 | KM-04.4 | 두 번 변경+no-op+실패 복구·실제 주기 실행 | 미착수 | 미실행 |
@@ -518,3 +518,9 @@ KM-03.4 C 완료: 실제 설치 Claude Code2.1.300을8회 실행해68개 도구 
 로컬 시험 응답기는 실제 host가 호출할 동작만 제공하고 MCP 결과는 실제 매니저/CKS에서 받았다. 모델 호출·비용은0이며 자율 에이전트 성능·의미 품질·독립 사람 수용을 판정하지 않았다. strict MCP fixture는 plugin 선언의 실제 launcher를 명시 연결했다. 처음의 strict discovery 설정·실제 SIGINT 종료 오류·시험 parser/retry 단언 및 test-only ResourceWarning은 initial-failures에 보존했다. 원본 source와 기존 current는 수정하지 않았다.
 
 [C packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json)에 새 Go 원시 결과·전체 사례 목록·103개 로그·8회 raw trace를 보존한다. 현재 소스1,703입력=Go1,256+기타447이며 승인5입력은 그대로다. B는c51f7423 snapshot에서 검증했다. 전체12/28·기능3/7 완료다. 남은16개는 KM-04.1–4(정기/변경 갱신), KM-05.1–4(공통 개념 매핑), KM-06.1–4(비교 근거 MCP), OE-01.1–4(온톨로지 효과 평가)다. 다음은 KM-04.1의 trigger·성공 기준·변경 pin 설계다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 이어간다.
+
+## KM-04.1 명시 정책·trigger·성공 계약
+
+KM-04.1 완료: 명시 정책·수동/정기/변경 polling·clock skew/놓친 일정 합치기·등록/프로젝트/명시 corpus 범위·재시도 상한·required gate와 held/게시 성공 계약을27개 반례로 검증했다. 문서 없는 source의 자동 관찰 입력과 사람의 의미 검토를 분리하고 변경된 verified 지식의 무조건 승계를 금지했다. 이 단계는 설계/정책 판정이며 scheduler 실행·자동 DB 갱신 완료가 아니다. build/fmt/vet/lint·문서132개·증거 보호10개를 통과했다. Go/의존/fixture byte가 C와 같아3,820통과·18skip 및 race810통과·2skip의 committed 원자료를 참조했으며 새 Go 실행으로 세지 않는다.
+
+[정책 계약 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-04-contract/manifest.json)에27개 전체 사례 이름·실행 로그와 실제 host C의 동결 검증을 보존한다. 소스1,704입력=Go1,256+기타448, 원래 승인5개는 보존한다. 전체13/28·기능3/7이다. 다음은 KM-04.2의 변경/삭제/no-op·자동 관찰 입력 구현이다. 남은15개는 KM-04.2–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 계속한다.
