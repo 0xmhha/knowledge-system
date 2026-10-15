@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'real-project-comparison': {
+        'revision': 'efd43995', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-06-real-projects',
+        'scope': 'historical_KM06_complete_actual_real_project_source_MCP_not_ontology_quality_effect',
+        'scripts': ['check-real-comparison-evidence.py', 'test_real_comparison_evidence.py'],
+    },
     'comparison-failures': {
         'revision': 'dd554e79', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-06-failures',
         'scope': 'historical_KM06_3_actual_owned_partial_failure_budget_signal_not_real_projects',
@@ -173,6 +178,17 @@ def verify(checkpoint='journal-foundation', root=ROOT):
     folder = selected.get('base',BASE) + selected['folder']
     manifest, binding = json.loads(read(folder + '/manifest.json')), json.loads(read(folder + '/source-binding.json'))
     paths = set(manifest['source_sha256']) | set(binding['approved_input_sha256']) | {'scripts', BASE.rstrip('/'), folder, 'system/contracts/versioned-maintenance'}
+    # A checkpoint with unchanged Go references a prior fresh execution. Its
+    # immutable raw proof is a transitive dependency of an isolated restore.
+    validation = json.loads(read(folder + '/validation.json'))
+    reference = validation.get('Go_reference')
+    if reference:
+        proof = PurePosixPath(reference['manifest'])
+        if proof.is_absolute() or '..' in proof.parts or str(proof) != reference['manifest']:
+            raise ValueError('unsafe Go proof reference')
+        if hashlib.sha256(read(str(proof))).hexdigest() != reference['manifest_sha256']:
+            raise ValueError('Go proof reference differs in committed snapshot')
+        paths.add(str(proof.parent))
     paths.update('docs/spec-driven/' + name for name in ('KNOWLEDGE-ROADMAP-PROGRESS.json', 'KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md',
         'KNOWLEDGE-ROADMAP-TEST-MATRIX.md', 'PROJECT-COLLECTION-ISOLATION.md', 'VERSIONED-MAINTENANCE-CONTRACT.md', 'VERSIONED-MAINTENANCE-RUNTIME.md'))
     for name in paths:

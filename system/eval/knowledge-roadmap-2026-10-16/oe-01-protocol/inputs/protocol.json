@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "stage": "preregistered_no_new_query_execution",
+  "question_count": 16,
+  "retrieval_scored_questions": 14,
+  "unscored_source_controls": 2,
+  "fact_families": 5,
+  "unique_function_units": 11,
+  "approved_concepts": 4,
+  "approved_implementation_links": 0,
+  "arms": [
+    "off",
+    "concept_text",
+    "relations",
+    "combined"
+  ],
+  "counts": {
+    "warmup": 1,
+    "retrieval": 2,
+    "warm_latency": 5,
+    "cold_process": 0
+  },
+  "planned_capture_calls": 512,
+  "API_instrumentation": {
+    "mode": "owned loopback HTTP proxy to approved local Ollama127.0.0.1:11434",
+    "attribution": "question-arm batch; metadata/readiness separated",
+    "recorded": "path/status/request SHA256 and byte length, elapsed time, optional server-reported prompt_eval_count",
+    "token_counts_inferred_from_bytes": false,
+    "latency_scope": "same proxy for all arms; local proxy overhead included; descriptive warm latency"
+  },
+  "mode_order": "rotate per question index",
+  "scoring_cap": 10,
+  "search_caps": "identical non-mode generated configuration; actual settings recorded before capture",
+  "model": {
+    "name": "bge-m3:latest",
+    "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "dimension": 1024
+  },
+  "requests_sha256": "6a5ffb1c7e48b980e448944562e55329a3b09013f3b3df9fe2229b19a33317e3",
+  "labels_sha256": "1e21aa7b13e39fe6c5fda88e8294ba14c917e1e9255e2afbc5d2ec134027f9a0",
+  "criteria_sha256": "15acf5d3cc687057b2b9a9783e697e8a7e8169e4f874f1288e8c577e68dc49c2",
+  "quality_acceptance": false,
+  "independent_gold_or_holdout": false,
+  "LLM_answer_quality": null,
+  "paid_model_calls": 0,
+  "default_ontology_mode_changed": false,
+  "limitations": [
+    "questions authored after prior no_match results; mechanism-focused development study, not untouched holdout",
+    "same fact language variants and repeated calls are clustered, not independent new facts",
+    "source-derived finite function-finding oracle, not human accepted general behavior/policy relevance",
+    "old13/42 and old12 questions are not reused as independent new question data; reference families overlap and are disclosed",
+    "relations arm has zero reviewed implementation assertions; execution does not create missing semantic links",
+    "local shared host small warm sample; descriptive latency only; independent acceptance remains separate"
+  ]
+}
