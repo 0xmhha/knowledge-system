@@ -151,19 +151,26 @@
       "priority": "P0",
       "scope": "knowledge_manager_plugin",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "not_started",
-      "design_status": "draft",
+      "status": "in_progress",
+      "design_status": "native_package_registration_doctor_launcher_verified_grounded_collection_next",
       "depends_on": [
         "KM-02"
       ],
-      "evidence": [],
-      "verification": "not_run",
+      "evidence": [
+        "docs/spec-driven/KNOWLEDGE-MANAGER-PLUGIN.md",
+        "plugins/knowledge-manager/README.md",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json"
+      ],
+      "verification": "registration14_native_manifest_skills_agents3_actual_metadata_bootstrap9_not_model_or_full_manager",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
           "id": "KM-03.1",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         },
         {
           "id": "KM-03.2",
@@ -180,6 +187,11 @@
           "status": "not_started",
           "evidence": []
         }
+      ],
+      "remaining": [
+        "KM-03.2 grounded document-free collection and compatible knowledge drafts",
+        "KM-03.3 tacit questions uncertainty conflicts exclusions and review/adoption/retraction",
+        "KM-03.4 actual Claude host full build/query reader binding and failure recovery"
       ]
     },
     {
@@ -396,7 +408,7 @@
   "latest_preparation_validation": {
     "adopted_policy_guard_tests_passed": 8,
     "documentation_contract_tests_passed": 20,
-    "live_documents_checked": 127,
+    "live_documents_checked": 131,
     "ontology_effect_executed": true,
     "feature_completion_count": 2,
     "ontology_effect_scope": "local descriptive observation only; no independent quality verdict",
@@ -494,8 +506,13 @@
     "public_maintenance_failure_EOF_sessions": 4,
     "public_maintenance_failure_guard_tests": 12,
     "public_maintenance_failure_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures/manifest.json",
-    "failure_binding_advance": "verified_committed_manifest_and_source_checker"
+    "failure_binding_advance": "verified_committed_manifest_and_source_checker",
+    "manager_registration_tests": 14,
+    "manager_native_validations": 3,
+    "manager_bootstrap_checks": 9,
+    "manager_bootstrap_evidence_tests": 10,
+    "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json"
   },
-  "completed_subtasks": 8,
+  "completed_subtasks": 9,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
 }

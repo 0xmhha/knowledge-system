@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 KM-01·KM-02 로컬 구현을 완료했다. 세부28개 중8개 완료·3개 진행 중(OE-01.1–03)·17개 미착수다. 다음은 KM-03.1의 Claude 지식 매니저 패키지·등록/진단/초기 구축/복구 설계다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 별도 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 KM-01·KM-02와 KM-03.1 등록 기반을 완료했다. 전체28개 중9개 완료·3개 진행 중(OE-01.1–03)·16개 미착수다. 다음은 KM-03.2의 문서 없는 프로젝트에서 근거를 수집해 지식 초안을 만드는 기능이다. [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [별도 작업표](../REMAINING-WORK.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는2/7이다.
 
@@ -16,7 +16,7 @@
 | KM-02.2 | 비동기 build/status/cancel과 정합 gate | 완료 | [공개 실행](./VERSIONED-MAINTENANCE-RUNTIME.md)28항목·실제 retained 조회2건·EOF5개·전체 Go/race·증거 보호10개 통과 |
 | KM-02.3 | idempotency/lock/중단/실패/rollback | 완료 | A–D2·실제 E1 host43/E2 retention21·전체 Go/race 검증; .4 별도 |
 | KM-02.4 | 공개 도구의 잘못된 대상·부분 실패·취소 보호 | 완료 | 실제 공개36항목·부분 DB·기존 current/reader·마지막 v4 정상 게시/조회 검증 |
-| KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 미착수 | 미실행 |
+| KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 완료 | 등록14·native3·실제 metadata bootstrap9·증거10; 초안/검토/reader 미구현 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 미착수 | 미실행 |
 | KM-03.3 | 암묵지 질문·불확실성·검토/채택/회수 | 미착수 | 미실행 |
 | KM-03.4 | 실제 Claude host 전체 구축·조회와 실패 복구 | 미착수 | 미실행 |
@@ -416,3 +416,18 @@ KM-02.3 완료로 전체7/28이며 다음은 KM-02.4의 공개 잘못된 대상/
 | 이번 별도 검사 | build/fmt/vet/lint·문서·증거 보호12개 |
 
 [실패 matrix packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures/manifest.json)과 실행 명세를 따른다. 현재 소스1,689입력은 유지 Go1,253개·기타436개이며 추가3입력은 E2 manifest와 실제 module/race raw proof다. 원래 승인5입력은 그대로다. Go를 새로 실행한 것으로 기록하지 않는다. KM-02의4/4를 완료해 전체8/28·기능2/7이다. 남은20개는 KM-03.1–4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 다음은 KM-03.1이며 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.
+
+
+## KM-03.1 완료: 매니저 패키지·등록·진단
+
+| 범위 | 결과 | 완료로 확대하지 않는 범위 |
+|---|---|---|
+| 등록 helper | 14개 시험 통과 | DB 구축/원문 문서 생성 아님 |
+| project 격리/소유 | UUID·명시 owner·겹침/legacy/변조/링크 거부 | 이름/commit을 project 신원으로 쓰지 않음 |
+| 실제 CLI strict validator | manifest/skill/agent3개 통과 | 모델 행동 검증 아님 |
+| 실제 metadata bootstrap | 9항목 통과 | 2연결·정상 EOF·4개 도구/37개 schema |
+| 소스/DB | 문서 없는 Go source 불변·dataset 미생성 | 초안/검토/reader 미구현 |
+| Go proof | E2의1253 Go·모든 입력 동일 후 참조 | 새 Go 실행으로 세지 않음 |
+| 이번 별도 gate | build/fmt/lint·문서131개·증거 보호10개 | 독립 수용/품질 아님 |
+
+[bootstrap packet](../../system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json)과 [매니저 계약](./KNOWLEDGE-MANAGER-PLUGIN.md)을 따른다. 소스1,697입력은 유지 Go1,253개·기타444개이며 추가8개는 plugin runtime/skill/agent/config/schema다. 승인5개 입력은 그대로다. 전체9/28·기능2/7 완료다. 남은19개는 KM-03.2–4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4이며 다음은 KM-03.2다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개도 별도 유지한다.
