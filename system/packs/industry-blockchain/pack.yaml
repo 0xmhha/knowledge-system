@@ -1,0 +1,67 @@
+{
+  "pack_schema_version": 1,
+  "pack_id": "industry.blockchain",
+  "version": "1.0.0",
+  "owner": "knowledge-system maintainers",
+  "scope": "Optional comparison vocabulary; no project capability, authority or quality acceptance is implied.",
+  "requires": [],
+  "concepts": [
+    {
+      "id": "transaction",
+      "kind": "entity",
+      "definition": "A proposed state-changing message and its validation or execution lifecycle."
+    },
+    {
+      "id": "consensus",
+      "kind": "process",
+      "definition": "The protocol by which participants agree on a shared ledger history under stated assumptions."
+    },
+    {
+      "id": "finality",
+      "kind": "process",
+      "definition": "The stated condition under which a ledger decision is treated as irreversible or subject to specified rollback assumptions."
+    },
+    {
+      "id": "transaction-ordering",
+      "kind": "process",
+      "definition": "The mechanism choosing and ordering transactions for proposed execution."
+    },
+    {
+      "id": "mempool-admission",
+      "kind": "process",
+      "definition": "The local handling of pending transactions before inclusion, including acceptance, replacement and removal."
+    },
+    {
+      "id": "staking",
+      "kind": "process",
+      "definition": "The explicit commitment or delegation of stake, with project-defined entry, exit and penalty behavior when supported."
+    },
+    {
+      "id": "validator-lifecycle",
+      "kind": "process",
+      "definition": "The project-defined admission, activation, duties, rotation and removal of validators."
+    },
+    {
+      "id": "staking-policy",
+      "kind": "rule",
+      "definition": "Explicitly documented or configured rules governing supported staking operations, distinct from inferred code intent."
+    }
+  ],
+  "relation_types": [],
+  "constraints": [
+    {
+      "id": "no-project-equivalence",
+      "description": "Concept alignment does not merge project, symbol, policy or evidence identities."
+    },
+    {
+      "id": "explicit-applicability",
+      "description": "No feature is universal; unsupported, uncollected and not applicable remain distinct."
+    }
+  ],
+  "competency_questions": [
+    "How do selected versions implement staking entry and withdrawal, where supported?",
+    "Which consensus, finality and settlement assumptions are evidenced for each project?",
+    "How do mempool admission, replacement, eviction and transaction ordering differ?",
+    "Which findings are unknown, unsupported or explicitly not applicable?"
+  ]
+}

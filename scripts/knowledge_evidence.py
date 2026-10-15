@@ -74,7 +74,7 @@ def unchanged_go(root,validation):
     return roadmap
 
 
-def current_go(root,folder,validation,binding):
+def current_go(root,folder,validation,binding,race_packages=6):
     """Validate a new count=1 execution when maintained Go has changed."""
     require(validation['current_Go_validation_reused']is False and validation['Go_count_flag']==1,'changed Go reused historical results')
     expected = {n for n in binding['source_sha256']if n.endswith('.go')and n.startswith(('cmd/','internal/','pkg/'))}
@@ -88,7 +88,7 @@ def current_go(root,folder,validation,binding):
         require(counts==validation[label]and counts['failed_tests']==counts['failed_packages']==0,'current Go raw/count/fail/skip differs')
         require(validation['commands'][label]['exit_code']==0 and '-count=1'in validation['commands'][label]['argv'],'current Go command failed/cached')
     require(validation['commands']['module']['argv'][-1]=='./...'and '-race'in validation['commands']['race']['argv']
-            and validation['race']['packages']==6,'Go execution scope reduced')
+            and validation['race']['packages']==race_packages,'Go execution scope reduced')
     return roadmap
 
 

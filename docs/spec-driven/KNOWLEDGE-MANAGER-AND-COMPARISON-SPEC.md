@@ -93,7 +93,7 @@
 
 ### KM-05 — 공통 산업 개념과 프로젝트별 매핑 · P1, KM-01 의존
 
-- [ ] KM-05.1: 버전 관리되는 산업 팩과 비교 질문에서 출발해 개념·정의·별칭·포함/제외·비교 축을 설계한다. 첫 후보는 blockchain의 transaction, consensus/finality, transaction ordering, mempool/admission, staking/validator lifecycle과 정책이다.
+- [x] KM-05.1: 버전 관리되는 산업 팩과 비교 질문에서 출발해 개념·정의·별칭·포함/제외·비교 축을 설계한다. 첫 후보는 blockchain의 transaction, consensus/finality, transaction ordering, mempool/admission, staking/validator lifecycle과 정책이다.
 - [ ] KM-05.2: 공통 개념과 프로젝트별 구현·문서·설정/정책·테스트 근거를 연결한다. 같은 이름이 다른 의미인 경우와 이름이 달라도 같은 역할인 경우를 모두 검토한다.
 - [ ] KM-05.3: exact/close/broader/narrower/related 등 개념 매핑의 의미·범위·검토/버전 정책을 정한다. 의미 유사성을 entity 동일성으로 바꾸거나 close 관계를 자동 전이하지 않는다. 공통 core 타입은 재정의하지 않는다.
 - [ ] KM-05.4: 동일/유사/비교 불가·미수집·미지원·명시적 비적용을 구분하고, 일부 프로젝트에 없는 기능·서로 다른 L1/L2 역할·여러 network/config·서로 다른 산업 입력을 검증한다.
@@ -223,3 +223,10 @@ Python268개(기존224+worker/MCP44), 실제 공개 MCP20항목·222도구호출
 KM-04.4 완료: 실제 두 프로젝트에서20항목·MCP221호출·정상 EOF2개를 검증했다. A는 periodic/change로7→8→9→10을 게시하고 문서·명시 ontology 원자료 root 삭제와 제공 메모 교체를 반영했다. 실제 graph 실패1건은 current/마지막 성공을 보존했고 같은 입력의 연결된 attempt2가 복구했다. no-op은 중복 job을 만들지 않았고 v1 코드/삭제된 자료의 당시 인용을 계속 조회했다. 동명 module/Value를 가진 B의 DB 전체 파일 hash·current·실제 본문/인용은 불변이었다. 비공개 자료 제외·자동 의미/사람 검토 미생성도 확인했다. 이는 mock embedding의 실제 lifecycle 검증이며 검색 품질·온톨로지 효과·독립 수용은 별도다.
 
 전체16/28·기능4/7 완료다. 다음은 KM-05.1의 산업 개념·정의·별칭·포함/제외·비교 축 설계다. 남은12개는 KM-05.1–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도로 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋하며 계속한다.
+
+
+## KM-05.1 공통 개념 팩
+
+KM-05.1 완료: 기존 knowledgepack loader를 재사용한 선택형 industry.blockchain1.0.0 팩에8개념·26비교 축을 추가했다. 한영 별칭·포함/제외·역할/버전/network/config/시점 조건, 정확 byte pin과 unknown/ambiguous 계약을29개 Go 사례로 검증했다. 단어의 exact_term 일치를 구현 매핑 승인이나 project/entity 동일성으로 해석하지 않는다. 공통 core20·운영 dataset·기본 자동 선택은 변경하지 않았다. 프로젝트 연결·비교 MCP·ontology 품질은 남는다.
+
+[설계와 사용 경계](./INDUSTRY-CONCEPT-COMPARISON.md)를 따른다. 전체17/28·기능4/7이다. 다음은 KM-05.2의 프로젝트별 코드·문서·설정/정책·테스트 근거 연결이다. 남은11개는 KM-05.2–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
