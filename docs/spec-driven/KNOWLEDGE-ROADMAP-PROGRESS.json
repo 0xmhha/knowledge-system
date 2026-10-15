@@ -247,27 +247,37 @@
       "design_status": "draft",
       "depends_on": [],
       "evidence": [
-        "docs/spec-driven/operational-preparation/ontology-effect-dev/manifest.json"
+        "docs/spec-driven/operational-preparation/ontology-effect-dev/manifest.json",
+        "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json",
+        "docs/spec-driven/ONTOLOGY-EFFECT-DEV-OBSERVATION.md"
       ],
-      "verification": "not_run",
+      "verification": "source_bound_local_observation_384_calls_verified_quality_inconclusive",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
           "id": "OE-01.1",
           "status": "in_progress",
           "evidence": [
-            "docs/spec-driven/operational-preparation/ontology-effect-dev/manifest.json"
+            "docs/spec-driven/operational-preparation/ontology-effect-dev/manifest.json",
+            "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json",
+            "docs/spec-driven/ONTOLOGY-EFFECT-DEV-OBSERVATION.md"
           ]
         },
         {
           "id": "OE-01.2",
-          "status": "not_started",
-          "evidence": []
+          "status": "in_progress",
+          "evidence": [
+            "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json",
+            "docs/spec-driven/ONTOLOGY-EFFECT-DEV-OBSERVATION.md"
+          ]
         },
         {
           "id": "OE-01.3",
-          "status": "not_started",
-          "evidence": []
+          "status": "in_progress",
+          "evidence": [
+            "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json",
+            "docs/spec-driven/ONTOLOGY-EFFECT-DEV-OBSERVATION.md"
+          ]
         },
         {
           "id": "OE-01.4",
@@ -276,7 +286,7 @@
         }
       ],
       "execution_stages": {
-        "single_project": "preparing",
+        "single_project": "descriptive_observation_complete_extended_quality_validation_pending",
         "multi_project": "not_started",
         "multi_project_depends_on": [
           "KM-05",
@@ -284,11 +294,26 @@
         ]
       },
       "remaining_preparation": [
-        "expected evidence and scoring plan",
-        "semantic DB eligibility/alignment and owned candidate",
-        "prior semantic family overlap review",
-        "paired repetition/order/resource plan"
-      ]
+        "independently reviewed complete relevant-evidence sets and English/ambiguity coverage",
+        "natural-language concept interpretation and verified implementation links",
+        "multi-project mapping/comparison after KM-05/KM-06"
+      ],
+      "local_observation": {
+        "planned_calls": 384,
+        "observed_calls": 384,
+        "failed_calls": 0,
+        "missing_calls": 0,
+        "citations_verified": 3616,
+        "bodies_verified": 3616,
+        "location_hit_at_10_all_arms": 0.625,
+        "location_RR_at_10_all_arms": 0.20729166666666665,
+        "active_arm_no_match_calls": 288,
+        "post_observation_exact_term_probe_calls": 8,
+        "post_observation_probe_final_boosts": 0,
+        "quality_verdict": "inconclusive",
+        "full_OE01_complete": false,
+        "manifest": "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json"
+      }
     }
   ],
   "documentation_validation": {
@@ -314,9 +339,13 @@
   "latest_preparation_validation": {
     "adopted_policy_guard_tests_passed": 8,
     "documentation_contract_tests_passed": 20,
-    "live_documents_checked": 122,
+    "live_documents_checked": 123,
     "original_source_binding_checks_passed": 2069,
-    "ontology_effect_executed": false,
-    "feature_completion_count": 0
+    "ontology_effect_executed": true,
+    "feature_completion_count": 0,
+    "ontology_effect_scope": "local descriptive observation only; no independent quality verdict",
+    "ontology_effect_calls": 384,
+    "ontology_mechanism_probe_calls": 8,
+    "ontology_observation_false_completion_tests_passed": 10
   }
 }

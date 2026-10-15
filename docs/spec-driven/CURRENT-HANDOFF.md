@@ -1,11 +1,11 @@
 # 현재 인수인계
 
-최신 진행: [정책 overlay 적용 검증](./POLICY-OVERLAY-ADOPTION.md)에서 별도 source0bf2f4d1 profile로 실제 graph125,089node/176,822edge·정책42/연결146·CKS24도구호출을 확인했다. 수정7건의 source/canonical parity와 음성3개를 통과했고 기존 원본/운영 current는 보존했다. 일반 domain sync는 여전히 기존 정책을 재생성하므로 생성기 수정은 미완료다. OE-01은 질문12개/4개 arm 입력 준비 중이며 기존 retained dataset에 semantic DB가 없어 별도 정합 후보를 준비하는 것이 다음이다. 효과 미실행·새 기능 완료0/7·기존 독립 수용0/9를 유지한다.
+최신 진행: [정책 overlay 적용 검증](./POLICY-OVERLAY-ADOPTION.md)에서 별도 source0bf2f4d1 profile로 실제 graph125,089node/176,822edge·정책42/연결146·CKS24도구호출을 확인했다. 수정7건의 source/canonical parity와 음성3개를 통과했고 기존 원본/운영 current는 보존했다. 일반 domain sync는 여전히 기존 정책을 재생성하므로 생성기 수정은 미완료다. [OE-01 단일 프로젝트 개발 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은 source baca2869의 별도 복제본에서384회 실패/누락0·인용3,616개 검증을 마쳤다. 활성288회 no_match·순위 차이0, 정확 용어의 별도 진단8회는 매칭/정의 검색 동작·최종 boost0이다. 기본 off·품질 inconclusive·새 기능 완료0/7·기존 독립 수용0/9를 유지한다. 다음은 KM-01 scope/key 조사와 collection 격리 계약이다.
 
 
-2026-10-15 최신 우선 범위: [지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json). 온톨로지 효과 평가 OE-01을 우선 필수 검증으로 채택했다. KM-01 프로젝트 격리, KM-02 버전 DB 운영 도구, KM-03 Claude 매니저 플러그인, KM-04 주기 갱신, KM-05 공통 개념 매핑, KM-06 비교 근거 MCP를 요구로 등록했다.7개/하위28개의 완료는0이며 OE-01 입력 준비를 시작했다. 나머지는 미착수이고 설계 초안이다. 기존 WI-5는 KM-03/04로 구체화하여 중복 집계하지 않는다. 기존 선택 후속13개 중 ontology 평가는 OE-01로 이동했으므로 선택 후보는12개다.
+2026-10-15 최신 우선 범위: [지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json). 온톨로지 효과 평가 OE-01을 우선 필수 검증으로 채택했다. KM-01 프로젝트 격리, KM-02 버전 DB 운영 도구, KM-03 Claude 매니저 플러그인, KM-04 주기 갱신, KM-05 공통 개념 매핑, KM-06 비교 근거 MCP를 요구로 등록했다.7개/하위28개의 완료는0이며 OE-01 로컬 개발 관찰만 수행했고 확대·독립 품질·다중 프로젝트 평가는 남는다. 나머지는 미착수이고 설계 초안이다. 기존 WI-5는 KM-03/04로 구체화하여 중복 집계하지 않는다. 기존 선택 후속13개 중 ontology 평가는 OE-01로 이동했으므로 선택 후보는12개다.
 
-로컬 개발·도구/회귀 검증은 정식 독립 수용의 단계0 동결·담당자·유료 모델 지정 없이 계속한다. 실제 모델 실행/독립 수용에 해당 조건을 적용한다. 다음은 정책 연결7건 보완·OE-01 단일 프로젝트 평가, 확장 경로는 KM-01→02→03→04와 KM-05→06 후 다중 프로젝트 평가다. 원래9개 구현/독립 수용 원장은 별도로 유지한다.
+로컬 개발·도구/회귀 검증은 정식 독립 수용의 단계0 동결·담당자·유료 모델 지정 없이 계속한다. 실제 모델 실행/독립 수용에 해당 조건을 적용한다. 정책 연결7건의 로컬 보완과 OE-01 첫 개발 관찰을 마쳤다. 다음 확장 경로는 KM-01→02→03→04와 KM-05→06 후 다중 프로젝트 평가다. 원래9개 구현/독립 수용 원장은 별도로 유지한다.
 
 
 2026-10-14 통합 확인 기준은 main a214fbb18039f2e63ee93c0f073bfb1b61c3e716이다. [PR #102](https://github.com/0xmhha/knowledge-system/pull/102)는 head e77e59b8의 [CI5/5](https://github.com/0xmhha/knowledge-system/actions/runs/38565382940) 통과 후 스쿼시 머지됐다. 통합 시 로컬 main/원격 main·PR tree 동일성·clean worktree·기록된 source/evidence guard를 확인했다. 현재 checkout은 `git status --short --branch`로 확인하며 고정한 통합 commit을 미래의 실시간 HEAD로 해석하지 않는다.
@@ -13,7 +13,7 @@
 ## 현재 완료와 남은 범위
 
 - 상위 WI-V1/V2/3/4/1/2/C/6/SP는 구현·명시 검증9/9 완료다.9개 운영·사람 독립 수용은 not_recorded이며 [전체 작업표](../REMAINING-WORK.md)에 별도 기록한다.
-- WI-5는 담당 저장소 미확보다. 다른9개 구현 완료 수와 구분한다. 일반 후속13개는 기능별 범위 결정이 필요하다.
+- WI-5는 KM-03/04로 구체화했고 중복 집계하지 않는다. 별도 선택 후속은12개이며 기능별 범위 결정이 필요하다.
 - go-stablenet 출처 매핑·42질문 재평가·SNK06 범위 검토3/3, 서버 종료 SD-01–04는4/4 완료다. 원래 SNK06 실패·과거 종료 오류는 보존한다. [비교/종료 작업표](./GO-STABLENET-DATASET-COMPARISON.md)를 따른다.
 - coding-agent·ChainBench의 원본 commit/patch/bundle은 구현 packet에 보존한다. knowledge-system 머지로 다른 저장소 게시·설치·운영 상태를 완료 처리하지 않는다.
 
