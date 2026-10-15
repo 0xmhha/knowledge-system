@@ -66,7 +66,7 @@
 
 - [x] KM-02.1: 현행 legacy MCP와 versioned CLI의 실제 capability 차이를 고정하고, project/version/config·source 범위를 결속하는 새 요청/오류/상태 계약을 설계한다. 새 도구명은 구현 시 schema와 함께 확정한다.
 - [x] KM-02.2: 소유한 대상의 비동기 build/status/cancel을 제공하고 source→후보→graph/vector/knowledge/semantic 정합 검사→활성화 경로를 연결한다. 검토 대기 후보와 활성 DB를 구분한다.
-- [ ] KM-02.3: idempotency·writer lock·재시도/중복 요청·timeout·부분 실패·rollback/read lease를 기존 전환 계약에 맞춰 구현한다. pinned 쓰기 거부를 legacy 도구나 직접 DB 수정으로 우회하지 않는다.
+- [x] KM-02.3: idempotency·writer lock·재시도/중복 요청·timeout·부분 실패·rollback/read lease를 기존 전환 계약에 맞춰 구현한다. pinned 쓰기 거부를 legacy 도구나 직접 DB 수정으로 우회하지 않는다.
 - [ ] KM-02.4: 잘못된 프로젝트/버전/경로·graph/vector 한쪽 실패·의미 입력 불일치·취소·종료에서 기존 current와 조회가 보존되는지 공개 도구로 검증한다.
 
 완료 결과: 플러그인이 도구 응답과 실제 DB 상태로 구축/갱신 성공 여부를 판단할 수 있다. 단순 job 시작 응답을 DB 생성 완료로 세지 않는다.
@@ -136,6 +136,4 @@
 
 전체28개 세부 작업과 이번17개 시험의 상태는 [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)에서 함께 확인한다. 전체 작업 완료와 공통 계층 fixture 통과를 구분한다.
 
-KM-02.3 중간 A–D2는 private journal·접수/replay·publication 이력·하위 실행 감독·소유 scratch 정리까지 검증했다. 새 v2 protocol의 실행 종료는 writer lease 해제와 exact owner 정리 후에만 판정한다. 공개 durable 연결과 E 실제 host 재시작·rollback/read lease/GC는 아직 남아 있어 KM-02.3을 체크하지 않는다. 상세 검증과 원자료는 실행 명세/시험표를 따른다.
-
-E1 실제 공개 durable host43항목과 정상 EOF 취소 의도 저장 수정을 검증했다. capability는 durable_journal이며 전체 Go3,793통과·19skip, 관련 race784통과·2skip, build/fmt/lint를 통과했다. E2 실제 read lease/rollback/GC 통합 검증이 남아 KM-02.3과 전체 완료 수6/28은 유지한다. 다음은 E2다.
+KM-02.3은 durable journal·재시작/replay·publication/취소·하위 실행/소유 scratch 복구와 실제 E1 host43·E2 reader/rollback/GC21항목을 검증해 완료했다. 캐시 없는 전체 Go3,794통과·18skip, 관련 race784통과·2skip과 build/fmt/lint를 통과했다. 다음은 KM-02.4의 공개 부분 실패·의미 입력·timeout/대상 보호 검증이다. 세부7/28·기능1/7 완료이며 KM-02 전체·독립 수용은 완료가 아니다.

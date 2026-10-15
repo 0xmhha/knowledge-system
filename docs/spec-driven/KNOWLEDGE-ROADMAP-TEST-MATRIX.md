@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 단계는 KM-02.2 완료 후 KM-02.3 영속 기록·복구 구현 중이다. KM-01의4개 세부 작업과 KM-02.1/02.2를 완료했으며 전체28개 중6개 완료·4개 진행 중·18개 미착수다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 KM-02.3 영속 기록·실제 host 복구·reader/rollback/GC를 완료했다. 전체28개 중7개 완료·3개 진행 중(OE-01.1–03)·18개 미착수다. 다음은 KM-02.4의 공개 실패 보호 검증이다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 별도 운영 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는1/7이다.
 
@@ -14,7 +14,7 @@
 | KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 완료 | 실제4DB·최종52항목 통과; 동일 원문 fork·모델 분리·쓰기18건 거부·rollback/GC/재시작 보존 |
 | KM-02.1 | legacy/versioned capability와 새 요청·상태 계약 | 완료 | [계약](./VERSIONED-MAINTENANCE-CONTRACT.md)·schema·101사례 통과; 새 공개 실행은 .2–04 |
 | KM-02.2 | 비동기 build/status/cancel과 정합 gate | 완료 | [공개 실행](./VERSIONED-MAINTENANCE-RUNTIME.md)28항목·실제 retained 조회2건·EOF5개·전체 Go/race·증거 보호10개 통과 |
-| KM-02.3 | idempotency/lock/중단/실패/rollback | 진행 중 | private A–C·shared 전환 이력·race141개 통과; 하위 실행 종료 D·공개 영속 연결 E는 미구현·미검증 |
+| KM-02.3 | idempotency/lock/중단/실패/rollback | 완료 | A–D2·실제 E1 host43/E2 retention21·전체 Go/race 검증; .4 별도 |
 | KM-02.4 | 공개 도구의 잘못된 대상·부분 실패·취소 보호 | 미착수 | 미실행 |
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 미착수 | 미실행 |
 | KM-03.2 | 문서 없는 프로젝트의 근거 기반 지식 초안 | 미착수 | 미실행 |
@@ -36,6 +36,8 @@
 | OE-01.2 | 같은 자료의 off/concept_text/relations/combined | 진행 중 | 로컬384회 실패/누락0; 확대 범위 남음 |
 | OE-01.3 | 근거·순위·unknown·지연/비용·답변 효과 | 진행 중 | 위치/지연 관찰 통과; precision/recall·실제 답변/독립 품질 미실행 |
 | OE-01.4 | 다중 프로젝트 개념 매핑·오인·비교 효과 | 미착수 | KM-05/06 이후 실행 |
+
+아래 단계별 기록은 당시 checkpoint의 범위다. 현재 전체 상태는 위 표와 원장을 따른다.
 
 ## 이번 KM-01 공통 계층 시험 전체 목록
 
@@ -371,3 +373,26 @@ B 증거 보호13개도 통과했다. 실제 공개 회귀는81개 도구 호출
 | build/fmt/vet/lint·문서 | 통과 | 현재 명령 계약 |
 
 [E1 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json)과 실행 명세를 따른다. 소스1,683입력은 유지 Go1,253개·기타430개이며 승인5개 입력은 그대로다. E2 실제 read lease/rollback/GC와 과거 publication 이력 보존은 미실행이며 세부6/28을 유지한다. 다음 E2 → KM-02.4 → KM-03.1–4 → KM-04.1–4 → KM-05.1–4 → KM-06.1–4 → OE-01.1–4이며 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.
+
+
+## KM-02.3 E2 완료: 실제 reader·rollback·GC
+
+| 검증 | 결과 | 확인한 경계 |
+|---|---|---|
+| E1 실제 fixture 복원 | 입력 hash 결속 | 새 소유 경로, 합성 DB 아님 |
+| 실제 MCP/CLI | 21항목 통과 | rollback·v4/v5 게시·reader 원문 보존 |
+| 읽기 중 GC | 보호·계획 적용 후 조회 통과 | current/rollback/held/명시 보호 별도 |
+| reader 해제·다시 연결 | 회수 가능·stale 계획 거부 | 수동 참조 수정 없음 |
+| GC 실제 삭제 | v3 삭제·양수 byte 회수 | v1/v2/v4/v5 보존 |
+| 삭제 후 기록·조회 | 과거 receipt/replay 불변·v3 시작 거부·v5 조회 | activation을 현재 serving으로 세지 않음 |
+| 프로젝트 보존 | A v1·B held v1·history byte 불변 | 다른 프로젝트 영향 없음 |
+| 실제 stdio 종료 | 5연결 EOF0 | 비정상 종료 숨김 없음 |
+| 캐시 없는 전체 Go | 3,812사례: 3,794통과·18skip | 135패키지, 실패0 |
+| 캐시 없는 관련6패키지 race | 786사례: 784통과·2skip | 실패0 |
+| build/fmt/vet/lint·문서 | 통과 | 현재 코드 |
+
+기존에 skip이던 TestDefaultRouteIP가 이번 실제 실행에서는 통과했다. raw Go 결과의 상태를 집계했으며 수동으로 skip을 통과로 바꾸지 않았다.
+
+[E2 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json)과 실행 명세를 따른다. E1은0fa42cef snapshot에서 별도 검증했다. 소스1,686입력은 유지 Go1,253개·기타433개이며 추가3입력은 E1 실제 fixture/manifest/원시 관찰이다. 원래 승인5입력은 바꾸지 않는다. 증거 보호12개는 wire·인용·계획·CLI 거부·기록/입력·skip·완료 집계 변조를 거부한다.
+
+KM-02.3 완료로 전체7/28이며 다음은 KM-02.4의 공개 잘못된 대상/경로·graph/vector 부분 실패·의미 입력 불일치·timeout/cancel/shutdown 보호 검증이다. 남은21개는 KM-02.4, KM-03.1–4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4다. 별도 정책 생성기 보완·운영/독립 수용9개·선택 후속12개도 유지한다.

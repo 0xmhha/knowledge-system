@@ -87,7 +87,7 @@
       "scope": "versioned_maintenance_tools",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "public_durable_host_E1_verified_E2_readlease_rollback_GC_pending",
+      "design_status": "public_durable_recovery_and_readlease_rollback_GC_verified_KM02_4_pending",
       "depends_on": [
         "KM-01"
       ],
@@ -96,9 +96,10 @@
         "system/eval/knowledge-roadmap-2026-10-15/km-02-contract/manifest.json",
         "docs/spec-driven/VERSIONED-MAINTENANCE-RUNTIME.md",
         "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json"
       ],
-      "verification": "E1_actual_public_host43_fresh_Go3793_pass19_skip_related_race784_pass2_skip",
+      "verification": "E1_actual_host43_E2_actual_retention21_fresh_Go3794_pass18_skip_related_race784_pass2_skip",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -119,9 +120,10 @@
         },
         {
           "id": "KM-02.3",
-          "status": "in_progress",
+          "status": "complete",
           "evidence": [
-            "docs/spec-driven/VERSIONED-MAINTENANCE-RUNTIME.md"
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
           ]
         },
         {
@@ -134,12 +136,11 @@
         "capability_audit": "verified_current_MCP35_CLI_help_and_source",
         "design_schema_and_lifecycle": "verified_101_cases",
         "public_versioned_build_status_cancel": "verified_actual_public_28_checks_5_clean_EOF_sessions",
-        "durable_jobs_idempotency_crash_recovery": "A_B_C_D1_D2_E1_verified_E2_actual_readlease_rollback_GC_pending",
+        "durable_jobs_idempotency_crash_recovery": "verified_A_B_C_D1_D2_E1_E2_actual_public_host_replay_shutdown_readlease_rollback_GC",
         "real_public_maintenance_evaluation": "local_lifecycle_and_retained_v2_reads_only_mock_embedding_not_quality_or_independent_acceptance"
       },
       "remaining": [
-        "KM-02.3 E2 verify actual public read lease, rollback and GC integration without changing historical publication receipts",
-        "KM-02.4 verify public cross-project and partial-failure/cancel/shutdown controls"
+        "KM-02.4 verify public wrong targets/paths, graph/vector partial failure, semantic mismatch, timeout/cancel/shutdown preserve current/readers"
       ]
     },
     {
@@ -393,7 +394,7 @@
   "latest_preparation_validation": {
     "adopted_policy_guard_tests_passed": 8,
     "documentation_contract_tests_passed": 20,
-    "live_documents_checked": 126,
+    "live_documents_checked": 127,
     "ontology_effect_executed": true,
     "feature_completion_count": 1,
     "ontology_effect_scope": "local descriptive observation only; no independent quality verdict",
@@ -403,16 +404,16 @@
     "knowledge_roadmap_guard_tests_passed": 7,
     "collection_race_cases_passed": 40,
     "collection_top_level_tests_passed": 17,
-    "module_test_cases": 3789,
-    "module_tests_passed": 3770,
-    "module_tests_skipped": 19,
+    "module_test_cases": 3812,
+    "module_tests_passed": 3794,
+    "module_tests_skipped": 18,
     "module_failed_tests": 0,
     "build_fmt_lint_passed": true,
-    "refactoring_source_inventory_bindings_passed": 1679,
+    "refactoring_source_inventory_bindings_passed": 1683,
     "refactoring_source_inventory_checker_exit": 0,
-    "source_binding_update_receipt": "system/eval/knowledge-roadmap-2026-10-15/km-02-supervision-source-binding-update/receipt.json",
-    "related_race_cases": 763,
-    "related_race_passed": 761,
+    "source_binding_update_receipt": "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host-source-binding-update/receipt.json",
+    "related_race_cases": 786,
+    "related_race_passed": 784,
     "related_race_skipped": 2,
     "public_collection_checks": 24,
     "public_collection_tool_calls": 21,
@@ -473,8 +474,19 @@
     "command_supervision_public_checks": 28,
     "command_supervision_tool_calls": 90,
     "command_supervision_wire_pairs": 99,
-    "command_supervision_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-command-supervision/manifest.json"
+    "command_supervision_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-command-supervision/manifest.json",
+    "owned_staging_checkpoint_cases": 144,
+    "owned_staging_evidence_guard_tests_passed": 13,
+    "public_durable_host_checks": 43,
+    "public_durable_host_EOF_sessions": 7,
+    "public_durable_host_expected_SIGKILLs": 2,
+    "public_durable_host_evidence_guard_tests_passed": 14,
+    "public_retention_checks": 21,
+    "public_retention_EOF_sessions": 5,
+    "public_retention_evidence_guard_tests_passed": 12,
+    "public_retention_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json",
+    "retention_binding_advance": "pending_implementation_commit_and_committed_source_check"
   },
-  "completed_subtasks": 6,
+  "completed_subtasks": 7,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
 }

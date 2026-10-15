@@ -1,0 +1,23 @@
+[
+  "restore hash-bound actual E1 datasets into fresh owned roots",
+  "restored durable terminal and original replay match E1 snapshot",
+  "actual MCP reader pins retained v3 before rollback",
+  "actual CLI rollback switches current to v1",
+  "pinned reader retains v3 coordinates and body through rollback",
+  "rollback does not rewrite historical succeeded publication receipt",
+  "new v4 publication uses rolled back v1 as checked base",
+  "new v5 publication advances current and preserves pinned v3",
+  "GC plan protects actual pinned v3 and held v2",
+  "reviewed GC apply leaves active reader dataset intact",
+  "actual pinned reader remains serviceable after protected GC",
+  "released v3 becomes GC eligible without manual reference edits",
+  "GC rejects reviewed plan made stale by a new live reader",
+  "reviewed GC actually removes released v3 and reclaims bytes",
+  "GC preserves current rollback target held candidate and explicit v1",
+  "GC retains immutable historical publication and exact job replay",
+  "host restart after version GC preserves historical terminal result",
+  "deleted v3 cannot be silently rebound as another dataset",
+  "current v5 actual query returns new retained implementation after GC",
+  "old A v1 B held DB and publication history bytes stay unchanged",
+  "all five E2 stdio sessions end with clean EOF"
+]

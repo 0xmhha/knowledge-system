@@ -1,6 +1,6 @@
 # KM-02 공개 버전 DB 구축·상태·취소
 
-관리 플러그인이 작업 접수를 DB 구축 완료로 오인하지 않도록, 등록된 프로젝트의 불변 후보 구축과 실제 활성화를 구분한다. [요청·상태 계약](./VERSIONED-MAINTENANCE-CONTRACT.md)의 공개 실행 연결이다. KM-02.3 E1까지 영속 작업·실제 host 재시작을 검증했으며 E2 read lease/rollback/GC는 별도 검증 중이다. 전체 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+관리 플러그인이 작업 접수를 DB 구축 완료로 오인하지 않도록, 등록된 프로젝트의 불변 후보 구축과 실제 활성화를 구분한다. [요청·상태 계약](./VERSIONED-MAINTENANCE-CONTRACT.md)의 공개 실행 연결이다. KM-02.3의 영속 작업·실제 host 재시작과 E2 read lease/rollback/GC까지 검증했다. KM-02.4 공개 실패 검증은 별도다. 전체 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 등록과 공개 도구
 
@@ -37,7 +37,7 @@ inspect는 읽기 작업이며 output을 생성하지 않는다. build는 immuta
 
 ## 이번 단계의 지원 범위
 
-공개 작업 registry와 동일 key replay는 소유 root의 durable journal로 보존한다. 응답 capability는 `job_persistence=durable_journal`, `serving_adoption=not_observed`, `input_preparation=existing_reviewed_or_rendered_inputs`다. profile 최대32개·접수 기록 최대128개로 제한하며 초과 시 거부한다. 프로세스 재시작은 terminal snapshot과 원래 요청을 복원한다. 미종료 작업은 recovering에서 writer 소유·publication 이력·소유 scratch를 확인하고 종료 상태를 결정하며, 같은 구축을 자동 재실행하지 않는다. 저장 실패가 불확실하면 stale 상태를 응답하지 않고 reconcile_required로 거부한다. 정상 종료는 실행 중 작업의 취소 의도를 먼저 저장하고 하위 종료·정리를 기다린다. 강제 종료·취소·EOF의 실제 host 검증은 E1에서 수행했으며 E2의 read lease/rollback/GC 통합 검증까지 KM-02.3 전체는 진행 중이다.
+공개 작업 registry와 동일 key replay는 소유 root의 durable journal로 보존한다. 응답 capability는 `job_persistence=durable_journal`, `serving_adoption=not_observed`, `input_preparation=existing_reviewed_or_rendered_inputs`다. profile 최대32개·접수 기록 최대128개로 제한하며 초과 시 거부한다. 프로세스 재시작은 terminal snapshot과 원래 요청을 복원한다. 미종료 작업은 recovering에서 writer 소유·publication 이력·소유 scratch를 확인하고 종료 상태를 결정하며, 같은 구축을 자동 재실행하지 않는다. 저장 실패가 불확실하면 stale 상태를 응답하지 않고 reconcile_required로 거부한다. 정상 종료는 실행 중 작업의 취소 의도를 먼저 저장하고 하위 종료·정리를 기다린다. 강제 종료·취소·EOF는 E1, read lease/rollback/GC는 E2에서 검증했다. KM-02.3을 완료했으며 다음은 KM-02.4의 공개 실패 보호 검증이다.
 
 등록한 profile의 현재 접근 범위를 먼저 확인한 뒤 scoped key를 재조회한다. 같은 key/요청이면 source/current/version이 바뀌어도 같은 작업을 돌려주며, 같은 key의 다른 요청은 `idempotency_conflict`다. 새 요청은 source·profile·입력·embedding·base·기존 version을 모두 검사한다. 작업 제한 시간은 caller deadline과 profile 상한 중 허용된 범위이며 기존 하위 프로세스의 취소 경로를 사용한다.
 
@@ -143,3 +143,17 @@ D2에서는 새 protocol의 pre-gate 작업을 writer 종료·소유 scratch 정
 최종 E1은 전체 Go3,812사례(3,793통과·19skip), 관련6패키지 race786사례(784통과·2skip), build/fmt/vet/lint·문서 계약과43개 실제 host 항목을 통과했다. [E1 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json)은 raw wire·실제 fixture·새 Go 결과를 보관한다. `check-maintenance-durable-host-evidence.py`와 `test_maintenance_durable_host_evidence.py`는 강제 종료/취소/EOF 증거의 누락과 E2 완료 조작을 거부한다. D2의 당시 ed74cd7f snapshot 검증은 현재 코드의 Go 결과를 대체하지 않는다.
 
 E2 실제 read lease/rollback/GC 통합 검증은 남아 있다. 공개 연결이 영속화되었다는 사실만으로 KM-02.3 전체를 완료 처리하지 않는다. 전체 완료 수6/28을 유지한다.
+
+
+### E2 실행 기준: 읽기 보호·rollback·정확한 GC 계획
+
+E1의 hash-bound 실제 fixture만 새로운 소유 시험 경로로 복원한다. 실제 MCP reader를 v3에 유지한 채 공개 CLI rollback으로 v1을 활성화하고, reader가 계속 v3의 좌표/원문을 반환하는지 확인한다. 이후 공개 maintenance로 v4/v5를 구축해 GC 대상과 current/rollback/hold 보호를 분리한다. reader가 살아 있으면 v3는 삭제 대상이 아니어야 하고, 해제 후에는 회수 가능해야 한다. 계획 작성 뒤 reader가 다시 붙으면 해당 계획은 stale로 거부해야 한다. 새 계획으로 실제 삭제한 뒤에도 shared publication history와 원래 terminal status/replay가 같아야 한다. 설정 생성 자체는 경로를 담을 수 있지만 삭제된 v3로 reader 서버를 시작하는 것은 거부하고 현재 v5 조회는 실제 새 원문을 반환해야 한다. 이 경계와 전체 검증을 모두 통과한 뒤 KM-02.3을 체크한다.
+
+
+### E2 검증 완료와 KM-02.3 종료 판정
+
+E1 실제 fixture를 hash로 결속해 새 소유 경로에 복원하고21항목을 통과했다. v3 reader를 유지한 채 CLI rollback으로 current를 v1에 옮겨도 같은 v3 좌표/원문을 반환했다. 공개 도구로 v4/v5를 게시한 뒤 GC는 v3 reader와 v2 hold를 보호했다. reader가 끝나면 v3가 회수 가능해졌고, 새 reader가 붙으면 이전 계획을 거부했다. 새 계획으로 v3를 실제 삭제하고 회수 byte를 확인했다. v1/v2/v4/v5, A v1/B held v1의 byte, 과거 v3 publication history는 유지됐다.
+
+삭제된 v3의 설정 생성기는 경로를 담은 설정을 만들 수 있지만 실제 reader 서버는 시작을 거부하고 다른 dataset으로 대체하지 않았다. 현재 v5 조회는 실제 새 retained 구현을 반환했다. v3 DB를 삭제하고 host를 재시작해도 원래 succeeded snapshot과 key replay는 같았다. 과거 receipt는 현재 reader가 그 DB를 읽는다는 증거가 아니다.
+
+[E2 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json)은 raw MCP/CLI·GC 계획/결과·삭제 후 fixture·E1 입력 hash를 보관한다. 증거 보호12개, 캐시 없는 전체 Go3,794통과·18skip, 관련 race784통과·2skip, build/fmt/lint·문서 계약을 검증했다. E1의0fa42cef source snapshot 검증과 현재 결과를 구분했다. KM-02.3 완료로 전체7/28이다. 다음은 KM-02.4이며 KM-02 전체·검색 품질·온톨로지 효과·독립 수용은 완료가 아니다.
