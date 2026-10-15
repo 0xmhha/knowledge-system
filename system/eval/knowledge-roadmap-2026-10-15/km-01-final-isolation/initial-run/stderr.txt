@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-collection-isolation.py", line 383, in <module>
+    main()
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-collection-isolation.py", line 291, in main
+    read(client, status, 'b1', 'model-identity-restored')
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-collection-isolation.py", line 255, in read
+    verify(tool(client, 'cks.collection.get_context', request(status, key)), [key])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-collection-isolation.py", line 228, in tool
+    require(not r.get('isError'), 'unexpected tool error: ' + name)
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-collection-isolation.py", line 28, in require
+    raise ValueError(message)
+ValueError: unexpected tool error: cks.collection.get_context

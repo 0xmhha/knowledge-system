@@ -4,7 +4,7 @@
   "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
   "scope_status": "user_requested_features_with_implementation_in_progress",
   "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
-  "implementation_completed": 0,
+  "implementation_completed": 1,
   "total_work_items": 7,
   "total_subtasks": 28,
   "implementation_or_runtime_changed_by_this_documentation": false,
@@ -22,16 +22,17 @@
       "priority": "P0",
       "scope": "project_isolation",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "in_progress",
-      "design_status": "actual_backend_public_scoped_reads_connected_final_isolation_verification_pending",
+      "status": "complete",
+      "design_status": "implemented_and_locally_verified_isolation_independent_acceptance_separate",
       "depends_on": [],
       "evidence": [
         "docs/spec-driven/PROJECT-COLLECTION-ISOLATION.md",
         "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
         "system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json",
-        "system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation/manifest.json"
       ],
-      "verification": "owned_real_CKG_CKV_MCP_24_checks_passed_module_3600_passed_19_skips_race_444_passed_2_skips",
+      "verification": "owned_real_4DB_52_checks_46_tool_calls_18_writer_refusals_3_clean_EOF_source_bound_Go_reuse",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -60,10 +61,10 @@
         },
         {
           "id": "KM-01.4",
-          "status": "in_progress",
+          "status": "complete",
           "evidence": [
             "docs/spec-driven/PROJECT-COLLECTION-ISOLATION.md",
-            "system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json"
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
           ]
         }
       ],
@@ -72,12 +73,12 @@
         "catalog_contract": "complete",
         "library_guarded_reads": "verified_in_owned_fixtures",
         "public_CLI_MCP_adapters": "MCP_reads_connected_and_verified_in_owned_real_indexes",
-        "actual_backend_cross_project_reads_writes": "scoped_reads_verified_new_versioned_writes_not_added"
+        "actual_backend_cross_project_reads_writes": "scoped_reads_verified_new_versioned_writes_not_added",
+        "final_actual_backend_isolation": "verified_52_cases_in_owned_4DB_protocol_fixtures",
+        "existing_public_write_surfaces": "18_requests_refused_no_mutation_or_jobs",
+        "new_versioned_writes": "KM-02_not_added"
       },
-      "remaining": [
-        "complete final real-index identical-byte fork, mixed embedding configuration, and public write-surface isolation controls",
-        "version-aware writes and their cross-project protection connect through KM-02"
-      ]
+      "remaining": []
     },
     {
       "id": "KM-02",
@@ -369,7 +370,7 @@
     "documentation_contract_tests_passed": 20,
     "live_documents_checked": 125,
     "ontology_effect_executed": true,
-    "feature_completion_count": 0,
+    "feature_completion_count": 1,
     "ontology_effect_scope": "local descriptive observation only; no independent quality verdict",
     "ontology_effect_calls": 384,
     "ontology_mechanism_probe_calls": 8,
@@ -395,8 +396,19 @@
     "public_collection_packet": "system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/manifest.json",
     "public_collection_final_gates": "passed_build_module_race_full_lint_docs_evidence_guards_and_committed_source_inventory",
     "original_source_binding_checks_historical_passed": 2069,
-    "public_collection_false_completion_tests_passed": 8
+    "public_collection_false_completion_tests_passed": 8,
+    "final_isolation_packet": "system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation/manifest.json",
+    "final_isolation_checks": 52,
+    "final_isolation_tool_calls": 46,
+    "final_isolation_wire_pairs": 52,
+    "final_isolation_evidence_packs": 20,
+    "final_isolation_writer_refusals": 18,
+    "final_isolation_clean_EOF_sessions": 3,
+    "go_validation_method": "source_bound_reuse_no_Go_source_changes",
+    "final_isolation_metadata_gates": "passed_raw_protocol_HTTP_Git_citations_preservation_docs_and_current_ledger",
+    "final_isolation_false_completion_tests_passed": 9,
+    "current_roadmap_tests_passed": 7
   },
-  "completed_subtasks": 3,
+  "completed_subtasks": 4,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
 }

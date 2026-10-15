@@ -1,6 +1,6 @@
 # KM-01 프로젝트·버전 격리와 collection 기반
 
-2026-10-15 현재 immutable catalog·구현/비교 reader를 실제 CKG/CKV backend와 선택적 MCP 조회 도구에 연결했다. 여러 프로젝트의 DB를 물리적으로 합치지 않고 각 pinned DB를 명시적 collection으로 묶는다. KM-01.1/02/03은 완료했고 최종 반례 시험 KM-01.4와 KM-01 전체는 진행 중이다. DB 구축·갱신 쓰기와 산업 개념별 비교는 각각 KM-02와 KM-05/06에서 구현한다.
+2026-10-15 현재 immutable catalog·구현/비교 reader를 실제 CKG/CKV backend와 선택적 MCP 조회 도구에 연결했다. 여러 프로젝트의 DB를 물리적으로 합치지 않고 각 pinned DB를 명시적 collection으로 묶는다. KM-01.1–04와 전체 KM-01의 로컬 구현·격리 검증을 완료했다. 실제 embedding 품질·독립 수용은 별도다. DB 구축·갱신 쓰기와 산업 개념별 비교는 각각 KM-02와 KM-05/06에서 구현한다.
 
 상태는 [기능 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다. 구현은 [catalog](../../internal/system/collection/catalog.go)와 [session](../../internal/system/collection/session.go), 시험은 [collection_test.go](../../internal/system/collection/collection_test.go)다.
 
@@ -46,7 +46,7 @@ ScopedRef는 전체 좌표+origin+상대 path+local ID로 키를 만든다. Scop
 
 기존 graph/vector/semantic DB·identity·원문·도구 DTO는 변경하지 않았다. 새 catalog는 별도 설정이다. 기존 stable project ID를 사용하고 InspectVersionIdentity로 확인한 pinned 버전만 등록한다. legacy DB는 기존 경로로 읽고, collection에 넣으려면 정상적인 versioned build가 필요하다. 현재 저장된 DB의 ID를 새 catalog에 맞춰 직접 고치지 않는다.
 
-현재 `cks mcp`는 collection 설정이 있을 때 공개 조회 adapter를 연결한다. 다음은 KM-01.4의 동일 바이트 fork·서로 다른 embedding 구성·공개 쓰기 표면 전체 반례 검증이다. 이후 KM-02.1의 version-aware 도구 capability/요청 설계로 이어간다. 산업 공통 개념/프로젝트 매핑은 KM-05, 비교 자료 수집은 KM-06이다.
+현재 `cks mcp`는 collection 설정이 있을 때 공개 조회 adapter를 연결한다. KM-01.4 최종 반례를 통과했고 다음은 KM-02.1의 version-aware 도구 capability/요청 설계다. 산업 공통 개념/프로젝트 매핑은 KM-05, 비교 자료 수집은 KM-06이다.
 
 ## MCP 연결과 설정
 
@@ -73,3 +73,28 @@ collection:
 이전 기반 packet은17개 상위 시험/하위40사례의 fixture·race 검증을 보존한다. 이번 [공개 조회 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/manifest.json)은 실제 CKG/CKV DB3개와 mock embedding으로 수행한24개 확인 항목, MCP 도구21호출/요청·응답26쌍, 정상 EOF 종료3회를 보존한다. 같은 이름·module·함수의 두 프로젝트, A의 두 버전, 교대/warm 조회, 명시 비교, 잘못된 scope7종과 시작 거부6종, 원문 손상·복원, pinned reindex 거부, 재시작과 기본33도구 호환을 검증했다. DB/manifest18파일과 current 포인터2개가 그대로임을 확인했다.
 
 전체 모듈은3,619개 중3,600개 통과·19개 명시적 skip·실패0이다. 관련4패키지 race는444개 통과·2개 skip·실패0이며 기반40사례도 포함한다. 새 상위 시험6개/하위 포함14사례는 모두 통과했다. mock 검색의 인용/출처 격리 증거이며 실제 embedding 검색 품질·산업 비교·독립 수용을 통과시킨 것이 아니다. 전체 목록과 gate는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다.
+
+## KM-01.4 최종 검증 완료 기준
+
+아래 공개 경로 반례를 최종52항목으로 실행하고 원시 MCP·HTTP·Git 원문·보존 기록을 재검증했다. [최종 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation/manifest.json)을 근거로 KM-01.4와 전체 KM-01의 로컬 격리를 완료했다.
+
+1. 같은 이름·module·함수·소스 바이트·Git commit의 두 프로젝트를 실제 DB로 만들고 서로 다른 project ID와 인용 좌표를 유지한다.
+2. A의 코드 변경 두 버전과 B의 동일 소스/서로 다른 embedding 두 버전을 동시에 등록한다. 64차원 mock과 로컬 시험 응답기의96/128차원 model/digest를 분리한다. 반복·비교·재시작에서 근거를 다른 프로젝트/버전으로 대체하거나 중복 제거하지 않는다.
+3. 개별 조회가 선택한 member의 embedding 구성만 호출하는지 로컬 HTTP 원자료와 확인한다. model/digest 변동·잘못된 설정·중복 등록·부적절한 scope는 거부하고 정상 대상은 계속 읽힌다.
+4. 공개 쓰기 표면 index(full/incremental), setup, reindex에 root/version/current/그 아래 새 경로를 지정한다. A/B 간 잘못된 대상도 포함해 job 미생성·DB/원문/current 불변을 확인한다. 새 version-aware 쓰기 자체는 KM-02의 별도 구현 범위다.
+5. 실제 rollback과 재시작에서 catalog pin이 current를 따라 바뀌지 않고 이전/새 버전을 각각 읽는다. 기존 단일 프로젝트 read·legacy maintenance·GC/rollback 호환 회귀 근거도 연결한다.
+6. 원시 MCP 요청/응답, embedding HTTP 기록, source/DB 보존 기록, 전체 시험 목록과 소스 해시를 저장하고 누락·변조·범위 과장을 거부하는 검사로 재검증한다.
+
+실제 embedding 모델 품질, 산업 개념 매핑·장단점 비교와 독립 수용은 이 격리 완료 기준에 포함하지 않는다. 이번 시험 응답기는 구조와 출처 검증 전용이며 유료 모델 호출을 수행하지 않는다.
+
+## 최종 격리 결과와 한계
+
+같은 Git commit·전체 retained file hash·module·함수를 가진 A/B fork를 각각 실제 DB로 만들었다. A는 변경된 두 commit/버전, B는 같은 소스의96차원·128차원 모델 버전이다. 총4DB에서52항목·46도구호출·52요청/응답·정상 EOF3회를 확인했다. 개별 조회의 embedding HTTP 기록은 선택한 member의 모델만 호출했고,4개 참여 버전의 비교는 동일 원문도 별도 그룹으로 유지했다. DB/identity/manifest24파일과 current2개를 보존했다.
+
+공개 CKS35도구의 변경 표면을 조사해 index(full/incremental), setup, reindex의18개 요청을 실행했다. A/B의 root/version/current/current 아래 새 경로를 모두 거부했고 job을 시작하지 않았으며 거부 전후의 파일·모드·디렉터리·symlink 전체 목록이 같다. GC dry-run은4개 pin 모두 `pinned_reader`로 보호했다. 실제 A rollback 후에도 reader는 고정한 새/이전 버전을 읽었고 재시작에서도 pin을 유지했다. 멤버 변경은 digest를 바꾸고 이전 digest와 제거된 멤버를 거부했다. version-aware 새 쓰기는 여전히 KM-02의 계약/구현 대상이다.
+
+모델 digest가 변경되면 해당 member는 실패하고 부분 근거를 공개하지 않는다. 기존 Real CKV의 `modelDown`은 실패 후 유지되므로 원 digest를 되돌려도 reader 재시작이 필요하다. 다른 프로젝트와 같은 프로젝트의 다른 모델 member는 정상이다. 재시작 후 동일 원 digest의 조회 회복을 확인했다. 첫 실행의 즉시 회복 기대 실패는 `initial-run/`에 보존했고 구현을 바꾸거나 실패를 지우지 않았다.
+
+embedding은64차원 mock과 loopback 결정론적 시험 응답기의96/128차원 프로토콜이다. 실제 모델을 실행하거나 품질을 평가한 결과가 아니다. 테스트에서는 전체 도구 목록을 조사하되 기존 단일 프로젝트 조회35개 전체가 collection scope를 받는다고 설명하지 않는다. 새 collection 조회2개가 scope를 받으며 standalone CKG/CKV·새 유지보수 API의 권한 확장은 별도 계약이다.
+
+이번 단계는 Go 소스를 변경하지 않았다. 이전 전체 Go3,619개·관련 race446개와 build/fmt/lint 원자료는1,652개 소스의 동일 바이트를 다시 확인해 재사용했다. 문서와 최종 protocol·증거 검사만 새로 실행하며 실행한 시험과 재사용 근거를 [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)에 구분한다.

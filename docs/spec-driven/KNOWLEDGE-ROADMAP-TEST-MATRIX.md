@@ -1,8 +1,8 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 단계는 KM-01.3 실제 backend·공개 MCP 조회 연결 완료다. 최종 반례 시험 KM-01.4는 진행 중이며 전체28개 중3개 완료·4개 진행 중·21개 미착수다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 단계는 KM-01.4 최종 격리 검증 완료다. KM-01의4개 세부 작업을 모두 완료했으며 전체28개 중4개 완료·3개 진행 중·21개 미착수다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
 
-표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는0/7이다.
+표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는1/7이다.
 
 ## 전체28개 세부 작업과 시험 단계
 
@@ -11,7 +11,7 @@
 | KM-01.1 | 신원·key·cache·join·쓰기 조사와 이행 설계 | 완료 | [재사용/결손 표](./PROJECT-COLLECTION-ISOLATION.md) 작성·코드 대조 |
 | KM-01.2 | Project/Version/Collection과 고정 scope 계약 | 완료 | catalog·fork·두 버전·직렬화/재시작 시험 통과 |
 | KM-01.3 | 구현 대상 제한·명시 비교·잘못된 scope 거부 | 완료 | 실제 CKG/CKV3DB·공개 MCP24항목 통과; 원시 응답/인용 재검증 |
-| KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 진행 중 | 기반40사례·공개 조회24항목 통과; 동일 바이트 fork·다른 embedding 구성·공개 쓰기 전체 표면 남음 |
+| KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 완료 | 실제4DB·최종52항목 통과; 동일 원문 fork·모델 분리·쓰기18건 거부·rollback/GC/재시작 보존 |
 | KM-02.1 | legacy/versioned capability와 새 요청·상태 계약 | 미착수 | 미실행 |
 | KM-02.2 | 비동기 build/status/cancel과 정합 gate | 미착수 | 미실행 |
 | KM-02.3 | idempotency/lock/중단/실패/rollback | 미착수 | 미실행 |
@@ -110,8 +110,8 @@
 | 검증 대상 | 현재 상태 | 연결 작업 |
 |---|---|---|
 | 실제 CKG/CKV와 프로젝트별 provider 설정·공개 scope 오류/인용 | 이번 범위 통과 | KM-01.3 완료 |
-| 동일 바이트 fork 실제 DB·서로 다른 embedding 구성·cache 반복 | 기반 시험만 통과, 공개 확장 남음 | KM-01.4 |
-| 공개 쓰기 도구 전체 표면·다른 project/version DB와 current 보존 | pinned reindex1개 거부 통과, 전체 남음 | KM-01.4 및 KM-02.3/04 |
+| 동일 바이트 fork 실제 DB·서로 다른 embedding 구성·cache 반복 | 실제4DB·프로토콜52항목 통과 | KM-01 완료 |
+| 공개 쓰기 도구 전체 표면·다른 project/version DB와 current 보존 | 공개 CKS 변경3도구/18건 거부·보존 통과; 새 version-aware 쓰기 남음 | KM-02.3/04 |
 | 실제 Claude 매니저 host·등록/구축/실패 복구·갱신 | 미구현·미실행 | KM-02/03/04 |
 | 산업 개념 매핑·비교 행렬·실제 프로젝트 비교 | 미구현·미실행 | KM-05/06 |
 | 자연어·검토된 구현 관계·다중 프로젝트 ontology 효과 | 로컬 단일 프로젝트 관찰만 완료 | OE-01 후속 |
@@ -135,6 +135,82 @@
 
 실제 DB/manifest18파일과 current 포인터2개가 그대로임을 확인했다. 원문 손상은 소유한 fixture에서 재현하고 정확히 복구했다. 유효한 조회 근거14팩을 검증한 사실과 검색 품질·독립 수용은 분리한다. ontology의384회 관찰과 별도8회 진단에 이번 분모를 합치지 않는다.
 
-다음은 KM-01.4의 최종 격리 반례 검증이다. 이후 KM-02.1의 version-aware 도구 계약으로 이어간다. 신규7개 기능 외의 생성기 보완·운영/독립 수용9개·선택 후속12개는 [전체 작업표](../REMAINING-WORK.md)에 유지한다.
+KM-01 최종 격리를 완료했다. 다음은 KM-02.1의 version-aware 구축·갱신 capability/요청·상태 계약이다. 신규7개 기능 외의 생성기 보완·운영/독립 수용9개·선택 후속12개는 [전체 작업표](../REMAINING-WORK.md)에 유지한다.
 
 [소스 결속 후속 기록](../../system/eval/knowledge-roadmap-2026-10-15/km-01-public-source-binding-update/receipt.json)은 구현 커밋16a75b8d의 manifest를 기존 원장에 연결하고 나머지 승인·완료 필드를 그대로 유지한 사실을 기록한다. 공개 조회 packet의 `pending_committed_manifest`는 구현 커밋 당시의 상태이며 현재 완료된 소스 검사는 이 후속 기록을 따른다.
+
+## 최종 KM-01.4 시험 전체 목록
+
+실제 DB4개·공개 MCP52요청/응답·46도구호출·정상 종료3회다. 도구46회 중20회 성공(상태3회+조회17회),26회는 의도한 오류이며 성공 근거20팩을 재검증했다. 다음52항목은 호출/시작/보존 검사를 묶은 분모이므로 다른 시험 수에 더하지 않는다. [원시 증거](../../system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation/manifest.json)와 [전체 Go/race 사례 목록](../../system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation/test-inventory.json)을 보존했다.
+
+| 순서 | 검증 ID | 결과 |
+|---|---|---|
+| 1 | identical-fork-commit-and-all-retained-file-bytes | 통과 |
+| 2 | startup-rejected:duplicate-project | 통과 |
+| 3 | startup-rejected:duplicate-version | 통과 |
+| 4 | startup-rejected:shared-version-path | 통과 |
+| 5 | startup-rejected:fork-cycle | 통과 |
+| 6 | startup-rejected:wrong-member-model | 통과 |
+| 7 | startup-rejected:wrong-member-dimension | 통과 |
+| 8 | warm-mixed-read:0:a1 | 통과 |
+| 9 | warm-mixed-read:1:b1 | 통과 |
+| 10 | warm-mixed-read:2:b2 | 통과 |
+| 11 | warm-mixed-read:3:a2 | 통과 |
+| 12 | warm-mixed-read:4:b1 | 통과 |
+| 13 | warm-mixed-read:5:a1 | 통과 |
+| 14 | warm-mixed-read:6:b2 | 통과 |
+| 15 | warm-mixed-read:7:a2 | 통과 |
+| 16 | identical-forks-and-embedding-versions-not-deduplicated | 통과 |
+| 17 | request-rejected:wrong-subcollection | 통과 |
+| 18 | request-rejected:other-project-same-commit | 통과 |
+| 19 | request-rejected:duplicate-participant | 통과 |
+| 20 | runtime-model-digest-drift-refused | 통과 |
+| 21 | other-project-works-during-model-drift | 통과 |
+| 22 | same-project-other-model-works-during-model-drift | 통과 |
+| 23 | restored-model-stays-refused-until-reader-restart | 통과 |
+| 24 | writer-rejected:index-full | 통과 |
+| 25 | writer-rejected:index-incremental | 통과 |
+| 26 | writer-rejected:setup:project-a:root | 통과 |
+| 27 | writer-rejected:reindex:project-a:root | 통과 |
+| 28 | writer-rejected:setup:project-a:version | 통과 |
+| 29 | writer-rejected:reindex:project-a:version | 통과 |
+| 30 | writer-rejected:setup:project-a:current | 통과 |
+| 31 | writer-rejected:reindex:project-a:current | 통과 |
+| 32 | writer-rejected:setup:project-a:new-child | 통과 |
+| 33 | writer-rejected:reindex:project-a:new-child | 통과 |
+| 34 | writer-rejected:setup:project-b:root | 통과 |
+| 35 | writer-rejected:reindex:project-b:root | 통과 |
+| 36 | writer-rejected:setup:project-b:version | 통과 |
+| 37 | writer-rejected:reindex:project-b:version | 통과 |
+| 38 | writer-rejected:setup:project-b:current | 통과 |
+| 39 | writer-rejected:reindex:project-b:current | 통과 |
+| 40 | writer-rejected:setup:project-b:new-child | 통과 |
+| 41 | writer-rejected:reindex:project-b:new-child | 통과 |
+| 42 | no-async-job-created | 통과 |
+| 43 | GC-protects-all-pins:project-a | 통과 |
+| 44 | GC-protects-all-pins:project-b | 통과 |
+| 45 | active-new-pin-ignores-rollback-to-old | 통과 |
+| 46 | active-old-pin-after-rollback | 통과 |
+| 47 | restart-reordered-catalog-keeps-new-pin-while-current-old | 통과 |
+| 48 | restart-identical-fork-keeps-model96 | 통과 |
+| 49 | restart-same-source-keeps-model128 | 통과 |
+| 50 | membership-change-invalidates-old-catalog-pin | 통과 |
+| 51 | removed-member-refused-after-restart | 통과 |
+| 52 | remaining-member-works-after-membership-change | 통과 |
+
+실패한 첫 실행은 모델 복구 직후 자동 회복을 기대했다. 기존 CKV는 실패 상태를 reader 재시작까지 유지하므로 마지막 기대가 실패했고, 이후 시험은 지속 거부·다른 member 정상·재시작 후 회복을 검증했다. 원래 실패 로그·응답·당시 runner를 `initial-run/`에 보존한다.
+
+| 최종 단계 gate | 결과 |
+|---|---|
+| 실제 Git 동일 원문 fork·4DB·모델64/96/128 | 통과; 로컬 mock/시험 응답기 프로토콜 |
+| 공개 CKS 쓰기 표면 | index2모드 + setup/reindex의2프로젝트×4대상 =18건 거부·job 미생성·전체 tree 불변 |
+| rollback·GC·재시작·멤버 변경 | 통과;4개 reader pin 보호, current 복원·B current 보존 |
+| 원시 MCP/HTTP/Git/인용·본문 재검증 |52요청/응답·46도구호출·근거20팩 확인 |
+| Go 전체·race·build/fmt/lint | 소스1,652개 동일 바이트 확인 후 이전 통과 증거 재사용; 이번 Go 변경0 |
+| 문서·최신 작업표·증거 변조 방지 | 문서125개·계약20개·안내3개·현재 작업표7개·변조/누락 방지9개 통과 |
+
+이번 단계의 새 실행과 이전 Go 시험을 다시 실행한 것처럼 합산하지 않는다. Go는3,600통과/19skip, 관련 race는444통과/2skip의 원자료와 모든 사례 이름을 그대로 보존했다. 기존 기반 시점의7개 작업표 시험은 동결 원자료다. KM-01 전체 완료 후에도 미완료 기능을 대상으로 허위 완료를 검사하도록 `scripts/test_knowledge_roadmap_current.py`를 현재 회귀 진입점으로 추가했다. 원래 시험/packet을 수정하지 않고7개 검사를 이어받으며 부분 기능 대상 선택만 현재 미완료 항목으로 바꾼다.
+
+남은 기능은 KM-02~06 및 OE-01이다. 산업 개념별 비교·실제 모델 검색 품질·독립 수용이나 새 version-aware 쓰기는 KM-01 완료에 포함하지 않는다.
+
+현재 검증 진입점은 `python3 scripts/check-collection-isolation.py`, `python3 scripts/test_collection_isolation.py`, `python3 scripts/test_knowledge_roadmap_current.py`다. 새 검사9개는 정상 packet, 응답 누락, 동일 원문 fork의 재서명된 다른 프로젝트 인용, 다른 embedding 차원, 거부된 쓰기의 파일 변경, 종료 오류, Go skip의 통과 승격, 독립 수용 과장, 다른 모델 dispatch 기록을 검사한다. 종료 후 독립 재캡처한24파일/current2개의 값도 실행 전과 일치한다.
