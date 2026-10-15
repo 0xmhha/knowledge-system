@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-16 현재 KM-01–04를 완료했다. 전체28개 중18개 완료·3개 진행 중(OE-01.1–3)·7개 미착수다. 다음은 KM-05.3 매핑 검토/버전 정책이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
+2026-10-16 현재 KM-01–04를 완료했다. 전체28개 중19개 완료·3개 진행 중(OE-01.1–3)·6개 미착수다. 다음은 KM-05.4 지원/적용 범위 검증이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는4/7이다.
 
@@ -26,7 +26,7 @@
 | KM-04.4 | 두 번 변경+no-op+실패 복구·실제 주기 실행 | 완료 | 실제2프로젝트·20항목·221호출·2EOF0·문서/자료 삭제·메모 교체·graph 실패/연결 retry·타 DB hash/인용 불변 |
 | KM-05.1 | 산업 개념·정의·별칭·비교 축 | 완료 | 선택형 팩8개념/26축·한영/모호성·버전 pin29사례·새 전체Go/race7패키지 검증 |
 | KM-05.2 | 공통 개념과 프로젝트별 코드/정책/시험 연결 | 완료 | 비교59개(어휘29+연결30)·실제 보관 원문3프로젝트/5종류·committed/working-tree·전체Go/race7 검증 |
-| KM-05.3 | exact/close/broader 등의 검토·버전 의미 | 미착수 | 미실행 |
+| KM-05.3 | exact/close/broader 등의 검토·버전 의미 | 완료 | 정책34개·비교93개·정족수/회수/상충/미래·source/pack 변경 stale·과거 버전·키 별칭 거부 |
 | KM-05.4 | 비적용/미수집/미지원·L1/L2·network 차이 | 미착수 | 미실행 |
 | KM-06.1 | 명시 버전·개념·축·시점·상한의 비교 요청 | 미착수 | 미실행 |
 | KM-06.2 | 프로젝트별 근거 행렬/bundle | 미착수 | 미실행 |
@@ -589,3 +589,24 @@ KM-05.1 완료: 기존 knowledgepack loader를 재사용한 선택형 industry.b
 KM-05.2 완료: 명시 common concept/version/digest와 프로젝트·버전·network/config/역할/관찰 시점에 결속한 원문 연결을 구현했다. 서로 다른 이름의 같은 역할과 같은 이름의 다른 역할을3개 프로젝트의5종류 원문으로 검증하고, 동일 로컬ID를 서로 다른 scope에 보존했다. 기존 collection reader lease·target 검증과 retained evidence 정화/재검증을 재사용한다. code/document/configuration/policy/test와 원문 hash/span을 구분하며 모든 연결은 proposed다. 실제 사람 승인·그래프/벡터 검색 품질·공개 비교 MCP는 완료로 세지 않는다.
 
 전체18/28·기능4/7이다. 다음은 KM-05.3의 직접 매핑 의미·검토/회수·버전/stale 정책이다. 남은10개는 KM-05.3–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+## KM-05.3 직접 매핑·검토 시험 목록
+
+기존59개에 아래34개를 더한 비교 패키지93개다. 통제된 검토 기록으로 정책을 검증하며 실제 사람 승인·독립 품질로 세지 않는다. 최종 전체 회귀 후 단계 완료를 확정한다.
+
+| 상위 시험 | 하위 포함 실행 수 | 경계 |
+|---|---|---|
+| TestDirectMappingMeaningNeverMergesEntitiesOrInfersClosure | 6 | 5종류 직접 방향·broader/narrower 범위·entity/전이 금지 |
+| TestMappingReviewQuorumWithdrawalConflictAndTime | 15 | 14개 승인/중복/정족수/철회/상충/최신/미래 판정 |
+| TestMappingReviewsAreExactPinsAndProjectLocal | 1 | 해석 변경 stale·타 project/network 기록 미승계·위조 header 거부 |
+| TestReviewedBindingChecksCurrentArchiveAndKeepsHistoricalVersion | 1 | 새 버전 stale·당시 retained 승인/원문 유지·손상은 승인으로 우회 금지 |
+| TestMappingReviewDoesNotMigrateAcrossPackVersions | 1 | 공통 팩v2의 새 검토 요구·옛v1 선택/검토 보존 |
+| TestMappingReviewStrictSchemaAndNoMissingActor | 9 | 검토자/이유/판정/시각/target/source/namespace8개·변조 이벤트/정족수 거부 |
+| TestMappingReviewRejectsCaseAliases | 1 | 대소문자·유니코드 속성 별칭 덮기 거부 |
+
+
+## KM-05.3 완료 기록
+
+KM-05.3 완료: exact/close/broader/narrower/related를 local→shared 직접 관계로 고정하고 entity 동일시/자동 전이를 금지했다. 정확 source/해석/팩 pin의 검토 기록, 중복 검토자 정족수·최신 판정·회수·충돌·미래 시각·stale와 과거 버전 보존을 구현했다. 공개용 reader는 보관 원문을 재확인하며 승인 기록으로 손상을 우회하지 않는다. 검토자 label은 인증된 신원이 아니고 실제 사람 승인은 생성하지 않았다. 입력 필드의 대소문자/유니코드 별칭 덮기도 재현·거부했다.
+
+전체19/28·기능4/7이다. 다음은 KM-05.4의 비적용/미수집/미지원·역할/산업/network/config 차이 검증이다. 남은9개는 KM-05.4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

@@ -1,6 +1,6 @@
 # 산업 개념과 프로젝트별 비교 근거
 
-현재 KM-05.1의 선택형 공통 어휘와 KM-05.2의 프로젝트별 원문 연결을 구현했다. 검토/버전 처리·비교 MCP·실제 다중 프로젝트 품질은 다음 단계에서 검증한다. [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
+현재 KM-05.1의 선택형 공통 어휘와 KM-05.2의 프로젝트별 원문 연결을 구현했다. 직접 매핑의 검토/회수·버전/stale 정책도 구현했다. 지원/적용 범위·비교 MCP·실제 다중 프로젝트 품질은 다음 단계에서 검증한다. [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 목적과 기존 계층
 
@@ -77,3 +77,26 @@ MappingReader는 기존 collection session의 명시 catalog/member/target 검�
 KM-05.2 완료: 명시 common concept/version/digest와 프로젝트·버전·network/config/역할/관찰 시점에 결속한 원문 연결을 구현했다. 서로 다른 이름의 같은 역할과 같은 이름의 다른 역할을3개 프로젝트의5종류 원문으로 검증하고, 동일 로컬ID를 서로 다른 scope에 보존했다. 기존 collection reader lease·target 검증과 retained evidence 정화/재검증을 재사용한다. code/document/configuration/policy/test와 원문 hash/span을 구분하며 모든 연결은 proposed다. 실제 사람 승인·그래프/벡터 검색 품질·공개 비교 MCP는 완료로 세지 않는다.
 
 비교 패키지59개(어휘29+연결30)와 최종 전체 Go3921(3903통과18skip)·race895(893통과2skip)를 검증했다. 초기 손상 fixture의 읽기 전용 권한 문제와 working-tree commit/base 검증 오류의 실패 원자료를 보존했다. 전체 소스 재검증 이후 완료로 표시한다. [동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-05-bindings/manifest.json)를 따른다. 전체18/28·기능4/7이다. 다음은 KM-05.3의 직접 매핑 의미·검토/회수·버전/stale 정책이다. 남은10개는 KM-05.3–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+## KM-05.3 직접 매핑 의미와 검토/버전 계약
+
+매핑은 **프로젝트의 로컬 역할 → 공통 개념** 방향의 직접 연결이다. exact는 명시 조건에서 정의 범위가 맞는다는 주장이고, close는 상당한 중첩과 남는 차이, broader는 로컬 역할이 공통 개념보다 넓은 범위, narrower는 더 좁은 범위, related는 포함/동일성을 주장하지 않는 관련성이다. 다섯 종류 모두 entity identity=false, automatic transitivity=false다. 서로 다른 프로젝트가 같은 개념에 연결됐다는 이유로 코드·정책·인용 ID를 합치거나 A→B→C의 새 연결을 만들지 않는다. core20·기존 온톨로지 스키마/기본 순위는 변경하지 않는다.
+
+MappingReviewDocument는 schema1·명시 min_approvals1–8·최대512개 기록의1MiB 엄격 JSON이다. 기록에는 이벤트ID, local binding ID, 전체 concept/version/digest·프로젝트/버전·조건, 정확 BindingDigest, verified/rejected/withdrawn 판정, 제공된 reviewer_id·이유·시각이 필요하다. 검토 파일을 받지 않은 경우는 proposed이며 이름·응답·승인을 생성하지 않는다. ASCII lower_snake_case 속성 이름만 받으며 값의 UTF-8은 보존한다. 대소문자/유니코드 별칭이 같은 struct 필드를 덮는 입력도 거부한다.
+
+판정은 명시 as_of 시각을 사용한다. 관찰 전 검토·잘못된 시각·미래 승인을 현재 승인으로 쓰지 않는다. 현재 target/BindingDigest와 전체 header가 일치하는 기록만 적용한다. 시각이 가장 늦은 각 검토자 ID의 판정을 사용하고 같은 ID의 중복 기록으로 정족수를 채우지 않는다. 시각이 같은 상반 판정이나 검토자 간 승인/거부 충돌은 disputed/conflict로 남긴다. 같은 scoped 이벤트 ID의 바이트를 고쳐 덮는 문서는 거부하고 새 이벤트 ID를 요구한다. 배열 순서를 승인 우선순위로 사용하지 않는다.
+
+withdrawn은 그 검토자 ID의 앞선 투표만 회수한다. 다른 검토자의 유효 투표를 지우지 않으며 정족수 미달은 proposed다. rejected·withdrawn·disputed는 유효 승인으로 계산하지 않는다. 검토자 ID는 **제공된 기록 label**이며, 서로 다른 사람임을 인증하거나 독립 품질 수용을 제공하지 않는다. 응답에 reviewer_identity_authenticated=false와 independent_quality_acceptance=false를 유지한다. 조직 인증/서명이 필요한 수용은 별도 어댑터가 필요하다.
+
+검토의 state와 validity를 나눈다. 정확 현재 기록은 current다. 같은 프로젝트/network/config/역할의 논리적 연결에서 원문·스냅샷·해석/이유·관찰 시점·팩 버전/digest가 달라졌으면 현재 승인으로 승계하지 않고 stale/proposed로 보고한다. 타 프로젝트·network/config/역할의 기록은 현재 target의 승인이 아니다. 과거의 immutable 버전을 명시 선택하면 당시 원문·검토를 계속 확인할 수 있다. 새 팩은 정확 키를 다시 선택하고 검토해야 하며 자동 migration이나 관계 closure를 수행하지 않는다.
+
+공개 경로에 사용할 ReadReviewedBinding은 retained 원문 무결성을 다시 확인한 결과와 기록 판정을 함께 반환한다. 보관 blob이 손상되면 과거 verified 기록이 있어도 원문/확정 연결을 내보내지 않는다. 단독 AssessMappingReview는 기록 판정의 계산이며 실제 source 조회 완료를 뜻하지 않는다. 매핑 승인으로 원문 정책 내용의 승인·test 실행 통과·프로젝트 우월성을 판정하지 않는다.
+
+이번 검증의 검토자는 controlled fixture label이며 실제 사용자/담당자의 승인 기록이 아니다. 실제 프로젝트의 기존 proposed 연결을 자동 승격하지 않는다. 공개 비교 MCP와 비적용/미수집/지원 차이는 다음 단계에서 검증한다.
+
+
+## KM-05.3 완료 기록
+
+KM-05.3 완료: exact/close/broader/narrower/related를 local→shared 직접 관계로 고정하고 entity 동일시/자동 전이를 금지했다. 정확 source/해석/팩 pin의 검토 기록, 중복 검토자 정족수·최신 판정·회수·충돌·미래 시각·stale와 과거 버전 보존을 구현했다. 공개용 reader는 보관 원문을 재확인하며 승인 기록으로 손상을 우회하지 않는다. 검토자 label은 인증된 신원이 아니고 실제 사람 승인은 생성하지 않았다. 입력 필드의 대소문자/유니코드 별칭 덮기도 재현·거부했다.
+
+비교 패키지93개(어휘29+연결30+검토34), 전체 Go3955(3937통과18skip)·race929(927통과2skip)·빌드/fmt/vet/lint·문서133개를 검증했다. 초기 필드 alias 덮기 실패 원자료를 보존하며 source payload의 UTF-8을 제한하지 않는다. [동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-05-mapping-review/manifest.json)를 따른다. 전체19/28·기능4/7이다. 다음은 KM-05.4의 비적용/미수집/미지원·역할/산업/network/config 차이 검증이다. 남은9개는 KM-05.4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

@@ -95,7 +95,7 @@
 
 - [x] KM-05.1: 버전 관리되는 산업 팩과 비교 질문에서 출발해 개념·정의·별칭·포함/제외·비교 축을 설계한다. 첫 후보는 blockchain의 transaction, consensus/finality, transaction ordering, mempool/admission, staking/validator lifecycle과 정책이다.
 - [x] KM-05.2: 공통 개념과 프로젝트별 구현·문서·설정/정책·테스트 근거를 연결한다. 같은 이름이 다른 의미인 경우와 이름이 달라도 같은 역할인 경우를 모두 검토한다.
-- [ ] KM-05.3: exact/close/broader/narrower/related 등 개념 매핑의 의미·범위·검토/버전 정책을 정한다. 의미 유사성을 entity 동일성으로 바꾸거나 close 관계를 자동 전이하지 않는다. 공통 core 타입은 재정의하지 않는다.
+- [x] KM-05.3: exact/close/broader/narrower/related 등 개념 매핑의 의미·범위·검토/버전 정책을 정한다. 의미 유사성을 entity 동일성으로 바꾸거나 close 관계를 자동 전이하지 않는다. 공통 core 타입은 재정의하지 않는다.
 - [ ] KM-05.4: 동일/유사/비교 불가·미수집·미지원·명시적 비적용을 구분하고, 일부 프로젝트에 없는 기능·서로 다른 L1/L2 역할·여러 network/config·서로 다른 산업 입력을 검증한다.
 
 완료 결과: `staking` 등의 공통 질문에서 각 프로젝트의 해당 근거로 이동할 수 있다. 모든 프로젝트가 staking을 구현한다거나 L1 합의와 L2 sequencing이 같은 기능이라고 가정하지 않는다. 원천 부재는 기능 부재의 증거가 아니다.
@@ -237,3 +237,10 @@ KM-05.1 완료: 기존 knowledgepack loader를 재사용한 선택형 industry.b
 KM-05.2 완료: 명시 common concept/version/digest와 프로젝트·버전·network/config/역할/관찰 시점에 결속한 원문 연결을 구현했다. 서로 다른 이름의 같은 역할과 같은 이름의 다른 역할을3개 프로젝트의5종류 원문으로 검증하고, 동일 로컬ID를 서로 다른 scope에 보존했다. 기존 collection reader lease·target 검증과 retained evidence 정화/재검증을 재사용한다. code/document/configuration/policy/test와 원문 hash/span을 구분하며 모든 연결은 proposed다. 실제 사람 승인·그래프/벡터 검색 품질·공개 비교 MCP는 완료로 세지 않는다.
 
 [설계/검증 경계](./INDUSTRY-CONCEPT-COMPARISON.md)를 따른다. 전체18/28·기능4/7이다. 다음은 KM-05.3의 직접 매핑 의미·검토/회수·버전/stale 정책이다. 남은10개는 KM-05.3–4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-05.3 직접 매핑과 검토 정책
+
+KM-05.3 완료: exact/close/broader/narrower/related를 local→shared 직접 관계로 고정하고 entity 동일시/자동 전이를 금지했다. 정확 source/해석/팩 pin의 검토 기록, 중복 검토자 정족수·최신 판정·회수·충돌·미래 시각·stale와 과거 버전 보존을 구현했다. 공개용 reader는 보관 원문을 재확인하며 승인 기록으로 손상을 우회하지 않는다. 검토자 label은 인증된 신원이 아니고 실제 사람 승인은 생성하지 않았다. 입력 필드의 대소문자/유니코드 별칭 덮기도 재현·거부했다.
+
+[설계/검증 경계](./INDUSTRY-CONCEPT-COMPARISON.md)를 따른다. 전체19/28·기능4/7이다. 다음은 KM-05.4의 비적용/미수집/미지원·역할/산업/network/config 차이 검증이다. 남은9개는 KM-05.4, KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

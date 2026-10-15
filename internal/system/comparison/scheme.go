@@ -246,7 +246,7 @@ func uniqueJSON(d *json.Decoder, depth int) error {
 				return err
 			}
 			name, ok := key.(string)
-			if !ok || seen[name] {
+			if !ok || seen[name] || !jsonPropertyName(name) {
 				return ErrSchemeInvalid
 			}
 			seen[name] = true
@@ -257,4 +257,20 @@ func uniqueJSON(d *json.Decoder, depth int) error {
 	}
 	_, err = d.Token()
 	return err
+}
+
+// All configuration properties in this package are ASCII lower_snake_case.
+// Source payload values remain arbitrary UTF-8. Reject case-fold aliases
+// before encoding/json can silently select the same struct field twice.
+func jsonPropertyName(name string) bool {
+	if name == "" {
+		return false
+	}
+	for _, r := range name {
+		if r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_' {
+			continue
+		}
+		return false
+	}
+	return true
 }
