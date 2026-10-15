@@ -343,16 +343,17 @@
       "scope": "cross_project_comparison",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "KM06_1_readonly_explicit_request_contract_complete_runtime_next",
+      "design_status": "KM06_2_actual_readonly_comparison_MCP_complete_partial_failure_next",
       "depends_on": [
         "KM-01",
         "KM-05"
       ],
       "evidence": [
         "docs/spec-driven/COMPARISON-MCP-CONTRACT.md",
-        "system/eval/knowledge-roadmap-2026-10-16/km-06-contract/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-contract/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-runtime/manifest.json"
       ],
-      "verification": "contract50_total_comparison167_profile_catalog_scope_concept_facet_time_budget_guards_no_backend_or_actual_MCP",
+      "verification": "actual_native_mock2DB_12checks_9tools_2EOF0_comparison171_full_Go_race7_no_real_chain_or_quality_acceptance",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -365,8 +366,11 @@
         },
         {
           "id": "KM-06.2",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         },
         {
           "id": "KM-06.3",
@@ -588,7 +592,7 @@
     "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
     "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
   },
-  "completed_subtasks": 21,
+  "completed_subtasks": 22,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
   "manager_host_validation": {
     "packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json",

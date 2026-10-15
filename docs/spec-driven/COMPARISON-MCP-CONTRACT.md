@@ -1,16 +1,16 @@
 # 읽기 전용 다중 프로젝트 비교 MCP 계약
 
-KM-06.1의 요청/설정 계약을 구현했다. 실제 공개 MCP 실행·근거 행렬·부분 실패·실제 프로젝트 검증은 KM-06.2–4다. 이 문서의 설계를 서버 실행 완료로 세지 않는다. [공통 개념/연결](./INDUSTRY-CONCEPT-COMPARISON.md), [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다.
+KM-06.1–2의 요청/설정 계약·실제 공개 읽기 전용 MCP·근거 행렬을 구현했다. 부분 실패/종료 보호의 확대 검증과 실제 프로젝트 비교는 KM-06.3–4다. [공통 개념/연결](./INDUSTRY-CONCEPT-COMPARISON.md), [상위 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)를 따른다.
 
 ## 목적과 경계
 
 LLM/사용자가 선택한 프로젝트별 코드·문서·설정/정책·테스트의 비교 자료를 얻도록 한다. 동일 개념이나 유사 역할로 프로젝트 신원·구현·정책을 합치지 않는다. 도구는 source evidence를 제공하고 장단점·우월성·측정하지 않은 성능/보안성의 최종 결론을 만들지 않는다. 구현 문맥의 단일 target 경로는 기존 collection 구현 모드를 사용하며 새 요청은 comparison 모드만 받는다. patch target·쓰기·current 전환·job 접수를 제공하지 않는다.
 
-공개 도구명은 선택 설정의 cks.comparison.describe와 cks.comparison.extract로 고정한다. 독립적인 비교 진입점은 mcp 명령 그룹 아래 comparison 하위 명령으로 계획한다. 기존 기본 MCP·collection·maintenance·manager의 measured 모드와 분리하여 source-only 비교 때문에 단일 프로젝트 backend나 dummy 모델을 열지 않는다. 실제 등록/진입점은 다음 단계에서 구현하며 현재 실행 명령으로 안내하지 않는다.
+공개 도구명은 선택 설정의 cks.comparison.describe와 cks.comparison.extract로 고정한다. 독립적인 비교 진입점은 `cks mcp comparison --profile /absolute/profile.json`이다. 기존 기본 MCP·collection·maintenance·manager의 measured 모드와 분리하여 source-only 비교 때문에 단일 프로젝트 backend나 dummy 모델을 열지 않는다. 이 실행은 선택한 profile만 사용한다. 매니저 plugin이 이 두 도구를 proxy하는 것으로 간주하지 않는다.
 
 ## 설정과 고정 신원
 
-ComparisonProfileDocument schema1은 name, catalog_path, scheme_root, 선택적 bindings_path/reviews_path, sanitize_rules_path, scopes를 갖는1MiB 로컬 JSON이다. 절대·정규화 경로만 선언한다. 등록 범위는 최대128개다. schema decoder는 형상만 검사하고 파일 존재·원문 읽기 준비·실제 MCP 연결을 보장하지 않는다. runtime loader가 다음 단계에서 no-follow·파일 byte hash·전체 profile digest를 고정해야 한다. 그때까지 순수 계약 생성자의 profile digest는 호출자가 제공한 pin이다.
+ComparisonProfileDocument schema1은 name, catalog_path, scheme_root, 선택적 bindings_path/reviews_path, sanitize_rules_path, scopes를 갖는1MiB 로컬 JSON이다. 절대·정규화 경로만 선언한다. 등록 범위는 최대128개다. schema decoder는 형상만 검사하고 파일 존재·원문 읽기 준비·실제 MCP 연결을 보장하지 않는다. runtime loader는 profile/catalog/연결/검토/정제 파일의 no-follow 읽기와 byte hash·scheme tree digest를 합쳐 실제 profile digest를 고정한다. symlink 경로와 등록 scope 밖 binding을 거부한다. 실행 중 설정 파일 변경은 반영하지 않으며 재시작 시 새 pin으로 바뀐다. 원문 dataset의 준비 상태는 요청별로 확인한다. 순수 계약 생성자의 digest와 실제 loader가 읽은 digest를 구분한다.
 
 프로젝트 scope는 전체 V2Coordinates + industry + network/configuration/component_role/observed_at이다. scope ID는 이 tuple의 SHA-256이며 project name·로컬 binding ID·URI를 전역 신원으로 사용하지 않는다. 동등한 timezone 표현과 industry 대소문자/공백만 정규화하고 network/config/역할 ID는 임의로 합치지 않는다. 한 프로젝트의 다른 버전·network/config도 다른 scope다. catalog에 등록하지 않은 scope나 정규화 후 중복 scope는 거부한다.
 
@@ -34,9 +34,9 @@ catalog digest는 기존 canonical collection 계약을 재사용한다. runtime
 
 요청은 설정/원천/경로·patch target·backend를 바꾸는 필드를 받지 않는다. 엄격 JSON과 lower_snake_case 속성 이름을 적용한다. question 및 원문은 데이터이며 명령으로 실행하지 않는다. 이 계약의 Select/DecodeRequest는 routing/예산 검증이며 backend 호출이나 자료 조회 성공이 아니다.
 
-## 후속 행렬·오류·노출 설계
+## 행렬과 후속 오류·종료 보호
 
-KM-06.2는 각 participant/facet에 공통 정의·로컬 구현/정책·source 종류·인용·mapping 이유/검토·조건·unknown을 분리한 행렬을 제공한다. 공통/차이 후보에는 양쪽 프로젝트의 근거와 이유를 요구하며 동일 용어나 source text가 행동 동일성을 증명한다고 주장하지 않는다. 기본은 현재 recorded review가 있는 자료이고 명시 후보 모드는 proposed를 유지한다.
+구현한 KM-06.2는 각 participant/facet에 공통 정의·로컬 구현/정책·source 종류·인용·mapping 이유/검토·조건·unknown을 분리한 행렬을 제공한다. 공통/차이 후보에는 양쪽 프로젝트의 근거와 이유를 요구하며 동일 용어나 source text가 행동 동일성을 증명한다고 주장하지 않는다. 기본은 현재 recorded review가 있는 자료이고 명시 후보 모드는 proposed를 유지한다.
 
 KM-06.3은 한 프로젝트의 source 부재/손상과 다른 프로젝트의 정상 결과를 분리한다. 전체 profile/catalog 형상과 membership을 먼저 검증한 후 선택 버전별로 reader를 열어 한 실패가 시작 시 전체를 막지 않도록 한다. 등록 밖 경로/프로젝트로 fallback하지 않는다. 같은 project/scope의 상충은 유지하고 다른 프로젝트의 차이는 한 내부 모순으로 만들지 않는다. 요청 예산/기한·응답 byte와 인용 상한·reader lease·EOF/신호 정리를 검증한다. 부분 실패/누락/초과를 조용히 숨기거나 자료 완전성으로 표현하지 않는다.
 
@@ -50,3 +50,12 @@ KM-06.4는 둘 이상의 실제 로컬 프로젝트를 고정 버전/범위로 D
 KM-06.1 완료: 읽기 전용 comparison 모드·고정 profile/catalog·명시 scope 참여자/공통 개념/축·시각/예산 계약을 구현했다. 이름이나 자연어에서 대상을 추측하지 않고2–16개 scope와1–8개 축을 선택한다. stale/타 collection/동일 범위 중복·구현 모드·요청 경로/target 변조·미래 시각/초과 예산을 거부한다. 한 프로젝트의 명시적인 다른 조건도 비교 가능하며 호출자 변경으로 고정 라우팅을 바꾸지 못한다. 이 단계는 계약50개 검증이며 actual source read/MCP 호출0이다.
 
 비교167개(기존117+계약50), 전체 Go4029(4011통과18skip)·race1003(1001통과2skip)·빌드/fmt/vet/lint·문서134개를 검증했다. 순수 profile/요청 검증이며 실제 file loader/source query/공개 MCP 실행은 아니다. [동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-06-contract/manifest.json)를 따른다. 전체21/28·기능5/7이다. 다음은 KM-06.2의 공개 MCP·프로젝트별 근거 행렬/bundle 구현이다. 남은7개는 KM-06.2–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+
+## KM-06.2 완료 기록
+
+KM-06.2 완료: 고정된 로컬 profile/catalog·선택 pack/연결/검토·정제 규칙의 실제 byte digest를 고정하는 loader와 독립 stdio 비교 MCP를 구현했다. describe/extract2도구만 노출하고 읽기 전용·비파괴·동일 요청 반복 가능·외부 네트워크 비사용 표시를 명시한다. 각 프로젝트/조건·개념/축의 source 종류·본문/인용·매핑 이유/검토 상태·unknown을 분리하며 양쪽 근거가 있는 공통/차이 후보만 제공한다. 기존 매니저18/updates6도구에 자동 추가된 것으로 세지 않는다.
+
+비교171개(계약167+runtime4), 전체 Go4033(4015통과18skip)·race1007(1005통과2skip,7패키지)·빌드/fmt/vet/lint·문서134개를 검증했다. 실제 native mock2DB 구축 후12항목·9도구호출·2세션 EOF0이며 유료 모델0이다. 통제 source fixture의 실제 조회/transport 검증이며 실제 체인 비교·의미 품질/독립 수용은 아니다.
+
+[동결 증거](../../system/eval/knowledge-roadmap-2026-10-16/km-06-runtime/manifest.json)를 따른다. 프로필 경로 canonicalization fixture 오류와 native 검증기 vector manifest 파일명 오류도 초기 실패로 보존했다. 전체22/28·기능5/7이다. 다음은 KM-06.3 부분 실패·상충/누락·기한/예산·reader/종료 보호의 완성이다. 남은6개는 KM-06.3–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

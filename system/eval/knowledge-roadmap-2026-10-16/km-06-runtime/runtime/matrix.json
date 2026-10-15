@@ -1,0 +1,567 @@
+{
+  "schema_version": 1,
+  "state": "partial",
+  "profile_digest": "1d12b07e0d3832a7419de47a990e65c1ae4e27fcf7568eb2235a25193de56bf5",
+  "catalog_digest": "4606366a9c238bb45dfd46ef47bd650209af3bc4bf43726e476ec19cd4596732",
+  "collection_id": "chains",
+  "mode": "comparison",
+  "concept": {
+    "key": {
+      "pack_id": "industry.blockchain",
+      "version": "1.0.0",
+      "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+      "concept_id": "staking"
+    },
+    "definition": "The explicit commitment or delegation of stake, with project-defined entry, exit and penalty behavior when supported.",
+    "view": {
+      "id": "staking",
+      "aliases": [
+        "staking",
+        "스테이킹",
+        "stake",
+        "delegation"
+      ],
+      "includes": [
+        "stake commitment, delegation, withdrawal and penalties"
+      ],
+      "excludes": [
+        "not all validator systems require stake; same-named amounts are not sufficient"
+      ],
+      "applicable_roles": [
+        "staking-network"
+      ],
+      "facets": [
+        {
+          "id": "entry",
+          "question": "What conditions permit staking or delegation?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "exit",
+          "question": "What conditions and delay permit withdrawal?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "penalty",
+          "question": "What evidenced conditions cause penalties or slashing?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        }
+      ]
+    }
+  },
+  "facets": [
+    "entry",
+    "exit"
+  ],
+  "as_of": "2026-10-15T19:00:04Z",
+  "question": "",
+  "groups": [
+    {
+      "participant": {
+        "scope_id": "1aefe4c61a85f8cc0ee5d6b0d3ac4a6bd07adc8ed63c6c2eb1d84efb42b48983",
+        "scope": {
+          "coordinates": {
+            "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+            "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+            "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "fixture-network",
+            "configuration": "fixture-config",
+            "component_role": "staking-network",
+            "observed_at": "2026-10-15T18:59:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+              "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+              "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "fixture-network",
+              "configuration": "fixture-config",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T18:59:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking"
+          },
+          "facet": "entry",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "staking",
+                "binding_digest": "1d9a1ef834850e68e58b34cf73162d95c3ea2f6babaef8f006f8608f23844e00",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "staking"
+                },
+                "coordinates": {
+                  "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+                  "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+                  "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+                  "source_mode": "snapshot-only",
+                  "base_commit": ""
+                },
+                "conditions": {
+                  "network": "fixture-network",
+                  "configuration": "fixture-config",
+                  "component_role": "staking-network",
+                  "observed_at": "2026-10-15T18:59:59+00:00"
+                },
+                "local_concept": "Stake",
+                "mapping": "close",
+                "reason": "Controlled fixture mapping candidate, source integrity only; no real chain or human approval.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "evidence-code",
+                      "kind": "code",
+                      "facets": [
+                        "entry"
+                      ],
+                      "citation": {
+                        "file": "stake.go",
+                        "start_line": 2,
+                        "end_line": 2,
+                        "commit_hash": "",
+                        "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+                        "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+                        "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+                        "source_mode": "snapshot-only",
+                        "base_commit": "",
+                        "origin_id": "repo",
+                        "file_sha256": "52e2fba5571aacddc6b62b5df9d496bdac0351b025bb9247023f3f23ab6b1ce2",
+                        "content_sha256": "33b488a576ed6707fb3a4cd1650f526f70097fd2b1c0cf581375b202244d271c"
+                      }
+                    },
+                    "body": "func Stake()int{return 32}\n"
+                  },
+                  {
+                    "reference": {
+                      "id": "evidence-policy",
+                      "kind": "policy",
+                      "facets": [
+                        "entry"
+                      ],
+                      "citation": {
+                        "file": "POLICY.md",
+                        "start_line": 1,
+                        "end_line": 1,
+                        "commit_hash": "",
+                        "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+                        "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+                        "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+                        "source_mode": "snapshot-only",
+                        "base_commit": "",
+                        "origin_id": "repo",
+                        "file_sha256": "e4fa48da0ce44ebe3b3b692ce1737745f882710de508ec5f238f716711e1ab2b",
+                        "content_sha256": "e4fa48da0ce44ebe3b3b692ce1737745f882710de508ec5f238f716711e1ab2b"
+                      }
+                    },
+                    "body": "Controlled fixture Stake entry uses 32 units. This is not a real chain policy.\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+              "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+              "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "fixture-network",
+              "configuration": "fixture-config",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T18:59:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking"
+          },
+          "facet": "exit",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    },
+    {
+      "participant": {
+        "scope_id": "4822b70757a1d62a90d5fc7bac72630552b4c321ff641f316f14cf7c2c77099c",
+        "scope": {
+          "coordinates": {
+            "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+            "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+            "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "fixture-network",
+            "configuration": "fixture-config",
+            "component_role": "staking-network",
+            "observed_at": "2026-10-15T19:00:04+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+              "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+              "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "fixture-network",
+              "configuration": "fixture-config",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:00:04+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking"
+          },
+          "facet": "entry",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "staking",
+                "binding_digest": "928ead50b91a2229451e7884212805c41accf0202b7e941d6671cea39e668f50",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "staking"
+                },
+                "coordinates": {
+                  "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+                  "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+                  "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+                  "source_mode": "snapshot-only",
+                  "base_commit": ""
+                },
+                "conditions": {
+                  "network": "fixture-network",
+                  "configuration": "fixture-config",
+                  "component_role": "staking-network",
+                  "observed_at": "2026-10-15T19:00:04+00:00"
+                },
+                "local_concept": "Bond",
+                "mapping": "close",
+                "reason": "Controlled fixture mapping candidate, source integrity only; no real chain or human approval.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "evidence-code",
+                      "kind": "code",
+                      "facets": [
+                        "entry"
+                      ],
+                      "citation": {
+                        "file": "stake.go",
+                        "start_line": 2,
+                        "end_line": 2,
+                        "commit_hash": "",
+                        "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+                        "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+                        "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+                        "source_mode": "snapshot-only",
+                        "base_commit": "",
+                        "origin_id": "repo",
+                        "file_sha256": "84c1b86e0da3df3076865aab741017a11f0ed83117da0978fe666f15e5383263",
+                        "content_sha256": "1c0e85d8e6eac7485bd11288d7613c8c7a6799e379712c2d168533e887e8ca9a"
+                      }
+                    },
+                    "body": "func Bond()int{return 64}\n"
+                  },
+                  {
+                    "reference": {
+                      "id": "evidence-policy",
+                      "kind": "policy",
+                      "facets": [
+                        "entry"
+                      ],
+                      "citation": {
+                        "file": "POLICY.md",
+                        "start_line": 1,
+                        "end_line": 1,
+                        "commit_hash": "",
+                        "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+                        "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+                        "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+                        "source_mode": "snapshot-only",
+                        "base_commit": "",
+                        "origin_id": "repo",
+                        "file_sha256": "1e9f9b407857cff0b66c384093a37566f11d10f817a5a93241dfa673738b6453",
+                        "content_sha256": "1e9f9b407857cff0b66c384093a37566f11d10f817a5a93241dfa673738b6453"
+                      }
+                    },
+                    "body": "Controlled fixture Bond entry uses 64 units. This is not a real chain policy.\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+              "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+              "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "fixture-network",
+              "configuration": "fixture-config",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:00:04+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking"
+          },
+          "facet": "exit",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "different_evidence_or_conditions_candidate",
+      "facet": "entry",
+      "participants": [
+        "1aefe4c61a85f8cc0ee5d6b0d3ac4a6bd07adc8ed63c6c2eb1d84efb42b48983",
+        "4822b70757a1d62a90d5fc7bac72630552b4c321ff641f316f14cf7c2c77099c"
+      ],
+      "binding_digests": [
+        "1d9a1ef834850e68e58b34cf73162d95c3ea2f6babaef8f006f8608f23844e00",
+        "928ead50b91a2229451e7884212805c41accf0202b7e941d6671cea39e668f50"
+      ],
+      "evidence": [
+        {
+          "scope_id": "1aefe4c61a85f8cc0ee5d6b0d3ac4a6bd07adc8ed63c6c2eb1d84efb42b48983",
+          "binding_digest": "1d9a1ef834850e68e58b34cf73162d95c3ea2f6babaef8f006f8608f23844e00",
+          "citations": [
+            {
+              "file": "stake.go",
+              "start_line": 2,
+              "end_line": 2,
+              "commit_hash": "",
+              "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+              "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+              "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "52e2fba5571aacddc6b62b5df9d496bdac0351b025bb9247023f3f23ab6b1ce2",
+              "content_sha256": "33b488a576ed6707fb3a4cd1650f526f70097fd2b1c0cf581375b202244d271c"
+            },
+            {
+              "file": "POLICY.md",
+              "start_line": 1,
+              "end_line": 1,
+              "commit_hash": "",
+              "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+              "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+              "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "e4fa48da0ce44ebe3b3b692ce1737745f882710de508ec5f238f716711e1ab2b",
+              "content_sha256": "e4fa48da0ce44ebe3b3b692ce1737745f882710de508ec5f238f716711e1ab2b"
+            }
+          ]
+        },
+        {
+          "scope_id": "4822b70757a1d62a90d5fc7bac72630552b4c321ff641f316f14cf7c2c77099c",
+          "binding_digest": "928ead50b91a2229451e7884212805c41accf0202b7e941d6671cea39e668f50",
+          "citations": [
+            {
+              "file": "stake.go",
+              "start_line": 2,
+              "end_line": 2,
+              "commit_hash": "",
+              "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+              "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+              "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "84c1b86e0da3df3076865aab741017a11f0ed83117da0978fe666f15e5383263",
+              "content_sha256": "1c0e85d8e6eac7485bd11288d7613c8c7a6799e379712c2d168533e887e8ca9a"
+            },
+            {
+              "file": "POLICY.md",
+              "start_line": 1,
+              "end_line": 1,
+              "commit_hash": "",
+              "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+              "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+              "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+              "source_mode": "snapshot-only",
+              "base_commit": "",
+              "origin_id": "repo",
+              "file_sha256": "1e9f9b407857cff0b66c384093a37566f11d10f817a5a93241dfa673738b6453",
+              "content_sha256": "1e9f9b407857cff0b66c384093a37566f11d10f817a5a93241dfa673738b6453"
+            }
+          ]
+        }
+      ],
+      "reasons": [
+        "Controlled fixture mapping candidate, source integrity only; no real chain or human approval.",
+        "Controlled fixture mapping candidate, source integrity only; no real chain or human approval."
+      ]
+    }
+  ],
+  "used_body_bytes": 210,
+  "used_citations": 4,
+  "completeness_scope": "requested_project_facet_rows_only_not_all_project_evidence",
+  "final_assessment": "LLM_or_user_evaluates_tradeoffs_from_cited_evidence"
+}

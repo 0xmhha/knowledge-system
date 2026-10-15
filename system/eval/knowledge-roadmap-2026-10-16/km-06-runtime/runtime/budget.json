@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "state": "partial",
+  "profile_digest": "1d12b07e0d3832a7419de47a990e65c1ae4e27fcf7568eb2235a25193de56bf5",
+  "catalog_digest": "4606366a9c238bb45dfd46ef47bd650209af3bc4bf43726e476ec19cd4596732",
+  "collection_id": "chains",
+  "mode": "comparison",
+  "concept": {
+    "key": {
+      "pack_id": "industry.blockchain",
+      "version": "1.0.0",
+      "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+      "concept_id": "staking"
+    },
+    "definition": "The explicit commitment or delegation of stake, with project-defined entry, exit and penalty behavior when supported.",
+    "view": {
+      "id": "staking",
+      "aliases": [
+        "staking",
+        "스테이킹",
+        "stake",
+        "delegation"
+      ],
+      "includes": [
+        "stake commitment, delegation, withdrawal and penalties"
+      ],
+      "excludes": [
+        "not all validator systems require stake; same-named amounts are not sufficient"
+      ],
+      "applicable_roles": [
+        "staking-network"
+      ],
+      "facets": [
+        {
+          "id": "entry",
+          "question": "What conditions permit staking or delegation?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "exit",
+          "question": "What conditions and delay permit withdrawal?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "penalty",
+          "question": "What evidenced conditions cause penalties or slashing?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        }
+      ]
+    }
+  },
+  "facets": [
+    "entry",
+    "exit"
+  ],
+  "as_of": "2026-10-15T19:00:04Z",
+  "question": "",
+  "groups": [
+    {
+      "participant": {
+        "scope_id": "1aefe4c61a85f8cc0ee5d6b0d3ac4a6bd07adc8ed63c6c2eb1d84efb42b48983",
+        "scope": {
+          "coordinates": {
+            "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+            "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+            "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "fixture-network",
+            "configuration": "fixture-config",
+            "component_role": "staking-network",
+            "observed_at": "2026-10-15T18:59:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+              "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+              "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "fixture-network",
+              "configuration": "fixture-config",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T18:59:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking"
+          },
+          "facet": "entry",
+          "state": "budget_exceeded",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence",
+            "whole_facet_omitted_by_explicit_response_budget"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+              "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+              "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "fixture-network",
+              "configuration": "fixture-config",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T18:59:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking"
+          },
+          "facet": "exit",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    },
+    {
+      "participant": {
+        "scope_id": "4822b70757a1d62a90d5fc7bac72630552b4c321ff641f316f14cf7c2c77099c",
+        "scope": {
+          "coordinates": {
+            "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+            "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+            "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+            "source_mode": "snapshot-only",
+            "base_commit": ""
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "fixture-network",
+            "configuration": "fixture-config",
+            "component_role": "staking-network",
+            "observed_at": "2026-10-15T19:00:04+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+              "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+              "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "fixture-network",
+              "configuration": "fixture-config",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:00:04+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking"
+          },
+          "facet": "entry",
+          "state": "budget_exceeded",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence",
+            "whole_facet_omitted_by_explicit_response_budget"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+              "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+              "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+              "source_mode": "snapshot-only",
+              "base_commit": ""
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "fixture-network",
+              "configuration": "fixture-config",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:00:04+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking"
+          },
+          "facet": "exit",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    }
+  ],
+  "candidates": [],
+  "used_body_bytes": 0,
+  "used_citations": 0,
+  "completeness_scope": "requested_project_facet_rows_only_not_all_project_evidence",
+  "final_assessment": "LLM_or_user_evaluates_tradeoffs_from_cited_evidence"
+}
