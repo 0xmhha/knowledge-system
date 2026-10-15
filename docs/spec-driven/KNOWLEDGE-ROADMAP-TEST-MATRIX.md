@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-16 현재 KM-01–05를 완료했다. 전체28개 중20개 완료·3개 진행 중(OE-01.1–3)·5개 미착수다. 다음은 KM-06.1 공개 비교 요청 계약이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
+2026-10-16 현재 KM-01–05를 완료했다. 전체28개 중21개 완료·3개 진행 중(OE-01.1–3)·4개 미착수다. 다음은 KM-06.2 공개 비교 MCP와 근거 행렬 구현이다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는5/7이다.
 
@@ -28,7 +28,7 @@
 | KM-05.2 | 공통 개념과 프로젝트별 코드/정책/시험 연결 | 완료 | 비교59개(어휘29+연결30)·실제 보관 원문3프로젝트/5종류·committed/working-tree·전체Go/race7 검증 |
 | KM-05.3 | exact/close/broader 등의 검토·버전 의미 | 완료 | 정책34개·비교93개·정족수/회수/상충/미래·source/pack 변경 stale·과거 버전·키 별칭 거부 |
 | KM-05.4 | 비적용/미수집/미지원·L1/L2·network 차이 | 완료 | 적용/지원24개·비교117개·Rust text/AST·L1/L2·정책 차이/내부상충·선언/미결정·schema1/2·손상 |
-| KM-06.1 | 명시 버전·개념·축·시점·상한의 비교 요청 | 미착수 | 미실행 |
+| KM-06.1 | 명시 버전·개념·축·시점·상한의 비교 요청 | 완료 | 계약50개·비교167개·pin/scope/권한/시각/예산·요청 경로/target 거부; 실제 MCP/조회0 |
 | KM-06.2 | 프로젝트별 근거 행렬/bundle | 미착수 | 미실행 |
 | KM-06.3 | 상충·누락·자료 부족·부분 실패 상태 | 미착수 | 미실행 |
 | KM-06.4 | 둘 이상 실제 프로젝트의 비교·오인·근거 시험 | 미착수 | 미실행 |
@@ -631,3 +631,23 @@ KM-05.3 완료: exact/close/broader/narrower/related를 local→shared 직접 �
 KM-05.4 완료: exact/similar 후보·incomparable·not_collected·unknown·unsupported·not_applicable·conflict·unavailable을 분리했다. 다른 산업/역할·L1 consensus/L2 sequencing·network/config를 구분하고, Rust 원문 읽기와 Rust AST 미지원을 혼동하지 않는다. 비적용/미결정 선언은 source/조건/검토와 함께 처리하며 검색 무응답·거부/회수를 기능 부재로 바꾸지 않는다. schema2 선언을 digest에 포함하고 기존 schema1 식별값은 유지했다. 상충은 같은 프로젝트/조건 안에서만 판단하며 보관 손상은 결과를 폐기한다.
 
 전체20/28·기능5/7 완료다. 다음은 KM-06.1 비교 요청·MCP 계약 설계다. 남은8개는 KM-06.1–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.
+
+## KM-06.1 공개 비교 요청 계약 시험 목록
+
+기존117개에 아래50개를 더한 비교 패키지167개다. 계약 검증 fixture는 dataset/backend를 열지 않으며 실제 serving readiness/MCP 실행 근거가 아니다. 최종 전체 회귀 후 완료로 확정한다.
+
+| 상위 시험 | 하위 포함 실행 수 | 경계 |
+|---|---|---|
+| TestComparisonContractRoutesOnlyExplicitParticipantsAndOwnsValues | 1 | 명시 participant·기본 후보 제외·입력/출력 slice 소유·질문은 데이터 |
+| TestComparisonRequestRejectionsBeforeAnyBackend | 27 | 26개 schema/mode/scope/collection/concept/facet/time/budget/pin 거부 |
+| TestComparisonRequestDecodeRejectsPathsAndAliasOverrides | 6 | 5개 설정/원천/target·case/중복 필드 거부 |
+| TestScopeIdentityIncludesVersionConditionsAndKeepsAliasesSeparate | 7 | 6개 project/dataset/snapshot/network/config/role 차이·동등 시각·중복 등록 거부 |
+| TestSameProjectExplicitNetworkComparisonIsAllowed | 1 | 같은 project/version·다른 명시 network scope 보존 |
+| TestComparisonProfileDecodeIsConfigurationShapeNotReadiness | 8 | 7개 profile 형상 반례·파일이 없어도 readiness로 표시하지 않음 |
+
+
+## KM-06.1 완료 기록
+
+KM-06.1 완료: 읽기 전용 comparison 모드·고정 profile/catalog·명시 scope 참여자/공통 개념/축·시각/예산 계약을 구현했다. 이름이나 자연어에서 대상을 추측하지 않고2–16개 scope와1–8개 축을 선택한다. stale/타 collection/동일 범위 중복·구현 모드·요청 경로/target 변조·미래 시각/초과 예산을 거부한다. 한 프로젝트의 명시적인 다른 조건도 비교 가능하며 호출자 변경으로 고정 라우팅을 바꾸지 못한다. 이 단계는 계약50개 검증이며 actual source read/MCP 호출0이다.
+
+전체21/28·기능5/7이다. 다음은 KM-06.2의 공개 MCP·프로젝트별 근거 행렬/bundle 구현이다. 남은7개는 KM-06.2–4, OE-01.1–4이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 유지한다. 사용자가 멈추기 전까지 단계별 서명 커밋으로 계속한다.

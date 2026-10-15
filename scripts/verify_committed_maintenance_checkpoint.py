@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'project-applicability': {
+        'revision': 'ba807f5e', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-05-applicability',
+        'scope': 'historical_KM05_complete_library_scope_not_public_comparison_MCP',
+        'scripts': ['check-project-applicability-evidence.py', 'test_project_applicability_evidence.py'],
+    },
     'mapping-review': {
         'revision': 'f2eef29d', 'base': 'system/eval/knowledge-roadmap-2026-10-16/', 'folder': 'km-05-mapping-review',
         'scope': 'historical_KM05_3_direct_mapping_recorded_review_not_applicability_or_MCP',
