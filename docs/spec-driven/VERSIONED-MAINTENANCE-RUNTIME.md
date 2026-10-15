@@ -113,4 +113,17 @@ D1의7개 시험은 argv/작업 위치/출력 보존, 실제 부모 kill 후 늦
 
 [D1 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-command-supervision/manifest.json)은 `check-maintenance-supervision-evidence.py`·`test_maintenance_supervision_evidence.py`로 검사한다. D1은 **소유한 staging의 복구 정리까지 완료했다는 뜻이 아니다**. 다음 D2에서는 candidate와 random owner token으로 결속한 staging record를 만들고, 확인된 writer quiescence 아래에서 그 임시 경로만 정리한다. 출처가 확인되지 않는 경로나 다른 작업의 자료는 제거하지 않는다. capture 안의 실패 진단과 일회용 외부 임시 공간을 구분하고 freshness 임시 출력도 같은 scratch 안에 둔다.
 
-D2 정리와 E 실제 공개 재시작·rollback/read lease/GC를 확인한 뒤에만 새로운 protocol의 pre-gate 작업을 interrupted/canceled로 확정하고 공개 durable 모드를 켠다. 과거 protocol이 없는 private record의 실행 종료를 추정하지 않는다. KM-02.3은 진행 중이며 전체 완료 수6/28을 유지한다.
+D2에서는 새 protocol의 pre-gate 작업을 writer 종료·소유 scratch 정리 뒤에만 interrupted/canceled로 확정한다. E 실제 공개 재시작·rollback/read lease/GC까지 확인한 뒤 공개 durable 모드를 켠다. 과거 protocol이 없는 private record의 실행 종료를 추정하지 않는다. KM-02.3은 진행 중이며 전체 완료 수6/28을 유지한다.
+
+
+### D2 중간 검증: 후보 내부의 소유 staging과 복구 정리
+
+새 관리 구축은 후보 버전 안에 random token을 가진 `.build-source-*`를 예약한다. 프로젝트·snapshot·dataset·version·operation ID와 상대 디렉터리를 먼저 durable record로 기록하고, 같은 내용을 내부 owner marker에 기록한 뒤 자료를 채운다. freshness 임시 출력도 같은 scratch에 둔다. 기존 source capture의 진단 자료는 후보 안에 보존하며 임의의 외부 경로를 삭제하지 않는다.
+
+정상 구축은 scratch 정리를 마친 뒤 gate/publication을 진행한다. 오류·취소 때는 dataset mutation lock을 다시 얻어 하위 writer 종료를 확인한 뒤 exact owner의 scratch만 정리한다. 강제 종료 후 비공개 복구도 같은 경로를 따른다. 후보/작업/owner 불일치, 링크, 경로 이탈, marker 없는 비어 있지 않은 디렉터리는 거부하고 recovering으로 남긴다. marker 작성 전 생성한 비어 있는 예약 디렉터리만 제한적으로 제거한다. 최종 상태를 기록한 다음 실행 중 writer가 계속 자료를 쓰는 것을 허용하지 않는다.
+
+`owner-socket-mutation-lease-staging-v2`로 접수된 작업만 pre-gate interrupted/canceled 자동 판정 대상이다. 이전 v1 또는 protocol 없는 기록에는 이 보장을 소급하지 않는다. v1은 종료 증거가 없으면 recovering으로 남긴다. CLI legacy 캡처의 기존 외부 worktree 경로에는 이 소유 정리를 적용하지 않는다.
+
+소유 경로 시험은 실제 프로세스를 기록/디렉터리/marker/자료 작성 경계에서 강제 종료한 뒤 정리한다. 다른 프로젝트·snapshot·dataset·operation·marker·링크·경로 이탈 자료가 보존되는지도 확인한다. 서비스 시험은 writer lock을 잡은 동안 새 v2도 recovering이며, 해제 후에만 scratch 정리와 interrupted를 확정하고 v1은 계속 보류함을 확인한다. 취소된 context가 정리를 중간 완료로 위장하지 않으며 새 복구 context로 정리할 수 있다.
+
+[정리 checkpoint packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-owned-staging/manifest.json)은 해당 실행의 전체 Go/race·공개 실제 28항목과 결속한다. `check-maintenance-staging-evidence.py`와 `test_maintenance_staging_evidence.py`로 부분 완료의 범위와 원자료 변조를 검사한다. 공개 서비스는 아직 process-lifetime이고 E의 실제 durable 재시작·read lease/rollback/GC는 미완료다. KM-02.3 전체와 완료 수6/28은 그대로 유지한다.

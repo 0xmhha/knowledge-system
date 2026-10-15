@@ -135,3 +135,5 @@
 [Ethereum optimistic rollup 설명](https://ethereum.org/en/developers/docs/scaling/optimistic-rollups/)에서 sequencer의 거래 순서 결정과 L1 제출을 구분하듯, 비교 축도 공통 개념 아래에서 역할·가정·적용 범위를 보존한다. 온톨로지 자체가 source extraction·프로젝트별 mapping·비교 API 또는 검증된 장단점 판정을 자동 제공하는 것은 아니다. 이 작업표는 그 연결 기능을 구현 대상으로 명시한다.
 
 전체28개 세부 작업과 이번17개 시험의 상태는 [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md)에서 함께 확인한다. 전체 작업 완료와 공통 계층 fixture 통과를 구분한다.
+
+KM-02.3 중간 A–D2는 private journal·접수/replay·publication 이력·하위 실행 감독·소유 scratch 정리까지 검증했다. 새 v2 protocol의 실행 종료는 writer lease 해제와 exact owner 정리 후에만 판정한다. 공개 durable 연결과 E 실제 host 재시작·rollback/read lease/GC는 아직 남아 있어 KM-02.3을 체크하지 않는다. 상세 검증과 원자료는 실행 명세/시험표를 따른다.

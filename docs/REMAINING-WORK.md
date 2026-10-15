@@ -87,3 +87,5 @@ WI-5의 기존 수집→ingest→검토→승격/회수→색인 검증 목적�
 문서의 옛 WI 잔여표 정리는 완료했다. 다음은 위 우선 작업표의 KM-02.3 durable journal·scoped replay·재시작/publication 복구를 진행하며, 정책 생성기 보완과 OE-01의 확대·다중 프로젝트 검증도 유지한다. [운영·독립 수용 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)의 단계0 동결과9개 정식 검증은 별도 경로다. WI-5는 KM-03/04에 통합 집계하며 저장소 지정이 가능한 로컬 개발 전체를 중단시키지 않는다.
 
 과거 재감사의 구현 부족분은 [감사 기록](./spec-driven/UPPER-WORK-ITEMS-AUDIT.md)에 남긴다. 최신9/9 구현을 과거 표로 되돌리지 않는다. 일반 검증 체크리스트의 빈 체크박스는 매 변경의 절차이며 프로젝트 잔여 기능으로 집계하지 않는다. 기존 worksheet catalog·pinned v2 쓰기 거부·온톨로지 MCP·정책/보안 질의를 새 미구현 항목으로 재등록하지 않는다.
+
+현재 KM-02.3 A–D2는 로컬 검증했으며 다음은 E 실제 공개 durable host 재시작/replay·취소/중단·rollback/read lease/GC와 공개 연결이다. 세부6/28 완료를 유지한다. 전체 Go3,792통과·19skip, 관련 race783통과·2skip, 실제 공개28항목과 build/fmt/lint를 확인했다. [전체 시험표](./spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md)와 원장에 따라 미완료 작업을 이어간다.

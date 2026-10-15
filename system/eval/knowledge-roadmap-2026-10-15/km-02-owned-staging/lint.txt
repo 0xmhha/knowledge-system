@@ -1,0 +1,18 @@
+go vet ./...
+/Users/kevin/.gvm/pkgsets/go1.26.8/global/bin/golangci-lint run --timeout 15m ./...
+0 issues.
+engine boundaries: OK
+go build  -o bin/ckg ./cmd/graph
+go build  -o bin/ckv ./cmd/vector
+go build  -o bin/cks ./cmd/cks
+....................
+----------------------------------------------------------------------
+Ran 20 tests in 0.094s
+
+OK
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.103s
+
+OK
+documentation: OK (127 live documents)

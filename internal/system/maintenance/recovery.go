@@ -72,7 +72,10 @@ func (s *Service) startRecoveryLocked(p registered, j *job) {
 		defer ticker.Stop()
 		for {
 			ctx, cancel := context.WithTimeout(s.ctx, 30*time.Second)
-			done, _ := s.recoverDurableJobOnce(ctx, p, j, false)
+			j.mu.Lock()
+			protocol := j.record.ExecutionProtocol
+			j.mu.Unlock()
+			done, _ := s.recoverDurableJobOnce(ctx, p, j, protocol == "owner-socket-mutation-lease-staging-v2")
 			cancel()
 			if done {
 				s.mu.Lock()
@@ -114,6 +117,11 @@ func (s *Service) recoverDurableJobOnce(ctx context.Context, p registered, j *jo
 			return reject("reconcile_required")
 		}
 		record := j.record
+		if allowInterrupted {
+			if err := setup.CleanupAbandonedBuildStaging(ctx, p.out, record.Request.NewVersion, record.Request.ProjectID, record.Request.SourcePin.SnapshotID, record.ExpectedDatasetID, j.status.JobID); err != nil {
+				return err
+			}
+		}
 		if proof != nil {
 			if !record.Status.BuildComplete || record.Status.Candidate == nil {
 				return reject("reconcile_required")

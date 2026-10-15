@@ -17,6 +17,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'system/eval/knowledge-roadmap-2026-10-15/'
 CHECKPOINTS = {
+    'command-supervision': {
+        'revision': '1283a22c', 'folder': 'km-02-command-supervision',
+        'scope': 'historical_KM02_3_D1_parent_deadline_supervision_process_compatibility_only',
+        'scripts': ['check-maintenance-supervision-evidence.py', 'test_maintenance_supervision_evidence.py'],
+    },
     'journal-foundation': {
         'revision': 'fff83134', 'folder': 'km-02-journal-foundation',
         'scope': 'historical_KM02_3_A_private_foundation_and_process_compatibility_only',

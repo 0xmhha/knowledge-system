@@ -707,8 +707,9 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	}
 	var captured CapturedSource
 	var buildCleanup func() error
+	var trackedBuild bool
 	defer func() {
-		if buildCleanup != nil {
+		if buildCleanup != nil && !trackedBuild {
 			_ = buildCleanup()
 		}
 	}()
@@ -730,24 +731,36 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		if err != nil {
 			return err
 		}
-		stageParent, err := os.MkdirTemp("", "cks-build-source-")
-		if err != nil {
-			return fmt.Errorf("reindex: prepare isolated build source: %w", err)
+
+		var stageParent string
+		var releaseStage func() error
+		if managedHash.MatchString(gopt.ExpectedDatasetID) && (captured.Identity.SourceMode == "snapshot-only" || captured.Identity.GitArchivePolicy != "") {
+			stageParent, releaseStage, err = newBuildStaging(ctx, vo.Out, captured.Identity, gopt.ExpectedDatasetID, gopt.PublicationID)
+			trackedBuild = true
+		} else {
+			stageParent, err = os.MkdirTemp("", "cks-build-source-")
+			releaseStage = func() error { return os.RemoveAll(stageParent) }
 		}
+		if err != nil {
+			return fmt.Errorf("reindex: prepare owned build source: %w", err)
+		}
+		ctx = context.WithValue(ctx, buildScratchKey{}, stageParent)
 		buildRoot := filepath.Join(stageParent, "tree")
 		buildCleanup, err = captured.MaterializeBuildTreeContext(ctx, buildRoot)
 		if err != nil {
-			_ = os.RemoveAll(stageParent)
+			if !trackedBuild {
+				_ = releaseStage()
+			}
 			return fmt.Errorf("reindex: materialize captured source: %w", err)
 		}
 		cleanupTree := buildCleanup
 		buildCleanup = func() error {
-			err := cleanupTree()
-			if cleanupErr := os.RemoveAll(stageParent); err == nil {
-				err = cleanupErr
+			if err := cleanupTree(); err != nil {
+				return err
 			}
-			return err
+			return releaseStage()
 		}
+
 		if err := captured.VerifyAgainstContext(ctx, buildRoot); err != nil {
 			return fmt.Errorf("reindex: staged source differs from capture: %w", err)
 		}

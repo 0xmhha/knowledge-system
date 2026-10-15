@@ -269,7 +269,8 @@ func VerifyDerivedFresh(step, label string, argv []string, committed string, emi
 }
 
 func VerifyDerivedFreshContext(ctx context.Context, step, label string, argv []string, committed string, emit func(Event)) error {
-	dir, err := os.MkdirTemp("", "knowledge-setup-fresh-")
+	scratch, _ := ctx.Value(buildScratchKey{}).(string)
+	dir, err := os.MkdirTemp(scratch, "knowledge-setup-fresh-")
 	if err != nil {
 		return fmt.Errorf("verify: %s: %w", label, err)
 	}

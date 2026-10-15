@@ -292,7 +292,7 @@ func (s *Service) Build(ctx context.Context, request BuildRequest) (JobStatus, e
 			stop()
 			return JobStatus{}, err
 		}
-		record := journalRecord{SchemaVersion: 1, ExecutionProtocol: "owner-socket-mutation-lease-v1", Request: request, Profile: prepared.view, ExpectedDatasetID: prepared.identity.DatasetID,
+		record := journalRecord{SchemaVersion: 1, ExecutionProtocol: "owner-socket-mutation-lease-staging-v2", Request: request, Profile: prepared.view, ExpectedDatasetID: prepared.identity.DatasetID,
 			CreatedAt: created.Format(time.RFC3339Nano), DeadlineAt: deadline.Format(time.RFC3339Nano), Status: cloneStatus(j.status)}
 		if err := store.save(record); err != nil {
 			stop()
@@ -424,7 +424,9 @@ func (s *Service) execute(ctx context.Context, p registered, value prepared, j *
 	var quiescenceErr error
 	if err != nil && !errors.Is(err, setup.ErrDatasetWriterBusy) {
 		probe, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		quiescenceErr = setup.WithDatasetMutationLock(probe, p.out, func(context.Context) error { return nil })
+		quiescenceErr = setup.WithDatasetMutationLock(probe, p.out, func(ctx context.Context) error {
+			return setup.CleanupAbandonedBuildStaging(ctx, p.out, r.NewVersion, r.ProjectID, r.SourcePin.SnapshotID, value.identity.DatasetID, j.requestID())
+		})
 		cancel()
 	}
 	j.mu.Lock()

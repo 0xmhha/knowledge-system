@@ -56,7 +56,7 @@ type journalStore struct {
 }
 
 func validateRecord(r journalRecord) error {
-	if r.ExecutionProtocol != "" && r.ExecutionProtocol != "owner-socket-mutation-lease-v1" {
+	if r.ExecutionProtocol != "" && r.ExecutionProtocol != "owner-socket-mutation-lease-v1" && r.ExecutionProtocol != "owner-socket-mutation-lease-staging-v2" {
 		return reject("reconcile_required")
 	}
 	created, cerr := time.Parse(time.RFC3339Nano, r.CreatedAt)

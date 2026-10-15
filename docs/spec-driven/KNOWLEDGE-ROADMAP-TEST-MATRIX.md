@@ -341,3 +341,18 @@ B 증거 보호13개도 통과했다. 실제 공개 회귀는81개 도구 호출
 | owned staging 정리·전체 D/E | 미구현·미검증; 전체 완료 수6/28 유지 |
 
 [D1 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-command-supervision/manifest.json)과 [실행 명세](./VERSIONED-MAINTENANCE-RUNTIME.md)를 따른다. 현재 소스1,679입력은 유지 Go1,249개·기타430개다. 다음은 D2의 owner token/프로젝트/후보와 결속된 staging 정리와 quiescence 판정 연결이다. 이후 E 실제 공개 재시작·lease/rollback/GC → KM-02.4 → KM-03.1–4 → KM-04.1–4 → KM-05.1–4 → KM-06.1–4 → OE-01.1–4를 진행한다. 정책 생성기·운영/독립 수용9개·선택 후속12개는 별도 유지한다.
+
+
+## KM-02.3 중간 단계 D2: 소유 staging 정리
+
+| 시험 범위 | 결과 | 완료 판정에 쓰는 의미 |
+|---|---|---|
+| 전체 Go | 3,811사례: 3,792통과·19skip | 현재 소스 회귀, skip은 통과로 계산하지 않음 |
+| 관련6패키지 race | 785사례: 783통과·2skip | setup/maintenance/MCP/config/CLI 경합 |
+| maintenance | 144사례 통과 | 이전141 + v1/v2 writer 해제·정리 경계3 |
+| 실제 프로세스 kill | record/디렉터리/owner/부분 자료4경계 통과 | 후보 안의 exact owner scratch만 정리 |
+| 잘못된 소유/링크/경로 | 10변형 거부·witness 보존 | 다른 자료의 자동 삭제 방지 |
+| 실제 CKS/CKG/CKV·MCP | 고정28항목·5연결 EOF0 | 공개 process-lifetime 회귀, durable 완료 증거 아님 |
+| build/fmt/vet/lint·문서 | 통과 | 현재 코드/명령 계약 |
+
+[D2 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-owned-staging/manifest.json)과 [실행 명세](./VERSIONED-MAINTENANCE-RUNTIME.md)를 따른다. 현재 소스1,682입력은 유지 Go1,252개·기타430개이며 원래 승인5개 입력은 바꾸지 않는다. D1은1283a22c 당시 snapshot에서 검증하고 현재 Go 결과를 재사용하지 않는다. 다음은 E 실제 공개 durable 재시작/replay·취소/중단·rollback/read lease/GC이며 KM-02.3은 진행 중, 완료 수6/28이다. 이후 KM-02.4, KM-03.1–4, KM-04.1–4, KM-05.1–4, KM-06.1–4, OE-01.1–4를 진행한다. 별도 정책 생성기·운영/독립 수용9개·선택 후속12개도 유지한다.
