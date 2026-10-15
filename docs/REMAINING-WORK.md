@@ -16,11 +16,11 @@
 
 ## 현재 우선 작업
 
-2026-10-15 사용자 추가 요청을 [지식 매니저·비교 명세](./spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 진행 원장](./spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json)에 반영했다. 기능7개·하위 작업28개는 모두 미착수이며 문서 등록을 구현 완료로 세지 않는다.
+2026-10-15 사용자 추가 요청을 [지식 매니저·비교 명세](./spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)와 [전용 진행 원장](./spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json)에 반영했다. 기능7개·하위 작업28개의 완료는0이다. OE-01의 입력 준비를 시작했고 나머지는 미착수다. 문서 등록이나 준비 검증을 기능 완료로 세지 않는다.
 
 | 우선순위 | ID | 작업과 기대 결과 | 상태 |
 |---|---|---|---|
-| P0 | OE-01 | 온톨로지 off/on 효과·근거 정확도·오인·지연/비용 평가. 단일 프로젝트부터 진행하고 다중 프로젝트 비교 평가로 확장 | 필수 검증으로 채택, 미실행 |
+| P0 | OE-01 | 온톨로지 off/on 효과·근거 정확도·오인·지연/비용 평가. 단일 프로젝트부터 진행하고 다중 프로젝트 비교 평가로 확장 | 입력 준비 중, 효과 미실행 |
 | P0 | KM-01 | 프로젝트/포크/버전 격리와 collection 스키마. 동명 코드·정책의 혼입 방지 | 요구 등록, 설계 초안 |
 | P0 | KM-02 | 버전 DB 구축·갱신을 위한 비동기 도구 계약. 기존 pinned 쓰기 거부를 유지하며 안전한 경로 추가 | 요구 등록, 설계 초안 |
 | P0 | KM-03 | Claude 지식 매니저 플러그인. 문서가 없는 프로젝트도 수집·초안·검토 대기·DB 구축·조회까지 관리 | 필수 기능으로 채택, 미구현 |
@@ -28,7 +28,7 @@
 | P1 | KM-05 | 산업 공통 개념과 프로젝트별 근거 매핑. 같은 용어/다른 의미와 같은 역할/다른 용어 구분 | 요구 등록, 설계 초안 |
 | P1 | KM-06 | 프로젝트별 staking·합의·mempool 등의 비교 근거를 구조화하여 MCP/LLM에 제공 | 요구 등록, 설계 초안 |
 
-현재 순서는 정책 연결7건 보완·검증 → OE-01 단일 프로젝트 평가다. 확장 구현은 KM-01→02→03→04, 격리 계약 이후 KM-05→06, 이후 OE-01 다중 프로젝트 평가 순서다. 사용자는 수동 문서를 먼저 작성할 필요 없이 매니저가 근거 있는 지식 초안을 생성하도록 요청했다. 관찰하지 못한 설계 의도를 임의로 사실화하지 않는다.
+[정책 수정 overlay의 로컬 graph/CKS 검증](./spec-driven/POLICY-OVERLAY-ADOPTION.md)을 완료했다.7개 수정·저장된146개 연결·실제 source/canonical/음성 제어를 확인했고 원래 생성기는 아직 기존 참조를 재생성하므로 일반 재생성 보완은 남는다. 현재는 OE-01 질문12개와 비교4arm을 준비 중이다. 다음은 기존 데이터셋에 승인 정의를 정합한 별도 semantic DB 후보 준비와 실제 off/on 평가다. 확장 구현은 KM-01→02→03→04, 격리 계약 이후 KM-05→06, 이후 OE-01 다중 프로젝트 평가 순서다. 사용자는 수동 문서를 먼저 작성할 필요 없이 매니저가 근거 있는 지식 초안을 생성하도록 요청했다. 관찰하지 못한 설계 의도를 임의로 사실화하지 않는다.
 
 로컬 설계·개발·회귀/도구 검증은 독립 평가 담당자·유료 모델/비용 지정 없이 진행한다. 해당 지정은 실제 모델을 호출하거나 독립 수용을 판정하는 범위에 적용한다. 아래9개 정식 평가 계획의 미동결이 이 개발 경로 전체를 차단하지 않는다.
 
@@ -38,7 +38,7 @@ WI-5의 기존 수집→ingest→검토→승격/회수→색인 검증 목적�
 
 ## 구현 후 남은 운영·독립 수용 검증
 
-[대상·완료 기준 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)과 [별도 검증 원장](./spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 로컬 Go pilot 후보·항목별 입력/제안 gate·필요 receipt를 정리했다. 계획은 draft이며 실행/수용은0/9다. [실행 protocol·동결 체크리스트](./spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.md)와 source inventory를 준비했고 단계0은 preparing이다. 함수40개·review10개·확장 intent20개 source 후보와4개 미해결 실행 recipe를 추가했다. [review/정답 초안](./spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)은10개 rubric45anchor·3개 비완전 값/제어 초안이며 독립 채택은0이다. [ChainBench 종료·시험 상태 격리 보완](./spec-driven/OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)은 후보 코드·개발 검증 완료이며 실제 설치/노드 검증은 남는다. coding-agent 게시 전 종료·Stop 재진입도 OP-CA-01 후보 b6e2abdc에서 개발 검증을 완료했다. 두 소비자는 [격리 host 채택·연결](./spec-driven/ISOLATED-HOST-ADOPTION.md) 범위에서 검증했다. coding-agent는 SessionStart를 보완한 b7e7868, ChainBench는 bdf5ad27을 채택했고 실제 CLI2.1.300의 로컬 시험 응답기 사례5/5를 통과했다. 실제 모델·전체 역할·CKS·노드 검증은 남는다. [정책·보안 입력 검토 자료](./spec-driven/POLICY-SECURITY-INPUT-REVIEW.md)에 기존 정책42개·참조146개, source 호출68개와 query 후보12개를 추가했다. 수동 보안4개는 미승인 metadata 제안이며 독립 gold는0이다. [실제 프런트엔드 진단](./spec-driven/POLICY-REFERENCE-DIAGNOSIS.md)에서6개 미연결과 경고 없이 다른 함수에 붙는1개를 확인했다. 수정7개 사본은146개 연결·경고0개이며 원본에 미적용·미승인이다. 다음 개발 경로는 위 우선 작업표를 따른다. 정식 독립 평가를 실행할 때에는 별도로 입력·검토자·모델/비용·범위/기준을 고정한다.
+[대상·완료 기준 계획](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md)과 [별도 검증 원장](./spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 로컬 Go pilot 후보·항목별 입력/제안 gate·필요 receipt를 정리했다. 계획은 draft이며 실행/수용은0/9다. [실행 protocol·동결 체크리스트](./spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.md)와 source inventory를 준비했고 단계0은 preparing이다. 함수40개·review10개·확장 intent20개 source 후보와4개 미해결 실행 recipe를 추가했다. [review/정답 초안](./spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md)은10개 rubric45anchor·3개 비완전 값/제어 초안이며 독립 채택은0이다. [ChainBench 종료·시험 상태 격리 보완](./spec-driven/OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md)은 후보 코드·개발 검증 완료이며 실제 설치/노드 검증은 남는다. coding-agent 게시 전 종료·Stop 재진입도 OP-CA-01 후보 b6e2abdc에서 개발 검증을 완료했다. 두 소비자는 [격리 host 채택·연결](./spec-driven/ISOLATED-HOST-ADOPTION.md) 범위에서 검증했다. coding-agent는 SessionStart를 보완한 b7e7868, ChainBench는 bdf5ad27을 채택했고 실제 CLI2.1.300의 로컬 시험 응답기 사례5/5를 통과했다. 실제 모델·전체 역할·CKS·노드 검증은 남는다. [정책·보안 입력 검토 자료](./spec-driven/POLICY-SECURITY-INPUT-REVIEW.md)에 기존 정책42개·참조146개, source 호출68개와 query 후보12개를 추가했다. 수동 보안4개는 미승인 metadata 제안이며 독립 gold는0이다. [실제 프런트엔드 진단](./spec-driven/POLICY-REFERENCE-DIAGNOSIS.md)에서6개 미연결과 경고 없이 다른 함수에 붙는1개를 확인했다. 수정7개는 별도 평가 profile에서 실제 graph 저장·CKS 조회까지 검증했다. 원본·운영 설정은 그대로이며 독립 의미 수용과 생성기 보완은 남는다. 다음 개발 경로는 위 우선 작업표를 따른다. 정식 독립 평가를 실행할 때에는 별도로 입력·검토자·모델/비용·범위/기준을 고정한다.
 
 9개 모두 독립 수용 상태는 not_recorded다. controlled fixture·공개 MCP 실행·CI 통과는 기록된 구현 검증이며, 실제 host/체인/전체 프로젝트·독립 검토자의 수용 기록은 각 범위를 먼저 확정해 진행한다.
 

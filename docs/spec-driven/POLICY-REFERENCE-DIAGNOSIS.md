@@ -1,5 +1,7 @@
 # 정책 참조 연결 진단과 수정안
 
+후속 상태: [고정 소스용 overlay 채택·검증](./POLICY-OVERLAY-ADOPTION.md)에서 수정7건을 별도 profile로 로컬 적용하고 실제 DB의146개 연결과 공개 CKS 조회를 확인했다. 아래는 적용 전 진단의 범위다. 과거 packet의 unapproved/unapplied 필드는 당시 증거로 보존하며 독립 gold 승인은 계속0이다. 원래 생성기의 재생성 문제와 온톨로지 효과 평가는 별도로 남는다.
+
 2026-10-15. 단계0 준비 작업이다. [기존 입력 조사](./POLICY-SECURITY-INPUT-REVIEW.md)의 미연결6개를 실제 CKG Go AST 프런트엔드와 `policy.Resolve`로 재현했다. 추가로 경고 없이 다른 함수에 붙는 참조1개를 확인했다. 수정안7개는 별도 YAML 사본이며 원본 overlay·기존 평가 packet·운영 index에는 적용하지 않았다. 승인된 수정·독립 gold·운영 수용은0이다.
 
 ## 범위와 재현 근거
@@ -45,7 +47,7 @@
 
 ## 다음 순서와 남은 작업
 
-1. 위7개 이름 수정의 정책 의미를 검토하고 새 평가용 overlay로 채택할지 결정한다. 기존 source-bound YAML/packet을 덮어써 과거 증거를 바꾸지 않는다. 아직 approved cases·DEV/FINAL·금액/시간 한도·동결은 없다.
+1. 새 평가용 overlay의 로컬 채택·DB/CKS 조회는 후속 기록에서 완료했다. 원래 생성기의 source-aware 재생성 보완과 독립 정책 의미 검토는 남는다. 기존 source-bound YAML/packet을 덮어써 과거 증거를 바꾸지 않는다. 정식 평가의 approved cases·DEV/FINAL·동결은 미완료다.
 2. 정책/security query12개·4/4/4 그룹·독립 family를 검토한다. WI-2 project 표본 부족은 inconclusive로 유지하고 별도 controlled 분모의 채택 여부를 정한다. 이번 연결 진단은 취약점 탐지나 자동 rule 양성 검증이 아니다.
 3. 정답 작성자·독립 내용 검토자·최종 수용자·실행 담당자, 실제 모델·인증 방식·비용 한도를 지정한다. 새 결함/증상/seed·완전한 의존 정답·review/intent 정답과 DEV/FINAL·기준·실행 recipe를 확정해 단계0을 동결한다.
 4. 이후 단계1–4의 실제 runtime·품질·독립 수용을 수행한다. 현재9개 모두 not_run/not_recorded다. WI-5는 새 지식 매니저 KM-03/04로 구체화했고 온톨로지 효과 평가는 필수 OE-01로 이동했다. 새 기능·평가7개와 선택 후속12개·태그/공개 배포 결정은 [전체 작업표](../REMAINING-WORK.md)에 남아 있다.

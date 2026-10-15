@@ -2,7 +2,7 @@
   "schema_version": 1,
   "document_date": "2026-10-15",
   "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
-  "scope_status": "user_requested_features_recorded_design_draft",
+  "scope_status": "user_requested_features_with_development_preparation_in_progress",
   "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
   "implementation_completed": 0,
   "total_work_items": 7,
@@ -243,17 +243,21 @@
       "priority": "P0",
       "scope": "ontology_effect_evaluation",
       "scope_decision": "requested_by_user_2026-10-15",
-      "status": "not_started",
+      "status": "in_progress",
       "design_status": "draft",
       "depends_on": [],
-      "evidence": [],
+      "evidence": [
+        "docs/spec-driven/operational-preparation/ontology-effect-dev/manifest.json"
+      ],
       "verification": "not_run",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
           "id": "OE-01.1",
-          "status": "not_started",
-          "evidence": []
+          "status": "in_progress",
+          "evidence": [
+            "docs/spec-driven/operational-preparation/ontology-effect-dev/manifest.json"
+          ]
         },
         {
           "id": "OE-01.2",
@@ -272,13 +276,19 @@
         }
       ],
       "execution_stages": {
-        "single_project": "not_started",
+        "single_project": "preparing",
         "multi_project": "not_started",
         "multi_project_depends_on": [
           "KM-05",
           "KM-06"
         ]
-      }
+      },
+      "remaining_preparation": [
+        "expected evidence and scoring plan",
+        "semantic DB eligibility/alignment and owned candidate",
+        "prior semantic family overlap review",
+        "paired repetition/order/resource plan"
+      ]
     }
   ],
   "documentation_validation": {
@@ -288,5 +298,25 @@
     "subtask_ids_matched": 28,
     "existing_implementation_and_formal_acceptance_ledgers_unchanged": true,
     "feature_execution": "not_run"
+  },
+  "current_prerequisites": {
+    "policy_reference_local_overlay": {
+      "status": "complete",
+      "scope": "pinned local policy overlay graph storage/public CKS verification only",
+      "evidence": [
+        "system/eval/operational-preparation-2026-10-15/adopted-policy/manifest.json"
+      ],
+      "source_aware_regeneration": "not_implemented",
+      "independent_acceptance": "not_recorded",
+      "manifest_sha256": "a3277936dfc84a865fedb8bfa5799a9f5c36022d6690f66209b005adeac4a37b"
+    }
+  },
+  "latest_preparation_validation": {
+    "adopted_policy_guard_tests_passed": 8,
+    "documentation_contract_tests_passed": 20,
+    "live_documents_checked": 122,
+    "original_source_binding_checks_passed": 2069,
+    "ontology_effect_executed": false,
+    "feature_completion_count": 0
   }
 }

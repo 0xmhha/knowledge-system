@@ -1,0 +1,87 @@
+[
+  {
+    "policy_id": "A10.codegen.contract_regen_procedure",
+    "target": "compile.Compile",
+    "response": {
+      "schema_version": 1,
+      "status": "annotations_found",
+      "reason": "",
+      "snapshot_sha256": "188097fc8672a7c0c0e82dfeb19ad843e58f11e61b70305b3c097dba5efb8074",
+      "symbol": {
+        "node_id": "ff9ffa92eee21ceb",
+        "canonical_id": "github.com/ethereum/go-ethereum/systemcontracts/compile/compiler.Compile",
+        "file": "systemcontracts/compile/compiler/compiler.go",
+        "indexed_commit": "",
+        "source_sha256": {
+          "status": "retained_blob",
+          "value": "983edfbdc59fe6221fd6f98cb952bf35072222089af5ceb871c5b026fffd05ca"
+        },
+        "metadata_sha256": "557e60d6fd2b2dfe8304f16a43db7bf12afd925a366ce71802cfdaf565b8737a"
+      },
+      "annotations": [
+        {
+          "id": "policy:A10.codegen.contract_regen_procedure",
+          "kind": "Policy",
+          "name": "System contract artifact regeneration: solc 0.8.14 to artifacts/v1 and v2",
+          "category": "A10",
+          "related_symbol_id": "ff9ffa92eee21ceb",
+          "explanation": {
+            "status": "retained_operator_value",
+            "value": "System contract bytecode (governance v1 and v2, NativeCoinAdapter) is\nproduced by systemcontracts/compile. The tool downloads solc 0.8.14\nto ~/.solc-bin if absent, invokes it on the Solidity sources under\nsystemcontracts/solidity/, and writes binaries to\nsystemcontracts/artifacts/v1 and artifacts/v2/. Those binaries are\ngo:embed'd into contracts.go and consumed at genesis time via\nInjectContracts. The do-not-edit constraint on the artifacts (see\nA10.codegen.no_edit_zones) is enforced by re-running this procedure,\nnot by static checks.\n"
+          },
+          "modification_hint": {
+            "status": "retained_operator_value",
+            "value": ""
+          },
+          "severity": {
+            "status": "retained_operator_value",
+            "value": ""
+          },
+          "provenance": {
+            "origin": "operator_curated_metadata",
+            "source_path": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+            "source_sha256": {
+              "status": "unknown",
+              "value": ""
+            },
+            "source_line": {
+              "status": "unknown",
+              "value": ""
+            },
+            "version": {
+              "status": "unknown",
+              "value": ""
+            },
+            "reviewer": {
+              "status": "unknown",
+              "value": ""
+            },
+            "reviewed_at": {
+              "status": "unknown",
+              "value": ""
+            },
+            "approval": {
+              "status": "unknown",
+              "value": ""
+            },
+            "identity_trust": "not_authenticated",
+            "metadata_sha256": "c3f4a662b1cd0722fb8b036a94651396466dfb469825927293c07988c5c4a132"
+          }
+        }
+      ],
+      "more": false,
+      "max_annotations": 32,
+      "timeout_ms": 1000,
+      "safety_verdict": "unknown",
+      "automatic_rules": "separate_opt_in_rule_candidates_not_executed",
+      "limitations": [
+        "Manual tags are operator assertions, not verified vulnerabilities or policy compliance; empty tags do not prove safety",
+        "YAML bytes, real row, version, reviewer, review time and approval were not retained; identity/signature trust unsupported",
+        "SQL bounds row count; synchronous legacy node/blob reads and row bytes are not hard process memory or preemptive time bounds",
+        "Legacy merged descriptions cannot reliably separate remediation or severity",
+        "Final rechecks are not a database snapshot transaction and cannot detect changes reverted between reads"
+      ],
+      "elapsed_micros": 74655
+    }
+  }
+]

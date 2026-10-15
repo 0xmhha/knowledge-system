@@ -1,0 +1,63 @@
+[
+  {
+    "label": "ckg-buildinfo",
+    "command": [
+      "go",
+      "version",
+      "-m",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg"
+    ],
+    "cwd": "/private/tmp/ks-adopted-policy-20261015-verified",
+    "exit_code": 0,
+    "elapsed_seconds": 0.024683750234544277
+  },
+  {
+    "label": "cks-buildinfo",
+    "command": [
+      "go",
+      "version",
+      "-m",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks"
+    ],
+    "cwd": "/private/tmp/ks-adopted-policy-20261015-verified",
+    "exit_code": 0,
+    "elapsed_seconds": 0.022506666835397482
+  },
+  {
+    "label": "domain-sync",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "domain",
+      "sync",
+      "--project",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/domain-knowledge",
+      "--ckv-out",
+      "/private/tmp/ks-adopted-policy-20261015-verified/regenerated-vector.yaml.txt",
+      "--ckg-out",
+      "/private/tmp/ks-adopted-policy-20261015-verified/regenerated-policy.yaml.txt"
+    ],
+    "cwd": "/private/tmp/ks-adopted-policy-20261015-verified",
+    "exit_code": 0,
+    "elapsed_seconds": 0.18788808258250356
+  },
+  {
+    "label": "index",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "build",
+      "--src",
+      "/private/tmp/ks-adopted-policy-20261015-verified/source",
+      "--out",
+      "/private/tmp/ks-adopted-policy-20261015-verified/graph",
+      "--lang",
+      "go",
+      "--policy-file",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "--no-cache",
+      "--fail-on-parse-errors"
+    ],
+    "cwd": "/private/tmp/ks-adopted-policy-20261015-verified",
+    "exit_code": 0,
+    "elapsed_seconds": 35.87245579203591
+  }
+]
