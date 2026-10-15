@@ -87,15 +87,17 @@
       "scope": "versioned_maintenance_tools",
       "scope_decision": "requested_by_user_2026-10-15",
       "status": "in_progress",
-      "design_status": "strict_schema_lifecycle_request_status_error_contract_complete_runtime_not_connected",
+      "design_status": "public_scoped_runtime_locally_verified_process_lifetime_durable_recovery_pending",
       "depends_on": [
         "KM-01"
       ],
       "evidence": [
         "docs/spec-driven/VERSIONED-MAINTENANCE-CONTRACT.md",
-        "system/eval/knowledge-roadmap-2026-10-15/km-02-contract/manifest.json"
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-contract/manifest.json",
+        "docs/spec-driven/VERSIONED-MAINTENANCE-RUNTIME.md",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json"
       ],
-      "verification": "design_conformance_101_cases_passed_no_public_versioned_execution",
+      "verification": "design101_actual_public_runtime28_fresh_Go3646_pass19_skip_race632_pass2_skip_evidence_guard10",
       "independent_acceptance": "not_recorded",
       "subtasks": [
         {
@@ -108,8 +110,11 @@
         },
         {
           "id": "KM-02.2",
-          "status": "not_started",
-          "evidence": []
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
         },
         {
           "id": "KM-02.3",
@@ -125,12 +130,11 @@
       "execution_stages": {
         "capability_audit": "verified_current_MCP35_CLI_help_and_source",
         "design_schema_and_lifecycle": "verified_101_cases",
-        "public_versioned_build_status_cancel": "not_connected",
+        "public_versioned_build_status_cancel": "verified_actual_public_28_checks_5_clean_EOF_sessions",
         "durable_jobs_idempotency_crash_recovery": "not_implemented",
-        "real_public_maintenance_evaluation": "not_run"
+        "real_public_maintenance_evaluation": "local_lifecycle_and_retained_v2_reads_only_mock_embedding_not_quality_or_independent_acceptance"
       },
       "remaining": [
-        "KM-02.2 implement operator profile inspection and public asynchronous version-aware build/status/cancel",
         "KM-02.3 implement durable journal, replay, locks, timeout and publication recovery",
         "KM-02.4 verify public cross-project and partial-failure/cancel/shutdown controls"
       ]
@@ -396,16 +400,16 @@
     "knowledge_roadmap_guard_tests_passed": 7,
     "collection_race_cases_passed": 40,
     "collection_top_level_tests_passed": 17,
-    "module_test_cases": 3619,
-    "module_tests_passed": 3600,
+    "module_test_cases": 3665,
+    "module_tests_passed": 3646,
     "module_tests_skipped": 19,
     "module_failed_tests": 0,
     "build_fmt_lint_passed": true,
-    "refactoring_source_inventory_bindings_passed": 1652,
+    "refactoring_source_inventory_bindings_passed": 1660,
     "refactoring_source_inventory_checker_exit": 0,
     "source_binding_update_receipt": "system/eval/knowledge-roadmap-2026-10-15/km-01-public-source-binding-update/receipt.json",
-    "related_race_cases": 446,
-    "related_race_passed": 444,
+    "related_race_cases": 634,
+    "related_race_passed": 632,
     "related_race_skipped": 2,
     "public_collection_checks": 24,
     "public_collection_tool_calls": 21,
@@ -422,7 +426,7 @@
     "final_isolation_evidence_packs": 20,
     "final_isolation_writer_refusals": 18,
     "final_isolation_clean_EOF_sessions": 3,
-    "go_validation_method": "source_bound_reuse_no_Go_source_changes",
+    "go_validation_method": "fresh_current_Go_module_and_related_race_not_historical_reuse",
     "final_isolation_metadata_gates": "passed_raw_protocol_HTTP_Git_citations_preservation_docs_and_current_ledger",
     "final_isolation_false_completion_tests_passed": 9,
     "current_roadmap_tests_passed": 7,
@@ -431,8 +435,15 @@
     "maintenance_contract_scope": "design_only_not_runtime_success",
     "current_Go_dependency_inputs_match": true,
     "maintenance_contract_final_gates": "passed_design101_probe_history_roadmap7_document126_evidence_guard9_source_inventory",
-    "maintenance_contract_false_completion_tests_passed": 9
+    "maintenance_contract_false_completion_tests_passed": 9,
+    "maintenance_runtime_checks": 28,
+    "maintenance_runtime_tool_calls": 90,
+    "maintenance_runtime_wire_pairs": 99,
+    "maintenance_runtime_EOF_sessions": 5,
+    "maintenance_runtime_false_completion_tests": 10,
+    "maintenance_runtime_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json",
+    "current_Go_validation_reused": false
   },
-  "completed_subtasks": 5,
+  "completed_subtasks": 6,
   "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
 }

@@ -1,7 +1,9 @@
 package setup
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -48,12 +50,32 @@ type fileConfig struct {
 // LoadConfig reads a setup config file into Options. Path-valued fields that
 // are relative are resolved against the config file's directory.
 func LoadConfig(path string) (Options, error) {
+	return loadConfig(path, false)
+}
+
+// LoadConfigStrict is used for operator-registered maintenance profiles.
+// Legacy CLI config loading retains its existing compatibility behavior.
+func LoadConfigStrict(path string) (Options, error) {
+	return loadConfig(path, true)
+}
+
+func loadConfig(path string, strict bool) (Options, error) {
 	buf, err := os.ReadFile(path)
 	if err != nil {
 		return Options{}, err
 	}
 	var fc fileConfig
-	if err := yaml.Unmarshal(buf, &fc); err != nil {
+	if strict {
+		decoder := yaml.NewDecoder(bytes.NewReader(buf))
+		decoder.KnownFields(true)
+		if err := decoder.Decode(&fc); err != nil {
+			return Options{}, fmt.Errorf("%s: %w", path, err)
+		}
+		var extra any
+		if err := decoder.Decode(&extra); err != io.EOF {
+			return Options{}, fmt.Errorf("setup config has trailing document")
+		}
+	} else if err := yaml.Unmarshal(buf, &fc); err != nil {
 		return Options{}, fmt.Errorf("%s: %w", path, err)
 	}
 	base := filepath.Dir(path)

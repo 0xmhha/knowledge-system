@@ -43,6 +43,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/0xmhha/knowledge-system/internal/system/maintenance"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
 	ckvtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 
@@ -324,6 +325,18 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 	if collections != nil {
 		defer func() { _ = collections.Close() }()
 		deps.Collection = collections
+	}
+	if len(cfg.Maintenance.Profiles) > 0 {
+		self, err := os.Executable()
+		if err != nil {
+			return fmt.Errorf("config_invalid: maintenance executable unavailable")
+		}
+		service, err := maintenance.New(cfg.Maintenance.Profiles, self)
+		if err != nil {
+			return fmt.Errorf("config_invalid: maintenance profiles could not be verified: %w", err)
+		}
+		defer service.Close()
+		deps.Maintenance = service
 	}
 	if cfg.Listen.ResolvedTransport() == "http" {
 		name := cfg.Name // already defaulted to the namespace root above

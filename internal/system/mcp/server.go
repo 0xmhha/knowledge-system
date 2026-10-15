@@ -36,6 +36,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/composer"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/sanitize"
 	"github.com/0xmhha/knowledge-system/internal/system/embedder"
+	"github.com/0xmhha/knowledge-system/internal/system/maintenance"
 	"github.com/0xmhha/knowledge-system/internal/system/vocab"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -52,6 +53,7 @@ var ToolNameHealth = toolName("ops.health")
 // the slim tool surface deliberately resists envelope sprawl (envelope/auth
 // fields belong to a later policy layer, not here).
 type Deps struct {
+	Maintenance *maintenance.Service
 	// Optional collection tools; absent preserves the single-dataset schema.
 	Collection *CollectionService
 	// Optional out-of-band experiment recorder; never changes a tool result.
@@ -142,6 +144,9 @@ func Register(s *mcpserver.MCPServer, d Deps) error {
 	registerGetForTaskV2(s, d)
 	if d.Collection != nil {
 		registerCollection(s, d.Collection)
+	}
+	if d.Maintenance != nil {
+		registerMaintenance(s, d.Maintenance)
 	}
 	registerLabelSuspects(s, d)
 	registerSemanticStatus(s, d)

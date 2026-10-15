@@ -11,6 +11,7 @@
 | Dataset response and identity | [public v1/v2 contract](./PUBLIC-CONTRACT-V2.md), [source snapshot contract](./SOURCE-SNAPSHOT-ADR.md) |
 | Meaning and domain inputs | [semantic contract](./SEMANTIC-CONTRACT.md), [20 core types](./ONTOLOGY-20-USAGE.md), [domain-pack contract](./DOMAIN-PACK-CONTRACT-V1.md), [worksheet catalog](./WORKSHEET-CATALOG-CONTRACT-V1.md) |
 | Review and evaluation | [patch workflow](./PATCH-WORKFLOW.md), [evaluation contract](./EVAL-CONTRACT.md), [evaluation status](./EVALUATION-STATUS.md) |
+| Knowledge manager and comparison | [roadmap/spec](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [all28 test stages](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [public maintenance runtime](./VERSIONED-MAINTENANCE-RUNTIME.md) |
 | Publication | [release policy](./RELEASE-POLICY.md) |
 | Original evidence | [recovery](./EVIDENCE-RECOVERY.md) |
 

@@ -1,6 +1,6 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
-2026-10-15 현재 단계는 KM-02.1 구축·갱신 계약 설계 완료다. KM-01의4개 세부 작업과 KM-02.1을 완료했으며 전체28개 중5개 완료·3개 진행 중·20개 미착수다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
+2026-10-15 현재 단계는 KM-02.2 공개 구축·취소 로컬 검증 완료다. KM-01의4개 세부 작업과 KM-02.1/02.2를 완료했으며 전체28개 중6개 완료·3개 진행 중·19개 미착수다. 실제 상태는 [진행 원장](./KNOWLEDGE-ROADMAP-PROGRESS.json), 목적과 전체 완료 기준은 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), 기존 운영·선택 후속 범위는 [전체 작업표](../REMAINING-WORK.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는1/7이다.
 
@@ -13,7 +13,7 @@
 | KM-01.3 | 구현 대상 제한·명시 비교·잘못된 scope 거부 | 완료 | 실제 CKG/CKV3DB·공개 MCP24항목 통과; 원시 응답/인용 재검증 |
 | KM-01.4 | 동명·fork·두 버전·cache·재시작·쓰기/호환 반례 | 완료 | 실제4DB·최종52항목 통과; 동일 원문 fork·모델 분리·쓰기18건 거부·rollback/GC/재시작 보존 |
 | KM-02.1 | legacy/versioned capability와 새 요청·상태 계약 | 완료 | [계약](./VERSIONED-MAINTENANCE-CONTRACT.md)·schema·101사례 통과; 새 공개 실행은 .2–04 |
-| KM-02.2 | 비동기 build/status/cancel과 정합 gate | 미착수 | 미실행 |
+| KM-02.2 | 비동기 build/status/cancel과 정합 gate | 완료 | [공개 실행](./VERSIONED-MAINTENANCE-RUNTIME.md)28항목·실제 retained 조회2건·EOF5개·전체 Go/race·증거 보호10개 통과 |
 | KM-02.3 | idempotency/lock/중단/실패/rollback | 미착수 | 미실행 |
 | KM-02.4 | 공개 도구의 잘못된 대상·부분 실패·취소 보호 | 미착수 | 미실행 |
 | KM-03.1 | 매니저 등록·설치·초기 구축·복구 절차 | 미착수 | 미실행 |
@@ -233,7 +233,7 @@ KM-01 완료 당시의 진입점은 `python3 scripts/check-collection-isolation.
 
 101개 모두 통과했다. 현재 MCP35도구를 initialize/tools-list2요청으로 새로 확인했고 새 versioned build/cancel은 미노출·정상 EOF0이다. CLI의 version/project/source-mode/hold/test-gate와 rollback help도 확인했다. 최초 help probe는 stdout에만 상세 flag가 있다고 기대해 실패했다. 실제 flags는 stderr에 있으며 두 stream을 보존하고 결합해 검증하는 최종 probe가 통과했다. 제품 코드는 바꾸지 않았다.
 
-KM-01의 최종 packet은 당시 커밋cb373e94의 소스·문서 snapshot에서 검증한다. 현재 완료 수5를 과거 완료 수4에 억지로 맞추거나 과거 packet을 다시 쓰지 않는다. 현재 작업표28개 일치 검사는 별도로 실행한다. Go 소스1,652개와 go.mod/go.sum이 당시와 같은 바이트라 이전 전체 Go3,600통과/19skip·race444통과/2skip·build/fmt/lint 증거를 재사용한다. 새로운101개 설계 사례를 Go 시험 분모에 더하지 않는다.
+KM-01의 최종 packet은 당시 커밋cb373e94의 소스·문서 snapshot에서 검증한다. 현재 완료 수6을 과거 완료 수4에 억지로 맞추거나 과거 packet을 다시 쓰지 않는다. 현재 작업표28개 일치 검사는 별도로 실행한다. KM-02.1 당시에는1,652개 소스·의존 입력의 바이트가 같아 이전 Go 증거를 재사용했다. 이 수에는 Go1,223개와 기타 입력429개가 포함되며, 이전 표기의 “Go1,652개”를 바로잡는다. KM-02.2는 Go 소스가 변경되어 전체 시험을 새로 실행했다. 새로운101개 설계 사례를 Go 시험 분모에 더하지 않는다.
 
 | 이번 단계 gate | 결과 |
 |---|---|
@@ -243,6 +243,29 @@ KM-01의 최종 packet은 당시 커밋cb373e94의 소스·문서 snapshot에서
 | 현재 작업표·문서·증거 허위 완료 방지 | 현재 작업표7개·문서126개/계약20개/안내3개·새 증거 검사9개 통과 |
 | 새 공개 비동기 구축·취소·durable job | 미구현·미실행; KM-02.2–04 |
 
-다음 작업은 KM-02.2다. 논리 operation inspect_profile/build/status/cancel을 실제 host profile과 backend에 연결하고 공개 이름/schema를 확정한다. 이후 .3의 중복·재시작·publication 복구와 .4의 공개 실패 경계를 검증한다.
+KM-02.1 이후 공개 연결을 KM-02.2에서 구현·검증했다. 현재 다음 작업은 KM-02.3의 중복·재시작·publication 복구이고, 이후 .4의 공개 실패 경계를 검증한다.
 
-현재 설계 적합성·증거 검사는 `python3 scripts/check-versioned-maintenance-contract.py`, `python3 scripts/check-maintenance-design-evidence.py`, `python3 scripts/test_maintenance_design_evidence.py`로 실행한다. 증거9개 시험은 정상 packet·사례 누락·거짓 성공·설계의 공개 runtime 승격·변경 도구를 실행한 probe·지원 CLI flag 누락·과거 소스 결속의 위조·실패 gate·source audit 변조를 검사한다. 과거 runtime snapshot과 현재 작업표·설계 적합성을 분리하여 완료 수 증가만으로 과거 증거를 다시 만들지 않는다.
+KM-02.1 당시 설계 적합성·증거 검사는 `python3 scripts/check-versioned-maintenance-contract.py`, `python3 scripts/check-maintenance-design-evidence.py`, `python3 scripts/test_maintenance_design_evidence.py`로 실행한다. 증거9개 시험은 정상 packet·사례 누락·거짓 성공·설계의 공개 runtime 승격·변경 도구를 실행한 probe·지원 CLI flag 누락·과거 소스 결속의 위조·실패 gate·source audit 변조를 검사한다. 과거 runtime snapshot과 현재 작업표·설계 적합성을 분리하여 완료 수 증가만으로 과거 증거를 다시 만들지 않는다.
+
+
+## KM-02.2 공개 구축·조회·취소 완료
+
+[실행 명세](./VERSIONED-MAINTENANCE-RUNTIME.md)와 [원자료 packet](../../system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json)을 따른다. 기존 과거 packet은 변경하지 않는다. 설계 증거는 `python3 scripts/verify_committed_maintenance_design.py`로7034ce85 snapshot에서 검사하며, 현재 runtime은 새 Go 시험으로 검증한다.
+
+| 검증 | 결과 |
+|---|---|
+| 공개 MCP lifecycle 고정 항목 | 28/28 통과; 두 프로젝트 실제 CKG/CKV·deterministic mock embedding |
+| 실제 dataset 도구·wire | 90회 호출·전체99쌍; polling 수는 시험 항목 수와 별도 |
+| 최초/두 번째 실제 publication | A v1·v3 성공, 정확한 receipt·base·좌표 확인 |
+| 검토 보류·취소·격리 | A v2/B v1 held, B v2 실행 중 취소, A v1 불변·B current 없음 |
+| 실제 조회 | A 이전 v1 marker101·새 v3 marker404 retained 본문/인용 확인 |
+| 연결 종료 | 기본·maintenance·재연결·reader2개 총5개 정상 EOF |
+| 전체 Go | 3,665사례=3,646통과+19skip; 실패0, 전체135package 정상 종료 |
+| 관련5패키지 race | 634사례=632통과+2skip; 실패0 |
+| build/fmt/vet/lint/경계/문서 | 통과; 문서 계약20개·패키지 안내3개 |
+| 증거 변조·허위 완료 방지 | 10개 통과; wire 누락·거짓 held/canceled 성공·종료 오류·durability 과장·skip 승격·타 프로젝트 인용·DB 변경·lint 실패 |
+| 현재 소스 결속 | 기존 입력+새 Go8개=1,660개; 유지 Go1,231개+기타429개, 승인 상태 변경 없음 |
+| 영속 job·재시작 복구 | 미구현·미실행, KM-02.3 |
+| 전체 KM-02·독립 수용·검색 품질 | 완료 아님 |
+
+현재 완료6/28·진행3/28(OE-01.1–03)·미착수19/28다. 다음은 KM-02.3, 이후 .4 → KM-03 → KM-04 → KM-05 → KM-06 → OE-01 확대/다중 프로젝트 평가 순서다. 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 범위다.

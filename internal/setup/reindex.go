@@ -470,6 +470,12 @@ func Rollback(dataset, version string) error {
 
 // GateOptions parameterizes the pre-promote gate suite.
 type GateOptions struct {
+	// Scoped callers recheck mutable request pins while the dataset lock is
+	// held. Nil preserves the existing CLI behavior.
+	BeforeCandidate func(context.Context) error
+	// Publish wraps the checked pointer swap while both mutation locks are
+	// held, so cancellation/base CAS and the publication result share a boundary.
+	Publish         func(context.Context, func() (string, error)) (string, error)
 	CaptureLimits   CaptureLimits
 	ExternalOrigins []CaptureOrigin
 	// HoldForReview keeps a fully gated immutable candidate off current until
@@ -653,6 +659,11 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		return err
 	}
 	defer lock.release()
+	if gopt.BeforeCandidate != nil {
+		if err := gopt.BeforeCandidate(ctx); err != nil {
+			return err
+		}
+	}
 
 	// Build into the version directory (o.Out/<version>/{graph,vector}).
 	vo := o
@@ -848,6 +859,9 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	}
 
 	prev, err := withPointerLock(dataset, func() (string, error) {
+		if gopt.Publish != nil {
+			return gopt.Publish(ctx, func() (string, error) { return promoteLockedContext(ctx, dataset, version, false) })
+		}
 		return promoteLockedContext(ctx, dataset, version, false)
 	})
 	if err != nil {

@@ -1,6 +1,6 @@
 # KM-02.1 버전 DB 구축·갱신 계약
 
-2026-10-15 기준의 설계·적합성 계약이다. [전체 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)의 KM-02.1을 구체화한다. [기계 판독 스키마](../../system/contracts/versioned-maintenance/v1/schema.json), [상태 전이](../../system/contracts/versioned-maintenance/v1/state-machine.json), [capability 조사](../../system/contracts/versioned-maintenance/v1/capabilities.json), [101개 사례](../../system/contracts/versioned-maintenance/v1/fixtures.json)를 함께 관리한다. 공개 MCP 실행은 KM-02.2, 지속성·중복/장애 복구는 .3, 공개 실패 반례는 .4에 남는다.
+2026-10-15 기준의 설계·적합성 계약이다. KM-02.2의 현재 공개 연결·설정·단계별 한계는 [실행 명세](./VERSIONED-MAINTENANCE-RUNTIME.md)를 따른다. 아래 capability 조사는 KM-02.1 완료 당시 관찰이며 현재 공개 도구 수를 뜻하지 않는다. [전체 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)의 KM-02.1을 구체화한다. [기계 판독 스키마](../../system/contracts/versioned-maintenance/v1/schema.json), [상태 전이](../../system/contracts/versioned-maintenance/v1/state-machine.json), [capability 조사](../../system/contracts/versioned-maintenance/v1/capabilities.json), [101개 사례](../../system/contracts/versioned-maintenance/v1/fixtures.json)를 함께 관리한다. 공개 MCP 실행은 KM-02.2, 지속성·중복/장애 복구는 .3, 공개 실패 반례는 .4에 남는다.
 
 ## 목적과 현재 capability
 
@@ -15,13 +15,13 @@
 | version CLI | project/source/input/embedding pin, 새 버전 gate·hold·활성화·rollback 제공 | capture/Reindex/Gate/reader lease와 기존 변경 lock 재사용 |
 | serving | 시작 시 버전과 collection을 고정 | current 전환과 조회 연결의 새 버전 채택을 분리 |
 
-현재 MCP35도구와 CLI help를 읽기 전용으로 확인했다. 새 versioned build/cancel 도구는 노출하지 않았다. 논리 operation은 `inspect_profile`, `build`, `status`, `cancel`로 고정하며 **공개 도구명은 KM-02.2에서 실제 등록과 input/output schema를 함께 확정한다.** 기존 도구명이나 기본 도구 수를 설계 문서만으로 바꾸지 않는다.
+KM-02.1 당시 MCP35도구와 CLI help를 읽기 전용으로 확인했다. 당시에는 새 versioned build/cancel 도구를 노출하지 않았다. 논리 operation은 `inspect_profile`, `build`, `status`, `cancel`로 고정하며 공개 이름/schema는 KM-02.2에서 `cks.dataset.inspect_profile/build/status/cancel`로 등록했다. 기존 도구명이나 기본 도구 수를 설계 문서만으로 바꾸지 않는다.
 
 ## 프로젝트 profile과 입력 결속
 
 호스트에 등록한 profile은 project ID, 허용 source/origin·output root, 정규화된 setup 설정, 실행 파일/모델 정책, capture 정책·자원 상한, 필수 gate와 활성화 정책을 소유한다. 같은 표시 이름·URL·함수·commit이어도 project ID를 합치지 않는다. caller는 profile ID를 선택하며 경로·endpoint·실행 명령·DB 파일·skip-vector를 요청으로 덮어쓰지 못한다. profile 등록/설치는 KM-03의 매니저 절차에 연결한다.
 
-`inspect_profile`은 실제 등록된 profile을 읽고 다음 구축에 사용할 profile/input/embedding digest와 source pin, 현재 버전의 전체 좌표 및 capability를 반환할 예정이며 아직 실행 도구가 아니다. source 수집은 등록 범위에 한정하고 개인 세션/개인 로그를 기본 입력으로 읽지 않는다. preview 후 source가 바뀌면 build에서 거부하고 다시 inspect한다.
+`inspect_profile`은 실제 등록된 profile을 읽고 다음 구축에 사용할 profile/input/embedding digest와 source pin, 현재 버전의 전체 좌표 및 capability를 반환한다. 현재 공개 구현의 process-lifetime 제한은 실행 명세에 명시한다. source 수집은 등록 범위에 한정하고 개인 세션/개인 로그를 기본 입력으로 읽지 않는다. preview 후 source가 바뀌면 build에서 거부하고 다시 inspect한다.
 
 | build 필드 | 의미 |
 |---|---|
