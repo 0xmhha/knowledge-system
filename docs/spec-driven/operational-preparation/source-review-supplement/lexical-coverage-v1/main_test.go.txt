@@ -1,0 +1,117 @@
+package main
+
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"go/types"
+	"reflect"
+	"sort"
+	"testing"
+)
+
+// These are development controls with known source, not project gold cases.
+var controls = []struct {
+	name, body string
+	shadows    int
+	reuse      int
+}{
+	{"sibling_names", `func f() { if true { x:=1; _=x }; if false { x:=2; _=x } }`, 0, 0},
+	{"nested_block", `func f() { x:=1; { x:=2; _=x }; _=x }`, 1, 0},
+	{"mixed_short", `func f() { x:=1; x,y:=2,3; _,_=x,y }`, 0, 1},
+	{"parameter_reuse", `func f(x int) { x,y:=2,3; _,_=x,y }`, 0, 1},
+	{"named_result_reuse", `func f() (x int) { x,y:=2,3; _=y; return }`, 0, 1},
+	{"if_initializer", `func f() { x:=1; if x:=2; x>0 { _=x } else { _=x }; _=x }`, 1, 0},
+	{"for_initializer", `func f() { i:=1; for i:=0; i<2; i++ { _=i }; _=i }`, 1, 0},
+	{"range_define", `func f() { i:=9; for i:=range []int{1} { _=i }; _=i }`, 1, 0},
+	{"range_assignment", `func f() { i:=9; for i=range []int{1} { _=i }; _=i }`, 0, 0},
+	{"closure_excluded", `func f() { x:=1; g:=func(){ x:=2; { x:=3; _=x }; _=x }; g(); _=x }`, 0, 0},
+	{"closure_initializer_outer_name", `func f() { x:=1; { x:=func()int{return x}(); _=x }; _=x }`, 1, 0},
+	{"switch_case_scopes", `func f() { x:=1; switch { case true: x:=2; _=x; default: x:=3; _=x }; _=x }`, 2, 0},
+	{"type_switch_guards", `func f(x any) { switch x:=x.(type) { case int: _=x; default: _=x } }`, 2, 0},
+	{"type_case_guard_reuse", `func f(x any) { switch x:=x.(type) { case int: x,y:=2,3; _,_=x,y } }`, 1, 1},
+	{"select_receive", `func f(ch chan int) { x:=1; select { case x:=<-ch: _=x; default: }; _=x }`, 1, 0},
+	{"select_case_siblings", `func f(a,b chan int) { select { case x:=<-a: _=x; case x:=<-b: _=x } }`, 0, 0},
+	{"blank_ignored", `func f(){ _,x:=1,2; _,y:=3,4; _,_=x,y }`, 0, 0},
+	{"type_blocks_outer_variable", `func f(){ x:=1; { type x int; { var x int; _=x }; _=x(0) }; _=x }`, 0, 0},
+	{"var_initializer", `func f(){ x:=1; { var x=x; _=x }; _=x }`, 1, 0},
+	{"package_variable_excluded", `var x=1; func f(){ x:=2; _=x }`, 0, 0},
+	{"receiver_reuse", `type T int; func(x T) f(){ x,y:=T(2),3; _,_=x,y }`, 0, 1},
+	{"parenthesized_assignment", `func f(){ x:=1; (x)=2; _=x }`, 0, 0},
+}
+
+func insideExcluded(pos int, row functionCensus) bool {
+	for _, s := range row.ExcludedClosures {
+		if s.Start <= pos && pos < s.End {
+			return true
+		}
+	}
+	return false
+}
+
+func TestLexicalCoverage(t *testing.T) {
+	for _, tc := range controls {
+		t.Run(tc.name, func(t *testing.T) {
+			source := "package control\n" + tc.body
+			row := analyze(sourceInput{Path: "control.go", Source: source})[0]
+			fs := token.NewFileSet()
+			file, err := parser.ParseFile(fs, "control.go", source, parser.SkipObjectResolution)
+			if err != nil {
+				t.Fatal(err)
+			}
+			info := &types.Info{Defs: map[*ast.Ident]types.Object{}, Uses: map[*ast.Ident]types.Object{}, Implicits: map[ast.Node]types.Object{}}
+			pkg, err := new(types.Config).Check("control", fs, []*ast.File{file}, info)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := []string{}
+			add := func(obj types.Object) {
+				v, ok := obj.(*types.Var)
+				if !ok || v.Name() == "_" || v.Parent() == nil || v.Parent() == pkg.Scope() || insideExcluded(fs.Position(v.Pos()).Offset, row) {
+					return
+				}
+				parent, outer := v.Parent().Parent().LookupParent(v.Name(), v.Pos())
+				if _, isVar := outer.(*types.Var); isVar && parent != pkg.Scope() {
+					want = append(want, fmt.Sprintf("%s@%d>%d", v.Name(), fs.Position(v.Pos()).Offset, fs.Position(outer.Pos()).Offset))
+				}
+			}
+			for _, obj := range info.Defs {
+				add(obj)
+			}
+			for _, obj := range info.Implicits {
+				add(obj)
+			}
+			got := []string{}
+			reuse := 0
+			for _, e := range row.Events {
+				if e.Kind == "local_variable_shadow" {
+					got = append(got, fmt.Sprintf("%s@%d>%d", e.Name, e.Site.Start, e.Outer.Site.Start))
+				}
+				if e.Kind == "same_scope_short_reuse" {
+					reuse++
+					var ident *ast.Ident
+					ast.Inspect(file, func(n ast.Node) bool {
+						if id, ok := n.(*ast.Ident); ok && fs.Position(id.Pos()).Offset == e.Site.Start {
+							ident = id
+							return false
+						}
+						return true
+					})
+					if ident == nil || info.Uses[ident] == nil || fs.Position(info.Uses[ident].Pos()).Offset != e.Binding.Site.Start {
+						t.Fatal("short reuse does not match go/types binding")
+					}
+				}
+			}
+			sort.Strings(got)
+			sort.Strings(want)
+			if !reflect.DeepEqual(got, want) || len(got) != tc.shadows || reuse != tc.reuse {
+				t.Fatalf("shadows got %v want %v count=%d; reuse=%d want=%d", got, want, tc.shadows, reuse, tc.reuse)
+			}
+			if tc.name == "parenthesized_assignment" && !row.Features["local_variable_reassignment"] {
+				t.Fatal("parenthesized local assignment missed")
+			}
+			t.Logf("LEXICAL_CONTROL %s shadows=%d same_scope_reuse=%d go_types_match=true", tc.name, len(got), reuse)
+		})
+	}
+}

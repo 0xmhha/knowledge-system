@@ -1,0 +1,77 @@
+WI-1 실제 로컬 변수 범위 및 표본 커버리지 — 2026-10-16
+
+목적과 완료 범위
+기존 40개 함수의 반복 := 이름을 실제 shadow로 오인하지 않도록 원문을 재검사했다.
+부모 블록에서 보이는 로컬 변수와 안쪽 새 변수를 다른 선언 위치로 구분한다.
+이번 완료는 고정 원문의 범위 집계와 개발 대조군 검증이다.
+독립 표본 확정·완전한 데이터/제어 edge 정답·backend 품질 평가는 완료하지 않았다.
+
+결과 — 수치는 함수를 세며, 위치 수와 독립 표본 수를 혼용하지 않는다
+항목                                전체 후보 40개   운영 후보 39개
+본문 변수 선언                       40               39
+본문 선언 AND 알려진 로컬 변수 재대입 36               35
+같은 scope의 := 기존 변수 재사용       9                8
+분기                                 40               39
+본문 자체의 루프                     38               37
+실제 로컬 변수 shadow                17               16
+return                               40               39
+
+miner/stress/clique/main.go의 main은 개발 스트레스 원문 전용 1개다.
+이번에도 실행하지 않았으며 운영 후보 분모에 넣지 않는다.
+원래 반복 이름 hint는 38개였고, 이 중 21개에는 이번 정의의 실제 로컬 shadow가 없었다.
+전체 shadow 위치는 29곳이다. 여러 위치를 독립 함수 여러 개로 세지 않는다.
+익명 함수 19개는 별도 함수 본문이므로 상위 함수 집계에서 제외했다.
+analyzeBlock(SRC-005), handleBatch(SRC-040)의 loop hint는 익명 함수 내부에서 유래했다.
+기존 후보 JSON 및 과거 원자료는 수정하지 않았고 새 lexical-coverage-v1에 결과를 추가했다.
+
+확인 가능한 예시 — go-stablenet 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+- SRC-002 Gossip: backend/backend.go 189행 ok와 191행 안쪽 if의 새 ok.
+- SRC-006 ReadHeaderRange: accessors_chain.go 300행 i와 336행 range의 새 i.
+- SRC-011 DumpToCollector: dump.go 132행 err와 140행 if의 새 err.
+- SRC-022 findBeaconAncestor: beaconsync.go 207행 number와 239행 if의 새 number.
+각 식별자의 정확한 byte/행·선언·scope와 바깥 바인딩은 logs/analyzer.json에 있다.
+함수 바이트와 모든 파일은 Git commit→tree→blob proof로 검증한다.
+
+정의와 제외 범위
+실제 shadow: 가장 가까이 보이는 바깥 로컬 변수와 다른 새 안쪽 변수 선언.
+같은 블록의 x,y := ...에서 x 재사용은 새 shadow가 아니다. 파라미터와 함수 최상위
+본문은 같은 scope이며, 형제 블록에만 있는 같은 이름도 서로를 가리지 않는다.
+재대입은 알려진 로컬 식별자에 대한 =, 복합 대입, ++/--, range =, := 재사용이다.
+필드/인덱스의 메모리 쓰기, package/import/universe 이름, 익명 함수 내부는 제외한다.
+분기는 if·값 switch·type switch·select다. type switch guard는 case별 별도 바인딩이다.
+같은 guard 원문 위치가 여러 case에 등장해도 독립 표본을 늘리지 않는다.
+선언/재정의 후보는 같은 함수에 본문 변수 선언과 로컬 재대입이 모두 있는 보수적 제안이다.
+이를 정식 구문 정의로 채택할지는 검토가 필요하다.
+소스 전체 프로젝트의 타입 검사를 수행하지 않았다. 원문은 파싱만 했고 실행하지 않았다.
+변수 use 순서·alias·경로 실현 가능성·완전한 may-reach/제어 의존 edge는 산출하지 않는다.
+
+검증
+Go 1.26.9, 표준 라이브러리만 쓰는 임시 모듈로 build/fmt/vet/lint 4건 통과.
+개발 대조군 22개를 Go 표준 go/types의 실제 선언 바인딩과 대조했다.
+형제/중첩 블록, 혼합 :=, 파라미터/결과/receiver 재사용, if/for/range,
+switch/type-switch/select scope, blank, 중간 type 이름, initializer, closure 제외를 포함한다.
+일반/race 각각 22개로 총 44개 관측 통과. AI가 작성한 개발 대조군이며 독립 gold가 아니다.
+검증기는 실행 가능한 코드를 packet에서 불러오지 않고 신뢰하는 live analyzer만 사용한다.
+원문 40개를 오프라인에서 재파싱해 원자료와 완전히 같은 관측인지 확인한다.
+재파싱에는 설치된 호환 Go도 사용할 수 있지만, 보존한 본 시험은 Go 1.26.9이다.
+프로젝트 원문 실행·프로젝트 패키지 빌드·노드·모델·지식 시스템 의존성 backend 호출은 모두 0회다.
+변조 거부 회귀 20개와 관련 Python 회귀 전체 204개가 통과했다.
+문서 134개·기존 구현 완료 상태 검사 통과, 이전 동결 패킷 8개·유지보수 Go 소스 변경 없음.
+
+재검증
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_lexical_coverage.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-lexical-coverage.py docs/spec-driven/operational-preparation/source-review-supplement/lexical-coverage-v1
+설치된 Go가 PATH/GOROOT에서 사용 가능해야 한다. 도구/모듈 다운로드는 비활성화한다.
+원자료 재생성은 prepare-lexical-coverage.py에 새 --output, --repo, Go 1.26.9 --goroot,
+--lint 경로를 지정한다. 이전 패킷을 덮어쓰지 않는다.
+
+남은 WI-1 작업
+39개 운영 후보는 문법 수량만으로는 최소 30개와 구문별 4개 제안을 충족할 여지가 있다.
+그러나 독립 승인 함수는 0개다. 노출/중복·대표성·DEV/FINAL 배정·표본 충분성은 미검토다.
+30개 이상 독립 함수의 완전한 구조적/lexical may-reach data/control gold와
+정확한 span/바인딩/edge 매칭, baseline, 자원, 통계를 F-01~F-08로 동결해야 한다.
+담당자 미정·freeze null·execution_allowed false·정식 수용 0/9를 유지한다.
+
+다음 준비 작업
+선언별 use·분기/루프 합류·return 경계의 검토 자료를 원문과 함께 보완한다.
+자동 집계를 완전한 edge 정답이나 precision/recall 점수로 표시하지 않는다.

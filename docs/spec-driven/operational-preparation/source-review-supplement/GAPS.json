@@ -85,7 +85,7 @@
       "id": "WI-1",
       "preparation_candidate_count": 40,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "기존 문법 함수 후보 40개. 실제 lexical shadow 확인과 완전한 독립 edge gold는 미작성.",
+      "note": "기존 함수 후보 40개를 본문 로컬 범위로 재집계: 운영 39개/개발 스트레스 원문 전용 1개. 운영 후보의 실제 로컬 shadow 16개·선언과 재대입 35개·루프 37개·분기/return 각 39개. 독립 승인·완전한 edge gold·의존성 backend 평가는 미수행.",
       "requirements": {
         "independent_functions_min": 30,
         "constructs": [
@@ -102,9 +102,22 @@
       "formal_status": "not_prepared",
       "remaining": [
         "독립 검토자와 최종 수용 담당자 지정",
-        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
-        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
-      ]
+        "선언별 use와 분기 경계의 구조적 may-reach 검토 자료·비포함 경계 보완",
+        "30개 이상 함수의 독립성·DEV/FINAL·표본 충분성 및 각 구문 4개 이상을 검토·동결",
+        "완전한 독립 data/control edge gold·canonical matching·baseline 확정",
+        "승인된 범위의 의존성 backend 실행 및 precision/recall·운영·독립 수용 판정"
+      ],
+      "lexical_coverage_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/lexical-coverage-v1/manifest.json",
+        "production_candidates": 39,
+        "development_stress_source_only": 1,
+        "production_local_shadow_functions": 16,
+        "production_declaration_and_reassignment_functions": 35,
+        "approved_independent_functions": 0,
+        "source_replay_verified": true,
+        "go_types_development_controls": 22,
+        "normal_race_control_observations": 44
+      }
     },
     {
       "id": "WI-2",
@@ -203,7 +216,7 @@
     }
   ],
   "next_priority": [
-    "WI-1 실제 lexical shadow·선언/재정의 커버리지와 필요한 함수 표본 확인",
+    "WI-1 선언별 use·분기 경계의 구조적 may-reach 검토 자료와 비포함 경계 준비",
     "WI-3 독립 사실 가족 20개 미충족·노출/중복·gold·실제 검색/호스트 경로 검토",
     "WI-4 실제 도달성·후보 계약·독립성·동결·반복 실행 미충족분 검토",
     "WI-V1/WI-V2의 실제 API 도달 가능성·독립 티켓·독립 오라클·승인 후보 집합 검토",
