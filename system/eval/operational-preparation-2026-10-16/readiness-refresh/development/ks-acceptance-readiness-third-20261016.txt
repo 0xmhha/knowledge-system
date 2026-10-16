@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-acceptance-readiness.py", line 62, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-acceptance-readiness.py", line 49, in main
+    directory=out/key;directory.mkdir();client=wire.Client(None,None,directory,command=command,namespace='');sessions.append(client)
+                      ^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/pathlib.py", line 1116, in mkdir
+    os.mkdir(self, mode)
+FileExistsError: [Errno 17] File exists: '/private/tmp/ks-acceptance-readiness-third-20261016/cks'

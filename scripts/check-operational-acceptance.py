@@ -140,6 +140,21 @@ def check(root, protocol, ledger, require_frozen=False):
         errors.append("freeze checklist must contain F-01 through F-08 exactly once")
     if not file_hash(protocol.get("source_inventory"), protocol.get("source_inventory_sha256")):
         errors.append("source preparation inventory missing or hash differs")
+    refreshed = protocol.get("current_readiness_preparation")
+    if refreshed != ledger.get("current_readiness_preparation"):
+        errors.append("protocol/ledger current readiness references differ")
+    if refreshed is not None:
+        try:
+            if (refreshed.get("kind") != "preparation_only_not_formal_execution"
+                    or not file_hash(refreshed.get("manifest"), refreshed.get("manifest_sha256"))):
+                raise ValueError("current readiness scope or hash differs")
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("current_readiness", Path(__file__).with_name("check-acceptance-readiness.py"))
+            readiness = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(readiness)
+            errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            errors.append("current readiness preparation invalid: " + str(exc))
     for field in ("input_candidate_pool", "host_preflight"):
         reference = protocol.get(field)
         if reference is not None:

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-acceptance-readiness.py", line 61, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-acceptance-readiness.py", line 30, in main
+    binary=out/'cks';run('build',['go','build','-o',str(binary),'./cmd/cks'],source,timeout=300);buildinfo=run('buildinfo',['go','version','-m',str(binary)]);require('vcs.revision='+revision in buildinfo and 'vcs.modified=false'in buildinfo,'fresh CKS provenance missing')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-acceptance-readiness.py", line 24, in run
+    r=subprocess.run(argv,cwd=cwd,env=environment,capture_output=True,timeout=timeout);(out/(label+'.stdout.txt')).write_bytes(r.stdout);(out/(label+'.stderr.txt')).write_bytes(r.stderr);commands.append({'label':label,'argv':argv,'cwd':str(cwd),'exit_code':r.returncode,'stdout_sha256':sha(r.stdout),'stderr_sha256':sha(r.stderr)});write('commands.json',commands);require(r.returncode==0,'command failed: '+label);return r.stdout.decode().strip()
+                                                                                                                                                                                                                                                                                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-acceptance-readiness.py", line 17, in require
+    if not value:raise ValueError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: command failed: build

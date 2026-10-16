@@ -34,6 +34,20 @@ class PreparationGuardTests(unittest.TestCase):
     def errors(self, frozen=False):
         return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
 
+    def test_current_readiness_cannot_be_promoted(self):
+        for value in (self.protocol,self.ledger):
+            value['current_readiness_preparation']['kind']='operational_acceptance'
+        self.assertTrue(self.errors())
+
+    def test_current_readiness_reference_must_match(self):
+        self.protocol.pop('current_readiness_preparation')
+        self.assertTrue(self.errors())
+
+    def test_current_readiness_hash_is_bound(self):
+        for value in (self.protocol,self.ledger):
+            value['current_readiness_preparation']['manifest_sha256']='0'*64
+        self.assertTrue(self.errors())
+
     def test_current_documents_are_consistent(self):
         self.assertEqual(guard.check(guard.ROOT, self.actual_protocol, self.actual_ledger)[0], [])
 

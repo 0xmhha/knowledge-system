@@ -1,5 +1,8 @@
 # 남은 전체 작업
 
+현재 운영 준비 갱신: source3a530a25 격리 재빌드·소비자 tracked2412파일·CKS33개 schema 일치/ChainBench81개 metadata·현재 CLI2.1.301 로컬 scripted5개를 확인했다.9개 평가의 기준선/단위/매칭/분모 제안과 F-01–08 결정표를 준비했다. 실제 모델·노드·독립 gold/사람 승인0이며 운영·독립 수용은0/9다. [현재 결정표](../system/eval/operational-preparation-2026-10-16/readiness-refresh/freeze-review-checklist.json)와 [검토 자료](./spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.md)를 따른다. 다음은 역할·범위 검토와 새 독립 입력/gold 준비이며 선택 후속12개는 별도다.
+
+
 2026-10-16 현재 로컬 구현·준비 상태 기준이다. 구현·문서 main 통합 근거는2026-10-14 기록을 따른다. 완료 상태는 [구현 원장](./spec-driven/UPPER-WORK-ITEMS-PROGRESS.json)과 기록된 증거를 따른다. 완료한 구현, 운영·독립 수용 검증, 새로 채택해야 할 후속 범위를 구분한다.
 
 ## 완료한 요청 범위

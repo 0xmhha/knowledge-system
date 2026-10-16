@@ -1,5 +1,8 @@
 # 현재 인수인계
 
+운영·독립 수용 준비 갱신(2026-10-16): source3a530a25 격리 빌드·CKS33개 스키마 일치/ChainBench81개 metadata·현재 Claude Code2.1.301의 로컬 scripted5개를 새로 검증했다. 실제 모델/노드0, 정식9개 수용0/9·F-01–08 pending이다.9개 baseline/표본/위치 매칭/분모 제안과 역할·입력·recipe의 남은 결정을 [현재 protocol](./OPERATIONAL-ACCEPTANCE-PROTOCOL.md)에 정리했다. 다음은 검토자·범위·독립 입력/gold 검토다.
+
+
 2026-10-16 기준 지식 매니저·프로젝트 비교 로드맵은 **28/28 세부 작업·7/7 기능 완료**다. 사용자가 멈추라고 하기 전까지 남은 작업을 순서대로 구현·검증하고 단계별 서명 로컬 커밋으로 보존한다. 각 완료 단계마다 현재 단계·검증 결과·다음 작업·남은 전체 범위를 화면 로그와 문서에 기록한다. 세부 상태는 [시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다.
 
 ## 현재 구현과 다음 단계
@@ -30,7 +33,7 @@ OE-01.3 완료: 고정512회 원자료에서 유한한 완전 함수 찾기 과�
 
 ## 보존할 결정과 품질 관찰
 
-정책 참조 수정7건은 별도 평가 overlay로 사용자 채택 승인을 기록했다. [승인 영수증](../../system/eval/operational-preparation-2026-10-15/adopted-policy-user-approval/receipt.json)과 [적용 검증](./POLICY-OVERLAY-ADOPTION.md)을 따른다. 원본 정책·원래 승인 입력은 보존한다. 일반 domain sync가 기존 잘못된 참조를 재생성하는 문제는 아직 별도 보완 대상이다.
+정책 참조 수정7건은 별도 평가 overlay로 사용자 채택 승인을 기록했다. [승인 영수증](../../system/eval/operational-preparation-2026-10-15/adopted-policy-user-approval/receipt.json)과 [적용 검증](./POLICY-OVERLAY-ADOPTION.md)을 따른다. 원본 정책·원래 승인 입력은 보존한다. 기존 무소스 sync의 동작을 보존하면서 명시적 --code-root의 선언 대조/오파일 거부와 재생성을 보완했다.
 
 [OE-01 단일 프로젝트 관찰](./ONTOLOGY-EFFECT-DEV-OBSERVATION.md)은384회 실패/누락0·인용3,616개 원문 일치, 활성288회 no_match·순위 차이0이었다. 별도 정확 용어8회도 최종 boost0이다. 기본 off·quality=inconclusive를 유지한다. KM-04.4에서 단독 합성 대문자 식별자 질의가 비고 같은 자료가 자연어 질의에 나타난 사례도 OE-01 질의 해석/회수율 후보로 보존했다. 새 기능 구현이나 계획 승인을 독립 정답·품질 승인으로 바꾸지 않는다.
 

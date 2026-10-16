@@ -1,8 +1,41 @@
 # 운영 검증 실행 protocol과 동결 준비
 
+## 2026-10-16 현재 준비 결과와 검토할 결정
+
+로컬 로드맵28/28과 명시적 소스 대조 정책 생성기를 완료한 뒤, 운영·독립 수용의 준비 자료를 현재 코드와 대조했다. 새 준비 검증은 정식 운영/품질/사람 수용의0/9를 바꾸지 않는다. 기존 source inventory와 과거 packet은 당시 관측으로 보존한다.
+
+| 이번 준비 항목 | 확인한 내용 |
+|---|---|
+| 현재 source·빌드 | knowledge-system3a530a25를 깨끗한 격리 checkout에서 재빌드; Go1.26.9·vcs.modified=false |
+| 소비자 | 채택 coding-agent b7e7868의367개·ChainBench bdf5ad27의2045개 tracked 파일과 commit 대조 |
+| 도구 계약 | 실제 CKS33개 입력 스키마가 소비자33개와 모두 일치; ChainBench81개; metadata2세션 EOF0 |
+| 현재 host | CLI2.1.301의 valid/tools/incomplete/tampered/cancel5개를 로컬 시험 응답기로 새 실행·재판정 |
+| 모델 metadata | BGE-M3 digest790764642607…16bab·Ollama0.40.4; 실제 임베딩/LLM 추론0·개인 인증 미조회 |
+| 평가 초안 |9개별 기준선·독립 표본 단위·canonical 매칭·분모/기권 제안; 승인 gold0·DEV/FINAL0 |
+
+host의 API 응답은 로컬 스크립트이고 실제 역할의 추론/판단은 수행하지 않았다. 새 CLI의5개 연결 시험을 과거2.1.300 결과로 대체하지 않았다. 취소 host143은 요청한 종료로 보존하며 MCP5개는0이다. 알려진 게시/정책 완화 거부와 Stop 단일 재진입을 확인했지만 실제 모델·전체 역할·HTTP 소비자·실제 노드/cleanup·다른 플랫폼은 미검증이다. CKS metadata는 graph+mock CKV 설정이므로 실제 BGE 검색 연결의 통과가 아니다. 모델 차원은 이번 metadata 점검에서 재측정하지 않았다.
+
+검토 자료는 [현재 증거](../../system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json), [8개 결정표](../../system/eval/operational-preparation-2026-10-16/readiness-refresh/freeze-review-checklist.json), [9개 평가·채점 제안](../../system/eval/operational-preparation-2026-10-16/readiness-refresh/scoring-review-proposals.json)이다. 제안은 AI 초안으로 표시하며 기존9개 input_groups의 정답/사례·담당·모델/비용 필드를 자동 채우지 않는다.
+
+| ID | 권고와 현재 준비 | 아직 필요한 결정/근거 |
+|---|---|---|
+| F-01 | 격리 Go pilot·게시 전 평가 종료·review 로컬 전달 | 실제 수용 범위 채택 |
+| F-02 | 현재 source3a530a25·기존 채택 b7e7868/bdf5ad27·go-stablenet0bf2f4d1 후보 | source/복제/submodule 포함 범위 채택 |
+| F-03 |9개별 baseline/표본 단위/위치 매칭/분모 초안 | 비교·채점 계약과 실제 baseline 경로 채택 |
+| F-04 | family 단위 paired bootstrap·부족/undefined/inconclusive 제안 | 방법·gate·FINAL 충분성 결정 |
+| F-05 | AI 초안과 사람 검토를 구분하는 역할 표 | gold 작성·독립 검토·최종 수용 담당 이름/독립성 |
+| F-06 | 현재 준비 비용은 실제 모델 호출0 | 실제 LLM pilot을 선택할 때 provider/model/auth/비용/자원 상한 |
+| F-07 | 함수40/review10/확장20·rubric45는 후보 초안 | 새 ticket/case·독립 gold·family/DEV/FINAL 봉인 |
+| F-08 | 새 host5개와 metadata 계약/종료 검증 | HTTP·전체 역할·노드/권한·정확한 actual recipe와 cleanup |
+
+이번 준비 검증: snapshot 보호16개·운영 수용 보호36개·문서 계약20개·문서134개 검사 통과. 구조 guard의 pending101개는8개 F 결정 영역 아래의 세부 필드/입력/receipt이며101개 결함이나101개 구현 작업이 아니다. --require-frozen은 예상 exit1로 실행을 거부한다. 새 Go 변경 없이1275개 Go와 결속 입력이 동일한 직전 서명 전체4078/race1066 결과를 참조했고, 새 격리 CLI 빌드·metadata·현재 host 시험은 이번에 실행했다.
+
+F-01–08의 decision은 모두 pending이고 freeze=null·execution_allowed=false다. 사람 이름과 독립 정답을 임의 생성하거나 반복/번역/한 함수의 edge를 독립 표본으로 늘리지 않는다. 준비 검증을 마쳐도 정식9개 수용의 선행 조건이 사라지지 않는다. 다음은 위 구체 자료의 역할·범위 검토와 새 독립 입력/정답 준비다. 선택 후속12개는 별도 범위다.
+
+
 2026-10-15: 이 문서와 JSON의 미동결 gate는9개 정식 평가를 위한 것이다. [지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)의 로컬 설계/개발/회귀를 막는 조건이 아니다. 담당자·실제 모델/비용 지정은 해당 실제 실행·독립 수용 범위에 적용한다. 온톨로지 효과 평가 OE-01은 별도 필수 우선 범위이며 새7개 작업의 구현 완료와9개 독립 수용의 분모를 합치지 않는다.
 
-정책 입력의 후속 [실제 AST 프런트엔드/연결기 진단](./POLICY-REFERENCE-DIAGNOSIS.md)에서 기존6개 경고와 경고 없는 다른 함수 연결1개를 재현했다. 수정7개 사본은146개 연결·경고0개이며 새 평가 overlay 채택은 미정이다. 원본 source-bound 입력·과거 packet·gold·동결 상태는 변경하지 않았다. 이 진단은 stage0 준비 근거이며 실제 설치/index/MCP·독립 정책 의미·품질 수용을 대신하지 않는다.
+정책 입력의 후속 [실제 AST 프런트엔드/연결기 진단](./POLICY-REFERENCE-DIAGNOSIS.md)에서 기존6개 경고와 경고 없는 다른 함수 연결1개를 재현했다. 수정7개는 별도 평가 overlay로 사용자 채택을 기록했고 실제 graph/CKS 연결과 명시적 소스 대조 재생성까지 후속 검증했다. 독립 의미/품질 수용은 별도다. 원본 source-bound 입력·과거 packet·gold·동결 상태는 변경하지 않았다. 이 진단은 stage0 준비 근거이며 실제 설치/index/MCP·독립 정책 의미·품질 수용을 대신하지 않는다.
 
 2026-10-15. 단계0은 **preparing**이다. [계획](./OPERATIONAL-ACCEPTANCE-PLAN.md)의 대상·기준을 [실행용 JSON](./OPERATIONAL-ACCEPTANCE-PROTOCOL.json)으로 옮겼고, [진행 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json)에 준비 근거를 연결했다. source 입력 후보와 runtime recipe 초안을 준비했으며 새 정답·검토 승인·확정된 실행 recipe가 없어 실행 허용은 false, 동결 기록은 null이다.
 
