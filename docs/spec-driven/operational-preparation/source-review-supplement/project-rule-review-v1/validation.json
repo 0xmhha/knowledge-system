@@ -1,0 +1,85 @@
+{
+  "kind": "project_source_local_kernel_not_runtime_mcp_or_independent_acceptance",
+  "go_version": "go version go1.26.9 darwin/arm64",
+  "lint_version": "golangci-lint has version 2.14.0 built with go1.26.8 from (unknown, modified: ?, mod sum: \"h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=\") on (unknown)",
+  "go_source_reference_commit": "6c72898ad38f84fc3a8f11c6d0c534b493930106",
+  "quality_checks": [
+    {
+      "kind": "build",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-project-rule-review-20261016/work/overlay.json",
+        "-c",
+        "-o",
+        "/private/tmp/ks-project-rule-review-20261016/work/project.test",
+        "./pkg/graph/valueflow"
+      ]
+    },
+    {
+      "kind": "fmt",
+      "exit_code": 0,
+      "command": [
+        "-l",
+        "/private/tmp/ks-project-rule-review-20261016/work/rules_test.go"
+      ]
+    },
+    {
+      "kind": "vet",
+      "exit_code": 0,
+      "command": [
+        "vet",
+        "-overlay=/private/tmp/ks-project-rule-review-20261016/work/overlay.json",
+        "./pkg/graph/valueflow"
+      ]
+    },
+    {
+      "kind": "lint",
+      "exit_code": 0,
+      "command": [
+        "run",
+        "--timeout=120s",
+        "./pkg/graph/valueflow"
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "mode": "normal",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-project-rule-review-20261016/work/overlay.json",
+        "-json",
+        "-count=1",
+        "-run=^TestProjectRule",
+        "-timeout=90s",
+        "./pkg/graph/valueflow"
+      ],
+      "function_observations": 51,
+      "syntax_controls": 5
+    },
+    {
+      "mode": "race",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-project-rule-review-20261016/work/overlay.json",
+        "-json",
+        "-count=1",
+        "-run=^TestProjectRule",
+        "-timeout=90s",
+        "-race",
+        "./pkg/graph/valueflow"
+      ],
+      "function_observations": 51,
+      "syntax_controls": 5
+    }
+  ],
+  "normalized_normal_race_equal": true,
+  "existing_tests_preserved": true,
+  "maintained_go_source_unchanged": true,
+  "source_analysis_invocations_per_mode": 102,
+  "analyzed_project_code_executed": false,
+  "public_input_scope": "source_packaging_separation_not_os_filesystem_isolation"
+}

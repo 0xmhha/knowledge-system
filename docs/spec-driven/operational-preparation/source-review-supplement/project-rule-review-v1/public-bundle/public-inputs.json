@@ -1,0 +1,823 @@
+{
+  "kind": "project_function_source_preparation_no_gold",
+  "snapshot_kind": "synthetic_source_bundle_not_retained_graph",
+  "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+  "cases": [
+    {
+      "id": "PROJECT-001",
+      "code": "func NewType(t string, internalType string, components []ArgumentMarshaling) (typ Type, err error) {\n\t// check that array brackets are equal if they exist\n\tif strings.Count(t, \"[\") != strings.Count(t, \"]\") {\n\t\treturn Type{}, errors.New(\"invalid arg type in abi\")\n\t}\n\ttyp.stringKind = t\n\n\t// if there are brackets, get ready to go into slice/array mode and\n\t// recursively create the type\n\tif strings.Count(t, \"[\") != 0 {\n\t\t// Note internalType can be empty here.\n\t\tsubInternal := internalType\n\t\tif i := strings.LastIndex(internalType, \"[\"); i != -1 {\n\t\t\tsubInternal = subInternal[:i]\n\t\t}\n\t\t// recursively embed the type\n\t\ti := strings.LastIndex(t, \"[\")\n\t\tembeddedType, err := NewType(t[:i], subInternal, components)\n\t\tif err != nil {\n\t\t\treturn Type{}, err\n\t\t}\n\t\t// grab the last cell and create a type from there\n\t\tsliced := t[i:]\n\t\t// grab the slice size with regexp\n\t\tre := regexp.MustCompile(\"[0-9]+\")\n\t\tintz := re.FindAllString(sliced, -1)\n\n\t\tif len(intz) == 0 {\n\t\t\t// is a slice\n\t\t\ttyp.T = SliceTy\n\t\t\ttyp.Elem = &embeddedType\n\t\t\ttyp.stringKind = embeddedType.stringKind + sliced\n\t\t} else if len(intz) == 1 {\n\t\t\t// is an array\n\t\t\ttyp.T = ArrayTy\n\t\t\ttyp.Elem = &embeddedType\n\t\t\ttyp.Size, err = strconv.Atoi(intz[0])\n\t\t\tif err != nil {\n\t\t\t\treturn Type{}, fmt.Errorf(\"abi: error parsing variable size: %v\", err)\n\t\t\t}\n\t\t\ttyp.stringKind = embeddedType.stringKind + sliced\n\t\t} else {\n\t\t\treturn Type{}, errors.New(\"invalid formatting of array type\")\n\t\t}\n\t\treturn typ, err\n\t}\n\t// parse the type and size of the abi-type.\n\tmatches := typeRegex.FindAllStringSubmatch(t, -1)\n\tif len(matches) == 0 {\n\t\treturn Type{}, fmt.Errorf(\"invalid type '%v'\", t)\n\t}\n\tparsedType := matches[0]\n\n\t// varSize is the size of the variable\n\tvar varSize int\n\tif len(parsedType[3]) > 0 {\n\t\tvar err error\n\t\tvarSize, err = strconv.Atoi(parsedType[2])\n\t\tif err != nil {\n\t\t\treturn Type{}, fmt.Errorf(\"abi: error parsing variable size: %v\", err)\n\t\t}\n\t} else {\n\t\tif parsedType[0] == \"uint\" || parsedType[0] == \"int\" {\n\t\t\t// this should fail because it means that there's something wrong with\n\t\t\t// the abi type (the compiler should always format it to the size...always)\n\t\t\treturn Type{}, fmt.Errorf(\"unsupported arg type: %s\", t)\n\t\t}\n\t}\n\t// varType is the parsed abi type\n\tswitch varType := parsedType[1]; varType {\n\tcase \"int\":\n\t\ttyp.Size = varSize\n\t\ttyp.T = IntTy\n\tcase \"uint\":\n\t\ttyp.Size = varSize\n\t\ttyp.T = UintTy\n\tcase \"bool\":\n\t\ttyp.T = BoolTy\n\tcase \"address\":\n\t\ttyp.Size = 20\n\t\ttyp.T = AddressTy\n\tcase \"string\":\n\t\ttyp.T = StringTy\n\tcase \"bytes\":\n\t\tif varSize == 0 {\n\t\t\ttyp.T = BytesTy\n\t\t} else {\n\t\t\tif varSize > 32 {\n\t\t\t\treturn Type{}, fmt.Errorf(\"unsupported arg type: %s\", t)\n\t\t\t}\n\t\t\ttyp.T = FixedBytesTy\n\t\t\ttyp.Size = varSize\n\t\t}\n\tcase \"tuple\":\n\t\tvar (\n\t\t\tfields     []reflect.StructField\n\t\t\telems      []*Type\n\t\t\tnames      []string\n\t\t\texpression string // canonical parameter expression\n\t\t\tused       = make(map[string]bool)\n\t\t)\n\t\texpression += \"(\"\n\t\tfor idx, c := range components {\n\t\t\tcType, err := NewType(c.Type, c.InternalType, c.Components)\n\t\t\tif err != nil {\n\t\t\t\treturn Type{}, err\n\t\t\t}\n\t\t\tname := ToCamelCase(c.Name)\n\t\t\tif name == \"\" {\n\t\t\t\treturn Type{}, errors.New(\"abi: purely anonymous or underscored field is not supported\")\n\t\t\t}\n\t\t\tfieldName := ResolveNameConflict(name, func(s string) bool { return used[s] })\n\t\t\tif err != nil {\n\t\t\t\treturn Type{}, err\n\t\t\t}\n\t\t\tused[fieldName] = true\n\t\t\tif !isValidFieldName(fieldName) {\n\t\t\t\treturn Type{}, fmt.Errorf(\"field %d has invalid name\", idx)\n\t\t\t}\n\t\t\tfields = append(fields, reflect.StructField{\n\t\t\t\tName: fieldName, // reflect.StructOf will panic for any exported field.\n\t\t\t\tType: cType.GetType(),\n\t\t\t\tTag:  reflect.StructTag(\"json:\\\"\" + c.Name + \"\\\"\"),\n\t\t\t})\n\t\t\telems = append(elems, &cType)\n\t\t\tnames = append(names, c.Name)\n\t\t\texpression += cType.stringKind\n\t\t\tif idx != len(components)-1 {\n\t\t\t\texpression += \",\"\n\t\t\t}\n\t\t}\n\t\texpression += \")\"\n\n\t\ttyp.TupleType = reflect.StructOf(fields)\n\t\ttyp.TupleElems = elems\n\t\ttyp.TupleRawNames = names\n\t\ttyp.T = TupleTy\n\t\ttyp.stringKind = expression\n\n\t\tconst structPrefix = \"struct \"\n\t\t// After solidity 0.5.10, a new field of abi \"internalType\"\n\t\t// is introduced. From that we can obtain the struct name\n\t\t// user defined in the source code.\n\t\tif internalType != \"\" && strings.HasPrefix(internalType, structPrefix) {\n\t\t\t// Foo.Bar type definition is not allowed in golang,\n\t\t\t// convert the format to FooBar\n\t\t\ttyp.TupleRawName = strings.ReplaceAll(internalType[len(structPrefix):], \".\", \"\")\n\t\t}\n\n\tcase \"function\":\n\t\ttyp.T = FunctionTy\n\t\ttyp.Size = 24\n\tdefault:\n\t\treturn Type{}, fmt.Errorf(\"unsupported arg type: %s\", t)\n\t}\n\n\treturn\n}",
+      "source": {
+        "node_id": "PROJECT-001",
+        "file": "accounts/abi/type.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "028e962f2548741e3f975bcd2c288a0f0cc42261f7a9e0f65df58de08b11ae54",
+        "language": "go",
+        "start_line": 70,
+        "start_byte": 1820,
+        "bytes": 4609,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "NewType"
+      }
+    },
+    {
+      "id": "PROJECT-002",
+      "code": "func (c *ChainConfig) LoadForks(path string) error {\n\tfile, err := os.ReadFile(path)\n\tif err != nil {\n\t\treturn fmt.Errorf(\"failed to read beacon chain config file: %v\", err)\n\t}\n\tconfig := make(map[string]string)\n\tif err := yaml.Unmarshal(file, &config); err != nil {\n\t\treturn fmt.Errorf(\"failed to parse beacon chain config file: %v\", err)\n\t}\n\tvar (\n\t\tversions = make(map[string][]byte)\n\t\tepochs   = make(map[string]uint64)\n\t)\n\tepochs[\"GENESIS\"] = 0\n\n\tfor key, value := range config {\n\t\tif strings.HasSuffix(key, \"_FORK_VERSION\") {\n\t\t\tname := key[:len(key)-len(\"_FORK_VERSION\")]\n\t\t\tif v, err := hexutil.Decode(value); err == nil {\n\t\t\t\tversions[name] = v\n\t\t\t} else {\n\t\t\t\treturn fmt.Errorf(\"failed to decode hex fork id %q in beacon chain config file: %v\", value, err)\n\t\t\t}\n\t\t}\n\t\tif strings.HasSuffix(key, \"_FORK_EPOCH\") {\n\t\t\tname := key[:len(key)-len(\"_FORK_EPOCH\")]\n\t\t\tif v, err := strconv.ParseUint(value, 10, 64); err == nil {\n\t\t\t\tepochs[name] = v\n\t\t\t} else {\n\t\t\t\treturn fmt.Errorf(\"failed to parse epoch number %q in beacon chain config file: %v\", value, err)\n\t\t\t}\n\t\t}\n\t}\n\tfor name, epoch := range epochs {\n\t\tif version, ok := versions[name]; ok {\n\t\t\tdelete(versions, name)\n\t\t\tc.AddFork(name, epoch, version)\n\t\t} else {\n\t\t\treturn fmt.Errorf(\"fork id missing for %q in beacon chain config file\", name)\n\t\t}\n\t}\n\tfor name := range versions {\n\t\treturn fmt.Errorf(\"epoch number missing for fork %q in beacon chain config file\", name)\n\t}\n\tsort.Sort(c.Forks)\n\treturn nil\n}",
+      "source": {
+        "node_id": "PROJECT-002",
+        "file": "beacon/types/config.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "214f980d009932cdfa85618ab00e26d1d626967774ebc1300de0d3f35174e7ec",
+        "language": "go",
+        "start_line": 130,
+        "start_byte": 3979,
+        "bytes": 1467,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "LoadForks"
+      }
+    },
+    {
+      "id": "PROJECT-003",
+      "code": "func doDocker(cmdline []string) {\n\tvar (\n\t\timage    = flag.Bool(\"image\", false, `Whether to build and push an arch specific docker image`)\n\t\tmanifest = flag.String(\"manifest\", \"\", `Push a multi-arch docker image for the specified architectures (usually \"amd64,arm64\")`)\n\t\tupload   = flag.String(\"upload\", \"\", `Where to upload the docker image (usually \"ethereum/client-go\")`)\n\t)\n\tflag.CommandLine.Parse(cmdline)\n\n\t// Skip building and pushing docker images for PR builds\n\tenv := build.Env()\n\tmaybeSkipArchive(env)\n\n\t// Retrieve the upload credentials and authenticate\n\tuser := getenvBase64(\"DOCKER_HUB_USERNAME\")\n\tpass := getenvBase64(\"DOCKER_HUB_PASSWORD\")\n\n\tif len(user) > 0 && len(pass) > 0 {\n\t\tauther := exec.Command(\"docker\", \"login\", \"-u\", string(user), \"--password-stdin\")\n\t\tauther.Stdin = bytes.NewReader(pass)\n\t\tbuild.MustRun(auther)\n\t}\n\t// Retrieve the version infos to build and push to the following paths:\n\t//  - ethereum/client-go:latest                            - Pushes to the master branch, Gstable only\n\t//  - ethereum/client-go:stable                            - Version tag publish on GitHub, Gstable only\n\t//  - ethereum/client-go:alltools-latest                   - Pushes to the master branch, Gstable & tools\n\t//  - ethereum/client-go:alltools-stable                   - Version tag publish on GitHub, Gstable & tools\n\t//  - ethereum/client-go:release-<major>.<minor>           - Version tag publish on GitHub, Gstable only\n\t//  - ethereum/client-go:alltools-release-<major>.<minor>  - Version tag publish on GitHub, Gstable & tools\n\t//  - ethereum/client-go:v<major>.<minor>.<patch>          - Version tag publish on GitHub, Gstable only\n\t//  - ethereum/client-go:alltools-v<major>.<minor>.<patch> - Version tag publish on GitHub, Gstable & tools\n\tvar tags []string\n\n\tswitch {\n\tcase env.Branch == \"master\":\n\t\ttags = []string{\"latest\"}\n\tcase strings.HasPrefix(env.Tag, \"v1.\"):\n\t\ttags = []string{\"stable\", fmt.Sprintf(\"release-1.%d\", params.VersionMinor), \"v\" + params.Version}\n\t}\n\t// If architecture specific image builds are requested, build and push them\n\tif *image {\n\t\tbuild.MustRunCommand(\"docker\", \"build\", \"--build-arg\", \"COMMIT=\"+env.Commit, \"--build-arg\", \"VERSION=\"+params.VersionWithMeta, \"--build-arg\", \"BUILDNUM=\"+env.Buildnum, \"--tag\", fmt.Sprintf(\"%s:TAG\", *upload), \".\")\n\t\tbuild.MustRunCommand(\"docker\", \"build\", \"--build-arg\", \"COMMIT=\"+env.Commit, \"--build-arg\", \"VERSION=\"+params.VersionWithMeta, \"--build-arg\", \"BUILDNUM=\"+env.Buildnum, \"--tag\", fmt.Sprintf(\"%s:alltools-TAG\", *upload), \"-f\", \"Dockerfile.alltools\", \".\")\n\n\t\t// Tag and upload the images to Docker Hub\n\t\tfor _, tag := range tags {\n\t\t\tgethImage := fmt.Sprintf(\"%s:%s-%s\", *upload, tag, runtime.GOARCH)\n\t\t\ttoolImage := fmt.Sprintf(\"%s:alltools-%s-%s\", *upload, tag, runtime.GOARCH)\n\n\t\t\t// If the image already exists (non version tag), check the build\n\t\t\t// number to prevent overwriting a newer commit if concurrent builds\n\t\t\t// are running. This is still a tiny bit racey if two published are\n\t\t\t// done at the same time, but that's extremely unlikely even on the\n\t\t\t// master branch.\n\t\t\tfor _, img := range []string{gethImage, toolImage} {\n\t\t\t\tif exec.Command(\"docker\", \"pull\", img).Run() != nil {\n\t\t\t\t\tcontinue // Generally the only failure is a missing image, which is good\n\t\t\t\t}\n\t\t\t\tbuildnum, err := exec.Command(\"docker\", \"inspect\", \"--format\", \"{{index .Config.Labels \\\"buildnum\\\"}}\", img).CombinedOutput()\n\t\t\t\tif err != nil {\n\t\t\t\t\tlog.Fatalf(\"Failed to inspect container: %v\\nOutput: %s\", err, string(buildnum))\n\t\t\t\t}\n\t\t\t\tbuildnum = bytes.TrimSpace(buildnum)\n\n\t\t\t\tif len(buildnum) > 0 && len(env.Buildnum) > 0 {\n\t\t\t\t\toldnum, err := strconv.Atoi(string(buildnum))\n\t\t\t\t\tif err != nil {\n\t\t\t\t\t\tlog.Fatalf(\"Failed to parse old image build number: %v\", err)\n\t\t\t\t\t}\n\t\t\t\t\tnewnum, err := strconv.Atoi(env.Buildnum)\n\t\t\t\t\tif err != nil {\n\t\t\t\t\t\tlog.Fatalf(\"Failed to parse current build number: %v\", err)\n\t\t\t\t\t}\n\t\t\t\t\tif oldnum > newnum {\n\t\t\t\t\t\tlog.Fatalf(\"Current build number %d not newer than existing %d\", newnum, oldnum)\n\t\t\t\t\t} else {\n\t\t\t\t\t\tlog.Printf(\"Updating %s from build %d to %d\", img, oldnum, newnum)\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\tbuild.MustRunCommand(\"docker\", \"image\", \"tag\", fmt.Sprintf(\"%s:TAG\", *upload), gethImage)\n\t\t\tbuild.MustRunCommand(\"docker\", \"image\", \"tag\", fmt.Sprintf(\"%s:alltools-TAG\", *upload), toolImage)\n\t\t\tbuild.MustRunCommand(\"docker\", \"push\", gethImage)\n\t\t\tbuild.MustRunCommand(\"docker\", \"push\", toolImage)\n\t\t}\n\t}\n\t// If multi-arch image manifest push is requested, assemble it\n\tif len(*manifest) != 0 {\n\t\t// Since different architectures are pushed by different builders, wait\n\t\t// until all required images are updated.\n\t\tvar mismatch bool\n\t\tfor i := 0; i < 2; i++ { // 2 attempts, second is race check\n\t\t\tmismatch = false // hope there's no mismatch now\n\n\t\t\tfor _, tag := range tags {\n\t\t\t\tfor _, arch := range strings.Split(*manifest, \",\") {\n\t\t\t\t\tgethImage := fmt.Sprintf(\"%s:%s-%s\", *upload, tag, arch)\n\t\t\t\t\ttoolImage := fmt.Sprintf(\"%s:alltools-%s-%s\", *upload, tag, arch)\n\n\t\t\t\t\tfor _, img := range []string{gethImage, toolImage} {\n\t\t\t\t\t\tif out, err := exec.Command(\"docker\", \"pull\", img).CombinedOutput(); err != nil {\n\t\t\t\t\t\t\tlog.Printf(\"Required image %s unavailable: %v\\nOutput: %s\", img, err, out)\n\t\t\t\t\t\t\tmismatch = true\n\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t}\n\t\t\t\t\t\tbuildnum, err := exec.Command(\"docker\", \"inspect\", \"--format\", \"{{index .Config.Labels \\\"buildnum\\\"}}\", img).CombinedOutput()\n\t\t\t\t\t\tif err != nil {\n\t\t\t\t\t\t\tlog.Fatalf(\"Failed to inspect container: %v\\nOutput: %s\", err, string(buildnum))\n\t\t\t\t\t\t}\n\t\t\t\t\t\tbuildnum = bytes.TrimSpace(buildnum)\n\n\t\t\t\t\t\tif string(buildnum) != env.Buildnum {\n\t\t\t\t\t\t\tlog.Printf(\"Build number mismatch on %s: want %s, have %s\", img, env.Buildnum, buildnum)\n\t\t\t\t\t\t\tmismatch = true\n\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tif mismatch {\n\t\t\t\t\t\tbreak\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tif mismatch {\n\t\t\t\t\tbreak\n\t\t\t\t}\n\t\t\t}\n\t\t\tif mismatch {\n\t\t\t\t// Build numbers mismatching, retry in a short time to\n\t\t\t\t// avoid concurrent fails in both publisher images. If\n\t\t\t\t// however the retry failed too, it means the concurrent\n\t\t\t\t// builder is still crunching, let that do the publish.\n\t\t\t\tif i == 0 {\n\t\t\t\t\ttime.Sleep(30 * time.Second)\n\t\t\t\t}\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tbreak\n\t\t}\n\t\tif mismatch {\n\t\t\tlog.Println(\"Relinquishing publish to other builder\")\n\t\t\treturn\n\t\t}\n\t\t// Assemble and push the Gstable manifest image\n\t\tfor _, tag := range tags {\n\t\t\tgethImage := fmt.Sprintf(\"%s:%s\", *upload, tag)\n\n\t\t\tvar gethSubImages []string\n\t\t\tfor _, arch := range strings.Split(*manifest, \",\") {\n\t\t\t\tgethSubImages = append(gethSubImages, gethImage+\"-\"+arch)\n\t\t\t}\n\t\t\tbuild.MustRunCommand(\"docker\", append([]string{\"manifest\", \"create\", gethImage}, gethSubImages...)...)\n\t\t\tbuild.MustRunCommand(\"docker\", \"manifest\", \"push\", gethImage)\n\t\t}\n\t\t// Assemble and push the alltools manifest image\n\t\tfor _, tag := range tags {\n\t\t\ttoolImage := fmt.Sprintf(\"%s:alltools-%s\", *upload, tag)\n\n\t\t\tvar toolSubImages []string\n\t\t\tfor _, arch := range strings.Split(*manifest, \",\") {\n\t\t\t\ttoolSubImages = append(toolSubImages, toolImage+\"-\"+arch)\n\t\t\t}\n\t\t\tbuild.MustRunCommand(\"docker\", append([]string{\"manifest\", \"create\", toolImage}, toolSubImages...)...)\n\t\t\tbuild.MustRunCommand(\"docker\", \"manifest\", \"push\", toolImage)\n\t\t}\n\t}\n}",
+      "source": {
+        "node_id": "PROJECT-003",
+        "file": "build/ci.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "32e0750df3c70108846c3e8d6ce8710a5320124ef4233ff6aec803789fff0bf0",
+        "language": "go",
+        "start_line": 514,
+        "start_byte": 16694,
+        "bytes": 7212,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "doDocker"
+      }
+    },
+    {
+      "id": "PROJECT-004",
+      "code": "func doDebianSource(cmdline []string) {\n\tvar (\n\t\tcachedir = flag.String(\"cachedir\", \"./build/cache\", `Filesystem path to cache the downloaded Go bundles at`)\n\t\tsigner   = flag.String(\"signer\", \"\", `Signing key name, also used as package author`)\n\t\tupload   = flag.String(\"upload\", \"\", `Where to upload the source package (usually \"ethereum/ethereum\")`)\n\t\tsshUser  = flag.String(\"sftp-user\", \"\", `Username for SFTP upload (usually \"geth-ci\")`)\n\t\tworkdir  = flag.String(\"workdir\", \"\", `Output directory for packages (uses temp dir if unset)`)\n\t\tnow      = time.Now()\n\t)\n\tflag.CommandLine.Parse(cmdline)\n\t*workdir = makeWorkdir(*workdir)\n\tenv := build.Env()\n\ttc := new(build.GoToolchain)\n\tmaybeSkipArchive(env)\n\n\t// Import the signing key.\n\tif key := getenvBase64(\"PPA_SIGNING_KEY\"); len(key) > 0 {\n\t\tgpg := exec.Command(\"gpg\", \"--import\")\n\t\tgpg.Stdin = bytes.NewReader(key)\n\t\tbuild.MustRun(gpg)\n\t}\n\t// Download and verify the Go source packages.\n\tvar (\n\t\tgobootbundle = downloadGoBootstrapSources(*cachedir)\n\t\tgobundle     = downloadGoSources(*cachedir)\n\t)\n\t// Download all the dependencies needed to build the sources and run the ci script\n\tsrcdepfetch := tc.Go(\"mod\", \"download\")\n\tsrcdepfetch.Env = append(srcdepfetch.Env, \"GOPATH=\"+filepath.Join(*workdir, \"modgopath\"))\n\tbuild.MustRun(srcdepfetch)\n\n\tcidepfetch := tc.Go(\"run\", \"./build/ci.go\")\n\tcidepfetch.Env = append(cidepfetch.Env, \"GOPATH=\"+filepath.Join(*workdir, \"modgopath\"))\n\tcidepfetch.Run() // Command fails, don't care, we only need the deps to start it\n\n\t// Create Debian packages and upload them.\n\tfor _, pkg := range debPackages {\n\t\tfor distro, goboot := range debDistroGoBoots {\n\t\t\t// Prepare the debian package with the go-ethereum sources.\n\t\t\tmeta := newDebMetadata(distro, goboot, *signer, env, now, pkg.Name, pkg.Version, pkg.Executables)\n\t\t\tpkgdir := stageDebianSource(*workdir, meta)\n\n\t\t\t// Add bootstrapper Go source code\n\t\t\tif err := build.ExtractArchive(gobootbundle, pkgdir); err != nil {\n\t\t\t\tlog.Fatalf(\"Failed to extract bootstrapper Go sources: %v\", err)\n\t\t\t}\n\t\t\tif err := os.Rename(filepath.Join(pkgdir, \"go\"), filepath.Join(pkgdir, \".goboot\")); err != nil {\n\t\t\t\tlog.Fatalf(\"Failed to rename bootstrapper Go source folder: %v\", err)\n\t\t\t}\n\t\t\t// Add builder Go source code\n\t\t\tif err := build.ExtractArchive(gobundle, pkgdir); err != nil {\n\t\t\t\tlog.Fatalf(\"Failed to extract builder Go sources: %v\", err)\n\t\t\t}\n\t\t\tif err := os.Rename(filepath.Join(pkgdir, \"go\"), filepath.Join(pkgdir, \".go\")); err != nil {\n\t\t\t\tlog.Fatalf(\"Failed to rename builder Go source folder: %v\", err)\n\t\t\t}\n\t\t\t// Add all dependency modules in compressed form\n\t\t\tos.MkdirAll(filepath.Join(pkgdir, \".mod\", \"cache\"), 0755)\n\t\t\tif err := cp.CopyAll(filepath.Join(pkgdir, \".mod\", \"cache\", \"download\"), filepath.Join(*workdir, \"modgopath\", \"pkg\", \"mod\", \"cache\", \"download\")); err != nil {\n\t\t\t\tlog.Fatalf(\"Failed to copy Go module dependencies: %v\", err)\n\t\t\t}\n\t\t\t// Run the packaging and upload to the PPA\n\t\t\tdebuild := exec.Command(\"debuild\", \"-S\", \"-sa\", \"-us\", \"-uc\", \"-d\", \"-Zxz\", \"-nc\")\n\t\t\tdebuild.Dir = pkgdir\n\t\t\tbuild.MustRun(debuild)\n\n\t\t\tvar (\n\t\t\t\tbasename  = fmt.Sprintf(\"%s_%s\", meta.Name(), meta.VersionString())\n\t\t\t\tsource    = filepath.Join(*workdir, basename+\".tar.xz\")\n\t\t\t\tdsc       = filepath.Join(*workdir, basename+\".dsc\")\n\t\t\t\tchanges   = filepath.Join(*workdir, basename+\"_source.changes\")\n\t\t\t\tbuildinfo = filepath.Join(*workdir, basename+\"_source.buildinfo\")\n\t\t\t)\n\t\t\tif *signer != \"\" {\n\t\t\t\tbuild.MustRunCommand(\"debsign\", changes)\n\t\t\t}\n\t\t\tif *upload != \"\" {\n\t\t\t\tppaUpload(*workdir, *upload, *sshUser, []string{source, dsc, changes, buildinfo})\n\t\t\t}\n\t\t}\n\t}\n}",
+      "source": {
+        "node_id": "PROJECT-004",
+        "file": "build/ci.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "624ad15e5f3c6cb66abca63392319e27ceb885a3d8194f73b934c2dbcdf4ca69",
+        "language": "go",
+        "start_line": 680,
+        "start_byte": 23928,
+        "bytes": 3619,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "doDebianSource"
+      }
+    },
+    {
+      "id": "PROJECT-005",
+      "code": "func getFiles() []string {\n\tcmd := exec.Command(\"git\", \"ls-tree\", \"-r\", \"--name-only\", \"HEAD\")\n\tvar files []string\n\terr := doLines(cmd, func(line string) {\n\t\tif skipFile(line) {\n\t\t\treturn\n\t\t}\n\t\text := filepath.Ext(line)\n\t\tfor _, wantExt := range extensions {\n\t\t\tif ext == wantExt {\n\t\t\t\tgoto keep\n\t\t\t}\n\t\t}\n\t\treturn\n\tkeep:\n\t\tfiles = append(files, line)\n\t})\n\tif err != nil {\n\t\tlog.Fatal(\"error getting files:\", err)\n\t}\n\treturn files\n}",
+      "source": {
+        "node_id": "PROJECT-005",
+        "file": "build/update-license.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "880cc07aa49e346942ab06c781a96027ca0cb7b3460ee13867f255857cc18514",
+        "language": "go",
+        "start_line": 196,
+        "start_byte": 4840,
+        "bytes": 431,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "getFiles"
+      }
+    },
+    {
+      "id": "PROJECT-006",
+      "code": "func gitAuthors(files []string) []string {\n\tcmds := []string{\"shortlog\", \"-s\", \"-n\", \"-e\", \"HEAD\", \"--\"}\n\tcmds = append(cmds, files...)\n\tcmd := exec.Command(\"git\", cmds...)\n\tvar authors []string\n\terr := doLines(cmd, func(line string) {\n\t\tm := authorRegexp.FindStringSubmatch(line)\n\t\tif len(m) > 1 {\n\t\t\tauthors = append(authors, m[1])\n\t\t}\n\t})\n\tif err != nil {\n\t\tlog.Fatalln(\"error getting authors:\", err)\n\t}\n\treturn authors\n}",
+      "source": {
+        "node_id": "PROJECT-006",
+        "file": "build/update-license.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "6a1b5837cb35e51fcff0960be1a6334b6815a1fa40db0abe503084ab43c13973",
+        "language": "go",
+        "start_line": 221,
+        "start_byte": 5332,
+        "bytes": 424,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "gitAuthors"
+      }
+    },
+    {
+      "id": "PROJECT-007",
+      "code": "func mailmapLookup(authors []string) []string {\n\tif len(authors) == 0 {\n\t\treturn nil\n\t}\n\tcmds := []string{\"check-mailmap\", \"--\"}\n\tcmds = append(cmds, authors...)\n\tcmd := exec.Command(\"git\", cmds...)\n\tvar translated []string\n\terr := doLines(cmd, func(line string) {\n\t\ttranslated = append(translated, line)\n\t})\n\tif err != nil {\n\t\tlog.Fatalln(\"error translating authors:\", err)\n\t}\n\treturn translated\n}",
+      "source": {
+        "node_id": "PROJECT-007",
+        "file": "build/update-license.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "868785603779f25b4c89252086e210a17735817999f56d9cbf75601000abbac6",
+        "language": "go",
+        "start_line": 255,
+        "start_byte": 6223,
+        "bytes": 398,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "mailmapLookup"
+      }
+    },
+    {
+      "id": "PROJECT-008",
+      "code": "func fileInfo(file string) (*info, error) {\n\tinfo := &info{file: file, Year: int64(time.Now().Year())}\n\tcmd := exec.Command(\"git\", \"log\", \"--follow\", \"--find-renames=80\", \"--find-copies=80\", \"--pretty=format:%ai\", \"--\", file)\n\terr := doLines(cmd, func(line string) {\n\t\ty, err := strconv.ParseInt(line[:4], 10, 64)\n\t\tif err != nil {\n\t\t\tfmt.Printf(\"cannot parse year: %q\", line[:4])\n\t\t}\n\t\tif y < info.Year {\n\t\t\tinfo.Year = y\n\t\t}\n\t})\n\treturn info, err\n}",
+      "source": {
+        "node_id": "PROJECT-008",
+        "file": "build/update-license.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "828907b23aa0154c5ca4b0e4a8c3c38282caf2093088a7bca23da2f33a7b13ef",
+        "language": "go",
+        "start_line": 354,
+        "start_byte": 8564,
+        "bytes": 450,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "fileInfo"
+      }
+    },
+    {
+      "id": "PROJECT-009",
+      "code": "func parseExtAddr(spec string) (ip net.IP, port int, ok bool) {\n\tip = net.ParseIP(spec)\n\tif ip != nil {\n\t\treturn ip, 0, true\n\t}\n\thost, portstr, err := net.SplitHostPort(spec)\n\tif err != nil {\n\t\treturn nil, 0, false\n\t}\n\tip = net.ParseIP(host)\n\tif ip == nil {\n\t\treturn nil, 0, false\n\t}\n\tport, err = strconv.Atoi(portstr)\n\tif err != nil {\n\t\treturn nil, 0, false\n\t}\n\treturn ip, port, true\n}",
+      "source": {
+        "node_id": "PROJECT-009",
+        "file": "cmd/devp2p/discv4cmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "f2ac3a6820e113d4bc6a58462eccc3e15693ddf2a44b45d83b818afebb379a78",
+        "language": "go",
+        "start_line": 288,
+        "start_byte": 7296,
+        "bytes": 386,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "parseExtAddr"
+      }
+    },
+    {
+      "id": "PROJECT-010",
+      "code": "func parseFilterLimit(args []string) (int, error) {\n\tlimit := -1\n\tfor i, arg := range args {\n\t\tif arg == \"-limit\" {\n\t\t\tif i == len(args)-1 {\n\t\t\t\treturn -1, errors.New(\"-limit requires an argument\")\n\t\t\t}\n\t\t\tn, err := strconv.Atoi(args[i+1])\n\t\t\tif err != nil {\n\t\t\t\treturn -1, fmt.Errorf(\"invalid -limit %q\", args[i+1])\n\t\t\t}\n\t\t\tlimit = n\n\t\t}\n\t}\n\treturn limit, nil\n}",
+      "source": {
+        "node_id": "PROJECT-010",
+        "file": "cmd/devp2p/nodesetcmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "5b8528f5d5eea0b4dd4e2f333ca550e1a9933089099453ef714b17dabf0498e3",
+        "language": "go",
+        "start_line": 168,
+        "start_byte": 4204,
+        "bytes": 362,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "parseFilterLimit"
+      }
+    },
+    {
+      "id": "PROJECT-011",
+      "code": "func block(ctx *cli.Context) error {\n\tnum, err := strconv.ParseUint(ctx.Args().First(), 10, 64)\n\tif err != nil {\n\t\treturn fmt.Errorf(\"invalid block number: %w\", err)\n\t}\n\te, err := open(ctx, num/uint64(ctx.Int(eraSizeFlag.Name)))\n\tif err != nil {\n\t\treturn fmt.Errorf(\"error opening era1: %w\", err)\n\t}\n\tdefer e.Close()\n\t// Read block with number.\n\tblock, err := e.GetBlockByNumber(num)\n\tif err != nil {\n\t\treturn fmt.Errorf(\"error reading block %d: %w\", num, err)\n\t}\n\t// Convert block to JSON and print.\n\tval := ethapi.RPCMarshalBlock(block, ctx.Bool(txsFlag.Name), ctx.Bool(txsFlag.Name), params.MainnetChainConfig)\n\tb, err := json.MarshalIndent(val, \"\", \"  \")\n\tif err != nil {\n\t\treturn fmt.Errorf(\"error marshaling json: %w\", err)\n\t}\n\tfmt.Println(string(b))\n\treturn nil\n}",
+      "source": {
+        "node_id": "PROJECT-011",
+        "file": "cmd/era/main.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "4ccfbadccbbf143a66c3b29f741ccaa03a15a6e088818957c7d0e67d14f0f3db",
+        "language": "go",
+        "start_line": 108,
+        "start_byte": 2503,
+        "bytes": 770,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "block"
+      }
+    },
+    {
+      "id": "PROJECT-012",
+      "code": "func info(ctx *cli.Context) error {\n\tepoch, err := strconv.ParseUint(ctx.Args().First(), 10, 64)\n\tif err != nil {\n\t\treturn fmt.Errorf(\"invalid epoch number: %w\", err)\n\t}\n\te, err := open(ctx, epoch)\n\tif err != nil {\n\t\treturn err\n\t}\n\tdefer e.Close()\n\tacc, err := e.Accumulator()\n\tif err != nil {\n\t\treturn fmt.Errorf(\"error reading accumulator: %w\", err)\n\t}\n\ttd, err := e.InitialTD()\n\tif err != nil {\n\t\treturn fmt.Errorf(\"error reading total difficulty: %w\", err)\n\t}\n\tinfo := struct {\n\t\tAccumulator     common.Hash `json:\"accumulator\"`\n\t\tTotalDifficulty *big.Int    `json:\"totalDifficulty\"`\n\t\tStartBlock      uint64      `json:\"startBlock\"`\n\t\tCount           uint64      `json:\"count\"`\n\t}{\n\t\tacc, td, e.Start(), e.Count(),\n\t}\n\tb, _ := json.MarshalIndent(info, \"\", \"  \")\n\tfmt.Println(string(b))\n\treturn nil\n}",
+      "source": {
+        "node_id": "PROJECT-012",
+        "file": "cmd/era/main.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "4fcbd974046c7aa7d9ea9a87f36e607b29b5e355a394fda8ef64a51f7d9bdf33",
+        "language": "go",
+        "start_line": 134,
+        "start_byte": 3339,
+        "bytes": 804,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "info"
+      }
+    },
+    {
+      "id": "PROJECT-013",
+      "code": "func validateEnodeURL(enode string) bool {\n\tif !strings.HasPrefix(enode, \"enode://\") {\n\t\tlog.Error(\"Invalid enode URL: must start with 'enode://'\")\n\t\treturn false\n\t}\n\n\tu, err := url.Parse(enode)\n\tif err != nil {\n\t\tlog.Error(\"Invalid enode URL format\", \"err\", err)\n\t\treturn false\n\t}\n\n\t// Check if the hex part is valid (should be 128 characters after enode://)\n\tif len(u.User.String()) != 128 {\n\t\tlog.Error(\"Invalid public key in enode URL: must be 128 hex characters\")\n\t\treturn false\n\t}\n\n\t// Validate the host:port part\n\thostPort := u.Host\n\tif hostPort == \"\" {\n\t\tlog.Error(\"Missing host:port in enode URL\")\n\t\treturn false\n\t}\n\n\thost, port, err := net.SplitHostPort(hostPort)\n\tif err != nil {\n\t\tlog.Error(\"Invalid host:port format in enode URL\", \"err\", err)\n\t\treturn false\n\t}\n\n\t// Validate port\n\tif _, err := strconv.Atoi(port); err != nil {\n\t\tlog.Error(\"Invalid port number in enode URL\")\n\t\treturn false\n\t}\n\n\t// Validate IP address\n\tif net.ParseIP(host) == nil {\n\t\tlog.Error(\"Invalid IP address in enode URL\")\n\t\treturn false\n\t}\n\n\treturn true\n}",
+      "source": {
+        "node_id": "PROJECT-013",
+        "file": "cmd/genesis_generator/genesis_generator.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "0c6208c9a3fa71a8d1330a5393efb0ddf71ab231d2a76b49662ce06458e812b9",
+        "language": "go",
+        "start_line": 522,
+        "start_byte": 16169,
+        "bytes": 1042,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "validateEnodeURL"
+      }
+    },
+    {
+      "id": "PROJECT-014",
+      "code": "func readDefaultInt(def int) int {\n\tfor {\n\t\ttext := promptInput(\"> \")\n\t\tif text = strings.TrimSpace(text); text == \"\" {\n\t\t\treturn def\n\t\t}\n\t\tval, err := strconv.Atoi(strings.TrimSpace(text))\n\t\tif err != nil {\n\t\t\tlog.Error(\"Invalid input, expected integer\", \"err\", err)\n\t\t\tcontinue\n\t\t}\n\t\treturn val\n\t}\n}",
+      "source": {
+        "node_id": "PROJECT-014",
+        "file": "cmd/genesis_generator/reader.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "d3d0a1534885003ea97e69060f122d5d42358a29196b24ee90d0d5fa8b3026c8",
+        "language": "go",
+        "start_line": 80,
+        "start_byte": 2492,
+        "bytes": 301,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "readDefaultInt"
+      }
+    },
+    {
+      "id": "PROJECT-015",
+      "code": "func exportChain(ctx *cli.Context) error {\n\tif ctx.Args().Len() < 1 {\n\t\tutils.Fatalf(\"This command requires an argument.\")\n\t}\n\n\tstack, _ := makeConfigNode(ctx)\n\tdefer stack.Close()\n\n\tchain, db := utils.MakeChain(ctx, stack, true)\n\tdefer db.Close()\n\tstart := time.Now()\n\n\tvar err error\n\tfp := ctx.Args().First()\n\tif ctx.Args().Len() < 3 {\n\t\terr = utils.ExportChain(chain, fp)\n\t} else {\n\t\t// This can be improved to allow for numbers larger than 9223372036854775807\n\t\tfirst, ferr := strconv.ParseInt(ctx.Args().Get(1), 10, 64)\n\t\tlast, lerr := strconv.ParseInt(ctx.Args().Get(2), 10, 64)\n\t\tif ferr != nil || lerr != nil {\n\t\t\tutils.Fatalf(\"Export error in parsing parameters: block number not an integer\\n\")\n\t\t}\n\t\tif first < 0 || last < 0 {\n\t\t\tutils.Fatalf(\"Export error: block number must be greater than 0\\n\")\n\t\t}\n\t\tif head := chain.CurrentSnapBlock(); uint64(last) > head.Number.Uint64() {\n\t\t\tutils.Fatalf(\"Export error: block number %d larger than head block %d\\n\", uint64(last), head.Number.Uint64())\n\t\t}\n\t\terr = utils.ExportAppendChain(chain, fp, uint64(first), uint64(last))\n\t}\n\tif err != nil {\n\t\tutils.Fatalf(\"Export error: %v\\n\", err)\n\t}\n\tfmt.Printf(\"Export done in %v\\n\", time.Since(start))\n\treturn nil\n}",
+      "source": {
+        "node_id": "PROJECT-015",
+        "file": "cmd/gstable/chaincmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "56f64b11612aa0669283dd41a5e194e9a87116c74c12769f6ba893b46beadbe5",
+        "language": "go",
+        "start_line": 395,
+        "start_byte": 12316,
+        "bytes": 1210,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "exportChain"
+      }
+    },
+    {
+      "id": "PROJECT-016",
+      "code": "func exportHistory(ctx *cli.Context) error {\n\tif ctx.Args().Len() != 3 {\n\t\tutils.Fatalf(\"usage: %s\", ctx.Command.ArgsUsage)\n\t}\n\n\tstack, _ := makeConfigNode(ctx)\n\tdefer stack.Close()\n\n\tchain, _ := utils.MakeChain(ctx, stack, true)\n\tstart := time.Now()\n\n\tvar (\n\t\tdir         = ctx.Args().Get(0)\n\t\tfirst, ferr = strconv.ParseInt(ctx.Args().Get(1), 10, 64)\n\t\tlast, lerr  = strconv.ParseInt(ctx.Args().Get(2), 10, 64)\n\t)\n\tif ferr != nil || lerr != nil {\n\t\tutils.Fatalf(\"Export error in parsing parameters: block number not an integer\\n\")\n\t}\n\tif first < 0 || last < 0 {\n\t\tutils.Fatalf(\"Export error: block number must be greater than 0\\n\")\n\t}\n\tif head := chain.CurrentSnapBlock(); uint64(last) > head.Number.Uint64() {\n\t\tutils.Fatalf(\"Export error: block number %d larger than head block %d\\n\", uint64(last), head.Number.Uint64())\n\t}\n\terr := utils.ExportHistory(chain, dir, uint64(first), uint64(last), uint64(era.MaxEra1Size))\n\tif err != nil {\n\t\tutils.Fatalf(\"Export error: %v\\n\", err)\n\t}\n\tfmt.Printf(\"Export done in %v\\n\", time.Since(start))\n\treturn nil\n}",
+      "source": {
+        "node_id": "PROJECT-016",
+        "file": "cmd/gstable/chaincmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "0322271c400255c9cd3fca394865640d4c4a3ec3f29d0e7363464d6aa97f237e",
+        "language": "go",
+        "start_line": 491,
+        "start_byte": 14954,
+        "bytes": 1051,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "exportHistory"
+      }
+    },
+    {
+      "id": "PROJECT-017",
+      "code": "func parseDumpConfig(ctx *cli.Context, stack *node.Node) (*state.DumpConfig, ethdb.Database, common.Hash, error) {\n\tdb := utils.MakeChainDatabase(ctx, stack, true)\n\tdefer db.Close()\n\n\tvar header *types.Header\n\tif ctx.NArg() > 1 {\n\t\treturn nil, nil, common.Hash{}, fmt.Errorf(\"expected 1 argument (number or hash), got %d\", ctx.NArg())\n\t}\n\tif ctx.NArg() == 1 {\n\t\targ := ctx.Args().First()\n\t\tif hashish(arg) {\n\t\t\thash := common.HexToHash(arg)\n\t\t\tif number := rawdb.ReadHeaderNumber(db, hash); number != nil {\n\t\t\t\theader = rawdb.ReadHeader(db, hash, *number)\n\t\t\t} else {\n\t\t\t\treturn nil, nil, common.Hash{}, fmt.Errorf(\"block %x not found\", hash)\n\t\t\t}\n\t\t} else {\n\t\t\tnumber, err := strconv.ParseUint(arg, 10, 64)\n\t\t\tif err != nil {\n\t\t\t\treturn nil, nil, common.Hash{}, err\n\t\t\t}\n\t\t\tif hash := rawdb.ReadCanonicalHash(db, number); hash != (common.Hash{}) {\n\t\t\t\theader = rawdb.ReadHeader(db, hash, number)\n\t\t\t} else {\n\t\t\t\treturn nil, nil, common.Hash{}, fmt.Errorf(\"header for block %d not found\", number)\n\t\t\t}\n\t\t}\n\t} else {\n\t\t// Use latest\n\t\theader = rawdb.ReadHeadHeader(db)\n\t}\n\tif header == nil {\n\t\treturn nil, nil, common.Hash{}, errors.New(\"no head block found\")\n\t}\n\tstartArg := common.FromHex(ctx.String(utils.StartKeyFlag.Name))\n\tvar start common.Hash\n\tswitch len(startArg) {\n\tcase 0: // common.Hash\n\tcase 32:\n\t\tstart = common.BytesToHash(startArg)\n\tcase 20:\n\t\tstart = crypto.Keccak256Hash(startArg)\n\t\tlog.Info(\"Converting start-address to hash\", \"address\", common.BytesToAddress(startArg), \"hash\", start.Hex())\n\tdefault:\n\t\treturn nil, nil, common.Hash{}, fmt.Errorf(\"invalid start argument: %x. 20 or 32 hex-encoded bytes required\", startArg)\n\t}\n\tvar conf = &state.DumpConfig{\n\t\tSkipCode:          ctx.Bool(utils.ExcludeCodeFlag.Name),\n\t\tSkipStorage:       ctx.Bool(utils.ExcludeStorageFlag.Name),\n\t\tOnlyWithAddresses: !ctx.Bool(utils.IncludeIncompletesFlag.Name),\n\t\tStart:             start.Bytes(),\n\t\tMax:               ctx.Uint64(utils.DumpLimitFlag.Name),\n\t}\n\tlog.Info(\"State dump configured\", \"block\", header.Number, \"hash\", header.Hash().Hex(),\n\t\t\"skipcode\", conf.SkipCode, \"skipstorage\", conf.SkipStorage,\n\t\t\"start\", hexutil.Encode(conf.Start), \"limit\", conf.Max)\n\treturn conf, db, header.Root, nil\n}",
+      "source": {
+        "node_id": "PROJECT-017",
+        "file": "cmd/gstable/chaincmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "d791e6c2ac1b2e92381f666301c1e2d8d09a557352244bf6d5481266460d6124",
+        "language": "go",
+        "start_line": 547,
+        "start_byte": 16711,
+        "bytes": 2206,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "parseDumpConfig"
+      }
+    },
+    {
+      "id": "PROJECT-018",
+      "code": "func hashish(x string) bool {\n\t_, err := strconv.Atoi(x)\n\treturn err != nil\n}",
+      "source": {
+        "node_id": "PROJECT-018",
+        "file": "cmd/gstable/chaincmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "8670e1ca09be2b4fda7d81f1cc4a731b1550e12041ee6278927a19ebb6cc4a04",
+        "language": "go",
+        "start_line": 631,
+        "start_byte": 19553,
+        "bytes": 77,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "hashish"
+      }
+    },
+    {
+      "id": "PROJECT-019",
+      "code": "func dbDumpTrie(ctx *cli.Context) error {\n\tif ctx.NArg() < 3 {\n\t\treturn fmt.Errorf(\"required arguments: %v\", ctx.Command.ArgsUsage)\n\t}\n\tstack, _ := makeConfigNode(ctx)\n\tdefer stack.Close()\n\n\tdb := utils.MakeChainDatabase(ctx, stack, true)\n\tdefer db.Close()\n\n\ttriedb := utils.MakeTrieDatabase(ctx, db, false, true, false)\n\tdefer triedb.Close()\n\n\tvar (\n\t\tstate   []byte\n\t\tstorage []byte\n\t\taccount []byte\n\t\tstart   []byte\n\t\tmax     = int64(-1)\n\t\terr     error\n\t)\n\tif state, err = hexutil.Decode(ctx.Args().Get(0)); err != nil {\n\t\tlog.Info(\"Could not decode the state root\", \"error\", err)\n\t\treturn err\n\t}\n\tif account, err = hexutil.Decode(ctx.Args().Get(1)); err != nil {\n\t\tlog.Info(\"Could not decode the account hash\", \"error\", err)\n\t\treturn err\n\t}\n\tif storage, err = hexutil.Decode(ctx.Args().Get(2)); err != nil {\n\t\tlog.Info(\"Could not decode the storage trie root\", \"error\", err)\n\t\treturn err\n\t}\n\tif ctx.NArg() > 3 {\n\t\tif start, err = hexutil.Decode(ctx.Args().Get(3)); err != nil {\n\t\t\tlog.Info(\"Could not decode the seek position\", \"error\", err)\n\t\t\treturn err\n\t\t}\n\t}\n\tif ctx.NArg() > 4 {\n\t\tif max, err = strconv.ParseInt(ctx.Args().Get(4), 10, 64); err != nil {\n\t\t\tlog.Info(\"Could not decode the max count\", \"error\", err)\n\t\t\treturn err\n\t\t}\n\t}\n\tid := trie.StorageTrieID(common.BytesToHash(state), common.BytesToHash(account), common.BytesToHash(storage))\n\ttheTrie, err := trie.New(id, triedb)\n\tif err != nil {\n\t\treturn err\n\t}\n\ttrieIt, err := theTrie.NodeIterator(start)\n\tif err != nil {\n\t\treturn err\n\t}\n\tvar count int64\n\tit := trie.NewIterator(trieIt)\n\tfor it.Next() {\n\t\tif max > 0 && count == max {\n\t\t\tfmt.Printf(\"Exiting after %d values\\n\", count)\n\t\t\tbreak\n\t\t}\n\t\tfmt.Printf(\"  %d. key %#x: %#x\\n\", count, it.Key, it.Value)\n\t\tcount++\n\t}\n\treturn it.Err\n}",
+      "source": {
+        "node_id": "PROJECT-019",
+        "file": "cmd/gstable/dbcmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "cd73617a81dc08d72323addd0809abbdbb2b06e3e09e8d86fa8b0cc8a4c4174b",
+        "language": "go",
+        "start_line": 510,
+        "start_byte": 14965,
+        "bytes": 1754,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "dbDumpTrie"
+      }
+    },
+    {
+      "id": "PROJECT-020",
+      "code": "func freezerInspect(ctx *cli.Context) error {\n\tif ctx.NArg() < 4 {\n\t\treturn fmt.Errorf(\"required arguments: %v\", ctx.Command.ArgsUsage)\n\t}\n\tvar (\n\t\tfreezer = ctx.Args().Get(0)\n\t\ttable   = ctx.Args().Get(1)\n\t)\n\tstart, err := strconv.ParseInt(ctx.Args().Get(2), 10, 64)\n\tif err != nil {\n\t\tlog.Info(\"Could not read start-param\", \"err\", err)\n\t\treturn err\n\t}\n\tend, err := strconv.ParseInt(ctx.Args().Get(3), 10, 64)\n\tif err != nil {\n\t\tlog.Info(\"Could not read count param\", \"err\", err)\n\t\treturn err\n\t}\n\tstack, _ := makeConfigNode(ctx)\n\tancient := stack.ResolveAncient(\"chaindata\", ctx.String(utils.AncientFlag.Name))\n\tstack.Close()\n\treturn rawdb.InspectFreezerTable(ancient, freezer, table, start, end)\n}",
+      "source": {
+        "node_id": "PROJECT-020",
+        "file": "cmd/gstable/dbcmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "f484f10cbccd87da4b23f9906c0bb272760f4960faaa3c50cfab4c6299cfe52a",
+        "language": "go",
+        "start_line": 577,
+        "start_byte": 16721,
+        "bytes": 699,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "freezerInspect"
+      }
+    },
+    {
+      "id": "PROJECT-021",
+      "code": "func importLDBdata(ctx *cli.Context) error {\n\tstart := 0\n\tswitch ctx.NArg() {\n\tcase 1:\n\t\tbreak\n\tcase 2:\n\t\ts, err := strconv.Atoi(ctx.Args().Get(1))\n\t\tif err != nil {\n\t\t\treturn fmt.Errorf(\"second arg must be an integer: %v\", err)\n\t\t}\n\t\tstart = s\n\tdefault:\n\t\treturn fmt.Errorf(\"required arguments: %v\", ctx.Command.ArgsUsage)\n\t}\n\tvar (\n\t\tfName     = ctx.Args().Get(0)\n\t\tstack, _  = makeConfigNode(ctx)\n\t\tinterrupt = make(chan os.Signal, 1)\n\t\tstop      = make(chan struct{})\n\t)\n\tdefer stack.Close()\n\tsignal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)\n\tdefer signal.Stop(interrupt)\n\tdefer close(interrupt)\n\tgo func() {\n\t\tif _, ok := <-interrupt; ok {\n\t\t\tlog.Info(\"Interrupted during ldb import, stopping at next batch\")\n\t\t}\n\t\tclose(stop)\n\t}()\n\tdb := utils.MakeChainDatabase(ctx, stack, false)\n\tdefer db.Close()\n\treturn utils.ImportLDBData(db, fName, int64(start), stop)\n}",
+      "source": {
+        "node_id": "PROJECT-021",
+        "file": "cmd/gstable/dbcmd.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "137b83f63e6e96ac43a840d1c85f9fe42a96b755dba1483b3d0b4caebd5bcc52",
+        "language": "go",
+        "start_line": 601,
+        "start_byte": 17422,
+        "bytes": 874,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "importLDBdata"
+      }
+    },
+    {
+      "id": "PROJECT-022",
+      "code": "func MakeAddress(ks *keystore.KeyStore, account string) (accounts.Account, error) {\n\t// If the specified account is a valid address, return it\n\tif common.IsHexAddress(account) {\n\t\treturn accounts.Account{Address: common.HexToAddress(account)}, nil\n\t}\n\t// Otherwise try to interpret the account as a keystore index\n\tindex, err := strconv.Atoi(account)\n\tif err != nil || index < 0 {\n\t\treturn accounts.Account{}, fmt.Errorf(\"invalid account address or index %q\", account)\n\t}\n\tlog.Warn(\"-------------------------------------------------------------------\")\n\tlog.Warn(\"Referring to accounts by order in the keystore folder is dangerous!\")\n\tlog.Warn(\"This functionality is deprecated and will be removed in the future!\")\n\tlog.Warn(\"Please use explicit addresses! (can search via `geth account list`)\")\n\tlog.Warn(\"-------------------------------------------------------------------\")\n\n\taccs := ks.Accounts()\n\tif len(accs) <= index {\n\t\treturn accounts.Account{}, fmt.Errorf(\"index %d higher than number of accounts %d\", index, len(accs))\n\t}\n\treturn accs[index], nil\n}",
+      "source": {
+        "node_id": "PROJECT-022",
+        "file": "cmd/utils/flags.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "c1ff656edf7fe83bd499f25a7ead0084748a00455ca452bef13392b6a1079e2a",
+        "language": "go",
+        "start_line": 1267,
+        "start_byte": 43438,
+        "bytes": 1059,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "MakeAddress"
+      }
+    },
+    {
+      "id": "PROJECT-023",
+      "code": "func setRequiredBlocks(ctx *cli.Context, cfg *ethconfig.Config) {\n\trequiredBlocks := ctx.String(EthRequiredBlocksFlag.Name)\n\tif requiredBlocks == \"\" {\n\t\tif ctx.IsSet(LegacyWhitelistFlag.Name) {\n\t\t\tlog.Warn(\"The flag --whitelist is deprecated and will be removed, please use --eth.requiredblocks\")\n\t\t\trequiredBlocks = ctx.String(LegacyWhitelistFlag.Name)\n\t\t} else {\n\t\t\treturn\n\t\t}\n\t}\n\tcfg.RequiredBlocks = make(map[uint64]common.Hash)\n\tfor _, entry := range strings.Split(requiredBlocks, \",\") {\n\t\tparts := strings.Split(entry, \"=\")\n\t\tif len(parts) != 2 {\n\t\t\tFatalf(\"Invalid required block entry: %s\", entry)\n\t\t}\n\t\tnumber, err := strconv.ParseUint(parts[0], 0, 64)\n\t\tif err != nil {\n\t\t\tFatalf(\"Invalid required block number %s: %v\", parts[0], err)\n\t\t}\n\t\tvar hash common.Hash\n\t\tif err = hash.UnmarshalText([]byte(parts[1])); err != nil {\n\t\t\tFatalf(\"Invalid required block hash %s: %v\", parts[1], err)\n\t\t}\n\t\tcfg.RequiredBlocks[number] = hash\n\t}\n}",
+      "source": {
+        "node_id": "PROJECT-023",
+        "file": "cmd/utils/flags.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "5165eef709f065afed751b2f210f6d6ed9229eb3c3e9a9b740a12a6b07a550b6",
+        "language": "go",
+        "start_line": 1537,
+        "start_byte": 52289,
+        "bytes": 941,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "setRequiredBlocks"
+      }
+    },
+    {
+      "id": "PROJECT-024",
+      "code": "func DecodeUint64(input string) (uint64, error) {\n\traw, err := checkNumber(input)\n\tif err != nil {\n\t\treturn 0, err\n\t}\n\tdec, err := strconv.ParseUint(raw, 16, 64)\n\tif err != nil {\n\t\terr = mapError(err)\n\t}\n\treturn dec, err\n}",
+      "source": {
+        "node_id": "PROJECT-024",
+        "file": "common/hexutil/hexutil.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "5db4e35413f38d39f2190e4b42472cc071ecc0a5bdd47e3367f6388bc356d978",
+        "language": "go",
+        "start_line": 92,
+        "start_byte": 2753,
+        "bytes": 222,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "DecodeUint64"
+      }
+    },
+    {
+      "id": "PROJECT-025",
+      "code": "func ParseUint64(s string) (uint64, bool) {\n\tif s == \"\" {\n\t\treturn 0, true\n\t}\n\tif len(s) >= 2 && (s[:2] == \"0x\" || s[:2] == \"0X\") {\n\t\tv, err := strconv.ParseUint(s[2:], 16, 64)\n\t\treturn v, err == nil\n\t}\n\tv, err := strconv.ParseUint(s, 10, 64)\n\treturn v, err == nil\n}",
+      "source": {
+        "node_id": "PROJECT-025",
+        "file": "common/math/integer.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "67868864f205b95e0bc1caf0cf7e1318b5fa303c13ff2a99dc3323a1a719dca3",
+        "language": "go",
+        "start_line": 72,
+        "start_byte": 2134,
+        "bytes": 266,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "ParseUint64"
+      }
+    },
+    {
+      "id": "PROJECT-026",
+      "code": "func (d *Decimal) UnmarshalJSON(input []byte) error {\n\tif !isString(input) {\n\t\treturn &json.UnmarshalTypeError{Value: \"non-string\", Type: reflect.TypeOf(uint64(0))}\n\t}\n\tif i, err := strconv.ParseInt(string(input[1:len(input)-1]), 10, 64); err == nil {\n\t\t*d = Decimal(i)\n\t\treturn nil\n\t} else {\n\t\treturn err\n\t}\n}",
+      "source": {
+        "node_id": "PROJECT-026",
+        "file": "common/types.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "cf184cb6e22709777a653d4fda21a54204ec8b018dc1cc634020a307a700405e",
+        "language": "go",
+        "start_line": 469,
+        "start_byte": 13034,
+        "bytes": 310,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "UnmarshalJSON"
+      }
+    },
+    {
+      "id": "PROJECT-027",
+      "code": "func Fuzz(data []byte) int {\n\tif len(data) < 32 {\n\t\treturn -1\n\t}\n\ttmpFile, err := os.CreateTemp(\"\", \"\")\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer os.Remove(tmpFile.Name())\n\tdefer tmpFile.Close()\n\n\ttestSecKey, testPubKey := createKeyPair()\n\t// Create message\n\ttmpFile.Write(data)\n\tif err = tmpFile.Close(); err != nil {\n\t\tpanic(err)\n\t}\n\t// Fuzz comments\n\tvar untrustedComment string\n\tvar trustedComment string\n\tf := fuzz.NewFromGoFuzz(data)\n\tf.Fuzz(&untrustedComment)\n\tf.Fuzz(&trustedComment)\n\tfmt.Printf(\"untrusted: %v\\n\", untrustedComment)\n\tfmt.Printf(\"trusted: %v\\n\", trustedComment)\n\n\terr = SignifySignFile(tmpFile.Name(), tmpFile.Name()+\".sig\", testSecKey, untrustedComment, trustedComment)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer os.Remove(tmpFile.Name() + \".sig\")\n\n\tsignify := \"signify\"\n\tpath := os.Getenv(\"SIGNIFY\")\n\tif path != \"\" {\n\t\tsignify = path\n\t}\n\n\t_, err := exec.LookPath(signify)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\t// Write the public key into the file to pass it as\n\t// an argument to signify-openbsd\n\tpubKeyFile, err := os.CreateTemp(\"\", \"\")\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer os.Remove(pubKeyFile.Name())\n\tdefer pubKeyFile.Close()\n\tpubKeyFile.WriteString(\"untrusted comment: signify public key\\n\")\n\tpubKeyFile.WriteString(testPubKey)\n\tpubKeyFile.WriteString(\"\\n\")\n\n\tcmd := exec.Command(signify, \"-V\", \"-p\", pubKeyFile.Name(), \"-x\", tmpFile.Name()+\".sig\", \"-m\", tmpFile.Name())\n\tif output, err := cmd.CombinedOutput(); err != nil {\n\t\tpanic(fmt.Sprintf(\"could not verify the file: %v, output: \\n%s\", err, output))\n\t}\n\n\t// Verify the signature using a golang library\n\tsig, err := minisign.NewSignatureFromFile(tmpFile.Name() + \".sig\")\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\tpKey, err := minisign.NewPublicKey(testPubKey)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\tvalid, err := pKey.VerifyFromFile(tmpFile.Name(), sig)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tif !valid {\n\t\tpanic(\"invalid signature\")\n\t}\n\treturn 1\n}",
+      "source": {
+        "node_id": "PROJECT-027",
+        "file": "crypto/signify/signify_fuzz.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "cfa4c107b8b5ecf68e7b4e318089ca21312fb8d4f7ced66752b5a751e4306a77",
+        "language": "go",
+        "start_line": 33,
+        "start_byte": 967,
+        "bytes": 1914,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "Fuzz"
+      }
+    },
+    {
+      "id": "PROJECT-028",
+      "code": "func createKeyPair() (string, string) {\n\t// Create key and put it in correct format\n\ttmpKey, err := os.CreateTemp(\"\", \"\")\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer os.Remove(tmpKey.Name())\n\tdefer os.Remove(tmpKey.Name() + \".pub\")\n\tdefer os.Remove(tmpKey.Name() + \".sec\")\n\tcmd := exec.Command(\"signify\", \"-G\", \"-n\", \"-p\", tmpKey.Name()+\".pub\", \"-s\", tmpKey.Name()+\".sec\")\n\tif output, err := cmd.CombinedOutput(); err != nil {\n\t\tpanic(fmt.Sprintf(\"could not verify the file: %v, output: \\n%s\", err, output))\n\t}\n\tsecKey, err := getKey(tmpKey.Name() + \".sec\")\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tpubKey, err := getKey(tmpKey.Name() + \".pub\")\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\treturn secKey, pubKey\n}",
+      "source": {
+        "node_id": "PROJECT-028",
+        "file": "crypto/signify/signify_fuzz.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "8777e505fc51e72e9d35b5621c010dec4a479e9b5a96050063f81701e10cb427",
+        "language": "go",
+        "start_line": 128,
+        "start_byte": 3149,
+        "bytes": 691,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "createKeyPair"
+      }
+    },
+    {
+      "id": "PROJECT-029",
+      "code": "func (b *Long) UnmarshalGraphQL(input interface{}) error {\n\tvar err error\n\tswitch input := input.(type) {\n\tcase string:\n\t\t// uncomment to support hex values\n\t\tif strings.HasPrefix(input, \"0x\") {\n\t\t\t// apply leniency and support hex representations of longs.\n\t\t\tvalue, err := hexutil.DecodeUint64(input)\n\t\t\t*b = Long(value)\n\t\t\treturn err\n\t\t} else {\n\t\t\tvalue, err := strconv.ParseInt(input, 10, 64)\n\t\t\t*b = Long(value)\n\t\t\treturn err\n\t\t}\n\tcase int32:\n\t\t*b = Long(input)\n\tcase int64:\n\t\t*b = Long(input)\n\tcase float64:\n\t\t*b = Long(input)\n\tdefault:\n\t\terr = fmt.Errorf(\"unexpected type %T for Long\", input)\n\t}\n\treturn err\n}",
+      "source": {
+        "node_id": "PROJECT-029",
+        "file": "graphql/graphql.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "4cf8cc55c6719c0f7b206c4cabefbec89134acd7eb1387c9d667b9aeb7076a86",
+        "language": "go",
+        "start_line": 54,
+        "start_byte": 1920,
+        "bytes": 616,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "UnmarshalGraphQL"
+      }
+    },
+    {
+      "id": "PROJECT-030",
+      "code": "func getDate(commit string) string {\n\tif commit == \"\" {\n\t\treturn \"\"\n\t}\n\tout := RunGit(\"show\", \"-s\", \"--format=%ct\", commit)\n\tif out == \"\" {\n\t\treturn \"\"\n\t}\n\tdate, err := strconv.ParseInt(strings.TrimSpace(out), 10, 64)\n\tif err != nil {\n\t\tpanic(fmt.Sprintf(\"failed to parse git commit date: %v\", err))\n\t}\n\treturn time.Unix(date, 0).Format(\"20060102\")\n}",
+      "source": {
+        "node_id": "PROJECT-030",
+        "file": "internal/build/env.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "7d928f472e7b0e91807884f341ab595f7e2000a8b8c14ad099cfe52c2d31db75",
+        "language": "go",
+        "start_line": 136,
+        "start_byte": 4830,
+        "bytes": 350,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "getDate"
+      }
+    },
+    {
+      "id": "PROJECT-031",
+      "code": "func (g *GoToolchain) goTool(command string, args ...string) *exec.Cmd {\n\tif g.Root == \"\" {\n\t\tg.Root = runtime.GOROOT()\n\t}\n\ttool := exec.Command(filepath.Join(g.Root, \"bin\", \"go\"), command) // nolint: gosec\n\ttool.Args = append(tool.Args, args...)\n\ttool.Env = append(tool.Env, \"GOROOT=\"+g.Root)\n\n\t// Forward environment variables to the tool, but skip compiler target settings.\n\t// TODO: what about GOARM?\n\tskip := map[string]struct{}{\"GOROOT\": {}, \"GOARCH\": {}, \"GOOS\": {}, \"GOBIN\": {}, \"CC\": {}}\n\tfor _, e := range os.Environ() {\n\t\tif i := strings.IndexByte(e, '='); i >= 0 {\n\t\t\tif _, ok := skip[e[:i]]; ok {\n\t\t\t\tcontinue\n\t\t\t}\n\t\t}\n\t\ttool.Env = append(tool.Env, e)\n\t}\n\treturn tool\n}",
+      "source": {
+        "node_id": "PROJECT-031",
+        "file": "internal/build/gotool.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "5b25f0d2e1c6f2729d0568d66320278349c3b7daaa7196c1018e0ce14f661e77",
+        "language": "go",
+        "start_line": 63,
+        "start_byte": 1914,
+        "bytes": 682,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "goTool"
+      }
+    },
+    {
+      "id": "PROJECT-032",
+      "code": "func MustRunCommand(cmd string, args ...string) {\n\tMustRun(exec.Command(cmd, args...))\n}",
+      "source": {
+        "node_id": "PROJECT-032",
+        "file": "internal/build/util.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "a222ec4e91cc51fb9a43e4f76b7f53e1016572b77f63eedbccc015c82fb5c20b",
+        "language": "go",
+        "start_line": 67,
+        "start_byte": 1594,
+        "bytes": 88,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "MustRunCommand"
+      }
+    },
+    {
+      "id": "PROJECT-033",
+      "code": "func MustRunCommandWithOutput(cmd string, args ...string) {\n\tinterval := time.NewTicker(time.Minute)\n\tdone := make(chan struct{})\n\tdefer interval.Stop()\n\tdefer close(done)\n\tgo func() {\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-interval.C:\n\t\t\t\tfmt.Printf(\"Waiting for command %q\\n\", cmd)\n\t\t\tcase <-done:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\tMustRun(exec.Command(cmd, args...))\n}",
+      "source": {
+        "node_id": "PROJECT-033",
+        "file": "internal/build/util.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "06512abd7e346b2c2a1d6f0ff90efb8a284b0759c0520549ac4d766a269c815c",
+        "language": "go",
+        "start_line": 74,
+        "start_byte": 1890,
+        "bytes": 354,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "MustRunCommandWithOutput"
+      }
+    },
+    {
+      "id": "PROJECT-034",
+      "code": "func RunGit(args ...string) string {\n\tcmd := exec.Command(\"git\", args...)\n\tvar stdout, stderr bytes.Buffer\n\tcmd.Stdout, cmd.Stderr = &stdout, &stderr\n\tif err := cmd.Run(); err != nil {\n\t\tif e, ok := err.(*exec.Error); ok && e.Err == exec.ErrNotFound {\n\t\t\tif !warnedAboutGit {\n\t\t\t\tlog.Println(\"Warning: can't find 'git' in PATH\")\n\t\t\t\twarnedAboutGit = true\n\t\t\t}\n\t\t\treturn \"\"\n\t\t}\n\t\tlog.Fatal(strings.Join(cmd.Args, \" \"), \": \", err, \"\\n\", stderr.String())\n\t}\n\treturn strings.TrimSpace(stdout.String())\n}",
+      "source": {
+        "node_id": "PROJECT-034",
+        "file": "internal/build/util.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "5536bf46fc064c91ab6e34c30fae3f3176062f7e837f5625c4fcdbdfce1affa8",
+        "language": "go",
+        "start_line": 96,
+        "start_byte": 2370,
+        "bytes": 499,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "RunGit"
+      }
+    },
+    {
+      "id": "PROJECT-035",
+      "code": "func UploadSFTP(identityFile, host, dir string, files []string) error {\n\tsftp := exec.Command(\"sftp\")\n\tsftp.Stderr = os.Stderr\n\tif identityFile != \"\" {\n\t\tsftp.Args = append(sftp.Args, \"-i\", identityFile)\n\t}\n\tsftp.Args = append(sftp.Args, host)\n\tfmt.Println(\">>>\", printArgs(sftp.Args))\n\tif *DryRunFlag {\n\t\treturn nil\n\t}\n\n\tstdin, err := sftp.StdinPipe()\n\tif err != nil {\n\t\treturn fmt.Errorf(\"can't create stdin pipe for sftp: %v\", err)\n\t}\n\tstdout, err := sftp.StdoutPipe()\n\tif err != nil {\n\t\treturn fmt.Errorf(\"can't create stdout pipe for sftp: %v\", err)\n\t}\n\tif err := sftp.Start(); err != nil {\n\t\treturn err\n\t}\n\tin := io.MultiWriter(stdin, os.Stdout)\n\tfor _, f := range files {\n\t\tfmt.Fprintln(in, \"put\", f, path.Join(dir, filepath.Base(f)))\n\t}\n\tfmt.Fprintln(in, \"exit\")\n\t// Some issue with the PPA sftp server makes it so the server does not\n\t// respond properly to a 'bye', 'exit' or 'quit' from the client.\n\t// To work around that, we check the output, and when we see the client\n\t// exit command, we do a hard exit.\n\t// See\n\t// https://github.com/kolban-google/sftp-gcs/issues/23\n\t// https://github.com/mscdex/ssh2/pull/1111\n\taborted := false\n\tgo func() {\n\t\tscanner := bufio.NewScanner(stdout)\n\t\tfor scanner.Scan() {\n\t\t\ttxt := scanner.Text()\n\t\t\tfmt.Println(txt)\n\t\t\tif txt == \"sftp> exit\" {\n\t\t\t\t// Give it .5 seconds to exit (server might be fixed), then\n\t\t\t\t// hard kill it from the outside\n\t\t\t\ttime.Sleep(500 * time.Millisecond)\n\t\t\t\taborted = true\n\t\t\t\tsftp.Process.Kill()\n\t\t\t}\n\t\t}\n\t}()\n\tstdin.Close()\n\terr = sftp.Wait()\n\tif aborted {\n\t\treturn nil\n\t}\n\treturn err\n}",
+      "source": {
+        "node_id": "PROJECT-035",
+        "file": "internal/build/util.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "48b70d57a10eecd43b9fedb20658594ea95dff8bf39c50fc2b40bc743437d553",
+        "language": "go",
+        "start_line": 153,
+        "start_byte": 4241,
+        "bytes": 1568,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "UploadSFTP"
+      }
+    },
+    {
+      "id": "PROJECT-036",
+      "code": "func ReadDir(dir, network string) ([]string, error) {\n\tentries, err := os.ReadDir(dir)\n\tif err != nil {\n\t\treturn nil, fmt.Errorf(\"error reading directory %s: %w\", dir, err)\n\t}\n\tvar (\n\t\tnext = uint64(0)\n\t\teras []string\n\t)\n\tfor _, entry := range entries {\n\t\tif path.Ext(entry.Name()) != \".era1\" {\n\t\t\tcontinue\n\t\t}\n\t\tparts := strings.Split(entry.Name(), \"-\")\n\t\tif len(parts) != 3 || parts[0] != network {\n\t\t\t// invalid era1 filename, skip\n\t\t\tcontinue\n\t\t}\n\t\tif epoch, err := strconv.ParseUint(parts[1], 10, 64); err != nil {\n\t\t\treturn nil, fmt.Errorf(\"malformed era1 filename: %s\", entry.Name())\n\t\t} else if epoch != next {\n\t\t\treturn nil, fmt.Errorf(\"missing epoch %d\", next)\n\t\t}\n\t\tnext += 1\n\t\teras = append(eras, entry.Name())\n\t}\n\treturn eras, nil\n}",
+      "source": {
+        "node_id": "PROJECT-036",
+        "file": "internal/era/era.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "7a05ee73dbe401a48167eee5c055e30b4d3e551c17baa0fa0888eb5479e20375",
+        "language": "go",
+        "start_line": 57,
+        "start_byte": 1709,
+        "bytes": 745,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "ReadDir"
+      }
+    },
+    {
+      "id": "PROJECT-037",
+      "code": "func (h *GlogHandler) Vmodule(ruleset string) error {\n\tvar filter []pattern\n\tfor _, rule := range strings.Split(ruleset, \",\") {\n\t\t// Empty strings such as from a trailing comma can be ignored\n\t\tif len(rule) == 0 {\n\t\t\tcontinue\n\t\t}\n\t\t// Ensure we have a pattern = level filter rule\n\t\tparts := strings.Split(rule, \"=\")\n\t\tif len(parts) != 2 {\n\t\t\treturn errVmoduleSyntax\n\t\t}\n\t\tparts[0] = strings.TrimSpace(parts[0])\n\t\tparts[1] = strings.TrimSpace(parts[1])\n\t\tif len(parts[0]) == 0 || len(parts[1]) == 0 {\n\t\t\treturn errVmoduleSyntax\n\t\t}\n\t\t// Parse the level and if correct, assemble the filter rule\n\t\tl, err := strconv.Atoi(parts[1])\n\t\tif err != nil {\n\t\t\treturn errVmoduleSyntax\n\t\t}\n\t\tlevel := FromLegacyLevel(l)\n\n\t\tif level == LevelCrit {\n\t\t\tcontinue // Ignore. It's harmless but no point in paying the overhead.\n\t\t}\n\t\t// Compile the rule pattern into a regular expression\n\t\tmatcher := \".*\"\n\t\tfor _, comp := range strings.Split(parts[0], \"/\") {\n\t\t\tif comp == \"*\" {\n\t\t\t\tmatcher += \"(/.*)?\"\n\t\t\t} else if comp != \"\" {\n\t\t\t\tmatcher += \"/\" + regexp.QuoteMeta(comp)\n\t\t\t}\n\t\t}\n\t\tif !strings.HasSuffix(parts[0], \".go\") {\n\t\t\tmatcher += \"/[^/]+\\\\.go\"\n\t\t}\n\t\tmatcher = matcher + \"$\"\n\n\t\tre, _ := regexp.Compile(matcher)\n\t\tfilter = append(filter, pattern{re, level})\n\t}\n\t// Swap out the vmodule pattern for the new filter system\n\th.lock.Lock()\n\tdefer h.lock.Unlock()\n\n\th.patterns = filter\n\th.siteCache = make(map[uintptr]slog.Level)\n\th.override.Store(len(filter) != 0)\n\n\treturn nil\n}",
+      "source": {
+        "node_id": "PROJECT-037",
+        "file": "log/handler_glog.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "ff1beeeeb1351deff7527a3567efb273cd4b67f2717fea7812255f3af002197d",
+        "language": "go",
+        "start_line": 86,
+        "start_byte": 2995,
+        "bytes": 1462,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "Vmodule"
+      }
+    },
+    {
+      "id": "PROJECT-038",
+      "code": "func ReadDiskStats(stats *DiskStats) error {\n\t// Open the process disk IO counter file\n\tinf, err := os.Open(fmt.Sprintf(\"/proc/%d/io\", os.Getpid()))\n\tif err != nil {\n\t\treturn err\n\t}\n\tdefer inf.Close()\n\tin := bufio.NewReader(inf)\n\n\t// Iterate over the IO counter, and extract what we need\n\tfor {\n\t\t// Read the next line and split to key and value\n\t\tline, err := in.ReadString('\\n')\n\t\tif err != nil {\n\t\t\tif err == io.EOF {\n\t\t\t\treturn nil\n\t\t\t}\n\t\t\treturn err\n\t\t}\n\t\tparts := strings.Split(line, \":\")\n\t\tif len(parts) != 2 {\n\t\t\tcontinue\n\t\t}\n\t\tkey := strings.TrimSpace(parts[0])\n\t\tvalue, err := strconv.ParseInt(strings.TrimSpace(parts[1]), 10, 64)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\n\t\t// Update the counter based on the key\n\t\tswitch key {\n\t\tcase \"syscr\":\n\t\t\tstats.ReadCount = value\n\t\tcase \"syscw\":\n\t\t\tstats.WriteCount = value\n\t\tcase \"rchar\":\n\t\t\tstats.ReadBytes = value\n\t\tcase \"wchar\":\n\t\t\tstats.WriteBytes = value\n\t\t}\n\t}\n}",
+      "source": {
+        "node_id": "PROJECT-038",
+        "file": "metrics/disk_linux.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "e5a925c8dcb194ab4195ea3e070a5ee126e3549cd766e8eddb92290f468fff8a",
+        "language": "go",
+        "start_line": 31,
+        "start_byte": 1027,
+        "bytes": 916,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "ReadDiskStats"
+      }
+    },
+    {
+      "id": "PROJECT-039",
+      "code": "func (w *gzipResponseWriter) init() {\n\tif w.inited {\n\t\treturn\n\t}\n\tw.inited = true\n\n\thdr := w.resp.Header()\n\tlength := hdr.Get(\"content-length\")\n\tif len(length) > 0 {\n\t\tif n, err := strconv.ParseUint(length, 10, 64); err != nil {\n\t\t\tw.hasLength = true\n\t\t\tw.contentLength = n\n\t\t}\n\t}\n\n\t// Setting Transfer-Encoding to \"identity\" explicitly disables compression. net/http\n\t// also recognizes this header value and uses it to disable \"chunked\" transfer\n\t// encoding, trimming the header from the response. This means downstream handlers can\n\t// set this without harm, even if they aren't wrapped by newGzipHandler.\n\t//\n\t// In go-ethereum, we use this signal to disable compression for certain error\n\t// responses which are flushed out close to the write deadline of the response. For\n\t// these cases, we want to avoid chunked transfer encoding and compression because\n\t// they require additional output that may not get written in time.\n\tpassthrough := hdr.Get(\"transfer-encoding\") == \"identity\"\n\tif !passthrough {\n\t\tw.gz = gzPool.Get().(*gzip.Writer)\n\t\tw.gz.Reset(w.resp)\n\t\thdr.Del(\"content-length\")\n\t\thdr.Set(\"content-encoding\", \"gzip\")\n\t}\n}",
+      "source": {
+        "node_id": "PROJECT-039",
+        "file": "node/rpcstack.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "0c565c6aad6c759d942ea6fe281b9ec10e48f4597afb305b8a854d8c6041f2e0",
+        "language": "go",
+        "start_line": 493,
+        "start_byte": 13962,
+        "bytes": 1138,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "init"
+      }
+    },
+    {
+      "id": "PROJECT-040",
+      "code": "func predictAddr(t *netutil.IPTracker) (net.IP, uint16) {\n\tep := t.PredictEndpoint()\n\tif ep == \"\" {\n\t\treturn nil, 0\n\t}\n\tipString, portString, _ := net.SplitHostPort(ep)\n\tip := net.ParseIP(ipString)\n\tport, err := strconv.ParseUint(portString, 10, 16)\n\tif err != nil {\n\t\treturn nil, 0\n\t}\n\treturn ip, uint16(port)\n}",
+      "source": {
+        "node_id": "PROJECT-040",
+        "file": "p2p/enode/localnode.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "48267627ad00d43becf2849ad273412114342ae0ae1d74447461044b1d4e8145",
+        "language": "go",
+        "start_line": 280,
+        "start_byte": 7662,
+        "bytes": 312,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "predictAddr"
+      }
+    },
+    {
+      "id": "PROJECT-041",
+      "code": "func parseComplete(rawurl string) (*Node, error) {\n\tvar (\n\t\tid               *ecdsa.PublicKey\n\t\ttcpPort, udpPort uint64\n\t)\n\tu, err := url.Parse(rawurl)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tif u.Scheme != \"enode\" {\n\t\treturn nil, errors.New(\"invalid URL scheme, want \\\"enode\\\"\")\n\t}\n\t// Parse the Node ID from the user portion.\n\tif u.User == nil {\n\t\treturn nil, errors.New(\"does not contain node ID\")\n\t}\n\tif id, err = parsePubkey(u.User.String()); err != nil {\n\t\treturn nil, fmt.Errorf(\"invalid public key (%v)\", err)\n\t}\n\t// Parse the IP address.\n\tip := net.ParseIP(u.Hostname())\n\tif ip == nil {\n\t\tips, err := lookupIPFunc(u.Hostname())\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tip = ips[0]\n\t}\n\t// Ensure the IP is 4 bytes long for IPv4 addresses.\n\tif ipv4 := ip.To4(); ipv4 != nil {\n\t\tip = ipv4\n\t}\n\t// Parse the port numbers.\n\tif tcpPort, err = strconv.ParseUint(u.Port(), 10, 16); err != nil {\n\t\treturn nil, errors.New(\"invalid port\")\n\t}\n\tudpPort = tcpPort\n\tqv := u.Query()\n\tif qv.Get(\"discport\") != \"\" {\n\t\tudpPort, err = strconv.ParseUint(qv.Get(\"discport\"), 10, 16)\n\t\tif err != nil {\n\t\t\treturn nil, errors.New(\"invalid discport in query\")\n\t\t}\n\t}\n\treturn NewV4(id, ip, int(tcpPort), int(udpPort)), nil\n}",
+      "source": {
+        "node_id": "PROJECT-041",
+        "file": "p2p/enode/urlv4.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "d99396f4ba1a37986eb86a16ad9da1b2c07fb79ddb1e844324c88b200c4291d1",
+        "language": "go",
+        "start_line": 110,
+        "start_byte": 3209,
+        "bytes": 1206,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "parseComplete"
+      }
+    },
+    {
+      "id": "PROJECT-042",
+      "code": "func assignTCPPort() (uint16, error) {\n\tl, err := net.Listen(\"tcp\", \"127.0.0.1:0\")\n\tif err != nil {\n\t\treturn 0, err\n\t}\n\tl.Close()\n\t_, port, err := net.SplitHostPort(l.Addr().String())\n\tif err != nil {\n\t\treturn 0, err\n\t}\n\tp, err := strconv.ParseUint(port, 10, 16)\n\tif err != nil {\n\t\treturn 0, err\n\t}\n\treturn uint16(p), nil\n}",
+      "source": {
+        "node_id": "PROJECT-042",
+        "file": "p2p/simulations/adapters/types.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "08b540d6441ff7b6bdcff52ff9f625b49ac74661b99f4c7b7afb945c2e1e854f",
+        "language": "go",
+        "start_line": 236,
+        "start_byte": 6862,
+        "bytes": 323,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "assignTCPPort"
+      }
+    },
+    {
+      "id": "PROJECT-043",
+      "code": "func (s *Server) StartMocker(w http.ResponseWriter, req *http.Request) {\n\ts.mockerMtx.Lock()\n\tdefer s.mockerMtx.Unlock()\n\tif s.mockerStop != nil {\n\t\thttp.Error(w, \"mocker already running\", http.StatusInternalServerError)\n\t\treturn\n\t}\n\tmockerType := req.FormValue(\"mocker-type\")\n\tmockerFn := LookupMocker(mockerType)\n\tif mockerFn == nil {\n\t\thttp.Error(w, fmt.Sprintf(\"unknown mocker type %q\", html.EscapeString(mockerType)), http.StatusBadRequest)\n\t\treturn\n\t}\n\tnodeCount, err := strconv.Atoi(req.FormValue(\"node-count\"))\n\tif err != nil {\n\t\thttp.Error(w, \"invalid node-count provided\", http.StatusBadRequest)\n\t\treturn\n\t}\n\ts.mockerStop = make(chan struct{})\n\tgo mockerFn(s.network, s.mockerStop, nodeCount)\n\n\tw.WriteHeader(http.StatusOK)\n}",
+      "source": {
+        "node_id": "PROJECT-043",
+        "file": "p2p/simulations/http.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "7ccc3cbfd17bee117eef445564c87eecccc5571d0b37ec513ebe761e3ef9e4c5",
+        "language": "go",
+        "start_line": 330,
+        "start_byte": 9753,
+        "bytes": 735,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "StartMocker"
+      }
+    },
+    {
+      "id": "PROJECT-044",
+      "code": "func NewMsgFilters(filterParam string) (MsgFilters, error) {\n\tfilters := make(MsgFilters)\n\tfor _, filter := range strings.Split(filterParam, \"-\") {\n\t\tproto, codes, found := strings.Cut(filter, \":\")\n\t\tif !found || proto == \"\" || codes == \"\" {\n\t\t\treturn nil, fmt.Errorf(\"invalid message filter: %s\", filter)\n\t\t}\n\n\t\tfor _, code := range strings.Split(codes, \",\") {\n\t\t\tif code == \"*\" || code == \"-1\" {\n\t\t\t\tfilters[MsgFilter{Proto: proto, Code: -1}] = struct{}{}\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tn, err := strconv.ParseUint(code, 10, 64)\n\t\t\tif err != nil {\n\t\t\t\treturn nil, fmt.Errorf(\"invalid message code: %s\", code)\n\t\t\t}\n\t\t\tfilters[MsgFilter{Proto: proto, Code: int64(n)}] = struct{}{}\n\t\t}\n\t}\n\treturn filters, nil\n}",
+      "source": {
+        "node_id": "PROJECT-044",
+        "file": "p2p/simulations/http.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "db12c981e9deaf62b87b508973223ea28fa8c70ff7e83b54bf86ad3e833f12d2",
+        "language": "go",
+        "start_line": 478,
+        "start_byte": 13681,
+        "bytes": 700,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "NewMsgFilters"
+      }
+    },
+    {
+      "id": "PROJECT-045",
+      "code": "func parseInteger(encType string, encValue interface{}) (*big.Int, error) {\n\tvar (\n\t\tlength int\n\t\tsigned = strings.HasPrefix(encType, \"int\")\n\t\tb      *big.Int\n\t)\n\tif encType == \"int\" || encType == \"uint\" {\n\t\tlength = 256\n\t} else {\n\t\tlengthStr := \"\"\n\t\tif strings.HasPrefix(encType, \"uint\") {\n\t\t\tlengthStr = strings.TrimPrefix(encType, \"uint\")\n\t\t} else {\n\t\t\tlengthStr = strings.TrimPrefix(encType, \"int\")\n\t\t}\n\t\tatoiSize, err := strconv.Atoi(lengthStr)\n\t\tif err != nil {\n\t\t\treturn nil, fmt.Errorf(\"invalid size on integer: %v\", lengthStr)\n\t\t}\n\t\tlength = atoiSize\n\t}\n\tswitch v := encValue.(type) {\n\tcase *math.HexOrDecimal256:\n\t\tb = (*big.Int)(v)\n\tcase *big.Int:\n\t\tb = v\n\tcase string:\n\t\tvar hexIntValue math.HexOrDecimal256\n\t\tif err := hexIntValue.UnmarshalText([]byte(v)); err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tb = (*big.Int)(&hexIntValue)\n\tcase float64:\n\t\t// JSON parses non-strings as float64. Fail if we cannot\n\t\t// convert it losslessly\n\t\tif float64(int64(v)) == v {\n\t\t\tb = big.NewInt(int64(v))\n\t\t} else {\n\t\t\treturn nil, fmt.Errorf(\"invalid float value %v for type %v\", v, encType)\n\t\t}\n\t}\n\tif b == nil {\n\t\treturn nil, fmt.Errorf(\"invalid integer value %v/%v for type %v\", encValue, reflect.TypeOf(encValue), encType)\n\t}\n\tif b.BitLen() > length {\n\t\treturn nil, fmt.Errorf(\"integer larger than '%v'\", encType)\n\t}\n\tif !signed && b.Sign() == -1 {\n\t\treturn nil, fmt.Errorf(\"invalid negative value for unsigned type %v\", encType)\n\t}\n\treturn b, nil\n}",
+      "source": {
+        "node_id": "PROJECT-045",
+        "file": "signer/core/apitypes/types.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "eb7a7c144c4b598d4ea3cad071cc1fc09fb680f07da8ab798f23dbc927c9ca1f",
+        "language": "go",
+        "start_line": 434,
+        "start_byte": 12586,
+        "bytes": 1444,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "parseInteger"
+      }
+    },
+    {
+      "id": "PROJECT-046",
+      "code": "func (typedData *TypedData) EncodePrimitiveValue(encType string, encValue interface{}, depth int) ([]byte, error) {\n\tswitch encType {\n\tcase \"address\":\n\t\tretval := make([]byte, 32)\n\t\tswitch val := encValue.(type) {\n\t\tcase string:\n\t\t\tif common.IsHexAddress(val) {\n\t\t\t\tcopy(retval[12:], common.HexToAddress(val).Bytes())\n\t\t\t\treturn retval, nil\n\t\t\t}\n\t\tcase []byte:\n\t\t\tif len(val) == 20 {\n\t\t\t\tcopy(retval[12:], val)\n\t\t\t\treturn retval, nil\n\t\t\t}\n\t\tcase [20]byte:\n\t\t\tcopy(retval[12:], val[:])\n\t\t\treturn retval, nil\n\t\t}\n\t\treturn nil, dataMismatchError(encType, encValue)\n\tcase \"bool\":\n\t\tboolValue, ok := encValue.(bool)\n\t\tif !ok {\n\t\t\treturn nil, dataMismatchError(encType, encValue)\n\t\t}\n\t\tif boolValue {\n\t\t\treturn math.PaddedBigBytes(common.Big1, 32), nil\n\t\t}\n\t\treturn math.PaddedBigBytes(common.Big0, 32), nil\n\tcase \"string\":\n\t\tstrVal, ok := encValue.(string)\n\t\tif !ok {\n\t\t\treturn nil, dataMismatchError(encType, encValue)\n\t\t}\n\t\treturn crypto.Keccak256([]byte(strVal)), nil\n\tcase \"bytes\":\n\t\tbytesValue, ok := parseBytes(encValue)\n\t\tif !ok {\n\t\t\treturn nil, dataMismatchError(encType, encValue)\n\t\t}\n\t\treturn crypto.Keccak256(bytesValue), nil\n\t}\n\tif strings.HasPrefix(encType, \"bytes\") {\n\t\tlengthStr := strings.TrimPrefix(encType, \"bytes\")\n\t\tlength, err := strconv.Atoi(lengthStr)\n\t\tif err != nil {\n\t\t\treturn nil, fmt.Errorf(\"invalid size on bytes: %v\", lengthStr)\n\t\t}\n\t\tif length < 0 || length > 32 {\n\t\t\treturn nil, fmt.Errorf(\"invalid size on bytes: %d\", length)\n\t\t}\n\t\tif byteValue, ok := parseBytes(encValue); !ok || len(byteValue) != length {\n\t\t\treturn nil, dataMismatchError(encType, encValue)\n\t\t} else {\n\t\t\t// Right-pad the bits\n\t\t\tdst := make([]byte, 32)\n\t\t\tcopy(dst, byteValue)\n\t\t\treturn dst, nil\n\t\t}\n\t}\n\tif strings.HasPrefix(encType, \"int\") || strings.HasPrefix(encType, \"uint\") {\n\t\tb, err := parseInteger(encType, encValue)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\treturn math.U256Bytes(b), nil\n\t}\n\treturn nil, fmt.Errorf(\"unrecognized type '%s'\", encType)\n}",
+      "source": {
+        "node_id": "PROJECT-046",
+        "file": "signer/core/apitypes/types.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "4f448532022c9d6ff81100f2cc4d541104dd22d2690c0c38abdbb6be0f3019ee",
+        "language": "go",
+        "start_line": 489,
+        "start_byte": 14136,
+        "bytes": 1959,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "EncodePrimitiveValue"
+      }
+    },
+    {
+      "id": "PROJECT-047",
+      "code": "func initializeCoinAdapter(coinAdapterAddress common.Address, param map[string]string, alloc *types.GenesisAlloc) ([]params.StateParam, error) {\n\tsp := make([]params.StateParam, 0)\n\n\t// SLOT_COIN_ADAPTER_MASTER_MINTER\n\tmasterMinter, ok := param[COIN_ADAPTER_PARAM_MASTER_MINTER]\n\tif !ok || len(masterMinter) == 0 {\n\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: missing parameter: %s\", COIN_ADAPTER_PARAM_MASTER_MINTER)\n\t}\n\tsp = append(sp, params.StateParam{\n\t\tAddress: coinAdapterAddress,\n\t\tKey:     common.HexToHash(SLOT_COIN_ADAPTER_MASTER_MINTER),\n\t\tValue:   common.BytesToHash(common.HexToAddress(masterMinter).Bytes()),\n\t})\n\n\t// SLOT_COIN_ADAPTER_MINTERS, SLOT_COIN_ADAPTER_MINTER_ALLOWED\n\tif mintersStr, ok := param[COIN_ADAPTER_PARAM_MINTERS]; ok && len(mintersStr) > 0 {\n\t\tminters := splitAndTrim(mintersStr, \",\")\n\t\tminterAllowedAmounts := make([]*big.Int, len(minters))\n\t\tif minterAllowedStr, ok := param[COIN_ADAPTER_PARAM_MINTER_ALLOWED]; ok && len(minterAllowedStr) > 0 {\n\t\t\tminterAllowed := splitAndTrim(minterAllowedStr, \",\")\n\t\t\tif len(minters) != len(minterAllowed) {\n\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: the number of minters and minterAllowedAmounts must be the same\")\n\t\t\t}\n\t\t\tfor i, allowed := range minterAllowed {\n\t\t\t\tallowedAmount, ok := new(big.Int).SetString(allowed, 10)\n\t\t\t\tif !ok {\n\t\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: invalid minterAllowed, must be decimal\")\n\t\t\t\t}\n\t\t\t\tminterAllowedAmounts[i] = allowedAmount\n\t\t\t}\n\t\t}\n\t\tmintersSlot := common.HexToHash(SLOT_COIN_ADAPTER_MINTERS)\n\t\tminterAllowedSlot := common.HexToHash(SLOT_COIN_ADAPTER_MINTER_ALLOWED)\n\t\tfor i, minter := range minters {\n\t\t\tminterAddress := common.HexToAddress(minter)\n\t\t\tsp = append(sp, params.StateParam{\n\t\t\t\tAddress: coinAdapterAddress,\n\t\t\t\tKey:     CalculateMappingSlot(mintersSlot, minterAddress),\n\t\t\t\tValue:   common.BytesToHash([]byte{1}), // == true\n\t\t\t})\n\n\t\t\tif minterAllowedAmounts[i] != nil {\n\t\t\t\tsp = append(sp, params.StateParam{\n\t\t\t\t\tAddress: coinAdapterAddress,\n\t\t\t\t\tKey:     CalculateMappingSlot(minterAllowedSlot, minterAddress),\n\t\t\t\t\tValue:   common.BigToHash(minterAllowedAmounts[i]),\n\t\t\t\t})\n\t\t\t}\n\t\t}\n\t}\n\n\t// SLOT_COIN_ADAPTER_COIN_MANAGER\n\tsp = append(sp, params.StateParam{\n\t\tAddress: coinAdapterAddress,\n\t\tKey:     common.HexToHash(SLOT_COIN_ADAPTER_COIN_MANAGER),\n\t\tValue:   common.BytesToHash(params.NativeCoinManagerAddress.Bytes()),\n\t})\n\n\t// SLOT_COIN_ADAPTER_ACCOUNT_MANAGER\n\tsp = append(sp, params.StateParam{\n\t\tAddress: coinAdapterAddress,\n\t\tKey:     common.HexToHash(SLOT_COIN_ADAPTER_ACCOUNT_MANAGER),\n\t\tValue:   common.BytesToHash(params.AccountManagerAddress.Bytes()),\n\t})\n\n\t// SLOT_COIN_ADAPTER_NAME\n\tcoinName, ok := param[COIN_ADAPTER_PARAM_NAME]\n\tif !ok || len(coinName) == 0 {\n\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: missing parameter: %s\", COIN_ADAPTER_PARAM_NAME)\n\t}\n\tfor slot, value := range EncodeBytesToSlots(common.HexToHash(SLOT_COIN_ADAPTER_NAME), []byte(coinName)) {\n\t\tsp = append(sp, params.StateParam{\n\t\t\tAddress: coinAdapterAddress,\n\t\t\tKey:     slot,\n\t\t\tValue:   value,\n\t\t})\n\t}\n\n\t// SLOT_COIN_ADAPTER_SYMBOL\n\tsymbol, ok := param[COIN_ADAPTER_PARAM_SYMBOL]\n\tif !ok || len(symbol) == 0 {\n\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: missing parameter: %s\", COIN_ADAPTER_PARAM_SYMBOL)\n\t}\n\tfor slot, value := range EncodeBytesToSlots(common.HexToHash(SLOT_COIN_ADAPTER_SYMBOL), []byte(symbol)) {\n\t\tsp = append(sp, params.StateParam{\n\t\t\tAddress: coinAdapterAddress,\n\t\t\tKey:     slot,\n\t\t\tValue:   value,\n\t\t})\n\t}\n\n\t// SLOT_COIN_ADAPTER_DECIMALS\n\tdecimalsStr, ok := param[COIN_ADAPTER_PARAM_DECIMALS]\n\tif !ok || len(decimalsStr) == 0 {\n\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: missing parameter: %s\", COIN_ADAPTER_PARAM_DECIMALS)\n\t}\n\tdecimals, err := strconv.ParseUint(decimalsStr, 10, 8)\n\tif err != nil {\n\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params.decimals`: %w\", err)\n\t}\n\tsp = append(sp, params.StateParam{\n\t\tAddress: coinAdapterAddress,\n\t\tKey:     common.HexToHash(SLOT_COIN_ADAPTER_DECIMALS),\n\t\tValue:   common.BytesToHash([]byte{uint8(decimals)}),\n\t})\n\n\t// SLOT_COIN_ADAPTER_CURRENCY\n\tcurrency, ok := param[COIN_ADAPTER_PARAM_CURRENCY]\n\tif !ok || len(currency) == 0 {\n\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: missing parameter: %s\", COIN_ADAPTER_PARAM_CURRENCY)\n\t}\n\tfor slot, value := range EncodeBytesToSlots(common.HexToHash(SLOT_COIN_ADAPTER_CURRENCY), []byte(currency)) {\n\t\tsp = append(sp, params.StateParam{\n\t\t\tAddress: coinAdapterAddress,\n\t\t\tKey:     slot,\n\t\t\tValue:   value,\n\t\t})\n\t}\n\n\t// SLOT_COIN_ADAPTER_TOTAL_SUPPLY\n\tif alloc != nil {\n\t\ttotalSupply := new(big.Int)\n\t\tfor _, account := range *alloc {\n\t\t\tif account.Balance != nil {\n\t\t\t\ttotalSupply.Add(totalSupply, account.Balance)\n\t\t\t}\n\t\t}\n\t\tsp = append(sp, params.StateParam{\n\t\t\tAddress: coinAdapterAddress,\n\t\t\tKey:     common.HexToHash(SLOT_COIN_ADAPTER_TOTAL_SUPPLY),\n\t\t\tValue:   common.BigToHash(totalSupply),\n\t\t})\n\t}\n\n\treturn sp, nil\n}",
+      "source": {
+        "node_id": "PROJECT-047",
+        "file": "systemcontracts/coin_adapter.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "2fbebfbde6e43f1397a435204758c3d691b8ca81b34afdba1affdaee6280352a",
+        "language": "go",
+        "start_line": 34,
+        "start_byte": 1229,
+        "bytes": 5073,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "initializeCoinAdapter"
+      }
+    },
+    {
+      "id": "PROJECT-048",
+      "code": "func Compile(openzeppelinPath string, sourceFiles ...string) (compiledTy, error) {\n\tsolcPath, err := solcdownloader.GetSolcBin(solcVersion)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tif openzeppelinPath == \"\" {\n\t\topenzeppelinPath = \"../solidity/openzeppelin\"\n\t}\n\targs := []string{\n\t\t\"--combined-json\", \"bin,bin-runtime,srcmap,srcmap-runtime,abi,userdoc,devdoc,metadata,hashes\",\n\t\t\"--optimize\",                // code optimizer switched on\n\t\t\"--allow-paths\", \".,./,../\", //default to support relative path： ./  ../  .\n\t\tfmt.Sprintf(\"@openzeppelin/contracts/=%s/contracts/contracts/\", openzeppelinPath),\n\t\tfmt.Sprintf(\"@openzeppelin/contracts-upgradeable/=%s/contracts-upgradeable/contracts/\", openzeppelinPath),\n\t\t\"--\",\n\t}\n\t// ~/.solc-bin/solc-0.8.14\n\tcmd := exec.Command(solcPath, append(args, sourceFiles...)...)\n\n\tvar stderr, stdout bytes.Buffer\n\tcmd.Stderr, cmd.Stdout = &stderr, &stdout\n\tif err := cmd.Run(); err != nil {\n\t\treturn nil, fmt.Errorf(\"solc: %v\\n%s\", err, stderr.Bytes())\n\t}\n\n\t// compiler version\n\tvar compilerVersion = struct {\n\t\tVersion string\n\t}{}\n\n\tif err := json.Unmarshal(stdout.Bytes(), &compilerVersion); err != nil {\n\t\treturn nil, err\n\t} else if contracts, err := compiler.ParseCombinedJSON(stdout.Bytes(), \"\", \"\", compilerVersion.Version, strings.Join(args, \" \")); err != nil {\n\t\treturn nil, err\n\t} else {\n\t\tout := make(compiledTy)\n\t\tfor name, v := range contracts {\n\t\t\tn := strings.Split(name, \":\")[1]\n\t\t\tif _, ok := out[n]; ok {\n\t\t\t\treturn nil, fmt.Errorf(\"duplicated contract name: %s\", name)\n\t\t\t} else {\n\t\t\t\tout[n] = v\n\t\t\t}\n\t\t}\n\t\treturn out, nil\n\t}\n}",
+      "source": {
+        "node_id": "PROJECT-048",
+        "file": "systemcontracts/compile/compiler/compiler.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "983edfbdc59fe6221fd6f98cb952bf35072222089af5ceb871c5b026fffd05ca",
+        "language": "go",
+        "start_line": 40,
+        "start_byte": 1236,
+        "bytes": 1578,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "Compile"
+      }
+    },
+    {
+      "id": "PROJECT-049",
+      "code": "func GetSolcBin(version string) (string, error) {\n\tosName, ok := osMapping[runtime.GOOS]\n\tif !ok {\n\t\treturn \"\", fmt.Errorf(\"unsupported OS: %s\", runtime.GOOS)\n\t}\n\tarch := runtime.GOARCH\n\t// Handle ARM architecture\n\tif runtime.GOARCH == \"arm64\" {\n\t\tif osName == \"macosx\" {\n\t\t\t// Mac ARM → check Rosetta 2\n\t\t\tif err := exec.Command(\"pgrep\", \"oahd\").Run(); err != nil {\n\t\t\t\treturn \"\", fmt.Errorf(\"rosetta 2 is required to run amd64 solc binary on Apple Silicon\")\n\t\t\t}\n\t\t\tarch = \"amd64\"\n\t\t} else {\n\t\t\t// ARM on non-Mac OS → unsupported\n\t\t\treturn \"\", fmt.Errorf(\"unsupported architecture: ARM is not supported on %s\", osName)\n\t\t}\n\t}\n\n\t// Home directory based path for storing solc binaries\n\thome, err := os.UserHomeDir()\n\tif err != nil {\n\t\treturn \"\", err\n\t}\n\tdir := filepath.Join(home, solcBinDirName)\n\tif err := os.MkdirAll(dir, 0755); err != nil {\n\t\treturn \"\", err\n\t}\n\n\t// Local binary file name\n\tbinName := fmt.Sprintf(\"solc-%s\", version)\n\tif osName == \"windows\" {\n\t\tbinName += \".exe\"\n\t}\n\tbinPath := filepath.Join(dir, binName)\n\n\t// Return the path immediately if the binary already exists\n\tif _, err := os.Stat(binPath); err == nil {\n\t\treturn binPath, nil\n\t}\n\n\tfmt.Printf(\"%s not found, downloading...\\n\", binName)\n\n\t// Windows versions below 0.7.2 are unsupported\n\tif osName == \"windows\" && versionCompare(version, \"0.7.2\") < 0 {\n\t\treturn \"\", fmt.Errorf(\"unsupported version on Windows: %s. Please use >=0.7.2\", version)\n\t}\n\n\t// Fetch list.json to find the build info\n\tlistURL := fmt.Sprintf(\"%s/%s-%s/list.json\", solcRepoURL, osName, arch)\n\tbuild, err := getBuild(listURL, version)\n\tif err != nil {\n\t\treturn \"\", err\n\t}\n\n\t// Construct download URL using the build path\n\tdownloadUrl := fmt.Sprintf(\"%s/%s-%s/%s\", solcRepoURL, osName, arch, build.Path)\n\tif err := downloadSolc(binPath, downloadUrl); err != nil {\n\t\treturn \"\", err\n\t}\n\n\t// Verify SHA256 checksum\n\tif ok, err := verifyChecksum(binPath, build.Sha256); err != nil {\n\t\treturn \"\", err\n\t} else if !ok {\n\t\tos.Remove(binPath)\n\t\treturn \"\", fmt.Errorf(\"downloaded file checksum mismatch\")\n\t}\n\n\t// Set executable permission on macOS/Linux\n\tif osName != \"windows\" {\n\t\tif err := os.Chmod(binPath, 0755); err != nil {\n\t\t\treturn \"\", err\n\t\t}\n\t}\n\n\tfmt.Println(\"Download complete:\", binPath)\n\treturn binPath, nil\n}",
+      "source": {
+        "node_id": "PROJECT-049",
+        "file": "systemcontracts/compile/solcdownloader/downloader.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "5162f2f88cfc27528549b216eb11db32c2a476ad07b9a645f271bb6760304031",
+        "language": "go",
+        "start_line": 73,
+        "start_byte": 2650,
+        "bytes": 2263,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "GetSolcBin"
+      }
+    },
+    {
+      "id": "PROJECT-050",
+      "code": "func initializeBase(govBaseAddress common.Address, param map[string]string) ([]params.StateParam, error) {\n\tsp := make([]params.StateParam, 0)\n\n\tquorum := uint64(0)\n\tif quorumStr, ok := param[GOV_BASE_PARAM_QUORUM]; ok {\n\t\tvar err error\n\t\tquorum, err = strconv.ParseUint(quorumStr, 10, 64)\n\t\tif err != nil {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.quorum`: %w\", err)\n\t\t}\n\n\t\t// Validate quorum is greater than 0\n\t\tif quorum == 0 {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.quorum` must be greater than 0\")\n\t\t}\n\n\t\tsp = append(sp,\n\t\t\tparams.StateParam{\n\t\t\t\tAddress: govBaseAddress,\n\t\t\t\tKey:     common.HexToHash(SLOT_GOV_BASE_quorum),\n\t\t\t\tValue:   common.BigToHash(big.NewInt(int64(quorum))),\n\t\t\t},\n\t\t)\n\t}\n\n\tif expiryStr, ok := param[GOV_BASE_PARAM_EXPIRY]; ok {\n\t\texpiry, err := strconv.ParseUint(expiryStr, 10, 64)\n\t\tif err != nil {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.expiry`: %w\", err)\n\t\t}\n\t\tsp = append(sp,\n\t\t\tparams.StateParam{\n\t\t\t\tAddress: govBaseAddress,\n\t\t\t\tKey:     common.HexToHash(SLOT_GOV_BASE_proposalExpiry),\n\t\t\t\tValue:   common.BigToHash(big.NewInt(int64(expiry))),\n\t\t\t},\n\t\t)\n\t}\n\n\tif membersStr, ok := param[GOV_BASE_PARAM_MEMBERS]; ok {\n\t\tmemberAddresses := splitAndTrim(membersStr, \",\")\n\n\t\t// Pre-validate and deduplicate members\n\t\tuniqueMembers := make([]common.Address, 0)\n\t\tseen := make(map[common.Address]struct{})\n\t\tfor _, addrStr := range memberAddresses {\n\t\t\tmember := common.HexToAddress(addrStr)\n\n\t\t\t// Validate zero address\n\t\t\tif member == (common.Address{}) {\n\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.members` contains invalid zero address\")\n\t\t\t}\n\n\t\t\t// Add to slice only if not seen before\n\t\t\tif _, exists := seen[member]; !exists {\n\t\t\t\tseen[member] = struct{}{}\n\t\t\t\tuniqueMembers = append(uniqueMembers, member)\n\t\t\t}\n\t\t}\n\n\t\t// Check quorum after deduplication\n\t\tif quorum > 0 && uint64(len(uniqueMembers)) < quorum {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.quorum` (%d) must not be greater than unique member count (%d)\", quorum, len(uniqueMembers))\n\t\t}\n\n\t\t// Enforce maximum member limit (matches Solidity MAX_MEMBER_INDEX)\n\t\tconst MAX_MEMBERS = 255\n\t\tif len(uniqueMembers) > MAX_MEMBERS {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.members` count (%d) exceeds maximum allowed (%d)\", len(uniqueMembers), MAX_MEMBERS)\n\t\t}\n\n\t\t// Quorum validation matching GovBase.sol logic\n\t\t// This ensures consistency between genesis initialization and smart contract behavior\n\t\t// Only validate if quorum is explicitly provided (quorum > 0)\n\t\tif quorum > 0 {\n\t\t\tmemberCount := uint64(len(uniqueMembers))\n\t\t\tif memberCount == 1 {\n\t\t\t\t// Single member governance: quorum must be exactly 1\n\t\t\t\t// WARNING: Single-member governance is centralized and not recommended for production\n\t\t\t\tif quorum != 1 {\n\t\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.quorum` must be exactly 1 for single-member governance, got %d\", quorum)\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\t// Multi-member governance: require at least 2 approvals (proposer + 1 reviewer)\n\t\t\t\t// This prevents any single member from executing proposals without peer review\n\t\t\t\t// Security: quorum=1 would allow single-member unilateral decisions\n\t\t\t\tif quorum < 2 {\n\t\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.quorum` (%d) must be at least 2 for multi-member governance (member count: %d)\", quorum, memberCount)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tmembersSlot := common.HexToHash(SLOT_GOV_BASE_members)\n\t\tversionedMemberListSlot := common.HexToHash(SLOT_GOV_BASE_versionedMemberList)\n\t\tversionSlot := common.HexToHash(SLOT_GOV_BASE_version)\n\t\tmemberIndexByVersionSlot := common.HexToHash(SLOT_GOV_BASE_memberIndexByVersion)\n\t\tquorumByVersionSlot := common.HexToHash(SLOT_GOV_BASE_quorumByVersion)\n\n\t\tversionStr, ok2 := param[GOV_BASE_PARAM_MEMBER_VERSION]\n\t\tif !ok2 {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.memberVersion` is required when `systemContracts.govBase.params.members` is set\")\n\t\t}\n\t\tversionInt, err := strconv.ParseUint(versionStr, 10, 64)\n\t\tif err != nil {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.memberVersion`: %w\", err)\n\t\t}\n\t\tversion := new(big.Int).SetUint64(versionInt)\n\n\t\t// joinedAt is set to 0 for all initial members.\n\t\t// We do not use the current time in the genesis (configuration).\n\t\t// This is because it makes the genesis generation non-deterministic.\n\t\tmemberData := Member{\n\t\t\tIsActive: true,\n\t\t\tJoinedAt: 0,\n\t\t}.ToHash()\n\n\t\tcurrentIdx := uint64(0)\n\t\t// Use uniqueMembers slice for iteration\n\t\tfor _, member := range uniqueMembers {\n\t\t\t// Additional overflow check (defensive programming)\n\t\t\tif currentIdx >= MAX_MEMBERS {\n\t\t\t\treturn nil, fmt.Errorf(\"member index overflow: currentIdx (%d) >= MAX_MEMBERS (%d)\", currentIdx, MAX_MEMBERS)\n\t\t\t}\n\t\t\tsp = append(sp,\n\t\t\t\t// Set member active status and joinedAt timestamp\n\t\t\t\tparams.StateParam{\n\t\t\t\t\tAddress: govBaseAddress,\n\t\t\t\t\tKey:     CalculateMappingSlot(membersSlot, member),\n\t\t\t\t\tValue:   memberData,\n\t\t\t\t},\n\t\t\t\t// Add member to versionedMemberList[version][currentIdx]\n\t\t\t\tparams.StateParam{\n\t\t\t\t\tAddress: govBaseAddress,\n\t\t\t\t\tKey:     CalculateDynamicSlot(CalculateMappingSlot(versionedMemberListSlot, version), new(big.Int).SetUint64(currentIdx)),\n\t\t\t\t\tValue:   common.BytesToHash(member.Bytes()),\n\t\t\t\t},\n\t\t\t\t// Set memberIndexByVersion[version][member] = currentIdx + 1\n\t\t\t\t// Note: Index is 1-based (0 means not a member)\n\t\t\t\tparams.StateParam{\n\t\t\t\t\tAddress: govBaseAddress,\n\t\t\t\t\tKey:     CalculateMappingSlot(CalculateMappingSlot(memberIndexByVersionSlot, version), member),\n\t\t\t\t\tValue:   common.BigToHash(new(big.Int).SetUint64(currentIdx + 1)),\n\t\t\t\t},\n\t\t\t)\n\t\t\tcurrentIdx++\n\t\t}\n\n\t\tif currentIdx > 0 {\n\t\t\tsp = append(sp,\n\t\t\t\tparams.StateParam{\n\t\t\t\t\tAddress: govBaseAddress,\n\t\t\t\t\tKey:     CalculateMappingSlot(versionedMemberListSlot, version),\n\t\t\t\t\tValue:   common.BigToHash(new(big.Int).SetUint64(currentIdx)),\n\t\t\t\t},\n\t\t\t)\n\t\t}\n\t\tsp = append(sp,\n\t\t\tparams.StateParam{\n\t\t\t\tAddress: govBaseAddress,\n\t\t\t\tKey:     versionSlot,\n\t\t\t\tValue:   common.BigToHash(version),\n\t\t\t},\n\t\t)\n\n\t\t// Set quorumByVersion[version] = quorum\n\t\t// This creates a snapshot of the quorum value at this member version\n\t\tif quorum > 0 {\n\t\t\tsp = append(sp,\n\t\t\t\tparams.StateParam{\n\t\t\t\t\tAddress: govBaseAddress,\n\t\t\t\t\tKey:     CalculateMappingSlot(quorumByVersionSlot, version),\n\t\t\t\t\tValue:   common.BigToHash(new(big.Int).SetUint64(quorum)),\n\t\t\t\t},\n\t\t\t)\n\t\t}\n\t}\n\n\t// Initialize maxActiveProposalsPerMember (default: 3, range: 1-50)\n\tmaxProposals := uint64(3) // Default value\n\tif maxProposalsStr, ok := param[GOV_BASE_PARAM_MAX_PROPOSALS]; ok {\n\t\tvar err error\n\t\tmaxProposals, err = strconv.ParseUint(maxProposalsStr, 10, 64)\n\t\tif err != nil {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.maxProposals`: %w\", err)\n\t\t}\n\n\t\t// Validate range: 1 to 50 (inclusive)\n\t\tif maxProposals < 1 || maxProposals > 50 {\n\t\t\treturn nil, fmt.Errorf(\"`systemContracts.govBase.params.maxProposals` must be between 1 and 50, got %d\", maxProposals)\n\t\t}\n\t}\n\n\tsp = append(sp,\n\t\tparams.StateParam{\n\t\t\tAddress: govBaseAddress,\n\t\t\tKey:     common.HexToHash(SLOT_GOV_BASE_maxActiveProposalsPerMember),\n\t\t\tValue:   common.BigToHash(big.NewInt(int64(maxProposals))),\n\t\t},\n\t)\n\n\treturn sp, nil\n}",
+      "source": {
+        "node_id": "PROJECT-050",
+        "file": "systemcontracts/gov_base.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "4a0f1c6b9ba2ec1cf1b0895b4010458d0b9de24c9bce82b291139a39b96d4f2e",
+        "language": "go",
+        "start_line": 135,
+        "start_byte": 4641,
+        "bytes": 7242,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "initializeBase"
+      }
+    },
+    {
+      "id": "PROJECT-051",
+      "code": "func GetChainConfig(forkString string) (baseConfig *params.ChainConfig, eips []int, err error) {\n\tvar (\n\t\tsplitForks            = strings.Split(forkString, \"+\")\n\t\tok                    bool\n\t\tbaseName, eipsStrings = splitForks[0], splitForks[1:]\n\t)\n\tif baseConfig, ok = Forks[baseName]; !ok {\n\t\treturn nil, nil, UnsupportedForkError{baseName}\n\t}\n\tfor _, eip := range eipsStrings {\n\t\tif eipNum, err := strconv.Atoi(eip); err != nil {\n\t\t\treturn nil, nil, fmt.Errorf(\"syntax error, invalid eip number %v\", eipNum)\n\t\t} else {\n\t\t\tif !vm.ValidEip(eipNum) {\n\t\t\t\treturn nil, nil, fmt.Errorf(\"syntax error, invalid eip number %v\", eipNum)\n\t\t\t}\n\t\t\teips = append(eips, eipNum)\n\t\t}\n\t}\n\treturn baseConfig, eips, nil\n}",
+      "source": {
+        "node_id": "PROJECT-051",
+        "file": "tests/state_test_util.go",
+        "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "sha256": "7055783045d5742363273664dea131721fae82150dfb112e74da81de199fc357",
+        "language": "go",
+        "start_line": 163,
+        "start_byte": 6330,
+        "bytes": 704,
+        "snapshot_sha256": "8525da90c15ec2dfd7dff0a189d4e2fed8caa04fa446d51d56973702b652617f",
+        "function_name": "GetChainConfig"
+      }
+    }
+  ]
+}

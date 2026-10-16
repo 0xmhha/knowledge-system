@@ -1,0 +1,85 @@
+{
+  "kind": "project_local_source_rule_observations_not_independent_quality_or_runtime",
+  "counts": {
+    "source_functions": 51,
+    "source_files": 34,
+    "original_call_denominator": 68,
+    "observed_candidates_per_mode": 2,
+    "functions_with_candidates": 2,
+    "calls_with_candidates": 2,
+    "closure_calls": 1,
+    "incomplete_rule_functions": 0,
+    "calls_in_incomplete_functions": 0,
+    "independent_positive_gold": 0,
+    "independent_negative_gold": 0,
+    "approved_independent_cases": 0
+  },
+  "by_rule": {
+    "parameter-command-name": {
+      "original_call_denominator": 20,
+      "calls_with_candidates": 2,
+      "independent_positive_gold": 0,
+      "independent_negative_gold": 0
+    },
+    "discarded-conversion-error": {
+      "original_call_denominator": 48,
+      "calls_with_candidates": 0,
+      "independent_positive_gold": 0,
+      "independent_negative_gold": 0
+    }
+  },
+  "base_status_counts": {
+    "partial": 51
+  },
+  "rule_status_counts": {
+    "matched_bounded": 51
+  },
+  "diagnostic_counts": {
+    "isolated_type_info_partial": 51,
+    "opaque_call": 992,
+    "short_circuit_unsupported": 33,
+    "closure_unsupported": 8,
+    "range_binding_unsupported": 34,
+    "external_value_unknown": 656,
+    "aggregate_alias_unknown": 75,
+    "memory_write_untracked": 74,
+    "field_read_untracked": 183,
+    "slice_alias_unknown": 16,
+    "reference_alias_unknown": 151,
+    "alias_or_channel_effect": 15,
+    "element_read_untracked": 60,
+    "expression_unsupported": 23,
+    "closure_value_unknown": 8,
+    "reaching_definition_unknown": 75,
+    "memory_read_untracked": 44,
+    "async_or_deferred_effect": 30,
+    "aggregate_value_unknown": 1,
+    "type_assertion_unknown": 7,
+    "select_unsupported": 1
+  },
+  "call_status_counts": {
+    "empty_bounded_candidates_not_confirmed_negative_or_safe": 65,
+    "closure_body_excluded_not_confirmed_negative": 1,
+    "candidate_observed_not_confirmed_vulnerability": 2
+  },
+  "synthetic_snapshot_not_retained_graph": true,
+  "controlled_cases_added_to_project_denominator": 0,
+  "formal_runs": 0,
+  "mcp_calls": 0,
+  "model_calls": 0,
+  "nodes_started": 0,
+  "analyzed_project_code_executed": false,
+  "precision": null,
+  "recall": null,
+  "confusion_matrix": null,
+  "runtime_vulnerabilities_confirmed": null,
+  "quality_status": "not_scored_independent_gold_and_project_positive_sufficiency_unestablished",
+  "limits": [
+    "51 exposed functions and 68 calls are not independent examples",
+    "no candidates or incomplete analysis cannot become confirmed negative labels",
+    "candidate detection does not prove attacker control, resolved callee, sanitizer effect or executable path",
+    "source commit/byte pins are real; node IDs and bundle snapshot are synthetic, not retained graph/MCP proof",
+    "build/platform/generated/closure boundaries and external caller reachability need separate review",
+    "controlled examples cannot repair project positive sufficiency or independent gold"
+  ]
+}

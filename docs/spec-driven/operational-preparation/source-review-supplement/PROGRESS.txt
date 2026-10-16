@@ -164,10 +164,23 @@
 - rule-observations-v1/관측 원자료와 RULE-OBSERVATIONS.txt에 결과 및 미완료 범위 기록.
 - 연관 Python 회귀 325개·문서 134개·기존 구현 완료 상태 검사 통과.
 - 이전 동결 패킷 13개와 유지보수 Go 소스 변경 없음.
-[예정] 15. WI-2 프로젝트 source/sink·지원 범위와 양성 충분성 검토
+[검증 완료] 15. WI-2 프로젝트 source/sink·지원 범위와 양성 충분성 검토
 - 기존 68개 호출/51개 함수의 고정 원문에서 실제 직접 출발점·sink·소유권·지원 제한을 검토.
 - 가능한 로컬 분석과 원문 대조를 준비하되 실제 retained graph/MCP 실행과 독립 gold는 분리.
 - 통제 입력으로 프로젝트 양성 분모를 채우지 않고 부족/미확인 상태를 그대로 기록.
+- Git commit→tree→blob으로 34개 파일과 함수 51개·호출 span 68개를 원래 패킷과 대조.
+- 실제 로컬 분석기 일반/race 각 51개 함수·syntax 대조군 각 5개, 결과 일치.
+- 명령 후보 CALL-045/046 두 곳·숫자 변환 후보 0개. 두 후보는 같은 build 보조 파일.
+- CALL-017은 closure 내부. 빈 관측 65개·제외 1개를 독립 음성/안전 판정으로 세지 않는다.
+- 모든 함수는 partial type 정보, bounded rule pass는 51개. 표본 충분성·정답·운영 도달성은 미확인.
+- 관측기 build/fmt/vet/lint 4건·전용 provenance/변조 거부 회귀 33개 통과.
+- PROJECT-RULE-REVIEW.txt와 project-rule-review-v1에 원문·관측·범위·미완료 기준 기록.
+- 연관 Python 회귀 358개·현재 문서 134개·기존 구현 완료 상태 검사 통과.
+- 이전 동결 패킷 14개와 유지보수 Go 소스 변경 없음.
+[예정] 16. WI-2 후보 호출자의 명령 선택 계약과 문맥
+- CALL-045/046의 직접 호출자·명령 이름 유래·build 지원 범위를 고정 원문에서 검토한다.
+- 호출자 표기를 실제 graph resolution·공격자 제어·운영 실행 가능성으로 승격하지 않는다.
+- 현재 프로젝트 양성/음성 충분성 부족과 독립 검토·MCP 경로 미확인 상태를 유지한다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -199,14 +212,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-2 프로젝트 호출 68곳/51함수의 source/sink·지원 경계·도달성과 양성 충분성을 검토한다.
+WI-2 두 명령 후보의 호출자·명령 선택 계약·build 지원 범위에 대한 원문 문맥을 검토한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_rule_observations.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-rule-observations.py docs/spec-driven/operational-preparation/source-review-supplement/rule-observations-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_project_rule_review.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-project-rule-review.py docs/spec-driven/operational-preparation/source-review-supplement/project-rule-review-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
-이 검증은 원문 일치·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
+이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~14단계 검증 완료, 15단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~15단계 검증 완료, 16단계 예정. 정식 독립 수용은 계속 0/9이다.
