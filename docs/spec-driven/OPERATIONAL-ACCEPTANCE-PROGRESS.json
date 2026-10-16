@@ -272,6 +272,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/symptom-inputs-v1/manifest.json",
           "sha256": "aa048d44743bfd578c1bfc6d964ed4be9a08eda2e86f68babc6e9c7a21900afc",
           "status": "symptom_drafts_not_independent_gold_or_holdout"
+        },
+        "symptom_wire_preflight": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/symptom-wire-preflight-v1/manifest.json",
+          "sha256": "677c1d27314674caef0da900b0a6ab605e2196831ce9c88441aad080a8c11c49",
+          "status": "parser_preflight_not_retrieval_or_independent_acceptance"
         }
       },
       "completed_preparation": [
@@ -295,7 +300,8 @@
         "bounded_extracted_unsubscribe_method_normal_race_probe_with_mutants_and_owned_cleanup",
         "five_source_schedule_mechanism_proposals_with_twenty_one_schedules_and_unreviewed_overlap",
         "synthetic_udp_reset_cursor_branch_probe_with_controlled_timer_requests",
-        "twenty_symptom_only_input_cards_with_fifteen_conservative_groups_and_unreviewed_overlap"
+        "twenty_symptom_only_input_cards_with_fifteen_conservative_groups_and_unreviewed_overlap",
+        "public_only_symptom_wire_and_real_go_parser_preflight_without_backend_calls"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -505,6 +511,38 @@
           "operational_guard_tests_passed": 36,
           "documentation_contract_tests_passed": 20,
           "live_document_check_count": 134
+        },
+        "symptom_wire_preflight": {
+          "kind": "parser_preflight_not_retrieval_or_independent_acceptance",
+          "public_requests": 20,
+          "parser_observations": 40,
+          "control_observations": 12,
+          "build_fmt_vet_lint_checks_passed": 4,
+          "guard_tests_passed": 14,
+          "backend_calls": 0,
+          "retrieval_runs": 0,
+          "model_calls": 0,
+          "agent_role_runs": 0,
+          "macro_recall_at_10": null,
+          "formal_state_unchanged": true,
+          "maintained_go_source_unchanged": true,
+          "regression_tests": {
+            "test_source_review_supplement.py": 12,
+            "test_review_context.py": 12,
+            "test_subscription_ticket.py": 12,
+            "test_subscription_probe.py": 15,
+            "test_schedule_candidates.py": 16,
+            "test_udp_cursor_probe.py": 13,
+            "test_symptom_inputs.py": 18,
+            "test_symptom_wire_preflight.py": 14,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20
+          },
+          "python_regression_tests_passed": 184,
+          "prior_frozen_packets_unchanged": true,
+          "live_document_check_count": 134,
+          "original_implementation_completion_guard": "pass"
         }
       },
       "candidate_counts": {
@@ -627,7 +665,7 @@
   },
   "preparation_gap_inventory": {
     "path": "docs/spec-driven/operational-preparation/source-review-supplement/GAPS.json",
-    "sha256": "ec10c002df459e47669acedb3f5c9141ad7a6775cc773ecb71cf14142e35a766",
+    "sha256": "dd5996d6ad3dffea3566d285b1bf35559c77db08082f9cf7d9b934ce22b30299",
     "formal_completed": 0,
     "formal_total": 9,
     "optional_backlog_count": 12
@@ -656,5 +694,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/symptom-inputs-v1/manifest.json",
     "sha256": "aa048d44743bfd578c1bfc6d964ed4be9a08eda2e86f68babc6e9c7a21900afc",
     "status": "symptom_drafts_not_independent_gold_or_holdout"
+  },
+  "symptom_wire_preflight": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/symptom-wire-preflight-v1/manifest.json",
+    "sha256": "677c1d27314674caef0da900b0a6ab605e2196831ce9c88441aad080a8c11c49",
+    "status": "parser_preflight_not_retrieval_or_independent_acceptance"
   }
 }

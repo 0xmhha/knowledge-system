@@ -1,0 +1,635 @@
+{
+  "kind": "actual_request_parser_preflight_not_search_or_host_evaluation",
+  "go_version": "go version go1.26.9 darwin/arm64",
+  "lint_version": "golangci-lint has version 2.14.0 built with go1.26.8 from (unknown, modified: ?, mod sum: \"h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=\") on (unknown)",
+  "go_source_reference_commit": "36379c3a6d2e9816b149e787456b55f2e74ba8e2",
+  "maintained_go_worktree_unchanged": true,
+  "quality_checks": [
+    {
+      "kind": "build",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-symptom-wire-preflight-final-20261016/work/overlay.json",
+        "-c",
+        "-o",
+        "/private/tmp/ks-symptom-wire-preflight-final-20261016/work/parser.test",
+        "./internal/system/mcp"
+      ],
+      "go_overlay_enabled": true
+    },
+    {
+      "kind": "fmt",
+      "exit_code": 0,
+      "command": [
+        "-l",
+        "/private/tmp/ks-symptom-wire-preflight-final-20261016/work/symptom_wire_preflight_test.go"
+      ],
+      "go_overlay_enabled": false
+    },
+    {
+      "kind": "vet",
+      "exit_code": 0,
+      "command": [
+        "vet",
+        "-overlay=/private/tmp/ks-symptom-wire-preflight-final-20261016/work/overlay.json",
+        "./internal/system/mcp"
+      ],
+      "go_overlay_enabled": true
+    },
+    {
+      "kind": "lint",
+      "exit_code": 0,
+      "command": [
+        "run",
+        "--timeout=120s",
+        "./internal/system/mcp"
+      ],
+      "go_overlay_enabled": true
+    }
+  ],
+  "runs": [
+    {
+      "mode": "normal",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-symptom-wire-preflight-final-20261016/work/overlay.json",
+        "-json",
+        "-count=1",
+        "-run=^TestSymptomWirePreflight",
+        "-timeout=60s",
+        "./internal/system/mcp"
+      ],
+      "public_requests": 20,
+      "controls": 6
+    },
+    {
+      "mode": "race",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-symptom-wire-preflight-final-20261016/work/overlay.json",
+        "-json",
+        "-count=1",
+        "-run=^TestSymptomWirePreflight",
+        "-timeout=60s",
+        "-race",
+        "./internal/system/mcp"
+      ],
+      "public_requests": 20,
+      "controls": 6
+    }
+  ],
+  "observations": [
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-001",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 190,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-002",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 197,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-003",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 199,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-004",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 211,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-005",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 201,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-006",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 206,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-007",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 204,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-008",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 193,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-009",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 194,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-010",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 200,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-011",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 212,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-012",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 219,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-013",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 196,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-014",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 181,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-015",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 200,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-016",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 182,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-017",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 203,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-018",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 208,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-019",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 195,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-020",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 201,
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-001",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 190,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-002",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 197,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-003",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 199,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-004",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 211,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-005",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 201,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-006",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 206,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-007",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 204,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-008",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 193,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-009",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 194,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-010",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 200,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-011",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 212,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-012",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 219,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-013",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 196,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-014",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 181,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-015",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 200,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-016",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 182,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-017",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 203,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-018",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 208,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-019",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 195,
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "case_id": "RQ-020",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "defaults_accepted": true,
+      "name": "cks.context.label_suspects",
+      "parser_accepted": true,
+      "seed_mode": "text_only",
+      "symptom_bytes": 201,
+      "mode": "race"
+    }
+  ],
+  "controls": [
+    {
+      "backend_calls": 0,
+      "control_id": "minimal_defaults",
+      "expected_valid": true,
+      "observed_valid": true,
+      "stage": "parser_defaults",
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "unknown_gold_field",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "parser_defaults",
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "fractional_candidates",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "parser_defaults",
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "insufficient_call_budget",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "parser_defaults",
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "site_without_line",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "parser_defaults",
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "public_seed_hint",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "public_input_policy",
+      "mode": "normal"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "minimal_defaults",
+      "expected_valid": true,
+      "observed_valid": true,
+      "stage": "parser_defaults",
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "unknown_gold_field",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "parser_defaults",
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "fractional_candidates",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "parser_defaults",
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "insufficient_call_budget",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "parser_defaults",
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "site_without_line",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "parser_defaults",
+      "mode": "race"
+    },
+    {
+      "backend_calls": 0,
+      "control_id": "public_seed_hint",
+      "expected_valid": false,
+      "observed_valid": false,
+      "stage": "public_input_policy",
+      "mode": "race"
+    }
+  ],
+  "backend_calls": 0,
+  "retrieval_runs": 0,
+  "model_calls": 0,
+  "agent_role_runs": 0,
+  "formal_runs": 0,
+  "independent_gold_records": 0,
+  "macro_recall_at_10": null,
+  "public_bundle_scope": "request packaging separation; not an OS filesystem access boundary",
+  "virtual_test_file": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/internal/system/mcp/suspects_fixture_test.go",
+  "physical_test_file_created_in_repo": false,
+  "existing_test_file_byte_unchanged": true
+}

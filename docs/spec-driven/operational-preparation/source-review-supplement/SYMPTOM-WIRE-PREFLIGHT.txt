@@ -1,0 +1,53 @@
+WI-3 공개 요청 파서 사전 검증 — 2026-10-16
+
+확인한 결과
+공개 증상 입력 20개를 cks.context.label_suspects 텍스트 seed 요청으로 변환했다.
+실제 parseSuspectRequest와 Request.Defaults에서 일반/race 각각 20개가 통과했다.
+별도 대조군 6개를 두 모드에서 검사해 총 52개 관측을 보존했다.
+빌드·gofmt·vet·golangci-lint 4개 검사와 전용 증거 회귀 14개가 통과했다.
+
+공개 요청의 형태
+arguments는 symptom, commit, max_candidates=10, max_seeds=3, max_enriched=3,
+max_calls=32, depth=2, budget_ms=1000만 포함한다.
+commit은 공통 go-stablenet source pin이다. 함수·파일·행·확장 citation seed는 전달하지 않는다.
+이 값은 사전 검증용 요청 제안이며 정식 실행 자원·통계 승인이 아니다.
+
+대조군
+- symptom만 주어진 최소 요청: 실제 기본값 적용 확인.
+- 미지원 gold 필드·소수 후보 개수·너무 작은 호출 상한·행 없는 파일 위치: 실제 파서/범위 검사 거부.
+- 공개 입력의 symbol seed: 공개 입력 정책으로 거부.
+심볼·파일·citation seed는 별도 유효 API 모드다. 이번 요청 묶음은 텍스트 모드로 제한했다.
+
+자료·소스 경계
+export-symptom-wire.py는 공개 JSON 하나만 읽어 요청을 만든다.
+실행 테스트가 받는 public-bundle에는 wire-requests.json 하나만 존재한다.
+비공개 원문 노트·gold·후보 함수 목록을 인자로 전달하지 않는다.
+이는 요청 묶음의 내용 분리 검증이며 OS 파일 접근 격리를 구성한 것은 아니다.
+실제 backend·검색·모델·agent 역할 호출은 모두 0회다. recall은 null이다.
+
+Go 파일 유지
+기존 테스트 파일의 원본을 보존하고 import와 사전 검증 테스트를 임시 overlay에 추가했다.
+실제 저장소의 Go 파일은 바꾸지 않았다. 기존 테스트 정의도 overlay에서 유지했다.
+선택해 실행한 것은 TestSymptomWirePreflight 및 Controls이며 전체 패키지 테스트 실행을 뜻하지 않는다.
+템플릿·기존 파일·overlay backing·실제 parser/defaults/helper·모듈 및 검사 설정의 hash를 묶었다.
+초기 새 가상 파일 overlay는 lint source loader가 디스크 경로를 읽지 못해 실패했다.
+당시 로그·overlay·템플릿을 prior-overlay-diagnostic에 보존했다.
+최종 검사는 기존 파일을 보존하는 overlay 방식으로 모두 통과했다.
+
+정식 수용까지 남은 WI-3 작업
+독립 사실 가족 20개·독립 root-cause 위치·표본 충분성·기본선·canonical span 매칭을 확정해야 한다.
+현재 20문항은 15개 보수적 그룹 제안이며 모두 미승인이다. 노출/기존 문항 중복 검토도 필요하다.
+실제 데이터셋·검색 backend·호스트 분석 역할·반복 확장 상한을 고정한 후 실제 경로를 검증해야 한다.
+현재 파서 수용률을 검색 recall이나 원인 발견 성공률로 표시하지 않는다.
+담당자 미정, 정식 수용 0/9, freeze null·execution_allowed false를 유지한다.
+
+재검증
+python3 scripts/test_symptom_inputs.py
+python3 scripts/test_symptom_wire_preflight.py
+python3 scripts/check-symptom-wire-preflight.py docs/spec-driven/operational-preparation/source-review-supplement/symptom-wire-preflight-v1
+재실행은 scripts/run-symptom-wire-preflight.py에 새 --output,
+Go 1.26.9 --goroot, --lint 경로를 지정한다. 이전 실패 이력은 선택적 --prior-failed-output으로 보존한다.
+
+다음 비용 없는 준비 작업
+WI-1의 실제 lexical shadow와 선언/재정의 커버리지를 확인한다.
+반복된 := 이름을 실제 shadow로 잘못 세는 문제를 줄이고 필요한 함수 표본을 정리한다.

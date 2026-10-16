@@ -75,9 +75,16 @@
 - 기존 문항과 주제 유사성을 AI가 표시한 항목은 16문항/29쌍.
 - 전용 회귀 18개·45개 파일 바이트 동일 재생성 통과, 독립 gold/recall 없음.
 - SYMPTOM-INPUTS.txt에 입력 목록·표본 부족·노출 한계를 기록.
-[진행 예정] 8. 공개 입력 요청 분리와 실제 MCP 요청 파서 사전 검증
+[검증 완료] 8. 공개 입력 요청 분리와 실제 MCP 요청 파서 사전 검증
 - 공개 입력만으로 텍스트 seed 요청을 생성하고 Go parser/Defaults를 검사.
-- 검색·backend·host·모델을 실행하거나 점수를 산출하지 않는다.
+- 실제 parser/Defaults에서 일반/race 공개 요청 관측 40건·대조군 관측 12건 통과.
+- build/fmt/vet/lint 4건·전용 증거 회귀 14개 통과.
+- 실제 Go 파일·기존 테스트 정의를 보존하는 임시 overlay 사용.
+- 초기 lint loader 실패 로그도 보존. 공개 bundle은 wire 요청 파일 1개만 포함.
+- 연관 Python 회귀 184개·현재 문서 134개·기존 구현 완료 상태 검사 통과.
+- 이전 동결 패킷 7개와 유지보수 Go 소스 변경 없음.
+- 검색·backend·host·모델은 실행하지 않았고 recall은 null.
+- SYMPTOM-WIRE-PREFLIGHT.txt에 결과와 검증 범위를 기록.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -109,7 +116,7 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-8단계의 공개 요청 분리와 실제 요청 파서 사전 검증을 진행한다.
+WI-1의 실제 lexical shadow와 선언/재정의 커버리지·함수 표본을 확인한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
@@ -120,4 +127,4 @@ python3 scripts/test_review_context.py
 python3 scripts/check-review-context.py docs/spec-driven/operational-preparation/source-review-supplement/context-v1
 이 검증은 원문 일치·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~7단계 검증 완료. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~8단계 검증 완료. 정식 독립 수용은 계속 0/9이다.
