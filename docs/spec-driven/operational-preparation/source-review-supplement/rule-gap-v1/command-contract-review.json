@@ -1,0 +1,904 @@
+{
+  "kind": "source_syntax_and_ai_context_not_command_execution",
+  "candidate_calls": [
+    {
+      "case_id": "PROJECT-032",
+      "call_id": "CALL-045",
+      "candidate": {
+        "id": "7e22035540c955678bafcc3bc014d4b78f69c18c2c68a2993756ed611fc50db2",
+        "rule_id": "parameter-command-name",
+        "origin": "automatic",
+        "source_occurrence": "entry/definition/v1614/1614",
+        "source_location": {
+          "start_byte": 1614,
+          "end_byte": 1617,
+          "start_line": 67,
+          "end_line": 67
+        },
+        "sink_occurrence": "b0/n0/use/v1614/1666",
+        "sink_location": {
+          "start_byte": 1666,
+          "end_byte": 1669,
+          "start_line": 68,
+          "end_line": 68
+        },
+        "path": [
+          "entry",
+          "b0/n0"
+        ],
+        "conditions": [],
+        "certainty": "lexical_may_reach",
+        "target_resolution": "syntax_only_unverified",
+        "sanitizer": "not_proven"
+      },
+      "source_text": "cmd",
+      "sink_text": "cmd",
+      "conditions": [],
+      "runtime_reachability": "not_established",
+      "safety_verdict": "unknown",
+      "gold": false,
+      "approved": false
+    },
+    {
+      "case_id": "PROJECT-033",
+      "call_id": "CALL-046",
+      "candidate": {
+        "id": "48e8aa6efc24b69337da13b4221efdc6fb7f7b58c6db2b75f2bd4509c95b9a15",
+        "rule_id": "parameter-command-name",
+        "origin": "automatic",
+        "source_occurrence": "entry/definition/v1920/1920",
+        "source_location": {
+          "start_byte": 1920,
+          "end_byte": 1923,
+          "start_line": 74,
+          "end_line": 74
+        },
+        "sink_occurrence": "b0/n5/use/v1920/2228",
+        "sink_location": {
+          "start_byte": 2228,
+          "end_byte": 2231,
+          "start_line": 89,
+          "end_line": 89
+        },
+        "path": [
+          "entry",
+          "b0/n5"
+        ],
+        "conditions": [],
+        "certainty": "lexical_may_reach",
+        "target_resolution": "syntax_only_unverified",
+        "sanitizer": "not_proven"
+      },
+      "source_text": "cmd",
+      "sink_text": "cmd",
+      "conditions": [],
+      "runtime_reachability": "not_established",
+      "safety_verdict": "unknown",
+      "gold": false,
+      "approved": false
+    }
+  ],
+  "callers_separate_from_project_denominator": [
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommandWithOutput",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 12269,
+        "end_byte_exclusive": 12339,
+        "start_line": 375,
+        "end_line": 375
+      },
+      "function_name": "doLint",
+      "function_site": {
+        "start_byte": 11888,
+        "end_byte_exclusive": 12387,
+        "start_line": 363,
+        "end_line": 377
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "identifier",
+        "text": "linter",
+        "site": {
+          "start_byte": 12300,
+          "end_byte_exclusive": 12306,
+          "start_line": 375,
+          "end_line": 375
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommandWithOutput(linter, append(lflags, packages...)...)",
+      "id": "CALLER-001",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 18793,
+        "end_byte_exclusive": 19006,
+        "start_line": 554,
+        "end_line": 554
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 18814,
+          "end_byte_exclusive": 18822,
+          "start_line": 554,
+          "end_line": 554
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"build\", \"--build-arg\", \"COMMIT=\"+env.Commit, \"--build-arg\", \"VERSION=\"+params.VersionWithMeta, \"--build-arg\", \"BUILDNUM=\"+env.Buildnum, \"--tag\", fmt.Sprintf(\"%s:TAG\", *upload), \".\")",
+      "id": "CALLER-002",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 19009,
+        "end_byte_exclusive": 19260,
+        "start_line": 555,
+        "end_line": 555
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 19030,
+          "end_byte_exclusive": 19038,
+          "start_line": 555,
+          "end_line": 555
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"build\", \"--build-arg\", \"COMMIT=\"+env.Commit, \"--build-arg\", \"VERSION=\"+params.VersionWithMeta, \"--build-arg\", \"BUILDNUM=\"+env.Buildnum, \"--tag\", fmt.Sprintf(\"%s:alltools-TAG\", *upload), \"-f\", \"Dockerfile.alltools\", \".\")",
+      "id": "CALLER-003",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 20833,
+        "end_byte_exclusive": 20922,
+        "start_line": 593,
+        "end_line": 593
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 20854,
+          "end_byte_exclusive": 20862,
+          "start_line": 593,
+          "end_line": 593
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"image\", \"tag\", fmt.Sprintf(\"%s:TAG\", *upload), gethImage)",
+      "id": "CALLER-004",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 20926,
+        "end_byte_exclusive": 21024,
+        "start_line": 594,
+        "end_line": 594
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 20947,
+          "end_byte_exclusive": 20955,
+          "start_line": 594,
+          "end_line": 594
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"image\", \"tag\", fmt.Sprintf(\"%s:alltools-TAG\", *upload), toolImage)",
+      "id": "CALLER-005",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 21028,
+        "end_byte_exclusive": 21077,
+        "start_line": 595,
+        "end_line": 595
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 21049,
+          "end_byte_exclusive": 21057,
+          "start_line": 595,
+          "end_line": 595
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"push\", gethImage)",
+      "id": "CALLER-006",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 21081,
+        "end_byte_exclusive": 21130,
+        "start_line": 596,
+        "end_line": 596
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 21102,
+          "end_byte_exclusive": 21110,
+          "start_line": 596,
+          "end_line": 596
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"push\", toolImage)",
+      "id": "CALLER-007",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 23261,
+        "end_byte_exclusive": 23363,
+        "start_line": 662,
+        "end_line": 662
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 23282,
+          "end_byte_exclusive": 23290,
+          "start_line": 662,
+          "end_line": 662
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", append([]string{\"manifest\", \"create\", gethImage}, gethSubImages...)...)",
+      "id": "CALLER-008",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 23367,
+        "end_byte_exclusive": 23428,
+        "start_line": 663,
+        "end_line": 663
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 23388,
+          "end_byte_exclusive": 23396,
+          "start_line": 663,
+          "end_line": 663
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"manifest\", \"push\", gethImage)",
+      "id": "CALLER-009",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 23730,
+        "end_byte_exclusive": 23832,
+        "start_line": 673,
+        "end_line": 673
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 23751,
+          "end_byte_exclusive": 23759,
+          "start_line": 673,
+          "end_line": 673
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", append([]string{\"manifest\", \"create\", toolImage}, toolSubImages...)...)",
+      "id": "CALLER-010",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 23836,
+        "end_byte_exclusive": 23897,
+        "start_line": 674,
+        "end_line": 674
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 23857,
+          "end_byte_exclusive": 23865,
+          "start_line": 674,
+          "end_line": 674
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"manifest\", \"push\", toolImage)",
+      "id": "CALLER-011",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 27380,
+        "end_byte_exclusive": 27420,
+        "start_line": 754,
+        "end_line": 754
+      },
+      "function_name": "doDebianSource",
+      "function_site": {
+        "start_byte": 23928,
+        "end_byte_exclusive": 27547,
+        "start_line": 680,
+        "end_line": 761
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"debsign\"",
+        "literal": "debsign",
+        "site": {
+          "start_byte": 27401,
+          "end_byte_exclusive": 27410,
+          "start_line": 754,
+          "end_line": 754
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"debsign\", changes)",
+      "id": "CALLER-012",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 33181,
+        "end_byte_exclusive": 33279,
+        "start_line": 966,
+        "end_line": 966
+      },
+      "function_name": "stageDebianSource",
+      "function_site": {
+        "start_byte": 32926,
+        "end_byte_exclusive": 34294,
+        "start_line": 959,
+        "end_line": 983
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"git\"",
+        "literal": "git",
+        "site": {
+          "start_byte": 33202,
+          "end_byte_exclusive": 33207,
+          "start_line": 966,
+          "end_line": 966
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"git\", \"checkout-index\", \"-a\", \"--prefix\", pkgdir+string(filepath.Separator))",
+      "id": "CALLER-013",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 37027,
+        "end_byte_exclusive": 37249,
+        "start_line": 1047,
+        "end_line": 1054
+      },
+      "function_name": "doWindowsInstaller",
+      "function_site": {
+        "start_byte": 34317,
+        "end_byte_exclusive": 37381,
+        "start_line": 986,
+        "end_line": 1059
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"makensis.exe\"",
+        "literal": "makensis.exe",
+        "site": {
+          "start_byte": 37048,
+          "end_byte_exclusive": 37062,
+          "start_line": 1047,
+          "end_line": 1047
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"makensis.exe\",\n\t\t\"/DOUTPUTFILE=\"+installer,\n\t\t\"/DMAJORVERSION=\"+version[0],\n\t\t\"/DMINORVERSION=\"+version[1],\n\t\t\"/DBUILDVERSION=\"+version[2],\n\t\t\"/DARCH=\"+*arch,\n\t\tfilepath.Join(*workdir, \"geth.nsi\"),\n\t)",
+      "id": "CALLER-014",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    }
+  ],
+  "existing_ai_context_reviews": [
+    {
+      "id": "CALLER-CONTEXT-01",
+      "topic": "명령 이름과 후속 인자의 범위",
+      "fact_draft": "확인한 CI 직접 호출 중 문자열 명령 이름은 docker, debsign, git, makensis.exe다. 후속 인자의 flag/env 조합은 현재 명령 이름 규칙의 안전 판정 대상이 아니다.",
+      "anchors": [
+        {
+          "path": "build/ci.go",
+          "git_blob": "2417ecec4c04ae74415dd02f5b54be6cd54b3baf",
+          "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+          "start_line": 552,
+          "end_line": 555,
+          "start_byte": 18701,
+          "end_byte_exclusive": 19261,
+          "span_sha256": "a09d6f625e86069129a8223290826074ad8bc560d6d9a89c42ec31bdd38f3b10",
+          "source_text": "\t// If architecture specific image builds are requested, build and push them\n\tif *image {\n\t\tbuild.MustRunCommand(\"docker\", \"build\", \"--build-arg\", \"COMMIT=\"+env.Commit, \"--build-arg\", \"VERSION=\"+params.VersionWithMeta, \"--build-arg\", \"BUILDNUM=\"+env.Buildnum, \"--tag\", fmt.Sprintf(\"%s:TAG\", *upload), \".\")\n\t\tbuild.MustRunCommand(\"docker\", \"build\", \"--build-arg\", \"COMMIT=\"+env.Commit, \"--build-arg\", \"VERSION=\"+params.VersionWithMeta, \"--build-arg\", \"BUILDNUM=\"+env.Buildnum, \"--tag\", fmt.Sprintf(\"%s:alltools-TAG\", *upload), \"-f\", \"Dockerfile.alltools\", \".\")\n"
+        },
+        {
+          "path": "build/ci.go",
+          "git_blob": "2417ecec4c04ae74415dd02f5b54be6cd54b3baf",
+          "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+          "start_line": 750,
+          "end_line": 756,
+          "start_byte": 27211,
+          "end_byte_exclusive": 27448,
+          "span_sha256": "c4e14c89ba04daca50a730b1075c9e9fb7298adc58fbfa26405fdccce5bb88af",
+          "source_text": "\t\t\t\tchanges   = filepath.Join(*workdir, basename+\"_source.changes\")\n\t\t\t\tbuildinfo = filepath.Join(*workdir, basename+\"_source.buildinfo\")\n\t\t\t)\n\t\t\tif *signer != \"\" {\n\t\t\t\tbuild.MustRunCommand(\"debsign\", changes)\n\t\t\t}\n\t\t\tif *upload != \"\" {\n"
+        },
+        {
+          "path": "build/ci.go",
+          "git_blob": "2417ecec4c04ae74415dd02f5b54be6cd54b3baf",
+          "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+          "start_line": 959,
+          "end_line": 966,
+          "start_byte": 32926,
+          "end_byte_exclusive": 33280,
+          "span_sha256": "5eab85e807aef99dd4adcc4199c2f4e1c5553dfd66a8a095fc97070200751e3b",
+          "source_text": "func stageDebianSource(tmpdir string, meta debMetadata) (pkgdir string) {\n\tpkg := meta.Name() + \"-\" + meta.VersionString()\n\tpkgdir = filepath.Join(tmpdir, pkg)\n\tif err := os.Mkdir(pkgdir, 0755); err != nil {\n\t\tlog.Fatal(err)\n\t}\n\t// Copy the source code.\n\tbuild.MustRunCommand(\"git\", \"checkout-index\", \"-a\", \"--prefix\", pkgdir+string(filepath.Separator))\n"
+        },
+        {
+          "path": "build/ci.go",
+          "git_blob": "2417ecec4c04ae74415dd02f5b54be6cd54b3baf",
+          "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+          "start_line": 1043,
+          "end_line": 1054,
+          "start_byte": 36833,
+          "end_byte_exclusive": 37250,
+          "span_sha256": "d06b759277d1971d9a41e72af7fcd42a237f4b127f0439998529c0ebc6ab847d",
+          "source_text": "\tinstaller, err := filepath.Abs(\"geth-\" + archiveBasename(*arch, params.ArchiveVersion(env.Commit)) + \".exe\")\n\tif err != nil {\n\t\tlog.Fatalf(\"Failed to convert installer file path: %v\", err)\n\t}\n\tbuild.MustRunCommand(\"makensis.exe\",\n\t\t\"/DOUTPUTFILE=\"+installer,\n\t\t\"/DMAJORVERSION=\"+version[0],\n\t\t\"/DMINORVERSION=\"+version[1],\n\t\t\"/DBUILDVERSION=\"+version[2],\n\t\t\"/DARCH=\"+*arch,\n\t\tfilepath.Join(*workdir, \"geth.nsi\"),\n\t)\n"
+        }
+      ],
+      "unknowns": [
+        "전체 호출 그래프와 alias/dynamic dispatch",
+        "후속 인자 정책과 외부 도구의 동작",
+        "해당 명령이 실제 실행되는 환경"
+      ],
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "gold": false,
+      "reviewer": null,
+      "split": null,
+      "runtime_reachability": "not_established",
+      "safety_verdict": "unknown",
+      "independence_approved": false
+    },
+    {
+      "id": "CALLER-CONTEXT-02",
+      "topic": "린터 명령 경로의 반환값 문맥",
+      "fact_draft": "doLint는 cachedir flag를 downloadLinter에 넘기고 반환값 linter를 명령 이름으로 전달한다. downloadLinter는 checksum 파일의 version, OS/arch, archive 다운로드·해제 코드와 경로 반환을 포함한다.",
+      "anchors": [
+        {
+          "path": "build/ci.go",
+          "git_blob": "2417ecec4c04ae74415dd02f5b54be6cd54b3baf",
+          "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+          "start_line": 363,
+          "end_line": 376,
+          "start_byte": 11888,
+          "end_byte_exclusive": 12386,
+          "span_sha256": "f38a613a0127ae4ac5c1717db186adcad9f71a959d7fb2c017a769589223fd8e",
+          "source_text": "func doLint(cmdline []string) {\n\tvar (\n\t\tcachedir = flag.String(\"cachedir\", \"./build/cache\", \"directory for caching golangci-lint binary.\")\n\t)\n\tflag.CommandLine.Parse(cmdline)\n\tpackages := []string{\"./...\"}\n\tif len(flag.CommandLine.Args()) > 0 {\n\t\tpackages = flag.CommandLine.Args()\n\t}\n\n\tlinter := downloadLinter(*cachedir)\n\tlflags := []string{\"run\", \"--config\", \".golangci.yml\"}\n\tbuild.MustRunCommandWithOutput(linter, append(lflags, packages...)...)\n\tfmt.Println(\"You have achieved perfection.\")\n"
+        },
+        {
+          "path": "build/ci.go",
+          "git_blob": "2417ecec4c04ae74415dd02f5b54be6cd54b3baf",
+          "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+          "start_line": 380,
+          "end_line": 405,
+          "start_byte": 12444,
+          "end_byte_exclusive": 13248,
+          "span_sha256": "61ecbad7197657d7ab6d88b5ad2314cb4c966e620fe36695a158d95d9df8c9d3",
+          "source_text": "func downloadLinter(cachedir string) string {\n\tcsdb := build.MustLoadChecksums(\"build/checksums.txt\")\n\tversion, err := build.Version(csdb, \"golangci\")\n\tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\tarch := runtime.GOARCH\n\text := \".tar.gz\"\n\n\tif runtime.GOOS == \"windows\" {\n\t\text = \".zip\"\n\t}\n\tif arch == \"arm\" {\n\t\tarch += \"v\" + os.Getenv(\"GOARM\")\n\t}\n\tbase := fmt.Sprintf(\"golangci-lint-%s-%s-%s\", version, runtime.GOOS, arch)\n\turl := fmt.Sprintf(\"https://github.com/golangci/golangci-lint/releases/download/v%s/%s%s\", version, base, ext)\n\tarchivePath := filepath.Join(cachedir, base+ext)\n\tif err := csdb.DownloadFile(url, archivePath); err != nil {\n\t\tlog.Fatal(err)\n\t}\n\tif err := build.ExtractArchive(archivePath, cachedir); err != nil {\n\t\tlog.Fatal(err)\n\t}\n\treturn filepath.Join(cachedir, base, \"golangci-lint\")\n}\n"
+        }
+      ],
+      "unknowns": [
+        "checksum 및 archive 구현의 독립 검토",
+        "실제 다운로드·파일 신뢰·경로 내용",
+        "cachedir와 실행 환경에 대한 권한/공격자 제어"
+      ],
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "gold": false,
+      "reviewer": null,
+      "split": null,
+      "runtime_reachability": "not_established",
+      "safety_verdict": "unknown",
+      "independence_approved": false
+    },
+    {
+      "id": "CALLER-CONTEXT-03",
+      "topic": "두 wrapper와 실행 gate",
+      "fact_draft": "두 wrapper는 exec.Command(cmd,args...)를 MustRun에 넘긴다. MustRun은 명령을 표시하고 DryRunFlag가 false인 분기에서 cmd.Run을 호출하며 오류는 log.Fatal에 전달한다. WithOutput에는 별도 ticker/goroutine과 defer 정리 코드가 있다.",
+      "anchors": [
+        {
+          "path": "internal/build/util.go",
+          "git_blob": "b41014a16f0d7dd76927eb9d76ae047b57e73274",
+          "file_sha256": "7c6de2628aeb61faea3577d0ef13f73da79c202c70cf89155fa80cde01de57f4",
+          "start_line": 38,
+          "end_line": 51,
+          "start_byte": 980,
+          "end_byte_exclusive": 1341,
+          "span_sha256": "7a9c6ab067e83a88e1d2ea412f4d2c3650cb76685ceec79eaaa2ec0ddcd6956f",
+          "source_text": "var DryRunFlag = flag.Bool(\"n\", false, \"dry run, don't execute commands\")\n\n// MustRun executes the given command and exits the host process for\n// any error.\nfunc MustRun(cmd *exec.Cmd) {\n\tfmt.Println(\">>>\", printArgs(cmd.Args))\n\tif !*DryRunFlag {\n\t\tcmd.Stderr = os.Stderr\n\t\tcmd.Stdout = os.Stdout\n\t\tif err := cmd.Run(); err != nil {\n\t\t\tlog.Fatal(err)\n\t\t}\n\t}\n}\n"
+        },
+        {
+          "path": "internal/build/util.go",
+          "git_blob": "b41014a16f0d7dd76927eb9d76ae047b57e73274",
+          "file_sha256": "7c6de2628aeb61faea3577d0ef13f73da79c202c70cf89155fa80cde01de57f4",
+          "start_line": 67,
+          "end_line": 90,
+          "start_byte": 1594,
+          "end_byte_exclusive": 2245,
+          "span_sha256": "579ef4ff59c1c2c523418a8e0a4928e02e4c72ee0ee16a25b3820436ee0a5067",
+          "source_text": "func MustRunCommand(cmd string, args ...string) {\n\tMustRun(exec.Command(cmd, args...))\n}\n\n// MustRunCommandWithOutput runs the given command, and ensures that some output will be\n// printed while it runs. This is useful for CI builds where the process will be stopped\n// when there is no output.\nfunc MustRunCommandWithOutput(cmd string, args ...string) {\n\tinterval := time.NewTicker(time.Minute)\n\tdone := make(chan struct{})\n\tdefer interval.Stop()\n\tdefer close(done)\n\tgo func() {\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-interval.C:\n\t\t\t\tfmt.Printf(\"Waiting for command %q\\n\", cmd)\n\t\t\tcase <-done:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\tMustRun(exec.Command(cmd, args...))\n}\n"
+        }
+      ],
+      "unknowns": [
+        "실제 DryRunFlag 설정과 실행 결과",
+        "명령 lookup·자식 프로세스의 실행/종료",
+        "동시 실행·오류 종료 시의 실제 자원 수명"
+      ],
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "gold": false,
+      "reviewer": null,
+      "split": null,
+      "runtime_reachability": "not_established",
+      "safety_verdict": "unknown",
+      "independence_approved": false
+    },
+    {
+      "id": "CALLER-CONTEXT-04",
+      "topic": "CI 진입점과 build 선택 경계",
+      "fact_draft": "호출자 파일에는 none build constraint와 CI 명시 실행 설명이 있다. main은 os.Args[1]을 기준으로 lint/docker/debsrc/nsis 등의 함수로 분기한다. 이 원문은 서비스 요청 경로의 실행 증명이 아니다.",
+      "anchors": [
+        {
+          "path": "build/ci.go",
+          "git_blob": "2417ecec4c04ae74415dd02f5b54be6cd54b3baf",
+          "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+          "start_line": 17,
+          "end_line": 37,
+          "start_byte": 793,
+          "end_byte_exclusive": 2092,
+          "span_sha256": "5ff3b46d6ddf830511867620bffd0c4f4294004c3a8b26287195f77877626b17",
+          "source_text": "//go:build none\n// +build none\n\n/*\nThe ci command is called from Continuous Integration scripts.\n\nUsage: go run build/ci.go <command> <command flags/arguments>\n\nAvailable commands are:\n\n\tinstall    [ -arch architecture ] [ -cc compiler ] [ packages... ]                          -- builds packages and executables\n\ttest       [ -coverage ] [ packages... ]                                                    -- runs the tests\n\tlint                                                                                        -- runs certain pre-selected linters\n\tarchive    [ -arch architecture ] [ -type zip|tar ] [ -signer key-envvar ] [ -signify key-envvar ] [ -upload dest ] -- archives build artifacts\n\timportkeys                                                                                  -- imports signing keys from env\n\tdebsrc     [ -signer key-id ] [ -upload dest ]                                              -- creates a debian source package\n\tnsis                                                                                        -- creates a Windows NSIS installer\n\tpurge      [ -store blobstore ] [ -days threshold ]                                         -- purges old archives from the blobstore\n\nFor all commands, -n prevents execution of external programs (dry run mode).\n*/\n"
+        },
+        {
+          "path": "build/ci.go",
+          "git_blob": "2417ecec4c04ae74415dd02f5b54be6cd54b3baf",
+          "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+          "start_line": 158,
+          "end_line": 189,
+          "start_byte": 5214,
+          "end_byte_exclusive": 5912,
+          "span_sha256": "69ea62baf693b91a4e6a77c8316c5d3b58994c067ffed4a6b9f02dd7204a2707",
+          "source_text": "func main() {\n\tlog.SetFlags(log.Lshortfile)\n\n\tif !common.FileExist(filepath.Join(\"build\", \"ci.go\")) {\n\t\tlog.Fatal(\"this script must be run from the root of the repository\")\n\t}\n\tif len(os.Args) < 2 {\n\t\tlog.Fatal(\"need subcommand as first argument\")\n\t}\n\tswitch os.Args[1] {\n\tcase \"install\":\n\t\tdoInstall(os.Args[2:])\n\tcase \"test\":\n\t\tdoTest(os.Args[2:])\n\tcase \"lint\":\n\t\tdoLint(os.Args[2:])\n\tcase \"archive\":\n\t\tdoArchive(os.Args[2:])\n\tcase \"docker\":\n\t\tdoDocker(os.Args[2:])\n\tcase \"debsrc\":\n\t\tdoDebianSource(os.Args[2:])\n\tcase \"nsis\":\n\t\tdoWindowsInstaller(os.Args[2:])\n\tcase \"purge\":\n\t\tdoPurge(os.Args[2:])\n\tcase \"sanitycheck\":\n\t\tdoSanityCheck()\n\tdefault:\n\t\tlog.Fatal(\"unknown command \", os.Args[1])\n\t}\n}\n"
+        }
+      ],
+      "unknowns": [
+        "실제 CI/workflow에서 호출하는 조건",
+        "build tag/platform별 실행 구성",
+        "서비스 또는 외부 호출자의 운영 도달성"
+      ],
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "gold": false,
+      "reviewer": null,
+      "split": null,
+      "runtime_reachability": "not_established",
+      "safety_verdict": "unknown",
+      "independence_approved": false
+    },
+    {
+      "id": "CALLER-CONTEXT-05",
+      "topic": "후보 수와 독립성 해석",
+      "fact_draft": "후보 두 곳은 같은 internal/build/util.go의 유사한 wrapper다. 호출자 관측을 추가해도 두 후보를 독립 결함이나 검토 완료 양성 정답으로 승격하지 않는다.",
+      "anchors": [
+        {
+          "path": "internal/build/util.go",
+          "git_blob": "b41014a16f0d7dd76927eb9d76ae047b57e73274",
+          "file_sha256": "7c6de2628aeb61faea3577d0ef13f73da79c202c70cf89155fa80cde01de57f4",
+          "start_line": 67,
+          "end_line": 90,
+          "start_byte": 1594,
+          "end_byte_exclusive": 2245,
+          "span_sha256": "579ef4ff59c1c2c523418a8e0a4928e02e4c72ee0ee16a25b3820436ee0a5067",
+          "source_text": "func MustRunCommand(cmd string, args ...string) {\n\tMustRun(exec.Command(cmd, args...))\n}\n\n// MustRunCommandWithOutput runs the given command, and ensures that some output will be\n// printed while it runs. This is useful for CI builds where the process will be stopped\n// when there is no output.\nfunc MustRunCommandWithOutput(cmd string, args ...string) {\n\tinterval := time.NewTicker(time.Minute)\n\tdone := make(chan struct{})\n\tdefer interval.Stop()\n\tdefer close(done)\n\tgo func() {\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-interval.C:\n\t\t\t\tfmt.Printf(\"Waiting for command %q\\n\", cmd)\n\t\t\tcase <-done:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\tMustRun(exec.Command(cmd, args...))\n}\n"
+        }
+      ],
+      "unknowns": [
+        "독립 fact family와 positive/negative gold",
+        "지원 규칙별 프로젝트 표본 충분성",
+        "실제 retained graph/MCP/소비자 연결 수용"
+      ],
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "gold": false,
+      "reviewer": null,
+      "split": null,
+      "runtime_reachability": "not_established",
+      "safety_verdict": "unknown",
+      "independence_approved": false
+    }
+  ],
+  "contract_questions": [
+    "두 후보는 같은 internal/build/util.go wrapper이며 명령 이름은 매개변수다. 독립 결함 두 개나 공격자 제어 양성으로 세지 않는다.",
+    "호출자 14개/5함수는 두 파일의 문법 참조다. alias/function value/동적/외부 호출자를 포함한 실제 resolved call graph 완전성은 미확인이다.",
+    "문자열 명령 13개와 linter identifier 1개는 PATH·실행 파일 내용·checksum/archive·cachedir 신뢰 또는 후속 인자 안전을 증명하지 않는다.",
+    "none build constraint·명시적 CI dispatch·DryRunFlag/실제 cmd.Run·log.Fatal 경로의 환경/권한/실행 영수증을 검토한다. 이 단계에서는 프로젝트 명령/다운로드를 실행하지 않는다."
+  ],
+  "actual_command_execution_receipt": null,
+  "attacker_control_receipt": null,
+  "resolved_call_graph_receipt": null,
+  "new_project_commands_executed": 0,
+  "formal_runs": 0
+}

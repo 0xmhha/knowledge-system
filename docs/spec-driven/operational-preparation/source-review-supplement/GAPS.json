@@ -194,7 +194,7 @@
       "id": "WI-2",
       "preparation_candidate_count": 40,
       "count_semantics": "exposed_controlled_source_drafts_not_project_or_independent_units",
-      "note": "지원 규칙 2개·기존 개발 fixture 23개·통제 입력 40개(규칙별 AI 양성/음성 기대 각 10개)를 분리했다. 통제 일반/race 원문 관측 각 40개·대조군 각 14개, AI 수량 차이 0개. 이후 고정 Git commit의 프로젝트 34파일/51함수·68호출(명령 20·숫자 변환 48)을 실제 로컬 분석기로 일반/race 각 51개 관측했다. 명령 후보는 CALL-045/046 두 곳이며 같은 internal/build/util.go의 보조 함수이다. 숫자 변환 후보는 0개, CALL-017은 closure 내부이다. 65개 빈 관측·1개 closure 제외를 확정 음성으로 세지 않는다. 51함수 모두 부분 타입 진단을 보존했고 독립 gold·프로젝트 양성 충분성·위험성·MCP/실제 운영 도달성은 미판정이다. 기존 annotation query 12개도 별도 분모로 유지한다. 후보의 직접 호출자 문맥을 2개 고정 파일에서 보완: CI 내 문법상 직접 호출 14개/5함수, 명령 이름 literal 13개·linter identifier 1개. wrapper→MustRun·DryRunFlag·downloadLinter·CI dispatch에 대한 비공개 AI 문맥 초안 5개/원문 근거 11곳을 작성. import 표기는 실제 callee resolution이 아니며 원래 68호출/2후보 분모와 독립 gold 0개 상태를 유지한다.",
+      "note": "통제 입력 40개/규칙별 AI 양성·음성 제안 각 10개와 로컬 80관측은 독립 gold가 아니다. 780쌍·기존 개발 fixture 23개와 920건 대조(정확 일치 0건)도 fresh/독립성 승인이 아니다. 프로젝트 68호출/51함수·34파일의 명령 후보 2개/빈 관측 65개/closure 제외 1개를 별도로 유지. 호출자 14개/5함수·AI 문맥 5개/11근거와 annotation query 12개를 양성/음성 분모에 합치지 않는다. 규칙별 독립 양성/음성 0개, 실제 command/PATH/archive/cachedir/인자 신뢰·공격자 제어·도달성 미확인. 현재 구현/채택 consumer 계약 14곳 대조: 공유 CKG/CKS engine·strict input/상한·optional expected pins·metadata parity 확인. ROLE-RULE-TOOL-01은 Analyzer 본문/schema에 rule_candidates가 있지만 explicit tools 목록에 없음을 기록; 실제 host 권한/거부는 미판정. 과거 실제 CKG 58/CKS 9요청·23compiled fixture·5함수 parity 성공을 보존하며 당시 review-condition TP10/TN7/FP2/FN4·recall10/14를 이번 독립 후보 품질 점수로 전용하지 않음. 이번 프로젝트 retained graph/MCP/설치 역할 실행·독립 gold/matching·분모·품질 수용은 미확보다.",
       "requirements": {
         "new_positive_cases_per_supported_rule_min": 10,
         "new_negative_cases_per_supported_rule_min": 10,
@@ -207,13 +207,14 @@
         "controlled_and_project_denominators_separate": true
       },
       "approved_independent_cases": 0,
-      "formal_status": "local_source_and_caller_context_prepared_independent_quality_and_runtime_not_evaluated",
+      "formal_status": "rule_sample_gold_command_and_mcp_gap_inventory_prepared_independent_acceptance_not_evaluated",
       "remaining": [
-        "규칙별 독립 양성/음성 각 10개를 확보·검토; 두 build wrapper 후보와 변환 후보 0곳은 충분성을 입증하지 않음",
-        "검토 범위 밖 alias/dynamic/external caller·실제 명령 선택 계약·실행 환경/공격자 제어/운영 도달성을 별도 판정",
-        "실제 retained graph→MCP/소비자 정합·stale/권한·SDK 경로를 승인된 범위에서 검증",
-        "독립 검토자와 최종 수용 담당자 지정 및 독립 탐지 정답·위험성 별도 판정",
-        "baseline·매칭·입력/정답·표본 충분성·DEV/FINAL 동결 후 운영·품질·독립 수용 판정"
+        "독립 검토자·최종 수용 담당자 지정. 규칙별 신규 독립 양성/음성 각 10개 이상·sanitizer/branch/shadow/external target·노출/가족/DEV-FINAL 및 프로젝트 양성 충분성 검토; controlled/project/caller/manual 분모 분리",
+        "지원 syntax candidate와 review condition/취약점 판정을 분리한 완전한 독립 gold 및 포함/제외/unknown 근거 작성. 빈 후보/partial/matched_bounded/미지원·closure 제외를 안전 음성으로 간주하지 않음",
+        "실제 명령 이름/호출자 binding·PATH/다운로드/archive/checksum/cachedir 신뢰·후속 인자·DryRunFlag/CI build/dispatch·외부 도달성/권한·실행/정리 계약 검토",
+        "pack/version/digest/engine·project/commit/file/function/source/snapshot pin·source/sink 좌표/규칙·witness/조건·dedup/case-family 집계·미지원/오류/상한/기권 분모 및 baseline 동결",
+        "ROLE-RULE-TOOL-01의 Analyzer 본문/explicit tools 목록 차이 해소와 실제 유효 권한/등록 alias 확인; consumer 변경 채택 및 설치 역할의 직접 MCP 호출/typed 결과/handoff 영수증 검증 필요",
+        "승인된 retained project dataset→CKG/CKS public client→실제 MCP/SDK/설치 역할 경로에서 pins·schema·manual/automatic 분리·stale/private/limit 거부를 검증하고 rule별/전체 혼동행렬·precision/recall>=0.80 제안 및 운영/품질/독립 수용 판정"
       ],
       "rule_coverage_preparation": {
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-coverage-v1/manifest.json",
@@ -234,6 +235,11 @@
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-caller-context-v1/manifest.json",
         "sha256": "8eeabdff6f6721ae831944d340d9322f5f4599a9d52208b78cf4a7aa254596a6",
         "status": "caller_syntax_and_ai_context_not_runtime_or_independent_gold"
+      },
+      "rule_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-gap-v1/manifest.json",
+        "sha256": "50247302a2d3b743a300a63a641b9eaf61a8aa5ddf243c041804c91504bb90bf",
+        "status": "rule_sample_gold_command_and_mcp_gaps_not_acceptance"
       }
     },
     {
@@ -316,13 +322,14 @@
     }
   ],
   "next_priority": [
-    "WI-2 독립 표본·정답·실제 명령/호출자 계약·MCP 경로 미충족분 검토",
-    "WI-6/WI-SP의 독립 검토·표본·정답 미충족분 보완",
+    "WI-6 독립 intent/seed 가족·쌍 구성·관련성/잡음 정답·실제 기본/확장 경로·warm 지연 기준의 미충족분 검토",
+    "WI-SP 독립 symbol·수동/자동 provenance·정책/보안/미태그 정답·ACL/비공개/위조 경계와 실제 소비자 경로 미충족분 검토",
     "WI-C 10개 사례의 계약·필수 항목·priority 질문 판정과 typed 보고서/그림·handoff·host 실행 미충족분 검토",
     "WI-1 30함수의 독립 value kind·완전한 data/control gold·return 좌표/주석 정합·matching 및 baseline/실행 수용 미충족분 검토",
     "WI-3 독립 사실 가족/정답·top-10/분모·baseline 동결 및 실제 symptom-only 검색/설치 역할 경로 미충족분 보완",
     "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완",
-    "WI-V1/WI-V2 독립 티켓/실제 API 계약·도달성·주/독립 oracle·승인 후보 집합·selector/current HEAD/설치 역할 실행 및 독립 수용 미충족분 보완"
+    "WI-V1/WI-V2 독립 티켓/실제 API 계약·도달성·주/독립 oracle·승인 후보 집합·selector/current HEAD/설치 역할 실행 및 독립 수용 미충족분 보완",
+    "WI-2 독립 표본/gold·명령/호출자 계약·명시적 Analyzer 도구 노출·retained project MCP/설치 역할과 품질 수용 미충족분 보완"
   ],
   "optional_backlog_count": 12
 }

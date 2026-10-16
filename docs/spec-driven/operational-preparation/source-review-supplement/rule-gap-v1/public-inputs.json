@@ -1,0 +1,285 @@
+{
+  "kind": "exposed_unapproved_controlled_sources_no_labels",
+  "cases": [
+    {
+      "id": "RULE-1-01",
+      "code": "func F(cmd string){a:=cmd;b:=a;exec.Command(b)}",
+      "source_sha256": "9f638f30288cdbf62d3169aa624a5194e45eaa5628b6ea29921fc9c3d2b23355",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-02",
+      "code": "func F(cmd string,ok bool){name:=\"fixed\";if ok{name=cmd}else{name=\"other\"};exec.Command(name)}",
+      "source_sha256": "d3de4b5d7b59ba34c02d0a742f99dfc08be8ce02052d0ac41d76124b7b0c1b0b",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-03",
+      "code": "func F(cmd string,n int){name:=\"fixed\";for i:=0;i<n;i++{name=cmd};exec.Command(name)}",
+      "source_sha256": "5f7b3fbf9f9d06be587fa0e876e33c75615dd8aa9b661ee8e887a9ee006dbbde",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-04",
+      "code": "func F(cmd string){name:=\"fixed\";{name:=cmd;exec.Command(name)};_=name}",
+      "source_sha256": "0ecb97c06731f91ad422c6c700b08d376911e3845ab9beb50d5e0fcdc3226b72",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-05",
+      "code": "func F(cmd string){a:=sanitize(cmd);b:=a;exec.Command(b)}",
+      "source_sha256": "4b7a6a3809969ec8bff557cc2a93c4f86a67a41645c73f3512f5153cf4fbadb7",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-06",
+      "code": "func F(cmd string){a:=cmd;exec.CommandContext(nil,a)}",
+      "source_sha256": "55d8f652c4b388e0693e1c1064db883bf4ebdc84f669841e52e356760db987d7",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-07",
+      "code": "func F(cmd string,exec Fake){a:=cmd;exec.Command(a)}",
+      "source_sha256": "01463d9a6ec4de3bcbbce9885b96b32daba7daafe81b4c4f2e2a8d389734615a",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-08",
+      "code": "func F(cmd string,ok bool){if ok{exec.Command(cmd)}}",
+      "source_sha256": "de7a37a061a2d4b2ce1ebf7136fdc05430964f3c884256896af2f0091b6bd5b2",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-09",
+      "code": "func F(cmd string){a:=cmd;a+=\"suffix\";exec.Command(a)}",
+      "source_sha256": "51a4efac71ae73c74738a72b8639fae43ce9a6d1f90c869923f92b83ddccd014",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-10",
+      "code": "func F(cmd string,ok bool){if !ok{return};exec.Command(cmd)}",
+      "source_sha256": "1dbe09d8f57cf30c7aff7dfc5b5c71862a5e5affb4d2a1876aa4b75c8da8ba78",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-11",
+      "code": "func F(cmd string){a:=cmd;b:=a;b=\"fixed\";exec.Command(b)}",
+      "source_sha256": "eaea58cbf335e10a27689d1796d2b22601c5946e173a801f27468749680c6e5e",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-12",
+      "code": "func F(cmd string,ok bool){a:=cmd;if ok{a=\"one\"}else{a=\"two\"};exec.Command(a)}",
+      "source_sha256": "e7dbb15799530ecf073e19222c749a4662d371ab24b83eab155c1a3fe66479c6",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-13",
+      "code": "func F(cmd string){name:=cmd;{name:=\"fixed\";exec.Command(name)};_=name}",
+      "source_sha256": "e23757e50f3dd482a93e04635df90c5e4ede5c2b04223141ba7623834ef038b4",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-14",
+      "code": "func F(cmd string){_=sanitize(cmd);name:=\"fixed\";exec.Command(name)}",
+      "source_sha256": "574d429991a7a996b9d0bff344ca4853ddab192ed726e121f0492d881326a968",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-15",
+      "code": "func F(cmd string){a:=cmd;process.Command(a)}",
+      "source_sha256": "48a9b21e6cfaddc29e90ac77a451d9aa659b9afc4c409551824c6a4e90c975aa",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-16",
+      "code": "func F(cmd string){box:=Box{cmd};exec.Command(box.Name)}",
+      "source_sha256": "aac86f9a35c44cabb9d82cfca1fb90956abf60a3d27e7670a85729e966ed541e",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-17",
+      "code": "func F(cmd string){exec.Command(cmd+\"suffix\")}",
+      "source_sha256": "595986b19309a8e97e2e5e9b26ea1dd2568e4cd10bc1bc136f413d3b9908928c",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-18",
+      "code": "func F(cmd string){exec.CommandContext(nil,\"fixed\",cmd)}",
+      "source_sha256": "8b2abcc5e8935e4fe03a25823da253ec2ba7a055678889f6608a6eca45c73b56",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-19",
+      "code": "func F(cmd string){a,b:=\"fixed\",cmd;_=b;exec.Command(a)}",
+      "source_sha256": "f084a916ba0935ba61fc08fe214e7edcd7ed5868ba28cf46adbad1653654ec8d",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-1-20",
+      "code": "func F(cmd string){a:=cmd;cb:=func(){exec.Command(a)};_=cb}",
+      "source_sha256": "50222a16cdef95210dbbf3b5deba99188e0ae508c7f8128218923203b9bb82c4",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-01",
+      "code": "func F(s string)uint64{v,_:=strconv.ParseUint(s,16,32);return v}",
+      "source_sha256": "8911e44a259a0452a2218d442405963d86cc7628c1c8649c201b22a7c428f6d5",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-02",
+      "code": "func F(s string)int{v,_:=strconv.Atoi(s);a:=v;b:=a;return b}",
+      "source_sha256": "583a0375e27fd29a6071bc44ba02be593380bd641ac193d4427cda69c7aa7b5a",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-03",
+      "code": "func F(s string,ok bool)int{v,_:=strconv.Atoi(s);out:=0;if ok{out=v};return out}",
+      "source_sha256": "be0a60e8b1d1015485b1803350d352099fb6033bb0c253f7cdff6a5735af33a9",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-04",
+      "code": "func F(s string,n int)int{v,_:=strconv.Atoi(s);out:=0;for i:=0;i<n;i++{out=v};return out}",
+      "source_sha256": "cec2dac86289c8dd02c9ba4f4b1e84391f0a3ea39b674126d8d2467984b0564c",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-05",
+      "code": "func F(s string,ok bool)int{v:=0;if ok{v,_:=strconv.Atoi(s);return v};return v}",
+      "source_sha256": "3f95a4a59b13e8ee1fac76fd8ae0325c7d11ae0b59728fbcb81ffb5fc7959e05",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-06",
+      "code": "func F(s string)int{v,_:=strconv.Atoi(s);out:=clamp(v);return out}",
+      "source_sha256": "19fa5ab3a216cf2503d733e5ab6cb46f5aaee0bcfb470afb222e3f5c4b5441d8",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-07",
+      "code": "func F(s string,strconv Fake)int{v,_:=strconv.Atoi(s);return v}",
+      "source_sha256": "c6f24a09320c67794cd2f7f89b69fde525cc766012ba017148e8f2cdfc9f2150",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-08",
+      "code": "func F(s string)int{v,_:=strconv.Atoi(s);v+=2;return v}",
+      "source_sha256": "c7beb2efedb39d75a7d23bb0a53c88a412f821ccfd97b8966b318e401bd2725e",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-09",
+      "code": "func F(s string,ok bool)int{v,_:=strconv.Atoi(s);if !ok{return 0};return v}",
+      "source_sha256": "91547c9b222f57876f4b59b021b9078e9b3848f29becc8005c8c970930cdd16d",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-10",
+      "code": "func F(s string)int64{v,_:=strconv.ParseInt(s,16,32);copy:=v;return copy}",
+      "source_sha256": "04948d2f614d7247b66ace9a2d73f1d3d8e0323530f3b813519c1d8d482e7fc9",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-11",
+      "code": "func F(s string)int{v,err:=strconv.Atoi(s);_=err;return v}",
+      "source_sha256": "44b7135a7aaa59b60bf8010ed3044589790ff022b4d9699ccd95cf2a30965419",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-12",
+      "code": "func F(s string)int{v,_:=strconv.Atoi(s);out:=v;out=4;return out}",
+      "source_sha256": "8bd018c05e499489f80c4ee5d7ab8e6c29f78e0af492f42c2ea666380484315e",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-13",
+      "code": "func F(s string,ok bool)int{v,_:=strconv.Atoi(s);if ok{v=1}else{v=2};return v}",
+      "source_sha256": "9b175d5b3eacdd8218b62809c84ae285a864bd411f7677c8f83cd60f9afc6397",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-14",
+      "code": "func F(s string,ok bool)int{v,_:=strconv.Atoi(s);if ok{v:=4;return v};return 0}",
+      "source_sha256": "addb942838288bcdcb89b5b745f5970be6a0769d6dc33cfd22562d42e478e654",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-15",
+      "code": "func F(s string)int{v,_:=strconv.Atoi(s);_=clamp(v);out:=1;return out}",
+      "source_sha256": "888ce57311a3b4c4dec9c0ef0b2cf10f4c5f5ef4d1abae376e872248f08261ee",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-16",
+      "code": "func F(s string)int{v,_:=conversion.Atoi(s);out:=v;return out}",
+      "source_sha256": "cd313b93807c1ce96be17217cb89d5d232a48bf4f2cc55aa015e6594cc5a8841",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-17",
+      "code": "func F(s string)int{v,_:=strconv.Atoi(s);return v+1}",
+      "source_sha256": "2509d3c8bb785e9ef553547431ba45400bd93af1014bb875863b1d09c74fd069",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-18",
+      "code": "func F(s string)(out int){v,_:=strconv.Atoi(s);out=v;return}",
+      "source_sha256": "e015e664e6a430cb0bc3fcdf2ac3d6aa3e26c4509e77ddbc46f44c82704a4152",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-19",
+      "code": "func F(s string)int{cb:=func()int{v,_:=strconv.Atoi(s);return v};_=cb;return 0}",
+      "source_sha256": "9c3fcfefb8cfc3092db9979d4cd09c769f8d544515ea8669414bab4b203bf1fd",
+      "split": null,
+      "scoring_allowed": false
+    },
+    {
+      "id": "RULE-2-20",
+      "code": "func F(s string)int{var v int;var err error;v,err=strconv.Atoi(s);_=err;return v}",
+      "source_sha256": "3fad9ed576e0420a58cb13d9ea1dcd1329d45bb7b3dc8665ecafd0f736b8debc",
+      "split": null,
+      "scoring_allowed": false
+    }
+  ]
+}
