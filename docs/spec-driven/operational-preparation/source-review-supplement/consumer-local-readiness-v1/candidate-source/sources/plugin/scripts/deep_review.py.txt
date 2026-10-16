@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+"""Source-bound structured code-review artifacts and delivery validation.
+
+Consumes actual retained CKS responses; does not compute CFG/rules, run a model,
+modify code, contact trackers or confer human acceptance. CLI verification is
+also required outside Write/Edit hooks. Transport authenticity is not proven
+by local JSON validation; response/source hashes only bind the supplied data.
+"""
+from pathlib import Path, PurePosixPath
+import argparse
+import hashlib
+import json
+import re
+
+SCHEMA=1
+MAX_BYTES=4*1024*1024
+MAX_FINDINGS=32
+MAX_STATEMENTS=64
+SECTIONS=('data_state','guards_exceptions','complexity','resources','io','priority_tradeoffs')
+SHA=re.compile(r'^[0-9a-f]{64}$')
+COMMIT=re.compile(r'^(?:[0-9a-f]{40}|[0-9a-f]{64})$')
+class Invalid(ValueError):pass
+
+def require(condition,message):
+ if not condition:raise Invalid(message)
+def canonical(value):return json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def exact(value,required,optional=()):
+ require(isinstance(value,dict)and set(required)<=set(value)and set(value)<=set(required)|set(optional),'missing/unknown fields: '+','.join(required))
+def nonempty(value):return isinstance(value,str)and bool(value.strip())and len(value)<=8192
+def load(path):
+ raw=Path(path).read_bytes();require(len(raw)<=MAX_BYTES,'artifact exceeds4MiB')
+ def pairs(items):
+  result={}
+  for k,v in items:require(k not in result,'duplicate JSON field');result[k]=v
+  return result
+ value=json.loads(raw,object_pairs_hook=pairs,parse_constant=lambda _:(_ for _ in ()).throw(Invalid('nonfinite JSON')))
+ return raw,value
+def private_path(name):
+ require(nonempty(name),'source path required');path=PurePosixPath(name)
+ require(not path.is_absolute()and str(path)==name and '..'not in path.parts and '.claude'not in path.parts and path.parts[0]!='logs'and '\\'not in name,'private/unclean source path')
+def location(v):
+ exact(v,('start_byte','end_byte','start_line','end_line'))
+ require(all(type(x)is int for x in v.values())and 0<=v['start_byte']<=v['end_byte']and 1<=v['start_line']<=v['end_line'],'invalid source location')
+def source_pin(v):
+ exact(v,('node_id','file','commit','sha256','language','start_line','start_byte','bytes','snapshot_sha256'),('canonical_id','function_name'))
+ private_path(v['file']);require(nonempty(v['node_id'])and COMMIT.fullmatch(v['commit'])and SHA.fullmatch(v['sha256'])and SHA.fullmatch(v['snapshot_sha256']),'immutable source identity required')
+ require(v['language']=='go'and type(v['start_line'])is int and v['start_line']>=1 and type(v['start_byte'])is int and v['start_byte']>=0 and type(v['bytes'])is int and 0<v['bytes']<=256*1024,'unsupported source scope')
+ return v
+
+def validate_bundle(bundle):
+ exact(bundle,('schema_version','ticket_id','rules','function_review'))
+ require(bundle['schema_version']==SCHEMA and nonempty(bundle['ticket_id']),'bundle identity/version')
+ receipt=bundle['rules'];exact(receipt,('tool','arguments','result'))
+ require(receipt['tool']=='cks.context.rule_candidates','explicit retained rule tool required')
+ args=receipt['arguments'];exact(args,('rule_pack','function'),('max_candidates','max_flow_steps'))
+ require(args['rule_pack']=='go-local-review@1.0.0','explicit versioned rule pack required')
+ query=args['function'];exact(query,(),('node_id','canonical_id','expected_commit','expected_source_sha256','expected_snapshot_sha256','limits'))
+ require(('node_id'in query)!=('canonical_id'in query),'exact selected function identity required')
+ require(all(nonempty(query[k])for k in query if k!='limits'),'explicit nonempty query strings required')
+ caps={'max_source_bytes':256*1024,'max_ast_nodes':4096,'max_blocks':256,'max_nodes':1024,'max_edges':4096,'max_iterations':128,'max_facts':65536,'timeout_ms':1000}
+ if 'limits'in query:
+  require(isinstance(query['limits'],dict)and set(query['limits'])<=set(caps),'invalid/unknown base limits')
+  require(all(type(n)is int and 1<=n<=caps[k]for k,n in query['limits'].items()),'invalid base limit value')
+ for k,cap in [('max_candidates',64),('max_flow_steps',4096)]:
+  if k in args:require(type(args[k])is int and 1<=args[k]<=cap,'invalid rule bound')
+ result=receipt['result'];require(isinstance(result,dict)and result.get('status')in('partial','analyzed_bounded')and isinstance(result.get('analysis'),dict),'incomplete/unavailable base analysis cannot finish review')
+ analysis=result['analysis'];source=source_pin(analysis['source']);require(result['snapshot_sha256']==source['snapshot_sha256'],'query snapshot differs from source')
+ for key,target in [('node_id','node_id'),('canonical_id','canonical_id'),('expected_commit','commit'),('expected_source_sha256','sha256'),('expected_snapshot_sha256','snapshot_sha256')]:
+  if key in query:require(query[key]==source.get(target),'request/source pin mismatch: '+key)
+ require(not analysis.get('truncated')and analysis.get('schema_version')==1,'truncated/wrong base analysis')
+ nodes=analysis['nodes'];require(isinstance(nodes,list)and len(nodes)<=1024,'node cap/type')
+ by_id={};blocks={'b'+str(b['id'])for b in analysis['blocks']}
+ for node in nodes:
+  require(isinstance(node,dict)and nonempty(node.get('id'))and node['id']not in by_id,'invalid/duplicate graph node');location(node['location']);require(isinstance(node.get('text'),str)and type(node.get('block'))is int,'source text/block required');by_id[node['id']]=node;blocks.add('b'+str(node['block']))
+  loc=node['location'];require(source['start_byte']<=loc['start_byte']<=loc['end_byte']<=source['start_byte']+source['bytes']and loc['start_line']>=source['start_line'],'node outside retained source')
+  if not node.get('synthetic'):require(loc['end_byte']-loc['start_byte']==len(node['text'].encode())and loc['end_line']-loc['start_line']==node['text'].count('\n'),'node text/location differs')
+ edges=analysis['edges'];require(isinstance(edges,list)and len(edges)<=4096,'edge cap/type')
+ for edge in edges:
+  require(isinstance(edge,dict),'edge object required');ids=blocks if edge.get('kind')=='cfg'else blocks|set(by_id)if edge.get('kind')=='control_dependence'else set(by_id);require(edge.get('from')in ids and edge.get('to')in ids,'edge references foreign nodes')
+ rules=analysis['rules'];require(isinstance(rules,dict)and rules.get('status')=='matched_bounded'and rules.get('origin')=='automatic'and rules.get('pack_id')=='go-local-review'and rules.get('pack_version')=='1.0.0'and SHA.fullmatch(rules.get('pack_sha256','')),'unsupported/incomplete rules cannot finish review')
+ candidates=rules['candidates'];require(isinstance(candidates,list)and len(candidates)<=64,'candidate cap/type')
+ for c in candidates:
+  require(c.get('origin')=='automatic'and c.get('certainty')=='lexical_may_reach'and c.get('target_resolution')=='syntax_only_unverified'and c.get('sanitizer')=='not_proven','candidate certainty/origin overclaim')
+  require(SHA.fullmatch(c.get('id',''))and isinstance(c.get('path'),list)and len(c['path'])>0 and all(n in by_id for n in c['path']),'candidate path/id invalid');location(c['source_location']);location(c['sink_location'])
+  require(isinstance(c.get('conditions'),list)and len(c['conditions'])<=4096,'condition cap/type')
+  for condition in c['conditions']:
+   exact(condition,('node','condition'),('location','location_status'))
+   require(nonempty(condition['condition']),'condition label required')
+   status=condition.get('location_status','source_node')
+   if status=='source_node':require(condition['node']in by_id and condition.get('location')==by_id[condition['node']]['location'],'condition original citation differs')
+   else:require(status=='structural_block_unlocated'and condition['node']in blocks and 'location'not in condition,'unlocated control cannot fabricate a citation')
+ review=bundle['function_review'];exact(review,('tool','arguments','result'));require(review['tool']=='cks.context.review_function','function review receipt required')
+ require(isinstance(review['arguments'],dict)and review['arguments'].get('symbol')in(source.get('canonical_id'),source['node_id'],review['result'].get('seed',{}).get('qualified_name')),'function review selector differs')
+ seed=review['result'].get('seed',{});require(seed.get('id')==source['node_id']and seed.get('file_path')==source['file']and seed.get('start_line')==source['start_line'],'structural review identity/location differs')
+ require(isinstance(review['result'].get('code'),dict),'structural review unavailable')
+ return source,analysis,by_id
+
+def validate_judgments(judgments,by_id,candidates):
+ exact(judgments,('sections','findings','criteria'))
+ exact(judgments['sections'],SECTIONS)
+ known=0
+ for name,section in judgments['sections'].items():
+  exact(section,('status','claim','evidence_nodes','assumptions','unknowns','origin'))
+  require(section['status']in('inferred','unknown')and section['origin']=='agent_reasoning'and nonempty(section['claim']),'invalid reasoning section '+name)
+  require(isinstance(section['evidence_nodes'],list)and len(section['evidence_nodes'])<=MAX_STATEMENTS and all(n in by_id for n in section['evidence_nodes']),'foreign reasoning evidence')
+  for field in ('assumptions','unknowns'):require(isinstance(section[field],list)and all(nonempty(s)for s in section[field]),'explicit assumptions/unknowns required')
+  if section['status']=='inferred':require(section['evidence_nodes']and section['assumptions'],'inference requires evidence and assumptions');known+=1
+  else:require(section['unknowns'],'unknown section requires limitations')
+ require(known>0,'all-unknown placeholder cannot complete a deep review')
+ findings=judgments['findings'];require(isinstance(findings,list)and len(findings)<=MAX_FINDINGS,'finding cap/type')
+ ids=set()
+ for finding in findings:
+  exact(finding,('id','category','claim','suggestion','priority','evidence_nodes','rule_candidates','assumptions','unknowns','origin','state'))
+  require(nonempty(finding['id'])and finding['id']not in ids and finding['origin']=='agent_reasoning'and finding['state']=='review_candidate','finding identity/origin or verified vulnerability overclaim');ids.add(finding['id'])
+  require(finding['priority']in('high','medium','low')and finding['category']in('state','guard','exception','complexity','resource','io','tradeoff'),'finding category/priority')
+  require(nonempty(finding['claim'])and nonempty(finding['suggestion']),'finding explanation/remediation required')
+  require(isinstance(finding['evidence_nodes'],list)and finding['evidence_nodes']and all(n in by_id for n in finding['evidence_nodes']),'finding original evidence required')
+  require(isinstance(finding['rule_candidates'],list)and all(c in candidates for c in finding['rule_candidates']),'unknown automatic candidate')
+  for name in ('assumptions','unknowns'):require(isinstance(finding[name],list)and finding[name]and all(nonempty(s)for s in finding[name]),'finding assumptions/unknowns required')
+ criteria=judgments['criteria'];require(isinstance(criteria,list)and 0<len(criteria)<=32,'review criteria required')
+ seen=set()
+ for row in criteria:
+  exact(row,('id','requirement','section','status','reason'))
+  require(nonempty(row['id'])and row['id']not in seen and nonempty(row['requirement'])and row['section']in SECTIONS and row['status']in('covered','unknown')and nonempty(row['reason']),'invalid/duplicate review criterion');seen.add(row['id'])
+  if row['status']=='covered':require(judgments['sections'][row['section']]['status']=='inferred','unknown section cannot fulfill review criterion')
+ return judgments
+
+def computed_view(analysis):
+ return {'origin':'graph_computation','sequence':{'kind':'bounded_cfg_not_execution_trace','edges':[e for e in analysis['edges']if e['kind']=='cfg']},'module':{'kind':'retained_file_membership','file':analysis['source']['file'],'symbol':analysis['source']['node_id'],'interprocedural_edges':'unknown'},'value_control':{'nodes':analysis['nodes'],'edges':analysis['edges'],'variables':analysis['variables'],'occurrences':analysis['occurrences'],'def_use':analysis['def_use']},'automatic_rule_candidates':analysis['rules']['candidates'],'capability':analysis['capability'],'diagnostics':analysis['diagnostics']}
+
+def build(bundle,judgments):
+ source,analysis,by_id=validate_bundle(bundle);validate_judgments(judgments,by_id,{c['id']for c in analysis['rules']['candidates']})
+ return {'schema_version':SCHEMA,'ticket_id':bundle['ticket_id'],'status':'structured_partial_review','source':source,'evidence_sha256':sha(canonical(bundle)),'computed':computed_view(analysis),'reasoning':judgments,'structural_review':{'origin':'graph_record','snapshot_association':'identity_only_unverified_snapshot','response':bundle['function_review']['result']},'limitations':['graph rule/value computation is bounded, not whole-program safety','structural review lacks its own immutable snapshot/blob pin; no atomic cross-call proof','source/CFG order is not a runtime call trace','agent findings, complexity/resources/I/O and priorities are reasoning, not measured facts','local receipt hashes do not authenticate MCP transport or grant reviewer acceptance'],'independent_acceptance':'not_recorded'}
+
+def validate(report,bundle):
+ exact(report,('schema_version','ticket_id','status','source','evidence_sha256','computed','reasoning','structural_review','limitations','independent_acceptance'))
+ expected=build(bundle,report['reasoning']);require(report==expected,'report/source/computed/origin/limitations changed');return report
+
+def markdown(report):
+ # JSON code blocks preserve attribution and avoid rendering source text as HTML.
+ def safe(value):return json.dumps(value,ensure_ascii=False,indent=2,sort_keys=True).replace('```','\\u0060\\u0060\\u0060')
+ lines=['# Structured function review','', 'Status: structured partial review; independent acceptance: not recorded.','', 'Source pins:', '```json',safe(report['source']),'```','', 'Computed CFG sequence (not an execution trace):','```json',safe(report['computed']['sequence']),'```','', 'Module membership:', '```json',safe(report['computed']['module']),'```']
+ for name in SECTIONS:
+  section=report['reasoning']['sections'][name];lines+=['', '## '+name,'','```json',safe(section),'```']
+ lines+=['','## Findings and review criteria','','```json',safe({'findings':report['reasoning']['findings'],'criteria':report['reasoning']['criteria']}),'```','','## Limitations','']+['- '+s for s in report['limitations']]
+ lines+=['','## Diagrams (computed local structure; no runtime trace)','','```mermaid',sequence_diagram(report),'```','','```mermaid',module_diagram(report),'```']
+ return '\n'.join(lines)+'\n'
+
+def sequence_diagram(report):
+ edges=report['computed']['sequence']['edges'];ids=sorted({e[k]for e in edges for k in ('from','to')})
+ labels={b:'v'+sha(b.encode())[:12]for b in ids};lines=['flowchart TD','%% Computed bounded CFG; runtime feasibility, calls and exceptions remain unknown.']
+ for b in ids:lines.append('  '+labels[b]+'["'+b+'"]')
+ for e in edges:
+  label=e.get('condition','') or 'successor'
+  lines.append('  '+labels[e['from']]+' -->|'+label+'| '+labels[e['to']])
+ if not ids:lines.append('  empty["No CFG successors; no safety conclusion"]')
+ return '\n'.join(lines)
+def module_diagram(report):
+ module=report['computed']['module'];label=json.dumps(module['file'],ensure_ascii=True)
+ return '\n'.join(['flowchart LR','%% Computed retained-file membership; interprocedural edges are unknown.','  file['+label+'] -->|computed membership| symbol["Selected retained function"]','  symbol -.->|unknown, not computed| external["Interprocedural relationships unavailable"]'])
+
+def write_review(workspace,bundle,judgments):
+ workspace=Path(workspace);require(workspace.is_dir(),'existing ticket workspace required');report=build(bundle,judgments)
+ (workspace/'deep-review-evidence.json').write_bytes(canonical(bundle)+b'\n');(workspace/'deep-review.json').write_bytes(canonical(report)+b'\n');(workspace/'review-report.md').write_text(markdown(report));(workspace/'sequence.mmd').write_text(sequence_diagram(report)+'\n');(workspace/'modules.mmd').write_text(module_diagram(report)+'\n');return report
+
+def verify_workspace(workspace,state=None):
+ workspace=Path(workspace);raw,report=load(workspace/'deep-review.json');_,bundle=load(workspace/'deep-review-evidence.json');validate(report,bundle)
+ text=(workspace/'review-report.md').read_text();require(text==markdown(report),'review delivery report differs from typed artifact')
+ require((workspace/'sequence.mmd').read_text()==sequence_diagram(report)+'\n'and (workspace/'modules.mmd').read_text()==module_diagram(report)+'\n','diagram differs from source-bound view')
+ if state is None:_,state=load(workspace/'state.json')
+ require(isinstance(state,dict)and state.get('ticket_type')=='code_review'and state.get('ticket_id')==report['ticket_id'],'review ticket identity/type differs')
+ analysis=state.get('states',{}).get('ANALYSIS',{});require(analysis.get('deep_review_sha256')==sha(raw),'analysis must bind exact validated deep review bytes')
+ if state.get('current_state')in('COMPLETION','COMPLETED'):
+  planning=state.get('states',{}).get('PLANNING',{});require(planning.get('review_report_sha256')==sha(text.encode())and planning.get('status')=='completed','completion requires bound delivered review report')
+ return {'status':'validated_delivery','ticket_id':report['ticket_id'],'deep_review_sha256':sha(raw),'review_report_sha256':sha(text.encode()),'independent_acceptance':'not_recorded'}
+
+def main():
+ parser=argparse.ArgumentParser();sub=parser.add_subparsers(dest='action',required=True)
+ create=sub.add_parser('build');create.add_argument('--workspace',type=Path,required=True);create.add_argument('--bundle',type=Path,required=True);create.add_argument('--judgments',type=Path,required=True)
+ verify=sub.add_parser('verify');verify.add_argument('--workspace',type=Path,required=True)
+ args=parser.parse_args()
+ try:
+  if args.action=='build':_,bundle=load(args.bundle);_,judgments=load(args.judgments);report=write_review(args.workspace,bundle,judgments);print(json.dumps({'status':report['status'],'independent_acceptance':'not_recorded'}))
+  else:print(json.dumps(verify_workspace(args.workspace)))
+ except (Invalid,ValueError,TypeError,KeyError,OSError)as error:print(json.dumps({'status':'invalid','reason':str(error)}));return 2
+ return 0
+if __name__=='__main__':raise SystemExit(main())

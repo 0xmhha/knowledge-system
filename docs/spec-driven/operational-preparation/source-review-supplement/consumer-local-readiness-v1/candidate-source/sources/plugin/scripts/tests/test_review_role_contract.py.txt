@@ -1,0 +1,222 @@
+import copy
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+spec = importlib.util.spec_from_file_location("original_review_tests", ROOT / "scripts/tests/test_deep_review.py")
+original = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(original)
+review = original.review
+
+BASE_TOOLS = {'analyzer': ['mcp__plugin_coding-agent_chainbench__chainbench_experiment', 'mcp__plugin_coding-agent_chainbench__chainbench_prepare_log_observation', 'mcp__plugin_coding-agent_chainbench__chainbench_observe_logs', 'Read', 'Write', 'Edit', 'Bash', 'mcp__plugin_coding-agent_cks__cks_context_semantic_search', 'mcp__plugin_coding-agent_cks__cks_context_search_text', 'mcp__plugin_coding-agent_cks__cks_context_find_symbol', 'mcp__plugin_coding-agent_cks__cks_context_get_subgraph', 'mcp__plugin_coding-agent_cks__cks_context_find_callers', 'mcp__plugin_coding-agent_cks__cks_context_find_callees', 'mcp__plugin_coding-agent_cks__cks_context_impact_analysis', 'mcp__plugin_coding-agent_cks__cks_context_concurrency_impact', 'mcp__plugin_coding-agent_cks__cks_context_change_history', 'mcp__plugin_coding-agent_cks__cks_context_get_for_task', 'mcp__plugin_coding-agent_cks__cks_context_label_suspects', 'mcp__plugin_coding-agent_cks__cks_context_find_invariants', 'mcp__plugin_coding-agent_cks__cks_context_get_conventions', 'mcp__plugin_coding-agent_cks__cks_ops_health', 'mcp__plugin_coding-agent_cks__cks_ops_freshness', 'mcp__plugin_coding-agent_cks__cks_ops_index', 'mcp__plugin_coding-agent_chainbench__chainbench_init', 'mcp__plugin_coding-agent_chainbench__chainbench_start', 'mcp__plugin_coding-agent_chainbench__chainbench_stop', 'mcp__plugin_coding-agent_chainbench__chainbench_restart', 'mcp__plugin_coding-agent_chainbench__chainbench_status', 'mcp__plugin_coding-agent_chainbench__chainbench_state_compact', 'mcp__plugin_coding-agent_chainbench__chainbench_test_list', 'mcp__plugin_coding-agent_chainbench__chainbench_test_run', 'mcp__plugin_coding-agent_chainbench__chainbench_report', 'mcp__plugin_coding-agent_chainbench__chainbench_contract_deploy', 'mcp__plugin_coding-agent_chainbench__chainbench_contract_call', 'mcp__plugin_coding-agent_chainbench__chainbench_tx_send', 'mcp__plugin_coding-agent_chainbench__chainbench_tx_wait', 'mcp__plugin_coding-agent_chainbench__chainbench_txpool_inspect', 'mcp__plugin_coding-agent_chainbench__chainbench_node_rpc', 'mcp__plugin_coding-agent_chainbench__chainbench_consensus_status', 'mcp__plugin_coding-agent_chainbench__chainbench_consensus_health', 'mcp__plugin_coding-agent_chainbench__chainbench_consensus_validators', 'mcp__plugin_coding-agent_chainbench__chainbench_consensus_block_info', 'mcp__plugin_coding-agent_chainbench__chainbench_network_partition', 'mcp__plugin_coding-agent_chainbench__chainbench_network_peers', 'mcp__plugin_coding-agent_chainbench__chainbench_network_topology', 'mcp__plugin_coding-agent_chainbench__chainbench_log_search', 'mcp__plugin_coding-agent_chainbench__chainbench_log_timeline', 'mcp__plugin_coding-agent_chainbench__chainbench_failure_context', 'mcp__plugin_coding-agent_chainbench__chainbench_events_get'], 'planner': ['Read', 'Write', 'Edit', 'Bash', 'mcp__plugin_coding-agent_cks__cks_context_semantic_search', 'mcp__plugin_coding-agent_cks__cks_context_search_text', 'mcp__plugin_coding-agent_cks__cks_context_find_symbol', 'mcp__plugin_coding-agent_cks__cks_context_get_subgraph', 'mcp__plugin_coding-agent_cks__cks_context_find_callers', 'mcp__plugin_coding-agent_cks__cks_context_find_callees', 'mcp__plugin_coding-agent_cks__cks_context_impact_analysis', 'mcp__plugin_coding-agent_cks__cks_context_concurrency_impact', 'mcp__plugin_coding-agent_cks__cks_context_change_history', 'mcp__plugin_coding-agent_cks__cks_context_get_for_task', 'mcp__plugin_coding-agent_cks__cks_ops_health', 'mcp__plugin_coding-agent_cks__cks_ops_freshness', 'mcp__plugin_coding-agent_cks__cks_ops_index']}
+ADDITIONS = {"analyzer": ["value_dependencies", "rule_candidates", "value_dependency_expansion", "policy_security", "review_function"], "planner": ["review_function", "rule_candidates"]}
+
+def role_tools(text):
+    front = text.split("---", 2)[1]
+    return [line.strip()[2:] for line in front.split("tools:\n", 1)[1].split("\nskills:", 1)[0].splitlines() if line.strip().startswith("- ")]
+
+
+def check_tools(role, text):
+    expected = BASE_TOOLS[role] + ["mcp__plugin_coding-agent_cks__cks_context_" + name for name in ADDITIONS[role]]
+    if role_tools(text) != expected:
+        raise ValueError("exact role tools differ")
+    schema = json.loads((ROOT / "contracts/cks-tools.schema.json").read_text())["providers"]["cks"]["tools"]
+    for name in ADDITIONS[role]:
+        if schema["cks_context_" + name]["wire_name"] != "cks.context." + name:
+            raise ValueError("wire namespace differs")
+
+
+class RoleContractTests(unittest.TestCase):
+    def make_workspace(self, root):
+        return original.DeepReviewTests().make_workspace(root)
+
+    def hook(self, workspace, state, tool="Write"):
+        before = (workspace / "state.json").read_text()
+        data = {"tool_name": tool, "cwd": str(workspace), "tool_input": {"file_path": str(workspace / "state.json"), "content": json.dumps(state)}}
+        if tool == "Edit":
+            data["tool_input"] = {"file_path": str(workspace / "state.json"), "old_string": before, "new_string": json.dumps(state)}
+        result = subprocess.run([sys.executable, str(ROOT / "hooks/deep-review-guard.py")], input=json.dumps(data), text=True, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, "")
+        return json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] if result.stdout.strip() else "allow"
+
+    def test_exact_role_tools_and_schema(self):
+        for role, count in [("analyzer", 54), ("planner", 19)]:
+            with self.subTest(role=role):
+                text = (ROOT / "agents" / (role + ".md")).read_text()
+                check_tools(role, text)
+                self.assertEqual(len(role_tools(text)), count)
+
+    def test_each_missing_new_alias_rejected(self):
+        for role, names in ADDITIONS.items():
+            text = (ROOT / "agents" / (role + ".md")).read_text()
+            for name in names:
+                with self.subTest(role=role, name=name):
+                    altered = text.replace("  - mcp__plugin_coding-agent_cks__cks_context_" + name + "\n", "")
+                    with self.assertRaises(ValueError):
+                        check_tools(role, altered)
+
+    def test_existing_tool_removal_wildcard_duplicate_and_reorder_rejected(self):
+        text = (ROOT / "agents/analyzer.md").read_text()
+        for changed in [text.replace("  - Read\n", ""), text.replace("cks_context_rule_candidates\n", "*\n"), text.replace("  - Read\n", "  - Read\n  - Read\n"), text.replace("  - Read\n  - Write\n", "  - Write\n  - Read\n")]:
+            with self.subTest(change=changed[:20]):
+                with self.assertRaises(ValueError):
+                    check_tools("analyzer", changed)
+
+    def test_no_legacy_review_dispatch_or_severity_template(self):
+        for role in ADDITIONS:
+            text = (ROOT / "agents" / (role + ".md")).read_text()
+            rows = [line for line in text.splitlines() if line.lstrip().startswith("| code_review")]
+            self.assertEqual(len(rows), 1)
+            self.assertNotIn("DONE", rows[0])
+            self.assertNotIn("§3 ANALYSIS", rows[0])
+        text = (ROOT / "agents/planner.md").read_text()
+        self.assertNotIn('light ANALYSIS for "code_review"', text)
+        section = text.split("## 7.", 1)[1].split("## 8.", 1)[0]
+        self.assertNotIn("Cap at 30", section)
+        self.assertNotIn("critical | high", section)
+        self.assertIn("at most 32", section)
+        self.assertIn("high | medium | low", section)
+
+    def test_typed_handoff_guidance_present(self):
+        for role in ADDITIONS:
+            text = (ROOT / "agents" / (role + ".md")).read_text()
+            section = text.split("## 7.", 1)[1].split("## 8.", 1)[0]
+            for required in ["deep-review-evidence.json", "deep-review.json", "review-report.md", "sequence.mmd", "modules.mmd", "ANALYSIS.deep_review_sha256", "PLANNING.review_report_sha256", "identity_only_unverified_snapshot", "not_recorded"]:
+                self.assertIn(required, section)
+            for required in ["data_state", "guards_exceptions", "complexity", "resources", "io", "priority_tradeoffs"]:
+                self.assertIn(required, section)
+            self.assertIn("Direct", section.replace("direct", "Direct"))
+            self.assertIn("shell", section)
+            self.assertIn("{plugin_root}/scripts/deep_review.py", section)
+            self.assertIn("python3", section)
+            self.assertIn("do not assume", section)
+            self.assertIn("not a runtime trace", " ".join(section.split()))
+
+    def test_planner_enters_planning_and_returns_priority_summary(self):
+        text = (ROOT / "agents/planner.md").read_text()
+        self.assertIn("do not repeat", text)
+        self.assertIn("current_state=PLANNING", text)
+        self.assertIn("independent acceptance not_recorded", text)
+        self.assertIn("{by priority}", text)
+        self.assertNotIn("{by severity}", text)
+
+    def test_priority_three_values_and_finding_cap(self):
+        bundle, judgments = original.bundle(), original.judgments()
+        template = judgments["findings"][0]
+        for priority in ["high", "medium", "low"]:
+            item = copy.deepcopy(judgments); item["findings"][0]["priority"] = priority
+            review.build(bundle, item)
+        for priority in ["critical", "safe"]:
+            item = copy.deepcopy(judgments); item["findings"][0]["priority"] = priority
+            with self.assertRaises(review.Invalid):
+                review.build(bundle, item)
+        judgments["findings"] = [{**copy.deepcopy(template), "id": "finding-" + str(i)} for i in range(32)]
+        review.build(bundle, judgments)
+        judgments["findings"].append({**copy.deepcopy(template), "id": "finding-32"})
+        with self.assertRaises(review.Invalid):
+            review.build(bundle, judgments)
+
+    def test_partial_shape_is_not_independent_gold(self):
+        b, j = original.bundle(), original.judgments()
+        j["findings"] = []; j["criteria"] = j["criteria"][:1]
+        report = review.build(b, j)
+        self.assertEqual(report["status"], "structured_partial_review")
+        self.assertEqual(report["independent_acceptance"], "not_recorded")
+        self.assertEqual(report["structural_review"]["snapshot_association"], "identity_only_unverified_snapshot")
+
+    def test_structural_identity_is_not_atomic_snapshot_or_runtime_trace(self):
+        bundle = original.bundle()
+        bundle["function_review"]["result"]["code"]["signature"] = "unverified structural content control"
+        report = review.build(bundle, original.judgments())
+        self.assertEqual(report["structural_review"]["snapshot_association"], "identity_only_unverified_snapshot")
+        self.assertEqual(report["computed"]["sequence"]["kind"], "bounded_cfg_not_execution_trace")
+        self.assertEqual(report["computed"]["module"]["interprocedural_edges"], "unknown")
+        self.assertEqual(report["independent_acceptance"], "not_recorded")
+
+    def test_analysis_hash_must_be_bound_before_cli_verification(self):
+        with tempfile.TemporaryDirectory() as temp:
+            w, state = self.make_workspace(temp)
+            state["current_state"] = "ANALYSIS"; state["states"]["ANALYSIS"] = {"status": "in_progress"}
+            with self.assertRaises(review.Invalid):
+                review.verify_workspace(w, state)
+            state["states"]["ANALYSIS"]["deep_review_sha256"] = review.sha((w / "deep-review.json").read_bytes())
+            review.verify_workspace(w, state)
+
+    def test_planning_hash_completion_and_idempotent_reentry(self):
+        with tempfile.TemporaryDirectory() as temp:
+            w, state = self.make_workspace(temp)
+            state["current_state"] = "COMPLETION"; state["states"]["PLANNING"] = {"status": "completed"}
+            self.assertEqual(self.hook(w, state), "deny")
+            state["states"]["PLANNING"]["review_report_sha256"] = review.sha((w / "review-report.md").read_bytes())
+            self.assertEqual(self.hook(w, state), "allow")
+            first = review.verify_workspace(w, state)
+            self.assertEqual(first, review.verify_workspace(w, state))
+            (w / "state.json").write_text(json.dumps(state))
+            result = subprocess.run([sys.executable, str(ROOT / "scripts/deep_review.py"), "verify", "--workspace", str(w)], capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 0, result.stdout)
+            self.assertEqual(json.loads(result.stdout)["independent_acceptance"], "not_recorded")
+
+    def test_revision_returns_to_analysis_and_replaces_both_bindings(self):
+        with tempfile.TemporaryDirectory() as temp:
+            w, state = self.make_workspace(temp)
+            state["states"]["PLANNING"] = {"status": "completed", "review_report_sha256": review.sha((w / "review-report.md").read_bytes())}
+            (w / "state.json").write_text(json.dumps(state))
+            revised = original.judgments(); revised["sections"]["priority_tradeoffs"]["claim"] += " Clarify ownership first."
+            review.write_review(w, original.bundle(), revised)
+            changed = copy.deepcopy(state); changed["states"]["ANALYSIS"]["deep_review_sha256"] = review.sha((w / "deep-review.json").read_bytes())
+            self.assertEqual(self.hook(w, changed), "deny")
+            changed["current_state"] = "ANALYSIS"; changed["states"]["ANALYSIS"]["status"] = "in_progress"; changed["states"]["PLANNING"] = {"status": "pending"}
+            self.assertEqual(self.hook(w, changed), "allow")
+            (w / "state.json").write_text(json.dumps(changed)); review.verify_workspace(w, changed)
+            changed["current_state"] = "PLANNING"; changed["states"]["ANALYSIS"]["status"] = "completed"
+            self.assertEqual(self.hook(w, changed), "allow"); (w / "state.json").write_text(json.dumps(changed))
+            changed["current_state"] = "COMPLETED"; changed["states"]["PLANNING"] = {"status": "completed", "review_report_sha256": state["states"]["PLANNING"]["review_report_sha256"]}
+            self.assertEqual(self.hook(w, changed), "deny")
+            changed["states"]["PLANNING"]["review_report_sha256"] = review.sha((w / "review-report.md").read_bytes())
+            self.assertEqual(self.hook(w, changed), "allow")
+
+    def test_write_and_edit_type_and_hash_bypass_denied(self):
+        with tempfile.TemporaryDirectory() as temp:
+            w, state = self.make_workspace(temp)
+            for tool in ["Write", "Edit"]:
+                for bad in [dict(state, ticket_type="feature"), dict(state, ticket_id="OTHER")]:
+                    with self.subTest(tool=tool):
+                        self.assertEqual(self.hook(w, bad, tool), "deny")
+
+    def test_every_missing_artifact_and_generated_content_tamper_denied(self):
+        with tempfile.TemporaryDirectory() as temp:
+            w, state = self.make_workspace(temp)
+            for name in ["deep-review-evidence.json", "deep-review.json", "review-report.md", "sequence.mmd", "modules.mmd"]:
+                with self.subTest(name=name):
+                    review.write_review(w, original.bundle(), original.judgments()); (w / name).unlink()
+                    self.assertEqual(self.hook(w, state), "deny")
+            for name in ["review-report.md", "sequence.mmd", "modules.mmd"]:
+                review.write_review(w, original.bundle(), original.judgments()); (w / name).write_text("forged content")
+                self.assertEqual(self.hook(w, state), "deny")
+
+    def test_shell_is_outside_hook_and_cli_still_refuses_forgery(self):
+        with tempfile.TemporaryDirectory() as temp:
+            w, state = self.make_workspace(temp); (w / "review-report.md").write_text("shell-written forgery")
+            self.assertEqual(self.hook(w, state, "Bash"), "allow")
+            result = subprocess.run([sys.executable, str(ROOT / "scripts/deep_review.py"), "verify", "--workspace", str(w)], capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 2)
+
+    def test_old_planner_markdown_only_completion_refused(self):
+        with tempfile.TemporaryDirectory() as temp:
+            w, state = self.make_workspace(temp)
+            state["current_state"] = "COMPLETED"; state["states"]["PLANNING"] = {"status": "completed"}
+            self.assertEqual(self.hook(w, state), "deny")
+            (w / "review-report.md").write_text("# Free form report")
+            state["states"]["PLANNING"]["review_report_sha256"] = review.sha((w / "review-report.md").read_bytes())
+            self.assertEqual(self.hook(w, state), "deny")
+
+
+if __name__ == "__main__":
+    unittest.main()

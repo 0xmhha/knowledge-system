@@ -326,9 +326,23 @@
 - 두 role의 옛 code_review→DONE source2곳·frontmatter/return까지 정렬 범위에 포함.
 - 전용 명세/허위완료 방지48개 포함 관련 회귀296개 통과. 명세8파일 두 차례 byte 재현 일치.
 - 문서134개/기존 구현 완료 상태 검사 통과. 기존25패킷·Go·현재 handoff/잔여 문서·정식9항목 유지.
-[예정] 27. 격리 소비자 후보의 도구 노출·Planner 구조화 전달 계약 보완 및 로컬 회귀
+[완료: 요청 로컬 범위] 27. 격리 소비자 후보의 도구 노출·Planner 구조화 전달 계약 보완 및 로컬 회귀
 - 별도 소유 checkout에서 두 role 파일·회귀 테스트를 최소 변경하고 verifier/runtime/기존 도구 목록을 보존한다.
 - 명세 P01~P04의 source/metadata/전달/변조 대조부터 검증한다. 실제 role/stdio/그림 검증은 후속 P05~P08로 구분한다.
+- 격리 candidateaf4ff8b1(3개 서명 commit), 원본 채택b7e7868 유지. 변경은 두 role 문서와 새16회귀 테스트3파일뿐.
+- 도구 Analyzer49→54/Planner17→19·기존순서/현재input metadata 정합·옛dispatch/설명/return/Markdown절차 정렬.
+- 실제 설치 plugin_root를 먼저 resolve하고 python3/절대경로·build 입력flags로 호출. 작업폴더=설치경로 가정 제거.
+- ANALYSIS in_progress hash 기록→CLI검증→handoff, Planner report hash·재진입과 stale/foreign/변조 거부를 실제 로컬 script/hook으로 검증.
+- 로컬 회귀45개 통과(기존review15/labels14/새role16). runtime/schema/기존test 보존, 임시시험 경로 정리·서명·원본clean 확인.
+- CKS/CKG 두 빌드 통과·stderr 없음·Go source delta0. host 파일hash는 기록했으나 host를 새 실행한 증거는 아님.
+- 22계획사례 중 local-only6개(T01/T02/T08/T11/T12/T17) 통과, 나머지16개 미실행. P02~P04 전체교차 검증은 P05~P08 pending.
+- consumer-local-readiness-v1에 rawlogs/source Gitproof·복구용 full bundle·patch 보존. 후보 미채택·새역할/MCP/모델/리스너/정식실행0.
+- 증거 guard30개 포함 저장소 관련 회귀326개·문서134개/기존 구현 검사 통과. 동결52파일의 재구성2회 일치.
+- 초기 Go cache 경고 로그는 소유 preflight에 보존하고 재빌드 stderr0 확인. raw patch/build-info 공백도 원래 bytes 보존.
+- 기존26패킷·유지보수Go·현재 handoff/잔여 문서·정식9항목 유지. 전체 계획/실제 역할 수용으로 승격하지 않음.
+[예정] 28. P05 소유 fixture→실제 CKS stdio 검증
+- 현재 source에 묶인 binary를 재확인하고 소유 Go fixture/index로5도구 actual request/response·pin/상한/오류 경로를 검증한다.
+- static schema/도구 목록이나 direct client 성공을 P06 실제 역할/권한 성공으로 세지 않는다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -360,14 +374,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-격리된 별도 coding-agent 후보에서 두 role 파일의 도구 노출·Planner 구조화 전달 계약 보완과 로컬 회귀(P01~P04)를 진행한다.
+P05 소유 fixture/index→실제 CKS stdio의5도구·pin/상한/오류 경로를 검증한다. 이후 P06 실제역할·P07 그림/종료·P08 준비 판정을 진행한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_contract_plan.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-contract-plan.py --packet docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_local_readiness.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-local-readiness.py --packet docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~26단계 검증 완료, 27단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~26단계와 27단계 요청 구현/로컬 검증 완료, 28단계 예정. P02~P04 교차 검증은 P05~P08 pending. 정식 독립 수용은 계속 0/9이다.

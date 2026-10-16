@@ -367,6 +367,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
           "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
           "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+        },
+        "consumer_local_readiness": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+          "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+          "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
         }
       },
       "completed_preparation": [
@@ -409,7 +414,8 @@
         "wi6_independent_family_paired_baseline_expansion_relevance_noise_actual_path_and_warm_latency_gap_review_with_scoped_historical_fixture_metrics",
         "WI-SP 준비24단계: 독립 symbol·수동/자동 출처·annotation gold·ACL/private/위조·소비자 경로 공백 점검, 일반/race native 재검증 및 기록 문서 문맥 검증 완료. 독립 수용 아님.",
         "WI-C 준비25단계:10후보/8모듈의 실제 리뷰 계약·필수 항목/priority 초안·typed report/그림·handoff·설치 역할 공백, native 일반/race·consumer 기존15/추가12 로컬 계약·전용51 검증 완료. 독립 정답/품질 수용 아님.",
-        "준비26단계: 소비자 Analyzer5/Planner2 명시 도구 노출·Planner/역할 dispatch·typed report/hash/handoff 계약의 요구사항12·구현8단계·격리 검증22사례·증거/종료 계획 작성 및 정합 검증 완료. 실제 구현·새 host/MCP/모델 실행·독립 수용 아님."
+        "준비26단계: 소비자 Analyzer5/Planner2 명시 도구 노출·Planner/역할 dispatch·typed report/hash/handoff 계약의 요구사항12·구현8단계·격리 검증22사례·증거/종료 계획 작성 및 정합 검증 완료. 실제 구현·새 host/MCP/모델 실행·독립 수용 아님.",
+        "준비27단계: 격리 소비자 후보af4ff8b1에서 두 role 문서/새테스트3파일로 도구7항목과 Planner/dispatch/hash/re-entry 계약 보완. 소비자 로컬45·증거 guard30 포함 저장소326회귀·binary2빌드 검증 완료. P01~P04 요청 로컬 범위 완료이며 P02~P04 전체 stdio/actual role 검증은 P05~P08 pending. 후보 미채택·정식 수용 아님."
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -1767,6 +1773,79 @@
           "live_document_check_count": 134,
           "original_implementation_completion_guard": "pass",
           "regression_status": "pass_scoped_specification_checks_not_implementation_validation"
+        },
+        "consumer_local_readiness": {
+          "date": "2026-10-17",
+          "kind": "P01_P04_local_implementation_and_controls_not_full_plan_or_host_acceptance",
+          "candidate_commit": "af4ff8b1b7778cb8dd783af684ecefd01b76283c",
+          "candidate_repository": "/private/tmp/ks-consumer-contract-candidate-20261017",
+          "candidate_branch": "codex/consumer-contract-readiness",
+          "candidate_signed_commits": 3,
+          "candidate_files_changed": 3,
+          "candidate_adopted": false,
+          "original_adopted_commit_unchanged": "b7e78689676769e8536626e76eed7165d870e1ba",
+          "role_tool_entries": 7,
+          "role_tools_after": {
+            "analyzer": 54,
+            "planner": 19
+          },
+          "consumer_local_tests_passed": 45,
+          "consumer_test_counts": {
+            "test_deep_review.py": 15,
+            "test_review_role_contract.py": 16,
+            "test_suspect_labels.py": 14
+          },
+          "repository_scoped_regression_tests_passed": 326,
+          "repository_regression_scope": "local_evidence_plan_ledger_readiness_docs_and_affected_consumer_gaps_not_full_repository",
+          "dedicated_evidence_guard_tests_passed": 30,
+          "regression_tests": {
+            "test_consumer_local_readiness.py": 30,
+            "test_consumer_contract_plan.py": 48,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20,
+            "test_review_gap.py": 51,
+            "test_rule_gap.py": 36,
+            "test_expansion_gap.py": 39,
+            "test_policy_security_gap.py": 42,
+            "test_operational_host_probe.py": 8
+          },
+          "built_binaries": [
+            "cks",
+            "ckg"
+          ],
+          "built_go_source_delta": 0,
+          "final_build_stderr_empty": true,
+          "initial_cache_warning_logs_retained_at": "/private/tmp/ks-consumer-contract-readiness-20261017/initial-build-logs",
+          "host_binary_pinned_but_not_executed": true,
+          "planned_local_cases_passed": [
+            "T01",
+            "T02",
+            "T08",
+            "T11",
+            "T12",
+            "T17"
+          ],
+          "planned_full_cases_pending": 16,
+          "P02_P04_full_cross_layer_validation": "pending_P05_P08",
+          "frozen_evidence_reconstruction_files": 52,
+          "reconstruction_count": 2,
+          "reconstruction_executes_new_tests": false,
+          "raw_git_patch_and_build_info_whitespace_preserved": true,
+          "candidate_full_git_bundle_verified": true,
+          "new_actual_role_sessions": 0,
+          "new_mcp_sessions": 0,
+          "new_model_calls": 0,
+          "new_network_listeners": 0,
+          "formal_runs": 0,
+          "formal_state_unchanged": true,
+          "protocol_criteria_unchanged": true,
+          "prior_frozen_packets_unchanged": 26,
+          "maintained_go_source_unchanged": true,
+          "live_document_check_count": 134,
+          "original_implementation_completion_guard": "pass",
+          "regression_status": "pass_scoped_local_controls_not_installed_role_or_formal_acceptance",
+          "installed_plugin_root_resolution_guidance_verified_locally": true
         }
       },
       "candidate_counts": {
@@ -1889,7 +1968,7 @@
   },
   "preparation_gap_inventory": {
     "path": "docs/spec-driven/operational-preparation/source-review-supplement/GAPS.json",
-    "sha256": "70cd3bb4a9dd00ccb754a32486acb0a54d66dfe9289b27a45596ec16195e4a7f",
+    "sha256": "4143c46a7a23819d66b8e5278c5ef8eeb7d7de051eac99d562496a4e90b751c3",
     "formal_completed": 0,
     "formal_total": 9,
     "optional_backlog_count": 12
@@ -2013,5 +2092,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
     "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
     "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+  },
+  "consumer_local_readiness": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+    "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+    "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
   }
 }

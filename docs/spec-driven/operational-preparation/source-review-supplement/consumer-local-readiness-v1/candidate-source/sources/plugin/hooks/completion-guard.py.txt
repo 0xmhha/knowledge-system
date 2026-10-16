@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""PreToolUse guard for bugfix completion and frozen oracle plans.
+
+Checks Write/Edit pipeline state transitions. Direct shell/manual edits are
+outside this hook boundary; callers must also run the completion-check CLI.
+"""
+import json
+import os
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from oracle_gate import GateError, completion_check  # noqa: E402
+from publication_policy import transition_check  # noqa: E402
+import subprocess
+
+
+def deny(reason):
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+        "permissionDecision": "deny", "permissionDecisionReason": reason}}))
+
+
+def proposed_content(data, old):
+    inputs = data["tool_input"]
+    if data["tool_name"] == "Write":
+        content = inputs.get("content")
+        if not isinstance(content, str):
+            raise GateError("Write requires complete JSON content")
+        return content
+    before, after = inputs.get("old_string"), inputs.get("new_string")
+    if not isinstance(before, str) or not before or not isinstance(after, str):
+        raise GateError("Edit requires a nonempty existing JSON fragment")
+    count = old.count(before)
+    if count == 0 or (count != 1 and not inputs.get("replace_all")):
+        raise GateError("Edit fragment does not uniquely identify the current state")
+    return old.replace(before, after) if inputs.get("replace_all") else old.replace(before, after, 1)
+
+
+def main():
+    try:
+        data = json.load(sys.stdin)
+    except (ValueError, TypeError):
+        return 0
+    if not isinstance(data, dict) or data.get("tool_name") not in ("Write", "Edit"):
+        return 0
+    inputs = data.get("tool_input") or {}
+    if not isinstance(inputs, dict):
+        return 0
+    name = inputs.get("file_path")
+    if not isinstance(name, str):
+        return 0
+    path = Path(name)
+    if not path.is_absolute():
+        path = Path(data.get("cwd") or os.getcwd()) / path
+    if path.name not in ("state.json", "oracle-validity-plan.json"):
+        return 0
+    workspace = path.parent
+    recognizable = ".coding-agent" in path.parts and "tickets" in path.parts
+    try:
+        old = path.read_text() if path.exists() else ""
+        try:
+            old_state = json.loads((workspace / "state.json").read_text()) if (workspace / "state.json").exists() else {}
+        except (ValueError, OSError):
+            if not recognizable:
+                return 0
+            raise GateError("cannot parse existing pipeline state")
+        if not recognizable and not (isinstance(old_state, dict) and old_state.get("ticket_id")):
+            return 0
+        if not isinstance(old_state, dict):
+            raise GateError("pipeline state must be an object")
+        if path.name == "oracle-validity-plan.json":
+            first_carry = (old_state.get("current_state") == "IMPLEMENTATION"
+                and not old_state.get("states", {}).get("ANALYSIS", {}).get("oracle_validity_plan_sha256"))
+            if (old_state.get("ticket_type") == "bugfix"
+                    and old_state.get("current_state") not in ("ANALYSIS", "TICKET_INTAKE") and not first_carry):
+                raise GateError("oracle plan is frozen after ANALYSIS; return to diagnosis to revise it")
+            return 0
+        candidate = json.loads(proposed_content(data, old))
+        if not isinstance(candidate, dict):
+            raise GateError("pipeline state must remain an object")
+        if old_state.get("ticket_type") == "bugfix" and candidate.get("ticket_type") != "bugfix":
+            raise GateError("cannot bypass bugfix validation by changing the ticket type")
+        old_hash = old_state.get("states", {}).get("ANALYSIS", {}).get("oracle_validity_plan_sha256")
+        new_hash = candidate.get("states", {}).get("ANALYSIS", {}).get("oracle_validity_plan_sha256")
+        if old_hash and old_hash != new_hash and candidate.get("current_state") != "ANALYSIS":
+            raise GateError("frozen plan identity cannot change outside diagnosis")
+        # Legacy publish workspaces retain their existing completion behavior.
+        needs_policy = ("publication_policy" in old_state.get("config", {})
+                        or "publication_policy" in candidate.get("config", {})
+                        or (workspace / "publication-policy.json").exists()
+                        or candidate.get("current_state") == "EVALUATED")
+        if old_state and needs_policy:
+            root = subprocess.run(["git", "-C", str(workspace), "rev-parse", "--show-toplevel"],
+                                  check=True, capture_output=True, text=True, timeout=5).stdout.strip()
+            transition_check(workspace, old_state, candidate, Path(root))
+        if candidate.get("current_state") in ("COMPLETION", "COMPLETED"):
+            completion_check(workspace, candidate)
+    except Exception as exc:
+        # Errors on positively identified pipeline files cannot permit completion.
+        deny("Bugfix completion blocked: " + str(exc))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

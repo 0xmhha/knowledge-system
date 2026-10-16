@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""Local bugfix evaluation boundary. Not an outbound-network sandbox or approval."""
+import argparse
+import copy
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+from oracle_gate import GateError, completion_check
+from fix_selection import verify_selection
+
+POLICY = 'publication-policy.json'
+RECEIPT = 'evaluation-exit.json'
+MODE = 'evaluation_only'
+TERMINAL = 'EVALUATED'
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+
+
+def load(path):
+    value = json.loads(path.read_text())
+    if not isinstance(value, dict):
+        raise GateError(f'{path.name} must be an object')
+    return value
+
+
+def git(repo, *args):
+    return subprocess.run(['git', '-C', str(repo), *args], check=True, capture_output=True,
+                          text=True, timeout=10).stdout.strip()
+
+
+def policy(workspace, state, repo):
+    """Default publication behavior is unchanged; an opt-in cannot silently disappear."""
+    if workspace.resolve().parent != (repo.resolve() / '.coding-agent/tickets').resolve():
+        raise GateError('evaluation workspace must be a direct owned ticket directory')
+    mode = state.get('config', {}).get('publication_policy', 'publish')
+    path = workspace / POLICY
+    if mode not in ('publish', MODE):
+        raise GateError('unknown publication policy')
+    if not path.exists():
+        if mode == MODE:
+            raise GateError('evaluation_only requires an intake policy lock')
+        return 'publish'
+    locked = load(path)
+    expected = {'schema_version': 1, 'mode': MODE, 'autonomy_mode': 'auto', 'ticket_id': state.get('ticket_id'),
+                'ticket_type': 'bugfix', 'pipeline_variant': 'full',
+                'requirement_source': 'local', 'repo_root': str(repo.resolve()),
+                'workspace': str(workspace.resolve()), 'base_ref': state.get('config', {}).get('base_ref')}
+    if (locked != expected or mode != MODE or state.get('ticket_type') != 'bugfix'
+            or state.get('pipeline_variant') != 'full' or state.get('requirement_source') != 'local'
+            or state.get('config', {}).get('autonomy', {}).get('mode') != 'auto'
+            or state.get('config', {}).get('autonomy', {}).get('auto_merge') is not False
+            or not locked['ticket_id'] or not locked['base_ref']):
+        raise GateError('evaluation-only intake identity/policy changed or conflicts with auto_merge')
+    return MODE
+
+
+def initialize(workspace, state, repo):
+    if workspace.resolve().parent != (repo.resolve() / '.coding-agent/tickets').resolve():
+        raise GateError('evaluation workspace must be a direct owned ticket directory')
+    if state.get('current_state') != 'TICKET_INTAKE':
+        raise GateError('policy can only be locked at intake')
+    cfg = state.get('config', {})
+    value = {'schema_version': 1, 'mode': MODE, 'autonomy_mode': 'auto', 'ticket_id': state.get('ticket_id'),
+             'ticket_type': 'bugfix', 'pipeline_variant': 'full', 'requirement_source': 'local',
+             'repo_root': str(repo.resolve()), 'workspace': str(workspace.resolve()),
+             'base_ref': cfg.get('base_ref')}
+    if git(repo, 'rev-parse', 'HEAD') != cfg.get('base_ref'):
+        raise GateError('intake base must be the actual HEAD')
+    path = workspace / POLICY
+    if path.exists():
+        policy(workspace, state, repo)
+        return  # idempotent resume; never replace a different lock
+    # Validate before writing, including explicit opt-in and incompatible modes.
+    if (cfg.get('publication_policy') != MODE or not value['ticket_id']
+            or any(state.get(k) != value[k] for k in ('ticket_type', 'pipeline_variant', 'requirement_source'))
+            or cfg.get('autonomy', {}).get('mode') != 'auto'
+            or cfg.get('autonomy', {}).get('auto_merge') is not False):
+        raise GateError('evaluation_only requires local full bugfix and auto_merge=false')
+    with path.open('x') as stream:
+        stream.write(json.dumps(value, indent=2) + '\n')
+
+
+def artifacts(workspace):
+    result = {}
+    for path in sorted(workspace.rglob('*')):
+        if path.is_symlink():
+            raise GateError('exit evidence cannot contain symlinks')
+        if path.is_file() and path.relative_to(workspace).as_posix() not in ('state.json', RECEIPT, 'logs/impl.log', 'logs/agent-transcript.jsonl'):
+            if path.stat().st_size > 64 * 1024 * 1024:
+                raise GateError('exit evidence file exceeds 64 MiB')
+            result[path.relative_to(workspace).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return result
+
+
+def prerequisites(workspace, state, repo):
+    if policy(workspace, state, repo) != MODE:
+        raise GateError('local evaluation exit requires evaluation_only')
+    if state.get('current_state') not in ('EVALUATION_PASS', TERMINAL):
+        raise GateError('evaluation exit requires EVALUATION_PASS')
+    for stage in ('TICKET_INTAKE', 'ANALYSIS', 'PLANNING', 'DESIGN', 'IMPLEMENTATION'):
+        if state.get('states', {}).get(stage, {}).get('status') != 'completed':
+            raise GateError(f'required pipeline stage incomplete: {stage}')
+    steps = state.get('states', {}).get('IMPLEMENTATION', {}).get('plan_progress', {}).get('steps')
+    if not isinstance(steps, list) or not steps or any(
+            step.get('status') != 'completed' or not step.get('commits') for step in steps):
+        raise GateError('implementation plan steps are missing or incomplete')
+    evaluation = state.get('states', {}).get('EVALUATION', {})
+    if evaluation.get('status') != 'completed' or not evaluation.get('completed_at'):
+        raise GateError('evaluation stage must have completed')
+    if state.get('states', {}).get('COMPLETION', {}).get('pr_url'):
+        raise GateError('evaluation-only cannot claim a published PR')
+    report = evaluation.get('report_path')
+    if report != 'test-report.md' or not (workspace / report).is_file() or not (workspace / report).read_text().strip():
+        raise GateError('evaluation report is missing')
+    # Keep the existing required stages and their tier-dependent skip semantics.
+    # A missing/failed required stage, oracle, or selected tree cannot exit.
+    completion_check(workspace, state, repo)
+    verify_selection(workspace, repo, state, applied=True)
+    if git(repo, 'status', '--porcelain', '--untracked-files=no'):
+        raise GateError('tracked subject source is dirty')
+
+
+def receipt(workspace, state, repo):
+    return {'schema_version': 1, 'kind': 'local_evaluation_only_not_delivery_or_acceptance',
+            'state_sha256': digest(state), 'head': git(repo, 'rev-parse', 'HEAD'),
+            'tree': git(repo, 'rev-parse', 'HEAD^{tree}'), 'artifacts': artifacts(workspace),
+            'boundary_runner_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            'independent_human_acceptance': 'not_recorded'}
+
+
+def check_exit(workspace, state, repo):
+    if state.get('current_state') != TERMINAL:
+        raise GateError('not a local evaluation terminal')
+    prerequisites(workspace, state, repo)
+    if load(workspace / RECEIPT) != receipt(workspace, state, repo):
+        raise GateError('local exit receipt is missing, stale or altered')
+
+
+def finalize(workspace, state, repo):
+    if state.get('current_state') == TERMINAL:
+        check_exit(workspace, state, repo)
+        return
+    if (workspace / 'state.next.json').exists():
+        raise GateError('interrupted state.next.json requires explicit recovery before retry')
+    prerequisites(workspace, state, repo)
+    final = copy.deepcopy(state)
+    final['current_state'] = TERMINAL
+    final['current_agent'] = None
+    # Receipt first: interruption before state write cannot manufacture terminal success.
+    (workspace / RECEIPT).write_text(json.dumps(receipt(workspace, final, repo), indent=2) + '\n')
+    temporary = workspace / 'state.next.json'
+    temporary.write_text(json.dumps(final, indent=2) + '\n')
+    temporary.replace(workspace / 'state.json')
+
+
+def transition_check(workspace, old, candidate, repo):
+    if (old.get('config', {}).get('publication_policy', 'publish') !=
+            candidate.get('config', {}).get('publication_policy', 'publish')):
+        raise GateError('publication policy is immutable after state creation')
+    mode = policy(workspace, candidate, repo)
+    if mode == MODE:
+        if candidate.get('current_state') in ('COMPLETION', 'COMPLETED'):
+            raise GateError('evaluation_only cannot enter publication/completion')
+        if candidate.get('states', {}).get('COMPLETION', {}).get('pr_url'):
+            raise GateError('evaluation_only cannot record a PR URL')
+        if candidate.get('current_state') == TERMINAL:
+            check_exit(workspace, candidate, repo)
+    elif candidate.get('current_state') == TERMINAL:
+        raise GateError('EVALUATED requires an evaluation-only policy')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--workspace', type=Path, required=True)
+    parser.add_argument('--repo', type=Path, required=True)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--init', action='store_true')
+    group.add_argument('--finalize', action='store_true')
+    group.add_argument('--check-exit', action='store_true')
+    args = parser.parse_args()
+    try:
+        workspace, repo = args.workspace.resolve(), args.repo.resolve()
+        state = load(workspace / 'state.json')
+        action = initialize if args.init else finalize if args.finalize else check_exit
+        action(workspace, state, repo)
+        print(json.dumps({'publication_policy': MODE, 'check': 'PASS', 'action': action.__name__}))
+        return 0
+    except (GateError, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
+        print(json.dumps({'check': 'ERROR', 'reason': str(exc)}))
+        return 2
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

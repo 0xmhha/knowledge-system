@@ -1,0 +1,13 @@
+소비자 P01~P04 구현·로컬 회귀 검증 — 준비27단계
+격리 후보 af4ff8b1b7778cb8dd783af684ecefd01b76283c / 채택 원본 b7e78689676769e8536626e76eed7165d870e1ba 유지
+두 role 문서·새 회귀 테스트3파일만 변경. 도구 Analyzer49→54, Planner17→19. runtime/schema/기존 테스트 보존.
+로컬 회귀45개(기존 review15/관련labels14/새role16) 통과; 서명 commit·원본 유지·임시 시험 경로 정리 확인.
+P01~P04 요청 구현/로컬 작업 완료. P02~P04의 실제 stdio/role 교차 검증은 P05~P08에 남아 있다.
+22계획사례 중 로컬 범위6개 T01/T02/T08/T11/T12/T17 통과. 나머지16개를 통과로 세지 않는다.
+실제 tools/list·역할 호출/권한·renderer·host취소/정리 검증 미수행. 새 MCP/역할/모델/리스너0건.
+빌드한 CKS/CKG와 host 파일의 hash를 기록했다. host를 새로 실행한 증거가 아니며 다음 실행 전 재확인한다.
+hash를 ANALYSIS in_progress에서 먼저 묶고 CLI 검증 후 handoff한다. 재진입은 양쪽 hash를 갱신하며 stale 완료를 거부한다.
+CFG/runtime·file membership/interprocedural·structural unpinned·형식과 의미 정답/품질 수용의 경계 유지.
+후보는 아직 채택/운영 설치하지 않았다. 독립 담당자 미정·F-01~F-08 pending·freeze null·정식 수용0/9.
+다음: P05 소유 Go fixture/index→실제 CKS stdio 도구/거부 경로 검증. 이후 P06 실제 역할·P07 그림/종료·P08 최종 준비 판정.
+candidate.bundle에는 전체 reachable Git 이력과 HEAD가 있다. 새 소유 clone에서 복구하고 원본 채택 checkout은 수정하지 않는다.

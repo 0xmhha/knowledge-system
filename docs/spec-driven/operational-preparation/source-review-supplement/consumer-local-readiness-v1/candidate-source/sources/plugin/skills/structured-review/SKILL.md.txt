@@ -1,0 +1,47 @@
+---
+name: structured-review
+description: Source-bound partial function review with calculated and agent reasoning provenance, diagrams, review criteria and delivery validation.
+---
+
+# Structured function review
+
+Apply for code_review analysis. Retain exact selected symbol, commit/blob/snapshot
+pins. Explicitly select go-local-review@1.0.0 in the request; automatic rule
+analysis is not enabled by default globally. Capture actual CKS rule_candidates
+and review_function request/results in an owned ticket bundle. The rule result
+already contains computed value/control data: reuse it. Keep unavailable or
+unsupported data explicit; never replace it with safe/false/zero placeholders.
+
+The evidence bundle has schema_version1, ticket_id, rules and function_review.
+Each receipt has tool, arguments, result. Tool names are actual wire names.
+Rule/function query identity must match. Structural review has no independent
+snapshot/blob pin; record identity_only_unverified_snapshot, without borrowing
+another call's pin to claim atomic cross-call consistency. A receipt hash binds
+supplied JSON and does not authenticate MCP transport or reviewer identity.
+
+Provide judgments with sections data_state, guards_exceptions, complexity,
+resources, io and priority_tradeoffs. Each section is agent_reasoning with status
+inferred or unknown, claim, original evidence_nodes, assumptions and unknowns.
+All-unknown placeholders cannot finish analysis. Findings are review_candidate
+agent reasoning, original anchors, rule candidate references, remediation,
+priority, assumptions and unknowns. Criteria bind the user's requirement to a
+section with covered/unknown and rationale. An unknown section cannot be marked
+covered. AST counts are not complexity or performance measurements; explain
+assumptions and external effects. Model priority tradeoffs without treating a
+review suggestion as an executed fix or independent acceptance.
+
+Use plugin/scripts/deep_review.py build --workspace <owned-ticket> --bundle
+<captured-bundle> --judgments <judgments>. It emits typed evidence/review,
+sequence.mmd (bounded CFG order, not runtime trace), modules.mmd (retained file
+membership; interprocedural links unknown) and review-report.md. Computed nodes
+and edges originate in CKG; agent interpretations remain separate. The report
+and diagrams are canonical views, so arbitrary edits fail verification.
+
+Bind the emitted deep-review SHA to states.ANALYSIS.deep_review_sha256. Run
+plugin/scripts/deep_review.py verify --workspace <owned-ticket>, then hand off
+ANALYSIS -> PLANNING. Planner validates delivery and binds the report SHA to
+states.PLANNING.review_report_sha256 with completed status. The review-only
+terminal verifies both. Never skip directly from light review to COMPLETION.
+Human/production acceptance stays not_recorded. Hooks only cover identified
+Write/Edit state transitions; direct shell edits require the same CLI verifier.
+This workflow does not authorize posting to trackers or publishing a PR.
