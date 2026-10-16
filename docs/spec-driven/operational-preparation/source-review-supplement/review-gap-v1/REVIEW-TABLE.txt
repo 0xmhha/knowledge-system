@@ -1,0 +1,122 @@
+WI-C 실제 리뷰·우선순위·필수 항목·보고서/그림·인수인계·설치 역할 공백 — 비공개 AI 자료
+10후보·8모듈·9파일, 독립 리뷰/필수 정답/현재 프로젝트 결과0개. 형식 검증은 의미 수용이 아니다.
+
+REVIEW-DRAFT-SRC-001 Status
+getStartEnd/analyzeBlock의 허용 범위·오류·최대 순회 및 round 산술 계약
+RPC 호출자 제한·블록 누락·partial 결과와 외부 조회/집계 비용
+RPC 허용 범위·최대 처리량·응답시간 요구와 analyzeBlock 계약을 확인한 뒤 범위/비용 항목의 필수 여부와 우선순위를 정할 수 있는가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-002 Gossip
+cache 업데이트와 Send의 payload 소유권·동시성·실패/재전송 계약
+goroutine/peer 수·queue/backpressure 상한과 cache를 먼저 갱신하는 영향
+재전송 보장·peer 수신 성공·payload 소유권·동시성 요구 중 필수 검토 항목은 무엇이며 실패 영향에 따라 어떤 우선순위를 부여해야 하는가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-006 ReadHeaderRange
+number/count 산술 허용 범위·2M 주석과 실제 상위 cap 계약
+live/ancient 경계·부분 반환·역순 정렬 및 AncientRange의 실제 maxBytes 의미
+count 상한과 부분 결과 계약·산술 허용 범위·메모리 예산을 확정하면 어떤 경계가 필수 항목이며 영향과 우선순위는 무엇인가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-007 ReadAllBadBlocks
+DB/RLP 오류와 정상 빈 목록의 구별 요구·호출자 복구 정책
+입력 RLP 크기/항목 수와 block 생성 할당·손상된 기록 처리
+오류와 빈 목록의 구분 요구·badBlock 데이터 규모·할당 예산을 확인한 뒤 누락하면 안 되는 항목과 우선순위를 정할 수 있는가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-011 DumpToCollector
+iterator/collector 소유권·panic 허용·OnlyWithAddresses/skip/Max 완전성 계약
+storage 오류/건너뜀·nextKey 재개와 trie/collector 자원/메모리 비용
+dump 완전성·panic 허용·collector 소유권·Max/skip 요구에서 필수 항목은 무엇이며 데이터 누락이나 중단의 영향을 어떻게 우선순위에 반영하는가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-016 Init
+store/limbo 초기화 실패의 Close/rollback·reserver 소유권과 재시도
+Datacap/drop의 진척·종료·잠금 조건 및 디스크/메모리 비용 상한
+초기화 실패 시 rollback/소유권·Datacap 초과 처리·진행 보장 계약을 확인한 뒤 어떤 자원/상태 항목을 필수로 하고 어떤 우선순위를 부여하는가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-021 eventLoop
+실제 subscriber 종료/해제·buffer/송신 대기·이벤트 도달성 계약
+timer/notification/subscription 생명주기·누수/정지의 oracle와 비용
+소비자 종료·송신 대기·subscription 해제 계약과 실제 도달성을 확인한 뒤 요구 위반 여부 및 영향/우선순위를 어떻게 판정하는가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-027 newWorkLoopOrigin
+실제 worker 호출자·channel/lock/WaitGroup·timer 종료/재설정 계약
+commit/exit 선택·recommit 비용/진척과 branch별 경합·스케줄 oracle
+worker 종료·commit 요청·timer 재설정·recommit 비용의 요구 계약을 확인한 뒤 필수 guard/자원 항목과 영향별 우선순위를 정할 수 있는가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-031 Resolve
+RequestENR/lookup의 peer identity·sequence 최신성·fallback 반환 요구
+재시도 횟수·실제 deadline/cancel·요청 비용과 외부 호출 계약
+Resolve의 최신성/identity 요구·deadline·재시도 예산을 확인한 뒤 fallback 반환과 요청 비용 중 필수 검토 항목 및 우선순위는 무엇인가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+REVIEW-DRAFT-SRC-036 DialOptions
+transport별 constructor 성공/재연결·취소·TLS/오류 계약
+newClient와 ctx의 소유권·연결/정리·할당 및 외부 I/O 비용
+transport별 연결/취소·재연결·소유권·TLS 요구를 확인한 뒤 어떤 항목이 필수이며 실패 영향별 우선순위는 무엇인가?
+priority: 미정; 필수 gold·생략 수·실제 호출·handoff 미확보
+
+RC-01 internal/system/mcp/review.go:19
+review_function은 code/history/tests를 분리하고 동적 호출·반대 channel 주체·history 범위의 한계를 알린다.
+미충족: 빈 목록/제한된 호출 그래프는 부재·안전 또는 실행 순서 증명이 아니다.
+
+RC-02 internal/system/mcp/review.go:74
+symbol과 caller_depth/max_items를 받아 clamp하고 구형 index는 requires_reindex 오류를 낸다.
+미충족: strict retained raw decoder와 달리 일반 인자 getter를 사용한다. 정확한 함수·pin/상한/오류 분모와 public transport를 별도로 동결해야 한다.
+
+RC-03 internal/system/mcp/review.go:120
+typed production/history/test 결과를 반환하며 PR 조회 실패는 available 설명에 기록한다.
+미충족: structural 응답 자체의 commit/blob/snapshot pin이 없어 rule 응답과 원자적 snapshot 일치를 증명하지 않는다.
+
+RC-04 internal/system/ckgclient/real.go:1083
+실제 client는 seed를 먼저 resolve하고 store.Review를 읽는다.
+미충족: 동명/다른 project·commit·실제 graph 경로와 두 호출의 일관성 receipt가 필요하다.
+
+RC-05 internal/graph/persist/sqlite_review.go:25
+review index rebuild는 transaction이며 조회는 production function/method와 index를 사용한다.
+미충족: index 재구축 transaction이 여러 consumer 호출에 걸친 snapshot 원자성 보장은 아니다.
+
+RC-06 plugin/scripts/deep_review.py:45
+명시 pack/함수와 retained source bounds·노드/관계·manual과 구분한 automatic 후보·structural identity를 검증한다.
+미충족: optional expected pin·부분지원·source hash의 운송 인증 범위를 구분하고 실제 retained project 수신 근거가 필요하다.
+
+RC-07 plugin/scripts/deep_review.py:99
+6개 추론 절, 원 노드/assumption/unknown, high/medium/low 후보와 비어 있지 않은 criteria를 검증한다.
+미충족: 필수 gold 집합 대조나 priority 의미 판정은 하지 않는다. 한 criterion/빈 finding도 형식상 가능하며 누락0 의미가 아니다.
+
+RC-08 plugin/scripts/deep_review.py:129
+computed CFG/file membership와 agent reasoning을 구분하며 Markdown/두 Mermaid 그림을 재생성한다.
+미충족: CFG는 runtime sequence가 아니고 모듈 그림은 interprocedural 관계 분석이 아니다. 그림 bytes 일치는 의미 완전성/렌더링 성공이 아니다.
+
+RC-09 plugin/scripts/deep_review.py:163
+5개 산출물의 내용 일치와 ANALYSIS·완료 PLANNING hash를 검증한다.
+미충족: CLI 성공은 로컬 산출물 전달 검증이며 reviewer 인증·모델 품질·실제 host role 실행이 아니다.
+
+RC-10 plugin/hooks/deep-review-guard.py:1
+식별된 Write/Edit state만 검증하고 code_review type/hash 우회를 거부한다.
+미충족: 직접 shell/state 수정은 hook 밖이다. 실제 등록·실행과 CLI 의무를 별도로 확인한다.
+
+RC-11 plugin/agents/analyzer.md:902
+code_review는 source-bound bundle·6절·typed artifact/diagram·ANALYSIS hash를 요구한다.
+미충족: 명시 도구 목록과 실제 설치 권한/조회·handoff receipt가 필요하다.
+
+RC-12 plugin/agents/planner.md:819
+Planner의 기존 절은 일반 Markdown/severity4종/cap30와 PLANNING 완료만 안내한다.
+미충족: typed high/medium/low cap32·정확한 보고서/diagram 재생성·PLANNING report hash 계약과 불일치한다. 문서를 따르는 역할 성공을 가정하지 않는다.
+
+RC-13 plugin/agents/orchestrator.md:397
+review_only는 ANALYSIS→PLANNING→COMPLETION·5산출물과 verify/hash binding을 요구한다.
+미충족: Planner 지시와 실제 dispatch/hook 등록/설치 역할을 포함한 수신·전달 증거가 필요하다.
+
+RC-14 plugin/skills/state-machine/SKILL.md:546
+review_only 전달·hash 동결·CLI와 unknown 한계를 명시한다.
+미충족: 이 파일은 채택 source 증거이며 지금 작업의 실행 지시/실제 설치 증명으로 삼지 않는다.
+
+RC-15 plugin/hooks/hooks.json:66
+PreToolUse registry에 deep-review guard가 등록돼 있다.
+미충족: 등록 source는 실제 host hook 장착/호출 receipt나 Bash 수정 검증 증거가 아니다.

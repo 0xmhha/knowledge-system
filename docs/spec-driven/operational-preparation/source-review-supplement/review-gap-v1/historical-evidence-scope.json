@@ -1,0 +1,150 @@
+{
+  "kind": "preserved_owned_single_fixture_not_ten_independent_reviews",
+  "summary": {
+    "schema_version": 1,
+    "scope": "owned compiled Go state/guard/cost/tradeoff fixture -> actual CKS31 contract -> typed partial review/diagrams -> actual hook and standalone delivery validation; not model quality or human acceptance",
+    "fixture_commit": "0e9d9ef667cf2d4d5780c15a29ea7b53da1d5baa",
+    "checks": [
+      "public-range-control-location-unknown",
+      "incomplete-review-denied",
+      "actual-artifact-builder",
+      "bound-analysis-handoff",
+      "unbound-planning-denied",
+      "bound-review-delivery",
+      "standalone-delivery-verifier",
+      "tamper-type-denied",
+      "tamper-source-denied",
+      "tamper-computed-edge-denied",
+      "tamper-acceptance-denied",
+      "tamper-dimension-denied",
+      "tamper-report-denied",
+      "tamper-diagram-denied",
+      "tamper-deleted-artifact-denied",
+      "tamper-frozen-hash-denied"
+    ],
+    "cks_contract_tools": 31,
+    "ckg_exit": 0,
+    "cks_exit": 0,
+    "cks_requests": 5,
+    "source_sha256": "2debeb905228667208557e416dafb9f64fc596b441b29b7e90a86e901bcbf96b",
+    "snapshot_sha256": "7dc9121b95d68404d3dbdfb106a76486c56c2a79c7a4d939d2b0ee0c8ae15ade",
+    "validator_sha256": "83fe5f62e55b451d5a1a2ab772acc2718aa26525b50d326808f6eff85c6c8d47",
+    "hook_sha256": "6d07823c8fca960968a27522f00fee3bd9d4cd3600f477baade6cd534626cb1e",
+    "binary_sha256": "345ffd91121d5e5d37f41687828829b57392a270d77d17e70637888e6a1b8e10",
+    "cks_binary_sha256": "0b6514fe1d57b8c65e08268ce61b41c81e267292ae2e9f5f48d8e342705e2880",
+    "independent_acceptance": "not_recorded"
+  },
+  "request_matrix": [
+    {
+      "id": 1,
+      "method": "initialize",
+      "tool": null,
+      "arguments": null
+    },
+    {
+      "id": 2,
+      "method": "tools/list",
+      "tool": null,
+      "arguments": null
+    },
+    {
+      "id": 3,
+      "method": "tools/call",
+      "tool": "cks.context.rule_candidates",
+      "arguments": {
+        "rule_pack": "go-local-review@1.0.0",
+        "function": {
+          "node_id": "aaea48476b26a8e1",
+          "expected_commit": "0e9d9ef667cf2d4d5780c15a29ea7b53da1d5baa",
+          "expected_source_sha256": "477c4484ae2be3e0f2980b8066b71876295cbab0107dabbe01b292c69106f1d8"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "method": "tools/call",
+      "tool": "cks.context.rule_candidates",
+      "arguments": {
+        "rule_pack": "go-local-review@1.0.0",
+        "function": {
+          "node_id": "c7b299f57164a5df",
+          "expected_commit": "0e9d9ef667cf2d4d5780c15a29ea7b53da1d5baa",
+          "expected_source_sha256": "2debeb905228667208557e416dafb9f64fc596b441b29b7e90a86e901bcbf96b"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "method": "tools/call",
+      "tool": "cks.context.review_function",
+      "arguments": {
+        "symbol": "example.invalid/deep-fixture.Process",
+        "caller_depth": 2
+      }
+    }
+  ],
+  "typed_status": "structured_partial_review",
+  "structural_snapshot_association": "identity_only_unverified_snapshot",
+  "sections": [
+    "complexity",
+    "data_state",
+    "guards_exceptions",
+    "io",
+    "priority_tradeoffs",
+    "resources"
+  ],
+  "criteria": [
+    {
+      "id": "data_state",
+      "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+      "requirement": "Review data_state",
+      "section": "data_state",
+      "status": "covered"
+    },
+    {
+      "id": "guards_exceptions",
+      "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+      "requirement": "Review guards_exceptions",
+      "section": "guards_exceptions",
+      "status": "covered"
+    },
+    {
+      "id": "complexity",
+      "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+      "requirement": "Review complexity",
+      "section": "complexity",
+      "status": "covered"
+    },
+    {
+      "id": "resources",
+      "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+      "requirement": "Review resources",
+      "section": "resources",
+      "status": "covered"
+    },
+    {
+      "id": "io",
+      "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+      "requirement": "Review io",
+      "section": "io",
+      "status": "covered"
+    },
+    {
+      "id": "priority_tradeoffs",
+      "reason": "Scoped original-node evidence and explicit assumptions supplied; independent acceptance not recorded",
+      "requirement": "Review priority_tradeoffs",
+      "section": "priority_tradeoffs",
+      "status": "covered"
+    }
+  ],
+  "delivery_verification": {
+    "status": "validated_delivery",
+    "ticket_id": "DEEP-REVIEW-FIXTURE",
+    "deep_review_sha256": "2d5180fad227a705283507eae7e174e372501b8b21fa05d9b90f681142f5b2e6",
+    "review_report_sha256": "a440318e0388fb05d63b13c787b61ef8361f1a627bf87c5efac1d6df749e2292",
+    "independent_acceptance": "not_recorded"
+  },
+  "current_project_cases_covered": 0,
+  "independent_priority_or_required_item_quality": null,
+  "installed_role_execution_verified": false
+}

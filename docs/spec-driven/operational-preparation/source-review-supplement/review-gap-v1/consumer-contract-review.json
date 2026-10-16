@@ -1,0 +1,415 @@
+{
+  "kind": "source_contract_inspection_not_installed_role_execution",
+  "contracts": [
+    {
+      "id": "RC-01",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/review.go",
+      "lines": [
+        19,
+        72
+      ],
+      "fact": "review_function은 code/history/tests를 분리하고 동적 호출·반대 channel 주체·history 범위의 한계를 알린다.",
+      "gap": "빈 목록/제한된 호출 그래프는 부재·안전 또는 실행 순서 증명이 아니다.",
+      "anchor": {
+        "start_line": 19,
+        "end_line": 72,
+        "start_byte": 458,
+        "end_byte_exclusive": 3297,
+        "span_sha256": "1a7f55f8b086c35b4f557842cde902a8b564858252330d9148ac6c0e725bbfbc"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-02",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/review.go",
+      "lines": [
+        74,
+        119
+      ],
+      "fact": "symbol과 caller_depth/max_items를 받아 clamp하고 구형 index는 requires_reindex 오류를 낸다.",
+      "gap": "strict retained raw decoder와 달리 일반 인자 getter를 사용한다. 정확한 함수·pin/상한/오류 분모와 public transport를 별도로 동결해야 한다.",
+      "anchor": {
+        "start_line": 74,
+        "end_line": 119,
+        "start_byte": 3298,
+        "end_byte_exclusive": 5714,
+        "span_sha256": "75b62c27b5cf0300aeefc32d2db306933c8095f343b51ec8d5f1cc08fad9946a"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-03",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/review.go",
+      "lines": [
+        120,
+        144
+      ],
+      "fact": "typed production/history/test 결과를 반환하며 PR 조회 실패는 available 설명에 기록한다.",
+      "gap": "structural 응답 자체의 commit/blob/snapshot pin이 없어 rule 응답과 원자적 snapshot 일치를 증명하지 않는다.",
+      "anchor": {
+        "start_line": 120,
+        "end_line": 144,
+        "start_byte": 5714,
+        "end_byte_exclusive": 7375,
+        "span_sha256": "4012c9f986313c21bc785c477a590b10a3b9dc93c7f2aff7f41935cbd93b91ef"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-04",
+      "scope": "current_repository",
+      "path": "internal/system/ckgclient/real.go",
+      "lines": [
+        1083,
+        1100
+      ],
+      "fact": "실제 client는 seed를 먼저 resolve하고 store.Review를 읽는다.",
+      "gap": "동명/다른 project·commit·실제 graph 경로와 두 호출의 일관성 receipt가 필요하다.",
+      "anchor": {
+        "start_line": 1083,
+        "end_line": 1100,
+        "start_byte": 39908,
+        "end_byte_exclusive": 40521,
+        "span_sha256": "5b07ebe59da8ecc871b423912424639cf2e5396c1b588da1d21d62aebca5b2f1"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-05",
+      "scope": "current_repository",
+      "path": "internal/graph/persist/sqlite_review.go",
+      "lines": [
+        25,
+        91
+      ],
+      "fact": "review index rebuild는 transaction이며 조회는 production function/method와 index를 사용한다.",
+      "gap": "index 재구축 transaction이 여러 consumer 호출에 걸친 snapshot 원자성 보장은 아니다.",
+      "anchor": {
+        "start_line": 25,
+        "end_line": 91,
+        "start_byte": 746,
+        "end_byte_exclusive": 3818,
+        "span_sha256": "3cd0aed4e8eb8570d27c3e3b227c899751746c53825c14ea85911b11a2bdccfc"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-06",
+      "scope": "adopted_consumer",
+      "path": "plugin/scripts/deep_review.py",
+      "lines": [
+        45,
+        97
+      ],
+      "fact": "명시 pack/함수와 retained source bounds·노드/관계·manual과 구분한 automatic 후보·structural identity를 검증한다.",
+      "gap": "optional expected pin·부분지원·source hash의 운송 인증 범위를 구분하고 실제 retained project 수신 근거가 필요하다.",
+      "anchor": {
+        "start_line": 45,
+        "end_line": 97,
+        "start_byte": 2191,
+        "end_byte_exclusive": 8551,
+        "span_sha256": "ef6069eadf2faf600fd22a75476c4326b5df536d8786a3bb3d8bc6cd4b0425d6"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-07",
+      "scope": "adopted_consumer",
+      "path": "plugin/scripts/deep_review.py",
+      "lines": [
+        99,
+        127
+      ],
+      "fact": "6개 추론 절, 원 노드/assumption/unknown, high/medium/low 후보와 비어 있지 않은 criteria를 검증한다.",
+      "gap": "필수 gold 집합 대조나 priority 의미 판정은 하지 않는다. 한 criterion/빈 finding도 형식상 가능하며 누락0 의미가 아니다.",
+      "anchor": {
+        "start_line": 99,
+        "end_line": 127,
+        "start_byte": 8552,
+        "end_byte_exclusive": 11597,
+        "span_sha256": "c85c6d15bf6c2065bb2884e7e3ddc8c9254a3603ff0233d611a1951b7f16095a"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-08",
+      "scope": "adopted_consumer",
+      "path": "plugin/scripts/deep_review.py",
+      "lines": [
+        129,
+        161
+      ],
+      "fact": "computed CFG/file membership와 agent reasoning을 구분하며 Markdown/두 Mermaid 그림을 재생성한다.",
+      "gap": "CFG는 runtime sequence가 아니고 모듈 그림은 interprocedural 관계 분석이 아니다. 그림 bytes 일치는 의미 완전성/렌더링 성공이 아니다.",
+      "anchor": {
+        "start_line": 129,
+        "end_line": 161,
+        "start_byte": 11598,
+        "end_byte_exclusive": 15661,
+        "span_sha256": "2266cb57e42c011464c57fe4440587568bcd7d05a53f9a6ed9d5edd07f1ce62f"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-09",
+      "scope": "adopted_consumer",
+      "path": "plugin/scripts/deep_review.py",
+      "lines": [
+        163,
+        176
+      ],
+      "fact": "5개 산출물의 내용 일치와 ANALYSIS·완료 PLANNING hash를 검증한다.",
+      "gap": "CLI 성공은 로컬 산출물 전달 검증이며 reviewer 인증·모델 품질·실제 host role 실행이 아니다.",
+      "anchor": {
+        "start_line": 163,
+        "end_line": 176,
+        "start_byte": 15662,
+        "end_byte_exclusive": 17537,
+        "span_sha256": "21254a6598dd309e5468cb5f70625a054a3fe691bc08085f9b01fe9760bd0ecf"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-10",
+      "scope": "adopted_consumer",
+      "path": "plugin/hooks/deep-review-guard.py",
+      "lines": [
+        1,
+        38
+      ],
+      "fact": "식별된 Write/Edit state만 검증하고 code_review type/hash 우회를 거부한다.",
+      "gap": "직접 shell/state 수정은 hook 밖이다. 실제 등록·실행과 CLI 의무를 별도로 확인한다.",
+      "anchor": {
+        "start_line": 1,
+        "end_line": 38,
+        "start_byte": 0,
+        "end_byte_exclusive": 2415,
+        "span_sha256": "6d07823c8fca960968a27522f00fee3bd9d4cd3600f477baade6cd534626cb1e"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-11",
+      "scope": "adopted_consumer",
+      "path": "plugin/agents/analyzer.md",
+      "lines": [
+        902,
+        920
+      ],
+      "fact": "code_review는 source-bound bundle·6절·typed artifact/diagram·ANALYSIS hash를 요구한다.",
+      "gap": "명시 도구 목록과 실제 설치 권한/조회·handoff receipt가 필요하다.",
+      "anchor": {
+        "start_line": 902,
+        "end_line": 920,
+        "start_byte": 60117,
+        "end_byte_exclusive": 61346,
+        "span_sha256": "1545568daab149eeda26c8faf303b6670d483d709896a1bbca5056fb60b26a6f"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-12",
+      "scope": "adopted_consumer",
+      "path": "plugin/agents/planner.md",
+      "lines": [
+        819,
+        868
+      ],
+      "fact": "Planner의 기존 절은 일반 Markdown/severity4종/cap30와 PLANNING 완료만 안내한다.",
+      "gap": "typed high/medium/low cap32·정확한 보고서/diagram 재생성·PLANNING report hash 계약과 불일치한다. 문서를 따르는 역할 성공을 가정하지 않는다.",
+      "anchor": {
+        "start_line": 819,
+        "end_line": 868,
+        "start_byte": 33930,
+        "end_byte_exclusive": 35102,
+        "span_sha256": "bc4b080436234dbb1b7cceefe3950e3c5917a58ccb42b32fa1b98d45235249dd"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-13",
+      "scope": "adopted_consumer",
+      "path": "plugin/agents/orchestrator.md",
+      "lines": [
+        397,
+        413
+      ],
+      "fact": "review_only는 ANALYSIS→PLANNING→COMPLETION·5산출물과 verify/hash binding을 요구한다.",
+      "gap": "Planner 지시와 실제 dispatch/hook 등록/설치 역할을 포함한 수신·전달 증거가 필요하다.",
+      "anchor": {
+        "start_line": 397,
+        "end_line": 413,
+        "start_byte": 18940,
+        "end_byte_exclusive": 19783,
+        "span_sha256": "073fab4a8d79d6e875f23d6404d18253cf60892e5e2853e6dfaaf791d43995ec"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-14",
+      "scope": "adopted_consumer",
+      "path": "plugin/skills/state-machine/SKILL.md",
+      "lines": [
+        546,
+        558
+      ],
+      "fact": "review_only 전달·hash 동결·CLI와 unknown 한계를 명시한다.",
+      "gap": "이 파일은 채택 source 증거이며 지금 작업의 실행 지시/실제 설치 증명으로 삼지 않는다.",
+      "anchor": {
+        "start_line": 546,
+        "end_line": 558,
+        "start_byte": 24432,
+        "end_byte_exclusive": 25238,
+        "span_sha256": "9ae92fa527c8ecc980fc54c5c9c19981107cca1e7ed2662e340f79f29c4a45c9"
+      },
+      "approved": false
+    },
+    {
+      "id": "RC-15",
+      "scope": "adopted_consumer",
+      "path": "plugin/hooks/hooks.json",
+      "lines": [
+        66,
+        76
+      ],
+      "fact": "PreToolUse registry에 deep-review guard가 등록돼 있다.",
+      "gap": "등록 source는 실제 host hook 장착/호출 receipt나 Bash 수정 검증 증거가 아니다.",
+      "anchor": {
+        "start_line": 66,
+        "end_line": 76,
+        "start_byte": 1691,
+        "end_byte_exclusive": 2021,
+        "span_sha256": "1cf45eb7c7e34c2cc9790844f950772cda2aab71b7886aa4e7fbd1afdec313eb"
+      },
+      "approved": false
+    }
+  ],
+  "criteria_snapshot": {
+    "protocol": {
+      "id": "WI-C",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "metrics_proposal": {
+        "required_rubric_omissions_max": 0,
+        "source_artifact_state_binding_match_fraction": 1.0
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    "progress": {
+      "id": "WI-C",
+      "owner": "coding-agent",
+      "target": "설치된 code_review 모드의 보고서·그림·상태/전달 gate",
+      "input_proposal": "새 함수/모듈 리뷰10건 이상, module5개 이상. state/guard·자원/비용·우선순위의 참조 rubric과 필수 결함/제약을 독립 고정",
+      "completion_proposal": "모든 문서/그림·source hash·typed artifact/state 연결 일치. 사전 필수 guard/state/자원 항목의 누락0. 독립 검토자가10건을 기준별 수용. 변조·placeholder-only·미핀 structural 자료의 확정 판단은 차단",
+      "limitations": "CFG 그림은 runtime sequence가 아니다. partial 지원·assumption·unknown과 추론 edge를 계산된 사실로 승격하지 않는다",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-c/manifest.json",
+        "revision": "c56d491c2080c1802b55df5e4257e1f56c3f2c4f"
+      }
+    }
+  },
+  "role_exposure_gaps": [
+    {
+      "role": "analyzer",
+      "tool": "review_function",
+      "wire_name": "cks.context.review_function",
+      "metadata_input_parity": true,
+      "explicit_alias": "mcp__plugin_coding-agent_cks__cks_context_review_function",
+      "explicit_role_tool_present": false,
+      "effective_host_permissions": null,
+      "runtime_denial_proven": false,
+      "installed_role_receipt": null
+    },
+    {
+      "role": "analyzer",
+      "tool": "rule_candidates",
+      "wire_name": "cks.context.rule_candidates",
+      "metadata_input_parity": true,
+      "explicit_alias": "mcp__plugin_coding-agent_cks__cks_context_rule_candidates",
+      "explicit_role_tool_present": false,
+      "effective_host_permissions": null,
+      "runtime_denial_proven": false,
+      "installed_role_receipt": null
+    },
+    {
+      "role": "planner",
+      "tool": "review_function",
+      "wire_name": "cks.context.review_function",
+      "metadata_input_parity": true,
+      "explicit_alias": "mcp__plugin_coding-agent_cks__cks_context_review_function",
+      "explicit_role_tool_present": false,
+      "effective_host_permissions": null,
+      "runtime_denial_proven": false,
+      "installed_role_receipt": null
+    },
+    {
+      "role": "planner",
+      "tool": "rule_candidates",
+      "wire_name": "cks.context.rule_candidates",
+      "metadata_input_parity": true,
+      "explicit_alias": "mcp__plugin_coding-agent_cks__cks_context_rule_candidates",
+      "explicit_role_tool_present": false,
+      "effective_host_permissions": null,
+      "runtime_denial_proven": false,
+      "installed_role_receipt": null
+    }
+  ],
+  "planner_contract_conflict": {
+    "typed_priority_levels": [
+      "high",
+      "medium",
+      "low"
+    ],
+    "typed_findings_cap": 32,
+    "legacy_planner_severity_levels": [
+      "critical",
+      "high",
+      "medium",
+      "low"
+    ],
+    "legacy_planner_findings_cap": 30,
+    "legacy_planner_binds_report_hash": false,
+    "legacy_planner_text_requires_typed_regeneration": false,
+    "actual_role_failed": null,
+    "external_consumer_modified": false
+  },
+  "six_sections_prove_required_item_completeness": false,
+  "priority_enum_proves_priority_correctness": false,
+  "criteria_labels_are_independent_gold": false,
+  "structural_snapshot_atomicity_verified": false,
+  "cfg_is_runtime_trace": false,
+  "module_diagram_is_interprocedural_analysis": false,
+  "diagram_bytes_prove_rendering_or_quality": false,
+  "local_hash_authenticates_transport_or_reviewer": false,
+  "hook_registry_proves_installed_hook": false,
+  "shell_edits_guarded_by_deep_review_hook": false,
+  "actual_installed_role_receipt": null,
+  "actual_project_dual_tool_receipt": null
+}

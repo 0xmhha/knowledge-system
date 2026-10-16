@@ -301,10 +301,22 @@
 - 현재 문서는 유지하고 Git 기록 문서 view로 원래14개 테스트 통과. 기존 실패/기록문맥 통과를 구분해 보존.
 - 기록 문맥14개 별도 통과(합계688개). 패킷45파일 두 차례 재생성 일치·문서134개/기존 구현 검사 통과.
 - POLICY-SECURITY-GAP-REVIEW.txt와 policy-security-gap-v1에 정답/출처·경계/소비자 공백 기록.
-[예정] 25. WI-C 실제 리뷰 계약·priority 초안·typed 보고서/그림·handoff·설치 역할 공백 점검
+[완료] 25. WI-C 실제 리뷰 계약·priority 초안·typed 보고서/그림·handoff·설치 역할 공백 점검
 - 기존10사례·rubric/근거와 실제 구조화 리뷰/검증/소비자 경로를 대조한다.
 - 우선순위/필수 항목·관련성의 AI 검토 초안과 독립 사람 판정을 구분한다.
 - source/pin·typed 보고서/그림·handoff·완료 guard·실제 설치 역할 영수증의 미충족분을 기록한다.
+- 10후보/8모듈/9파일·45AI anchor·5동일문맥19곳·45쌍의 기존 자료 보존. 독립 리뷰/gold0개.
+- 사례별 필수 항목 질문20개·조건부 priority 제안과15source 계약·채택consumer16파일 대조.
+- 6절/priority enum/criteria는 의미/누락0 판정이 아님. structural unpinned/CFG·모듈그림 범위 유지.
+- Analyzer/Planner의2도구 explicit alias4항목 누락. Planner 옛 보고서·severity/cap·hash 전달 계약 불일치1건.
+- native 일반/race 각7개·기존consumer15테스트/추가12계약 점검 통과. 외부consumer·운영 상태 변경 없음.
+- 과거 actualCKS5요청/16checks·typed/diagrams/handoff/hook/CLI 성과 유지. 전용51 포함 현재 회귀725개 통과.
+- 소비자15/추가12계약·native 일반/race 각7 통과. 기록 문맥14개 별도 통과; 최신 문서의 과거 guard 불일치1건 유지.
+- 패킷49파일 두 차례 재생성 일치·문서134개/기존 구현 완료 검사 통과. 기존24패킷·Go·현재 handoff/잔여 문서 유지.
+- REVIEW-GAP-REVIEW.txt와 review-gap-v1에 공백/계약/원자료 기록.
+[예정] 26. 소비자 도구 노출·Planner 구조화 전달 계약 보완 명세와 격리 검증 계획
+- WI-C와 앞선 검토의 실제 소비자 공백을 묶어 수정 범위·필수 동작·검증 기준을 구체화한다.
+- 실제 설치/외부 repo 수정·정식 실행은 범위를 구분하고 독립 승인 없이 수용 완료로 세지 않는다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -336,14 +348,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-C 실제 리뷰 계약·priority 검토 초안·필수 항목·typed 보고서/그림·handoff·설치 역할 경로의 공백을 점검한다.
+소비자 도구 노출·Planner 구조화 전달 계약 보완 명세와 격리 검증 계획을 작성한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_policy_security_gap.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-policy-security-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_review_gap.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-review-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/review-gap-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~24단계 검증 완료, 25단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~25단계 검증 완료, 26단계 예정. 정식 독립 수용은 계속 0/9이다.

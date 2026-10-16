@@ -1,0 +1,94 @@
+import copy
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import unittest
+
+ROOT=Path(__file__).resolve().parents[2]
+spec=importlib.util.spec_from_file_location('deep_review',ROOT/'scripts/deep_review.py');review=importlib.util.module_from_spec(spec);spec.loader.exec_module(review)
+FIXTURE=Path(__file__).parent/'fixtures'
+def bundle():return json.loads((FIXTURE/'deep-review-bundle.json').read_text())
+def judgments():return json.loads((FIXTURE/'deep-review-judgments.json').read_text())
+class DeepReviewTests(unittest.TestCase):
+ def test_actual_source_shape_and_inferred_unknown_split(self):
+  b=bundle();report=review.build(b,judgments());review.validate(report,b)
+  self.assertEqual(report['computed']['origin'],'graph_computation');self.assertEqual(report['reasoning']['sections']['resources']['status'],'unknown');self.assertEqual(report['structural_review']['snapshot_association'],'identity_only_unverified_snapshot');self.assertEqual(report['independent_acceptance'],'not_recorded')
+  self.assertIn('flowchart TD',review.sequence_diagram(report));self.assertIn('unknown, not computed',review.module_diagram(report))
+ def test_canonical_hash_is_stable(self):
+  b=bundle();reordered=json.loads(json.dumps(b,sort_keys=True));self.assertEqual(review.build(b,judgments()),review.build(reordered,judgments()))
+ def test_missing_required_dimensions_and_all_unknown_placeholder_rejected(self):
+  j=judgments();j['sections'].pop('io')
+  with self.assertRaises(review.Invalid):review.build(bundle(),j)
+  j=judgments()
+  for section in j['sections'].values():section.update(status='unknown',unknowns=['not reviewed'])
+  with self.assertRaises(review.Invalid):review.build(bundle(),j)
+ def test_reasoning_needs_original_evidence_and_assumptions(self):
+  for field,value in [('evidence_nodes',[]),('evidence_nodes',['foreign']),('assumptions',[])]:
+   j=judgments();j['sections']['guards_exceptions'][field]=value
+   with self.assertRaises(review.Invalid):review.build(bundle(),j)
+ def test_empty_unknown_and_false_observation_rejected(self):
+  for change in ['missing_reason','observed']:
+   j=judgments();section=j['sections']['resources'];section['unknowns']=[] if change=='missing_reason'else['unknown'];section['status']='observed'if change=='observed'else'unknown'
+   with self.assertRaises(review.Invalid):review.build(bundle(),j)
+ def test_findings_cannot_be_confirmed_vulnerabilities(self):
+  for field,value in [('state','confirmed'),('origin','graph_computation'),('evidence_nodes',['foreign']),('rule_candidates',['foreign'])]:
+   j=judgments();j['findings'][0][field]=value
+   with self.assertRaises(review.Invalid):review.build(bundle(),j)
+ def test_unknown_section_cannot_cover_criterion(self):
+  j=judgments();j['criteria'][1]['status']='covered'
+  with self.assertRaises(review.Invalid):review.build(bundle(),j)
+ def test_foreign_source_identity_snapshot_and_private_paths_rejected(self):
+  for field,value in [('node_id','foreign'),('commit','main'),('snapshot_sha256','0'*64),('file','.claude/session.go'),('file','logs/session.go'),('file','../source.go')]:
+   b=bundle();b['rules']['result']['analysis']['source'][field]=value
+   with self.assertRaises(review.Invalid):review.build(b,judgments())
+ def test_other_structural_symbol_and_missing_pin_not_borrowed(self):
+  b=bundle();b['function_review']['result']['seed']['id']='foreign'
+  with self.assertRaises(review.Invalid):review.build(b,judgments())
+  b=bundle();r=review.build(b,judgments());self.assertEqual(r['structural_review']['snapshot_association'],'identity_only_unverified_snapshot')
+ def test_unsupported_truncated_unknown_pack_and_bound_rejected(self):
+  for change in ['truncated','base','rules','pack','bound']:
+   b=bundle()
+   if change=='truncated':b['rules']['result']['analysis']['truncated']=True
+   if change=='base':b['rules']['result']['status']='unsupported'
+   if change=='rules':b['rules']['result']['analysis']['rules']['status']='incomplete'
+   if change=='pack':b['rules']['arguments']['rule_pack']='latest'
+   if change=='bound':b['rules']['arguments']['max_flow_steps']=0
+   with self.assertRaises(review.Invalid):review.build(b,judgments())
+ def test_foreign_edges_and_outside_source_positions_rejected(self):
+  b=bundle();b['rules']['result']['analysis']['edges'][0]['to']='outside'
+  with self.assertRaises(review.Invalid):review.build(b,judgments())
+  b=bundle();b['rules']['result']['analysis']['nodes'][0]['location']['end_byte']=999999
+  with self.assertRaises(review.Invalid):review.build(b,judgments())
+ def test_report_computed_edge_and_acceptance_tamper_rejected(self):
+  b=bundle();r=review.build(b,judgments());r['computed']['sequence']['edges'][0]['condition']='proven'
+  with self.assertRaises(review.Invalid):review.validate(r,b)
+  r=review.build(b,judgments());r['independent_acceptance']='accepted'
+  with self.assertRaises(review.Invalid):review.validate(r,b)
+ def make_workspace(self,root):
+  workspace=Path(root)/'.coding-agent/tickets/REVIEW-FIXTURE';workspace.mkdir(parents=True);review.write_review(workspace,bundle(),judgments());raw=(workspace/'deep-review.json').read_bytes();state={'ticket_id':'REVIEW-FIXTURE','ticket_type':'code_review','current_state':'PLANNING','states':{'ANALYSIS':{'status':'completed','deep_review_sha256':review.sha(raw)},'PLANNING':{'status':'pending'}}};(workspace/'state.json').write_text(json.dumps(state));return workspace,state
+ def hook(self,workspace,state):
+  event={'tool_name':'Write','cwd':str(workspace),'tool_input':{'file_path':str(workspace/'state.json'),'content':json.dumps(state)}}
+  result=subprocess.run([sys.executable,str(ROOT/'hooks/deep-review-guard.py')],input=json.dumps(event),text=True,capture_output=True);self.assertEqual(result.returncode,0,result.stderr);return result.stdout
+ def test_delivery_hash_hook_cli_and_diagrams(self):
+  with tempfile.TemporaryDirectory()as root:
+   workspace,state=self.make_workspace(root);review.verify_workspace(workspace);self.assertEqual(self.hook(workspace,state),'')
+   state['current_state']='COMPLETED';self.assertIn('deny',self.hook(workspace,state))
+   state['states']['PLANNING']={'status':'completed','review_report_sha256':review.sha((workspace/'review-report.md').read_bytes())};self.assertEqual(self.hook(workspace,state),'');review.verify_workspace(workspace,state)
+   out=subprocess.run([sys.executable,str(ROOT/'scripts/deep_review.py'),'verify','--workspace',str(workspace)],capture_output=True,text=True);self.assertEqual(out.returncode,0,out.stdout)
+   (workspace/'modules.mmd').unlink();self.assertIn('deny',self.hook(workspace,state))
+ def test_type_bypass_frozen_hash_report_and_bundle_tamper_denied(self):
+  with tempfile.TemporaryDirectory()as root:
+   workspace,state=self.make_workspace(root);wrong=copy.deepcopy(state);wrong['ticket_type']='feature';self.assertIn('deny',self.hook(workspace,wrong))
+   wrong=copy.deepcopy(state);wrong['states']['ANALYSIS']['deep_review_sha256']='0'*64;self.assertIn('deny',self.hook(workspace,wrong))
+   (workspace/'review-report.md').write_text('review complete');self.assertIn('deny',self.hook(workspace,state))
+   review.write_review(workspace,bundle(),judgments());b=bundle();b['rules']['arguments']['function']['expected_commit']='0'*40;(workspace/'deep-review-evidence.json').write_text(json.dumps(b));self.assertIn('deny',self.hook(workspace,state))
+ def test_duplicate_and_nonfinite_json_rejected(self):
+  with tempfile.TemporaryDirectory()as root:
+   path=Path(root)/'input.json'
+   for raw in ['{"schema_version":1,"schema_version":2}','{"number":NaN}']:
+    path.write_text(raw)
+    with self.assertRaises(review.Invalid):review.load(path)
+if __name__=='__main__':unittest.main()

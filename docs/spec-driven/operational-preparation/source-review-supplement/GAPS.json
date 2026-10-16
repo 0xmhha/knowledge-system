@@ -246,7 +246,7 @@
       "id": "WI-C",
       "preparation_candidate_count": 10,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "공개 입력 10개를 고정 원문·기존 AI rubric 45곳과 연결했다: 운영 원문 제안 10개/모듈 표기 8개/파일 9개. 초기 후보 SRC-026은 실제 공개 패킷에서 이미 SRC-027로 교체되어 있었다. 같은 사례의 외부 문맥 5개/19곳을 새 리뷰로 합치지 않는다. 상태/guard·자원/비용의 AI 자료 연결은 각 10개이며 충분성/필수 항목 정답은 미검토. 우선순위 10개 모두 요구사항·영향 판정 미정. 독립 사례·gold·typed 보고서/그림·handoff·host 실행 수용 증거는 이번 패킷에 없다.",
+      "note": "기존10후보/8모듈/9파일·45AI anchor·같은 사례5문맥19곳을 유지하고15계약 anchor·채택 consumer16파일을 Git/채택SHA와 대조했다. 45쌍 중 같은 모듈2쌍/같은 파일1쌍이며 독립성·노출/DEV-FINAL 미승인이다. 사례별 필수 항목 질문20개와 조건부 영향/우선순위 검토 초안은 gold가 아니다. 6절/criteria/priority enum의 형식 검증은 필수 항목 완전성·의미/우선순위 정답을 검증하지 않는다. structural review는 identity-only/unpinned이며 CFG는 runtime trace·모듈그림은 interprocedural graph가 아니다. Analyzer와 Planner의 review_function/rule_candidates explicit alias4항목이 없고 실제 유효권한/거부 미검증. Planner 옛 Markdown/severity4종/cap30·PLANNING완료 지시는 typed3종/cap32·보고서/그림 정확 재생성·report hash 계약과 충돌한다. 현재 native 일반/race 각7개·consumer 원래15테스트/추가12로컬 계약 점검 통과. 과거 실제CKS5요청/16checks·typed/diagram/hash/hook/CLI 성과는 유지하되 현재10프로젝트 리뷰/설치 역할/독립수용으로 세지 않는다.",
       "requirements": {
         "independent_review_cases_min": 10,
         "modules_min": 5,
@@ -257,18 +257,25 @@
         ]
       },
       "approved_independent_cases": 0,
-      "formal_status": "source_material_inventory_prepared_independent_rubric_and_host_acceptance_not_evaluated",
+      "formal_status": "review_contract_rubric_artifact_handoff_and_role_gap_inventory_prepared_independent_acceptance_not_evaluated",
       "remaining": [
-        "독립 검토자와 최종 수용 담당자 지정; 공개 입력의 노출·중복·가족 독립성과 10개/5모듈 충분성 검토",
-        "10개 사례의 외부 계약과 필수 상태/guard·자원/비용 항목을 재검토하고 누락 없는 정답 작성",
-        "10개 priority 질문을 요구사항·실패 영향으로 판정하고 필수 항목·우선순위 rubric 동결",
-        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 및 F-01~F-08 동결",
-        "typed 보고서·그림·원문 hash·state handoff·실제 host 실행 영수증 수집 후 운영·품질·독립 수용 판정"
+        "독립 검토자·최종 수용 담당자 지정, 신규10review/5module 이상·노출/같은문맥/가족/DEV-FINAL·표본 충분성 검토",
+        "각 source/caller/요구 계약과 상태/guard·복잡도/자원/I/O·priority/tradeoff 필수 항목 전체 ID·근거·unknown 허용·독립 gold 작성; 6절/AI anchor 수를 완전성으로 세지 않음",
+        "도달성·실패 영향·소유권·호환성·실측 비용과 조건부 제안을 대조해 priority gold/수용가능한 다른 판정·matching/omission 분모·기권/빈 gold/partial/오류 기준 동결",
+        "Planner 기존 report 절의 severity/cap/직접 Markdown/전달 hash 불일치를 structured-review 계약과 정렬하고 Analyzer/Planner 실제 도구 노출·권한과 hook/CLI 경로를 격리 검증",
+        "project/commit/canonical function·source span/blob/snapshot·두 MCP 응답/pack/version/limits·structural unpinned 한계를 고정하고 실제 retained graph→CKS→설치 역할 receipt 확보",
+        "독립10사례별 typed JSON/evidence/Markdown·CFG/모듈 그림의 계산/추론/unknown·rendering/표현 범위·ANALYSIS/PLANNING hash/handoff와 변조/우회 차단 영수증 검증",
+        "F-01~F-08·baseline/입력/gold/매칭/표본/실행 범위 동결 후 필수 항목 누락0·산출물/source/state100% 제안과 운영·품질·독립 수용을 별도 판정"
       ],
       "review_coverage_preparation": {
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/review-coverage-v1/manifest.json",
         "sha256": "e7efea1c8d661c2240b6fdb81d1d488fe063b0c82b6cd9af4544d7bf02372c90",
         "status": "review_material_mapping_not_independent_rubric_or_acceptance"
+      },
+      "review_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/review-gap-v1/manifest.json",
+        "sha256": "c3d677e0d31f88b4509a69116d6cfee018ff8a7063948849275e4fd527218942",
+        "status": "review_contract_rubric_artifact_handoff_and_role_gaps_not_acceptance"
       }
     },
     {
@@ -341,14 +348,15 @@
     }
   ],
   "next_priority": [
-    "WI-C 실제 리뷰 계약·priority 검토 초안·필수 항목·typed 보고서/그림·handoff·설치 역할 경로의 미충족분 점검",
+    "WI-C/공통 소비자: 명시적 도구 노출·Planner 구조화 전달 계약 보완 명세와 격리 검증 계획 작성; 외부 소비자 자동 수정/설치 아님",
     "WI-1 30함수의 독립 value kind·완전한 data/control gold·return 좌표/주석 정합·matching 및 baseline/실행 수용 미충족분 검토",
     "WI-3 독립 사실 가족/정답·top-10/분모·baseline 동결 및 실제 symptom-only 검색/설치 역할 경로 미충족분 보완",
     "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완",
     "WI-V1/WI-V2 독립 티켓/실제 API 계약·도달성·주/독립 oracle·승인 후보 집합·selector/current HEAD/설치 역할 실행 및 독립 수용 미충족분 보완",
     "WI-2 독립 표본/gold·명령/호출자 계약·명시적 Analyzer 도구 노출·retained project MCP/설치 역할과 품질 수용 미충족분 보완",
     "WI-6 운영 독립 가족/관련성 gold·기본/확장 실제 쌍·명시적 소비자 도구 노출·warm 반복/p95 기준 및 품질 수용 미충족분 보완",
-    "WI-SP 독립 symbol/gold·수동/자동 provenance·도구 노출·실제12symbol/MCP/배포 ACL·private/spoof 경계 및 독립 수용 미충족분 보완"
+    "WI-SP 독립 symbol/gold·수동/자동 provenance·도구 노출·실제12symbol/MCP/배포 ACL·private/spoof 경계 및 독립 수용 미충족분 보완",
+    "WI-C 독립 required-item/priority gold·실제10사례 typed report/diagram/handoff/설치 역할 및 운영·품질 수용 미충족분 보완"
   ],
   "optional_backlog_count": 12
 }
