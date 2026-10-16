@@ -203,7 +203,7 @@
       "id": "WI-C",
       "preparation_candidate_count": 10,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "기존 공개 검토 입력 10개 중 5개의 외부 호출 문맥을 보완. 15개 독립 사례로 세지 않음.",
+      "note": "공개 입력 10개를 고정 원문·기존 AI rubric 45곳과 연결했다: 운영 원문 제안 10개/모듈 표기 8개/파일 9개. 초기 후보 SRC-026은 실제 공개 패킷에서 이미 SRC-027로 교체되어 있었다. 같은 사례의 외부 문맥 5개/19곳을 새 리뷰로 합치지 않는다. 상태/guard·자원/비용의 AI 자료 연결은 각 10개이며 충분성/필수 항목 정답은 미검토. 우선순위 10개 모두 요구사항·영향 판정 미정. 독립 사례·gold·typed 보고서/그림·handoff·host 실행 수용 증거는 이번 패킷에 없다.",
       "requirements": {
         "independent_review_cases_min": 10,
         "modules_min": 5,
@@ -214,12 +214,19 @@
         ]
       },
       "approved_independent_cases": 0,
-      "formal_status": "not_prepared",
+      "formal_status": "source_material_inventory_prepared_independent_rubric_and_host_acceptance_not_evaluated",
       "remaining": [
-        "독립 검토자와 최종 수용 담당자 지정",
-        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
-        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
-      ]
+        "독립 검토자와 최종 수용 담당자 지정; 공개 입력의 노출·중복·가족 독립성과 10개/5모듈 충분성 검토",
+        "10개 사례의 외부 계약과 필수 상태/guard·자원/비용 항목을 재검토하고 누락 없는 정답 작성",
+        "10개 priority 질문을 요구사항·실패 영향으로 판정하고 필수 항목·우선순위 rubric 동결",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 및 F-01~F-08 동결",
+        "typed 보고서·그림·원문 hash·state handoff·실제 host 실행 영수증 수집 후 운영·품질·독립 수용 판정"
+      ],
+      "review_coverage_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/review-coverage-v1/manifest.json",
+        "sha256": "e7efea1c8d661c2240b6fdb81d1d488fe063b0c82b6cd9af4544d7bf02372c90",
+        "status": "review_material_mapping_not_independent_rubric_or_acceptance"
+      }
     },
     {
       "id": "WI-6",
@@ -272,13 +279,13 @@
     }
   ],
   "next_priority": [
-    "WI-C 공개 리뷰 입력 10개의 module·state/guard·resources/cost·priority 기준 및 원문/기존 AI 문맥 coverage 점검",
     "WI-1 독립 검토·완전한 정답·value kind/범위·매칭 미충족분 검토",
     "WI-3 독립 사실 가족 20개 미충족·노출/중복·gold·실제 검색/호스트 경로 검토",
     "WI-4 실제 도달성·후보 계약·독립성·동결·반복 실행 미충족분 검토",
     "WI-V1/WI-V2의 실제 API 도달 가능성·독립 티켓·독립 오라클·승인 후보 집합 검토",
     "WI-2 독립 표본·정답·실제 명령/호출자 계약·MCP 경로 미충족분 검토",
-    "WI-6/WI-SP의 독립 검토·표본·정답 미충족분 보완"
+    "WI-6/WI-SP의 독립 검토·표본·정답 미충족분 보완",
+    "WI-C 10개 사례의 계약·필수 항목·priority 질문 판정과 typed 보고서/그림·handoff·host 실행 미충족분 검토"
   ],
   "optional_backlog_count": 12
 }
