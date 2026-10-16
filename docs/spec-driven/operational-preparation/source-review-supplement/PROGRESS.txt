@@ -53,6 +53,16 @@
 - SUBSCRIPTION-RESULTS.txt에 해석 범위와 재검증 방법을 기록했다.
 - 실제 노드·RPC 전체 경로 재현이나 독립 수용으로 표시하지 않는다.
 
+[검증 완료] 5. WI-4 원문 가설·스케줄 후보
+- 기존 1개+새 메커니즘 4개, 상관된 스케줄 21개, 원문 근거 17곳.
+- 계약 질문·도달성 제한·정상 대조군·관측·2초 상한·소유 자원 정리 명시.
+- 쌍별 중복 검토 10건은 미승인, 독립 가족 0개 유지.
+- 전용 회귀 16개, 32개 파일의 바이트 동일 재생성 검증.
+- SCHEDULE-CANDIDATES.txt에 범위와 판정 한계를 기록.
+[진행 예정] 6. UDP resetTimeout 합성 분기 시험
+- 원본 closure와 다음 커서를 보존하는 AI 수정 초안을 별도 임시 모듈에서 비교.
+- 실제 UDP·호스트 시계·운영 상태 변경 없이 목록·오류 통지·타이머 상태 관측.
+
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
 실행 허용 false, freeze null, 독립 검토 승인 없음. 이번 보완은 준비 작업이다.
@@ -83,7 +93,7 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-4의 다른 원문 가설·schedule 후보와 가족 중복·관측·정리 조건을 정리한다.
+6단계의 UDP 합성 분기 시험을 진행한다.
 이어 WI-3 검색 입력과 비공개 근거를 분리한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
@@ -95,4 +105,4 @@ python3 scripts/test_review_context.py
 python3 scripts/check-review-context.py docs/spec-driven/operational-preparation/source-review-supplement/context-v1
 이 검증은 원문 일치·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~4단계 검증 완료. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~5단계 검증 완료. 정식 독립 수용은 계속 0/9이다.
