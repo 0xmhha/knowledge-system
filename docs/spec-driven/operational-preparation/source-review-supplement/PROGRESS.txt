@@ -124,9 +124,22 @@
 - 연관 Python 회귀 248개·문서 134개·기존 구현 완료 상태 검사 통과.
 - 이전 동결 패킷 10개와 유지보수 Go 소스 변경 없음.
 - FUNCTION-SAMPLE.txt와 function-sample-v1/REVIEW-TABLE.txt에 결과·선정 이력 기록.
-[예정] 12. 선정 함수의 선언/use·이동 경계 관측 범위 확장
+[검증 완료] 12. 선정 함수의 선언/use·이동 경계 관측 범위 확장
 - 새 위치 검토 자료가 있는 4개와 미작성 26개를 분리하고, 후자의 관측을 보완한다.
 - 부분 타입 진단·range/reference/closure 등의 제한을 유지하고 완전한 gold로 승격하지 않는다.
+- 전체 선정 30개/25개 파일 관측. 기존 4개 원자료 일치, 추가 26개 수집.
+- occurrence 1725개 중 본문 바인딩 대조 1721개·signature 영역 격리 4개.
+- syntax marker 409개·range binding 있는 함수 22개·익명 함수 본문 14개 제외.
+- 격리 4개는 deliver의 validate/reconstruct 함수형 파라미터이며 바깥 본문 변수에 합치지 않는다.
+- 검사 도구 build/fmt/vet/lint 4건·대조군 일반/race 28건·전용 회귀 24개 통과.
+- sample-locations-v1/function-checklist.json이 현재 관측 상태이며, stage 11 체크표는 당시 스냅샷으로 보존.
+- 완전한 use/edge 정답·scalar/reference kind·CFG/postdominator·독립 수용은 미완료.
+- 연관 Python 회귀 272개·문서 134개·기존 구현 완료 상태 검사 통과.
+- 이전 동결 패킷 11개와 유지보수 Go 소스 변경 없음.
+- SAMPLE-LOCATIONS.txt에 결과·근거·한계 기록.
+[예정] 13. WI-2 실제 지원 규칙별 사례 범위 점검
+- 지원하는 두 규칙의 양성/음성 후보와 sanitizer·branch·shadow·external target을 점검한다.
+- 기존 source query 12개를 규칙별 독립 양성/음성 각 10개로 오인하지 않도록 분모를 나눈다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -158,14 +171,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-1 선정 표본 중 추가 26개 함수의 선언/use·이동 경계 관측과 범위 제한을 보완한다.
+WI-2 실제 지원 규칙별 양성/음성 후보와 sanitizer·branch·shadow·external target 범위를 점검한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_function_sample.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-function-sample.py docs/spec-driven/operational-preparation/source-review-supplement/function-sample-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_sample_locations.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-sample-locations.py docs/spec-driven/operational-preparation/source-review-supplement/sample-locations-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 일치·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~11단계 검증 완료, 12단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~12단계 검증 완료, 13단계 예정. 정식 독립 수용은 계속 0/9이다.
