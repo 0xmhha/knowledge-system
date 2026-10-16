@@ -157,7 +157,7 @@
       "id": "WI-2",
       "preparation_candidate_count": 40,
       "count_semantics": "exposed_controlled_source_drafts_not_project_or_independent_units",
-      "note": "지원 규칙 2개·기존 개발 fixture 23개·통제 입력 40개(규칙별 AI 양성/음성 기대 각 10개)를 분리했다. 통제 일반/race 원문 관측 각 40개·대조군 각 14개, AI 수량 차이 0개. 이후 고정 Git commit의 프로젝트 34파일/51함수·68호출(명령 20·숫자 변환 48)을 실제 로컬 분석기로 일반/race 각 51개 관측했다. 명령 후보는 CALL-045/046 두 곳이며 같은 internal/build/util.go의 보조 함수이다. 숫자 변환 후보는 0개, CALL-017은 closure 내부이다. 65개 빈 관측·1개 closure 제외를 확정 음성으로 세지 않는다. 51함수 모두 부분 타입 진단을 보존했고 독립 gold·프로젝트 양성 충분성·위험성·MCP/실제 운영 도달성은 미판정이다. 기존 annotation query 12개도 별도 분모로 유지한다.",
+      "note": "지원 규칙 2개·기존 개발 fixture 23개·통제 입력 40개(규칙별 AI 양성/음성 기대 각 10개)를 분리했다. 통제 일반/race 원문 관측 각 40개·대조군 각 14개, AI 수량 차이 0개. 이후 고정 Git commit의 프로젝트 34파일/51함수·68호출(명령 20·숫자 변환 48)을 실제 로컬 분석기로 일반/race 각 51개 관측했다. 명령 후보는 CALL-045/046 두 곳이며 같은 internal/build/util.go의 보조 함수이다. 숫자 변환 후보는 0개, CALL-017은 closure 내부이다. 65개 빈 관측·1개 closure 제외를 확정 음성으로 세지 않는다. 51함수 모두 부분 타입 진단을 보존했고 독립 gold·프로젝트 양성 충분성·위험성·MCP/실제 운영 도달성은 미판정이다. 기존 annotation query 12개도 별도 분모로 유지한다. 후보의 직접 호출자 문맥을 2개 고정 파일에서 보완: CI 내 문법상 직접 호출 14개/5함수, 명령 이름 literal 13개·linter identifier 1개. wrapper→MustRun·DryRunFlag·downloadLinter·CI dispatch에 대한 비공개 AI 문맥 초안 5개/원문 근거 11곳을 작성. import 표기는 실제 callee resolution이 아니며 원래 68호출/2후보 분모와 독립 gold 0개 상태를 유지한다.",
       "requirements": {
         "new_positive_cases_per_supported_rule_min": 10,
         "new_negative_cases_per_supported_rule_min": 10,
@@ -170,14 +170,13 @@
         "controlled_and_project_denominators_separate": true
       },
       "approved_independent_cases": 0,
-      "formal_status": "project_local_kernel_observed_independent_gold_and_runtime_not_evaluated",
+      "formal_status": "local_source_and_caller_context_prepared_independent_quality_and_runtime_not_evaluated",
       "remaining": [
-        "관측된 명령 후보 2곳의 호출자·명령 이름 선택 계약·build 지원 범위와 외부 입력 도달성 문맥을 원문으로 검토; 실행 가능성은 별도 판정",
-        "규칙별 독립 양성/음성 각 10개를 확보·검토; 현재 후보 2곳/변환 0곳은 충분성을 입증하지 않으며 통제 사례로 프로젝트 분모 보충 금지",
-        "실제 retained graph→MCP/소비자 정합·stale/권한·SDK 경로는 별도 승인된 실행 범위에서 검증",
-        "독립 검토자와 최종 수용 담당자 지정",
-        "독립 탐지 정답·위험성 별도 판정·입력/정답·매칭·DEV/FINAL 동결",
-        "승인된 범위의 MCP/소비자 실행 및 운영·품질·독립 수용 판정"
+        "규칙별 독립 양성/음성 각 10개를 확보·검토; 두 build wrapper 후보와 변환 후보 0곳은 충분성을 입증하지 않음",
+        "검토 범위 밖 alias/dynamic/external caller·실제 명령 선택 계약·실행 환경/공격자 제어/운영 도달성을 별도 판정",
+        "실제 retained graph→MCP/소비자 정합·stale/권한·SDK 경로를 승인된 범위에서 검증",
+        "독립 검토자와 최종 수용 담당자 지정 및 독립 탐지 정답·위험성 별도 판정",
+        "baseline·매칭·입력/정답·표본 충분성·DEV/FINAL 동결 후 운영·품질·독립 수용 판정"
       ],
       "rule_coverage_preparation": {
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-coverage-v1/manifest.json",
@@ -193,6 +192,11 @@
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/project-rule-review-v1/manifest.json",
         "sha256": "bab1912a639ce00156fc690afdeb2337c5125a6b213319e8841328ffbb169901",
         "status": "project_local_source_observations_not_independent_quality_or_runtime"
+      },
+      "rule_caller_context": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-caller-context-v1/manifest.json",
+        "sha256": "8eeabdff6f6721ae831944d340d9322f5f4599a9d52208b78cf4a7aa254596a6",
+        "status": "caller_syntax_and_ai_context_not_runtime_or_independent_gold"
       }
     },
     {
@@ -268,12 +272,13 @@
     }
   ],
   "next_priority": [
-    "WI-2 두 명령 후보의 호출자·명령 선택 계약·build 지원 범위에 대한 원문 문맥 검토",
+    "WI-C 공개 리뷰 입력 10개의 module·state/guard·resources/cost·priority 기준 및 원문/기존 AI 문맥 coverage 점검",
     "WI-1 독립 검토·완전한 정답·value kind/범위·매칭 미충족분 검토",
     "WI-3 독립 사실 가족 20개 미충족·노출/중복·gold·실제 검색/호스트 경로 검토",
     "WI-4 실제 도달성·후보 계약·독립성·동결·반복 실행 미충족분 검토",
     "WI-V1/WI-V2의 실제 API 도달 가능성·독립 티켓·독립 오라클·승인 후보 집합 검토",
-    "WI-C/WI-6/WI-SP의 독립 검토·표본·정답 미충족분 보완"
+    "WI-2 독립 표본·정답·실제 명령/호출자 계약·MCP 경로 미충족분 검토",
+    "WI-6/WI-SP의 독립 검토·표본·정답 미충족분 보완"
   ],
   "optional_backlog_count": 12
 }

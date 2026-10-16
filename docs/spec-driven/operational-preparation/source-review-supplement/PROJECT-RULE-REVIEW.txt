@@ -105,3 +105,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-project-rule-review.py docs/spec
 새 기록 실행은 scripts/run-project-rule-review.py --repo PINNED_LOCAL_REPO
 --output NEW_DIRECTORY --goroot EXPLICIT_GO_1_26_9_ROOT --lint EXISTING_GOLANGCI_LINT 로 수행한다.
 이전 패킷과 원문은 덮어쓰지 않는다.
+
+후속 갱신: 후보 두 곳의 호출자/명령 계약 원문 문맥은 RULE-CALLER-CONTEXT.txt와
+rule-caller-context-v1에 기록했다. 호출자 14개는 기존 프로젝트 68호출/2후보와
+분모를 합치지 않으며 독립 정답·운영 도달성 미확인 상태를 유지한다.
