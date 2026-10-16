@@ -305,7 +305,7 @@
       "id": "WI-SP",
       "preparation_candidate_count": 12,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "기존 symbol query 후보 12개. 독립 annotation gold·권한 경계 판정은 미승인.",
+      "note": "12개 source symbol 제안(정책4/보안AI초안4/직접policy참조없음4), 고정 Go5파일·66쌍 중 같은 파일11쌍, 독립 symbol/gold 승인0개. source 재생성 완료 자료의42policy/146edges 중 선정 정책4symbol의5관계를 대조했으나 이 projection은 policy-only이며 보안 태그 부재/전체12응답/독립정답 증명이 아니다. 보안4개는 미승인 수동AI overlay proposal이고 미태그4개는 선택 overlay 상대 범위다. 현재/채택 source 계약14곳·project5/consumer2파일 Git/채택SHA·consumer input metadata 정합 대조. Analyzer explicit tools에 policy_security alias가 없으며 실제 유효권한/거부·설치 역할/handoff는 미검증. YAML row/hash/version/reviewer/time/approval unknown과 graph metadata/Go commit을 구분하고 legacy hint/severity를 추측하지 않는다. 직접 peer RemoteAddr/CIDR ACL은 reviewer 인증·project/symbol 권한과 별개다. 현재 native 일반/race 각상위12+ACL세부12 통과; httptest/fake backend이지 deployed listener/현재12심볼 수용이 아니다. 과거 실제 stdio fixture18요청·typed/manual/automatic/empty/not-found/stale/상한/원문삭제 성과, 최신source-aware 재생성 수정완료·ontology미평가/production비활성 상태 보존. 정식gold/매칭/거부분모/HTTP·proxy/설치 소비자 receipt는 미확보다.",
       "requirements": {
         "independent_symbols_min": 12,
         "policy_symbols_min": 4,
@@ -322,23 +322,33 @@
         ]
       },
       "approved_independent_cases": 0,
-      "formal_status": "source_queries_and_annotation_drafts_not_reviewed",
+      "formal_status": "policy_security_symbol_provenance_gold_boundary_and_consumer_gap_inventory_prepared_independent_acceptance_not_evaluated",
       "remaining": [
-        "독립 검토자와 최종 수용 담당자 지정",
-        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
-        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
-      ]
+        "독립 검토자·최종 수용 담당자 지정, 독립12symbol 이상/정책4·보안4·미태그4 및 같은 파일/정책·의미 가족·노출/DEV-FINAL·표본 충분성 검토",
+        "선택 source/overlay/graph snapshot별 exact annotation ID/kind·related symbol·설명/힌트/severity·known/unknown gold를 독립 작성. 보안AI초안4개는 의미 검토·승인/ingest·실제 결과 없이 existing tag로 세지 않음",
+        "project/commit/canonical function·path/span/blob/snapshot·정책/security relation과 version/hash 매칭을 동결. no_annotations/not_found/unavailable/unsupported/partial·legacy/typed와 manual/automatic/LLM 해석 분리",
+        "YAML원본/row/hash/version/reviewer/time/approval 미보존을 unknown으로 유지; graphmetadataSHA/Go commit·StartLine1·조작된YAML/header를 reviewer/원본 인증으로 승격하지 않음",
+        "invalid/stale/cap/timeout/변경snapshot·private symbol/annotation/edge·.claude/logs·잘못된 relation·legacy backend의 기대 거부/비노출 gold와 원래분모·coverage·기권 처리 동결",
+        "직접peer/loopback/remote/defaultLAN/explicit IPv4·IPv6 CIDR·public/invalid/nil·forwarded spoof/proxy topology/listen의 배포 계약과 실제 listener/허용·거부·backend 미호출 영수증 검증",
+        "Analyzer explicit policy_security 도구 노출·실제 유효 권한·retained graph→public client/MCP/SDK→설치 역할/typed handoff의 현재12symbol·경계 receipt 검증",
+        "F-01~F-08·baseline/입력/gold/매칭/표본/실행 범위 동결 후 annotation match100%/기대 permission refusal100% 제안과 운영·품질·독립 수용 판정"
+      ],
+      "policy_security_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1/manifest.json",
+        "sha256": "18a380ed5ac265f678cd3adfaf80a9aa1f4d448410ed63145d6f7381f96865d1",
+        "status": "policy_security_symbol_provenance_gold_boundary_and_consumer_gaps_not_acceptance"
+      }
     }
   ],
   "next_priority": [
-    "WI-SP 독립 symbol·수동/자동 provenance·정책/보안/미태그 정답·ACL/비공개/위조 경계와 실제 소비자 경로 미충족분 검토",
-    "WI-C 10개 사례의 계약·필수 항목·priority 질문 판정과 typed 보고서/그림·handoff·host 실행 미충족분 검토",
+    "WI-C 실제 리뷰 계약·priority 검토 초안·필수 항목·typed 보고서/그림·handoff·설치 역할 경로의 미충족분 점검",
     "WI-1 30함수의 독립 value kind·완전한 data/control gold·return 좌표/주석 정합·matching 및 baseline/실행 수용 미충족분 검토",
     "WI-3 독립 사실 가족/정답·top-10/분모·baseline 동결 및 실제 symptom-only 검색/설치 역할 경로 미충족분 보완",
     "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완",
     "WI-V1/WI-V2 독립 티켓/실제 API 계약·도달성·주/독립 oracle·승인 후보 집합·selector/current HEAD/설치 역할 실행 및 독립 수용 미충족분 보완",
     "WI-2 독립 표본/gold·명령/호출자 계약·명시적 Analyzer 도구 노출·retained project MCP/설치 역할과 품질 수용 미충족분 보완",
-    "WI-6 운영 독립 가족/관련성 gold·기본/확장 실제 쌍·명시적 소비자 도구 노출·warm 반복/p95 기준 및 품질 수용 미충족분 보완"
+    "WI-6 운영 독립 가족/관련성 gold·기본/확장 실제 쌍·명시적 소비자 도구 노출·warm 반복/p95 기준 및 품질 수용 미충족분 보완",
+    "WI-SP 독립 symbol/gold·수동/자동 provenance·도구 노출·실제12symbol/MCP/배포 ACL·private/spoof 경계 및 독립 수용 미충족분 보완"
   ],
   "optional_backlog_count": 12
 }

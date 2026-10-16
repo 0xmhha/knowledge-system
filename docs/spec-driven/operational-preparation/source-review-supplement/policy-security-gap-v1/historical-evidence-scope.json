@@ -1,0 +1,356 @@
+{
+  "kind": "prior_fixture_and_regenerated_policy_not_independent_twelve_symbol_acceptance",
+  "fixture_summary": {
+    "schema_version": 1,
+    "fixture_commit": "4efdbb447587efb032ac38efb1b9fd9ce45125e5",
+    "checks": [
+      "actual33 registered tools and exact consumer input contract",
+      "positive policy and two security relations pinned to selected symbol",
+      "exact typed description remediation severity persistence",
+      "source row YAML hash version reviewer time approval unknown, separate graph metadata hash",
+      "manual tags and opt-in automatic rules remain distinct without safety verdict",
+      "untagged negative does not imply safety",
+      "not-found distinct from empty annotations",
+      "exact canonical identity parity",
+      "actual SQL row cap and partial/more reason",
+      "expected_commit mismatch refusal",
+      "expected_source_sha256 mismatch refusal",
+      "expected_snapshot_sha256 mismatch refusal",
+      "six actual runtime input refusals",
+      "identical retained results after source and both overlays deleted"
+    ],
+    "cks_tools": 33,
+    "ckg_exit": 0,
+    "cks_exit": 0,
+    "cks_requests": 18,
+    "binary_sha256": "aa1e6079ffa2bfd51c17f7613b3207e13db9e71f7921a1e2d332986547c0e95b",
+    "cks_binary_sha256": "7c05c9776276ce2461fd31568437a2c06789aff2844117487833df060139e7de",
+    "independent_acceptance": "not_recorded",
+    "http_scope": "middleware and existing CIDR tests separately; stdio fixture does not authenticate a reviewer"
+  },
+  "fixture_annotations": [
+    {
+      "id": "policy:fork-review",
+      "kind": "Policy",
+      "name": "Fork review",
+      "category": "consensus",
+      "related_symbol_id": "0a014f39bd4b265c",
+      "explanation": {
+        "status": "retained_operator_value",
+        "value": "Preserve fork activation behavior"
+      },
+      "modification_hint": {
+        "status": "retained_operator_value",
+        "value": ""
+      },
+      "severity": {
+        "status": "retained_operator_value",
+        "value": ""
+      },
+      "provenance": {
+        "origin": "operator_curated_metadata",
+        "source_path": "/private/tmp/ks-sp-committed-execution/source/policy.yaml",
+        "source_sha256": {
+          "status": "unknown",
+          "value": ""
+        },
+        "source_line": {
+          "status": "unknown",
+          "value": ""
+        },
+        "version": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewer": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewed_at": {
+          "status": "unknown",
+          "value": ""
+        },
+        "approval": {
+          "status": "unknown",
+          "value": ""
+        },
+        "identity_trust": "not_authenticated",
+        "metadata_sha256": "8fd74ca8bb4c0e78ac9a0f63b583fc79c656d977a7bb96c0b3f87aa4740a4f8b"
+      }
+    },
+    {
+      "id": "security:manual-boundary",
+      "kind": "SecurityPattern",
+      "name": "Operator boundary review",
+      "category": "review",
+      "related_symbol_id": "0a014f39bd4b265c",
+      "explanation": {
+        "status": "retained_operator_value",
+        "value": "Manual risk hypothesis, not a confirmed vulnerability"
+      },
+      "modification_hint": {
+        "status": "retained_operator_value",
+        "value": "Review input assumptions before editing"
+      },
+      "severity": {
+        "status": "retained_operator_value",
+        "value": "high"
+      },
+      "provenance": {
+        "origin": "operator_curated_metadata",
+        "source_path": "/private/tmp/ks-sp-committed-execution/source/security.yaml",
+        "source_sha256": {
+          "status": "unknown",
+          "value": ""
+        },
+        "source_line": {
+          "status": "unknown",
+          "value": ""
+        },
+        "version": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewer": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewed_at": {
+          "status": "unknown",
+          "value": ""
+        },
+        "approval": {
+          "status": "unknown",
+          "value": ""
+        },
+        "identity_trust": "not_authenticated",
+        "metadata_sha256": "00def5bf34cf3c6c4bc2d3ea5f45f9be57513dd57af122a28aac4cda6aebb97b"
+      }
+    },
+    {
+      "id": "security:manual-overflow",
+      "kind": "SecurityPattern",
+      "name": "Arithmetic review",
+      "category": "",
+      "related_symbol_id": "0a014f39bd4b265c",
+      "explanation": {
+        "status": "retained_operator_value",
+        "value": "Manual arithmetic hypothesis"
+      },
+      "modification_hint": {
+        "status": "retained_operator_value",
+        "value": ""
+      },
+      "severity": {
+        "status": "retained_operator_value",
+        "value": "low"
+      },
+      "provenance": {
+        "origin": "operator_curated_metadata",
+        "source_path": "/private/tmp/ks-sp-committed-execution/source/security.yaml",
+        "source_sha256": {
+          "status": "unknown",
+          "value": ""
+        },
+        "source_line": {
+          "status": "unknown",
+          "value": ""
+        },
+        "version": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewer": {
+          "status": "unknown",
+          "value": ""
+        },
+        "reviewed_at": {
+          "status": "unknown",
+          "value": ""
+        },
+        "approval": {
+          "status": "unknown",
+          "value": ""
+        },
+        "identity_trust": "not_authenticated",
+        "metadata_sha256": "d10e160ef985c3e3bf69ac86a1cd66008b712bff77ab0fccc7926c61201da01a"
+      }
+    }
+  ],
+  "fixture_wire_requests": [
+    {
+      "id": 1,
+      "method": "initialize",
+      "tool": null,
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 2,
+      "method": "tools/list",
+      "tool": null,
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 3,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 4,
+      "method": "tools/call",
+      "tool": "cks.context.rule_candidates",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 5,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 6,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 7,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 8,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 9,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 10,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 11,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    },
+    {
+      "id": 12,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": true,
+      "tool_error": false
+    },
+    {
+      "id": 13,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": true,
+      "tool_error": false
+    },
+    {
+      "id": 14,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": true,
+      "tool_error": false
+    },
+    {
+      "id": 15,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": true,
+      "tool_error": false
+    },
+    {
+      "id": 16,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": true,
+      "tool_error": false
+    },
+    {
+      "id": 17,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": true,
+      "tool_error": false
+    },
+    {
+      "id": 18,
+      "method": "tools/call",
+      "tool": "cks.context.policy_security",
+      "rpc_error": false,
+      "tool_error": false
+    }
+  ],
+  "empty_status": "no_annotations",
+  "missing_status": "not_found",
+  "typed_and_canonical_and_deleted_source_results_preserved": true,
+  "historical_http_handler_test_passed": true,
+  "fixture_is_deployed_http_listener": false,
+  "source_regeneration_summary": {
+    "kind": "local_source_aware_policy_regeneration_verification",
+    "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "source_scope": "882 tracked non-test Go blobs plus original go.mod/go.sum; no Git metadata, non-Go assets or tests copied",
+    "source_execution": false,
+    "target_package_build": false,
+    "policy_sha256": "f65fa65afbbdbfaec5251f03312c3dad4023c932ec2c61a569d893d44e614dd3",
+    "approved_policy_sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+    "graph_sha256": "58077b3e8b6a83b5b76a5f858dcb3d74ba44954fae989f05e1db32c754dce161",
+    "policy_nodes": 42,
+    "policy_edges": 146,
+    "corrections_verified": 7,
+    "public_negative_controls": 3,
+    "canonical_and_source_pin_checks": 7,
+    "selected_go_files": 843,
+    "parse_errors_count": 0,
+    "unresolved_refs_count": 0,
+    "cks_exit": 0,
+    "binary_sha256": {
+      "ckg": "ff07be281078d6aa394482cb3754c3e34cf6527af05ea55d4f8bc7088896fc5c",
+      "cks": "7ec0b25c458e7af9391a02b6a5cb82d05b4724f175d10358dcd4703501fbcf24"
+    },
+    "ckv_backend": "mock; annotation path only, no vector/ontology quality claim",
+    "independent_acceptance": "not_recorded",
+    "ontology_effect_evaluated": false,
+    "production_activated": false
+  },
+  "source_regeneration_status": {
+    "legacy_original_policy_reproduced": true,
+    "uncorrected_wrong_file_refused": true,
+    "both_outputs_preserved_on_refusal": true,
+    "owned_entry_file_corrections": 1,
+    "corrected_policy_reproduced": true,
+    "equality_scope": "all policy fields and sorted governs; approved replacement retained old list order",
+    "generated_policy_sha256": "f65fa65afbbdbfaec5251f03312c3dad4023c932ec2c61a569d893d44e614dd3",
+    "approved_policy_sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+    "regeneration_fix_complete": true,
+    "source_aware_mode": "explicit --code-root",
+    "original_entries_or_approved_overlay_changed": false,
+    "independent_acceptance": false
+  },
+  "current_twelve_independent_symbol_acceptances": 0,
+  "current_twelve_actual_mcp_receipts": 0
+}

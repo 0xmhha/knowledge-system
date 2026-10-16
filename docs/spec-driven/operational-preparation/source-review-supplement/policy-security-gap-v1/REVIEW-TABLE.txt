@@ -1,0 +1,113 @@
+WI-SP 독립 symbol·manual/automatic 출처·gold·ACL/private/spoof·소비자 공백 — 비공개 AI 자료
+12제안=정책4/보안proposal4/직접policy참조없음4. 독립 승인/gold/현재12symbol MCP receipt0개.
+일반/race 각12개 기존 top-level 테스트+12개 ACL subtest 통과는 배포 host/독립 수용 증거가 아니다.
+
+SPC-001 systemcontracts.GetMaxMinterAllowance existing_policy
+저장 policy 관계만: [{"id": "7f7694cb3604e3ea", "qualified_name": "systemcontracts.GetMaxMinterAllowance", "file_path": "systemcontracts/gov_master_minter.go", "start_line": 192, "dst": "policy:A4.gov_minter.mint_proposal_allowance"}]
+
+SPC-002 systemcontracts.GetMintProposalAmount existing_policy
+저장 policy 관계만: [{"id": "c6b6a6a85cfec803", "qualified_name": "systemcontracts.GetMintProposalAmount", "file_path": "systemcontracts/gov_minter.go", "start_line": 122, "dst": "policy:A4.gov_minter.mint_proposal_allowance"}, {"id": "c6b6a6a85cfec803", "qualified_name": "systemcontracts.GetMintProposalAmount", "file_path": "systemcontracts/gov_minter.go", "start_line": 122, "dst": "policy:A4.system_contracts.gov_minter"}]
+
+SPC-003 systemcontracts.initializeValidator existing_policy
+저장 policy 관계만: [{"id": "df59c05b1fe8f7c6", "qualified_name": "systemcontracts.initializeValidator", "file_path": "systemcontracts/gov_validator.go", "start_line": 52, "dst": "policy:A4.gov_validator.genesis_initialization"}]
+
+SPC-004 systemcontracts.CalculateDynamicSlot existing_policy
+저장 policy 관계만: [{"id": "ecdf094081c2f71a", "qualified_name": "systemcontracts.CalculateDynamicSlot", "file_path": "systemcontracts/stateutil.go", "start_line": 40, "dst": "policy:A4.system_contracts.storage_slot_layout"}]
+
+SPC-005 systemcontracts.GetMinterAt security_proposal
+저장 policy 관계만: []
+
+SPC-006 systemcontracts.GetBLSPublicKey security_proposal
+저장 policy 관계만: []
+
+SPC-007 systemcontracts.GetRefundableBalance security_proposal
+저장 policy 관계만: []
+
+SPC-008 systemcontracts.VarLenBytesToMultipleHash security_proposal
+저장 policy 관계만: []
+
+SPC-009 systemcontracts.GetMinterCount no_direct_overlay_reference
+저장 policy 관계만: []
+
+SPC-010 systemcontracts.HashToAddress no_direct_overlay_reference
+저장 policy 관계만: []
+
+SPC-011 systemcontracts.IncrementHash no_direct_overlay_reference
+저장 policy 관계만: []
+
+SPC-012 systemcontracts.checkSystemContractVersions no_direct_overlay_reference
+저장 policy 관계만: []
+
+SP-01 pkg/graph/annotations/query.go:24
+결과는 정확한 symbol·annotation·known/unknown provenance·manual origin·자동 rules 별도 상태를 제공한다.
+미충족: annotation match gold와 실제 정책 준수/취약점 승인·검토자 인증을 분리한다.
+
+SP-02 pkg/graph/annotations/query.go:104
+raw decode는 중복/null/unknown/잘못된 타입·상한·복수 선택자를 거부한다.
+미충족: 정식 입력/오류 기대 정답·분모와 실제 소비자/HTTP 요청 영수증은 독립 동결해야 한다.
+
+SP-03 pkg/graph/annotations/query.go:168
+symbol은 public relative path, annotation/edge는 private 경로 제외 규칙을 적용한다.
+미충족: 이 필터를 프로젝트별/사용자별 권한이나 기밀 분류 전반의 승인으로 간주하지 않는다.
+
+SP-04 pkg/graph/annotations/query.go:182
+Query는 retained 자료만 조회하고 기본32/상한128·협력 timeout, 선택적 expected pin을 적용한다.
+미충족: 수용 요청의 source/commit/snapshot pin·상한/partial/기권·coverage를 동결한다. live YAML fallback이나 hard memory/선점 deadline 보장이 아니다.
+
+SP-05 pkg/graph/annotations/query.go:247
+governed_by/has_security_pattern 관계와 typed payload를 읽되 YAML row/hash/version/reviewer/approval은 unknown이며 legacy hint/severity는 추측하지 않는다.
+미충족: Go commit·graph metadata SHA·StartLine1을 원본 YAML/독립 검토자 승인으로 바꾸지 않는다.
+
+SP-06 pkg/graph/annotations/query.go:309
+재조회한 manifest/symbol/blob/tag/page/more가 다르면 결과를 지우고 no_annotations와 not_found를 구분한다.
+미충족: 동시 snapshot transaction이나 ABA 변경 검출 보장과 다르다. 빈 태그·누락·unavailable·partial의 정답/거부 분모가 필요하다.
+
+SP-07 pkg/graph/policy/policy.go:145
+policy resolver는 name matching 후 operator payload를 저장하고 YAML row는 추적하지 않아 StartLine1을 넣는다.
+미충족: 원래 YAML manifest와 현재 graph의 출처를 별도로 보존하고 정확한 symbolic matching의 중복/alias·범위 검토가 필요하다.
+
+SP-08 pkg/graph/security/security.go:181
+security resolver도 수동 YAML description/remediation/severity를 typed payload와 관계로 저장한다.
+미충족: AI 보안 proposal4개를 이미 ingested/검토 완료된 보안 태그로 세지 않는다. 자동 rule 후보는 별도다.
+
+MCP-01 internal/system/mcp/annotations.go:12
+policy_security는 readOnly metadata와 strict input·optional public client를 통해 annotation Query를 호출한다.
+미충족: readOnlyHint는 권한/검토자 인증이 아니다. SDK/schema 등록과 실제 역할 노출·실행을 대조한다.
+
+MCP-02 internal/system/ckgclient/annotations.go:9
+public annotation client는 LLM-safe retained reader를 쓰고 legacy backend는 unavailable을 반환한다.
+미충족: unsupported backend를 음성/빈 태그/성공으로 집계하지 않는다.
+
+ACL-01 internal/system/mcp/server.go:228
+HTTPPolicy는 기본 loopback 또는 명시적 remote/CIDR 네트워크 범위를 정한다.
+미충족: 사용자/리뷰어 인증이나 심볼/프로젝트별 권한 기능을 구현한 것으로 해석하지 않는다.
+
+ACL-02 internal/system/mcp/server.go:329
+clientACL과 middleware는 직접 peer RemoteAddr를 기준으로 거부하고 X-Forwarded-For를 신뢰하지 않는다.
+미충족: 운영 listen·CIDR·proxy topology·허용/거부 expectation을 동결하고 실제 배포 endpoint/설치 소비자 경로를 확인한다.
+
+TEST-01 internal/system/mcp/annotations_test.go:57
+HTTP handler 통제는 위조 forwarded loopback을 붙여도 비허용 peer를 backend 전 거부하며 loopback 호출을 허용한다.
+미충족: httptest/fake backend는 실제 deployed listener·proxy/사용자 인증/12심볼 gold 수용 시험이 아니다.
+
+HOST-01 plugin/agents/analyzer.md:13
+Analyzer의 명시적 CKS tools 목록에는 policy_security 직접 alias가 없다.
+미충족: consumer schema 존재와 직접 역할 노출은 다르다. 유효 host 권한·판정/typed handoff receipt가 필요하다.
+
+정답/출처 질문:
+정책4/보안4/미태그4의 범위·독립 symbol/family·노출·DEV-FINAL·표본 충분성을 독립 검토한다. 같은 계약/파일·동일 정책의 여러 심볼을 임의 독립 승인하지 않는다.
+정책/보안 overlay 원본 버전·bytes/hash·정확한 대상/관계·category/설명/수정힌트/severity의 authoritative gold와 unknown/빈 문자열/legacy 의미를 사전 동결한다.
+보안4개는 unapproved AI 수동 proposal이다. 독립 의미 검토·선택 overlay/graph ingest·실제 응답 없이 존재하는 security tag gold로 세지 않는다.
+미태그4개는 선택 overlay와 snapshot에서의 범위다. no_annotations/not_found/unavailable/unsupported/partial을 구분하고 안전/정책 비적용으로 승격하지 않는다.
+project/commit/canonical symbol·file/span/blob/snapshot·annotation ID/kind/edge·source metadata와 field known/unknown을 매칭한다. name만으로 다른 프로젝트를 합치지 않는다.
+YAML row/hash/version/reviewer/time/approval이 runtime에 저장되지 않았다면 unknown을 유지한다. 별도 packet의 YAML hash·Go commit·graph metadata SHA가 reviewer 인증을 대신하지 않는다.
+manual annotation/automatic rule candidate/LLM 해석·취약점 수용은 다른 증거다. automatic query를 별도로 실행하고 annotation 관계/출처를 덮어쓰지 않는다.
+정확도100%·기대 거부100% 제안은 독립 gold/negative control 분모·cap/timeout/stale/기권 정책과 승인된 실제 경로를 동결한 뒤 판정한다.
+
+경계/소비자 질문:
+peer ACL의 loopback/remote off/default LAN/explicit IPv4·IPv6 CIDR·public/invalid/nil 주소와 직접 peer 기대 결과를 구성한다.
+X-Forwarded-For/Forwarded/X-Real-IP·proxy topology에서 직접 peer와 claimed identity를 구분한다. 허용 proxy가 들어온 경우의 배포 기대 계약을 독립 동결한다.
+비공개 symbol/annotation/edge·절대/비정규 경로·.claude/logs·stale pins/변경 snapshot·legacy backend에 대한 결과 비노출과 backend 전 거부를 따로 기록한다.
+HTTP/stdio·public client·SDK/schema·실제 설치 역할/alias/유효 권한·typed handoff와 실제 deployed listener receipt를 분리한다.
+readOnly·CIDR 허용·조작된 설명/YAML reviewer 필드·metadata hash는 인증된 reviewer/원본 증명/프로젝트별 권한이 아니다.
+기존 통제 테스트/fixture/정책 재생성 성과를 보존하되 정식12독립심볼·운영 권한/독립 수용으로 합산하지 않는다.

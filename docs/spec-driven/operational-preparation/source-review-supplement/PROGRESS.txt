@@ -286,10 +286,25 @@
 - 전용 변조/경계39개·연관 Python 회귀608개·문서134개·기존 구현 완료 상태 검사 통과.
 - 20파일 두 차례 재생성 바이트 일치. 이전 동결 패킷22개·유지보수 Go 변경 없음.
 - EXPANSION-GAP-REVIEW.txt와 expansion-gap-v1에 가족·쌍/gold·검색 경로·warm 계약 공백 기록.
-[예정] 24. WI-SP 독립 symbol·provenance·정답·권한 경계·소비자 경로 공백 점검
+[완료] 24. WI-SP 독립 symbol·provenance·정답·권한 경계·소비자 경로 공백 점검
 - 기존 정책/보안/미태그 symbol과 수동/자동 자료를 독립12개/범주별4개 기준에 대조한다.
 - 원본YAML/provenance·의미 gold·stale/invalid/위조/private/ACL와 실제 MCP/역할 영수증 미충족분을 기록한다.
 - annotation 존재/빈 결과·자동 rule 후보를 독립 승인·안전·권한 통과로 승격하지 않는다.
+- 12symbol=정책4/보안AI초안4/직접policy참조없음4, 고정Go5파일·66쌍 중 같은 파일11쌍.
+- source-aware 재생성42policy/146edges 중 선정 정책4symbol의5관계 대조. policy-only를 security 부재/gold로 세지 않음.
+- 독립symbol/gold/현재12symbol MCP receipt0개. YAML6개 출처 필드 unknown·legacy/typed·manual/automatic 구분.
+- 현재/채택 source계약14곳·consumer2파일 Git/metadata input parity 대조. Analyzer explicit policy_security alias 누락.
+- 직접peer RemoteAddr ACL과 reviewer 인증·project/symbol 권한을 구분. 배포 listener/proxy/설치 역할 미검증.
+- 현재 offlineGo1.26.9 일반/race 각상위12+ACL세부12 pass·2package 완료. httptest/fake backend·외부 listener 없음.
+- 과거 실제stdio fixture18요청·typed/empty/missing/stale/상한/원문삭제, 최신 재생성 수정완료 성과/한계 보존.
+- 전용 변조/경계 테스트42개 포함 현재 문맥674개 통과. 기존 문서2개의 역사적 바인딩 차이1건 별도 보존.
+- 현재 문서는 유지하고 Git 기록 문서 view로 원래14개 테스트 통과. 기존 실패/기록문맥 통과를 구분해 보존.
+- 기록 문맥14개 별도 통과(합계688개). 패킷45파일 두 차례 재생성 일치·문서134개/기존 구현 검사 통과.
+- POLICY-SECURITY-GAP-REVIEW.txt와 policy-security-gap-v1에 정답/출처·경계/소비자 공백 기록.
+[예정] 25. WI-C 실제 리뷰 계약·priority 초안·typed 보고서/그림·handoff·설치 역할 공백 점검
+- 기존10사례·rubric/근거와 실제 구조화 리뷰/검증/소비자 경로를 대조한다.
+- 우선순위/필수 항목·관련성의 AI 검토 초안과 독립 사람 판정을 구분한다.
+- source/pin·typed 보고서/그림·handoff·완료 guard·실제 설치 역할 영수증의 미충족분을 기록한다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -321,14 +336,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-SP 독립 symbol·수동/자동 provenance·정책/보안/미태그 정답·ACL/비공개/위조 경계와 실제 소비자 경로의 공백을 점검한다.
+WI-C 실제 리뷰 계약·priority 검토 초안·필수 항목·typed 보고서/그림·handoff·설치 역할 경로의 공백을 점검한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_expansion_gap.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-expansion-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/expansion-gap-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_policy_security_gap.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-policy-security-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~23단계 검증 완료, 24단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~24단계 검증 완료, 25단계 예정. 정식 독립 수용은 계속 0/9이다.

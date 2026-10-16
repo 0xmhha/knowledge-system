@@ -1,0 +1,354 @@
+{
+  "kind": "source_and_owned_handler_controls_not_deployed_consumer_acceptance",
+  "contracts": [
+    {
+      "id": "SP-01",
+      "scope": "current_repository",
+      "path": "pkg/graph/annotations/query.go",
+      "lines": [
+        24,
+        80
+      ],
+      "fact": "결과는 정확한 symbol·annotation·known/unknown provenance·manual origin·자동 rules 별도 상태를 제공한다.",
+      "gap": "annotation match gold와 실제 정책 준수/취약점 승인·검토자 인증을 분리한다.",
+      "anchor": {
+        "start_line": 24,
+        "end_line": 80,
+        "start_byte": 476,
+        "end_byte_exclusive": 2894,
+        "span_sha256": "d4318b0f139bbf3e8df116702d258053ab8e19d83f7222cb1ca97426167699e0"
+      },
+      "approved": false
+    },
+    {
+      "id": "SP-02",
+      "scope": "current_repository",
+      "path": "pkg/graph/annotations/query.go",
+      "lines": [
+        104,
+        165
+      ],
+      "fact": "raw decode는 중복/null/unknown/잘못된 타입·상한·복수 선택자를 거부한다.",
+      "gap": "정식 입력/오류 기대 정답·분모와 실제 소비자/HTTP 요청 영수증은 독립 동결해야 한다.",
+      "anchor": {
+        "start_line": 104,
+        "end_line": 165,
+        "start_byte": 3921,
+        "end_byte_exclusive": 5627,
+        "span_sha256": "b32b371f40a7bf6b84345781bbe99db1f53b86c04e7359c0417cfd24ba48cfca"
+      },
+      "approved": false
+    },
+    {
+      "id": "SP-03",
+      "scope": "current_repository",
+      "path": "pkg/graph/annotations/query.go",
+      "lines": [
+        168,
+        180
+      ],
+      "fact": "symbol은 public relative path, annotation/edge는 private 경로 제외 규칙을 적용한다.",
+      "gap": "이 필터를 프로젝트별/사용자별 권한이나 기밀 분류 전반의 승인으로 간주하지 않는다.",
+      "anchor": {
+        "start_line": 168,
+        "end_line": 180,
+        "start_byte": 5644,
+        "end_byte_exclusive": 6019,
+        "span_sha256": "f4dc579b7b2a1e78a6b8db0abcbe7df192afe417d8f3c1e5b376bac1067b20b9"
+      },
+      "approved": false
+    },
+    {
+      "id": "SP-04",
+      "scope": "current_repository",
+      "path": "pkg/graph/annotations/query.go",
+      "lines": [
+        182,
+        224
+      ],
+      "fact": "Query는 retained 자료만 조회하고 기본32/상한128·협력 timeout, 선택적 expected pin을 적용한다.",
+      "gap": "수용 요청의 source/commit/snapshot pin·상한/partial/기권·coverage를 동결한다. live YAML fallback이나 hard memory/선점 deadline 보장이 아니다.",
+      "anchor": {
+        "start_line": 182,
+        "end_line": 224,
+        "start_byte": 6093,
+        "end_byte_exclusive": 8180,
+        "span_sha256": "e910e0d6d3e3907fe507f528a768fc204863628ab69a4dbc2bdbce80435a443a"
+      },
+      "approved": false
+    },
+    {
+      "id": "SP-05",
+      "scope": "current_repository",
+      "path": "pkg/graph/annotations/query.go",
+      "lines": [
+        247,
+        307
+      ],
+      "fact": "governed_by/has_security_pattern 관계와 typed payload를 읽되 YAML row/hash/version/reviewer/approval은 unknown이며 legacy hint/severity는 추측하지 않는다.",
+      "gap": "Go commit·graph metadata SHA·StartLine1을 원본 YAML/독립 검토자 승인으로 바꾸지 않는다.",
+      "anchor": {
+        "start_line": 247,
+        "end_line": 307,
+        "start_byte": 8795,
+        "end_byte_exclusive": 12056,
+        "span_sha256": "bfafee9c18f4f07867dc4da49fdc650f01d8f81ad11b83650cfa0a6303f96f68"
+      },
+      "approved": false
+    },
+    {
+      "id": "SP-06",
+      "scope": "current_repository",
+      "path": "pkg/graph/annotations/query.go",
+      "lines": [
+        309,
+        345
+      ],
+      "fact": "재조회한 manifest/symbol/blob/tag/page/more가 다르면 결과를 지우고 no_annotations와 not_found를 구분한다.",
+      "gap": "동시 snapshot transaction이나 ABA 변경 검출 보장과 다르다. 빈 태그·누락·unavailable·partial의 정답/거부 분모가 필요하다.",
+      "anchor": {
+        "start_line": 309,
+        "end_line": 345,
+        "start_byte": 12112,
+        "end_byte_exclusive": 13350,
+        "span_sha256": "8e874b988597c60d45b958be5d564f4274a9649905f5a58e3f9b29c574cace18"
+      },
+      "approved": false
+    },
+    {
+      "id": "SP-07",
+      "scope": "current_repository",
+      "path": "pkg/graph/policy/policy.go",
+      "lines": [
+        145,
+        190
+      ],
+      "fact": "policy resolver는 name matching 후 operator payload를 저장하고 YAML row는 추적하지 않아 StartLine1을 넣는다.",
+      "gap": "원래 YAML manifest와 현재 graph의 출처를 별도로 보존하고 정확한 symbolic matching의 중복/alias·범위 검토가 필요하다.",
+      "anchor": {
+        "start_line": 145,
+        "end_line": 190,
+        "start_byte": 5896,
+        "end_byte_exclusive": 7223,
+        "span_sha256": "13c756c89d409b8ce99e433452034bcf45df38f4b36b4c9c4d26d0f00b3195c3"
+      },
+      "approved": false
+    },
+    {
+      "id": "SP-08",
+      "scope": "current_repository",
+      "path": "pkg/graph/security/security.go",
+      "lines": [
+        181,
+        214
+      ],
+      "fact": "security resolver도 수동 YAML description/remediation/severity를 typed payload와 관계로 저장한다.",
+      "gap": "AI 보안 proposal4개를 이미 ingested/검토 완료된 보안 태그로 세지 않는다. 자동 rule 후보는 별도다.",
+      "anchor": {
+        "start_line": 181,
+        "end_line": 214,
+        "start_byte": 6858,
+        "end_byte_exclusive": 7848,
+        "span_sha256": "95b48ba178908f09e9da17371396b7d9bd3c24bc58fe8bea3a26d7abc741b4b1"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-01",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/annotations.go",
+      "lines": [
+        12,
+        42
+      ],
+      "fact": "policy_security는 readOnly metadata와 strict input·optional public client를 통해 annotation Query를 호출한다.",
+      "gap": "readOnlyHint는 권한/검토자 인증이 아니다. SDK/schema 등록과 실제 역할 노출·실행을 대조한다.",
+      "anchor": {
+        "start_line": 12,
+        "end_line": 42,
+        "start_byte": 266,
+        "end_byte_exclusive": 2870,
+        "span_sha256": "7bdf7da0be2db432e9acf2eb1d40b295092fe5f73464cee963d83c1c7138b823"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-02",
+      "scope": "current_repository",
+      "path": "internal/system/ckgclient/annotations.go",
+      "lines": [
+        9,
+        20
+      ],
+      "fact": "public annotation client는 LLM-safe retained reader를 쓰고 legacy backend는 unavailable을 반환한다.",
+      "gap": "unsupported backend를 음성/빈 태그/성공으로 집계하지 않는다.",
+      "anchor": {
+        "start_line": 9,
+        "end_line": 20,
+        "start_byte": 162,
+        "end_byte_exclusive": 870,
+        "span_sha256": "2ef8c0cf17d658a92b8126263598f01df0138092d12c4dd03917a80cf1c1e8c9"
+      },
+      "approved": false
+    },
+    {
+      "id": "ACL-01",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/server.go",
+      "lines": [
+        228,
+        240
+      ],
+      "fact": "HTTPPolicy는 기본 loopback 또는 명시적 remote/CIDR 네트워크 범위를 정한다.",
+      "gap": "사용자/리뷰어 인증이나 심볼/프로젝트별 권한 기능을 구현한 것으로 해석하지 않는다.",
+      "anchor": {
+        "start_line": 228,
+        "end_line": 240,
+        "start_byte": 8669,
+        "end_byte_exclusive": 9252,
+        "span_sha256": "53d1f7c49a0574a157e3e39a0547e69eff729cd966e5e3d5ad7e4667f9b67721"
+      },
+      "approved": false
+    },
+    {
+      "id": "ACL-02",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/server.go",
+      "lines": [
+        329,
+        376
+      ],
+      "fact": "clientACL과 middleware는 직접 peer RemoteAddr를 기준으로 거부하고 X-Forwarded-For를 신뢰하지 않는다.",
+      "gap": "운영 listen·CIDR·proxy topology·허용/거부 expectation을 동결하고 실제 배포 endpoint/설치 소비자 경로를 확인한다.",
+      "anchor": {
+        "start_line": 329,
+        "end_line": 376,
+        "start_byte": 12547,
+        "end_byte_exclusive": 13808,
+        "span_sha256": "2cd16984efed1bbee49462ac2a743e15fd7421685980d43318451d3980448351"
+      },
+      "approved": false
+    },
+    {
+      "id": "TEST-01",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/annotations_test.go",
+      "lines": [
+        57,
+        103
+      ],
+      "fact": "HTTP handler 통제는 위조 forwarded loopback을 붙여도 비허용 peer를 backend 전 거부하며 loopback 호출을 허용한다.",
+      "gap": "httptest/fake backend는 실제 deployed listener·proxy/사용자 인증/12심볼 gold 수용 시험이 아니다.",
+      "anchor": {
+        "start_line": 57,
+        "end_line": 103,
+        "start_byte": 2195,
+        "end_byte_exclusive": 4684,
+        "span_sha256": "8e92eecefbd9b13aa79080003d32e4e3deb988719d559da0b924921c6fa400d4"
+      },
+      "approved": false
+    },
+    {
+      "id": "HOST-01",
+      "scope": "adopted_consumer",
+      "path": "plugin/agents/analyzer.md",
+      "lines": [
+        13,
+        37
+      ],
+      "fact": "Analyzer의 명시적 CKS tools 목록에는 policy_security 직접 alias가 없다.",
+      "gap": "consumer schema 존재와 직접 역할 노출은 다르다. 유효 host 권한·판정/typed handoff receipt가 필요하다.",
+      "anchor": {
+        "start_line": 13,
+        "end_line": 37,
+        "start_byte": 708,
+        "end_byte_exclusive": 1984,
+        "span_sha256": "a5241ee4ec9b20094ee3164c79721ebb88006e4cbbcdbb1bbe0e77d90cbf2699"
+      },
+      "approved": false
+    }
+  ],
+  "boundary_questions": [
+    "peer ACL의 loopback/remote off/default LAN/explicit IPv4·IPv6 CIDR·public/invalid/nil 주소와 직접 peer 기대 결과를 구성한다.",
+    "X-Forwarded-For/Forwarded/X-Real-IP·proxy topology에서 직접 peer와 claimed identity를 구분한다. 허용 proxy가 들어온 경우의 배포 기대 계약을 독립 동결한다.",
+    "비공개 symbol/annotation/edge·절대/비정규 경로·.claude/logs·stale pins/변경 snapshot·legacy backend에 대한 결과 비노출과 backend 전 거부를 따로 기록한다.",
+    "HTTP/stdio·public client·SDK/schema·실제 설치 역할/alias/유효 권한·typed handoff와 실제 deployed listener receipt를 분리한다.",
+    "readOnly·CIDR 허용·조작된 설명/YAML reviewer 필드·metadata hash는 인증된 reviewer/원본 증명/프로젝트별 권한이 아니다.",
+    "기존 통제 테스트/fixture/정책 재생성 성과를 보존하되 정식12독립심볼·운영 권한/독립 수용으로 합산하지 않는다."
+  ],
+  "criteria_snapshot": {
+    "protocol": {
+      "id": "WI-SP",
+      "status": "source_queries_and_annotation_drafts_not_reviewed",
+      "requirements_proposal": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "metrics_proposal": {
+        "annotation_match_fraction": 1.0,
+        "expected_permission_refusal_fraction": 1.0,
+        "unavailable_yaml_or_reviewer_provenance": "unknown"
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "preparation_reference": {
+        "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+        "kind": "source_drafts_not_gold_or_runtime"
+      }
+    },
+    "progress": {
+      "id": "WI-SP",
+      "owner": "CKS+CKG",
+      "target": "실제 소비자의 policy_security 질의와 운영 HTTP/CIDR 경계",
+      "input_proposal": "새 symbol12개 이상: 정책4·보안4·빈 태그4. manual/automatic·legacy/typed·입력/stale/권한 거부 제어를 별도 고정",
+      "completion_proposal": "사전 annotation 정답의 관련 symbol·설명/힌트/severity가100% 일치. 저장되지 않은 YAML row/hash/version/reviewer/approval은 unknown. 빈 태그와 not-found 구분. 직접 peer ACL·위조 헤더·private 경계는 기대 거부100%. 독립 검토자의 범위 수용",
+      "limitations": "manual 태그는 검증된 취약점/정책 적합 판정이 아니다. graph metadata SHA와 Go commit을 YAML/검토자 증명으로 사용하지 않는다. reviewer 인증은 현재 미지원",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/manifest.json",
+        "revision": "e10f12b19a5219a37b2f9eaae417d76a875ff5c8"
+      }
+    }
+  },
+  "consumer_exposure_gap": {
+    "wire_name": "cks.context.policy_security",
+    "metadata_input_parity": true,
+    "explicit_analyzer_alias": "mcp__plugin_coding-agent_cks__cks_context_policy_security",
+    "explicit_analyzer_tool_present": false,
+    "effective_host_permissions": null,
+    "runtime_denial_proven": false,
+    "installed_role_receipt": null
+  },
+  "peer_acl_is_reviewer_authentication": false,
+  "peer_acl_is_per_symbol_or_project_authorization": false,
+  "metadata_hash_authenticates_yaml_or_reviewer": false,
+  "deployed_listener_and_proxy_receipt": null,
+  "independent_control_gold": null,
+  "expected_refusal_fraction": null
+}
