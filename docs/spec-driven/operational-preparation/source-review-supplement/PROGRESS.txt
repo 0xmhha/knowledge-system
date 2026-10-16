@@ -69,6 +69,16 @@
 - 연관 회귀 152개·문서 134개·기존 구현 완료 상태 검사 통과.
 - 이전 동결 패킷과 유지보수 Go 소스는 변경하지 않았다.
 
+[검증 완료] 7. WI-3 증상 검색 공개 입력·원문 노트·중복 후보
+- 증상만의 질문 20개·유형 7개·원문 근거 40곳, source function 힌트 제외.
+- 가족 제안 15개·문항 쌍 190개·기존 42문항과 비교 840개. 독립성 모두 미승인.
+- 기존 문항과 주제 유사성을 AI가 표시한 항목은 16문항/29쌍.
+- 전용 회귀 18개·45개 파일 바이트 동일 재생성 통과, 독립 gold/recall 없음.
+- SYMPTOM-INPUTS.txt에 입력 목록·표본 부족·노출 한계를 기록.
+[진행 예정] 8. 공개 입력 요청 분리와 실제 MCP 요청 파서 사전 검증
+- 공개 입력만으로 텍스트 seed 요청을 생성하고 Go parser/Defaults를 검사.
+- 검색·backend·host·모델을 실행하거나 점수를 산출하지 않는다.
+
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
 실행 허용 false, freeze null, 독립 검토 승인 없음. 이번 보완은 준비 작업이다.
@@ -99,7 +109,7 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-3 검색 입력과 비공개 근거를 분리하고 가족 중복을 검토한다.
+8단계의 공개 요청 분리와 실제 요청 파서 사전 검증을 진행한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
@@ -110,4 +120,4 @@ python3 scripts/test_review_context.py
 python3 scripts/check-review-context.py docs/spec-driven/operational-preparation/source-review-supplement/context-v1
 이 검증은 원문 일치·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~6단계 검증 완료. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~7단계 검증 완료. 정식 독립 수용은 계속 0/9이다.
