@@ -1,0 +1,186 @@
+[
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "parameter",
+    "code": "func F(cmd string){exec.Command(cmd)}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "copy",
+    "code": "func F(cmd string){name:=cmd;exec.Command(name)}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "compound",
+    "code": "func F(cmd string){cmd+=\"suffix\";exec.Command(cmd)}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "kill",
+    "code": "func F(cmd string){name:=cmd;name=\"fixed\";exec.Command(name)}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "literal",
+    "code": "func F(cmd string){exec.Command(\"fixed\",cmd)}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "branch",
+    "code": "func F(cmd string,flag bool){name:=\"fixed\";if flag{name=cmd};exec.Command(name)}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "loop",
+    "code": "func F(cmd string,flag bool){name:=\"fixed\";for flag{name=cmd;flag=false};exec.Command(name)}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "shadow",
+    "code": "func F(cmd string){name:=\"fixed\";{name:=cmd;_=name};exec.Command(name)}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "parallel_rhs",
+    "code": "func F(cmd string){name,other:=\"fixed\",cmd;_=other;exec.Command(name)}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "command_context",
+    "code": "func F(cmd string){exec.CommandContext(nil,cmd)}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "unknown_sanitizer",
+    "code": "func F(cmd string){name:=sanitize(cmd);exec.Command(name)}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "alias_unknown",
+    "code": "func F(cmd string){ref:=&cmd;exec.Command(*ref)}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "renamed_import_miss",
+    "code": "func F(cmd string){process.Command(cmd)}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "spoofed_target_candidate",
+    "code": "func F(cmd string,exec Fake){exec.Command(cmd)}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "closure_not_inlined",
+    "code": "func F(cmd string){f:=func(){exec.Command(cmd)};_=f}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackScalarCommandCorpus",
+    "name": "unreachable",
+    "code": "func F(cmd string){return;exec.Command(cmd)}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "parameter-command-name",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackDiscardedErrorCorpus",
+    "name": "discarded",
+    "code": "func F(s string)int{v,_:=strconv.Atoi(s);return v}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "discarded-conversion-error",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackDiscardedErrorCorpus",
+    "name": "copy",
+    "code": "func F(s string)int{v,_:=strconv.ParseInt(s,10,64);out:=v;return out}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "discarded-conversion-error",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackDiscardedErrorCorpus",
+    "name": "checked",
+    "code": "func F(s string)int{v,err:=strconv.Atoi(s);if err!=nil{return 0};return v}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "discarded-conversion-error",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackDiscardedErrorCorpus",
+    "name": "overwritten",
+    "code": "func F(s string)int{v,_:=strconv.Atoi(s);v=3;return v}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "discarded-conversion-error",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackDiscardedErrorCorpus",
+    "name": "unused",
+    "code": "func F(s string)int{v,_:=strconv.Atoi(s);_=v;return 3}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "discarded-conversion-error",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackDiscardedErrorCorpus",
+    "name": "branch",
+    "code": "func F(s string,flag bool)int{v,_:=strconv.Atoi(s);if flag{return v};return 0}",
+    "expected_candidates_in_existing_test": 1,
+    "rule": "discarded-conversion-error",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  },
+  {
+    "test": "TestRulePackDiscardedErrorCorpus",
+    "name": "renamed_miss",
+    "code": "func F(s string)int{v,_:=conversion.Atoi(s);return v}",
+    "expected_candidates_in_existing_test": 0,
+    "rule": "discarded-conversion-error",
+    "status": "existing_developer_fixture_not_new_independent_gold"
+  }
+]

@@ -155,9 +155,9 @@
     },
     {
       "id": "WI-2",
-      "preparation_candidate_count": 12,
-      "count_semantics": "drafts_only_not_independent_units",
-      "note": "기존 정책·보안 source query 12개. 지원 규칙별 독립 양성/음성 gold는 0개.",
+      "preparation_candidate_count": 40,
+      "count_semantics": "exposed_controlled_source_drafts_not_project_or_independent_units",
+      "note": "지원 규칙 2개 계약과 기존 개발 fixture 23개를 대조. 새 통제 입력 초안 40개(규칙별 AI 양성/음성 제안 각 10개)를 공개 원문과 비공개 기대 초안으로 분리하고 문법 parse만 수행. 실제 규칙 관측·독립 gold는 0개. 기존 프로젝트 호출 68곳/51함수(명령 20·숫자 변환 48)는 별도 분모이며 직접 parameter 표기 hint 2개·blank second LHS 표기 hint 0개. 이것은 탐지/확정 음성 판정이 아니다. annotation query 12개는 WI-SP 용도로 별도 유지.",
       "requirements": {
         "new_positive_cases_per_supported_rule_min": 10,
         "new_negative_cases_per_supported_rule_min": 10,
@@ -170,12 +170,20 @@
         "controlled_and_project_denominators_separate": true
       },
       "approved_independent_cases": 0,
-      "formal_status": "source_syntax_census_only_independent_cases_not_prepared",
+      "formal_status": "controlled_source_drafts_and_project_syntax_screen_only",
       "remaining": [
+        "통제 입력 40개의 실제 AnalyzeRules 일반/race 관측, 후보 원문 위치·조건·target/sanitizer unknown·상한·결정성 검증",
+        "기존 fixture와 메커니즘/의미 중복 및 family 독립성 검토; 신규 독립 사례로 자동 계산 금지",
+        "프로젝트 호출의 실제 rule source/sink·호출자/도달성 검토 및 양성 충분성 평가; 부족하면 inconclusive",
         "독립 검토자와 최종 수용 담당자 지정",
-        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
-        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
-      ]
+        "독립 탐지 정답·위험성 별도 판정·입력/정답·매칭·DEV/FINAL 동결",
+        "승인된 범위의 MCP/소비자 실행 및 운영·품질·독립 수용 판정"
+      ],
+      "rule_coverage_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-coverage-v1/manifest.json",
+        "sha256": "79142e1a247500ed4a30b22c846d994438e6438057bb079d43d7cb1d8a75a294",
+        "status": "rule_source_proposals_not_detection_gold_or_acceptance"
+      }
     },
     {
       "id": "WI-C",
@@ -250,7 +258,7 @@
     }
   ],
   "next_priority": [
-    "WI-2 실제 지원 규칙별 양성/음성 후보와 sanitizer·branch·shadow·external target 범위 점검",
+    "WI-2 통제 입력 40개의 실제 분석기 관측과 source pin·조건·unknown·상한/결정성 검증",
     "WI-1 독립 검토·완전한 정답·value kind/범위·매칭 미충족분 검토",
     "WI-3 독립 사실 가족 20개 미충족·노출/중복·gold·실제 검색/호스트 경로 검토",
     "WI-4 실제 도달성·후보 계약·독립성·동결·반복 실행 미충족분 검토",
