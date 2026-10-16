@@ -314,9 +314,21 @@
 - 소비자15/추가12계약·native 일반/race 각7 통과. 기록 문맥14개 별도 통과; 최신 문서의 과거 guard 불일치1건 유지.
 - 패킷49파일 두 차례 재생성 일치·문서134개/기존 구현 완료 검사 통과. 기존24패킷·Go·현재 handoff/잔여 문서 유지.
 - REVIEW-GAP-REVIEW.txt와 review-gap-v1에 공백/계약/원자료 기록.
-[예정] 26. 소비자 도구 노출·Planner 구조화 전달 계약 보완 명세와 격리 검증 계획
+[완료] 26. 소비자 도구 노출·Planner 구조화 전달 계약 보완 명세와 격리 검증 계획
 - WI-C와 앞선 검토의 실제 소비자 공백을 묶어 수정 범위·필수 동작·검증 기준을 구체화한다.
 - 실제 설치/외부 repo 수정·정식 실행은 범위를 구분하고 독립 승인 없이 수용 완료로 세지 않는다.
+- Analyzer5/Planner2 총7role-tool 항목·5고유도구, 기존49/17 보존→계획54/19. 런타임/서버/schema는 보존.
+- 요구사항12개·선행관계가 있는8구현단계·22검증사례/기대결과·22원자료필드를 연결했다.
+- typed5산출물/6추론절·priority3종/cap32·ANALYSIS/PLANNING hash·재진입·실제hook/CLI/role 계약 명세.
+- CFG/runtime·file membership/interprocedural·structural unpinned·형식/독립 gold와 수용 경계 유지.
+- 비용 없는 local responder·stdio/소유자원/시간/요청/종료·복구·증거상한은 후속 준비 실행 제안이며 정식 프로토콜 동결 아님.
+- consumer-contract-plan-v1의 명세/격리 검증 계획 작성. 구현0·새역할/모델/MCP실행0·22계획사례 모두 not_run.
+- 두 role의 옛 code_review→DONE source2곳·frontmatter/return까지 정렬 범위에 포함.
+- 전용 명세/허위완료 방지48개 포함 관련 회귀296개 통과. 명세8파일 두 차례 byte 재현 일치.
+- 문서134개/기존 구현 완료 상태 검사 통과. 기존25패킷·Go·현재 handoff/잔여 문서·정식9항목 유지.
+[예정] 27. 격리 소비자 후보의 도구 노출·Planner 구조화 전달 계약 보완 및 로컬 회귀
+- 별도 소유 checkout에서 두 role 파일·회귀 테스트를 최소 변경하고 verifier/runtime/기존 도구 목록을 보존한다.
+- 명세 P01~P04의 source/metadata/전달/변조 대조부터 검증한다. 실제 role/stdio/그림 검증은 후속 P05~P08로 구분한다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -348,14 +360,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-소비자 도구 노출·Planner 구조화 전달 계약 보완 명세와 격리 검증 계획을 작성한다.
+격리된 별도 coding-agent 후보에서 두 role 파일의 도구 노출·Planner 구조화 전달 계약 보완과 로컬 회귀(P01~P04)를 진행한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_review_gap.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-review-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/review-gap-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_contract_plan.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-contract-plan.py --packet docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~25단계 검증 완료, 26단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~26단계 검증 완료, 27단계 예정. 정식 독립 수용은 계속 0/9이다.
