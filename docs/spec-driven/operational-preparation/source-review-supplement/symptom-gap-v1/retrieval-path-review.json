@@ -1,0 +1,320 @@
+{
+  "status": "source_and_prior_evidence_scope_review_not_new_search_run",
+  "routes": [
+    {
+      "id": "R01",
+      "scope": "current_repository",
+      "path": "scripts/export-symptom-wire.py",
+      "lines": [
+        34,
+        45
+      ],
+      "fact": "공개 카드만으로 text-only 요청을 만들며 candidates10/seeds3/enriched3/calls32/depth2/1000ms를 넣는다.",
+      "gap": "공개 요청 포장은 OS 파일 접근 격리나 실제 검색 실행 영수증이 아니다.",
+      "anchor": {
+        "start_line": 34,
+        "end_line": 45,
+        "start_byte": 1977,
+        "end_byte_exclusive": 2544,
+        "span_sha256": "97fb16f91d93e3acab8bbaff02a4bdbc2b653d51a32c85c6e809210b3162aa83"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R02",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/suspects.go",
+      "lines": [
+        54,
+        79
+      ],
+      "fact": "handler가 요청을 파싱하고 backend alignment·retained identity·sanitizer 조건을 확인한다.",
+      "gap": "이번 20개 요청의 실제 handler→retained dataset 검증은 미실행이다.",
+      "anchor": {
+        "start_line": 54,
+        "end_line": 79,
+        "start_byte": 3194,
+        "end_byte_exclusive": 4784,
+        "span_sha256": "0a10789da1edf4c7cfa11313ae8c848ef83a7a4ff86cf7653e45e1477978452c"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R03",
+      "scope": "current_repository",
+      "path": "internal/system/suspects/compose.go",
+      "lines": [
+        151,
+        187
+      ],
+      "fact": "text seed는 graph/vector health와 model reachability·snapshot 좌표를 확인한다.",
+      "gap": "실제 대상 index·embedding 모델/차원/일관된 snapshot·health 영수증이 필요하다. 여기의 모델은 검색용 embedder이며 분석 역할 모델과 다르다.",
+      "anchor": {
+        "start_line": 151,
+        "end_line": 187,
+        "start_byte": 4841,
+        "end_byte_exclusive": 6342,
+        "span_sha256": "fcddbb8caf8bd6c19cf016fbc7b65f5666ec502b558f9442ece20e7d0326713e"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R04",
+      "scope": "current_repository",
+      "path": "internal/system/suspects/compose.go",
+      "lines": [
+        287,
+        305
+      ],
+      "fact": "text-only 분기는 semantic 검색 후 keyword 검색을 하며 각각 MaxSeeds를 요청한다.",
+      "gap": "요청의 max_candidates10은 벡터 검색 K=10을 뜻하지 않는다. 각 검색·확장·최종 후보 단계 중 top-10 평가 대상을 동결해야 한다.",
+      "anchor": {
+        "start_line": 287,
+        "end_line": 305,
+        "start_byte": 9743,
+        "end_byte_exclusive": 10596,
+        "span_sha256": "dc7857db97acc467832627bfb6585aa426fe407e48d74a1a868f8e68068498b4"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R05",
+      "scope": "current_repository",
+      "path": "internal/system/suspects/compose.go",
+      "lines": [
+        222,
+        234
+      ],
+      "fact": "candidate는 citation key로 중복을 제거하며 처음 추가된 순서로 append하고 상한에서 더 받지 않는다.",
+      "gap": "이 순서를 원인 확률 순위로 해석하지 않는다. 여러 round의 top-10 선택·dedup·순서 정책과 baseline이 미동결이다.",
+      "anchor": {
+        "start_line": 222,
+        "end_line": 234,
+        "start_byte": 7922,
+        "end_byte_exclusive": 8266,
+        "span_sha256": "765cf572df347fafed3360b25c1ddc26557e02e3ddc489a3d9e2e79fae4036d7"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R06",
+      "scope": "current_repository",
+      "path": "internal/system/suspects/compose.go",
+      "lines": [
+        341,
+        370
+      ],
+      "fact": "시작점마다 calls/called-by 방향의 one-hop 탐색을 반복하며 depth와 candidate 상한을 적용한다.",
+      "gap": "제한된 탐색의 누락·partial·budget·abstention을 원래 분모와 coverage에서 어떻게 처리할지 미동결이다.",
+      "anchor": {
+        "start_line": 341,
+        "end_line": 370,
+        "start_byte": 12031,
+        "end_byte_exclusive": 13064,
+        "span_sha256": "538aa34d68c339cd76cdeb2304692c2e8ab538adac50cdc21f2b559ac59609f5"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R07",
+      "scope": "current_repository",
+      "path": "internal/system/suspects/compose.go",
+      "lines": [
+        566,
+        603
+      ],
+      "fact": "graph/vector identity를 마지막에 다시 확인하고 stop reasons·partial·실제 call count를 결과에 넣는다.",
+      "gap": "실제 20개 text-only 요청의 backend transcript·snapshot pin·stop reason 영수증은 없다.",
+      "anchor": {
+        "start_line": 566,
+        "end_line": 603,
+        "start_byte": 20444,
+        "end_byte_exclusive": 21923,
+        "span_sha256": "01d193af0ff09d8b72156b99fc99679897c34e802a6860010014d81ad1f02a0f"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R08",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/suspects.go",
+      "lines": [
+        106,
+        131
+      ],
+      "fact": "Compose 결과의 candidate/signal 원문을 retained anchor로 검증하고 구조화 응답을 반환한다.",
+      "gap": "factual 응답과 독립 root-cause 판정·정답 관련성 라벨은 별도이다. 실제 artifact와 source hash 매칭이 필요하다.",
+      "anchor": {
+        "start_line": 106,
+        "end_line": 131,
+        "start_byte": 5800,
+        "end_byte_exclusive": 6747,
+        "span_sha256": "e6a03cf08cf92f346a89320adbb01a5b5e6f03402a456378f94e10bd25d9facc"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R09",
+      "scope": "current_repository",
+      "path": "internal/system/ckvclient/real.go",
+      "lines": [
+        113,
+        143
+      ],
+      "fact": "실제 vector adapter는 query/filter/K를 in-process engine SemanticSearch로 전달한다.",
+      "gap": "real adapter 구현 존재는 이번 요청의 embedding·검색 실행 증거가 아니다. 과거 symbol/expand 시험으로 채울 수 없다.",
+      "anchor": {
+        "start_line": 113,
+        "end_line": 143,
+        "start_byte": 4543,
+        "end_byte_exclusive": 5716,
+        "span_sha256": "70ee1014c12b5a75084467b1ca31a9a94e04ee972da86a014582ff12f3b8da3e"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R10",
+      "scope": "adopted_consumer_source",
+      "path": "plugin/agents/analyzer.md",
+      "lines": [
+        95,
+        99
+      ],
+      "fact": "채택한 analyzer 원문은 bugfix에서 suspect-labeling을 적용하고 factual 자료와 agent 가설을 구분하여 artifact를 저장하도록 한다.",
+      "gap": "채택 원문의 지시 존재와 실제 설치된 역할의 20개 입력 실행·handoff 영수증은 다르다.",
+      "anchor": {
+        "start_line": 95,
+        "end_line": 99,
+        "start_byte": 5034,
+        "end_byte_exclusive": 5401,
+        "span_sha256": "dc1ce685f73889cff671ea8077e0ffaff43312bce70b127d72ba044c5ace87a3"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R11",
+      "scope": "adopted_consumer_source",
+      "path": "plugin/skills/suspect-labeling/SKILL.md",
+      "lines": [
+        14,
+        47
+      ],
+      "fact": "채택한 지시는 실제 host alias·structured response·별도 가설을 기록하며 조사당 최대 3round/20citation/96call을 규정한다.",
+      "gap": "실제 host tools/list·alias·installed version/hash·role 실행·반복 종료 이유·source pin 증거가 필요하다. 이 파일은 감사 대상 원문이지 이번 실행에 호출한 skill이 아니다.",
+      "anchor": {
+        "start_line": 14,
+        "end_line": 47,
+        "start_byte": 519,
+        "end_byte_exclusive": 3076,
+        "span_sha256": "6b1e50f73146939617b026f9000567dd9f29bc3ef33a3f7a3b663fbc0c8fc46f"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    },
+    {
+      "id": "R12",
+      "scope": "adopted_consumer_source",
+      "path": "plugin/scripts/suspect_labels.py",
+      "lines": [
+        99,
+        118
+      ],
+      "fact": "consumer는 round/candidate/call 상한과 별도 judgment를 검사하고 acceptance=not_recorded를 유지한다.",
+      "gap": "형식 검증 통과는 원인 승인·독립 gold·recall 통과를 뜻하지 않는다.",
+      "anchor": {
+        "start_line": 99,
+        "end_line": 118,
+        "start_byte": 7797,
+        "end_byte_exclusive": 10027,
+        "span_sha256": "749d25bbe22b2340fbb35772890e424218f1113a6a061a215f633815ec003b32"
+      },
+      "observation_kind": "source_inspection_not_new_runtime",
+      "approved": false
+    }
+  ],
+  "parser_only": {
+    "requests": 20,
+    "normal_race_observations": 40,
+    "backend_calls": 0
+  },
+  "historical_real_graph_smoke": {
+    "summary": {
+      "status": "PASS",
+      "source_commit": "47f06bdc47ef3a69b3317e0f37122ff83a3ad48d",
+      "distances": {
+        "Leaf": 0,
+        "Middle": 1,
+        "Top": 2
+      },
+      "rounds": 2,
+      "schema_tools": 29,
+      "scope": "owned real Go SQLite graph and actual stdio MCP; vector backend not exercised; no cause acceptance or production host claim"
+    },
+    "coding_agent_revision": "b9290af1982b55693a5f49bbc9fad5dc2cbb76af",
+    "core_reference_revision": "63a7411742426839244948743dd02b902df350aa",
+    "tool_call_count": 3,
+    "seed_modes": [
+      "symbol",
+      "expand",
+      "symbol"
+    ],
+    "current_symptom_text_requests_covered": 0,
+    "historical_http_host": {
+      "status": "PASS",
+      "observed_tool": "mcp__plugin_coding-agent_cks__cks_context_label_suspects",
+      "input": {
+        "symptom": "hang in Leaf call path",
+        "symbol": "Leaf",
+        "depth": 2
+      },
+      "calls": 1,
+      "transport": "Streamable HTTP loopback",
+      "scope": "exact coding-agent server name on owned source; plugin installer/full bugfix role execution and production cause acceptance not recorded"
+    }
+  },
+  "later_isolated_host": {
+    "session_tool_calls": {
+      "valid-03": [],
+      "tools-03": [
+        "chainbench_chains"
+      ],
+      "incomplete-02": [],
+      "tampered-02": [],
+      "cancel-01": []
+    },
+    "current_symptom_text_requests_covered": 0,
+    "actual_agent_pipeline_acceptance": "not_run"
+  },
+  "adopted_consumer": {
+    "revision": "b7e78689676769e8536626e76eed7165d870e1ba",
+    "verified_source_paths": [
+      "plugin/agents/analyzer.md",
+      "plugin/skills/suspect-labeling/SKILL.md",
+      "plugin/scripts/suspect_labels.py"
+    ],
+    "installed_role_execution_established": false
+  },
+  "top_10_evaluation_target": null,
+  "cross_backend_cause_ranking": "not_established",
+  "canonical_matching": null,
+  "baseline": null,
+  "case_vs_family_aggregation": null,
+  "unknown_and_abstention_denominator_policy": null,
+  "dev_final_allocation": null,
+  "new_backend_calls": 0,
+  "new_model_calls": 0,
+  "new_host_sessions": 0,
+  "new_nodes_started": 0,
+  "formal_runs": 0,
+  "macro_recall_at_10": null
+}

@@ -215,10 +215,24 @@
 - 전용 변조/경계 회귀 30개·연관 회귀 441개·문서 134개·기존 구현 완료 상태 검사 통과.
 - 10파일 재생성 바이트 일치. 이전 동결 패킷 17개와 유지보수 Go 코드 변경 없음.
 - SEMANTIC-GAP-REVIEW.txt와 semantic-gap-v1에 source·질문·분모·정답/매칭 공백 기록.
-[예정] 19. WI-3 독립 사실 가족·노출/중복·정답·검색 경로 미충족분 점검
+[검증 완료] 19. WI-3 독립 사실 가족·노출/중복·정답·검색 경로 미충족분 점검
 - 기존 증상 카드 20개/가족 제안 15개를 기존 원문·AI 사실·과거 질문과 대조한다.
 - 독립 가족 20개/증상 4종/top-10 기준의 부족과 실제 검색/host 연결 공백을 명시한다.
 - 새 독립 가족·fresh holdout·gold·검색 성공을 준비 메타데이터로 만들어 내지 않는다.
+- 입력 20개/증상 label 7종/가족 제안 15개(두 카드 5그룹), 독립 가족 승인 0개.
+- 현 그룹을 유지하면 제안 수로도 5개 부족. 임의 분리 승인이 아니며 독립 최소 20개는 여전히 미확보.
+- 190쌍 중 같은 그룹 5쌍/파일 3쌍. 과거 질문 42개와 840건 비교, AI topic flag 29건/16카드.
+- literal/exact match 0건·topic 표시 없는 4카드를 fresh/독립으로 처리하지 않음. 선정 함수 자료와 14카드 중복.
+- 가족 판정 질문 15개·현재 구현/채택 consumer 경로 근거 12곳, consumer 3파일을 Git 증명/채택 SHA로 대조.
+- 기존 실제 graph/host 시험의 symbol·expand 입력과 후속 ChainBench 목록 조회를 이번 text 검색 증거로 합치지 않음.
+- 20개 모두 독립 gold/관련 위치·top-10 단계/순서·case/family 집계·baseline·실제 검색/설치 역할 영수증 미확보.
+- 전용 변조/경계 회귀 29개·연관 회귀 470개·문서 134개·기존 구현 완료 상태 검사 통과.
+- 30파일 재생성 바이트 일치·public wire 불변. 이전 동결 패킷 18개와 유지보수 Go 코드 변경 없음.
+- SYMPTOM-GAP-REVIEW.txt와 symptom-gap-v1에 원문·노출·정답·경로별 공백 기록.
+[예정] 20. WI-4 실제 도달성·후보 계약·독립 스케줄·반복 실행 공백 점검
+- 기존 source 가설 5개/21스케줄·구독/UDP 로컬 probe를 실제 대상 계약/도달성과 대조한다.
+- 독립 가족 5개·arm별 100회·baseline 증상 10건 기준과 현재 실행 범위/오라클의 공백을 기록한다.
+- 합성/추출 관측을 실제 운영 발생률·독립 가족·프로토콜 동결/수용으로 승격하지 않는다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -250,14 +264,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-3 증상 입력 20개와 가족 제안·노출/중복·정답 자료 및 실제 검색/host 경로의 미충족분을 점검한다.
+WI-4 원문 가설·로컬 probe와 실제 도달성/계약·독립 스케줄·반복 실행 기준의 공백을 점검한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_semantic_gap.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-semantic-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/semantic-gap-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_symptom_gap.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-symptom-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/symptom-gap-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~18단계 검증 완료, 19단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~19단계 검증 완료, 20단계 예정. 정식 독립 수용은 계속 0/9이다.
