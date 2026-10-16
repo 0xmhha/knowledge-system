@@ -1,0 +1,43 @@
+검토용 함수 표본 — 제안이며 승인/DEV/FINAL/gold 아님
+ID       역할       모듈             구문(D/B/L/S/R)  함수 및 원문
+D=선언+재대입 B=분기 L=루프 S=실제 로컬 shadow R=return
+SRC-001 선정제안 consensus/wbft YYY-Y *API.Status consensus/wbft/backend/api.go:169
+SRC-002 선정제안 consensus/wbft YYYYY *Backend.Gossip consensus/wbft/backend/backend.go:176
+SRC-003 선정제안 consensus/wbft YYY-Y *Core.handleRoundChangeMsg consensus/wbft/core/roundchange.go:103
+SRC-004 선정제안 consensus/wbft YYY-Y *Preprepare.DecodeRLP consensus/wbft/messages/preprepare.go:73
+SRC-005 예비제안 consensus/wbft YY--Y *API.analyzeBlock consensus/wbft/backend/api.go:285
+SRC-006 선정제안 core/rawdb YYYYY ReadHeaderRange core/rawdb/accessors_chain.go:295
+SRC-007 선정제안 core/rawdb YYYYY ReadAllBadBlocks core/rawdb/accessors_chain.go:875
+SRC-008 예비제안 core/rawdb YYYYY WriteBadBlock core/rawdb/accessors_chain.go:893
+SRC-009 선정제안 core/rawdb YYY-Y inspectFreezers core/rawdb/ancient_utils.go:80
+SRC-010 선정제안 core/rawdb YYYYY InitDatabaseFromFreezer core/rawdb/chain_iterator.go:35
+SRC-011 선정제안 core/state YYYYY *StateDB.DumpToCollector core/state/dump.go:118
+SRC-012 선정제안 core/state YYYYY *Pruner.Prune core/state/pruner/pruner.go:238
+SRC-013 선정제안 core/state YYY-Y RecoverPruning core/state/pruner/pruner.go:343
+SRC-014 선정제안 core/state YYY-Y generateStorages core/state/snapshot/generate.go:520
+SRC-015 예비제안 core/state YYY-Y generateAccounts core/state/snapshot/generate.go:568
+SRC-016 선정제안 core/txpool YYYYY *BlobPool.Init core/txpool/blobpool/blobpool.go:347
+SRC-017 선정제안 core/txpool YYYYY *BlobPool.Reset core/txpool/blobpool/blobpool.go:784
+SRC-018 선정제안 core/txpool -YYYY newLimbo core/txpool/blobpool/limbo.go:51
+SRC-019 선정제안 core/txpool YYY-Y *LegacyPool.scheduleReorgLoop core/txpool/legacypool/legacypool.go:1294
+SRC-020 예비제안 core/txpool YYY-Y *LegacyPool.promoteExecutables core/txpool/legacypool/legacypool.go:1547
+SRC-021 선정제안 eth/downloader YYY-Y *DownloaderAPI.eventLoop eth/downloader/api.go:67
+SRC-022 선정제안 eth/downloader YYYYY *Downloader.findBeaconAncestor eth/downloader/beaconsync.go:195
+SRC-023 선정제안 eth/downloader YYYYY *Downloader.findAncestorSpanSearch eth/downloader/downloader.go:894
+SRC-024 선정제안 eth/downloader YYY-Y *queue.deliver eth/downloader/queue.go:862
+SRC-025 예비제안 eth/downloader YYYYY *skeleton.initSync eth/downloader/skeleton.go:519
+SRC-026 개발전용 miner YYYYY main miner/stress/clique/main.go:47
+SRC-027 선정제안 miner YYY-Y *worker.newWorkLoopOrigin miner/worker.go:510
+SRC-028 선정제안 miner YYY-Y newTransactionsByPriceAndNonce miner/ordering.go:134
+SRC-029 선정제안 miner YYY-Y *worker.newWorkLoopWBFT miner/worker.go:608
+SRC-030 선정제안 miner -YY-Y *worker.mainLoop miner/worker.go:686
+SRC-031 선정제안 p2p YYYYY *UDPv4.Resolve p2p/discover/v4_udp.go:175
+SRC-032 예비제안 p2p YYY-Y *UDPv4.loop p2p/discover/v4_udp.go:407
+SRC-033 선정제안 p2p YYY-Y *UDPv5.waitForNodes p2p/discover/v5_udp.go:391
+SRC-034 선정제안 p2p YYYYY decodeRecord p2p/enr/enr.go:216
+SRC-035 예비제안 p2p -YY-Y *Netlist.UnmarshalTOML p2p/netutil/net.go:100
+SRC-036 선정제안 rpc YYYYY DialOptions rpc/client.go:193
+SRC-037 예비제안 rpc YYY-Y *Client.BatchCallContext rpc/client.go:399
+SRC-038 예비제안 rpc YYY-Y *Client.dispatch rpc/client.go:621
+SRC-039 선정제안 rpc YYY-Y StartIPCEndpoint rpc/endpoints.go:27
+SRC-040 선정제안 rpc -Y--Y *handler.handleBatch rpc/handler.go:168

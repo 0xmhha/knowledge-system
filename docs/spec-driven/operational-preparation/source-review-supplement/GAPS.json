@@ -85,7 +85,7 @@
       "id": "WI-1",
       "preparation_candidate_count": 40,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "기존 함수 후보 40개를 본문 로컬 범위로 재집계: 운영 39개/개발 스트레스 원문 전용 1개. 운영 후보의 실제 로컬 shadow 16개·선언과 재대입 35개·루프 37개·분기/return 각 39개. 독립 승인·완전한 edge gold·의존성 backend 평가는 미수행. 추가로 운영 함수 4개에 source occurrence 241개·syntax marker 62개를 관측하고 비완전 관계 19건·제외 7건·이동 경계 14건의 비공개 검토 초안을 작성. 타입 진단을 보존한 부분 검사이며 backend/CFG/postdominator 평가는 미수행.",
+      "note": "기존 함수 후보 40개를 본문 로컬 범위로 재집계: 운영 39개/개발 스트레스 원문 전용 1개. 운영 후보의 실제 로컬 shadow 16개·선언과 재대입 35개·루프 37개·분기/return 각 39개. 독립 승인·완전한 edge gold·의존성 backend 평가는 미수행. 추가로 운영 함수 4개에 source occurrence 241개·syntax marker 62개를 관측하고 비완전 관계 19건·제외 7건·이동 경계 14건의 비공개 검토 초안을 작성. 타입 진단을 보존한 부분 검사이며 backend/CFG/postdominator 평가는 미수행. 운영 30개/8모듈의 검토 표본 제안과 예비 9개·개발전용 제외 1개를 분리. 선정 표본은 선언+재대입 27/분기 30/루프 29/shadow 14/return 30. 전체 741쌍(선정 435쌍)·기존 질문 비교 1638건(선정 1260건)을 메타데이터/기존 AI 표시로 작성했으나 의미적 독립성은 전부 미검토.",
       "requirements": {
         "independent_functions_min": 30,
         "constructs": [
@@ -102,7 +102,7 @@
       "formal_status": "not_prepared",
       "remaining": [
         "독립 검토자와 최종 수용 담당자 지정",
-        "30개 이상 운영 함수의 검토용 표본 제안·문법 커버리지·노출/중복 비교표와 비완전 use/분기 검토 자료 확장",
+        "선정 30개 중 추가 26개 함수의 선언/use·이동 경계 관측과 범위 제한 보완",
         "30개 이상 함수의 독립성·DEV/FINAL·표본 충분성 및 각 구문 4개 이상을 검토·동결",
         "완전한 독립 data/control edge gold·canonical matching·baseline 확정",
         "승인된 범위의 의존성 backend 실행 및 precision/recall·운영·독립 수용 판정"
@@ -127,6 +127,17 @@
         "exhaustive_gold_records": 0,
         "dependency_backend_runs": 0,
         "project_typecheck_passed": false
+      },
+      "function_sample_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/function-sample-v1/manifest.json",
+        "selected_function_proposals": 30,
+        "reserve_function_proposals": 9,
+        "modules": 8,
+        "selected_source_files": 25,
+        "same_file_pairs_selected": 6,
+        "shared_ai_group_pairs_selected": 2,
+        "independent_functions_approved": 0,
+        "selected_without_new_dependency_location_review": 26
       }
     },
     {
@@ -226,7 +237,7 @@
     }
   ],
   "next_priority": [
-    "WI-1 운영 함수 30개 이상의 표본 제안·문법 커버리지와 노출/중복 검토표 준비",
+    "WI-1 선정 표본 중 추가 26개 함수의 선언/use·이동 경계 관측과 범위 제한 보완",
     "WI-3 독립 사실 가족 20개 미충족·노출/중복·gold·실제 검색/호스트 경로 검토",
     "WI-4 실제 도달성·후보 계약·독립성·동결·반복 실행 미충족분 검토",
     "WI-V1/WI-V2의 실제 API 도달 가능성·독립 티켓·독립 오라클·승인 후보 집합 검토",

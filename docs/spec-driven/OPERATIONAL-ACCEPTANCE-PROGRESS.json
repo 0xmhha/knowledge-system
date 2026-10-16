@@ -287,6 +287,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/dependency-review-v1/manifest.json",
           "sha256": "fd6b58d8018eaadce038aa3ae18d8332b2696d71d7cb9cee7999477360fc1397",
           "status": "private_source_proposals_not_independent_edge_gold"
+        },
+        "function_sample_preparation": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/function-sample-v1/manifest.json",
+          "sha256": "cfc108b33a4f6c135dcfad177caece393b1b3407bde5cb213ca4528759be22a0",
+          "status": "exposed_review_sample_not_independent_holdout_or_gold"
         }
       },
       "completed_preparation": [
@@ -313,7 +318,8 @@
         "twenty_symptom_only_input_cards_with_fifteen_conservative_groups_and_unreviewed_overlap",
         "public_only_symptom_wire_and_real_go_parser_preflight_without_backend_calls",
         "local_scope_census_of_forty_source_candidates_with_closure_exclusion_and_go_types_development_controls",
-        "four_private_dependency_source_reviews_with_local_use_locations_exit_owners_and_unapproved_matching_proposal"
+        "four_private_dependency_source_reviews_with_local_use_locations_exit_owners_and_unapproved_matching_proposal",
+        "thirty_function_purposive_review_sample_with_reserves_exposure_pairwise_and_prior_question_ledgers"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -634,6 +640,53 @@
           "original_implementation_completion_guard": "pass",
           "prior_frozen_packets_unchanged": 9,
           "maintained_go_source_unchanged": true
+        },
+        "function_sample_preparation": {
+          "date": "2026-10-16",
+          "kind": "exposed_review_sample_not_independent_holdout_or_gold",
+          "selected_function_proposals": 30,
+          "reserve_function_proposals": 9,
+          "modules": 8,
+          "construct_counts": {
+            "declaration_redefinition": 27,
+            "branch": 30,
+            "loop": 29,
+            "shadow": 14,
+            "return": 30
+          },
+          "selected_source_files": 25,
+          "selected_pairs": 435,
+          "production_pairs": 741,
+          "selected_prior_question_comparisons": 1260,
+          "production_prior_question_comparisons": 1638,
+          "guard_tests_passed": 22,
+          "byte_identical_reproduction_files": 11,
+          "independent_functions_approved": 0,
+          "independent_gold_records": 0,
+          "formal_state_unchanged": true,
+          "dependency_backend_calls": 0,
+          "regression_status": "pass",
+          "regression_tests": {
+            "test_source_review_supplement.py": 12,
+            "test_review_context.py": 12,
+            "test_subscription_ticket.py": 12,
+            "test_subscription_probe.py": 15,
+            "test_schedule_candidates.py": 16,
+            "test_udp_cursor_probe.py": 13,
+            "test_symptom_inputs.py": 18,
+            "test_symptom_wire_preflight.py": 14,
+            "test_lexical_coverage.py": 20,
+            "test_dependency_review.py": 22,
+            "test_function_sample.py": 22,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20
+          },
+          "python_regression_tests_passed": 248,
+          "live_document_check_count": 134,
+          "original_implementation_completion_guard": "pass",
+          "prior_frozen_packets_unchanged": 10,
+          "maintained_go_source_unchanged": true
         }
       },
       "candidate_counts": {
@@ -756,7 +809,7 @@
   },
   "preparation_gap_inventory": {
     "path": "docs/spec-driven/operational-preparation/source-review-supplement/GAPS.json",
-    "sha256": "e2a4a1c9489a8e8db8484bd6ac99799caaed3083f1a7a2b08f07c5fa2ea27bb3",
+    "sha256": "31ed5e53917d8b0ecea496ccfb0deaed9cf44d4f3595957b722465f9df19703f",
     "formal_completed": 0,
     "formal_total": 9,
     "optional_backlog_count": 12
@@ -800,5 +853,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/dependency-review-v1/manifest.json",
     "sha256": "fd6b58d8018eaadce038aa3ae18d8332b2696d71d7cb9cee7999477360fc1397",
     "status": "private_source_proposals_not_independent_edge_gold"
+  },
+  "function_sample_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/function-sample-v1/manifest.json",
+    "sha256": "cfc108b33a4f6c135dcfad177caece393b1b3407bde5cb213ca4528759be22a0",
+    "status": "exposed_review_sample_not_independent_holdout_or_gold"
   }
 }
