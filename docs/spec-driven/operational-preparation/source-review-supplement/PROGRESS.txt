@@ -202,10 +202,23 @@
 - 전용 변조/경계 회귀 25개·연관 회귀 411개·문서 134개·기존 구현 완료 상태 검사 통과.
 - 공개 사본과 원본 바이트 일치. 8파일 재생성 일치, 이전 동결 패킷 16개·유지보수 Go 불변.
 - REVIEW-COVERAGE.txt와 review-coverage-v1에 근거·질문·수용 공백을 기록.
-[예정] 18. WI-1 선정 30개 함수의 의미 검토·독립 정답 미충족분 점검
+[검증 완료] 18. WI-1 선정 30개 함수의 의미 검토·독립 정답 미충족분 점검
 - 기존 위치 관측과 비완전 AI 관계를 대조하여 완전한 data/control gold의 공백을 기록한다.
 - value kind·scope·memory/call·비정상 종료/비종료·matching 초안을 검토하고 확정 사실/unknown을 구분한다.
 - 담당자 미정 상태에서 가능한 원문 준비만 수행하며 독립 승인·품질 수용으로 승격하지 않는다.
+- 30함수의 고정 원문을 읽고 의미 검토 질문 30개·매칭/지원 계약 질문 14개를 원문 span에 연결.
+- 로컬 occurrence 1721개/선언 412개 값 종류 미확정, callback signature 4개 격리 유지.
+- 기존 관계 초안 4함수·statement anchor 3함수의 합집합 6함수. 기존 관계 자료 없는 함수는 24개.
+- 30함수 모두 완전한 data/control gold null·정확한 matching 미동결. 미작성을 빈 음성 집합으로 세지 않음.
+- bare return 주석의 선언 좌표 설명과 구현의 return 문 좌표 전달 불일치 기록. 코드/계약 동결은 하지 않음.
+- range 22함수·제외 closure 9함수·select 6함수·panic 구문 2함수·결과 없는 return 표기 8함수의 한계 보존.
+- 전용 변조/경계 회귀 30개·연관 회귀 441개·문서 134개·기존 구현 완료 상태 검사 통과.
+- 10파일 재생성 바이트 일치. 이전 동결 패킷 17개와 유지보수 Go 코드 변경 없음.
+- SEMANTIC-GAP-REVIEW.txt와 semantic-gap-v1에 source·질문·분모·정답/매칭 공백 기록.
+[예정] 19. WI-3 독립 사실 가족·노출/중복·정답·검색 경로 미충족분 점검
+- 기존 증상 카드 20개/가족 제안 15개를 기존 원문·AI 사실·과거 질문과 대조한다.
+- 독립 가족 20개/증상 4종/top-10 기준의 부족과 실제 검색/host 연결 공백을 명시한다.
+- 새 독립 가족·fresh holdout·gold·검색 성공을 준비 메타데이터로 만들어 내지 않는다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -237,14 +250,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-1 선정 30개 함수의 위치 자료·AI 비완전 관계와 의미 검토/완전한 gold의 공백을 대조한다.
+WI-3 증상 입력 20개와 가족 제안·노출/중복·정답 자료 및 실제 검색/host 경로의 미충족분을 점검한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_review_coverage.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-review-coverage.py --packet docs/spec-driven/operational-preparation/source-review-supplement/review-coverage-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_semantic_gap.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-semantic-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/semantic-gap-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~17단계 검증 완료, 18단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~18단계 검증 완료, 19단계 예정. 정식 독립 수용은 계속 0/9이다.

@@ -1,0 +1,170 @@
+WI-1 함수 의미·정답·매칭 공백 — 비공개 AI 검토 초안
+30개 위치 관측은 완전한 의미 검토/정답이 아니다. data/control gold 30개 모두 미작성.
+기존 관계 초안 4함수·statement anchor 3함수, 합집합 6함수. 독립 gold 0개.
+새 원문 질문 30개와 구현 계약 질문 14개. missing gold=null; unknown/미관측을 음성으로 세지 않는다.
+
+SRC-001 consensus/wbft Status consensus/wbft/backend/api.go:169
+기존 관계 초안: 0 / statement anchor: False / range bindings: 2 / 제외 closure: 0
+counter 초기화 뒤 블록/round map을 순회하고 totalRounds를 갱신한다.
+미충족 판단: n·totalRounds의 루프 합류/재정의와 map 원소 쓰기·analyzeBlock 호출 효과를 어떻게 분리하고, 모든 사용의 정의 집합을 작성할 것인가?
+
+SRC-002 consensus/wbft Gossip consensus/wbft/backend/backend.go:176
+기존 관계 초안: 4 / statement anchor: False / range bindings: 3 / 제외 closure: 0
+바깥/안쪽 cache 조회가 각각 ok를 선언하고 outboundCode 분기 뒤 비동기 전송을 시작한다.
+미충족 판단: 동명 ok의 선언을 분리하고 outboundCode의 초기/조건부 정의를 매칭하되 cache·payload·goroutine 효과는 어떻게 unknown으로 남길 것인가?
+
+SRC-003 consensus/wbft handleRoundChangeMsg consensus/wbft/core/roundchange.go:103
+기존 관계 초안: 0 / statement anchor: False / range bindings: 1 / 제외 closure: 0
+num·currentRoundMessages·logger를 재대입하고 num 조건의 분기에서 newRound를 계산하여 호출에 전달한다.
+미충족 판단: 앞선 Add 호출 효과와 별개로 num 재정의의 kill·분기 조건·짧은 회로·참조 값의 역할을 어떻게 정답과 매칭에 반영할 것인가?
+
+SRC-004 consensus/wbft DecodeRLP consensus/wbft/messages/preprepare.go:73
+기존 관계 초안: 0 / statement anchor: False / range bindings: 2 / 제외 closure: 0
+Decode의 주소 인자와 range 내부 rc를 사용하고 receiver 필드들에 결과를 쓴다.
+미충족 판단: message/rc의 aggregate·주소 역할과 range binding을 scalar 간선에서 분리하고 receiver 필드 쓰기를 독립 정답의 지원 범위에 어떻게 표시할 것인가?
+
+SRC-006 core/rawdb ReadHeaderRange core/rawdb/accessors_chain.go:295
+기존 관계 초안: 5 / statement anchor: False / range bindings: 1 / 제외 closure: 0
+i와 count가 초기화/조건부 재대입/루프 갱신을 거쳐 ancient 조회 크기 계산에 쓰인다.
+미충족 판단: 안쪽 range의 i와 바깥 i를 분리하고 break/루프 합류의 may-reach 정의 집합을 작성하되 산술 경로 가능성과 slice 내용 효과는 어떻게 구분할 것인가?
+
+SRC-007 core/rawdb ReadAllBadBlocks core/rawdb/accessors_chain.go:875
+기존 관계 초안: 0 / statement anchor: True / range bindings: 1 / 제외 closure: 0
+DecodeBytes에 badBlocks 주소를 넘긴 뒤 range에서 blocks를 append하여 반환한다.
+미충족 판단: 기존 statement anchor를 정확한 occurrence로 바꾸고 slice 재바인딩·decode의 메모리 쓰기·range 변수를 다른 값 종류로 어떻게 분리할 것인가?
+
+SRC-009 core/rawdb inspectFreezers core/rawdb/ancient_utils.go:80
+기존 관계 초안: 0 / statement anchor: False / range bindings: 1 / 제외 closure: 0
+freezer 분기에서 여러 err 선언을 검사하고 f.Close를 defer한 뒤 info를 infos에 append한다.
+미충족 판단: switch case별 err/info 범위와 defer 호출의 즉시 인자 평가·나중 효과를 분리하고 정상 종료 제어 정답을 어떻게 작성할 것인가?
+
+SRC-010 core/rawdb InitDatabaseFromFreezer core/rawdb/chain_iterator.go:35
+기존 관계 초안: 0 / statement anchor: False / range bindings: 2 / 제외 closure: 0
+AncientRange 오류는 log.Crit에 전달하고 range 안에서 hash·batch·i를 갱신한다.
+미충족 판단: log.Crit를 이 함수 원문만으로 no-return 처리하지 않고 구조적 제어 경로를 정하며 batch 메모리 효과와 i/hash 재정의를 어떻게 매칭할 것인가?
+
+SRC-011 core/state DumpToCollector core/state/dump.go:118
+기존 관계 초안: 5 / statement anchor: False / range bindings: 0 / 제외 closure: 0
+iterator 오류는 반환하고 decode 오류에는 panic 호출이 있으며 주소 preimage 분기에 따라 continue 또는 주소 대입을 수행한다.
+미충족 판단: 동명 err·named result nextKey·address/addr의 값 종류를 검토하고 panic/continue/주소 효과를 포함한 지원 범위의 완전한 정답을 어떻게 정할 것인가?
+
+SRC-012 core/state Prune core/state/pruner/pruner.go:238
+기존 관계 초안: 0 / statement anchor: False / range bindings: 1 / 제외 closure: 0
+found/root를 루프 안에서 갱신하고 break 뒤 found 조건으로 오류를 반환한다.
+미충족 판단: 초기 found와 반복 갱신·root 참조/aggregate·break 소유권을 구분하여 모든 정의 집합과 정상 종료 제어 정답을 어떻게 작성할 것인가?
+
+SRC-013 core/state RecoverPruning core/state/pruner/pruner.go:343
+기존 관계 초안: 0 / statement anchor: False / range bindings: 1 / 제외 closure: 0
+found/layers/middleRoots 초기화 뒤 range에서 found를 갱신하거나 map 원소를 쓰고 prune을 호출한다.
+미충족 판단: found의 zero/조건부 정의와 map 원소 쓰기를 분리하고 외부 prune 효과를 정답의 로컬 scalar 범위 밖에 어떻게 표시할 것인가?
+
+SRC-014 core/state generateStorages core/state/snapshot/generate.go:520
+기존 관계 초안: 0 / statement anchor: False / range bindings: 0 / 제외 closure: 1
+origin을 초기화한 뒤 generateRange 결과와 exhausted 또는 increaseKey(origin) 결과로 루프를 빠져나간다.
+미충족 판단: origin의 재바인딩·loop-carried 정의를 검토하고 onStorage closure의 내부 상태/return을 외부 함수의 제어 간선으로 합치지 않으려면 어떤 경계가 필요한가?
+
+SRC-016 core/txpool Init core/txpool/blobpool/blobpool.go:347
+기존 관계 초안: 0 / statement anchor: False / range bindings: 2 / 제외 closure: 1
+state/err의 fallback 재대입과 index closure를 통한 fails append가 store Open 주변에 있다.
+미충족 판단: state/err의 정의 집합과 callback 호출로 인한 fails 변경을 분리하고 range·field·heap·drop 효과를 어떻게 unknown으로 유지할 것인가?
+
+SRC-017 core/txpool Reset core/txpool/blobpool/blobpool.go:784
+기존 관계 초안: 0 / statement anchor: False / range bindings: 3 / 제외 closure: 1
+StateAt 오류는 return하고 p의 필드를 갱신한 뒤 reorg 결과를 range로 처리한다.
+미충족 판단: statedb/err·reinject/inclusions의 범위와 adds slice 재바인딩을 검토하고 lock/defer/외부 field 변경을 순차 scalar gold로 오인하지 않으려면 무엇이 필요한가?
+
+SRC-018 core/txpool newLimbo core/txpool/blobpool/limbo.go:51
+기존 관계 초안: 0 / statement anchor: False / range bindings: 1 / 제외 closure: 1
+index closure가 fails에 append하고 store Open 뒤 fails를 순회하여 Delete 오류에 Close 후 반환한다.
+미충족 판단: closure capture와 외부 Open의 callback 효과를 outer reaching definition으로 만들지 않고 l/store/fails의 역할·실패 분기를 어떻게 매칭할 것인가?
+
+SRC-019 core/txpool scheduleReorgLoop core/txpool/legacypool/legacypool.go:1294
+기존 관계 초안: 0 / statement anchor: False / range bindings: 0 / 제외 closure: 0
+조건부 goroutine 시작 뒤 curDone/nextDone·상태 flags·참조를 재대입하고 select에서 요청을 처리한다.
+미충족 판단: 순차 재바인딩과 채널 송수신/비동기 완료를 분리하며 select 및 무한 루프의 제어 정답을 어떤 unknown 범위로 제한할 것인가?
+
+SRC-021 eth/downloader eventLoop eth/downloader/api.go:67
+기존 관계 초안: 0 / statement anchor: False / range bindings: 2 / 제외 closure: 1
+timer 분기에서 started/done을 확인·갱신하고 progress 결과에 따라 채널 전송과 continue를 수행한다.
+미충족 판단: flag의 loop-carried 정의와 getProgress closure·channel/select 효과를 구분하고 정상 종료/비종료의 미확정 범위를 어떻게 정답에 표시할 것인가?
+
+SRC-022 eth/downloader findBeaconAncestor eth/downloader/beaconsync.go:195
+기존 관계 초안: 0 / statement anchor: False / range bindings: 0 / 제외 closure: 0
+end가 내부 number 선언의 값으로 보정되고 binary-search 루프가 start/end를 재대입한다.
+미충족 판단: 바깥 number와 if-init number shadow 및 start/end의 loop 합류를 구분하고 field/call 결과가 scalar로 확인되지 않은 부분을 어떻게 매칭할 것인가?
+
+SRC-023 eth/downloader findAncestorSpanSearch eth/downloader/downloader.go:894
+기존 관계 초안: 0 / statement anchor: False / range bindings: 2 / 제외 closure: 0
+range 검증의 내부 number와 바깥 number가 별도이며 후속 루프에서 number/hash를 조건부 대입 후 break한다.
+미충족 판단: 동명 number의 범위를 분리하고 known 분기·continue/break 뒤 return까지의 정의 집합을 완성하되 header/hash aggregate를 어떻게 분류할 것인가?
+
+SRC-024 eth/downloader deliver eth/downloader/queue.go:862
+기존 관계 초안: 0 / statement anchor: False / range bindings: 4 / 제외 closure: 0
+validate callback 오류는 failure 대입 후 break하고 reconstruct callback 및 taskPool 삭제 뒤 accepted를 증가시킨다.
+미충족 판단: callback signature의 index/header/result 네 선언을 본문 로컬에서 제외하고 callback 메모리 효과·range·accepted/i 갱신을 어떻게 별도 매칭할 것인가?
+
+SRC-027 miner newWorkLoopOrigin miner/worker.go:510
+기존 관계 초안: 0 / statement anchor: False / range bindings: 0 / 제외 closure: 2
+interval을 최소값으로 보정하여 minRecommit/recommit에 대입하고 feedback 분기에서도 recommit을 갱신한다.
+미충족 판단: 이 scalar 갱신과 commit/clearPending closure의 capture·atomic·channel 효과를 분리하고 select/비종료 경계를 어떻게 정답에 유지할 것인가?
+
+SRC-028 miner newTransactionsByPriceAndNonce miner/ordering.go:134
+기존 관계 초안: 0 / statement anchor: False / range bindings: 3 / 제외 closure: 0
+range에서 wrapped/err를 계산하고 오류면 map 삭제 후 continue하며 성공이면 heads와 txs 원소를 갱신한다.
+미충족 판단: range 참조/alias와 slice·map 원소 쓰기를 scalar 재정의에서 분리하고 accTxs[0]의 오류 경로 가능성을 구조적 정상 종료 정답과 어떻게 구분할 것인가?
+
+SRC-029 miner newWorkLoopWBFT miner/worker.go:608
+기존 관계 초안: 0 / statement anchor: False / range bindings: 0 / 제외 closure: 2
+handler type assertion fallback 후 nil이면 panic 호출을 하고 NewChainHead 결과에 따라 commit을 호출한다.
+미충족 판단: handler/err 바인딩과 type assertion의 미확정 효과·panic·closure·select를 분리하고 정상 종료 제어 간선을 어떻게 제한할 것인가?
+
+SRC-030 miner mainLoop miner/worker.go:686
+기존 관계 초안: 0 / statement anchor: False / range bindings: 1 / 제외 closure: 1
+tcount를 저장한 뒤 commitTransactions를 호출하고 receiver count 비교로 snapshot을 갱신하며 종료 채널에서 return한다.
+미충족 판단: tcount 로컬과 receiver field/외부 호출 효과를 분리하고 여러 select 종료·defer closure가 있는 함수의 제어 정답을 어떻게 작성할 것인가?
+
+SRC-031 p2p Resolve p2p/discover/v4_udp.go:175
+기존 관계 초안: 0 / statement anchor: True / range bindings: 1 / 제외 closure: 0
+n이 table node로 재대입될 수 있으며 key 주소 인자·lookup range·내부 rn 재선언이 있다.
+미충족 판단: n 참조 재바인딩·key aggregate/주소·동명 rn을 분리하고 기존 statement anchor를 occurrence/node 수준의 매칭으로 어떻게 구체화할 것인가?
+
+SRC-033 p2p waitForNodes p2p/discover/v5_udp.go:391
+기존 관계 초안: 0 / statement anchor: False / range bindings: 1 / 제외 closure: 0
+응답을 type assertion하고 range로 node들을 append한 뒤 total·received 조건 또는 error 채널에서 반환한다.
+미충족 판단: total/received의 loop-carried 정의와 channel/type assertion·seen map 변경·비종료를 구분하여 어떤 영역을 unknown으로 유지할 것인가?
+
+SRC-034 p2p decodeRecord p2p/enr/enr.go:216
+기존 관계 초안: 0 / statement anchor: False / range bindings: 0 / 제외 closure: 0
+루프의 decode 오류마다 return/break하고 prevkey 비교 후 dec.pairs append와 prevkey 대입을 수행한다.
+미충족 판단: named result dec/raw/err의 entry 정의와 내부 err shadow·prevkey 정의를 분리하고 decode의 field 메모리 쓰기를 scalar 간선으로 오인하지 않으려면 무엇이 필요한가?
+
+SRC-036 rpc DialOptions rpc/client.go:193
+기존 관계 초안: 5 / statement anchor: True / range bindings: 1 / 제외 closure: 0
+scheme 분기별로 reconnect를 대입하고 ws 경로의 rc/err를 검사한 뒤 newClient에 넘긴다.
+미충족 판단: reconnect의 zero/각 분기 정의와 참조/함수 값을 검토하고 cfg 옵션 mutation·constructor 효과 및 기존 statement anchor를 어떻게 분리·매칭할 것인가?
+
+SRC-039 rpc StartIPCEndpoint rpc/endpoints.go:27
+기존 관계 초안: 0 / statement anchor: False / range bindings: 1 / 제외 closure: 0
+API range 안에서 regMap/registered를 갱신하고 listener 오류 검사 뒤 goroutine을 시작한다.
+미충족 판단: 내부 err와 listener err의 범위·slice/map/참조 역할·비동기 효과를 분리하고 반환까지의 모든 로컬 정의와 제어 간선을 어떻게 정할 것인가?
+
+SRC-040 rpc handleBatch rpc/handler.go:168
+기존 관계 초안: 0 / statement anchor: False / range bindings: 0 / 제외 closure: 4
+calls를 선언하고 handleResponses callback이 calls에 append하며 startCallProc에 또 다른 closure를 넘긴다.
+미충족 판단: callback 이후 len(calls)의 정의를 호출 효과로 단정하지 않고 closure 내부 timer/cancel/return을 외부 함수의 occurrence·CFG에서 어떻게 격리할 것인가?
+
+매칭·지원 범위 질문:
+M01 원문 identity·좌표: retained graph snapshot·node ID와 canonical identity의 실제 매핑/독립 동결 미확보
+M02 선언·entry·range: 모든 entry/constant/range 변수에 대한 독립 값 종류·gold 미작성
+M03 값 종류와 사용 역할: 부분 타입 정보에서 모든 occurrence의 값 종류와 role 매핑 미확정
+M04 bare return 구현 좌표: sample의 explicit_results=0만으로 named-result implicit use 존재를 추정하지 않는다. 독립 좌표 대조 필요
+M05 bare return 주석 불일치: 주석 정정과 명시적/named/synthetic return 계약 대조는 후속 코드 작업. 이번에는 유지보수 Go 불변
+M06 CFG node·분기·synthetic 위치: statement anchor→실제 node/branch 매핑·synthetic exit·중복/모호성 처리 미동결
+M07 사용 전 정의와 kill: 30개 함수의 exhaustive use→definition sets 및 비간선 사유 미작성
+M08 관계 수준·kind·certainty: 정확한 canonical key·dedup·ambiguity·FP/FN/unknown 분모·zero denominator 처리 미동결
+M09 정상 종료·비종료: 실제 CFG/후지배 정답·비정상/비종료 제외와 unknown 분모 미작성
+M10 no-return·부분 타입: 프로젝트 타입/호출 효과·실제 예외/경로 가능성 증거 없음
+M11 closure·select·짧은 회로·호출: 각 함수의 지원 영역/제외 영역·자원 cap·partial/truncated 평가 정책 미동결
+M12 주소·메모리: alias·field/element·channel·외부 mutation을 위한 독립 범위/정답 미확보
+M13 snapshot/commit pin: baseline·SDK/MCP·양 arm의 같은 snapshot/limits·실행 영수증 미확보
+M14 blob 및 실행 후 pin: DEV/FINAL·baseline·matching·resource budget·독립 승인 동결 미완료

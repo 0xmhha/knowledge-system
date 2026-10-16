@@ -1,0 +1,346 @@
+{
+  "status": "source_grounded_matching_questions_not_frozen_or_executed",
+  "approved": false,
+  "reviews": [
+    {
+      "id": "M01",
+      "path": "pkg/graph/valueflow/cfg.go",
+      "lines": [
+        18,
+        48
+      ],
+      "topic": "원문 identity·좌표",
+      "proposal": "project/repository 식별자는 별도 평가 envelope로 보존하고 commit/file/function SHA/start offset과 retained snapshot/node pin을 함께 매칭한다. byte offset은 UTF-8 원문 기준, end는 exclusive로 제안한다.",
+      "unresolved": "retained graph snapshot·node ID와 canonical identity의 실제 매핑/독립 동결 미확보",
+      "anchor": {
+        "start_line": 18,
+        "end_line": 48,
+        "start_byte": 329,
+        "end_byte_exclusive": 1369,
+        "span_sha256": "761ee07c07bb968e07604859fb92480730e229ae619cb754191a8aa437f7760a"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M02",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        63,
+        109
+      ],
+      "topic": "선언·entry·range",
+      "proposal": "변수 이름 대신 선언 위치와 함수 identity를 사용한다. receiver/parameter/result entry와 로컬 정의를 구분하고 range_unknown을 지원되는 scalar 정답으로 자동 변환하지 않는다.",
+      "unresolved": "모든 entry/constant/range 변수에 대한 독립 값 종류·gold 미작성",
+      "anchor": {
+        "start_line": 63,
+        "end_line": 109,
+        "start_byte": 1662,
+        "end_byte_exclusive": 3242,
+        "span_sha256": "89a10b841225353c209d80607a1cd617a87620ec803d27d11c0f54c820d2d1eb"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M03",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        281,
+        315
+      ],
+      "topic": "값 종류와 사용 역할",
+      "proposal": "helper의 read/write/read_write를 engine role로 직접 치환하지 않는다. 값의 scalar/reference/aggregate/unknown 분류와 address 문맥을 각각 검토한다.",
+      "unresolved": "부분 타입 정보에서 모든 occurrence의 값 종류와 role 매핑 미확정",
+      "anchor": {
+        "start_line": 281,
+        "end_line": 315,
+        "start_byte": 8117,
+        "end_byte_exclusive": 9517,
+        "span_sha256": "bb4e58cd559bd0d05f450e859f394288f799fd8fd9f9956f59423d11444528bb"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M04",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        441,
+        452
+      ],
+      "topic": "bare return 구현 좌표",
+      "proposal": "현재 구현의 implicit named-result use는 return 문 위치를 전달한다. 선언 identity와 occurrence 위치·CFG node 위치를 별도 필드로 유지한다.",
+      "unresolved": "sample의 explicit_results=0만으로 named-result implicit use 존재를 추정하지 않는다. 독립 좌표 대조 필요",
+      "anchor": {
+        "start_line": 441,
+        "end_line": 452,
+        "start_byte": 13565,
+        "end_byte_exclusive": 13954,
+        "span_sha256": "34fbf88cccccefa294bdbb9b806304cfc425616429f665c42447e66a7855a900"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M05",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        471,
+        473
+      ],
+      "topic": "bare return 주석 불일치",
+      "proposal": "이 주석의 declaration coordinate 설명과 M04 구현의 return-site 전달을 별도 검토 항목으로 기록한다. 주석을 canonical matching 근거로 사용하지 않는다.",
+      "unresolved": "주석 정정과 명시적/named/synthetic return 계약 대조는 후속 코드 작업. 이번에는 유지보수 Go 불변",
+      "anchor": {
+        "start_line": 471,
+        "end_line": 473,
+        "start_byte": 14406,
+        "end_byte_exclusive": 14562,
+        "span_sha256": "964808d217f55b7c138fdbc0bfc751da3ae58efc31ccc1e44aa7a264af9fa9b3"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M06",
+      "path": "pkg/graph/valueflow/cfg.go",
+      "lines": [
+        275,
+        310
+      ],
+      "topic": "CFG node·분기·synthetic 위치",
+      "proposal": "b/n ID의 숫자만으로 gold를 매칭하지 않는다. node kind/span/block 역할·synthetic 여부와 조건 라벨을 함께 사용하고 빈 block fallback을 별도로 정의한다.",
+      "unresolved": "statement anchor→실제 node/branch 매핑·synthetic exit·중복/모호성 처리 미동결",
+      "anchor": {
+        "start_line": 275,
+        "end_line": 310,
+        "start_byte": 10410,
+        "end_byte_exclusive": 12002,
+        "span_sha256": "7d3304ba3299a3924cc50d1f3565e4386a89b0f98bd3f8ff49be18d9469b8386"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M07",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        584,
+        597
+      ],
+      "topic": "사용 전 정의와 kill",
+      "proposal": "같은 node의 사용은 현재 state에 먼저 연결하고 이후 정의로 갱신하는 관측 계약을 검토한다. read_write·loop 합류·동명 shadow의 완전한 정의 집합을 별도 작성한다.",
+      "unresolved": "30개 함수의 exhaustive use→definition sets 및 비간선 사유 미작성",
+      "anchor": {
+        "start_line": 584,
+        "end_line": 597,
+        "start_byte": 17197,
+        "end_byte_exclusive": 17536,
+        "span_sha256": "2d862a310ad90a8f06acdd86ec7d6e3df278fd733508a556d5d148c194c6ffa6"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M08",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        794,
+        808
+      ],
+      "topic": "관계 수준·kind·certainty",
+      "proposal": "occurrence-level DefUse와 node-level Edge를 다른 평가 단위로 둔다. 선언·두 endpoint·kind·certainty·control condition의 tuple을 제안하며 node-level 중복 병합 규칙은 따로 동결한다.",
+      "unresolved": "정확한 canonical key·dedup·ambiguity·FP/FN/unknown 분모·zero denominator 처리 미동결",
+      "anchor": {
+        "start_line": 794,
+        "end_line": 808,
+        "start_byte": 22686,
+        "end_byte_exclusive": 23300,
+        "span_sha256": "d7366627f0435310bd7b11dc08849c070f131e674e0a1355adaf2898eb16dd08"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M09",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        614,
+        666
+      ],
+      "topic": "정상 종료·비종료",
+      "proposal": "control gold는 normal-exit structural postdominator 기준을 검토한다. 잠재 비종료 영역을 빈 control gold나 안전 판정으로 바꾸지 않는다.",
+      "unresolved": "실제 CFG/후지배 정답·비정상/비종료 제외와 unknown 분모 미작성",
+      "anchor": {
+        "start_line": 614,
+        "end_line": 666,
+        "start_byte": 17858,
+        "end_byte_exclusive": 19137,
+        "span_sha256": "d3f6291693283ac74444b6a672950d51fd1a6feaca24a2bbe14a0d28f00245c9"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M10",
+      "path": "pkg/graph/valueflow/cfg.go",
+      "lines": [
+        227,
+        252
+      ],
+      "topic": "no-return·부분 타입",
+      "proposal": "고립 함수는 log.Crit/os.Exit/panic 표기만으로 no-return을 증명하지 않는다. 타입 진단과 빌드/지원 상태를 별도로 유지한다.",
+      "unresolved": "프로젝트 타입/호출 효과·실제 예외/경로 가능성 증거 없음",
+      "anchor": {
+        "start_line": 227,
+        "end_line": 252,
+        "start_byte": 8507,
+        "end_byte_exclusive": 9876,
+        "span_sha256": "e85d4463d225bc935dd260548385d04fbe19f189265c6758076286ddeb08084b"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M11",
+      "path": "pkg/graph/valueflow/cfg.go",
+      "lines": [
+        320,
+        345
+      ],
+      "topic": "closure·select·짧은 회로·호출",
+      "proposal": "closure/async/defer/select/short-circuit/opaque call 진단을 보존하고 이들을 일반 순차 scalar/제어 정확도로 합산하지 않는다.",
+      "unresolved": "각 함수의 지원 영역/제외 영역·자원 cap·partial/truncated 평가 정책 미동결",
+      "anchor": {
+        "start_line": 320,
+        "end_line": 345,
+        "start_byte": 12383,
+        "end_byte_exclusive": 13424,
+        "span_sha256": "ad3f15500fc9d691072b5192fc5d22ea7050bb1adccafbbfe354a045d399512c"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M12",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        339,
+        355
+      ],
+      "topic": "주소·메모리",
+      "proposal": "field/index/dereference와 주소 읽기는 local container binding flow와 메모리 내용의 별도 의미로 유지한다. unsupported는 unknown이며 자동 음성 정답이 아니다.",
+      "unresolved": "alias·field/element·channel·외부 mutation을 위한 독립 범위/정답 미확보",
+      "anchor": {
+        "start_line": 339,
+        "end_line": 355,
+        "start_byte": 10279,
+        "end_byte_exclusive": 10997,
+        "span_sha256": "46277367a04714004bcc1c748eccf6a750175860abab8dfc9ad3157ad275e946"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M13",
+      "path": "pkg/graph/valueflow/query.go",
+      "lines": [
+        136,
+        153
+      ],
+      "topic": "snapshot/commit pin",
+      "proposal": "운영 query의 snapshot/commit pin과 원문 준비 패킷의 Git pin을 구분한다. 현재 함수 표본에는 실제 retained snapshot 영수증이 없다.",
+      "unresolved": "baseline·SDK/MCP·양 arm의 같은 snapshot/limits·실행 영수증 미확보",
+      "anchor": {
+        "start_line": 136,
+        "end_line": 153,
+        "start_byte": 4257,
+        "end_byte_exclusive": 4843,
+        "span_sha256": "79b57ab88d432a08e6e76b3005a26cc9896f849e8cbcbde107828b3be226ace9"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    },
+    {
+      "id": "M14",
+      "path": "pkg/graph/valueflow/query.go",
+      "lines": [
+        193,
+        235
+      ],
+      "topic": "blob 및 실행 후 pin",
+      "proposal": "function SHA와 좌표/길이 및 실행 후 manifest pin을 검토한다. source-only 점검을 실제 query 성공이나 수용으로 승격하지 않는다.",
+      "unresolved": "DEV/FINAL·baseline·matching·resource budget·독립 승인 동결 미완료",
+      "anchor": {
+        "start_line": 193,
+        "end_line": 235,
+        "start_byte": 6227,
+        "end_byte_exclusive": 8168,
+        "span_sha256": "7906a4df2c75d3975ed371052ef71cff671a3a15d73ae14d378c2588c8b2478a"
+      },
+      "status": "source_inspected_proposal_not_frozen",
+      "approved": false,
+      "reviewer": null,
+      "receipt": null
+    }
+  ],
+  "legacy_matching_proposal": {
+    "status": "proposal_not_frozen_or_executed",
+    "approved": false,
+    "reviewer": null,
+    "matching": [
+      "same project/commit/function source hash and absolute source offsets",
+      "same declaration identity, occurrence location/role and actual CFG node location",
+      "edge kind and certainty kept separate: data/address/reference/aggregate/unknown",
+      "synthetic entry and bare-return occurrences need explicit coordinate rules",
+      "range_binding_unsupported and unmapped facts remain unknown, not automatic negative edges",
+      "control_dependence requires normal-exit postdominators; source nesting/exit owner is not enough"
+    ],
+    "baseline": null,
+    "dev_final_allocation": null,
+    "formal_resource_budget": null,
+    "engine_contract_inspection": "read_only_source_not_backend_execution",
+    "gold_manifest": null,
+    "canonical_matching_frozen": false,
+    "scoring_allowed": false
+  },
+  "evaluation_units_must_remain_separate": [
+    "occurrence_def_use",
+    "node_dependence_edges",
+    "normal_exit_control_edges"
+  ],
+  "gold_manifest": null,
+  "canonical_matching_frozen": false,
+  "baseline": null,
+  "dev_final_allocation": null,
+  "resource_budget": null,
+  "unknown_denominator_policy": null,
+  "scoring_allowed": false
+}
