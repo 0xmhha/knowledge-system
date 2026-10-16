@@ -242,6 +242,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/expansion-v1/manifest.json",
           "sha256": "bcbff0e10edd1ecffde3bca1a3232fa4558fa4d01e9e4d1cdaa48e4b64d06580",
           "status": "ai_preparation_only_not_gold_or_acceptance"
+        },
+        "review_context_supplement": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/context-v1/manifest.json",
+          "sha256": "0fc52eaebcece24f13d2579e0b6155e4de409d67da2d0654bdefafdbd3352caa",
+          "status": "private_ai_context_not_verified_defects_or_gold"
         }
       },
       "completed_preparation": [
@@ -259,7 +264,8 @@
         "adopted_consumer_sources_and_actual_cli_local_scripted_connection_five_cases",
         "existing_policy_reference_inventory_rule_call_census_and_twelve_source_queries",
         "actual_ast_frontend_policy_reference_diagnosis_and_seven_unapplied_corrections",
-        "source_grounded_expansion_input_and_private_ai_rationale_supplement"
+        "source_grounded_expansion_input_and_private_ai_rationale_supplement",
+        "five_private_ai_caller_callee_context_notes_with_offline_git_proofs"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -325,6 +331,19 @@
           "documentation_contract_tests_passed": 20,
           "live_document_check_count": 134,
           "formal_state_unchanged": true
+        },
+        "review_context_supplement": {
+          "kind": "private_ai_context_not_independent_acceptance",
+          "ai_context_reviews": 5,
+          "source_anchors": 19,
+          "source_files": 9,
+          "draft_guard_tests_passed": 12,
+          "operational_guard_tests_passed": 36,
+          "readiness_guard_tests_passed": 16,
+          "both_packets_byte_identical_regeneration": true,
+          "formal_state_unchanged": true,
+          "actual_target_execution": false,
+          "independent_gold_records": 0
         }
       },
       "candidate_counts": {
@@ -439,5 +458,17 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/expansion-v1/manifest.json",
     "sha256": "bcbff0e10edd1ecffde3bca1a3232fa4558fa4d01e9e4d1cdaa48e4b64d06580",
     "status": "ai_preparation_only_not_gold_or_acceptance"
+  },
+  "review_context_supplement": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/context-v1/manifest.json",
+    "sha256": "0fc52eaebcece24f13d2579e0b6155e4de409d67da2d0654bdefafdbd3352caa",
+    "status": "private_ai_context_not_verified_defects_or_gold"
+  },
+  "preparation_gap_inventory": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/GAPS.json",
+    "sha256": "9fd663c29cb3c06b8502f4bb97066205f27e0559446d459219e0a687ea433892",
+    "formal_completed": 0,
+    "formal_total": 9,
+    "optional_backlog_count": 12
   }
 }

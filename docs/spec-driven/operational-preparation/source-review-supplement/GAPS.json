@@ -1,0 +1,212 @@
+{
+  "status": "preparation_gap_inventory_not_acceptance",
+  "formal_completed": 0,
+  "formal_total": 9,
+  "reviewer_assignment": "user_confirmed_unassigned",
+  "items": [
+    {
+      "id": "WI-V1",
+      "preparation_candidate_count": 1,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "구독 종료 순서의 AI 가설 1개. 실제 재현·독립 결함 티켓·독립 오라클은 0개.",
+      "requirements": {
+        "independent_defect_tickets_min": 2,
+        "normal_controls": true,
+        "symptom_reintroduction_mutants": true,
+        "overfit_mutants": true,
+        "oracles": [
+          "primary",
+          "independently_derived"
+        ]
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "not_prepared",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    },
+    {
+      "id": "WI-V2",
+      "preparation_candidate_count": 0,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "WI-V1 가설의 수정 방향·재도입·과적합 변이 제안만 존재. 실행 가능한 후보 집합은 미작성.",
+      "requirements": {
+        "shared_ticket_group": "WI-V1",
+        "candidates_per_ticket_min": 2,
+        "independent_acceptable_candidate_set": true
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "not_prepared",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    },
+    {
+      "id": "WI-3",
+      "preparation_candidate_count": 0,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "증상 검색용으로 분리된 입력 및 독립 사실 가족을 아직 작성하지 않음.",
+      "requirements": {
+        "independent_fact_families_min": 20,
+        "symptom_types_min": 4,
+        "top_k": 10
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "not_prepared",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    },
+    {
+      "id": "WI-4",
+      "preparation_candidate_count": 0,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "승인된 seed/schedule 가족·baseline 발생 빈도·arm 실행 결과 없음.",
+      "requirements": {
+        "independent_seed_schedule_families_min": 5,
+        "planned_runs_per_arm_min": 100,
+        "baseline_symptom_events_min": 10
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "not_prepared",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    },
+    {
+      "id": "WI-1",
+      "preparation_candidate_count": 40,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "기존 문법 함수 후보 40개. 실제 lexical shadow 확인과 완전한 독립 edge gold는 미작성.",
+      "requirements": {
+        "independent_functions_min": 30,
+        "constructs": [
+          "declaration_redefinition",
+          "branch",
+          "loop",
+          "shadow",
+          "return"
+        ],
+        "functions_per_construct_min": 4,
+        "gold_semantics": "structural_lexical_may_reach_not_path_feasibility"
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "not_prepared",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    },
+    {
+      "id": "WI-2",
+      "preparation_candidate_count": 12,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "기존 정책·보안 source query 12개. 지원 규칙별 독립 양성/음성 gold는 0개.",
+      "requirements": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "source_syntax_census_only_independent_cases_not_prepared",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    },
+    {
+      "id": "WI-C",
+      "preparation_candidate_count": 10,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "기존 공개 검토 입력 10개 중 5개의 외부 호출 문맥을 보완. 15개 독립 사례로 세지 않음.",
+      "requirements": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "not_prepared",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    },
+    {
+      "id": "WI-6",
+      "preparation_candidate_count": 20,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "이번 공개 입력·비공개 AI 검토 20쌍. 운영 원문 후보 19개와 개발용 stress 1개. 독립 가족 수는 미판정.",
+      "requirements": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "not_prepared",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    },
+    {
+      "id": "WI-SP",
+      "preparation_candidate_count": 12,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "기존 symbol query 후보 12개. 독립 annotation gold·권한 경계 판정은 미승인.",
+      "requirements": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "source_queries_and_annotation_drafts_not_reviewed",
+      "remaining": [
+        "독립 검토자와 최종 수용 담당자 지정",
+        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
+        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
+      ]
+    }
+  ],
+  "next_priority": [
+    "WI-V1/WI-V2 구독 종료 가설의 개발용 티켓·정상 대조군·변이·오라클 초안 구체화",
+    "WI-4 결정적 schedule 후보와 관측·종료 조건 설계",
+    "WI-3 증상 검색 공개 입력 후보·비공개 근거와 가족 중복 목록 작성",
+    "WI-1/WI-2/WI-C/WI-6/WI-SP의 독립 검토·표본·정답 미충족분 보완"
+  ],
+  "optional_backlog_count": 12
+}

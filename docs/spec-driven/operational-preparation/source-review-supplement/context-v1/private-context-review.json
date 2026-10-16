@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "status": "ai_draft_not_independent_gold",
+  "independent_gold_records": 0,
+  "runtime_executions": 0,
+  "reviews": [
+    {
+      "candidate_id": "SRC-001",
+      "title": "블록 범위 계산의 기본값·경계 문맥",
+      "anchors": [
+        {
+          "path": "consensus/wbft/backend/api.go",
+          "start_line": 224,
+          "end_line": 230,
+          "source_fact_draft": "시작 또는 끝만 주어지면 짝이 없는 인자를 오류로 거부한다.",
+          "start_byte": 7871,
+          "end_byte_exclusive": 8100,
+          "span_sha256": "b4a88a30d701dc13793b0173c00665d3ce0c7ef5ca7813948c4bad17266b1e69"
+        },
+        {
+          "path": "consensus/wbft/backend/api.go",
+          "start_line": 235,
+          "end_line": 244,
+          "source_fact_draft": "둘 다 nil이면 현재 높이를 end로 사용한다. end>=63이면 start=end-63, 아니면 start=1이다.",
+          "start_byte": 8158,
+          "end_byte_exclusive": 8487,
+          "span_sha256": "c9089eb356b1f7983efa26a754fe2aa987d22e24d2fc82d8d41ebd42ec23ddfc"
+        },
+        {
+          "path": "consensus/wbft/backend/api.go",
+          "start_line": 246,
+          "end_line": 260,
+          "source_fact_draft": "명시 범위는 start>end 또는 end>현재 높이를 거부하고 numBlocks=end-start+1을 반환한다. 별도 최대 범위 길이 제한은 이 함수에 없다.",
+          "start_byte": 8497,
+          "end_byte_exclusive": 8960,
+          "span_sha256": "125a67da63b0655230bf6d25827339346d9045bbacaa5b8e8bb41a6f2c426645"
+        }
+      ],
+      "remaining_unknowns": [
+        "현재 높이 0·음수 RPC sentinel의 의도된 계약과 상위 RPC 허용 범위는 미검토",
+        "analyzeBlock 내부 비용·동시 변경과 실제 기본 범위 결과는 실행하지 않았다"
+      ],
+      "unsupported_conclusions": [
+        "모든 입력에서 정확히 최근 64개 블록을 읽는다",
+        "전체 RPC 경로에 범위 길이 제한이 전혀 없다"
+      ],
+      "followup_candidate": {
+        "kind": "boundary_input_draft",
+        "public_input_proposal": "기본 블록 범위의 초기 높이와 명시 범위 경계를 평가하세요.",
+        "suggested_cases": [
+          "height=0, both nil",
+          "height=1, both nil",
+          "height=63, both nil",
+          "only one endpoint",
+          "start=end",
+          "start>end",
+          "end above current height"
+        ],
+        "independent_expected_result": null
+      },
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "verified_defect": false,
+      "exhaustive_gold": false,
+      "precision_recall_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-006",
+      "title": "헤더 읽기의 부분 결과와 한 경로의 요청 제한",
+      "anchors": [
+        {
+          "path": "core/headerchain.go",
+          "start_line": 487,
+          "end_line": 501,
+          "source_fact_draft": "GetHeadersFrom은 미래 번호 요청에서 가용한 부분으로 요청을 조정하거나 nil을 반환하는 best-effort 경로를 가진다.",
+          "start_byte": 17107,
+          "end_byte_exclusive": 17741,
+          "span_sha256": "913f117e1a71fb4b6eccfbcec4bb2e735c1f3215f4b935241b981f20779cc7f6"
+        },
+        {
+          "path": "core/headerchain.go",
+          "start_line": 508,
+          "end_line": 523,
+          "source_fact_draft": "캐시에서 읽은 뒤 남은 count를 ReadHeaderRange에 넘기고 그 결과를 append하여 반환한다.",
+          "start_byte": 17950,
+          "end_byte_exclusive": 18305,
+          "span_sha256": "d3008133b3ef3f0feddbf5d3686f49225f95e2f16bc5581099332ffb01b8f66d"
+        },
+        {
+          "path": "core/blockchain_reader.go",
+          "start_line": 97,
+          "end_line": 99,
+          "source_fact_draft": "BlockChain.GetHeadersFrom은 HeaderChain.GetHeadersFrom으로 위임한다.",
+          "start_byte": 3656,
+          "end_byte_exclusive": 3778,
+          "span_sha256": "6b977cc1de5873eb4d74f698598036e8cbd0d9f1e889c91317356faa011be5e7"
+        },
+        {
+          "path": "eth/protocols/eth/handlers.go",
+          "start_line": 152,
+          "end_line": 171,
+          "source_fact_draft": "serviceContiguousBlockHeaderQuery는 count를 maxHeadersServe로 제한하고 번호 모드에서 GetHeadersFrom을 호출한다.",
+          "start_byte": 5053,
+          "end_byte_exclusive": 5737,
+          "span_sha256": "6610a2cd5c83ff762b5c9f7e42b19fa30c05cb9b622d31d5f4d5ebc5ecd479da"
+        }
+      ],
+      "remaining_unknowns": [
+        "전체 호출 경로 열거·maxHeadersServe 상수의 실제 값·직접 rawdb 호출자의 제한은 이 보완에서 검증하지 않았다",
+        "maxBytes=count*8000과 주석 2M의 일치는 여전히 별도 계약 검토 대상",
+        "프로토콜 단계의 count 제한을 모든 직접 호출에 일반화하지 않는다"
+      ],
+      "unsupported_conclusions": [
+        "부분 결과 자체가 결함이다",
+        "모든 호출자가 2M byte로 제한한다",
+        "어느 호출자에도 count 제한이 없다"
+      ],
+      "followup_candidate": {
+        "kind": "partial_result_control_draft",
+        "public_input_proposal": "캐시 일부 적중, 미래 높이, DB 읽기 실패의 헤더 응답 처리를 검토하세요.",
+        "independent_expected_result": null
+      },
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "verified_defect": false,
+      "exhaustive_gold": false,
+      "precision_recall_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-016",
+      "title": "초기화 실패에서 저장소 정리의 범위",
+      "anchors": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "start_line": 347,
+          "end_line": 436,
+          "source_fact_draft": "Init은 store 획득 이후 실패한 invalid transaction 삭제와 newLimbo 생성 오류에서 p.Close를 호출하지만 그 반환 오류는 사용하지 않는다.",
+          "start_byte": 18031,
+          "end_byte_exclusive": 20666,
+          "span_sha256": "1698505a11491b9ce7bf00a2b718384e3035e9a48fccf93684f2d524cbe8273e"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "start_line": 439,
+          "end_line": 457,
+          "source_fact_draft": "Close는 limbo가 있을 때만 limbo.Close를 호출하고 store.Close는 조건 없이 호출한다. 오류를 모아 반환한다.",
+          "start_byte": 20721,
+          "end_byte_exclusive": 21148,
+          "span_sha256": "b239fd6dc5c68cce1232ece090006bd29a5ad5c6bef3f32db91fcf46ac38e721"
+        },
+        {
+          "path": "core/txpool/blobpool/limbo.go",
+          "start_line": 81,
+          "end_line": 84,
+          "source_fact_draft": "limbo.Close는 내부 store.Close의 결과를 반환한다.",
+          "start_byte": 2821,
+          "end_byte_exclusive": 2933,
+          "span_sha256": "4a123d8aad22c9b624789352c3996d80d9b0b67947d8254ea415c8a081bdcf2f"
+        }
+      ],
+      "remaining_unknowns": [
+        "외부 저장소 Close의 성공·중복 호출 안전성·실제 파일 해제는 확인하지 않았다",
+        "Close 호출 시 모든 경로에서 store가 초기화되어 있는지는 전체 호출자 검토가 필요하다",
+        "원래 초기화 오류가 우선 반환되는 계약인지 검토 필요"
+      ],
+      "unsupported_conclusions": [
+        "Close를 호출하므로 정리에 반드시 성공한다",
+        "Close는 어떤 부분 초기화 상태에서도 안전하다",
+        "초기화 실패에서 발생한 모든 정리 오류가 사용자에게 반환된다"
+      ],
+      "followup_candidate": {
+        "kind": "cleanup_failure_input_draft",
+        "public_input_proposal": "저장소 획득 전후 오류와 정리 자체의 실패가 함께 있을 때 동작을 검토하세요.",
+        "independent_expected_result": null
+      },
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "verified_defect": false,
+      "exhaustive_gold": false,
+      "precision_recall_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-021",
+      "title": "구독 해제와 알림 송신의 채널 순서",
+      "anchors": [
+        {
+          "path": "eth/downloader/api.go",
+          "start_line": 45,
+          "end_line": 54,
+          "source_fact_draft": "API 생성자는 install/uninstall 채널을 버퍼 없이 생성하고 eventLoop를 시작한다.",
+          "start_byte": 1802,
+          "end_byte_exclusive": 2190,
+          "span_sha256": "e8cdc13fcf7827f286290e4d4981013729173ff70f732ad425d4e33bcab304d7"
+        },
+        {
+          "path": "eth/downloader/api.go",
+          "start_line": 91,
+          "end_line": 99,
+          "source_fact_draft": "eventLoop는 install에서 done이면 i로 false를 송신하고 uninstall을 수신하면 목록에서 삭제한 후 확인 채널을 닫는다.",
+          "start_byte": 3212,
+          "end_byte_exclusive": 3458,
+          "span_sha256": "e646646f3812001aea3e88511ea55cba1f3d3f3b04a2d0c6c187b0cbc7833eec"
+        },
+        {
+          "path": "eth/downloader/api.go",
+          "start_line": 115,
+          "end_line": 130,
+          "source_fact_draft": "진행·완료 알림은 구독 채널로 직접 송신되며 이 송신 자체에 취소 select가 없다.",
+          "start_byte": 3745,
+          "end_byte_exclusive": 3995,
+          "span_sha256": "00c7249da3acfd229ce3af5bd6f4ee79844e5cc65bdb2a195aeee70555f27c3e"
+        },
+        {
+          "path": "eth/downloader/api.go",
+          "start_line": 141,
+          "end_line": 154,
+          "source_fact_draft": "Syncing의 goroutine은 버퍼 없는 statuses를 구독하고 RPC 종료 또는 notifier 종료 시 반환하며 defer로 Unsubscribe를 호출한다.",
+          "start_byte": 4377,
+          "end_byte_exclusive": 4666,
+          "span_sha256": "62a5cb9c478963cd0ce877053def5af96c019240b208d143f722bcbcfebad64e"
+        },
+        {
+          "path": "eth/downloader/api.go",
+          "start_line": 183,
+          "end_line": 198,
+          "source_fact_draft": "Unsubscribe는 uninstall 요청 송신을 먼저 완료한 뒤 status를 소비하거나 uninstall 확인을 기다린다.",
+          "start_byte": 5644,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "e2ae5909f1e8adcb46cc05fb07d6f70c6b5bf45a6b9ce029669632eb23ce97e0"
+        }
+      ],
+      "remaining_unknowns": [
+        "실제 API에서 이 순서를 재현한 실행 증거는 없다",
+        "사용자 consumer가 별도 status 수신자를 유지하는지와 event mux 종료 순서는 추가 검토 필요"
+      ],
+      "unsupported_conclusions": [
+        "Unsubscribe는 모든 스케줄에서 종료한다",
+        "실제 운영 교착을 재현했다",
+        "독립적으로 확인된 결함 티켓이다"
+      ],
+      "followup_candidate": {
+        "kind": "ai_schedule_hypothesis_not_verified_ticket",
+        "public_input_proposal": "동기화 알림 전달 중 구독자가 종료할 때 구독 해제가 반환하지 않는 증상을 조사하세요. 정상 종료 대조군도 비교하세요.",
+        "hypothesis_schedule_private": [
+          "eventLoop enters unbuffered status send",
+          "sole status consumer exits on RPC termination before receiving notification",
+          "deferred Unsubscribe enters unbuffered uninstall send",
+          "eventLoop cannot receive uninstall while waiting for status receiver; Unsubscribe drains status only after uninstall send returns"
+        ],
+        "normal_control_proposal": "알림을 수신한 뒤 uninstall을 처리할 수 있는 스케줄",
+        "candidate_fix_proposal": "uninstall 등록 대기 중에도 status를 소비할 수 있도록 handshake를 설계한다. 실제 수정 채택은 별도 검토 필요.",
+        "symptom_reintroduction_proposal": "등록 대기 중 status 소비 경로를 제거한 변이",
+        "overfit_mutant_proposal": "uninstall 확인 없이 즉시 반환해 지연 증상만 숨기는 변이",
+        "independent_expected_result": null,
+        "independently_derived_oracle": null,
+        "tickets_promoted_to_protocol": 0
+      },
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "verified_defect": false,
+      "exhaustive_gold": false,
+      "precision_recall_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-036",
+      "title": "클라이언트 생성과 실제 HTTP 연결의 구분",
+      "anchors": [
+        {
+          "path": "rpc/client.go",
+          "start_line": 232,
+          "end_line": 240,
+          "source_fact_draft": "newClient는 connect(initctx)를 호출하고 그 오류를 반환한다. 성공하면 initClient 후 reconnectFunc를 저장한다.",
+          "start_byte": 7719,
+          "end_byte_exclusive": 7983,
+          "span_sha256": "386f588e10176dee8d5d73d038953e4dc562035155b023cdc2efc5ba4e28eda4"
+        },
+        {
+          "path": "rpc/http.go",
+          "start_line": 145,
+          "end_line": 169,
+          "source_fact_draft": "HTTP transport factory는 httpConn을 구성하며 반환 reconnect 함수는 그 객체와 nil을 반환한다. 이 함수 몸체에는 HTTP 요청이 없다.",
+          "start_byte": 4502,
+          "end_byte_exclusive": 5085,
+          "span_sha256": "770800a18f62e0fd6c2ebda628d8c71ca3ad53f737f373b533e76410941035de"
+        },
+        {
+          "path": "rpc/client.go",
+          "start_line": 267,
+          "end_line": 271,
+          "source_fact_draft": "initClient는 HTTP가 아닌 경우에만 dispatch goroutine을 시작한다.",
+          "start_byte": 8829,
+          "end_byte_exclusive": 8904,
+          "span_sha256": "85c2dd3a1e0af24226e9412e52b6af66f6f2cc0b723849490a606b0b0b430d71"
+        },
+        {
+          "path": "rpc/http.go",
+          "start_line": 171,
+          "end_line": 177,
+          "source_fact_draft": "sendHTTP가 hc.doRequest를 호출하고 오류 처리 및 응답 body Close를 수행한다.",
+          "start_byte": 5086,
+          "end_byte_exclusive": 5302,
+          "span_sha256": "f7f139a686c24426ddc3404da36ff21cae1a292dc5bafd75bfd0ae299d28a12b"
+        }
+      ],
+      "remaining_unknowns": [
+        "doRequest 내부의 네트워크·TLS·timeout 구현은 이 보완에서 검토하지 않았다",
+        "WS/IPC/stdio의 connect 부수효과와 재연결 동작은 transport별 추가 검토 필요"
+      ],
+      "unsupported_conclusions": [
+        "HTTP DialOptions 성공이 서버 접속 성공을 보장한다",
+        "모든 transport는 최초 RPC 요청까지 실제 연결을 지연한다"
+      ],
+      "followup_candidate": {
+        "kind": "transport_semantics_negative_control_draft",
+        "public_input_proposal": "HTTP 클라이언트 생성 성공과 최초 요청의 성공을 구분하는 검토 사례를 작성하세요.",
+        "independent_expected_result": null
+      },
+      "origin": "ai_manual_source_reading",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "verified_defect": false,
+      "exhaustive_gold": false,
+      "precision_recall_scoring_allowed": false
+    }
+  ]
+}
