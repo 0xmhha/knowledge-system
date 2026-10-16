@@ -275,7 +275,7 @@
       "id": "WI-6",
       "preparation_candidate_count": 20,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "이번 공개 입력·비공개 AI 검토 20쌍. 운영 원문 후보 19개와 개발용 stress 1개. 독립 가족 수는 미판정.",
+      "note": "공개 입력 20개=운영 seed 제안 19개+개발 stress 1개·의도 label 4종, 고정 원문 14파일/기존 AI 근거 40곳. 운영 제안 수로도 최소20개에 1개 부족하며 독립 가족/관련성 gold/실제 프로젝트 paired receipt/warm 영수증은 0개. 190쌍 중 같은 파일7/의도41쌍, 기존 노출 WI-1 표본과 16seed 중복이며 다른 label도 독립으로 승인하지 않는다. 기본은 정확한 함수 지역 분석, 확장은 outgoing calls/invokes를 통한 함수 문맥이며 intent/prompt 검색 필드·caller 확장·computed argument/return transfer가 없다. 현재/채택 source 계약12곳·consumer2파일 Git/채택 SHA·두 도구 metadata input parity를 대조했다. Analyzer explicit tools에는 기본/확장 도구가 없으며 실제 유효 권한/거부·의도→쌍 호출 정책/handoff는 미검증. gold·매칭·seed 포함·같은 snapshot/local caps와 추가 aggregate budget·arm order·partial/unknown/empty/error 분모·warm/반복/p95/ratio 정의가 null이다. 과거 실제 6함수 fixture의 CKG7/CKS13요청·단일seed 쌍/기본1/4→확장4/4·noise1/5·상한/순환/불변 검증은 보존한다. 선언 fixture labels에 따른 recall delta .75/noise delta .20과 서버 단일1431/2875µs는 이번 독립 품질/warm p95 수용이 아니다. curated metadata는 separate_not_joined/not_verified다.",
       "requirements": {
         "independent_intent_seed_families_min": 20,
         "intent_types_min": 4,
@@ -285,12 +285,21 @@
         ]
       },
       "approved_independent_cases": 0,
-      "formal_status": "not_prepared",
+      "formal_status": "expansion_family_pair_gold_path_and_warm_gap_inventory_prepared_independent_acceptance_not_evaluated",
       "remaining": [
-        "독립 검토자와 최종 수용 담당자 지정",
-        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
-        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
-      ]
+        "독립 검토자·최종 수용 담당자 지정, 운영 독립 intent/seed 가족20개 이상·의도4종 및 노출/중복·가족·표본 충분성·DEV/FINAL 검토; stress를 운영 분모에 넣지 않고 현재 운영 제안19개 부족 보완",
+        "의도별 완전한 관련/비관련/unknown 함수·근거 gold와 seed 포함/도달 가능한 universe 판정. outgoing call 문맥과 caller 요구·computed value transfer·curated/ontology dataset join의 지원 범위를 구분",
+        "project/commit/snapshot/function canonical identity·source/blob hash·source 위치 매칭, 고유 함수/analysis null/wrapper/hop/curated 단위·cycle/dedup/partial/중단·기권/실패/빈 gold·빈 반환의 분모 및 family macro 지표 동결",
+        "같은 retained seed/snapshot/local limits, 각 arm aggregate caps·전체 예산·버전/backend·실제 요청·순서/취소/retry/재색인 정책과 기본선 동결",
+        "소비자 기본/확장 도구의 explicit Analyzer 노출·실제 유효 권한·의도→호출 정책을 확정하고 retained project graph→CKS public client/MCP→설치 역할/typed handoff의 paired receipt 검증",
+        "warm 정의/초기 제외·반복 최소치·session/cache/환경·측정 clock/범위·arm order·p95 quantile/ratio와 family 집계·오류/상한/누락/0지연 분모 동결 후 반복 원자료 수집",
+        "F-01~F-08·입력/gold/매칭/표본/실행 범위를 동결하고 승인 범위에서 macro recall delta>=.10, noise delta<=.10, warm p95 ratio<=2.0 제안 및 운영/품질/독립 수용 판정"
+      ],
+      "expansion_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/expansion-gap-v1/manifest.json",
+        "sha256": "cd8bd64a7876f4a3cffb3d5ea5039bb7957348678d4a0178f31d3072ef2b4a0b",
+        "status": "expansion_family_pair_gold_path_and_warm_gaps_not_acceptance"
+      }
     },
     {
       "id": "WI-SP",
@@ -322,14 +331,14 @@
     }
   ],
   "next_priority": [
-    "WI-6 독립 intent/seed 가족·쌍 구성·관련성/잡음 정답·실제 기본/확장 경로·warm 지연 기준의 미충족분 검토",
     "WI-SP 독립 symbol·수동/자동 provenance·정책/보안/미태그 정답·ACL/비공개/위조 경계와 실제 소비자 경로 미충족분 검토",
     "WI-C 10개 사례의 계약·필수 항목·priority 질문 판정과 typed 보고서/그림·handoff·host 실행 미충족분 검토",
     "WI-1 30함수의 독립 value kind·완전한 data/control gold·return 좌표/주석 정합·matching 및 baseline/실행 수용 미충족분 검토",
     "WI-3 독립 사실 가족/정답·top-10/분모·baseline 동결 및 실제 symptom-only 검색/설치 역할 경로 미충족분 보완",
     "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완",
     "WI-V1/WI-V2 독립 티켓/실제 API 계약·도달성·주/독립 oracle·승인 후보 집합·selector/current HEAD/설치 역할 실행 및 독립 수용 미충족분 보완",
-    "WI-2 독립 표본/gold·명령/호출자 계약·명시적 Analyzer 도구 노출·retained project MCP/설치 역할과 품질 수용 미충족분 보완"
+    "WI-2 독립 표본/gold·명령/호출자 계약·명시적 Analyzer 도구 노출·retained project MCP/설치 역할과 품질 수용 미충족분 보완",
+    "WI-6 운영 독립 가족/관련성 gold·기본/확장 실제 쌍·명시적 소비자 도구 노출·warm 반복/p95 기준 및 품질 수용 미충족분 보완"
   ],
   "optional_backlog_count": 12
 }

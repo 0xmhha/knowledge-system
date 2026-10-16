@@ -1,0 +1,600 @@
+{
+  "kind": "historical_one_six_function_fixture_not_twenty_independent_project_families",
+  "summary": {
+    "schema_version": 1,
+    "fixture_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+    "checks": [
+      "unique source-pinned local analyses with cycle dedup",
+      "call/value/control/curated provenance separation",
+      "independent relevance recall noise cost comparison",
+      "functions budget",
+      "candidates budget",
+      "nodes budget",
+      "edges budget",
+      "facts budget",
+      "isolated negative",
+      "stale source refusal",
+      "actual runtime input refusal",
+      "retained expansion after source deletion"
+    ],
+    "metrics": {
+      "fixture_relevant_symbols": 4,
+      "baseline_returned": 1,
+      "baseline_recall": 0.25,
+      "expanded_returned": 5,
+      "expanded_recall": 1.0,
+      "expanded_noise": 1,
+      "expanded_precision": 0.8,
+      "baseline_elapsed_micros": 1431,
+      "expanded_elapsed_micros": 2875,
+      "scope": "independently compiled source relevance labels for this6-function fixture only; no whole-program optimality"
+    },
+    "cks_tools": 32,
+    "ckg_exit": 0,
+    "cks_exit": 0,
+    "cks_requests": 13,
+    "binary_sha256": "497e4ba3ff09e5068b7dff79ab911b96ce627d9961268fb9abec07367e046e93",
+    "cks_binary_sha256": "5946b75696419c964521ec955ae5ff5e61bc8f17026bc435a35332afc8865cbd",
+    "independent_acceptance": "not_recorded"
+  },
+  "derived_arithmetic": {
+    "kind": "derived_from_historical_fixture_declared_labels_not_current_quality",
+    "baseline_recall": 0.25,
+    "expanded_recall": 1.0,
+    "recall_delta": 0.75,
+    "baseline_noise_fraction": 0.0,
+    "expanded_noise_fraction": 0.2,
+    "noise_fraction_delta": 0.2,
+    "single_server_elapsed_ratio": 2.0090845562543675,
+    "warm_p95_latency_ratio": null,
+    "formal_threshold_verdict": null,
+    "empty_return_noise_fraction_policy": null,
+    "current_project_scores": null
+  },
+  "ckg_request_matrix": [
+    {
+      "id": 1,
+      "method": "initialize",
+      "tool": null,
+      "arguments": null,
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 2,
+      "method": "tools/call",
+      "tool": "flow_probe.context.find_symbol",
+      "arguments": {
+        "name": "Seed",
+        "exact": false,
+        "include_blobs": true
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 3,
+      "method": "tools/call",
+      "tool": "flow_probe.context.find_symbol",
+      "arguments": {
+        "name": "Cycle",
+        "exact": false,
+        "include_blobs": true
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 4,
+      "method": "tools/call",
+      "tool": "flow_probe.context.find_symbol",
+      "arguments": {
+        "name": "Transform",
+        "exact": false,
+        "include_blobs": true
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 5,
+      "method": "tools/call",
+      "tool": "flow_probe.context.find_symbol",
+      "arguments": {
+        "name": "Normalize",
+        "exact": false,
+        "include_blobs": true
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 6,
+      "method": "tools/call",
+      "tool": "flow_probe.context.find_symbol",
+      "arguments": {
+        "name": "Noise",
+        "exact": false,
+        "include_blobs": true
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 7,
+      "method": "tools/call",
+      "tool": "flow_probe.context.find_symbol",
+      "arguments": {
+        "name": "Isolated",
+        "exact": false,
+        "include_blobs": true
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    }
+  ],
+  "cks_request_matrix": [
+    {
+      "id": 1,
+      "method": "initialize",
+      "tool": null,
+      "arguments": null,
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 2,
+      "method": "tools/list",
+      "tool": null,
+      "arguments": null,
+      "rpc_error": false,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 3,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependencies",
+      "arguments": {
+        "node_id": "0a014f39bd4b265c",
+        "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+        "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784"
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "partial",
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 4,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+          "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784"
+        },
+        "limits": {
+          "max_functions": 8,
+          "max_hops": 3
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "expanded_bounded",
+      "returned_function_wrappers": 5,
+      "stop_reasons": []
+    },
+    {
+      "id": 5,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+          "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784"
+        },
+        "limits": {
+          "max_functions": 1
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "budget_exhausted",
+      "returned_function_wrappers": 1,
+      "stop_reasons": [
+        "functions"
+      ]
+    },
+    {
+      "id": 6,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+          "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784"
+        },
+        "limits": {
+          "max_candidates": 1
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "budget_exhausted",
+      "returned_function_wrappers": 2,
+      "stop_reasons": [
+        "candidates",
+        "hop_boundary"
+      ]
+    },
+    {
+      "id": 7,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+          "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784"
+        },
+        "limits": {
+          "max_total_nodes": 1
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "budget_exhausted",
+      "returned_function_wrappers": 1,
+      "stop_reasons": [
+        "function_analysis"
+      ]
+    },
+    {
+      "id": 8,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+          "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784"
+        },
+        "limits": {
+          "max_total_edges": 1
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "budget_exhausted",
+      "returned_function_wrappers": 1,
+      "stop_reasons": [
+        "function_analysis"
+      ]
+    },
+    {
+      "id": 9,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+          "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784"
+        },
+        "limits": {
+          "max_total_facts": 1
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "budget_exhausted",
+      "returned_function_wrappers": 1,
+      "stop_reasons": [
+        "function_analysis"
+      ]
+    },
+    {
+      "id": 10,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "cccc6547db78ed22"
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "expanded_bounded",
+      "returned_function_wrappers": 1,
+      "stop_reasons": []
+    },
+    {
+      "id": 11,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_source_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "source_mismatch",
+      "returned_function_wrappers": 0,
+      "stop_reasons": [
+        "source_or_snapshot_changed"
+      ]
+    },
+    {
+      "id": 12,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+          "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784"
+        },
+        "limits": {
+          "max_hops": 0
+        }
+      },
+      "rpc_error": true,
+      "tool_error": false,
+      "status": null,
+      "returned_function_wrappers": null,
+      "stop_reasons": null
+    },
+    {
+      "id": 13,
+      "method": "tools/call",
+      "tool": "cks.context.value_dependency_expansion",
+      "arguments": {
+        "function": {
+          "node_id": "0a014f39bd4b265c",
+          "expected_commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+          "expected_source_sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784",
+          "expected_snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8"
+        },
+        "limits": {
+          "max_functions": 8,
+          "max_hops": 3
+        }
+      },
+      "rpc_error": false,
+      "tool_error": false,
+      "status": "expanded_bounded",
+      "returned_function_wrappers": 5,
+      "stop_reasons": []
+    }
+  ],
+  "paired_same_seed_request": true,
+  "paired_same_snapshot": true,
+  "paired_seed_local_limits_equal": true,
+  "baseline_limits": {
+    "max_source_bytes": 262144,
+    "max_ast_nodes": 4096,
+    "max_blocks": 256,
+    "max_nodes": 1024,
+    "max_edges": 4096,
+    "max_iterations": 128,
+    "timeout_ms": 1000,
+    "max_facts": 65536
+  },
+  "expanded_aggregate_limits": {
+    "max_functions": 8,
+    "max_hops": 3,
+    "max_candidates": 32,
+    "max_total_nodes": 2048,
+    "max_total_edges": 8192,
+    "max_total_facts": 131072,
+    "timeout_ms": 1000
+  },
+  "baseline_function": {
+    "node_id": "0a014f39bd4b265c",
+    "canonical_id": "example.invalid/expansion-fixture.Seed",
+    "file": "logic.go",
+    "commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+    "sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784",
+    "language": "go",
+    "start_line": 3,
+    "start_byte": 17,
+    "bytes": 91,
+    "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+    "function_name": "Seed"
+  },
+  "expanded_functions": [
+    {
+      "node_id": "0a014f39bd4b265c",
+      "canonical_id": "example.invalid/expansion-fixture.Seed",
+      "file": "logic.go",
+      "commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+      "sha256": "eddd95fa8bc95a611beb0e32a6f11af1aa21bc9f7197a863624d33936974f784",
+      "language": "go",
+      "start_line": 3,
+      "start_byte": 17,
+      "bytes": 91,
+      "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+      "function_name": "Seed"
+    },
+    {
+      "node_id": "1935b5d78d98c06e",
+      "canonical_id": "example.invalid/expansion-fixture.Noise",
+      "file": "logic.go",
+      "commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+      "sha256": "f6575422d71e96836c514aaad34e1adc1bbdf7418a44332bd1a766d4c35588f0",
+      "language": "go",
+      "start_line": 18,
+      "start_byte": 289,
+      "bytes": 39,
+      "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+      "function_name": "Noise"
+    },
+    {
+      "node_id": "e5526edc7f8f14b7",
+      "canonical_id": "example.invalid/expansion-fixture.Cycle",
+      "file": "logic.go",
+      "commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+      "sha256": "a6e46b4334ea871c62453554f21792f0f60d54f9f2f0121b0e5a83abe27d6f57",
+      "language": "go",
+      "start_line": 10,
+      "start_byte": 109,
+      "bytes": 82,
+      "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+      "function_name": "Cycle"
+    },
+    {
+      "node_id": "eccae2ec14bf97ae",
+      "canonical_id": "example.invalid/expansion-fixture.Transform",
+      "file": "logic.go",
+      "commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+      "sha256": "fcba6171600e0674f3d473eaf3a2e48f345492ae971e0d56abd19834d17a6f46",
+      "language": "go",
+      "start_line": 16,
+      "start_byte": 192,
+      "bytes": 53,
+      "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+      "function_name": "Transform"
+    },
+    {
+      "node_id": "29081ef00a26bd73",
+      "canonical_id": "example.invalid/expansion-fixture.Normalize",
+      "file": "logic.go",
+      "commit": "8f57f4f91439476cc1910f051c848a865fb03f20",
+      "sha256": "1ced1d7f296475771b9ebd6accfbc638d64383f4d43bb8bdcbc6c15d456b6037",
+      "language": "go",
+      "start_line": 17,
+      "start_byte": 246,
+      "bytes": 42,
+      "snapshot_sha256": "c368f224512ee1e18a3e79fdcc8253a9f90c2205d42ed7ac4482c595091370c8",
+      "function_name": "Normalize"
+    }
+  ],
+  "hops": [
+    {
+      "source_node": "0a014f39bd4b265c",
+      "target_node": "1935b5d78d98c06e",
+      "relation": "calls",
+      "origin": "retained_call_graph",
+      "argument_mapping": "not_computed",
+      "source_line": 4
+    },
+    {
+      "source_node": "0a014f39bd4b265c",
+      "target_node": "e5526edc7f8f14b7",
+      "relation": "calls",
+      "origin": "retained_call_graph",
+      "argument_mapping": "not_computed",
+      "source_line": 6
+    },
+    {
+      "source_node": "0a014f39bd4b265c",
+      "target_node": "eccae2ec14bf97ae",
+      "relation": "calls",
+      "origin": "retained_call_graph",
+      "argument_mapping": "not_computed",
+      "source_line": 8
+    },
+    {
+      "source_node": "e5526edc7f8f14b7",
+      "target_node": "0a014f39bd4b265c",
+      "relation": "calls",
+      "origin": "retained_call_graph",
+      "argument_mapping": "not_computed",
+      "source_line": 12
+    },
+    {
+      "source_node": "e5526edc7f8f14b7",
+      "target_node": "eccae2ec14bf97ae",
+      "relation": "calls",
+      "origin": "retained_call_graph",
+      "argument_mapping": "not_computed",
+      "source_line": 14
+    },
+    {
+      "source_node": "eccae2ec14bf97ae",
+      "target_node": "29081ef00a26bd73",
+      "relation": "calls",
+      "origin": "retained_call_graph",
+      "argument_mapping": "not_computed",
+      "source_line": 16
+    }
+  ],
+  "curated_flow": {
+    "origin": "operator_curated_metadata",
+    "status": "separate_not_joined",
+    "query_tool": "cks.context.get_flow",
+    "source_association": "not_verified",
+    "reason": "Curated call order/reads/writes are separate records; they are not local computed def-use/control or a verified cross-dataset join"
+  },
+  "cap_results": {
+    "functions": {
+      "status": "budget_exhausted",
+      "stop_reasons": [
+        "functions"
+      ]
+    },
+    "candidates": {
+      "status": "budget_exhausted",
+      "stop_reasons": [
+        "candidates",
+        "hop_boundary"
+      ]
+    },
+    "nodes": {
+      "status": "budget_exhausted",
+      "stop_reasons": [
+        "function_analysis"
+      ]
+    },
+    "edges": {
+      "status": "budget_exhausted",
+      "stop_reasons": [
+        "function_analysis"
+      ]
+    },
+    "facts": {
+      "status": "budget_exhausted",
+      "stop_reasons": [
+        "function_analysis"
+      ]
+    }
+  },
+  "historical_failure_status": "historical_not_completion_evidence",
+  "current_project_cases_covered": 0,
+  "warm_repeated_samples": null,
+  "warm_definition_receipt": null,
+  "actual_installed_analyzer_pair_receipt": null
+}

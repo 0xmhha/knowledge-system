@@ -1,0 +1,311 @@
+{
+  "kind": "source_inspection_not_actual_project_retrieval_or_installed_role",
+  "contracts": [
+    {
+      "id": "EXP-01",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/expand.go",
+      "lines": [
+        16,
+        57
+      ],
+      "fact": "입력은 정확한 함수 QueryInput과 확장 limits이며 intent/prompt 검색 필드가 없다.",
+      "gap": "카드의 의도는 gold·평가에 반영할 조건이며 엔진이 text query로 검색/순위를 바꾼다고 간주하지 않는다.",
+      "anchor": {
+        "start_line": 16,
+        "end_line": 57,
+        "start_byte": 233,
+        "end_byte_exclusive": 1934,
+        "span_sha256": "140ba2e4b7dc54e233f4f3c5e74da4eac8ad2099ddc951a55c3d0591507200d0"
+      },
+      "approved": false
+    },
+    {
+      "id": "EXP-02",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/expand.go",
+      "lines": [
+        58,
+        106
+      ],
+      "fact": "확장 기본/최대 functions/hops/candidates/aggregate/time 상한과 strict raw input을 검증한다.",
+      "gap": "같은 local limits와 각 arm의 추가 aggregate cap·시간 예산 대응을 명시하고 동일 cap을 모호하게 쓰지 않는다.",
+      "anchor": {
+        "start_line": 58,
+        "end_line": 106,
+        "start_byte": 1934,
+        "end_byte_exclusive": 3483,
+        "span_sha256": "a9bcb81f6b6eea92ac1417ba9238c971336e2494ddfd65c480fc63d94e2a96e0"
+      },
+      "approved": false
+    },
+    {
+      "id": "EXP-03",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/expand.go",
+      "lines": [
+        145,
+        218
+      ],
+      "fact": "각 고유 함수의 지역 분석을 수행하고 seed snapshot·aggregate cap·partial 상태를 보존한다.",
+      "gap": "반환 wrapper 수와 유효 analysis 함수 수를 구분하고 partial/빈 분석/미지원 분모를 동결한다.",
+      "anchor": {
+        "start_line": 145,
+        "end_line": 218,
+        "start_byte": 5114,
+        "end_byte_exclusive": 7344,
+        "span_sha256": "7980cfd94427759a55dad38e7b841047fc80316ff1036e8c2fd71e1abe439c75"
+      },
+      "approved": false
+    },
+    {
+      "id": "EXP-04",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/expand.go",
+      "lines": [
+        225,
+        283
+      ],
+      "fact": "나가는 calls/invokes만 조회하며 순환/중복을 줄이고 hop argument_mapping은 not_computed다.",
+      "gap": "호출자 탐색·argument/return 전달·타당한 실행 경로 또는 intent 관련성으로 승격하지 않는다.",
+      "anchor": {
+        "start_line": 225,
+        "end_line": 283,
+        "start_byte": 7534,
+        "end_byte_exclusive": 9452,
+        "span_sha256": "639884be48f72219b669d67512c5b7bc0b0eb5e8ec84aeb757069401ea43094b"
+      },
+      "approved": false
+    },
+    {
+      "id": "EXP-05",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/expand.go",
+      "lines": [
+        291,
+        332
+      ],
+      "fact": "최종 manifest/node/blob/edge page와 more를 재확인하고 시간 초과/변경을 명시한다.",
+      "gap": "사례별 graph/retained source receipt·한계/중단/재시도·원래 분모를 실제 MCP 입력과 대조해야 한다.",
+      "anchor": {
+        "start_line": 291,
+        "end_line": 332,
+        "start_byte": 9767,
+        "end_byte_exclusive": 10907,
+        "span_sha256": "97fda7381bfc9eb3da21da1e61a431b1e5ab9f28dc069be40e4e317fed241ab7"
+      },
+      "approved": false
+    },
+    {
+      "id": "EXP-06",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/query.go",
+      "lines": [
+        114,
+        151
+      ],
+      "fact": "기본 Query는 서버 측 elapsed를 측정하고 retained manifest와 선택적인 source/snapshot/commit pin을 대조한다.",
+      "gap": "end-to-end 지연과 서버 내부 elapsed를 분리하고 정식 요청은 필요한 pin을 명시해야 한다.",
+      "anchor": {
+        "start_line": 114,
+        "end_line": 151,
+        "start_byte": 3455,
+        "end_byte_exclusive": 4797,
+        "span_sha256": "02f0f3965bc18a002ac48ed26f99896791f7d3001eda1761e1d3032dfb988b6d"
+      },
+      "approved": false
+    },
+    {
+      "id": "EXP-07",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/expand.go",
+      "lines": [
+        110,
+        123
+      ],
+      "fact": "확장 elapsed는 Expand의 서버 측 소요 시간이다.",
+      "gap": "CKS facade·직렬화·transport·소비자 해석을 포함하는 warm p95와 자동으로 같지 않다.",
+      "anchor": {
+        "start_line": 110,
+        "end_line": 123,
+        "start_byte": 3642,
+        "end_byte_exclusive": 4583,
+        "span_sha256": "254c0daa3f3463f6d68d55cbfffe0865a5628a13cb16c4e42db779e7ccbffe39"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-01",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/valueflow.go",
+      "lines": [
+        15,
+        62
+      ],
+      "fact": "기본 arm은 CKS context.value_dependencies에서 public client와 공유 Query를 호출한다.",
+      "gap": "baseline은 검색 top-k 문맥이 아니라 선택 함수 1개의 지역 분석이다. 평가 반환 단위를 동결한다.",
+      "anchor": {
+        "start_line": 15,
+        "end_line": 62,
+        "start_byte": 326,
+        "end_byte_exclusive": 1930,
+        "span_sha256": "50ef9c62ab70f0d014b89acdeadbbd8d3e0dbb214a0eda4df849253a16e25ba6"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-02",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/value_expansion.go",
+      "lines": [
+        15,
+        58
+      ],
+      "fact": "확장 arm은 optional backend를 통해 Expand하며 curated flow는 separate_not_joined/not_verified다.",
+      "gap": "metadata·call hop을 계산된 값 전달·검증된 dataset join이나 ontology 효과로 판정하지 않는다.",
+      "anchor": {
+        "start_line": 15,
+        "end_line": 58,
+        "start_byte": 326,
+        "end_byte_exclusive": 3604,
+        "span_sha256": "5dc6006ffb172775a4adf77f2f5e5a72ff65e02c91d4be4d4e66f7802c4ca155"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-03",
+      "scope": "current_repository",
+      "path": "internal/system/ckgclient/valueflow.go",
+      "lines": [
+        34,
+        45
+      ],
+      "fact": "public expansion client는 LLM-safe retained reader를 사용하고 legacy 불가 상태를 명시한다.",
+      "gap": "이번 프로젝트 retained graph/public client/MCP/설치된 역할의 실제 paired receipt가 없다.",
+      "anchor": {
+        "start_line": 34,
+        "end_line": 45,
+        "start_byte": 1348,
+        "end_byte_exclusive": 2190,
+        "span_sha256": "333f427d9f0985697457c8872ecdf29b7e6836239caeeccac83c2ab8bd6c23bc"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-04",
+      "scope": "current_repository",
+      "path": "pkg/graph/mcphandlers/valueflow.go",
+      "lines": [
+        15,
+        32
+      ],
+      "fact": "standalone 기본 도구도 같은 Query 엔진을 호출한다.",
+      "gap": "standalone 성공을 CKS 소비자/역할의 쌍 실행 성공으로 세지 않는다.",
+      "anchor": {
+        "start_line": 15,
+        "end_line": 32,
+        "start_byte": 338,
+        "end_byte_exclusive": 942,
+        "span_sha256": "ce8c0b2b6aa65a1767c1e57dffc6b151fb05527452ed7f69245b3f9d64a7d2de"
+      },
+      "approved": false
+    },
+    {
+      "id": "HOST-01",
+      "scope": "adopted_consumer",
+      "path": "plugin/agents/analyzer.md",
+      "lines": [
+        13,
+        37
+      ],
+      "fact": "Analyzer의 명시적 CKS tools 목록에 value_dependencies/value_dependency_expansion이 없다.",
+      "gap": "소비자 contract의 도구 존재와 직접 역할 노출은 다르다. 실제 유효 권한·의도→호출 정책·handoff를 검증해야 한다.",
+      "anchor": {
+        "start_line": 13,
+        "end_line": 37,
+        "start_byte": 708,
+        "end_byte_exclusive": 1984,
+        "span_sha256": "a5241ee4ec9b20094ee3164c79721ebb88006e4cbbcdbb1bbe0e77d90cbf2699"
+      },
+      "approved": false
+    }
+  ],
+  "criteria_snapshot": {
+    "protocol": {
+      "id": "WI-6",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "metrics_proposal": {
+        "macro_recall_delta_min": 0.1,
+        "macro_noise_fraction_delta_max": 0.1,
+        "warm_p95_latency_ratio_max": 2.0,
+        "delta_unit": "fraction_difference_0.10_equals_10_percentage_points",
+        "empty_return_noise_fraction": null
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    "progress": {
+      "id": "WI-6",
+      "owner": "CKS",
+      "target": "실제 프로젝트에서 같은 seed의 지역 baseline과 bounded 함수 문맥 확장",
+      "input_proposal": "새 독립 intent/seed 사실군20개 이상, 독립 관련 함수 gold와 intent 유형4개 이상. baseline=context.value_dependencies, 확장=context.value_dependency_expansion. 동일 snapshot·고정 상한으로 paired 비교",
+      "completion_proposal": "macro recall 증가>=0.10, macro noise fraction 증가<=0.10, warm p95 latency ratio<=2.0 제안. 반환 함수/근거·분모·cycle/dedup·호출/값/curated 구분·부분/중단·source pin 필수. 독립 관련성 검토",
+      "limitations": "증가량은 percentage-point 단위다. noise fraction=비관련 반환/전체 반환. 빈 반환은 별도 실패/기권으로 기록. 비용 상승을 숨기거나 자동 argument transfer/dataset join을 주장하지 않는다",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-6/manifest.json",
+        "revision": "fcdea20fb818d59747f17fb7f6cc4a6125e39846"
+      }
+    }
+  },
+  "consumer_exposure_gaps": [
+    {
+      "tool": "value_dependencies",
+      "wire_name": "cks.context.value_dependencies",
+      "metadata_input_parity": true,
+      "explicit_analyzer_alias": "mcp__plugin_coding-agent_cks__cks_context_value_dependencies",
+      "explicit_analyzer_tool_present": false,
+      "effective_host_permissions": null,
+      "runtime_denial_proven": false,
+      "installed_role_receipt": null
+    },
+    {
+      "tool": "value_dependency_expansion",
+      "wire_name": "cks.context.value_dependency_expansion",
+      "metadata_input_parity": true,
+      "explicit_analyzer_alias": "mcp__plugin_coding-agent_cks__cks_context_value_dependency_expansion",
+      "explicit_analyzer_tool_present": false,
+      "effective_host_permissions": null,
+      "runtime_denial_proven": false,
+      "installed_role_receipt": null
+    }
+  ],
+  "intent_is_engine_query_field": false,
+  "incoming_call_expansion_implemented_here": false,
+  "computed_argument_return_transfer": false,
+  "verified_curated_dataset_join": false,
+  "actual_project_retained_graph_receipt": null,
+  "actual_project_paired_mcp_receipt": null
+}

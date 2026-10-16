@@ -271,10 +271,25 @@
 - 전용 변조/경계 테스트 36개·연관 Python 회귀 569개·문서 134개·기존 구현 완료 상태 검사 통과.
 - 19파일 두 차례 재생성 바이트 일치, 이전 동결 패킷 21개·유지보수 Go 변경 없음.
 - RULE-GAP-REVIEW.txt와 rule-gap-v1에 표본/gold·명령 계약·MCP/소비자 노출의 공백 기록.
-[예정] 23. WI-6 독립 가족·쌍 구성·정답·기본/확장 검색과 warm 지연 공백 점검
+[검증 완료] 23. WI-6 독립 가족·쌍 구성·정답·기본/확장 검색과 warm 지연 공백 점검
 - intent/seed 제안·기존 실행과 독립 가족 20개/의도 4종 기준을 대조한다.
 - 같은 snapshot/cap의 기본·확장 쌍·관련성/잡음 gold·warm 지연의 미동결 기준을 기록한다.
 - 실제 retained 검색/MCP/소비자·독립 수용으로 승격하지 않고 표본/실행 준비 미충족분을 정리한다.
+- 20카드=운영19+개발stress1·의도4종, 원문14파일/기존AI근거40곳. 운영 제안만으로도 최소20개에 1개 부족.
+- 190쌍 중 같은 파일7/의도41쌍·기존 노출 WI-1 표본과16seed 중복. 독립 가족/gold 승인0개 유지.
+- 지역 baseline과 outgoing calls/invokes 확장 경로12근거·채택 consumer2파일 Git/입력 metadata 정합 대조.
+- intent text 검색·caller 확장·computed argument/return transfer·curated verified join으로 승격하지 않음.
+- Analyzer explicit tools에 기본/확장 직접 도구2개 누락. 실제 유효 권한/거부·의도별 실행/handoff는 미판정.
+- 현재20개 쌍·관련/비관련 gold·매칭·local/aggregate caps·arm order/오류 분모·warm/반복/p95/ratio 모두 미동결.
+- 과거 실제6함수 fixture CKG7/CKS13요청·1seed 쌍 성과 유지. recall delta.75/noise delta.20은 현재 수용이 아님.
+- 단일 서버1431/2875µs를 warm p95 ratio로 세지 않음. empty-return noise fraction null 유지.
+- 전용 변조/경계39개·연관 Python 회귀608개·문서134개·기존 구현 완료 상태 검사 통과.
+- 20파일 두 차례 재생성 바이트 일치. 이전 동결 패킷22개·유지보수 Go 변경 없음.
+- EXPANSION-GAP-REVIEW.txt와 expansion-gap-v1에 가족·쌍/gold·검색 경로·warm 계약 공백 기록.
+[예정] 24. WI-SP 독립 symbol·provenance·정답·권한 경계·소비자 경로 공백 점검
+- 기존 정책/보안/미태그 symbol과 수동/자동 자료를 독립12개/범주별4개 기준에 대조한다.
+- 원본YAML/provenance·의미 gold·stale/invalid/위조/private/ACL와 실제 MCP/역할 영수증 미충족분을 기록한다.
+- annotation 존재/빈 결과·자동 rule 후보를 독립 승인·안전·권한 통과로 승격하지 않는다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -306,14 +321,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-WI-6 독립 intent/seed 가족·기본/확장 쌍·관련성/잡음 정답·실제 검색 경로와 warm 지연 기준의 공백을 점검한다.
+WI-SP 독립 symbol·수동/자동 provenance·정책/보안/미태그 정답·ACL/비공개/위조 경계와 실제 소비자 경로의 공백을 점검한다.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_rule_gap.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-rule-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/rule-gap-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_expansion_gap.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-expansion-gap.py --packet docs/spec-driven/operational-preparation/source-review-supplement/expansion-gap-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~22단계 검증 완료, 23단계 예정. 정식 독립 수용은 계속 0/9이다.
+현재 준비 1~23단계 검증 완료, 24단계 예정. 정식 독립 수용은 계속 0/9이다.
