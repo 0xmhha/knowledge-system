@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Translate a selected Go test's explicit assertion marker into oracle protocol.
+
+Copy this adapter into the subject's frozen oracle files before the RED commit.
+It does not derive expected values and may be shared as transport, never as a
+shared oracle expectation. A missing test, build error, wrong failure, or timeout
+is ERROR, including when go test exits 1.
+"""
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+
+
+def outcome(events, code, test, assertion):
+    if any(e.get("Action") == "build-fail" or
+           e.get("Output", "").lstrip().startswith(("panic:", "fatal error:")) for e in events):
+        return "error"
+    if any(e.get("Action") == "fail" and e.get("Test")
+           and e["Test"] != test and not e["Test"].startswith(test + "/") for e in events):
+        return "error"
+    selected = [e for e in events if e.get("Test") == test or e.get("Test", "").startswith(test + "/")]
+    # Only an explicit, selected assertion failure counts. Other failures in the
+    # same test are not RED merely because the process returned nonzero.
+    failures = {e["Test"] for e in selected if e.get("Action") == "fail"}
+    marker = "ORACLE_ASSERTION[" + assertion + "]"
+    marked = {e["Test"] for e in selected if e.get("Action") == "output" and marker in e.get("Output", "")}
+    ran = any(e.get("Test") == test and e.get("Action") == "run" for e in selected)
+    top_passed = any(e.get("Test") == test and e.get("Action") == "pass" for e in selected)
+    top_failed = any(e.get("Test") == test and e.get("Action") == "fail" for e in selected)
+    leaves = {x for x in failures if not any(y.startswith(x + "/") for y in failures)}
+    if ran and top_passed and code == 0 and not failures:
+        return "pass"
+    if ran and top_failed and code == 1 and leaves and leaves <= marked:
+        return "symptom_fail"
+    return "error"
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--package", required=True)
+    parser.add_argument("--test", required=True)
+    parser.add_argument("--assertion-id", required=True)
+    args = parser.parse_args()
+    if (not re.fullmatch(r"Test[A-Za-z0-9_]+", args.test)
+            or args.package.startswith("-") or "..." in args.package):
+        parser.error("expected an exact Go test name and package")
+    value = {"schema_version": 1, "symptom_id": os.environ.get("ORACLE_SYMPTOM_ID"),
+             "assertion_id": args.assertion_id, "case_id": os.environ.get("ORACLE_CASE_ID"),
+             "subject_commit": os.environ.get("ORACLE_SUBJECT_COMMIT"), "outcome": "error"}
+    try:
+        run = subprocess.run(["go", "test", "-json", "-count=1", "-run", "^" + args.test + "$", args.package],
+                             capture_output=True, text=True, timeout=295)
+        events = [json.loads(x) for x in run.stdout.splitlines() if x.strip()]
+        value["outcome"] = outcome(events, run.returncode, args.test, args.assertion_id)
+        value["go_exit_code"] = run.returncode
+        value["runtime"] = subprocess.run(["go", "version"], capture_output=True, text=True, timeout=5).stdout.strip()
+        # Preserve the selected test's diagnostics without emitting mixed JSON.
+        sys.stderr.write(run.stdout[-32768:])
+        sys.stderr.write(run.stderr[-8192:])
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        value["reason"] = str(exc)
+    print(json.dumps(value))
+    return {"pass": 0, "symptom_fail": 1, "error": 2}[value["outcome"]]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

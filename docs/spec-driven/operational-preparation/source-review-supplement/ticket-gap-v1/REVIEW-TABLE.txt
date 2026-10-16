@@ -1,0 +1,130 @@
+WI-V1/WI-V2 API·독립 티켓·오라클·수용 가능 후보 집합 — 비공개 AI 준비 자료
+개발 티켓 1개/AI 후보 2개/추출 관측 50건. 독립 승인 티켓·오라클·후보 집합 0개.
+eth_subscribe(["syncing"]) 경로 원문 확인; 실제 API/설치 역할 실행 영수증 없음.
+
+API-01 eth/backend.go:325
+Ethereum.APIs는 eth namespace에 DownloaderAPI를 등록한다.
+미충족: 대상 설치/transport 설정과 실제 eth_subscribe 요청 영수증은 없다.
+
+API-02 rpc/service.go:60
+구독 callback은 일반 callback과 별도 registry에 등록한다.
+미충족: 등록된 실제 서비스 인스턴스와 세션 pin 확인 필요.
+
+API-03 rpc/service.go:115
+exported method를 formatName으로 변환하여 callback 이름을 정한다.
+미충족: Syncing의 subscription 분류와 lower-case 이름 연결을 검토한다.
+
+API-04 rpc/service.go:230
+context와 Subscription/error 서명이 subscription이며 첫 문자를 소문자로 바꾼다.
+미충족: 소스 경로 확인이 실제 호출 도달성 증명은 아니다.
+
+API-05 rpc/handler.go:530
+*_subscribe는 첫 인자를 구독 이름으로 사용하고 notifier를 context에 넣어 callback을 호출한다.
+미충족: allowSubscribe/transport·등록·실제 callback 실행 영수증 필요.
+
+API-06 rpc/handler.go:572
+*_unsubscribe는 server subscription의 err 채널을 닫고 map에서 지운 뒤 반환한다.
+미충족: RPC 해제 응답은 downstream Unsubscribe 확인/반환과 동일하지 않다.
+
+API-07 rpc/handler.go:367
+연결 정리는 server 구독 오류 채널에 오류를 보내고 닫는다.
+미충족: 연결 종료/구독 종료/알림 중첩 스케줄과 소유 정리를 검토한다.
+
+API-08 rpc/subscription.go:94
+Notifier는 context 조회·subscription 생성·알림 송신·연결 Closed를 제공한다.
+미충족: Notify 활성화/버퍼/writeJSON 지연과 무시되는 error의 영향을 확인한다.
+
+API-09 eth/downloader/api.go:45
+생성자는 buffer 없는 설치/해제 채널과 eventLoop goroutine을 만든다.
+미충족: 실제 mux/chain/progress 및 eventLoop 수명은 추출 대역 범위 밖이다.
+
+API-10 eth/downloader/api.go:67
+eventLoop는 map 등록/삭제와 삭제 확인 close, 동기 status 송신을 수행하며 mux 종료 시 반환한다.
+미충족: 다른 수신자의 정지·이미 done인 등록·mux 종료 뒤 확인 미발생의 계약이 미확정이다.
+
+API-11 eth/downloader/api.go:133
+Syncing은 unbuffered status를 구독하고 RPC err/Closed에서 반환하며 Unsubscribe를 defer한다.
+미충족: RPC 종료와 실제 eventLoop 송신 중첩을 통제 대역 없이 재현해야 한다.
+
+API-12 eth/downloader/api.go:180
+Unsubscribe는 uninstall 요청 송신 뒤 status를 drain하며 확인을 기다린다. 반환 후 status 채널 미사용 계약을 주석에 명시한다.
+미충족: 반환 상한·eventLoop 생존 가정·sync.Once 동시 호출과 종료 이후 안전성을 독립 검토한다.
+
+API-13 eth/downloader/api.go:200
+SubscribeSyncStatus는 설치 요청 송신 후 구독 객체를 반환한다.
+미충족: done 상태에서 초기 false 송신이 후속 해제와 겹칠 수 있는 실제 순서를 검토한다.
+
+V-01 plugin/scripts/oracle_gate.py:80
+계획은 primary/independent 두 역할과 별도 derivation/소스 hash를 요구한다.
+미충족: 별도 파일과 서로 다른 hash만으로 의미적 독립성은 증명되지 않는다.
+
+V-02 plugin/scripts/oracle_gate.py:264
+분류기는 source·실행·assertion identity를 확인하며 ERROR를 RED로 세지 않고 정확한 실행 집합을 대조한다.
+미충족: 현재 티켓의 실제 driver/전체 API 기준 RED/GREEN 영수증이 없다.
+
+V-03 plugin/scripts/oracle_gate.py:398
+완료 검사는 상태·단계·보고서/계획 hash·현재 source를 묶고 e2e에서 chainbench PASS를 요구한다.
+미충족: simulation은 일부 단계 WARN/SKIPPED를 허용한다. WI별 필수 hard gate를 독립 동결해야 한다.
+
+V-04 plugin/scripts/go_oracle_driver.py:20
+Go adapter는 선택 test의 assertion marker와 실행 이벤트를 분리하여 build/다른 assertion/누락을 error로 처리한다.
+미충족: 이 transport는 기대값을 독립 도출하지 않는다.
+
+V-05 plugin/scripts/fix_selection.py:240
+후보를 격리 source에 materialize하고 oracle/regression/metric 결과와 observation completeness를 기록한다.
+미충족: 현재 두 구독 후보에 대한 selector spec/RED carrier/실제 metric driver는 없다.
+
+V-06 plugin/scripts/fix_selection.py:324
+불완전/의견 미일치/필수 측정 누락은 DEFERRED, 모두 부적격은 REJECTED, 복수 frontier는 TIED, 단독 일치만 SELECTED다.
+미충족: 이 판정은 독립 acceptable set membership 검사나 전역 최적성 증명이 아니다.
+
+V-07 plugin/scripts/fix_selection.py:419
+재검사는 spec/report/runner/repo/source의 묶임과 RED carrier 변경 범위를 검사한다.
+미충족: 이번 티켓의 적용 tree/current HEAD 검증·후속 final V1 기록이 없다.
+
+V-08 plugin/hooks/hooks.json:39
+PreToolUse Write|Edit 경로에 완료/선택 guard가 등록되어 있다.
+미충족: 등록 원문은 실제 설치 host의 hook 호출·기권·재진입 영수증이 아니다.
+
+V-09 plugin/hooks/fix-selection-guard.py:20
+선택 guard는 state 진입 시 선택 증거와 적용 tree를 검사한다.
+미충족: 인식된 state/Write|Edit 경로 범위이며 실제 역할의 전 경로 불가능성 증명은 아니다.
+
+V-10 plugin/agents/analyzer.md:929
+Analyzer는 티켓 조건에서 독립 도출한 oracle 준비와 미실행 PASS 금지를 명시한다.
+미충족: 역할 문서 존재를 이번 티켓의 실제 Analyzer 실행으로 세지 않는다.
+
+V-11 plugin/agents/planner.md:73
+Planner는 둘 이상 대안·기준/adapter 동결·선택 실행을 요구한다.
+미충족: 같은 AI가 작성한 두 대안을 독립 티켓 또는 독립 gold로 세지 않는다.
+
+V-12 plugin/agents/implementer.md:29
+Implementer는 선택 source와 RED carrier를 유지하며 적용 tree를 재검사한다.
+미충족: 기존 추출 fixture는 실제 프로젝트 적용 tree/설치 역할 증거가 아니다.
+
+V-13 plugin/agents/evaluator.md:58
+Evaluator는 선택 current HEAD 검증과 final V1 관측을 요구한다.
+미충족: 과거 trial oracle는 이번 티켓의 final V1/current HEAD 완료 증거가 아니다.
+
+V-14 plugin/agents/evaluator.md:887
+Evaluator는 oracle CLI 결과/실제 보고서 hash를 요구하며 사람의 독립 수용을 추론하지 않는다.
+미충족: 기계 PASS와 독립 의미 검토/최종 수용은 별도로 판정한다.
+
+CAND-A 중첩 select로 요청 전 drain/요청 후 확인 대기를 구분한다. 다른 구독자 정지·loop 종료·무한 status 공급에서 반환/안전 계약을 독립 검토한다.
+독립 수용 가능 membership: null
+
+CAND-B 단일 select에서 요청 성공 뒤 send=nil로 중복 요청을 막는다. 확인 전 drain·nil case 비활성화와 종료/공정성 가정을 독립 검토한다.
+독립 수용 가능 membership: null
+
+독립 oracle 검토 질문:
+실제 API trace에서 증상/정상·허용 비결정 순서와 관측 상한을 정의하고 timeout·infra 오류·미도달을 결함 RED와 분리해야 한다.
+secondary wait graph는 같은 AI/같은 가설이다. 독립 검토자가 주 oracle의 상수/helper를 복사하지 않고 별도 derivation·실행 driver·검토 receipt를 마련해야 한다.
+삭제/확인/반환/반환 후 status 미사용을 구분하고 rescue 전 결과·소유 goroutine 정리·동시 호출을 유지해야 한다.
+MUT-REINTRO는 원본과 같은 바이트이며 별도 결함/가족이 아니다. MUT-EARLY의 실패 이유·정상 대조군·진짜 오류 거부를 실제 tier에 묶어야 한다.
+
+수용 가능 집합/비교 기준 질문:
+티켓별 독립 검토자가 후보 ID뿐 아니라 source commit/tree/diff/요구사항 pin과 membership 근거를 사전 동결해야 한다.
+hard gate는 correctness·normal regression·mutation sensitivity·actual API contract·source/driver pin·필수 단계·owned cleanup을 명시하고 WARN/SKIPPED 허용 범위를 독립 결정해야 한다.
+같은 AI fixture 통과를 acceptable set으로 채우지 않는다. CAND-A/B membership는 null로 유지한다.
+all-bad→선택 없음, tie→TIED, incomplete/unknown→DEFERRED의 수용 mapping과 오류/분모·허용 기권을 동결해야 한다.
+성능·메모리·공정성·복잡도·유지보수성의 axes/단위/방향/허용차/측정 adapter·비용/불일치·사람 선택 수용을 정한다. 현재 구독 후보의 비교 측정은 없다.

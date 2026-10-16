@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""Gate bugfix DESIGN/implementation/evaluation on executed candidate selection."""
+import importlib.util
+import json
+import os
+from pathlib import Path
+import sys
+
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/"scripts"))
+from fix_selection import verify_selection
+from oracle_gate import GateError
+
+spec=importlib.util.spec_from_file_location("completion_guard",ROOT/"hooks/completion-guard.py")
+helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
+
+
+def main():
+    try:data=json.load(sys.stdin)
+    except (ValueError,TypeError):return 0
+    if not isinstance(data,dict) or data.get("tool_name") not in ("Write","Edit"):return 0
+    inputs=data.get("tool_input")
+    if not isinstance(inputs,dict) or not isinstance(inputs.get("file_path"),str):return 0
+    path=Path(inputs["file_path"])
+    if not path.is_absolute():path=Path(data.get("cwd") or os.getcwd())/path
+    if path.name not in ("state.json","fix-selection-spec.json"):return 0
+    workspace=path.parent;recognizable=".coding-agent" in path.parts and "tickets" in path.parts
+    try:
+        old=(workspace/"state.json").read_text() if (workspace/"state.json").exists() else "{}"
+        try:state=json.loads(old)
+        except ValueError:
+            if not recognizable:return 0
+            raise GateError("existing pipeline state is invalid")
+        if not recognizable and not (isinstance(state,dict) and state.get("ticket_id")):return 0
+        if not isinstance(state,dict):raise GateError("pipeline state must be an object")
+        if state.get("ticket_type")!="bugfix":return 0
+        old_hash=state.get("states",{}).get("DESIGN",{}).get("fix_selection_spec_sha256")
+        if path.name=="fix-selection-spec.json":
+            if old_hash and state.get("current_state") not in ("ANALYSIS","PLANNING"):
+                raise GateError("candidate criteria/proposals are frozen; return to planning to revise them")
+            return 0
+        candidate=json.loads(helper.proposed_content(data,old))
+        if not isinstance(candidate,dict):raise GateError("new pipeline state must be an object")
+        new_hash=candidate.get("states",{}).get("DESIGN",{}).get("fix_selection_spec_sha256")
+        if old_hash and old_hash!=new_hash and candidate.get("current_state") not in ("ANALYSIS","PLANNING"):
+            raise GateError("cannot change frozen candidate identity outside replanning")
+        target=candidate.get("current_state")
+        enters_impl=target=="IMPLEMENTATION" and state.get("current_state")!="IMPLEMENTATION"
+        enters_eval=target=="EVALUATION" and state.get("current_state")!="EVALUATION"
+        if enters_impl or enters_eval or target in ("COMPLETION","COMPLETED"):
+            repo=Path(json.loads((workspace/"fix-selection-report.json").read_text())["repo_root"])
+            verify_selection(workspace,repo,candidate,applied=enters_eval or target in ("COMPLETION","COMPLETED"))
+    except Exception as exc:
+        helper.deny("Bugfix candidate selection blocked: "+str(exc))
+    return 0
+
+
+if __name__=="__main__":raise SystemExit(main())

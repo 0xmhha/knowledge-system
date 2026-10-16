@@ -8,7 +8,7 @@
       "id": "WI-V1",
       "preparation_candidate_count": 1,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "개발용 티켓 초안 1개. 추출 원본·대역에서 송신 대기 관측, 정상 대조군과 변이 검증 완료. 실제 API 전체 재현·독립 티켓·독립 오라클은 0개.",
+      "note": "개발 티켓 1개/독립 승인 0개. 고정 project 5파일·API 근거 13곳으로 eth 등록→eth_subscribe([syncing])→Syncing→구독 등록/알림→RPC 해제·연결 종료→defer Unsubscribe 경로를 대조했다. RPC 해제 응답은 내부 삭제 확인/해제 반환 증명이 아니다. 기존 추출 50관측은 eventLoop/notifier 대역이며 실제 API 전체 실행은 0건. 같은 AI wait graph는 독립 도출 oracle가 아니다. 과거 ledger 통제 Go/CLI/guard 16oracle 실행 PASS는 보존하지만 이번 티켓·설치된 네 역할·독립 수용으로 세지 않는다. 정상/변이·rescue 전 결과·동시 호출·loop 수명/다른 subscriber 계약을 독립 동결해야 한다.",
       "requirements": {
         "independent_defect_tickets_min": 2,
         "normal_controls": true,
@@ -20,30 +20,44 @@
         ]
       },
       "approved_independent_cases": 0,
-      "formal_status": "not_prepared",
+      "formal_status": "api_ticket_oracle_and_acceptable_set_gap_inventory_prepared_independent_acceptance_not_evaluated",
       "remaining": [
-        "독립 검토자와 최종 수용 담당자 지정",
-        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
-        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
-      ]
+        "독립 검토자·최종 수용 담당자를 지정하고 결함 티켓 2개 이상/노출·중복·가족 독립성·DEV/FINAL·표본 충분성을 검토; 현재 개발 티켓 1개를 임의 승인/분리하지 않음",
+        "실제 eth_subscribe transport·등록/notifier·Syncing/eventLoop/해제·RPC 오류/연결 종료·done 등록·mux 종료·다른 subscriber 정지의 계약/도달성을 source pin과 실행 receipt로 확정",
+        "주 oracle와 독립 재도출 derivation/driver·정상 대조군·증상 재도입/과적합 변이를 실제 tier에 사전 동결; source/assertion/timeout/infra/missing과 rescue 전후·owned cleanup을 구분",
+        "baseline RED carrier·head GREEN·정상 GREEN·변이 감지·잘못된 oracle/assertion/build/timeout/tamper/stale/단계 누락 거부의 사례별 판정/분모와 F-01~F-08 동결",
+        "승인 범위에서 설치된 Analyzer→Planner→Implementer→Evaluator의 typed state/plan/report hash·최종 HEAD·재진입/거부 receipt와 독립 의미 검토·운영/품질/최종 수용 기록"
+      ],
+      "ticket_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/ticket-gap-v1/manifest.json",
+        "sha256": "9538f6698bbb5f4bd971687bb3b1ef73b474ee46cc7bd33759529975d51fae2c",
+        "status": "api_ticket_oracle_and_acceptable_set_gaps_not_acceptance"
+      }
     },
     {
       "id": "WI-V2",
       "preparation_candidate_count": 2,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "동일 티켓의 AI 수정 후보 2개가 로컬 기준 각 10/10 충족. 변이 2개를 구분함. 독립 수용 가능 후보 집합은 미승인.",
+      "note": "같은 개발 티켓의 AI 후보 CAND-A/B 2개가 로컬 기준 각 10/10을 충족했다. 두 방법의 drain/한 번 요청/확인 대기 설계를 원문과 대조했으나 실제 API receipt·적용 project tree·비교 성능/공정성 측정과 독립 acceptable membership는 모두 null이다. 원본=재도입 변이의 byte identity를 유지한다. 채택 consumer 9파일·계약 14곳에서 candidate materialize/driver/hard gate/Pareto/panel/current HEAD/상태 guard를 확인했다. 과거 ledger 후보 loop/copy/literal의 실제 Go·fixture/model panel 실행과 선택 성공은 보존하고 이번 후보 집합 승인으로 세지 않는다. 순수 함수 22건은 all-bad REJECTED/tie TIED/incomplete DEFERRED/invalid ERROR를 검증했으나 실제 selector CLI나 설치 host 실행이 아니다.",
       "requirements": {
         "shared_ticket_group": "WI-V1",
         "candidates_per_ticket_min": 2,
         "independent_acceptable_candidate_set": true
       },
       "approved_independent_cases": 0,
-      "formal_status": "not_prepared",
+      "formal_status": "api_ticket_oracle_and_acceptable_set_gap_inventory_prepared_independent_acceptance_not_evaluated",
       "remaining": [
-        "독립 검토자와 최종 수용 담당자 지정",
-        "입력·정답·표본 충분성·기본선·매칭·DEV/FINAL 동결",
-        "승인된 범위의 실행 및 운영·품질·독립 수용 판정"
-      ]
+        "WI-V1의 독립 승인된 티켓 2개 이상을 공유하고 티켓별 실제 source 후보 2개 이상·origin/source/tree/diff와 RED carrier/후보별 변이를 동결",
+        "독립 검토자가 후보별 acceptable membership와 포함/제외/unknown 근거·요구사항/정상/actual API/정리 hard gates를 사전 동결; 미확정 set은 null이며 빈 승인 집합 또는 AI 통과 후보 집합으로 대체하지 않음",
+        "실행 metric/regression adapter·비교 axes/단위/방향/허용차·필수 측정과 WARN/SKIPPED 허용 범위·선택 규칙/분모를 동결; 후보 부적격과 증거 부족을 구분",
+        "all-bad→없음(REJECTED), 동률→TIED, 실행/측정/의견 부족→DEFERRED, ERROR의 수용 mapping과 사람 선택 수용·panel 출처/비용/불일치를 기록",
+        "승인 범위의 실제 후보 생성/selector CLI/panel/선택→적용 tree→current HEAD 최종 V1→설치된 네 역할 handoff/상태 guard를 검증하고 hard gates+독립 set membership·운영/품질/독립 수용 판정"
+      ],
+      "ticket_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/ticket-gap-v1/manifest.json",
+        "sha256": "9538f6698bbb5f4bd971687bb3b1ef73b474ee46cc7bd33759529975d51fae2c",
+        "status": "api_ticket_oracle_and_acceptable_set_gaps_not_acceptance"
+      }
     },
     {
       "id": "WI-3",
@@ -302,13 +316,13 @@
     }
   ],
   "next_priority": [
-    "WI-V1/WI-V2의 실제 API 도달 가능성·독립 티켓·독립 오라클·승인 후보 집합 검토",
     "WI-2 독립 표본·정답·실제 명령/호출자 계약·MCP 경로 미충족분 검토",
     "WI-6/WI-SP의 독립 검토·표본·정답 미충족분 보완",
     "WI-C 10개 사례의 계약·필수 항목·priority 질문 판정과 typed 보고서/그림·handoff·host 실행 미충족분 검토",
     "WI-1 30함수의 독립 value kind·완전한 data/control gold·return 좌표/주석 정합·matching 및 baseline/실행 수용 미충족분 검토",
     "WI-3 독립 사실 가족/정답·top-10/분모·baseline 동결 및 실제 symptom-only 검색/설치 역할 경로 미충족분 보완",
-    "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완"
+    "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완",
+    "WI-V1/WI-V2 독립 티켓/실제 API 계약·도달성·주/독립 oracle·승인 후보 집합·selector/current HEAD/설치 역할 실행 및 독립 수용 미충족분 보완"
   ],
   "optional_backlog_count": 12
 }
