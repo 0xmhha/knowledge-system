@@ -1,0 +1,20 @@
+package subscriptionfixture
+
+func (s *SyncStatusSubscription) Unsubscribe() {
+	s.unsubOnce.Do(func() {
+		req := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}
+		for {
+			select {
+			case s.api.uninstallSyncSubscription <- &req:
+				for {
+					select {
+					case <-s.c:
+					case <-req.uninstalled:
+						return
+					}
+				}
+			case <-s.c:
+			}
+		}
+	})
+}

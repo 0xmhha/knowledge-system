@@ -1,0 +1,255 @@
+package subscriptionfixture
+
+import (
+	"encoding/json"
+	"os"
+	"runtime"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"testing"
+	"time"
+)
+
+// The producer is a controlled stand-in for the event loop, not the full API.
+// Supervisor cancellation is used only after observations, for owned cleanup.
+type pilot struct {
+	api                                        *DownloaderAPI
+	status                                     chan interface{}
+	stop, attempted, registered, ackGate, done chan struct{}
+	active, confirmed                          atomic.Bool
+	requests                                   atomic.Int32
+}
+
+//go:noinline
+func (p *pilot) sendStatus() bool {
+	select {
+	case p.status <- true:
+		return true
+	case <-p.stop:
+		return false
+	}
+}
+
+func (p *pilot) pump(scenario string) {
+	defer close(p.done)
+	if scenario == "normal_delivery_then_unsubscribe" || scenario == "blocked_delivery_then_consumer_exit" {
+		close(p.attempted)
+		if !p.sendStatus() {
+			return
+		}
+	}
+	select {
+	case req := <-p.api.uninstallSyncSubscription:
+		p.requests.Add(1)
+		p.active.Store(false)
+		close(p.registered)
+		if scenario == "late_delivery_before_confirmation" && !p.sendStatus() {
+			p.confirmed.Store(true)
+			close(req.uninstalled)
+			return
+		}
+		if scenario == "confirmation_delayed" {
+			select {
+			case <-p.ackGate:
+			case <-p.stop:
+			}
+		}
+		p.confirmed.Store(true)
+		close(req.uninstalled)
+	case <-p.stop:
+	}
+}
+
+func closed(c <-chan struct{}) bool {
+	select {
+	case <-c:
+		return true
+	default:
+		return false
+	}
+}
+
+func stackWaiting(function, state string) bool {
+	b := make([]byte, 1<<20)
+	n := runtime.Stack(b, true)
+	for _, block := range strings.Split(string(b[:n]), "\n\n") {
+		if strings.Contains(block, function) && strings.Contains(strings.SplitN(block, "\n", 2)[0], state) {
+			return true
+		}
+	}
+	return false
+}
+
+func waitUntil(t *testing.T, condition func() bool, description string) {
+	t.Helper()
+	limit := time.Now().Add(2 * time.Second)
+	for !condition() {
+		if time.Now().After(limit) {
+			b := make([]byte, 1<<20)
+			n := runtime.Stack(b, true)
+			t.Fatalf("inconclusive: did not observe %s\n%s", description, b[:n])
+		}
+		time.Sleep(time.Millisecond)
+	}
+}
+
+type observation struct {
+	Variant       string `json:"variant"`
+	Scenario      string `json:"scenario"`
+	Completed     bool   `json:"completed_before_rescue"`
+	Confirmed     bool   `json:"confirmation_issued_before_rescue"`
+	Removed       bool   `json:"subscription_removed_before_rescue"`
+	Requests      int32  `json:"requests_before_rescue"`
+	Premature     bool   `json:"returned_before_confirmation"`
+	WaitCycle     bool   `json:"two_sender_wait_witness"`
+	AckDelay      bool   `json:"confirmation_delay_observed"`
+	OwnersStopped bool   `json:"all_owned_goroutines_stopped"`
+	Accepted      bool   `json:"satisfies_ai_fixture_criteria"`
+}
+
+func exercise(t *testing.T, variant, scenario string) observation {
+	p := &pilot{api: &DownloaderAPI{uninstallSyncSubscription: make(chan *uninstallSyncSubscriptionRequest)},
+		status: make(chan interface{}), stop: make(chan struct{}), attempted: make(chan struct{}),
+		registered: make(chan struct{}), ackGate: make(chan struct{}), done: make(chan struct{})}
+	p.active.Store(true)
+	go p.pump(scenario)
+	sub := &SyncStatusSubscription{api: p.api, c: p.status}
+	callersDone := make(chan struct{})
+	var premature atomic.Bool
+	var callers sync.WaitGroup
+	started := false
+	// Rescue never runs before the observation is copied. It may release the
+	// original method's wait without changing the recorded pre-rescue verdict.
+	cleanup := func() {
+		close(p.stop)
+		select {
+		case <-p.done:
+		case <-time.After(2 * time.Second):
+			t.Fatal("producer cleanup failed")
+		}
+		if !started {
+			return
+		}
+		limit := time.After(2 * time.Second)
+		for {
+			select {
+			case <-callersDone:
+				return
+			case req := <-p.api.uninstallSyncSubscription:
+				close(req.uninstalled)
+			case <-p.status:
+			case <-limit:
+				t.Fatal("caller cleanup failed")
+				return
+			}
+		}
+	}
+	cleaned := false
+	defer func() {
+		if !cleaned {
+			cleanup()
+		}
+	}()
+	if scenario == "normal_delivery_then_unsubscribe" || scenario == "blocked_delivery_then_consumer_exit" {
+		select {
+		case <-p.attempted:
+		case <-time.After(2 * time.Second):
+			t.Fatal("producer did not start")
+		}
+		if scenario == "normal_delivery_then_unsubscribe" {
+			select {
+			case <-p.status:
+			case <-time.After(2 * time.Second):
+				t.Fatal("normal notification not received")
+			}
+		} else {
+			waitUntil(t, func() bool { return stackWaiting("(*pilot).sendStatus", "[select]") }, "notification producer wait")
+		}
+	}
+	count := 1
+	if scenario == "concurrent_unsubscribe_once" {
+		count = 2
+	}
+	barrier := make(chan struct{})
+	callers.Add(count)
+	for i := 0; i < count; i++ {
+		go func() {
+			defer callers.Done()
+			<-barrier
+			sub.Unsubscribe()
+			if !p.confirmed.Load() {
+				premature.Store(true)
+			}
+		}()
+	}
+	go func() { callers.Wait(); close(callersDone) }()
+	started = true
+	close(barrier)
+	result := observation{Variant: variant, Scenario: scenario}
+	if scenario == "confirmation_delayed" {
+		waitUntil(t, func() bool { return closed(p.registered) || closed(callersDone) }, "registration or early return")
+		if closed(p.registered) {
+			waitUntil(t, func() bool { return closed(callersDone) || stackWaiting("Unsubscribe.func1", "[select]") }, "confirmation wait")
+			result.AckDelay = !closed(callersDone)
+		}
+		close(p.ackGate)
+	}
+	waitUntil(t, func() bool {
+		if closed(callersDone) {
+			return true
+		}
+		if scenario == "blocked_delivery_then_consumer_exit" &&
+			stackWaiting("(*pilot).sendStatus", "[select]") && stackWaiting("Unsubscribe.func1", "[chan send]") {
+			result.WaitCycle = true
+			return true
+		}
+		return false
+	}, "completion or source-derived two-sender wait")
+	result.Completed = closed(callersDone)
+	result.Confirmed = p.confirmed.Load()
+	result.Removed = !p.active.Load()
+	result.Requests = p.requests.Load()
+	result.Premature = premature.Load()
+	result.Accepted = result.Completed && result.Confirmed && result.Removed && result.Requests == 1 && !result.Premature
+	if scenario == "confirmation_delayed" {
+		result.Accepted = result.Accepted && result.AckDelay
+	}
+	cleanup()
+	cleaned = true
+	result.OwnersStopped = closed(p.done) && closed(callersDone)
+	return result
+}
+
+func TestExtractedMethod(t *testing.T) {
+	variant := os.Getenv("KS_DRAFT_VARIANT")
+	raw, err := os.ReadFile("expectations.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var expected map[string]map[string]bool
+	if err = json.Unmarshal(raw, &expected); err != nil {
+		t.Fatal(err)
+	}
+	rows, ok := expected[variant]
+	if !ok {
+		t.Fatal("unknown variant")
+	}
+	scenarios := []string{"normal_delivery_then_unsubscribe", "blocked_delivery_then_consumer_exit", "late_delivery_before_confirmation", "confirmation_delayed", "concurrent_unsubscribe_once"}
+	for _, scenario := range scenarios {
+		t.Run(scenario, func(t *testing.T) {
+			result := exercise(t, variant, scenario)
+			encoded, _ := json.Marshal(result)
+			t.Log("DRAFT_OBSERVATION " + string(encoded))
+			if !result.OwnersStopped {
+				t.Fatal("owned goroutines not stopped")
+			}
+			if result.Accepted != rows[scenario] {
+				t.Fatalf("AI draft expectation mismatch: got %v want %v", result.Accepted, rows[scenario])
+			}
+			if scenario == "blocked_delivery_then_consumer_exit" && (variant == "ORIGINAL" || variant == "MUT-REINTRO") && !result.WaitCycle {
+				t.Fatal("missing two-sender wait witness")
+			}
+		})
+	}
+}

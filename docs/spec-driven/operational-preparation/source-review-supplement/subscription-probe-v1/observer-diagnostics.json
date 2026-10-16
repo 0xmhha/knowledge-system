@@ -1,0 +1,34 @@
+{
+  "kind": "retained_observer_failures_not_suppressed",
+  "attempts": [
+    {
+      "id": "initial",
+      "scope": "partial_observer_attempt_not_final_probe_matrix",
+      "failed_subtests": [
+        "blocked_delivery_then_consumer_exit",
+        "confirmation_delayed"
+      ],
+      "reason": "race instrumentation renamed the inlined Unsubscribe closure; observer expected Unsubscribe.func1",
+      "data_race_reported": false
+    },
+    {
+      "id": "diagnostic",
+      "scope": "partial_observer_attempt_not_final_probe_matrix",
+      "failed_subtests": [
+        "blocked_delivery_then_consumer_exit",
+        "confirmation_delayed"
+      ],
+      "reason": "race instrumentation renamed the inlined Unsubscribe closure; observer expected Unsubscribe.func1",
+      "data_race_reported": false
+    }
+  ],
+  "fix": "match the stable receiver method name, and capture both waiting stacks from one snapshot",
+  "quality_fixture_revision": {
+    "kind": "controlled_loop_request_identity_check_added",
+    "prior_lint_finding": "unused uninstall request c field in early-return variant",
+    "change": "removal now checks req.c == subscribed status channel; this models the source delete(syncSubscriptions, u.c) more faithfully",
+    "full_matrix_rerun": true,
+    "prior_matrix_observations": 50,
+    "prior_matrix_scope": "diagnostic superseded fixture; not part of final 50"
+  }
+}

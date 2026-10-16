@@ -252,6 +252,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1/manifest.json",
           "sha256": "188c20406cc81b9391484e8c0803e151c05b675065b0036abfa3fc314a4a009e",
           "status": "development_draft_not_independent_ticket_or_gold"
+        },
+        "subscription_local_probe": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-probe-v1/manifest.json",
+          "sha256": "a2d62ce06dc06d66db1d3bb866a673a39356092744ac7bb12d8344c8aeb8d6e2",
+          "status": "extracted_method_fixture_only_not_independent_acceptance"
         }
       },
       "completed_preparation": [
@@ -271,7 +276,8 @@
         "actual_ast_frontend_policy_reference_diagnosis_and_seven_unapplied_corrections",
         "source_grounded_expansion_input_and_private_ai_rationale_supplement",
         "five_private_ai_caller_callee_context_notes_with_offline_git_proofs",
-        "subscription_development_ticket_two_ai_fixes_two_mutants_and_five_correlated_schedule_drafts"
+        "subscription_development_ticket_two_ai_fixes_two_mutants_and_five_correlated_schedule_drafts",
+        "bounded_extracted_unsubscribe_method_normal_race_probe_with_mutants_and_owned_cleanup"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -363,6 +369,59 @@
           "formal_state_unchanged": true,
           "operational_guard_tests_passed": 36,
           "live_document_check_count": 134
+        },
+        "subscription_local_probe": {
+          "kind": "extracted_method_fixture_only_not_independent_acceptance",
+          "toolchain": "go version go1.26.9 darwin/arm64",
+          "final_observations": 50,
+          "final_go_test_runs": 10,
+          "correlated_schedule_variants": 5,
+          "build_fmt_vet_lint_checks_passed": 20,
+          "result_counts": {
+            "ORIGINAL": {
+              "criteria_satisfied": 8,
+              "observations": 10,
+              "wait_witnesses": 2
+            },
+            "CAND-A": {
+              "criteria_satisfied": 10,
+              "observations": 10,
+              "wait_witnesses": 0
+            },
+            "CAND-B": {
+              "criteria_satisfied": 10,
+              "observations": 10,
+              "wait_witnesses": 0
+            },
+            "MUT-REINTRO": {
+              "criteria_satisfied": 8,
+              "observations": 10,
+              "wait_witnesses": 2
+            },
+            "MUT-EARLY": {
+              "criteria_satisfied": 0,
+              "observations": 10,
+              "wait_witnesses": 0
+            }
+          },
+          "guard_tests_passed": 15,
+          "independent_tickets": 0,
+          "formal_state_unchanged": true,
+          "original_go_source_modified": false,
+          "full_project_api_executed": false,
+          "regression_tests": {
+            "test_source_review_supplement.py": 12,
+            "test_review_context.py": 12,
+            "test_subscription_ticket.py": 12,
+            "test_subscription_probe.py": 15,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20
+          },
+          "python_regression_tests_passed": 123,
+          "live_document_check_count": 134,
+          "original_implementation_completion_guard": "pass",
+          "previous_frozen_packets_unchanged": true
         }
       },
       "candidate_counts": {
@@ -485,7 +544,7 @@
   },
   "preparation_gap_inventory": {
     "path": "docs/spec-driven/operational-preparation/source-review-supplement/GAPS.json",
-    "sha256": "d64c7391485426b6de20cf8f375858f47d2e85a9b353089971afa6b4a2cc9ae5",
+    "sha256": "1fdc003d4800b5f19d5349afbf71334cfc282cc8bde5b1d3c40a31d0c8e6193b",
     "formal_completed": 0,
     "formal_total": 9,
     "optional_backlog_count": 12
@@ -494,5 +553,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1/manifest.json",
     "sha256": "188c20406cc81b9391484e8c0803e151c05b675065b0036abfa3fc314a4a009e",
     "status": "development_draft_not_independent_ticket_or_gold"
+  },
+  "subscription_local_probe": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-probe-v1/manifest.json",
+    "sha256": "a2d62ce06dc06d66db1d3bb866a673a39356092744ac7bb12d8344c8aeb8d6e2",
+    "status": "extracted_method_fixture_only_not_independent_acceptance"
   }
 }
