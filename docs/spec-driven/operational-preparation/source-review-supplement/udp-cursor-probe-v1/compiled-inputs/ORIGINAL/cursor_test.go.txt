@@ -1,0 +1,119 @@
+package udpcursorfixture
+
+import (
+	"container/list"
+	"encoding/json"
+	"errors"
+	"os"
+	"testing"
+	"time"
+)
+
+const respTimeout = 500 * time.Millisecond
+
+var errClockWarp = errors.New("controlled clockwarp branch")
+
+type replyMatcher struct {
+	deadline time.Time
+	errc     chan error
+}
+
+// This adapter records timer requests; it does not model real timer delivery.
+type timerTrace struct {
+	resetCalls int
+	stopCalls  int
+}
+
+func (t *timerTrace) Reset(_ time.Duration) bool { t.resetCalls++; return true }
+func (t *timerTrace) Stop() bool                 { t.stopCalls++; return true }
+
+type observation struct {
+	Variant       string `json:"variant"`
+	Case          string `json:"case"`
+	Remaining     int    `json:"remaining_elements"`
+	Notifications int    `json:"clockwarp_notifications"`
+	ResetRequests int    `json:"timer_reset_requests"`
+	StopRequests  int    `json:"timer_stop_requests"`
+	NextRecorded  bool   `json:"next_timeout_recorded"`
+}
+
+func probe(delays []time.Duration) observation {
+	plist := list.New()
+	timeout := new(timerTrace)
+	var nextTimeout *replyMatcher
+	var requests []*replyMatcher
+	for _, delay := range delays {
+		p := &replyMatcher{deadline: time.Now().Add(delay), errc: make(chan error, 1)}
+		requests = append(requests, p)
+		plist.PushBack(p)
+	}
+	resetTimeout := func() {
+		if plist.Front() == nil || nextTimeout == plist.Front().Value {
+			return
+		}
+		// Start the timer so it fires when the next pending reply has expired.
+		now := time.Now()
+		for el := plist.Front(); el != nil; el = el.Next() {
+			nextTimeout = el.Value.(*replyMatcher)
+			if dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {
+				timeout.Reset(dist)
+				return
+			}
+			// Remove pending replies whose deadline is too far in the
+			// future. These can occur if the system clock jumped
+			// backwards after the deadline was assigned.
+			nextTimeout.errc <- errClockWarp
+			plist.Remove(el)
+		}
+		nextTimeout = nil
+		timeout.Stop()
+	}
+	resetTimeout()
+	result := observation{Remaining: plist.Len(), ResetRequests: timeout.resetCalls,
+		StopRequests: timeout.stopCalls, NextRecorded: nextTimeout != nil}
+	for _, p := range requests {
+		select {
+		case err := <-p.errc:
+			if err == errClockWarp {
+				result.Notifications++
+			}
+		default:
+		}
+	}
+	return result
+}
+
+func TestSyntheticCursor(t *testing.T) {
+	variant := os.Getenv("KS_CURSOR_VARIANT")
+	if variant != "ORIGINAL" && variant != "CURSOR-DRAFT" {
+		t.Fatal("unknown variant")
+	}
+	far, near := 24*time.Hour, respTimeout/2
+	cases := []struct {
+		name   string
+		delays []time.Duration
+		old    observation
+		fixed  observation
+	}{
+		{"one_far", []time.Duration{far}, observation{Remaining: 0, Notifications: 1, StopRequests: 1}, observation{Remaining: 0, Notifications: 1, StopRequests: 1}},
+		{"two_far", []time.Duration{far, far}, observation{Remaining: 1, Notifications: 1, StopRequests: 1}, observation{Remaining: 0, Notifications: 2, StopRequests: 1}},
+		{"far_then_near", []time.Duration{far, near}, observation{Remaining: 1, Notifications: 1, StopRequests: 1}, observation{Remaining: 1, Notifications: 1, ResetRequests: 1, NextRecorded: true}},
+		{"two_near", []time.Duration{near, near}, observation{Remaining: 2, ResetRequests: 1, NextRecorded: true}, observation{Remaining: 2, ResetRequests: 1, NextRecorded: true}},
+		{"near_then_far", []time.Duration{near, far}, observation{Remaining: 2, ResetRequests: 1, NextRecorded: true}, observation{Remaining: 2, ResetRequests: 1, NextRecorded: true}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			result := probe(c.delays)
+			want := c.old
+			if variant == "CURSOR-DRAFT" {
+				want = c.fixed
+			}
+			if result != want {
+				t.Fatalf("AI draft example mismatch: got %+v want %+v", result, want)
+			}
+			result.Variant, result.Case = variant, c.name
+			encoded, _ := json.Marshal(result)
+			t.Log("CURSOR_OBSERVATION " + string(encoded))
+		})
+	}
+}

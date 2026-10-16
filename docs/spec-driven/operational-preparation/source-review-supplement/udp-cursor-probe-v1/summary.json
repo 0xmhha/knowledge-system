@@ -1,0 +1,325 @@
+{
+  "kind": "synthetic_source_branch_probe_not_udp_or_clock_rollback",
+  "go_version": "go version go1.26.9 darwin/arm64",
+  "lint_version": "golangci-lint has version 2.14.0 built with go1.26.8 from (unknown, modified: ?, mod sum: \"h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=\") on (unknown)",
+  "observations": [
+    {
+      "variant": "ORIGINAL",
+      "case": "one_far",
+      "remaining_elements": 0,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "normal"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "two_far",
+      "remaining_elements": 1,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "normal"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "far_then_near",
+      "remaining_elements": 1,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "normal"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "two_near",
+      "remaining_elements": 2,
+      "clockwarp_notifications": 0,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "normal"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "near_then_far",
+      "remaining_elements": 2,
+      "clockwarp_notifications": 0,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "normal"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "one_far",
+      "remaining_elements": 0,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "race"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "two_far",
+      "remaining_elements": 1,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "race"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "far_then_near",
+      "remaining_elements": 1,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "race"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "two_near",
+      "remaining_elements": 2,
+      "clockwarp_notifications": 0,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "race"
+    },
+    {
+      "variant": "ORIGINAL",
+      "case": "near_then_far",
+      "remaining_elements": 2,
+      "clockwarp_notifications": 0,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "race"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "one_far",
+      "remaining_elements": 0,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "normal"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "two_far",
+      "remaining_elements": 0,
+      "clockwarp_notifications": 2,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "normal"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "far_then_near",
+      "remaining_elements": 1,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "normal"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "two_near",
+      "remaining_elements": 2,
+      "clockwarp_notifications": 0,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "normal"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "near_then_far",
+      "remaining_elements": 2,
+      "clockwarp_notifications": 0,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "normal"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "one_far",
+      "remaining_elements": 0,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "race"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "two_far",
+      "remaining_elements": 0,
+      "clockwarp_notifications": 2,
+      "timer_reset_requests": 0,
+      "timer_stop_requests": 1,
+      "next_timeout_recorded": false,
+      "mode": "race"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "far_then_near",
+      "remaining_elements": 1,
+      "clockwarp_notifications": 1,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "race"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "two_near",
+      "remaining_elements": 2,
+      "clockwarp_notifications": 0,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "race"
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "case": "near_then_far",
+      "remaining_elements": 2,
+      "clockwarp_notifications": 0,
+      "timer_reset_requests": 1,
+      "timer_stop_requests": 0,
+      "next_timeout_recorded": true,
+      "mode": "race"
+    }
+  ],
+  "runs": [
+    {
+      "variant": "ORIGINAL",
+      "mode": "normal",
+      "exit_code": 0,
+      "observations": 5,
+      "command": [
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout=10s",
+        "./..."
+      ]
+    },
+    {
+      "variant": "ORIGINAL",
+      "mode": "race",
+      "exit_code": 0,
+      "observations": 5,
+      "command": [
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout=10s",
+        "-race",
+        "./..."
+      ]
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "mode": "normal",
+      "exit_code": 0,
+      "observations": 5,
+      "command": [
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout=10s",
+        "./..."
+      ]
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "mode": "race",
+      "exit_code": 0,
+      "observations": 5,
+      "command": [
+        "test",
+        "-json",
+        "-count=1",
+        "-timeout=10s",
+        "-race",
+        "./..."
+      ]
+    }
+  ],
+  "quality_checks": [
+    {
+      "variant": "ORIGINAL",
+      "kind": "build",
+      "exit_code": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "kind": "fmt",
+      "exit_code": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "kind": "vet",
+      "exit_code": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "kind": "lint",
+      "exit_code": 0
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "kind": "build",
+      "exit_code": 0
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "kind": "fmt",
+      "exit_code": 0
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "kind": "vet",
+      "exit_code": 0
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "kind": "lint",
+      "exit_code": 0
+    }
+  ],
+  "compiled_inputs_sha256": {
+    "ORIGINAL": {
+      "go.mod": "8e8b9cd075055422935c3628c8298a1d596c80cec143559b9e96b88272545b15",
+      "cursor_test.go": "2af07db3391bfbf4f1edf23027ee8c2b2501f5e1bf883d700274de97b627cbbd"
+    },
+    "CURSOR-DRAFT": {
+      "go.mod": "8e8b9cd075055422935c3628c8298a1d596c80cec143559b9e96b88272545b15",
+      "cursor_test.go": "afefa3ddeb9a27edfb92bd7c491afc14bfc8255709f6e017294be6c9d828a5b7"
+    }
+  },
+  "timer_scope": "Reset/Stop call recorder; real timer firing is not tested",
+  "network_calls": 0,
+  "nodes_started": 0,
+  "host_clock_changes": 0,
+  "formal_runs": 0,
+  "accepted_independent_families": 0,
+  "verified_project_defect": false,
+  "operational_reachability": "not_verified",
+  "independent_oracle": null,
+  "production_patch_applied": false
+}

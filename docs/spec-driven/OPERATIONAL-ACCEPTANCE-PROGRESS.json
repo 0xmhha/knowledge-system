@@ -262,6 +262,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/schedule-candidates-v1/manifest.json",
           "sha256": "2a94ff761ea7c20bf3f3dad39803f7f4698cb49f291be52dde05c5c7b41d164d",
           "status": "source_schedule_proposals_not_independent_families"
+        },
+        "udp_cursor_local_probe": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/udp-cursor-probe-v1/manifest.json",
+          "sha256": "536f7cb90c255253d9806d48ea2d834714059623aa9ff892a84d62ec063c88b2",
+          "status": "synthetic_source_branch_only_not_operational_reachability"
         }
       },
       "completed_preparation": [
@@ -283,7 +288,8 @@
         "five_private_ai_caller_callee_context_notes_with_offline_git_proofs",
         "subscription_development_ticket_two_ai_fixes_two_mutants_and_five_correlated_schedule_drafts",
         "bounded_extracted_unsubscribe_method_normal_race_probe_with_mutants_and_owned_cleanup",
-        "five_source_schedule_mechanism_proposals_with_twenty_one_schedules_and_unreviewed_overlap"
+        "five_source_schedule_mechanism_proposals_with_twenty_one_schedules_and_unreviewed_overlap",
+        "synthetic_udp_reset_cursor_branch_probe_with_controlled_timer_requests"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -443,6 +449,39 @@
           "operational_guard_tests_passed": 36,
           "documentation_contract_tests_passed": 20,
           "live_document_check_count": 134
+        },
+        "udp_cursor_local_probe": {
+          "kind": "synthetic_source_branch_only_not_operational_reachability",
+          "arms": 2,
+          "synthetic_cases": 5,
+          "modes": [
+            "normal",
+            "race"
+          ],
+          "observations": 20,
+          "build_fmt_vet_lint_checks_passed": 8,
+          "guard_tests_passed": 13,
+          "timer_adapter": "Reset/Stop call recording only",
+          "clock_rollback_reproduced": false,
+          "accepted_independent_families": 0,
+          "formal_state_unchanged": true,
+          "production_patch_applied": false,
+          "regression_tests": {
+            "test_source_review_supplement.py": 12,
+            "test_review_context.py": 12,
+            "test_subscription_ticket.py": 12,
+            "test_subscription_probe.py": 15,
+            "test_schedule_candidates.py": 16,
+            "test_udp_cursor_probe.py": 13,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20
+          },
+          "python_regression_tests_passed": 152,
+          "live_document_check_count": 134,
+          "original_implementation_completion_guard": "pass",
+          "prior_frozen_packets_unchanged": true,
+          "maintained_go_source_unchanged": true
         }
       },
       "candidate_counts": {
@@ -565,7 +604,7 @@
   },
   "preparation_gap_inventory": {
     "path": "docs/spec-driven/operational-preparation/source-review-supplement/GAPS.json",
-    "sha256": "25a1b27c95fcb4a05814ff5838458e5a0e521cab83c3a27071d08972b436c744",
+    "sha256": "40e68afc900448d1a66f7d6367ccfeaf1ef2c953eb5388ef6d348ddf6b30fdf9",
     "formal_completed": 0,
     "formal_total": 9,
     "optional_backlog_count": 12
@@ -584,5 +623,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/schedule-candidates-v1/manifest.json",
     "sha256": "2a94ff761ea7c20bf3f3dad39803f7f4698cb49f291be52dde05c5c7b41d164d",
     "status": "source_schedule_proposals_not_independent_families"
+  },
+  "udp_cursor_local_probe": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/udp-cursor-probe-v1/manifest.json",
+    "sha256": "536f7cb90c255253d9806d48ea2d834714059623aa9ff892a84d62ec063c88b2",
+    "status": "synthetic_source_branch_only_not_operational_reachability"
   }
 }

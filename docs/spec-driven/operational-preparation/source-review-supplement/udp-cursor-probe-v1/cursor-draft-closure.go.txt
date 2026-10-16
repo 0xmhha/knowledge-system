@@ -1,0 +1,23 @@
+	resetTimeout := func() {
+		if plist.Front() == nil || nextTimeout == plist.Front().Value {
+			return
+		}
+		// Start the timer so it fires when the next pending reply has expired.
+		now := time.Now()
+		for el := plist.Front(); el != nil; {
+			next := el.Next()
+			nextTimeout = el.Value.(*replyMatcher)
+			if dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {
+				timeout.Reset(dist)
+				return
+			}
+			// Remove pending replies whose deadline is too far in the
+			// future. These can occur if the system clock jumped
+			// backwards after the deadline was assigned.
+			nextTimeout.errc <- errClockWarp
+			plist.Remove(el)
+			el = next
+		}
+		nextTimeout = nil
+		timeout.Stop()
+	}
