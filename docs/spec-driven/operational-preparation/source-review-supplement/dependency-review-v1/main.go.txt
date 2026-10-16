@@ -1,0 +1,243 @@
+// Source locations and local binding observations, not reaching-definition/CFG gold.
+package main
+
+import (
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"go/types"
+	"os"
+)
+
+type input struct {
+	Path, Source string
+	Starts       []int
+}
+type location struct {
+	StartByte int `json:"start_byte"`
+	EndByte   int `json:"end_byte_exclusive"`
+	StartLine int `json:"start_line"`
+	EndLine   int `json:"end_line"`
+}
+type occurrence struct {
+	Name        string   `json:"name"`
+	Role        string   `json:"role"`
+	Site        location `json:"site"`
+	Declaration location `json:"declaration"`
+}
+type marker struct {
+	Kind            string    `json:"kind"`
+	Site            location  `json:"site"`
+	Condition       *location `json:"condition,omitempty"`
+	Target          *location `json:"target,omitempty"`
+	TargetKind      string    `json:"target_kind,omitempty"`
+	CallBinding     string    `json:"call_binding,omitempty"`
+	ExplicitResults int       `json:"explicit_results"`
+}
+type function struct {
+	Path           string       `json:"path"`
+	Name           string       `json:"name"`
+	Site           location     `json:"site"`
+	SHA256         string       `json:"function_sha256"`
+	Occurrences    []occurrence `json:"occurrences"`
+	Markers        []marker     `json:"markers"`
+	SkippedClosure []location   `json:"excluded_closures"`
+}
+type fileObservation struct {
+	Path                   string     `json:"path"`
+	Functions              []function `json:"functions"`
+	TypecheckScope         string     `json:"typecheck_scope"`
+	ProjectTypecheckPassed bool       `json:"project_typecheck_passed"`
+	TypeErrors             int        `json:"partial_type_error_count"`
+	DiagnosticExamples     []string   `json:"partial_type_error_examples"`
+}
+
+func observe(in input) fileObservation {
+	fs := token.NewFileSet()
+	file, err := parser.ParseFile(fs, in.Path, in.Source, parser.SkipObjectResolution|parser.AllErrors)
+	if err != nil {
+		panic(err)
+	}
+	loc := func(n ast.Node) location {
+		p, q := fs.Position(n.Pos()), fs.Position(n.End())
+		return location{p.Offset, q.Offset, p.Line, q.Line}
+	}
+	info := &types.Info{Defs: map[*ast.Ident]types.Object{}, Uses: map[*ast.Ident]types.Object{}}
+	out := fileObservation{Path: in.Path, Functions: []function{}, TypecheckScope: "single_file_no_importer_incomplete_project_typecheck", DiagnosticExamples: []string{}}
+	config := types.Config{DisableUnusedImportCheck: true, Error: func(err error) {
+		out.TypeErrors++
+		if len(out.DiagnosticExamples) < 12 {
+			out.DiagnosticExamples = append(out.DiagnosticExamples, err.Error())
+		}
+	}}
+	// External types/imports are intentionally unresolved. Only concrete local
+	// declaration locations actually present in Info are reported; no types,
+	// alias semantics or complete project typecheck are claimed from this pass.
+	_, _ = config.Check(file.Name.Name, fs, []*ast.File{file}, info)
+	for _, decl := range file.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+		selected := len(in.Starts) == 0
+		for _, start := range in.Starts {
+			selected = selected || fs.Position(fn.Pos()).Offset == start
+		}
+		if !selected {
+			continue
+		}
+		row := function{Path: in.Path, Name: fn.Name.Name, Site: loc(fn), Occurrences: []occurrence{}, Markers: []marker{}, SkippedClosure: []location{}}
+		row.SHA256 = fmt.Sprintf("%x", sha256.Sum256([]byte(in.Source)[row.Site.StartByte:row.Site.EndByte]))
+		roles := map[*ast.Ident]string{}
+		labels := map[string]ast.Stmt{}
+		lhs := func(expr ast.Expr, role string) {
+			if id, ok := ast.Unparen(expr).(*ast.Ident); ok {
+				roles[id] = role
+			}
+		}
+		ast.Inspect(fn, func(n ast.Node) bool {
+			if _, ok := n.(*ast.FuncLit); ok {
+				return false
+			}
+			switch x := n.(type) {
+			case *ast.AssignStmt:
+				role := "write"
+				if x.Tok != token.ASSIGN && x.Tok != token.DEFINE {
+					role = "read_write"
+				}
+				for _, expr := range x.Lhs {
+					lhs(expr, role)
+				}
+			case *ast.IncDecStmt:
+				lhs(x.X, "read_write")
+			case *ast.RangeStmt:
+				lhs(x.Key, "write")
+				lhs(x.Value, "write")
+			case *ast.LabeledStmt:
+				labels[x.Label.Name] = x.Stmt
+			}
+			return true
+		})
+		stack := []ast.Node{}
+		ast.Inspect(fn, func(n ast.Node) bool {
+			if n == nil {
+				stack = stack[:len(stack)-1]
+				return false
+			}
+			if _, ok := n.(*ast.FuncLit); ok {
+				row.SkippedClosure = append(row.SkippedClosure, loc(n))
+				return false
+			}
+			if id, ok := n.(*ast.Ident); ok && id.Name != "_" {
+				object, role := info.Uses[id], "read"
+				if defined := info.Defs[id]; defined != nil {
+					object, role = defined, "definition"
+				} else if r := roles[id]; r != "" {
+					role = r
+				}
+				key := false
+				if len(stack) > 0 {
+					if parent, ok := stack[len(stack)-1].(*ast.KeyValueExpr); ok && parent.Key == id {
+						key = true
+					}
+				}
+				if obj, ok := object.(*types.Var); ok && !obj.IsField() && !key && obj.Pos() >= fn.Pos() && obj.Pos() < fn.End() {
+					declSite := location{StartByte: fs.Position(obj.Pos()).Offset, StartLine: fs.Position(obj.Pos()).Line}
+					declSite.EndByte, declSite.EndLine = declSite.StartByte+len(obj.Name()), declSite.StartLine
+					row.Occurrences = append(row.Occurrences, occurrence{id.Name, role, loc(id), declSite})
+				}
+			}
+			m := marker{Site: loc(n)}
+			switch x := n.(type) {
+			case *ast.IfStmt:
+				m.Kind = "if"
+				condition := loc(x.Cond)
+				m.Condition = &condition
+			case *ast.ForStmt:
+				m.Kind = "for"
+				if x.Cond != nil {
+					condition := loc(x.Cond)
+					m.Condition = &condition
+				}
+			case *ast.RangeStmt:
+				m.Kind = "range"
+			case *ast.SwitchStmt:
+				m.Kind = "switch"
+				if x.Tag != nil {
+					condition := loc(x.Tag)
+					m.Condition = &condition
+				}
+			case *ast.TypeSwitchStmt:
+				m.Kind = "type_switch"
+			case *ast.SelectStmt:
+				m.Kind = "select"
+			case *ast.CaseClause:
+				m.Kind = "case"
+			case *ast.ReturnStmt:
+				m.Kind, m.ExplicitResults = "return", len(x.Results)
+				target := loc(fn)
+				m.Target, m.TargetKind = &target, "function"
+			case *ast.BranchStmt:
+				m.Kind = x.Tok.String()
+				var target ast.Node
+				if x.Label != nil {
+					target = labels[x.Label.Name]
+				} else if x.Tok == token.CONTINUE || x.Tok == token.BREAK {
+					for i := len(stack) - 1; i >= 0; i-- {
+						switch stack[i].(type) {
+						case *ast.ForStmt, *ast.RangeStmt:
+							target = stack[i]
+						case *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.SelectStmt:
+							if x.Tok == token.BREAK {
+								target = stack[i]
+							}
+						}
+						if target != nil {
+							break
+						}
+					}
+				}
+				if target != nil {
+					site := loc(target)
+					m.Target, m.TargetKind = &site, fmt.Sprintf("%T", target)
+				}
+			case *ast.GoStmt:
+				m.Kind = "go"
+			case *ast.DeferStmt:
+				m.Kind = "defer"
+			case *ast.CallExpr:
+				if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "panic" {
+					m.Kind = "panic_call_syntax_only"
+					m.CallBinding = "local_or_unresolved"
+					if info.Uses[id] == types.Universe.Lookup("panic") {
+						m.CallBinding = "builtin_panic"
+					}
+				}
+			}
+			if m.Kind != "" {
+				row.Markers = append(row.Markers, m)
+			}
+			stack = append(stack, n)
+			return true
+		})
+		out.Functions = append(out.Functions, row)
+	}
+	return out
+}
+
+func main() {
+	var inputs []input
+	if err := json.NewDecoder(os.Stdin).Decode(&inputs); err != nil {
+		panic(err)
+	}
+	out := []fileObservation{}
+	for _, in := range inputs {
+		out = append(out, observe(in))
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(out); err != nil {
+		panic(err)
+	}
+}

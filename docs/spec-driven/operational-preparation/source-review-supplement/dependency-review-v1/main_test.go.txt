@@ -1,0 +1,170 @@
+package main
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestDependencyReviewLocations(t *testing.T) {
+	cases := []struct {
+		name, source string
+		check        func(*testing.T, function)
+	}{
+		{"shadow_identity", `func f(x int) { { x:=2; _=x }; _=x }`, func(t *testing.T, f function) {
+			defs, reads := map[int]bool{}, map[int]bool{}
+			for _, o := range f.Occurrences {
+				if o.Name == "x" {
+					switch o.Role {
+					case "definition":
+						defs[o.Site.StartByte] = true
+					case "read":
+						reads[o.Declaration.StartByte] = true
+					}
+				}
+			}
+			if len(defs) != 2 || len(reads) != 2 {
+				t.Fatal("shadow bindings merged")
+			}
+		}},
+		{"short_reuse", `func f(x int){x,y:=2,3;_,_=x,y}`, func(t *testing.T, f function) {
+			for _, o := range f.Occurrences {
+				if o.Name == "x" && o.Role == "write" && o.Site.StartByte != o.Declaration.StartByte {
+					return
+				}
+			}
+			t.Fatal("same-scope := reuse not observed as write")
+		}},
+		{"compound_roles", `func f(x int){x+=2;x++;_=x}`, func(t *testing.T, f function) {
+			n := 0
+			for _, o := range f.Occurrences {
+				if o.Name == "x" && o.Role == "read_write" {
+					n++
+				}
+			}
+			if n != 2 {
+				t.Fatal("compound/increment read-write count", n)
+			}
+		}},
+		{"parenthesized_write", `func f(x int){(x)=2;_=x}`, func(t *testing.T, f function) {
+			for _, o := range f.Occurrences {
+				if o.Name == "x" && o.Role == "write" {
+					return
+				}
+			}
+			t.Fatal("parenthesized write absent")
+		}},
+		{"range_shadow", `func f(i int){for i:=range []int{1}{_=i};_=i}`, func(t *testing.T, f function) {
+			decls := map[int]bool{}
+			for _, o := range f.Occurrences {
+				if o.Name == "i" && o.Role == "read" {
+					decls[o.Declaration.StartByte] = true
+				}
+			}
+			if len(decls) != 2 {
+				t.Fatal("range shadow merged")
+			}
+		}},
+		{"nested_continue", `func f(){for {for {continue};continue}}`, func(t *testing.T, f function) {
+			loops, targets := []int{}, []int{}
+			for _, m := range f.Markers {
+				if m.Kind == "for" {
+					loops = append(loops, m.Site.StartByte)
+				} else if m.Kind == "continue" && m.Target != nil {
+					targets = append(targets, m.Target.StartByte)
+				}
+			}
+			if len(loops) != 2 || len(targets) != 2 || targets[0] != loops[1] || targets[1] != loops[0] {
+				t.Fatal("continue loop ownership", loops, targets)
+			}
+		}},
+		{"break_switch_inside_loop", `func f(){for {switch {default:break};break}}`, func(t *testing.T, f function) {
+			targets := []string{}
+			for _, m := range f.Markers {
+				if m.Kind == "break" {
+					targets = append(targets, m.TargetKind)
+				}
+			}
+			if len(targets) != 2 || targets[0] != "*ast.SwitchStmt" || targets[1] != "*ast.ForStmt" {
+				t.Fatal("break target kinds", targets)
+			}
+		}},
+		{"label_continue", `func f(){outer:for {for {continue outer}}}`, func(t *testing.T, f function) {
+			outer := -1
+			for _, m := range f.Markers {
+				if m.Kind == "for" && outer < 0 {
+					outer = m.Site.StartByte
+				}
+				if m.Kind == "continue" && (m.Target == nil || m.Target.StartByte != outer) {
+					t.Fatal("labeled continue target")
+				}
+			}
+		}},
+		{"named_bare_return", `func f()(out int){out=1;return}`, func(t *testing.T, f function) {
+			for _, m := range f.Markers {
+				if m.Kind == "return" && m.ExplicitResults == 0 && m.TargetKind == "function" {
+					return
+				}
+			}
+			t.Fatal("bare return marker missing")
+		}},
+		{"closure_excluded", `func f(x int){g:=func(){x=9};g();_=x}`, func(t *testing.T, f function) {
+			if len(f.SkippedClosure) != 1 {
+				t.Fatal("closure exclusion missing")
+			}
+			for _, o := range f.Occurrences {
+				if f.SkippedClosure[0].StartByte <= o.Site.StartByte && o.Site.StartByte < f.SkippedClosure[0].EndByte {
+					t.Fatal("closure occurrence leaked")
+				}
+			}
+		}},
+		{"struct_key_not_variable", `func f(){X:=1;v:=struct{X int}{X:X};_,_=X,v}`, func(t *testing.T, f function) {
+			n := 0
+			for _, o := range f.Occurrences {
+				if o.Name == "X" {
+					n++
+				}
+			}
+			if n != 3 {
+				t.Fatal("field/key mistaken for variable", n)
+			}
+		}},
+		{"async_and_panic_syntax", `func f(x int){go func(){}();panic(x)}`, func(t *testing.T, f function) {
+			kinds := map[string]bool{}
+			for _, m := range f.Markers {
+				kinds[m.Kind] = true
+				if m.Kind == "panic_call_syntax_only" && m.CallBinding != "builtin_panic" {
+					t.Fatal("builtin panic not identified")
+				}
+			}
+			if !kinds["go"] || !kinds["panic_call_syntax_only"] {
+				t.Fatal("syntax boundary markers missing")
+			}
+		}},
+		{"shadowed_panic", `func f(){panic:=func(int){};panic(1)}`, func(t *testing.T, f function) {
+			for _, m := range f.Markers {
+				if m.Kind == "panic_call_syntax_only" && m.CallBinding == "local_or_unresolved" {
+					return
+				}
+			}
+			t.Fatal("shadowed panic confused with builtin")
+		}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := observe(input{Path: "control.go", Source: "package control\n" + tc.source})
+			if out.TypeErrors != 0 || len(out.Functions) != 1 || out.ProjectTypecheckPassed {
+				t.Fatal("control source check/scope mismatch", out)
+			}
+			tc.check(t, out.Functions[0])
+			t.Logf("DEPENDENCY_LOCATION_CONTROL %s pass=true", tc.name)
+		})
+	}
+}
+
+func TestPartialSourceTypecheckIsExplicit(t *testing.T) {
+	out := observe(input{Path: "partial.go", Source: "package partial\nfunc f(x Missing){y:=x;_=y}"})
+	if out.TypeErrors == 0 || len(out.DiagnosticExamples) == 0 || !strings.Contains(out.TypecheckScope, "incomplete") || out.ProjectTypecheckPassed {
+		t.Fatal("partial project typecheck must not become success")
+	}
+	t.Log("DEPENDENCY_LOCATION_CONTROL partial_typecheck pass=true")
+}

@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "kind": "dependency_review_source_preparation_only",
+  "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "candidate_pool_sha256": "029285c70ad60d104cdd59aa351ff07984905440c72465f3ecd094b16ed2a114",
+  "lexical_manifest": "docs/spec-driven/operational-preparation/source-review-supplement/lexical-coverage-v1/manifest.json",
+  "lexical_manifest_sha256": "40f0dc0ecdb0fcd81a6d7df7bbeb3247e83f52f7e2c5c47893efc4eb221d8e54",
+  "source_bindings": {
+    "scripts/dependency_review_locations.go.txt": {
+      "sha256": "e22f424ba9b35eb986875d62d5a8c552891a970e76d28380cc71873e506aec42",
+      "artifact": "main.go.txt"
+    },
+    "scripts/fixtures/dependency_review_locations_test.go.txt": {
+      "sha256": "a999e29ebbba59afae471610767afc512c8f298b7f052f98d0d6e3b07016d2ca",
+      "artifact": "main_test.go.txt"
+    },
+    "scripts/fixtures/dependency_review_proposals.json": {
+      "sha256": "c45b3e998ab7c80673fe2b46a3906701c34e56d6cda004dbe0b7c4cb3fabd491",
+      "artifact": "curation.json"
+    },
+    "scripts/prepare-dependency-review.py": {
+      "sha256": "bd9945a670b15200c11fa87a14abe3d19a75bd6a8ef9accfa7ffe66a527ae24f",
+      "artifact": "generator.py.txt"
+    },
+    "scripts/source_packet.py": {
+      "sha256": "1b77db4e9d454c47fbe77e9da968780a27f3cd7a2e46d12f8439a320dfc6f1a6",
+      "artifact": "source-packet.py.txt"
+    },
+    "pkg/graph/valueflow/cfg.go": {
+      "sha256": "021edec687381f3a104a00158d44d2ee2c7efe3003d5135f21bd6dbfd684e3fa",
+      "artifact": "engine-source/pkg/graph/valueflow/cfg.go.txt"
+    },
+    "pkg/graph/valueflow/dependence.go": {
+      "sha256": "722f28c58905299be96cf151272a3db8c84b448d635b0ff9933646b493a2e4b5",
+      "artifact": "engine-source/pkg/graph/valueflow/dependence.go.txt"
+    },
+    "pkg/graph/valueflow/query.go": {
+      "sha256": "9fc504e7bcd49669032f148456fc43995406060ca717ee48e3f5f32a3dbe6c14",
+      "artifact": "engine-source/pkg/graph/valueflow/query.go.txt"
+    },
+    "internal/system/mcp/valueflow.go": {
+      "sha256": "211861820874f9ddcaa45e4d0cccc93d8a0850ed458755656f282c2e09492b7c",
+      "artifact": "engine-source/internal/system/mcp/valueflow.go.txt"
+    }
+  },
+  "counts": {
+    "functions": 4,
+    "data_proposals": 19,
+    "exclusion_proposals": 7,
+    "exit_ownership_markers": 14,
+    "context_anchors": 8,
+    "development_controls": 14,
+    "control_observations": 28,
+    "quality_checks": 4,
+    "independent_gold_records": 0
+  },
+  "artifacts": {
+    "curation.json": "c45b3e998ab7c80673fe2b46a3906701c34e56d6cda004dbe0b7c4cb3fabd491",
+    "diagnostics.json": "c42dc20cfee6a22d05fccfe5f3e5d12c8b25658afaefc4ffed3de9d4044ce089",
+    "engine-source/internal/system/mcp/valueflow.go.txt": "211861820874f9ddcaa45e4d0cccc93d8a0850ed458755656f282c2e09492b7c",
+    "engine-source/pkg/graph/valueflow/cfg.go.txt": "021edec687381f3a104a00158d44d2ee2c7efe3003d5135f21bd6dbfd684e3fa",
+    "engine-source/pkg/graph/valueflow/dependence.go.txt": "722f28c58905299be96cf151272a3db8c84b448d635b0ff9933646b493a2e4b5",
+    "engine-source/pkg/graph/valueflow/query.go.txt": "9fc504e7bcd49669032f148456fc43995406060ca717ee48e3f5f32a3dbe6c14",
+    "formal-state.json": "8c7b4546bc0b9493722720426c9328f091dabca4fecce49794f2a1e0db046457",
+    "generator.py.txt": "bd9945a670b15200c11fa87a14abe3d19a75bd6a8ef9accfa7ffe66a527ae24f",
+    "git-proof.json": "353af0cb3be8e459f729ed37df100d9188031d0f670210ffc15817931985ebb3",
+    "go.mod.txt": "451ecff0fe8374591ec7e71332af1a38a68dea39d3ccd8bc447222d01d20b9d6",
+    "location-inputs.json": "b454ad8590de2d77d24d94381886f9529bce41872123f6a78c0fefe77269bb43",
+    "logs/build.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/build.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/fmt.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/fmt.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/lint.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/lint.stdout.txt": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
+    "logs/locations.json": "fe660e46c34b9d6071a9704ce28a482f9dca45ff2f9691d20446f8635371e03b",
+    "logs/locations.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/normal.jsonl": "3f3bfa17b49ee832dc7bf54931d544fdfd06f7b121d2bb1382aac0ef4986fd60",
+    "logs/normal.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/race.jsonl": "de0c60d487a4c5a9dcd94f4b5e26f884fc0f9b8a67b1864bceeaca6ac56c4876",
+    "logs/race.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/vet.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/vet.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "main.go.txt": "e22f424ba9b35eb986875d62d5a8c552891a970e76d28380cc71873e506aec42",
+    "main_test.go.txt": "a999e29ebbba59afae471610767afc512c8f298b7f052f98d0d6e3b07016d2ca",
+    "matching-contract.json": "1adb99bb50be253fbc74fbf20654b660e6b3ad0516bc43af2067078cf9ef03f0",
+    "objects/098969c343962d00d8222b9f7181b7e33004b18d.tree": "eea5bb9610ae5f203b13f84fe45a4c3de57c0a3f98276d12b5e99c661791630c",
+    "objects/0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8.commit": "ff5bce589896e7c4cd48f9e0c90f08849c33befe8292066efeec0b0f9858396e",
+    "objects/8cd1f56caa3ee0a0fbe372bb9bf75e2ec2112942.tree": "a96490a593120bfa6106607a3cfae6cac6b6efc116483a49a422e3323766b772",
+    "objects/a2fed4426de4fbc80db8febc12d7b0d74da3e6d3.tree": "f1495774fe67ceb41ec00a447e9a620dd4ebbca198c0f7e71afa9d9be73a5531",
+    "objects/b0a44a92cd3dbe3001be7227404664fd6f85e6ac.tree": "6f8e2ae8e55706ba2f77b347316965cf0b348e23e63617ce076bde2fd5f82db9",
+    "objects/dbe79ecc657b890b6b4a16781b2a5b779388e9dc.tree": "72f7da05525bf1506c552e87652402f20e2981d0bc5d7534a9c537db90b9ad85",
+    "objects/eefa4a0deead9c853f8b73cf4d4012d096274aa9.tree": "4b85ca8e696ebc25bc25b21a7b7826d49cd699f2e5cdad4daec83bde618c2558",
+    "objects/f18bc8624d7b9feec528f55d9f1768cd066851d6.tree": "a90afca9997c969bd1ac6d953f7ffa7b9bf870bf41edaebb00172cb011b4d1f8",
+    "objects/f5fe0e76e7117eae9402daff29950fe1360f4113.tree": "e29b8f7992873142221997f547358b5db8abeb9d2bb0fa0aa2550ecde01e9be6",
+    "prior-quality-diagnostic/go.mod.txt": "451ecff0fe8374591ec7e71332af1a38a68dea39d3ccd8bc447222d01d20b9d6",
+    "prior-quality-diagnostic/logs/build.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prior-quality-diagnostic/logs/build.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prior-quality-diagnostic/logs/fmt.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prior-quality-diagnostic/logs/fmt.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prior-quality-diagnostic/logs/lint.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prior-quality-diagnostic/logs/lint.stdout.txt": "c516fd0cf078875f6f79b2eec7e3b067ecddac6cca3abf3edf6dcd99b20f5864",
+    "prior-quality-diagnostic/logs/vet.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prior-quality-diagnostic/logs/vet.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prior-quality-diagnostic/main.go.txt": "e22f424ba9b35eb986875d62d5a8c552891a970e76d28380cc71873e506aec42",
+    "prior-quality-diagnostic/main_test.go.txt": "c7b7e2e4a7856e38bf116edc75e31f3488de71a8edb4d11dd997d96eb0f23b88",
+    "private-review.json": "aae191220662cc6c6cf72093a0bdff951ddb1b33ab392d345a06402636cd0486",
+    "source-packet.py.txt": "1b77db4e9d454c47fbe77e9da968780a27f3cd7a2e46d12f8439a320dfc6f1a6",
+    "sources/consensus/wbft/backend/backend.go.txt": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+    "sources/core/rawdb/accessors_chain.go.txt": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+    "sources/core/state/dump.go.txt": "db8982dfac16229485d5b6d3c886c5bb907fc0953160e2cadd70d81e69294c61",
+    "sources/rpc/client.go.txt": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+    "validation.json": "5b179ef7e6c65d123236a566ef9ab2d4d20a7833f004b9646af3d59192ae1eeb"
+  }
+}

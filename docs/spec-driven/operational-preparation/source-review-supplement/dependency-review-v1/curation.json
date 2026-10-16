@@ -1,0 +1,674 @@
+{
+  "schema_version": 1,
+  "status": "private_ai_review_proposals_not_gold",
+  "data_reviews": [
+    {
+      "id": "DR-01",
+      "candidate_id": "SRC-002",
+      "variable": "ok",
+      "use": {
+        "line": 190,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 189,
+          "role": "definition"
+        }
+      ],
+      "rationale": "바깥 캐시 조회의 ok가 바깥 if 조건에 쓰인다."
+    },
+    {
+      "id": "DR-02",
+      "candidate_id": "SRC-002",
+      "variable": "ok",
+      "use": {
+        "line": 191,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 191,
+          "role": "definition"
+        }
+      ],
+      "rationale": "안쪽 m.Get의 새 ok가 같은 if 조건에 쓰인다. 189행 ok와 다른 바인딩이다."
+    },
+    {
+      "id": "DR-03",
+      "candidate_id": "SRC-002",
+      "variable": "outboundCode",
+      "use": {
+        "line": 206,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 202,
+          "role": "definition"
+        },
+        {
+          "line": 204,
+          "role": "write"
+        }
+      ],
+      "rationale": "조건부 덮어쓰기 뒤 Send 호출 인자는 기본값 또는 code 대입의 정의가 구조적으로 도달할 수 있다."
+    },
+    {
+      "id": "DR-04",
+      "candidate_id": "SRC-002",
+      "variable": "m",
+      "use": {
+        "line": 199,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 189,
+          "role": "definition"
+        },
+        {
+          "line": 196,
+          "role": "write"
+        }
+      ],
+      "rationale": "캐시 적중과 새 캐시 생성 경로의 로컬 참조 바인딩을 검토한다. 캐시 내부 데이터 의미는 별개다."
+    },
+    {
+      "id": "DR-05",
+      "candidate_id": "SRC-006",
+      "variable": "count",
+      "use": {
+        "line": 321,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 295,
+          "role": "definition"
+        },
+        {
+          "line": 303,
+          "role": "write"
+        },
+        {
+          "line": 318,
+          "role": "read_write"
+        }
+      ],
+      "rationale": "초기 인자·상한 보정·반복 감소가 loop 이후 조건에 합류할 수 있다. 값 기반 경로 가능성은 증명하지 않는다."
+    },
+    {
+      "id": "DR-06",
+      "candidate_id": "SRC-006",
+      "variable": "i",
+      "use": {
+        "line": 326,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 300,
+          "role": "definition"
+        },
+        {
+          "line": 310,
+          "role": "read_write"
+        }
+      ],
+      "rationale": "live loop 건너뜀과 반복 후 인덱스 바인딩을 구분한다. unsigned 산술의 실제 결과 안전성은 별도다."
+    },
+    {
+      "id": "DR-07",
+      "candidate_id": "SRC-006",
+      "variable": "i",
+      "use": {
+        "line": 337,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 336,
+          "role": "definition"
+        }
+      ],
+      "rationale": "마지막 range의 안쪽 i만 사용한다. 현재 backend의 range binding 지원 제한도 별도 검토해야 한다."
+    },
+    {
+      "id": "DR-08",
+      "candidate_id": "SRC-006",
+      "variable": "data",
+      "use": {
+        "line": 336,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 326,
+          "role": "definition"
+        }
+      ],
+      "rationale": "AncientRange가 반환한 바깥 data를 range 표현식에서 참조한다. live 조회의 안쪽 data와 구분한다."
+    },
+    {
+      "id": "DR-09",
+      "candidate_id": "SRC-006",
+      "variable": "rlpHeaders",
+      "use": {
+        "line": 339,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 296,
+          "role": "definition"
+        },
+        {
+          "line": 312,
+          "role": "write"
+        },
+        {
+          "line": 337,
+          "role": "write"
+        }
+      ],
+      "rationale": "정상 마지막 return에서 참조 바인딩 합류를 검토한다. append 메모리/내용을 scalar 값 정답으로 보지 않는다."
+    },
+    {
+      "id": "DR-10",
+      "candidate_id": "SRC-011",
+      "variable": "err",
+      "use": {
+        "line": 133,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 132,
+          "role": "definition"
+        }
+      ],
+      "rationale": "최초 NodeIterator의 오류 바인딩을 검사한다."
+    },
+    {
+      "id": "DR-11",
+      "candidate_id": "SRC-011",
+      "variable": "err",
+      "use": {
+        "line": 141,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 140,
+          "role": "definition"
+        }
+      ],
+      "rationale": "DecodeBytes if initializer의 새 err가 panic 인자이다. 실제 panic 도달성은 미판정이다."
+    },
+    {
+      "id": "DR-12",
+      "candidate_id": "SRC-011",
+      "variable": "err",
+      "use": {
+        "line": 178,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 177,
+          "role": "write"
+        }
+      ],
+      "rationale": "172행에 선언한 err를 177행 같은 scope의 :=에서 재사용해 덮어쓴 뒤 검사한다."
+    },
+    {
+      "id": "DR-13",
+      "candidate_id": "SRC-011",
+      "variable": "nextKey",
+      "use": {
+        "line": 212,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 118,
+          "role": "definition"
+        },
+        {
+          "line": 201,
+          "role": "write"
+        }
+      ],
+      "rationale": "이름 있는 결과의 entry zero와 다음 key 대입이 최종 return에서 합류할 수 있다. slice 내용은 알 수 없다."
+    },
+    {
+      "id": "DR-14",
+      "candidate_id": "SRC-011",
+      "variable": "logged",
+      "use": {
+        "line": 194,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 127,
+          "role": "definition"
+        },
+        {
+          "line": 197,
+          "role": "write"
+        }
+      ],
+      "rationale": "최초 timestamp와 이전 반복에서 갱신한 timestamp가 loop header 이후 검사에 도달할 수 있다. 시간 조건의 실제 성립은 미측정이다."
+    },
+    {
+      "id": "DR-15",
+      "candidate_id": "SRC-036",
+      "variable": "err",
+      "use": {
+        "line": 195,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 194,
+          "role": "definition"
+        }
+      ],
+      "rationale": "URL parse의 바깥 err를 검사한다."
+    },
+    {
+      "id": "DR-16",
+      "candidate_id": "SRC-036",
+      "variable": "err",
+      "use": {
+        "line": 211,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 209,
+          "role": "definition"
+        }
+      ],
+      "rationale": "WS case 내부의 새 err를 return한다. 바깥 URL parse err와 구분한다."
+    },
+    {
+      "id": "DR-17",
+      "candidate_id": "SRC-036",
+      "variable": "reconnect",
+      "use": {
+        "line": 222,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 207,
+          "role": "write"
+        },
+        {
+          "line": 213,
+          "role": "write"
+        },
+        {
+          "line": 215,
+          "role": "write"
+        },
+        {
+          "line": 217,
+          "role": "write"
+        }
+      ],
+      "rationale": "정상 switch arm의 대입만 합류할 것으로 제안한다. default와 WS 오류는 return하므로 entry zero 정의 제외를 검토한다."
+    },
+    {
+      "id": "DR-18",
+      "candidate_id": "SRC-036",
+      "variable": "cfg",
+      "use": {
+        "line": 222,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 199,
+          "role": "definition"
+        }
+      ],
+      "rationale": "로컬 cfg 포인터 바인딩을 인자로 전달한다. applyOption이나 constructor의 pointee 변경은 이 관계로 입증하지 않는다."
+    },
+    {
+      "id": "DR-19",
+      "candidate_id": "SRC-036",
+      "variable": "rc",
+      "use": {
+        "line": 213,
+        "role": "read"
+      },
+      "definitions": [
+        {
+          "line": 209,
+          "role": "definition"
+        }
+      ],
+      "rationale": "WS constructor 결과의 로컬 참조를 reconnect에 전달한다. 실제 연결 성공은 미판정이다."
+    }
+  ],
+  "exclusion_reviews": [
+    {
+      "id": "EX-01",
+      "candidate_id": "SRC-002",
+      "variable": "ok",
+      "definition": {
+        "line": 189,
+        "role": "definition"
+      },
+      "use": {
+        "line": 191,
+        "role": "read"
+      },
+      "exclusion_reason_proposal": "different_lexical_binding",
+      "rationale": "바깥 ok를 안쪽 조건의 ok에 연결하지 않는다."
+    },
+    {
+      "id": "EX-02",
+      "candidate_id": "SRC-006",
+      "variable": "i",
+      "definition": {
+        "line": 300,
+        "role": "definition"
+      },
+      "use": {
+        "line": 337,
+        "role": "read"
+      },
+      "exclusion_reason_proposal": "different_lexical_binding",
+      "rationale": "outer i와 range i를 이름만으로 합치지 않는다."
+    },
+    {
+      "id": "EX-03",
+      "candidate_id": "SRC-006",
+      "variable": "data",
+      "definition": {
+        "line": 311,
+        "role": "definition"
+      },
+      "use": {
+        "line": 336,
+        "role": "read"
+      },
+      "exclusion_reason_proposal": "different_lexical_binding",
+      "rationale": "live if의 data는 ancient data의 선언과 다르다."
+    },
+    {
+      "id": "EX-04",
+      "candidate_id": "SRC-011",
+      "variable": "err",
+      "definition": {
+        "line": 172,
+        "role": "definition"
+      },
+      "use": {
+        "line": 178,
+        "role": "read"
+      },
+      "exclusion_reason_proposal": "intervening_write_proposal",
+      "rationale": "177행의 같은 scope 재대입이 172행 정의를 대체한다는 구조적 제외 초안이다."
+    },
+    {
+      "id": "EX-05",
+      "candidate_id": "SRC-036",
+      "variable": "reconnect",
+      "definition": {
+        "line": 204,
+        "role": "definition"
+      },
+      "use": {
+        "line": 222,
+        "role": "read"
+      },
+      "exclusion_reason_proposal": "all_fallthrough_arms_write_proposal",
+      "rationale": "정상 arm 모두에서 대입하고 다른 arm은 반환하므로 zero 정의의 도달을 제외할지 검토한다."
+    },
+    {
+      "id": "EX-06",
+      "candidate_id": "SRC-036",
+      "variable": "err",
+      "definition": {
+        "line": 194,
+        "role": "definition"
+      },
+      "use": {
+        "line": 211,
+        "role": "read"
+      },
+      "exclusion_reason_proposal": "different_lexical_binding",
+      "rationale": "WS case의 return err를 URL parse err와 합치지 않는다."
+    },
+    {
+      "id": "EX-07",
+      "candidate_id": "SRC-011",
+      "variable": "nextKey",
+      "definition": {
+        "line": 201,
+        "role": "write"
+      },
+      "target_marker": {
+        "kind": "return",
+        "line": 135
+      },
+      "exclusion_reason_proposal": "earlier_explicit_nil_return_proposal",
+      "rationale": "135행 return nil은 nextKey의 명시적 읽기가 아니며 이 함수 호출의 201행 대입보다 먼저 종료한다."
+    }
+  ],
+  "boundaries": [
+    {
+      "id": "BD-01",
+      "candidate_id": "SRC-002",
+      "marker": {
+        "kind": "continue",
+        "line": 193
+      },
+      "expected_target_start_line": 188
+    },
+    {
+      "id": "BD-02",
+      "candidate_id": "SRC-006",
+      "marker": {
+        "kind": "break",
+        "line": 316
+      },
+      "expected_target_start_line": 310
+    },
+    {
+      "id": "BD-03",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "continue",
+        "line": 159
+      },
+      "expected_target_start_line": 138
+    },
+    {
+      "id": "BD-04",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "continue",
+        "line": 175
+      },
+      "expected_target_start_line": 138
+    },
+    {
+      "id": "BD-05",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "continue",
+        "line": 180
+      },
+      "expected_target_start_line": 138
+    },
+    {
+      "id": "BD-06",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "continue",
+        "line": 187
+      },
+      "expected_target_start_line": 183
+    },
+    {
+      "id": "BD-07",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "break",
+        "line": 203
+      },
+      "expected_target_start_line": 138
+    },
+    {
+      "id": "BD-08",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "return",
+        "line": 135
+      },
+      "expected_target_start_line": 118
+    },
+    {
+      "id": "BD-09",
+      "candidate_id": "SRC-036",
+      "marker": {
+        "kind": "return",
+        "line": 196
+      },
+      "expected_target_start_line": 193
+    },
+    {
+      "id": "BD-10",
+      "candidate_id": "SRC-036",
+      "marker": {
+        "kind": "return",
+        "line": 211
+      },
+      "expected_target_start_line": 193
+    },
+    {
+      "id": "BD-11",
+      "candidate_id": "SRC-036",
+      "marker": {
+        "kind": "return",
+        "line": 219
+      },
+      "expected_target_start_line": 193
+    },
+    {
+      "id": "BD-12",
+      "candidate_id": "SRC-036",
+      "marker": {
+        "kind": "return",
+        "line": 222
+      },
+      "expected_target_start_line": 193
+    },
+    {
+      "id": "BD-13",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "panic_call_syntax_only",
+        "line": 141
+      },
+      "expected_target_start_line": null
+    },
+    {
+      "id": "BD-14",
+      "candidate_id": "SRC-002",
+      "marker": {
+        "kind": "go",
+        "line": 206
+      },
+      "expected_target_start_line": null
+    }
+  ],
+  "contexts": [
+    {
+      "candidate_id": "SRC-002",
+      "anchors": [
+        [
+          189,
+          206,
+          "서로 다른 ok·m 재대입·continue와 비동기 송신을 구분한다."
+        ],
+        [
+          202,
+          209,
+          "outboundCode 조건부 대입과 return nil의 의미를 구분한다."
+        ]
+      ],
+      "unknowns": [
+        "go 송신은 완료 대기나 성공 보장이 아니다.",
+        "cache 및 broadcaster의 alias/동시성/호출 효과는 별도다."
+      ]
+    },
+    {
+      "candidate_id": "SRC-006",
+      "anchors": [
+        [
+          295,
+          319,
+          "입력 보정·live loop·break가 count 감소와 post를 우회하는 경계를 검토한다."
+        ],
+        [
+          321,
+          339,
+          "조기 return·ancient 조회·range shadow와 최종 return을 구분한다."
+        ]
+      ],
+      "unknowns": [
+        "불완전 DB 읽기·count/i unsigned 산술의 실제 안전성은 미판정이다.",
+        "range iteration binding은 현재 valueflow에서 unsupported 진단 대상이다.",
+        "slice reference와 내용·메모리 alias를 scalar 결과로 합치지 않는다."
+      ]
+    },
+    {
+      "candidate_id": "SRC-011",
+      "anchors": [
+        [
+          118,
+          142,
+          "named result zero·conf 재대입·초기 오류 return과 DecodeBytes panic을 구분한다."
+        ],
+        [
+          170,
+          203,
+          "서로 다른 err와 중첩 loop continue·outer break·nextKey 대입을 구분한다."
+        ],
+        [
+          206,
+          212,
+          "loop 이후 로그와 최종 결과의 출처를 검토한다."
+        ]
+      ],
+      "unknowns": [
+        "storage continue는 계정 loop가 아닌 가장 안쪽 storage loop로 간다.",
+        "panic은 정상 종료 postdominator와 같은 의미로 처리하지 않는다.",
+        "field·map·pointer·콜백 효과는 완전한 local scalar gold가 아니다."
+      ]
+    },
+    {
+      "candidate_id": "SRC-036",
+      "anchors": [
+        [
+          193,
+          223,
+          "오류 shadow·switch arm 합류·조기 종료·newClient 호출의 경계를 검토한다."
+        ]
+      ],
+      "unknowns": [
+        "constructor/newClient 반환을 연결 성공이나 리소스 안전성으로 자동 판정하지 않는다.",
+        "cfg pointee mutation과 참조 alias는 별도다.",
+        "normal-exit postdominator 계산 전에는 nesting을 control edge로 채점하지 않는다."
+      ]
+    }
+  ]
+}
