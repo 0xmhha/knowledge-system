@@ -1,0 +1,133 @@
+[
+  {
+    "label": "format",
+    "command": [
+      "gofmt",
+      "-w",
+      "logic.go",
+      "logic_test.go",
+      "a/same.go",
+      "b/same.go"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.04256554087623954,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "git-init",
+    "command": [
+      "git",
+      "init",
+      "-q"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.021260292269289494,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "git-add",
+    "command": [
+      "git",
+      "add",
+      "."
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.01866345899179578,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "git-commit",
+    "command": [
+      "git",
+      "-c",
+      "user.name=Owned P05 fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "-c",
+      "commit.gpgsign=false",
+      "commit",
+      "-qm",
+      "test: own stdio contract fixture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.040321792010217905,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "git-head",
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.013252750039100647,
+    "stdout_sha256": "60fff387ad3ae1e97733ec01897050073603473f067e68dddb15385aaae75bca",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "fixture-race",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=1",
+      "./..."
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 2.6378663750365376,
+    "stdout_sha256": "04282fc092f659f959c73a132ab9b5fa5ffa5905b30b33cfa3889e3bf9083635",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "fixture-vet",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.16140179196372628,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "fixture-bundle",
+    "command": [
+      "git",
+      "bundle",
+      "create",
+      "/private/tmp/ks-consumer-stdio-packet-20261017/fixture.bundle",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.02275600004941225,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "index",
+    "command": [
+      "/private/tmp/ks-consumer-contract-readiness-20261017/bin/ckg",
+      "build",
+      "--src",
+      "/private/tmp/ks-consumer-stdio-20261017/source",
+      "--out",
+      "/private/tmp/ks-consumer-stdio-20261017/graph",
+      "--lang",
+      "go",
+      "--policy-file",
+      "/private/tmp/ks-consumer-stdio-20261017/source/policy.yaml",
+      "--security-pattern-file",
+      "/private/tmp/ks-consumer-stdio-20261017/source/security.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.6305452496744692,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "4e92dcf114ee72bdbcb6ea912b0e17c496ccec5e2a03210218f21f397f82fe4c"
+  }
+]

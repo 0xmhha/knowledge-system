@@ -1,4 +1,4 @@
-평가 입력 및 AI 검토 초안 보완 — 2026-10-16
+평가 입력 및 AI 검토 초안 보완 — 2026-10-17
 
 목적
 함수와 관계없이 순번으로 부여했던 문맥 확장 의도를 실제 원문에 맞추고,
@@ -340,9 +340,29 @@
 - 증거 guard30개 포함 저장소 관련 회귀326개·문서134개/기존 구현 검사 통과. 동결52파일의 재구성2회 일치.
 - 초기 Go cache 경고 로그는 소유 preflight에 보존하고 재빌드 stderr0 확인. raw patch/build-info 공백도 원래 bytes 보존.
 - 기존26패킷·유지보수Go·현재 handoff/잔여 문서·정식9항목 유지. 전체 계획/실제 역할 수용으로 승격하지 않음.
-[예정] 28. P05 소유 fixture→실제 CKS stdio 검증
-- 현재 source에 묶인 binary를 재확인하고 소유 Go fixture/index로5도구 actual request/response·pin/상한/오류 경로를 검증한다.
-- static schema/도구 목록이나 direct client 성공을 P06 실제 역할/권한 성공으로 세지 않는다.
+[검증 완료] 28. P05 소유 fixture/index와 실제 CKS stdio
+- 새 Go fixture를 gofmt/race/vet·Git bundle/index로 고정. P01의 CKS/CKG hash와 유지 Go 소스 일치.
+- 실제 등록33도구와 소비자 schema 일치, 필수5도구 모두 호출. schema 변조3종 거부.
+- 4도구×commit/source/snapshot pin 거부12건, 실제 입력 오류8건, 상한8종 확인.
+- unsupported/partial·missing/ambiguous·review index 누락·retained backend 미설정 경로를 보존.
+- 1ms cooperative deadline3회 모두 시간 예산 소진. host/전송 timeout을 검증한 것으로 세지 않음.
+- source/YAML 삭제 후 retained 결과 일치·복구. 수동 주석/unknown·미태그와 안전 판정 구분.
+- 초기 YAML/후보 수 시험 오류와 SQLite WAL 미반영 구형 index 시험을 진단 원자료로 보존.
+- 주4세션56요청 + 진단5세션57요청 = 9세션113요청. 자식 모두 EOF exit0/reap, 동시 MCP 최대1·리스너0.
+- CKV manifest 미설정 warning/dummy alignment 실패 진단 보존. vector 검색/운영 alignment 검증 아님.
+- 계획22건 중 전체7건 통과: T01/T02/T03/T08/T11/T12/T17. 나머지15건 pending.
+- T04/T09/T10/T16/T19/T20은 하위 경로 관측만 있고 전체 통과가 아니다. actual role receipt 없음.
+- STDIO-READINESS-REPORT.txt·stdio-readiness.json·원자료와 새 guard에서 단계/분모를 확인한다.
+- 전용 변조 거부37개 + 관련326개 = 363개 회귀 통과. 현재 문서134개·기존 구현 완료 상태 검사 통과.
+- 증거116파일을 새2복사본에서 재구성해 바이트 일치 확인. 새 측정2회로 세지 않음.
+- 이전 동결 패킷27개·유지보수 Go·원본/후보 consumer·원래 readiness 결합 문서 유지.
+- 실제 역할/모델0·후보 미채택·정식 수용0/9 유지. 이후 P06 실제 역할→P07 그림/종료→P08 준비 판정.
+
+[예정] 29. P06 실제 역할 adapter·로컬 응답기
+- 실제 Analyzer/Planner dispatch와 유효 도구 목록을 수집하고 7쌍의 alias→wire 호출 receipt를 검증한다.
+- 정상 typed report/handoff·hash·재진입·permission/provider 실패 경로를 구분한다.
+- 직접 stdio 성공으로 actual role receipt를 대체하지 않는다. 모델 품질 평가·실제 모델 호출은 하지 않는다.
+- 이후 P07 그림 render/host 취소·종료와 P08 최종 준비 판정이 남아 있다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -374,14 +394,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-P05 소유 fixture/index→실제 CKS stdio의5도구·pin/상한/오류 경로를 검증한다. 이후 P06 실제역할·P07 그림/종료·P08 준비 판정을 진행한다.
+P06 실제 Analyzer/Planner 역할 adapter·로컬 응답기로 도구7쌍/typed handoff/재진입/권한 실패를 검증한다. 이후 P07 그림/host 취소·종료, P08 최종 준비 판정.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_local_readiness.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-local-readiness.py --packet docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_stdio_readiness.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-stdio-readiness.py --packet docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비 1~26단계와 27단계 요청 구현/로컬 검증 완료, 28단계 예정. P02~P04 교차 검증은 P05~P08 pending. 정식 독립 수용은 계속 0/9이다.
+현재 준비1~27단계 및 28단계/P05 소유 stdio 검증 완료. 29단계/P06 예정. P02~P04의 실제 역할 교차 검증과 P07~P08은 pending. 정식 독립 수용은 계속0/9이다.
