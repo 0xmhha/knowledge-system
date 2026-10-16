@@ -1,0 +1,438 @@
+package experiment
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"math"
+	"time"
+)
+
+const MinimumInferenceSamples = 30
+
+// Factory is implemented by an execution adapter, never by caller-supplied
+// JSON. Open must return the cleanup handle even when initialization fails.
+type Factory interface {
+	Open(context.Context, TrialRequest) (TrialSession, error)
+}
+type TrialRequest struct {
+	ExperimentID       string
+	Mode               string
+	Source             Source
+	Schedule           Schedule
+	OwnedNodeIDs       []string
+	Injection          *Injection
+	AssertionID        string
+	NormalAssertionIDs []string
+	Resume             *ResumeTrigger
+	ObservationWindow  time.Duration
+}
+
+// TrialSession owns only the resources its factory allocated. Close must not
+// stop an adopted or unrelated network. Observation sessions are read-only.
+type TrialSession interface {
+	Identity(context.Context) (SessionIdentity, error)
+	Run(context.Context) (Observation, error)
+	Close(context.Context) error
+}
+type SessionIdentity struct {
+	RuntimeSHA256 string   `json:"runtime_sha256,omitempty"`
+	Source        Source   `json:"source"`
+	LeaseID       string   `json:"lease_id"`
+	OwnedNodeIDs  []string `json:"owned_node_ids"`
+	ReadOnly      bool     `json:"read_only"`
+}
+type AssertionObservation struct {
+	ID            string `json:"id"`
+	Pass          bool   `json:"pass"`
+	Error         string `json:"error,omitempty"`
+	ReceiptSHA256 string `json:"receipt_sha256"`
+}
+type InjectionObservation struct {
+	Kind          string `json:"kind"`
+	Target        string `json:"target"`
+	Step          string `json:"step"`
+	DelayMS       int    `json:"delay_ms"`
+	Executed      bool   `json:"executed"`
+	ReceiptSHA256 string `json:"receipt_sha256"`
+}
+type MonitorEvent struct {
+	Name          string    `json:"name"`
+	AssertionID   string    `json:"assertion_id"`
+	Source        Source    `json:"source"`
+	ObservedAt    time.Time `json:"observed_at"`
+	ReceiptSHA256 string    `json:"receipt_sha256"`
+}
+type RawReceipt struct {
+	Kind   string          `json:"kind"`
+	SHA256 string          `json:"sha256"`
+	Body   json.RawMessage `json:"body"`
+}
+type Observation struct {
+	Receipts       []RawReceipt           `json:"receipts,omitempty"`
+	Polls          int                    `json:"polls,omitempty"`
+	WatchedSeconds float64                `json:"watched_seconds,omitempty"`
+	Symptom        AssertionObservation   `json:"symptom"`
+	Controls       []AssertionObservation `json:"controls"`
+	Injection      *InjectionObservation  `json:"injection"`
+	Events         []MonitorEvent         `json:"events"`
+}
+type Trial struct {
+	Cohort       string           `json:"cohort"`
+	Source       Source           `json:"source"`
+	Schedule     Schedule         `json:"schedule"`
+	Identity     *SessionIdentity `json:"identity"`
+	Observation  *Observation     `json:"observation"`
+	Outcome      string           `json:"outcome"` // PASS, SYMPTOM_FAIL, CONTROL_FAIL, ERROR
+	Error        string           `json:"error,omitempty"`
+	CleanupOK    bool             `json:"cleanup_ok"`
+	CleanupError string           `json:"cleanup_error,omitempty"`
+	StartedAt    time.Time        `json:"started_at"`
+	FinishedAt   time.Time        `json:"finished_at"`
+}
+type TrialCounts struct {
+	Planned              int      `json:"planned"`
+	Attempted            int      `json:"attempted"`
+	Completed            int      `json:"completed"` // usable designated assertion + controls + cleanup
+	SymptomFailures      int      `json:"symptom_failures"`
+	ControlFailures      int      `json:"control_failures"`
+	InfrastructureErrors int      `json:"infrastructure_errors"`
+	Missing              int      `json:"missing"`
+	FailureRate          *float64 `json:"failure_rate"`
+	UpperFailureRate95   *float64 `json:"upper_failure_rate_95"`
+}
+type Report struct {
+	SchemaVersion   int          `json:"schema_version"`
+	Plan            Plan         `json:"plan"`
+	PlanSHA256      string       `json:"plan_sha256"`
+	Trials          []Trial      `json:"trials"`
+	Before          TrialCounts  `json:"before"`
+	After           *TrialCounts `json:"after"`
+	Verdict         string       `json:"verdict"`
+	StopReason      string       `json:"stop_reason"`
+	ResumeRequested bool         `json:"resume_requested"`
+	Acceptance      string       `json:"acceptance"`
+}
+
+func RunInvestigation(parent context.Context, p Plan, f Factory) (Report, error) {
+	if e := p.Validate(); e != nil {
+		return Report{}, e
+	}
+	if f == nil {
+		return Report{}, fmt.Errorf("missing execution factory")
+	}
+	// Own every pointer/slice: a caller may not change frozen conditions while
+	// callbacks run. Callbacks receive separate copies again for each trial.
+	raw, _ := json.Marshal(p)
+	var frozen Plan
+	if e := json.Unmarshal(raw, &frozen); e != nil {
+		return Report{}, e
+	}
+	p = frozen
+	digest, _ := p.Digest()
+	schedules, _ := p.Schedules()
+	out := Report{SchemaVersion: 1, Plan: p, PlanSHA256: digest, Trials: []Trial{}, Acceptance: "not_recorded"}
+	ctx, cancel := context.WithTimeout(parent, time.Duration(p.TotalTimeoutSeconds)*time.Second)
+	defer cancel()
+	sources := []Source{p.Before}
+	if p.After != nil {
+		sources = append(sources, *p.After)
+	}
+	stop := false
+	for _, schedule := range schedules {
+		for cohort, source := range sources {
+			if ctx.Err() != nil {
+				out.StopReason = "total_time_budget"
+				stop = true
+				break
+			}
+			label := "before"
+			if cohort == 1 {
+				label = "after"
+			}
+			trial := execute(ctx, p, source, schedule, label, f)
+			out.Trials = append(out.Trials, trial)
+			if p.Mode == "observation" && trial.Outcome == "SYMPTOM_FAIL" && trial.Observation != nil {
+				for _, event := range trial.Observation.Events {
+					if event.Name == p.Resume.Event && event.AssertionID == p.Resume.AssertionID {
+						out.StopReason = "designated_symptom_recurred"
+						stop = true
+					}
+				}
+			}
+			if !trial.CleanupOK {
+				out.StopReason = "cleanup_unresolved"
+				stop = true
+				break
+			}
+		}
+		if stop {
+			break
+		}
+	}
+	out.Before = count(out.Trials, "before", p.Repetitions)
+	if p.After != nil {
+		after := count(out.Trials, "after", p.Repetitions)
+		out.After = &after
+	}
+	out.Verdict = verdict(out)
+	if p.Mode == "observation" {
+		out.Verdict = "AWAITING_OBSERVATION"
+		if out.Before.InfrastructureErrors > 0 || out.Before.ControlFailures > 0 {
+			out.Verdict = "ERROR"
+		} else {
+			for _, trial := range out.Trials {
+				if trial.Outcome != "SYMPTOM_FAIL" || trial.Observation == nil {
+					continue
+				}
+				for _, e := range trial.Observation.Events {
+					if e.Name == p.Resume.Event && e.AssertionID == p.Resume.AssertionID {
+						out.ResumeRequested = true
+						out.Verdict = "RECURRED"
+					}
+				}
+			}
+		}
+	}
+	if out.StopReason == "" {
+		out.StopReason = "planned_trials_finished"
+	}
+	return out, nil
+}
+
+func execute(parent context.Context, p Plan, source Source, schedule Schedule, cohort string, f Factory) (trial Trial) {
+	trial = Trial{Cohort: cohort, Source: source, Schedule: schedule, Outcome: "ERROR", StartedAt: time.Now().UTC()}
+	ctx, cancel := context.WithTimeout(parent, time.Duration(p.TrialTimeoutSeconds)*time.Second)
+	defer cancel()
+	request := TrialRequest{ExperimentID: p.ID, Mode: p.Mode, Source: source, Schedule: schedule, OwnedNodeIDs: append([]string(nil), p.OwnedNodeIDs...), AssertionID: p.AssertionID, NormalAssertionIDs: append([]string(nil), p.NormalAssertionIDs...)}
+	if p.Injection != nil {
+		i := *p.Injection
+		request.Injection = &i
+	}
+	if p.Resume != nil {
+		r := *p.Resume
+		request.Resume = &r
+		request.ObservationWindow = time.Duration(r.WindowSeconds) * time.Second / time.Duration(p.Repetitions)
+	}
+	var session TrialSession
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			trial.Outcome = "ERROR"
+			trial.Error = "execution_adapter_panic"
+		}
+		if session != nil {
+			// Cancellation of a trial never cancels the cleanup attempt.
+			clean, cancelClean := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancelClean()
+			err := safeClose(clean, session)
+			trial.CleanupOK = err == nil
+			if err != nil {
+				trial.CleanupError = err.Error()
+				trial.Outcome = "ERROR"
+			}
+		} else {
+			trial.CleanupOK = trial.Error != "execution_adapter_panic"
+		}
+		trial.FinishedAt = time.Now().UTC()
+	}()
+	var err error
+	session, err = f.Open(ctx, request)
+	if err != nil {
+		trial.Error = "initialization_failed: " + err.Error()
+		return
+	}
+	if session == nil {
+		trial.Error = "missing_trial_session"
+		return
+	}
+	identity, err := session.Identity(ctx)
+	if err != nil {
+		trial.Error = "identity_unavailable: " + err.Error()
+		return
+	}
+	identity.OwnedNodeIDs = append([]string(nil), identity.OwnedNodeIDs...)
+	trial.Identity = &identity
+	if identity.Source != source || identity.LeaseID == "" || !unique(identity.OwnedNodeIDs) {
+		trial.Error = "session_identity_mismatch"
+		return
+	}
+	if p.Mode == "observation" {
+		if !identity.ReadOnly {
+			trial.Error = "observation_must_be_read_only"
+			return
+		}
+	} else {
+		if identity.ReadOnly || !sameSet(identity.OwnedNodeIDs, p.OwnedNodeIDs) {
+			trial.Error = "node_ownership_mismatch"
+			return
+		}
+	}
+	observation, err := session.Run(ctx)
+	trial.Observation = &observation
+	if err != nil {
+		trial.Error = "execution_failed: " + err.Error()
+		return
+	}
+	if ctx.Err() != nil {
+		trial.Error = "trial_time_budget"
+		return
+	}
+	after, err := session.Identity(ctx)
+	if err != nil || after.Source != identity.Source || after.LeaseID != identity.LeaseID || after.ReadOnly != identity.ReadOnly || after.RuntimeSHA256 != identity.RuntimeSHA256 || !sameSet(after.OwnedNodeIDs, identity.OwnedNodeIDs) {
+		trial.Error = "session_identity_changed"
+		return
+	}
+	if e := validateObservation(p, source, schedule, observation, trial.StartedAt, time.Now().UTC()); e != nil {
+		trial.Error = e.Error()
+		return
+	}
+	trial.Outcome = "PASS"
+	for _, control := range observation.Controls {
+		if !control.Pass {
+			trial.Outcome = "CONTROL_FAIL"
+			return
+		}
+	}
+	if !observation.Symptom.Pass {
+		trial.Outcome = "SYMPTOM_FAIL"
+	}
+	return
+}
+func safeClose(ctx context.Context, s TrialSession) (err error) {
+	defer func() {
+		if recover() != nil {
+			err = fmt.Errorf("cleanup_adapter_panic")
+		}
+	}()
+	return s.Close(ctx)
+}
+func sameSet(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for _, v := range a {
+		if !contains(b, v) {
+			return false
+		}
+	}
+	return true
+}
+func validAssertion(a AssertionObservation) bool {
+	return a.ID != "" && a.Error == "" && validHash(a.ReceiptSHA256, 64)
+}
+func validateObservation(p Plan, source Source, schedule Schedule, o Observation, start, end time.Time) error {
+	if o.Symptom.ID != p.AssertionID || !validAssertion(o.Symptom) {
+		return fmt.Errorf("designated_assertion_unavailable")
+	}
+	if len(o.Controls) != len(p.NormalAssertionIDs) {
+		return fmt.Errorf("normal_control_coverage_mismatch")
+	}
+	names := []string{}
+	for _, c := range o.Controls {
+		if !validAssertion(c) || !contains(p.NormalAssertionIDs, c.ID) || contains(names, c.ID) {
+			return fmt.Errorf("normal_control_identity_mismatch")
+		}
+		names = append(names, c.ID)
+	}
+	if p.Injection != nil {
+		i := o.Injection
+		want := p.Injection
+		if i == nil || !i.Executed || i.Kind != want.Kind || i.Target != want.Target || i.Step != want.Step || i.DelayMS != schedule.DelayMS || !validHash(i.ReceiptSHA256, 64) {
+			return fmt.Errorf("injection_not_verified")
+		}
+	} else if o.Injection != nil {
+		return fmt.Errorf("unexpected_injection")
+	}
+	if len(o.Events) > 128 {
+		return fmt.Errorf("event_budget_exceeded")
+	}
+	for _, e := range o.Events {
+		if e.Source != source || e.Name == "" || !validHash(e.ReceiptSHA256, 64) || e.ObservedAt.Before(start) || e.ObservedAt.After(end) {
+			return fmt.Errorf("event_identity_mismatch")
+		}
+	}
+	return nil
+}
+func count(trials []Trial, cohort string, planned int) TrialCounts {
+	c := TrialCounts{Planned: planned}
+	for _, trial := range trials {
+		if trial.Cohort != cohort {
+			continue
+		}
+		c.Attempted++
+		switch trial.Outcome {
+		case "PASS":
+			c.Completed++
+		case "SYMPTOM_FAIL":
+			c.Completed++
+			c.SymptomFailures++
+		case "CONTROL_FAIL":
+			c.ControlFailures++
+		default:
+			c.InfrastructureErrors++
+		}
+	}
+	c.Missing = planned - c.Attempted
+	if c.Completed > 0 {
+		rate := float64(c.SymptomFailures) / float64(c.Completed)
+		upper := UpperBinomial95(c.SymptomFailures, c.Completed)
+		c.FailureRate = &rate
+		c.UpperFailureRate95 = &upper
+	}
+	return c
+}
+func verdict(r Report) string {
+	p := r.Plan
+	before := r.Before
+	if before.InfrastructureErrors > 0 || before.ControlFailures > 0 || r.After != nil && (r.After.InfrastructureErrors > 0 || r.After.ControlFailures > 0) {
+		return "ERROR"
+	}
+	if before.Missing > 0 || before.Completed < p.MinCompleted || before.Completed < MinimumInferenceSamples {
+		return "INCONCLUSIVE"
+	}
+	if before.SymptomFailures < p.MinSymptomFailures {
+		return "AWAITING_OBSERVATION"
+	}
+	if r.After == nil {
+		return "REPRODUCED"
+	}
+	after := r.After
+	if after.Missing > 0 || after.Completed < p.MinCompleted || after.Completed < MinimumInferenceSamples {
+		return "INCONCLUSIVE"
+	}
+	if after.UpperFailureRate95 == nil || *after.UpperFailureRate95 > p.MaxFailureRate {
+		return "RATE_BOUND_NOT_MET"
+	}
+	return "OBSERVED_RATE_BOUND_MET"
+}
+
+// UpperBinomial95 is the one-sided 95% Clopper-Pearson upper bound. It is
+// an observed-window bound, never a claim that a failure is impossible.
+func UpperBinomial95(k, n int) float64 {
+	if n < 1 || k < 0 || k > n {
+		return math.NaN()
+	}
+	if k == n {
+		return 1
+	}
+	if k == 0 {
+		return -math.Expm1(math.Log(.05) / float64(n))
+	}
+	lo, hi := float64(k)/float64(n), 1.0
+	for iteration := 0; iteration < 60; iteration++ {
+		p := (lo + hi) / 2
+		cdf := 0.0
+		logN, _ := math.Lgamma(float64(n + 1))
+		for i := 0; i <= k; i++ {
+			logI, _ := math.Lgamma(float64(i + 1))
+			logRest, _ := math.Lgamma(float64(n - i + 1))
+			cdf += math.Exp(logN - logI - logRest + float64(i)*math.Log(p) + float64(n-i)*math.Log1p(-p))
+		}
+		if cdf > .05 {
+			lo = p
+		} else {
+			hi = p
+		}
+	}
+	return (lo + hi) / 2
+}

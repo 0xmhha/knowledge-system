@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "status": "schedule_input_candidates_only",
+  "contains_gold": false,
+  "cases": [
+    {
+      "case_id": "SCHED-001",
+      "work_item": "WI-4",
+      "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_paths": [
+        "eth/downloader/api.go"
+      ],
+      "prompt": "알림 전달과 구독 종료가 겹치는 조건에서 완료·정리 상태를 기록하세요.",
+      "split": null,
+      "approved": false,
+      "contains_gold": false
+    },
+    {
+      "case_id": "SCHED-002",
+      "work_item": "WI-4",
+      "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_paths": [
+        "p2p/discover/v4_udp.go"
+      ],
+      "prompt": "대기 요청이 여러 개일 때 알림·제거·다음 timeout 설정 상태를 원문 조건별로 기록하세요.",
+      "split": null,
+      "approved": false,
+      "contains_gold": false
+    },
+    {
+      "case_id": "SCHED-003",
+      "work_item": "WI-4",
+      "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_paths": [
+        "miner/worker.go"
+      ],
+      "prompt": "종료와 새 작업 이벤트가 겹칠 때 작업 전달·반환·타이머 정리의 순서를 기록하세요.",
+      "split": null,
+      "approved": false,
+      "contains_gold": false
+    },
+    {
+      "case_id": "SCHED-004",
+      "work_item": "WI-4",
+      "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_paths": [
+        "consensus/wbft/backend/backend.go",
+        "eth/protocols/eth/peer.go"
+      ],
+      "prompt": "비동기 송신 성공·실패·중복 요청 조건에서 캐시와 실제 시도 횟수를 구분해 기록하세요.",
+      "split": null,
+      "approved": false,
+      "contains_gold": false
+    },
+    {
+      "case_id": "SCHED-005",
+      "work_item": "WI-4",
+      "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_paths": [
+        "core/txpool/blobpool/blobpool.go",
+        "event/feed.go"
+      ],
+      "prompt": "pool 갱신과 구독자의 조회·이벤트 수신이 겹칠 때 잠금과 알림 완료 상태를 기록하세요.",
+      "split": null,
+      "approved": false,
+      "contains_gold": false
+    }
+  ]
+}

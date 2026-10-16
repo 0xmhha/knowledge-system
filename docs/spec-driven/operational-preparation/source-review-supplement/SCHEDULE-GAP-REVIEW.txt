@@ -1,0 +1,89 @@
+WI-4 실제 도달성·스케줄 계약·독립 가족·반복 실행 공백 — 준비 20단계
+작성일 2026-10-17 (Asia/Seoul)
+상태: 준비 20단계 공백 점검·검증 완료. 정식 독립 수용 아님.
+
+목적
+기존 source 가설 5개/상관된 스케줄 21개와 로컬/과거 운영 대역 증거를 분리하여,
+독립 가족 5개·arm별 100회·baseline 증상 10건·600초 관찰의 미충족분을 기록한다.
+원문, 준비 계획, 통제 시험, 실제 대상 도달성, 독립 수용을 각각 추적한다.
+
+후보별 도달성과 계약
+SCHED-001: Syncing은 buffer 없는 status 채널을 구독하고 RPC 오류/연결 종료 시
+  goroutine을 반환하며 Unsubscribe를 defer한다. API eventLoop의 송신과 실제 종료가
+  겹치는 경로·notifier 계약·해제 확인·반환 상한은 실제 대상/독립 오라클로 검토해야 한다.
+SCHED-002: 등록 경로는 Now.Add(respTimeout) deadline을 사용한다. 먼 미래 deadline은
+  합성 입력이며 운영 유입은 미검증이다. monotonic 시각이 유지되는 조건에서 wall-clock
+  rollback만으로 재현했다고 주장하지 않는다. 응답/timeout/clockwarp 제거 순회는 같은
+  메커니즘의 분기로 유지하고 실제 timer firing·전체 matcher 처리 계약을 검토한다.
+SCHED-003: 선정 가설은 newWorkLoopOrigin이다. 실제 dispatch는 Anzeon==nil에서 Origin,
+  아니면 WBFT다. 대상 config·송신/exit 동시 준비·backlog와 허용 작업 범위가 미확인이다.
+  select에서 exit가 항상 이겨야 한다고 가정하거나 closure return을 worker 누수로 단정하지 않는다.
+SCHED-004: Broadcast는 validator 확인 후 Gossip을 호출한다. cache는 실제 전송 완료 전에
+  갱신된다. best-effort/시도 억제/전달 성공의 의미·실패 재시도 요구·실제 peer 경로가 미확정이다.
+SCHED-005: reorgs=true 구독은 insertFeed에 연결된다. 실제 subscriber가 수신 전에 Stats의
+  같은 lock을 기다리는지·buffer 포화가 가능한지·허용 backpressure·unsubscribe 계약이 미검증이다.
+기존 17근거와 진입 문맥 5곳은 고정 commit 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8의
+7파일 Git commit→tree→blob 원문에 대조했다. 문법상 경로가 실제 실행 도달성 증명은 아니다.
+
+가족과 분모
+- 서로 다른 메커니즘 label 5개는 독립 승인 5개가 아니다. 승인 가족·독립 오라클 0개.
+- 스케줄 21개는 같은 5가설의 정상/경계/가정 변형이다. 10쌍의 가족 비교도 모두 독립성 미검토.
+- 구독 추출 시험: 5variant(원문·후보 2개·변이 2개) × 5관련 시나리오 × 일반/race 2모드 = 50관측.
+  한 source 가설이며 eventLoop/RPC notifier는 대역이다. 실제 API 발생률·100회/arm 분모로 세지 않는다.
+- UDP 합성 시험: 원문/커서 초안 × 5deadline 구성 × 일반/race = 20관측.
+  timer Reset/Stop 요청 기록이며 실제 UDP/시계 변경/타이머 발화 시험은 아니다.
+- 일반/race 모드는 baseline/fix arm이 아니다. 후보·변이별 합계를 독립 결함/가족으로 세지 않는다.
+- 현재 5가족의 baseline/fix 계획·유효 반복 수·증상 수·비율·불확실성 구간은 null이다.
+  미확인을 관측 0건이나 완료 100건으로 바꾸지 않는다. 승인된 운영 반복은 0건이다.
+
+과거 실제 실행 증거의 범위
+- 과거 소유 Go RPC 대역 비교는 arm별 planned/completed 60회, baseline 증상 60건,
+  after 증상 0건으로 OBSERVED_RATE_BOUND_MET을 기록했다. 최소 symptom 계획은 3건이었다.
+  이 기록은 대역의 source-pinned 비교/정리 증거이며 현재 5가설·100회 기준의 수용 증거가 아니다.
+- 과거 모드9은 각 2초로 계획한 두 log 창에서 AWAITING_OBSERVATION 후 RECURRED,
+  지정 event의 분석 재진입·planning 거부·소유 자원 정리를 검증했다. 재발 창은 event 관측 후
+  조기 종료한다. 두 창을 모두 2초 동안 관찰했거나 600초 기준을 채웠다고 주장하지 않는다.
+- normal/race/build/vet 통제가 통과해도 instrumentation 기록의 timing_neutrality는 not_proven이다.
+  로깅 오버헤드/스케줄 교란의 효과·불확실성 평가가 없는 상태를 유지한다.
+- 과거 실행 owner revision과 현재 채택 revision을 별도로 기록했다. 채택 ChainBench 5파일과
+  consumer instrumentation 1파일을 기존 채택 SHA 및 Git 증명으로 대조했다.
+  원문 존재를 현재 설치된 역할의 실행/수용으로 승격하지 않는다.
+
+실행·판정 연결 질문 11개
+- generic Plan은 repetitions 1..1000과 개별 timeout 범위를 허용한다. 이 범위가 WI-4의
+  100회/arm·600초 관찰·F-01~F-08을 자동으로 강제하지 않는다.
+- 같은 seed/trial의 hash schedule을 양 arm에 적용하는 기능은 있으나 실제 환경 교란,
+  arm 순서·retry·독립 가족·DEV/FINAL을 자동 보장하지 않는다.
+- 엔진은 planned/attempted/completed, symptom/control/인프라 오류/missing을 분리한다.
+  유효 분모·불충분 관측·취소·재시도와 가족 집계 정책을 독립 동결해야 한다.
+- 일반 엔진의 최소 추론 표본은 30이다. 수정 후 단측 95% Clopper-Pearson 상한을
+  MaxFailureRate라는 절대 임계치와 비교하는 판정은 baseline 대비 실패율 비율<=0.50과 다르다.
+- 프로토콜의 paired family-cluster bootstrap(95%, 10000회) 제안도 이 단일 arm 상한과 다르다.
+  상대 비율·가족 불확실성·undefined/zero denominator를 연결할 수용 평가 기준/매칭이 미동결이다.
+- generic AWAITING_OBSERVATION/RECURRED/OBSERVED_RATE_BOUND_MET은 정식 독립 수용 상태가 아니다.
+  zero/insufficient baseline은 inconclusive 제안을 유지한다. '무재발'의 적용 대상이
+  baseline/관찰 창/수정 후 arm 중 무엇인지와 상태 연결도 동결해야 한다.
+- trial/전체 timeout·600초 log 관찰·source/driver/environment pin·초기 log anchor·재발/변조/
+  취소/오류/정리와 실제 분석 역할 재진입의 영수증이 필요하다.
+- cleanup은 취소된 trial과 별도 context를 쓰도록 구현되어 있다. 실제 대상에서도 소유권과
+  정리 완료·외부/기존 노드 비정지 경계를 기록해야 한다.
+- 구조화 log MCP 관찰은 비교/주입 실행과 다른 경로다. 현재 5가설의 실제 반복/설치 역할
+  경로·timing neutrality는 미확보다. 이번에는 임계치나 일반 엔진 구현을 변경하지 않았다.
+각 계약의 고정 원문 span과 미충족 사항은 schedule-gap-v1/execution-contract-review.json 참조.
+
+검증
+- 전용 변조/경계 테스트 30개 통과: 21스케줄→독립 가족 승격, 미확인 분모→100회/0증상,
+  합성/대역→운영 도달성, 2초→600초, 무재발→수정 수용, absolute→relative 동일시,
+  timing neutrality·오라클·cleanup 영수증 위조 및 무승인 실행 허용을 거부했다.
+- 신규 backend/model/노드/시계 변경/target state 쓰기/정식 평가 실행 0건.
+  새 native 코드를 작성하지 않았고 유지보수 Go는 변경하지 않았다.
+- 연관 Python 회귀 500개(23개 suite), 현재 문서 134개, 기존 구현 완료 상태 검사 통과.
+- 패킷 28파일 재생성 바이트 일치·공개 입력 불변. 이전 동결 패킷 19개·유지보수 Go 변경 없음.
+- suite별 테스트 수는 진행 장부 phase 0의 schedule_gap_preparation에 기록.
+- 담당자 '미정', F-01~F-08 pending, freeze null, execution_allowed false,
+  정식 독립 수용 0/9 및 기존 구현 완료 상태 유지.
+
+다음 작업
+준비 21단계: WI-V1/WI-V2의 실제 API 경로·독립 티켓·주/독립 도출 오라클·독립 수용 가능
+후보 집합의 미충족분을 기존 개발용 티켓/추출 시험/변이 자료와 대조한다.
+전체 정식 작업 9개와 별도 후속 후보 12개는 PROGRESS.txt 및 GAPS.json에 유지한다.

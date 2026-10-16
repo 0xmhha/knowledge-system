@@ -1,0 +1,61 @@
+package mcp
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/0xmhha/chainbench/internal/app"
+)
+
+func logObservationTool(prepare bool) Tool {
+	name := "chainbench_observe_logs"
+	description := "Observe frozen structured code logs on recorded node machines, with no node control. Returns recurrence/awaiting/error and source-bound raw events; never fix acceptance."
+	if prepare {
+		name = "chainbench_prepare_log_observation"
+		description = "Freeze actual clean source/composition and complete-line cursors for a structured log observation. Reads only; creates no node or file."
+	}
+	schema := logObservationSchema()
+	if prepare {
+		source := schema["properties"].(map[string]any)["plan"].(map[string]any)["properties"].(map[string]any)["source"].(map[string]any)
+		source["required"] = []string{"commit"}
+	}
+	return Tool{Name: name, Description: description, ReadOnly: prepare, InputSchema: map[string]any{"type": "object", "properties": map[string]any{"input": schema}, "required": []string{"input"}, "additionalProperties": false}, Handler: func(ctx context.Context, args map[string]any) (string, error) {
+		if len(args) != 1 || args["input"] == nil {
+			return "", fmt.Errorf("log observation input required")
+		}
+		raw, e := json.Marshal(args["input"])
+		if e != nil {
+			return "", e
+		}
+		in, e := app.DecodeLogObservationInput(raw)
+		if e != nil {
+			return "", e
+		}
+		var result any
+		if prepare {
+			result, e = app.PrepareLogObservation(ctx, app.Deps{}, in)
+		} else {
+			result, e = app.ObserveTimingLogs(ctx, app.Deps{}, in)
+		}
+		if e != nil {
+			return "", e
+		}
+		out, e := json.Marshal(result)
+		return string(out), e
+	}}
+}
+func logObservationSchema() map[string]any {
+	text := func(max int) map[string]any {
+		return map[string]any{"type": "string", "minLength": 1, "maxLength": max}
+	}
+	integer := func(min, max int) map[string]any {
+		return map[string]any{"type": "integer", "minimum": min, "maximum": max}
+	}
+	object := func(props map[string]any, required ...string) map[string]any {
+		return map[string]any{"type": "object", "properties": props, "required": required, "additionalProperties": false}
+	}
+	source := experimentInputSchema()["properties"].(map[string]any)["plan"].(map[string]any)["properties"].(map[string]any)["before"]
+	anchor := object(map[string]any{"node": integer(1, 32), "id": map[string]any{"type": "integer", "minimum": 1}, "initial": map[string]any{"type": "string", "contentEncoding": "base64", "maxLength": 87384}}, "node")
+	plan := object(map[string]any{"schema_version": map[string]any{"type": "integer", "const": 1}, "id": text(128), "source": source, "probe_id": text(128), "instrumentation_sha256": map[string]any{"type": "string", "pattern": "^[0-9a-f]{64}$"}, "event": text(128), "sites": map[string]any{"type": "array", "items": text(256), "minItems": 1, "maxItems": 32, "uniqueItems": true}, "window_seconds": integer(1, 3600), "poll_ms": integer(50, 5000), "max_bytes": integer(4096, 65536), "max_events": integer(1, 256), "anchors": map[string]any{"type": "array", "items": anchor, "minItems": 1, "maxItems": 8}}, "schema_version", "id", "source", "probe_id", "instrumentation_sha256", "event", "sites", "window_seconds", "poll_ms", "max_bytes", "max_events", "anchors")
+	return object(map[string]any{"plan": plan, "workspace": text(4096), "binary": text(4096), "artifact_root": text(4096)}, "plan", "workspace", "binary")
+}

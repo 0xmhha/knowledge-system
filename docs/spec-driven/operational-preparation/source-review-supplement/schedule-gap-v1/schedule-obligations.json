@@ -1,0 +1,648 @@
+[
+  {
+    "family_proposal": "SCHED-001",
+    "schedule": {
+      "id": "SUB-normal",
+      "kind": "normal_control",
+      "start_conditions": [
+        "알림 수신자 존재"
+      ],
+      "steps": [
+        "알림 수신",
+        "해제 요청",
+        "확인 후 반환"
+      ],
+      "observations": [
+        "반환·등록 제거·확인·소유 goroutine 종료"
+      ],
+      "primary_expectation_draft": "원문 정상 대조군에서 완료",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-001",
+    "schedule": {
+      "id": "SUB-blocked",
+      "kind": "symptom_candidate",
+      "start_conditions": [
+        "버퍼 없는 status",
+        "유일 수신자가 알림 전 종료"
+      ],
+      "steps": [
+        "알림 송신 대기",
+        "구독 해제 진입"
+      ],
+      "observations": [
+        "송신 대기 스택 두 개",
+        "구조 신호 전 반환 여부"
+      ],
+      "primary_expectation_draft": "통제된 원본 메서드에서 순환 대기 관측",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-001",
+    "schedule": {
+      "id": "SUB-late",
+      "kind": "boundary_control",
+      "start_conditions": [
+        "해제 요청을 수신함"
+      ],
+      "steps": [
+        "확인 전에 추가 알림",
+        "해제 확인"
+      ],
+      "observations": [
+        "알림 소비",
+        "확인 전 조기 반환 여부"
+      ],
+      "primary_expectation_draft": "확인 이전 알림을 소비하고 확인 후 반환",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-001",
+    "schedule": {
+      "id": "SUB-ack",
+      "kind": "boundary_control",
+      "start_conditions": [
+        "확인 신호를 시험이 소유"
+      ],
+      "steps": [
+        "해제 등록",
+        "확인 지연",
+        "확인 해제"
+      ],
+      "observations": [
+        "확인 대기",
+        "반환 순서"
+      ],
+      "primary_expectation_draft": "확인 전 반환 금지",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-001",
+    "schedule": {
+      "id": "SUB-once",
+      "kind": "idempotence_control",
+      "start_conditions": [
+        "동일 구독"
+      ],
+      "steps": [
+        "두 해제 호출 동시 진입",
+        "확인"
+      ],
+      "observations": [
+        "요청 수",
+        "두 호출 종료"
+      ],
+      "primary_expectation_draft": "요청 1개와 두 호출 완료",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-002",
+    "schedule": {
+      "id": "UDP-near",
+      "kind": "normal_control",
+      "start_conditions": [
+        "가까운 deadline 2개"
+      ],
+      "steps": [
+        "resetTimeout 1회"
+      ],
+      "observations": [
+        "남은 목록",
+        "오류 수",
+        "타이머 활성"
+      ],
+      "primary_expectation_draft": "첫 요청에 timeout 설정",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-002",
+    "schedule": {
+      "id": "UDP-far-pair",
+      "kind": "synthetic_branch",
+      "start_conditions": [
+        "합성 먼 미래 deadline 2개",
+        "오류 채널 버퍼 1"
+      ],
+      "steps": [
+        "resetTimeout 1회"
+      ],
+      "observations": [
+        "두 번째 원소 잔존",
+        "오류 통지 수",
+        "타이머 중지"
+      ],
+      "primary_expectation_draft": "원본 삭제 순회가 다음 원소에 도달하는지 관측",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-002",
+    "schedule": {
+      "id": "UDP-far-near",
+      "kind": "synthetic_branch",
+      "start_conditions": [
+        "합성 먼 미래 head",
+        "가까운 deadline tail"
+      ],
+      "steps": [
+        "resetTimeout 1회"
+      ],
+      "observations": [
+        "tail 잔존과 타이머 활성",
+        "head 오류"
+      ],
+      "primary_expectation_draft": "미처리 원소와 중지 타이머의 동시 존재를 관측",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-002",
+    "schedule": {
+      "id": "UDP-response-timeout",
+      "kind": "related_branch_proposal",
+      "start_conditions": [
+        "같은 응답 조건 또는 만료 시각의 matcher 2개"
+      ],
+      "steps": [
+        "한 응답 또는 timeout 이벤트 처리"
+      ],
+      "observations": [
+        "처리된 matcher 수",
+        "남은 matcher",
+        "후속 깨움 필요"
+      ],
+      "primary_expectation_draft": "같은 제거 커서 문제의 다른 분기로 별도 가족에 합산하지 않음",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-003",
+    "schedule": {
+      "id": "WORK-normal",
+      "kind": "normal_control",
+      "start_conditions": [
+        "exit 미준비",
+        "작업 수신자 준비"
+      ],
+      "steps": [
+        "작업 이벤트",
+        "송신",
+        "종료"
+      ],
+      "observations": [
+        "작업 수",
+        "외부 루프 반환",
+        "타이머 정리"
+      ],
+      "primary_expectation_draft": "정상 작업 전달과 종료",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-003",
+    "schedule": {
+      "id": "WORK-exit",
+      "kind": "boundary_control",
+      "start_conditions": [
+        "작업 수신자 없음",
+        "exit 준비"
+      ],
+      "steps": [
+        "commit 진입",
+        "바깥 루프 재진입"
+      ],
+      "observations": [
+        "closure 반환",
+        "외부 함수 반환"
+      ],
+      "primary_expectation_draft": "두 반환 범위를 구별",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-003",
+    "schedule": {
+      "id": "WORK-both",
+      "kind": "contract_question",
+      "start_conditions": [
+        "송신과 exit가 동시에 준비"
+      ],
+      "steps": [
+        "select 선택 관측"
+      ],
+      "observations": [
+        "선택 분기",
+        "전달된 작업 수"
+      ],
+      "primary_expectation_draft": "선택 결과를 기록하며 계약 확정 전 실패로 채점하지 않음",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-003",
+    "schedule": {
+      "id": "WORK-backlog",
+      "kind": "contract_question",
+      "start_conditions": [
+        "start/head 이벤트 backlog",
+        "exit 준비"
+      ],
+      "steps": [
+        "반환까지 이벤트 소비 관측"
+      ],
+      "observations": [
+        "종료 전에 추가 처리한 이벤트",
+        "종료 시간 상한"
+      ],
+      "primary_expectation_draft": "원문만으로 특정 공정성·즉시 종료를 보장하지 않음",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-004",
+    "schedule": {
+      "id": "GOSSIP-normal",
+      "kind": "normal_control",
+      "start_conditions": [
+        "새 hash",
+        "가짜 peer 성공"
+      ],
+      "steps": [
+        "첫 호출",
+        "송신 완료 대기"
+      ],
+      "observations": [
+        "캐시 기록",
+        "송신 시도 1회"
+      ],
+      "primary_expectation_draft": "송신 시도와 완료를 분리 기록",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-004",
+    "schedule": {
+      "id": "GOSSIP-fail-repeat",
+      "kind": "contract_question",
+      "start_conditions": [
+        "첫 가짜 송신 오류",
+        "같은 peer/hash"
+      ],
+      "steps": [
+        "첫 호출 완료",
+        "두 번째 호출"
+      ],
+      "observations": [
+        "캐시 hit",
+        "송신 시도 수",
+        "반환 오류 수"
+      ],
+      "primary_expectation_draft": "재시도 억제 관측을 계약 확정 전 결함으로 채점하지 않음",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-004",
+    "schedule": {
+      "id": "GOSSIP-delay-repeat",
+      "kind": "boundary_control",
+      "start_conditions": [
+        "첫 가짜 송신 대기"
+      ],
+      "steps": [
+        "캐시 기록",
+        "두 번째 호출",
+        "첫 송신 해제"
+      ],
+      "observations": [
+        "완료 전 중복 억제",
+        "모든 가짜 peer 종료"
+      ],
+      "primary_expectation_draft": "중복 억제와 전달 보장 구분",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-004",
+    "schedule": {
+      "id": "GOSSIP-cache-control",
+      "kind": "normal_control",
+      "start_conditions": [
+        "새 peer 캐시 또는 다른 hash"
+      ],
+      "steps": [
+        "추가 호출"
+      ],
+      "observations": [
+        "새 송신 시도",
+        "캐시 범위"
+      ],
+      "primary_expectation_draft": "전역 영구 손실로 일반화하지 않음",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-005",
+    "schedule": {
+      "id": "POOL-normal",
+      "kind": "normal_control",
+      "start_conditions": [
+        "수신자 준비",
+        "Stats는 수신 후 호출"
+      ],
+      "steps": [
+        "Reset 송신",
+        "수신",
+        "Stats"
+      ],
+      "observations": [
+        "잠금 해제",
+        "송신·조회 완료"
+      ],
+      "primary_expectation_draft": "정상 순서에서 완료",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-005",
+    "schedule": {
+      "id": "POOL-lock-cycle",
+      "kind": "controlled_assumption",
+      "start_conditions": [
+        "Reset이 잠금 소유",
+        "구독자는 수신 전 Stats 대기",
+        "채널 여유 없음"
+      ],
+      "steps": [
+        "이벤트 송신",
+        "subscriber 조회"
+      ],
+      "observations": [
+        "잠금 대기와 송신 대기",
+        "정리 전에 완료 여부"
+      ],
+      "primary_expectation_draft": "대역에서만 구성한 순환 대기이며 운영 도달성은 미검증",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-005",
+    "schedule": {
+      "id": "POOL-buffer",
+      "kind": "boundary_control",
+      "start_conditions": [
+        "이벤트 1개를 담을 빈 버퍼"
+      ],
+      "steps": [
+        "Reset 송신",
+        "잠금 해제",
+        "Stats 후 수신"
+      ],
+      "observations": [
+        "버퍼 사용",
+        "두 작업 완료"
+      ],
+      "primary_expectation_draft": "유한 빈 버퍼 대조군을 모든 부하 안전성으로 일반화하지 않음",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  },
+  {
+    "family_proposal": "SCHED-005",
+    "schedule": {
+      "id": "POOL-unsubscribe",
+      "kind": "boundary_control",
+      "start_conditions": [
+        "느린 구독자",
+        "시험 소유 해제 경로"
+      ],
+      "steps": [
+        "송신 대기",
+        "구독 해제"
+      ],
+      "observations": [
+        "Send 해제",
+        "pool 잠금 해제",
+        "소유 goroutine 정리"
+      ],
+      "primary_expectation_draft": "Feed의 구독 제거 경로도 관측",
+      "step_deadline_ms": 2000,
+      "cleanup": [
+        "관측 결과를 먼저 복사한다",
+        "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+        "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+      ],
+      "outcome_status": "ai_draft_not_independent_oracle"
+    },
+    "operational_reachability": "not_verified",
+    "independent_oracle": null,
+    "frozen_arm_assignment": null,
+    "operational_runs": 0
+  }
+]
