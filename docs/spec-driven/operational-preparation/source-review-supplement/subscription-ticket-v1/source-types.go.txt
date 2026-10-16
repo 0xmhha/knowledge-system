@@ -1,0 +1,12 @@
+// uninstallSyncSubscriptionRequest uninstalls a syncing subscription in the API event loop.
+type uninstallSyncSubscriptionRequest struct {
+	c           chan interface{}
+	uninstalled chan interface{}
+}
+
+// SyncStatusSubscription represents a syncing subscription.
+type SyncStatusSubscription struct {
+	api       *DownloaderAPI   // register subscription in event loop of this api instance
+	c         chan interface{} // channel where events are broadcasted to
+	unsubOnce sync.Once        // make sure unsubscribe logic is executed once
+}
