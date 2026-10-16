@@ -1,0 +1,51 @@
+{
+  "kind": "controlled_analyzer_observations_not_independent_quality_or_project_effect",
+  "counts": {
+    "controlled_sources": 40,
+    "distinct_controlled_sources_with_candidates": 20,
+    "candidates_per_mode": 20,
+    "ai_proposal_matches": 40,
+    "ai_proposal_disagreements": 0,
+    "independent_gold_records": 0,
+    "approved_independent_cases": 0
+  },
+  "by_rule": {
+    "discarded-conversion-error": {
+      "inputs": 20,
+      "with_candidates": 10,
+      "empty": 10
+    },
+    "parameter-command-name": {
+      "inputs": 20,
+      "with_candidates": 10,
+      "empty": 10
+    }
+  },
+  "diagnostic_counts": {
+    "isolated_type_info_partial": 40,
+    "opaque_call": 44,
+    "external_value_unknown": 36,
+    "aggregate_alias_unknown": 1,
+    "field_read_untracked": 1,
+    "closure_unsupported": 2,
+    "closure_value_unknown": 2,
+    "reference_alias_unknown": 3
+  },
+  "project_cases_analyzed": 0,
+  "mcp_calls": 0,
+  "model_calls": 0,
+  "nodes_started": 0,
+  "formal_runs": 0,
+  "precision": null,
+  "recall": null,
+  "confusion_matrix": null,
+  "analyzed_source_executed": false,
+  "latency_measurement": "elapsed_micros_zeroed_not_benchmarked",
+  "limits": [
+    "AI proposal agreement is not accuracy or independent gold",
+    "controlled examples do not fill project positive denominators",
+    "synthetic retained offsets and snapshot pins are not a real retained graph or MCP round trip",
+    "isolated function type diagnostics remain partial; callee identity and sanitizer effects unresolved",
+    "native analyzer determinism and bounds do not prove runtime safety or production acceptance"
+  ]
+}

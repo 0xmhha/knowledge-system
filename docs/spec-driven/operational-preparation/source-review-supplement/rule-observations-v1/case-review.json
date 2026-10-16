@@ -1,0 +1,1769 @@
+[
+  {
+    "case_id": "RULE-1-01",
+    "mechanism": "copy_chain",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "96376198a5e4396f3e7dd7d005bc51987591ca6afe753418c5d3588e97c2af1a",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "b",
+        "conditions": [],
+        "path": [
+          "entry",
+          "b0/n0",
+          "b0/n1",
+          "b0/n2"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-02",
+    "mechanism": "conditional_copy",
+    "coverage_tags": [
+      "branch"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "71dd9b507ae5ba30f65482f076ff6aa9d2917371dc58759f0ad59d4dc4e3081c",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "name",
+        "conditions": [
+          {
+            "condition": {
+              "node": "b0/n1",
+              "condition": "true",
+              "location": {
+                "start_byte": 444,
+                "end_byte": 446,
+                "start_line": 20,
+                "end_line": 20
+              },
+              "location_status": "source_node"
+            },
+            "source_text": "ok"
+          }
+        ],
+        "path": [
+          "entry",
+          "b1/n0",
+          "b2/n0"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-03",
+    "mechanism": "loop_copy",
+    "coverage_tags": [
+      "loop"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "065dbfe22ad733f03d7cb4bfde61ab802289a8c52c2a6d8efb91fe5de7296568",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "name",
+        "conditions": [
+          {
+            "condition": {
+              "node": "b3/n0",
+              "condition": "true",
+              "location": {
+                "start_byte": 448,
+                "end_byte": 451,
+                "start_line": 20,
+                "end_line": 20
+              },
+              "location_status": "source_node"
+            },
+            "source_text": "i<n"
+          }
+        ],
+        "path": [
+          "entry",
+          "b1/n0",
+          "b2/n0"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-04",
+    "mechanism": "inner_shadow_source",
+    "coverage_tags": [
+      "shadow"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "56188e524fd5c8d837b11461cfc52bce41934e4204d3279328ea776eb1e8732b",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "name",
+        "conditions": [],
+        "path": [
+          "entry",
+          "b0/n1",
+          "b0/n2"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-05",
+    "mechanism": "opaque_sanitizer_copy",
+    "coverage_tags": [
+      "sanitizer"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "4583f1409db049f2f4611bff0abaaee092a6850e563a6a969f98334a73f3df95",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "b",
+        "conditions": [],
+        "path": [
+          "entry",
+          "b0/n0",
+          "b0/n1",
+          "b0/n2"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-06",
+    "mechanism": "context_copy",
+    "coverage_tags": [
+      "external_target"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "1e398d261d61f3145cceb2d5eec354a99d829b73a96c5adde0e9f4bd5b50610e",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "a",
+        "conditions": [],
+        "path": [
+          "entry",
+          "b0/n0",
+          "b0/n1"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-07",
+    "mechanism": "spoofed_receiver_copy",
+    "coverage_tags": [
+      "external_target"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "0f8c5f76ca82a5ae6e1c05d5afcb3f50e037ea0289e02a0a3cfcc233e1cb0e4b",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "a",
+        "conditions": [],
+        "path": [
+          "entry",
+          "b0/n0",
+          "b0/n1"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-08",
+    "mechanism": "guarded_sink",
+    "coverage_tags": [
+      "branch"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "998c2ffdd7f68c4d4b853ccfbd1a3ae74c4a8db0b509f909a7986cfba078450d",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "cmd",
+        "conditions": [
+          {
+            "condition": {
+              "node": "b0/n0",
+              "condition": "true",
+              "location": {
+                "start_byte": 430,
+                "end_byte": 432,
+                "start_line": 20,
+                "end_line": 20
+              },
+              "location_status": "source_node"
+            },
+            "source_text": "ok"
+          }
+        ],
+        "path": [
+          "entry",
+          "b1/n0"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-09",
+    "mechanism": "compound_copy",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "6bc7d059cbf1a64ced1014a35a2a50ccfd35a41445245efeb7def7c69de3cb8e",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "a",
+        "conditions": [],
+        "path": [
+          "entry",
+          "b0/n0",
+          "b0/n1",
+          "b0/n2"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-10",
+    "mechanism": "early_exit_guard",
+    "coverage_tags": [
+      "branch"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "5e30b8476e24e5245fc0bc692bee1414df43524b82d19517c694f4b3b2f620c6",
+        "rule_id": "parameter-command-name",
+        "source_text": "cmd",
+        "sink_text": "cmd",
+        "conditions": [
+          {
+            "condition": {
+              "node": "b0/n0",
+              "condition": "false",
+              "location": {
+                "start_byte": 430,
+                "end_byte": 433,
+                "start_line": 20,
+                "end_line": 20
+              },
+              "location_status": "source_node"
+            },
+            "source_text": "!ok"
+          }
+        ],
+        "path": [
+          "entry",
+          "b2/n0"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-11",
+    "mechanism": "kill_after_copy",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-12",
+    "mechanism": "all_branch_kill",
+    "coverage_tags": [
+      "branch"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-13",
+    "mechanism": "inner_fixed_shadow",
+    "coverage_tags": [
+      "shadow"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-14",
+    "mechanism": "unrelated_sanitizer",
+    "coverage_tags": [
+      "sanitizer"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-15",
+    "mechanism": "renamed_external_copy",
+    "coverage_tags": [
+      "external_target"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-16",
+    "mechanism": "indirect_selector_sink",
+    "coverage_tags": [
+      "unsupported"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "aggregate_alias_unknown",
+      "external_value_unknown",
+      "field_read_untracked"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-17",
+    "mechanism": "sink_expression",
+    "coverage_tags": [
+      "unsupported"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-18",
+    "mechanism": "context_wrong_argument",
+    "coverage_tags": [
+      "external_target"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-19",
+    "mechanism": "parallel_rhs_fixed",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-1-20",
+    "mechanism": "closure_only_sink",
+    "coverage_tags": [
+      "unsupported"
+    ],
+    "rule": "parameter-command-name",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "closure_unsupported",
+      "opaque_call",
+      "closure_value_unknown",
+      "reference_alias_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-01",
+    "mechanism": "unsigned_direct",
+    "coverage_tags": [
+      "external_target"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "3a80ead110d6cbaf3426f6416655651c3b752344f3b03a4581f8c78695e3a764",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "v",
+        "conditions": [],
+        "path": [
+          "b0/n0",
+          "b0/n1"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-02",
+    "mechanism": "copy_chain",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "a31e0bc5309d25be1d3ed6d875c7c27344acd78c6d95fd4a6926053ec09dffd9",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "b",
+        "conditions": [],
+        "path": [
+          "b0/n0",
+          "b0/n1",
+          "b0/n2",
+          "b0/n3"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-03",
+    "mechanism": "branch_copy",
+    "coverage_tags": [
+      "branch"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "507e7fa48c1d02f29478865245ed9af2836c2cd29b757b90e4beaf415c5278b5",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "out",
+        "conditions": [
+          {
+            "condition": {
+              "node": "b0/n2",
+              "condition": "true",
+              "location": {
+                "start_byte": 459,
+                "end_byte": 461,
+                "start_line": 20,
+                "end_line": 20
+              },
+              "location_status": "source_node"
+            },
+            "source_text": "ok"
+          }
+        ],
+        "path": [
+          "b0/n0",
+          "b1/n0",
+          "b2/n0"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-04",
+    "mechanism": "loop_copy",
+    "coverage_tags": [
+      "loop"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "b4e540e69b1fcbd93791b98c74d12b1865b326eff0423c3c08dfce62f07c6517",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "out",
+        "conditions": [
+          {
+            "condition": {
+              "node": "b3/n0",
+              "condition": "true",
+              "location": {
+                "start_byte": 463,
+                "end_byte": 466,
+                "start_line": 20,
+                "end_line": 20
+              },
+              "location_status": "source_node"
+            },
+            "source_text": "i<n"
+          }
+        ],
+        "path": [
+          "b0/n0",
+          "b1/n0",
+          "b2/n0"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-05",
+    "mechanism": "inner_shadow_source",
+    "coverage_tags": [
+      "shadow"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "9473ee5ad20302e6aaf834f25a172d278602c166e2e8fcd583463ec30d9e6a0c",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "v",
+        "conditions": [
+          {
+            "condition": {
+              "node": "b0/n1",
+              "condition": "true",
+              "location": {
+                "start_byte": 436,
+                "end_byte": 438,
+                "start_line": 20,
+                "end_line": 20
+              },
+              "location_status": "source_node"
+            },
+            "source_text": "ok"
+          }
+        ],
+        "path": [
+          "b1/n0",
+          "b1/n1"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-06",
+    "mechanism": "opaque_sanitizer",
+    "coverage_tags": [
+      "sanitizer"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "c9b0421a544eb558ac5039134e397bcd04944382fde56c7929326d1b7ba52426",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "out",
+        "conditions": [],
+        "path": [
+          "b0/n0",
+          "b0/n1",
+          "b0/n2"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-07",
+    "mechanism": "spoofed_receiver",
+    "coverage_tags": [
+      "external_target"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "b05e2215f445362dd11ab20280d9f01a10f57a1a714641aa8493071ee945a964",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "v",
+        "conditions": [],
+        "path": [
+          "b0/n0",
+          "b0/n1"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-08",
+    "mechanism": "compound_result",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "0dfdc0b3594a33ee5304bc09038dab955da658c013bace78b72afd1e0af82476",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "v",
+        "conditions": [],
+        "path": [
+          "b0/n0",
+          "b0/n1",
+          "b0/n2"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-09",
+    "mechanism": "guarded_return",
+    "coverage_tags": [
+      "branch"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "3e8d707f4e0f335e57564be594e8110959e401d43ec9cefb2cbb62a3450d548c",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "v",
+        "conditions": [
+          {
+            "condition": {
+              "node": "b0/n1",
+              "condition": "false",
+              "location": {
+                "start_byte": 452,
+                "end_byte": 455,
+                "start_line": 20,
+                "end_line": 20
+              },
+              "location_status": "source_node"
+            },
+            "source_text": "!ok"
+          }
+        ],
+        "path": [
+          "b0/n0",
+          "b2/n0"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-10",
+    "mechanism": "signed_copy",
+    "coverage_tags": [
+      "external_target"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 1,
+    "observed_candidates": 1,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [
+      {
+        "candidate_id": "54b6e4843fc715785464e894bb47d058c16ae73f761de0b3ca20e0970bc8da0a",
+        "rule_id": "discarded-conversion-error",
+        "source_text": "v",
+        "sink_text": "copy",
+        "conditions": [],
+        "path": [
+          "b0/n0",
+          "b0/n1",
+          "b0/n2"
+        ],
+        "safety_verdict": "unknown"
+      }
+    ],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-11",
+    "mechanism": "named_error_discarded_later",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-12",
+    "mechanism": "kill_copy",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-13",
+    "mechanism": "all_branch_kill",
+    "coverage_tags": [
+      "branch"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-14",
+    "mechanism": "inner_fixed_shadow",
+    "coverage_tags": [
+      "shadow"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-15",
+    "mechanism": "unrelated_sanitizer",
+    "coverage_tags": [
+      "sanitizer"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-16",
+    "mechanism": "renamed_external_copy",
+    "coverage_tags": [
+      "external_target"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-17",
+    "mechanism": "return_expression",
+    "coverage_tags": [
+      "unsupported"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-18",
+    "mechanism": "bare_return",
+    "coverage_tags": [
+      "unsupported"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-19",
+    "mechanism": "conversion_in_closure",
+    "coverage_tags": [
+      "unsupported"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "closure_unsupported",
+      "opaque_call",
+      "closure_value_unknown",
+      "reference_alias_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  },
+  {
+    "case_id": "RULE-2-20",
+    "mechanism": "assigned_error_variable",
+    "coverage_tags": [
+      "flow"
+    ],
+    "rule": "discarded-conversion-error",
+    "proposed_candidates": 0,
+    "observed_candidates": 0,
+    "matches_ai_proposal": true,
+    "base_status": "partial",
+    "capabilities": {
+      "cfg": "bounded_go",
+      "control_dependence": "normal_exit_postdominators",
+      "data_dependence": "local_scalar_may_reach",
+      "def_use": "lexical_may_reach",
+      "exceptions": "unsupported",
+      "local_binding": "isolated_go_types",
+      "memory_alias": "unsupported",
+      "package_types": "unavailable_function_blob",
+      "short_circuit": "unsupported"
+    },
+    "diagnostic_codes": [
+      "isolated_type_info_partial",
+      "opaque_call",
+      "external_value_unknown",
+      "reference_alias_unknown"
+    ],
+    "candidate_spans": [],
+    "gold": false,
+    "approved": false,
+    "reviewer": null,
+    "safety_verdict": "unknown",
+    "split": null
+  }
+]
