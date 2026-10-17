@@ -1,0 +1,71 @@
+{
+  "verification": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/private/tmp/ks-host-schema-consumer-20261017/plugin/scripts/deep_review.py",
+      "verify",
+      "--workspace",
+      "/private/tmp/ks-consumer-role-t04-t10-seed-20261017/source/.coding-agent/tickets/KS-P06-REVIEW"
+    ],
+    "exit_code": 2,
+    "stdout": "{\"status\": \"invalid\", \"reason\": \"report/source/computed/origin/limitations changed\"}\n",
+    "stderr": ""
+  },
+  "workspace": {
+    "input-bundle.json": {
+      "sha256": "1efc07a9c2cca4b6955f15482178b989a330946c4c144607839885c22404105e",
+      "json": null
+    },
+    "state.json": {
+      "sha256": "850696d0dbc5d9742e76498a77b42bc6a4743828468f38800cc19899629f9374",
+      "json": {
+        "ticket_id": "KS-P06-REVIEW",
+        "ticket_type": "code_review",
+        "current_state": "PLANNING",
+        "config": {
+          "autonomy": {
+            "mode": "interactive"
+          }
+        },
+        "states": {
+          "ANALYSIS": {
+            "status": "completed",
+            "deep_review_sha256": "71fa4b9688edf807ca42343f37cab4ce2d099f13d9de901f8512019104e437c3"
+          },
+          "PLANNING": {
+            "status": "pending"
+          }
+        }
+      }
+    },
+    "review-report.md": {
+      "sha256": "2e14a41cf361f6cc2b8d9427dc236543dd2411fd507ee7bfc2679703d4cff703",
+      "json": null
+    },
+    "sequence.mmd": {
+      "sha256": "a212968346e985fc11d925e7353b81536d3130af206aabe88fc08e3dcd2ca739",
+      "json": null
+    },
+    "adapter-commands.json": {
+      "sha256": "c13806bb1b93777d68cb9a0b0a9490dfa532741c688cb3ee39e0d47d1267c77e",
+      "json": null
+    },
+    "scripted-judgments.json": {
+      "sha256": "ab714e82b5a0c8aa5690d6eed623075331a8220afaa6ebea958f444f98d21ad1",
+      "json": null
+    },
+    "deep-review-evidence.json": {
+      "sha256": "aab2c8822e1509ab2af89e8504e81ae888b6a510e93651c22eec640cd4a0adc5",
+      "json": null
+    },
+    "modules.mmd": {
+      "sha256": "121f3a5e7083949a4144ebf3e212eb6d6360790ce68f7b411eaf4ae8c3f9883a",
+      "json": null
+    },
+    "deep-review.json": {
+      "sha256": "f953f7bdea135c6cf0987aedb9499a4254ecbc5219812302fd00b087c921206c",
+      "json": null
+    }
+  },
+  "origin": "local_verifier_mutation"
+}

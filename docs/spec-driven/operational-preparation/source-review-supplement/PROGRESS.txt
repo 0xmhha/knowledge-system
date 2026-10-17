@@ -491,6 +491,22 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 - 변경 없는 stage30 native full test/race 각4063통과·18skip, build/fmt/vet/lint/boundaries 결과 재사용. 새 Go 전체 검사로 세지 않음.
 - 계획19/22 통과·현재 실패0·미완료3(T10/T16/T22). 전역 node ID·tenant ACL·transport/reviewer 인증·자율 모델 준수·온톨로지 효과 수용은 미입증. 후보 미채택·실제모델0·정식 실행0/수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지.
 
-다음 작업(최신): T10 partial/unknown 전달 검증 → T16 오류 처리/평가 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
+33단계 당시 다음 작업(역사 기록): T10 partial/unknown 전달 검증 → T16 오류 처리/평가 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_foreign_pin.py
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-foreign-pin.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1
+
+
+[완료 — 격리 통합 검증] 34. T10 partial·unknown 전달과 불완전/placeholder 거부
+- 실제 Seed와 Field의 rule/review 응답에서 outer/analysis partial·truncated=false·rules matched_bounded 조건을 확인. 각각 typed5산출물/6절·inferred1/unknown5·capability/diagnostics/구조적 한계와 independent_acceptance not_recorded를 유지해 실제 Planner 전달/완료/CLI검증.
+- Field의 규칙 후보0과 memory_alias unsupported·memory_write_untracked 진단을 유지. 후보 없음·빈 findings·형식상 criterion1개를 안전·누락0·온톨로지 효과/의미 품질 수용으로 세지 않음.
+- 실제 Analyzer의 unsupported Box·max_nodes1 budget_exhausted/truncated·max_flow_steps1 rules incomplete3응답과, 소유한 checkpoint 완료 legacy index(code_edges 제거)의 requires_reindex isError1응답을 원문 보존. 구형 index 오류는 운영 장애 시험이 아님.
+- 실제 MCP 응답4종과 별도 synthetic6종(all-unknown/누락절/truncated flag/unknown→observed/빈 unknowns/complete_safe 상태)을 분리. 실제 Planner CLI exit2 10건·Write hook10거부가 정확한 사유와 일치.
+- 변이된 bytes를 원본 산출물+실제 wire 응답/선언된 로컬 변이로 재구성해 hash/validator 사유 대조. 매회 전달 상태 미변경과 원본 bytes 복구/CLI0 확인. 마지막 정상 Seed 전달 및 별도 Field 전달 성공.
+- 실제6host/CKS9요청·6exit0/reap·소유 PID18개 부재·감사기 live 양성 대조와 loopback 응답기/출력worker 정리, rescue0. 실제 모델0·정식 실행0.
+- 증거244파일 두 복사본은 바이트 일치·검증 통과. 새 host/CKS/PID 측정으로 세지 않음. 이전33동결 패킷·유지 Go/runtime/schema·bound 문서·원본/후보4checkout 보존.
+- 전용 보호 검사38개 + 이전 관련553개 = 591개 통과. package notice 별도3개·문서134개·기존 구현 완료 검사·공백 검사 통과. 변경 없는 stage30 native full test/race 각4063통과/18skip·build/fmt/vet/lint/boundaries 결과 재사용이며 새 Go 전체 검사 아님.
+- 계획20/22 통과·현재 실패0·미완료2(T16/T22). 자연어 의미 정확성·필수 결함 누락·안전·완전성/온톨로지 효과 미평가. 후보 미채택·정식 수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지.
+
+다음 작업(최신): T16 오류 처리·평가 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_partial.py
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-partial.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-partial-v1

@@ -1,0 +1,15 @@
+flowchart TD
+%% Computed bounded CFG; runtime feasibility, calls and exceptions remain unknown.
+  vc02c0b965e02["b0"]
+  v7dc96f776c84["b1"]
+  v4814d92093ac["b2"]
+  v76a8277347f5["b3"]
+  v486bacc5c2d8["b4"]
+  v3c5661974942["b5"]
+  vc02c0b965e02 -->|successor| v7dc96f776c84
+  v7dc96f776c84 -->|branch_0| v4814d92093ac
+  v7dc96f776c84 -->|branch_1| v76a8277347f5
+  v4814d92093ac -->|successor| v7dc96f776c84
+  v76a8277347f5 -->|true| v486bacc5c2d8
+  v76a8277347f5 -->|false| v3c5661974942
+  v486bacc5c2d8 -->|successor| v3c5661974942
