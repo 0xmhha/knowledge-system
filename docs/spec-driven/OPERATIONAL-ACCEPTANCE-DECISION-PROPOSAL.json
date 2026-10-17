@@ -1,0 +1,482 @@
+{
+  "schema_version": 1,
+  "document_date": "2026-10-17",
+  "kind": "adoption_and_independent_acceptance_decision_draft",
+  "authority": "proposal_only_not_adoption_freeze_or_execution_approval",
+  "base_commit": "4932767115f568fff7313e91c77f45b377203108",
+  "source_bindings": {
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/manifest.json": "6776de8233d694ece37ca4d04363fe7d15ec345a152e8d3ca2fb209970c47ece",
+    "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+    "docs/spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json": "4ff28d3be05945b7f5f37a08446c981b4f6939952ac44fcb6a77e272b074e85d",
+    "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md": "a673d9a3124b017affa5994f698e5c94485807e28f27618d4785dd13087fec6f"
+  },
+  "current_state": {
+    "isolated_preparation_passed": 22,
+    "isolated_preparation_total": 22,
+    "P01_P08_complete": true,
+    "local_roadmap_implementation_completed": 7,
+    "local_roadmap_implementation_total": 7,
+    "local_roadmap_subtasks_completed": 28,
+    "local_roadmap_subtasks_total": 28,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "reviewer_assignment": "미정",
+    "freeze": null,
+    "formal_execution_allowed": false,
+    "candidate_adopted": false,
+    "production_activation": false,
+    "ontology_bounded_studies": "complete_with_quality_inconclusive_not_independent_acceptance",
+    "historical_unconfirmed_CKS_exit_receipts": 1
+  },
+  "candidate_pair": {
+    "CKS": {
+      "commit": "0c6cea1c74772e56438ec340b12e208811284b8a",
+      "delta_files_vs_base": 5,
+      "scope": "host-compatible selector metadata/descriptions, matching native schema golden and tests; existing decoders/query/ACL unchanged",
+      "base_reference": "5b39c413"
+    },
+    "coding_agent": {
+      "commit": "b32b7a5a01908c129732dd67b692b0c525dc04f2",
+      "base_reference": "b7e78689676769e8536626e76eed7165d870e1ba",
+      "delta_files_vs_base": 5,
+      "scope": "Analyzer/Planner explicit tool/structured delivery contracts, two schema mirrors and role tests"
+    },
+    "integration_requirement": "reconcile_with_current_destination_HEADs_and_rebuild_repin_after_integration; old binary hashes are prior evidence, not hashes of future artifacts",
+    "rollback": "retain exact previous source/plugin/config/binaries/dataset identity; current source/schema remain unchanged in this proposal"
+  },
+  "decisions": [
+    {
+      "id": "D01",
+      "title": "소스 후보 채택",
+      "status": "awaiting_user_decision",
+      "recommended": "CKS와 coding-agent를 한 쌍으로 통합·검증한다. 현재 작업 브랜치의 최소 패치와 로컬 서명 커밋까지 진행하고 푸시/PR/머지는 별도 범위로 둔다.",
+      "alternatives": [
+        "한쪽만 채택하지 않고 보류",
+        "전체 기능 추가/런타임 재설계는 별도 명세"
+      ],
+      "formal_freeze_topics": [
+        "F-02"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": null
+    },
+    {
+      "id": "D02",
+      "title": "적용 대상과 활성화",
+      "status": "awaiting_user_decision",
+      "recommended": "첫 단계는 별도 소유 시험 환경에서 go-stablenet 한 프로젝트를 검증한다. 다음 비교 단계는 go-wemix를 명시적으로 추가한다. 운영 current·전역 플러그인 등록·기존 서비스·매니저 주기 갱신은 전환하지 않는다.",
+      "alternatives": [
+        "운영 전환까지 포함하려면 별도 대상·재시작·rollback·운영 승인 정의",
+        "다른 프로젝트를 시험 대상으로 지정"
+      ],
+      "formal_freeze_topics": [
+        "F-01",
+        "F-08"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": null
+    },
+    {
+      "id": "D03",
+      "title": "온톨로지 기본값과 범위",
+      "status": "awaiting_user_decision",
+      "recommended": "기본 off를 유지한다. 정합한 데이터의 기존 read-only semantic 도구는 사용할 수 있으며, 검색 on/off 효과는 같은 자료·모델·상한의 별도 시험 설정으로만 비교한다. 매핑·사람 검토·검색 활성화를 구분한다.",
+      "alternatives": [
+        "개별 시험 모드만 명시 opt-in",
+        "운영 기본 on은 독립 효과 판정 이후 별도 결정"
+      ],
+      "formal_freeze_topics": [
+        "F-01",
+        "F-02",
+        "F-07"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": null
+    },
+    {
+      "id": "D04",
+      "title": "정답 검토자와 최종 수용 담당자",
+      "status": "awaiting_user_decision",
+      "recommended": "AI는 초안·실행 보조를 담당하고, 별도 사람 검토자가 정답과 매칭 규칙을 검토하며 사용자가 최종 사용 범위를 수용한다. 정답 작성/검토와 후보 결과 노출을 기록하고 역할 겸임 시 독립성 제한을 명시한다. 이름·역할은 추정해서 기록하지 않는다.",
+      "alternatives": [
+        "담당자 미정 유지: 로컬 통합/시험 준비는 계속, 정식 독립 수용은 보류",
+        "한 사람이 겸임: 제한된 자체 검토로 기록하고 독립 수용으로 승격하지 않음"
+      ],
+      "formal_freeze_topics": [
+        "F-05"
+      ],
+      "additional_information_required": [
+        "사람 gold 검토자의 이름·역할",
+        "최종 수용 담당자의 이름·역할",
+        "정답 작성/검토·후보 출력 노출·역할 겸임 여부"
+      ],
+      "approval_receipt": null
+    },
+    {
+      "id": "D05",
+      "title": "독립 표본·기존 기준·통계",
+      "status": "awaiting_user_decision",
+      "recommended": "기존 9개 요구 표본/수치 기준은 유지 제안하고, 새 독립 FINAL 입력·완전한 정답·매칭·분모를 검토 후 고정한다. 기존 노출 자료와 AI 초안은 DEV/회귀로만 사용한다. 가족 단위 paired cluster bootstrap95%/10000회, 충분성 부족·undefined·미실행은 inconclusive/not_run으로 둔다.",
+      "alternatives": [
+        "표본·기준 조정은 실행 전 근거와 함께 별도 수정 승인",
+        "최소 표본 도달만으로 품질 합격을 선언하지 않음"
+      ],
+      "formal_freeze_topics": [
+        "F-03",
+        "F-04",
+        "F-07"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": null
+    },
+    {
+      "id": "D06",
+      "title": "온톨로지 독립 효과의 추가 판정안",
+      "status": "awaiting_user_decision",
+      "recommended": "독립 FINAL20가족 이상·4의도 이상을 별도로 검토한다. DEV에서 off/concept_text/relations/combined를 진단하고 FINAL primary 비교 모드는 사전 선택한다. 같은 자료의 off 대비 recall@10 +5%p 이상·95% paired CI 하한>0, precision 하락2%p 이내, warm p95비1.25 이하를 초안으로 제안한다. 타 프로젝트 혼입0·인용 원문 일치100%를 필수 조건으로 둔다. 개선 불충분이면 기본 off 유지 또는 inconclusive다.",
+      "alternatives": [
+        "임계치는 독립 검토 후 수정 가능; 실행 뒤 유리하게 바꾸지 않음",
+        "LLM 답변 품질 효과는 실제 모델을 사용할 때 별도 평가"
+      ],
+      "formal_freeze_topics": [
+        "F-03",
+        "F-04",
+        "F-07"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": null
+    },
+    {
+      "id": "D07",
+      "title": "모델·비용·시간·자원",
+      "status": "awaiting_user_decision",
+      "recommended": "첫 단계는 추가 유료 모델/API 호출0원으로 소스 통합·로컬 host/MCP와 검색 효과 준비를 진행한다. 기존 BGE-M3/native1024 선택을 유지하고 실측 전 정확한 runtime/digest/전처리 신원을 재확인한다. 로컬 자원·시간은 별도 측정한다. 실제 LLM 답변·자율 역할 평가는 모델/인증/총액 상한이 지정될 때만 시작한다.",
+      "alternatives": [
+        "유료 모델 평가는 계속 보류",
+        "실제 모델 평가를 원하면 provider/model·인증 방식·금액/통화·계량 출처를 별도 지정"
+      ],
+      "formal_freeze_topics": [
+        "F-06",
+        "F-08"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": null
+    },
+    {
+      "id": "D08",
+      "title": "종료·게시·운영 전환",
+      "status": "awaiting_user_decision",
+      "recommended": "평가 자료·검증·로컬 커밋에서 종료한다. 자동 push/PR/merge·외부 tracker·운영 설치·전역 설정 변경·기존 서비스 종료는 수행 범위에 넣지 않는다. 통합 완료 후 게시와 운영 적용을 별도 단계로 제안한다.",
+      "alternatives": [
+        "푸시/PR 등은 원하는 저장소·브랜치·범위를 명시해 별도 승인",
+        "운영 전환은 보존/백업·재시작·rollback 기준을 검증 후 별도 승인"
+      ],
+      "formal_freeze_topics": [
+        "F-01",
+        "F-08"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": null
+    }
+  ],
+  "existing_nine_requirement_and_metric_proposals": [
+    {
+      "id": "WI-V1",
+      "requirements": {
+        "independent_defect_tickets_min": 2,
+        "normal_controls": true,
+        "symptom_reintroduction_mutants": true,
+        "overfit_mutants": true,
+        "oracles": [
+          "primary",
+          "independently_derived"
+        ]
+      },
+      "metrics": {
+        "declared_oracle_and_normal_control_pass_fraction": 1.0,
+        "expected_invalid_refusal_fraction": 1.0
+      }
+    },
+    {
+      "id": "WI-V2",
+      "requirements": {
+        "shared_ticket_group": "WI-V1",
+        "candidates_per_ticket_min": 2,
+        "independent_acceptable_candidate_set": true
+      },
+      "metrics": {
+        "selected_candidates_satisfy_hard_gates_and_gold": true,
+        "all_bad_selection": null,
+        "ties_and_insufficiency_explicit": true
+      }
+    },
+    {
+      "id": "WI-3",
+      "requirements": {
+        "independent_fact_families_min": 20,
+        "symptom_types_min": 4,
+        "top_k": 10
+      },
+      "metrics": {
+        "macro_case_recall_at_10_min": 0.8
+      }
+    },
+    {
+      "id": "WI-4",
+      "requirements": {
+        "independent_seed_schedule_families_min": 5,
+        "planned_runs_per_arm_min": 100,
+        "baseline_symptom_events_min": 10
+      },
+      "metrics": {
+        "fix_to_baseline_symptom_rate_ratio_max": 0.5,
+        "no_recurrence_verdict": "inconclusive"
+      }
+    },
+    {
+      "id": "WI-1",
+      "requirements": {
+        "independent_functions_min": 30,
+        "constructs": [
+          "declaration_redefinition",
+          "branch",
+          "loop",
+          "shadow",
+          "return"
+        ],
+        "functions_per_construct_min": 4,
+        "gold_semantics": "structural_lexical_may_reach_not_path_feasibility"
+      },
+      "metrics": {
+        "data_edge_precision_min": 0.95,
+        "data_edge_recall_min": 0.9,
+        "control_edge_precision_min": 0.95,
+        "control_edge_recall_min": 0.9
+      }
+    },
+    {
+      "id": "WI-2",
+      "requirements": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "metrics": {
+        "candidate_precision_min": 0.8,
+        "candidate_recall_min": 0.8,
+        "vulnerability_acceptance_separate": true
+      }
+    },
+    {
+      "id": "WI-C",
+      "requirements": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "metrics": {
+        "required_rubric_omissions_max": 0,
+        "source_artifact_state_binding_match_fraction": 1.0
+      }
+    },
+    {
+      "id": "WI-6",
+      "requirements": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "metrics": {
+        "macro_recall_delta_min": 0.1,
+        "macro_noise_fraction_delta_max": 0.1,
+        "warm_p95_latency_ratio_max": 2.0,
+        "delta_unit": "fraction_difference_0.10_equals_10_percentage_points",
+        "empty_return_noise_fraction": null
+      }
+    },
+    {
+      "id": "WI-SP",
+      "requirements": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "metrics": {
+        "annotation_match_fraction": 1.0,
+        "expected_permission_refusal_fraction": 1.0,
+        "unavailable_yaml_or_reviewer_provenance": "unknown"
+      }
+    }
+  ],
+  "ontology_new_gate_proposal": {
+    "status": "not_approved_not_frozen_not_a_change_to_WI6",
+    "FINAL_independent_families_min": 20,
+    "intent_types_min": 4,
+    "DEV_modes": [
+      "off",
+      "concept_text",
+      "relations",
+      "combined"
+    ],
+    "FINAL_primary": "off_vs_one_predeclared_mode_selected_before_holdout",
+    "same_corpus_source_snapshot_model_top_k_and_budget": true,
+    "recall_at_10_delta_min": 0.05,
+    "recall_delta_CI95_lower_strictly_positive": true,
+    "precision_delta_min": -0.02,
+    "warm_p95_ratio_max": 1.25,
+    "cross_project_contamination_max": 0,
+    "citation_source_match_fraction": 1.0,
+    "sample_sufficiency_required": true,
+    "multiple_arm_claims_require_multiplicity_plan": true,
+    "answer_quality_evaluated_by_retrieval_metrics": false,
+    "no_gain_or_insufficient_result": "keep_default_off; inconclusive_or_no_demonstrated_benefit",
+    "WI6_unchanged": {
+      "recall_delta_min": 0.1,
+      "noise_delta_max": 0.1,
+      "warm_p95_ratio_max": 2.0
+    }
+  },
+  "measurement_draft": {
+    "warmup_calls": 2,
+    "retrieval_repeats": 5,
+    "warm_repeats": 20,
+    "cold_repeats": 3,
+    "cold_definition": "fresh_CKS_process_model_cache_residency_recorded_separately",
+    "paired_order": "counterbalanced_record_each_arm_order",
+    "latency_percentile_method": null,
+    "owned_server_shutdown_modes": [
+      "EOF",
+      "idle_SIGTERM",
+      "active_SIGTERM"
+    ],
+    "shutdown_repeats_per_mode": 3,
+    "shutdown_seconds_max": 5,
+    "forced_kills_allowed": 0,
+    "unmeasured_cost": null,
+    "latency_percentile_method_proposal": "nearest_rank_ceiling_p_times_n; preserve raw times/sample_count;20 warm samples do not certify tail stability",
+    "statistics": {
+      "status": "proposed_not_approved",
+      "method": "paired cluster bootstrap on independent fact/function/seed families",
+      "confidence_percent": 95,
+      "replicates": 10000,
+      "seed": 20261015,
+      "percentiles": [
+        2.5,
+        97.5
+      ],
+      "undefined_fraction_inconclusive_above": 0.05,
+      "scope": "descriptive scoped assessment; not population-wide production failure or success proof"
+    },
+    "resource_limits": {
+      "status": "proposed_not_approved",
+      "parallel_measurement_sessions": 1,
+      "owned_nodes_max": 2,
+      "index_minutes_max": 90,
+      "host_case_minutes_max": 30,
+      "repeat_arm_minutes_max": 30,
+      "observation_minutes_max": 10,
+      "llm_provider": null,
+      "llm_model": null,
+      "llm_cost_limit": null
+    },
+    "budget_boundary": "no_paid_model_in_phaseA; actual_LLM_budget_still_unassigned"
+  },
+  "proposed_sequence": [
+    {
+      "id": "A",
+      "title": "후보 통합·비운영 적용 준비",
+      "entry": "D01/D02/D03/D07/D08 source/pilot scope approval; no reviewer/model assignment required for local technical work",
+      "exit": "minimal integrated diff, source/runtime contract comparison, full build/test/race/fmt/vet/lint/boundary checks as applicable, consumer regressions, fresh signed binary pins and isolated host smoke, local commits only"
+    },
+    {
+      "id": "B",
+      "title": "독립 입력·정답·평가 기준 확정",
+      "entry": "D04/D05/D06 assignments and methodology review",
+      "exit": "F01-F08 receipts for the chosen formal run; separate DEV/FINAL, full gold/matching, sample sufficiency and ontology protocol frozen before outcomes"
+    },
+    {
+      "id": "C",
+      "title": "정식 실행·사용 범위 수용",
+      "entry": "actual run requirements fulfilled; real LLM only after D07 model/auth/limit assignment",
+      "exit": "nine WI verdicts plus mandatory ontology independent effect verdict; raw attempts/errors/denominators/cost/cleanup; final human scoped acceptance"
+    },
+    {
+      "id": "D",
+      "title": "게시·운영 적용",
+      "entry": "separate explicit publication/deployment scope and validated rollback",
+      "exit": "approved targets only; fresh installed compatibility and restart/rollback receipts; no automatic global activation"
+    }
+  ],
+  "remaining_formal_ids": [
+    "WI-1",
+    "WI-2",
+    "WI-3",
+    "WI-4",
+    "WI-V1",
+    "WI-V2",
+    "WI-6",
+    "WI-SP",
+    "WI-C"
+  ],
+  "mandatory_ontology_remaining": [
+    "independent semantic/retrieval gold and reviewer acceptance",
+    "reviewed implementation/concept links and meaningful family coverage",
+    "real LLM answer-quality effect only when real model scope is assigned"
+  ],
+  "completed_roadmap_items_not_reopened": [
+    "KM-01",
+    "KM-02",
+    "KM-03",
+    "KM-04",
+    "KM-05",
+    "KM-06",
+    "OE-01 bounded studies"
+  ],
+  "optional_backlog": [
+    "조직 인증/권한",
+    "공개 CLI/HTTP·graph export",
+    "graph 점수/확장 조정",
+    "domain flow gold 평가",
+    "대규모 corpus/긴 함수",
+    "PR/as-of 지식",
+    "legacy 출처",
+    "CoreML",
+    "embedding cache 연결",
+    "운영 감사 연결",
+    "viewer 상호작용",
+    "배포/downstream 동기화"
+  ],
+  "execution_performed_by_this_proposal": {
+    "code_changes": 0,
+    "candidate_adoptions": 0,
+    "production_writes": 0,
+    "real_model_calls": 0,
+    "new_quality_measurements": 0,
+    "formal_approvals": 0,
+    "push_PR_merge_operations": 0
+  },
+  "response_instructions": "D01~D08별 승인/수정/보류를 답할 수 있다. 모두 권고안 승인이라고 답해도 D04의 실제 이름/역할은 별도 제공 전 미정이며, 유료 모델과 운영 전환은 자동 승인되지 않는다."
+}
