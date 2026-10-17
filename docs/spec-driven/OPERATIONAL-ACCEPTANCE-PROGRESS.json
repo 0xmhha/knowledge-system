@@ -415,14 +415,21 @@
         },
         "adoption_acceptance_decision_proposal": {
           "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-          "sha256": "578577824f822522a5a479d0748d1ef403250a1416174c67b768b972ca4dc10f",
-          "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_locally_no_formal_freeze"
+          "sha256": "29a2952f83120e06a8ba9617abae5a53f95f189a3253c27e943ca49255ff327b",
+          "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_pilot_not_ready_no_formal_freeze"
         },
         "consumer_adoption": {
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
           "sha256": "3a17b8326ab4a1cdf1e0d3d9b926cc41c722813b7c892c04179e5b7ec5e4b760",
           "status": "approved_local_source_integration_fresh_validation_complete_not_formal_acceptance",
           "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
+        },
+        "stablenet_pilot": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/manifest.json",
+          "sha256": "127c32a9508a927146deb06f1d24277f853333acc98c912da98610bb6bc24b25",
+          "status": "verification_complete_default_retrieval_not_ready",
+          "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/REPORT.txt",
+          "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json"
         }
       },
       "completed_preparation": [
@@ -477,7 +484,8 @@
         "준비35/T16: 소유 CKS5세션에서 missing/ambiguous/구형 index/provider 비서비스·시작 실패·hard transport timeout을 원문 보존. 전체8시나리오=partial2+비사용6, 도구평가7+진단1. late 응답1은 timeout 성공 승격 금지·별도 recovery, exit0/reap4·startup exit1/reap1·PID5부재. provider 실제 연결 timeout 및 manifest/alignment 복합 조건을 유지. 준비21/22; 실제 host/모델·정식/온톨로지 효과 수용 아님.",
         "준비36/P08/T22: 현재 전후 전역/프로젝트 설정32항목·운영metadata/current42항목·기존 비소유엔진10개·보호파일1575개/서명clean5checkout·binary/remote refs 유지. 소유fixture4변이 검출→정확복구→실제CKS1 partial/exit0/reap 및 owned socket 양성대조/close, foreign·symlink2거부. 이전35패킷 local commit/계보 및 PID161부재 확인하되 과거 미확인CKS exit1건 유지. 격리 P01~P08/22사례 완료; 후보채택/배포·과거 전역소급·독립 품질/온톨로지 효과 수용 아님.",
         "준비37: 검증 완료 후보2개 통합·소유 pilot·ontology off·독립 gold/담당자·기존9기준·온톨로지 추가gate·유료모델0원 우선·게시/운영 별도 범위의 D01~08 권고안을 문서화. 로드맵7/7·28/28 로컬 구현과 제한 효과 연구 완료/품질inconclusive를 유지. 사용자 결정·채택/운영·정식 실행/수용은 미완료.",
-        "approved_pair_source_adoption_fresh_full_native_consumer_checks_and_actual_scripted_host_not_formal_acceptance"
+        "approved_pair_source_adoption_fresh_full_native_consumer_checks_and_actual_scripted_host_not_formal_acceptance",
+        "bounded_go_stablenet_source_dataset_model_and_boundary_measurements_recorded_with_default_retrieval_gaps_not_ready"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -2958,6 +2966,46 @@
           "current_phase": "A_source_integration_local_validation_complete",
           "next_task": "owned_nonproduction_go_stablenet_pilot_then_explicit_go_wemix_comparison",
           "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
+        },
+        "stablenet_pilot": {
+          "status": "verification_complete_default_retrieval_not_ready",
+          "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+          "model_digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+          "model_dimensions": 1024,
+          "ollama_version": "0.40.4",
+          "primary_inputs": 6,
+          "keyword_success": 6,
+          "Go_filtered_vector_success": 6,
+          "unfiltered_vector_success": 1,
+          "v2_success": 2,
+          "primary_raw_hits_checked": 110,
+          "non_citable_convention_hits": 1,
+          "raw_hits_with_retained_file_witness": 109,
+          "v2_packs_including_restore": 3,
+          "v2_citations_hash_body_coordinates_checked": 30,
+          "ranking_repeats": 2,
+          "typed_pin_foreign_refusals": 4,
+          "retained_tamper_refusals": 1,
+          "controlled_manifest_startup_refusals": 2,
+          "live_source_override_ignored": true,
+          "all_tool_attempts": 52,
+          "normal_EOF_exit0_reaped": 4,
+          "observed_exit1_reaped": 3,
+          "owned_PID_count": 7,
+          "forced_termination": 0,
+          "default_retrieval_ready": false,
+          "independent_quality_evaluated": false,
+          "ontology_effect_evaluated": false,
+          "formal_completed": 0,
+          "formal_total": 9,
+          "reviewer_assignment": "미정",
+          "paid_LLM_calls": 0,
+          "production_writes": 0,
+          "evidence_protection_tests": 10,
+          "next_task": "SN-P01",
+          "readiness_complete": false
         }
       },
       "candidate_counts": {
@@ -3257,8 +3305,8 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "578577824f822522a5a479d0748d1ef403250a1416174c67b768b972ca4dc10f",
-    "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_locally_no_formal_freeze"
+    "sha256": "29a2952f83120e06a8ba9617abae5a53f95f189a3253c27e943ca49255ff327b",
+    "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_pilot_not_ready_no_formal_freeze"
   },
   "consumer_adoption": {
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
@@ -3267,5 +3315,12 @@
     "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
   },
   "local_adoption_completed": true,
-  "historical_preparation_fields": "Previous named preparation records describe their frozen source and execution dates. consumer_adoption is the current integration observation; it does not change formal items or replace the historical denominators."
+  "historical_preparation_fields": "Previous named preparation records describe their frozen source and execution dates. consumer_adoption is the current integration observation; it does not change formal items or replace the historical denominators.",
+  "stablenet_pilot": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/manifest.json",
+    "sha256": "127c32a9508a927146deb06f1d24277f853333acc98c912da98610bb6bc24b25",
+    "status": "verification_complete_default_retrieval_not_ready",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/REPORT.txt",
+    "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json"
+  }
 }

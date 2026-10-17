@@ -1,0 +1,370 @@
+[
+  {
+    "label": "initialize",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {},
+        "clientInfo": {
+          "name": "owned-consumer-P05",
+          "version": "1"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        },
+        "serverInfo": {
+          "name": "owned-go-stablenet-pilot",
+          "version": "cks-mcp/0.0.1-dev"
+        }
+      }
+    }
+  },
+  {
+    "label": "health",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.ops.health",
+        "arguments": {}
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "owned-go-stablenet-pilot",
+          "status": "ok",
+          "serviceable": true,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-pilot-20261017-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-pilot-20261017-01/dataset/pilot-v1/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "model_reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-13T14:54:37Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:11434",
+              "data_path": "/private/tmp/ks-stablenet-pilot-20261017-01/dataset/pilot-v1/vector"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+            "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-pilot-20261017-01/source\" differs from indexed checkout \"/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "label": "ontology",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.semantic.status",
+        "arguments": {}
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "ontology preparation status"
+          }
+        ],
+        "structuredContent": {
+          "state": "off",
+          "mode": "off",
+          "availability": "unconfigured",
+          "reason": "unconfigured",
+          "store_configured": false,
+          "read_tools_ready": false,
+          "retrieval_ready": false,
+          "supported_modes": [
+            "off",
+            "baseline",
+            "concept_text",
+            "relations",
+            "combined"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "label": "symbol",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.find_symbol",
+        "arguments": {
+          "name": "QuorumSize",
+          "language": "go",
+          "exclude_tests": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "find_symbol result"
+          }
+        ],
+        "structuredContent": {
+          "symbol": "QuorumSize",
+          "citations": [
+            {
+              "file": "consensus/wbft/validator/default.go",
+              "start_line": 226,
+              "end_line": 229,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            {
+              "file": "consensus/wbft/types.go",
+              "start_line": 242,
+              "end_line": 242,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "label": "keyword",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.search_text",
+        "arguments": {
+          "query": "QuorumSize",
+          "k": 10,
+          "exclude_tests": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "search_text result"
+          }
+        ],
+        "structuredContent": {
+          "query": "QuorumSize",
+          "hits": [
+            {
+              "citation": {
+                "file": "consensus/wbft/validator/default.go",
+                "start_line": 226,
+                "end_line": 229,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 1,
+              "score": 1,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/types.go",
+                "start_line": 242,
+                "end_line": 242,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 2,
+              "score": 0.8424457548578778,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/justification.go",
+                "start_line": 75,
+                "end_line": 87,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 3,
+              "score": 0.34877521658506894,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/justification.go",
+                "start_line": 112,
+                "end_line": 127,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 4,
+              "score": 0.25747825600315094,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/justification.go",
+                "start_line": 91,
+                "end_line": 108,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 5,
+              "score": 0.15985302170494267,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/justification.go",
+                "start_line": 40,
+                "end_line": 71,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 7,
+              "score": 0.11889654608196948,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/roundchange.go",
+                "start_line": 254,
+                "end_line": 276,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 8,
+              "score": 0,
+              "source": "graph"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "label": "vector",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 6,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.semantic_search",
+        "arguments": {
+          "query": "WBFT validator quorum size",
+          "k": 10,
+          "exclude_tests": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 6,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "cks.context.semantic_search: ckvclient: SemanticSearch: retained citation \"entries/A1.wbft_core.quorum_calc.md\": source_missing: source is not in retained inventory"
+          }
+        ],
+        "isError": true
+      }
+    }
+  },
+  {
+    "label": "pack",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 7,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Explain WBFT validator quorum size in go-stablenet",
+          "intent": "arch_explain",
+          "explain_ontology": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 7,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "code=service_unavailable: The indexed service is unavailable."
+          }
+        ],
+        "isError": true,
+        "structuredContent": {
+          "code": "service_unavailable",
+          "message": "The indexed service is unavailable."
+        }
+      }
+    }
+  }
+]

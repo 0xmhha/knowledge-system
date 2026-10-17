@@ -1,0 +1,44 @@
+{
+  "scope": "exposed purposive diagnostics, not independent gold/holdout or quality acceptance",
+  "inputs": [
+    {
+      "id": "Q1",
+      "keyword": "QuorumSize",
+      "prompt": "Explain WBFT validator quorum size in go-stablenet",
+      "intent": "arch_explain"
+    },
+    {
+      "id": "Q2",
+      "keyword": "ValidateTransaction",
+      "prompt": "Review transaction admission validation in the transaction pool",
+      "intent": "qa_review"
+    },
+    {
+      "id": "Q3",
+      "keyword": "txByPriceAndTime",
+      "prompt": "Explain transaction price and time ordering in the miner",
+      "intent": "arch_explain"
+    },
+    {
+      "id": "Q4",
+      "keyword": "handleCommitMsg",
+      "prompt": "Trace WBFT commit message handling and quorum checks",
+      "intent": "arch_explain"
+    },
+    {
+      "id": "Q5",
+      "keyword": "GasTip",
+      "prompt": "Investigate transaction pool gas tip policy when a pending transaction is restored",
+      "intent": "bug_fix"
+    },
+    {
+      "id": "Q6",
+      "keyword": "Unsubscribe",
+      "prompt": "Review subscription unsubscribe shutdown concurrency and cleanup",
+      "intent": "concurrency_safety"
+    }
+  ],
+  "k": 10,
+  "filtered_vector_language": "go",
+  "unfiltered_vector_and_v2_errors_retained": true
+}

@@ -571,6 +571,22 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 - 기존667개는 통합전ba6 source에서 재실행한 역사적 보호검사. 현재source에 합산하지 않음. 새증거 보호12개 통과.
 - 실제host실행8581과 최종d1의plugin tree동일. 형식수정/CI후속이 다른실행으로 바뀐것처럼 기록하지 않음.
 - D04미정·정식0/9·freeze null/executionfalse·온톨로지quality inconclusive 유지. 운영설치/유료모델/외부게시0.
-다음 작업(최신): 소유 go-stablenet 비운영pilot의 source/dataset/BGE-M3실제runtime pin·정렬·semantic off/출처/혼입 경계 검증 → go-wemix 명시 비교.
+38단계 당시 다음 작업(역사 기록): 소유 go-stablenet 비운영pilot의 source/dataset/BGE-M3실제runtime pin·정렬·semantic off/출처/혼입 경계 검증 → go-wemix 명시 비교.
 남은 전체: 위pilot/비교; 독립담당자·입력/완전gold/매칭/DEV-FINAL/표본충분성·F01~08실행동결; 정식WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 9건; 필수온톨로지독립효과/구현연결/모델지정후답변효과; 별도후속12건. 상세목록은 consumer-adoption-v1/REPORT.txt.
 검증38: scripts/test_consumer_adoption.py 및 scripts/check-consumer-adoption.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1
+
+
+[검증 실행 완료 — 기본 검색 준비 미충족] 39. go-stablenet 실제 소스/데이터/모델·정렬/출처/프로젝트경계
+- 소스0bf2f4d1 clean·retained repo2224파일 Git 바이트 일치. 원본selected2175파일 전체복사·종료후 원본/복사 bytes 복구 확인.
+- 실제Ollama0.40.4·BGE-M3 digest790764…16bab/1024차원 일치. CKG/CKV좌표/논리digest/모델 health 정렬. clone재배치 source_root_ok=false 경고 보존.
+- primary6질의: keyword6/6·Go필터vector6/6, unfiltered1/6·v2 2/6. 외부원문 누락 source_missing 실패 분모 보존.
+- raw110hit 중보관파일109·가상convention1을 구분. 성공v2 2+복구1=30인용의coords/hash/원문/순서/integrity 재계산 일치. 반복2회순서동일은 품질/지연수용이 아님.
+- typed pin/foreign-node거부4건, retained변조거부1, manifest변조startup거부2, live변조시retained동일·정확pin복구 확인. 가상metadata변조/별도fixture이며 실제go-wemix·tenant ACL 수용이 아님.
+- 실제도구52시도/CKS7자식회수: 정상EOF0 4개·초기설정exit1 1개·의도한startup거부exit1 2개, readerjoin·PID부재·강제종료0. 공개startup진단은operation_failed로세부원인미표시.
+- 전역32·운영metadata/pointer42·원본후보5·비소유엔진11 보존. 최초잠금구조누락·readonly변조수집실패·rank가정수정·convention 비인용 발견도 원자료로 보존.
+- vector21304중472chunk는retained경로없음(doc234/flow34/convention204). 전부검색노출됐다고 세지 않음. 원본DB 임의수정/운영전환0.
+- 증거보호10검사 통과. Go변경없어이전fdb43 전체일반/race각4063·18skip및build/fmt/vet/lint/boundary 재사용. 독립품질/온톨로지효과/정식0/9·D04미정 유지.
+다음 작업(최신): SN-P01 새소유version의 외부원문/namespace·비인용convention 보완 → SN-P02 기존/새버전6질의·경계/복구재검증 → SN-P03 출처오류/모델오류분류 → SN-P04 go-wemix 비교.
+남은 전체: SN-P01~04; 독립담당자·DEV/FINAL/완전gold/매칭/표본·F01~08동결; WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 9건; 필수온톨로지독립효과/구현연결/모델지정후답변효과; 별도후속12건. 상세는 stablenet-pilot-v1/REPORT.txt 및 BLOCKERS.json.
+검증39: scripts/test_stablenet_pilot.py 및 scripts/check-stablenet-pilot.py
+검증39 최종: pilot보호10·adoption회귀12·문서계약20·고지3(총45검사) 통과, live문서134·기존구현guard·과거패킷불변·참조hash·공백 검사 통과. 이 보호검사 통과는 기본검색 준비 미충족 판정을 바꾸지 않는다.

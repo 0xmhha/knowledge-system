@@ -1,0 +1,69 @@
+import hashlib,json,os,shutil,subprocess,sys,urllib.request,datetime,importlib.util
+from pathlib import Path
+R=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=Path('/private/tmp/ks-stablenet-pilot-20261017-01');S=Path('/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet');D=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-comparison-20261013');V=(D/'current').resolve();B=Path('/private/tmp/ks-adoption-runtime-20261017/bin/cks')
+assert not O.exists();O.mkdir()
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def sha(p):
+ h=hashlib.sha256()
+ with p.open('rb')as f:
+  for chunk in iter(lambda:f.read(4<<20),b''):h.update(chunk)
+ return h.hexdigest()
+def git(*a):return subprocess.check_output(['git','-c','core.hooksPath=/dev/null','-C',str(S),*a],text=True).strip()
+plan={'schema_version':1,'declared_before_search':True,'created_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'native_source_commit':'fdb43ae2412d071f02b6b0dc5df0e50d3966b59e','runtime_binary':str(B),'runtime_binary_sha256':sha(B),'selected_dataset':str(V),'selection_reason':'latest retained BGE-M3 go-stablenet comparison build from October13; source matches clean0bf2; not a new corpus or ontology-effect study','scope':'bounded technical pilot, exposed diagnostic queries, no independent quality acceptance','model':'bge-m3:latest','embedding_dimensions':1024,'ontology_mode':'off','type_neighbors':False,'glossary':False,'query_count':6,'retrieval_k':10,'repeat_first_query':2,'faults':['wrong_commit','wrong_snapshot','wrong_source_hash','foreign_fixture_node','vector_project_manifest_mismatch','vector_snapshot_manifest_mismatch','retained_blob_tamper','live_checkout_tamper'],'formal_completed':0,'formal_total':9,'reviewer_assignment':'미정','paid_LLM_calls':0,'production_write':False,'external_publication':False,'acceptance':['clean source commit and all retained repo-file bytes match Git objects','copied dataset identity and graph/vector source coordinates align','observed local model digest and output dimension equal recorded identity','actual raw keyword/vector and archive-backed v2 retrieval execute; ranking and citation integrity recorded, no quality threshold inferred','all v2 citations keep exact project/dataset/snapshot/source/commit and content hashes','controlled mismatches/tamper refused or expose a gap; never hide failed attempts','EOF exit0/reap, no owned workers/process leaks, protected original files/pointers/configs unchanged']}
+dump(O/'protocol.json',plan)
+head=git('rev-parse','HEAD');assert head=='0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8'and not git('status','--porcelain')
+before={'source_root':str(S),'source_commit':head,'source_status':git('status','--porcelain'),'dataset_current_target':os.readlink(D/'current'),'dataset_resolved':str(V),'files':{str(p.relative_to(V)):{'bytes':p.stat().st_size,'sha256':sha(p)}for p in sorted(V.rglob('*'))if p.is_file()}}
+assert not any(p.name.endswith(('-wal','-shm'))for p in V.rglob('*'))
+dump(O/'original-before.json',before);print('Original selected dataset hashed',len(before['files']),flush=True)
+shutil.copytree(V,O/'dataset/pilot-v1');(O/'dataset/current').symlink_to('pilot-v1');copy=O/'dataset/pilot-v1'
+assert all(sha(copy/k)==v['sha256']for k,v in before['files'].items());print('Independent byte-exact dataset copy ready',flush=True)
+sources=json.load(open(copy/'sources/manifest.json'));tree={}
+for row in subprocess.check_output(['git','-C',str(S),'ls-tree','-rz',head]).split(b'\0'):
+ if row:
+  meta,path=row.split(b'\t',1);mode,kind,obj=meta.split();tree[path.decode()]={'mode':mode.decode(),'kind':kind.decode(),'object':obj.decode()}
+checks=[]
+for row in sources['files']:
+ blob=copy/'sources/blobs'/row['sha256'];assert sha(blob)==row['sha256']
+ if row['origin_id']=='repo':
+  data=blob.read_bytes();obj=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest();assert row['path']in tree and tree[row['path']]['object']==obj,row['path'];checks.append({'origin_id':'repo','path':row['path'],'sha256':row['sha256'],'git_blob':obj,'commit_equal':True})
+dump(O/'retained-source-git-equality.json',checks)
+subprocess.run(['git','-c','core.hooksPath=/dev/null','clone','--shared','--no-checkout',str(S),str(O/'source')],check=True,capture_output=True,timeout=120);subprocess.run(['git','-c','core.hooksPath=/dev/null','-C',str(O/'source'),'checkout','--detach',head],check=True,capture_output=True,timeout=120)
+print('Source clone and all retained Git bytes verified',len(checks),flush=True)
+# Hash-only configuration/operational projection; never copy credentials.
+sys.path.insert(0,str(R/'scripts'));spec=importlib.util.spec_from_file_location('scope',R/'scripts/run-consumer-final.py');scope=importlib.util.module_from_spec(spec);spec.loader.exec_module(scope);p=json.load(open(scope.PLAN));dump(O/'scope-before.json',{'global':scope.global_state(p),'operations':scope.operations(p),'source_repos':scope.sources()['repos']})
+base='http://127.0.0.1:11434'
+def api(path,body=None):
+ req=urllib.request.Request(base+'/api/'+path,data=json.dumps(body).encode()if body else None,headers={'Content-Type':'application/json'})
+ with urllib.request.urlopen(req,timeout=90)as r:raw=r.read()
+ return json.loads(raw),hashlib.sha256(raw).hexdigest()
+version,vsha=api('version');tags,tsha=api('tags');model=next(x for x in tags['models']if x['name']=='bge-m3:latest');show,ssha=api('show',{'model':model['name'],'verbose':False});embedding,esha=api('embed',{'model':model['name'],'input':'go-stablenet non-production identity probe'});values=embedding['embeddings'][0]
+id=json.load(open(copy/'dataset-identity.json'));assert model['digest']==id['embedding_identity']['model_digest'];assert len(values)==id['embedding_identity']['Dim']==1024
+projection={'observed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'endpoint':base,'version':version['version'],'version_response_sha256':vsha,'tags_response_sha256':tsha,'selected_model':model,'show':{k:show[k]for k in ['details','model_info','capabilities']if k in show},'show_response_sha256':ssha,'embedding_probe':{'input':'go-stablenet non-production identity probe','response_sha256':esha,'dimensions':len(values),'finite':all(__import__('math').isfinite(v)for v in values),'l2_norm':sum(v*v for v in values)**.5,'model':embedding.get('model'),'prompt_eval_count':embedding.get('prompt_eval_count'),'total_duration':embedding.get('total_duration')},'matches_dataset_identity':True,'paid_model_calls':0,'model_downloads':0};dump(O/'model-identity.json',projection)
+config=f'''version: 1
+name: owned-go-stablenet-pilot
+backends:
+  ckg:
+    path: {copy}/graph/graph.db
+    source_root: {O}/source
+  ckv:
+    path: {copy}/vector
+    provider: ollama
+    embed_model: bge-m3:latest
+    embed_dim: 1024
+    ollama_url: http://127.0.0.1:11434
+listen:
+  transport: stdio
+logging:
+  level: error
+sanitize:
+  rules_path: {R}/system/policies/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true
+semantic:
+  ontology_mode: off
+retrieval:
+  recall_k: 10
+  type_neighbors: false
+'''
+(O/'cks.yaml').write_text(config);dump(O/'binary-pin.json',{'path':str(B),'sha256':sha(B),'source_commit':plan['native_source_commit']})
+print('SETUP PASS: source/dataset/model digest and1024 dimensions; Ollama'+projection['version'],flush=True)

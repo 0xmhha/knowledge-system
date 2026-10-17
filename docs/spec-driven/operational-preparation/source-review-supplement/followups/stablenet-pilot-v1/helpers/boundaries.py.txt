@@ -1,0 +1,39 @@
+from pathlib import Path
+import json,hashlib,stat
+source=Path('/private/tmp/ks-stablenet-pilot-run.py').read_text();exec(compile(source.split('inputs=')[0],'<shared owned client>','exec'))
+selected=json.load(open(O/'selected-symbol.json'));baseline=payload(json.load(open(O/'value-baseline.json')));args={'node_id':selected['id']};faults=json.load(open(O/'fault-results.json'))
+# The previous collector used isError alone for status DTOs; retain that first
+# observation and derive domain refusal from raw status+analysis, not envelope flags.
+for f in faults:f['domain_refused']=f['response'].get('status')in ['source_mismatch','not_found']and f['response'].get('analysis')is None
+records=json.load(open(V/'sources/manifest.json'))['files'];entry=next(x for x in records if x['origin_id']=='repo'and x['path']==selected['file']);blob=V/'sources/blobs'/entry['sha256'];old=blob.read_bytes();mode=stat.S_IMODE(blob.stat().st_mode);assert hashlib.sha256(old).hexdigest()==entry['sha256']
+dump(O/'mutation-collector-correction.json',{'first_run_exit':1,'first_run_issue':'owned copied retained blob was read-only; first attempted write raised PermissionError before mutation; source bytes verified unchanged','correction':'record original mode; allow mutation on owned copy only; restore bytes and mode in finally','previous_raw_calls_reused_not_reexecuted':True,'domain_status_refusal_not_MCP_isError':'source_mismatch/not_found with analysis:null are refusals; initial envelope-only refused:false retained'})
+c=Client('boundary-resume')
+def norm(v):
+ if isinstance(v,dict):return{k:norm(x)for k,x in v.items()if k!='elapsed_micros'}
+ if isinstance(v,list):return[norm(x)for x in v]
+ return v
+try:
+ c.initialize()
+ try:
+  blob.chmod(mode|stat.S_IWUSR);blob.write_bytes(old+b'\n// controlled owned retained blob fault\n');r=c.call('retained-blob-tamper','cks.context.get_for_task_v2',{'prompt':'Explain WBFT validator quorum size in go-stablenet','intent':'arch_explain'});faults.append({'id':'retained-blob-tamper','domain_refused':fail(r),'response':payload(r)})
+ finally:blob.write_bytes(old);blob.chmod(mode)
+ live=O/'source'/selected['file'];raw=live.read_bytes()
+ try:
+  live.write_bytes(raw+b'\n// controlled owned live source tamper\n');r=c.call('live-checkout-tamper','cks.context.value_dependencies',args);faults.append({'id':'live-checkout-tamper','retained_source_unchanged':norm(payload(r))==norm(baseline),'response':payload(r)})
+ finally:live.write_bytes(raw)
+ pin=baseline['analysis']['source'];r=c.call('exact-pin-restored','cks.context.value_dependencies',{**args,'expected_commit':pin['commit'],'expected_source_sha256':pin['sha256'],'expected_snapshot_sha256':baseline['snapshot_sha256']});assert payload(r)['status']=='partial';faults.append({'id':'exact-pin-restored','status':payload(r)['status'],'pins_equal':payload(r)['analysis']['source']==pin})
+finally:c.close();dump(O/'fault-results-final.json',faults)
+manifest=V/'vector/manifest.json';raw=manifest.read_bytes()
+for label,key,value in [('foreign-project-manifest','project_id','foreign-controlled-pilot-project'),('wrong-snapshot-manifest','snapshot_id','0'*64)]:
+ obj=json.loads(raw);obj[key]=value;manifest.write_text(json.dumps(obj));cl=Client(label)
+ try:
+  try:
+   cl.initialize();h=cl.call('health','cks.ops.health');pack=cl.call('pack','cks.context.get_for_task_v2',{'prompt':'Explain transaction price and time ordering in the miner','intent':'arch_explain'});row={'id':label,'controlled_manifest_fault':True,'metadata_key':key,'startup_refused':False,'health':payload(h),'domain_refused':fail(pack),'response':payload(pack)}
+  except (ValueError,EOFError,BrokenPipeError)as e:row={'id':label,'controlled_manifest_fault':True,'metadata_key':key,'startup_refused':True,'failure':type(e).__name__,'domain_refused':True}
+ finally:cl.close();manifest.write_bytes(raw)
+ faults.append(row);dump(O/'fault-results-final.json',faults)
+cl=Client('restored')
+try:
+ cl.initialize();r=cl.call('health','cks.ops.health');assert payload(r)['serviceable'];cl.call('keyword','cks.context.search_text',{'query':'QuorumSize','k':10,'exclude_tests':True});cl.call('vector-go','cks.context.semantic_search',{'query':'Explain WBFT validator quorum size in go-stablenet','k':10,'language':'go','exclude_tests':True});r=cl.call('known-success-v2','cks.context.get_for_task_v2',{'prompt':'Explain transaction price and time ordering in the miner','intent':'arch_explain','explain_ontology':True});assert not fail(r)
+finally:cl.close()
+print('Boundary resume complete: typed wrong-pin/foreign-node refusals, owned blob/live tamper, two manifest faults, restored successful v2',flush=True)

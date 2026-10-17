@@ -1,0 +1,782 @@
+[
+  {
+    "label": "initialize",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {},
+        "clientInfo": {
+          "name": "owned-consumer-P05",
+          "version": "1"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        },
+        "serverInfo": {
+          "name": "owned-go-stablenet-pilot",
+          "version": "cks-mcp/0.0.1-dev"
+        }
+      }
+    }
+  },
+  {
+    "label": "health",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.ops.health",
+        "arguments": {}
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "owned-go-stablenet-pilot",
+          "status": "ok",
+          "serviceable": true,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-pilot-20261017-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-pilot-20261017-01/dataset/pilot-v1/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "model_reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-13T14:54:37Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:11434",
+              "data_path": "/private/tmp/ks-stablenet-pilot-20261017-01/dataset/pilot-v1/vector"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+            "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-pilot-20261017-01/source\" differs from indexed checkout \"/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "label": "keyword",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.search_text",
+        "arguments": {
+          "query": "QuorumSize",
+          "k": 10,
+          "exclude_tests": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "search_text result"
+          }
+        ],
+        "structuredContent": {
+          "query": "QuorumSize",
+          "hits": [
+            {
+              "citation": {
+                "file": "consensus/wbft/validator/default.go",
+                "start_line": 226,
+                "end_line": 229,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 1,
+              "score": 1,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/types.go",
+                "start_line": 242,
+                "end_line": 242,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 2,
+              "score": 0.8424457548578778,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/justification.go",
+                "start_line": 75,
+                "end_line": 87,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 3,
+              "score": 0.34877521658506894,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/justification.go",
+                "start_line": 112,
+                "end_line": 127,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 4,
+              "score": 0.25747825600315094,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/justification.go",
+                "start_line": 91,
+                "end_line": 108,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 5,
+              "score": 0.15985302170494267,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/justification.go",
+                "start_line": 40,
+                "end_line": 71,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 7,
+              "score": 0.11889654608196948,
+              "source": "graph"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/roundchange.go",
+                "start_line": 254,
+                "end_line": 276,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 8,
+              "score": 0,
+              "source": "graph"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "label": "vector-go",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.semantic_search",
+        "arguments": {
+          "query": "Explain WBFT validator quorum size in go-stablenet",
+          "k": 10,
+          "language": "go",
+          "exclude_tests": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "semantic_search result"
+          }
+        ],
+        "structuredContent": {
+          "query": "Explain WBFT validator quorum size in go-stablenet",
+          "hits": [
+            {
+              "citation": {
+                "file": "consensus/wbft/validator/default.go",
+                "start_line": 226,
+                "end_line": 229,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 1,
+              "score": 0.5810292959213257,
+              "source": "vector",
+              "symbol": "defaultSet.QuorumSize",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).QuorumSize",
+              "chunk_kind": "symbol",
+              "text": "func (valSet *defaultSet) QuorumSize() int {\n\t//c.currentLogger(true, nil).Trace(\"WBFT: confirmation Formula used ceil(2N/3)\")\n\treturn int(math.Ceil(float64(valSet.Size()) - valSet.F()))\n}"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/types.go",
+                "start_line": 216,
+                "end_line": 245,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 2,
+              "score": 0.5767149925231934,
+              "source": "vector",
+              "symbol": "ValidatorSet",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft.ValidatorSet",
+              "chunk_kind": "symbol",
+              "text": "ValidatorSet interface {\n\t// Calculate the proposer\n\tCalcProposer(lastProposer common.Address, round uint64)\n\t// Return the validator size\n\tSize() int\n\t// Return the validator array\n\tList() []Validator\n\t// Return the validator address array\n\tAddressList() []common.Address\n\t// Get validator by index\n\tGetByIndex(i uint64) Validator\n\t// Get validator by given address\n\tGetByAddress(addr common.Address) (int, Validator)\n\t// Get current proposer\n\tGetProposer() Validator\n\t// Check whether the validator with given address is a proposer\n\tIsProposer(address common.Address) bool\n\t// Add validator\n\tAddValidator(address common.Address, blsPublicKey []byte) bool\n\t// Remove validator\n\tRemoveValidator(address common.Address) bool\n\t// Copy validator set\n\tCopy() ValidatorSet\n\t// Get the maximum number of faulty nodes\n\tF() float64\n\t// Get quorum size ( which is n-f)\n\tQuorumSize() int\n\t// Get proposer policy\n\tPolicy() ProposerPolicy\n}"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/engine/engine.go",
+                "start_line": 1244,
+                "end_line": 1244,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 3,
+              "score": 0.5722411274909973,
+              "source": "vector",
+              "symbol": "errors.New",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/engine.verifyEpoch",
+              "chunk_kind": "invariant",
+              "text": "WBFT: mismatch in validator sizes"
+            },
+            {
+              "citation": {
+                "file": "cmd/genesis_generator/genesis_generator.go",
+                "start_line": 321,
+                "end_line": 371,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 4,
+              "score": 0.56641885638237,
+              "source": "vector",
+              "symbol": "genesisGenerator.wbftChainConfig",
+              "canonical_id": "github.com/ethereum/go-ethereum/cmd/genesis_generator.(*genesisGenerator).wbftChainConfig",
+              "chunk_kind": "symbol",
+              "text": "func (g *genesisGenerator) wbftChainConfig() {\n\tg.Genesis.Difficulty = types.WBFTDefaultDifficulty\n\n\tfmt.Println()\n\tfmt.Println(\"Which accounts are allowed to seal? (mandatory at least one)\")\n\n\tvar validators []common.Address\n\tvar blsPublicKeys []string\n\tfor {\n\t\tif address := readAddress(); address != nil {\n\t\t\tvalidators = append(validators, *address)\n\t\t\tblsPublicKeys = append(blsPublicKeys, readBLSPubKey())\n\t\t\tcontinue\n\t\t}\n\t\tif len(validators) > 0 {\n\t\t\tbreak\n\t\t}\n\t}\n\n\tminQuorum := 2\n\tif len(validators) == 1 {\n\t\tminQuorum = 1\n\t}\n\n\tfmt.Println()\n\tfmt.Printf(\"Enter the quorum for governance: (default = %d)\\n\", minQuorum)\n\n\tvar quorum int\n\tfor {\n\t\tquorum = readDefaultInt(minQuorum)\n\t\tif quorum < minQuorum {\n\t\t\tfmt.Printf(\"Quorum must be at least %d\\n\", minQuorum)\n\t\t\tcontinue\n\t\t}\n\t\tif quorum > len(validators) {\n\t\t\tfmt.Printf(\"Quorum cannot exceed number of validators: %d\\n\", len(validators))\n\t\t\tcontinue\n\t\t}\n\t\tbreak\n\t}\n\n\tg.setAnzeonConfig(validators, blsPublicKeys, quorum)\n\n\t// you can add config file for static nodes if you want\n\tfmt.Println()\n\tfmt.Println(\"Want to generate config.toml file to configure static nodes to connect?\")\n\tfmt.Println(\"Else you have to manage peer node manually (default true)\")\n\tif readDefaultYesNo(true) {\n\t\tgenConfigFile()\n\t}\n}"
+            },
+            {
+              "citation": {
+                "file": "params/config_wbft.go",
+                "start_line": 50,
+                "end_line": 53,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 5,
+              "score": 0.5636379420757294,
+              "source": "vector",
+              "symbol": "WBFTInit",
+              "canonical_id": "github.com/ethereum/go-ethereum/params.WBFTInit",
+              "chunk_kind": "symbol",
+              "text": "WBFTInit struct {\n\tValidators    []common.Address `json:\"validators\"`    // initial WBFT validators, order is matter\n\tBLSPublicKeys []string         `json:\"blsPublicKeys\"` // BLS public ket list of validators, order must be same as validators\n}"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/core.go",
+                "start_line": 433,
+                "end_line": 443,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 6,
+              "score": 0.5560910701751709,
+              "source": "vector",
+              "symbol": "Core.checkValidatorSignature",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).checkValidatorSignature",
+              "chunk_kind": "symbol",
+              "text": "func (c *Core) checkValidatorSignature(data []byte, sig []byte, view wbft.View) (common.Address, error) {\n\tif view.Cmp(c.currentView()) < 0 && c.state == StateAcceptRequest && view.Cmp(&wbft.View{\n\t\tSequence: new(big.Int).Sub(c.current.Sequence(), common.Big1),\n\t\tRound:    c.PriorRound(),\n\t}) == 0 {\n\t\tif valSet := c.PriorValidators(); valSet != nil {\n\t\t\treturn wbft.CheckValidatorSignature(valSet, data, sig)\n\t\t}\n\t}\n\treturn wbft.CheckValidatorSignature(c.valSet, data, sig)\n}"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/engine/engine.go",
+                "start_line": 1248,
+                "end_line": 1248,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 7,
+              "score": 0.5548098981380463,
+              "source": "vector",
+              "symbol": "errors.New",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/engine.verifyEpoch",
+              "chunk_kind": "invariant",
+              "text": "WBFT: The two validators do not match"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/core/commit.go",
+                "start_line": 86,
+                "end_line": 131,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 8,
+              "score": 0.5530551373958588,
+              "source": "vector",
+              "symbol": "Core.handleCommitMsg",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).handleCommitMsg",
+              "chunk_kind": "symbol",
+              "text": "// It\n// - validates COMMIT message digest matches the current block proposal\n// - accumulates valid COMMIT messages until reaching quorum\n// - when quorum of COMMIT messages is reached then update state and commits\nfunc (c *Core) handleCommitMsg(commit *wbfmessage.Commit) error {\n\tlogger := c.currentLogger(true, commit)\n\n\tlogger.Debug(\"WBFT: handle COMMIT message\", \"commits.count\", c.current.WBFTCommits.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Check digest\n\tif commit.Digest != c.current.Proposal().Hash() {\n\t\tlogger.Warn(\"WBFT: invalid COMMIT message digest\", \"digest\", commit.Digest, \"proposal\", c.current.Proposal().Hash().String())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Check commitSeal\n\tblock, ok := c.current.Proposal().(*types.Block)\n\tif !ok {\n\t\tlogger.Warn(\"WBFT: failed to cast proposal from COMMIT message to *types.Block\")\n\t\treturn errInvalidMessage\n\t}\n\n\tif verifySeal(c.valSet, block.Header(), uint32(commit.CommonPayload.Round.Uint64()), SealTypeCommit,\n\t\tcommit.CommitSeal, commit.Source()) != nil {\n\t\tlogger.Warn(\"WBFT: failed to verify seal from COMMIT message\", \"number\", block.Header().Number, \"from\", commit.Source())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Add to received msgs\n\tif err := c.current.WBFTCommits.Add(commit); err != nil {\n\t\tc.logger.Error(\"WBFT: failed to save COMMIT message\", \"err\", err)\n\t\treturn err\n\t}\n\n\tlogger = logger.New(\"commits.count\", c.current.WBFTCommits.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// If we reached threshold\n\tif c.current.WBFTCommits.Size() >= c.valSet.QuorumSize() {\n\t\tlogger.Info(\"WBFT: received quorum of COMMIT messages\")\n\t\tc.commitWBFT()\n\t} else {\n\t\tlogger.Trace(\"WBFT: accepted new COMMIT messages\")\n\t}\n\n\treturn nil\n}"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/utils.go",
+                "start_line": 59,
+                "end_line": 73,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 9,
+              "score": 0.5518986582756042,
+              "source": "vector",
+              "symbol": "CheckValidatorSignature",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft.CheckValidatorSignature",
+              "chunk_kind": "symbol",
+              "text": "func CheckValidatorSignature(valSet ValidatorSet, data []byte, sig []byte) (common.Address, error) {\n\t// 1. Get signature address\n\tsigner, err := GetSignatureAddress(data, sig)\n\tif err != nil {\n\t\tlog.Error(\"WBFT: Failed to get signer address\", \"err\", err)\n\t\treturn common.Address{}, err\n\t}\n\n\t// 2. Check validator\n\tif _, val := valSet.GetByAddress(signer); val != nil {\n\t\treturn val.Address(), nil\n\t}\n\n\treturn common.Address{}, ErrUnauthorizedAddress\n}"
+            },
+            {
+              "citation": {
+                "file": "params/config_wbft.go",
+                "start_line": 132,
+                "end_line": 136,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 10,
+              "score": 0.5510860085487366,
+              "source": "vector",
+              "symbol": "Init",
+              "canonical_id": "github.com/ethereum/go-ethereum/params.Init",
+              "chunk_kind": "symbol",
+              "text": "Init struct {\n\tValidators      []common.Address `json:\"validators\"`      // initial WBFT validators, order is matter\n\tBLSPublicKeys   []string         `json:\"blsPublicKeys\"`   // BLS public ket list of validators, order must be same as validators\n\tSystemContracts *SystemContracts `json:\"systemContracts\"` // initial gov contracts, order must be same as validators\n}"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "label": "known-success-v2",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Explain transaction price and time ordering in the miner",
+          "intent": "arch_explain",
+          "explain_ontology": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "v2 evidence pack"
+          }
+        ],
+        "structuredContent": {
+          "format_version": 2,
+          "coordinates": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+            "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "query": "Explain transaction price and time ordering in the miner",
+          "citations": [
+            {
+              "file": "miner/ordering.go",
+              "start_line": 104,
+              "end_line": 106,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "c1d9be4e438c37f44a40fad577b0d1eb3c525c852d9a7c95be3dadb580df0730"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 177,
+              "end_line": 183,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "937952603c00eb36cc2ae906137c5d2525df795cf89038c66389cc268fdf6ed7"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 62,
+              "end_line": 66,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "16610faeb712f6868f1f9b75cff492bdf61609f34685ffd806c7a0c08b6e66e5"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 30,
+              "end_line": 35,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "97eafe8f731dc465fc1ee740c1149da7d307ebbd0c3c5080eecb69283368c090"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 102,
+              "end_line": 102,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "9dc1db4712f88f1503beac88ef042fb5d9c044a49b55e28b8e04c9732756794a"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 68,
+              "end_line": 68,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "e67ab381c61f8e8384b9a365ea4d3d55039926c06793cb6985a3b15392e9ffdb"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 37,
+              "end_line": 60,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "143aad2b4f794f5ea6cbb4b5dd205db27e4d42525556d482cfe821d86abd7470"
+            },
+            {
+              "file": "core/types/transaction.go",
+              "start_line": 554,
+              "end_line": 558,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "91b8e4b15f84c00ed947dbff08b15d87f3f95538f79009719ddefac05b82a310",
+              "content_sha256": "e3f98a3d25aff50262d844137696edd10b8ab7bc7180fa361536174bfd9a5a8c"
+            },
+            {
+              "file": "systemcontracts/coin_adapter.go",
+              "start_line": 55,
+              "end_line": 55,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "a072fc6c9b197b9f5eed6370be6aa96d70befd145df87a8a252e0b8bcf788e21",
+              "content_sha256": "2105950beedd014495e5178124419a1d7d1d23b6b4bc9da302047c5a2880c89d"
+            },
+            {
+              "file": "systemcontracts/coin_adapter.go",
+              "start_line": 60,
+              "end_line": 60,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "a072fc6c9b197b9f5eed6370be6aa96d70befd145df87a8a252e0b8bcf788e21",
+              "content_sha256": "8c1af3d31f244e178dbeec663a5d6945a66107d0bf4c355c6b05f9edd3aa4a6c"
+            }
+          ],
+          "bodies": [
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 104,
+                "end_line": 106,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "c1d9be4e438c37f44a40fad577b0d1eb3c525c852d9a7c95be3dadb580df0730"
+              },
+              "text": "func (s *txByPriceAndTime) Push(x interface{}) {\n\ts.txs = append(s.txs, x.(*txWithMinerFee))\n}\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 177,
+                "end_line": 183,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "937952603c00eb36cc2ae906137c5d2525df795cf89038c66389cc268fdf6ed7"
+              },
+              "text": "// Peek returns the next transaction by price.\nfunc (t *transactionsByPriceAndNonce) Peek() (*txpool.LazyTransaction, *uint256.Int) {\n\tif len(t.heads.txs) == 0 {\n\t\treturn nil, nil\n\t}\n\treturn t.heads.txs[0].tx, t.heads.txs[0].fees\n}\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 62,
+                "end_line": 66,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "16610faeb712f6868f1f9b75cff492bdf61609f34685ffd806c7a0c08b6e66e5"
+              },
+              "text": "type txByPriceAndTime struct {\n\ttxs           []*txWithMinerFee\n\tanzeonEnabled bool                    // Cached value of chainConfig.AnzeonEnabled() to avoid repeated checks\n\tisAuthorized  map[common.Address]bool // Pre-computed authorized status for all accounts to avoid repeated checks in Less()\n}\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 30,
+                "end_line": 35,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "97eafe8f731dc465fc1ee740c1149da7d307ebbd0c3c5080eecb69283368c090"
+              },
+              "text": "// txWithMinerFee wraps a transaction with its gas price or effective miner gasTipCap\ntype txWithMinerFee struct {\n\ttx   *txpool.LazyTransaction\n\tfrom common.Address\n\tfees *uint256.Int\n}\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 102,
+                "end_line": 102,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "9dc1db4712f88f1503beac88ef042fb5d9c044a49b55e28b8e04c9732756794a"
+              },
+              "text": "func (s *txByPriceAndTime) Swap(i, j int) { s.txs[i], s.txs[j] = s.txs[j], s.txs[i] }\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 68,
+                "end_line": 68,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "e67ab381c61f8e8384b9a365ea4d3d55039926c06793cb6985a3b15392e9ffdb"
+              },
+              "text": "func (s *txByPriceAndTime) Len() int { return len(s.txs) }\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 37,
+                "end_line": 60,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "143aad2b4f794f5ea6cbb4b5dd205db27e4d42525556d482cfe821d86abd7470"
+              },
+              "text": "// newTxWithMinerFee creates a wrapped transaction, calculating the effective\n// miner gasTipCap if a base fee is provided.\n// Returns error in case of a negative effective miner gasTipCap.\nfunc newTxWithMinerFee(tx *txpool.LazyTransaction, from common.Address, baseFee, headerTip *uint256.Int, isAuthorized bool) (*txWithMinerFee, error) {\n\ttip := new(uint256.Int).Set(tx.GasTipCap)\n\tif baseFee != nil {\n\t\tif tx.GasFeeCap.Cmp(baseFee) < 0 {\n\t\t\treturn nil, types.ErrGasFeeCapTooLow\n\t\t}\n\t\ttip = new(uint256.Int).Sub(tx.GasFeeCap, baseFee)\n\t\ttxTip := new(uint256.Int).Set(tx.GasTipCap)\n\t\tif !isAuthorized && headerTip != nil && txTip.Gt(headerTip) {\n\t\t\ttip = headerTip\n\t\t}\n\t\tif tip.Gt(txTip) {\n\t\t\ttip = txTip\n\t\t}\n\t}\n\treturn &txWithMinerFee{\n\t\ttx:   tx,\n\t\tfrom: from,\n\t\tfees: tip,\n\t}, nil\n}\n"
+            },
+            {
+              "citation": {
+                "file": "core/types/transaction.go",
+                "start_line": 554,
+                "end_line": 558,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "91b8e4b15f84c00ed947dbff08b15d87f3f95538f79009719ddefac05b82a310",
+                "content_sha256": "e3f98a3d25aff50262d844137696edd10b8ab7bc7180fa361536174bfd9a5a8c"
+              },
+              "text": "// Time returns the time when the transaction was first seen on the network. It\n// is a heuristic to prefer mining older txs vs new all other things equal.\nfunc (tx *Transaction) Time() time.Time {\n\treturn tx.time\n}\n"
+            },
+            {
+              "citation": {
+                "file": "systemcontracts/coin_adapter.go",
+                "start_line": 55,
+                "end_line": 55,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "a072fc6c9b197b9f5eed6370be6aa96d70befd145df87a8a252e0b8bcf788e21",
+                "content_sha256": "2105950beedd014495e5178124419a1d7d1d23b6b4bc9da302047c5a2880c89d"
+              },
+              "text": "\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: the number of minters and minterAllowedAmounts must be the same\")\n"
+            },
+            {
+              "citation": {
+                "file": "systemcontracts/coin_adapter.go",
+                "start_line": 60,
+                "end_line": 60,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "a072fc6c9b197b9f5eed6370be6aa96d70befd145df87a8a252e0b8bcf788e21",
+                "content_sha256": "8c1af3d31f244e178dbeec663a5d6945a66107d0bf4c355c6b05f9edd3aa4a6c"
+              },
+              "text": "\t\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: invalid minterAllowed, must be decimal\")\n"
+            }
+          ],
+          "graph_neighbors": [],
+          "semantic": null,
+          "evidence_state": "complete",
+          "metadata": {
+            "ontology": {
+              "explanation": {
+                "state": "off",
+                "total_changed": 0,
+                "truncated": false,
+                "final_body_budget_partial": false,
+                "quality_evaluated": false
+              },
+              "mode": "off",
+              "state": "off",
+              "baseline_citations": 10,
+              "matched_concepts": 0,
+              "applied_relations": 0,
+              "boosted_citations": 0
+            },
+            "integrity_hash_algo": "sha256-v2",
+            "integrity_hash": "b1b277831406679377ade8b1f880e215f2c21731d7b02a4a235493994f487b24"
+          }
+        }
+      }
+    }
+  }
+]

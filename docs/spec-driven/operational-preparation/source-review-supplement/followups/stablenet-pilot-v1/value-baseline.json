@@ -1,0 +1,248 @@
+{
+  "jsonrpc": "2.0",
+  "id": 36,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"schema_version\":1,\"status\":\"partial\",\"snapshot_sha256\":\"9faf814cfba12178adc070648905876d39f399387000998f4a06716b79a09263\",\"analysis\":{\"schema_version\":1,\"source\":{\"node_id\":\"90591deae205962f\",\"canonical_id\":\"github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).QuorumSize\",\"file\":\"consensus/wbft/validator/default.go\",\"commit\":\"0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8\",\"sha256\":\"9ec2fd9dd0d115b237181bc084793831604722d88acbead3457dc6205d9aeba3\",\"language\":\"go\",\"start_line\":226,\"start_byte\":5948,\"bytes\":188,\"snapshot_sha256\":\"9faf814cfba12178adc070648905876d39f399387000998f4a06716b79a09263\",\"function_name\":\"QuorumSize\"},\"limits\":{\"max_source_bytes\":262144,\"max_ast_nodes\":4096,\"max_blocks\":256,\"max_nodes\":1024,\"max_edges\":4096,\"max_iterations\":128,\"timeout_ms\":1000,\"max_facts\":65536},\"status\":\"partial\",\"capability\":{\"cfg\":\"bounded_go\",\"control_dependence\":\"normal_exit_postdominators\",\"data_dependence\":\"local_scalar_may_reach\",\"def_use\":\"lexical_may_reach\",\"exceptions\":\"unsupported\",\"local_binding\":\"isolated_go_types\",\"memory_alias\":\"unsupported\",\"package_types\":\"unavailable_function_blob\",\"short_circuit\":\"unsupported\"},\"blocks\":[{\"id\":0,\"kind\":\"Body\",\"reachable\":true,\"nodes\":[\"entry\",\"b0/n0\"]},{\"id\":1,\"kind\":\"Unreachable\",\"reachable\":false,\"nodes\":[]}],\"nodes\":[{\"id\":\"b0/n0\",\"block\":0,\"kind\":\"ReturnStmt\",\"location\":{\"start_byte\":6076,\"end_byte\":6134,\"start_line\":228,\"end_line\":228},\"text\":\"return int(math.Ceil(float64(valSet.Size()) - valSet.F()))\",\"synthetic\":false},{\"id\":\"entry\",\"block\":0,\"kind\":\"entry\",\"location\":{\"start_byte\":5948,\"end_byte\":5990,\"start_line\":226,\"end_line\":226},\"text\":\"\",\"synthetic\":true}],\"edges\":[{\"from\":\"entry\",\"to\":\"b0/n0\",\"kind\":\"address_dependence\",\"certainty\":\"may_reach\",\"variable\":\"v5954\"}],\"diagnostics\":[{\"code\":\"isolated_type_info_partial\",\"message\":\"Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof\"},{\"code\":\"opaque_call\",\"message\":\"Isolated function source has no interprocedural effects or abnormal-exit proof\",\"location\":{\"start_byte\":6083,\"end_byte\":6134,\"start_line\":228,\"end_line\":228}},{\"code\":\"opaque_call\",\"message\":\"Isolated function source has no interprocedural effects or abnormal-exit proof\",\"location\":{\"start_byte\":6087,\"end_byte\":6133,\"start_line\":228,\"end_line\":228}},{\"code\":\"opaque_call\",\"message\":\"Isolated function source has no interprocedural effects or abnormal-exit proof\",\"location\":{\"start_byte\":6097,\"end_byte\":6119,\"start_line\":228,\"end_line\":228}},{\"code\":\"opaque_call\",\"message\":\"Isolated function source has no interprocedural effects or abnormal-exit proof\",\"location\":{\"start_byte\":6105,\"end_byte\":6118,\"start_line\":228,\"end_line\":228}},{\"code\":\"opaque_call\",\"message\":\"Isolated function source has no interprocedural effects or abnormal-exit proof\",\"location\":{\"start_byte\":6122,\"end_byte\":6132,\"start_line\":228,\"end_line\":228}},{\"code\":\"external_value_unknown\",\"message\":\"Value read has no local lexical definition; no source edge is invented\",\"location\":{\"start_byte\":6087,\"end_byte\":6091,\"start_line\":228,\"end_line\":228}}],\"truncated\":false,\"elapsed_micros\":1771,\"variables\":[{\"id\":\"v5954\",\"name\":\"valSet\",\"kind\":\"receiver\",\"declaration\":{\"start_byte\":5954,\"end_byte\":5960,\"start_line\":226,\"end_line\":226}}],\"occurrences\":[{\"id\":\"b0/n0/address/v5954/6105\",\"node\":\"b0/n0\",\"variable\":\"v5954\",\"role\":\"address\",\"location\":{\"start_byte\":6105,\"end_byte\":6111,\"start_line\":228,\"end_line\":228},\"reachable\":true},{\"id\":\"b0/n0/address/v5954/6122\",\"node\":\"b0/n0\",\"variable\":\"v5954\",\"role\":\"address\",\"location\":{\"start_byte\":6122,\"end_byte\":6128,\"start_line\":228,\"end_line\":228},\"reachable\":true},{\"id\":\"entry/definition/v5954/5954\",\"node\":\"entry\",\"variable\":\"v5954\",\"role\":\"definition\",\"location\":{\"start_byte\":5954,\"end_byte\":5960,\"start_line\":226,\"end_line\":226},\"reachable\":true}],\"def_use\":[{\"definition\":\"entry/definition/v5954/5954\",\"use\":\"b0/n0/address/v5954/6105\",\"variable\":\"v5954\",\"certainty\":\"lexical_may_reach\"},{\"definition\":\"entry/definition/v5954/5954\",\"use\":\"b0/n0/address/v5954/6122\",\"variable\":\"v5954\",\"certainty\":\"lexical_may_reach\"}],\"iterations\":6,\"facts_peak\":16},\"elapsed_micros\":395743}"
+      }
+    ],
+    "structuredContent": {
+      "schema_version": 1,
+      "status": "partial",
+      "snapshot_sha256": "9faf814cfba12178adc070648905876d39f399387000998f4a06716b79a09263",
+      "analysis": {
+        "schema_version": 1,
+        "source": {
+          "node_id": "90591deae205962f",
+          "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).QuorumSize",
+          "file": "consensus/wbft/validator/default.go",
+          "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "sha256": "9ec2fd9dd0d115b237181bc084793831604722d88acbead3457dc6205d9aeba3",
+          "language": "go",
+          "start_line": 226,
+          "start_byte": 5948,
+          "bytes": 188,
+          "snapshot_sha256": "9faf814cfba12178adc070648905876d39f399387000998f4a06716b79a09263",
+          "function_name": "QuorumSize"
+        },
+        "limits": {
+          "max_source_bytes": 262144,
+          "max_ast_nodes": 4096,
+          "max_blocks": 256,
+          "max_nodes": 1024,
+          "max_edges": 4096,
+          "max_iterations": 128,
+          "timeout_ms": 1000,
+          "max_facts": 65536
+        },
+        "status": "partial",
+        "capability": {
+          "cfg": "bounded_go",
+          "control_dependence": "normal_exit_postdominators",
+          "data_dependence": "local_scalar_may_reach",
+          "def_use": "lexical_may_reach",
+          "exceptions": "unsupported",
+          "local_binding": "isolated_go_types",
+          "memory_alias": "unsupported",
+          "package_types": "unavailable_function_blob",
+          "short_circuit": "unsupported"
+        },
+        "blocks": [
+          {
+            "id": 0,
+            "kind": "Body",
+            "reachable": true,
+            "nodes": [
+              "entry",
+              "b0/n0"
+            ]
+          },
+          {
+            "id": 1,
+            "kind": "Unreachable",
+            "reachable": false,
+            "nodes": []
+          }
+        ],
+        "nodes": [
+          {
+            "id": "b0/n0",
+            "block": 0,
+            "kind": "ReturnStmt",
+            "location": {
+              "start_byte": 6076,
+              "end_byte": 6134,
+              "start_line": 228,
+              "end_line": 228
+            },
+            "text": "return int(math.Ceil(float64(valSet.Size()) - valSet.F()))",
+            "synthetic": false
+          },
+          {
+            "id": "entry",
+            "block": 0,
+            "kind": "entry",
+            "location": {
+              "start_byte": 5948,
+              "end_byte": 5990,
+              "start_line": 226,
+              "end_line": 226
+            },
+            "text": "",
+            "synthetic": true
+          }
+        ],
+        "edges": [
+          {
+            "from": "entry",
+            "to": "b0/n0",
+            "kind": "address_dependence",
+            "certainty": "may_reach",
+            "variable": "v5954"
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "isolated_type_info_partial",
+            "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+          },
+          {
+            "code": "opaque_call",
+            "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+            "location": {
+              "start_byte": 6083,
+              "end_byte": 6134,
+              "start_line": 228,
+              "end_line": 228
+            }
+          },
+          {
+            "code": "opaque_call",
+            "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+            "location": {
+              "start_byte": 6087,
+              "end_byte": 6133,
+              "start_line": 228,
+              "end_line": 228
+            }
+          },
+          {
+            "code": "opaque_call",
+            "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+            "location": {
+              "start_byte": 6097,
+              "end_byte": 6119,
+              "start_line": 228,
+              "end_line": 228
+            }
+          },
+          {
+            "code": "opaque_call",
+            "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+            "location": {
+              "start_byte": 6105,
+              "end_byte": 6118,
+              "start_line": 228,
+              "end_line": 228
+            }
+          },
+          {
+            "code": "opaque_call",
+            "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+            "location": {
+              "start_byte": 6122,
+              "end_byte": 6132,
+              "start_line": 228,
+              "end_line": 228
+            }
+          },
+          {
+            "code": "external_value_unknown",
+            "message": "Value read has no local lexical definition; no source edge is invented",
+            "location": {
+              "start_byte": 6087,
+              "end_byte": 6091,
+              "start_line": 228,
+              "end_line": 228
+            }
+          }
+        ],
+        "truncated": false,
+        "elapsed_micros": 1771,
+        "variables": [
+          {
+            "id": "v5954",
+            "name": "valSet",
+            "kind": "receiver",
+            "declaration": {
+              "start_byte": 5954,
+              "end_byte": 5960,
+              "start_line": 226,
+              "end_line": 226
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "id": "b0/n0/address/v5954/6105",
+            "node": "b0/n0",
+            "variable": "v5954",
+            "role": "address",
+            "location": {
+              "start_byte": 6105,
+              "end_byte": 6111,
+              "start_line": 228,
+              "end_line": 228
+            },
+            "reachable": true
+          },
+          {
+            "id": "b0/n0/address/v5954/6122",
+            "node": "b0/n0",
+            "variable": "v5954",
+            "role": "address",
+            "location": {
+              "start_byte": 6122,
+              "end_byte": 6128,
+              "start_line": 228,
+              "end_line": 228
+            },
+            "reachable": true
+          },
+          {
+            "id": "entry/definition/v5954/5954",
+            "node": "entry",
+            "variable": "v5954",
+            "role": "definition",
+            "location": {
+              "start_byte": 5954,
+              "end_byte": 5960,
+              "start_line": 226,
+              "end_line": 226
+            },
+            "reachable": true
+          }
+        ],
+        "def_use": [
+          {
+            "definition": "entry/definition/v5954/5954",
+            "use": "b0/n0/address/v5954/6105",
+            "variable": "v5954",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "entry/definition/v5954/5954",
+            "use": "b0/n0/address/v5954/6122",
+            "variable": "v5954",
+            "certainty": "lexical_may_reach"
+          }
+        ],
+        "iterations": 6,
+        "facts_peak": 16
+      },
+      "elapsed_micros": 395743
+    }
+  }
+}
