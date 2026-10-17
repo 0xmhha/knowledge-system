@@ -551,7 +551,13 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 - 전용 로드맵 재대조: KM-01~06과 OE-01의 로컬 구현/제한 연구7/7·28/28 완료를 유지한다. 온톨로지 연구를 미실행으로 되돌리지 않는다. 제한 연구 quality=inconclusive, 독립 의미/답변 gold·검토된 구현 연결·실제LLM답변 효과·사람 수용/운영 활성화는 미완료이며 추가 모델 지정은 로컬 개발의 공통 선행조건이 아님.
 - 기존9개 수치 제안/모델·자원·역할·입력/정답/실행허용은 수정하지 않고 새 결정안 참조만 연결. D01~D08 모두 권고안 승인이어도 D04 이름/역할이 주어지지 않으면 미정이며 유료모델·운영전환·푸시/PR은 자동 승인되지 않는다.
 
-다음 작업(최신): D01~D08의 승인/수정/보류와 D04 담당자 이름·역할 확인. 기술 통합 범위 승인 시 A(현재HEAD 통합·검증·로컬커밋) 진행; B(독립입력/정답/기준동결) → C(정식9건+필수온톨로지독립효과) → D(별도승인 게시/운영적용).
+37단계 당시 다음 작업(역사 기록): D01~D08의 승인/수정/보류와 D04 담당자 이름·역할 확인. 기술 통합 범위 승인 시 A(현재HEAD 통합·검증·로컬커밋) 진행; B(독립입력/정답/기준동결) → C(정식9건+필수온톨로지독립효과) → D(별도승인 게시/운영적용).
 남은 전체 범위: 후보 통합/비운영pilot 및 승인; WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 정식9건; 온톨로지 독립 의미/답변 품질 수용·구현연결; 별도 후속12건(조직인증/권한·공개CLI/HTTP/graph export·graph점수/확장·domain flow gold·대규모자료/긴함수·PR/as-of·legacy출처·CoreML·embedding cache·운영감사·viewer·배포/downstream). 기존7개 로드맵 구현은 완료 유지.
 결정안: docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json
 검증37: 문서 계약20개·문서134개·기존 구현 완료 판정·JSON/참조hash/8결정 미승인·기존 정식필드 무변경·공백 검사 통과. 기존667회귀는 이전 검증이며 이번 새 실행으로 세지 않음.
+
+[진행 중] 38. 승인된 후보 통합·새 로컬 검증
+- 사용자 D01~D08 권고 승인·D04 담당자미정 유지. 두 후보 통합/로컬 검증/문서/서명커밋만 진행하며 정식gold/수용·유료모델·운영/global 설치·push/PR/merge를 실행하지 않음.
+- CKS 현재HEAD의 유지 Go 소스는 후보 기준5b39c413과 동일. CKS5파일을 정확 적용. coding-agent 현재 원격main3a66d91f는 b32b7a5a의 조상이며 의존16commit/61파일 전체가 필요함을 기록. 소유 새 통합 clone에서 fast-forward하고 원본/기존 후보 checkout을 보존.
+- 옛 source-bound667회귀/22사례는 당시 source 문맥에서 보존·재검증한다. 변경된 현재 source 결과로 재표시하지 않으며 새 source binding·전체빌드/test/race/fmt/vet/lint·consumer 회귀·새 binary pin/actual host 관측을 별도로 기록.
+다음 작업(최신): 새 source 커밋 → fresh 전체검증/consumer 실제연결 → 최종 증거·문서/커밋. 담당자/독립gold/온톨로지 의미/답변 효과·정식9건 및 별도후속12건은 남음.
