@@ -604,3 +604,17 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 검증40: scripts/check-stablenet-rebuild.py·scripts/test_stablenet_rebuild.py 및 validation-summary.json.
 
 검증40 최종(2026-10-18 KST): 증거보호12·이전pilot10·문서계약20·고지3(총45) 및 live문서134·기존완료guard·재검산·역사adoption guard·공백 검사 통과. 정식/구현상태·기존동결패킷·consumer 보존 재확인. 전체일반/race각4065pass·18skip·0fail. 서명 최종커밋은 생성 직후 검증하며 자기해시를 패킷에 삽입하지 않는다.
+
+
+[완료 — 런타임 오류 분류/복구 범위] 41. SN-P03 출처·무결성 오류와 임베딩 실패
+- typed query embedding 실패만 모델 음성 관측으로 기록; source/integrity/store/budget/unknown은 모델 상태를 set/clear하지 않음. caller context취소/timeout은 공유상태 비오염. 양성/음성5초TTL·Health-only재확인·성공raw검색 즉시복구.
+- 이전a330 실제source_missing→모델false·503복구뒤TTL후에도false 재현. 수정4ce에서는source_missing/snapshot_mismatch 유지·모델true·정상v2유지. 소유503/빈응답은embedding_failed·v2gate거부·재시작없이두복구경로 성공.
+- 최초실제경로에서legacy sourceguard raw오류 공백 발견·보완. 초기4세션/20요청/실패수집기 및 소유Go그룹SIGTERM/exit-15/그룹부재 보존. 최종소스전체검증은 새실행으로 분리.
+- fresh일반/race각4086pass·18skip·0fail, build/fmt/vet/lint/boundaries/docs/build-bins 통과. 최종도구37·총도구57, v2인용54검증.
+- 최종4+초기4=정상EOF0/reap8·소유listener2닫힘·원본/이전DB/복사본 bytes·전역32·운영metadata42·checkout5·비소유엔진11 보존. 공유모델신호/운영/게시0.
+- 기동시degraded dummy 재구성과 실제MCPcancel notification은이번범위아님. 정식0/9·D04미정·freeze null/executionfalse, 로드맵7/7·28/28·준비22/22 및온톨로지기존연구완료/inconclusive 유지.
+다음 작업(최신): SN-P04 실제go-wemix 소스/데이터/모델과개념/검색/출처/혼입 비교.
+남은 전체: SN-P04; 독립담당자·새DEV/FINAL/완전gold/매칭/충분성·F01~08동결; 정식WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C9건; 필수온톨로지독립효과/검토구현연결/모델지정후답변효과; 별도후속12건. 상세는 stablenet-errors-v1/WORKLIST.json 및 REPORT.txt.
+검증41: scripts/check-stablenet-errors.py·scripts/test_stablenet_errors.py 및 validation-summary.json.
+
+검증41 최종: 증거보호13·이전pilot10·문서계약20·고지3(총46), live문서134·기존완료guard·새재검산·역사adoption/rebuild guard·공백 검사 통과. 최초진단4세션/실패수집기/초기소유Go중단을 보존하며, 최종source의전체검증은새실행이다. 정식/구현상태와기존동결패킷/consumer 보존. 최종서명커밋은생성후확인한다.

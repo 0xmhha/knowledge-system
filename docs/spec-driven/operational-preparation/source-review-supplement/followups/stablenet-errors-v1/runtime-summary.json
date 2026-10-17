@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "case": "baseline-source",
+      "old_bug_observed": true
+    },
+    {
+      "case": "baseline-model",
+      "old_latch_observed_after_TTL": true
+    },
+    {
+      "case": "fixed-source",
+      "source_missing_does_not_poison_model_or_v2_gate": true
+    },
+    {
+      "case": "fixed-recovery",
+      "missing_corrupt_restored": true,
+      "query_failure_detected": true,
+      "health_only_recovery_without_restart": true,
+      "raw_success_immediate_recovery": true,
+      "empty_response_failure_detected": true,
+      "probe_failure_and_recovery": true
+    }
+  ],
+  "formal_completed": 0,
+  "formal_total": 9,
+  "reviewer_assignment": "미정",
+  "paid_LLM_calls": 0,
+  "production_writes": 0,
+  "external_publication": 0,
+  "proxy_isolation": true,
+  "actual_shared_model_restarts": 0,
+  "context_cancellation_scope": "native engine/adapter/MCP tests, not actual MCP cancellation notification"
+}

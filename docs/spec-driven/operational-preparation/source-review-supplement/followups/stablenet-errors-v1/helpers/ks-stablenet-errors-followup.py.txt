@@ -1,0 +1,24 @@
+import pathlib,json,time,subprocess,os,shutil
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=pathlib.Path('/private/tmp/ks-stablenet-errors-20261018-01');deadline=time.monotonic()+3600
+while True:
+ p=O/'validation/native-isolated/receipts.json';rows=json.load(open(p))
+ if any(r['exit_code']!=0 for r in rows):raise SystemExit('native validation failed; no completion update performed')
+ if len(rows)==5:break
+ if time.monotonic()>deadline:raise SystemExit('native validation receipt deadline; no completion update performed')
+ time.sleep(2)
+assert all(r['source_head']=='4cebf0c890b6708f3c6cd756749ccfdc55e096eb'for r in rows)
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=R),'source tree changed during native suite'
+commands=[('packet',['python3','/private/tmp/ks-stablenet-errors-packet.py']),('worklist-docs',['python3','/private/tmp/ks-stablenet-errors-docs.py']),('public-contract-doc',['python3','/private/tmp/ks-stablenet-errors-public-docs.py'])]
+receipts=[]
+def call(label,args):
+ start=time.monotonic()
+ with(O/(label+'.followup.log')).open('wb')as f:r=subprocess.run(args,cwd=R,stdout=f,stderr=subprocess.STDOUT,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'},timeout=600)
+ receipts.append({'label':label,'argv':args,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-start});(O/'followup-receipts.json').write_text(json.dumps(receipts,indent=2)+'\n');print(label,'exit',r.returncode,flush=True)
+ if r.returncode:raise SystemExit(1)
+for label,args in commands:call(label,args)
+shutil.copyfile('/private/tmp/test_stablenet_errors.py',R/'scripts/test_stablenet_errors.py')
+call('final-validation',['python3','/private/tmp/ks-stablenet-errors-validation-final.py'])
+call('seal',['python3','/private/tmp/ks-stablenet-errors-final-seal.py'])
+call('sealed-check',['python3','scripts/check-stablenet-errors.py'])
+call('sealed-docs',['python3','scripts/check-docs.py'])
+print('native, actual runtime, packet, docs and protection checks complete; ready for final signed commit',flush=True)

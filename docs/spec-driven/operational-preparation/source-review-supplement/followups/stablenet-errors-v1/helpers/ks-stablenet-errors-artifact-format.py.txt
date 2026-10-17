@@ -1,0 +1,26 @@
+import pathlib,json,hashlib,gzip,shutil,sys
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');D=R/'docs/spec-driven';P=D/'operational-preparation/source-review-supplement/followups/stablenet-errors-v1';rel=str(P.relative_to(R)/'manifest.json');finish='--finish'in sys.argv
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def load(p):return json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+q=P/'helpers/ks-stablenet-errors-public-docs.py.txt';compressed=q.with_name(q.name+'.gz')
+if q.exists():
+ raw=q.read_bytes();assert raw==pathlib.Path('/private/tmp/ks-stablenet-errors-public-docs.py').read_bytes();compressed.write_bytes(gzip.compress(raw,mtime=0));assert gzip.decompress(compressed.read_bytes())==raw;q.unlink()
+folder=P/'validation/artifact-format';folder.mkdir(exist_ok=True);shutil.copyfile('/private/tmp/ks-stablenet-errors-staged-whitespace-initial.log',folder/'staged-whitespace-initial.log')
+s=load(P/'validation-summary.json');s['staged_artifact_whitespace']={'initial_exit_code':2,'correction':'exact executed public-doc helper bytes preserved as gzip instead of whitespace-normalized text','original_source_sha256':hashlib.sha256(gzip.decompress(compressed.read_bytes())).hexdigest(),'Go_source_unchanged':True,'followup_passed':finish}
+if finish:
+ for name in ['ks-stablenet-errors-format-guards.log','ks-stablenet-errors-format-check.log','ks-stablenet-errors-format-docs.log']:shutil.copyfile(pathlib.Path('/private/tmp')/name,folder/name)
+ s['staged_artifact_whitespace']['repeated_protection_tests_passed']=13
+save(P/'validation-summary.json',s);shutil.copyfile('/private/tmp/ks-stablenet-errors-artifact-format.py',P/'helpers/ks-stablenet-errors-artifact-format.py.txt')
+m=load(P/'manifest.json');m['artifacts']={str(p.relative_to(P)):sha(p)for p in sorted(P.rglob('*'))if p.is_file()and p.name!='manifest.json'};save(P/'manifest.json',m);digest=sha(P/'manifest.json');proposal=D/'OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json'
+def refresh(x):
+ if isinstance(x,dict):
+  if x.get('manifest')==rel:x['sha256']=digest
+  if x.get('path')==str(proposal.relative_to(R)):x['sha256']=sha(proposal)
+  for v in x.values():refresh(v)
+ elif isinstance(x,list):
+  for v in x:refresh(v)
+d=load(proposal);refresh(d);save(proposal,d)
+for name in ['OPERATIONAL-ACCEPTANCE-PROGRESS.json','OPERATIONAL-ACCEPTANCE-PROTOCOL.json','operational-preparation/source-review-supplement/GAPS.json']:
+ p=D/name;d=load(p);refresh(d);save(p,d)
+print('executed helper bytes preserved as gzip; artifact manifest/current references refreshed; Go unchanged')

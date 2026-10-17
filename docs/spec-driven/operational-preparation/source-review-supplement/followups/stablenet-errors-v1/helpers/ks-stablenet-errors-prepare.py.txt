@@ -1,0 +1,17 @@
+import pathlib,json,hashlib,shutil,subprocess,os,importlib.util,sys,urllib.request
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=pathlib.Path('/private/tmp/ks-stablenet-errors-20261018-01');previous=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');ORIGINAL=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data/go-stablenet-comparison-20261013')
+def sha(p):
+ h=hashlib.sha256()
+ with p.open('rb')as f:
+  for b in iter(lambda:f.read(4<<20),b''):h.update(b)
+ return h.hexdigest()
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def inventory(p):return {'root':str(p),'files':{str(f.relative_to(p)):{'bytes':f.stat().st_size,'sha256':sha(f)}for f in sorted(p.rglob('*'))if f.is_file()}}
+versions={'selected':(ORIGINAL/'current').resolve(),'prior_old':previous/'old-dataset/old-v1','prior_new':previous/'dataset/retained-origins-v2'};dump(O/'datasets-before.json',{'versions':{k:inventory(v)for k,v in versions.items()},'original_current':os.readlink(ORIGINAL/'current'),'previous_owned_current_exists':(previous/'dataset/current').exists()});print('protected dataset hashes captured',flush=True)
+for arm,key,version in [('old','prior_old','old-v1'),('new','prior_new','retained-origins-v2')]:
+ root=O/(arm+'-dataset');root.mkdir();shutil.copytree(versions[key],root/version);(root/'.reindex.lock').touch();(root/'.readers').mkdir();(root/'.readers'/(version+'.lock')).touch()
+subprocess.run(['git','-c','core.hooksPath=/dev/null','clone','--shared','--no-checkout',str(previous/'source'),str(O/'source')],check=True,capture_output=True);subprocess.run(['git','-c','core.hooksPath=/dev/null','-C',str(O/'source'),'checkout','--detach','0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8'],check=True,capture_output=True)
+sys.path.insert(0,str(R/'scripts'));s=importlib.util.spec_from_file_location('scope',R/'scripts/run-consumer-final.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);plan=json.load(open(m.PLAN));dump(O/'scope-before.json',{'global':m.global_state(plan),'operations':m.operations(plan),'source_repos':m.sources()['repos']})
+tags=json.load(urllib.request.urlopen('http://127.0.0.1:11434/api/tags'));model=next(x for x in tags['models']if x['name']=='bge-m3:latest');version=json.load(urllib.request.urlopen('http://127.0.0.1:11434/api/version'));dump(O/'model-before.json',{'model':model,'runtime':version,'dimension':1024,'paid_LLM_calls':0});assert model['digest']=='7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab'
+for arm in ['old','new']:dump(O/(arm+'-owned-before.json'),inventory(O/(arm+'-dataset')/('old-v1'if arm=='old'else'retained-origins-v2')))
+print('owned old/new datasets, fixed source, scope/model baselines ready',flush=True)

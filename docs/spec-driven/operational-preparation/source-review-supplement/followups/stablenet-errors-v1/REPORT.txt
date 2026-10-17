@@ -1,0 +1,50 @@
+41단계 — SN-P03 출처·무결성 오류와 임베딩 실패의 분류·복구 / 완료
+검증일: 2026-10-18 (KST)
+
+목적과 계약
+- 출처 누락·무결성 오류를 모델 장애로 기록하던 문제와, 한 번 모델 장애로 기록되면 Health만으로 복구되지 않던 고정 상태를 해소했다.
+- query-vector 생성 실패는 ckv.ErrEmbeddingFailed로 구분하고 원래 provider 오류를 errors.Is로 보존한다. provider 자체 timeout은 임베딩 실패지만 caller context 취소/기한 만료는 공유 모델 상태를 오염시키지 않는다. 문자열이 같다는 이유로 모델 장애를 판단하지 않는다.
+- 출처/무결성/store/budget/unknown 오류는 모델 관측을 새로 set/clear하지 않는다. source_missing/snapshot_mismatch를 특정 코드로 유지한다. Health는 캐시된 모델 사용 가능성이지 모든 corpus 원문의 완전성 증명이 아니다. 원문 검증은 계속 fail-closed다.
+- 양성·음성 모델 관측 모두 5초 뒤 다시 확인한다. 성공한 raw 검색은 음성 캐시를 즉시 지우고, Health만의 재확인으로도 서비스 가능성이 회복된다. 취소된 probe는 캐시에 기록하지 않고 빈 probe 응답은 실패다.
+- semantic_search 오류와 v2 composition 오류는 bounded code/message로 전달한다. embedding_failed, request_canceled, request_timeout, source_missing, snapshot_mismatch를 구별하며 알 수 없는 semantic 오류는 retrieval_failed다. v2의 모델 사용 가능성 gate 거부는 service_unavailable이다.
+- 선행 archive 검증은 임베딩보다 먼저 원문 오류를 거부할 수 있다. 이 legacy context guard도 구체적 코드/제한된 메시지를 사용하도록 보완했다. provider 오류 본문의 source_missing 문자열이 typed 임베딩 실패를 가리지 못한다.
+
+실제 경로 검증
+- 이전 clean a330 바이너리와 수정 clean4cebf0c8 바이너리를 같은 BGE-M3 digest790764…16bab/native1024·Ollama0.40.4 및 동일 기존/신규 데이터 복사본에 연결했다. 추가 유료 LLM 호출0; 실제 로컬 임베딩 추론은 실행했다.
+- 이전 바이너리: 기존 데이터의 실제 source_missing 뒤 model_reachable=false가 되는 문제, 임베딩503 뒤 endpoint를 복구하고 TTL을 넘겨도 Health가 계속 false인 문제를 재현했다.
+- 수정 바이너리: 기존 데이터의 실제 source_missing 뒤 모델 정상·알려진 정상 v2 검색 성공을 확인했다. 신규 소유 버전의 실제 검색에 노출된 외부 blob을 삭제/변조해 각각 source_missing/snapshot_mismatch를 확인했고, 원본 bytes/mode 복구 후 정상 검색/v2가 성공했다.
+- 실제 서비스 연결 경로의 소유 중계 endpoint에서만 503·빈 embedding 응답을 주입했다. 둘 다 embedding_failed·즉시 모델 false로 분류했고 v2 gate는 service_unavailable로 거부했다. 공유 Ollama를 실제 중단하거나 재설정한 시험이 아니다.
+- 중계 endpoint 복구 후 TTL+Health만으로 true가 되고 v2 성공, 별도 실패 후 raw 검색 성공으로 즉시 true, Health probe 자체 실패/복구 경로까지 검증했다. 프로세스 재시작 없이 같은 세션에서 수행했다.
+- 최종 도구 요청37회·HTTP 관측898건, 최종 성공 v2 pack5개/인용54건의 좌표·원문·SHA·integrity 일치. 이는 검색/품질 recall·지연 수용이나 온톨로지 효과 판정이 아니다.
+
+최초 검증에서 발견한 공백과 보존
+- 최초2fd67205 실제 경로에서 retained blob누락은 CKV 호출 이전의 legacy source guard가 raw 오류로 먼저 거부했다. 수집기가 구조화 code를 기대해 실패한 원자료, 당시 정상 종료한4세션·20도구 요청·proxy 관측을 diagnostics/initial-guard-run에 보존했다.
+- 해당 선행 검사 보완을 위해 소유 초기 Go 테스트 그룹을 PID·부모·PGID·명령으로 확인하고 SIGTERM으로 회수했다. 첫 부분 실행의 exit-15와 그룹 비어 있음 기록을 보존하며, 그 통과 수를 현재 소스 전체 검사에 합산하지 않는다. 시험 CKS 서버를 강제 종료한 사례는 아니다.
+- 추가 선행검사 회귀 통과 후4cebf0c8로 소스를 고정하고 전체 검증을 새로 실행했다. 최종 build/test/race/lint/build-bins 5명령은 모두0·timeout/강제종료0이다.
+
+검증과 보존
+- 최종 일반4086pass/18skip, race4086pass/18skip, fail0. fmt/vet/golangci/boundaries/docs/build-bins 통과. 새 계약8개 상위 검사와 하위 사례가 포함되며 skip은 통과 수에 합산하지 않는다.
+- 실제 CKSexit0/EOF/reap 8개(최종4+초기진단4), 중계listener2개 닫힘/스레드join·소유PID부재 확인. 공유 모델 재시작/신호0.
+- 원본 selected·이전 old/new 버전 전체 파일 SHA, 이번 old/new 복사본 bytes, reader lease, source checkout, 전역32·운영metadata42·기존checkout5·비소유엔진11 보존. owned current생성0·운영전환/외부게시0.
+- 증거 재검산: scripts/check-stablenet-errors.py; 변조보호: scripts/test_stablenet_errors.py. 최종 증거보호13·이전pilot보호10·문서계약20·고지3(총46), live문서134, 기존완료guard·새재검산·역사adoption/rebuild guard·공백 검사가 통과했다. 실행별 기록은 validation-summary.json에 보존한다. 원본완료guard 원문 로그는 private에만 보존한다. 이전 source-bound 재검산은 --no-live-source로 역사 증거만 확인하고 현재 소스의 새 실행으로 표시하지 않는다.
+
+범위의 한계
+- 런타임에 모델이 연결된 real adapter의 실패·복구 계약이다. 기동 시 모델 불가로 구성된 degraded dummy를 자동 real client로 재구성하는 기능은 이번 범위가 아니다.
+- caller context 취소/timeout 분류는 native engine/adapter/MCP 검사 범위다. 실제 MCP 취소 notification의 전달·취소 동작은 실행/추가하지 않았다.
+- Health가 true여도 누락된 원문을 안전하다고 인정하지 않는다. old 데이터의 원문 누락은 여전히 거부한다. 새 비운영 데이터만 검증했고 운영 current를 전환하지 않았다.
+
+현재 단계
+- SN-P01·SN-P02 유지, SN-P03 완료: pilot 3/4.
+- 로컬 로드맵7/7·28/28 및 격리 준비22/22 완료 유지. D04미정·정식0/9·freeze null/execution_allowed false 유지.
+- 제한 온톨로지 연구는 완료/quality=inconclusive 유지. 이번 오류 분류 보완을 독립 효과 수용으로 승격하지 않는다.
+
+다음 작업: SN-P04 실제 go-wemix 소스·데이터·모델을 식별하고 go-stablenet과 프로젝트별 개념/검색·출처·혼입 비교.
+
+남은 전체 작업
+1. SN-P04: go-wemix 실제 소스/데이터 식별 후 프로젝트 간 개념·검색·출처/혼입 비교
+2. FORMAL-PREP: D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결
+3. FORMAL-9: WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 정식 실행·수용 (0/9)
+4. ONTOLOGY: 독립 의미/검색 gold, 검토된 구현-개념 연결/가족 coverage, 승인 DEV/FINAL 효과 gate; 실제 LLM 답변 효과는 모델/인증/상한 지정 후
+5. OPTIONAL-12: 조직 인증/권한; 공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사; viewer; 배포/downstream
+
+게시·운영 적용은 별도 범위 지정 후 수행한다. 담당자/유료 모델 지정은 로컬 기술 작업의 공통 선행조건이 아니다.

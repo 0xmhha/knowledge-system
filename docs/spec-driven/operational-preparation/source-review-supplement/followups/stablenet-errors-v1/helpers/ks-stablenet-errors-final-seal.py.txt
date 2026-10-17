@@ -1,0 +1,30 @@
+import pathlib,json,hashlib,shutil,re
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');D=R/'docs/spec-driven';P=D/'operational-preparation/source-review-supplement/followups/stablenet-errors-v1';O=pathlib.Path('/private/tmp/ks-stablenet-errors-20261018-01');refpath=str(P.relative_to(R)/'manifest.json')
+def read(p):return json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+rows=read(O/'validation/final/receipts.json');assert len(rows)==10 and all(r['exit_code']==0 for r in rows)
+counts={k:int(re.search(r'Ran (\d+) tests?',(O/'validation/final'/(k+'.log')).read_text()).group(1))for k in ['error-guards','pilot-historical-guards','documentation-contract','package-notice']};assert counts=={'error-guards':13,'pilot-historical-guards':10,'documentation-contract':20,'package-notice':3};assert '134 live documents'in(O/'validation/final/live-documentation.log').read_text()
+folder=P/'validation/final';folder.mkdir(exist_ok=True)
+shutil.copyfile(O/'validation/final/receipts.json',folder/'receipts.json')
+for r in rows:
+ if r['label']!='original-completion-guard':shutil.copyfile(O/'validation/final'/r['raw_file'],folder/r['raw_file'])
+summary={'final_observation_date':'2026-10-18','scope':'SN-P03_runtime_classification_recovery_not_independent_acceptance','checks':rows,'guard_tests':counts,'total_scoped_Python_tests':sum(counts.values()),'live_documents':134,'original_completion_guard_exit_code':0,'original_completion_guard_raw_log':'private_only_not_published','formal_and_implementation_state_preserved':True,'historical_packets_unchanged':True,'Go_source_unchanged_after_4ce':True,'consumer_checkout_unchanged':True,'initial_actual_runtime_guard_failure_preserved':True,'initial_owned_native_interruption_exit':-15,'final_native_interruption':0,'historical_source_verification':'adoption and rebuild checks explicitly --no-live-source; not current-source regression','formal_completed':0,'formal_total':9,'reviewer_assignment':'미정','self_containing_commit':'signed final commit and clean tree are verified after creation; its own hash is not embedded'};save(P/'validation-summary.json',summary)
+p=P/'REPORT.txt';text=p.read_text().replace('최종 문서/보호검사 결과는 validation-summary.json에 기록한다.','최종 증거보호13·이전pilot보호10·문서계약20·고지3(총46), live문서134, 기존완료guard·새재검산·역사adoption/rebuild guard·공백 검사가 통과했다. 실행별 기록은 validation-summary.json에 보존한다. 원본완료guard 원문 로그는 private에만 보존한다.');p.write_text(text)
+for name in ['ks-stablenet-errors-final-seal.py','ks-stablenet-errors-docs.py','ks-stablenet-errors-packet.py','ks-stablenet-errors-validation-final.py']:
+ shutil.copyfile(pathlib.Path('/private/tmp')/name,P/'helpers'/(name+'.txt'))
+m=read(P/'manifest.json');m['artifacts']={str(p.relative_to(P)):sha(p)for p in sorted(P.rglob('*'))if p.is_file()and p.name!='manifest.json'};save(P/'manifest.json',m);digest=sha(P/'manifest.json');proposal=D/'OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json'
+def refresh(x):
+ if isinstance(x,dict):
+  if x.get('manifest')==refpath:x['sha256']=digest
+  if x.get('path')==str(proposal.relative_to(R)):x['sha256']=sha(proposal)
+  for v in x.values():refresh(v)
+ elif isinstance(x,list):
+  for v in x:refresh(v)
+d=read(proposal);refresh(d);save(proposal,d)
+for name in ['OPERATIONAL-ACCEPTANCE-PROGRESS.json','OPERATIONAL-ACCEPTANCE-PROTOCOL.json','operational-preparation/source-review-supplement/GAPS.json']:
+ p=D/name;d=read(p);refresh(d)
+ if name=='OPERATIONAL-ACCEPTANCE-PROGRESS.json':d['phases'][0]['preparation_validation']['stablenet_error_recovery']['evidence_protection_tests_passed']=13
+ save(p,d)
+with(D/'operational-preparation/source-review-supplement/PROGRESS.txt').open('a')as f:f.write('\n검증41 최종: 증거보호13·이전pilot10·문서계약20·고지3(총46), live문서134·기존완료guard·새재검산·역사adoption/rebuild guard·공백 검사 통과. 최초진단4세션/실패수집기/초기소유Go중단을 보존하며, 최종source의전체검증은새실행이다. 정식/구현상태와기존동결패킷/consumer 보존. 최종서명커밋은생성후확인한다.\n')
+print('final validation receipts sealed; current references refreshed; formal0/9 unchanged')

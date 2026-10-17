@@ -415,8 +415,8 @@
         },
         "adoption_acceptance_decision_proposal": {
           "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-          "sha256": "d4c981399a7e7a060b57f472bd10a94c8f44b5e5029d89a2c5d1764701b34111",
-          "status": "D01_D08_scope_approved_D04_unassigned_rebuild_scoped_pass_no_formal_freeze"
+          "sha256": "af144786f403bebbf22ff967389a5fcf10a354f0126c639b866bf6a8647ec565",
+          "status": "D01_D08_scope_approved_D04_unassigned_SN-P03_scoped_pass_no_formal_freeze"
         },
         "consumer_adoption": {
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
@@ -438,7 +438,15 @@
           "sha256": "3244926efe8853fb6aebda3fe927481be3f401d093708d2c828f443be69faa9b",
           "status": "SN-P01_SN-P02_scoped_technical_pass",
           "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/REPORT.txt",
-          "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json"
+          "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json",
+          "historical_source_validation": true
+        },
+        "stablenet_error_recovery": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/manifest.json",
+          "sha256": "68667c650cc8df14fbcfbc5be9971520f8eab6a8e51d1bb8c95e300dac9c2ba6",
+          "status": "SN-P03_scoped_runtime_classification_recovery_pass",
+          "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/REPORT.txt",
+          "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/WORKLIST.json"
         }
       },
       "completed_preparation": [
@@ -3075,6 +3083,53 @@
           "formal_state_unchanged": true,
           "evidence_protection_tests_passed": 12,
           "final_validation_date": "2026-10-18"
+        },
+        "stablenet_error_recovery": {
+          "status": "SN-P03_scoped_runtime_classification_recovery_pass",
+          "native_source_commit": "4cebf0c890b6708f3c6cd756749ccfdc55e096eb",
+          "native_test": {
+            "pass": 4086,
+            "skip": 18,
+            "fail": 0
+          },
+          "native_race": {
+            "pass": 4086,
+            "skip": 18,
+            "fail": 0
+          },
+          "baseline_source_poison_and_model_latch_reproduced": true,
+          "specific_source_integrity_errors_preserved": true,
+          "real_healthy_embedding_before_source_failure": true,
+          "controlled_embedding_faults": [
+            "503",
+            "empty_response"
+          ],
+          "health_only_TTL_recovery": true,
+          "successful_raw_query_immediate_recovery": true,
+          "caller_context_scope": "native tests; MCP cancellation notification not tested",
+          "final_stdio_sessions": 4,
+          "initial_diagnostic_stdio_sessions_preserved": 4,
+          "normal_EOF_exit0_reaped": 8,
+          "all_actual_tool_attempts": 57,
+          "final_tool_attempts": 37,
+          "proxy_HTTP_observations": 898,
+          "initial_proxy_HTTP_observations": 850,
+          "all_proxy_HTTP_observations": 1748,
+          "successful_v2_packs_verified": 5,
+          "v2_citations_verified": 54,
+          "owned_initial_native_interruption": 1,
+          "final_native_interruption": 0,
+          "shared_model_restarts_or_signals": 0,
+          "formal_completed": 0,
+          "formal_total": 9,
+          "reviewer_assignment": "미정",
+          "independent_quality_evaluated": false,
+          "ontology_effect_evaluated": false,
+          "production_activation": false,
+          "paid_LLM_calls": 0,
+          "SN-P04_complete": false,
+          "formal_state_unchanged": true,
+          "evidence_protection_tests_passed": 13
         }
       },
       "candidate_counts": {
@@ -3374,8 +3429,8 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "d4c981399a7e7a060b57f472bd10a94c8f44b5e5029d89a2c5d1764701b34111",
-    "status": "D01_D08_scope_approved_D04_unassigned_rebuild_scoped_pass_no_formal_freeze"
+    "sha256": "af144786f403bebbf22ff967389a5fcf10a354f0126c639b866bf6a8647ec565",
+    "status": "D01_D08_scope_approved_D04_unassigned_SN-P03_scoped_pass_no_formal_freeze"
   },
   "consumer_adoption": {
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
@@ -3399,21 +3454,22 @@
     "sha256": "3244926efe8853fb6aebda3fe927481be3f401d093708d2c828f443be69faa9b",
     "status": "SN-P01_SN-P02_scoped_technical_pass",
     "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/REPORT.txt",
-    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json"
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json",
+    "historical_source_validation": true
   },
   "current_execution_state": {
-    "current_stage": "40_SN-P01_SN-P02_scoped_technical_pass",
+    "current_stage": "41_SN-P03_runtime_classification_recovery_pass",
     "completed_in_this_scope": [
-      "SN-P01",
-      "SN-P02"
+      "SN-P03"
     ],
-    "next_task": "SN-P03",
+    "pilot_steps_completed": [
+      "SN-P01",
+      "SN-P02",
+      "SN-P03"
+    ],
+    "pilot_steps_total": 4,
+    "next_task": "SN-P04",
     "remaining_all": [
-      {
-        "id": "SN-P03",
-        "status": "pending",
-        "task": "실제 검색 출처/무결성 오류와 임베딩 모델 장애의 분류·health/복구 계약 보완"
-      },
       {
         "id": "SN-P04",
         "status": "pending",
@@ -3447,6 +3503,14 @@
     "isolated_preparation_completed": "22/22",
     "independent_quality_or_ontology_acceptance": false,
     "production_activation": false,
-    "publication": false
+    "publication": false,
+    "last_verified_date": "2026-10-18"
+  },
+  "stablenet_error_recovery": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/manifest.json",
+    "sha256": "68667c650cc8df14fbcfbc5be9971520f8eab6a8e51d1bb8c95e300dac9c2ba6",
+    "status": "SN-P03_scoped_runtime_classification_recovery_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/WORKLIST.json"
   }
 }

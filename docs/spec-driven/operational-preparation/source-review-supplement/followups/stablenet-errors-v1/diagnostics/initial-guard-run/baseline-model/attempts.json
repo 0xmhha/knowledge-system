@@ -1,0 +1,562 @@
+[
+  {
+    "label": "initialize",
+    "method": "initialize",
+    "params": {
+      "protocolVersion": "2024-11-05",
+      "capabilities": {},
+      "clientInfo": {
+        "name": "owned-consumer-P05",
+        "version": "1"
+      }
+    },
+    "mode": "healthy",
+    "outcome": "response",
+    "started_monotonic": 3485561.9947325,
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        },
+        "serverInfo": {
+          "name": "baseline-model",
+          "version": "cks-mcp/0.0.1-dev"
+        }
+      }
+    },
+    "finished_monotonic": 3485569.18807225
+  },
+  {
+    "label": "health-before",
+    "method": "tools/call",
+    "params": {
+      "name": "cks.ops.health",
+      "arguments": {}
+    },
+    "mode": "healthy",
+    "outcome": "response",
+    "started_monotonic": 3485569.188696541,
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "baseline-model",
+          "status": "ok",
+          "serviceable": true,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-errors-20261018-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/new-dataset/retained-origins-v2/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "model_reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-17T14:57:15Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:55814",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/new-dataset/retained-origins-v2/vector"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-errors-20261018-01/source\" differs from indexed checkout \"/private/tmp/ks-stablenet-rebuild-20261017-01/source\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    },
+    "finished_monotonic": 3485569.442243541
+  },
+  {
+    "label": "embedding-failed",
+    "method": "tools/call",
+    "params": {
+      "name": "cks.context.semantic_search",
+      "arguments": {
+        "query": "Explain WBFT validator quorum size in go-stablenet",
+        "k": 10,
+        "exclude_tests": true
+      }
+    },
+    "mode": "503",
+    "outcome": "response",
+    "started_monotonic": 3485569.443097375,
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "cks.context.semantic_search: ckvclient: SemanticSearch: embed: ollama: HTTP 503 from embedding endpoint"
+          }
+        ],
+        "isError": true
+      }
+    },
+    "finished_monotonic": 3485569.473457291
+  },
+  {
+    "label": "health-down",
+    "method": "tools/call",
+    "params": {
+      "name": "cks.ops.health",
+      "arguments": {}
+    },
+    "mode": "503",
+    "outcome": "response",
+    "started_monotonic": 3485569.4739155,
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "baseline-model",
+          "status": "degraded",
+          "serviceable": false,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-errors-20261018-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/new-dataset/retained-origins-v2/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-17T14:57:15Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:55814",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/new-dataset/retained-origins-v2/vector",
+              "reason": "embedding model unreachable (last query failed)"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-errors-20261018-01/source\" differs from indexed checkout \"/private/tmp/ks-stablenet-rebuild-20261017-01/source\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    },
+    "finished_monotonic": 3485569.632623041
+  },
+  {
+    "label": "health-still-latched",
+    "method": "tools/call",
+    "params": {
+      "name": "cks.ops.health",
+      "arguments": {}
+    },
+    "mode": "healthy",
+    "outcome": "response",
+    "started_monotonic": 3485574.984181166,
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "baseline-model",
+          "status": "degraded",
+          "serviceable": false,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-errors-20261018-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/new-dataset/retained-origins-v2/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-17T14:57:15Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:55814",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/new-dataset/retained-origins-v2/vector",
+              "reason": "embedding model unreachable (last query failed)"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-errors-20261018-01/source\" differs from indexed checkout \"/private/tmp/ks-stablenet-rebuild-20261017-01/source\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    },
+    "finished_monotonic": 3485575.141087208
+  },
+  {
+    "label": "raw-recovery",
+    "method": "tools/call",
+    "params": {
+      "name": "cks.context.semantic_search",
+      "arguments": {
+        "query": "Explain WBFT validator quorum size in go-stablenet",
+        "k": 10,
+        "exclude_tests": true
+      }
+    },
+    "mode": "healthy",
+    "outcome": "response",
+    "started_monotonic": 3485575.142592541,
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 6,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "semantic_search result"
+          }
+        ],
+        "structuredContent": {
+          "query": "Explain WBFT validator quorum size in go-stablenet",
+          "hits": [
+            {
+              "citation": {
+                "file": "@cks/docs/0/entries/A1.wbft_core.quorum_calc.md",
+                "start_line": 1,
+                "end_line": 18,
+                "commit_hash": ""
+              },
+              "rank": 1,
+              "score": 0.6132823526859283,
+              "source": "vector",
+              "symbol": "wbft-quorum-size-calculation",
+              "chunk_kind": "doc",
+              "text": "# WBFT quorum size calculation\n\n**Status:** verified · **Subsystem:** A1 (WBFT Consensus Core) · **Type:** B3\n\nWBFT requires QuorumSize = ceil(N - F) where N is the validator set\nsize and F = (N-1)/3 evaluated in float64. The quorum is the minimum\ncount of Prepare or Commit messages needed before the consensus core\nadvances state. State advancement in handlePrepareMsg uses the\nexpression WBFTPrepares.Size() >= valSet.QuorumSize().\n\nceil(N - F) is the AUTHORITATIVE quorum; any reimplementation MUST\nreproduce it exactly. The dangerous refactor is not int-vs-float (see\nthe correctness note below) but swapping the FORMULA: the PBFT-textbook\n2f+1 or a simple majority N/2+1 DIVERGE from ceil(N - F) for N not of\nthe form 3f+1, and a lower quorum finalizes with too few honest nodes\n(a safety violation). Examples: N=5 -> ceil=4 but 2f+1=3; N=6 -> ceil=5\nbut 2f+1=3; N=8 -> ceil=6 but 2f+1=5.\n\n"
+            },
+            {
+              "citation": {
+                "file": "@cks/docs/0/entries/A1.wbft_core.quorum_calc.md",
+                "start_line": 28,
+                "end_line": 33,
+                "commit_hash": ""
+              },
+              "rank": 2,
+              "score": 0.6121285855770111,
+              "source": "vector",
+              "symbol": "code-anchors",
+              "chunk_kind": "doc",
+              "text": "## Code anchors\n- `consensus/wbft/validator/default.go` defaultSet.F:222 — F = (N-1)/3 as float64 — integer cast would lose precision\n- `consensus/wbft/validator/default.go` defaultSet.QuorumSize:226 — QuorumSize = ceil(N - F) using math.Ceil over float64\n- `consensus/wbft/core/prepare.go` Core.handlePrepareMsg:87 — threshold check that gates StatePrepared transition\n- `consensus/wbft/types.go` ValidatorSet:216 — interface declaration; F() returns float64 (not int)\n\n"
+            },
+            {
+              "citation": {
+                "file": "@cks/docs/0/entries/A14.foundations.equal_power.md",
+                "start_line": 1,
+                "end_line": 19,
+                "commit_hash": ""
+              },
+              "rank": 3,
+              "score": 0.602405458688736,
+              "source": "vector",
+              "symbol": "equal-power-validators-every-validator-has-voting-power-1",
+              "chunk_kind": "doc",
+              "text": "# Equal-power validators — every validator has voting power = 1\n\n**Status:** verified · **Subsystem:** A14 (Protocol Foundations & Design Philosophy) · **Type:** B4\n\ngo-stablenet is PoA with equal-weight validators: every validator's\nvoting power is 1, with no stake field, no weight field, no slashing.\nThe defaultValidator struct (consensus/wbft/validator/default.go:32)\ncarries only Address + BLSPublicKey — no Power/Weight/Stake field\nexists anywhere in the validator set. Quorum is computed by COUNT\n(ceil(N − F), see A1.wbft_core.quorum_calc), not by stake sum.\n\nAny change that introduces stake-weighted voting, weighted quorum,\nproposer selection biased by stake, or stake-conditioned rewards is\na STABILITY-VIOLATING bug — even if the test suite passes — because\nit imports Ethereum/WEMIX validator economics that go-stablenet\nexplicitly does NOT follow. This trap fires when an LLM extrapolates\nfrom generic PBFT / PoS literature without checking the validator\ntype.\n\n"
+            },
+            {
+              "citation": {
+                "file": "@cks/docs/0/entries/A1.wbft_core.quorum_calc.md",
+                "start_line": 19,
+                "end_line": 23,
+                "commit_hash": ""
+              },
+              "rank": 4,
+              "score": 0.5827788710594177,
+              "source": "vector",
+              "symbol": "invariants",
+              "chunk_kind": "doc",
+              "text": "## Invariants\n- QuorumSize is exactly ceil(N - F) with F = (N-1)/3; the live code computes it in float64 via math.Ceil (default.go:226). Any alternative formula must yield the identical value for every N.\n- QuorumSize is always >= 1, including N = 1 (ceil(1 - 0) = 1).\n- Prepare/Commit state transitions compare with >= QuorumSize, not >.\n\n"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/validator/default.go",
+                "start_line": 226,
+                "end_line": 229,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 5,
+              "score": 0.5810292959213257,
+              "source": "vector",
+              "symbol": "defaultSet.QuorumSize",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).QuorumSize",
+              "chunk_kind": "symbol",
+              "text": "func (valSet *defaultSet) QuorumSize() int {\n\t//c.currentLogger(true, nil).Trace(\"WBFT: confirmation Formula used ceil(2N/3)\")\n\treturn int(math.Ceil(float64(valSet.Size()) - valSet.F()))\n}"
+            },
+            {
+              "citation": {
+                "file": "@cks/docs/0/entries/A1.wbft_core.quorum_calc.md",
+                "start_line": 37,
+                "end_line": 38,
+                "commit_hash": ""
+              },
+              "rank": 6,
+              "score": 0.580839604139328,
+              "source": "vector",
+              "symbol": "related",
+              "chunk_kind": "doc",
+              "text": "## Related\nA1.wbft_core.consensus_flow_architecture, A3.validator_set.epoch_transition\n"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/types.go",
+                "start_line": 216,
+                "end_line": 245,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 7,
+              "score": 0.5767149925231934,
+              "source": "vector",
+              "symbol": "ValidatorSet",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft.ValidatorSet",
+              "chunk_kind": "symbol",
+              "text": "ValidatorSet interface {\n\t// Calculate the proposer\n\tCalcProposer(lastProposer common.Address, round uint64)\n\t// Return the validator size\n\tSize() int\n\t// Return the validator array\n\tList() []Validator\n\t// Return the validator address array\n\tAddressList() []common.Address\n\t// Get validator by index\n\tGetByIndex(i uint64) Validator\n\t// Get validator by given address\n\tGetByAddress(addr common.Address) (int, Validator)\n\t// Get current proposer\n\tGetProposer() Validator\n\t// Check whether the validator with given address is a proposer\n\tIsProposer(address common.Address) bool\n\t// Add validator\n\tAddValidator(address common.Address, blsPublicKey []byte) bool\n\t// Remove validator\n\tRemoveValidator(address common.Address) bool\n\t// Copy validator set\n\tCopy() ValidatorSet\n\t// Get the maximum number of faulty nodes\n\tF() float64\n\t// Get quorum size ( which is n-f)\n\tQuorumSize() int\n\t// Get proposer policy\n\tPolicy() ProposerPolicy\n}"
+            },
+            {
+              "citation": {
+                "file": "README.md",
+                "start_line": 154,
+                "end_line": 238,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "parent_citation": {
+                "file": "README.md",
+                "start_line": 133,
+                "end_line": 238,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "heading_path": "StableNet Specification / Anzeon WBFT Engine: A Tailored Evolution of WBFT for StableNet",
+              "rank": 8,
+              "score": 0.5757975578308105,
+              "source": "vector",
+              "symbol": "anzeon-wbft-engine-a-tailored-evolution-of-wbft-for-stablenet",
+              "chunk_kind": "doc",
+              "text": "Here's a sample code snippet for the Anzeon config:\n```\n\"anzeon\": {\n  \"wbft\": {\n    \"requestTimeoutSeconds\": 2,\n    \"blockPeriodSeconds\": 1,\n    \"epochLength\": 10,\n    \"proposerPolicy\": 0,\n    \"maxRequestTimeoutSeconds\": null\n  },\n  \"init\": {\n    \"validators\": [\n      \"0xaa5faa65e9cc0f74a85b6fdfb5f6991f5c094697\"\n    ],\n    \"blsPublicKeys\": [\n      \"0xaec493af8fa358a1c6f05499f2dd712721ade88c477d21b799d38e9b84582b6fbe4f4adc21e1e454bc37522eb3478b9b\"\n    ]\n  },\n  \"systemContracts\": {\n    \"govValidator\": {\n      \"address\": \"0x0000000000000000000000000000000000001001\",\n      \"version\": \"v1\",\n      \"params\": {\n          \"members\": \"0xC3C49d11659170e525c3ed3E0D4560d485EF9229\",\n          \"quorum\": \"1\",\n          \"expiry\": \"604800\",\n          \"memberVersion\": \"1\",\n          \"validators\": \"0xaa5faa65e9cc0f74a85b6fdfb5f6991f5c094697\",\n          \"blsPublicKeys\": \"0xaec493af8fa358a1c6f05499f2dd712721ade88c477d21b799d38e9b84582b6fbe4f4adc21e1e454bc37522eb3478b9b\"\n      }\n    },\n    \"nativeCoinAdapter\": {\n      \"address\": \"0x0000000000000000000000000000000000001000\",\n      \"version\": \"v1\",\n      \"params\": {\n        \"currency\": \"KRW\",\n        \"decimals\": \"18\",\n        \"masterMinter\": \"0xaa5faa65e9cc0f74a85b6fdfb5f6991f5c094697\",\n        \"minterAllowed\": \"10000000000000000000000000000\",\n        \"minters\": \"0xaa5faa65e9cc0f74a85b6fdfb5f6991f5c094697\",\n        \"name\": \"WKRC\",\n        \"symbol\": \"WKRC\"\n      }\n    },\n    \"govMinter\": {\n      \"address\": \"0x0000000000000000000000000000000000001003\",\n      \"version\": \"v1\",\n      \"params\": {\n        \"beneficiaries\": \"0xaa5faa65e9cc0f74a85b6fdfb5f6991f5c094697\",\n        \"expiry\": \"604800\",\n        \"fiatToken\": \"0x0000000000000000000000000000000000001000\",\n        \"memberVersion\": \"1\",\n        \"members\": \"0xaa5faa65e9cc0f74a85b6fdfb5f6991f5c094697\",\n        \"quorum\": \"1\"\n      }\n    },\n    \"govMasterMinter\": {\n      \"address\": \"0x0000000000000000000000000000000000001002\",\n      \"version\": \"v1\",\n      \"params\": {\n        \"expiry\": \"604800\",\n        \"fiatToken\": \"0x0000000000000000000000000000000000001000\",\n        \"maxMinterAllowance\": \"10000000000000000000000000000\",\n        \"memberVersion\": \"1\",\n        \"members\": \"0xaa5faa65e9cc0f74a85b6fdfb5f6991f5c094697\",\n        \"quorum\": \"1\"\n      }\n    }\n  }\n}\n```\n- The init section specifies the validators that will be active from block 1 through the first epoch.\n- The systemContracts/govValidator section must define the following mandatory parameters. These values are used for the initialization of the GovValidator contract:\n  - members: The addresses of each validator's operation key.\n    - This can be either an EOA (Externally Owned Account) wallet address or a multisig contract address.\n  - validators: The addresses of each validator's validator key.\n    - This is the block signing address and corresponds to the coinbase of each block.\n  - blsPublicKeys: The BLS public key for each validator.\n    - This is used for signing WBFT consensus messages.\n- These three lists must be comma-separated, and keys at the same index across the lists collectively form a single validator.\n- It's important to note that the validator set specified in govValidator will take effect starting from the second epoch.\n  - For the first epoch, the active validators are determined not by the GovValidator's list, but by the init configuration in the genesis block. \n  - Unless there is a specific reason otherwise, it is recommended to set the govValidator's validator set to be identical to the init configuration.\n\n\n"
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/engine/engine.go",
+                "start_line": 1244,
+                "end_line": 1244,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "rank": 9,
+              "score": 0.5722411274909973,
+              "source": "vector",
+              "symbol": "errors.New",
+              "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/engine.verifyEpoch",
+              "chunk_kind": "invariant",
+              "text": "WBFT: mismatch in validator sizes"
+            },
+            {
+              "citation": {
+                "file": "@cks/docs/0/entries/A14.foundations.equal_power.md",
+                "start_line": 30,
+                "end_line": 34,
+                "commit_hash": ""
+              },
+              "rank": 10,
+              "score": 0.5721653997898102,
+              "source": "vector",
+              "symbol": "code-anchors",
+              "chunk_kind": "doc",
+              "text": "## Code anchors\n- `consensus/wbft/validator/default.go` defaultValidator:32 — Validator struct — Address + BLSPublicKey only; no Power/Weight/Stake field\n- `consensus/wbft/validator/default.go` defaultSet:61 — Validator set struct — list + policy; no stake aggregation\n- `consensus/wbft/validator/default.go` defaultSet.QuorumSize:226 — Quorum computed by count via ceil(N − F), not by stake\n\n"
+            }
+          ]
+        }
+      }
+    },
+    "finished_monotonic": 3485575.36508175
+  },
+  {
+    "label": "health-recovered",
+    "method": "tools/call",
+    "params": {
+      "name": "cks.ops.health",
+      "arguments": {}
+    },
+    "mode": "healthy",
+    "outcome": "response",
+    "started_monotonic": 3485575.365800625,
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 7,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "baseline-model",
+          "status": "ok",
+          "serviceable": true,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-errors-20261018-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/new-dataset/retained-origins-v2/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "model_reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-17T14:57:15Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:55814",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/new-dataset/retained-origins-v2/vector"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-errors-20261018-01/source\" differs from indexed checkout \"/private/tmp/ks-stablenet-rebuild-20261017-01/source\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    },
+    "finished_monotonic": 3485575.612388083
+  }
+]

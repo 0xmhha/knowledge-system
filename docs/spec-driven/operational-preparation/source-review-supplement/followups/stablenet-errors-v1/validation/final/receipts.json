@@ -1,0 +1,117 @@
+[
+  {
+    "label": "error-guards",
+    "argv": [
+      "python3",
+      "scripts/test_stablenet_errors.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 9.503408916760236,
+    "raw_sha256": "d7d0ac0fae290a9e550584664bea6af5099271fdeefb3a647bbad3ce706df6d3",
+    "raw_file": "error-guards.log"
+  },
+  {
+    "label": "pilot-historical-guards",
+    "argv": [
+      "python3",
+      "scripts/test_stablenet_pilot.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 5.013989791739732,
+    "raw_sha256": "e816b5e619361892ab41633fe605a115685104df9427471368969cdf96974353",
+    "raw_file": "pilot-historical-guards.log"
+  },
+  {
+    "label": "documentation-contract",
+    "argv": [
+      "python3",
+      "scripts/test_documentation_contract.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.3523654160089791,
+    "raw_sha256": "c9a502b2c889ebefbffc077691ecab3872c048f02e1b02e4f43d10ce424f3c71",
+    "raw_file": "documentation-contract.log"
+  },
+  {
+    "label": "package-notice",
+    "argv": [
+      "python3",
+      "scripts/test_package_notice_recipe.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.12770570814609528,
+    "raw_sha256": "34ff82c9bce649d67e370e561160edc2f3775cac5ecd696672dbfe5e853e07e8",
+    "raw_file": "package-notice.log"
+  },
+  {
+    "label": "live-documentation",
+    "argv": [
+      "python3",
+      "scripts/check-docs.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 6.315724458079785,
+    "raw_sha256": "5932c92b1d962cafa4f4e3d23f5873c23b5de5d729e1748da42137cc6bea4841",
+    "raw_file": "live-documentation.log"
+  },
+  {
+    "label": "original-completion-guard",
+    "argv": [
+      "python3",
+      "scripts/check-refactoring-progress.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 32.90094712516293,
+    "raw_sha256": "9fe1eb832db27ca734328bd2bb1b58df1bf6f783960988cb3397c44e3c806573",
+    "raw_file": "original-completion-guard.log"
+  },
+  {
+    "label": "error-check",
+    "argv": [
+      "python3",
+      "scripts/check-stablenet-errors.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 2.5711263329721987,
+    "raw_sha256": "c317d43f4f405618f53289fc208be4faa3704c9749165d86d859e7255e5e400e",
+    "raw_file": "error-check.log"
+  },
+  {
+    "label": "adoption-historical-check",
+    "argv": [
+      "python3",
+      "scripts/check-consumer-adoption.py",
+      "--packet",
+      "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1",
+      "--no-live-source"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.5586071670986712,
+    "raw_sha256": "43de8d26d5e27b049c9439a64cbcfed76944c095ef5e4d80d0f82141dbb78731",
+    "raw_file": "adoption-historical-check.log"
+  },
+  {
+    "label": "rebuild-historical-check",
+    "argv": [
+      "python3",
+      "scripts/check-stablenet-rebuild.py",
+      "--no-live-source"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.8648325419053435,
+    "raw_sha256": "ea7360bc6218f015023c0dee703488274f635cc8234ac478b83101466ea63348",
+    "raw_file": "rebuild-historical-check.log"
+  },
+  {
+    "label": "whitespace",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.5151796252466738,
+    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw_file": "whitespace.log"
+  }
+]

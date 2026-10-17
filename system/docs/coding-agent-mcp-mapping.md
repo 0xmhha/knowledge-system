@@ -271,7 +271,32 @@ Before issuing retrieval calls in a long-lived session, the coding-agent should:
 { "name": "cks.ops.health", "arguments": {} }
 ```
 
-A `degraded` rollup (ckv unreachable but ckg ok) is still useful: the coding-agent can fall back to `search_text` / `find_symbol` / `find_callers` and skip `semantic_search`. A `down` rollup (ckg unreachable) means retrieval cannot proceed; the planner should surface the error rather than silently degrade.
+`serviceable` is true only when both backends, the vector model, and their
+alignment are usable. Evidence composition is gated when it is false. Individual
+graph tools can still help diagnose a degraded vector path; report that limited
+scope when using their results.
+
+`model_reachable` reflects cached model usability. A query embedding failure
+records a negative observation immediately; both positive and negative
+observations expire after five seconds. The next health call then probes again,
+and a successful raw semantic search refreshes a positive observation immediately.
+Source, integrity, store, budget, and unknown search errors leave this model
+observation unchanged. A healthy model still requires per-query source checks.
+Caller cancellation does not persist as a shared model outage.
+
+`semantic_search` errors carry a bounded `code`/`message` with `isError: true`.
+`source_missing` identifies a missing retained original; `snapshot_mismatch`
+identifies a source/identity mismatch. `embedding_failed` identifies query-vector
+production failure, including unusable provider responses, and does not establish
+a network outage. Caller cancellation/deadline uses `request_canceled` or
+`request_timeout`; other semantic failures use `retrieval_failed`. V2 preserves
+these specific composition errors, while its serviceability gate returns
+`service_unavailable`; inspect backend health to identify the unavailable part.
+The legacy source preflight also preserves bounded source-error codes.
+
+TTL recovery applies to a real adapter that connected successfully at startup.
+A client configured as a degraded dummy during startup requires client
+reconfiguration after its provider becomes available.
 
 `cks.ops.freshness` is a soft check — returns the CKV index's recorded last-built commit vs the working tree. The coding-agent should warn the user (not block) when freshness is stale.
 
