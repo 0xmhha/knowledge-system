@@ -407,6 +407,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1/manifest.json",
           "sha256": "5519439540cfa214646aea61473b1bb26fff9919f77d1838c2d0a9db70fd9e72",
           "status": "T16_owned_errors_pass_plan21_of22_not_adopted_or_accepted"
+        },
+        "consumer_final": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/manifest.json",
+          "sha256": "6776de8233d694ece37ca4d04363fe7d15ec345a152e8d3ca2fb209970c47ece",
+          "status": "P08_T22_isolated_plan22_of22_not_adopted_or_accepted"
         }
       },
       "completed_preparation": [
@@ -458,7 +463,8 @@
         "준비32/T04: 명시적 pack/함수·일반모드 opt-in 유지·실제 규칙 응답의 분석 재사용·Analyzer/Planner 검증/전달3회의 추가CKS0 및 동일5산출물 검증. 실제7host/8CKS exit0/reap·13요청·중복 adapter exit1 보존. 격리 workflow 완료이며 모델 자율 준수/서버 캐시·차단·품질/독립 수용 아님.",
         "준비33/T09: 같은 Seed/logic.go와 충돌하는 graph-local node ID를 가진 별도 프로젝트 A/B에서 canonical·지원 pin과 동결 전달을 실제 검증. 최종4host/42CKS·matrix24거부·CLI8/Write hook9거부·원본 복구/정상 완료. 초기 빈 발견/잘못된 node 가정/ticket stale-read 보존. 격리 시험 완료·전역 ID/tenant ACL/모델/정식 수용 아님.",
         "준비34/T10: 실제 Seed/Field partial2건은 matched rules·비잘림·5unknown절/capability/diagnostics/한계를 유지해 전달. 실제 응답4종+로컬 변이6종의 CLI10/Write hook10거부·원본 복구 및 정상 전달2건 검증. 실제6host/9CKS 종료·회수. 빈 후보는 안전/누락0·의미/온톨로지 효과 수용 아님.",
-        "준비35/T16: 소유 CKS5세션에서 missing/ambiguous/구형 index/provider 비서비스·시작 실패·hard transport timeout을 원문 보존. 전체8시나리오=partial2+비사용6, 도구평가7+진단1. late 응답1은 timeout 성공 승격 금지·별도 recovery, exit0/reap4·startup exit1/reap1·PID5부재. provider 실제 연결 timeout 및 manifest/alignment 복합 조건을 유지. 준비21/22; 실제 host/모델·정식/온톨로지 효과 수용 아님."
+        "준비35/T16: 소유 CKS5세션에서 missing/ambiguous/구형 index/provider 비서비스·시작 실패·hard transport timeout을 원문 보존. 전체8시나리오=partial2+비사용6, 도구평가7+진단1. late 응답1은 timeout 성공 승격 금지·별도 recovery, exit0/reap4·startup exit1/reap1·PID5부재. provider 실제 연결 timeout 및 manifest/alignment 복합 조건을 유지. 준비21/22; 실제 host/모델·정식/온톨로지 효과 수용 아님.",
+        "준비36/P08/T22: 현재 전후 전역/프로젝트 설정32항목·운영metadata/current42항목·기존 비소유엔진10개·보호파일1575개/서명clean5checkout·binary/remote refs 유지. 소유fixture4변이 검출→정확복구→실제CKS1 partial/exit0/reap 및 owned socket 양성대조/close, foreign·symlink2거부. 이전35패킷 local commit/계보 및 PID161부재 확인하되 과거 미확인CKS exit1건 유지. 격리 P01~P08/22사례 완료; 후보채택/배포·과거 전역소급·독립 품질/온톨로지 효과 수용 아님."
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -2747,6 +2753,140 @@
           "reconstruction_executes_new_measurements": false,
           "related_previous_scoped_tests_passed": 591,
           "whitespace_check": "pass"
+        },
+        "consumer_final": {
+          "test_id": "T22",
+          "step_id": "P08",
+          "status": "isolated_final_readiness_pass_not_adopted",
+          "full_plan_passed": 22,
+          "full_plan_pending": [],
+          "P01_P08_isolated_complete": true,
+          "protected_global_configuration_entries": 32,
+          "operational_metadata_entries": 42,
+          "existing_unowned_engines_preserved": 10,
+          "maintained_protected_files": 1575,
+          "signed_clean_source_checkouts": 5,
+          "prior_frozen_packets_unchanged": 35,
+          "prior_packet_local_commits_verified": 35,
+          "historical_PIDs_observed_absent": 161,
+          "historical_unconfirmed_CKS_exit_receipts": 1,
+          "historical_exit_receipts_reconstructed_from_PID_absence": false,
+          "owned_restore_exact": true,
+          "foreign_path_and_symlink_refusals": 2,
+          "restored_real_CKS_queries": 1,
+          "new_CKS_exit0_reaped": 1,
+          "new_owned_listener_closed": true,
+          "protected_before_after_equal": true,
+          "global_preservation_scope": "current_T22_window_only",
+          "operational_full_database_or_availability_verified": false,
+          "self_commit_needs_post_creation_verification": true,
+          "actual_host_sessions": 0,
+          "real_model_calls": 0,
+          "formal_runs": 0,
+          "candidate_adopted": false,
+          "production_mutations": 0,
+          "external_publication": 0,
+          "formal_completed": 0,
+          "formal_total": 9,
+          "ontology_effect_acceptance": "not_evaluated",
+          "next": "assign_independent_gold_reviewer_and_final_owner_then_freeze_DEV_FINAL_gold_matching_budget_and_run_scope",
+          "date": "2026-10-17",
+          "kind": "P08_T22_isolated_readiness_not_deployment_or_acceptance",
+          "T22_complete": true,
+          "current_planned_cases_failed": [],
+          "final_rescues": 0,
+          "formal_state_unchanged": true,
+          "maintained_go_source_unchanged": true,
+          "native_full_checks": "reuse_unchanged_pinned_stage30_results_not_new_runs",
+          "prior_native_test": {
+            "pass": 4063,
+            "skip": 18,
+            "fail": 0
+          },
+          "prior_native_race": {
+            "pass": 4063,
+            "skip": 18,
+            "fail": 0
+          },
+          "planned_full_cases_passed": [
+            "T01",
+            "T02",
+            "T03",
+            "T04",
+            "T05",
+            "T06",
+            "T07",
+            "T08",
+            "T09",
+            "T10",
+            "T11",
+            "T12",
+            "T13",
+            "T14",
+            "T15",
+            "T16",
+            "T17",
+            "T18",
+            "T19",
+            "T20",
+            "T21",
+            "T22"
+          ],
+          "planned_full_cases_pending": 0,
+          "pending_case_ids": [],
+          "implementation_steps_isolated_completed": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08"
+          ],
+          "dedicated_evidence_guard_tests_passed": 38,
+          "repository_scoped_regression_tests_passed": 667,
+          "regression_tests": {
+            "test_host_schema_compatibility.py": 31,
+            "test_consumer_role_readiness.py": 39,
+            "test_consumer_stdio_readiness.py": 37,
+            "test_consumer_local_readiness.py": 30,
+            "test_consumer_contract_plan.py": 48,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20,
+            "test_review_gap.py": 51,
+            "test_rule_gap.py": 36,
+            "test_expansion_gap.py": 39,
+            "test_policy_security_gap.py": 42,
+            "test_operational_host_probe.py": 8,
+            "test_consumer_render_lifecycle.py": 44,
+            "test_consumer_opt_in.py": 38,
+            "test_consumer_foreign_pin.py": 38,
+            "test_consumer_partial.py": 38,
+            "test_consumer_errors.py": 38,
+            "test_consumer_final.py": 38
+          },
+          "live_document_check_count": 134,
+          "package_notice_recipe_tests_passed": 3,
+          "original_implementation_completion_guard": "pass",
+          "frozen_reconstruction_count": 2,
+          "reconstruction_executes_new_measurements": false,
+          "related_previous_scoped_tests_passed": 629,
+          "whitespace_check": "pass",
+          "remaining_formal_ids": [
+            "WI-1",
+            "WI-2",
+            "WI-3",
+            "WI-4",
+            "WI-V1",
+            "WI-V2",
+            "WI-6",
+            "WI-SP",
+            "WI-C"
+          ],
+          "optional_backlog_count": 12,
+          "local_signed_commit_finalization": "actual self-containing commit verified after packet creation; hash cannot be embedded inside itself"
         }
       },
       "candidate_counts": {
@@ -3038,5 +3178,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1/manifest.json",
     "sha256": "5519439540cfa214646aea61473b1bb26fff9919f77d1838c2d0a9db70fd9e72",
     "status": "T16_owned_errors_pass_plan21_of22_not_adopted_or_accepted"
+  },
+  "consumer_final": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/manifest.json",
+    "sha256": "6776de8233d694ece37ca4d04363fe7d15ec345a152e8d3ca2fb209970c47ece",
+    "status": "P08_T22_isolated_plan22_of22_not_adopted_or_accepted"
   }
 }

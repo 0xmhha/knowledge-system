@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "test_id": "T22",
+  "step_id": "P08",
+  "base_commit": "39f4554034ae8fb9ad7a87b8b22b9a21cbebf368",
+  "scope": "final_owned_readiness_not_deployment_or_formal_acceptance",
+  "observation_window": "current_T22_before_after_only; earlier immutable receipts are separate historical proof",
+  "allowed_mutations": [
+    "fresh_owned_fixture_files_and_pointer",
+    "new_packet_and_helpers",
+    "preparation_ledgers_only",
+    "signed_local_commit"
+  ],
+  "forbidden_actions": [
+    "push",
+    "fetch",
+    "pull",
+    "PR_or_tracker_write",
+    "production_setup_or_rollback",
+    "plugin_install",
+    "global_settings_write",
+    "signal_unowned_process"
+  ],
+  "protected_global_files": [
+    ".claude/settings.json",
+    ".claude/settings.local.json",
+    ".claude/plugins/installed_plugins.json",
+    ".mcp.json",
+    ".config/cks/cks.yaml",
+    ".config/knowledge-system/config.yaml"
+  ],
+  "project_config_names": [
+    ".mcp.json",
+    ".claude/settings.json",
+    ".claude/settings.local.json"
+  ],
+  "operational_dataset_root": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge-data",
+  "operational_scan_depth": 4,
+  "operational_metadata_names": [
+    "current",
+    "active",
+    "cks.yaml",
+    "config.yaml",
+    "setup.yaml",
+    "manifest.json",
+    "dataset.json",
+    "identity.json",
+    "versions.json"
+  ],
+  "owned_restore_files": [
+    "cks.yaml",
+    "sanitize.yaml",
+    "graph/graph.db",
+    "graph/manifest.json",
+    "source/logic.go"
+  ],
+  "requirements": [
+    "Hash only global configuration bytes; project MCP/settings and installed registry checked without copying contents or credentials. Compare current before/after, not an invented historical baseline.",
+    "Preserve four earlier pinned checkouts plus adopted ChainBench and current native/host binaries; retain signed source commits and local refs without contacting remotes.",
+    "Snapshot scoped dataset metadata/pointers and engine/service identities. Existing non-owned engines are preserved and never terminated. No availability/ACL/full-DB-content claim.",
+    "Fresh owned fixture gets owner token, backup, deliberate source/index/config/pointer faults, rejection before restore, exact-byte restore and real pinned CKS query. Refuse foreign root and symlink escape before mutation.",
+    "Retain all earlier35 packets and historical failures, especially one unconfirmed initial CKS exit; PID absence cannot create a missing exit receipt. Compare final22 case matrix to actual packet scopes.",
+    "Preserve formal0/9, unknown reviewer/freeze null/model0/no candidate adoption. Final self-containing commit cannot be embedded in its own hash: verify actual signed local commit after packet creation."
+  ],
+  "real_model_calls": 0,
+  "formal_runs": 0,
+  "limitations": [
+    "Current endpoint comparison does not prove untouched global state for earlier stages lacking a baseline.",
+    "Scoped metadata/pointers and process identities are not a byte checksum of every live database, a security sandbox, or a service availability test.",
+    "Existing processes from other sessions are outside owned cleanup. Temporary evidence/fixture directories remain for review; process/listener cleanup is required.",
+    "P01-P08 completion means isolated candidate readiness; adoption, installed roles, semantic quality and ontology effect remain unevaluated."
+  ]
+}
