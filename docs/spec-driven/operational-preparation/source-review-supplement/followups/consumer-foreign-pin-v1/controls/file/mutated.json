@@ -1,0 +1,70 @@
+{
+  "verification": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/private/tmp/ks-host-schema-consumer-20261017/plugin/scripts/deep_review.py",
+      "verify",
+      "--workspace",
+      "/private/tmp/ks-consumer-role-t04-t09-A3-20261017/source/.coding-agent/tickets/KS-P06-REVIEW"
+    ],
+    "exit_code": 2,
+    "stdout": "{\"status\": \"invalid\", \"reason\": \"structural review identity/location differs\"}\n",
+    "stderr": ""
+  },
+  "workspace": {
+    "input-bundle.json": {
+      "sha256": "ce32a296d6f837243782d9144c4083853912e86d679337e7277852d7b37efef5",
+      "json": null
+    },
+    "state.json": {
+      "sha256": "e2a46098e291c2570193c0a20dd871f7e13efcbc739917327533830a6be40f9c",
+      "json": {
+        "ticket_id": "KS-P06-REVIEW",
+        "ticket_type": "code_review",
+        "current_state": "PLANNING",
+        "config": {
+          "autonomy": {
+            "mode": "interactive"
+          }
+        },
+        "states": {
+          "ANALYSIS": {
+            "status": "completed",
+            "deep_review_sha256": "05aeb418a47cd2713caa014d773ca22fdab8d493ff425f95bea9de5ce2c0d352"
+          },
+          "PLANNING": {
+            "status": "pending"
+          }
+        }
+      }
+    },
+    "review-report.md": {
+      "sha256": "2e14a41cf361f6cc2b8d9427dc236543dd2411fd507ee7bfc2679703d4cff703",
+      "json": null
+    },
+    "sequence.mmd": {
+      "sha256": "a212968346e985fc11d925e7353b81536d3130af206aabe88fc08e3dcd2ca739",
+      "json": null
+    },
+    "adapter-commands.json": {
+      "sha256": "c0496d8673c671feb72a24421b7179705a779f8d89afdaa2a5f650a0332ca91e",
+      "json": null
+    },
+    "scripted-judgments.json": {
+      "sha256": "ab714e82b5a0c8aa5690d6eed623075331a8220afaa6ebea958f444f98d21ad1",
+      "json": null
+    },
+    "deep-review-evidence.json": {
+      "sha256": "c901d084928dca377d2bcd583eb511c47afac3257508f179fabd093072d83dc6",
+      "json": null
+    },
+    "modules.mmd": {
+      "sha256": "121f3a5e7083949a4144ebf3e212eb6d6360790ce68f7b411eaf4ae8c3f9883a",
+      "json": null
+    },
+    "deep-review.json": {
+      "sha256": "05aeb418a47cd2713caa014d773ca22fdab8d493ff425f95bea9de5ce2c0d352",
+      "json": null
+    }
+  }
+}

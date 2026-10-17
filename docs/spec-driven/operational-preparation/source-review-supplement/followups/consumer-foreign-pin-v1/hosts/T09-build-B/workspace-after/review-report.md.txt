@@ -1,0 +1,231 @@
+# Structured function review
+
+Status: structured partial review; independent acceptance: not recorded.
+
+Source pins:
+```json
+{
+  "bytes": 246,
+  "canonical_id": "example.invalid/foreign-pin-fixture.Seed",
+  "commit": "5615bd40f641f146796af08997a47f843bf23ec5",
+  "file": "logic.go",
+  "function_name": "Seed",
+  "language": "go",
+  "node_id": "ea016a756cff1cc8",
+  "sha256": "adb3afd85b486e6abcc8da73a33dccbdc9e1a55930fc531ae04c7d5e57d49bc8",
+  "snapshot_sha256": "2ef5d7865a8428cff32c6fbea69de27995c7a0b166f30682d13eacaa386fcc5e",
+  "start_byte": 65,
+  "start_line": 7
+}
+```
+
+Computed CFG sequence (not an execution trace):
+```json
+{
+  "edges": [
+    {
+      "certainty": "structural",
+      "from": "b0",
+      "kind": "cfg",
+      "to": "b1"
+    },
+    {
+      "certainty": "conservative",
+      "condition": "branch_0",
+      "from": "b1",
+      "kind": "cfg",
+      "to": "b2"
+    },
+    {
+      "certainty": "conservative",
+      "condition": "branch_1",
+      "from": "b1",
+      "kind": "cfg",
+      "to": "b3"
+    },
+    {
+      "certainty": "structural",
+      "from": "b2",
+      "kind": "cfg",
+      "to": "b1"
+    },
+    {
+      "certainty": "conservative",
+      "condition": "true",
+      "from": "b3",
+      "kind": "cfg",
+      "to": "b4"
+    },
+    {
+      "certainty": "conservative",
+      "condition": "false",
+      "from": "b3",
+      "kind": "cfg",
+      "to": "b5"
+    },
+    {
+      "certainty": "structural",
+      "from": "b4",
+      "kind": "cfg",
+      "to": "b5"
+    }
+  ],
+  "kind": "bounded_cfg_not_execution_trace"
+}
+```
+
+Module membership:
+```json
+{
+  "file": "logic.go",
+  "interprocedural_edges": "unknown",
+  "kind": "retained_file_membership",
+  "symbol": "ea016a756cff1cc8"
+}
+```
+
+## data_state
+
+```json
+{
+  "assumptions": [
+    "The pinned owned fixture is the review target."
+  ],
+  "claim": "The owned fixture has a retained local computation to inspect.",
+  "evidence_nodes": [
+    "b0/n0"
+  ],
+  "origin": "agent_reasoning",
+  "status": "inferred",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## guards_exceptions
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established guards_exceptions.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## complexity
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established complexity.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## resources
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established resources.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## io
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established io.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## priority_tradeoffs
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established priority_tradeoffs.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## Findings and review criteria
+
+```json
+{
+  "criteria": [
+    {
+      "id": "owned-local-shape",
+      "reason": "Scripted transport fixture only; not independent completeness or quality.",
+      "requirement": "Preserve the source-bound local computation with explicit uncertainty.",
+      "section": "data_state",
+      "status": "covered"
+    }
+  ],
+  "findings": []
+}
+```
+
+## Limitations
+
+- graph rule/value computation is bounded, not whole-program safety
+- structural review lacks its own immutable snapshot/blob pin; no atomic cross-call proof
+- source/CFG order is not a runtime call trace
+- agent findings, complexity/resources/I/O and priorities are reasoning, not measured facts
+- local receipt hashes do not authenticate MCP transport or grant reviewer acceptance
+
+## Diagrams (computed local structure; no runtime trace)
+
+```mermaid
+flowchart TD
+%% Computed bounded CFG; runtime feasibility, calls and exceptions remain unknown.
+  vc02c0b965e02["b0"]
+  v7dc96f776c84["b1"]
+  v4814d92093ac["b2"]
+  v76a8277347f5["b3"]
+  v486bacc5c2d8["b4"]
+  v3c5661974942["b5"]
+  vc02c0b965e02 -->|successor| v7dc96f776c84
+  v7dc96f776c84 -->|branch_0| v4814d92093ac
+  v7dc96f776c84 -->|branch_1| v76a8277347f5
+  v4814d92093ac -->|successor| v7dc96f776c84
+  v76a8277347f5 -->|true| v486bacc5c2d8
+  v76a8277347f5 -->|false| v3c5661974942
+  v486bacc5c2d8 -->|successor| v3c5661974942
+```
+
+```mermaid
+flowchart LR
+%% Computed retained-file membership; interprocedural edges are unknown.
+  file["logic.go"] -->|computed membership| symbol["Selected retained function"]
+  symbol -.->|unknown, not computed| external["Interprocedural relationships unavailable"]
+```

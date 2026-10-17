@@ -1,0 +1,110 @@
+[
+  {
+    "label": "format",
+    "argv": [
+      "gofmt",
+      "-w",
+      "logic.go"
+    ],
+    "cwd": "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "elapsed_seconds": 0.014121916610747576
+  },
+  {
+    "label": "fixture-test",
+    "argv": [
+      "go",
+      "test",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source",
+    "exit_code": 0,
+    "stdout": "ok  \texample.invalid/foreign-pin-fixture\t0.449s\n?   \texample.invalid/foreign-pin-fixture/a\t[no test files]\n?   \texample.invalid/foreign-pin-fixture/b\t[no test files]\n",
+    "stderr": "",
+    "elapsed_seconds": 1.500783915631473
+  },
+  {
+    "label": "fixture-vet",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "elapsed_seconds": 0.443749416153878
+  },
+  {
+    "label": "git-add",
+    "argv": [
+      "git",
+      "add",
+      "go.mod",
+      "logic.go"
+    ],
+    "cwd": "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "elapsed_seconds": 0.01877995813265443
+  },
+  {
+    "label": "git-commit",
+    "argv": [
+      "git",
+      "-c",
+      "user.name=Owned T09 fixture",
+      "-c",
+      "user.email=fixture@example.invalid",
+      "-c",
+      "commit.gpgsign=false",
+      "commit",
+      "-qm",
+      "test: distinct foreign pin fixture"
+    ],
+    "cwd": "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "elapsed_seconds": 0.03364237491041422
+  },
+  {
+    "label": "git-head",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source",
+    "exit_code": 0,
+    "stdout": "5615bd40f641f146796af08997a47f843bf23ec5\n",
+    "stderr": "",
+    "elapsed_seconds": 0.008802665863186121
+  },
+  {
+    "label": "index",
+    "argv": [
+      "/private/tmp/ks-host-schema-runtime-20261017/bin/ckg",
+      "build",
+      "--src",
+      "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source",
+      "--out",
+      "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/foreign-graph",
+      "--lang",
+      "go",
+      "--policy-file",
+      "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source/policy.yaml",
+      "--security-pattern-file",
+      "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source/security.yaml"
+    ],
+    "cwd": "/private/tmp/ks-consumer-role-t04-t09-B3-20261017/source",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "time=2026-10-17T16:37:20.543+09:00 level=INFO msg=\"detected files\" go=4 ts=0 sol=0 proto=0\ntime=2026-10-17T16:37:21.055+09:00 level=INFO msg=\"http client matching\" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=0 placeholders_dropped=0\ntime=2026-10-17T16:37:21.198+09:00 level=INFO msg=\"temporal G6 emitted\" commit_nodes=2 hunk_nodes=9 changed_in_edges=65 blame_edges=4 hunk_edges=9 hunk_blobs=9 max_per_file=10\ntime=2026-10-17T16:37:21.326+09:00 level=INFO msg=\"policy enrichment emitted\" policy_nodes=1 governed_by_edges=1\ntime=2026-10-17T16:37:21.347+09:00 level=INFO msg=\"security enrichment emitted\" security_nodes=2 has_security_pattern_edges=2\ntime=2026-10-17T16:37:21.358+09:00 level=INFO msg=\"review index rebuilt\" test_files=1\ntime=2026-10-17T16:37:21.386+09:00 level=INFO msg=\"build complete\" nodes=54 edges=140 pkg_tree_edges=38 topic_resolutions=3\nckg: built 54 nodes / 140 edges into /private/tmp/ks-consumer-role-t04-t09-B3-20261017/foreign-graph\n",
+    "elapsed_seconds": 0.9480057498440146
+  }
+]

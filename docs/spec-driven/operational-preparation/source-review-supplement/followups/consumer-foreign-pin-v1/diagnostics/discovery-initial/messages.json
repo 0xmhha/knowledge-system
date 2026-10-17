@@ -1,0 +1,65 @@
+[
+  {
+    "label": "initialize",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {},
+        "clientInfo": {
+          "name": "owned-consumer-P05",
+          "version": "1"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        },
+        "serverInfo": {
+          "name": "knowledge-graph",
+          "version": "0.1.0"
+        }
+      }
+    }
+  },
+  {
+    "label": "find-Seed",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "tools/call",
+      "params": {
+        "name": "flow_probe.context.find_symbol",
+        "arguments": {
+          "name": "Seed",
+          "exact": true,
+          "include_blobs": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": ""
+          }
+        ],
+        "structuredContent": {
+          "nodes": []
+        }
+      }
+    }
+  }
+]

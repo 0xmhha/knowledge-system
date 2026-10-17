@@ -473,6 +473,24 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 - 이전31동결 패킷·유지 Go/runtime/schema·기존 bound 문서 및 원본/후보4checkout 보존. 변경 없는 stage30 native full test/race 각4063통과/18skip, build/fmt/vet/lint/boundaries 결과 재사용; 새 Go 전체 검사로 세지 않음.
 - 계획18/22 통과, 실패0/미완료4(T09/T10/T16/T22). 독립 의미·품질/온톨로지 효과·모델 자율 준수 미평가. 후보 미채택·실제 모델0·정식 실행0·수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지.
 
-다음 작업(최신): T09 foreign/pin 실제 통합 검증 → T10 partial/unknown → T16 오류 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
+32단계 당시 다음 작업(역사 기록): T09 foreign/pin 실제 통합 검증 → T10 partial/unknown → T16 오류 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_opt_in.py
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-opt-in.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1
+
+
+[완료 — 격리 통합 검증] 33. T09 다른 프로젝트·함수/ticket/source pin 거부
+- 별도 B 프로젝트를 같은 Seed/logic.go 이름으로 생성. 다른 module/canonical·commit/source/snapshot과 원본 source Git 객체 증명·A/B index bytes 보존. B fixture format/test/vet/index 명령 통과.
+- node ID는 A/B에서 충돌한다. graph-local ID만 바꾼 요청을 foreign 거부로 세지 않음. A graph와 A pin의 같은 ID는 A를 반환하는 정상 대조군으로 보존. coherent B node+pins/canonical 및 다른 함수·개별 commit/source/snapshot은 기대 거부.
+- 최종 실제 Analyzer의4도구(value/rules/expansion/policy)×9입력=36요청: 정상/ID충돌 대조12·source_mismatch/not_found24. 거부 응답의 usable analysis/annotation 부재 확인. B의 정상 조회와 stale A→B1거부 별도 검증.
+- 실제 A/B 각각 rule/review2호출의 bundle/typed5산출물을 생성해 별도 정상 검증. 구조 리뷰는 identity_only_unverified_snapshot이며 expected pin 미지원/원자적 snapshot·transport 인증 아님.
+- 실제 Planner에서 node/canonical/file/commit/source/snapshot/ticket/coherent B산출물8종 CLI exit2와 실제 Write hook9거부(동결 identity 재결합 포함). 매회 mutated bytes가 전달로 바뀌지 않았고 A의 원본 bytes 복구/CLI0 확인. 마지막 정상 A완료·hash/CLI 검증 통과.
+- 첫 발견 질의는 exact 이름 계약으로 빈 결과·controller exit1. 첫 전체4host 시도는 node ID 충돌을 잘못 가정한 no-op 검증0/Write 허용과 ticket stale-read(실제 hook 증명 아님)를 발견해 T09 미통과로 보존. 수정한 대조군/Read 갱신 후 전체 재시험. 제품 코드 변경으로 숨기지 않음.
+- 최종4host/CKS42요청·5exit0/reap·CKG1exit0/reap. 초기 포함8host/CKS80요청·10exit0/reap·CKG3exit0/reap, 전체 소유 PID29개 부재와 감사기 live 양성 대조·응답기/worker 정리, rescue0.
+- 새 증거385파일·이전32동결 패킷·현재 Go/runtime/schema·bound 문서·원본/후보4checkout 보존. T04의 고정 실행 helper를 변경 없이 재사용했으므로 invocation의 T04 prefix는 실제 원문대로 보존.
+- 전용 증거 보호 검사38개 + 이전 관련515개 = 553개 통과. package notice 별도3개·문서134개·기존 구현 완료 검사·공백 검사 통과. 새 두 복사본은 바이트 일치·검증 통과; 재구성은 새 host/CKS/PID 측정이 아님.
+- 변경 없는 stage30 native full test/race 각4063통과·18skip, build/fmt/vet/lint/boundaries 결과 재사용. 새 Go 전체 검사로 세지 않음.
+- 계획19/22 통과·현재 실패0·미완료3(T10/T16/T22). 전역 node ID·tenant ACL·transport/reviewer 인증·자율 모델 준수·온톨로지 효과 수용은 미입증. 후보 미채택·실제모델0·정식 실행0/수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지.
+
+다음 작업(최신): T10 partial/unknown 전달 검증 → T16 오류 처리/평가 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_foreign_pin.py
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-foreign-pin.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1

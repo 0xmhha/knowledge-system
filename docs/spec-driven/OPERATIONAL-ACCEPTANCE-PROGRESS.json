@@ -392,6 +392,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1/manifest.json",
           "sha256": "c221e36f9eff1dde30207b53b8188c52d9d386f8c895bfb2ac2a682134c4f3bc",
           "status": "T04_isolated_workflow_pass_plan18_of22_not_adopted_or_accepted"
+        },
+        "consumer_foreign_pin": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+          "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+          "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
         }
       },
       "completed_preparation": [
@@ -440,7 +445,8 @@
         "준비29단계 실제 역할 관측·증거 준비: 소유 host10세션/API35시도/CKS8호출, 실제 Analyzer→Planner 2세대 전달·hash/Write/Edit/shell 거부6건·명시적 deny/backend 미설정 확인. 요구7쌍 중5쌍 성공, host 최상위 oneOf로2도구 제외. P06은 미완료이며 통과12/실패3/미완료7, 스키마 호환 후속 명세 초안 작성. 독립 수용 아님.",
         "준비30단계 격리 CKS/소비자 host 호환 후보·전체 Go/consumer 검증·서명/새 바이너리 pin·실제7/7쌍·94 native 비교·전달/거부6건 재검증. P06 격리 시험 완료, 전체22 중15통과/7미완료. 후보 채택·품질/온톨로지 효과·정식 수용 아님.",
         "P07_actual_local_rendering_and_signal_safe_owned_lifecycle_with_initial_failures_preserved",
-        "준비32/T04: 명시적 pack/함수·일반모드 opt-in 유지·실제 규칙 응답의 분석 재사용·Analyzer/Planner 검증/전달3회의 추가CKS0 및 동일5산출물 검증. 실제7host/8CKS exit0/reap·13요청·중복 adapter exit1 보존. 격리 workflow 완료이며 모델 자율 준수/서버 캐시·차단·품질/독립 수용 아님."
+        "준비32/T04: 명시적 pack/함수·일반모드 opt-in 유지·실제 규칙 응답의 분석 재사용·Analyzer/Planner 검증/전달3회의 추가CKS0 및 동일5산출물 검증. 실제7host/8CKS exit0/reap·13요청·중복 adapter exit1 보존. 격리 workflow 완료이며 모델 자율 준수/서버 캐시·차단·품질/독립 수용 아님.",
+        "준비33/T09: 같은 Seed/logic.go와 충돌하는 graph-local node ID를 가진 별도 프로젝트 A/B에서 canonical·지원 pin과 동결 전달을 실제 검증. 최종4host/42CKS·matrix24거부·CLI8/Write hook9거부·원본 복구/정상 완료. 초기 빈 발견/잘못된 node 가정/ticket stale-read 보존. 격리 시험 완료·전역 ID/tenant ACL/모델/정식 수용 아님."
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -2345,6 +2351,124 @@
           "next": "T09 foreign/pins, then T10 partial/unknown, T16 error denominators, P08/T22",
           "related_previous_scoped_tests_passed": 477,
           "whitespace_check": "pass"
+        },
+        "consumer_foreign_pin": {
+          "test_id": "T09",
+          "status": "isolated_two_project_pin_and_frozen_delivery_pass",
+          "final_host_sessions": 4,
+          "final_CKS_requests": 42,
+          "final_CKS_exit0_reaped": 5,
+          "final_CKG_exit0_reaped": 1,
+          "matrix_requests": 36,
+          "matrix_refusals": 24,
+          "matrix_positives_including_local_ID_collision": 12,
+          "native_stale_A_on_B_refusals": 1,
+          "consumer_CLI_refusals": 8,
+          "actual_Write_hook_refusals": 9,
+          "genuine_A_completion": true,
+          "all_attempts_host_sessions": 8,
+          "all_attempts_CKS_requests": 80,
+          "all_attempts_CKS_exit0_reaped": 10,
+          "all_attempts_CKG_exit0_reaped": 3,
+          "owned_PIDs_absent": 29,
+          "node_IDs_globally_unique": false,
+          "structural_expected_pins_supported": false,
+          "tenant_ACL_or_transport_authentication_proven": false,
+          "autonomous_model_adherence": "not_evaluated",
+          "prior_frozen_packets_unchanged": 32,
+          "formal_completed": 0,
+          "formal_total": 9,
+          "ontology_effect_acceptance": "not_evaluated",
+          "candidate_adopted": false,
+          "real_model_calls": 0,
+          "formal_runs": 0,
+          "full_plan_passed": 19,
+          "full_plan_pending": [
+            "T10",
+            "T16",
+            "T22"
+          ],
+          "next": "T10 partial/unknown, then T16 and P08/T22",
+          "date": "2026-10-17",
+          "kind": "T09_actual_two_project_pins_and_frozen_delivery_not_adoption_or_quality",
+          "T09_complete": true,
+          "final_matrix_positive_controls": 12,
+          "current_planned_cases_failed": [],
+          "initial_discovery_controller_exit": 1,
+          "initial_full_controller_exit": 0,
+          "initial_full_run_not_T09_pass": true,
+          "initial_node_noop_Write_allowed": true,
+          "initial_ticket_stale_read_not_hook_proof": true,
+          "final_all_control_restores_byte_identical": true,
+          "final_rescues": 0,
+          "formal_state_unchanged": true,
+          "maintained_go_source_unchanged": true,
+          "native_fixture_B_format_test_vet_index": "pass",
+          "native_full_checks": "reuse_unchanged_pinned_stage30_results_not_new_runs",
+          "prior_native_test": {
+            "pass": 4063,
+            "skip": 18,
+            "fail": 0
+          },
+          "prior_native_race": {
+            "pass": 4063,
+            "skip": 18,
+            "fail": 0
+          },
+          "planned_full_cases_passed": [
+            "T01",
+            "T02",
+            "T03",
+            "T04",
+            "T05",
+            "T06",
+            "T07",
+            "T08",
+            "T09",
+            "T11",
+            "T12",
+            "T13",
+            "T14",
+            "T15",
+            "T17",
+            "T18",
+            "T19",
+            "T20",
+            "T21"
+          ],
+          "planned_full_cases_pending": 3,
+          "pending_case_ids": [
+            "T10",
+            "T16",
+            "T22"
+          ],
+          "dedicated_evidence_guard_tests_passed": 38,
+          "repository_scoped_regression_tests_passed": 553,
+          "regression_tests": {
+            "test_host_schema_compatibility.py": 31,
+            "test_consumer_role_readiness.py": 39,
+            "test_consumer_stdio_readiness.py": 37,
+            "test_consumer_local_readiness.py": 30,
+            "test_consumer_contract_plan.py": 48,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20,
+            "test_review_gap.py": 51,
+            "test_rule_gap.py": 36,
+            "test_expansion_gap.py": 39,
+            "test_policy_security_gap.py": 42,
+            "test_operational_host_probe.py": 8,
+            "test_consumer_render_lifecycle.py": 44,
+            "test_consumer_opt_in.py": 38,
+            "test_consumer_foreign_pin.py": 38
+          },
+          "live_document_check_count": 134,
+          "package_notice_recipe_tests_passed": 3,
+          "original_implementation_completion_guard": "pass",
+          "frozen_reconstruction_count": 2,
+          "reconstruction_executes_new_measurements": false,
+          "related_previous_scoped_tests_passed": 515,
+          "whitespace_check": "pass"
         }
       },
       "candidate_counts": {
@@ -2621,5 +2745,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1/manifest.json",
     "sha256": "c221e36f9eff1dde30207b53b8188c52d9d386f8c895bfb2ac2a682134c4f3bc",
     "status": "T04_isolated_workflow_pass_plan18_of22_not_adopted_or_accepted"
+  },
+  "consumer_foreign_pin": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+    "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+    "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
   }
 }

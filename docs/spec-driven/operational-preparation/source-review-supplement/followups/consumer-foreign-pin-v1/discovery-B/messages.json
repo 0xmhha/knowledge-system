@@ -1,0 +1,79 @@
+[
+  {
+    "label": "initialize",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {},
+        "clientInfo": {
+          "name": "owned-consumer-P05",
+          "version": "1"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        },
+        "serverInfo": {
+          "name": "knowledge-graph",
+          "version": "0.1.0"
+        }
+      }
+    }
+  },
+  {
+    "label": "find-Seed",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "tools/call",
+      "params": {
+        "name": "flow_probe.context.find_symbol",
+        "arguments": {
+          "name": "Seed",
+          "exact": false,
+          "include_blobs": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": ""
+          }
+        ],
+        "structuredContent": {
+          "nodes": [
+            {
+              "canonical_id": "example.invalid/foreign-pin-fixture.Seed",
+              "confidence": "EXTRACTED",
+              "file": "logic.go",
+              "id": "ea016a756cff1cc8",
+              "line": 7,
+              "name": "Seed",
+              "qname": "fixture.Seed",
+              "signature": "func Seed(command string, values []int, strict bool) *exec.Cmd",
+              "source": "func Seed(command string, values []int, strict bool) *exec.Cmd {\n\ttotal := 0\n\tfor _, value := range values {\n\t\ttotal += value\n\t}\n\tif strict && total < 0 {\n\t\tcommand = \"foreign-fixed\"\n\t}\n\tHelper(total)\n\tEmpty(total)\n\treturn exec.Command(command)\n}",
+              "type": "Function",
+              "usage_score": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+]
