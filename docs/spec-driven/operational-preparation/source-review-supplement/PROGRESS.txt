@@ -455,6 +455,24 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 - 이전30단계의 변경 없는 고정 native full test/race 각4063통과·18skip 및 build/fmt/vet/lint/boundaries 검증을 재사용하며 새 Go 실행으로 세지 않음.
 - 실제 모델0·운영 정식 실행0·정식 수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지. 시험 observer와 후보는 미채택, 온톨로지 효과는 미평가.
 
-다음 작업(최신): T04 opt-in/재사용·T09 foreign/pin·T10 partial/unknown·T16 오류 분모의 실제 통합 검증, 이후 P08/T22 준비 최종 판정. 위에 기록한 정식9건과 별도 후속12건 전체가 남아 있다.
+31단계 당시 다음 작업(역사 기록): T04 opt-in/재사용·T09 foreign/pin·T10 partial/unknown·T16 오류 분모의 실제 통합 검증, 이후 P08/T22 준비 최종 판정. 위에 기록한 정식9건과 별도 후속12건 전체가 남아 있다.
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_render_lifecycle.py
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-render-lifecycle.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-render-lifecycle-v1
+
+
+[완료 — 격리 workflow] 32. T04 opt-in·재사용·중복 처리
+- 일반 feature 기본 경로는 CKS0, 명시적 value_dependencies 경로는 자동 rules 없음. code_review 전용 dispatch/§7만 versioned rule pack을 요구하며 다른 모드의 본문에 전역 rule 실행 계약이 없음을 고정 source로 대조.
+- native 실제7요청: pack 누락/버전 누락/미지원 pack/함수 누락4건 거부, 기본 조회1·명시 rule1·반복 rule1 성공. 규칙 외 값/제어 view는 elapsed_micros만 제외해 동일. 반복 요청 성공을 캐시 또는 중복 차단으로 해석하지 않음.
+- 실제 Analyzer code_review는 rule_candidates1회 + review_function1회. 정확한 함수/commit/source/snapshot과 pack을 실제 API→MCP→bundle로 대조. computed view는 응답의 직접 투영이며 소비자의 별도 CFG/규칙 계산 없음. native 공통 build/parse/규칙 opt-in은 source 근거이며 runtime profiler 측정 아님.
+- Analyzer 재진입·Planner 전달·Planner 재진입의 실제 CLI 검증3회에서 CKS0. 다섯 산출물 hash 유지 및 전달 state/hash 확인. 검증기가 무결성을 위해 예상 projection을 재생성하는 것과 graph 분석 재실행을 구분.
+- 의도적 중복 대조군은 실제 rule2회/review1회. host/CKS가 두 요청을 수용한 원자료를 보존하고 시험용 adapter의 exit1·중복 선택 거부·산출물 미생성 확인. 이 guard는 제품의 host/native 중복 호출 차단이 아님.
+- 실제7host/8CKS exit0·회수, 총13 CKS요청(역할6/native7), loopback 응답기/worker 정리와 소유 PID22개 부재·감사기 양성 대조 확인, rescue0. 중복 adapter의 예상 오류1건은 host exit0와 별도 보존.
+- 수집기 초기 대조에서 initialized 알림/호출 분모, plugin-root 치환, host _meta를 구분하도록 검사를 보완. 초기 preflight 자료는 소유 임시 폴더에 보존하며 실행 원자료 변경·추가 host 측정 없이 재검증.
+- 전용 보호 검사38개 + 기존 관련477개 = 515개 통과. package notice 별도3개·문서134개·기존 구현 완료 검사·공백 검사 통과. 증거156파일 두 복사본 바이트 일치·검증 통과, 새 측정으로 세지 않음.
+- 커밋 검사에서 원본 Git 서명 객체의 공백 경고를 확인해 새 패킷의 .gitattributes에 commit/tree 바이너리 속성을 적용. 이전 uncommitted 패킷은 임시 폴더에 보존, 동일 host 원자료로 최종 증거만 재수집했으며 추가 host 실행은 없음. 원본 Git 객체 bytes는 변경하지 않음.
+- 이전31동결 패킷·유지 Go/runtime/schema·기존 bound 문서 및 원본/후보4checkout 보존. 변경 없는 stage30 native full test/race 각4063통과/18skip, build/fmt/vet/lint/boundaries 결과 재사용; 새 Go 전체 검사로 세지 않음.
+- 계획18/22 통과, 실패0/미완료4(T09/T10/T16/T22). 독립 의미·품질/온톨로지 효과·모델 자율 준수 미평가. 후보 미채택·실제 모델0·정식 실행0·수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지.
+
+다음 작업(최신): T09 foreign/pin 실제 통합 검증 → T10 partial/unknown → T16 오류 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_opt_in.py
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-opt-in.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1

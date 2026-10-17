@@ -387,6 +387,11 @@
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-render-lifecycle-v1/manifest.json",
           "sha256": "c96b20f550910bd42a785227ebebc3e5edfe7e59031c6b7fefe33a81d36c8452",
           "status": "P07_render_lifecycle_pass_plan17_of22_not_adopted_or_accepted"
+        },
+        "consumer_opt_in": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1/manifest.json",
+          "sha256": "c221e36f9eff1dde30207b53b8188c52d9d386f8c895bfb2ac2a682134c4f3bc",
+          "status": "T04_isolated_workflow_pass_plan18_of22_not_adopted_or_accepted"
         }
       },
       "completed_preparation": [
@@ -434,7 +439,8 @@
         "준비28단계/P05: 소유 Go fixture race/vet·index와 고정 CKS 실제 stdio의 도구5개/schema33개·pin 거부12건·입력 오류8건·상한8종·deadline3회·구형 index/backend 미설정 경로를 검증. 주4세션56요청/진단5세션57요청 모두 보존·9자식 reap. T03 추가 전체7/22, 나머지15건의 actual role/교차 검증 미완료. 후보 미채택·정식 수용 아님.",
         "준비29단계 실제 역할 관측·증거 준비: 소유 host10세션/API35시도/CKS8호출, 실제 Analyzer→Planner 2세대 전달·hash/Write/Edit/shell 거부6건·명시적 deny/backend 미설정 확인. 요구7쌍 중5쌍 성공, host 최상위 oneOf로2도구 제외. P06은 미완료이며 통과12/실패3/미완료7, 스키마 호환 후속 명세 초안 작성. 독립 수용 아님.",
         "준비30단계 격리 CKS/소비자 host 호환 후보·전체 Go/consumer 검증·서명/새 바이너리 pin·실제7/7쌍·94 native 비교·전달/거부6건 재검증. P06 격리 시험 완료, 전체22 중15통과/7미완료. 후보 채택·품질/온톨로지 효과·정식 수용 아님.",
-        "P07_actual_local_rendering_and_signal_safe_owned_lifecycle_with_initial_failures_preserved"
+        "P07_actual_local_rendering_and_signal_safe_owned_lifecycle_with_initial_failures_preserved",
+        "준비32/T04: 명시적 pack/함수·일반모드 opt-in 유지·실제 규칙 응답의 분석 재사용·Analyzer/Planner 검증/전달3회의 추가CKS0 및 동일5산출물 검증. 실제7host/8CKS exit0/reap·13요청·중복 adapter exit1 보존. 격리 workflow 완료이며 모델 자율 준수/서버 캐시·차단·품질/독립 수용 아님."
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -2236,6 +2242,109 @@
           "package_notice_recipe_tests_passed": 3,
           "related_previous_scoped_tests_passed": 433,
           "whitespace_check": "pass"
+        },
+        "consumer_opt_in": {
+          "date": "2026-10-17",
+          "kind": "T04_static_and_actual_owned_fixture_not_model_or_formal_acceptance",
+          "T04_complete": true,
+          "host_sessions": 7,
+          "CKS_processes_exit0_reaped": 8,
+          "native_tool_requests": 7,
+          "native_invalid_refusals": 4,
+          "actual_role_CKS_requests": 6,
+          "all_CKS_requests": 13,
+          "review_build_calls": {
+            "rule_candidates": 1,
+            "review_function": 1,
+            "additional_value_dependencies": 0
+          },
+          "reuse_and_delivery_verifications": 3,
+          "reuse_and_delivery_CKS_calls": 0,
+          "five_artifact_hashes_unchanged": true,
+          "native_shared_parse_value_control_rule_path": "source_verified_not_runtime_profiled",
+          "consumer_computed_view": "lossless_projection_not_new_graph_engine",
+          "duplicate_native_and_host_calls_allowed": true,
+          "duplicate_fixture_adapter_refusals": 1,
+          "expected_adapter_exit": 1,
+          "server_cache_or_duplicate_blocker_verified": false,
+          "autonomous_model_adherence": "not_evaluated",
+          "postrun_owned_PIDs_absent": 22,
+          "audit_live_positive_control": true,
+          "rescues": 0,
+          "candidate_adopted": false,
+          "real_model_calls": 0,
+          "formal_runs": 0,
+          "formal_state_unchanged": true,
+          "ontology_effect_acceptance": "not_evaluated",
+          "prior_frozen_packets_unchanged": 31,
+          "maintained_go_source_unchanged": true,
+          "native_full_checks": "reuse_unchanged_pinned_stage30_checks_not_rerun",
+          "prior_native_test": {
+            "pass": 4063,
+            "skip": 18,
+            "fail": 0
+          },
+          "prior_native_race": {
+            "pass": 4063,
+            "skip": 18,
+            "fail": 0
+          },
+          "planned_full_cases_passed": [
+            "T01",
+            "T02",
+            "T03",
+            "T04",
+            "T05",
+            "T06",
+            "T07",
+            "T08",
+            "T11",
+            "T12",
+            "T13",
+            "T14",
+            "T15",
+            "T17",
+            "T18",
+            "T19",
+            "T20",
+            "T21"
+          ],
+          "planned_full_cases_failed": [],
+          "planned_full_cases_pending": 4,
+          "pending_case_ids": [
+            "T09",
+            "T10",
+            "T16",
+            "T22"
+          ],
+          "dedicated_evidence_guard_tests_passed": 38,
+          "repository_scoped_regression_tests_passed": 515,
+          "regression_tests": {
+            "test_host_schema_compatibility.py": 31,
+            "test_consumer_role_readiness.py": 39,
+            "test_consumer_stdio_readiness.py": 37,
+            "test_consumer_local_readiness.py": 30,
+            "test_consumer_contract_plan.py": 48,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20,
+            "test_review_gap.py": 51,
+            "test_rule_gap.py": 36,
+            "test_expansion_gap.py": 39,
+            "test_policy_security_gap.py": 42,
+            "test_operational_host_probe.py": 8,
+            "test_consumer_render_lifecycle.py": 44,
+            "test_consumer_opt_in.py": 38
+          },
+          "live_document_check_count": 134,
+          "package_notice_recipe_tests_passed": 3,
+          "original_implementation_completion_guard": "pass",
+          "frozen_reconstruction_count": 2,
+          "reconstruction_executes_new_measurements": false,
+          "collector_preflight_corrections": "initialized notification vs call, plugin-root interpolation, host _meta; raw host/native measurements unchanged",
+          "next": "T09 foreign/pins, then T10 partial/unknown, T16 error denominators, P08/T22",
+          "related_previous_scoped_tests_passed": 477,
+          "whitespace_check": "pass"
         }
       },
       "candidate_counts": {
@@ -2507,5 +2616,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-render-lifecycle-v1/manifest.json",
     "sha256": "c96b20f550910bd42a785227ebebc3e5edfe7e59031c6b7fefe33a81d36c8452",
     "status": "P07_render_lifecycle_pass_plan17_of22_not_adopted_or_accepted"
+  },
+  "consumer_opt_in": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1/manifest.json",
+    "sha256": "c221e36f9eff1dde30207b53b8188c52d9d386f8c895bfb2ac2a682134c4f3bc",
+    "status": "T04_isolated_workflow_pass_plan18_of22_not_adopted_or_accepted"
   }
 }

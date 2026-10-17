@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+"""T04: owned actual-host scripted workflow and native opt-in controls."""
+import argparse
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shlex
+import subprocess
+import sys
+import time
+import uuid
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def module(name):
+    spec = importlib.util.spec_from_file_location(name.replace('-', '_'), ROOT / 'scripts' / name)
+    value = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(value)
+    return value
+
+
+base = module('consumer-compatible-host.py')
+life = module('run-consumer-lifecycle.py')
+own = module('consumer-process-ownership.py')
+stdio = module('prepare-consumer-stdio-readiness.py')
+dump, sha, require = base.dump, base.sha, base.require
+PLAN = ROOT / 'scripts/fixtures/consumer-opt-in-plan.json'
+PRIOR = life.PRIOR
+
+
+def proxy(args):
+    require(str(args.log).startswith('/private/tmp/ks-consumer-role-t04-'), 'owned log required')
+    require(sha(args.binary) == json.loads((PRIOR / 'binary-pins.json').read_text())['cks_sha256'], 'CKS pin')
+    with args.log.open('a') as stream:
+        stream.write(json.dumps({'kind': 'owner', 'owner': args.owner, 'wrapper_pid': os.getpid(), 'wrapper_identity': own.snapshot(os.getpid()), 'driver_sha256': sha(Path(__file__)), 'proxy_sha256': sha(ROOT / 'scripts/consumer-lifecycle-proxy.py')}) + '\n')
+    return module('consumer-lifecycle-proxy.py').run(args)
+
+
+def run_case(root, case, role, workspace, actions):
+    out = root / case
+    out.mkdir()
+    profile = out / 'claude-config'
+    profile.mkdir()
+    nonce = uuid.uuid4().hex
+    pins = json.loads((PRIOR / 'binary-pins.json').read_text())
+    require(sha(base.BINARY) == pins['cks_sha256'] and sha(base.HOST) == '475517caa611e3318a2f298fa071287ec98955538df78c58f709ecc01e5ae2d3', 'binary pins')
+    before = base.snapshot(workspace)
+    dump(out / 'workspace-before.json', before)
+    tools = json.loads((ROOT / 'internal/system/mcp/testdata/agent-mcp.schema.json').read_text())['tools']
+    aliases = ['mcp__plugin_coding-agent_cks__' + name.replace('.', '_') for name in tools]
+    observer = shlex.join([sys.executable, str(Path(__file__).resolve()), '--observe', '--log', str(out / 'hook-inputs.jsonl')])
+    settings = {'permissions': {'allow': ['Bash', 'Read', 'Write', 'Edit'] + aliases}, 'disableClaudeAiConnectors': True, 'hooks': {event: [{'hooks': [{'type': 'command', 'command': observer, 'timeout': 5}], **({'matcher': '*'} if event in ['PreToolUse', 'PostToolUse'] else {})}] for event in ['SessionStart', 'Stop', 'PreToolUse', 'PostToolUse']}}
+    mcp = {'mcpServers': {'plugin_coding-agent_cks': {'command': sys.executable, 'args': [str(Path(__file__).resolve()), '--proxy', '--owner', nonce, '--binary', str(base.BINARY), '--config', str(root / 'cks.yaml'), '--log', str(out / 'mcp-frames.jsonl')]}}}
+    dump(out / 'settings.json', settings)
+    dump(out / 'mcp.json', mcp)
+    dump(out / 'scripted-actions.json', actions)
+    env = {'PATH': os.environ.get('PATH', '/usr/bin:/bin:/usr/sbin:/sbin'), 'TMPDIR': str(out), 'CLAUDE_CONFIG_DIR': str(profile), 'ANTHROPIC_API_KEY': 'owned-local-fixture-not-a-real-key', 'CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC': '1', 'DISABLE_TELEMETRY': '1', 'DISABLE_ERROR_REPORTING': '1', 'ENABLE_CLAUDEAI_MCP_SERVERS': 'false', 'API_TIMEOUT_MS': '10000', 'PYTHONDONTWRITEBYTECODE': '1'}
+    if 'HOME' in os.environ:
+        env['HOME'] = os.environ['HOME']
+    argv = [str(base.HOST), '--print', '--agent', 'coding-agent:' + role, '--model', 'claude-sonnet-4-6', '--max-budget-usd', '0.10', '--plugin-dir', str(base.CANDIDATE / 'plugin'), '--strict-mcp-config', '--mcp-config', str(out / 'mcp.json'), '--setting-sources', '', '--settings', str(out / 'settings.json'), '--permission-mode', 'manual', '--permission-prompts', 'none', '--include-hook-events', '--output-format', 'stream-json', '--verbose', '--debug-file', str(out / 'host.debug.txt'), '--no-session-persistence', '--no-chrome', '--tools', 'Bash,Read,Write,Edit', '--', 'KS_HOST_PROBE:T04-' + case + '. Owned T04 local scripted workflow only. Mode: ' + ('feature' if case.startswith('feature-') else 'code_review') + '. No publication or independent acceptance.']
+    gateway = life.Gateway('T04-' + case, base.ActionPlan(actions, out, workspace), out)
+    started = time.monotonic()
+    forced = False
+    with gateway as url:
+        env['ANTHROPIC_BASE_URL'] = url
+        dump(out / 'invocation.json', {'argv': argv, 'cwd': str(root / 'source'), 'workspace': str(workspace), 'env': {k: v for k, v in env.items() if k not in ['HOME', 'PATH', 'ANTHROPIC_API_KEY']}, 'api_credential_kind': 'constant_fake_local_token', 'host_sha256': sha(base.HOST), 'cks_sha256': sha(base.BINARY), 'driver_sha256': sha(Path(__file__)), 'owner': nonce, 'case': case, 'role': role})
+        process = subprocess.Popen(argv, cwd=root / 'source', env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
+        identity = own.snapshot(process.pid)
+        try:
+            stdout, stderr = process.communicate(timeout=90)
+        except subprocess.TimeoutExpired:
+            forced = True
+            process.terminate()
+            try:
+                stdout, stderr = process.communicate(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                stdout, stderr = process.communicate(timeout=5)
+    (out / 'host.stdout.jsonl').write_text(stdout)
+    (out / 'host.stderr.txt').write_text(stderr)
+    frames = out / 'mcp-frames.jsonl'
+    for _ in range(80):
+        if frames.exists() and any(r['kind'] == 'exit' for r in life.rows(frames)):
+            break
+        time.sleep(.1)
+    rows = life.rows(frames)
+    owners = [r for r in rows if r['kind'] == 'owner']
+    identities = [r for r in [identity, owners[0]['wrapper_identity'] if owners else None] if r]
+    cleanup = own.wait_gone(identities)
+    rescue = own.rescue(identities) if not cleanup['all_observed_identities_gone'] else []
+    end = {'case': case, 'host_pid': process.pid, 'host_exit': process.returncode, 'host_reaped': process.poll() is not None, 'forced': forced, 'elapsed_seconds': time.monotonic() - started, 'owned_identities': identities, 'cleanup': cleanup, 'rescue': rescue, 'gateway_cleanup': gateway.close_handlers(), 'real_model_calls': 0, 'formal_runs': 0}
+    dump(out / 'exit.json', end)
+    dump(out / 'workspace-after.json', base.snapshot(workspace))
+    saved = out / 'workspace-after'
+    saved.mkdir()
+    for file in workspace.iterdir():
+        if file.is_file():
+            (saved / file.name).write_bytes(file.read_bytes())
+    exits = [r for r in rows if r['kind'] == 'exit']
+    require(process.returncode == 0 and not forced and end['host_reaped'] and cleanup['all_observed_identities_gone'] and not rescue, 'host cleanup')
+    require(len(exits) == 1 and exits[0]['exit_code'] == 0 and exits[0]['child_reaped'] and exits[0]['signal_worker_joined'] and exits[0]['output_workers_joined'] and not exits[0]['forced_kill'] and not exits[0]['terminate_sent'], 'CKS exit/reap proof')
+    require(end['gateway_cleanup']['all_handler_threads_joined'] and end['gateway_cleanup']['server_socket_closed'] and end['gateway_cleanup']['server_thread_joined'], 'local responder cleanup')
+    print('T04 actual host: ' + case + ' exit0/CKS0/reaped', flush=True)
+
+
+def run(root):
+    base.setup(root)
+    dump(root / 'binary-pins.json', json.loads((PRIOR / 'binary-pins.json').read_text()))
+    record = json.loads((base.P05 / 'execution.json').read_text())
+    query = dict(record['query'])
+    query['expected_snapshot_sha256'] = next(r['response']['result']['structuredContent']['snapshot_sha256'] for r in json.loads((base.P05 / 'sessions/main/messages.json').read_text()) if r['label'] == 'baseline')
+    client = stdio.OwnedClient([str(base.BINARY), 'mcp', '--config', str(root / 'cks.yaml')], root / 'native')
+    try:
+        client.initialize()
+        for label, arguments in [('missing-pack', {'function': query}), ('unversioned-pack', {'rule_pack': 'go-local-review', 'function': query}), ('unknown-pack', {'rule_pack': 'unknown@1.0.0', 'function': query}), ('missing-function', {'rule_pack': 'go-local-review@1.0.0'})]:
+            require(stdio.refused(client.request(label, 'tools/call', {'name': 'cks.context.rule_candidates', 'arguments': arguments})), 'opt-in invalid input accepted')
+        for label, name, arguments in [('baseline', 'value_dependencies', query), ('explicit', 'rule_candidates', {'rule_pack': 'go-local-review@1.0.0', 'function': query}), ('explicit-repeat', 'rule_candidates', {'rule_pack': 'go-local-review@1.0.0', 'function': query})]:
+            require(not stdio.refused(client.request(label, 'tools/call', {'name': 'cks.context.' + name, 'arguments': arguments})), 'positive refused')
+    finally:
+        client.close()
+    workspace = root / 'source/.coding-agent/tickets/KS-P06-REVIEW'
+    workspace.mkdir(parents=True)
+    dump(workspace / 'state.json', {'ticket_id': 'KS-P06-REVIEW', 'ticket_type': 'feature', 'current_state': 'ANALYSIS', 'states': {'ANALYSIS': {'status': 'in_progress'}}})
+    plugin = base.CANDIDATE / 'plugin'
+    def read(w=workspace):
+        return {'name': 'Read', 'input': {'file_path': str(w / 'state.json')}}
+    def bash(parts):
+        return {'name': 'Bash', 'input': {'command': shlex.join([str(x) for x in parts]), 'description': 'Owned T04 workflow verification'}}
+    def tool(name, arguments):
+        return {'name': 'mcp__plugin_coding-agent_cks__cks_context_' + name, 'input': arguments}
+    rules = tool('rule_candidates', {'rule_pack': 'go-local-review@1.0.0', 'function': query})
+    review = tool('review_function', {'symbol': record['selected']['canonical_id']})
+    verify = bash([sys.executable, plugin / 'scripts/deep_review.py', 'verify', '--workspace', workspace])
+    run_case(root, 'feature-default', 'analyzer', workspace, [read()])
+    run_case(root, 'feature-value', 'analyzer', workspace, [tool('value_dependencies', query), read()])
+    dump(workspace / 'state.json', {'ticket_id': 'KS-P06-REVIEW', 'ticket_type': 'code_review', 'current_state': 'ANALYSIS', 'states': {'ANALYSIS': {'status': 'in_progress'}, 'PLANNING': {'status': 'pending'}}})
+    build = bash([sys.executable, ROOT / 'scripts/consumer-role-adapter.py', 'build', '--plugin', plugin, '--frames', root / 'review-build/mcp-frames.jsonl', '--workspace', workspace])
+    run_case(root, 'review-build', 'analyzer', workspace, [rules, review, build, read(), {'state_operation': 'handoff'}])
+    run_case(root, 'analyzer-reuse', 'analyzer', workspace, [read(), verify])
+    run_case(root, 'planner-delivery', 'planner', workspace, [read(), verify, {'state_operation': 'complete'}])
+    run_case(root, 'planner-reuse', 'planner', workspace, [read(), verify])
+    duplicate = root / 'source/.coding-agent/tickets/KS-T04-DUPLICATE'
+    duplicate.mkdir(parents=True)
+    dump(duplicate / 'state.json', {'ticket_id': 'KS-P06-REVIEW', 'ticket_type': 'code_review', 'current_state': 'ANALYSIS', 'states': {'ANALYSIS': {'status': 'in_progress'}}})
+    duplicate_build = bash([sys.executable, ROOT / 'scripts/consumer-role-adapter.py', 'build', '--plugin', plugin, '--frames', root / 'duplicate-control/mcp-frames.jsonl', '--workspace', duplicate])
+    run_case(root, 'duplicate-control', 'analyzer', duplicate, [rules, rules, review, duplicate_build])
+    dump(root / 'execution.json', {'driver_sha256': sha(Path(__file__)), 'plan_sha256': sha(PLAN), 'candidate_adopted': False, 'real_model_calls': 0, 'formal_runs': 0, 'root': str(root), 'host_cases': json.loads(PLAN.read_text())['host_cases'], 'query': query, 'scripted_selection_not_model_adherence': True})
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path)
+    parser.add_argument('--proxy', action='store_true')
+    parser.add_argument('--observe', action='store_true')
+    parser.add_argument('--owner')
+    parser.add_argument('--binary', type=Path)
+    parser.add_argument('--config', type=Path)
+    parser.add_argument('--log', type=Path)
+    args = parser.parse_args()
+    if args.proxy:
+        raise SystemExit(proxy(args))
+    if args.observe:
+        raise SystemExit(base.observe(args))
+    require(args.root is not None and str(args.root.resolve()).startswith('/private/tmp/ks-consumer-role-t04-'), 'fresh owned T04 root required')
+    run(args.root.resolve())
