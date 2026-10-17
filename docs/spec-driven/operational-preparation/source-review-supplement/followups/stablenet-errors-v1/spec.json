@@ -10,7 +10,8 @@
     "other_errors": "source/integrity/store/budget/unknown errors neither set nor clear cached model evidence",
     "health": "positive and negative observations expire after 5s; successful raw search clears a cached outage immediately; canceled probes do not mutate cache; empty probes are failures",
     "public_errors": "semantic_search and v2 composition preserve bounded source_missing/snapshot_mismatch/embedding_failed/request_canceled/request_timeout codes; unknown semantic error retrieval_failed; gated v2 outage service_unavailable",
-    "health_limit": "model_reachable is cached liveness/usability, not proof all corpus sources are complete or every query succeeds"
+    "health_limit": "model_reachable is cached liveness/usability, not proof all corpus sources are complete or every query succeeds",
+    "preflight": "legacy context source guard uses the same bounded specific error; archive verification can refuse before a query reaches the model"
   },
   "native_sources": {
     "added": [
@@ -25,7 +26,8 @@
       "internal/system/mcp/search.go",
       "internal/vector/query/errors.go",
       "internal/vector/query/service_embed.go",
-      "pkg/vector/ckv/ckv.go"
+      "pkg/vector/ckv/ckv.go",
+      "internal/system/mcp/source_guard.go"
     ]
   },
   "acceptance": [

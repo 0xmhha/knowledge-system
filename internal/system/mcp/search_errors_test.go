@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -35,6 +37,43 @@ func TestSemanticSearchErrorClassesAndBoundedPublicMessage(t *testing.T) {
 			}
 			if got := v2ToolErrorFor(tc.err, "compose_failed").StructuredContent.(map[string]string)["code"]; tc.name != "unknown" && got != tc.code {
 				t.Fatalf("v2 class=%s want=%s", got, tc.code)
+			}
+		})
+	}
+}
+
+func TestSemanticSearchPreflightPreservesSourceCodeBeforeBackend(t *testing.T) {
+	for _, code := range []string{"source_missing", "snapshot_mismatch"} {
+		t.Run(code, func(t *testing.T) {
+			version := newPinnedV2ErrorFixture(t)
+			dir := filepath.Join(version, "sources", "blobs")
+			entries, err := os.ReadDir(dir)
+			if err != nil || len(entries) != 1 {
+				t.Fatalf("blobs: %v %v", entries, err)
+			}
+			path := filepath.Join(dir, entries[0].Name())
+			if code == "source_missing" {
+				err = os.Remove(path)
+			} else {
+				err = os.Chmod(path, 0600)
+				if err == nil {
+					err = os.WriteFile(path, []byte("PRIVATE never return\n"), 0600)
+				}
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			f := newFixture(t, nil)
+			f.deps.EvidenceVersionDir = version
+			r, err := handleSemanticSearch(context.Background(), f.deps, callToolReq(map[string]any{"query": "query"}))
+			if err != nil || r == nil || !r.IsError || r.StructuredContent.(map[string]string)["code"] != code {
+				t.Fatalf("preflight code: %+v %v", r, err)
+			}
+			if strings.Contains(resultText(r), version) || strings.Contains(resultText(r), "PRIVATE") {
+				t.Fatal("preflight leaked private data")
+			}
+			if len(f.ckv.Calls.SemanticSearch) != 0 {
+				t.Fatal("invalid archive reached embedding backend")
 			}
 		})
 	}

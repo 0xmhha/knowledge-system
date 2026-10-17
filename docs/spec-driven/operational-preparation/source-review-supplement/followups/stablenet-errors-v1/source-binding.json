@@ -1145,7 +1145,7 @@
     "internal/system/mcp/server.go": "57575d8e4936e859668c0bdac8a763da3f0ed8389d7d40dd4c007f15e4c365ea",
     "internal/system/mcp/server_test.go": "010641d1e4bd006f82787aaa197b0236932d08d057df9948f400d329f5ec62b1",
     "internal/system/mcp/setup_tool.go": "17fbca8f54b44f6c6bc5748a314d2814f0f8087d5d3cdd65203ddfcd300be185",
-    "internal/system/mcp/source_guard.go": "4e8d4dda10d1fdd79199e3dd8085c7c10cb9fca270e26a652427e6d349685d2a",
+    "internal/system/mcp/source_guard.go": "2cde9c2ee4be26b70d7fde453cbb140faccd9af59fbaccdbf06472b7966aaef1",
     "internal/system/mcp/stdio_lifecycle_test.go": "0b6c40a6622352bea2567d730b251e8ed5c052d4023beee23e8e6385072e3f93",
     "internal/system/mcp/suspects.go": "03056bfe0cb28d396aa0d5a99bd9417599fb6e4661eee0270025f6a60bd08b07",
     "internal/system/mcp/suspects_fixture_test.go": "31749105c8d7867c79cbee746740c03abac29f29c4a98c780e6183ea4a7e6f2f",
@@ -1740,7 +1740,7 @@
     "tools/setup/tests/test_ks_setup.py": "b43a76ad804000d23bd5b28eb1afbfc7e1f64ba8e097095c8021ac417758a5a1",
     "internal/system/mcp/host_selector_contract_test.go": "a54fed8076331629b97eecc4fbaa2bb54263f410719bc8d40ab3b457ba44b703",
     "internal/system/ckvclient/real_health_test.go": "7b47ab0c31eb754ad032c0141a8a5a2b4ae99c3c546806de9e071184b96f98d9",
-    "internal/system/mcp/search_errors_test.go": "c52c4b99ec04d2cfd2ba16d5988e2b360baaeee93430fb4a7f14ecc59d76971e",
+    "internal/system/mcp/search_errors_test.go": "252d531e98ce2971a5577b256bfe49cbabf6c126ed1fccacbc5ff0e7e317479e",
     "internal/vector/query/service_embed_test.go": "d4b17cae7dfd0a6101c5f62054611c32c2f5826a94ae906c9ae5af558664e6e2",
     "pkg/vector/ckv/embedding_failure_test.go": "895535f94a4e79a791c01a9969c1e4b49781af28ae0c4065d5a49fe6223a0b71"
   },
@@ -1763,7 +1763,8 @@
     "internal/system/mcp/search.go",
     "internal/vector/query/errors.go",
     "internal/vector/query/service_embed.go",
-    "pkg/vector/ckv/ckv.go"
+    "pkg/vector/ckv/ckv.go",
+    "internal/system/mcp/source_guard.go"
   ],
   "implementation_completion_states_changed": false,
   "authorization": {
@@ -1775,5 +1776,7 @@
     "formal_acceptance": false,
     "production_activation": false,
     "paid_LLM_calls": 0
-  }
+  },
+  "initial_attempt_source_revision": "2fd6720504464b6623117e517e89b1ec33b553c4",
+  "initial_attempt_finding": "Real missing blob is refused in legacy preflight before CKV adapter; preserve bounded source error in that guard too. Initial attempt/raw diagnostics and owned interrupted validation are retained."
 }

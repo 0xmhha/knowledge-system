@@ -14,10 +14,10 @@ func legacyContextGuard(d Deps) *mcpgo.CallToolResult {
 	}
 	identity, err := setup.InspectVersionIdentity(d.EvidenceVersionDir)
 	if err != nil {
-		return mcpgo.NewToolResultErrorf("snapshot_mismatch: %v", err)
+		return v2ToolErrorFor(err, "snapshot_mismatch")
 	}
 	if identity != nil && identity.Source.SourceMode != "committed" {
-		return mcpgo.NewToolResultError("requires_v2: this source snapshot requires cks.context.get_for_task_v2")
+		return v2ToolError("requires_v2")
 	}
 	return nil
 }
