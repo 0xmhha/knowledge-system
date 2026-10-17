@@ -1,0 +1,61 @@
+import pathlib,json,hashlib,subprocess,datetime,copy
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');D=R/'docs/spec-driven';P=D/'operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1';rel=str(P.relative_to(R));binding=__import__('sys').argv[1]
+def load(p):return json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+date=datetime.date.today().isoformat();r=load(P/'result.json');assert r['status']=='SN-P01_SN-P02_scoped_technical_pass'
+remaining=[{'id':'SN-P03','status':'pending','task':'실제 검색 출처/무결성 오류와 임베딩 모델 장애의 분류·health/복구 계약 보완'},{'id':'SN-P04','status':'pending','task':'go-wemix 실제 소스/데이터 식별 후 프로젝트 간 개념·검색·출처/혼입 비교'},{'id':'FORMAL-PREP','status':'pending','task':'D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결'},{'id':'FORMAL-9','status':'pending','task':'WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 정식 실행·수용 (0/9)'},{'id':'ONTOLOGY','status':'pending','task':'독립 의미/검색 gold, 검토된 구현-개념 연결/가족 coverage, 승인 DEV/FINAL 효과 gate; 실제 LLM 답변 효과는 모델/인증/상한 지정 후'},{'id':'OPTIONAL-12','status':'separate_backlog','task':'조직 인증/권한; 공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사; viewer; 배포/downstream'}]
+state={'current_stage':'40_SN-P01_SN-P02_scoped_technical_pass','completed_in_this_scope':['SN-P01','SN-P02'],'next_task':'SN-P03','remaining_all':remaining,'formal_completed':0,'formal_total':9,'reviewer_assignment':'미정','local_roadmap_completed':'7/7;28/28','isolated_preparation_completed':'22/22','independent_quality_or_ontology_acceptance':False,'production_activation':False,'publication':False}
+spec=load(P/'spec.json');spec.update(status='scoped_technical_validation_complete',completion=r['status']);save(P/'spec.json',spec);save(P/'WORKLIST.json',state)
+report=f'''40단계 — 새 비운영 원문 보존 버전과 convention 계약 / SN-P01·SN-P02 완료
+
+요청: 외부 원문·출처 경로와 convention 처리 계약 보완, 기존/새 데이터 검색 재검증, 문서·로컬 서명 커밋. 정식 gold/온톨로지 품질 수용과 운영 전환은 포함하지 않는다.
+
+결과
+- 기존 source commit0bf2f4d1의 repo2224파일 바이트는 동일하다. 기존 domain44·flow27파일을 변경 없이 복사하고 지원 setup --hold-for-review로 새 소유 버전을 구축했다. 원본 문서 생성 의미/정책을 재작성하거나 DB를 수동 수정하지 않았다.
+- 새 retained origin: {json.dumps(r['retained_origin_files'],ensure_ascii=False)}. 전체 chunk {r['indexed_chunks']}개를 원문 좌표 또는 비인용 metadata로 분리했다: {json.dumps(r['chunk_citation_states'],ensure_ascii=False)}. metadata 전체를 source-backed로 합격 처리하지 않는다.
+- 외부 문서는 @cks/docs/<index>/<path> 이름공간과 docs:corpus.<index> origin으로 충돌 없이 보존된다. retained blob SHA·전체 인용 가능 chunk 경로/줄 범위를 점검했고 실제 검색의 외부 원문 witness {r['external_raw_hits_with_retained_source_verified']}hit를 확인했다.
+- convention 및 양수/정합 범위가 없는 검색 metadata는 optional non_citable_metadata=true를 반환한다. legacy file/text를 유지하되 Hit.IsValid는 이를 인용 가능하다고 인정하지 않고 v2 원문 인용으로 승격하지 않는다. false/필드 부재 자체가 원문 무결성 증명은 아니다.
+
+동일 노출 입력6개 비교 (성공/6; 독립 품질·recall 수용이 아닌 실행/출처 회귀)
+- 기존: {json.dumps(r['old'],ensure_ascii=False)}
+- 신규: {json.dumps(r['new'],ensure_ascii=False)}
+- 이전 실패·재시도·실제 요청 분모를 모두 보존했다. 기존 데이터의 누락을 새 reader가 마치 고친 것처럼 표시하지 않는다. 새 dataset/snapshot은 달라지며 source/project/BGE-M3 digest1024는 동일하다.
+- v2 성공 pack {r['successful_v2_packs_including_restore']}개 / 인용{r['v2_citations_verified']}건의 좌표·순서·본문·SHA·integrity를 재계산했다. 그 중 외부문서 v2 인용은 {r['external_v2_citations_verified']}건이다. raw 외부 원문 검증과 v2 실제 인용 건수를 혼동하지 않는다.
+- 잘못된 commit/source/snapshot pin은 source_mismatch·analysis=null, 타 프로젝트 fixture node는 not_found, retained 외부 blob변조는 snapshot_mismatch를 반환했다. live corpus만 바꾼 경우 retained 응답은 동일하고 bytes/mode 복구 후 정상 동작했다.
+- controlled project/snapshot manifest변조는 각각 startup exit1·회수, 정상4세션은 EOF exit0·회수. 총 도구 요청{r['all_actual_tool_attempts']}회 / 소유 process identity{r['owned_process_identities_audited']}개 종료 확인. startup 공개 진단 operation_failed만으로 세부 원인 code를 증명했다고 주장하지 않는다.
+
+검증/식별
+- native source a3307ccbf0373b16caa86292c79f3ae5eeefe254: fresh build ./..., 일반{r['native_test']['pass']}pass/{r['native_test']['skip']}skip, race{r['native_race']['pass']}pass/{r['native_race']['skip']}skip, fail0, fmt/vet/golangci/boundaries/docs와 build-bins 통과. 추가 metadata 계약2검사 포함. 18skip은 실행 성공 검사에 합산하지 않는다.
+- builder는 복사해 둔 clean fdb43ae2412d071f02b6b0dc5df0e50d3966b59e 바이너리이며 reader는 clean a330이다. 기존 builder가 제공하는 원문 보존 경로를 사용했으며 새 reader source와 동일한 빌더라고 표시하지 않는다.
+- active binding commit {binding}: 초기 binding 복사 시 남아있던 이전 단계의 delta 설명만 바로잡았다. 실제1732 source SHA는 검증한 a330과 동일하고 source 검증 후 Go 변경0이다.
+- 원본selected2175파일/current, 외부 원문·복사본, 전역32·운영metadata42·기존checkout5·비소유엔진11 보존. 소유 dataset/current 생성0, 원본/소유source clean. 유료 LLM0·외부게시0·운영변경0. 기존 BGE 로컬 임베딩 추론은 실제 실행했다.
+- 과거 frozen packet과 실패 기록은 그대로 보존했다. 이전 adoption guard는 해당 source의 역사 검증으로만 사용하며 현재 Go 전체 회귀는 위 새 실행 결과다.
+- 증거 재검산: scripts/check-stablenet-rebuild.py / 변조보호 scripts/test_stablenet_rebuild.py. 각 검증의 최종 실행 결과는 validation-summary.json에 별도 기록한다.
+
+현재 단계
+- SN-P01 새 비운영 데이터 원문/경로·비인용 convention 계약: 완료.
+- SN-P02 기존/새 버전 검색·출처/혼입·복구 검증: 완료 (이 노출6개·정의한 경계 범위).
+- 로드맵 구현7/7·28/28 및 격리 준비22/22는 완료 유지. D04미정·정식0/9·freeze null/execution_allowed false 유지. 온톨로지 제한 연구는 완료/quality=inconclusive이며 이번 검색 수정은 독립 효과 증명이 아니다.
+
+다음 작업: SN-P03 — 출처/무결성 오류를 모델 장애로 오분류하지 않도록 실제 오류·health·복구 계약 검증.
+
+남은 전체 작업
+'''+''.join(f"{i}. {x['id']}: {x['task']}\n"for i,x in enumerate(remaining,1))+'''\n게시/운영 적용은 별도 범위가 지정될 때 수행한다. 위 로컬 개발/검증의 공통 선행조건으로 유료 모델이나 담당자 지정을 요구하지 않는다.
+'''
+(P/'REPORT.txt').write_text(report)
+# Packet seal precedes non-packet indices: avoids cyclic hashes.
+manifest=load(P/'manifest.json');manifest['artifacts']={str(p.relative_to(P)):sha(p)for p in sorted(P.rglob('*'))if p.is_file()and p.name!='manifest.json'};save(P/'manifest.json',manifest)
+ref={'manifest':rel+'/manifest.json','sha256':sha(P/'manifest.json'),'status':r['status'],'report':rel+'/REPORT.txt','worklist':rel+'/WORKLIST.json'}
+proposal=D/'OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json';d=load(proposal);d['document_date']=date;d['current_state']['nonproduction_pilot']='retained_source_rebuild_and_paired_regression_scoped_pass_SN-P03_SN-P04_pending';d['execution_status']='local_rebuild_and_paired_provenance_complete_not_formal_acceptance';d['stablenet_rebuild']=ref;d['current_execution_state']=state;d['stablenet_pilot'].update(historical=True,superseded_for_current_readiness_by=ref['manifest']);d['stablenet_rebuild_authorization']=load(P/'source-binding.json')['authorization'];save(proposal,d)
+proposalref={'path':str(proposal.relative_to(R)),'sha256':sha(proposal),'status':'D01_D08_scope_approved_D04_unassigned_rebuild_scoped_pass_no_formal_freeze'}
+for name in ['OPERATIONAL-ACCEPTANCE-PROGRESS.json','OPERATIONAL-ACCEPTANCE-PROTOCOL.json','operational-preparation/source-review-supplement/GAPS.json']:
+ path=D/name;d=load(path);d['document_date']=date;d['stablenet_rebuild']=ref;d['current_execution_state']=state;d['adoption_acceptance_decision_proposal']=proposalref;d['stablenet_pilot'].update(historical=True,superseded_for_current_readiness_by=ref['manifest'])
+ if name.endswith('GAPS.json'):d['next_priority'][0]='SN-P01/SN-P02 새 비운영 원문/namespace·convention 비인용 및 기존/새6질의 회귀 완료. 다음 SN-P03 원문오류/모델오류 분류 → SN-P04 go-wemix 비교. 독립품질·온톨로지효과 미수용, 정식0/9·D04미정 유지.'
+ if name=='OPERATIONAL-ACCEPTANCE-PROGRESS.json':
+  phase=next(x for x in d['phases']if x['id']=='0');phase['evidence']['stablenet_pilot'].update(historical=True,superseded_for_current_readiness_by=ref['manifest']);phase['evidence']['stablenet_rebuild']=ref;phase['evidence']['adoption_acceptance_decision_proposal']=proposalref;phase['preparation_validation']['stablenet_rebuild']=r;phase['preparation_validation']['stablenet_rebuild']['formal_state_unchanged']=True
+ save(path,d)
+path=D/'REFACTORING-PROGRESS.json';d=load(path);d['active_source_binding']={'revision':binding,'manifest':rel+'/source-binding.json','manifest_sha256':sha(P/'source-binding.json')};save(path,d)
+log=D/'operational-preparation/source-review-supplement/PROGRESS.txt'
+with log.open('a')as f:f.write(f'''\n\n[검증 완료 — 노출6질의·출처 경계 범위] 40. SN-P01·SN-P02 새 비운영 원문 버전과 convention 계약\n- repo2224동일·domain44/flow27 원문 보존, 전체{r['indexed_chunks']}chunk 경로/범위·비인용metadata 구분. @cks/docs/<index>/<path> namespace·origin·blob SHA 검증.\n- optional non_citable_metadata로 convention/잘못된range 비인용 명시. false 자체는 무결성 보증이 아님. v2 원문인용 승격 금지.\n- 기존6질의 {json.dumps(r['old'],ensure_ascii=False)} → 신규 {json.dumps(r['new'],ensure_ascii=False)}. 실패/재시도 보존, 실제 외부 raw원문{r['external_raw_hits_with_retained_source_verified']}·v2인용{r['v2_citations_verified']}검증(외부v2 {r['external_v2_citations_verified']}).\n- 새a330source fresh일반/race각4065·18skip·0fail, build/fmt/vet/lint/boundaries/docs/build-bins 통과. builder fdb와reader a330식별분리.\n- 정상EOF0/reap4·controlledstartup1/reap2, 소유identity{r['owned_process_identities_audited']}종료확인·강제종료0. 원본2175/current·외부원문·전역32·운영metadata42·checkout5·비소유엔진11 보존.\n- SN-P01/SN-P02완료는 기술회귀 범위이며 독립품질/온톨로지효과/정식수용 아님. 로드맵7/7·28/28·준비22/22 유지; D04미정·정식0/9·freeze null/executionfalse·운영/게시0.\n다음 작업(최신): SN-P03 출처/무결성 오류와 모델장애 분류 → SN-P04 실제go-wemix 비교.\n남은 전체: SN-P03/SN-P04; 독립담당자·새DEV/FINAL/완전gold/매칭/충분성·F01~08동결; 정식WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 9건; 필수온톨로지독립효과/검토구현연결/모델지정후답변효과; 별도후속12건. 상세는 stablenet-rebuild-v1/WORKLIST.json 및 REPORT.txt.\n검증40: scripts/check-stablenet-rebuild.py·scripts/test_stablenet_rebuild.py 및 validation-summary.json.\n''')
+print('stage40 packet report/worklist and current indices updated; formal freeze unchanged')

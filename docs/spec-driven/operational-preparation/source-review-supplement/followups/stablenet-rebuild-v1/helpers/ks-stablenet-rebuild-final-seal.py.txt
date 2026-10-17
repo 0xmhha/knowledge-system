@@ -1,0 +1,42 @@
+import json,pathlib,hashlib,datetime,shutil,re
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');D=R/'docs/spec-driven';P=D/'operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1';O=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');date=datetime.date.today().isoformat();refpath=str(P.relative_to(R)/'manifest.json')
+def load(p):return json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+rows=load(O/'validation/final/receipts.json');assert len(rows)==9 and all(x['exit_code']==0 for x in rows)
+tests={}
+for key in ['rebuild-guards','pilot-historical-guards','documentation-contract','package-notice']:
+ tests[key]=int(re.search(r'Ran (\d+) tests?',(O/'validation/final'/(key+'.log')).read_text()).group(1))
+assert tests=={'rebuild-guards':12,'pilot-historical-guards':10,'documentation-contract':20,'package-notice':3}
+assert '134 live documents'in(O/'validation/final/live-documentation.log').read_text()
+folder=P/'validation/final';folder.mkdir(exist_ok=True)
+shutil.copyfile(O/'validation/final/receipts.json',folder/'receipts.json')
+for row in rows:
+ if row['label']!='original-completion-guard':shutil.copyfile(O/'validation/final'/row['raw_file'],folder/row['raw_file'])
+for name in ['ks-stablenet-rebuild-old-adoption-check.log','ks-stablenet-rebuild-old-adoption-check-retry.log']:shutil.copyfile(pathlib.Path('/private/tmp')/name,folder/name)
+summary={'final_observation_date':date,'scope':'SN-P01_SN-P02_scoped_technical_pass_not_independent_acceptance','checks':rows,'guard_tests':tests,'total_scoped_Python_tests':sum(tests.values()),'live_documents':134,'original_completion_guard_exit_code':0,'original_completion_guard_raw_log':'private_only_not_published','formal_and_implementation_state_preserved':True,'historical_packets_unchanged':True,'Go_source_unchanged_after_a330':True,'consumer_checkout_unchanged':True,'historical_adoption_check':'explicit --no-live-source; original missing required --packet invocation exit2 retained, corrected invocation exit0','formal_completed':0,'formal_total':9,'reviewer_assignment':'미정','self_containing_final_commit':'signature and clean status must be verified after creation; not embedded in its own packet'};save(P/'validation-summary.json',summary)
+e=load(P/'execution.json');e['final_validation_date']=date;save(P/'execution.json',e)
+w=load(P/'WORKLIST.json');w['last_verified_date']=date;save(P/'WORKLIST.json',w)
+p=P/'REPORT.txt';text=p.read_text();text=text.replace('40단계 — 새 비운영 원문 보존 버전과 convention 계약 / SN-P01·SN-P02 완료\n','40단계 — 새 비운영 원문 보존 버전과 convention 계약 / SN-P01·SN-P02 완료\n검증기간: 2026-10-17~2026-10-18 (KST).\n')
+text=text.replace('결과\n','결과\n- 새 데이터 보관 위치: /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2 (hold-for-review; 소유 current 없음). 임시 시험 자료이므로 이후 재사용/운영 전환 시 보관 위치·재검증·활성화 범위를 따로 정한다. 원본 current는 그대로다.\n',1)
+text=text.replace('각 검증의 최종 실행 결과는 validation-summary.json에 별도 기록한다.','최종 증거보호12·이전pilot보호10·문서계약20·패키지고지3(총45), live문서134, 기존완료guard·새재검산·역사adoption guard·공백 검사 통과. validation-summary.json에 실행별 기록을 남겼다. 역사adoption guard 최초 필수인자누락 CLI exit2도 보존하고 경로를 명시해 재실행0을 확인했다. 원본완료guard 원문 로그는 private 보존한다.')
+p.write_text(text)
+# Include exact final collection helpers as text, without adding executable corpus sources.
+for name in ['ks-stablenet-rebuild-final-seal.py','ks-stablenet-rebuild-docs.py','ks-stablenet-rebuild-packet.py']:shutil.copyfile(pathlib.Path('/private/tmp')/name,P/'helpers'/(name+'.txt'))
+m=load(P/'manifest.json');m['artifacts']={str(p.relative_to(P)):sha(p)for p in sorted(P.rglob('*'))if p.is_file()and p.name!='manifest.json'};save(P/'manifest.json',m);digest=sha(P/'manifest.json')
+proposal=D/'OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json'
+def refresh(x):
+ if isinstance(x,dict):
+  if x.get('manifest')==refpath:x['sha256']=digest
+  if x.get('path')==str(proposal.relative_to(R)):x['sha256']=sha(proposal)
+  for v in x.values():refresh(v)
+ elif isinstance(x,list):
+  for v in x:refresh(v)
+d=load(proposal);d['document_date']=date;refresh(d);save(proposal,d)
+for name in ['OPERATIONAL-ACCEPTANCE-PROGRESS.json','OPERATIONAL-ACCEPTANCE-PROTOCOL.json','operational-preparation/source-review-supplement/GAPS.json']:
+ p=D/name;d=load(p);d['document_date']=date;refresh(d)
+ if name=='OPERATIONAL-ACCEPTANCE-PROGRESS.json':d['phases'][0]['preparation_validation']['stablenet_rebuild']['evidence_protection_tests_passed']=12;d['phases'][0]['preparation_validation']['stablenet_rebuild']['final_validation_date']=date
+ save(p,d)
+log=D/'operational-preparation/source-review-supplement/PROGRESS.txt'
+with log.open('a')as f:f.write('\n검증40 최종(2026-10-18 KST): 증거보호12·이전pilot10·문서계약20·고지3(총45) 및 live문서134·기존완료guard·재검산·역사adoption guard·공백 검사 통과. 정식/구현상태·기존동결패킷·consumer 보존 재확인. 전체일반/race각4065pass·18skip·0fail. 서명 최종커밋은 생성 직후 검증하며 자기해시를 패킷에 삽입하지 않는다.\n')
+print('final validation receipts/report/worklist sealed; references refreshed; private guard log retained privately')

@@ -1,0 +1,47 @@
+import pathlib,json,hashlib,shutil,gzip,importlib.util,subprocess
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');P=R/'docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1';old=O/'old-dataset/old-v1';new=O/'dataset/retained-origins-v2';binding_commit=__import__('sys').argv[1]
+def copy(a,b):b.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(a,b)
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+for p in O.glob('*.json'):copy(p,P/p.name)
+for name in ['cks','ckg','ckv']:copy(O/(name+'-build-info.txt'),P/(name+'-build-info.txt'))
+copy(O/'read-bin/cks-build-info.txt',P/'read-bin-build-info.txt');copy(O/'chunk-source-ledger.json.gz',P/'chunk-source-ledger.json.gz');copy(O/'build.stdout.jsonl',P/'build.stdout.jsonl');copy(O/'build.stderr.txt',P/'build.stderr.txt')
+for p in O.glob('*.yaml'):copy(p,P/p.name)
+for p in(O/'fault-inputs').glob('*'):copy(p,P/'fault-inputs'/p.name)
+for arm,v in [('old',old),('new',new)]:
+ copy(v/'dataset-identity.json',P/(arm+'-identity.json'))
+ (P/(arm+'-source-manifest.json.gz')).write_bytes(gzip.compress((v/'sources/manifest.json').read_bytes(),mtime=0))
+ for folder in ['graph','vector']:(P/(arm+'-'+folder+'-manifest.json.gz')).write_bytes(gzip.compress((v/folder/'manifest.json').read_bytes(),mtime=0))
+source=json.load(open(new/'sources/manifest.json'));inventory={(r['origin_id'],r['path']):r for r in source['files']};witness={k:v for k,v in inventory.items()if k[0]!='repo'}
+for case in ['paired-old','paired-new','boundaries-new','foreign-project-new','foreign-snapshot-new','boundary-restored-new']:
+ for p in(O/case).iterdir():
+  if p.is_file():copy(p,P/'sessions'/case/p.name)
+ def walk(x):
+  if isinstance(x,dict):
+   if 'file'in x and 'start_line'in x:
+    origin=x.get('origin_id','repo');file=x['file']
+    if file.startswith('@cks/docs/'):
+     index,file=file[len('@cks/docs/'):].split('/',1);origin='docs:corpus.'+index
+    if(origin,file)in inventory:witness[(origin,file)]=inventory[(origin,file)]
+   for v in x.values():walk(v)
+  elif isinstance(x,list):
+   for v in x:walk(v)
+ for row in json.load(open(O/case/'messages.json')):
+  result=row['response'].get('result',{});value=result.get('structuredContent')
+  if value is None:
+   try:value=json.loads(result['content'][0]['text'])
+   except (ValueError,KeyError):value={}
+  walk(value)
+for r in witness.values():copy(new/'sources/blobs'/r['sha256'],P/'source-witness'/(r['sha256']+'.txt'))
+dump(P/'witness-index.json',[{'origin_id':origin,'path':path,'sha256':r['sha256']}for(origin,path),r in sorted(witness.items())])
+folder=O/'validation/native-isolated';out=P/'validation/native';out.mkdir(parents=True,exist_ok=True);copy(folder/'receipts.json',out/'receipts.json')
+for r in json.load(open(folder/'receipts.json')):
+ for stream in ['stdout','stderr']:(out/(r['label']+'.'+stream+'.gz')).write_bytes(gzip.compress((folder/(r['label']+'.'+stream)).read_bytes(),mtime=0))
+for p in pathlib.Path('/private/tmp').glob('ks-stablenet-rebuild-*.py'):copy(p,P/'helpers'/(p.name+'.txt'))
+for p in O.glob('*.collector.log'):copy(p,P/'collector-logs'/p.name)
+(P/'.gitattributes').write_text('**/*.gz binary\nsource-witness/*.txt -whitespace\n*-build-info.txt whitespace=-blank-at-eol\n')
+protocol=json.load(open(P/'protocol.json'));protocol.update(status='build_complete_with_followup_receipts',final_read_binary_source='a3307ccbf0373b16caa86292c79f3ae5eeefe254',original_plan_preserved=True);dump(P/'protocol.json',protocol)
+execution={'document_date':__import__('datetime').date.today().isoformat(),'native_source_commit':'a3307ccbf0373b16caa86292c79f3ae5eeefe254','build_source_commit':'fdb43ae2412d071f02b6b0dc5df0e50d3966b59e','binding_commit':binding_commit,'formal_completed':0,'formal_total':9,'reviewer_assignment':'미정','paid_LLM_calls':0,'production_writes':0,'external_publication':0,'source_binding_metadata_note':'Descriptive delta lists corrected after initial binding copy; Go hashes are identical to the validated a330 source. Builder uses copied fdb binaries; reader uses clean a330 binary.','preserved_historical_t22_unconfirmed_exit_receipts':1};dump(P/'execution.json',execution)
+copy(pathlib.Path('/private/tmp/check-stablenet-rebuild.py'),R/'scripts/check-stablenet-rebuild.py');spec=importlib.util.spec_from_file_location('rebuildcheck',R/'scripts/check-stablenet-rebuild.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+dump(P/'result.json',m.derive(P));dump(P/'manifest.json',{'schema_version':1,'checker':'scripts/check-stablenet-rebuild.py','checker_sha256':sha(R/'scripts/check-stablenet-rebuild.py'),'artifacts':{str(p.relative_to(P)):sha(p)for p in sorted(P.rglob('*'))if p.is_file()and p.name!='manifest.json'}})
+print(json.dumps(json.load(open(P/'result.json')),ensure_ascii=False));print('packet files',sum(p.is_file()for p in P.rglob('*')),'bytes',sum(p.stat().st_size for p in P.rglob('*')if p.is_file()))

@@ -1,0 +1,47 @@
+# Justification + locking — why view changes preserve safety
+
+**Status:** verified · **Subsystem:** A14 (Protocol Foundations & Design Philosophy) · **Type:** B4
+
+In PBFT/QBFT/WBFT, a PRE-PREPARE proposed in round r > 0 MUST carry
+a JUSTIFICATION proving it is consistent with what previous rounds
+may have committed: a quorum of ROUND-CHANGE messages plus, if any
+validator was already "locked" on a value, the PREPARE certificate
+for that locked value. WBFT enforces this in preprepare.go: a new
+proposal attaches `JustificationRoundChanges` and `Justification
+Prepares` (preprepare.go:69, :79); the receiver validates them via
+`isJustified(...)` (preprepare.go:135) before accepting the
+preprepare. The locking discipline says: once you Prepare on a
+value, you stay locked until a higher round shows a quorum-justified
+different value — this is what guarantees that a view change cannot
+silently overwrite a previously Committed block.
+
+Implication: any change to the preprepare validator, round-change
+payload format, or the message handler that handles justification
+payloads (consensus/wbft/core/handler.go:265–292) directly affects
+the SAFETY proof. Skipping `isJustified` for a "fast path", or
+loosening which payloads count as justification, is a SAFETY
+violation — two conflicting blocks can both reach quorum. This is
+the single most subtle place in WBFT and the most common
+hand-rolled-PBFT bug.
+
+## Invariants
+- PRE-PREPARE for round r > 0 carries a JUSTIFICATION; receivers verify it before accepting the proposal.
+- A validator that has Prepared on value v in round r stays 'locked' on v until a higher round produces a quorum-justified different value.
+- Justification payload format (RoundChange + Prepare signatures) is part of the consensus contract — changes affect cross-version interop.
+
+## Pitfalls
+- Skipping `isJustified` for a 'happy path' on round 0 only — and then enabling the skip path for round > 0 by accident.
+- Loosening signature checks on piggybacked justification payloads (handler.go:265) — accepts unjustified pre-prepares.
+- Changing JustificationPrepares aggregation rule without re-proving safety — same surface, different semantics, silent fork.
+
+## Code anchors
+- `consensus/wbft/core/preprepare.go` Core.handlePreprepareMsg:115 — isJustified() — the safety-critical justification check
+- `consensus/wbft/core/preprepare.go`:69 — Attach ROUND-CHANGE justification to outgoing PRE-PREPARE (round > 0)
+- `consensus/wbft/core/preprepare.go`:79 — Attach PREPARE justification (locking certificate)
+- `consensus/wbft/core/handler.go`:265 — Verifies signature of message and of all justification payloads
+
+## Aliases
+justification, 라운드 체인지 정당화, 락 정책, view-change 안전성, justification, view-change safety, locking discipline, isJustified, isJustified, JustificationRoundChanges, JustificationPrepares, SignedRoundChangePayload, locked
+
+## Related
+A1.wbft_core.message_handlers, A1.wbft_core.round_change_protocol, A14.theory.3f1_intersection

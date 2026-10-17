@@ -111,6 +111,21 @@ Mapping notes:
 - `include_history`: not part of `semantic_search`. Fetch with a follow-up `cks.context.change_history` call, or use `cks.context.get_for_task` which folds history into the composer's EvidencePack.
 - `rerank`: not exposed as a per-call flag. The composer (`get_for_task`) reranks by RRF over BM25 + symbol lists; `semantic_search` returns raw CKV hits.
 
+Raw CKS semantic hits may include `non_citable_metadata: true`. This marks
+convention summaries and hits without a positive, ordered source-line range.
+Keep their indexed text as contextual metadata; do not turn their file/line
+fields into a source citation or a v2 source body. The optional flag preserves
+existing hit fields, and its absence does not prove source integrity. Verify
+the dataset/source pins and retained bytes before citing a source-backed hit.
+
+External document hits use `@cks/docs/<index>/<path>` within the selected
+dataset, backed by retained origin `docs:corpus.<index>`. Resolve that origin
+through its source manifest rather than reading a same-named repository file
+or the current external input. In v2 citations, `origin_id` and the path within
+that origin identify the retained file. Rebuild a version with the external
+corpora included when old indexed hits have no retained original; changing
+the live directory alone cannot repair that version's source evidence.
+
 ### 3.2 phase3 (CKV): `ckv_index`
 
 ```ts

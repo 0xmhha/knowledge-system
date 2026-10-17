@@ -1,0 +1,59 @@
+import json,pathlib,importlib.util,sys,hashlib
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');sys.path.insert(0,str(R/'scripts'));s=importlib.util.spec_from_file_location('stdio',R/'scripts/prepare-consumer-stdio-readiness.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def payload(r):
+ res=r.get('result',{})
+ if 'structuredContent'in res:return res['structuredContent']
+ try:return json.loads(res['content'][0]['text'])
+ except (KeyError,ValueError):return {'error_text':str(res.get('content',r))}
+def failed(r):return'error'in r or r.get('result',{}).get('isError')is True
+class Client(m.OwnedClient):
+ def __init__(self,name,config):self.attempts=[];super().__init__([str(O/'read-bin/cks'),'mcp','--config',str(config)],O/name)
+ def request(self,label,method,params=None):
+  row={'label':label,'method':method,'params':params,'outcome':'attempted'};self.attempts.append(row);dump(self.path/'attempts.json',self.attempts)
+  try:r=super().request(label,method,params);row.update(outcome='response',response=r);return r
+  except Exception as e:row.update(outcome=type(e).__name__);raise
+  finally:dump(self.path/'attempts.json',self.attempts)
+ def call(self,label,name,args=None):return self.request(label,'tools/call',{'name':name,'arguments':args or{}})
+def config(arm):
+ V=O/('old-dataset/old-v1'if arm=='old'else'dataset/retained-origins-v2');p=O/(arm+'-cks.yaml');p.write_text(f'''version: 1
+name: owned-stablenet-rebuild-{arm}
+backends:
+  ckg:
+    path: {V}/graph/graph.db
+    source_root: {O}/source
+  ckv:
+    path: {V}/vector
+    provider: ollama
+    embed_model: bge-m3:latest
+    embed_dim: 1024
+    ollama_url: http://127.0.0.1:11434
+listen:
+  transport: stdio
+logging:
+  level: error
+sanitize:
+  rules_path: {R}/system/policies/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true
+semantic:
+  ontology_mode: off
+retrieval:
+  recall_k: 10
+  type_neighbors: false
+''');return p
+if __name__=='__main__':
+ arm=sys.argv[1];queries=json.load(open(R/'docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/query-inputs.json'))['inputs'];dump(O/'paired-inputs.json',{'inputs':queries,'scope':'same6 exposed diagnostic inputs for old/new; no independent gold or latency-quality verdict','read_source_commit':'a3307ccbf0373b16caa86292c79f3ae5eeefe254','k':10,'ontology':'off'});binary=O/'read-bin/cks';info=(O/'read-bin/cks-build-info.txt').read_text();assert'vcs.revision=a3307ccbf0373b16caa86292c79f3ae5eeefe254'in info and'vcs.modified=false'in info;dump(O/'read-binary-pin.json',{'source_commit':'a3307ccbf0373b16caa86292c79f3ae5eeefe254','sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),'build_info':info})
+ c=Client('paired-'+arm,config(arm));results=[]
+ try:
+  c.initialize();h=c.call('health','cks.ops.health');assert payload(h)['serviceable'];c.call('ontology','cks.semantic.status')
+  for q in queries:
+   keyword=c.call(q['id']+'-keyword','cks.context.search_text',{'query':q['keyword'],'k':10,'exclude_tests':True});filtered=c.call(q['id']+'-vector-go','cks.context.semantic_search',{'query':q['prompt'],'k':10,'language':'go','exclude_tests':True});unfiltered=c.call(q['id']+'-vector-all','cks.context.semantic_search',{'query':q['prompt'],'k':10,'exclude_tests':True})
+   if failed(unfiltered):c.call(q['id']+'-recover-go','cks.context.semantic_search',{'query':q['prompt'],'k':10,'language':'go','exclude_tests':True})
+   v2=c.call(q['id']+'-pack-v2','cks.context.get_for_task_v2',{'prompt':q['prompt'],'intent':q['intent'],'explain_ontology':True})
+   row={'id':q['id'],'keyword_ok':not failed(keyword),'filtered_vector_ok':not failed(filtered),'unfiltered_vector_ok':not failed(unfiltered),'v2_ok':not failed(v2),'v2_error':payload(v2)if failed(v2)else None,'v2_citations':len(payload(v2).get('citations',[]))};results.append(row);dump(O/(arm+'-results.json'),results);print(arm,json.dumps(row),flush=True)
+  for i in range(2):c.call('repeat-go-'+str(i),'cks.context.semantic_search',{'query':queries[0]['prompt'],'k':10,'language':'go','exclude_tests':True})
+  conv=c.call('convention-contract','cks.context.semantic_search',{'query':'shutdown package conventions','k':3,'kinds':'ConventionSummary','language':'go'});assert not failed(conv);hits=payload(conv)['hits'];assert hits and all(h['chunk_kind']=='convention'and h['non_citable_metadata']is True for h in hits)
+  c.call('legacy-knowledge-separation','cks.context.get_for_task',{'prompt':queries[5]['prompt'],'intent':queries[5]['intent']});c.call('health-after','cks.ops.health')
+ finally:c.close()
+ print(arm+' paired queries complete',flush=True)

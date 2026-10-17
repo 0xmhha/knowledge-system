@@ -543,7 +543,7 @@
     }
   ],
   "next_priority": [
-    "go-stablenet pilot 실측: keyword6/6·Go-filtered6/6, unfiltered1/6·v2 2/6. SN-P01 새 소유version에 외부문서/flow원문과 namespace·convention 비인용 계약 보완 → SN-P02 전체분모 재검증 → SN-P03 원문오류/모델오류 분류 → SN-P04 go-wemix 비교. 기본검색 준비 미충족, 정식0/9·D04미정 유지.",
+    "SN-P01/SN-P02 새 비운영 원문/namespace·convention 비인용 및 기존/새6질의 회귀 완료. 다음 SN-P03 원문오류/모델오류 분류 → SN-P04 go-wemix 비교. 독립품질·온톨로지효과 미수용, 정식0/9·D04미정 유지.",
     "WI-1 30함수의 독립 value kind·완전한 data/control gold·return 좌표/주석 정합·matching 및 baseline/실행 수용 미충족분 검토",
     "WI-3 독립 사실 가족/정답·top-10/분모·baseline 동결 및 실제 symptom-only 검색/설치 역할 경로 미충족분 보완",
     "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완",
@@ -611,8 +611,8 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "29a2952f83120e06a8ba9617abae5a53f95f189a3253c27e943ca49255ff327b",
-    "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_pilot_not_ready_no_formal_freeze"
+    "sha256": "d4c981399a7e7a060b57f472bd10a94c8f44b5e5029d89a2c5d1764701b34111",
+    "status": "D01_D08_scope_approved_D04_unassigned_rebuild_scoped_pass_no_formal_freeze"
   },
   "consumer_adoption": {
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
@@ -625,6 +625,64 @@
     "sha256": "127c32a9508a927146deb06f1d24277f853333acc98c912da98610bb6bc24b25",
     "status": "verification_complete_default_retrieval_not_ready",
     "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/REPORT.txt",
-    "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json"
+    "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json",
+    "historical": true,
+    "superseded_for_current_readiness_by": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json"
+  },
+  "document_date": "2026-10-18",
+  "stablenet_rebuild": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json",
+    "sha256": "3244926efe8853fb6aebda3fe927481be3f401d093708d2c828f443be69faa9b",
+    "status": "SN-P01_SN-P02_scoped_technical_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json"
+  },
+  "current_execution_state": {
+    "current_stage": "40_SN-P01_SN-P02_scoped_technical_pass",
+    "completed_in_this_scope": [
+      "SN-P01",
+      "SN-P02"
+    ],
+    "next_task": "SN-P03",
+    "remaining_all": [
+      {
+        "id": "SN-P03",
+        "status": "pending",
+        "task": "실제 검색 출처/무결성 오류와 임베딩 모델 장애의 분류·health/복구 계약 보완"
+      },
+      {
+        "id": "SN-P04",
+        "status": "pending",
+        "task": "go-wemix 실제 소스/데이터 식별 후 프로젝트 간 개념·검색·출처/혼입 비교"
+      },
+      {
+        "id": "FORMAL-PREP",
+        "status": "pending",
+        "task": "D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결"
+      },
+      {
+        "id": "FORMAL-9",
+        "status": "pending",
+        "task": "WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 정식 실행·수용 (0/9)"
+      },
+      {
+        "id": "ONTOLOGY",
+        "status": "pending",
+        "task": "독립 의미/검색 gold, 검토된 구현-개념 연결/가족 coverage, 승인 DEV/FINAL 효과 gate; 실제 LLM 답변 효과는 모델/인증/상한 지정 후"
+      },
+      {
+        "id": "OPTIONAL-12",
+        "status": "separate_backlog",
+        "task": "조직 인증/권한; 공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사; viewer; 배포/downstream"
+      }
+    ],
+    "formal_completed": 0,
+    "formal_total": 9,
+    "reviewer_assignment": "미정",
+    "local_roadmap_completed": "7/7;28/28",
+    "isolated_preparation_completed": "22/22",
+    "independent_quality_or_ontology_acceptance": false,
+    "production_activation": false,
+    "publication": false
   }
 }

@@ -1,0 +1,31 @@
+# istanbul/100 subprotocol architecture: piggy-backed on eth peers
+
+**Status:** verified · **Subsystem:** A9 (P2P, Istanbul Protocol & Custom RPC) · **Type:** B1
+
+WBFT consensus messages travel over a dedicated P2P subprotocol
+named istanbul, version 100, registered alongside the standard
+eth protocol. The 22-message subprotocol does not create its own
+peer set — every istanbul peer is an existing eth Peer whose
+EthPeerRegistered channel signals when it is ready to carry
+consensus traffic. When an istanbul message arrives, the handler
+dispatches it into the consensus engine's HandleMsg, which routes
+it to Core.handleEvents. Messages exceeding protocolMaxMsgSize
+are rejected before any consensus parsing. wbft.ErrStoppedEngine
+during peer-receive while the eth downloader is synchronising is
+expected and downgraded to debug-level logging — the engine starts
+consuming messages only after sync completes.
+
+## Code anchors
+- `eth/quorum_protocol.go` Istanbul100:39 — protocol version constant
+- `eth/quorum_protocol.go` quorumConsensusProtocolName:41 — protocol name literal — "istanbul"
+- `eth/quorum_protocol.go` in Ethereum.quorumConsensusProtocols:54 (loc) — 22 messages on Istanbul100
+- `eth/handler_istanbul.go` in handler.makeQuorumConsensusProtocol:82 (loc) — eth-peer-ready signal — istanbul reuses eth peers, never creates its own
+- `eth/handler_istanbul.go` in handler.handleConsensus:138 (loc) — message size gate — rejection happens before consensus parsing
+- `eth/handler_istanbul.go` in handler.handleConsensusLoop:120 (loc) — sync-time error path — debug log only, not warn/error
+- `consensus/wbft/backend/handler.go` — HandleMsg implementation that bridges P2P to consensus Core
+
+## Aliases
+istanbul 프로토콜, P2P 합의 프로토콜, istanbul/100, 합의 메시지 전송, istanbul subprotocol, consensus P2P, p2p consensus piggyback, Istanbul100, quorumConsensusProtocolName, quorumConsensusProtocolVersions, quorumConsensusProtocolLengths, EthPeerRegistered, HandleMsg, protocolMaxMsgSize, ErrStoppedEngine
+
+## Related
+A1.wbft_core.consensus_flow_architecture

@@ -1,0 +1,26 @@
+# System contract artifact regeneration: solc 0.8.14 to artifacts/v1 and v2
+
+**Status:** verified · **Subsystem:** A10 (Build, Tooling & Codegen) · **Type:** B6
+
+System contract bytecode (governance v1 and v2, NativeCoinAdapter) is
+produced by systemcontracts/compile. The tool downloads solc 0.8.14
+to ~/.solc-bin if absent, invokes it on the Solidity sources under
+systemcontracts/solidity/, and writes binaries to
+systemcontracts/artifacts/v1 and artifacts/v2/. Those binaries are
+go:embed'd into contracts.go and consumed at genesis time via
+InjectContracts. The do-not-edit constraint on the artifacts (see
+A10.codegen.no_edit_zones) is enforced by re-running this procedure,
+not by static checks.
+
+## Code anchors
+- `systemcontracts/compile/main.go` — entry point; orchestrates compile and ExportContractCode for v1 and v2 sources
+- `systemcontracts/compile/compiler/compiler.go` solcVersion:37 — pinned solc version; bump here when intentionally upgrading the compiler
+- `systemcontracts/compile/compiler/compiler.go` Compile:40 — downloads solc to ~/.solc-bin, runs it, parses ParseCombinedJSON output
+- `systemcontracts/compile/compiler/compiler.go` compiledTy.ExportContractCode:123 — writes the bytecode files under systemcontracts/artifacts/
+- `systemcontracts/contracts.go` — go:embed lines that consume the artifacts; new versions are wired here
+
+## Aliases
+시스템 컨트랙트 재생성, 솔리디티 컴파일, 아티팩트 빌드, 컨트랙트 코드젠, regenerate contracts, solc compile pipeline, artifact regeneration, system contract codegen, solcVersion, Compile, ExportContractCode, GovMinterContractV1, GovMinterContractV2, SystemContractCodes, CONTRACT_GOV_MINTER, go:embed
+
+## Related
+A10.codegen.no_edit_zones, A4.system_contracts.addresses, A4.system_contracts.gov_minter

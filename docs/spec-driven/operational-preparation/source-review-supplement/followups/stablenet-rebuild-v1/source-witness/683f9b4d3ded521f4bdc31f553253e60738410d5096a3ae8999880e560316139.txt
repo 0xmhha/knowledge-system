@@ -1,0 +1,46 @@
+# Txpool mutation must serialize through the reorg loop
+
+**Status:** verified · **Subsystem:** A13 (Block Production & Sealing) · **Type:** B4
+
+The legacy txpool runs a single goroutine — `pool.loop()` (started at
+core/txpool/legacypool/legacypool.go:366 `go pool.loop()`) — that
+owns the txpool's internal maps (pending/queue/all). All mutation
+events (head change, new tx, reorg) are queued and applied INSIDE
+that loop, which is why the txpool data structures are not
+individually locked: the loop is the serializer.
+
+The sealer (miner/) and the txpool reorg loop interact across this
+boundary: when the sealer requests a payload, it observes the
+txpool's state at a point AFTER a reorg-run; mutating txpool maps
+directly from the sealer (or from a tx-submission handler) WITHOUT
+going through the loop is a data race that can either lose pending
+txs or double-include them.
+
+The trap: an LLM adding a "fast path" that mutates pool.pending /
+pool.queue / pool.all from outside the loop (e.g. inside an RPC
+handler, or inside the sealer's payload-building hook). Symptoms are
+intermittent: tx drops, double-spend rejection on a tx that was
+validly removed, occasional miner crash on map iteration. Any new
+txpool mutation MUST enqueue into the loop's channel, not call the
+map mutators directly.
+
+## Invariants
+- Txpool maps (pending/queue/all) are mutated ONLY by `pool.loop()`.
+- External producers (RPC, sealer, p2p) enqueue events; they do NOT touch the maps directly.
+- The reorg loop is the serialization boundary — there is no per-map lock to fall back on.
+
+## Pitfalls
+- Mutating pool.pending / pool.queue from a non-loop goroutine — data race on map iteration.
+- Adding a sealer fast-path that filters pool.all without going through the loop's snapshot mechanism.
+- Assuming a per-map sync.Mutex exists — the design uses the loop as the lock, not per-map mutexes.
+
+## Code anchors
+- `core/txpool/legacypool/legacypool.go` LegacyPool.loop:375 — The single serializer goroutine that owns txpool maps
+- `core/txpool/legacypool/legacypool.go`:366 — `go pool.loop()` — sole owner of txpool mutation
+- `core/txpool/legacypool/legacypool.go` queueTxEvent:1340 — Correct enqueue path: requests reorg-run to apply the mutation
+
+## Aliases
+txpool 직렬화, 리오그 루프, txpool 동시성, 맵 경쟁, txpool serialization, reorg loop ownership, txpool mutation discipline, sealer race, LegacyPool, pool.loop, queueTxEvent, changesSinceReorg, reorg
+
+## Related
+A1.concurrency.core_lock_discipline, A11.state_transition.blacklist_check_points

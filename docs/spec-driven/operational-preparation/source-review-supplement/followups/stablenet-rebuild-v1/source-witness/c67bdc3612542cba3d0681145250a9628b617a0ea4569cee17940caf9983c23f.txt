@@ -1,0 +1,27 @@
+# System contract canonical addresses (Anzeon)
+
+**Status:** verified · **Subsystem:** A4 (System Contracts (Governance × 5)) · **Type:** B7
+
+Five governance system contracts and two native precompiles are
+deployed at well-known fixed addresses on go-stablenet. Source of
+truth for the 0x100x governance addresses is params/config_wbft.go;
+the 0xB000xx precompile address literals are params/protocol_params.go
+(NativeCoinManager 0xB00002, AccountManager 0xB00003), which
+core/vm/native_manager.go references when registering their method
+tables. These values are referenced everywhere in hardfork wiring,
+genesis JSON, and ABI tooling.
+
+## Code anchors
+- `params/config_wbft.go` DefaultNativeCoinAdapterAddress:32
+- `params/config_wbft.go` DefaultGovValidatorAddress:35
+- `params/config_wbft.go` DefaultGovMasterMinterAddress:38
+- `params/config_wbft.go` DefaultGovMinterAddress:41
+- `params/config_wbft.go` DefaultGovCouncilAddress:44
+- `params/protocol_params.go` NativeCoinManagerAddress:219 — 0xB00002 address literal (and AccountManagerAddress 0xB00003 at :220)
+- `core/vm/native_manager.go`:98 — registers the NativeCoinManager (params.NativeCoinManagerAddress) and AccountManager (params.AccountManagerAddress, :103) precompile method tables
+
+## Aliases
+시스템 컨트랙트 주소, 거버넌스 컨트랙트 주소, 네이티브 매니저 주소, system contract addresses, governance contract addresses, DefaultNativeCoinAdapterAddress, DefaultGovValidatorAddress, DefaultGovMasterMinterAddress, DefaultGovMinterAddress, DefaultGovCouncilAddress, NativeCoinManager, AccountManager
+
+## Related
+A3.validator_set.epoch_transition, A5.account_extra.bit_layout, A8.genesis.inject_contracts_two_phase

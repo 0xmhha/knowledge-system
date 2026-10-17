@@ -1,0 +1,16 @@
+import pathlib,json,subprocess,time,hashlib
+O=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');root=json.load(open(O/'build-start.json'))['pid'];seen={};until=time.monotonic()+5700
+while time.monotonic()<until:
+ raw=subprocess.check_output(['ps','-axo','pid=,ppid=,comm='],text=True)
+ for line in raw.splitlines():
+  cols=line.strip().split(None,2)
+  if len(cols)!=3:continue
+  pid,ppid=int(cols[0]),int(cols[1])
+  if pid!=root and ppid!=root:continue
+  proc=subprocess.run(['ps','-p',str(pid),'-o','pid=,ppid=,lstart=,command='],capture_output=True,text=True)
+  if proc.returncode==0:
+   value=proc.stdout.strip();seen[value]={'pid':pid,'ppid':ppid,'binary':pathlib.Path(cols[2]).name,'identity':value,'identity_sha256':hashlib.sha256(value.encode()).hexdigest()}
+ (O/'owned-build-processes.json').write_text(json.dumps(list(seen.values()),indent=2)+'\n')
+ if(O/'build-exit.json').exists():break
+ time.sleep(2)
+print('owned build root/direct children identities recorded',len(seen),flush=True)

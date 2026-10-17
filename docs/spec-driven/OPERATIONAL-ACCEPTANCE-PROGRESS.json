@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "document_date": "2026-10-17",
+  "document_date": "2026-10-18",
   "timezone": "Asia/Seoul",
   "plan": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md",
   "scope": "proposed isolated local Go pilot; no automatic external publication, deployment or production-global acceptance",
@@ -415,8 +415,8 @@
         },
         "adoption_acceptance_decision_proposal": {
           "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-          "sha256": "29a2952f83120e06a8ba9617abae5a53f95f189a3253c27e943ca49255ff327b",
-          "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_pilot_not_ready_no_formal_freeze"
+          "sha256": "d4c981399a7e7a060b57f472bd10a94c8f44b5e5029d89a2c5d1764701b34111",
+          "status": "D01_D08_scope_approved_D04_unassigned_rebuild_scoped_pass_no_formal_freeze"
         },
         "consumer_adoption": {
           "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
@@ -429,7 +429,16 @@
           "sha256": "127c32a9508a927146deb06f1d24277f853333acc98c912da98610bb6bc24b25",
           "status": "verification_complete_default_retrieval_not_ready",
           "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/REPORT.txt",
-          "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json"
+          "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json",
+          "historical": true,
+          "superseded_for_current_readiness_by": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json"
+        },
+        "stablenet_rebuild": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json",
+          "sha256": "3244926efe8853fb6aebda3fe927481be3f401d093708d2c828f443be69faa9b",
+          "status": "SN-P01_SN-P02_scoped_technical_pass",
+          "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/REPORT.txt",
+          "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json"
         }
       },
       "completed_preparation": [
@@ -3006,6 +3015,66 @@
           "evidence_protection_tests": 10,
           "next_task": "SN-P01",
           "readiness_complete": false
+        },
+        "stablenet_rebuild": {
+          "status": "SN-P01_SN-P02_scoped_technical_pass",
+          "native_source_commit": "a3307ccbf0373b16caa86292c79f3ae5eeefe254",
+          "native_test": {
+            "pass": 4065,
+            "skip": 18,
+            "fail": 0
+          },
+          "native_race": {
+            "pass": 4065,
+            "skip": 18,
+            "fail": 0
+          },
+          "source_files_unchanged": 2224,
+          "retained_origin_files": {
+            "repo": 2224,
+            "docs:corpus.0": 44,
+            "docs:corpus.1": 27
+          },
+          "indexed_chunks": 21304,
+          "chunk_citation_states": {
+            "retained_source_range": 21100,
+            "non_citable_metadata": 204
+          },
+          "paired_inputs": 6,
+          "old": {
+            "keyword": 6,
+            "vector-go": 6,
+            "vector-all": 1,
+            "pack-v2": 2
+          },
+          "new": {
+            "keyword": 6,
+            "vector-go": 6,
+            "vector-all": 6,
+            "pack-v2": 6
+          },
+          "all_actual_tool_attempts": 79,
+          "actual_metadata_contract_arms": 2,
+          "legacy_convention_knowledge_separated": true,
+          "successful_v2_packs_including_restore": 10,
+          "v2_citations_verified": 105,
+          "external_v2_citations_verified": 12,
+          "external_raw_hits_with_retained_source_verified": 11,
+          "normal_stdio_EOF_exit0_reaped": 4,
+          "intentional_manifest_startup_exit1_reaped": 2,
+          "owned_process_identities_audited": 15,
+          "formal_completed": 0,
+          "formal_total": 9,
+          "reviewer_assignment": "미정",
+          "independent_quality_evaluated": false,
+          "ontology_effect_evaluated": false,
+          "paid_LLM_calls": 0,
+          "production_activation": false,
+          "SN-P03_error_classification_complete": false,
+          "SN-P04_go_wemix_comparison_complete": false,
+          "formal_state_unchanged": true,
+          "evidence_protection_tests_passed": 12,
+          "final_validation_date": "2026-10-18"
         }
       },
       "candidate_counts": {
@@ -3305,8 +3374,8 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "29a2952f83120e06a8ba9617abae5a53f95f189a3253c27e943ca49255ff327b",
-    "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_pilot_not_ready_no_formal_freeze"
+    "sha256": "d4c981399a7e7a060b57f472bd10a94c8f44b5e5029d89a2c5d1764701b34111",
+    "status": "D01_D08_scope_approved_D04_unassigned_rebuild_scoped_pass_no_formal_freeze"
   },
   "consumer_adoption": {
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
@@ -3321,6 +3390,63 @@
     "sha256": "127c32a9508a927146deb06f1d24277f853333acc98c912da98610bb6bc24b25",
     "status": "verification_complete_default_retrieval_not_ready",
     "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/REPORT.txt",
-    "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json"
+    "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json",
+    "historical": true,
+    "superseded_for_current_readiness_by": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json"
+  },
+  "stablenet_rebuild": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json",
+    "sha256": "3244926efe8853fb6aebda3fe927481be3f401d093708d2c828f443be69faa9b",
+    "status": "SN-P01_SN-P02_scoped_technical_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json"
+  },
+  "current_execution_state": {
+    "current_stage": "40_SN-P01_SN-P02_scoped_technical_pass",
+    "completed_in_this_scope": [
+      "SN-P01",
+      "SN-P02"
+    ],
+    "next_task": "SN-P03",
+    "remaining_all": [
+      {
+        "id": "SN-P03",
+        "status": "pending",
+        "task": "실제 검색 출처/무결성 오류와 임베딩 모델 장애의 분류·health/복구 계약 보완"
+      },
+      {
+        "id": "SN-P04",
+        "status": "pending",
+        "task": "go-wemix 실제 소스/데이터 식별 후 프로젝트 간 개념·검색·출처/혼입 비교"
+      },
+      {
+        "id": "FORMAL-PREP",
+        "status": "pending",
+        "task": "D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결"
+      },
+      {
+        "id": "FORMAL-9",
+        "status": "pending",
+        "task": "WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 정식 실행·수용 (0/9)"
+      },
+      {
+        "id": "ONTOLOGY",
+        "status": "pending",
+        "task": "독립 의미/검색 gold, 검토된 구현-개념 연결/가족 coverage, 승인 DEV/FINAL 효과 gate; 실제 LLM 답변 효과는 모델/인증/상한 지정 후"
+      },
+      {
+        "id": "OPTIONAL-12",
+        "status": "separate_backlog",
+        "task": "조직 인증/권한; 공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사; viewer; 배포/downstream"
+      }
+    ],
+    "formal_completed": 0,
+    "formal_total": 9,
+    "reviewer_assignment": "미정",
+    "local_roadmap_completed": "7/7;28/28",
+    "isolated_preparation_completed": "22/22",
+    "independent_quality_or_ontology_acceptance": false,
+    "production_activation": false,
+    "publication": false
   }
 }

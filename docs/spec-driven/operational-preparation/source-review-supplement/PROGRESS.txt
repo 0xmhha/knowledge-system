@@ -590,3 +590,17 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 남은 전체: SN-P01~04; 독립담당자·DEV/FINAL/완전gold/매칭/표본·F01~08동결; WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 9건; 필수온톨로지독립효과/구현연결/모델지정후답변효과; 별도후속12건. 상세는 stablenet-pilot-v1/REPORT.txt 및 BLOCKERS.json.
 검증39: scripts/test_stablenet_pilot.py 및 scripts/check-stablenet-pilot.py
 검증39 최종: pilot보호10·adoption회귀12·문서계약20·고지3(총45검사) 통과, live문서134·기존구현guard·과거패킷불변·참조hash·공백 검사 통과. 이 보호검사 통과는 기본검색 준비 미충족 판정을 바꾸지 않는다.
+
+
+[검증 완료 — 노출6질의·출처 경계 범위] 40. SN-P01·SN-P02 새 비운영 원문 버전과 convention 계약
+- repo2224동일·domain44/flow27 원문 보존, 전체21304chunk 경로/범위·비인용metadata 구분. @cks/docs/<index>/<path> namespace·origin·blob SHA 검증.
+- optional non_citable_metadata로 convention/잘못된range 비인용 명시. false 자체는 무결성 보증이 아님. v2 원문인용 승격 금지.
+- 기존6질의 {"keyword": 6, "vector-go": 6, "vector-all": 1, "pack-v2": 2} → 신규 {"keyword": 6, "vector-go": 6, "vector-all": 6, "pack-v2": 6}. 실패/재시도 보존, 실제 외부 raw원문11·v2인용105검증(외부v2 12).
+- 새a330source fresh일반/race각4065·18skip·0fail, build/fmt/vet/lint/boundaries/docs/build-bins 통과. builder fdb와reader a330식별분리.
+- 정상EOF0/reap4·controlledstartup1/reap2, 소유identity15종료확인·강제종료0. 원본2175/current·외부원문·전역32·운영metadata42·checkout5·비소유엔진11 보존.
+- SN-P01/SN-P02완료는 기술회귀 범위이며 독립품질/온톨로지효과/정식수용 아님. 로드맵7/7·28/28·준비22/22 유지; D04미정·정식0/9·freeze null/executionfalse·운영/게시0.
+다음 작업(최신): SN-P03 출처/무결성 오류와 모델장애 분류 → SN-P04 실제go-wemix 비교.
+남은 전체: SN-P03/SN-P04; 독립담당자·새DEV/FINAL/완전gold/매칭/충분성·F01~08동결; 정식WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 9건; 필수온톨로지독립효과/검토구현연결/모델지정후답변효과; 별도후속12건. 상세는 stablenet-rebuild-v1/WORKLIST.json 및 REPORT.txt.
+검증40: scripts/check-stablenet-rebuild.py·scripts/test_stablenet_rebuild.py 및 validation-summary.json.
+
+검증40 최종(2026-10-18 KST): 증거보호12·이전pilot10·문서계약20·고지3(총45) 및 live문서134·기존완료guard·재검산·역사adoption guard·공백 검사 통과. 정식/구현상태·기존동결패킷·consumer 보존 재확인. 전체일반/race각4065pass·18skip·0fail. 서명 최종커밋은 생성 직후 검증하며 자기해시를 패킷에 삽입하지 않는다.

@@ -1,0 +1,39 @@
+# Native asset is WKRC (KRW stablecoin), not ETH
+
+**Status:** verified · **Subsystem:** A14 (Protocol Foundations & Design Philosophy) · **Type:** B4
+
+The native coin on go-stablenet is **WKRC** — a KRW-pegged
+stablecoin — not ETH. Source of truth: params/config.go genesis
+alloc carries name="WKRC", symbol="WKRC", currency="KRW", decimals=18;
+core/genesis_mainnet.json:58 mirrors the same. Mint/burn is
+bank-backed via GovMinter (A4) and the NativeCoinManager precompile
+(A5), tied to off-chain deposit/withdrawal.
+
+ETH-denominated assumptions baked into geth (`Ether=1e18`,
+`GasFloor`, gas-price units assumed to be ETH-wei) survive in the
+tree as residue but do NOT describe StableNet semantics — the unit
+is WKRC-wei, the asset is a KRW stablecoin, and supply changes are
+authorized real-asset events, not protocol issuance. An LLM that
+designs fee/reward/transfer logic against "ETH" assumptions will
+emit code that is silently wrong for regulatory reporting, fee
+accounting, and user-facing balances.
+
+## Invariants
+- Native asset is WKRC (symbol/name='WKRC', currency='KRW', decimals=18).
+- Native supply changes are bank-backed mint/burn through GovMinter + NativeCoinManager, not protocol issuance.
+- Ethereum 'Ether'/'wei' identifiers in the geth tree are residue; the unit is WKRC-wei.
+
+## Pitfalls
+- Writing fee/reward code that says 'ETH' in comments or identifiers — incorrect for accounting and audit.
+- Hardcoding ETH-style fee floors / tip defaults instead of consulting WKRC params.
+- Treating native supply as protocol-issued (e.g. block reward minting).
+
+## Code anchors
+- `params/config.go`:100 — WKRC native-coin definition: name/symbol='WKRC', currency='KRW', decimals=18 in NativeCoinAdapter Params
+- `core/genesis_mainnet.json`:58 — Mainnet genesis carries the same WKRC name/symbol pair
+
+## Aliases
+네이티브 코인, WKRC 스테이블코인, KRW 페그, ETH 아님, WKRC native asset, KRW-pegged stablecoin, not ETH, WKRC, KRW, NativeCoinAdapter, NativeCoinManager, decimals
+
+## Related
+A14.foundations.base_fee_redistribution, A4.system_contracts.addresses, A5.native_coin.issuance_burn_flow

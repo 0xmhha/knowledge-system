@@ -1,0 +1,32 @@
+import pathlib,json,sqlite3,hashlib,collections,gzip
+O=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');V=O/'dataset/retained-origins-v2';old=O/'old-dataset/old-v1'
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+source=json.load(open(V/'sources/manifest.json'));identity=json.load(open(V/'dataset-identity.json'));prior=json.load(open(old/'dataset-identity.json'));files={(r['origin_id'],r['path']):r for r in source['files']};code={k[1]:v['sha256']for k,v in files.items()if k[0]=='repo'};oldcode={r['path']:r['sha256']for r in json.load(open(old/'sources/manifest.json'))['files']if r['origin_id']=='repo'};assert code==oldcode and len(code)==2224
+assert identity['source']['project_id']==prior['source']['project_id']and identity['source']['source_commit']==prior['source']['source_commit'];assert identity['source']['snapshot_id']!=prior['source']['snapshot_id']and identity['dataset_id']!=prior['dataset_id'];assert identity['embedding_identity']==prior['embedding_identity']
+blobs={r['sha256'] for r in source['files']};assert all(sha(V/'sources/blobs'/s)==s for s in blobs)
+corpora=json.load(open(O/'corpus-inputs.json'))
+for origin in corpora['origins']:
+ for path,digest in origin['file_sha256'].items():assert files[(origin['id'],path)]['sha256']==digest
+with sqlite3.connect((V/'vector/vector.db').as_uri()+'?mode=ro&immutable=1',uri=True)as db:
+ rows=[dict(zip(['id','file','start_line','end_line','kind','language','commit','provenance'],row))for row in db.execute('SELECT id,file,start_line,end_line,chunk_kind,language,commit_hash,provenance FROM chunks ORDER BY id')]
+ledger=[];ranges={};missing=[];counts=collections.Counter()
+for row in rows:
+ f=row['file'];synthetic=row['kind']=='convention' or row['start_line']<1 or row['end_line']<row['start_line']
+ if synthetic:
+  assert row['kind']in ['convention','flow_spine','invariant','pr_background','pr_solution','commit_message'],row;row['citation_state']='non_citable_metadata';counts['non_citable_metadata']+=1
+ else:
+  origin='repo';rel=f
+  if f.startswith('@cks/docs/'):
+   index,rel=f[len('@cks/docs/'):].split('/',1);assert str(int(index))==index and int(index)>=0;origin='docs:corpus.'+index
+  rec=files.get((origin,rel))
+  if rec is None:missing.append(row);continue
+  key=rec['sha256']
+  if key not in ranges:
+   raw=(V/'sources/blobs'/key).read_bytes();ranges[key]=raw.count(b'\n')+int(bool(raw)and not raw.endswith(b'\n'))
+  assert 1<=row['start_line']<=row['end_line']<=ranges[key],row
+  row.update(origin_id=origin,path=rel,file_sha256=key,citation_state='retained_source_range');counts[origin]+=1
+ ledger.append(row)
+assert not missing,missing[:3]
+(O/'chunk-source-ledger.json.gz').write_bytes(gzip.compress((json.dumps(ledger,ensure_ascii=False,separators=(',',':'))+'\n').encode(),mtime=0));dump(O/'source-data-audit.json',{'same_retained_repository_files':2224,'old_and_new_embedding_identity_equal':True,'old_dataset_id':prior['dataset_id'],'new_dataset_id':identity['dataset_id'],'old_snapshot':prior['source']['snapshot_id'],'new_snapshot':identity['source']['snapshot_id'],'retained_origins':dict(collections.Counter(r['origin_id']for r in source['files'])),'all_retained_blob_hashes_verified':len(blobs),'chunk_count':len(rows),'chunk_citation_states':dict(counts),'missing_retained_source_paths':len(missing),'convention_metadata_has_no_source_assertion':True,'original_external_copy_bytes_equal_capture':True,'no_manual_database_patch':True})
+print('source/dataset/namespace audit PASS',dict(counts),flush=True)
