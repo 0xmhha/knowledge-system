@@ -1,0 +1,51 @@
+{
+  "document_date": "2026-10-18",
+  "status": "in_progress",
+  "scope": "SN-P03",
+  "entry_commit": "e2cf2f3265009c13deb8f0ab3e4e9d1a5c36457a",
+  "purpose": "A failed source/integrity check must not label a healthy embedder down; a true embedding failure must be observable and recover without restart or a permanently blocked v2 gate.",
+  "contract": {
+    "typed_error": "ckv.ErrEmbeddingFailed wraps query-vector generation/provider errors; errors.Is retains provider cause",
+    "caller_context": "caller-canceled/expired requests are not shared model failures; an active caller with a provider timeout is an embedding failure",
+    "other_errors": "source/integrity/store/budget/unknown errors neither set nor clear cached model evidence",
+    "health": "positive and negative observations expire after 5s; successful raw search clears a cached outage immediately; canceled probes do not mutate cache; empty probes are failures",
+    "public_errors": "semantic_search and v2 composition preserve bounded source_missing/snapshot_mismatch/embedding_failed/request_canceled/request_timeout codes; unknown semantic error retrieval_failed; gated v2 outage service_unavailable",
+    "health_limit": "model_reachable is cached liveness/usability, not proof all corpus sources are complete or every query succeeds"
+  },
+  "native_sources": {
+    "added": [
+      "internal/system/ckvclient/real_health_test.go",
+      "internal/system/mcp/search_errors_test.go",
+      "internal/vector/query/service_embed_test.go",
+      "pkg/vector/ckv/embedding_failure_test.go"
+    ],
+    "changed": [
+      "internal/system/ckvclient/real.go",
+      "internal/system/mcp/get_for_task_v2.go",
+      "internal/system/mcp/search.go",
+      "internal/vector/query/errors.go",
+      "internal/vector/query/service_embed.go",
+      "pkg/vector/ckv/ckv.go"
+    ]
+  },
+  "acceptance": [
+    "targeted engine/adapter/MCP tests and full fresh build/test/race/fmt/vet/lint/boundaries/docs",
+    "same clean new binary actual MCP/real BGE-M3 via own faultable forwarding endpoint, never stop shared model server",
+    "old dataset real source_missing keeps model reachable and eligible known-good v2 query",
+    "new owned dataset missing/corrupt retained external blob yields specific error; model remains up and exact bytes restore",
+    "owned endpoint returns 503/empty embeddings -> embedding_failed and immediate cached down; v2 gate refuses",
+    "recover both through successful raw query and TTL health-only reprobe then v2, without restart",
+    "all attempts, request/wire/lifecycle, proxy observations, selected source/hash/model identities retained",
+    "normal EOF exit0/reap, own listener closed; original data/config/pointers/previous packets preserved"
+  ],
+  "non_goals": [
+    "SN-P04 actual go-wemix comparison",
+    "independent gold/quality/ontology-effect acceptance",
+    "production/current/global changes or external publication",
+    "startup-configured degraded dummy automatic client reconstruction",
+    "MCP cancellation notification implementation; context semantics are covered in native tests"
+  ],
+  "formal_completed": 0,
+  "formal_total": 9,
+  "reviewer_assignment": "미정"
+}

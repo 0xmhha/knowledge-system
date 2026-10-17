@@ -17,6 +17,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/evidencev2"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+	"github.com/0xmhha/knowledge-system/pkg/vector/ckv"
 )
 
 func registerGetForTaskV2(s *mcpserver.MCPServer, d Deps) {
@@ -171,6 +172,17 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 }
 
 func v2ToolErrorFor(err error, fallback string) *mcpgo.CallToolResult {
+	// Classify typed embedding failures before inspecting provider text. A
+	// provider message containing source_missing is not a retained-source error.
+	if errors.Is(err, ckv.ErrEmbeddingFailed) {
+		return v2ToolError("embedding_failed")
+	}
+	if errors.Is(err, context.Canceled) {
+		return v2ToolError("request_canceled")
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return v2ToolError("request_timeout")
+	}
 	if errors.Is(err, evidencev2.ErrEvidenceBudget) {
 		return v2ToolError("budget_exceeded")
 	}
@@ -186,6 +198,10 @@ func v2ToolErrorFor(err error, fallback string) *mcpgo.CallToolResult {
 
 func v2ToolError(code string) *mcpgo.CallToolResult {
 	messages := map[string]string{
+		"embedding_failed":         "The query embedding could not be produced.",
+		"request_canceled":         "The request was canceled.",
+		"request_timeout":          "The request deadline expired.",
+		"retrieval_failed":         "The search could not be completed.",
 		"budget_exceeded":          "No complete retained evidence span fits the response budget.",
 		"requires_v2":              "Use the v2 interface for this source mode.",
 		"reindex_required":         "A pinned retained dataset is required.",

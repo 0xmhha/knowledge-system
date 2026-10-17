@@ -2,7 +2,7 @@ package query
 
 import "errors"
 
-// Six error sentinels make up the contract between ckv and its callers
+// Error sentinels make up the contract between ckv and its callers
 // (LLM agents via MCP, in-process consumers via pkg/ckv). Callers test
 // with errors.Is and decide handling per variant; the caller-guidance
 // for each is documented inline.
@@ -15,6 +15,12 @@ import "errors"
 // Caller guidance: surface to the operator with a "run `ckv build`"
 // hint. Do not retry — the index will not change without a rebuild.
 var ErrIndexUnavailable = errors.New("query: index unavailable")
+
+// ErrEmbeddingFailed identifies failure in query-vector production, including
+// provider errors and empty responses. It does not imply a network outage.
+// Caller cancellation/deadline is returned separately and must not poison
+// shared model health. Wrapped provider errors remain available via errors.Is.
+var ErrEmbeddingFailed = errors.New("query: embedding failed")
 
 // ErrFreshnessStale signals the index's recorded IndexedHead is behind
 // the source tree's current git HEAD. Returned by the freshness helpers

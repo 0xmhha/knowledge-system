@@ -2,10 +2,10 @@ package ckvclient
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/pkg/vector/ckv"
@@ -20,8 +20,8 @@ const DefaultK = 10
 // modelProbeTTL bounds how often Health issues a fresh embedding-model
 // liveness probe. Health is a fast, frequently-polled signal, so we cache
 // the probe result for this window instead of embedding on every call; a
-// failed real query trips the modelDown flag for immediate detection in
-// between probes.
+// failed embedding request records a negative result immediately. Both
+// positive and negative results expire so Health can discover recovery.
 const modelProbeTTL = 5 * time.Second
 
 // RealOpts configures the in-process ckv adapter. The old subprocess
@@ -59,11 +59,6 @@ type Real struct {
 	retainedSource bool
 	sourceReader   sourcepath.Reader
 	closed         bool
-
-	// modelDown is tripped when a real SemanticSearch fails (the engine's
-	// embed call could not reach the model) and cleared on success, so the
-	// next Health reflects a runtime disconnect without waiting for a probe.
-	modelDown atomic.Bool
 
 	// probe* cache the most recent embedding-model liveness probe under a
 	// modelProbeTTL window (see probeModel).
@@ -127,14 +122,10 @@ func (r *Real) SemanticSearch(ctx context.Context, query string, opts SearchOpts
 	}
 	resp, err := r.eng.SemanticSearch(ctx, query, ckv.SearchOptions{K: k, Filter: filter,
 		SrcRoot: r.sourceRoot, RetainedSource: r.retainedSource, SourceReader: r.sourceReader, EnableBM25Rerank: opts.BM25Rerank})
+	r.recordQueryResult(ctx, err)
 	if err != nil {
-		// A query failure means the engine could not embed the query —
-		// almost always the model endpoint is unreachable. Trip the flag so
-		// the next Health reports the model down without waiting for a probe.
-		r.modelDown.Store(true)
 		return nil, fmt.Errorf("ckvclient: SemanticSearch: %w", err)
 	}
-	r.modelDown.Store(false)
 	if resp == nil {
 		return nil, nil
 	}
@@ -223,30 +214,46 @@ func (r *Real) Health(ctx context.Context) (Health, error) {
 	return h, nil
 }
 
-// probeModel reports embedding-model liveness. It short-circuits to "down"
-// when a real query has tripped modelDown; otherwise it reuses a cached
-// probe within modelProbeTTL and only issues a fresh single-token embed when
-// the cache is stale. A probe failure also trips modelDown so a concurrent
-// query path observes the outage immediately.
-func (r *Real) probeModel(ctx context.Context) (bool, string) {
-	if r.modelDown.Load() {
-		return false, "embedding model unreachable (last query failed)"
+// recordQueryResult changes model health only on a successful search or a
+// typed embedding failure. Source/store/budget failures supply no model-health
+// evidence; cancellation belongs to the caller, not to shared backend state.
+func (r *Real) recordQueryResult(ctx context.Context, err error) {
+	if ctx.Err() != nil || (err != nil && !errors.Is(err, ckv.ErrEmbeddingFailed)) {
+		return
 	}
+	r.probeMu.Lock()
+	defer r.probeMu.Unlock()
+	r.lastProbe = time.Now()
+	r.lastProbeOK = err == nil
+	r.lastProbeReason = ""
+	if err != nil {
+		r.lastProbeReason = "query embedding failed"
+	}
+}
+
+// probeModel caches either outcome for modelProbeTTL. A negative result must
+// expire too: otherwise serviceability-gated v2 callers could never recover
+// without an out-of-band successful raw search or a restart.
+func (r *Real) probeModel(ctx context.Context) (bool, string) {
 	r.probeMu.Lock()
 	defer r.probeMu.Unlock()
 	if !r.lastProbe.IsZero() && time.Since(r.lastProbe) < modelProbeTTL {
 		return r.lastProbeOK, r.lastProbeReason
 	}
-	_, err := r.emb.Embed(ctx, []string{"liveness probe"})
+	vectors, err := r.emb.Embed(ctx, []string{"liveness probe"})
+	if ctx.Err() != nil {
+		return false, "embedding model probe canceled by caller"
+	}
+	if err == nil && (len(vectors) == 0 || len(vectors[0]) == 0) {
+		err = ckv.ErrEmbeddingFailed
+	}
 	r.lastProbe = time.Now()
 	if err != nil {
 		r.lastProbeOK = false
-		r.lastProbeReason = "embedding model probe failed: " + err.Error()
-		r.modelDown.Store(true)
+		r.lastProbeReason = "embedding model probe failed"
 	} else {
 		r.lastProbeOK = true
 		r.lastProbeReason = ""
-		r.modelDown.Store(false)
 	}
 	return r.lastProbeOK, r.lastProbeReason
 }

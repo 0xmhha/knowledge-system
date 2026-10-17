@@ -42,6 +42,12 @@ import (
 // model, dim mismatch, or no manifest. Caller: run `ckv build`.
 var ErrIndexUnavailable = query.ErrIndexUnavailable
 
+// ErrEmbeddingFailed: query-vector production failed. This is distinct from
+// source, integrity, store, or budget errors; it is not proof of network loss.
+// Recheck model health or retry after restoring the provider. Caller context
+// cancellation/deadline remains a separate error, not this sentinel.
+var ErrEmbeddingFailed = query.ErrEmbeddingFailed
+
 // ErrFreshnessStale: index's IndexedHead is behind current git HEAD.
 // Returned by Engine.CheckFreshness when callers opt in to strict
 // freshness checks. Caller: stale results usually still usable for
