@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "scope": "user_approved_host_metadata_and_consumer_contract_integration_not_new_quality_acceptance",
+  "scope": "user_approved_nonproduction_retained_external_source_rebuild_and_non_citable_metadata_contract",
   "previous_source_binding": {
     "revision": "fdb43ae2412d071f02b6b0dc5df0e50d3966b59e",
     "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/source-binding.json",
@@ -1747,14 +1747,12 @@
     "system/eval/b0-knowledge-system/human-review-m2max-2026-10-03.json": "5b8bad9ba6022eb6a05356540f282ecdeadd2d60083690dd022760908ca8cab1",
     "system/eval/b0-knowledge-system/static-v2-scopes-m2max-draft.json": "b76648c06ce55823ec96df631e003a7c377515113dbc07b167661d2468e104e2"
   },
-  "added_sources": [
-    "internal/system/mcp/host_selector_contract_test.go"
-  ],
+  "added_sources": [],
   "changed_preexisting_sources": [
-    "internal/system/mcp/annotations.go",
-    "internal/system/mcp/testdata/agent-mcp.schema.json",
-    "pkg/graph/mcphandlers/valueflow.go",
-    "pkg/graph/mcphandlers/valueflow_test.go"
+    "internal/system/ckvclient/real.go",
+    "internal/system/mcp/search_test.go",
+    "pkg/system/contract/hit.go",
+    "pkg/system/contract/hit_test.go"
   ],
   "implementation_completion_states_changed": false,
   "authorization": {
@@ -1766,5 +1764,7 @@
     "formal_acceptance": false,
     "production_activation": false,
     "paid_LLM_calls": 0
-  }
+  },
+  "validated_native_source_revision": "a3307ccbf0373b16caa86292c79f3ae5eeefe254",
+  "descriptive_metadata_correction": "Initial copied binding had prior adoption delta descriptions; actual source SHA maps were correct. This commit corrects descriptions only after all native checks and does not change Go source."
 }
