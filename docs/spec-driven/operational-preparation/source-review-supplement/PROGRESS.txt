@@ -436,6 +436,25 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 - 전용 증거31+기존402=433회귀, 문서134·기존 완료 검사 통과. 기존29개 동결 패킷·원본/이전 후보·bound 문서 유지, 새 패킷2복사본 바이트 재구성(새 실행 아님).
 - 판정은 로컬 scripted 응답. 실제 모델 추론·독립 의미 gold·품질·온톨로지 효과 수용은 미평가. 담당자미정/F01~08 pending/freeze null/executionfalse/정식0/9 유지.
 
-다음 작업(최신): P07 로컬 그림 렌더링·실제 host 취소/정리와 남은 T04/T09/T10/T16 통합검증, 이후 P08 최종 준비 판정. 위의 정식9건과 별도 후속12건은 그대로 남는다.
+30단계 당시 다음 작업(역사 기록): P07 로컬 그림 렌더링·실제 host 취소/정리와 남은 T04/T09/T10/T16 통합검증, 이후 P08 최종 준비 판정. 위의 정식9건과 별도 후속12건은 그대로 남는다.
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_host_schema_compatibility.py
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-host-schema-compatibility.py --packet docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1
+
+
+[완료 — 격리 시험] 31. P07 실제 그림 렌더링·신호 안전 소유 프로세스 정리
+- 고정된 기존 typed 그림4개를 로컬 Mermaid CLI12.0.0/mermaid12.1.0/Chromium으로 SVG/PNG8개 렌더링. 잘못된 문법1건은 비정상 종료·출력 없음. CFG6노드/7edge와 모듈3노드/2edge를 AI 시각 점검; runtime trace/의미 수용은 아님.
+- 초기 실제5host 종료 시험에서 SIGINT 관측기의 반복 신호 재진입과 SDK 강제 종료를 발견. CKS PID 부재만으로 회수 성공을 주장한 판정을 철회하고 exit/reap unknown1건을 원자료에 보존. 나머지 초기6CKS의 exit0/reap 기록 유지.
+- 최초 native budget 질의의 잘못된 discovery alias1건도 보존. 실제 CKS 이름으로 재시험해64전달/65번째EOF 거부 확인.
+- 기존 동결 observer는 보존. 새 시험 observer는 신호 callback에서 append만 수행하고 worker가 로그/child stdin 닫기를 담당. 전체 종료5종을 재실행: 정상/SIGTERM/SIGINT/deadline/의도적SIGKILL, host raw exit0/143/0/143/-9. 취소와 강제 종료는 정상 성공으로 분류하지 않음.
+- 최종6CKS 모두 exit0/회수. 반복SIGINT2개에도 출력/신호 worker join 및 소켓/응답기 정리. 추가64/65상한 재검증. 초기/수정 전체10host·13CKS·139전달 요청; 확인된 exit0/reap12개와 역사적 unknown1개를 구분.
+- 렌더러/host/wrapper/CKS의 소유 PID87개를 identity 기반 사후 점검해 모두 부재. 감사 프로세스 양성 대조 확인. rescue0. PID 부재를 과거 exit/reap 증명으로 대체하지 않음.
+- 취소 범위는 도구 응답 완료 후 로컬 API 대기 중 host 취소와 observer의 stdin EOF 정리다. CKS 계산 도중 취소·CKS 직접 신호·전역 네트워크 격리를 입증하지 않음.
+- 계획22사례 중17통과/실패0/5미완료(T04/T09/T10/T16/T22). 새 증거는 followups 하위에 격리해 기존30동결 패킷·현재 Go/schema·원본/후보 checkout·기존 bound 문서 보존.
+- 전용 증거 보호 검사44개 + 기존 관련433개 = 477개 통과. package notice 별도3개·문서134개·기존 구현 완료 검사·공백 검사 통과. 동결 증거220파일의 두 복사본은 바이트 일치 및 검증 통과; 재구성은 새 host/renderer/PID 측정으로 세지 않음.
+- 커밋 직전 staged 공백 검사에서 Mermaid 문법 오류 stderr 끝 빈 줄 경고1건 발견. 원본 bytes를 보존하고 followups/.gitattributes에서 해당 파일의 blank-at-eof만 예외로 지정; 나머지 공백 검사는 유지.
+- 이전30단계의 변경 없는 고정 native full test/race 각4063통과·18skip 및 build/fmt/vet/lint/boundaries 검증을 재사용하며 새 Go 실행으로 세지 않음.
+- 실제 모델0·운영 정식 실행0·정식 수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지. 시험 observer와 후보는 미채택, 온톨로지 효과는 미평가.
+
+다음 작업(최신): T04 opt-in/재사용·T09 foreign/pin·T10 partial/unknown·T16 오류 분모의 실제 통합 검증, 이후 P08/T22 준비 최종 판정. 위에 기록한 정식9건과 별도 후속12건 전체가 남아 있다.
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_render_lifecycle.py
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-render-lifecycle.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-render-lifecycle-v1
