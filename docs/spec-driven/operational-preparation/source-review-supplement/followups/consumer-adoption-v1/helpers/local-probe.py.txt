@@ -1,0 +1,24 @@
+import importlib.util,json,sys,shlex,subprocess
+from pathlib import Path
+ROOT=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');sys.path.insert(0,str(ROOT/'scripts'))
+def module(path):
+ spec=importlib.util.spec_from_file_location(path.stem.replace('-','_'),path);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
+h=module(Path('/private/tmp/ks-adoption-host.py'));b=h.base;root=Path('/private/tmp/ks-consumer-role-adopted-20261017-01');b.setup(root)
+pins=json.load(open(h.PRIOR/'binary-pins.json'));b.dump(root/'binary-pins.json',pins)
+record=json.load(open(b.P05/'execution.json'));query=dict(record['query']);query['expected_snapshot_sha256']=next(r['response']['result']['structuredContent']['snapshot_sha256']for r in json.load(open(b.P05/'sessions/main/messages.json'))if r['label']=='baseline')
+w=root/'source/.coding-agent/tickets/KS-P06-REVIEW';w.mkdir(parents=True);b.dump(w/'state.json',{'ticket_id':'KS-P06-REVIEW','ticket_type':'code_review','current_state':'ANALYSIS','states':{'ANALYSIS':{'status':'in_progress'},'PLANNING':{'status':'pending'}}})
+plugin=b.CANDIDATE/'plugin'
+def tool(name,args):return {'name':'mcp__plugin_coding-agent_cks__cks_context_'+name,'input':args}
+def bash(parts):return {'name':'Bash','input':{'command':shlex.join([str(p)for p in parts]),'description':'Owned integrated consumer verification'}}
+def read():return {'name':'Read','input':{'file_path':str(w/'state.json')}}
+def adapter(action):return bash([sys.executable,ROOT/'scripts/consumer-role-adapter.py',action,'--plugin',plugin,'--workspace',w])
+rules=tool('rule_candidates',{'rule_pack':'go-local-review@1.0.0','function':query});review=tool('review_function',{'symbol':record['selected']['canonical_id']})
+actions=[tool('value_dependencies',query),rules,tool('value_dependency_expansion',{'function':query,'limits':{'max_functions':8,'max_hops':3}}),tool('policy_security',query),review,bash([sys.executable,ROOT/'scripts/consumer-role-adapter.py','build','--plugin',plugin,'--frames',root/'analyzer/mcp-frames.jsonl','--workspace',w]),read(),{'state_operation':'handoff'}]
+h.run_case(root,'analyzer','analyzer',w,actions)
+diag=root/'source/.coding-agent/tickets/KS-ADOPT-DIAGNOSTIC';diag.mkdir();b.dump(diag/'state.json',{'ticket_id':'KS-ADOPT-DIAGNOSTIC','ticket_type':'code_review','current_state':'PLANNING','states':{'PLANNING':{'status':'pending'}}})
+h.run_case(root,'planner-tools','planner',diag,[rules,review])
+verify=bash([sys.executable,plugin/'scripts/deep_review.py','verify','--workspace',w])
+h.run_case(root,'planner-delivery','planner',w,[adapter('tamper'),read(),{'state_operation':'complete'},adapter('restore'),read(),verify,{'state_operation':'complete'},verify])
+matrix=module(ROOT/'scripts/run-host-schema-matrix.py');matrix.run(root,b.BINARY,Path('/private/tmp/ks-consumer-contract-readiness-20261017/bin/cks'))
+b.dump(root/'execution.json',{'source_pins':pins,'host_cases':['analyzer','planner-tools','planner-delivery'],'host_tool_pairs':7,'CKS_host_tool_requests':7,'native_comparison_requests':94,'actual_local_scripted_host':True,'actual_model_quality':False,'real_model_calls':0,'formal_runs':0,'production_installation':False,'root':str(root),'query':query,'host_driver_sha256':b.sha(Path('/private/tmp/ks-adoption-host.py')),'orchestrator_sha256':b.sha(Path(__file__))})
+print('integrated local probe complete:7 role-tool pairs;3 hosts;tamper refusal+restore+delivery;94 native comparison requests')

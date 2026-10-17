@@ -1,0 +1,49 @@
+import argparse,json,os,signal,subprocess,time,hashlib
+from pathlib import Path
+root=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');consumer=Path('/private/tmp/ks-adopted-consumer-20261017');out=Path('/private/tmp/ks-adoption-validation-20261017');out.mkdir(exist_ok=True)
+kind=__import__('sys').argv[1]
+folder=out/(kind+'-isolated');folder.mkdir(exist_ok=False)
+receipts=[]
+def call(label,argv,cwd,limit):
+ start=time.monotonic();timeout=False;term=False;kill=False
+ with (folder/(label+'.stdout')).open('wb')as stdout,(folder/(label+'.stderr')).open('wb')as stderr:
+  p=subprocess.Popen(argv,cwd=cwd,stdout=stdout,stderr=stderr,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1','GOCACHE':'/private/tmp/ks-adoption-go-cache-20261017'},start_new_session=True)
+  try:p.wait(timeout=limit)
+  except subprocess.TimeoutExpired:
+   timeout=True;term=True;os.killpg(p.pid,signal.SIGTERM)
+   try:p.wait(timeout=5)
+   except subprocess.TimeoutExpired:kill=True;os.killpg(p.pid,signal.SIGKILL);p.wait(timeout=5)
+ r={'label':label,'argv':argv,'cwd':str(cwd),'pid':p.pid,'owned_new_session':True,'exit_code':p.returncode,'timeout':timeout,'term_sent':term,'kill_sent':kill,'reaped':p.poll()is not None,'elapsed_seconds':time.monotonic()-start,'GOCACHE':'/private/tmp/ks-adoption-go-cache-20261017','source_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=cwd,text=True).strip()}
+ if '-json'in argv:
+  counts={'pass':0,'fail':0,'skip':0};packages={'pass':0,'fail':0,'skip':0}
+  for line in (folder/(label+'.stdout')).read_text(errors='replace').splitlines():
+   try:d=json.loads(line)
+   except ValueError:continue
+   action=d.get('Action');target=counts if d.get('Test') else packages
+   if action in target:target[action]+=1
+  r['tests']=counts;r['packages']=packages
+ for suffix in ['stdout','stderr']:r[suffix+'_sha256']=hashlib.sha256((folder/(label+'.'+suffix)).read_bytes()).hexdigest()
+ receipts.append(r);(folder/'receipts.json').write_text(json.dumps(receipts,indent=2)+'\n');print(json.dumps({k:r[k]for k in ['label','exit_code','elapsed_seconds','timeout']}),flush=True)
+ if p.returncode!=0 or timeout:raise SystemExit(1)
+if kind=='native':
+ for args in [('build',['go','build','./...'],900),('test',['go','test','-json','-count=1','-timeout=18m','./...'],1320),('race',['go','test','-race','-json','-count=1','-timeout=20m','./...'],1440),('lint',['make','lint','GOLANGCI_LINT=/Users/kevin/.gvm/pkgsets/go1.26.8/global/bin/golangci-lint'],1200)]:call(args[0],args[1],root,args[2])
+ call('build-bins',['make','build-bins'],root,900)
+elif kind=='consumer':
+ call('tool-names',['bash','contract/lint-tool-names.sh'],consumer,120)
+ call('bench',['python3','-m','unittest','discover','-s','bench/tests','-t','.'],consumer,300)
+ for file in sorted((consumer/'plugin/scripts/tests').glob('test_*.py')):call(file.stem,['python3',str(file)],consumer,240)
+ call('hooks',['python3','bench/hooks/test_hooks.py'],consumer,240)
+ module=consumer/'tools/jira-gateway-mcp'
+ call('jira-build',['go','build','./...'],module,300)
+ call('jira-test',['go','test','-json','-count=1','./...'],module,300)
+ call('jira-race',['go','test','-race','-json','-count=1','./...'],module,300)
+ call('jira-vet',['go','vet','./...'],module,300)
+ call('timing-race',['go','test','-race','-json','plugin/tools/timing-log-guard/main.go','plugin/tools/timing-log-guard/main_test.go'],consumer,300)
+ call('oracle-smoke',['python3','bench/oracle-validity/smoke.py','--out',str(folder/'oracle-evidence')],consumer,420)
+ call('selection-smoke',['python3','bench/oracle-validity/selection_smoke.py','--panel','fixture','--out',str(folder/'selection-evidence')],consumer,420)
+ call('evaluation-exit',['python3','bench/evaluation-exit/smoke.py','--out',str(folder/'evaluation-exit-evidence')],consumer,180)
+ files=[str(p)for p in (consumer/'tools').rglob('*.go')]+[str(p)for p in(consumer/'plugin/tools').rglob('*.go')]
+ call('fmt',['gofmt','-l',*files],consumer,60)
+ assert not (folder/'fmt.stdout').read_text().strip(),'consumer fmt drift'
+else:raise SystemExit('unknown suite')
+print(kind+' full validation complete',flush=True)

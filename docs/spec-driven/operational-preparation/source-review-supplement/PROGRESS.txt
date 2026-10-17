@@ -556,8 +556,21 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 결정안: docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json
 검증37: 문서 계약20개·문서134개·기존 구현 완료 판정·JSON/참조hash/8결정 미승인·기존 정식필드 무변경·공백 검사 통과. 기존667회귀는 이전 검증이며 이번 새 실행으로 세지 않음.
 
-[진행 중] 38. 승인된 후보 통합·새 로컬 검증
+[완료 — 승인된 로컬 통합] 38. 승인된 후보 통합·새 로컬 검증
 - 사용자 D01~D08 권고 승인·D04 담당자미정 유지. 두 후보 통합/로컬 검증/문서/서명커밋만 진행하며 정식gold/수용·유료모델·운영/global 설치·push/PR/merge를 실행하지 않음.
 - CKS 현재HEAD의 유지 Go 소스는 후보 기준5b39c413과 동일. CKS5파일을 정확 적용. coding-agent 현재 원격main3a66d91f는 b32b7a5a의 조상이며 의존16commit/61파일 전체가 필요함을 기록. 소유 새 통합 clone에서 fast-forward하고 원본/기존 후보 checkout을 보존.
 - 옛 source-bound667회귀/22사례는 당시 source 문맥에서 보존·재검증한다. 변경된 현재 source 결과로 재표시하지 않으며 새 source binding·전체빌드/test/race/fmt/vet/lint·consumer 회귀·새 binary pin/actual host 관측을 별도로 기록.
-다음 작업(최신): 새 source 커밋 → fresh 전체검증/consumer 실제연결 → 최종 증거·문서/커밋. 담당자/독립gold/온톨로지 의미/답변 효과·정식9건 및 별도후속12건은 남음.
+38단계 착수 당시 계획(역사 기록): 새 source 커밋 → fresh 전체검증/consumer 실제연결 → 최종 증거·문서/커밋。
+
+38단계 최종 결과: CKS fdb43ae2 native5파일·coding-agent d1ebafb8(main대비18커밋/66파일) 로컬 통합 완료.
+- fresh native 일반/race 전체 각각4063pass·18skip·0fail, build/fmt/vet/golangci/boundaries/docs·build-bins 통과.
+- consumer Python188·137tool reference·project/hooks·Jira build/test/race/vet·timing race·fixture3smoke 통과.
+- 최초 공유 Go캐시 누락 실패와 consumer기존4파일 fmt실패를 보존하고 전용캐시 및 형식/CI수정 뒤 재검증 통과.
+- 실제host3회·7role/tool쌍·변조CLI/Write거부·복구후정상전달·partial/unknown 유지. 이전/새native47+47비교 동일(시간제외).
+- CKS5개 exit0/reap·소유PID11부재·강제kill/rescue0. 전역32·운영metadata/pointer42·원본5checkout·기존동결패킷 보존.
+- 기존667개는 통합전ba6 source에서 재실행한 역사적 보호검사. 현재source에 합산하지 않음. 새증거 보호12개 통과.
+- 실제host실행8581과 최종d1의plugin tree동일. 형식수정/CI후속이 다른실행으로 바뀐것처럼 기록하지 않음.
+- D04미정·정식0/9·freeze null/executionfalse·온톨로지quality inconclusive 유지. 운영설치/유료모델/외부게시0.
+다음 작업(최신): 소유 go-stablenet 비운영pilot의 source/dataset/BGE-M3실제runtime pin·정렬·semantic off/출처/혼입 경계 검증 → go-wemix 명시 비교.
+남은 전체: 위pilot/비교; 독립담당자·입력/완전gold/매칭/DEV-FINAL/표본충분성·F01~08실행동결; 정식WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 9건; 필수온톨로지독립효과/구현연결/모델지정후답변효과; 별도후속12건. 상세목록은 consumer-adoption-v1/REPORT.txt.
+검증38: scripts/test_consumer_adoption.py 및 scripts/check-consumer-adoption.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1

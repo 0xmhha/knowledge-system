@@ -415,8 +415,14 @@
         },
         "adoption_acceptance_decision_proposal": {
           "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-          "sha256": "4ecc60e949bdec69c12ee6c144e66e0d6b767d58c0e5db01ad2373227b8f1c6d",
-          "status": "D01_D08_recommended_scope_approved_D04_unassigned_local_integration_only"
+          "sha256": "578577824f822522a5a479d0748d1ef403250a1416174c67b768b972ca4dc10f",
+          "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_locally_no_formal_freeze"
+        },
+        "consumer_adoption": {
+          "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
+          "sha256": "3a17b8326ab4a1cdf1e0d3d9b926cc41c722813b7c892c04179e5b7ec5e4b760",
+          "status": "approved_local_source_integration_fresh_validation_complete_not_formal_acceptance",
+          "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
         }
       },
       "completed_preparation": [
@@ -470,7 +476,8 @@
         "준비34/T10: 실제 Seed/Field partial2건은 matched rules·비잘림·5unknown절/capability/diagnostics/한계를 유지해 전달. 실제 응답4종+로컬 변이6종의 CLI10/Write hook10거부·원본 복구 및 정상 전달2건 검증. 실제6host/9CKS 종료·회수. 빈 후보는 안전/누락0·의미/온톨로지 효과 수용 아님.",
         "준비35/T16: 소유 CKS5세션에서 missing/ambiguous/구형 index/provider 비서비스·시작 실패·hard transport timeout을 원문 보존. 전체8시나리오=partial2+비사용6, 도구평가7+진단1. late 응답1은 timeout 성공 승격 금지·별도 recovery, exit0/reap4·startup exit1/reap1·PID5부재. provider 실제 연결 timeout 및 manifest/alignment 복합 조건을 유지. 준비21/22; 실제 host/모델·정식/온톨로지 효과 수용 아님.",
         "준비36/P08/T22: 현재 전후 전역/프로젝트 설정32항목·운영metadata/current42항목·기존 비소유엔진10개·보호파일1575개/서명clean5checkout·binary/remote refs 유지. 소유fixture4변이 검출→정확복구→실제CKS1 partial/exit0/reap 및 owned socket 양성대조/close, foreign·symlink2거부. 이전35패킷 local commit/계보 및 PID161부재 확인하되 과거 미확인CKS exit1건 유지. 격리 P01~P08/22사례 완료; 후보채택/배포·과거 전역소급·독립 품질/온톨로지 효과 수용 아님.",
-        "준비37: 검증 완료 후보2개 통합·소유 pilot·ontology off·독립 gold/담당자·기존9기준·온톨로지 추가gate·유료모델0원 우선·게시/운영 별도 범위의 D01~08 권고안을 문서화. 로드맵7/7·28/28 로컬 구현과 제한 효과 연구 완료/품질inconclusive를 유지. 사용자 결정·채택/운영·정식 실행/수용은 미완료."
+        "준비37: 검증 완료 후보2개 통합·소유 pilot·ontology off·독립 gold/담당자·기존9기준·온톨로지 추가gate·유료모델0원 우선·게시/운영 별도 범위의 D01~08 권고안을 문서화. 로드맵7/7·28/28 로컬 구현과 제한 효과 연구 완료/품질inconclusive를 유지. 사용자 결정·채택/운영·정식 실행/수용은 미완료.",
+        "approved_pair_source_adoption_fresh_full_native_consumer_checks_and_actual_scripted_host_not_formal_acceptance"
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -2909,6 +2916,48 @@
           "formal_state_unchanged": true,
           "code_or_global_or_production_changes": false,
           "previous_667_regression_tests": "prior_verified_results_not_new_runs_in_this_documentation_step"
+        },
+        "consumer_adoption": {
+          "status": "local_source_adoption_and_fresh_validation_pass",
+          "native_test": {
+            "pass": 4063,
+            "fail": 0,
+            "skip": 18
+          },
+          "native_race": {
+            "pass": 4063,
+            "fail": 0,
+            "skip": 18
+          },
+          "consumer_python_tests": 188,
+          "consumer_functional_commands": 25,
+          "consumer_corrective_checks": 7,
+          "consumer_initial_format_failure_retained": true,
+          "native_initial_shared_cache_failure_retained": true,
+          "actual_role_tool_pairs": 7,
+          "actual_hosts": 3,
+          "host_CKS_requests": 7,
+          "native_comparison_requests": 94,
+          "CKS_exit0_reaped": 5,
+          "owned_PID_audit_count": 11,
+          "CLI_tamper_refusal": 1,
+          "actual_Write_tamper_refusal": 1,
+          "restored_normal_delivery": 1,
+          "historical_guard_tests": 667,
+          "historical_guards_source": "ba6d1d22b3f95a6f3b3948717f9d0ea767870bee",
+          "new_quality_or_ontology_measurement": false,
+          "formal_completed": 0,
+          "formal_total": 9,
+          "reviewer_assignment": "미정",
+          "production_activation": false,
+          "real_model_calls": 0,
+          "external_publication": 0,
+          "evidence_protection_tests_passed": 12,
+          "native_source_commit": "fdb43ae2412d071f02b6b0dc5df0e50d3966b59e",
+          "consumer_final_commit": "d1ebafb8ddf4eb487b8f1d6285135e174c40834b",
+          "current_phase": "A_source_integration_local_validation_complete",
+          "next_task": "owned_nonproduction_go_stablenet_pilot_then_explicit_go_wemix_comparison",
+          "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
         }
       },
       "candidate_counts": {
@@ -3208,7 +3257,15 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "4ecc60e949bdec69c12ee6c144e66e0d6b767d58c0e5db01ad2373227b8f1c6d",
-    "status": "D01_D08_recommended_scope_approved_D04_unassigned_local_integration_only"
-  }
+    "sha256": "578577824f822522a5a479d0748d1ef403250a1416174c67b768b972ca4dc10f",
+    "status": "D01_D08_scope_approved_D04_unassigned_source_adopted_locally_no_formal_freeze"
+  },
+  "consumer_adoption": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
+    "sha256": "3a17b8326ab4a1cdf1e0d3d9b926cc41c722813b7c892c04179e5b7ec5e4b760",
+    "status": "approved_local_source_integration_fresh_validation_complete_not_formal_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
+  },
+  "local_adoption_completed": true,
+  "historical_preparation_fields": "Previous named preparation records describe their frozen source and execution dates. consumer_adoption is the current integration observation; it does not change formal items or replace the historical denominators."
 }
