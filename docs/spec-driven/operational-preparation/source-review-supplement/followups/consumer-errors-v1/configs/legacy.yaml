@@ -1,0 +1,16 @@
+version: 1
+name: owned-P06
+backends:
+  ckg:
+    path: /private/tmp/ks-consumer-errors-20261017-01/legacy.db
+    source_root: /private/tmp/ks-consumer-errors-20261017-01/source
+  ckv:
+    provider: mock
+listen:
+  transport: stdio
+logging:
+  level: error
+sanitize:
+  rules_path: /private/tmp/ks-consumer-errors-20261017-01/sanitize.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true

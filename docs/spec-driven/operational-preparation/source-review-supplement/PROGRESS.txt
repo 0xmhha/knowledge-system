@@ -507,6 +507,21 @@ PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --pac
 - 전용 보호 검사38개 + 이전 관련553개 = 591개 통과. package notice 별도3개·문서134개·기존 구현 완료 검사·공백 검사 통과. 변경 없는 stage30 native full test/race 각4063통과/18skip·build/fmt/vet/lint/boundaries 결과 재사용이며 새 Go 전체 검사 아님.
 - 계획20/22 통과·현재 실패0·미완료2(T16/T22). 자연어 의미 정확성·필수 결함 누락·안전·완전성/온톨로지 효과 미평가. 후보 미채택·정식 수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지.
 
-다음 작업(최신): T16 오류 처리·평가 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
+34단계 당시 다음 작업(역사 기록): T16 오류 처리·평가 분모 → P08/T22 최종 준비 판정. 위의 정식 수용9건과 별도 후속12건 전체가 남는다.
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_partial.py
 검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-partial.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-partial-v1
+
+[완료 — 소유 stdio 오류 검증] 35. T16 실제 오류·시작 실패·전송 timeout과 분모
+- 먼저 고정한 계획의 평가7도구 + 진단health1 = 실제 도구8시도, 시작 initialize 실패1을 포함한 전체8시나리오를 구분. raw stdin/stdout/stderr·응답 전 attempt·원래 exit/EOF를 보존하며 오류/응답 없음으로 분모를 줄이지 않음.
+- 실제 missing은 not_found/analysis null, Same은 ambiguous across2 isError, code_edges를 제거/checkpoint한 소유 legacy index는 requires_reindex isError. 정상과 복구2호출도 지원 partial이며 완전 분석/안전 증명이 아님.
+- configured Ollama의 소유 loopback bound-not-listening 주소에서 실제 model list unavailable/operation timed out 진단, vector unreachable·serviceable false와 get_for_task isError 관측. 즉시 연결 거부 예상과 다른 실제 연결 timeout을 원문 유지. CKV manifest 미존재/alignment 실패도 함께 있어 단일 원인 격리나 실제 embedding 품질로 세지 않음.
+- 정확한 Popen child/birth/command를 확인해 SIGSTOP·정지상태 T 관측 뒤 실제 요청의1초 hard transport timeout. SIGCONT 후 id가 같은 지연 응답1을 별도 보존하며 timeout 판정은 유지. 다음 새 id의 recovery만 별도 partial. 실제 Claude host timeout·계산 예산/자연 장애가 아닌 의도한 소유 process suspension fault.
+- invalid SQLite 소유 graph의 실제 시작 EOF/CKS exit1을 정상 성공으로 바꾸지 않음. 5자식 모두 회수·reader join·EOF 정리: 원래 exit0 4개/의도한 startup exit1 1개, terminate/kill0·PID5부재·감사기 live 양성 대조 확인.
+- 전체8시나리오=지원partial2+비사용6; 평가도구만의 partial2/7 및 별도 진단1을 구분. 늦은 응답을 더해3성공으로 세거나 실패를 빼100%로 표시하지 않음. complete analysis0·의미 precision/recall/safety null·온톨로지 효과 미평가.
+- 첫 evidence validator에서 읽기 전용 SQLite 검사가 WAL/SHM 보조파일을 만든 점을 발견. 이전 고정본은 임시 폴더에 보존하고 immutable 읽기로 변경해 동일 실행 원자료를 재수집. 새 CKS 측정 없음. 최종 두 복사본 검증/전체 bytes 일치, 검증 전후 파일 무변경 검사 통과.
+- 전용 보호 검사38 + 기존 관련591 = 629개 통과. package notice 별도3개·문서134개·기존 구현 완료 검사·공백 검사 통과. 이전34동결 패킷·유지 Go/runtime/schema·bound 문서·원본/후보4checkout 보존. stage30 full test/race 각4063통과/18skip·build/fmt/vet/lint/boundaries 결과 재사용; 새 전체 Go 실행 아님.
+- 준비21/22·현재 실패0·미완료T22. actual role 새 세션0·실제모델0·후보 미채택·정식 실행/수용0/9·담당자미정/F01~08 pending/freeze null/executionfalse 유지.
+
+다음 작업(최신): P08/T22 최종 준비 판정·원본/전역/운영 상태·복구·로컬 커밋/게시 경계 확인. 위의 정식 수용9건과 별도 후속12건 전체가 남으며, 온톨로지 효과 평가는 정식 수용에 포함해 수행해야 한다.
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_errors.py
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-errors.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "test_id": "T16",
+  "base_commit": "a7c9d929965e6d649b18446d7902d0c4b4475a25",
+  "scope": "owned_stdio_faults_not_actual_role_or_quality_acceptance",
+  "sessions": [
+    "main",
+    "legacy",
+    "provider",
+    "timeout",
+    "startup"
+  ],
+  "evaluation_cases": [
+    "positive",
+    "missing",
+    "ambiguous",
+    "legacy",
+    "provider",
+    "timeout",
+    "recovery",
+    "startup"
+  ],
+  "diagnostic_calls": [
+    "provider-health"
+  ],
+  "tool_evaluation_denominator": 7,
+  "scenario_denominator": 8,
+  "transport_deadline_seconds": 1.0,
+  "request_cap_per_session": 16,
+  "requirements": [
+    "Append attempt before any pipe write; preserve raw requests/responses/stderr, unmatched/late replies, timeout and EOF. Startup initialize failure remains in scenario denominator and outside tool denominator.",
+    "Use unchanged pinned CKS with owned fixture; actual missing/ambiguous, dropped code_edges, configured Ollama loopback connection refusal, invalid graph startup and SIGSTOP-induced hard transport timeout. No mock outage response.",
+    "Only owned Popen child is stopped/resumed. After hard deadline, retain timeout outcome even if late response succeeds; new recovery call is separate. EOF cleanup requires exit/reap/reader completion.",
+    "A partial result is not complete analysis. Never drop missing/error/timeout/startup cases to manufacture 100 percent success; semantic precision/recall/safety/ontology effect remain null.",
+    "Preserve previous34 packets, maintained runtime/schema, formal0/9 and no candidate adoption/publication."
+  ],
+  "limitations": [
+    "Client transport deadline is an injected process-suspension fault, not a natural backend compute deadline or actual Claude host timeout.",
+    "Unavailable provider has configured owned CKV path and real refused loopback Ollama connection; no real embedding model or vector quality measurement.",
+    "Damaged database and dropped table are owned faults, not operational outages."
+  ],
+  "real_model_calls": 0,
+  "formal_runs": 0
+}

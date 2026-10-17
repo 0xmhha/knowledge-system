@@ -1,0 +1,75 @@
+{
+  "test_id": "T16",
+  "status": "owned_actual_errors_denominators_pass",
+  "cases": [
+    {
+      "id": "positive",
+      "outcome": "supported_partial"
+    },
+    {
+      "id": "missing",
+      "outcome": "not_found"
+    },
+    {
+      "id": "ambiguous",
+      "outcome": "ambiguous_error"
+    },
+    {
+      "id": "legacy",
+      "outcome": "requires_reindex_error"
+    },
+    {
+      "id": "provider",
+      "outcome": "provider_unavailable_error"
+    },
+    {
+      "id": "timeout",
+      "outcome": "transport_timeout"
+    },
+    {
+      "id": "recovery",
+      "outcome": "supported_partial"
+    },
+    {
+      "id": "startup",
+      "outcome": "startup_failure"
+    }
+  ],
+  "scenario_denominator": 8,
+  "tool_evaluation_denominator": 7,
+  "diagnostic_tool_calls": 1,
+  "total_tool_attempts": 8,
+  "total_rpc_attempts": 13,
+  "supported_partial_results": 2,
+  "nonusable_scenarios": 6,
+  "scenario_supported_partial_fraction": {
+    "numerator": 2,
+    "denominator": 8
+  },
+  "evaluation_tool_supported_partial_fraction": {
+    "numerator": 2,
+    "denominator": 7
+  },
+  "late_responses_outside_success": 1,
+  "complete_analysis_results": 0,
+  "startup_failures": 1,
+  "raw_CKS_exit0_reaped": 4,
+  "raw_CKS_exit1_reaped": 1,
+  "owned_PIDs_absent": 5,
+  "provider_connection_observed": "operation_timed_out_not_immediate_refusal",
+  "provider_alignment_confounded": true,
+  "quality_precision_recall_safety": null,
+  "ontology_effect_acceptance": "not_evaluated",
+  "actual_role_sessions": 0,
+  "candidate_adopted": false,
+  "real_model_calls": 0,
+  "formal_runs": 0,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "prior_frozen_packets_unchanged": 34,
+  "full_plan_passed": 21,
+  "full_plan_pending": [
+    "T22"
+  ],
+  "next": "P08/T22 final readiness/recovery/publication boundary"
+}
