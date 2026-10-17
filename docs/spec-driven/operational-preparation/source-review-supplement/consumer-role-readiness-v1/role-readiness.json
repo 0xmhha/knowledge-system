@@ -1,0 +1,283 @@
+{
+  "kind": "P06_actual_role_partial_host_schema_admission_failure_not_complete",
+  "P06_complete": false,
+  "candidate_adopted": false,
+  "role_tool_pairs_required": 7,
+  "role_tool_pairs_succeeded": 5,
+  "successful_pairs": [
+    [
+      "analyzer",
+      "cks.context.review_function"
+    ],
+    [
+      "analyzer",
+      "cks.context.rule_candidates"
+    ],
+    [
+      "analyzer",
+      "cks.context.value_dependency_expansion"
+    ],
+    [
+      "planner",
+      "cks.context.review_function"
+    ],
+    [
+      "planner",
+      "cks.context.rule_candidates"
+    ]
+  ],
+  "failed_pairs": [
+    [
+      "analyzer",
+      "cks.context.value_dependencies"
+    ],
+    [
+      "analyzer",
+      "cks.context.policy_security"
+    ]
+  ],
+  "registered_CKS_tools": 33,
+  "effective_analyzer_tools": 23,
+  "effective_planner_tools": 19,
+  "configured_denied_planner_tools": 18,
+  "host_sessions": 10,
+  "adapter_diagnostic_sessions": 2,
+  "API_tool_attempts": 35,
+  "stdio_tool_requests": 8,
+  "owned_CKS_children_reaped": 10,
+  "actual_Write_Edit_guard_refusals": 6,
+  "sessions": [
+    {
+      "case": "P06-analyzer-01",
+      "role": "analyzer",
+      "host_exit": 0,
+      "stdio_tool_requests": 0,
+      "API_tool_attempts": 0,
+      "kind": "adapter_diagnostic",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-analyzer-02",
+      "role": "analyzer",
+      "host_exit": 1,
+      "stdio_tool_requests": 0,
+      "API_tool_attempts": 0,
+      "kind": "adapter_diagnostic",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-analyzer-03",
+      "role": "analyzer",
+      "host_exit": 0,
+      "stdio_tool_requests": 3,
+      "API_tool_attempts": 5,
+      "kind": "actual_role_local_scripted_response",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-analyzer-handoff",
+      "role": "analyzer",
+      "host_exit": 0,
+      "stdio_tool_requests": 2,
+      "API_tool_attempts": 5,
+      "kind": "actual_role_local_scripted_response",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-planner-delivery",
+      "role": "planner",
+      "host_exit": 0,
+      "stdio_tool_requests": 2,
+      "API_tool_attempts": 10,
+      "kind": "actual_role_local_scripted_response",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-analyzer-revision",
+      "role": "analyzer",
+      "host_exit": 0,
+      "stdio_tool_requests": 0,
+      "API_tool_attempts": 3,
+      "kind": "actual_role_local_scripted_response",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-planner-reentry",
+      "role": "planner",
+      "host_exit": 0,
+      "stdio_tool_requests": 0,
+      "API_tool_attempts": 4,
+      "kind": "actual_role_local_scripted_response",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-planner-denied",
+      "role": "planner",
+      "host_exit": 0,
+      "stdio_tool_requests": 0,
+      "API_tool_attempts": 1,
+      "kind": "actual_role_local_scripted_response",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-analyzer-unavailable",
+      "role": "analyzer",
+      "host_exit": 0,
+      "stdio_tool_requests": 1,
+      "API_tool_attempts": 1,
+      "kind": "actual_role_local_scripted_response",
+      "all_owned_children_reaped": true
+    },
+    {
+      "case": "P06-planner-boundary",
+      "role": "planner",
+      "host_exit": 0,
+      "stdio_tool_requests": 0,
+      "API_tool_attempts": 6,
+      "kind": "actual_role_local_scripted_response",
+      "all_owned_children_reaped": true
+    }
+  ],
+  "two_review_generations_validated": true,
+  "actual_role_reasoning_quality": "not_evaluated",
+  "reasoning_generator": "local_scripted_adapter_not_real_model",
+  "full_plan_cases_passed": [
+    "T01",
+    "T02",
+    "T03",
+    "T06",
+    "T07",
+    "T08",
+    "T11",
+    "T12",
+    "T13",
+    "T14",
+    "T17",
+    "T21"
+  ],
+  "full_plan_cases_failed": [
+    "T05",
+    "T19",
+    "T20"
+  ],
+  "full_plan_cases_pending": 7,
+  "full_plan_cases_not_passed": 10,
+  "planned_case_progress": [
+    {
+      "id": "T01",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T02",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T03",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T04",
+      "full_case_status": "not_run",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T05",
+      "full_case_status": "fail",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T06",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T07",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T08",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T09",
+      "full_case_status": "not_run",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T10",
+      "full_case_status": "not_run",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T11",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T12",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T13",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T14",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T15",
+      "full_case_status": "not_run",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T16",
+      "full_case_status": "not_run",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T17",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T18",
+      "full_case_status": "not_run",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T19",
+      "full_case_status": "fail",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T20",
+      "full_case_status": "fail",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T21",
+      "full_case_status": "pass",
+      "actual_role_quality": "not_evaluated"
+    },
+    {
+      "id": "T22",
+      "full_case_status": "not_run",
+      "actual_role_quality": "not_evaluated"
+    }
+  ],
+  "formal_completed": 0,
+  "formal_total": 9,
+  "independent_acceptance": "not_recorded",
+  "real_model_calls": 0,
+  "environment_network_security_sandbox_proven": false,
+  "next": "versioned top-level oneOf host compatibility specification/candidate; preserve runtime exact-selector validation; rerun all 7 pairs before P06 completion; then P07/P08"
+}

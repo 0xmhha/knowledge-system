@@ -1,0 +1,13 @@
+P06 실제 역할 연결·전달/거부 관측 — 준비29단계, P06 미완료
+실제 host2.1.300·격리 후보af4ff8b1·고정 CKS·소유 fixture와 로컬 scripted 응답기만 사용.
+등록 CKS33개와 별개로 host가 최상위 oneOf의 value_dependencies/policy_security2개를 제외한다. 실제 tool_use도 No such tool available로 실패.
+요구7쌍 중 성공5쌍: Analyzer rules/expansion/review + Planner review/rules. 누락2쌍을 성공으로 세지 않는다.
+Analyzer→Planner typed5산출물/6절·CLI·두 hash 전달, ANALYSIS 복귀→추론만 변경→재생성→Planner 재진입의2세대 검증.
+실제 Write/Edit hook 거부6건: report hash/type/ANALYSIS hash/이전 세대 hash/형식 우회/shell 변조 후 전달. shell 실패 CLI2→복구 CLI0 보존.
+명시적 Planner tool deny는 host 유효 도구에서 제외, CKS 호출0. backend 미설정 unavailable은 기존 전달 상태를 바꾸지 않음.
+전체 host10세션(API 도구 시도35/실제 CKS8요청), 초기 adapter 진단2세션 포함. host 실패1건·노출 실패2건/명시적거부/기타 대조를 분모에서 숨기지 않음.
+소유 host10개 reap·CKS10개 EOF exit0/reap·responder10개 닫힘. host 취소/강제종료·renderer 검증(P07)은 별도 pending.
+22계획사례: 전체 통과12, 실패3(T05/T19/T20), 나머지7 pending. P06 전체 완료·운영 후보 준비 완료로 표시하지 않음.
+판정 문안은 scripted adapter가 만들었다. 실제 모델 추론·의미 정답/누락0·독립 품질/온톨로지 효과 수용은 미평가.
+원본/격리 후보·backend schema/consumer contract를 이번에 변경하지 않음. 정식 수용0/9·담당자미정·freeze null·실행false 유지.
+다음: COMPATIBILITY-FOLLOWUP.txt의 새 호환 명세/별도 후보에서 runtime 입력 거부를 보존하며 metadata를 보완하고 P06 재검증. 이후 P07→P08.

@@ -358,11 +358,30 @@
 - 이전 동결 패킷27개·유지보수 Go·원본/후보 consumer·원래 readiness 결합 문서 유지.
 - 실제 역할/모델0·후보 미채택·정식 수용0/9 유지. 이후 P06 실제 역할→P07 그림/종료→P08 준비 판정.
 
-[예정] 29. P06 실제 역할 adapter·로컬 응답기
-- 실제 Analyzer/Planner dispatch와 유효 도구 목록을 수집하고 7쌍의 alias→wire 호출 receipt를 검증한다.
-- 정상 typed report/handoff·hash·재진입·permission/provider 실패 경로를 구분한다.
-- 직접 stdio 성공으로 actual role receipt를 대체하지 않는다. 모델 품질 평가·실제 모델 호출은 하지 않는다.
-- 이후 P07 그림 render/host 취소·종료와 P08 최종 준비 판정이 남아 있다.
+[부분 검증] 29. P06 실제 역할·전달/거부와 host 도구 admission 공백
+- 고정 Claude host2.1.300이 실제 Analyzer/Planner 원문을 불러온 것을 API system body·유효 tools·init/plugin/alias→wire로 대조.
+- 요구7쌍 중5쌍 성공: Analyzer rules/expansion/review, Planner review/rules.
+- CKS 등록33개와 별개로 host가 최상위 oneOf의 value_dependencies/policy_security2개를 제외. 실제 tool_use도 No such tool available로 실패.
+- P06 미완료. T05/T19/T20 실패 유지. registry/schema 정합 성공이 host 도구 노출 성공을 대신하지 않음.
+- Analyzer→Planner의 typed5산출물/6절·CLI·두 hash 전달과 ANALYSIS 복귀→재생성→재진입2세대 확인.
+- 실제 Write/Edit 거부6건: report hash/type/ANALYSIS hash/이전 세대 hash/Edit 우회/shell 변조 후 전달.
+- shell verifier exit2 후 전달 거부, 원본 bytes 복구 후 exit0 확인. shell 자체를 hook이 차단했다는 뜻이 아님.
+- 명시적 Planner 도구 deny: 유효 목록에서 제외·CKS 호출0. backend 미설정 unavailable은 기존 완료 상태를 바꾸지 않음.
+- host10세션/API 도구35시도/CKS8호출. 초기 adapter 진단2세션·CLI exit1·누락2도구를 숨기지 않음.
+- 소유 host10개 reap·CKS10개 exit0/reap·응답기10개 닫힘. 실제 host 취소/renderer/P07 전체 정리는 별도 미검증.
+- 22사례 전체 통과12(T01/T02/T03/T06/T07/T08/T11/T12/T13/T14/T17/T21), 실패3(T05/T19/T20), 미완료7(T04/T09/T10/T15/T16/T18/T22).
+- ROLE-READINESS-REPORT.txt·role-readiness.json에 실제 역할 원자료와 분모, COMPATIBILITY-FOLLOWUP.txt에 보완 명세 초안 보존.
+- 전용 증거 guard39개 + 관련363개 = 402개 회귀 통과. 도구 실패3사례를 성공으로 바꾸지 않음.
+- 문서134개·기존 구현 완료 상태 검사 통과. 증거211파일의 두 복사본 재구성 바이트 일치 확인(새 host 실행 아님).
+- 이전28개 동결 패킷·유지 Go·원래 readiness 결합 문서 유지. 원본 Markdown은 .md.txt 이름으로 bytes 보존.
+- scripted 문안을 모델 추론·독립 gold/누락0·의미 품질·온톨로지 효과 수용으로 세지 않음.
+- 원본/후보 consumer·backend schema/소비자 mirror·유지 Go·정식 수용 상태 보존.
+
+[다음 준비 작업] 30. 최상위 schema의 host 호환 후보 및 P06 재검증
+- 현재 범위의 backend_schema_or_permission_model_change=false를 보존하여 이번에는 schema/permission을 바꾸지 않음.
+- 별도 버전 명세/후보에서 host가 수용하는 metadata 표현과 consumer mirror를 보완하고 runtime exact-selector/type/null/unknown/pin/상한 거부를 보존한다.
+- 새 binary/source pin·schema 정합·부정 대조·실제7쌍을 확인한 뒤 P06 완료 여부를 재판정한다.
+- 이후 P07 그림 렌더링/host 취소·종료, P08 전체 준비 판정이 남는다.
 
 현재 정식 수용 상태: 0/9
 담당자: 사용자 답변 '미정'. F-05 미충족. F-01~F-08은 pending.
@@ -394,14 +413,14 @@ legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연�
 viewer 상호작용; 배포/downstream 동기화.
 
 다음 작업
-P06 실제 Analyzer/Planner 역할 adapter·로컬 응답기로 도구7쌍/typed handoff/재진입/권한 실패를 검증한다. 이후 P07 그림/host 취소·종료, P08 최종 준비 판정.
+host가 제외한2도구의 새 schema 호환 후보·consumer mirror·runtime 거부 보존을 검증하고 실제7쌍을 재시험한다. P06 완료 후 P07 그림/host 취소·종료, P08 최종 준비 판정.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
 현재 단계 검증 방법
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_stdio_readiness.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-stdio-readiness.py --packet docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_role_readiness.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --packet docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비1~27단계 및 28단계/P05 소유 stdio 검증 완료. 29단계/P06 예정. P02~P04의 실제 역할 교차 검증과 P07~P08은 pending. 정식 독립 수용은 계속0/9이다.
+현재 준비1~28단계 완료. 29단계/P06은 실제5/7쌍·전달/거부 검증 및2도구 노출 실패 관측까지 진행했다. P06 미완료이며 다음은30단계 호환 후보/재검증, 이후 P07~P08. 정식 독립 수용은 계속0/9이다.

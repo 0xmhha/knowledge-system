@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+"""Actual pinned Claude role + owned CKS stdio + local scripted API, never a model eval."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import queue
+import shlex
+import signal
+import subprocess
+import sys
+import threading
+import time
+ROOT=Path(__file__).resolve().parents[1]
+HOST=Path('/Users/kevin/.local/share/claude/versions/2.1.300')
+CANDIDATE=Path('/private/tmp/ks-consumer-contract-candidate-20261017')
+BINARY=Path('/private/tmp/ks-consumer-contract-readiness-20261017/bin/cks')
+P05=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1'
+
+
+def dump(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def require(v,s):
+    if not v:raise ValueError(s)
+def module(path):
+    s=importlib.util.spec_from_file_location(path.stem.replace('-','_'),path);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
+
+
+def proxy(args):
+    lock=threading.Lock();input_lock=threading.Lock();started=time.monotonic()
+    def record(kind,**data):
+        with lock,args.log.open('a') as f:f.write(json.dumps({'kind':kind,'time':time.time(),**data})+'\n')
+    command=[str(args.binary),'mcp','--config',str(args.config)]
+    child=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    record('start',wrapper_pid=os.getpid(),child_pid=child.pid,command=command,binary_sha256=sha(args.binary))
+    def eof():
+        with input_lock:
+            if not child.stdin.closed:
+                try:child.stdin.close()
+                except OSError:pass
+                record('stdin_eof')
+    def stop(number,_frame):record('signal',signal=number);eof()
+    for number in [signal.SIGTERM,signal.SIGINT]:signal.signal(number,stop)
+    def read_input():
+        count=0
+        try:
+            for raw in sys.stdin.buffer:
+                row=json.loads(raw)
+                if row.get('method')=='tools/call':
+                    count+=1
+                    if count>64:record('budget_refused',tool_requests=count);break
+                record('request',raw=raw.decode())
+                with input_lock:
+                    if child.stdin.closed:break
+                    child.stdin.write(raw);child.stdin.flush()
+        except (OSError,ValueError) as e:record('input_end',reason=type(e).__name__)
+        finally:eof()
+    def read_output():
+        try:
+            for raw in child.stdout:
+                record('response',raw=raw.decode());sys.stdout.buffer.write(raw);sys.stdout.buffer.flush()
+        except (BrokenPipeError,OSError):record('output_closed');eof()
+    def read_error():
+        for raw in child.stderr:record('stderr',raw=raw.decode())
+    threads=[threading.Thread(target=f,daemon=True) for f in [read_input,read_output,read_error]]
+    for t in threads:t.start()
+    terminated=False;forced=False
+    try:child.wait(timeout=900)
+    except subprocess.TimeoutExpired:
+        eof()
+        try:child.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            terminated=True;child.terminate()
+            try:child.wait(timeout=5)
+            except subprocess.TimeoutExpired:forced=True;child.kill();child.wait(timeout=5)
+    for t in threads[1:]:t.join(2)
+    record('exit',child_pid=child.pid,exit_code=child.returncode,terminate_sent=terminated,forced_kill=forced,child_reaped=child.poll() is not None,elapsed_seconds=time.monotonic()-started)
+    return child.returncode
+
+
+def observe(args):
+    data=json.load(sys.stdin)
+    with args.log.open('a') as f:f.write(json.dumps({'time':time.time(),'payload':data})+'\n')
+    return 0
+
+
+def payload(response):
+    r=response['result'];return r.get('structuredContent') or json.loads(r['content'][0]['text'])
+
+
+def setup(root):
+    require(not root.exists(),'fresh owned root');root.mkdir();repo=root/'source'
+    subprocess.run(['git','clone','-q',str(P05/'fixture.bundle'),str(repo)],check=True,capture_output=True)
+    graph=root/'graph';graph.mkdir()
+    for name in ['graph.db','manifest.json']:(graph/name).write_bytes((P05/'index'/name).read_bytes())
+    policy=root/'sanitize.yaml';policy.write_bytes((ROOT/'system/policies/sanitization_rules.yaml').read_bytes())
+    config=root/'cks.yaml';config.write_text('version: 1\nname: owned-P06\nbackends:\n  ckg:\n    path: '+str(graph/'graph.db')+'\n    source_root: '+str(repo)+'\n  ckv:\n    provider: mock\nlisten:\n  transport: stdio\nlogging:\n  level: error\nsanitize:\n  rules_path: '+str(policy)+'\n  default_action: drop\n  fail_closed_on_unknown_rule: true\n')
+    return repo,config
+
+
+def run(root,case,role,actions,deny=None):
+    out=root/case;out.mkdir();profile=out/'claude-config';profile.mkdir();repo=root/'source'
+    data=json.loads((P05/'execution.json').read_text());require(sha(HOST)=='475517caa611e3318a2f298fa071287ec98955538df78c58f709ecc01e5ae2d3','host binary pin')
+    require(sha(BINARY)==data['binary_sha256']['cks'],'CKS binary pin')
+    observer=shlex.join([sys.executable,str(Path(__file__).resolve()),'--observe','--log',str(out/'hook-inputs.jsonl')])
+    observerhooks={event:[{'hooks':[{'type':'command','command':observer,'timeout':5}],**({'matcher':'*'} if event in ['PreToolUse','PostToolUse'] else {})}] for event in ['SessionStart','Stop','PreToolUse','PostToolUse']}
+    wire=json.loads((ROOT/'internal/system/mcp/testdata/agent-mcp.schema.json').read_text())['tools']
+    aliases=['mcp__plugin_coding-agent_cks__'+name.replace('.','_') for name in wire]
+    settings={'permissions':{'allow':['Bash','Read','Write','Edit']+aliases,'deny':deny or []},'disableClaudeAiConnectors':True,'hooks':observerhooks}
+    dump(out/'settings.json',settings)
+    mcp={'mcpServers':{'plugin_coding-agent_cks':{'command':sys.executable,'args':[str(Path(__file__).resolve()),'--proxy','--binary',str(BINARY),'--config',str(root/'cks.yaml'),'--log',str(out/'mcp-frames.jsonl')]}}}
+    dump(out/'mcp.json',mcp);dump(out/'scripted-actions.json',actions)
+    env={'PATH':os.environ.get('PATH','/usr/bin:/bin:/usr/sbin:/sbin'),'TMPDIR':str(out),'CLAUDE_CONFIG_DIR':str(profile),'ANTHROPIC_API_KEY':'owned-local-fixture-not-a-real-key','CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC':'1','DISABLE_TELEMETRY':'1','DISABLE_ERROR_REPORTING':'1','ENABLE_CLAUDEAI_MCP_SERVERS':'false','API_TIMEOUT_MS':'10000','PYTHONDONTWRITEBYTECODE':'1'}
+    if 'HOME' in os.environ:env['HOME']=os.environ['HOME']
+    prompt=f'KS_HOST_PROBE:{case}. Owned scripted P06 role transport test only. Use the provided owned fixture; no external tracker, publication, real model, chain node, or independent acceptance. Preserve partial and unknown limitations.'
+    argv=[str(HOST),'--print','--agent','coding-agent:'+role,'--model','claude-sonnet-4-6','--max-budget-usd','0.10','--plugin-dir',str(CANDIDATE/'plugin'),'--strict-mcp-config','--mcp-config',str(out/'mcp.json'),'--setting-sources','','--settings',str(out/'settings.json'),'--permission-mode','manual','--permission-prompts','none','--include-hook-events','--output-format','stream-json','--verbose','--no-session-persistence','--no-chrome','--tools','Bash,Read,Write,Edit',prompt]
+    gateway=module(ROOT/'scripts/operational-host-probe.py').Gateway(case,actions,out)
+    started=time.monotonic();forced=False
+    with gateway as url:
+        env['ANTHROPIC_BASE_URL']=url
+        dump(out/'invocation.json',{'argv':argv,'cwd':str(repo),'env':{k:v for k,v in env.items() if k not in ['HOME','PATH','ANTHROPIC_API_KEY']},'api_credential_kind':'constant_fake_local_token','host_sha256':sha(HOST),'cks_sha256':sha(BINARY),'role':role,'model_kind':'local_scripted_transport_no_real_inference','helper_sha256':sha(Path(__file__))})
+        process=subprocess.Popen(argv,cwd=repo,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
+        try:stdout,stderr=process.communicate(timeout=180)
+        except subprocess.TimeoutExpired:
+            forced=True;os.killpg(process.pid,signal.SIGTERM)
+            try:stdout,stderr=process.communicate(timeout=5)
+            except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);stdout,stderr=process.communicate(timeout=5)
+        (out/'host.stdout.jsonl').write_text(stdout);(out/'host.stderr.txt').write_text(stderr)
+    for _ in range(50):
+        p=out/'mcp-frames.jsonl'
+        if p.exists() and any(json.loads(l)['kind']=='exit' for l in p.read_text().splitlines()):break
+        time.sleep(.1)
+    dump(out/'exit.json',{'host_pid':process.pid,'host_exit':process.returncode,'host_reaped':process.poll() is not None,'forced_host_termination':forced,'elapsed_seconds':time.monotonic()-started,'responder_closed':not gateway.thread.is_alive(),'responder_thread_joined':not gateway.thread.is_alive(),'responder_bind':'127.0.0.1','responder_port':gateway.server.server_address[1],'actual_role_requested':role,'real_model_calls':0,'formal_runs':0})
+    return out
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--proxy',action='store_true');p.add_argument('--observe',action='store_true');p.add_argument('--binary',type=Path);p.add_argument('--config',type=Path);p.add_argument('--log',type=Path);p.add_argument('--pilot-root',type=Path)
+    a=p.parse_args()
+    if a.proxy:return proxy(a)
+    if a.observe:return observe(a)
+    repo,config=setup(a.pilot_root.resolve());r=json.loads((P05/'execution.json').read_text());q=r['query'];s=json.loads((P05/'stdio-readiness.json').read_text());alias=lambda t:'mcp__plugin_coding-agent_cks__cks_context_'+t
+    actions=[{'name':alias(t),'input':({'rule_pack':'go-local-review@1.0.0','function':q} if t=='rule_candidates' else {'function':q} if t=='value_dependency_expansion' else {'symbol':r['selected']['canonical_id']} if t=='review_function' else q)}for t in ['value_dependencies','rule_candidates','value_dependency_expansion','policy_security','review_function']]
+    out=run(a.pilot_root.resolve(),'P06-analyzer-pilot','analyzer',actions);print(json.dumps({'out':str(out),'exit':json.loads((out/'exit.json').read_text())['host_exit']}))
+    return 0
+if __name__=='__main__':raise SystemExit(main())
