@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "scope": "owned_candidates_metadata_compatibility_not_adoption_or_independent_acceptance",
+  "cks_base": "5b39c413",
+  "consumer_base": "af4ff8b1b7778cb8dd783af684ecefd01b76283c",
+  "requirements": [
+    {
+      "id": "HC01",
+      "criterion": "No top-level oneOf/anyOf/allOf in the two affected tools; retain object properties, bounds, read-only hints and explicit runtime exclusivity description."
+    },
+    {
+      "id": "HC02",
+      "criterion": "Existing runtime decoders and graph/ACL/query implementations stay byte-identical. Node/canonical positives and absent/both/null/wrong-type/unknown/duplicate/cap invalid inputs preserve dispatch and refusal."
+    },
+    {
+      "id": "HC03",
+      "criterion": "Update only affected native golden metadata and both consumer mirrors. Actual registered schema matches mirrors; stale/missing/mutated schemas fail."
+    },
+    {
+      "id": "HC04",
+      "criterion": "Build, full module tests, race, fmt, vet, lint, boundaries and current documentation checks pass in owned CKS candidate; consumer contract regressions pass."
+    },
+    {
+      "id": "HC05",
+      "criterion": "Pin signed candidate commits and binaries. Actual pinned host receives all Analyzer5/Planner2 role-tool pairs and real stdio results; no schema-rewriting proxy."
+    },
+    {
+      "id": "HC06",
+      "criterion": "Actual Analyzer observes policy/security/untagged/missing and same-snapshot value/rules/expansion with caps and unknowns. Retain actual hook/hash/re-entry controls or explicitly state pending."
+    },
+    {
+      "id": "HC07",
+      "criterion": "Preserve prior29 packets, current root runtime/schema/harness, original consumer and formal state. Capture all failures/attempts, cleanup owned processes, keep quality/ontology effect not_evaluated and formal0/9."
+    }
+  ],
+  "metadata_representation_change": "Removing composition in shared value input also changes nested function metadata of rules/expansion; runtime exclusivity is still enforced. Record all four affected tool inputs.",
+  "next_after_compatibility": [
+    "P06 complete only when required actual role receipts pass",
+    "P07 renderer and cancellation/lifecycle",
+    "P08 final candidate readiness"
+  ],
+  "formal_acceptance": "not_recorded",
+  "resource_bounds": {
+    "local_Go_validation_command_seconds_max": 1200,
+    "host_session_seconds_max": 180,
+    "tool_requests_per_process_max": 64,
+    "parallel_host_sessions_max": 1,
+    "real_model_calls_max": 0,
+    "formal_runs_max": 0,
+    "package_timeout_minutes": {
+      "test": 14,
+      "race": 18
+    },
+    "adjustment_reason": "Initial normal/race default10m timeouts and race14m timeout with4062 passed/zero assertion failures at final multilingual fixture; preserve all3 attempts, rerun full race alone with18m package/20m command bounds."
+  }
+}

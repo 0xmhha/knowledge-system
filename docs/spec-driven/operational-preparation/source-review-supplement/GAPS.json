@@ -116,7 +116,7 @@
       "id": "WI-1",
       "preparation_candidate_count": 40,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "기존 함수 후보 40개를 본문 로컬 범위로 재집계: 운영 39개/개발 스트레스 원문 전용 1개. 운영 후보의 실제 로컬 shadow 16개·선언과 재대입 35개·루프 37개·분기/return 각 39개. 독립 승인·완전한 edge gold·의존성 backend 평가는 미수행. 추가로 운영 함수 4개에 source occurrence 241개·syntax marker 62개를 관측하고 비완전 관계 19건·제외 7건·이동 경계 14건의 비공개 검토 초안을 작성. 타입 진단을 보존한 부분 검사이며 backend/CFG/postdominator 평가는 미수행. 운영 30개/8모듈의 검토 표본 제안과 예비 9개·개발전용 제외 1개를 분리. 선정 표본은 선언+재대입 27/분기 30/루프 29/shadow 14/return 30. 전체 741쌍(선정 435쌍)·기존 질문 비교 1638건(선정 1260건)을 메타데이터/기존 AI 표시로 작성했으나 의미적 독립성은 전부 미검토. 선정 30개/25개 파일의 관측을 완료: 기존 4개 원자료 불변, 추가 26개 수집. 원시 occurrence 1725개 중 본문 선언 대조 1721개·콜백 함수형 signature 영역 4개 격리, syntax marker 409개. 독립 정답·CFG·품질 점수·수용은 미작성/미실행. 선정 30개를 원문으로 의미 점검하여 비공개 질문 30개·구현/매칭 질문 14개를 작성했다. 대응한 로컬 occurrence 1721개/변수 선언 412개의 값 종류·완전한 정의 집합은 미확정이고 callback signature 4개는 격리 유지. 기존 dependency 관계 초안 4함수와 statement anchor 3함수는 1함수가 겹쳐 합집합 6함수이며, 24함수에는 기존 관계 자료가 없다. 모든 30함수의 완전한 data/control gold·정확한 매칭은 미작성/미동결. range 22함수·제외 closure 9함수·select 표기 6함수·panic 구문 2함수·결과 없는 return 표기 8함수의 경계는 런타임/후지배 증명이 아니다. bare return 주석의 선언 좌표 설명과 구현의 return 문 좌표 전달 불일치를 기록했고 코드 변경·정답 동결은 하지 않았다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다.",
+      "note": "기존 함수 후보 40개를 본문 로컬 범위로 재집계: 운영 39개/개발 스트레스 원문 전용 1개. 운영 후보의 실제 로컬 shadow 16개·선언과 재대입 35개·루프 37개·분기/return 각 39개. 독립 승인·완전한 edge gold·의존성 backend 평가는 미수행. 추가로 운영 함수 4개에 source occurrence 241개·syntax marker 62개를 관측하고 비완전 관계 19건·제외 7건·이동 경계 14건의 비공개 검토 초안을 작성. 타입 진단을 보존한 부분 검사이며 backend/CFG/postdominator 평가는 미수행. 운영 30개/8모듈의 검토 표본 제안과 예비 9개·개발전용 제외 1개를 분리. 선정 표본은 선언+재대입 27/분기 30/루프 29/shadow 14/return 30. 전체 741쌍(선정 435쌍)·기존 질문 비교 1638건(선정 1260건)을 메타데이터/기존 AI 표시로 작성했으나 의미적 독립성은 전부 미검토. 선정 30개/25개 파일의 관측을 완료: 기존 4개 원자료 불변, 추가 26개 수집. 원시 occurrence 1725개 중 본문 선언 대조 1721개·콜백 함수형 signature 영역 4개 격리, syntax marker 409개. 독립 정답·CFG·품질 점수·수용은 미작성/미실행. 선정 30개를 원문으로 의미 점검하여 비공개 질문 30개·구현/매칭 질문 14개를 작성했다. 대응한 로컬 occurrence 1721개/변수 선언 412개의 값 종류·완전한 정의 집합은 미확정이고 callback signature 4개는 격리 유지. 기존 dependency 관계 초안 4함수와 statement anchor 3함수는 1함수가 겹쳐 합집합 6함수이며, 24함수에는 기존 관계 자료가 없다. 모든 30함수의 완전한 data/control gold·정확한 매칭은 미작성/미동결. range 22함수·제외 closure 9함수·select 표기 6함수·panic 구문 2함수·결과 없는 return 표기 8함수의 경계는 런타임/후지배 증명이 아니다. bare return 주석의 선언 좌표 설명과 구현의 return 문 좌표 전달 불일치를 기록했고 코드 변경·정답 동결은 하지 않았다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다.",
       "requirements": {
         "independent_functions_min": 30,
         "constructs": [
@@ -208,13 +208,18 @@
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
         "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
         "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
       }
     },
     {
       "id": "WI-2",
       "preparation_candidate_count": 40,
       "count_semantics": "exposed_controlled_source_drafts_not_project_or_independent_units",
-      "note": "통제 입력 40개/규칙별 AI 양성·음성 제안 각 10개와 로컬 80관측은 독립 gold가 아니다. 780쌍·기존 개발 fixture 23개와 920건 대조(정확 일치 0건)도 fresh/독립성 승인이 아니다. 프로젝트 68호출/51함수·34파일의 명령 후보 2개/빈 관측 65개/closure 제외 1개를 별도로 유지. 호출자 14개/5함수·AI 문맥 5개/11근거와 annotation query 12개를 양성/음성 분모에 합치지 않는다. 규칙별 독립 양성/음성 0개, 실제 command/PATH/archive/cachedir/인자 신뢰·공격자 제어·도달성 미확인. 현재 구현/채택 consumer 계약 14곳 대조: 공유 CKG/CKS engine·strict input/상한·optional expected pins·metadata parity 확인. ROLE-RULE-TOOL-01은 Analyzer 본문/schema에 rule_candidates가 있지만 explicit tools 목록에 없음을 기록; 실제 host 권한/거부는 미판정. 과거 실제 CKG 58/CKS 9요청·23compiled fixture·5함수 parity 성공을 보존하며 당시 review-condition TP10/TN7/FP2/FN4·recall10/14를 이번 독립 후보 품질 점수로 전용하지 않음. 이번 프로젝트 retained graph/MCP/설치 역할 실행·독립 gold/matching·분모·품질 수용은 미확보다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다.",
+      "note": "통제 입력 40개/규칙별 AI 양성·음성 제안 각 10개와 로컬 80관측은 독립 gold가 아니다. 780쌍·기존 개발 fixture 23개와 920건 대조(정확 일치 0건)도 fresh/독립성 승인이 아니다. 프로젝트 68호출/51함수·34파일의 명령 후보 2개/빈 관측 65개/closure 제외 1개를 별도로 유지. 호출자 14개/5함수·AI 문맥 5개/11근거와 annotation query 12개를 양성/음성 분모에 합치지 않는다. 규칙별 독립 양성/음성 0개, 실제 command/PATH/archive/cachedir/인자 신뢰·공격자 제어·도달성 미확인. 현재 구현/채택 consumer 계약 14곳 대조: 공유 CKG/CKS engine·strict input/상한·optional expected pins·metadata parity 확인. ROLE-RULE-TOOL-01은 Analyzer 본문/schema에 rule_candidates가 있지만 explicit tools 목록에 없음을 기록; 실제 host 권한/거부는 미판정. 과거 실제 CKG 58/CKS 9요청·23compiled fixture·5함수 parity 성공을 보존하며 당시 review-condition TP10/TN7/FP2/FN4·recall10/14를 이번 독립 후보 품질 점수로 전용하지 않음. 이번 프로젝트 retained graph/MCP/설치 역할 실행·독립 gold/matching·분모·품질 수용은 미확보다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다.",
       "requirements": {
         "new_positive_cases_per_supported_rule_min": 10,
         "new_negative_cases_per_supported_rule_min": 10,
@@ -280,13 +285,18 @@
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
         "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
         "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
       }
     },
     {
       "id": "WI-C",
       "preparation_candidate_count": 10,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "기존10후보/8모듈/9파일·45AI anchor·같은 사례5문맥19곳을 유지하고15계약 anchor·채택 consumer16파일을 Git/채택SHA와 대조했다. 45쌍 중 같은 모듈2쌍/같은 파일1쌍이며 독립성·노출/DEV-FINAL 미승인이다. 사례별 필수 항목 질문20개와 조건부 영향/우선순위 검토 초안은 gold가 아니다. 6절/criteria/priority enum의 형식 검증은 필수 항목 완전성·의미/우선순위 정답을 검증하지 않는다. structural review는 identity-only/unpinned이며 CFG는 runtime trace·모듈그림은 interprocedural graph가 아니다. Analyzer와 Planner의 review_function/rule_candidates explicit alias4항목이 없고 실제 유효권한/거부 미검증. Planner 옛 Markdown/severity4종/cap30·PLANNING완료 지시는 typed3종/cap32·보고서/그림 정확 재생성·report hash 계약과 충돌한다. 현재 native 일반/race 각7개·consumer 원래15테스트/추가12로컬 계약 점검 통과. 과거 실제CKS5요청/16checks·typed/diagram/hash/hook/CLI 성과는 유지하되 현재10프로젝트 리뷰/설치 역할/독립수용으로 세지 않는다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다.",
+      "note": "기존10후보/8모듈/9파일·45AI anchor·같은 사례5문맥19곳을 유지하고15계약 anchor·채택 consumer16파일을 Git/채택SHA와 대조했다. 45쌍 중 같은 모듈2쌍/같은 파일1쌍이며 독립성·노출/DEV-FINAL 미승인이다. 사례별 필수 항목 질문20개와 조건부 영향/우선순위 검토 초안은 gold가 아니다. 6절/criteria/priority enum의 형식 검증은 필수 항목 완전성·의미/우선순위 정답을 검증하지 않는다. structural review는 identity-only/unpinned이며 CFG는 runtime trace·모듈그림은 interprocedural graph가 아니다. Analyzer와 Planner의 review_function/rule_candidates explicit alias4항목이 없고 실제 유효권한/거부 미검증. Planner 옛 Markdown/severity4종/cap30·PLANNING완료 지시는 typed3종/cap32·보고서/그림 정확 재생성·report hash 계약과 충돌한다. 현재 native 일반/race 각7개·consumer 원래15테스트/추가12로컬 계약 점검 통과. 과거 실제CKS5요청/16checks·typed/diagram/hash/hook/CLI 성과는 유지하되 현재10프로젝트 리뷰/설치 역할/독립수용으로 세지 않는다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다.",
       "requirements": {
         "independent_review_cases_min": 10,
         "modules_min": 5,
@@ -336,13 +346,18 @@
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
         "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
         "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
       }
     },
     {
       "id": "WI-6",
       "preparation_candidate_count": 20,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "공개 입력 20개=운영 seed 제안 19개+개발 stress 1개·의도 label 4종, 고정 원문 14파일/기존 AI 근거 40곳. 운영 제안 수로도 최소20개에 1개 부족하며 독립 가족/관련성 gold/실제 프로젝트 paired receipt/warm 영수증은 0개. 190쌍 중 같은 파일7/의도41쌍, 기존 노출 WI-1 표본과 16seed 중복이며 다른 label도 독립으로 승인하지 않는다. 기본은 정확한 함수 지역 분석, 확장은 outgoing calls/invokes를 통한 함수 문맥이며 intent/prompt 검색 필드·caller 확장·computed argument/return transfer가 없다. 현재/채택 source 계약12곳·consumer2파일 Git/채택 SHA·두 도구 metadata input parity를 대조했다. Analyzer explicit tools에는 기본/확장 도구가 없으며 실제 유효 권한/거부·의도→쌍 호출 정책/handoff는 미검증. gold·매칭·seed 포함·같은 snapshot/local caps와 추가 aggregate budget·arm order·partial/unknown/empty/error 분모·warm/반복/p95/ratio 정의가 null이다. 과거 실제 6함수 fixture의 CKG7/CKS13요청·단일seed 쌍/기본1/4→확장4/4·noise1/5·상한/순환/불변 검증은 보존한다. 선언 fixture labels에 따른 recall delta .75/noise delta .20과 서버 단일1431/2875µs는 이번 독립 품질/warm p95 수용이 아니다. curated metadata는 separate_not_joined/not_verified다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다.",
+      "note": "공개 입력 20개=운영 seed 제안 19개+개발 stress 1개·의도 label 4종, 고정 원문 14파일/기존 AI 근거 40곳. 운영 제안 수로도 최소20개에 1개 부족하며 독립 가족/관련성 gold/실제 프로젝트 paired receipt/warm 영수증은 0개. 190쌍 중 같은 파일7/의도41쌍, 기존 노출 WI-1 표본과 16seed 중복이며 다른 label도 독립으로 승인하지 않는다. 기본은 정확한 함수 지역 분석, 확장은 outgoing calls/invokes를 통한 함수 문맥이며 intent/prompt 검색 필드·caller 확장·computed argument/return transfer가 없다. 현재/채택 source 계약12곳·consumer2파일 Git/채택 SHA·두 도구 metadata input parity를 대조했다. Analyzer explicit tools에는 기본/확장 도구가 없으며 실제 유효 권한/거부·의도→쌍 호출 정책/handoff는 미검증. gold·매칭·seed 포함·같은 snapshot/local caps와 추가 aggregate budget·arm order·partial/unknown/empty/error 분모·warm/반복/p95/ratio 정의가 null이다. 과거 실제 6함수 fixture의 CKG7/CKS13요청·단일seed 쌍/기본1/4→확장4/4·noise1/5·상한/순환/불변 검증은 보존한다. 선언 fixture labels에 따른 recall delta .75/noise delta .20과 서버 단일1431/2875µs는 이번 독립 품질/warm p95 수용이 아니다. curated metadata는 separate_not_joined/not_verified다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다.",
       "requirements": {
         "independent_intent_seed_families_min": 20,
         "intent_types_min": 4,
@@ -386,13 +401,18 @@
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
         "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
         "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
       }
     },
     {
       "id": "WI-SP",
       "preparation_candidate_count": 12,
       "count_semantics": "drafts_only_not_independent_units",
-      "note": "12개 source symbol 제안(정책4/보안AI초안4/직접policy참조없음4), 고정 Go5파일·66쌍 중 같은 파일11쌍, 독립 symbol/gold 승인0개. source 재생성 완료 자료의42policy/146edges 중 선정 정책4symbol의5관계를 대조했으나 이 projection은 policy-only이며 보안 태그 부재/전체12응답/독립정답 증명이 아니다. 보안4개는 미승인 수동AI overlay proposal이고 미태그4개는 선택 overlay 상대 범위다. 현재/채택 source 계약14곳·project5/consumer2파일 Git/채택SHA·consumer input metadata 정합 대조. Analyzer explicit tools에 policy_security alias가 없으며 실제 유효권한/거부·설치 역할/handoff는 미검증. YAML row/hash/version/reviewer/time/approval unknown과 graph metadata/Go commit을 구분하고 legacy hint/severity를 추측하지 않는다. 직접 peer RemoteAddr/CIDR ACL은 reviewer 인증·project/symbol 권한과 별개다. 현재 native 일반/race 각상위12+ACL세부12 통과; httptest/fake backend이지 deployed listener/현재12심볼 수용이 아니다. 과거 실제 stdio fixture18요청·typed/manual/automatic/empty/not-found/stale/상한/원문삭제 성과, 최신source-aware 재생성 수정완료·ontology미평가/production비활성 상태 보존. 정식gold/매칭/거부분모/HTTP·proxy/설치 소비자 receipt는 미확보다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다.",
+      "note": "12개 source symbol 제안(정책4/보안AI초안4/직접policy참조없음4), 고정 Go5파일·66쌍 중 같은 파일11쌍, 독립 symbol/gold 승인0개. source 재생성 완료 자료의42policy/146edges 중 선정 정책4symbol의5관계를 대조했으나 이 projection은 policy-only이며 보안 태그 부재/전체12응답/독립정답 증명이 아니다. 보안4개는 미승인 수동AI overlay proposal이고 미태그4개는 선택 overlay 상대 범위다. 현재/채택 source 계약14곳·project5/consumer2파일 Git/채택SHA·consumer input metadata 정합 대조. Analyzer explicit tools에 policy_security alias가 없으며 실제 유효권한/거부·설치 역할/handoff는 미검증. YAML row/hash/version/reviewer/time/approval unknown과 graph metadata/Go commit을 구분하고 legacy hint/severity를 추측하지 않는다. 직접 peer RemoteAddr/CIDR ACL은 reviewer 인증·project/symbol 권한과 별개다. 현재 native 일반/race 각상위12+ACL세부12 통과; httptest/fake backend이지 deployed listener/현재12심볼 수용이 아니다. 과거 실제 stdio fixture18요청·typed/manual/automatic/empty/not-found/stale/상한/원문삭제 성과, 최신source-aware 재생성 수정완료·ontology미평가/production비활성 상태 보존. 정식gold/매칭/거부분모/HTTP·proxy/설치 소비자 receipt는 미확보다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다.",
       "requirements": {
         "independent_symbols_min": 12,
         "policy_symbols_min": 4,
@@ -444,11 +464,16 @@
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
         "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
         "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
       }
     }
   ],
   "next_priority": [
-    "P06 후속 호환 후보: 최상위 oneOf로 host에서 제외되는 value_dependencies/policy_security2도구의 metadata·consumer mirror를 새 명세/별도 후보에서 보완. 기존 runtime exact-selector/type/null/unknown/pin/상한 거부와 동결 증거를 보존하고 실제7쌍 재검증. 이후 P07 renderer/host 취소·종료→P08 최종 준비 판정",
+    "P07 그림 로컬 렌더링/실제 host 취소·정리, 남은 T04 opt-in/중복·T09 foreign/pin·T10 partial/unknown·T16 오류 분모 통합 검증, 이후 P08 전체 준비 판정. P06은 별도 host 호환 후보7/7쌍에서 격리 시험 완료이며 채택·독립 수용은 아님.",
     "WI-1 30함수의 독립 value kind·완전한 data/control gold·return 좌표/주석 정합·matching 및 baseline/실행 수용 미충족분 검토",
     "WI-3 독립 사실 가족/정답·top-10/분모·baseline 동결 및 실제 symptom-only 검색/설치 역할 경로 미충족분 보완",
     "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완",
@@ -478,5 +503,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
     "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
     "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+  },
+  "host_schema_compatibility": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+    "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+    "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
   }
 }

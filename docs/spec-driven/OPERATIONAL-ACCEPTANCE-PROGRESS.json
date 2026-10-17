@@ -427,7 +427,8 @@
         "준비26단계: 소비자 Analyzer5/Planner2 명시 도구 노출·Planner/역할 dispatch·typed report/hash/handoff 계약의 요구사항12·구현8단계·격리 검증22사례·증거/종료 계획 작성 및 정합 검증 완료. 실제 구현·새 host/MCP/모델 실행·독립 수용 아님.",
         "준비27단계: 격리 소비자 후보af4ff8b1에서 두 role 문서/새테스트3파일로 도구7항목과 Planner/dispatch/hash/re-entry 계약 보완. 소비자 로컬45·증거 guard30 포함 저장소326회귀·binary2빌드 검증 완료. P01~P04 요청 로컬 범위 완료이며 P02~P04 전체 stdio/actual role 검증은 P05~P08 pending. 후보 미채택·정식 수용 아님.",
         "준비28단계/P05: 소유 Go fixture race/vet·index와 고정 CKS 실제 stdio의 도구5개/schema33개·pin 거부12건·입력 오류8건·상한8종·deadline3회·구형 index/backend 미설정 경로를 검증. 주4세션56요청/진단5세션57요청 모두 보존·9자식 reap. T03 추가 전체7/22, 나머지15건의 actual role/교차 검증 미완료. 후보 미채택·정식 수용 아님.",
-        "준비29단계 실제 역할 관측·증거 준비: 소유 host10세션/API35시도/CKS8호출, 실제 Analyzer→Planner 2세대 전달·hash/Write/Edit/shell 거부6건·명시적 deny/backend 미설정 확인. 요구7쌍 중5쌍 성공, host 최상위 oneOf로2도구 제외. P06은 미완료이며 통과12/실패3/미완료7, 스키마 호환 후속 명세 초안 작성. 독립 수용 아님."
+        "준비29단계 실제 역할 관측·증거 준비: 소유 host10세션/API35시도/CKS8호출, 실제 Analyzer→Planner 2세대 전달·hash/Write/Edit/shell 거부6건·명시적 deny/backend 미설정 확인. 요구7쌍 중5쌍 성공, host 최상위 oneOf로2도구 제외. P06은 미완료이며 통과12/실패3/미완료7, 스키마 호환 후속 명세 초안 작성. 독립 수용 아님.",
+        "준비30단계 격리 CKS/소비자 host 호환 후보·전체 Go/consumer 검증·서명/새 바이너리 pin·실제7/7쌍·94 native 비교·전달/거부6건 재검증. P06 격리 시험 완료, 전체22 중15통과/7미완료. 후보 채택·품질/온톨로지 효과·정식 수용 아님."
       ],
       "remaining_freeze_requirements": [
         "F-01",
@@ -2002,6 +2003,123 @@
           "original_implementation_completion_guard": "pass",
           "current_handoff_and_backlog_documents_unchanged": true,
           "raw_Markdown_bytes_preserved_as_txt": true
+        },
+        "host_schema_compatibility": {
+          "date": "2026-10-17",
+          "kind": "isolated_metadata_compatibility_and_actual_P06_not_adoption_or_acceptance",
+          "P06_complete": true,
+          "cks_commit": "0c6cea1c74772e56438ec340b12e208811284b8a",
+          "consumer_commit": "b32b7a5a01908c129732dd67b692b0c525dc04f2",
+          "cks_changed_files": 5,
+          "consumer_changed_files": 2,
+          "affected_input_schemas": 4,
+          "descriptions_changed": 2,
+          "candidate_adopted": false,
+          "native_build": "pass",
+          "native_full_test": {
+            "pass": 4063,
+            "skip": 18,
+            "fail": 0
+          },
+          "native_full_race": {
+            "pass": 4063,
+            "skip": 18,
+            "fail": 0
+          },
+          "native_lint_fmt_vet_boundaries_docs": "pass",
+          "initial_default_10min_package_timeouts_preserved": 2,
+          "additional_14min_race_timeout_preserved": 1,
+          "package_timeout_explicit_minutes": {
+            "test": 14,
+            "race": 18
+          },
+          "golden_documentation_envelope_restoration_with_contract_rerun": true,
+          "consumer_tests_passed": 45,
+          "actual_role_pairs": 7,
+          "required_role_pairs": 7,
+          "registered_tools": 33,
+          "effective_analyzer_tools": 25,
+          "effective_planner_tools": 19,
+          "host_sessions": 8,
+          "API_tool_attempts": 39,
+          "actual_CKS_tool_requests": 14,
+          "native_old_new_requests": 94,
+          "native_runtime_equal_omitting_only_elapsed_micros": true,
+          "actual_Write_Edit_refusals": 6,
+          "review_generations": 2,
+          "all_owned_hosts_and_CKS_reaped": true,
+          "local_responders_closed": 8,
+          "planned_full_cases_passed": [
+            "T01",
+            "T02",
+            "T03",
+            "T05",
+            "T06",
+            "T07",
+            "T08",
+            "T11",
+            "T12",
+            "T13",
+            "T14",
+            "T17",
+            "T19",
+            "T20",
+            "T21"
+          ],
+          "planned_full_cases_failed": [],
+          "planned_full_cases_pending": 7,
+          "pending_case_ids": [
+            "T04",
+            "T09",
+            "T10",
+            "T15",
+            "T16",
+            "T18",
+            "T22"
+          ],
+          "renderer_and_host_cancellation_verified": false,
+          "real_model_calls": 0,
+          "formal_runs": 0,
+          "ontology_effect_acceptance": "not_evaluated",
+          "formal_state_unchanged": true,
+          "prior_frozen_packets_unchanged": 29,
+          "maintained_go_source_unchanged": true,
+          "dedicated_evidence_guard_tests_passed": 31,
+          "repository_scoped_regression_tests_passed": 433,
+          "regression_tests": {
+            "test_host_schema_compatibility.py": 31,
+            "test_consumer_role_readiness.py": 39,
+            "test_consumer_stdio_readiness.py": 37,
+            "test_consumer_local_readiness.py": 30,
+            "test_consumer_contract_plan.py": 48,
+            "test_operational_acceptance.py": 36,
+            "test_acceptance_readiness.py": 16,
+            "test_documentation_contract.py": 20,
+            "test_review_gap.py": 51,
+            "test_rule_gap.py": 36,
+            "test_expansion_gap.py": 39,
+            "test_policy_security_gap.py": 42,
+            "test_operational_host_probe.py": 8
+          },
+          "live_document_check_count": 134,
+          "original_implementation_completion_guard": "pass",
+          "frozen_reconstruction_count": 2,
+          "reconstruction_executes_new_measurements": false,
+          "next": "P07 renderer/cancellation plus T04/T09/T10/T16, then P08",
+          "owned_fixture_index_reuse_verified": {
+            "fixture_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+            "index_sha256": {
+              "graph.db": "37aa6c3d00eb6f76f75048415960accb722b937b40ff09ac61ec9df8db7b8791",
+              "manifest.json": "cfe546cdc669bb05f601c0830a98f04e372f5d26781fdbb108986159158a557d"
+            },
+            "config_sha256": {
+              "cks.yaml": "de1a7d70527f14e5f30500a76f9f5bced2c75bcf5d13c054f2a2c83c61817e89",
+              "cks-unavailable.yaml": "8ce095d6742fe347803e5a41aa414898684f243cdb05dc3b191508ea2de7d699",
+              "sanitize.yaml": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96"
+            },
+            "tracked_fixture_files_unchanged": true,
+            "sample_time": "postrun"
+          }
         }
       },
       "candidate_counts": {
@@ -2263,5 +2381,10 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
     "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
     "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+  },
+  "host_schema_compatibility": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+    "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+    "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
   }
 }

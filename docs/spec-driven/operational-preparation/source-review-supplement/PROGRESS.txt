@@ -377,7 +377,7 @@
 - scripted 문안을 모델 추론·독립 gold/누락0·의미 품질·온톨로지 효과 수용으로 세지 않음.
 - 원본/후보 consumer·backend schema/소비자 mirror·유지 Go·정식 수용 상태 보존.
 
-[다음 준비 작업] 30. 최상위 schema의 host 호환 후보 및 P06 재검증
+[29단계 당시 후속 제안 — 아래30단계 실행으로 갱신] 30. 최상위 schema의 host 호환 후보 및 P06 재검증
 - 현재 범위의 backend_schema_or_permission_model_change=false를 보존하여 이번에는 schema/permission을 바꾸지 않음.
 - 별도 버전 명세/후보에서 host가 수용하는 metadata 표현과 consumer mirror를 보완하고 runtime exact-selector/type/null/unknown/pin/상한 거부를 보존한다.
 - 새 binary/source pin·schema 정합·부정 대조·실제7쌍을 확인한 뒤 P06 완료 여부를 재판정한다.
@@ -412,15 +412,30 @@ domain flow gold 평가; 대규모 corpus/긴 함수 sliding; PR/as-of 지식;
 legacy body 출처; CoreML dispatch; embedding cache 연결; 운영 감사 연결;
 viewer 상호작용; 배포/downstream 동기화.
 
-다음 작업
+29단계 당시 다음 작업(역사 기록)
 host가 제외한2도구의 새 schema 호환 후보·consumer mirror·runtime 거부 보존을 검증하고 실제7쌍을 재시험한다. P06 완료 후 P07 그림/host 취소·종료, P08 최종 준비 판정.
 GAPS.json에 9건의 기준과 미충족분을 기록했다. 담당자 미정이어도 자료 준비는
 가능하나 독립 승인·정식 점수·실제 모델 실행으로 승격하지 않는다.
 
-현재 단계 검증 방법
+29단계 검증 명령(보존)
 PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_role_readiness.py
 PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-role-readiness.py --packet docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1
 이전 단계의 검증 명령은 각 단계 보고서와 진행 장부의 regression_tests에 기록했다.
 이 검증은 원문 결합·로컬 관측·상태 경계 검증이다. AI 문장의 정답성에 대한 독립 검토를 대신하지 않는다.
 
-현재 준비1~28단계 완료. 29단계/P06은 실제5/7쌍·전달/거부 검증 및2도구 노출 실패 관측까지 진행했다. P06 미완료이며 다음은30단계 호환 후보/재검증, 이후 P07~P08. 정식 독립 수용은 계속0/9이다.
+이전29단계의2도구 노출 실패와 원자료는 보존했다. 현재30단계의 별도 호환 후보에서 P06 실제7/7쌍 재검증을 완료했다. 다음은 P07·남은 통합4사례·P08이며 정식 수용0/9이다.
+
+[완료 — 격리 시험] 30. host 호환 후보 및 P06 재검증
+- CKS5파일·consumer mirror2파일의 별도 서명 커밋, 입력 metadata4개/설명2개만 변경. runtime decoder/query/ACL/역할/hook 및 현재 ROOT schema/runtime 보존.
+- CKS build/full test/full race/fmt/vet/golangci-lint/boundaries/docs 통과. 전체검사 test {'pass': 4063, 'skip': 18, 'fail': 0}, race {'pass': 4063, 'skip': 18, 'fail': 0}. skip은 통과에 포함하지 않는다.
+- 첫 일반/race 기본10분 시간 초과2건과 race14분 시간 초과1건 보존; 일반14분/race18분 제한의 재검증 성공. golden 추출이 없앤 기존 설명3필드 복구·실행 metadata 동일 및 별도 계약 재검증 기록.
+- 소비자45회귀 통과. 새 소스/바이너리 pin의 이전·새47개씩94요청은 elapsed_micros만 제외한 응답 동등. strict selector/중복/null/type/상한/pin 거부 보존.
+- 실제 host2.1.300의 Analyzer25/Planner19 도구·요구7/7쌍 노출 및 호출 성공. 투명 proxy이며 schema rewrite 없음.
+-8host/API39시도/CKS14호출·모두 reap/응답기닫힘. 같은 snapshot 기본/규칙/확장·수동 정책/보안·미태그·missing·cap 응답 및 실제 전달/거부6건·두 hash세대 재검증.
+- 계획22사례 중15통과/실패0/7미완료(T04/T09/T10/T15/T16/T18/T22). P06 격리 시험 완료이며 후보 채택·운영 준비 전체 완료는 아니다.
+- 전용 증거31+기존402=433회귀, 문서134·기존 완료 검사 통과. 기존29개 동결 패킷·원본/이전 후보·bound 문서 유지, 새 패킷2복사본 바이트 재구성(새 실행 아님).
+- 판정은 로컬 scripted 응답. 실제 모델 추론·독립 의미 gold·품질·온톨로지 효과 수용은 미평가. 담당자미정/F01~08 pending/freeze null/executionfalse/정식0/9 유지.
+
+다음 작업(최신): P07 로컬 그림 렌더링·실제 host 취소/정리와 남은 T04/T09/T10/T16 통합검증, 이후 P08 최종 준비 판정. 위의 정식9건과 별도 후속12건은 그대로 남는다.
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_host_schema_compatibility.py
+검증: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-host-schema-compatibility.py --packet docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1
