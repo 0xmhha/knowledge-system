@@ -70,6 +70,25 @@ func TestHandleSemanticSearch_HappyPath(t *testing.T) {
 
 // --- search_text ---
 
+func TestHandleSemanticSearch_PreservesNonCitableMetadata(t *testing.T) {
+	t.Parallel()
+	f := newFixture(t, func(f *fixture) {
+		f.ckv.SearchHits = []contract.Hit{{Citation: contract.Citation{File: "pkg/<convention>"}, Rank: 1,
+			Source: contract.HitSourceCKV, ChunkKind: "convention", NonCitableMetadata: true, Text: "derived package summary"}}
+	})
+	result, err := handleSemanticSearch(context.Background(), f.deps, callToolReq(map[string]any{"query": "shutdown conventions"}))
+	if err != nil || result.IsError {
+		t.Fatalf("metadata search failed: %+v %v", result, err)
+	}
+	var out searchResponse
+	if err := decodeStructured(result, &out); err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Hits) != 1 || !out.Hits[0].NonCitableMetadata || out.Hits[0].Text == "" || out.Hits[0].IsValid() {
+		t.Fatalf("wire promoted or lost metadata: %+v", out)
+	}
+}
+
 func TestHandleSearchText_MissingQuery_IsError(t *testing.T) {
 	t.Parallel()
 	f := newFixture(t, nil)

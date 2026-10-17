@@ -1,0 +1,51 @@
+{
+  "status": "in_progress",
+  "scope": "SN-P01/SN-P02_nonproduction_retained_source_and_metadata_contract",
+  "native_delta": [
+    "internal/system/ckvclient/real.go",
+    "internal/system/mcp/search_test.go",
+    "pkg/system/contract/hit.go",
+    "pkg/system/contract/hit_test.go"
+  ],
+  "convention_contract": {
+    "wire_field": "non_citable_metadata",
+    "true_when": "convention chunk OR invalid/nonpositive source range",
+    "meaning": "derived metadata can inform context but cannot be promoted to source citation/v2 body",
+    "false_does_not_attest_source_integrity": true,
+    "legacy_convention_file_and_text_preserved": true,
+    "Hit_IsValid_refuses_flagged_metadata_even_if_coordinates_plausible": true
+  },
+  "dataset_contract": {
+    "supported_builder": "cks setup --hold-for-review",
+    "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "embedding": "same BGE-M3 digest1024",
+    "external_bytes": "copy existing rendered domain and flow corpora without new policy meanings",
+    "ordered_origins": [
+      "docs:corpus.0",
+      "docs:corpus.1"
+    ],
+    "citation_namespace": "@cks/docs/<index>/<path>",
+    "source_input_dataset_identity_changes_recorded": true,
+    "manual_SQL_patch_forbidden": true,
+    "original_current_unchanged": true
+  },
+  "acceptance": [
+    "full native build/test/race/fmt/vet/lint/boundaries",
+    "supported new held dataset build/gates; source/model identities recorded",
+    "same6 exposed queries old/new with every failure retained",
+    "actual source-backed docs and flow citations match retained origins/blobs",
+    "actual convention hits carry non_citable_metadata and are absent from v2 source citations",
+    "source-backed v2 coordinates/body/content/hash/integrity verify",
+    "wrong pin/project/blob cases refuse and recover with normal EOF/reap",
+    "old frozen packets/original data/global/pointers preserved"
+  ],
+  "non_goals": [
+    "SN-P03 source failure vs model failure classification",
+    "SN-P04 real go-wemix comparison",
+    "independent gold/ontology-effect or formal acceptance",
+    "publication or production installation"
+  ],
+  "formal_completed": 0,
+  "formal_total": 9,
+  "reviewer_assignment": "미정"
+}

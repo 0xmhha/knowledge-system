@@ -17,11 +17,29 @@ func TestHit_IsValid(t *testing.T) {
 		{Hit{Citation: good, Rank: 1, Score: -1.0}, true}, // negative score allowed
 		{Hit{Citation: good, Rank: 0}, false},             // rank must be >= 1
 		{Hit{Citation: bad, Rank: 1}, false},
+		{Hit{Citation: good, Rank: 1, NonCitableMetadata: true}, false}, // metadata cannot borrow a plausible code location
 	}
 	for _, tc := range cases {
 		if got := tc.h.IsValid(); got != tc.want {
 			t.Errorf("IsValid(%+v) = %v, want %v", tc.h, got, tc.want)
 		}
+	}
+}
+
+func TestHit_MetadataFlagSurvivesJSON(t *testing.T) {
+	t.Parallel()
+	in := Hit{Citation: Citation{File: "pkg/<convention>"}, Rank: 1, ChunkKind: "convention", NonCitableMetadata: true, Text: "derived package summary"}
+	raw, err := json.Marshal(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var wire map[string]any
+	if err := json.Unmarshal(raw, &wire); err != nil || wire["non_citable_metadata"] != true || wire["text"] != in.Text {
+		t.Fatalf("lost metadata contract: %s (%v)", raw, err)
+	}
+	var out Hit
+	if err := json.Unmarshal(raw, &out); err != nil || out.IsValid() {
+		t.Fatalf("metadata became a source citation: %+v (%v)", out, err)
 	}
 }
 
