@@ -1,0 +1,244 @@
+[
+  {
+    "ID": "RULE-1-05-identity",
+    "Path": "RULE-1-05-identity.go",
+    "Source": "package audit\nimport(exec \"os/exec\";process \"os/exec\";strconv \"strconv\";conversion \"strconv\")\nvar _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi\ntype Fake struct{}\nfunc(Fake)Command(string){}\nfunc(Fake)Atoi(string)(int,error){return 0,nil}\nfunc sanitize(v string)string{return v}\nfunc clamp(v int)int{return v}\nfunc F(cmd string){a:=sanitize(cmd);b:=a;exec.Command(b)}\n",
+    "Package": "example.invalid/wi2audit/RULE-1-05-identity",
+    "Profiles": null
+  },
+  {
+    "ID": "RULE-1-05-constant",
+    "Path": "RULE-1-05-constant.go",
+    "Source": "package audit\nimport(exec \"os/exec\";process \"os/exec\";strconv \"strconv\";conversion \"strconv\")\nvar _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi\ntype Fake struct{}\nfunc(Fake)Command(string){}\nfunc(Fake)Atoi(string)(int,error){return 0,nil}\nfunc sanitize(v string)string{return \"constant\"}\nfunc clamp(v int)int{return 7}\nfunc F(cmd string){a:=sanitize(cmd);b:=a;exec.Command(b)}\n",
+    "Package": "example.invalid/wi2audit/RULE-1-05-constant",
+    "Profiles": null
+  },
+  {
+    "ID": "RULE-1-07-scope",
+    "Path": "RULE-1-07-scope.go",
+    "Source": "package audit\nimport(exec \"os/exec\";process \"os/exec\";strconv \"strconv\";conversion \"strconv\")\nvar _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi\ntype Fake struct{}\nfunc(Fake)Command(string){}\nfunc(Fake)Atoi(string)(int,error){return 0,nil}\nfunc sanitize(v string)string{return v}\nfunc clamp(v int)int{return v}\nfunc F(cmd string,exec Fake){a:=cmd;exec.Command(a)}\n",
+    "Package": "example.invalid/wi2audit/RULE-1-07-scope",
+    "Profiles": null
+  },
+  {
+    "ID": "RULE-1-15-scope",
+    "Path": "RULE-1-15-scope.go",
+    "Source": "package audit\nimport(exec \"os/exec\";process \"os/exec\";strconv \"strconv\";conversion \"strconv\")\nvar _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi\ntype Fake struct{}\nfunc(Fake)Command(string){}\nfunc(Fake)Atoi(string)(int,error){return 0,nil}\nfunc sanitize(v string)string{return v}\nfunc clamp(v int)int{return v}\nfunc F(cmd string){a:=cmd;process.Command(a)}\n",
+    "Package": "example.invalid/wi2audit/RULE-1-15-scope",
+    "Profiles": null
+  },
+  {
+    "ID": "RULE-2-06-identity",
+    "Path": "RULE-2-06-identity.go",
+    "Source": "package audit\nimport(exec \"os/exec\";process \"os/exec\";strconv \"strconv\";conversion \"strconv\")\nvar _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi\ntype Fake struct{}\nfunc(Fake)Command(string){}\nfunc(Fake)Atoi(string)(int,error){return 0,nil}\nfunc sanitize(v string)string{return v}\nfunc clamp(v int)int{return v}\nfunc F(s string)int{v,_:=strconv.Atoi(s);out:=clamp(v);return out}\n",
+    "Package": "example.invalid/wi2audit/RULE-2-06-identity",
+    "Profiles": null
+  },
+  {
+    "ID": "RULE-2-06-constant",
+    "Path": "RULE-2-06-constant.go",
+    "Source": "package audit\nimport(exec \"os/exec\";process \"os/exec\";strconv \"strconv\";conversion \"strconv\")\nvar _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi\ntype Fake struct{}\nfunc(Fake)Command(string){}\nfunc(Fake)Atoi(string)(int,error){return 0,nil}\nfunc sanitize(v string)string{return \"constant\"}\nfunc clamp(v int)int{return 7}\nfunc F(s string)int{v,_:=strconv.Atoi(s);out:=clamp(v);return out}\n",
+    "Package": "example.invalid/wi2audit/RULE-2-06-constant",
+    "Profiles": null
+  },
+  {
+    "ID": "RULE-2-07-scope",
+    "Path": "RULE-2-07-scope.go",
+    "Source": "package audit\nimport(exec \"os/exec\";process \"os/exec\";strconv \"strconv\";conversion \"strconv\")\nvar _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi\ntype Fake struct{}\nfunc(Fake)Command(string){}\nfunc(Fake)Atoi(string)(int,error){return 0,nil}\nfunc sanitize(v string)string{return v}\nfunc clamp(v int)int{return v}\nfunc F(s string,strconv Fake)int{v,_:=strconv.Atoi(s);return v}\n",
+    "Package": "example.invalid/wi2audit/RULE-2-07-scope",
+    "Profiles": null
+  },
+  {
+    "ID": "RULE-2-16-scope",
+    "Path": "RULE-2-16-scope.go",
+    "Source": "package audit\nimport(exec \"os/exec\";process \"os/exec\";strconv \"strconv\";conversion \"strconv\")\nvar _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi\ntype Fake struct{}\nfunc(Fake)Command(string){}\nfunc(Fake)Atoi(string)(int,error){return 0,nil}\nfunc sanitize(v string)string{return v}\nfunc clamp(v int)int{return v}\nfunc F(s string)int{v,_:=conversion.Atoi(s);out:=v;return out}\n",
+    "Package": "example.invalid/wi2audit/RULE-2-16-scope",
+    "Profiles": null
+  },
+  {
+    "ID": "ORIGINAL-RULE-1-05",
+    "Path": "original-RULE-1-05.go",
+    "Source": "package wi2dev\nimport (exec \"os/exec\"; process \"os/exec\"; strconv \"strconv\"; conversion \"strconv\")\ntype Fake struct{}\ntype Box struct{Name string}\nfunc sanitize(string) string\nfunc clamp(int) int\nfunc F(cmd string){a:=sanitize(cmd);b:=a;exec.Command(b)}\n",
+    "Package": "example.invalid/wi2original/RULE-1-05",
+    "Profiles": null
+  },
+  {
+    "ID": "ORIGINAL-RULE-1-07",
+    "Path": "original-RULE-1-07.go",
+    "Source": "package wi2dev\nimport (exec \"os/exec\"; process \"os/exec\"; strconv \"strconv\"; conversion \"strconv\")\ntype Fake struct{}\ntype Box struct{Name string}\nfunc sanitize(string) string\nfunc clamp(int) int\nfunc F(cmd string,exec Fake){a:=cmd;exec.Command(a)}\n",
+    "Package": "example.invalid/wi2original/RULE-1-07",
+    "Profiles": null
+  },
+  {
+    "ID": "ORIGINAL-RULE-1-15",
+    "Path": "original-RULE-1-15.go",
+    "Source": "package wi2dev\nimport (exec \"os/exec\"; process \"os/exec\"; strconv \"strconv\"; conversion \"strconv\")\ntype Fake struct{}\ntype Box struct{Name string}\nfunc sanitize(string) string\nfunc clamp(int) int\nfunc F(cmd string){a:=cmd;process.Command(a)}\n",
+    "Package": "example.invalid/wi2original/RULE-1-15",
+    "Profiles": null
+  },
+  {
+    "ID": "ORIGINAL-RULE-2-06",
+    "Path": "original-RULE-2-06.go",
+    "Source": "package wi2dev\nimport (exec \"os/exec\"; process \"os/exec\"; strconv \"strconv\"; conversion \"strconv\")\ntype Fake struct{}\ntype Box struct{Name string}\nfunc sanitize(string) string\nfunc clamp(int) int\nfunc F(s string)int{v,_:=strconv.Atoi(s);out:=clamp(v);return out}\n",
+    "Package": "example.invalid/wi2original/RULE-2-06",
+    "Profiles": null
+  },
+  {
+    "ID": "ORIGINAL-RULE-2-07",
+    "Path": "original-RULE-2-07.go",
+    "Source": "package wi2dev\nimport (exec \"os/exec\"; process \"os/exec\"; strconv \"strconv\"; conversion \"strconv\")\ntype Fake struct{}\ntype Box struct{Name string}\nfunc sanitize(string) string\nfunc clamp(int) int\nfunc F(s string,strconv Fake)int{v,_:=strconv.Atoi(s);return v}\n",
+    "Package": "example.invalid/wi2original/RULE-2-07",
+    "Profiles": null
+  },
+  {
+    "ID": "ORIGINAL-RULE-2-16",
+    "Path": "original-RULE-2-16.go",
+    "Source": "package wi2dev\nimport (exec \"os/exec\"; process \"os/exec\"; strconv \"strconv\"; conversion \"strconv\")\ntype Fake struct{}\ntype Box struct{Name string}\nfunc sanitize(string) string\nfunc clamp(int) int\nfunc F(s string)int{v,_:=conversion.Atoi(s);out:=v;return out}\n",
+    "Package": "example.invalid/wi2original/RULE-2-16",
+    "Profiles": null
+  },
+  {
+    "ID": "build/ci.go",
+    "Path": "/private/tmp/ks-wi2-contract-20261019/original-source/build/ci.go",
+    "Source": "",
+    "Package": "",
+    "Profiles": [
+      {
+        "Name": "darwin_default",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": []
+      },
+      {
+        "Name": "linux_default",
+        "GOOS": "linux",
+        "GOARCH": "arm64",
+        "Tags": []
+      },
+      {
+        "Name": "darwin_none_tag",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": [
+          "none"
+        ]
+      },
+      {
+        "Name": "darwin_gofuzz_tag",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": [
+          "gofuzz"
+        ]
+      }
+    ]
+  },
+  {
+    "ID": "build/update-license.go",
+    "Path": "/private/tmp/ks-wi2-contract-20261019/original-source/build/update-license.go",
+    "Source": "",
+    "Package": "",
+    "Profiles": [
+      {
+        "Name": "darwin_default",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": []
+      },
+      {
+        "Name": "linux_default",
+        "GOOS": "linux",
+        "GOARCH": "arm64",
+        "Tags": []
+      },
+      {
+        "Name": "darwin_none_tag",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": [
+          "none"
+        ]
+      },
+      {
+        "Name": "darwin_gofuzz_tag",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": [
+          "gofuzz"
+        ]
+      }
+    ]
+  },
+  {
+    "ID": "crypto/signify/signify_fuzz.go",
+    "Path": "/private/tmp/ks-wi2-contract-20261019/original-source/crypto/signify/signify_fuzz.go",
+    "Source": "",
+    "Package": "",
+    "Profiles": [
+      {
+        "Name": "darwin_default",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": []
+      },
+      {
+        "Name": "linux_default",
+        "GOOS": "linux",
+        "GOARCH": "arm64",
+        "Tags": []
+      },
+      {
+        "Name": "darwin_none_tag",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": [
+          "none"
+        ]
+      },
+      {
+        "Name": "darwin_gofuzz_tag",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": [
+          "gofuzz"
+        ]
+      }
+    ]
+  },
+  {
+    "ID": "metrics/disk_linux.go",
+    "Path": "/private/tmp/ks-wi2-contract-20261019/original-source/metrics/disk_linux.go",
+    "Source": "",
+    "Package": "",
+    "Profiles": [
+      {
+        "Name": "darwin_default",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": []
+      },
+      {
+        "Name": "linux_default",
+        "GOOS": "linux",
+        "GOARCH": "arm64",
+        "Tags": []
+      },
+      {
+        "Name": "darwin_none_tag",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": [
+          "none"
+        ]
+      },
+      {
+        "Name": "darwin_gofuzz_tag",
+        "GOOS": "darwin",
+        "GOARCH": "arm64",
+        "Tags": [
+          "gofuzz"
+        ]
+      }
+    ]
+  }
+]

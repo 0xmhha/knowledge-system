@@ -1,0 +1,118 @@
+{
+  "kind": "WI2_source_contract_compiler_MCP_audit_not_formal_execution",
+  "previous_source_revision": "64c462347ad32c435c9d5970b22ca29dd9afb892",
+  "tools": [
+    {
+      "path": "scripts/wi2_contract_audit.py",
+      "sha256": "9e8f76a23359c27ea9932c8b0995b7eb909bc4f9b2703e8ed4cdc353da698d74"
+    },
+    {
+      "path": "scripts/prepare-wi2-contract-audit.py",
+      "sha256": "4bb7edd02374dabea304b8e18b9e986070a7feff8a01675665a1a9cca06211d5"
+    },
+    {
+      "path": "scripts/check-wi2-contract-audit.py",
+      "sha256": "6fc1078596d140d11480cb167f3879c8cc6cbbf7f53d2d1065478ca0fcbcb511"
+    },
+    {
+      "path": "scripts/test_wi2_contract_audit.py",
+      "sha256": "587190c5347b2692579dbc66f1a9497b0e4c3087c8327d8d51f9932e19a2520a"
+    },
+    {
+      "path": "scripts/prepare-wi2-scope-witnesses.py",
+      "sha256": "253b06d7510a4767e5ce31f375e847ecd5a6ad0f2878a888d925111cc0eeac83"
+    },
+    {
+      "path": "scripts/verify-wi2-contract-runtime.py",
+      "sha256": "cce851055207f0cbba5f93e66792645d7d9b5084cf7fa1fcaf22806744a64bd4"
+    },
+    {
+      "path": "scripts/wi2_contract_scope.go.txt",
+      "sha256": "d340def7ecf66ff66cb53767a75f7d3256cfc042bc1b9a807a4695d92a448001"
+    },
+    {
+      "path": "scripts/wi3_reason_fix.py",
+      "sha256": "2899d39ae8041db24f12a69409f721bcab621a0b652d168f4b917dd0f0050f05"
+    },
+    {
+      "path": "scripts/prepare-wi3-reason-fix.py",
+      "sha256": "37c3bb6f53d1decdd778095c90e31ac6521ff4e812c586078ee63f711579bac4"
+    },
+    {
+      "path": "scripts/wi2_dev_gold.py",
+      "sha256": "0f4aee18e1da7f47249de54ac0f43fe36cf029a880335848407368f869f8e8a6"
+    },
+    {
+      "path": "scripts/independent_acceptance.py",
+      "sha256": "a0d4c868e35c702e8ebb9287c08cb1e4e145431e58487ec785dc3bfdde1b41ea"
+    },
+    {
+      "path": "scripts/check-operational-acceptance.py",
+      "sha256": "ab1324793710b36f47c9efbe344e4edb00414d31be96c885efa14ddff7d8a7a1"
+    },
+    {
+      "path": "scripts/test_operational_acceptance.py",
+      "sha256": "744d7f2b5b2602a9655e468750936425ce9681340c84c6db5a976637a7b8d34c"
+    }
+  ],
+  "source_inputs": [
+    {
+      "path": "pkg/graph/valueflow/rules.go",
+      "sha256": "15b2984789d1460e1b2998e4854348f60d22c91d6418566a16223fe91f0ca450"
+    },
+    {
+      "path": "docs/graph/GO-RULE-CANDIDATES.md",
+      "sha256": "42607b245ce40e227d851d42580417420852f92485a23b3a6706fc38bec94a0a"
+    },
+    {
+      "path": "internal/graph/detect/golang.go",
+      "sha256": "6697383e2c73490f4ce22de7ab3614279fd8939e3d9f74fb95e58ddb86c633f6"
+    }
+  ],
+  "artifacts": {
+    "REPORT.txt": "2190eef9b2b6a350900e844964227dc1dab4d104b77290e96f94653c1bfaeb09",
+    "SUMMARY.json": "22c6715075b494faf07b88611b7d560446caa516f0afef0bfe668e28ecf64a7f",
+    "WORKLIST.json": "cb0ec7ea02016845b0b61d1c3cb0d8c240dfdf21ed24362deff874bc39c10571",
+    "actual-contract-review.json": "7af0116f0a5274fb7fd95f7069f051e043e466845bede53e11f8583d3ff9b3ec",
+    "compiler/oracle-inputs.json": "f3fb5915cc960e4ceb22cabbd4654b43d5fc0dbb39b3f8ea7304203a8f0b0a6f",
+    "compiler/oracle-output.json": "12563804ed40fcf89355d8b9eda088d1c1666ced44cc81b893bbf5af9f13c561",
+    "compiler/original-source/build/ci.go.txt": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa",
+    "compiler/original-source/build/update-license.go.txt": "c2543e6d241f51754292a48bd51f01052275c2adb8fe1d8112ce16a895805953",
+    "compiler/original-source/crypto/signify/signify_fuzz.go.txt": "1229d09050f80dbdb7815f88e47b04d3b15f72de6a814dc271bb5c5e507742f6",
+    "compiler/original-source/metrics/disk_linux.go.txt": "417814a49fae826da5b9b0f70b8683e7a1c30a9f14168087cdce813d84e8d456",
+    "compiler/witness-catalog.json": "0dbdb5850274399a32c3d83daf1335910a25869cf9ac34b983f033eb076d937e",
+    "compiler/witnesses/RULE-1-05-constant.go.txt": "095b7f5da29fa4ca6e3d8e2591a461ea8965e60cdac39ae9e06e66286fd42e2b",
+    "compiler/witnesses/RULE-1-05-identity.go.txt": "c4eebbad4d2d4e7de512eeeda771d17996eca6d5b4b7af0c8ebf20b28e07173a",
+    "compiler/witnesses/RULE-1-07-scope.go.txt": "aee5c7ae009de08f2dcf015469c8889ef2e3bc6d080a7ed6563806aec94e0503",
+    "compiler/witnesses/RULE-1-15-scope.go.txt": "a311713f40c1934b826d6151d76ef5f051c4a706e918da45f523524c0d686286",
+    "compiler/witnesses/RULE-2-06-constant.go.txt": "bee1c50f8207fa758a77091cd1a43a72baff9ecdea7f8a8b0dbd009b0f2530cf",
+    "compiler/witnesses/RULE-2-06-identity.go.txt": "087ee9a2a47051b2abd8e92346b07d35f54a14d7ff86a1ae94a3f80e8ae84be9",
+    "compiler/witnesses/RULE-2-07-scope.go.txt": "3ec41f66c40a2a838dbbfdcd70a742673527a629acf6011ccad304e4aed7c19b",
+    "compiler/witnesses/RULE-2-16-scope.go.txt": "a4f3e48f171f67244ffaa12704b7faddb7cac5f7ecd213f42ca69293836367c7",
+    "compiler-scope-review.json": "68ec0f0b873a2157b622c7497bbd9ff4c675524f53d7ea4ba404fdcc7bbeaa59",
+    "index-scope-review.json": "db5f1856f9f74855d1ee6e38d8e8766932c60a658789628ad6ec6f39fbb2c66e",
+    "matching-contract.json": "9e5dcbfecc03fb9a552a3f9ba1ad522821e7db1752c3d22c51e1a33410bc2236",
+    "runtime/controlled/mcp.stderr.txt": "a1465e945c9728a5ea227753cb5462ce1051390fde1c4ed6dc115e445106728d",
+    "runtime/controlled/mcp.stdin.jsonl.gz": "ee9d71543096a6545ebfcc864c85853e5055d6684e33a4cb1353b7101531064a",
+    "runtime/controlled/mcp.stdout.jsonl.gz": "4dcaa4e1cb5aaa06c40f048c88ba67112cb0a37b95b35937f5ae7b09a5899d8e",
+    "runtime/controlled/tools.json.gz": "eb1a202a3be64d2e1920d464de7a167999b6fa2c3bf4f16fbc514019ae314b2f",
+    "runtime/controlled-after.json.gz": "6fd073cfbdb6b54f57f3898a445228b30ec20bbdaff1a88414dcc044b3317210",
+    "runtime/controlled-before.json.gz": "6fd073cfbdb6b54f57f3898a445228b30ec20bbdaff1a88414dcc044b3317210",
+    "runtime/controlled.yaml": "1e8231a68274f5824e86fd8b0bf35ac4e36f5493f0db2bb0b50cf274cf41ae91",
+    "runtime/project/mcp.stderr.txt": "7825384528eefdf731be37ba95112d65a980d61f369040e0bea1e8e5650d5843",
+    "runtime/project/mcp.stdin.jsonl.gz": "82403256cd6277dbc30b9673cebb1200d77928fc4a1645d864f96c0aafb22975",
+    "runtime/project/mcp.stdout.jsonl.gz": "78870a67f00fcb59e0e73f378c2c177ac317778138acf692c6d3611d44e75a03",
+    "runtime/project/tools.json.gz": "eb1a202a3be64d2e1920d464de7a167999b6fa2c3bf4f16fbc514019ae314b2f",
+    "runtime/receipt.json": "dd1c44b21cd62053ca8955a4651c896883b22cb1d15a51d88408547b766601b5",
+    "runtime/responses.json": "20503bd2ca0a62edfc1bdaec3412d27916ec78a17c7a579975a66713bf90e05b",
+    "runtime/retained-after.json.gz": "d955c3c72de47a9490d7e5a508de12c7a56cfaa06c3f11720511a42c3c47d644",
+    "runtime/retained-before.json.gz": "d955c3c72de47a9490d7e5a508de12c7a56cfaa06c3f11720511a42c3c47d644",
+    "runtime/sessions.json": "9be5adbe562103c14008e7a825a6426c15ffb5755dd19225b25b1cfbd3a88941",
+    "validation/SUMMARY.json": "cef7ff4eeeb0e6bbcf97d5c3391e368aaf3aa732a5365ba654b75bec42a4dafe",
+    "validation/common-tests.txt": "5fc923bec26d1f9d76850d978d2cce0ac74582cfe044062f3b03d074236c0471",
+    "validation/docs-tests.txt": "4a04fee3cf398c02010b06554bfca8eb0fdc90397510e2db97d7b9e449a151e7",
+    "validation/notice-tests.txt": "d3e71e6369c2ee2914dd522d60ac70a106429d6e8d9ec0089d14a1c1f065633f",
+    "validation/oracle-execution.json": "6c0a8f41c8f0b0b67d5a8f1eea798b550740d890504597a0ae136d99bcd04489",
+    "validation/scope-tests.txt": "61183d851c52165558b86f73af4d6167763dca9ead9c8c831aa16cecd4b5c328"
+  }
+}

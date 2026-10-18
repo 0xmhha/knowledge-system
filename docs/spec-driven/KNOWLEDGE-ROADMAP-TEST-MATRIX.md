@@ -1,5 +1,26 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
+## 2026-10-19 단계57: WI2 호출 계약·별칭·opaque helper·index 범위 점검
+
+[단계57 보고서](./operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/WORKLIST.json)이 최신 진입점이다. **AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처는 요구하지 않는다.
+
+| 점검 범위 | 확인한 내용과 한계 |
+|---|---|
+| 차이6건 | 지역 selector 가림2·renamed import2·opaque helper2로 분류. v1은 명시적으로 syntax_only_unverified/not_proven/lexical_may_reach이며 실제 stdlib target/helper 효과 검증이 아님. 원래 의미 negative/positive/unknown과4반환 차이·2미반환 AI양성 유지 |
+| 컴파일러 보완 | 원래6F 본문 bytes를 그대로 둔 전체 파일 문맥8개는 타입 검사 통과. 지역 method와 stdlib 별칭 확인. 두 opaque 사례는 F hash가 같아도 helper가 identity/constant일 수 있음을 별도 문맥으로 기록. 본문만으로 helper 효과를 확정하지 않음 |
+| 원래 prefix | 선택6개의 기존 prefix는 standalone 프로그램으로 타입 검사 오류가 있음. 새 Fake methods/helper body/import-use prefix는 보완 증거이며 원래 입력이나 retained blob의 묵시적 대체가 아님 |
+| 심볼9개/입력17개 | 기록된 graph manifest에 없는4파일: build/ci.go·build/update-license.go·crypto/signify/signify_fuzz.go·metrics/disk_linux.go. 현재16개 MatchFile 관측은 none/gofuzz tag·Linux 파일 선택과 연결. 당시 정확한 GOOS/GOARCH/tags는 미기록이라 배타적 역사 원인은unknown |
+| 실제 MCP8회 | 동일 입력·pin·상한의 제어6개 후보 수1/1/0/1/1/0 유지. 과거 최종 출처 확인 deadline2개는 이번 동일1초 예산에서partial analysis/matched_bounded empty rules 반환. 과거 실패 보존·코드 수정/안전/독립 표본·점수로 승격하지 않음 |
+| 보존·native | 원래108입력과 정답 분모 유지. 기존 project·controlled graph 전후 동일, 소유 stdio2개 EOF0. 관리 Go 코드 변경0이며738c4a51의1738native/5승인 입력 결속·일반/race4107검증 재사용. 외부/유료LLM·설치역할·운영/게시0 |
+
+[컴파일러 문맥](./operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/compiler-scope-review.json), [manifest/profile 범위](./operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/index-scope-review.json), [실제 계약 관측](./operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/actual-contract-review.json)을 따른다. 현재 규칙팩의 계약 일치와 실제 의미 정확도를 분리한다. 새 pack·지원범위 확대·임계치 변경·정답 수정은 수행하지 않았다.
+
+다음은 **WI1 select 수신 범위의 reference 반례·WI3 traversal/계측 optional resolver 검토**다. 남은 전체는 이 부채와 WI1 값종류/53occurrence/3block, WI2 독립 의미·미기록 build profile·지원 범위·설치 역할, WI4/V1/V2 실제경로/oracle·WI6 nonseed/쌍/warm·WI-SP overlay/ACL·WI-C 독립필수항목/실제전달, 새독립DEV/FINAL·완전gold·matching/충분성·F01~08, 정식9개·온톨로지 효과다. 실제 LLM 답변 효과는 모델/인증/비용 상한 확정 후다. 선택12개는 별도 backlog다.
+
+이번 회귀111개(WI2 scope31·공통 수용57·문서20·notice3), 문서134개·생성39파일 동일 재생·Python8파일 구문·공백 검사와 미승인 gold/미동결 실행 거부를 확인했다. [검증 요약](./operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/validation/SUMMARY.json)에 Go helper/입력/출력 hash·버전, 원래108입력·실패 보존과 새 독립 표본0을 기록한다. native/승인 입력 hash가738c4a51의 결속과 같아 새 전체 Go 실행은 하지 않았다.
+
+이하 단계56 이전은 당시 기록이다.
+
 ## 2026-10-19 단계56: WI3 오류 사유 구분·새 native/실제 MCP 검증
 
 [단계56 보고서](./operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/WORKLIST.json)이 최신 진입점이다. **AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처는 요구하지 않으며, D04미정은 실제 검토·승인 대기다.

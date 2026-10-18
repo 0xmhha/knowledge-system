@@ -1,0 +1,9 @@
+package audit
+import(exec "os/exec";process "os/exec";strconv "strconv";conversion "strconv")
+var _,_,_,_ = exec.Command,process.Command,strconv.Atoi,conversion.Atoi
+type Fake struct{}
+func(Fake)Command(string){}
+func(Fake)Atoi(string)(int,error){return 0,nil}
+func sanitize(v string)string{return v}
+func clamp(v int)int{return v}
+func F(cmd string,exec Fake){a:=cmd;exec.Command(a)}

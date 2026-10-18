@@ -1,0 +1,128 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/build"
+	"go/importer"
+	"go/parser"
+	"go/token"
+	"go/types"
+	"os"
+)
+
+type Input struct {
+	ID, Path, Source, Package string
+	Profiles                  []Profile
+}
+type Profile struct {
+	Name, GOOS, GOARCH string
+	Tags               []string
+}
+type Site struct {
+	Start, End                                                                int
+	Text, Member, OwnerKind, ImportPath, ObjectPackage, ObjectName, Selection string
+}
+type Result struct {
+	ID                         string
+	Errors                     []string
+	FunctionStart, FunctionEnd int
+	Calls                      []Site
+	HelperReturns              map[string]string
+	Matches                    map[string]bool
+	MatchErrors                map[string]string
+}
+
+func main() {
+	var inputs []Input
+	if err := json.NewDecoder(os.Stdin).Decode(&inputs); err != nil {
+		panic(err)
+	}
+	results := []Result{}
+	for _, in := range inputs {
+		result := Result{ID: in.ID, Errors: []string{}, Calls: []Site{}, HelperReturns: map[string]string{}, Matches: map[string]bool{}, MatchErrors: map[string]string{}}
+		if in.Profiles != nil {
+			for _, profile := range in.Profiles {
+				ctx := build.Default
+				ctx.GOOS = profile.GOOS
+				ctx.GOARCH = profile.GOARCH
+				ctx.BuildTags = profile.Tags
+				name := in.Path
+				dir := "."
+				for i := len(in.Path) - 1; i >= 0; i-- {
+					if in.Path[i] == '/' {
+						dir = in.Path[:i]
+						name = in.Path[i+1:]
+						break
+					}
+				}
+				ok, err := ctx.MatchFile(dir, name)
+				result.Matches[profile.Name] = ok
+				if err != nil {
+					result.MatchErrors[profile.Name] = err.Error()
+				}
+			}
+			results = append(results, result)
+			continue
+		}
+		fs := token.NewFileSet()
+		file, err := parser.ParseFile(fs, in.Path, in.Source, parser.ParseComments)
+		if err != nil {
+			result.Errors = append(result.Errors, err.Error())
+			results = append(results, result)
+			continue
+		}
+		info := &types.Info{Uses: map[*ast.Ident]types.Object{}, Defs: map[*ast.Ident]types.Object{}, Selections: map[*ast.SelectorExpr]*types.Selection{}}
+		conf := types.Config{Importer: importer.Default(), Error: func(err error) { result.Errors = append(result.Errors, err.Error()) }}
+		_, _ = conf.Check(in.Package, fs, []*ast.File{file}, info)
+		for _, decl := range file.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			if ok && (fn.Name.Name == "sanitize" || fn.Name.Name == "clamp") && fn.Body != nil && len(fn.Body.List) == 1 {
+				if ret, yes := fn.Body.List[0].(*ast.ReturnStmt); yes && len(ret.Results) == 1 {
+					a, b := fs.Position(ret.Results[0].Pos()).Offset, fs.Position(ret.Results[0].End()).Offset
+					result.HelperReturns[fn.Name.Name] = in.Source[a:b]
+				}
+			}
+			if !ok || fn.Name.Name != "F" {
+				continue
+			}
+			result.FunctionStart = fs.Position(fn.Pos()).Offset
+			result.FunctionEnd = fs.Position(fn.End()).Offset
+			ast.Inspect(fn.Body, func(n ast.Node) bool {
+				call, ok := n.(*ast.CallExpr)
+				if !ok {
+					return true
+				}
+				sel, ok := call.Fun.(*ast.SelectorExpr)
+				if !ok {
+					return true
+				}
+				start, end := fs.Position(call.Pos()).Offset, fs.Position(call.End()).Offset
+				site := Site{Start: start, End: end, Text: in.Source[start:end], Member: sel.Sel.Name}
+				if id, ok := sel.X.(*ast.Ident); ok {
+					owner := info.Uses[id]
+					site.OwnerKind = fmt.Sprintf("%T", owner)
+					if pkg, ok := owner.(*types.PkgName); ok {
+						site.ImportPath = pkg.Imported().Path()
+					}
+				}
+				if obj := info.Uses[sel.Sel]; obj != nil {
+					site.ObjectName = obj.Name()
+					if obj.Pkg() != nil {
+						site.ObjectPackage = obj.Pkg().Path()
+					}
+				}
+				if selection := info.Selections[sel]; selection != nil {
+					site.Selection = selection.String()
+				}
+				result.Calls = append(result.Calls, site)
+				return true
+			})
+		}
+		results = append(results, result)
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(results); err != nil {
+		panic(err)
+	}
+}

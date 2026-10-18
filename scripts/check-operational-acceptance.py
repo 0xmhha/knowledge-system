@@ -152,6 +152,10 @@ def check(root, protocol, ledger, require_frozen=False):
                 import independent_acceptance
                 errors.extend(independent_acceptance.packet_errors(root, (root / refreshed["manifest"]).parent))
                 errors.extend(independent_acceptance.current_index_errors(root))
+            elif refreshed.get("kind") == "WI2_source_contract_compiler_MCP_audit_not_formal_execution":
+                import wi2_contract_audit
+                errors.extend(wi2_contract_audit.validate(root, (root / refreshed["manifest"]).parent))
+                errors.extend(wi2_contract_audit.current_indices(root, protocol, ledger))
             elif refreshed.get("kind") == "WI3_typed_failure_reason_native_MCP_not_formal_execution":
                 import wi3_reason_fix
                 errors.extend(wi3_reason_fix.validate(root, (root / refreshed["manifest"]).parent))
@@ -212,7 +216,7 @@ def check(root, protocol, ledger, require_frozen=False):
                 errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
             else:
                 raise ValueError("current readiness scope or hash differs")
-            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution", "WI1_consumer_matching_AI_DEV_not_formal_execution", "WI2_complete_bounded_AI_DEV_not_formal_execution", "WI2_consumer_context_AI_DEV_not_formal_execution", "WI3_bounded_AI_DEV_not_formal_execution", "WI3_observed_consumer_AI_DEV_not_formal_execution", "WI4_bounded_schedule_AI_DEV_not_formal_execution", "WIV1_V2_bounded_ticket_AI_DEV_not_formal_execution", "WI6_bounded_paired_AI_DEV_not_formal_execution", "WISP_bounded_overlay_AI_DEV_not_formal_execution", "WIC_bounded_review_AI_DEV_not_formal_execution", "WI123_readonly_debt_diagnostic_not_formal_execution", "WI3_typed_failure_reason_native_MCP_not_formal_execution"):
+            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution", "WI1_consumer_matching_AI_DEV_not_formal_execution", "WI2_complete_bounded_AI_DEV_not_formal_execution", "WI2_consumer_context_AI_DEV_not_formal_execution", "WI3_bounded_AI_DEV_not_formal_execution", "WI3_observed_consumer_AI_DEV_not_formal_execution", "WI4_bounded_schedule_AI_DEV_not_formal_execution", "WIV1_V2_bounded_ticket_AI_DEV_not_formal_execution", "WI6_bounded_paired_AI_DEV_not_formal_execution", "WISP_bounded_overlay_AI_DEV_not_formal_execution", "WIC_bounded_review_AI_DEV_not_formal_execution", "WI123_readonly_debt_diagnostic_not_formal_execution", "WI3_typed_failure_reason_native_MCP_not_formal_execution", "WI2_source_contract_compiler_MCP_audit_not_formal_execution"):
                 historical = protocol.get("historical_readiness_preparation")
                 if (historical != ledger.get("historical_readiness_preparation")
                         or not isinstance(historical, dict)
