@@ -1,3 +1,27 @@
+<!-- WI4-TARGET-CURRENT -->
+# 단계61 — WI-4 실제 구독 경로·수신자 종료·반복 관측 / 2026-10-19
+
+[명세](./operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/SCOPE.json) · [보완 명세](./operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/CORRECTIVE-SCOPE.json) · [수신자 종료 명세](./operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/FULL-RECEIVER-SCOPE.json) · [결과](./operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/SUMMARY.json) · [현재·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/WORKLIST.json).
+
+**AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다. D04는 미정이며 실명·이메일·연락처를 요청하지 않는다. 실제 검토 없이 승인 기록을 만들지 않는다.
+
+| 이번 기술 범위 | 확인한 결과와 한계 |
+|---|---|
+| 실제 대상 | go-stablenet `0bf2f4d1`의 추적 소스2228개와 원래7개 소스 hash 보존. 프로젝트 지정 Go1.23.12 일반/race binary를 각각 새로 빌드하고 시험 파일만 추가 |
+| 48회 모두 보존 | 원래 소스 조건 관측30건, 추가3호출 스트레스6건, 처음부터 수신자가 없는 변형3건, 관측기 실패9건. 실패를 통과로 바꿔 쓰지 않음 |
+| 실패 원인·보완 | 첫6건은 잘못된 소스 줄126/188을 관측. 이후race3건은 compiler closure 이름 차이로 관측 확정 실패. 실제 send 줄125/186과 같은 goroutine의 method scope를 확인하도록 보완. 단일 수신자의 실제 종료·join을 trigger 전에 확인한 최종6회는 일반/race 각3회 통과 |
+| 경로 구분 | 원래 조건30건 중 실제 constructor/eventLoop 경로12건, 실제 Unsubscribe에 제어 수신자를 연결한 경로18건. 제어 수신자3종을 전체 공개API 경로 검증으로 확대하지 않음 |
+| 시간 계약 | 실제60초 타이머와 준비 상한75초 뒤2초 관측을 분리. cleanup/rescue 전에 관측 확정. fresh-start부터2초 안에 도달했다는 주장이 아니며 전체 원래 드라이버 시간 계약 수용은0건 |
+| 정리·보존 | 모든 소유 process group 종료·임시 자원 정리. 운영 노드·글로벌 설치·게시·모델 호출0. 반복을 새 독립 가족/seed/동결 baseline-fix arm으로 세지 않음 |
+| 기존 CKS 회귀 | 관리 Go 입력1738개·승인5개·lint 설정2개는 단계60과 동일. 일반/race 각4158통과·18skip 근거를 재사용하며 새 전체 실행으로 기록하지 않음. 이번 upstream 시험 binary와 구분 |
+
+[보고서](./operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/REPORT.txt)와 [검증 요약](./operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/validation/SUMMARY.json)을 따른다. 현재 회귀104개(이번20·공통61·문서20·notice3)와 문서134개 통과, 원자료444개 파일 동일 재생을 확인했다. 서명 저장 여부는 실제 Git 커밋과 `--require-stored` 검증으로 확인한다. AI 어휘와 실제 조건 관측은 독립 gold·제품 결함 판정·품질 점수가 아니다.
+
+다음: **WI-4 나머지16스케줄의 실제 경로·스케줄·반복과 준비/2초 시간 계약을 점검**한다. 남은 전체: WI1의53발생/3블록·타입/값/메모리·독립 의미, WI2 독립 의미/build profile/지원/설치역할, WI3 독립 의미/새가족·기본예산/시작SLA/site거부 원인, WI4 남은16개/전체API·제어 수신자 범위/시간 계약/독립 가족·오라클·충분성, WI-V1/V2 실제API/독립티켓/수용후보, WI6 nonseed/기본·확장쌍/관련성·잡음/warm, WI-SP 실제overlay/ACL/출처, WI-C 필수항목/우선순위/보고서·그림/전달/설치역할, 새독립DEV/FINAL·완전정답·matching·충분성·F01~08, 정식9개, 온톨로지 독립정답/구현·개념연결/검색효과다. 실제LLM답변 평가는 모델·인증·비용상한 결정 후 진행하며 선택 백로그12개는 별도다.
+<!-- END-WI4-TARGET-CURRENT -->
+
+이하 단계60 이전은 당시 기록이다.
+
 <!-- WI3-WALK-CURRENT -->
 # 단계60 — WI-3 출처 연결·총 예산·요청 계측 / 2026-10-19
 

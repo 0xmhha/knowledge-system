@@ -1,0 +1,46 @@
+{
+  "scope": "owned full source availability preflight only; not target trial or independent acceptance",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "bundle_sha256": "c1bfb83924a159723fffd6c315ebe536bcfc0fd94d120763ecfab0a4cd762b6e",
+  "project_source_unchanged": true,
+  "network": false,
+  "submodule_initialization": false,
+  "formal_completed": 0,
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/ks-wi4-target-20261019/source",
+        "fetch",
+        "/private/tmp/ks-snp04-20261018-01/stablenet/retained-origins-v2/sources/history.bundle",
+        "refs/cks/base"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/private/tmp/ks-wi4-target-20261019/source",
+        "checkout",
+        "--detach",
+        "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "verified_source_sha256": {
+    "eth/downloader/api.go": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "p2p/discover/v4_udp.go": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+    "miner/worker.go": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+    "consensus/wbft/backend/backend.go": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+    "eth/protocols/eth/peer.go": "d14d60d2ecab00e6f85f9ebec12900b2d819269192d4538c93a2742b32bc518b",
+    "core/txpool/blobpool/blobpool.go": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+    "event/feed.go": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879"
+  },
+  "go_mod_sha256": "0c5c6cffdaeda51dfe06502c080df5e8d4e686a0ef5af9f3404feee164d12895",
+  "clean": true,
+  "target_trials": 0
+}

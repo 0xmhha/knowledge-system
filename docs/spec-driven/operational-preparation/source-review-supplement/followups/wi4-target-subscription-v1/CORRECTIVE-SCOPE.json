@@ -1,0 +1,122 @@
+{
+  "status": "declared_before_corrective_target_trials",
+  "retains_initial30": true,
+  "first_plan_failures": "Incorrect observer coordinates126/188 do not select actual send statements125/186; failed slots remain failed/unproved, no quality outcome",
+  "original_input_gap": "first SUB-once3calls are stress variant; original2calls still requires execution",
+  "target_production_patch": false,
+  "corrective_test_fixture": "scripts/fixtures/wi4-owned-subscription-two-callers.go.fixture",
+  "actual_source_send_lines": {
+    "broadcast": 125,
+    "uninstall_registration": 186
+  },
+  "additional_slots": [
+    {
+      "slot_id": "general-r1-SUB-blocked-corrected",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "concurrent_calls": 1
+    },
+    {
+      "slot_id": "general-r1-SUB-once-corrected",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "general-r2-SUB-blocked-corrected",
+      "variant": "general",
+      "repetition": 2,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "concurrent_calls": 1
+    },
+    {
+      "slot_id": "general-r2-SUB-once-corrected",
+      "variant": "general",
+      "repetition": 2,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "general-r3-SUB-blocked-corrected",
+      "variant": "general",
+      "repetition": 3,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "concurrent_calls": 1
+    },
+    {
+      "slot_id": "general-r3-SUB-once-corrected",
+      "variant": "general",
+      "repetition": 3,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "race-r1-SUB-blocked-corrected",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "concurrent_calls": 1
+    },
+    {
+      "slot_id": "race-r1-SUB-once-corrected",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "race-r2-SUB-blocked-corrected",
+      "variant": "race",
+      "repetition": 2,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "concurrent_calls": 1
+    },
+    {
+      "slot_id": "race-r2-SUB-once-corrected",
+      "variant": "race",
+      "repetition": 2,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "race-r3-SUB-blocked-corrected",
+      "variant": "race",
+      "repetition": 3,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "concurrent_calls": 1
+    },
+    {
+      "slot_id": "race-r3-SUB-once-corrected",
+      "variant": "race",
+      "repetition": 3,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    }
+  ],
+  "total_initial_slots": 30,
+  "total_corrective_slots": 12,
+  "total_planned_attempts": 42,
+  "native_timer_seconds": 60,
+  "setup_watchdog_seconds": 75,
+  "step_observation_watchdog_ms": 2000,
+  "process_watchdog_seconds": 110,
+  "max_concurrent_owned_processes": 2,
+  "previous_two_caller6_slots_included_not_dropped": true,
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "quality_score": null
+}

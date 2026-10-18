@@ -1,0 +1,73 @@
+{
+  "status": "declared_before_original_receiver_lifecycle_trials",
+  "reason": "A no-reader-from-start state is a source mechanism variant, not proof of the original single receiver termination lifecycle. Preserve corrective6 state variants separately and execute the exact lifecycle.",
+  "retains_initial30_and_corrective12": true,
+  "total_first_two_plans": 42,
+  "additional_slots": [
+    {
+      "slot_id": "general-r1-SUB-blocked-receiver",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "unique_receiver_lifecycle_required": true
+    },
+    {
+      "slot_id": "general-r2-SUB-blocked-receiver",
+      "variant": "general",
+      "repetition": 2,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "unique_receiver_lifecycle_required": true
+    },
+    {
+      "slot_id": "general-r3-SUB-blocked-receiver",
+      "variant": "general",
+      "repetition": 3,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "unique_receiver_lifecycle_required": true
+    },
+    {
+      "slot_id": "race-r1-SUB-blocked-receiver",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "unique_receiver_lifecycle_required": true
+    },
+    {
+      "slot_id": "race-r2-SUB-blocked-receiver",
+      "variant": "race",
+      "repetition": 2,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "unique_receiver_lifecycle_required": true
+    },
+    {
+      "slot_id": "race-r3-SUB-blocked-receiver",
+      "variant": "race",
+      "repetition": 3,
+      "case_id": "SUB-blocked",
+      "route": "real_API_eventLoop",
+      "unique_receiver_lifecycle_required": true
+    }
+  ],
+  "additional_slots_count": 6,
+  "total_planned_attempts": 48,
+  "test_fixture": "scripts/fixtures/wi4-owned-subscription-receiver.go.fixture",
+  "source_send_lines": [
+    125,
+    186
+  ],
+  "native_timer_seconds": 60,
+  "setup_watchdog_seconds": 75,
+  "observation_watchdog_ms": 2000,
+  "max_concurrent_owned_test_invocations": 2,
+  "production_patch": false,
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "quality_score": null,
+  "observer_method_scope": "same blocked goroutine, actual source file/send line and receiver method identity; accept compiler inline/closure suffix variants without changing source anchor",
+  "preserved_second_plan_race_observer_failures": "Race compiler renders Unsubscribe.1 instead of Unsubscribe.func1; retain3 failed slots and timeout stacks, do not reclassify as passes"
+}

@@ -1,0 +1,32 @@
+{
+  "scope": "offline package dependency/build-profile preflight; no target execution or node startup",
+  "argv": [
+    "/Users/kevin/.gvm/gos/go1.23.12/bin/go",
+    "list",
+    "-e",
+    "-deps",
+    "-json",
+    "./eth/downloader",
+    "./p2p/discover",
+    "./miner",
+    "./consensus/wbft/backend",
+    "./core/txpool/blobpool"
+  ],
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "task_environment": {
+    "GOROOT": "/Users/kevin/.gvm/gos/go1.23.12",
+    "GOTOOLCHAIN": "local",
+    "GOCACHE": "/private/tmp/ks-wi4-target-20261019/go-cache",
+    "GOFLAGS": "-mod=readonly",
+    "GOWORK": "off",
+    "GOPROXY": "off",
+    "GOSUMDB": "off",
+    "GOPRIVATE": "",
+    "GONOPROXY": "",
+    "GONOSUMDB": "",
+    "GOVCS": "*:off"
+  },
+  "timeout_seconds": 180,
+  "formal_completed": 0,
+  "independent_samples": 0
+}
