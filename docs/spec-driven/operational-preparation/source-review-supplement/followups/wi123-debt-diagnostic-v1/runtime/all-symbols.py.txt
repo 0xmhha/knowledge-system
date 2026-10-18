@@ -1,0 +1,15 @@
+import sys,json,hashlib,importlib.util,time
+from pathlib import Path
+R=Path.cwd();sys.path.insert(0,str(R/'scripts'));sp=importlib.util.spec_from_file_location('transport',R/'scripts/eval-value-dependencies.py');t=importlib.util.module_from_spec(sp);sp.loader.exec_module(t)
+base=R/'docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1';old=json.loads((base/'runtime/primary-results.json').read_text());symbols=list(dict.fromkeys(c['symbol'] for row in old for c in row['raw_response']['result']['structuredContent']['candidates'] if c['symbol']))
+p=Path('/private/tmp/ks-wi3-diagnostic-20261019/all-symbols');p.mkdir();dataset=Path('/private/tmp/ks-snp04-20261018-01/stablenet/retained-origins-v2');inventory=lambda:{x.relative_to(dataset).as_posix():hashlib.sha256(x.read_bytes()).hexdigest() for sub in ('graph','sources','vector') for x in (dataset/sub).rglob('*') if x.is_file() and not x.name.endswith(('lock','lease'))}
+write=lambda n,v:(p/n).write_text(json.dumps(v,indent=2)+'\n');before=inventory();write('before.json',before)
+binary=Path('/private/tmp/ks-snp04-20261018-01/read-cks');assert hashlib.sha256(binary.read_bytes()).hexdigest()=='0f96f0d527732ad414416217506dc564a5b0014d8b8f81e335f8c1c88896e54c';c=t.Client(None,None,p,command=[str(binary),'mcp','--config','/private/tmp/ks-snp04-20261018-01/go-stablenet.yaml'],namespace='cks.context.');rows=[]
+try:
+ c.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'wi3-all-observed-symbol-diagnostic','version':'1'}});write('tools.json',c.request('tools/list')['result']['tools'])
+ for symbol in symbols:
+  for name in ('impact_analysis','concurrency_impact'):
+   args={'symbol':symbol,'depth':2,'max_total':10};start=time.monotonic();r=c.request('tools/call',{'name':'cks.context.'+name,'arguments':args});rows.append({'tool':name,'arguments':args,'response':r,'wall_seconds':time.monotonic()-start});write('responses.json',rows)
+ print('actual symbols',len(symbols),'planned tool calls',len(symbols)*2,'attempted',len(rows),flush=True)
+finally:c.close();c.proc.stdout.close();write('session.json',{'exit':c.proc.returncode,'requests':c.id,'new_LLM_calls':0,'local_embedding_queries':0})
+after=inventory();write('after.json',after);assert before==after;write('receipt.json',{'planned_symbols':len(symbols),'planned_tool_calls':len(symbols)*2,'attempted':len(rows),'preserved':True,'formal_completed':0,'quality_scores':None})

@@ -84,6 +84,11 @@ class PreparationGuardTests(unittest.TestCase):
             value['wi6_dev_gold_preparation']['status'] = 'independent_approved'
         self.assertTrue(self.errors())
 
+    def test_WI123_direct_diagnostic_cannot_be_formal_acceptance(self):
+        for value in (self.protocol,self.ledger):
+            value['wi123_debt_diagnostic']['status'] = 'independent_approved'
+        self.assertTrue(self.errors())
+
     def test_WIC_source_vocabulary_cannot_be_independent_required_gold(self):
         for value in (self.protocol,self.ledger):
             value['wic_dev_gold_preparation']['status'] = 'independent_approved'

@@ -1,0 +1,12 @@
+import sys,json,importlib.util,hashlib,time
+from pathlib import Path
+R=Path.cwd();sys.path.insert(0,str(R/'scripts'));spec=importlib.util.spec_from_file_location('transport',R/'scripts/eval-value-dependencies.py');t=importlib.util.module_from_spec(spec);spec.loader.exec_module(t)
+p=Path('/private/tmp/ks-wi3-diagnostic-20261019/direct');p.mkdir();binary=Path('/private/tmp/ks-snp04-20261018-01/read-cks');assert hashlib.sha256(binary.read_bytes()).hexdigest()=='0f96f0d527732ad414416217506dc564a5b0014d8b8f81e335f8c1c88896e54c'
+c=t.Client(None,None,p,command=[str(binary),'mcp','--config','/private/tmp/ks-snp04-20261018-01/go-stablenet.yaml'],namespace='cks.context.');rows=[]
+try:
+ c.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'wi3-readonly-provider-diagnostic','version':'1'}})
+ for symbol in ['github.com/ethereum/go-ethereum/trie.(*StateTrie).DeleteStorage','github.com/ethereum/go-ethereum/consensus/wbft/backend.(*Backend).Verify','UNINDEXED_WI3_NEGATIVE_CONTROL']:
+  for method in ('impact_analysis','concurrency_impact'):
+   args={'symbol':symbol,'depth':2,'max_total':10};start=time.monotonic();response=c.request('tools/call',{'name':'cks.context.'+method,'arguments':args});rows.append({'tool':method,'arguments':args,'response':response,'wall_seconds':time.monotonic()-start});(p/'responses.json').write_text(json.dumps(rows,indent=2)+'\n');print(method,'tool_error' if response.get('result',{}).get('isError') else 'response',flush=True)
+finally:
+ c.close();c.proc.stdout.close();(p/'session.json').write_text(json.dumps({'exit':c.proc.returncode,'requests':c.id,'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),'LLM_calls':0})+'\n')

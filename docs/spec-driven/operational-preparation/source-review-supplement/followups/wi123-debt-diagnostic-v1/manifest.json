@@ -1,0 +1,100 @@
+{
+  "kind": "WI123_readonly_debt_diagnostic_not_formal_execution",
+  "previous_source_revision": "b9e0db369211aba2c55f0db48d49f446c8023b88",
+  "tools": [
+    {
+      "path": "scripts/acceptance_debt_diagnostic.py",
+      "sha256": "ac911d89b8b8102a2d1ec327209c16848443911d6f727f0d909d79b949622365"
+    },
+    {
+      "path": "scripts/prepare-acceptance-debt-diagnostic.py",
+      "sha256": "4de9d3d31a0b78cd7a032f28307c94008d0b4e2ed7e517053775073dd1c7aae0"
+    },
+    {
+      "path": "scripts/check-acceptance-debt-diagnostic.py",
+      "sha256": "97fdba5250c5bd78867c4c05a634143afa5a5eeaa172c94fe5425a58cdeaf7c0"
+    },
+    {
+      "path": "scripts/test_acceptance_debt_diagnostic.py",
+      "sha256": "6ce5143180f3b8433e2fe48f2d4f342ab9ba20df1f7dcaa0b6eea06765e9eac6"
+    },
+    {
+      "path": "scripts/wic_dev_gold.py",
+      "sha256": "68b60326fd4f6cecc851606311b4c4bd93ac09c1357e4c1370fce4fcb599d1c4"
+    },
+    {
+      "path": "scripts/prepare-wic-dev-gold.py",
+      "sha256": "749e576a8569754c10be8f81d1605dcf64404e343f359b20c8e35b6f416b93f5"
+    },
+    {
+      "path": "scripts/source_packet.py",
+      "sha256": "1b77db4e9d454c47fbe77e9da968780a27f3cd7a2e46d12f8439a320dfc6f1a6"
+    },
+    {
+      "path": "scripts/independent_acceptance.py",
+      "sha256": "a0d4c868e35c702e8ebb9287c08cb1e4e145431e58487ec785dc3bfdde1b41ea"
+    },
+    {
+      "path": "scripts/check-operational-acceptance.py",
+      "sha256": "71c6a856cae6703520c37fc7aabdf2a5b255b7ef2ca95859c9ef18599a5bd8d5"
+    },
+    {
+      "path": "scripts/test_operational_acceptance.py",
+      "sha256": "71f2c3461c73495acbf1ef5ddcccdbf27bc3da8be6bff9a04373d325b53d9bb0"
+    }
+  ],
+  "source_inputs": [
+    {
+      "path": "internal/system/suspects/compose.go",
+      "sha256": "575e6b95c90edb39bda748bd8aec74a858db79477b12232298b1caaf7a9f601b"
+    },
+    {
+      "path": "internal/system/ckgclient/identity.go",
+      "sha256": "a5705267db8f5f8f279842011c6a8bb9fc893e51d709d53b97a7edf324a60a84"
+    },
+    {
+      "path": "internal/system/ckgclient/real.go",
+      "sha256": "1ac72fba5672bd13a71503e9174933e733eb1c472acb565a77d0e0aaa8a27451"
+    },
+    {
+      "path": "internal/system/mcp/source_guard.go",
+      "sha256": "2cde9c2ee4be26b70d7fde453cbb140faccd9af59fbaccdbf06472b7966aaef1"
+    },
+    {
+      "path": "cmd/cks/mcpcli/serve.go",
+      "sha256": "37e392ba6c1c3a31bccde65f19ce9c124923e2180e42353e08d8de31e70d64d5"
+    }
+  ],
+  "artifacts": {
+    "REPORT.txt": "82e4892328914800e751be527977072b75e9e24df1e82debb5e7f20fb1e96729",
+    "REVIEW-LEDGER.json": "34509192dfda1c9dfa35edcf48338689bff1d0743c6ddebbf12ab2a74cbd29d0",
+    "SUMMARY.json": "4e05403fee36ef27b2d9f6daa8455fe46b6140c2bcf98f750c29fefe6f0370e9",
+    "WORKLIST.json": "ea011ae499a8f9982846e4ec718bbb861a4361fd0210c8ab26ae5d791825af57",
+    "matching-contract.json": "46db5d124e89b84dc8a9ab67c5e5f384b7e93bb237eb0280d8526f73ca066404",
+    "private/current-provider-diagnostic.json": "857581fd9365e41466ae367fb1ffeade825288056cfeca4885fc39ef2a42f4d6",
+    "private/original-case-diagnostic.json": "b1c48408f6d354d8c91760618a3b51494d841e8002c35aa199979a8a0430ea9c",
+    "runtime/all-symbols/after.json.gz": "e48508e2c42660544f6f85e67a72a62356506ab4fefecc4bfd34162d60c40f55",
+    "runtime/all-symbols/before.json.gz": "e48508e2c42660544f6f85e67a72a62356506ab4fefecc4bfd34162d60c40f55",
+    "runtime/all-symbols/mcp.stderr.txt": "db3d0306b906278b7c5c8e58d073a4841a7cc34ae1fabf06fa34dcda5ea6e3bf",
+    "runtime/all-symbols/mcp.stdin.jsonl.gz": "1b6cfa9a1731ae0b4722bcc9447721f775363692687dad9219f670155d6a4779",
+    "runtime/all-symbols/mcp.stdout.jsonl.gz": "20e8871a54bef46eb47ce42b4c71924d77afc6d2373c1a701bd4e40f7a221b0e",
+    "runtime/all-symbols/receipt.json": "b01d86c1a0fd49a0495d5ee6cad0cb47625f82f8060b60869bb0529c3b864a19",
+    "runtime/all-symbols/responses.json.gz": "9d34435cb850ac63caf854ee370de6de183a93f96bc467a1e6928d2ac6dbd1eb",
+    "runtime/all-symbols/session.json": "6539883ddee65f03186c4c1ab35353dd818ee20bac4c92386eb50ccda908c2be",
+    "runtime/all-symbols/tools.json.gz": "18ab1a5bb7ae24ce57cd01308d14c7cec0aab3049a3d503430dacea4e9756783",
+    "runtime/all-symbols.py.txt": "29dad3670da1a693c4de83342a41f41394027bd506cb76c6d527f72e0673cd4d",
+    "runtime/config.txt": "d1b24b02834a49747b23c6d0d4b3250ae3fdb8f1e0cc5525605ad3e9bf03fdbb",
+    "runtime/direct/mcp.stderr.txt": "0f5de963b5b3e3e8a402e418867b78d968eaba8ed677bd9af18958281ce53c56",
+    "runtime/direct/mcp.stdin.jsonl.gz": "81164358a45f397cf13f519312d3bb34bae13805a2fb39452fa8f51cf95d65c7",
+    "runtime/direct/mcp.stdout.jsonl.gz": "35f310c78c1b26071a8cbc6207904250ee49f9cad61e7da0393b4aff541370e5",
+    "runtime/direct/responses.json.gz": "44a824c2e8f11d87a11d6740960c40a9d2764023634457e75008d306ddbee290",
+    "runtime/direct/session.json": "be88c81421438f4baf1763f668d7f445ab332c79727ad77da87ee6ee5dda2fde",
+    "runtime/direct.py.txt": "d9fb50dc205de772e5adf63b62077cf7ab456f0d92ba1fdafcceea7d95480db5",
+    "runtime/identity.json": "4cb03c680c6e5b4e69478393caceeebb845d2d76e775a2323bc28bc0dce6baea",
+    "validation/SUMMARY.json": "fc3fe5d49bcc2b9fb9a92571643a5723a0d6d8ff1c6142e0f1e11809c88be54e",
+    "validation/common-tests.txt": "adae4174b610f2e9c1bde624ac26db5b76e15b29bf28ac3ae641e708a81251cf",
+    "validation/doc-tests.txt": "f22d232ed372ce48cfbdd7f8fb4c3086f2f7fbcc95f727f6333247c80bb11c38",
+    "validation/notice-tests.txt": "65e5db7630fc6b067dabaa4bc230b32c0066062fc413d0872b15997affbc3492",
+    "validation/tests.txt": "4d32e7adb36fe476d2a927988028295e2e08a301302e0c7abfc777d589811637"
+  }
+}

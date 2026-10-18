@@ -1,5 +1,26 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
+## 2026-10-19 단계55: WI1~3 검토 부채와 실제 graph provider 진단
+
+[단계55 보고서](./operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/WORKLIST.json)이 최신 진입점이다. AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false다. 실명/연락처를 요구하지 않으며 검토 승인만 대기한다.
+
+| 점검 대상 | 실제 확인과 남은 범위 |
+|---|---|
+| WI3 원래 결과 | 원래20건 모두partial·후보68개 보존. 17건의 시작 심볼26개가 미해석. 조합기는 하나라도 미해석이면 분석 대상3개 모두error로 두며 뒤의 성공이 그 오류를 지우지 않음 |
+| 오류 분모 | impact51+concurrency51=102개는 공유되는 출력 label이며 독립 장애102회가 아님. 나머지 RQ-003/004/019는 신호별observed9개. 신호별8개는not_requested. 과거 각 호출의 typed error trace가 없어 배타적 원인/과거 장애0을 단정하지 않음 |
+| 현재 실제 provider | 같은 원래binary/retained 데이터에서 관측된 서로 다른40심볼×2도구=80회 모두구조화 응답. 별도6회 탐색 중 미등록심볼2회 명시 거부. 소유 stdio2개 exit0,80회 실행 전후 graph/source/vector inventory 원래 자료와 동일 |
+| 결과 보존 | 두 CKS의 시작 시 모델목록 신원 조회는 sandbox 거부로 실패했고 CKV는 degraded였다. 실제 graph 전용 검증이며 전체 retrieval/모델 준비 성공이 아니다. 새 semantic/embedding 추론·LLM·설치에이전트 실행0. 직접 호출 성공으로 원래partial/error를 성공으로 교체하지 않음. 범위 밖/매칭불가66개는unknown 유지. legacy 직접응답이 retained 출처/품질 정답을 대체하지 않음 |
+| WI1 부채 | 58개: 암묵 occurrence53·도달불가 빈 block3·select loop 수명 lexical차이2. 값 종류·메모리/타입 의미·독립 검토는 미해결 |
+| WI2 부채 | source unknown13·미확인심볼9·분석불가2·반환된 source차이4·미반환 AI양성2. stdlib이 아닌 local/import 대상에 대한 잘못된 매칭과 alias flow를 우선 수정하며 정답/매칭을 결과에 맞춰 완화하지 않음 |
+
+[진단별 원래 사례](./operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/private/original-case-diagnostic.json), [현재 직접 호출](./operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/private/current-provider-diagnostic.json), [WI1~3 검토 부채](./operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/REVIEW-LEDGER.json)을 따른다. 모든 미확정 의미·독립 검토와 설치 역할은 미해결로 유지한다. native 코드 수정은 아직 하지 않았고 소스1738(Go1282)/승인5 동일성으로 이전 전체 native 검증을 재사용한다.
+
+다음은 **WI3의 seed_unresolved·실제 backend_error·budget 구분 구현과 공유 시작 심볼 회귀, 새 native/MCP 검증**이다. 이후 WI2 호출대상/alias·WI1 select 범위/unknown·WI3 unanchored traversal·설치 역할/독립 의미, WI4/V1/V2 실제 경로/oracle·WI6 nonseed/쌍/warm·WI-SP overlay/ACL·WI-C 필수항목/실제전달, 새 독립 DEV/FINAL·완전gold·matching/충분성·F01~08, 정식9개와 온톨로지 효과가 남아 있다. 실제 LLM 답변 효과는 모델/인증/비용 상한 확정 후다. 선택12개는 별도 backlog다.
+
+현재 회귀111개(진단33·공통 수용55·문서20·notice3), 문서134개·생성26파일 동일 재생·Python6파일 구문·공백 검사와 미승인 gold/미동결 실행 거부를 확인했다. 기존 원자료와 pinned source별 tool hash를 유지하고 과거 packet을 다시 seal하지 않았다. [검증 요약](./operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/validation/SUMMARY.json)에 현재graph80회/탐색6회와 모델목록 조회 거부2회·CKV degraded 한계를 분리한다. native 구현은 아직 미수정이며 이전 전체 검증 재사용이다.
+
+이하 단계54 이전은 당시 기록이다.
+
 ## 2026-10-19 단계54: WI-C DEV10·필수 항목/우선순위·현재 소비자 전달 계약 AI 초안
 
 [단계54 보고서](./operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/WORKLIST.json)이 최신 진입점이다. **요청한 AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처는 요구하지 않는다. 익명 역할 ID와 실제 검토/승인·근거 hash·독립성을 구분한다. D04미정은 개인정보 제출 대기가 아니라 검토·승인 대기다.
