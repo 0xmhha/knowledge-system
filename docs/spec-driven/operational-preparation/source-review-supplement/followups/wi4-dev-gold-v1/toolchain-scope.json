@@ -1,0 +1,33 @@
+{
+  "notes": {
+    "kind": "local_fixture_semantics_not_target_runtime_adoption",
+    "go_version": "go1.26.9",
+    "sources": {
+      "src/container/list/list.go": {
+        "artifact": "toolchain/src/container/list/list.go.txt",
+        "sha256": "88d1eadd6ac199fe42872bf52ff71264235fa51b0c5034be3d099fcfddcf640e"
+      },
+      "src/time/time.go": {
+        "artifact": "toolchain/src/time/time.go.txt",
+        "sha256": "e8b6ea9e6e7cb890aeed1d24ee7163a2237b6fa78ffc564efb8688dba717f02a"
+      }
+    },
+    "list_removal": "Remove clears the element links; Next on a removed element returns nil",
+    "monotonic_limit": "Now.Add deadlines and Sub use monotonic readings when both contain them; wall-clock rollback alone is not a demonstrated trigger",
+    "target_runtime_verified": false,
+    "clock_rollback_reproduced": false
+  },
+  "bindings": [
+    {
+      "path": "src/container/list/list.go",
+      "artifact": "docs/spec-driven/operational-preparation/source-review-supplement/schedule-candidates-v1/toolchain/src/container/list/list.go.txt",
+      "sha256": "88d1eadd6ac199fe42872bf52ff71264235fa51b0c5034be3d099fcfddcf640e"
+    },
+    {
+      "path": "src/time/time.go",
+      "artifact": "docs/spec-driven/operational-preparation/source-review-supplement/schedule-candidates-v1/toolchain/src/time/time.go.txt",
+      "sha256": "e8b6ea9e6e7cb890aeed1d24ee7163a2237b6fa78ffc564efb8688dba717f02a"
+    }
+  ],
+  "target_runtime_adopted": false
+}

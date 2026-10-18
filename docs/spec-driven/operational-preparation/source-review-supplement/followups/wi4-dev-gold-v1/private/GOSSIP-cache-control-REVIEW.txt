@@ -1,0 +1,236 @@
+GOSSIP-cache-control — WI-4 bounded conditional AI DEV, not independent oracle
+{
+  "case_id": "GOSSIP-cache-control",
+  "family_proposal": "SCHED-004",
+  "mechanism_proposal": "cache_mark_precedes_async_delivery",
+  "work_item_id": "WI-4",
+  "split": "DEV",
+  "formal_split": null,
+  "independent_family": null,
+  "reviewer": null,
+  "independent_review_receipt": null,
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_mode": "committed",
+  "source_project": "go-stablenet",
+  "schedule": {
+    "id": "GOSSIP-cache-control",
+    "kind": "normal_control",
+    "start_conditions": [
+      "새 peer 캐시 또는 다른 hash"
+    ],
+    "steps": [
+      "추가 호출"
+    ],
+    "observations": [
+      "새 송신 시도",
+      "캐시 범위"
+    ],
+    "primary_expectation_draft": "전역 영구 손실로 일반화하지 않음",
+    "step_deadline_ms": 2000,
+    "cleanup": [
+      "관측 결과를 먼저 복사한다",
+      "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+      "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+    ],
+    "outcome_status": "ai_draft_not_independent_oracle"
+  },
+  "strengthened_preconditions": [
+    "a truly distinct hash or a peer cache without this hash",
+    "one eligible peer returned",
+    "no concurrent changes"
+  ],
+  "source_entry": {
+    "anchor": {
+      "path": "consensus/wbft/backend/backend.go",
+      "start_line": 151,
+      "end_line": 172,
+      "start_byte": 4812,
+      "end_byte_exclusive": 5407,
+      "span_sha256": "fbf8ef51692a9687d27938892554189bdb7347ba970bf41880d6c29ec7cb7c5f"
+    },
+    "fact": "Broadcast는 validator 여부를 검사하고 Gossip을 호출한 뒤 자기 메시지를 비동기로 게시한다.",
+    "reachability_question": "실제 대상 peer/연결/메시지 code에서 캐시와 송신 실패·반복 호출 경로를 확보할 수 있는가? 가짜 peer 성공/오류는 실제 전달 영수증이 아니다.",
+    "contract_question": "best-effort·시도 중복 억제·전달 성공 중 캐시가 나타내는 의미와 재시도 요구를 확정해야 한다.",
+    "origin": "ai_source_inspection_not_runtime_or_gold",
+    "approved": false
+  },
+  "source_unknowns": [
+    "Gossip의 best-effort·중복 억제 의도가 아직 검토되지 않았다",
+    "peer별 캐시 만료·제거와 다른 송신 경로는 미검토",
+    "실제 네트워크는 사용하지 않고 가짜 peer 응답으로만 설계한다"
+  ],
+  "product_contract_questions": [
+    "캐시는 송신 시도 또는 전달 성공 중 무엇을 나타내는가",
+    "동일 payload의 송신 실패 후 재시도를 보장하는가"
+  ],
+  "source_refs": [
+    {
+      "path": "consensus/wbft/backend/backend.go",
+      "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+      "start_line": 176,
+      "end_line": 210,
+      "start_byte": 5451,
+      "end_byte_exclusive": 6352,
+      "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4",
+      "text": "func (sb *Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error {\n\thash := wbft.RLPHash(payload)\n\tsb.knownMessages.Add(hash, true)\n\n\ttargets := make(map[common.Address]bool)\n\tfor _, val := range valSet.List() {\n\t\tif val.Address() != sb.Address() {\n\t\t\ttargets[val.Address()] = true\n\t\t}\n\t}\n\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n\n\t\t\tvar outboundCode uint64 = istanbulMsg\n\t\t\tif _, ok := wbfmessage.MessageCodes()[code]; ok {\n\t\t\t\toutboundCode = code\n\t\t\t}\n\t\t\tgo p.SendWBFTConsensus(outboundCode, payload)\n\t\t}\n\t}\n\treturn nil\n}\n"
+    }
+  ],
+  "universe": [
+    {
+      "id": "new_cache_key_attempted",
+      "label": "legal",
+      "rationale": "The distinct cache key is inserted and a new asynchronous send is scheduled.",
+      "source_refs": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "start_line": 176,
+          "end_line": 210,
+          "start_byte": 5451,
+          "end_byte_exclusive": 6352,
+          "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4",
+          "text": "func (sb *Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error {\n\thash := wbft.RLPHash(payload)\n\tsb.knownMessages.Add(hash, true)\n\n\ttargets := make(map[common.Address]bool)\n\tfor _, val := range valSet.List() {\n\t\tif val.Address() != sb.Address() {\n\t\t\ttargets[val.Address()] = true\n\t\t}\n\t}\n\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n\n\t\t\tvar outboundCode uint64 = istanbulMsg\n\t\t\tif _, ok := wbfmessage.MessageCodes()[code]; ok {\n\t\t\t\toutboundCode = code\n\t\t\t}\n\t\t\tgo p.SendWBFTConsensus(outboundCode, payload)\n\t\t}\n\t}\n\treturn nil\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "same_payload_global_suppression",
+      "label": "unknown",
+      "rationale": "Global knownMessages insertion here is not used as the per-peer skip condition; distinct peer/hash policy must be evaluated locally.",
+      "source_refs": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "start_line": 176,
+          "end_line": 210,
+          "start_byte": 5451,
+          "end_byte_exclusive": 6352,
+          "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4",
+          "text": "func (sb *Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error {\n\thash := wbft.RLPHash(payload)\n\tsb.knownMessages.Add(hash, true)\n\n\ttargets := make(map[common.Address]bool)\n\tfor _, val := range valSet.List() {\n\t\tif val.Address() != sb.Address() {\n\t\t\ttargets[val.Address()] = true\n\t\t}\n\t}\n\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n\n\t\t\tvar outboundCode uint64 = istanbulMsg\n\t\t\tif _, ok := wbfmessage.MessageCodes()[code]; ok {\n\t\t\t\toutboundCode = code\n\t\t\t}\n\t\t\tgo p.SendWBFTConsensus(outboundCode, payload)\n\t\t}\n\t}\n\treturn nil\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "unmodelled_trace",
+      "label": "unknown",
+      "rationale": "Fresh cache does not imply independent family or prove eventual delivery.",
+      "source_refs": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "start_line": 176,
+          "end_line": 210,
+          "start_byte": 5451,
+          "end_byte_exclusive": 6352,
+          "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4",
+          "text": "func (sb *Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error {\n\thash := wbft.RLPHash(payload)\n\tsb.knownMessages.Add(hash, true)\n\n\ttargets := make(map[common.Address]bool)\n\tfor _, val := range valSet.List() {\n\t\tif val.Address() != sb.Address() {\n\t\t\ttargets[val.Address()] = true\n\t\t}\n\t}\n\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n\n\t\t\tvar outboundCode uint64 = istanbulMsg\n\t\t\tif _, ok := wbfmessage.MessageCodes()[code]; ok {\n\t\t\t\toutboundCode = code\n\t\t\t}\n\t\t\tgo p.SendWBFTConsensus(outboundCode, payload)\n\t\t}\n\t}\n\treturn nil\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "entry_unreached",
+      "label": "infra_or_unreached",
+      "rationale": "The specified source branch, object or trigger was not reached. No symptom success or valid trial.",
+      "source_refs": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "start_line": 176,
+          "end_line": 210,
+          "start_byte": 5451,
+          "end_byte_exclusive": 6352,
+          "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4",
+          "text": "func (sb *Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error {\n\thash := wbft.RLPHash(payload)\n\tsb.knownMessages.Add(hash, true)\n\n\ttargets := make(map[common.Address]bool)\n\tfor _, val := range valSet.List() {\n\t\tif val.Address() != sb.Address() {\n\t\t\ttargets[val.Address()] = true\n\t\t}\n\t}\n\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n\n\t\t\tvar outboundCode uint64 = istanbulMsg\n\t\t\tif _, ok := wbfmessage.MessageCodes()[code]; ok {\n\t\t\t\toutboundCode = code\n\t\t\t}\n\t\t\tgo p.SendWBFTConsensus(outboundCode, payload)\n\t\t}\n\t}\n\treturn nil\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "precondition_unproved",
+      "label": "infra_or_unreached",
+      "rationale": "Readiness, identity, buffer or ordering precondition was not proved. Do not infer target behavior from timeout.",
+      "source_refs": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "start_line": 176,
+          "end_line": 210,
+          "start_byte": 5451,
+          "end_byte_exclusive": 6352,
+          "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4",
+          "text": "func (sb *Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error {\n\thash := wbft.RLPHash(payload)\n\tsb.knownMessages.Add(hash, true)\n\n\ttargets := make(map[common.Address]bool)\n\tfor _, val := range valSet.List() {\n\t\tif val.Address() != sb.Address() {\n\t\t\ttargets[val.Address()] = true\n\t\t}\n\t}\n\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n\n\t\t\tvar outboundCode uint64 = istanbulMsg\n\t\t\tif _, ok := wbfmessage.MessageCodes()[code]; ok {\n\t\t\t\toutboundCode = code\n\t\t\t}\n\t\t\tgo p.SendWBFTConsensus(outboundCode, payload)\n\t\t}\n\t}\n\treturn nil\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "driver_error",
+      "label": "infra_or_unreached",
+      "rationale": "Driver, transport, instrumentation, resource or decode failure. Preserve planned slot and original error.",
+      "source_refs": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "start_line": 176,
+          "end_line": 210,
+          "start_byte": 5451,
+          "end_byte_exclusive": 6352,
+          "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4",
+          "text": "func (sb *Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error {\n\thash := wbft.RLPHash(payload)\n\tsb.knownMessages.Add(hash, true)\n\n\ttargets := make(map[common.Address]bool)\n\tfor _, val := range valSet.List() {\n\t\tif val.Address() != sb.Address() {\n\t\t\ttargets[val.Address()] = true\n\t\t}\n\t}\n\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n\n\t\t\tvar outboundCode uint64 = istanbulMsg\n\t\t\tif _, ok := wbfmessage.MessageCodes()[code]; ok {\n\t\t\t\toutboundCode = code\n\t\t\t}\n\t\t\tgo p.SendWBFTConsensus(outboundCode, payload)\n\t\t}\n\t}\n\treturn nil\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "cancel_or_cleanup_error",
+      "label": "infra_or_unreached",
+      "rationale": "Cancellation or failure to join all owned resources. Preserve original observation and cleanup failure separately.",
+      "source_refs": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "start_line": 176,
+          "end_line": 210,
+          "start_byte": 5451,
+          "end_byte_exclusive": 6352,
+          "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4",
+          "text": "func (sb *Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error {\n\thash := wbft.RLPHash(payload)\n\tsb.knownMessages.Add(hash, true)\n\n\ttargets := make(map[common.Address]bool)\n\tfor _, val := range valSet.List() {\n\t\tif val.Address() != sb.Address() {\n\t\t\ttargets[val.Address()] = true\n\t\t}\n\t}\n\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n\n\t\t\tvar outboundCode uint64 = istanbulMsg\n\t\t\tif _, ok := wbfmessage.MessageCodes()[code]; ok {\n\t\t\t\toutboundCode = code\n\t\t\t}\n\t\t\tgo p.SendWBFTConsensus(outboundCode, payload)\n\t\t}\n\t}\n\treturn nil\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    }
+  ],
+  "answer_sets": {
+    "legal": [
+      "new_cache_key_attempted"
+    ],
+    "symptom_candidate": [],
+    "unknown": [
+      "same_payload_global_suppression",
+      "unmodelled_trace"
+    ],
+    "infra_or_unreached": [
+      "entry_unreached",
+      "precondition_unproved",
+      "driver_error",
+      "cancel_or_cleanup_error"
+    ]
+  },
+  "empty_set_rationales": {
+    "symptom_candidate": "No authored symptom_candidate outcome in this finite conditional vocabulary; unmodelled traces stay unknown."
+  },
+  "complete_within_declared_vocabulary": true,
+  "complete_trace_or_product_gold": false,
+  "observation_axis": "language_permitted_source_behavior_and_product_symptom_are_distinct",
+  "symptom_meaning": "conditional_AI_observation_candidate_not_independent_product_violation",
+  "unknown_policy": "unmodelled_or_product_contract_unresolved_never_negative_or_automatic_pass",
+  "formal_gold_schema_gap": "unknown_outcomes must remain explicit; old three-set authoring form cannot silently merge unknown with infra",
+  "current_scores": null,
+  "actual_target_trial_receipt": null,
+  "formal_scoring_allowed": false,
+  "exposure": "previously_exposed_DEV_no_fresh_FINAL",
+  "independent_approved": false
+}

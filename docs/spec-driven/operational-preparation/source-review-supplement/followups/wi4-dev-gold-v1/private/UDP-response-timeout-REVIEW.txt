@@ -1,0 +1,256 @@
+UDP-response-timeout — WI-4 bounded conditional AI DEV, not independent oracle
+{
+  "case_id": "UDP-response-timeout",
+  "family_proposal": "SCHED-002",
+  "mechanism_proposal": "removed_list_cursor_loses_successor",
+  "work_item_id": "WI-4",
+  "split": "DEV",
+  "formal_split": null,
+  "independent_family": null,
+  "reviewer": null,
+  "independent_review_receipt": null,
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_mode": "committed",
+  "source_project": "go-stablenet",
+  "schedule": {
+    "id": "UDP-response-timeout",
+    "kind": "related_branch_proposal",
+    "start_conditions": [
+      "같은 응답 조건 또는 만료 시각의 matcher 2개"
+    ],
+    "steps": [
+      "한 응답 또는 timeout 이벤트 처리"
+    ],
+    "observations": [
+      "처리된 matcher 수",
+      "남은 matcher",
+      "후속 깨움 필요"
+    ],
+    "primary_expectation_draft": "같은 제거 커서 문제의 다른 분기로 별도 가족에 합산하지 않음",
+    "step_deadline_ms": 2000,
+    "cleanup": [
+      "관측 결과를 먼저 복사한다",
+      "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+      "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+    ],
+    "outcome_status": "ai_draft_not_independent_oracle"
+  },
+  "strengthened_preconditions": [
+    "explicitly select response or timeout branch",
+    "two matching/completed or expired matchers in known order",
+    "each result channel can accept a result",
+    "single event only"
+  ],
+  "source_entry": {
+    "anchor": {
+      "path": "p2p/discover/v4_udp.go",
+      "start_line": 452,
+      "end_line": 468,
+      "start_byte": 14187,
+      "end_byte_exclusive": 14809,
+      "span_sha256": "eb8e321ca454f668a01ab4ef8743fe7b68575a6d86e0379ba3e9c5f9a194688f"
+    },
+    "fact": "실제 matcher 등록은 time.Now().Add(respTimeout) deadline을 만들며 응답 완료 시 목록 원소를 제거한다.",
+    "reachability_question": "합성 먼 미래 deadline을 실제 등록 경로에서 어떻게 만들 수 있는가? monotonic 시각이 유지될 때 wall-clock rollback만을 유발 증거로 삼지 않는다. 응답/timeout 제거 분기도 같은 메커니즘으로 검토한다.",
+    "contract_question": "한 이벤트가 처리해야 하는 matcher 범위와 실제 timer firing/재설정 계약을 독립 검토해야 한다.",
+    "origin": "ai_source_inspection_not_runtime_or_gold",
+    "approved": false
+  },
+  "source_unknowns": [
+    "먼 미래 deadline은 합성 입력이다. 운영 pending 경로의 도달 가능성은 검증하지 않았다",
+    "Go 1.26.9의 Now.Add/Sub는 monotonic 값을 사용하므로 wall-clock rollback만으로 이 분기를 유발했다고 주장하지 않는다",
+    "응답·timeout·clockwarp 세 분기는 같은 삭제 순회 메커니즘으로 묶는다"
+  ],
+  "product_contract_questions": [
+    "한 번의 순회에서 처리할 pending 원소 범위는 무엇인가",
+    "먼 미래 deadline의 실제 유입 경로가 있는가"
+  ],
+  "source_refs": [
+    {
+      "path": "p2p/discover/v4_udp.go",
+      "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+      "start_line": 456,
+      "end_line": 486,
+      "start_byte": 14286,
+      "end_byte_exclusive": 15274,
+      "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+      "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+    }
+  ],
+  "universe": [
+    {
+      "id": "response_first_completed_second_left",
+      "label": "symptom_candidate",
+      "rationale": "In response branch, a true requestDone removes first and traversal ends; a second matching matcher is not visited in this invocation.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 456,
+          "end_line": 486,
+          "start_byte": 14286,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+          "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "timeout_first_expired_second_left",
+      "label": "symptom_candidate",
+      "rationale": "In timeout branch, removing first expired cursor ends traversal; next event behavior is a separate trace.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 456,
+          "end_line": 486,
+          "start_byte": 14286,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+          "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "response_not_done_continues",
+      "label": "legal",
+      "rationale": "If callback requestDone is false, cursor is retained so traversal can continue to the second matcher.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 456,
+          "end_line": 486,
+          "start_byte": 14286,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+          "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "unmodelled_trace",
+      "label": "unknown",
+      "rationale": "A response callback's ok and requestDone are different values; matching is not identical to completion. These branches remain one proposed mechanism family.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 456,
+          "end_line": 486,
+          "start_byte": 14286,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+          "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "entry_unreached",
+      "label": "infra_or_unreached",
+      "rationale": "The specified source branch, object or trigger was not reached. No symptom success or valid trial.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 456,
+          "end_line": 486,
+          "start_byte": 14286,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+          "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "precondition_unproved",
+      "label": "infra_or_unreached",
+      "rationale": "Readiness, identity, buffer or ordering precondition was not proved. Do not infer target behavior from timeout.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 456,
+          "end_line": 486,
+          "start_byte": 14286,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+          "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "driver_error",
+      "label": "infra_or_unreached",
+      "rationale": "Driver, transport, instrumentation, resource or decode failure. Preserve planned slot and original error.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 456,
+          "end_line": 486,
+          "start_byte": 14286,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+          "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "cancel_or_cleanup_error",
+      "label": "infra_or_unreached",
+      "rationale": "Cancellation or failure to join all owned resources. Preserve original observation and cleanup failure separately.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 456,
+          "end_line": 486,
+          "start_byte": 14286,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "9bfccd0484d6de332e60181ae9ea0a3a7226c9cc482d3360c21caa639e2cdf86",
+          "text": "\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\tcontTimeouts++\n\t\t\t\t}\n\t\t\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    }
+  ],
+  "answer_sets": {
+    "legal": [
+      "response_not_done_continues"
+    ],
+    "symptom_candidate": [
+      "response_first_completed_second_left",
+      "timeout_first_expired_second_left"
+    ],
+    "unknown": [
+      "unmodelled_trace"
+    ],
+    "infra_or_unreached": [
+      "entry_unreached",
+      "precondition_unproved",
+      "driver_error",
+      "cancel_or_cleanup_error"
+    ]
+  },
+  "empty_set_rationales": {},
+  "complete_within_declared_vocabulary": true,
+  "complete_trace_or_product_gold": false,
+  "observation_axis": "language_permitted_source_behavior_and_product_symptom_are_distinct",
+  "symptom_meaning": "conditional_AI_observation_candidate_not_independent_product_violation",
+  "unknown_policy": "unmodelled_or_product_contract_unresolved_never_negative_or_automatic_pass",
+  "formal_gold_schema_gap": "unknown_outcomes must remain explicit; old three-set authoring form cannot silently merge unknown with infra",
+  "current_scores": null,
+  "actual_target_trial_receipt": null,
+  "formal_scoring_allowed": false,
+  "exposure": "previously_exposed_DEV_no_fresh_FINAL",
+  "independent_approved": false
+}

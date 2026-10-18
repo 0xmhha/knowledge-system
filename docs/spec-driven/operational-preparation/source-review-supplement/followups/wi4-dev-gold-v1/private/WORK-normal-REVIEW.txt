@@ -1,0 +1,402 @@
+WORK-normal — WI-4 bounded conditional AI DEV, not independent oracle
+{
+  "case_id": "WORK-normal",
+  "family_proposal": "SCHED-003",
+  "mechanism_proposal": "cancellation_and_ready_send_selection",
+  "work_item_id": "WI-4",
+  "split": "DEV",
+  "formal_split": null,
+  "independent_family": null,
+  "reviewer": null,
+  "independent_review_receipt": null,
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_mode": "committed",
+  "source_project": "go-stablenet",
+  "schedule": {
+    "id": "WORK-normal",
+    "kind": "normal_control",
+    "start_conditions": [
+      "exit 미준비",
+      "작업 수신자 준비"
+    ],
+    "steps": [
+      "작업 이벤트",
+      "송신",
+      "종료"
+    ],
+    "observations": [
+      "작업 수",
+      "외부 루프 반환",
+      "타이머 정리"
+    ],
+    "primary_expectation_draft": "정상 작업 전달과 종료",
+    "step_deadline_ms": 2000,
+    "cleanup": [
+      "관측 결과를 먼저 복사한다",
+      "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+      "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+    ],
+    "outcome_status": "ai_draft_not_independent_oracle"
+  },
+  "strengthened_preconditions": [
+    "Anzeon configuration is nil selecting Origin loop",
+    "one actual event enters commit",
+    "work receiver is ready",
+    "exit is not ready at that select",
+    "exit is later closed"
+  ],
+  "source_entry": {
+    "anchor": {
+      "path": "miner/worker.go",
+      "start_line": 501,
+      "end_line": 506,
+      "start_byte": 16402,
+      "end_byte_exclusive": 16558,
+      "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d"
+    },
+    "fact": "newWorkLoop는 chainConfig.Anzeon이 nil이면 Origin, 아니면 WBFT 루프를 호출한다.",
+    "reachability_question": "선정 가설은 Origin 루프다. 평가 대상의 실제 chain config가 이 분기를 선택하는지와 종료·송신 동시 준비를 입증해야 한다.",
+    "contract_question": "종료의 선형화 지점·이미 수락한 작업 허용·select의 복수 합법 결과를 확정하기 전 단일 결과를 실패로 채점하지 않는다.",
+    "origin": "ai_source_inspection_not_runtime_or_gold",
+    "approved": false
+  },
+  "source_unknowns": [
+    "select 동시 준비에서 어느 분기를 택할지 하나의 고정 결과로 가정하지 않는다",
+    "종료 후 허용되는 이미 진행 중 작업의 범위는 미정이다",
+    "closure 반환만으로 전체 worker가 누수된다고 단정하지 않는다"
+  ],
+  "product_contract_questions": [
+    "종료 신호 관측과 작업 수락의 선형화 지점은 어디인가",
+    "이미 시작한 작업의 인계가 허용되는가"
+  ],
+  "source_refs": [
+    {
+      "path": "miner/worker.go",
+      "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+      "start_line": 501,
+      "end_line": 506,
+      "start_byte": 16402,
+      "end_byte_exclusive": 16558,
+      "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d",
+      "text": "func (w *worker) newWorkLoop(recommit time.Duration) {\n\tif w.chainConfig.Anzeon == nil {\n\t\tw.newWorkLoopOrigin(recommit)\n\t} else {\n\t\tw.newWorkLoopWBFT()\n\t}\n"
+    },
+    {
+      "path": "miner/worker.go",
+      "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+      "start_line": 523,
+      "end_line": 536,
+      "start_byte": 17094,
+      "end_byte_exclusive": 17422,
+      "span_sha256": "694c96a0569b6ea67d1d8a6daac7ffdd16ad2f780f224d7fac3120cd8192ba6d",
+      "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n"
+    },
+    {
+      "path": "miner/worker.go",
+      "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+      "start_line": 601,
+      "end_line": 605,
+      "start_byte": 19491,
+      "end_byte_exclusive": 19529,
+      "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953",
+      "text": "\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t}\n}\n"
+    }
+  ],
+  "universe": [
+    {
+      "id": "send_then_reset",
+      "label": "legal",
+      "rationale": "commit sends work then resets timer and newTxs; eventual outer exit is a separate event.",
+      "source_refs": [
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 501,
+          "end_line": 506,
+          "start_byte": 16402,
+          "end_byte_exclusive": 16558,
+          "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d",
+          "text": "func (w *worker) newWorkLoop(recommit time.Duration) {\n\tif w.chainConfig.Anzeon == nil {\n\t\tw.newWorkLoopOrigin(recommit)\n\t} else {\n\t\tw.newWorkLoopWBFT()\n\t}\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 523,
+          "end_line": 536,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17422,
+          "span_sha256": "694c96a0569b6ea67d1d8a6daac7ffdd16ad2f780f224d7fac3120cd8192ba6d",
+          "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 601,
+          "end_line": 605,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19529,
+          "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953",
+          "text": "\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t}\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "closure_return_from_exit",
+      "label": "unknown",
+      "rationale": "An exit return would require a readiness change inconsistent with the stipulated select; inspect actual trace before assigning a fault.",
+      "source_refs": [
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 501,
+          "end_line": 506,
+          "start_byte": 16402,
+          "end_byte_exclusive": 16558,
+          "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d",
+          "text": "func (w *worker) newWorkLoop(recommit time.Duration) {\n\tif w.chainConfig.Anzeon == nil {\n\t\tw.newWorkLoopOrigin(recommit)\n\t} else {\n\t\tw.newWorkLoopWBFT()\n\t}\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 523,
+          "end_line": 536,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17422,
+          "span_sha256": "694c96a0569b6ea67d1d8a6daac7ffdd16ad2f780f224d7fac3120cd8192ba6d",
+          "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 601,
+          "end_line": 605,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19529,
+          "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953",
+          "text": "\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t}\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "unmodelled_trace",
+      "label": "unknown",
+      "rationale": "No deterministic outer-loop termination bound follows from source or a fixture's watchdog.",
+      "source_refs": [
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 501,
+          "end_line": 506,
+          "start_byte": 16402,
+          "end_byte_exclusive": 16558,
+          "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d",
+          "text": "func (w *worker) newWorkLoop(recommit time.Duration) {\n\tif w.chainConfig.Anzeon == nil {\n\t\tw.newWorkLoopOrigin(recommit)\n\t} else {\n\t\tw.newWorkLoopWBFT()\n\t}\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 523,
+          "end_line": 536,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17422,
+          "span_sha256": "694c96a0569b6ea67d1d8a6daac7ffdd16ad2f780f224d7fac3120cd8192ba6d",
+          "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 601,
+          "end_line": 605,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19529,
+          "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953",
+          "text": "\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t}\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "entry_unreached",
+      "label": "infra_or_unreached",
+      "rationale": "The specified source branch, object or trigger was not reached. No symptom success or valid trial.",
+      "source_refs": [
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 501,
+          "end_line": 506,
+          "start_byte": 16402,
+          "end_byte_exclusive": 16558,
+          "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d",
+          "text": "func (w *worker) newWorkLoop(recommit time.Duration) {\n\tif w.chainConfig.Anzeon == nil {\n\t\tw.newWorkLoopOrigin(recommit)\n\t} else {\n\t\tw.newWorkLoopWBFT()\n\t}\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 523,
+          "end_line": 536,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17422,
+          "span_sha256": "694c96a0569b6ea67d1d8a6daac7ffdd16ad2f780f224d7fac3120cd8192ba6d",
+          "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 601,
+          "end_line": 605,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19529,
+          "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953",
+          "text": "\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t}\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "precondition_unproved",
+      "label": "infra_or_unreached",
+      "rationale": "Readiness, identity, buffer or ordering precondition was not proved. Do not infer target behavior from timeout.",
+      "source_refs": [
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 501,
+          "end_line": 506,
+          "start_byte": 16402,
+          "end_byte_exclusive": 16558,
+          "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d",
+          "text": "func (w *worker) newWorkLoop(recommit time.Duration) {\n\tif w.chainConfig.Anzeon == nil {\n\t\tw.newWorkLoopOrigin(recommit)\n\t} else {\n\t\tw.newWorkLoopWBFT()\n\t}\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 523,
+          "end_line": 536,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17422,
+          "span_sha256": "694c96a0569b6ea67d1d8a6daac7ffdd16ad2f780f224d7fac3120cd8192ba6d",
+          "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 601,
+          "end_line": 605,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19529,
+          "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953",
+          "text": "\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t}\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "driver_error",
+      "label": "infra_or_unreached",
+      "rationale": "Driver, transport, instrumentation, resource or decode failure. Preserve planned slot and original error.",
+      "source_refs": [
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 501,
+          "end_line": 506,
+          "start_byte": 16402,
+          "end_byte_exclusive": 16558,
+          "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d",
+          "text": "func (w *worker) newWorkLoop(recommit time.Duration) {\n\tif w.chainConfig.Anzeon == nil {\n\t\tw.newWorkLoopOrigin(recommit)\n\t} else {\n\t\tw.newWorkLoopWBFT()\n\t}\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 523,
+          "end_line": 536,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17422,
+          "span_sha256": "694c96a0569b6ea67d1d8a6daac7ffdd16ad2f780f224d7fac3120cd8192ba6d",
+          "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 601,
+          "end_line": 605,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19529,
+          "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953",
+          "text": "\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t}\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "cancel_or_cleanup_error",
+      "label": "infra_or_unreached",
+      "rationale": "Cancellation or failure to join all owned resources. Preserve original observation and cleanup failure separately.",
+      "source_refs": [
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 501,
+          "end_line": 506,
+          "start_byte": 16402,
+          "end_byte_exclusive": 16558,
+          "span_sha256": "9c68bbb89fe4e8293f84dcc6338edc187db7aa3f0b8d60324925c31af508f76d",
+          "text": "func (w *worker) newWorkLoop(recommit time.Duration) {\n\tif w.chainConfig.Anzeon == nil {\n\t\tw.newWorkLoopOrigin(recommit)\n\t} else {\n\t\tw.newWorkLoopWBFT()\n\t}\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 523,
+          "end_line": 536,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17422,
+          "span_sha256": "694c96a0569b6ea67d1d8a6daac7ffdd16ad2f780f224d7fac3120cd8192ba6d",
+          "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n"
+        },
+        {
+          "path": "miner/worker.go",
+          "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+          "start_line": 601,
+          "end_line": 605,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19529,
+          "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953",
+          "text": "\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t}\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    }
+  ],
+  "answer_sets": {
+    "legal": [
+      "send_then_reset"
+    ],
+    "symptom_candidate": [],
+    "unknown": [
+      "closure_return_from_exit",
+      "unmodelled_trace"
+    ],
+    "infra_or_unreached": [
+      "entry_unreached",
+      "precondition_unproved",
+      "driver_error",
+      "cancel_or_cleanup_error"
+    ]
+  },
+  "empty_set_rationales": {
+    "symptom_candidate": "No authored symptom_candidate outcome in this finite conditional vocabulary; unmodelled traces stay unknown."
+  },
+  "complete_within_declared_vocabulary": true,
+  "complete_trace_or_product_gold": false,
+  "observation_axis": "language_permitted_source_behavior_and_product_symptom_are_distinct",
+  "symptom_meaning": "conditional_AI_observation_candidate_not_independent_product_violation",
+  "unknown_policy": "unmodelled_or_product_contract_unresolved_never_negative_or_automatic_pass",
+  "formal_gold_schema_gap": "unknown_outcomes must remain explicit; old three-set authoring form cannot silently merge unknown with infra",
+  "current_scores": null,
+  "actual_target_trial_receipt": null,
+  "formal_scoring_allowed": false,
+  "exposure": "previously_exposed_DEV_no_fresh_FINAL",
+  "independent_approved": false
+}

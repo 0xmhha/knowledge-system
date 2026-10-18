@@ -1,0 +1,239 @@
+UDP-far-pair — WI-4 bounded conditional AI DEV, not independent oracle
+{
+  "case_id": "UDP-far-pair",
+  "family_proposal": "SCHED-002",
+  "mechanism_proposal": "removed_list_cursor_loses_successor",
+  "work_item_id": "WI-4",
+  "split": "DEV",
+  "formal_split": null,
+  "independent_family": null,
+  "reviewer": null,
+  "independent_review_receipt": null,
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_mode": "committed",
+  "source_project": "go-stablenet",
+  "schedule": {
+    "id": "UDP-far-pair",
+    "kind": "synthetic_branch",
+    "start_conditions": [
+      "합성 먼 미래 deadline 2개",
+      "오류 채널 버퍼 1"
+    ],
+    "steps": [
+      "resetTimeout 1회"
+    ],
+    "observations": [
+      "두 번째 원소 잔존",
+      "오류 통지 수",
+      "타이머 중지"
+    ],
+    "primary_expectation_draft": "원본 삭제 순회가 다음 원소에 도달하는지 관측",
+    "step_deadline_ms": 2000,
+    "cleanup": [
+      "관측 결과를 먼저 복사한다",
+      "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+      "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+    ],
+    "outcome_status": "ai_draft_not_independent_oracle"
+  },
+  "strengthened_preconditions": [
+    "two synthetic far deadlines at or above twice respTimeout",
+    "each errc has capacity for one result",
+    "nextTimeout differs from head",
+    "single resetTimeout call"
+  ],
+  "source_entry": {
+    "anchor": {
+      "path": "p2p/discover/v4_udp.go",
+      "start_line": 452,
+      "end_line": 468,
+      "start_byte": 14187,
+      "end_byte_exclusive": 14809,
+      "span_sha256": "eb8e321ca454f668a01ab4ef8743fe7b68575a6d86e0379ba3e9c5f9a194688f"
+    },
+    "fact": "실제 matcher 등록은 time.Now().Add(respTimeout) deadline을 만들며 응답 완료 시 목록 원소를 제거한다.",
+    "reachability_question": "합성 먼 미래 deadline을 실제 등록 경로에서 어떻게 만들 수 있는가? monotonic 시각이 유지될 때 wall-clock rollback만을 유발 증거로 삼지 않는다. 응답/timeout 제거 분기도 같은 메커니즘으로 검토한다.",
+    "contract_question": "한 이벤트가 처리해야 하는 matcher 범위와 실제 timer firing/재설정 계약을 독립 검토해야 한다.",
+    "origin": "ai_source_inspection_not_runtime_or_gold",
+    "approved": false
+  },
+  "source_unknowns": [
+    "먼 미래 deadline은 합성 입력이다. 운영 pending 경로의 도달 가능성은 검증하지 않았다",
+    "Go 1.26.9의 Now.Add/Sub는 monotonic 값을 사용하므로 wall-clock rollback만으로 이 분기를 유발했다고 주장하지 않는다",
+    "응답·timeout·clockwarp 세 분기는 같은 삭제 순회 메커니즘으로 묶는다"
+  ],
+  "product_contract_questions": [
+    "한 번의 순회에서 처리할 pending 원소 범위는 무엇인가",
+    "먼 미래 deadline의 실제 유입 경로가 있는가"
+  ],
+  "source_refs": [
+    {
+      "path": "p2p/discover/v4_udp.go",
+      "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+      "start_line": 420,
+      "end_line": 440,
+      "start_byte": 13330,
+      "end_byte_exclusive": 14003,
+      "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b",
+      "text": "\tresetTimeout := func() {\n\t\tif plist.Front() == nil || nextTimeout == plist.Front().Value {\n\t\t\treturn\n\t\t}\n\t\t// Start the timer so it fires when the next pending reply has expired.\n\t\tnow := time.Now()\n\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\tnextTimeout = el.Value.(*replyMatcher)\n\t\t\tif dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {\n\t\t\t\ttimeout.Reset(dist)\n\t\t\t\treturn\n\t\t\t}\n\t\t\t// Remove pending replies whose deadline is too far in the\n\t\t\t// future. These can occur if the system clock jumped\n\t\t\t// backwards after the deadline was assigned.\n\t\t\tnextTimeout.errc <- errClockWarp\n\t\t\tplist.Remove(el)\n\t\t}\n\t\tnextTimeout = nil\n\t\ttimeout.Stop()\n\t}\n"
+    }
+  ],
+  "universe": [
+    {
+      "id": "first_removed_second_left_timer_stop",
+      "label": "symptom_candidate",
+      "rationale": "Original Remove clears the removed cursor; el.Next then ends the loop. One clockwarp is sent, the second matcher remains and Stop is requested. This is a source-supported synthetic observation, not a verified real-clock failure.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 420,
+          "end_line": 440,
+          "start_byte": 13330,
+          "end_byte_exclusive": 14003,
+          "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b",
+          "text": "\tresetTimeout := func() {\n\t\tif plist.Front() == nil || nextTimeout == plist.Front().Value {\n\t\t\treturn\n\t\t}\n\t\t// Start the timer so it fires when the next pending reply has expired.\n\t\tnow := time.Now()\n\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\tnextTimeout = el.Value.(*replyMatcher)\n\t\t\tif dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {\n\t\t\t\ttimeout.Reset(dist)\n\t\t\t\treturn\n\t\t\t}\n\t\t\t// Remove pending replies whose deadline is too far in the\n\t\t\t// future. These can occur if the system clock jumped\n\t\t\t// backwards after the deadline was assigned.\n\t\t\tnextTimeout.errc <- errClockWarp\n\t\t\tplist.Remove(el)\n\t\t}\n\t\tnextTimeout = nil\n\t\ttimeout.Stop()\n\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "saved_successor_both_removed",
+      "label": "unknown",
+      "rationale": "Both far matchers removed may describe a separately pinned cursor-fix candidate; it is not the outcome of the declared original source.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 420,
+          "end_line": 440,
+          "start_byte": 13330,
+          "end_byte_exclusive": 14003,
+          "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b",
+          "text": "\tresetTimeout := func() {\n\t\tif plist.Front() == nil || nextTimeout == plist.Front().Value {\n\t\t\treturn\n\t\t}\n\t\t// Start the timer so it fires when the next pending reply has expired.\n\t\tnow := time.Now()\n\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\tnextTimeout = el.Value.(*replyMatcher)\n\t\t\tif dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {\n\t\t\t\ttimeout.Reset(dist)\n\t\t\t\treturn\n\t\t\t}\n\t\t\t// Remove pending replies whose deadline is too far in the\n\t\t\t// future. These can occur if the system clock jumped\n\t\t\t// backwards after the deadline was assigned.\n\t\t\tnextTimeout.errc <- errClockWarp\n\t\t\tplist.Remove(el)\n\t\t}\n\t\tnextTimeout = nil\n\t\ttimeout.Stop()\n\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "unmodelled_trace",
+      "label": "unknown",
+      "rationale": "Synthetic far deadlines cannot establish wall-clock rollback reachability with monotonic timestamps.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 420,
+          "end_line": 440,
+          "start_byte": 13330,
+          "end_byte_exclusive": 14003,
+          "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b",
+          "text": "\tresetTimeout := func() {\n\t\tif plist.Front() == nil || nextTimeout == plist.Front().Value {\n\t\t\treturn\n\t\t}\n\t\t// Start the timer so it fires when the next pending reply has expired.\n\t\tnow := time.Now()\n\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\tnextTimeout = el.Value.(*replyMatcher)\n\t\t\tif dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {\n\t\t\t\ttimeout.Reset(dist)\n\t\t\t\treturn\n\t\t\t}\n\t\t\t// Remove pending replies whose deadline is too far in the\n\t\t\t// future. These can occur if the system clock jumped\n\t\t\t// backwards after the deadline was assigned.\n\t\t\tnextTimeout.errc <- errClockWarp\n\t\t\tplist.Remove(el)\n\t\t}\n\t\tnextTimeout = nil\n\t\ttimeout.Stop()\n\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "entry_unreached",
+      "label": "infra_or_unreached",
+      "rationale": "The specified source branch, object or trigger was not reached. No symptom success or valid trial.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 420,
+          "end_line": 440,
+          "start_byte": 13330,
+          "end_byte_exclusive": 14003,
+          "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b",
+          "text": "\tresetTimeout := func() {\n\t\tif plist.Front() == nil || nextTimeout == plist.Front().Value {\n\t\t\treturn\n\t\t}\n\t\t// Start the timer so it fires when the next pending reply has expired.\n\t\tnow := time.Now()\n\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\tnextTimeout = el.Value.(*replyMatcher)\n\t\t\tif dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {\n\t\t\t\ttimeout.Reset(dist)\n\t\t\t\treturn\n\t\t\t}\n\t\t\t// Remove pending replies whose deadline is too far in the\n\t\t\t// future. These can occur if the system clock jumped\n\t\t\t// backwards after the deadline was assigned.\n\t\t\tnextTimeout.errc <- errClockWarp\n\t\t\tplist.Remove(el)\n\t\t}\n\t\tnextTimeout = nil\n\t\ttimeout.Stop()\n\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "precondition_unproved",
+      "label": "infra_or_unreached",
+      "rationale": "Readiness, identity, buffer or ordering precondition was not proved. Do not infer target behavior from timeout.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 420,
+          "end_line": 440,
+          "start_byte": 13330,
+          "end_byte_exclusive": 14003,
+          "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b",
+          "text": "\tresetTimeout := func() {\n\t\tif plist.Front() == nil || nextTimeout == plist.Front().Value {\n\t\t\treturn\n\t\t}\n\t\t// Start the timer so it fires when the next pending reply has expired.\n\t\tnow := time.Now()\n\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\tnextTimeout = el.Value.(*replyMatcher)\n\t\t\tif dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {\n\t\t\t\ttimeout.Reset(dist)\n\t\t\t\treturn\n\t\t\t}\n\t\t\t// Remove pending replies whose deadline is too far in the\n\t\t\t// future. These can occur if the system clock jumped\n\t\t\t// backwards after the deadline was assigned.\n\t\t\tnextTimeout.errc <- errClockWarp\n\t\t\tplist.Remove(el)\n\t\t}\n\t\tnextTimeout = nil\n\t\ttimeout.Stop()\n\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "driver_error",
+      "label": "infra_or_unreached",
+      "rationale": "Driver, transport, instrumentation, resource or decode failure. Preserve planned slot and original error.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 420,
+          "end_line": 440,
+          "start_byte": 13330,
+          "end_byte_exclusive": 14003,
+          "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b",
+          "text": "\tresetTimeout := func() {\n\t\tif plist.Front() == nil || nextTimeout == plist.Front().Value {\n\t\t\treturn\n\t\t}\n\t\t// Start the timer so it fires when the next pending reply has expired.\n\t\tnow := time.Now()\n\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\tnextTimeout = el.Value.(*replyMatcher)\n\t\t\tif dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {\n\t\t\t\ttimeout.Reset(dist)\n\t\t\t\treturn\n\t\t\t}\n\t\t\t// Remove pending replies whose deadline is too far in the\n\t\t\t// future. These can occur if the system clock jumped\n\t\t\t// backwards after the deadline was assigned.\n\t\t\tnextTimeout.errc <- errClockWarp\n\t\t\tplist.Remove(el)\n\t\t}\n\t\tnextTimeout = nil\n\t\ttimeout.Stop()\n\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "cancel_or_cleanup_error",
+      "label": "infra_or_unreached",
+      "rationale": "Cancellation or failure to join all owned resources. Preserve original observation and cleanup failure separately.",
+      "source_refs": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+          "start_line": 420,
+          "end_line": 440,
+          "start_byte": 13330,
+          "end_byte_exclusive": 14003,
+          "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b",
+          "text": "\tresetTimeout := func() {\n\t\tif plist.Front() == nil || nextTimeout == plist.Front().Value {\n\t\t\treturn\n\t\t}\n\t\t// Start the timer so it fires when the next pending reply has expired.\n\t\tnow := time.Now()\n\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\tnextTimeout = el.Value.(*replyMatcher)\n\t\t\tif dist := nextTimeout.deadline.Sub(now); dist < 2*respTimeout {\n\t\t\t\ttimeout.Reset(dist)\n\t\t\t\treturn\n\t\t\t}\n\t\t\t// Remove pending replies whose deadline is too far in the\n\t\t\t// future. These can occur if the system clock jumped\n\t\t\t// backwards after the deadline was assigned.\n\t\t\tnextTimeout.errc <- errClockWarp\n\t\t\tplist.Remove(el)\n\t\t}\n\t\tnextTimeout = nil\n\t\ttimeout.Stop()\n\t}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    }
+  ],
+  "answer_sets": {
+    "legal": [],
+    "symptom_candidate": [
+      "first_removed_second_left_timer_stop"
+    ],
+    "unknown": [
+      "saved_successor_both_removed",
+      "unmodelled_trace"
+    ],
+    "infra_or_unreached": [
+      "entry_unreached",
+      "precondition_unproved",
+      "driver_error",
+      "cancel_or_cleanup_error"
+    ]
+  },
+  "empty_set_rationales": {
+    "legal": "No authored legal outcome in this finite conditional vocabulary; unmodelled traces stay unknown."
+  },
+  "complete_within_declared_vocabulary": true,
+  "complete_trace_or_product_gold": false,
+  "observation_axis": "language_permitted_source_behavior_and_product_symptom_are_distinct",
+  "symptom_meaning": "conditional_AI_observation_candidate_not_independent_product_violation",
+  "unknown_policy": "unmodelled_or_product_contract_unresolved_never_negative_or_automatic_pass",
+  "formal_gold_schema_gap": "unknown_outcomes must remain explicit; old three-set authoring form cannot silently merge unknown with infra",
+  "current_scores": null,
+  "actual_target_trial_receipt": null,
+  "formal_scoring_allowed": false,
+  "exposure": "previously_exposed_DEV_no_fresh_FINAL",
+  "independent_approved": false
+}
