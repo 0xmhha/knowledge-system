@@ -74,6 +74,11 @@ class PreparationGuardTests(unittest.TestCase):
             value['wi4_dev_gold_preparation']['status'] = 'independent_approved'
         self.assertTrue(self.errors())
 
+    def test_shared_ticket_AI_membership_cannot_be_independent_gold(self):
+        for value in (self.protocol, self.ledger):
+            value['ticket_dev_gold_preparation']['status'] = 'independent_approved'
+        self.assertTrue(self.errors())
+
     def test_previous_authoring_source_must_stay_pinned(self):
         self.protocol['independent_freeze_preparation']['historical_source_revision'] = 'HEAD'
         self.assertTrue(self.errors())

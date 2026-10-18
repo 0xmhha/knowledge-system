@@ -1,0 +1,26 @@
+--- original/eth/downloader/api.go
++++ CAND-A/eth/downloader/api.go
+@@ -183,15 +183,17 @@
+ func (s *SyncStatusSubscription) Unsubscribe() {
+ 	s.unsubOnce.Do(func() {
+ 		req := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}
+-		s.api.uninstallSyncSubscription <- &req
+-
+ 		for {
+ 			select {
++			case s.api.uninstallSyncSubscription <- &req:
++				for {
++					select {
++					case <-s.c:
++					case <-req.uninstalled:
++						return
++					}
++				}
+ 			case <-s.c:
+-				// drop new status events until uninstall confirmation
+-				continue
+-			case <-req.uninstalled:
+-				return
+ 			}
+ 		}
+ 	})

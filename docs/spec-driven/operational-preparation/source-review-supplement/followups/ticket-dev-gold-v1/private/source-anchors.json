@@ -1,0 +1,119 @@
+{
+  "API-01": {
+    "path": "eth/backend.go",
+    "file_sha256": "53bcfa24717a3e698e13b8f1c1261d42d11ba23ffbb2d202c22a7b24520c86ad",
+    "start_byte": 11731,
+    "end_byte_exclusive": 12344,
+    "span_sha256": "6744776f7ed81fb657fd9cd53ac6e12beeb533503b5e19def30cb7f452bff0fe",
+    "text": "// NOTE, some of these services probably need to be moved to somewhere else.\nfunc (s *Ethereum) APIs() []rpc.API {\n\tapis := ethapi.GetAPIs(s.APIBackend)\n\n\t// Append any APIs exposed explicitly by the consensus engine\n\tapis = append(apis, s.engine.APIs(s.BlockChain())...)\n\n\t// Append all the local APIs and return\n\treturn append(apis, []rpc.API{\n\t\t{\n\t\t\tNamespace: \"eth\",\n\t\t\tService:   NewEthereumAPI(s),\n\t\t}, {\n\t\t\tNamespace: \"miner\",\n\t\t\tService:   NewMinerAPI(s),\n\t\t}, {\n\t\t\tNamespace: \"eth\",\n\t\t\tService:   downloader.NewDownloaderAPI(s.handler.downloader, s.blockchain, s.eventMux),\n\t\t}, {\n\t\t\tNamespace: \"admin\",\n",
+    "source_fact": "Ethereum.APIs는 eth namespace에 DownloaderAPI를 등록한다."
+  },
+  "API-02": {
+    "path": "rpc/service.go",
+    "file_sha256": "8c021cb6c157d2e7b20634b5ec589fca84b404a00726a9fb2ee99d53a69e2da9",
+    "start_byte": 2013,
+    "end_byte_exclusive": 2844,
+    "span_sha256": "b00ad7b69b91c6d0d6b78d952e3bf1d61422391c8d4c6b199b9fbf9388b90891",
+    "text": "func (r *serviceRegistry) registerName(name string, rcvr interface{}) error {\n\trcvrVal := reflect.ValueOf(rcvr)\n\tif name == \"\" {\n\t\treturn fmt.Errorf(\"no service name for type %s\", rcvrVal.Type().String())\n\t}\n\tcallbacks := suitableCallbacks(rcvrVal)\n\tif len(callbacks) == 0 {\n\t\treturn fmt.Errorf(\"service %T doesn't have any suitable methods/subscriptions to expose\", rcvr)\n\t}\n\n\tr.mu.Lock()\n\tdefer r.mu.Unlock()\n\tif r.services == nil {\n\t\tr.services = make(map[string]service)\n\t}\n\tsvc, ok := r.services[name]\n\tif !ok {\n\t\tsvc = service{\n\t\t\tname:          name,\n\t\t\tcallbacks:     make(map[string]*callback),\n\t\t\tsubscriptions: make(map[string]*callback),\n\t\t}\n\t\tr.services[name] = svc\n\t}\n\tfor name, cb := range callbacks {\n\t\tif cb.isSubscribe {\n\t\t\tsvc.subscriptions[name] = cb\n\t\t} else {\n\t\t\tsvc.callbacks[name] = cb\n\t\t}\n\t}\n\treturn nil\n}\n",
+    "source_fact": "구독 callback은 일반 callback과 별도 registry에 등록한다."
+  },
+  "API-03": {
+    "path": "rpc/service.go",
+    "file_sha256": "8c021cb6c157d2e7b20634b5ec589fca84b404a00726a9fb2ee99d53a69e2da9",
+    "start_byte": 3660,
+    "end_byte_exclusive": 4102,
+    "span_sha256": "02bdeb1f9570ce7266c5ae57825971534765e5d56b791e411f6732807a2b6ff9",
+    "text": "func suitableCallbacks(receiver reflect.Value) map[string]*callback {\n\ttyp := receiver.Type()\n\tcallbacks := make(map[string]*callback)\n\tfor m := 0; m < typ.NumMethod(); m++ {\n\t\tmethod := typ.Method(m)\n\t\tif method.PkgPath != \"\" {\n\t\t\tcontinue // method not exported\n\t\t}\n\t\tcb := newCallback(receiver, method.Func)\n\t\tif cb == nil {\n\t\t\tcontinue // function invalid\n\t\t}\n\t\tname := formatName(method.Name)\n\t\tcallbacks[name] = cb\n\t}\n\treturn callbacks\n",
+    "source_fact": "exported method를 formatName으로 변환하여 callback 이름을 정한다."
+  },
+  "API-04": {
+    "path": "rpc/service.go",
+    "file_sha256": "8c021cb6c157d2e7b20634b5ec589fca84b404a00726a9fb2ee99d53a69e2da9",
+    "start_byte": 6872,
+    "end_byte_exclusive": 7462,
+    "span_sha256": "9f321c01517ebf2ab4917d811c00fa82deea197d83cfcbfd30b6454a75891d8b",
+    "text": "// isPubSub tests whether the given method has as as first argument a context.Context and\n// returns the pair (Subscription, error).\nfunc isPubSub(methodType reflect.Type) bool {\n\t// numIn(0) is the receiver type\n\tif methodType.NumIn() < 2 || methodType.NumOut() != 2 {\n\t\treturn false\n\t}\n\treturn methodType.In(1) == contextType &&\n\t\tisSubscriptionType(methodType.Out(0)) &&\n\t\tisErrorType(methodType.Out(1))\n}\n\n// formatName converts to first character of name to lowercase.\nfunc formatName(name string) string {\n\tret := []rune(name)\n\tif len(ret) > 0 {\n\t\tret[0] = unicode.ToLower(ret[0])\n\t}\n",
+    "source_fact": "context와 Subscription/error 서명이 subscription이며 첫 문자를 소문자로 바꾼다."
+  },
+  "API-05": {
+    "path": "rpc/handler.go",
+    "file_sha256": "06ba24fec42275cf1c43785d230466d57b7502cb968cba2dcf9850f32a5efa3d",
+    "start_byte": 15018,
+    "end_byte_exclusive": 16402,
+    "span_sha256": "750e271bbb76c2092ec29bc0952865121f077c534034641b1913a0670cd3c1c1",
+    "text": "// handleSubscribe processes *_subscribe method calls.\nfunc (h *handler) handleSubscribe(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage {\n\tif !h.allowSubscribe {\n\t\treturn msg.errorResponse(ErrNotificationsUnsupported)\n\t}\n\n\t// Subscription method name is first argument.\n\tname, err := parseSubscriptionName(msg.Params)\n\tif err != nil {\n\t\treturn msg.errorResponse(&invalidParamsError{err.Error()})\n\t}\n\tnamespace := msg.namespace()\n\tcallb := h.reg.subscription(namespace, name)\n\tif callb == nil {\n\t\treturn msg.errorResponse(&subscriptionNotFoundError{namespace, name})\n\t}\n\n\t// Parse subscription name arg too, but remove it before calling the callback.\n\targTypes := append([]reflect.Type{stringType}, callb.argTypes...)\n\targs, err := parsePositionalArguments(msg.Params, argTypes)\n\tif err != nil {\n\t\treturn msg.errorResponse(&invalidParamsError{err.Error()})\n\t}\n\targs = args[1:]\n\n\t// Install notifier in context so the subscription handler can find it.\n\tn := &Notifier{h: h, namespace: namespace}\n\tcp.notifiers = append(cp.notifiers, n)\n\tctx := context.WithValue(cp.ctx, notifierKey{}, n)\n\n\treturn h.runMethod(ctx, msg, callb, args)\n}\n\n// runMethod runs the Go callback for an RPC method.\nfunc (h *handler) runMethod(ctx context.Context, msg *jsonrpcMessage, callb *callback, args []reflect.Value) *jsonrpcMessage {\n\tresult, err := callb.call(ctx, msg.Method, args)\n\tif err != nil {\n",
+    "source_fact": "*_subscribe는 첫 인자를 구독 이름으로 사용하고 notifier를 context에 넣어 callback을 호출한다."
+  },
+  "API-06": {
+    "path": "rpc/handler.go",
+    "file_sha256": "06ba24fec42275cf1c43785d230466d57b7502cb968cba2dcf9850f32a5efa3d",
+    "start_byte": 16469,
+    "end_byte_exclusive": 16798,
+    "span_sha256": "2b8b9b8dfa043299c6e0c926cdaf940b87f5a47fcaf12cf90a8fd0f0221912d1",
+    "text": "// unsubscribe is the callback function for all *_unsubscribe calls.\nfunc (h *handler) unsubscribe(ctx context.Context, id ID) (bool, error) {\n\th.subLock.Lock()\n\tdefer h.subLock.Unlock()\n\n\ts := h.serverSubs[id]\n\tif s == nil {\n\t\treturn false, ErrSubscriptionNotFound\n\t}\n\tclose(s.err)\n\tdelete(h.serverSubs, id)\n\treturn true, nil\n}\n",
+    "source_fact": "*_unsubscribe는 server subscription의 err 채널을 닫고 map에서 지운 뒤 반환한다."
+  },
+  "API-07": {
+    "path": "rpc/handler.go",
+    "file_sha256": "06ba24fec42275cf1c43785d230466d57b7502cb968cba2dcf9850f32a5efa3d",
+    "start_byte": 10692,
+    "end_byte_exclusive": 10980,
+    "span_sha256": "b80eb52370b2799afdd4bbc949d011995449eab5435c02c5b0cd3b582a94817f",
+    "text": "\n// cancelServerSubscriptions removes all subscriptions and closes their error channels.\nfunc (h *handler) cancelServerSubscriptions(err error) {\n\th.subLock.Lock()\n\tdefer h.subLock.Unlock()\n\n\tfor id, s := range h.serverSubs {\n\t\ts.err <- err\n\t\tclose(s.err)\n\t\tdelete(h.serverSubs, id)\n\t}\n}\n",
+    "source_fact": "연결 정리는 server 구독 오류 채널에 오류를 보내고 닫는다."
+  },
+  "API-08": {
+    "path": "rpc/subscription.go",
+    "file_sha256": "b7c8464cb869b52cf621727878b7e0cc4fe860242a2466943ac009cb6dc76f0e",
+    "start_byte": 2523,
+    "end_byte_exclusive": 4472,
+    "span_sha256": "5d650d0b36bef3aeefe2a3ffb0ae8f984e778d7cb9e4dc7b8938cc0d5a504680",
+    "text": "// NotifierFromContext returns the Notifier value stored in ctx, if any.\nfunc NotifierFromContext(ctx context.Context) (*Notifier, bool) {\n\tn, ok := ctx.Value(notifierKey{}).(*Notifier)\n\treturn n, ok\n}\n\n// Notifier is tied to a RPC connection that supports subscriptions.\n// Server callbacks use the notifier to send notifications.\ntype Notifier struct {\n\th         *handler\n\tnamespace string\n\n\tmu           sync.Mutex\n\tsub          *Subscription\n\tbuffer       []any\n\tcallReturned bool\n\tactivated    bool\n}\n\n// CreateSubscription returns a new subscription that is coupled to the\n// RPC connection. By default subscriptions are inactive and notifications\n// are dropped until the subscription is marked as active. This is done\n// by the RPC server after the subscription ID is send to the client.\nfunc (n *Notifier) CreateSubscription() *Subscription {\n\tn.mu.Lock()\n\tdefer n.mu.Unlock()\n\n\tif n.sub != nil {\n\t\tpanic(\"can't create multiple subscriptions with Notifier\")\n\t} else if n.callReturned {\n\t\tpanic(\"can't create subscription after subscribe call has returned\")\n\t}\n\tn.sub = &Subscription{ID: n.h.idgen(), namespace: n.namespace, err: make(chan error, 1)}\n\treturn n.sub\n}\n\n// Notify sends a notification to the client with the given data as payload.\n// If an error occurs the RPC connection is closed and the error is returned.\nfunc (n *Notifier) Notify(id ID, data any) error {\n\tn.mu.Lock()\n\tdefer n.mu.Unlock()\n\n\tif n.sub == nil {\n\t\tpanic(\"can't Notify before subscription is created\")\n\t} else if n.sub.ID != id {\n\t\tpanic(\"Notify with wrong ID\")\n\t}\n\tif n.activated {\n\t\treturn n.send(n.sub, data)\n\t}\n\tn.buffer = append(n.buffer, data)\n\treturn nil\n}\n\n// Closed returns a channel that is closed when the RPC connection is closed.\n// Deprecated: use subscription error channel\nfunc (n *Notifier) Closed() <-chan interface{} {\n\treturn n.h.conn.closed()\n}\n\n// takeSubscription returns the subscription (if one has been created). No subscription can\n",
+    "source_fact": "Notifier는 context 조회·subscription 생성·알림 송신·연결 Closed를 제공한다."
+  },
+  "API-09": {
+    "path": "eth/downloader/api.go",
+    "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "start_byte": 1802,
+    "end_byte_exclusive": 2190,
+    "span_sha256": "e8cdc13fcf7827f286290e4d4981013729173ff70f732ad425d4e33bcab304d7",
+    "text": "func NewDownloaderAPI(d *Downloader, chain *core.BlockChain, m *event.TypeMux) *DownloaderAPI {\n\tapi := &DownloaderAPI{\n\t\td:                         d,\n\t\tchain:                     chain,\n\t\tmux:                       m,\n\t\tinstallSyncSubscription:   make(chan chan interface{}),\n\t\tuninstallSyncSubscription: make(chan *uninstallSyncSubscriptionRequest),\n\t}\n\tgo api.eventLoop()\n\treturn api\n",
+    "source_fact": "생성자는 buffer 없는 설치/해제 채널과 eventLoop goroutine을 만든다."
+  },
+  "API-10": {
+    "path": "eth/downloader/api.go",
+    "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "start_byte": 2605,
+    "end_byte_exclusive": 3995,
+    "span_sha256": "521fa7ba4492c041fccb992e556e2dd6bcaf59e5b6e3bf566affedd2f189f6d3",
+    "text": "func (api *DownloaderAPI) eventLoop() {\n\tvar (\n\t\tsub               = api.mux.Subscribe(StartEvent{})\n\t\tsyncSubscriptions = make(map[chan interface{}]struct{})\n\t\tcheckInterval     = time.Second * 60\n\t\tcheckTimer        = time.NewTimer(checkInterval)\n\n\t\t// status flags\n\t\tstarted bool\n\t\tdone    bool\n\n\t\tgetProgress = func() ethereum.SyncProgress {\n\t\t\tprog := api.d.Progress()\n\t\t\tif txProg, err := api.chain.TxIndexProgress(); err == nil {\n\t\t\t\tprog.TxIndexFinishedBlocks = txProg.Indexed\n\t\t\t\tprog.TxIndexRemainingBlocks = txProg.Remaining\n\t\t\t}\n\t\t\treturn prog\n\t\t}\n\t)\n\tdefer checkTimer.Stop()\n\n\tfor {\n\t\tselect {\n\t\tcase i := <-api.installSyncSubscription:\n\t\t\tsyncSubscriptions[i] = struct{}{}\n\t\t\tif done {\n\t\t\t\ti <- false\n\t\t\t}\n\t\tcase u := <-api.uninstallSyncSubscription:\n\t\t\tdelete(syncSubscriptions, u.c)\n\t\t\tclose(u.uninstalled)\n\t\tcase event := <-sub.Chan():\n\t\t\tif event == nil {\n\t\t\t\treturn\n\t\t\t}\n\t\t\tswitch event.Data.(type) {\n\t\t\tcase StartEvent:\n\t\t\t\tstarted = true\n\t\t\t}\n\t\tcase <-checkTimer.C:\n\t\t\tif !started {\n\t\t\t\tcheckTimer.Reset(checkInterval)\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tprog := getProgress()\n\t\t\tif !prog.Done() {\n\t\t\t\tnotification := &SyncingResult{\n\t\t\t\t\tSyncing: true,\n\t\t\t\t\tStatus:  prog,\n\t\t\t\t}\n\t\t\t\tfor c := range syncSubscriptions {\n\t\t\t\t\tc <- notification\n\t\t\t\t}\n\t\t\t\tcheckTimer.Reset(checkInterval)\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tfor c := range syncSubscriptions {\n\t\t\t\tc <- false\n\t\t\t}\n\t\t\tdone = true\n\t\t}\n\t}\n}\n",
+    "source_fact": "eventLoop는 map 등록/삭제와 삭제 확인 close, 동기 status 송신을 수행하며 mux 종료 시 반환한다."
+  },
+  "API-11": {
+    "path": "eth/downloader/api.go",
+    "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "start_byte": 4115,
+    "end_byte_exclusive": 4696,
+    "span_sha256": "8d1b16677e9091e943071f84d70021d5e810a615b79b74d884897e839e6a7a36",
+    "text": "func (api *DownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription, error) {\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn &rpc.Subscription{}, rpc.ErrNotificationsUnsupported\n\t}\n\n\trpcSub := notifier.CreateSubscription()\n\n\tgo func() {\n\t\tstatuses := make(chan interface{})\n\t\tsub := api.SubscribeSyncStatus(statuses)\n\t\tdefer sub.Unsubscribe()\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase status := <-statuses:\n\t\t\t\tnotifier.Notify(rpcSub.ID, status)\n\t\t\tcase <-rpcSub.Err():\n\t\t\t\treturn\n\t\t\tcase <-notifier.Closed():\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\n\treturn rpcSub, nil\n",
+    "source_fact": "Syncing은 unbuffered status를 구독하고 RPC err/Closed에서 반환하며 Unsubscribe를 defer한다."
+  },
+  "API-12": {
+    "path": "eth/downloader/api.go",
+    "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "start_byte": 5458,
+    "end_byte_exclusive": 5992,
+    "span_sha256": "1b5398ed46172689f685f36418ea37b4a06c206e6f776bbb4421afc016c73d49",
+    "text": "// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n",
+    "source_fact": "Unsubscribe는 uninstall 요청 송신 뒤 status를 drain하며 확인을 기다린다. 반환 후 status 채널 미사용 계약을 주석에 명시한다."
+  },
+  "API-13": {
+    "path": "eth/downloader/api.go",
+    "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "start_byte": 5993,
+    "end_byte_exclusive": 6354,
+    "span_sha256": "def589cfa7e2f74acdef53a6af2edef4a728391e1e6e76fa90f14f9d458dfebb",
+    "text": "// SubscribeSyncStatus creates a subscription that will broadcast new synchronisation updates.\n// The given channel must receive interface values, the result can either.\nfunc (api *DownloaderAPI) SubscribeSyncStatus(status chan interface{}) *SyncStatusSubscription {\n\tapi.installSyncSubscription <- status\n\treturn &SyncStatusSubscription{api: api, c: status}\n}\n",
+    "source_fact": "SubscribeSyncStatus는 설치 요청 송신 후 구독 객체를 반환한다."
+  }
+}
