@@ -8,7 +8,7 @@
 
 실제 이전/새 CKS stdio 비교에서 선언 위치·심볼·보존 인용 확장3경로는 새 계측 on/off 결과가 경과 시간만 제외하고 일치하며, off의 이전/새 결과도 같다. 첫14회 시도의 주석 줄257 오류를 보존했고 선언 줄258·주석 줄을 분리한 이전16회/새16회를 추가했다. 총46호출·소유 세션6개 EOF0, 기존 source/graph/vector 전후 동일이다. 잘못된 commit·dataset·hash, 주석/없는 위치는 구조화 결과 없이 거부한다. 5000ms 상한의 기능 회귀이며 기본1초·warm 지연 수용이나 새 독립 표본으로 세지 않는다.
 
-새 결속 manifest를 커밋한 뒤 완료 주장 guard가 그 실제 revision을 읽도록 출처 참조를 갱신한다. 이 결속 정리가 끝나기 전에는 전체 단계 저장을 완료로 표시하지 않는다. 기존 작업 완료 상태는 변경하지 않는다. 자동 label_suspects 계측 scope와 unanchored traversal 정규화는 이번에 추가하지 않았다.
+출처 결속 마감 완료: 기능·검증 근거를 서명 커밋 `d692db85`에 저장하고, 그 실제 커밋의 source-binding을 현재 소스 참조로 연결한 뒤 완료 주장 guard를 통과했다. 기존 작업 상태는 모두 보존했다. [결속 마감 기록](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1-finalization.json)을 따른다. native 빌드 모드는30e43a34 +4파일 작업 트리 검증이며, 그 전체 입력 hash가 현재 커밋과 같다는 뜻이다. 자동 label_suspects 계측 scope와 unanchored traversal 정규화는 이번에 추가하지 않았다.
 
 다음: WI-3의 주석 포함 인용/정확한 선언 identity와 최종 검증 예산 계약. 남은 전체: WI-1의53발생 지점/3블록·타입/값/메모리 의미, WI-2의 독립 의미/build profile/지원/설치역할, WI-3 traversal/예산/startup/전체 호출 관측, WI-4/V1/V2 실제경로·오라클, WI-6 nonseed/쌍/warm, WI-SP overlay/ACL, WI-C 필수항목/전달, 새 독립 DEV/FINAL·완전 정답·매칭·충분성·F01~08, 정식9개, 온톨로지 효과 평가, 별도 선택 백로그12개다. 실제 LLM 답변 평가는 모델·인증·상한 결정 후 진행한다.
 
