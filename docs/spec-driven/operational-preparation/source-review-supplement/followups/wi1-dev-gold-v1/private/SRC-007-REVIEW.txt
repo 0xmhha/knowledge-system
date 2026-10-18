@@ -1,0 +1,78 @@
+SRC-007 — AI DEV draft, NOT independently approved
+core/rawdb/accessors_chain.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-007.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 29435, "start": 29433}, "flags": [], "id": "v@29433", "name": "db", "origin": "parameter", "value_kind": "unknown"}
+{"declaration": {"end": 29472, "start": 29468}, "flags": [], "id": "v@29468", "name": "blob", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 29477, "start": 29474}, "flags": [], "id": "v@29474", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 29548, "start": 29539}, "flags": ["address_exposed"], "id": "v@29539", "name": "badBlocks", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 29568, "start": 29565}, "flags": [], "id": "v@29565", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 29647, "start": 29641}, "flags": [], "id": "v@29641", "name": "blocks", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 29674, "start": 29671}, "flags": ["range_assignment_unknown"], "id": "v@29671", "name": "bad", "origin": "range", "value_kind": "reference_binding"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@29481: d:o@29433=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@29505: d:o@29474=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@29588: d:o@29468=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@29595: d:o@29539=unknown(address_exposed)
+u:o@29607: d:o@29565=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@29684: d:o@29539=unknown(address_exposed)
+u:o@29714: d:o@29641=positive(kill_free_nonempty_CFG_path); d:o@29698=positive(kill_free_nonempty_CFG_path)
+u:o@29747: d:o@29671=unknown(range_assignment_unknown)
+u:o@29768: d:o@29671=unknown(range_assignment_unknown)
+u:o@29791: d:o@29671=unknown(range_assignment_unknown)
+u:o@29824: d:o@29671=unknown(range_assignment_unknown)
+u:o@29858: d:o@29641=positive(kill_free_nonempty_CFG_path); d:o@29698=positive(kill_free_nonempty_CFG_path)
+
+Same-name shadow identity negatives:
+d:o@29565 -> u:o@29505 negative:different_lexical_declaration
+d:o@29474 -> u:o@29607 negative:different_lexical_declaration
+
+CFG block matching table (raw indices are only hints):
+695c08b137997b2e0fe3b92c953ba3da130b089bbdb87d0a936c886a54733dfc {"anchor": {"end": 29866, "start": 29465}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0", "n0.1"], "successors": [1, 2]}
+c2038b49ca58baad17ce0fa0b51af0df29a8f542e1baf13f08ccd050056c615d {"anchor": {"end": 29533, "start": 29502}, "id": 1, "kind": "IfThen", "live": true, "nodes": ["n1.0"], "successors": []}
+2bb3af24c69532918d3964fc7ebb345306952fb3a50b1b417050cfc1a66bc781 {"anchor": {"end": 29533, "start": 29502}, "id": 2, "kind": "IfDone", "live": true, "nodes": ["n2.0", "n2.1", "n2.2"], "successors": [4, 5]}
+ce383ad936eb8ed75d727f285075513ee5e3cc7ddc3081a4adea5dd21a6f9cf8 {"anchor": {"end": 29530, "start": 29520}, "id": 3, "kind": "Unreachable", "live": false, "nodes": [], "successors": [2]}
+f2af8a56d72840144ad30f2f5eeaf1e52f30109dd533c07060c94b87a22e08fe {"anchor": {"end": 29635, "start": 29562}, "id": 4, "kind": "IfThen", "live": true, "nodes": ["n4.0"], "successors": []}
+5cd855c1798c0b3761422af1f309e875be2f57d6eade488853b993d5317d56bb {"anchor": {"end": 29635, "start": 29562}, "id": 5, "kind": "IfDone", "live": true, "nodes": ["n5.0", "n5.1", "n5.2", "n5.3"], "successors": [7]}
+be14bf6724a4343a2a5f840cfb8c18511668ad6b744c5ecffe13bf8fc009620e {"anchor": {"end": 29632, "start": 29622}, "id": 6, "kind": "Unreachable", "live": false, "nodes": [], "successors": [5]}
+21947d4d6ddcd01798824354b8c2d6378bbde74f45dc5d138c94695809249e92 {"anchor": {"end": 29849, "start": 29664}, "id": 7, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [8, 9]}
+b1ccd87921a82acc514730c90ae537322aa6900740c87d998f7ce703c1ccad1b {"anchor": {"end": 29849, "start": 29664}, "id": 8, "kind": "RangeBody", "live": true, "nodes": ["n8.0"], "successors": [7]}
+a3fb08e47c7e052bf9ac83c4a12234936dd5763946b36e0652d1024c54fc336b {"anchor": {"end": 29849, "start": 29664}, "id": 9, "kind": "RangeDone", "live": true, "nodes": ["n9.0"], "successors": []}
+097fcd1a99a6d0e9ca61ee122171a35072446014b75269f0b3229a738311cbb1 {"anchor": {"end": 29864, "start": 29851}, "id": 10, "kind": "Unreachable", "live": false, "nodes": [], "successors": []}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "695c08b137997b2e0fe3b92c953ba3da130b089bbdb87d0a936c886a54733dfc", "target": "c2038b49ca58baad17ce0fa0b51af0df29a8f542e1baf13f08ccd050056c615d"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "695c08b137997b2e0fe3b92c953ba3da130b089bbdb87d0a936c886a54733dfc", "target": "2bb3af24c69532918d3964fc7ebb345306952fb3a50b1b417050cfc1a66bc781"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2bb3af24c69532918d3964fc7ebb345306952fb3a50b1b417050cfc1a66bc781", "target": "f2af8a56d72840144ad30f2f5eeaf1e52f30109dd533c07060c94b87a22e08fe"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2bb3af24c69532918d3964fc7ebb345306952fb3a50b1b417050cfc1a66bc781", "target": "5cd855c1798c0b3761422af1f309e875be2f57d6eade488853b993d5317d56bb"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2bb3af24c69532918d3964fc7ebb345306952fb3a50b1b417050cfc1a66bc781", "target": "21947d4d6ddcd01798824354b8c2d6378bbde74f45dc5d138c94695809249e92"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2bb3af24c69532918d3964fc7ebb345306952fb3a50b1b417050cfc1a66bc781", "target": "a3fb08e47c7e052bf9ac83c4a12234936dd5763946b36e0652d1024c54fc336b"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "21947d4d6ddcd01798824354b8c2d6378bbde74f45dc5d138c94695809249e92", "target": "21947d4d6ddcd01798824354b8c2d6378bbde74f45dc5d138c94695809249e92"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "21947d4d6ddcd01798824354b8c2d6378bbde74f45dc5d138c94695809249e92", "target": "b1ccd87921a82acc514730c90ae537322aa6900740c87d998f7ce703c1ccad1b"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 29500, "start": 29481}}
+{"kind": "call_effect_not_inferred", "span": {"end": 29605, "start": 29572}}
+{"kind": "range_binding_unknown", "span": {"end": 29849, "start": 29664}}
+{"kind": "call_effect_not_inferred", "span": {"end": 29846, "start": 29707}}
+{"kind": "call_effect_not_inferred", "span": {"end": 29845, "start": 29722}}
+{"kind": "call_effect_not_inferred", "span": {"end": 29807, "start": 29722}}
+{"kind": "call_effect_not_inferred", "span": {"end": 29758, "start": 29722}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Get", "span": {"end": 29487, "start": 29484}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "badBlockKey", "span": {"end": 29499, "start": 29488}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "DecodeBytes", "span": {"end": 29587, "start": 29576}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Block", "span": {"end": 29662, "start": 29657}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "NewBlockWithHeader", "span": {"end": 29746, "start": 29728}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "WithBody", "span": {"end": 29767, "start": 29759}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Transactions", "span": {"end": 29789, "start": 29777}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Uncles", "span": {"end": 29806, "start": 29800}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "WithWithdrawals", "span": {"end": 29823, "start": 29808}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Withdrawals", "span": {"end": 29844, "start": 29833}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

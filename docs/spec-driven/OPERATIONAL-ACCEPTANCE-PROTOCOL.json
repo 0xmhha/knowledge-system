@@ -33,7 +33,7 @@
     {
       "id": "F-03",
       "topic": "sampling_and_scoring",
-      "preparation_status": "complete_gold_authoring_and_matching_forms_prepared_independent_gold_pending",
+      "preparation_status": "WI1_bounded_complete_AI_drafts_prepared_semantic_gold_matching_independent_review_pending",
       "decision_status": "pending",
       "receipt": null
     },
@@ -61,7 +61,7 @@
     {
       "id": "F-07",
       "topic": "new_inputs_gold_and_holdout",
-      "preparation_status": "206_exposed_DEV_material_rows_indexed_new_FINAL_and_reviewed_complete_gold_pending",
+      "preparation_status": "WI1_30_exposed_DEV_inputs_and_AI_drafts_prepared_new_FINAL_and_independent_gold_pending",
       "decision_status": "pending",
       "receipt": null
     },
@@ -244,7 +244,7 @@
     },
     {
       "id": "WI-1",
-      "status": "not_prepared",
+      "status": "DEV30_AI_drafts_prepared_formal_independent_cases_not_prepared",
       "requirements_proposal": {
         "independent_functions_min": 30,
         "constructs": [
@@ -273,7 +273,14 @@
       "gold_manifest_sha256": null,
       "review_receipt": null,
       "final_minimum_independent_units": null,
-      "dev_sample_allocation": null
+      "dev_sample_allocation": null,
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/manifest.json",
+        "sha256": "115ff102128a1c72b8bacfb041e2e1f2e54638252eb2807a6f8e8f3e41ef7a10",
+        "status": "DEV30_bounded_AI_drafts_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/WORKLIST.json"
+      }
     },
     {
       "id": "WI-2",
@@ -697,9 +704,9 @@
     "kind": "unapproved_unapplied_ast_probe_only"
   },
   "current_readiness_preparation": {
-    "kind": "independent_freeze_authoring_not_formal_execution",
-    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/manifest.json",
-    "manifest_sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b"
+    "kind": "WI1_DEV_AI_gold_not_formal_execution",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/manifest.json",
+    "manifest_sha256": "115ff102128a1c72b8bacfb041e2e1f2e54638252eb2807a6f8e8f3e41ef7a10"
   },
   "reviewer_assignment_response": {
     "path": "docs/spec-driven/operational-preparation/reviewer-assignment-2026-10-16.json",
@@ -888,8 +895,8 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "38899fb5a44473102852b96df9bc00e110e37e14b50cbeb0bb7bb94d3af05d64",
-    "status": "D01_D08_scope_approved_D04_unassigned_FP01_FP04_prepared_no_formal_freeze"
+    "sha256": "a4278961440f9ec2f989a41a495f910dd53b83b238dafa4d38933583ae26afb9",
+    "status": "D04_unassigned_WI1_DEV30_AI_drafts_prepared_no_formal_freeze"
   },
   "consumer_adoption": {
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
@@ -925,12 +932,11 @@
     "historical_source_validation": true
   },
   "current_execution_state": {
-    "current_stage": "43_independent_freeze_authoring_prepared_not_frozen",
+    "current_stage": "44_WI1_DEV30_bounded_complete_AI_gold_drafts",
     "completed_in_this_scope": [
-      "FP01_exposure_inventory",
-      "FP02_gold_matching_authoring_contract",
-      "FP03_sufficiency_freeze_preparation",
-      "FP04_ontology_evaluation_preparation"
+      "WI1_DEV_inputs30",
+      "WI1_bounded_AI_gold30",
+      "WI1_source_matching_and_reference_verification"
     ],
     "pilot_steps_completed": [
       "SN-P01",
@@ -939,12 +945,12 @@
       "SN-P04"
     ],
     "pilot_steps_total": 4,
-    "next_task": "FORMAL-PREP_assign_roles_collect_new_families_complete_and_review_gold",
+    "next_task": "WI1_semantic_unknown_and_actual_runtime_matching_review_then_WI2_DEV_AI_drafts",
     "remaining_all": [
       {
         "id": "FORMAL-PREP",
-        "status": "mechanical_preparation_complete_human_and_new_inputs_pending",
-        "task": "D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결"
+        "status": "WI1_AI_DEV30_prepared_other_AI_drafts_and_independent_inputs_pending",
+        "task": "WI1 의미 unknown/실제 매칭 보완 및 나머지8개 WI DEV/AI 초안; D04 역할·독립성, 새 DEV/FINAL 가족·완전 gold·매칭·충분성·F01~08 동결"
       },
       {
         "id": "FORMAL-9",
@@ -970,7 +976,20 @@
     "independent_quality_or_ontology_acceptance": false,
     "production_activation": false,
     "publication": false,
-    "last_verified_date": "2026-10-18"
+    "last_verified_date": "2026-10-18",
+    "AI_DEV_draft_progress": {
+      "WI-1": "30/30_bounded_drafts_complete_not_independent_gold",
+      "remaining_work_items": [
+        "WI-2",
+        "WI-3",
+        "WI-4",
+        "WI-V1",
+        "WI-V2",
+        "WI-6",
+        "WI-SP",
+        "WI-C"
+      ]
+    }
   },
   "stablenet_error_recovery": {
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/manifest.json",
@@ -992,7 +1011,8 @@
     "sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b",
     "status": "authoring_prepared_not_frozen_not_accepted",
     "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt",
-    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json"
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json",
+    "historical_source_revision": "0f28a9a756f05cc29416ef953e4926ad24cc4ee8"
   },
   "historical_readiness_preparation": {
     "kind": "preparation_only_not_formal_execution",
@@ -1000,5 +1020,12 @@
     "manifest_sha256": "fffff1112ee82a82eb7e9a2c3bd16db57afea20af443cbb888724d06969804ea",
     "source_revision": "9de07a8264bc4aea7054dcea8abb6559801d1cef",
     "status": "historical_not_current_source_validation"
+  },
+  "wi1_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/manifest.json",
+    "sha256": "115ff102128a1c72b8bacfb041e2e1f2e54638252eb2807a6f8e8f3e41ef7a10",
+    "status": "DEV30_bounded_AI_drafts_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/WORKLIST.json"
   }
 }

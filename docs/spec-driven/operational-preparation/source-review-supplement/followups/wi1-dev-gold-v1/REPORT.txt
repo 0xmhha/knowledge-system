@@ -1,0 +1,68 @@
+WI-1 DEV 입력·완전한 범위 내 AI 정답 초안 — 단계44 /2026-10-18
+
+기존 go-stablenet30함수를 그대로 DEV로 지정한다. 새 독립 FINAL·승인 gold·정식 수용은0이다.
+public/은 입력/원문뿐이며 private/에는 AI 제안 정답을 별도로 둔다. 이 디렉터리 전체를 host에게 제공하지 않는다.
+완전성의 의미: 명시한 지역 binding/CFG universe의 모든 정의–사용/branch–block 쌍을 positive/negative/unknown/excluded로 열거한다.
+이는 지원 밖 의미까지 모두 아는 완전한 운영 정답이 아니다. unknown을 음성이나 무해함으로 바꾸지 않는다.
+원문을 Go parser/types와 고정 x/tools CFG로 관측하고, 새 Python 참조의 kill-free path 탐색으로 정의–사용을 작성한다.
+별도 transfer-set 알고리즘과 전수 대조하며, 제어 관계는 path-cut 후지배와 fixed-point 두 방식으로 전수 대조한다.
+후보 valueflow 엔진 결과를 정답으로 사용하지 않았다. 단 CFG 생성기는 후보와 공유하므로 공통 오류 위험이 있으며 독립 오라클이 아니다.
+부분 파일 타입·range·주소 노출·closure capture·상수/합성 좌표·미해결 identifier와 runtime matching의 한계를 그대로 보존한다.
+source/file/function SHA와 UTF8 byte span·선언·read/write phase·synthetic entry/return·shadow를 구분한다.
+실제 retained query·SDK/MCP 경로와 baseline·최종 매칭 동결·정확도 점수는 실행/채택하지 않는다.
+
+함수별 초안 현황 (P/N/U/X=positive/negative/unknown/excluded; 정답 승인 수가 아님)
+ID | data P/N/U/X | control P/N/U | shadow negative
+SRC-001 | 16/4/32/0 | 16/134/0 | 3
+SRC-002 | 15/0/19/0 | 18/234/0 | 6
+SRC-003 | 7/0/114/0 | 35/559/0 | 32
+SRC-004 | 11/0/16/0 | 8/40/0 | 4
+SRC-006 | 55/11/19/0 | 24/390/0 | 15
+SRC-007 | 4/0/10/0 | 8/40/0 | 2
+SRC-009 | 13/0/25/0 | 22/298/0 | 14
+SRC-010 | 18/2/42/0 | 22/356/0 | 21
+SRC-011 | 34/3/57/0 | 43/1109/0 | 38
+SRC-012 | 57/4/38/0 | 41/1039/0 | 24
+SRC-013 | 15/12/17/0 | 18/270/0 | 0
+SRC-014 | 2/0/15/0 | 9/45/0 | 0
+SRC-016 | 8/2/79/0 | 38/742/0 | 57
+SRC-017 | 27/0/22/0 | 20/284/0 | 3
+SRC-018 | 2/0/13/0 | 11/69/0 | 4
+SRC-019 | 62/0/9/0 | 35/465/0 | 4
+SRC-021 | 10/0/21/0 | 38/578/0 | 2
+SRC-022 | 6/2/65/0 | 29/631/0 | 4
+SRC-023 | 29/1/49/0 | 31/585/0 | 18
+SRC-024 | 64/0/17/0 | 33/687/0 | 25
+SRC-027 | 5/0/91/0 | 42/630/0 | 2
+SRC-028 | 4/0/34/0 | 12/168/0 | 6
+SRC-029 | 5/0/24/0 | 38/534/0 | 0
+SRC-030 | 4/0/60/0 | 35/661/0 | 5
+SRC-031 | 9/0/26/0 | 19/205/0 | 21
+SRC-033 | 25/1/7/0 | 16/176/0 | 3
+SRC-034 | 31/51/43/0 | 35/861/0 | 88
+SRC-036 | 9/1/13/0 | 26/334/0 | 4
+SRC-039 | 9/0/16/0 | 9/71/0 | 5
+SRC-040 | 0/0/11/0 | 6/36/0 | 0
+
+검증은 validation-summary.json. 기존 소스와 승인 입력이 같을 때만 이전 native 전체 결과를 참조하며 새 Go 전체 실행으로 기록하지 않는다.
+D04 미정·freeze null·execution_allowed=false·정식0/9·기본 ontology off를 유지한다.
+다음은 WI1 unknown/value-domain/합성 좌표와 실제 소비자 매칭 보완이며, 다른 WI의 DEV/AI 초안은 별도 순차 작업이다.
+남은 전체는 WORKLIST.json의 FORMAL-PREP/FORMAL-9/ONTOLOGY/OPTIONAL-12와 AI_DEV_draft_progress를 따른다.
+
+현재 초안 합계
+30함수/25파일, 지역 binding412개·occurrence1721개·함수형 signature4개 별도 격리.
+정의–사용쌍1654개:positive556/negative94/unknown1004, 별도 shadow 음성410쌍.
+구조 제어 branch–block쌍12968개:positive737/negative12231. 이는 후보 엔진의 정확도 점수가 아니다.
+private/SRC-xxx-REVIEW.txt는 사람이 읽을 수 있는 전체 use별 정답·블록 매칭·제어 양성/unknown·음성 complement·한계 검토표다.
+부족한 의미 정답·호출/alias/타입·실제 consumer 매칭 및 독립 검토를 완료로 체크하지 않는다.
+이전 단계43의 도구 결속 검사는0f28a9a7 소스 view에서49개 재검증하며 현재 소스 시험과 구분한다.
+현재 guard는 새 WI1 DEV 종류를 검사하고 단계43 packet/manifest/소스 버전은 그대로 보존한다.
+
+검증 확정
+현재26개 WI1 전용+운영 수용41+문서 계약20+notice3+비교 보호22=112개 통과.
+과거0f28a9a7 소스 view에서 기존 결속 검증49개 별도 통과; 현재 검증 수에 합산하지 않는다.
+원래 Git25파일 원문 일치·생성 payload101파일 바이트 동일 재생·14개 수기 통제 source 확인.
+새 원문 관측 helper는 Go1.26.8/x-tools0.48.0으로 build/vet/fmt 통과. 유지보수 Go/승인 입력 불변이며 Go 전체 재실행은 없다.
+준비·운영 수용·문서134개·완료 보호·공백 검사 통과. AI를 formal gold로 승격/미동결 실행 요청은 기대 exit1로 거부.
+signature 격리와 입력 snapshot 변조 guard 보완의 초기 진단을 보존했다. 읽기용 검토표는 canonical JSON 왕복 후에도 동일하다.
+D04미정·독립 승인0·정식0/9·새 FINAL0·freeze null 유지. 원문/DB/운영 current/전역 설정·과거 packet 바이트는 바꾸지 않았다.

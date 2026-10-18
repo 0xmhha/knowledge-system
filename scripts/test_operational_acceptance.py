@@ -39,6 +39,15 @@ class PreparationGuardTests(unittest.TestCase):
             value['current_readiness_preparation']['kind']='operational_acceptance'
         self.assertTrue(self.errors())
 
+    def test_WI1_DEV_draft_cannot_be_independent_gold(self):
+        for value in (self.protocol, self.ledger):
+            value['wi1_dev_gold_preparation']['status'] = 'independent_approved'
+        self.assertTrue(self.errors())
+
+    def test_previous_authoring_source_must_stay_pinned(self):
+        self.protocol['independent_freeze_preparation']['historical_source_revision'] = 'HEAD'
+        self.assertTrue(self.errors())
+
     def test_current_readiness_reference_must_match(self):
         self.protocol.pop('current_readiness_preparation')
         self.assertTrue(self.errors())

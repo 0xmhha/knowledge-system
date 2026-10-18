@@ -1,0 +1,66 @@
+SRC-040 — AI DEV draft, NOT independently approved
+rpc/handler.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-040.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 5307, "start": 5306}, "flags": ["captured_by_closure"], "id": "v@5306", "name": "h", "origin": "receiver", "value_kind": "reference_binding"}
+{"declaration": {"end": 5334, "start": 5330}, "flags": ["captured_by_closure"], "id": "v@5330", "name": "msgs", "origin": "parameter", "value_kind": "reference_binding"}
+{"declaration": {"end": 5895, "start": 5890}, "flags": ["captured_by_closure"], "id": "v@5890", "name": "calls", "origin": "local", "value_kind": "reference_binding"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@5407: d:o@5330=unknown(captured_by_closure)
+u:o@5422: d:o@5306=unknown(captured_by_closure)
+u:o@5626: d:o@5306=unknown(captured_by_closure)
+u:o@5658: d:o@5330=unknown(captured_by_closure)
+u:o@5666: d:o@5306=unknown(captured_by_closure)
+u:o@5690: d:o@5306=unknown(captured_by_closure)
+u:o@5930: d:o@5330=unknown(captured_by_closure)
+u:o@5938: d:o@5306=unknown(captured_by_closure)
+u:o@5956: d:o@5330=unknown(captured_by_closure)
+u:o@6031: d:o@5890=unknown(captured_by_closure)
+u:o@6129: d:o@5306=unknown(captured_by_closure)
+
+Same-name shadow identity negatives:
+
+CFG block matching table (raw indices are only hints):
+2782578fbbf3e36881e5834f069a549e0cbf945e5af41e5f8000a231ed25b1e7 {"anchor": {"end": 7595, "start": 5354}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0"], "successors": [1, 2]}
+ced340b89c12a3c2f3f7082a365f21de26f629072650d517fb7a87cae3226213 {"anchor": {"end": 5576, "start": 5400}, "id": 1, "kind": "IfThen", "live": true, "nodes": ["n1.0", "n1.1"], "successors": []}
+0b9ae80325562337a37e114aa6033f9733558db45acf835eb74e5932cafa5b08 {"anchor": {"end": 5576, "start": 5400}, "id": 2, "kind": "IfDone", "live": true, "nodes": ["n2.0"], "successors": [4, 5]}
+1eb21e3ded956904925ebae5d65ca943cd71441ab239831cd59b8e44be0426ca {"anchor": {"end": 5573, "start": 5567}, "id": 3, "kind": "Unreachable", "live": false, "nodes": [], "successors": [2]}
+70665a5518e8e396ea0445e063dc59889ab57bbfa2c3668a6fc96968bca77f82 {"anchor": {"end": 5783, "start": 5623}, "id": 4, "kind": "IfThen", "live": true, "nodes": ["n4.0", "n4.1"], "successors": []}
+c57e6fb95a5ad826632457d58db457f5656690deac2842690f7a363bfcd61b64 {"anchor": {"end": 5783, "start": 5623}, "id": 5, "kind": "IfDone", "live": true, "nodes": ["n5.0", "n5.1", "n5.2"], "successors": [7, 8]}
+513e0399a93492d120c1e07194a43ff0ddb57ba6e55fcaeb2f63e51d9a1cdf92 {"anchor": {"end": 5780, "start": 5774}, "id": 6, "kind": "Unreachable", "live": false, "nodes": [], "successors": [5]}
+a7c4653caab2f4378aa9a4c42b3d722ea90388f1490df370f5e6c34c2499096c {"anchor": {"end": 6056, "start": 6024}, "id": 7, "kind": "IfThen", "live": true, "nodes": ["n7.0"], "successors": []}
+3234c193e21a7518f08747b67c6c9025427722204a4ac8209503291e1c67cf07 {"anchor": {"end": 6056, "start": 6024}, "id": 8, "kind": "IfDone", "live": true, "nodes": ["n8.0", "n8.1"], "successors": []}
+9d632356aa4161bef6a1dd0f5bcdebb119cae81864b3c606d0bb1f8a6830e027 {"anchor": {"end": 6053, "start": 6047}, "id": 9, "kind": "Unreachable", "live": false, "nodes": [], "successors": [8]}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2782578fbbf3e36881e5834f069a549e0cbf945e5af41e5f8000a231ed25b1e7", "target": "ced340b89c12a3c2f3f7082a365f21de26f629072650d517fb7a87cae3226213"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2782578fbbf3e36881e5834f069a549e0cbf945e5af41e5f8000a231ed25b1e7", "target": "0b9ae80325562337a37e114aa6033f9733558db45acf835eb74e5932cafa5b08"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "0b9ae80325562337a37e114aa6033f9733558db45acf835eb74e5932cafa5b08", "target": "70665a5518e8e396ea0445e063dc59889ab57bbfa2c3668a6fc96968bca77f82"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "0b9ae80325562337a37e114aa6033f9733558db45acf835eb74e5932cafa5b08", "target": "c57e6fb95a5ad826632457d58db457f5656690deac2842690f7a363bfcd61b64"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "c57e6fb95a5ad826632457d58db457f5656690deac2842690f7a363bfcd61b64", "target": "a7c4653caab2f4378aa9a4c42b3d722ea90388f1490df370f5e6c34c2499096c"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "c57e6fb95a5ad826632457d58db457f5656690deac2842690f7a363bfcd61b64", "target": "3234c193e21a7518f08747b67c6c9025427722204a4ac8209503291e1c67cf07"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 5412, "start": 5403}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5564, "start": 5422}}
+{"kind": "closure_not_executed", "span": {"end": 5563, "start": 5438}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 5685, "start": 5626}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5663, "start": 5654}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5771, "start": 5690}}
+{"kind": "closure_not_executed", "span": {"end": 5770, "start": 5706}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5936, "start": 5899}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5935, "start": 5926}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6022, "start": 5938}}
+{"kind": "closure_not_executed", "span": {"end": 6021, "start": 5962}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6037, "start": 6027}}
+{"kind": "call_effect_not_inferred", "span": {"end": 7593, "start": 6129}}
+{"kind": "closure_not_executed", "span": {"end": 7592, "start": 6145}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "jsonrpcMessage", "span": {"end": 5921, "start": 5907}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

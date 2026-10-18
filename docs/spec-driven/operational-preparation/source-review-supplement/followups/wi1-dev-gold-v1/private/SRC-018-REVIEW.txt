@@ -1,0 +1,90 @@
+SRC-018 — AI DEV draft, NOT independently approved
+core/txpool/blobpool/limbo.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-018.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 2114, "start": 2107}, "flags": [], "id": "v@2107", "name": "datadir", "origin": "parameter", "value_kind": "scalar"}
+{"declaration": {"end": 2143, "start": 2142}, "flags": ["captured_by_closure"], "id": "v@2142", "name": "l", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 2329, "start": 2324}, "flags": ["captured_by_closure"], "id": "v@2324", "name": "fails", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 2345, "start": 2340}, "flags": [], "id": "v@2340", "name": "index", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 2471, "start": 2466}, "flags": [], "id": "v@2466", "name": "store", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 2476, "start": 2473}, "flags": [], "id": "v@2473", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 2693, "start": 2691}, "flags": ["range_assignment_unknown"], "id": "v@2691", "name": "id", "origin": "range", "value_kind": "scalar"}
+{"declaration": {"end": 2720, "start": 2717}, "flags": [], "id": "v@2717", "name": "err", "origin": "local", "value_kind": "unknown"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@2511: d:o@2107=positive(kill_free_nonempty_CFG_path)
+u:o@2535: d:o@2340=positive(kill_free_nonempty_CFG_path)
+u:o@2546: d:o@2473=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2573: d:o@2473=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2581: d:o@2142=unknown(captured_by_closure)
+u:o@2591: d:o@2466=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2606: d:o@2324=unknown(captured_by_closure)
+u:o@2675: d:o@2324=unknown(captured_by_closure)
+u:o@2703: d:o@2324=unknown(captured_by_closure)
+u:o@2724: d:o@2142=unknown(captured_by_closure)
+u:o@2739: d:o@2691=unknown(range_assignment_unknown)
+u:o@2744: d:o@2717=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2761: d:o@2142=unknown(captured_by_closure)
+u:o@2787: d:o@2717=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2811: d:o@2142=unknown(captured_by_closure)
+
+Same-name shadow identity negatives:
+d:o@2717 -> u:o@2546 negative:different_lexical_declaration
+d:o@2717 -> u:o@2573 negative:different_lexical_declaration
+d:o@2473 -> u:o@2744 negative:different_lexical_declaration
+d:o@2473 -> u:o@2787 negative:different_lexical_declaration
+
+CFG block matching table (raw indices are only hints):
+fba48ac41a3eadbf23e5afeafaf27b2b4eef0b03be21f0d78b225eefc9560f30 {"anchor": {"end": 2819, "start": 2139}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0", "n0.1", "n0.2", "n0.3", "n0.4"], "successors": [1, 2]}
+ef8861242151e27fd1306850675dda14ad010e1d5b2c441276540a042ef06df7 {"anchor": {"end": 2579, "start": 2543}, "id": 1, "kind": "IfThen", "live": true, "nodes": ["n1.0"], "successors": []}
+c9ecbde15d5efad619b4ec576b2c557bbfb6544a24165c6ec6e9f9a4f2c124c9 {"anchor": {"end": 2579, "start": 2543}, "id": 2, "kind": "IfDone", "live": true, "nodes": ["n2.0", "n2.1"], "successors": [4, 5]}
+955c1870f68b541ae7ebba315fc4c3b3b99d3f913fdafb4674efd80f2ddc25ec {"anchor": {"end": 2576, "start": 2561}, "id": 3, "kind": "Unreachable", "live": false, "nodes": [], "successors": [2]}
+1e9dba5c676a392eb1baecfca6e5d642145a87ec3f87a721515a81a10d761bcf {"anchor": {"end": 2802, "start": 2599}, "id": 4, "kind": "IfThen", "live": true, "nodes": ["n4.0", "n4.1", "n4.2", "n4.3"], "successors": [6]}
+e877a203fd4236b02527c87af2f27f37bcb4b0a99169956008f6f1df7e1c7fa1 {"anchor": {"end": 2802, "start": 2599}, "id": 5, "kind": "IfDone", "live": true, "nodes": ["n5.0"], "successors": []}
+04a117efe2813832ec39972dffca0bef8235bed43d1bf22823e2a60c96ff95be {"anchor": {"end": 2799, "start": 2684}, "id": 6, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [7, 8]}
+a1a1c799349104d9aa1b3621c9ffc2258dfb97bab5acf32c43bfa70d88a98047 {"anchor": {"end": 2799, "start": 2684}, "id": 7, "kind": "RangeBody", "live": true, "nodes": ["n7.0", "n7.1"], "successors": [9, 10]}
+5582dd649b258be4291f941e02e1737d6334b41eaac9542bb1743f942bd6d39b {"anchor": {"end": 2799, "start": 2684}, "id": 8, "kind": "RangeDone", "live": true, "nodes": [], "successors": [5]}
+d4c4dd3d1ffa5446dcbddf04cd1662967b05712e4d6ca88dcc86cf4f2bbba653 {"anchor": {"end": 2795, "start": 2714}, "id": 9, "kind": "IfThen", "live": true, "nodes": ["n9.0", "n9.1"], "successors": []}
+28f521c4a67841ccb54392ffbc33ce16ba980f801bf7e26b59e1684763a3f640 {"anchor": {"end": 2795, "start": 2714}, "id": 10, "kind": "IfDone", "live": true, "nodes": [], "successors": [6]}
+90bb3400d9673af0863e4e5cfd3da82268d3b92f170b685fd176e33f1487a7ca {"anchor": {"end": 2790, "start": 2775}, "id": 11, "kind": "Unreachable", "live": false, "nodes": [], "successors": [10]}
+459e376dc70db1def542847f06e9086ffc67136b0854d9ff5d318df399a7658b {"anchor": {"end": 2817, "start": 2804}, "id": 12, "kind": "Unreachable", "live": false, "nodes": [], "successors": []}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "fba48ac41a3eadbf23e5afeafaf27b2b4eef0b03be21f0d78b225eefc9560f30", "target": "ef8861242151e27fd1306850675dda14ad010e1d5b2c441276540a042ef06df7"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "fba48ac41a3eadbf23e5afeafaf27b2b4eef0b03be21f0d78b225eefc9560f30", "target": "c9ecbde15d5efad619b4ec576b2c557bbfb6544a24165c6ec6e9f9a4f2c124c9"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "c9ecbde15d5efad619b4ec576b2c557bbfb6544a24165c6ec6e9f9a4f2c124c9", "target": "1e9dba5c676a392eb1baecfca6e5d642145a87ec3f87a721515a81a10d761bcf"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "c9ecbde15d5efad619b4ec576b2c557bbfb6544a24165c6ec6e9f9a4f2c124c9", "target": "04a117efe2813832ec39972dffca0bef8235bed43d1bf22823e2a60c96ff95be"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "c9ecbde15d5efad619b4ec576b2c557bbfb6544a24165c6ec6e9f9a4f2c124c9", "target": "e877a203fd4236b02527c87af2f27f37bcb4b0a99169956008f6f1df7e1c7fa1"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "04a117efe2813832ec39972dffca0bef8235bed43d1bf22823e2a60c96ff95be", "target": "a1a1c799349104d9aa1b3621c9ffc2258dfb97bab5acf32c43bfa70d88a98047"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "04a117efe2813832ec39972dffca0bef8235bed43d1bf22823e2a60c96ff95be", "target": "e877a203fd4236b02527c87af2f27f37bcb4b0a99169956008f6f1df7e1c7fa1"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "04a117efe2813832ec39972dffca0bef8235bed43d1bf22823e2a60c96ff95be", "target": "5582dd649b258be4291f941e02e1737d6334b41eaac9542bb1743f942bd6d39b"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "a1a1c799349104d9aa1b3621c9ffc2258dfb97bab5acf32c43bfa70d88a98047", "target": "d4c4dd3d1ffa5446dcbddf04cd1662967b05712e4d6ca88dcc86cf4f2bbba653"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "a1a1c799349104d9aa1b3621c9ffc2258dfb97bab5acf32c43bfa70d88a98047", "target": "04a117efe2813832ec39972dffca0bef8235bed43d1bf22823e2a60c96ff95be"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "a1a1c799349104d9aa1b3621c9ffc2258dfb97bab5acf32c43bfa70d88a98047", "target": "28f521c4a67841ccb54392ffbc33ce16ba980f801bf7e26b59e1684763a3f640"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 2193, "start": 2165}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2244, "start": 2205}}
+{"kind": "closure_not_executed", "span": {"end": 2464, "start": 2349}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2541, "start": 2480}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2533, "start": 2521}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2612, "start": 2602}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2681, "start": 2621}}
+{"kind": "range_binding_unknown", "span": {"end": 2799, "start": 2684}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2742, "start": 2724}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2770, "start": 2761}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 2185, "start": 2181}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 2243, "start": 2239}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Open", "span": {"end": 2490, "start": 2486}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Options", "span": {"end": 2504, "start": 2497}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Path", "span": {"end": 2509, "start": 2505}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "newSlotter", "span": {"end": 2531, "start": 2521}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Warn", "span": {"end": 2629, "start": 2625}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Delete", "span": {"end": 2738, "start": 2732}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

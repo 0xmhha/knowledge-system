@@ -1,6 +1,20 @@
 # 현재 인수인계
 
-## 최신 상태 — 2026-10-18 / 독립 수용 동결 준비
+## 최신 상태 — 2026-10-18 / WI-1 DEV·AI 정답 초안
+
+**단계44: 기존 프로젝트30함수의 DEV 입력과 범위 내 완전한 AI 초안30개를 작성했다.** 원문25파일에 결속한 지역 binding412개·occurrence1721개를 다루고, 콜백 함수형의 signature4개는 별도 격리했다. 정의–사용쌍1654개(positive556/negative94/unknown1004), 별도 shadow 음성410쌍, 구조 제어 branch–block쌍12968개(positive737/negative12231)를 전수 분류했다. 이는 후보 분석기의 품질 점수나 독립 정답 승인 수가 아니다.
+
+public 입력/원문과 private AI 정답을 분리했다. 정답은 후보 valueflow 출력 없이 원문 관측 및 새 참조 알고리즘으로 작성하고 정의–사용/제어 각각 두 방식으로 대조한다. CFG 생성기는 후보와 같은 x/tools0.48.0이므로 공통 오류 가능성이 있다. 파일 단위 부분 타입 관측과 후보의 고립 함수 타입 문맥도 같다고 가정하지 않는다. 주소·range·capture·상수·미해결 타입·비종료와 실제 consumer 매칭 한계를 보존하며, 지원 밖 의미까지 완전한 운영 정답을 만들었다고 판정하지 않는다.
+
+각 함수의 `private/SRC-xxx-REVIEW.txt`에는 전체 use별 정의 집합과 unknown 사유·블록 매칭·제어 양성/unknown·음성 complement를 사람이 읽을 수 있게 작성했다. [SRC-007 검토 예시](./operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/private/SRC-007-REVIEW.txt)를 볼 수 있다.
+
+[현재 보고서](./operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/REPORT.txt), [초안 현황](./operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/SUMMARY.json), [현재 단계와 남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/WORKLIST.json), [검증 기록](./operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/validation-summary.json)을 따른다. 다음은 WI1 의미 unknown/값 종류·합성 좌표와 실제 소비자 매칭 보완, 이후 WI2 DEV/AI 초안이다. 나머지8개 WI 초안·새 DEV/FINAL 독립 가족/완전 의미 gold·F01~08 동결, 정식9개 수용, 필수 온톨로지 효과 수용, 별도 후속12개가 남는다.
+
+D04미정·독립 승인0·FINAL0·정식0/9·freeze null/execution_allowed=false를 유지한다. 이전 단계43 packet과 도구 source pin은0f28a9a7의 과거 검증으로 보존하고, 현재 준비 검사는 새 WI1 DEV 종류를 사용한다. 유지보수 Go·승인 입력·원문/DB/운영 current·전역 설정은 변경하지 않는다.
+
+현재 범위 회귀112개·원래0f28a9a7 소스의 과거 결속 회귀49개, 수기 source 통제14개·원래 Git25파일 대조·payload101파일 동일 재생·문서134개·미승인/미동결 거부 검증을 통과했다. 새 보조 관측기는 build/vet/fmt 통과이며 유지보수 Go 전체 시험을 새로 실행한 것으로 기록하지 않는다.
+
+## 이전 준비 — 2026-10-18 / 독립 수용 동결 준비
 
 **단계43의 준비 작업 FP01~04를 완료했다.** 기존 후보206행을 원본 SHA/행 좌표·노출 이력과 연결하고,9개 WI와 온톨로지의 완전 정답·매칭 작성 양식10개, 표본 충분성 원장, F01~08 준비표와 FINAL 접근·봉인 절차를 작성했다.206행은 독립 표본206개가 아니다. 모두 노출된 DEV 작성 자료이고, 새 FINAL·승인 gold는0개다. WI3의20입력은 제안 가족15개, WI6은 운영19개+stress1개, V1/V2는 공유 개발 티켓1개다.
 

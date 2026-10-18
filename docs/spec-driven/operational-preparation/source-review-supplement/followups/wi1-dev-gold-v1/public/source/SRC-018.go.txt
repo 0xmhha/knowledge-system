@@ -1,0 +1,29 @@
+func newLimbo(datadir string) (*limbo, error) {
+	l := &limbo{
+		index:  make(map[common.Hash]uint64),
+		groups: make(map[uint64]map[uint64]common.Hash),
+	}
+	// Index all limboed blobs on disk and delete anything unprocessable
+	var fails []uint64
+	index := func(id uint64, size uint32, data []byte) {
+		if l.parseBlob(id, data) != nil {
+			fails = append(fails, id)
+		}
+	}
+	store, err := billy.Open(billy.Options{Path: datadir}, newSlotter(), index)
+	if err != nil {
+		return nil, err
+	}
+	l.store = store
+
+	if len(fails) > 0 {
+		log.Warn("Dropping invalidated limboed blobs", "ids", fails)
+		for _, id := range fails {
+			if err := l.store.Delete(id); err != nil {
+				l.Close()
+				return nil, err
+			}
+		}
+	}
+	return l, nil
+}

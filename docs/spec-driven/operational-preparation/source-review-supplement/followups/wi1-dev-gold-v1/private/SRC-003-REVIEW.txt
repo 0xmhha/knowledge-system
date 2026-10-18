@@ -1,0 +1,406 @@
+SRC-003 — AI DEV draft, NOT independently approved
+consensus/wbft/core/roundchange.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-003.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 3858, "start": 3857}, "flags": [], "id": "v@3857", "name": "c", "origin": "receiver", "value_kind": "unknown"}
+{"declaration": {"end": 3898, "start": 3887}, "flags": [], "id": "v@3887", "name": "roundChange", "origin": "parameter", "value_kind": "unknown"}
+{"declaration": {"end": 3939, "start": 3933}, "flags": [], "id": "v@3933", "name": "logger", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 3984, "start": 3980}, "flags": [], "id": "v@3980", "name": "view", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 4020, "start": 4008}, "flags": [], "id": "v@4008", "name": "currentRound", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 4146, "start": 4143}, "flags": [], "id": "v@4143", "name": "num", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 4300, "start": 4280}, "flags": [], "id": "v@4280", "name": "currentRoundMessages", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 4603, "start": 4588}, "flags": [], "id": "v@4588", "name": "prepareMessages", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 4640, "start": 4638}, "flags": [], "id": "v@4638", "name": "pr", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 4664, "start": 4662}, "flags": [], "id": "v@4662", "name": "pb", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 4985, "start": 4982}, "flags": [], "id": "v@4982", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 5331, "start": 5328}, "flags": [], "id": "v@5328", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 5738, "start": 5735}, "flags": [], "id": "v@5735", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 6592, "start": 6584}, "flags": [], "id": "v@6584", "name": "newRound", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 7235, "start": 7227}, "flags": ["address_exposed"], "id": "v@7227", "name": "proposal", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 7653, "start": 7634}, "flags": ["address_exposed"], "id": "v@7634", "name": "roundChangeMessages", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 7728, "start": 7712}, "flags": [], "id": "v@7712", "name": "rcSignedPayloads", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 7790, "start": 7789}, "flags": ["range_assignment_unknown"], "id": "v@7789", "name": "m", "origin": "range", "value_kind": "unknown"}
+{"declaration": {"end": 7839, "start": 7834}, "flags": ["address_exposed"], "id": "v@7834", "name": "rcMsg", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 7973, "start": 7958}, "flags": ["address_exposed"], "id": "v@7958", "name": "prepareMessages", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 8041, "start": 8038}, "flags": [], "id": "v@8038", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 8241, "start": 8240}, "flags": [], "id": "v@8240", "name": "r", "origin": "local", "value_kind": "reference_binding"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@3943: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3965: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3988: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4024: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4150: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4187: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4304: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4348: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4364: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4441: d:o@4143=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6043=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4475: d:o@4280=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6179=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4546: d:o@3980=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4561: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4689: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4725: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4761: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4801: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4906: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@4945: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5074: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5124: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5169: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5228: d:o@4982=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5244: d:o@4982=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5259: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5295: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5441: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5486: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5530: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5589: d:o@5328=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5605: d:o@5328=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5635: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5669: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5703: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5742: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5763: d:o@3980=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5775: d:o@3887=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5788: d:o@4638=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5664=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5792: d:o@4662=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5698=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5796: d:o@4588=positive(kill_free_nonempty_CFG_path); d:o@5617=positive(kill_free_nonempty_CFG_path)
+u:o@5813: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5841: d:o@5735=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5857: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5920: d:o@5735=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5935: d:o@5735=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6049: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6086: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6202: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6246: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6271: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6310: d:o@4143=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6043=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6344: d:o@4280=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6179=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6379: d:o@4143=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6043=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6386: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6410: d:o@4143=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6043=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6418: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6596: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6631: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6648: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6709: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6726: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6742: d:o@6584=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6754: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6777: d:o@6584=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6798: d:o@4280=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6179=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6822: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6847: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6865: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6894: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6916: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@7239: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@7257: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@7276: d:o@7227=unknown(address_exposed); d:o@7358=unknown(address_exposed)
+u:o@7300: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@7320: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@7369: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@7657: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@7687: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@7800: d:o@7634=unknown(address_exposed)
+u:o@7843: d:o@7789=unknown(range_assignment_unknown)
+u:o@7900: d:o@7712=positive(kill_free_nonempty_CFG_path); d:o@7874=positive(kill_free_nonempty_CFG_path)
+u:o@7919: d:o@7834=unknown(address_exposed)
+u:o@7977: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8010: d:o@4008=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8057: d:o@7227=unknown(address_exposed); d:o@7358=unknown(address_exposed)
+u:o@8067: d:o@7712=positive(kill_free_nonempty_CFG_path); d:o@7874=positive(kill_free_nonempty_CFG_path)
+u:o@8085: d:o@7958=unknown(address_exposed)
+u:o@8102: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8126: d:o@8038=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8142: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8214: d:o@8038=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8275: d:o@7227=unknown(address_exposed); d:o@7358=unknown(address_exposed)
+u:o@8305: d:o@7634=unknown(address_exposed)
+u:o@8346: d:o@7958=unknown(address_exposed)
+u:o@8369: d:o@3857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8389: d:o@8240=positive(kill_free_nonempty_CFG_path)
+u:o@8404: d:o@3933=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@6262=unknown(unresolved_value_domain_or_compile_time_mapping)
+
+Same-name shadow identity negatives:
+d:o@5328 -> u:o@5228 negative:different_lexical_declaration
+d:o@5735 -> u:o@5228 negative:different_lexical_declaration
+d:o@8038 -> u:o@5228 negative:different_lexical_declaration
+d:o@5328 -> u:o@5244 negative:different_lexical_declaration
+d:o@5735 -> u:o@5244 negative:different_lexical_declaration
+d:o@8038 -> u:o@5244 negative:different_lexical_declaration
+d:o@4982 -> u:o@5589 negative:different_lexical_declaration
+d:o@5735 -> u:o@5589 negative:different_lexical_declaration
+d:o@8038 -> u:o@5589 negative:different_lexical_declaration
+d:o@4982 -> u:o@5605 negative:different_lexical_declaration
+d:o@5735 -> u:o@5605 negative:different_lexical_declaration
+d:o@8038 -> u:o@5605 negative:different_lexical_declaration
+d:o@7958 -> u:o@5796 negative:different_lexical_declaration
+d:o@4982 -> u:o@5841 negative:different_lexical_declaration
+d:o@5328 -> u:o@5841 negative:different_lexical_declaration
+d:o@8038 -> u:o@5841 negative:different_lexical_declaration
+d:o@4982 -> u:o@5920 negative:different_lexical_declaration
+d:o@5328 -> u:o@5920 negative:different_lexical_declaration
+d:o@8038 -> u:o@5920 negative:different_lexical_declaration
+d:o@4982 -> u:o@5935 negative:different_lexical_declaration
+d:o@5328 -> u:o@5935 negative:different_lexical_declaration
+d:o@8038 -> u:o@5935 negative:different_lexical_declaration
+d:o@4588 -> u:o@8085 negative:different_lexical_declaration
+d:o@5617 -> u:o@8085 negative:different_lexical_declaration
+d:o@4982 -> u:o@8126 negative:different_lexical_declaration
+d:o@5328 -> u:o@8126 negative:different_lexical_declaration
+d:o@5735 -> u:o@8126 negative:different_lexical_declaration
+d:o@4982 -> u:o@8214 negative:different_lexical_declaration
+d:o@5328 -> u:o@8214 negative:different_lexical_declaration
+d:o@5735 -> u:o@8214 negative:different_lexical_declaration
+d:o@4588 -> u:o@8346 negative:different_lexical_declaration
+d:o@5617 -> u:o@8346 negative:different_lexical_declaration
+
+CFG block matching table (raw indices are only hints):
+1898cecc93e3180175e368a5079cf12480edd6b48960c59e047b00d6e221ee8c {"anchor": {"end": 8473, "start": 3930}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0", "n0.1", "n0.2", "n0.3", "n0.4", "n0.5", "n0.6"], "successors": [1, 2]}
+481994626624d08d9c6132b41756425005068c3f65583d1bab7ed63a8545d7be {"anchor": {"end": 5945, "start": 4543}, "id": 1, "kind": "IfThen", "live": true, "nodes": ["n1.0", "n1.1", "n1.2", "n1.3"], "successors": [3, 4]}
+b530731a1a1e356de0bf1c6616b8cf9f377b12165733fc89a0972b47fab3a94a {"anchor": {"end": 5945, "start": 4543}, "id": 2, "kind": "IfDone", "live": true, "nodes": ["n2.0", "n2.1", "n2.2", "n2.3"], "successors": [14, 16]}
+fccae12c979d82627fb06eb38bd2d3ab09c3ec75e97fe54456850a75121c4c18 {"anchor": {"end": 5732, "start": 4686}, "id": 3, "kind": "IfThen", "live": true, "nodes": ["n3.0"], "successors": [5, 6]}
+8326e1a910e955033e797306101fd8593c1a17b236df58770115731b652a62f5 {"anchor": {"end": 5732, "start": 4686}, "id": 4, "kind": "IfDone", "live": true, "nodes": ["n4.0", "n4.1"], "successors": [11, 12]}
+07689fd27b8772e102428b88bae3521f4db15426ed93b2b0e73f24fa9910ae3d {"anchor": {"end": 5252, "start": 4903}, "id": 5, "kind": "IfThen", "live": true, "nodes": ["n5.0", "n5.1", "n5.2"], "successors": []}
+760c3b77148fac52afe9c7f89f144d9129b4db075f623ef85b4460d21ccc4b4b {"anchor": {"end": 5252, "start": 4903}, "id": 6, "kind": "IfDone", "live": true, "nodes": ["n6.0"], "successors": [8, 9]}
+0851ad88018da79cef5e0919f7cd51d676082b64b4f74b3e3d81a8624a12e3c6 {"anchor": {"end": 5247, "start": 5237}, "id": 7, "kind": "Unreachable", "live": false, "nodes": [], "successors": [6]}
+5e77ed6774361e423f7964a806d5d29aa9ced656a7028259012e2ddaa37d1373 {"anchor": {"end": 5613, "start": 5256}, "id": 8, "kind": "IfThen", "live": true, "nodes": ["n8.0", "n8.1", "n8.2"], "successors": []}
+b45772615d6b6d7e47f53ce489cd8fc96cf37be6fbcf821ad81217599b447e7f {"anchor": {"end": 5613, "start": 5256}, "id": 9, "kind": "IfDone", "live": true, "nodes": ["n9.0", "n9.1", "n9.2"], "successors": [4]}
+564e95e0de5e5fdd0f3368850095df32e9df57ce117ac1a79c4bb7d21b355749 {"anchor": {"end": 5608, "start": 5598}, "id": 10, "kind": "Unreachable", "live": false, "nodes": [], "successors": [9]}
+650c628a0dba11ecafa569adeb818ed8bda0479afa8a4ba256dba92957b575db {"anchor": {"end": 5942, "start": 5838}, "id": 11, "kind": "IfThen", "live": true, "nodes": ["n11.0", "n11.1"], "successors": []}
+4b34df6f19f9606445044a32e985d9a153978d161a10f94600f27e6827254830 {"anchor": {"end": 5942, "start": 5838}, "id": 12, "kind": "IfDone", "live": true, "nodes": [], "successors": [2]}
+5d5913d321f886488b0836f69029c7f957250bcb6c6c96a6216748e9c1cfef17 {"anchor": {"end": 5938, "start": 5928}, "id": 13, "kind": "Unreachable", "live": false, "nodes": [], "successors": [12]}
+4cf15dd35b12cfaa8107387a9fdd6cdf1de1e46edde29742717479b7ef1e30de {"anchor": {"end": 8459, "start": 6368}, "id": 14, "kind": "IfThen", "live": true, "nodes": ["n14.0", "n14.1", "n14.2", "n14.3"], "successors": [15]}
+cbda5dba36e126f42e6a03ac5fa02719a326f473614402be8f9b4b49a1aad172 {"anchor": {"end": 8459, "start": 6368}, "id": 15, "kind": "IfDone", "live": true, "nodes": ["n15.0"], "successors": []}
+94c66bc90bfafb555cc04d37c6b5ae18d345003c0251b0ca3c2112967d0cb27a {"anchor": {"end": 8459, "start": 6368}, "id": 16, "kind": "IfElse", "live": true, "nodes": ["n16.0"], "successors": [17, 19]}
+e1904c803cefde7ddba80506584a492bef22b3e45c9c5763dc59e0644160ed33 {"anchor": {"end": 8459, "start": 6795}, "id": 17, "kind": "IfThen", "live": true, "nodes": ["n17.0", "n17.1", "n17.2"], "successors": [20, 21]}
+feecc2fd15968e826d3a62ce6c298562344ee80a7de5378407113e9443994c80 {"anchor": {"end": 8459, "start": 6795}, "id": 18, "kind": "IfDone", "live": true, "nodes": [], "successors": [15]}
+0d68d32d98c0ccabd37761ce17c145812ede51e297b25cbb8332f52916b3c4c4 {"anchor": {"end": 8459, "start": 6795}, "id": 19, "kind": "IfElse", "live": true, "nodes": ["n19.0"], "successors": [18]}
+5c8d0106a5b03ca31e8b941758c7c59ced2dc32b807faf1933f8f4108af36a6a {"anchor": {"end": 7577, "start": 7273}, "id": 20, "kind": "IfThen", "live": true, "nodes": ["n20.0"], "successors": [22, 24]}
+b25a8b4a843d3c9f9a4ce8808ba0a71af513942b8d854e7cc7033c5d0f123c66 {"anchor": {"end": 7577, "start": 7273}, "id": 21, "kind": "IfDone", "live": true, "nodes": ["n21.0", "n21.1", "n21.2", "n21.3", "n21.4"], "successors": [26]}
+a0c5bb336823bb8de35a69097f0e13a67969de7301e786a4821dc524eab5dd3d {"anchor": {"end": 7573, "start": 7297}, "id": 22, "kind": "IfThen", "live": true, "nodes": ["n22.0"], "successors": [23]}
+1f352de552a28dfdbbe6269474698243df85ccb61b48a6b89354efb811313975 {"anchor": {"end": 7573, "start": 7297}, "id": 23, "kind": "IfDone", "live": true, "nodes": [], "successors": [21]}
+a0831ffb260ae8a5c24273761e803f44cbc3e0cf50e8419799be529a253646b6 {"anchor": {"end": 7573, "start": 7297}, "id": 24, "kind": "IfElse", "live": true, "nodes": ["n24.0", "n24.1"], "successors": []}
+28f673fd34097918707e71ff2f5497a34fc8b697f96d23952e2578f9482f7379 {"anchor": {"end": 7568, "start": 7510}, "id": 25, "kind": "Unreachable", "live": false, "nodes": [], "successors": [23]}
+fee21c379c3c51f8e1a7c9b0aa6793d80ac69742c59ec8cb24b127e10c1f9d6a {"anchor": {"end": 7954, "start": 7782}, "id": 26, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [27, 28]}
+06542588333ef19413c15ed216483b72349d285dea54c9957b475f2497217921 {"anchor": {"end": 7954, "start": 7782}, "id": 27, "kind": "RangeBody", "live": true, "nodes": ["n27.0", "n27.1"], "successors": [26]}
+9f8085c405656835f8cba8ef550c6c7662a1eab31cb2336ce446692489a5cab5 {"anchor": {"end": 7954, "start": 7782}, "id": 28, "kind": "RangeDone", "live": true, "nodes": ["n28.0", "n28.1", "n28.2"], "successors": [29, 30]}
+94d9b01711148b4d641489737f8fec742f6654e2119ef2749d64035d7c9cffa9 {"anchor": {"end": 8236, "start": 8035}, "id": 29, "kind": "IfThen", "live": true, "nodes": ["n29.0", "n29.1"], "successors": []}
+929dd364c5d2a548ff39b511c22194e915e22857d001f224c0a073f172690619 {"anchor": {"end": 8236, "start": 8035}, "id": 30, "kind": "IfDone", "live": true, "nodes": ["n30.0", "n30.1"], "successors": [18]}
+897839f5904204ab7a4f7c0f0d0cbe973fa7629916f17e24738ee192c3c1c959 {"anchor": {"end": 8232, "start": 8222}, "id": 31, "kind": "Unreachable", "live": false, "nodes": [], "successors": [30]}
+86e491d1037a102829d50861f696c261a4efa93843771833c18ad16ea539f334 {"anchor": {"end": 8471, "start": 8461}, "id": 32, "kind": "Unreachable", "live": false, "nodes": [], "successors": []}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "1898cecc93e3180175e368a5079cf12480edd6b48960c59e047b00d6e221ee8c", "target": "481994626624d08d9c6132b41756425005068c3f65583d1bab7ed63a8545d7be"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "1898cecc93e3180175e368a5079cf12480edd6b48960c59e047b00d6e221ee8c", "target": "b530731a1a1e356de0bf1c6616b8cf9f377b12165733fc89a0972b47fab3a94a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "481994626624d08d9c6132b41756425005068c3f65583d1bab7ed63a8545d7be", "target": "fccae12c979d82627fb06eb38bd2d3ab09c3ec75e97fe54456850a75121c4c18"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "481994626624d08d9c6132b41756425005068c3f65583d1bab7ed63a8545d7be", "target": "8326e1a910e955033e797306101fd8593c1a17b236df58770115731b652a62f5"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "b530731a1a1e356de0bf1c6616b8cf9f377b12165733fc89a0972b47fab3a94a", "target": "4cf15dd35b12cfaa8107387a9fdd6cdf1de1e46edde29742717479b7ef1e30de"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "b530731a1a1e356de0bf1c6616b8cf9f377b12165733fc89a0972b47fab3a94a", "target": "cbda5dba36e126f42e6a03ac5fa02719a326f473614402be8f9b4b49a1aad172"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "b530731a1a1e356de0bf1c6616b8cf9f377b12165733fc89a0972b47fab3a94a", "target": "94c66bc90bfafb555cc04d37c6b5ae18d345003c0251b0ca3c2112967d0cb27a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "fccae12c979d82627fb06eb38bd2d3ab09c3ec75e97fe54456850a75121c4c18", "target": "07689fd27b8772e102428b88bae3521f4db15426ed93b2b0e73f24fa9910ae3d"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "fccae12c979d82627fb06eb38bd2d3ab09c3ec75e97fe54456850a75121c4c18", "target": "760c3b77148fac52afe9c7f89f144d9129b4db075f623ef85b4460d21ccc4b4b"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "8326e1a910e955033e797306101fd8593c1a17b236df58770115731b652a62f5", "target": "650c628a0dba11ecafa569adeb818ed8bda0479afa8a4ba256dba92957b575db"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "8326e1a910e955033e797306101fd8593c1a17b236df58770115731b652a62f5", "target": "b530731a1a1e356de0bf1c6616b8cf9f377b12165733fc89a0972b47fab3a94a"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "8326e1a910e955033e797306101fd8593c1a17b236df58770115731b652a62f5", "target": "4b34df6f19f9606445044a32e985d9a153978d161a10f94600f27e6827254830"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "760c3b77148fac52afe9c7f89f144d9129b4db075f623ef85b4460d21ccc4b4b", "target": "5e77ed6774361e423f7964a806d5d29aa9ced656a7028259012e2ddaa37d1373"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "760c3b77148fac52afe9c7f89f144d9129b4db075f623ef85b4460d21ccc4b4b", "target": "8326e1a910e955033e797306101fd8593c1a17b236df58770115731b652a62f5"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "760c3b77148fac52afe9c7f89f144d9129b4db075f623ef85b4460d21ccc4b4b", "target": "b45772615d6b6d7e47f53ce489cd8fc96cf37be6fbcf821ad81217599b447e7f"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "94c66bc90bfafb555cc04d37c6b5ae18d345003c0251b0ca3c2112967d0cb27a", "target": "e1904c803cefde7ddba80506584a492bef22b3e45c9c5763dc59e0644160ed33"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "94c66bc90bfafb555cc04d37c6b5ae18d345003c0251b0ca3c2112967d0cb27a", "target": "cbda5dba36e126f42e6a03ac5fa02719a326f473614402be8f9b4b49a1aad172"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "94c66bc90bfafb555cc04d37c6b5ae18d345003c0251b0ca3c2112967d0cb27a", "target": "feecc2fd15968e826d3a62ce6c298562344ee80a7de5378407113e9443994c80"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "94c66bc90bfafb555cc04d37c6b5ae18d345003c0251b0ca3c2112967d0cb27a", "target": "0d68d32d98c0ccabd37761ce17c145812ede51e297b25cbb8332f52916b3c4c4"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e1904c803cefde7ddba80506584a492bef22b3e45c9c5763dc59e0644160ed33", "target": "5c8d0106a5b03ca31e8b941758c7c59ced2dc32b807faf1933f8f4108af36a6a"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e1904c803cefde7ddba80506584a492bef22b3e45c9c5763dc59e0644160ed33", "target": "b25a8b4a843d3c9f9a4ce8808ba0a71af513942b8d854e7cc7033c5d0f123c66"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e1904c803cefde7ddba80506584a492bef22b3e45c9c5763dc59e0644160ed33", "target": "fee21c379c3c51f8e1a7c9b0aa6793d80ac69742c59ec8cb24b127e10c1f9d6a"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e1904c803cefde7ddba80506584a492bef22b3e45c9c5763dc59e0644160ed33", "target": "9f8085c405656835f8cba8ef550c6c7662a1eab31cb2336ce446692489a5cab5"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5c8d0106a5b03ca31e8b941758c7c59ced2dc32b807faf1933f8f4108af36a6a", "target": "b25a8b4a843d3c9f9a4ce8808ba0a71af513942b8d854e7cc7033c5d0f123c66"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5c8d0106a5b03ca31e8b941758c7c59ced2dc32b807faf1933f8f4108af36a6a", "target": "a0c5bb336823bb8de35a69097f0e13a67969de7301e786a4821dc524eab5dd3d"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5c8d0106a5b03ca31e8b941758c7c59ced2dc32b807faf1933f8f4108af36a6a", "target": "1f352de552a28dfdbbe6269474698243df85ccb61b48a6b89354efb811313975"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5c8d0106a5b03ca31e8b941758c7c59ced2dc32b807faf1933f8f4108af36a6a", "target": "fee21c379c3c51f8e1a7c9b0aa6793d80ac69742c59ec8cb24b127e10c1f9d6a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5c8d0106a5b03ca31e8b941758c7c59ced2dc32b807faf1933f8f4108af36a6a", "target": "9f8085c405656835f8cba8ef550c6c7662a1eab31cb2336ce446692489a5cab5"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5c8d0106a5b03ca31e8b941758c7c59ced2dc32b807faf1933f8f4108af36a6a", "target": "a0831ffb260ae8a5c24273761e803f44cbc3e0cf50e8419799be529a253646b6"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "fee21c379c3c51f8e1a7c9b0aa6793d80ac69742c59ec8cb24b127e10c1f9d6a", "target": "fee21c379c3c51f8e1a7c9b0aa6793d80ac69742c59ec8cb24b127e10c1f9d6a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "fee21c379c3c51f8e1a7c9b0aa6793d80ac69742c59ec8cb24b127e10c1f9d6a", "target": "06542588333ef19413c15ed216483b72349d285dea54c9957b475f2497217921"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "9f8085c405656835f8cba8ef550c6c7662a1eab31cb2336ce446692489a5cab5", "target": "94d9b01711148b4d641489737f8fec742f6654e2119ef2749d64035d7c9cffa9"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "9f8085c405656835f8cba8ef550c6c7662a1eab31cb2336ce446692489a5cab5", "target": "cbda5dba36e126f42e6a03ac5fa02719a326f473614402be8f9b4b49a1aad172"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "9f8085c405656835f8cba8ef550c6c7662a1eab31cb2336ce446692489a5cab5", "target": "feecc2fd15968e826d3a62ce6c298562344ee80a7de5378407113e9443994c80"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "9f8085c405656835f8cba8ef550c6c7662a1eab31cb2336ce446692489a5cab5", "target": "929dd364c5d2a548ff39b511c22194e915e22857d001f224c0a073f172690619"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 3977, "start": 3943}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4006, "start": 3988}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4039, "start": 4024}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4200, "start": 4150}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4361, "start": 4304}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4496, "start": 4364}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4574, "start": 4546}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 4831, "start": 4689}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 4793, "start": 4689}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 4757, "start": 4689}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4827, "start": 4797}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4970, "start": 4906}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4940, "start": 4906}}
+{"kind": "call_effect_not_inferred", "span": {"end": 4960, "start": 4945}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5164, "start": 4989}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5117, "start": 5074}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5108, "start": 5074}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5157, "start": 5124}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5139, "start": 5124}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5232, "start": 5169}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5291, "start": 5259}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5525, "start": 5335}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5479, "start": 5441}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5473, "start": 5441}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5518, "start": 5486}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5593, "start": 5530}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5835, "start": 5742}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5834, "start": 5813}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5924, "start": 5857}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6099, "start": 6049}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6259, "start": 6202}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6365, "start": 6271}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 6432, "start": 6371}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6383, "start": 6371}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6398, "start": 6386}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6414, "start": 6402}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6430, "start": 6418}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6644, "start": 6596}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6722, "start": 6648}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6721, "start": 6709}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6751, "start": 6726}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6786, "start": 6754}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 6911, "start": 6798}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 6861, "start": 6798}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6843, "start": 6822}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6861, "start": 6847}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6907, "start": 6865}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6977, "start": 6916}}
+{"kind": "call_effect_not_inferred", "span": {"end": 7270, "start": 7239}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 7351, "start": 7300}}
+{"kind": "call_effect_not_inferred", "span": {"end": 7505, "start": 7419}}
+{"kind": "call_effect_not_inferred", "span": {"end": 7568, "start": 7517}}
+{"kind": "call_effect_not_inferred", "span": {"end": 7708, "start": 7687}}
+{"kind": "call_effect_not_inferred", "span": {"end": 7779, "start": 7732}}
+{"kind": "range_binding_unknown", "span": {"end": 7954, "start": 7782}}
+{"kind": "call_effect_not_inferred", "span": {"end": 7828, "start": 7800}}
+{"kind": "call_effect_not_inferred", "span": {"end": 7950, "start": 7893}}
+{"kind": "call_effect_not_inferred", "span": {"end": 8031, "start": 8010}}
+{"kind": "call_effect_not_inferred", "span": {"end": 8124, "start": 8045}}
+{"kind": "call_effect_not_inferred", "span": {"end": 8123, "start": 8102}}
+{"kind": "call_effect_not_inferred", "span": {"end": 8218, "start": 8142}}
+{"kind": "call_effect_not_inferred", "span": {"end": 8391, "start": 8369}}
+{"kind": "call_effect_not_inferred", "span": {"end": 8456, "start": 8404}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "currentLogger", "span": {"end": 3958, "start": 3945}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "View", "span": {"end": 4004, "start": 4000}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "currentView", "span": {"end": 4037, "start": 4026}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Round", "span": {"end": 4045, "start": 4040}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChangeSet", "span": {"end": 4166, "start": 4152}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "higherRoundMessages", "span": {"end": 4186, "start": 4167}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChangeSet", "span": {"end": 4320, "start": 4306}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "getRCMessagesForGivenRound", "span": {"end": 4347, "start": 4321}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 4375, "start": 4371}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Round", "span": {"end": 4556, "start": 4551}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Cmp", "span": {"end": 4560, "start": 4557}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Prepare", "span": {"end": 4625, "start": 4618}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Int", "span": {"end": 4649, "start": 4646}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Block", "span": {"end": 4677, "start": 4672}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedRound", "span": {"end": 4714, "start": 4701}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedBlock", "span": {"end": 4750, "start": 4737}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Justification", "span": {"end": 4786, "start": 4773}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Justification", "span": {"end": 4826, "start": 4813}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedBlock", "span": {"end": 4931, "start": 4918}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Number", "span": {"end": 4938, "start": 4932}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Cmp", "span": {"end": 4944, "start": 4941}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "currentView", "span": {"end": 4958, "start": 4947}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Sequence", "span": {"end": 4969, "start": 4961}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Errorf", "span": {"end": 4999, "start": 4993}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedBlock", "span": {"end": 5099, "start": 5086}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Number", "span": {"end": 5106, "start": 5100}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Uint64", "span": {"end": 5115, "start": 5109}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "currentView", "span": {"end": 5137, "start": 5126}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Sequence", "span": {"end": 5148, "start": 5140}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Uint64", "span": {"end": 5155, "start": 5149}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Warn", "span": {"end": 5180, "start": 5176}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedBlock", "span": {"end": 5284, "start": 5271}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 5289, "start": 5285}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedDigest", "span": {"end": 5321, "start": 5307}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Errorf", "span": {"end": 5345, "start": 5339}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedBlock", "span": {"end": 5466, "start": 5453}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 5471, "start": 5467}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hex", "span": {"end": 5477, "start": 5474}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedDigest", "span": {"end": 5512, "start": 5498}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hex", "span": {"end": 5516, "start": 5513}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Warn", "span": {"end": 5541, "start": 5537}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Justification", "span": {"end": 5660, "start": 5647}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedRound", "span": {"end": 5694, "start": 5681}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PreparedBlock", "span": {"end": 5728, "start": 5715}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChangeSet", "span": {"end": 5758, "start": 5744}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Add", "span": {"end": 5762, "start": 5759}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Round", "span": {"end": 5773, "start": 5768}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "valSet", "span": {"end": 5821, "start": 5815}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "QuorumSize", "span": {"end": 5832, "start": 5822}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Warn", "span": {"end": 5868, "start": 5864}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChangeSet", "span": {"end": 6065, "start": 6051}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "higherRoundMessages", "span": {"end": 6085, "start": 6066}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChangeSet", "span": {"end": 6218, "start": 6204}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "getRCMessagesForGivenRound", "span": {"end": 6245, "start": 6219}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "New", "span": {"end": 6281, "start": 6278}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "valSet", "span": {"end": 6394, "start": 6388}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "F", "span": {"end": 6396, "start": 6395}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "valSet", "span": {"end": 6426, "start": 6420}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "F", "span": {"end": 6428, "start": 6427}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChangeSet", "span": {"end": 6612, "start": 6598}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "getMinRoundChange", "span": {"end": 6630, "start": 6613}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 6659, "start": 6655}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "valSet", "span": {"end": 6717, "start": 6711}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "F", "span": {"end": 6719, "start": 6718}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "startNewRound", "span": {"end": 6741, "start": 6728}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "broadcastRoundChange", "span": {"end": 6776, "start": 6756}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "valSet", "span": {"end": 6830, "start": 6824}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "QuorumSize", "span": {"end": 6841, "start": 6831}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "IsProposer", "span": {"end": 6859, "start": 6849}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "current", "span": {"end": 6874, "start": 6867}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "preprepareSent", "span": {"end": 6889, "start": 6875}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Cmp", "span": {"end": 6893, "start": 6890}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 6927, "start": 6923}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "highestPrepared", "span": {"end": 7256, "start": 7241}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "current", "span": {"end": 7309, "start": 7302}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "current", "span": {"end": 7329, "start": 7322}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "pendingRequest", "span": {"end": 7344, "start": 7330}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "current", "span": {"end": 7378, "start": 7371}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "pendingRequest", "span": {"end": 7393, "start": 7379}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Proposal", "span": {"end": 7402, "start": 7394}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Warn", "span": {"end": 7427, "start": 7423}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "New", "span": {"end": 7527, "start": 7524}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChangeSet", "span": {"end": 7673, "start": 7659}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChanges", "span": {"end": 7686, "start": 7674}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Uint64", "span": {"end": 7706, "start": 7700}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "SignedRoundChangePayload", "span": {"end": 7775, "start": 7751}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Values", "span": {"end": 7826, "start": 7820}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "wbfmessage", "span": {"end": 7857, "start": 7847}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "RoundChange", "span": {"end": 7869, "start": 7858}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "SignedRoundChangePayload", "span": {"end": 7949, "start": 7925}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "roundChangeSet", "span": {"end": 7993, "start": 7979}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "prepareMessages", "span": {"end": 8009, "start": 7994}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Uint64", "span": {"end": 8029, "start": 8023}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "isJustified", "span": {"end": 8056, "start": 8045}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "valSet", "span": {"end": 8110, "start": 8104}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "QuorumSize", "span": {"end": 8121, "start": 8111}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Error", "span": {"end": 8154, "start": 8149}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Request", "span": {"end": 8253, "start": 8246}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Proposal", "span": {"end": 8266, "start": 8258}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "RCMessages", "span": {"end": 8298, "start": 8288}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PrepareMessages", "span": {"end": 8344, "start": 8329}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "sendPreprepareMsg", "span": {"end": 8388, "start": 8371}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Debug", "span": {"end": 8416, "start": 8411}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

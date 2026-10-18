@@ -1,0 +1,290 @@
+[
+  {
+    "name": "chain",
+    "source": "func chain(x int) int { y:=x; y=y+1; return y }",
+    "positive": [
+      [
+        "x int",
+        0,
+        "x;",
+        0
+      ],
+      [
+        "y:=",
+        0,
+        "y+1",
+        0
+      ],
+      [
+        "y=y",
+        0,
+        "y }",
+        0
+      ]
+    ]
+  },
+  {
+    "name": "branch",
+    "source": "func branch(x int, ok bool) int { y:=x; if ok { y=1 }; return y }",
+    "positive": [
+      [
+        "x int",
+        0,
+        "x;",
+        0
+      ],
+      [
+        "ok bool",
+        0,
+        "ok {",
+        0
+      ],
+      [
+        "y:=",
+        0,
+        "y }",
+        0
+      ],
+      [
+        "y=1",
+        0,
+        "y }",
+        0
+      ]
+    ],
+    "control_targets": [
+      "y=1"
+    ]
+  },
+  {
+    "name": "loop",
+    "source": "func loop(n int) int { x:=0; for x<n { x++ }; return x }",
+    "positive": [
+      [
+        "n int",
+        0,
+        "n {",
+        0
+      ],
+      [
+        "x:=",
+        0,
+        "x<n",
+        0
+      ],
+      [
+        "x++",
+        0,
+        "x<n",
+        0
+      ],
+      [
+        "x:=",
+        0,
+        "x++",
+        0
+      ],
+      [
+        "x++",
+        0,
+        "x++",
+        0
+      ],
+      [
+        "x:=",
+        0,
+        "x }",
+        0
+      ],
+      [
+        "x++",
+        0,
+        "x }",
+        0
+      ]
+    ]
+  },
+  {
+    "name": "shadow",
+    "source": "func shadow(x int) int { y:=x; if y>0 { x:=y; _=x }; return x }",
+    "positive": [
+      [
+        "x int",
+        0,
+        "x;",
+        0
+      ],
+      [
+        "x int",
+        0,
+        "return x",
+        7
+      ],
+      [
+        "y:=",
+        0,
+        "y>0",
+        0
+      ],
+      [
+        "y:=",
+        0,
+        "y;",
+        0
+      ],
+      [
+        "x:=",
+        0,
+        "x };",
+        0
+      ]
+    ],
+    "shadow_negatives": 3
+  },
+  {
+    "name": "swap",
+    "source": "func swap(x,y int) int { x,y=y,x; return x+y }",
+    "positive": [
+      [
+        "x,y int",
+        0,
+        "x;",
+        0
+      ],
+      [
+        "x,y=y",
+        0,
+        "x+y",
+        0
+      ],
+      [
+        "y int",
+        0,
+        "y,x",
+        0
+      ],
+      [
+        "y=y,x",
+        0,
+        "y }",
+        0
+      ]
+    ]
+  },
+  {
+    "name": "named",
+    "source": "func named(x int) (r int) { r=x; return }",
+    "positive": [
+      [
+        "x int",
+        0,
+        "x;",
+        0
+      ],
+      [
+        "r=x",
+        0,
+        "return",
+        0
+      ]
+    ]
+  },
+  {
+    "name": "ranged",
+    "source": "func ranged(xs []int) int { s:=0; for _,v:=range xs { s+=v }; return s }",
+    "unknown_names": [
+      "v"
+    ]
+  },
+  {
+    "name": "escaped",
+    "source": "func escaped(x int) int { p:=&x; *p=2; return x }",
+    "positive": [
+      [
+        "p:=",
+        0,
+        "p=2",
+        0
+      ]
+    ],
+    "unknown_names": [
+      "x"
+    ]
+  },
+  {
+    "name": "unicode",
+    "source": "func unicode(값 int) int { 결과:=값; return 결과 }",
+    "positive": [
+      [
+        "값 int",
+        0,
+        "값;",
+        0
+      ],
+      [
+        "결과:=",
+        0,
+        "결과 }",
+        0
+      ]
+    ]
+  },
+  {
+    "name": "capture",
+    "source": "func capture(x int) int { f:=func(){ x++ }; f(); return x }",
+    "positive": [
+      [
+        "f:=",
+        0,
+        "f();",
+        0
+      ]
+    ],
+    "unknown_names": [
+      "x"
+    ]
+  },
+  {
+    "name": "callback",
+    "source": "func callback(f func(x int) int) int { return f(1) }",
+    "positive": [
+      [
+        "f func",
+        0,
+        "f(1)",
+        0
+      ]
+    ]
+  },
+  {
+    "name": "forever",
+    "source": "func forever(n int) { for { n++ } }"
+  },
+  {
+    "name": "overwrite",
+    "source": "func overwrite(x int) int { x,x=1,2; return x }",
+    "positive": [
+      [
+        "x=1",
+        0,
+        "x }",
+        0
+      ]
+    ]
+  },
+  {
+    "name": "constant",
+    "source": "func constant(x int) int { const c=2; return x+c }",
+    "positive": [
+      [
+        "x int",
+        0,
+        "x+c",
+        0
+      ]
+    ],
+    "unknown_names": [
+      "c"
+    ]
+  }
+]

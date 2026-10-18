@@ -1,0 +1,165 @@
+SRC-021 — AI DEV draft, NOT independently approved
+eth/downloader/api.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-021.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 2614, "start": 2611}, "flags": ["captured_by_closure"], "id": "v@2611", "name": "api", "origin": "receiver", "value_kind": "reference_binding"}
+{"declaration": {"end": 2657, "start": 2654}, "flags": [], "id": "v@2654", "name": "sub", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 2725, "start": 2708}, "flags": [], "id": "v@2708", "name": "syncSubscriptions", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 2779, "start": 2766}, "flags": [], "id": "v@2766", "name": "checkInterval", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 2815, "start": 2805}, "flags": [], "id": "v@2805", "name": "checkTimer", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 2882, "start": 2875}, "flags": [], "id": "v@2875", "name": "started", "origin": "local", "value_kind": "scalar"}
+{"declaration": {"end": 2894, "start": 2890}, "flags": [], "id": "v@2890", "name": "done", "origin": "local", "value_kind": "scalar"}
+{"declaration": {"end": 2917, "start": 2906}, "flags": [], "id": "v@2906", "name": "getProgress", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 3220, "start": 3219}, "flags": [], "id": "v@3219", "name": "i", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 3333, "start": 3332}, "flags": [], "id": "v@3332", "name": "u", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 3440, "start": 3435}, "flags": [], "id": "v@3435", "name": "event", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 3670, "start": 3666}, "flags": ["address_exposed"], "id": "v@3666", "name": "prog", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 3725, "start": 3713}, "flags": [], "id": "v@3713", "name": "notification", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 3800, "start": 3799}, "flags": ["range_assignment_unknown"], "id": "v@3799", "name": "c", "origin": "range", "value_kind": "reference_binding"}
+{"declaration": {"end": 3921, "start": 3920}, "flags": ["range_assignment_unknown"], "id": "v@3920", "name": "c", "origin": "range", "value_kind": "reference_binding"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@2674: d:o@2611=unknown(captured_by_closure)
+u:o@2839: d:o@2766=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3175: d:o@2805=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3226: d:o@2611=unknown(captured_by_closure)
+u:o@3258: d:o@2708=positive(kill_free_nonempty_CFG_path)
+u:o@3276: d:o@3219=unknown(unmapped_definition)
+u:o@3298: d:o@2890=positive(kill_free_nonempty_CFG_path); d:o@3974=positive(kill_free_nonempty_CFG_path)
+u:o@3309: d:o@3219=unknown(unmapped_definition)
+u:o@3339: d:o@2611=unknown(captured_by_closure)
+u:o@3380: d:o@2708=positive(kill_free_nonempty_CFG_path)
+u:o@3399: d:o@3332=unknown(unmapped_definition)
+u:o@3413: d:o@3332=unknown(unmapped_definition)
+u:o@3446: d:o@2654=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3464: d:o@3435=unknown(unmapped_definition)
+u:o@3505: d:o@3435=unknown(unmapped_definition)
+u:o@3578: d:o@2805=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3599: d:o@2875=positive(kill_free_nonempty_CFG_path); d:o@3549=positive(kill_free_nonempty_CFG_path)
+u:o@3613: d:o@2805=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3630: d:o@2766=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3674: d:o@2906=positive(kill_free_nonempty_CFG_path)
+u:o@3695: d:o@3666=unknown(address_exposed)
+u:o@3779: d:o@3666=unknown(address_exposed)
+u:o@3810: d:o@2708=positive(kill_free_nonempty_CFG_path)
+u:o@3835: d:o@3799=unknown(range_assignment_unknown)
+u:o@3840: d:o@3713=positive(kill_free_nonempty_CFG_path)
+u:o@3863: d:o@2805=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3880: d:o@2766=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3931: d:o@2708=positive(kill_free_nonempty_CFG_path)
+u:o@3955: d:o@3920=unknown(range_assignment_unknown)
+
+Same-name shadow identity negatives:
+d:o@3920 -> u:o@3835 negative:different_lexical_declaration
+d:o@3799 -> u:o@3955 negative:different_lexical_declaration
+
+CFG block matching table (raw indices are only hints):
+7197d5e319e3f30fb153aa4576b59071f8f5545160f98231224c5c8120210f05 {"anchor": {"end": 3994, "start": 2643}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0", "n0.1", "n0.2", "n0.3", "n0.4", "n0.5", "n0.6", "n0.7"], "successors": [1]}
+d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1 {"anchor": {"end": 3992, "start": 3195}, "id": 1, "kind": "ForBody", "live": true, "nodes": ["n1.0", "n1.1", "n1.2", "n1.3"], "successors": [4, 5]}
+74d245d15f3ed59dd831619f22684588bdc0fcfee877c1bdac030420ff22a2d2 {"anchor": {"end": 3992, "start": 3195}, "id": 2, "kind": "ForDone", "live": false, "nodes": [], "successors": []}
+77fbef0939641a1947ec8521e3bd69364674c4ef1a4c8d3d018ad76172e88c5b {"anchor": {"end": 3989, "start": 3203}, "id": 3, "kind": "SelectDone", "live": true, "nodes": [], "successors": [1]}
+d77863b188b328cf240b923da78164b67b8c9d53eb836844130415bdc12628fe {"anchor": {"end": 3324, "start": 3214}, "id": 4, "kind": "SelectCaseBody", "live": true, "nodes": ["n4.0", "n4.1", "n4.2"], "successors": [6, 7]}
+636deba7e18ef7b834a360a11637e2c5482947131fcbb2d72d70b11764bc6c88 {"anchor": {"end": 3324, "start": 3214}, "id": 5, "kind": "SelectAfterCase", "live": true, "nodes": [], "successors": [8, 9]}
+b0e685f1b0906645fdb430fbf7fb130d49ce5699d079fa92c8879b0da240ade5 {"anchor": {"end": 3324, "start": 3295}, "id": 6, "kind": "IfThen", "live": true, "nodes": ["n6.0"], "successors": [7]}
+88ef0148158c26326d15359918e03cb2a11e545d451d5d79ab1936c61c2a8fa6 {"anchor": {"end": 3324, "start": 3295}, "id": 7, "kind": "IfDone", "live": true, "nodes": [], "successors": [3]}
+87fad884b887e97b1435833f2cd40a3829176a90a48994d986df21f66208b764 {"anchor": {"end": 3427, "start": 3327}, "id": 8, "kind": "SelectCaseBody", "live": true, "nodes": ["n8.0", "n8.1", "n8.2"], "successors": [3]}
+153dd44017a4eaf107d99a54deb65bdb6fdb699d699e914847ac950495f39b2d {"anchor": {"end": 3427, "start": 3327}, "id": 9, "kind": "SelectAfterCase", "live": true, "nodes": [], "successors": [10, 11]}
+47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195 {"anchor": {"end": 3568, "start": 3430}, "id": 10, "kind": "SelectCaseBody", "live": true, "nodes": ["n10.0", "n10.1"], "successors": [12, 13]}
+2aca1c2ef6794685db9842cbc470cd66a6e268d5477619e03c95a6a206d140db {"anchor": {"end": 3568, "start": 3430}, "id": 11, "kind": "SelectAfterCase", "live": true, "nodes": [], "successors": [18, 19]}
+5ee00d6edb997035056e310c188bb3027d6dc62abdfafbdcff1e1e14ce23fc25 {"anchor": {"end": 3494, "start": 3461}, "id": 12, "kind": "IfThen", "live": true, "nodes": ["n12.0"], "successors": []}
+9ac8596d743ca20d15759ce9ada6f59ee6c7246e991957140f59d1754954333a {"anchor": {"end": 3494, "start": 3461}, "id": 13, "kind": "IfDone", "live": true, "nodes": ["n13.0"], "successors": [16, 17]}
+35c6fa0fa364401246e48fb0f8df726d129d8e11aafaca0281639028991100ef {"anchor": {"end": 3489, "start": 3483}, "id": 14, "kind": "Unreachable", "live": false, "nodes": [], "successors": [13]}
+c4ab8e27ede891eb7451aaf7ab6f6dd19e4a129dec5e8cf6802981583cb8cebd {"anchor": {"end": 3568, "start": 3498}, "id": 15, "kind": "SwitchDone", "live": true, "nodes": [], "successors": [3]}
+7434b6321eebe6ddb59b73d261516ad21a604d437dc1b344896a039e948f1f9b {"anchor": {"end": 3563, "start": 3528}, "id": 16, "kind": "SwitchCaseBody", "live": true, "nodes": ["n16.0"], "successors": [15]}
+85a2a91546f195a89edd305f49a74f62498c3fd1df3701280d25696e55be84d6 {"anchor": {"end": 3563, "start": 3528}, "id": 17, "kind": "SwitchNextCase", "live": true, "nodes": [], "successors": [15]}
+9db515b02543b3e91d380eb7b23ac1722ae87170805145c7a7dac52897e66906 {"anchor": {"end": 3985, "start": 3571}, "id": 18, "kind": "SelectCaseBody", "live": true, "nodes": ["n18.0"], "successors": [20, 21]}
+48e90a24abeb75301b9ff1ebed3b101ee1c57493c63d2f967b53073ec2ddfed7 {"anchor": {"end": 3985, "start": 3571}, "id": 19, "kind": "SelectAfterCase", "live": true, "nodes": [], "successors": []}
+c1dd8a43df8e6c9b806fac6e95b2d892e00859f0ee5a9f4226da139bfc1ccb86 {"anchor": {"end": 3662, "start": 3595}, "id": 20, "kind": "IfThen", "live": true, "nodes": ["n20.0"], "successors": [1]}
+5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd {"anchor": {"end": 3662, "start": 3595}, "id": 21, "kind": "IfDone", "live": true, "nodes": ["n21.0", "n21.1"], "successors": [23, 24]}
+2d1fa389d4f13cbfaed12f0bd7bd4449cf15d5040a71a309d7bea824acfb9eec {"anchor": {"end": 3657, "start": 3649}, "id": 22, "kind": "Unreachable", "live": false, "nodes": [], "successors": [21]}
+c5e70277772c2dd49d5a1c91fe5c8489dfed03713e7dac61601bf86d4a37dfd5 {"anchor": {"end": 3912, "start": 3691}, "id": 23, "kind": "IfThen", "live": true, "nodes": ["n23.0", "n23.1", "n23.2"], "successors": [25]}
+82e31765386960c25f962aacbc6e036f9e97b81283233a4f916407a7d266ba77 {"anchor": {"end": 3912, "start": 3691}, "id": 24, "kind": "IfDone", "live": true, "nodes": ["n24.0", "n24.1"], "successors": [29]}
+637fd8afb51033c1bb82109b1c66eb220e92ddfe074e1c7aa51e820cfb0d23f5 {"anchor": {"end": 3858, "start": 3795}, "id": 25, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [26, 27]}
+76126effe68a406a77956169cc81a8212fd6458aea1f3c8110f500bde2d20e8e {"anchor": {"end": 3858, "start": 3795}, "id": 26, "kind": "RangeBody", "live": true, "nodes": ["n26.0"], "successors": [25]}
+e4676f65495197c2fee11498dcc35cd52330f626985fc127d00ae22253ea724e {"anchor": {"end": 3858, "start": 3795}, "id": 27, "kind": "RangeDone", "live": true, "nodes": ["n27.0"], "successors": [1]}
+1814e73b48da0020226b7883739e5cfc6021105a5754cfb8ac1810b919c722da {"anchor": {"end": 3907, "start": 3899}, "id": 28, "kind": "Unreachable", "live": false, "nodes": [], "successors": [24]}
+565229ae49c1e02d84b49b08d66b46a1caa2b1d54345176303b1334d12c80239 {"anchor": {"end": 3970, "start": 3916}, "id": 29, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [30, 31]}
+77cf762c35be7afeac6150952aa213d593f79f398d59540fa152e91d7e87a149 {"anchor": {"end": 3970, "start": 3916}, "id": 30, "kind": "RangeBody", "live": true, "nodes": ["n30.0"], "successors": [29]}
+263eda9c28484313607d3de7105253c4fc031988d3df38f1b3ea856fcde4ec70 {"anchor": {"end": 3970, "start": 3916}, "id": 31, "kind": "RangeDone", "live": true, "nodes": ["n31.0"], "successors": [3]}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1", "target": "d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1", "target": "77fbef0939641a1947ec8521e3bd69364674c4ef1a4c8d3d018ad76172e88c5b"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1", "target": "d77863b188b328cf240b923da78164b67b8c9d53eb836844130415bdc12628fe"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1", "target": "88ef0148158c26326d15359918e03cb2a11e545d451d5d79ab1936c61c2a8fa6"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d77863b188b328cf240b923da78164b67b8c9d53eb836844130415bdc12628fe", "target": "b0e685f1b0906645fdb430fbf7fb130d49ce5699d079fa92c8879b0da240ade5"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "636deba7e18ef7b834a360a11637e2c5482947131fcbb2d72d70b11764bc6c88", "target": "d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "636deba7e18ef7b834a360a11637e2c5482947131fcbb2d72d70b11764bc6c88", "target": "77fbef0939641a1947ec8521e3bd69364674c4ef1a4c8d3d018ad76172e88c5b"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "636deba7e18ef7b834a360a11637e2c5482947131fcbb2d72d70b11764bc6c88", "target": "636deba7e18ef7b834a360a11637e2c5482947131fcbb2d72d70b11764bc6c88"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "636deba7e18ef7b834a360a11637e2c5482947131fcbb2d72d70b11764bc6c88", "target": "87fad884b887e97b1435833f2cd40a3829176a90a48994d986df21f66208b764"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "153dd44017a4eaf107d99a54deb65bdb6fdb699d699e914847ac950495f39b2d", "target": "47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "153dd44017a4eaf107d99a54deb65bdb6fdb699d699e914847ac950495f39b2d", "target": "2aca1c2ef6794685db9842cbc470cd66a6e268d5477619e03c95a6a206d140db"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195", "target": "5ee00d6edb997035056e310c188bb3027d6dc62abdfafbdcff1e1e14ce23fc25"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195", "target": "d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195", "target": "77fbef0939641a1947ec8521e3bd69364674c4ef1a4c8d3d018ad76172e88c5b"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195", "target": "636deba7e18ef7b834a360a11637e2c5482947131fcbb2d72d70b11764bc6c88"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195", "target": "153dd44017a4eaf107d99a54deb65bdb6fdb699d699e914847ac950495f39b2d"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195", "target": "9ac8596d743ca20d15759ce9ada6f59ee6c7246e991957140f59d1754954333a"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "47b777cd6e6b08fc3d0e2957ae823337c11fcd4349db73a9c859f8a8ac117195", "target": "c4ab8e27ede891eb7451aaf7ab6f6dd19e4a129dec5e8cf6802981583cb8cebd"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2aca1c2ef6794685db9842cbc470cd66a6e268d5477619e03c95a6a206d140db", "target": "d00c9cca384fe3285c63da959533060844f615421110206965ceb186757300e1"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2aca1c2ef6794685db9842cbc470cd66a6e268d5477619e03c95a6a206d140db", "target": "636deba7e18ef7b834a360a11637e2c5482947131fcbb2d72d70b11764bc6c88"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2aca1c2ef6794685db9842cbc470cd66a6e268d5477619e03c95a6a206d140db", "target": "153dd44017a4eaf107d99a54deb65bdb6fdb699d699e914847ac950495f39b2d"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2aca1c2ef6794685db9842cbc470cd66a6e268d5477619e03c95a6a206d140db", "target": "9db515b02543b3e91d380eb7b23ac1722ae87170805145c7a7dac52897e66906"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2aca1c2ef6794685db9842cbc470cd66a6e268d5477619e03c95a6a206d140db", "target": "48e90a24abeb75301b9ff1ebed3b101ee1c57493c63d2f967b53073ec2ddfed7"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "9ac8596d743ca20d15759ce9ada6f59ee6c7246e991957140f59d1754954333a", "target": "7434b6321eebe6ddb59b73d261516ad21a604d437dc1b344896a039e948f1f9b"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "9ac8596d743ca20d15759ce9ada6f59ee6c7246e991957140f59d1754954333a", "target": "85a2a91546f195a89edd305f49a74f62498c3fd1df3701280d25696e55be84d6"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "9db515b02543b3e91d380eb7b23ac1722ae87170805145c7a7dac52897e66906", "target": "c1dd8a43df8e6c9b806fac6e95b2d892e00859f0ee5a9f4226da139bfc1ccb86"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "9db515b02543b3e91d380eb7b23ac1722ae87170805145c7a7dac52897e66906", "target": "5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd", "target": "c5e70277772c2dd49d5a1c91fe5c8489dfed03713e7dac61601bf86d4a37dfd5"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd", "target": "637fd8afb51033c1bb82109b1c66eb220e92ddfe074e1c7aa51e820cfb0d23f5"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd", "target": "e4676f65495197c2fee11498dcc35cd52330f626985fc127d00ae22253ea724e"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd", "target": "77fbef0939641a1947ec8521e3bd69364674c4ef1a4c8d3d018ad76172e88c5b"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd", "target": "82e31765386960c25f962aacbc6e036f9e97b81283233a4f916407a7d266ba77"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd", "target": "565229ae49c1e02d84b49b08d66b46a1caa2b1d54345176303b1334d12c80239"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "5b7d04785de73130f0319715357e167dbc264ec7593fb43132eef88f29a688dd", "target": "263eda9c28484313607d3de7105253c4fc031988d3df38f1b3ea856fcde4ec70"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "637fd8afb51033c1bb82109b1c66eb220e92ddfe074e1c7aa51e820cfb0d23f5", "target": "637fd8afb51033c1bb82109b1c66eb220e92ddfe074e1c7aa51e820cfb0d23f5"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "637fd8afb51033c1bb82109b1c66eb220e92ddfe074e1c7aa51e820cfb0d23f5", "target": "76126effe68a406a77956169cc81a8212fd6458aea1f3c8110f500bde2d20e8e"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "565229ae49c1e02d84b49b08d66b46a1caa2b1d54345176303b1334d12c80239", "target": "565229ae49c1e02d84b49b08d66b46a1caa2b1d54345176303b1334d12c80239"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "565229ae49c1e02d84b49b08d66b46a1caa2b1d54345176303b1334d12c80239", "target": "77cf762c35be7afeac6150952aa213d593f79f398d59540fa152e91d7e87a149"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 2705, "start": 2674}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2763, "start": 2728}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2853, "start": 2825}}
+{"kind": "closure_not_executed", "span": {"end": 3164, "start": 2920}}
+{"kind": "defer_effect_not_executed", "span": {"end": 3192, "start": 3169}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3192, "start": 3175}}
+{"kind": "select_runtime_readiness_unknown", "span": {"end": 3989, "start": 3203}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3403, "start": 3373}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3427, "start": 3407}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3456, "start": 3446}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3644, "start": 3613}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3687, "start": 3674}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3706, "start": 3695}}
+{"kind": "range_binding_unknown", "span": {"end": 3858, "start": 3795}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3894, "start": 3863}}
+{"kind": "range_binding_unknown", "span": {"end": 3970, "start": 3916}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Subscribe", "span": {"end": 2691, "start": 2682}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "StartEvent", "span": {"end": 2702, "start": 2692}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Second", "span": {"end": 2797, "start": 2791}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "NewTimer", "span": {"end": 2838, "start": 2830}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Stop", "span": {"end": 3190, "start": 3186}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Chan", "span": {"end": 3454, "start": 3450}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Data", "span": {"end": 3515, "start": 3511}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "StartEvent", "span": {"end": 3543, "start": 3533}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "C", "span": {"end": 3590, "start": 3589}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Reset", "span": {"end": 3629, "start": 3624}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Done", "span": {"end": 3704, "start": 3700}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Reset", "span": {"end": 3879, "start": 3874}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

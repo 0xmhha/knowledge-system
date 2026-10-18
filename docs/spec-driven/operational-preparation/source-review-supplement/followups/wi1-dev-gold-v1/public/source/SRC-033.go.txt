@@ -1,0 +1,31 @@
+func (t *UDPv5) waitForNodes(c *callV5, distances []uint) ([]*enode.Node, error) {
+	defer t.callDone(c)
+
+	var (
+		nodes           []*enode.Node
+		seen            = make(map[enode.ID]struct{})
+		received, total = 0, -1
+	)
+	for {
+		select {
+		case responseP := <-c.ch:
+			response := responseP.(*v5wire.Nodes)
+			for _, record := range response.Nodes {
+				node, err := t.verifyResponseNode(c, record, distances, seen)
+				if err != nil {
+					t.log.Debug("Invalid record in "+response.Name(), "id", c.node.ID(), "err", err)
+					continue
+				}
+				nodes = append(nodes, node)
+			}
+			if total == -1 {
+				total = min(int(response.RespCount), totalNodesResponseLimit)
+			}
+			if received++; received == total {
+				return nodes, nil
+			}
+		case err := <-c.err:
+			return nodes, err
+		}
+	}
+}

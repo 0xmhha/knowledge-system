@@ -1,0 +1,68 @@
+func (pool *LegacyPool) scheduleReorgLoop() {
+	defer pool.wg.Done()
+
+	var (
+		curDone       chan struct{} // non-nil while runReorg is active
+		nextDone      = make(chan struct{})
+		launchNextRun bool
+		reset         *txpoolResetRequest
+		dirtyAccounts *accountSet
+		queuedEvents  = make(map[common.Address]*sortedMap)
+	)
+	for {
+		// Launch next background reorg if needed
+		if curDone == nil && launchNextRun {
+			// Run the background reorg and announcements
+			go pool.runReorg(nextDone, reset, dirtyAccounts, queuedEvents)
+
+			// Prepare everything for the next round of reorg
+			curDone, nextDone = nextDone, make(chan struct{})
+			launchNextRun = false
+
+			reset, dirtyAccounts = nil, nil
+			queuedEvents = make(map[common.Address]*sortedMap)
+		}
+
+		select {
+		case req := <-pool.reqResetCh:
+			// Reset request: update head if request is already pending.
+			if reset == nil {
+				reset = req
+			} else {
+				reset.newHead = req.newHead
+			}
+			launchNextRun = true
+			pool.reorgDoneCh <- nextDone
+
+		case req := <-pool.reqPromoteCh:
+			// Promote request: update address set if request is already pending.
+			if dirtyAccounts == nil {
+				dirtyAccounts = req
+			} else {
+				dirtyAccounts.merge(req)
+			}
+			launchNextRun = true
+			pool.reorgDoneCh <- nextDone
+
+		case tx := <-pool.queueTxEventCh:
+			// Queue up the event, but don't schedule a reorg. It's up to the caller to
+			// request one later if they want the events sent.
+			addr, _ := types.Sender(pool.signer, tx)
+			if _, ok := queuedEvents[addr]; !ok {
+				queuedEvents[addr] = newSortedMap()
+			}
+			queuedEvents[addr].Put(tx)
+
+		case <-curDone:
+			curDone = nil
+
+		case <-pool.reorgShutdownCh:
+			// Wait for current run to finish.
+			if curDone != nil {
+				<-curDone
+			}
+			close(nextDone)
+			return
+		}
+	}
+}

@@ -1,0 +1,159 @@
+{
+  "status": "WI1_DEV30_bounded_AI_drafts_verified_not_independently_approved",
+  "current_scoped_tests": [
+    {
+      "test": "test_wi1_dev_gold.py",
+      "tests": 26,
+      "exit_code": 0,
+      "source_scope": "current"
+    },
+    {
+      "test": "test_operational_acceptance.py",
+      "tests": 41,
+      "exit_code": 0,
+      "source_scope": "current"
+    },
+    {
+      "test": "test_documentation_contract.py",
+      "tests": 20,
+      "exit_code": 0,
+      "source_scope": "current"
+    },
+    {
+      "test": "test_package_notice_recipe.py",
+      "tests": 3,
+      "exit_code": 0,
+      "source_scope": "current"
+    },
+    {
+      "test": "test_stablenet_comparison.py",
+      "tests": 22,
+      "exit_code": 0,
+      "source_scope": "current"
+    }
+  ],
+  "current_tests_total": 112,
+  "historical_tests": {
+    "count": 49,
+    "source_revision": "0f28a9a756f05cc29416ef953e4926ad24cc4ee8",
+    "exit_code": 0,
+    "presented_as_current_source": false
+  },
+  "hand_authored_source_controls": 14,
+  "gates": [
+    {
+      "gate": "WI1",
+      "argv": [
+        "python3",
+        "scripts/check-wi1-dev-gold.py"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "extra_ok": true
+    },
+    {
+      "gate": "expected-formal-refusal",
+      "argv": [
+        "python3",
+        "scripts/check-wi1-dev-gold.py",
+        "--require-formal-gold"
+      ],
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "extra_ok": true
+    },
+    {
+      "gate": "acceptance",
+      "argv": [
+        "python3",
+        "scripts/check-operational-acceptance.py"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "extra_ok": true
+    },
+    {
+      "gate": "expected-frozen-refusal",
+      "argv": [
+        "python3",
+        "scripts/check-operational-acceptance.py",
+        "--require-frozen"
+      ],
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "extra_ok": true
+    },
+    {
+      "gate": "docs",
+      "argv": [
+        "python3",
+        "scripts/check-docs.py"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "extra_ok": true
+    },
+    {
+      "gate": "helper-fmt",
+      "argv": [
+        "gofmt",
+        "-l",
+        "scripts/wi1_dev_source.go.txt"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "extra_ok": true
+    },
+    {
+      "gate": "helper-vet",
+      "argv": [
+        "go",
+        "vet",
+        "/private/tmp/ks-wi1-dev-20261018/main.go"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "extra_ok": true
+    },
+    {
+      "gate": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "extra_ok": true
+    }
+  ],
+  "completion_guard_exit_code": 0,
+  "completion_raw_log_public": false,
+  "live_documents": 134,
+  "original_Git_source_files_verified": 25,
+  "deterministic_generated_payload_files": 101,
+  "auxiliary_observer": {
+    "build": 0,
+    "vet": 0,
+    "fmt": 0,
+    "Go": "go1.26.8",
+    "x_tools_CFG": "v0.48.0",
+    "shared_with_candidate": "CFG constructor only; no candidate valueflow invoked"
+  },
+  "maintained_native_Go_changed": false,
+  "fresh_native_Go_full_tests": false,
+  "native_reference": "validation/unchanged-native-source.json",
+  "initial_diagnostics_preserved": true,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "D04": "미정",
+  "freeze": null,
+  "execution_allowed": false,
+  "FINAL_cases": 0,
+  "quality_scores": null,
+  "candidate_backend_calls": 0,
+  "additional_model_calls": 0,
+  "paid_model_calls": 0,
+  "publication": false
+}

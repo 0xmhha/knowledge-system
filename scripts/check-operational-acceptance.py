@@ -151,14 +151,10 @@ def check(root, protocol, ledger, require_frozen=False):
                 import independent_acceptance
                 errors.extend(independent_acceptance.packet_errors(root, (root / refreshed["manifest"]).parent))
                 errors.extend(independent_acceptance.current_index_errors(root))
-                historical = protocol.get("historical_readiness_preparation")
-                if (historical != ledger.get("historical_readiness_preparation")
-                        or not isinstance(historical, dict)
-                        or historical.get("source_revision") != "9de07a8264bc4aea7054dcea8abb6559801d1cef"
-                        or historical.get("manifest") != "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json"
-                        or historical.get("status") != "historical_not_current_source_validation"
-                        or not file_hash(historical.get("manifest"), historical.get("manifest_sha256"))):
-                    raise ValueError("historical readiness evidence lost or promoted")
+            elif refreshed.get("kind") == "WI1_DEV_AI_gold_not_formal_execution":
+                import wi1_dev_gold
+                errors.extend(wi1_dev_gold.validate_packet(root, (root / refreshed["manifest"]).parent))
+                errors.extend(wi1_dev_gold.current_indices(root, protocol, ledger))
             elif refreshed.get("kind") == "preparation_only_not_formal_execution":
                 import importlib.util
                 spec = importlib.util.spec_from_file_location("current_readiness", Path(__file__).with_name("check-acceptance-readiness.py"))
@@ -167,6 +163,15 @@ def check(root, protocol, ledger, require_frozen=False):
                 errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
             else:
                 raise ValueError("current readiness scope or hash differs")
+            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution"):
+                historical = protocol.get("historical_readiness_preparation")
+                if (historical != ledger.get("historical_readiness_preparation")
+                        or not isinstance(historical, dict)
+                        or historical.get("source_revision") != "9de07a8264bc4aea7054dcea8abb6559801d1cef"
+                        or historical.get("manifest") != "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json"
+                        or historical.get("status") != "historical_not_current_source_validation"
+                        or not file_hash(historical.get("manifest"), historical.get("manifest_sha256"))):
+                    raise ValueError("historical readiness evidence lost or promoted")
         except (OSError, ValueError, KeyError, TypeError) as exc:
             errors.append("current readiness preparation invalid: " + str(exc))
     for field in ("input_candidate_pool", "host_preflight"):

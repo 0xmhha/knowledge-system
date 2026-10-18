@@ -1,0 +1,27 @@
+func (t *UDPv4) Resolve(n *enode.Node) *enode.Node {
+	// Try asking directly. This works if the node is still responding on the endpoint we have.
+	if rn, err := t.RequestENR(n); err == nil {
+		return rn
+	}
+	// Check table for the ID, we might have a newer version there.
+	if intable := t.tab.getNode(n.ID()); intable != nil && intable.Seq() > n.Seq() {
+		n = intable
+		if rn, err := t.RequestENR(n); err == nil {
+			return rn
+		}
+	}
+	// Otherwise perform a network lookup.
+	var key enode.Secp256k1
+	if n.Load(&key) != nil {
+		return n // no secp256k1 key
+	}
+	result := t.LookupPubkey((*ecdsa.PublicKey)(&key))
+	for _, rn := range result {
+		if rn.ID() == n.ID() {
+			if rn, err := t.RequestENR(rn); err == nil {
+				return rn
+			}
+		}
+	}
+	return n
+}

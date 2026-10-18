@@ -1,0 +1,97 @@
+func (p *Pruner) Prune(root common.Hash) error {
+	// If the state bloom filter is already committed previously,
+	// reuse it for pruning instead of generating a new one. It's
+	// mandatory because a part of state may already be deleted,
+	// the recovery procedure is necessary.
+	_, stateBloomRoot, err := findBloomFilter(p.config.Datadir)
+	if err != nil {
+		return err
+	}
+	if stateBloomRoot != (common.Hash{}) {
+		return RecoverPruning(p.config.Datadir, p.db)
+	}
+	// If the target state root is not specified, use the HEAD-127 as the
+	// target. The reason for picking it is:
+	// - in most of the normal cases, the related state is available
+	// - the probability of this layer being reorg is very low
+	var layers []snapshot.Snapshot
+	if root == (common.Hash{}) {
+		// Retrieve all snapshot layers from the current HEAD.
+		// In theory there are 128 difflayers + 1 disk layer present,
+		// so 128 diff layers are expected to be returned.
+		layers = p.snaptree.Snapshots(p.chainHeader.Root, 128, true)
+		if len(layers) != 128 {
+			// Reject if the accumulated diff layers are less than 128. It
+			// means in most of normal cases, there is no associated state
+			// with bottom-most diff layer.
+			return fmt.Errorf("snapshot not old enough yet: need %d more blocks", 128-len(layers))
+		}
+		// Use the bottom-most diff layer as the target
+		root = layers[len(layers)-1].Root()
+	}
+	// Ensure the root is really present. The weak assumption
+	// is the presence of root can indicate the presence of the
+	// entire trie.
+	if !rawdb.HasLegacyTrieNode(p.db, root) {
+		// The special case is for clique based networks(goerli
+		// and some other private networks), it's possible that two
+		// consecutive blocks will have same root. In this case snapshot
+		// difflayer won't be created. So HEAD-127 may not paired with
+		// head-127 layer. Instead the paired layer is higher than the
+		// bottom-most diff layer. Try to find the bottom-most snapshot
+		// layer with state available.
+		//
+		// Note HEAD and HEAD-1 is ignored. Usually there is the associated
+		// state available, but we don't want to use the topmost state
+		// as the pruning target.
+		var found bool
+		for i := len(layers) - 2; i >= 2; i-- {
+			if rawdb.HasLegacyTrieNode(p.db, layers[i].Root()) {
+				root = layers[i].Root()
+				found = true
+				log.Info("Selecting middle-layer as the pruning target", "root", root, "depth", i)
+				break
+			}
+		}
+		if !found {
+			if len(layers) > 0 {
+				return errors.New("no snapshot paired state")
+			}
+			return fmt.Errorf("associated state[%x] is not present", root)
+		}
+	} else {
+		if len(layers) > 0 {
+			log.Info("Selecting bottom-most difflayer as the pruning target", "root", root, "height", p.chainHeader.Number.Uint64()-127)
+		} else {
+			log.Info("Selecting user-specified state as the pruning target", "root", root)
+		}
+	}
+	// All the state roots of the middle layer should be forcibly pruned,
+	// otherwise the dangling state will be left.
+	middleRoots := make(map[common.Hash]struct{})
+	for _, layer := range layers {
+		if layer.Root() == root {
+			break
+		}
+		middleRoots[layer.Root()] = struct{}{}
+	}
+	// Traverse the target state, re-construct the whole state trie and
+	// commit to the given bloom filter.
+	start := time.Now()
+	if err := snapshot.GenerateTrie(p.snaptree, root, p.db, p.stateBloom); err != nil {
+		return err
+	}
+	// Traverse the genesis, put all genesis state entries into the
+	// bloom filter too.
+	if err := extractGenesis(p.db, p.stateBloom); err != nil {
+		return err
+	}
+	filterName := bloomFilterName(p.config.Datadir, root)
+
+	log.Info("Writing state bloom to disk", "name", filterName)
+	if err := p.stateBloom.Commit(filterName, filterName+stateBloomFileTempSuffix); err != nil {
+		return err
+	}
+	log.Info("State bloom filter committed", "name", filterName)
+	return prune(p.snaptree, root, p.db, p.stateBloom, filterName, middleRoots, start)
+}

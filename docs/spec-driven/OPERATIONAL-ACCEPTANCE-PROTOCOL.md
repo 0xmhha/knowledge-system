@@ -1,5 +1,22 @@
 # 운영 검증 실행 protocol과 동결 준비
 
+## 2026-10-18 WI-1 DEV 입력과 범위 내 완전한 AI 정답 초안
+
+[단계44 자료](./operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/REPORT.txt)는 기존30함수의 노출된 DEV 입력과 AI 제안 정답이다. formal split·새 FINAL·독립 승인·품질 점수는 생성하지 않았다. public 입력과 private 정답을 다른 디렉터리에 두며, 이 전체 packet을 host의 읽기 root로 사용하지 않는다. 실제 수용 사례에는 private 정답 접근 통제가 별도로 필요하다.
+
+| 작성 항목 | 범위·남은 조건 |
+|---|---|
+| DEV30개 | 원래 프로젝트/commit/file/function SHA·절대 UTF8 span·원문 bytes에 결속; 독립 holdout으로 세지 않음 |
+| 정의–사용 초안 | 1654쌍 전수 분류, unknown1004 유지; source/sink·read/write phase·entry·shadow를 구분 |
+| 제어 초안 | branch–block12968쌍과 별도 node projection; normal-exit 구조, 비종료 영역은 unknown으로 별도 기록 |
+| signature 경계 | callback 함수형 선언4개를 바깥 함수의 지역 binding/정답에서 격리 |
+| 매칭 | 선언·좌표·node kind/역할·합성 entry/return·중복 ordinal 제안; 실제 retained ID/snapshot/소비자 변환·최종 동결 미완료 |
+| 독립성 | 원문/AI 참조 초안; CFG 라이브러리 공유와 부분 파일 타입 문맥의 공통 오류·문맥 차이를 명시; 독립 사람 검토 전 |
+
+`scripts/check-wi1-dev-gold.py`는 원문·좌표·전수 pair universe·label·대조 계산·독립 승인 미승격을 검사한다. `--require-formal-gold`는 이 초안을 정식 정답으로 사용하는 요청을 거부한다. 현재 준비 참조의 종류는 `WI1_DEV_AI_gold_not_formal_execution`이며, 단계43 자료의 도구 결속 검사는0f28a9a7 버전으로 보존한다. 과거 packet/manifest를 현재 도구에 맞춰 다시 쓰지 않는다.
+
+정의–사용은 명시한 지역 binding의 may-reach 관계이며 memory alias/호출 효과·경로 가능성이나 취약점 안전성의 정답이 아니다. 파일 단위 부분 타입 정보는 실제 고립 함수 분석의 타입 결과와 같다고 간주하지 않는다. 상수·range·주소 노출·capture·미해결 타입·매칭이 불명확한 관계를 unknown으로 남긴다. F03/F07의 완전한 **독립 의미 정답** 조건은 이 초안만으로 충족되지 않는다. D04미정·정식0/9·freeze null을 유지한다.
+
 ## 2026-10-18 독립 입력·완전 정답·온톨로지 동결 준비
 
 D04는 사용자 결정대로 **미정**이다. [단계43 보고서](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt)의 FP01~04는 준비 작업의 완료이며 정식 실행·gold 승인·F01~08 동결의 완료가 아니다. [현재 준비표](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/freeze-readiness.json)는8개 항목의 준비 자료와 남은 결정을 분리한다. 이전 시점의 source/host/도구 수는 아래 당시 기록으로 보존하며, 최신 실행 근거는 현재 JSON의 source-bound packet 참조를 따른다.

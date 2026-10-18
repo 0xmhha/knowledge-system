@@ -1,0 +1,144 @@
+SRC-031 — AI DEV draft, NOT independently approved
+p2p/discover/v4_udp.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-031.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 5402, "start": 5401}, "flags": [], "id": "v@5401", "name": "t", "origin": "receiver", "value_kind": "reference_binding"}
+{"declaration": {"end": 5420, "start": 5419}, "flags": [], "id": "v@5419", "name": "n", "origin": "parameter", "value_kind": "unknown"}
+{"declaration": {"end": 5547, "start": 5545}, "flags": [], "id": "v@5545", "name": "rn", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 5552, "start": 5549}, "flags": [], "id": "v@5549", "name": "err", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 5677, "start": 5670}, "flags": [], "id": "v@5670", "name": "intable", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 5769, "start": 5767}, "flags": [], "id": "v@5767", "name": "rn", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 5774, "start": 5771}, "flags": [], "id": "v@5771", "name": "err", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 5876, "start": 5873}, "flags": ["address_exposed"], "id": "v@5873", "name": "key", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 5960, "start": 5954}, "flags": [], "id": "v@5954", "name": "result", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 6015, "start": 6013}, "flags": ["range_assignment_unknown"], "id": "v@6013", "name": "rn", "origin": "range", "value_kind": "unknown"}
+{"declaration": {"end": 6067, "start": 6065}, "flags": [], "id": "v@6065", "name": "rn", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 6072, "start": 6069}, "flags": [], "id": "v@6069", "name": "err", "origin": "local", "value_kind": "reference_binding"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@5556: d:o@5401=positive(kill_free_nonempty_CFG_path)
+u:o@5569: d:o@5419=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5573: d:o@5549=positive(kill_free_nonempty_CFG_path)
+u:o@5595: d:o@5545=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5681: d:o@5401=positive(kill_free_nonempty_CFG_path)
+u:o@5695: d:o@5419=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5704: d:o@5670=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5722: d:o@5670=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5738: d:o@5419=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5754: d:o@5670=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5778: d:o@5401=positive(kill_free_nonempty_CFG_path)
+u:o@5791: d:o@5419=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5795: d:o@5771=positive(kill_free_nonempty_CFG_path)
+u:o@5818: d:o@5767=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5897: d:o@5419=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5905: d:o@5873=unknown(address_exposed)
+u:o@5928: d:o@5419=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@5964: d:o@5401=positive(kill_free_nonempty_CFG_path)
+u:o@5999: d:o@5873=unknown(address_exposed)
+u:o@6025: d:o@5954=positive(kill_free_nonempty_CFG_path)
+u:o@6039: d:o@6013=unknown(range_assignment_unknown)
+u:o@6050: d:o@5419=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6076: d:o@5401=positive(kill_free_nonempty_CFG_path)
+u:o@6089: d:o@6013=unknown(range_assignment_unknown)
+u:o@6094: d:o@6069=positive(kill_free_nonempty_CFG_path)
+u:o@6118: d:o@6065=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@6141: d:o@5419=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@5750=unknown(unresolved_value_domain_or_compile_time_mapping)
+
+Same-name shadow identity negatives:
+d:o@5771 -> u:o@5573 negative:different_lexical_declaration
+d:o@6069 -> u:o@5573 negative:different_lexical_declaration
+d:o@5767 -> u:o@5595 negative:different_lexical_declaration
+d:o@6013 -> u:o@5595 negative:different_lexical_declaration
+d:o@6065 -> u:o@5595 negative:different_lexical_declaration
+d:o@5549 -> u:o@5795 negative:different_lexical_declaration
+d:o@6069 -> u:o@5795 negative:different_lexical_declaration
+d:o@5545 -> u:o@5818 negative:different_lexical_declaration
+d:o@6013 -> u:o@5818 negative:different_lexical_declaration
+d:o@6065 -> u:o@5818 negative:different_lexical_declaration
+d:o@5545 -> u:o@6039 negative:different_lexical_declaration
+d:o@5767 -> u:o@6039 negative:different_lexical_declaration
+d:o@6065 -> u:o@6039 negative:different_lexical_declaration
+d:o@5545 -> u:o@6089 negative:different_lexical_declaration
+d:o@5767 -> u:o@6089 negative:different_lexical_declaration
+d:o@6065 -> u:o@6089 negative:different_lexical_declaration
+d:o@5549 -> u:o@6094 negative:different_lexical_declaration
+d:o@5771 -> u:o@6094 negative:different_lexical_declaration
+d:o@5545 -> u:o@6118 negative:different_lexical_declaration
+d:o@5767 -> u:o@6118 negative:different_lexical_declaration
+d:o@6013 -> u:o@6118 negative:different_lexical_declaration
+
+CFG block matching table (raw indices are only hints):
+e0250a06fcb69538aa73100c5d66b9744acb2783e66a3eef97183475bfd19fdc {"anchor": {"end": 6144, "start": 5446}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0", "n0.1"], "successors": [1, 2]}
+3c146b7c5030e3b9cd0d57016bd178dc35cd5c634f29227b9b794c46867eda16 {"anchor": {"end": 5600, "start": 5542}, "id": 1, "kind": "IfThen", "live": true, "nodes": ["n1.0"], "successors": []}
+cc0f58e32493765ec41fc4ec8de5ac620e008e727b2db4a0a886f6efcc0965f4 {"anchor": {"end": 5600, "start": 5542}, "id": 2, "kind": "IfDone", "live": true, "nodes": ["n2.0", "n2.1"], "successors": [4, 5]}
+82b9b347be1cd2e62b35b3f0938a11c57747d665bb224a476f19caa93e32fe49 {"anchor": {"end": 5597, "start": 5588}, "id": 3, "kind": "Unreachable", "live": false, "nodes": [], "successors": [2]}
+7b5804c3a32e3dbf13f53f54148972e8a935619202bddad304f8e26210788013 {"anchor": {"end": 5827, "start": 5667}, "id": 4, "kind": "IfThen", "live": true, "nodes": ["n4.0", "n4.1", "n4.2"], "successors": [6, 7]}
+4d5a84ee47af534548ada1a658edceec54cce658934f31d3394eb554355820b7 {"anchor": {"end": 5827, "start": 5667}, "id": 5, "kind": "IfDone", "live": true, "nodes": ["n5.0", "n5.1"], "successors": [9, 10]}
+2ad6514aca4a610299c084520e7430682e2c406b04340e97a8e7e017fd883d80 {"anchor": {"end": 5824, "start": 5764}, "id": 6, "kind": "IfThen", "live": true, "nodes": ["n6.0"], "successors": []}
+21797b85fd975c8a0f6ea8a9fcb16e05560d1f88ad209fde71e973b58a09c5c1 {"anchor": {"end": 5824, "start": 5764}, "id": 7, "kind": "IfDone", "live": true, "nodes": [], "successors": [5]}
+ca09be9f7eaf0cff5830a86cf955607eb7e198cb7f2e582fb9736c61febb2a5e {"anchor": {"end": 5820, "start": 5811}, "id": 8, "kind": "Unreachable", "live": false, "nodes": [], "successors": [7]}
+db285722b32876f1f4913f2dcabf1ac82d35cbbe9ecacdef8b1582a0caaba77b {"anchor": {"end": 5952, "start": 5894}, "id": 9, "kind": "IfThen", "live": true, "nodes": ["n9.0"], "successors": []}
+58a675a3b4e920a111172ea95efaceb192591f2fbbbf57d218ee221b629854bb {"anchor": {"end": 5952, "start": 5894}, "id": 10, "kind": "IfDone", "live": true, "nodes": ["n10.0", "n10.1", "n10.2", "n10.3"], "successors": [12]}
+6fa78eb719825396dbef7b7e9f501814f37a39ac7dbb1cd68ebbe202721ab8d1 {"anchor": {"end": 5929, "start": 5921}, "id": 11, "kind": "Unreachable", "live": false, "nodes": [], "successors": [10]}
+d33cda776b6174e2305b7623fb0aed61c70132ab4d46227337ca8438be2d5b9b {"anchor": {"end": 6132, "start": 6006}, "id": 12, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [13, 14]}
+2d1ecb28290c778c1bec2dcb2c93e729e81db7e1011c079bec0ec94fa296a98f {"anchor": {"end": 6132, "start": 6006}, "id": 13, "kind": "RangeBody", "live": true, "nodes": ["n13.0"], "successors": [15, 16]}
+fe80920d9e29c5726fad6cecdc8f1d637b221e50952b295221cc3c47982817c9 {"anchor": {"end": 6132, "start": 6006}, "id": 14, "kind": "RangeDone", "live": true, "nodes": ["n14.0"], "successors": []}
+262327b5f3e1fa1d5aa3f6139f6562ecfea9e393553a7f0be00abfb7fb3f2f98 {"anchor": {"end": 6129, "start": 6036}, "id": 15, "kind": "IfThen", "live": true, "nodes": ["n15.0", "n15.1"], "successors": [17, 18]}
+b069a17f9dd96a4bfcb48b057eb1c2cd796dc34867524b45a8f171539162c154 {"anchor": {"end": 6129, "start": 6036}, "id": 16, "kind": "IfDone", "live": true, "nodes": [], "successors": [12]}
+f9abf6adfc27b5383dc95d3ebca6703c403dc054b6bc441effbaaf19b5efdc6a {"anchor": {"end": 6125, "start": 6062}, "id": 17, "kind": "IfThen", "live": true, "nodes": ["n17.0"], "successors": []}
+1b47f939a7a61d438e5be0ce8066e562f14f4ebb0e23907986c75fb978cdc2cd {"anchor": {"end": 6125, "start": 6062}, "id": 18, "kind": "IfDone", "live": true, "nodes": [], "successors": [16]}
+a01d2ad8e370431818f5c9822d8b8598bbf12730d4ad7ef066fa2548ed97fba6 {"anchor": {"end": 6120, "start": 6111}, "id": 19, "kind": "Unreachable", "live": false, "nodes": [], "successors": [18]}
+65b6c60bdf02641469f314a6c078a6b6fc2b7646259a09cb5d339791ee049387 {"anchor": {"end": 6142, "start": 6134}, "id": 20, "kind": "Unreachable", "live": false, "nodes": [], "successors": []}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e0250a06fcb69538aa73100c5d66b9744acb2783e66a3eef97183475bfd19fdc", "target": "3c146b7c5030e3b9cd0d57016bd178dc35cd5c634f29227b9b794c46867eda16"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e0250a06fcb69538aa73100c5d66b9744acb2783e66a3eef97183475bfd19fdc", "target": "cc0f58e32493765ec41fc4ec8de5ac620e008e727b2db4a0a886f6efcc0965f4"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "cc0f58e32493765ec41fc4ec8de5ac620e008e727b2db4a0a886f6efcc0965f4", "target": "7b5804c3a32e3dbf13f53f54148972e8a935619202bddad304f8e26210788013"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "cc0f58e32493765ec41fc4ec8de5ac620e008e727b2db4a0a886f6efcc0965f4", "target": "4d5a84ee47af534548ada1a658edceec54cce658934f31d3394eb554355820b7"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "7b5804c3a32e3dbf13f53f54148972e8a935619202bddad304f8e26210788013", "target": "2ad6514aca4a610299c084520e7430682e2c406b04340e97a8e7e017fd883d80"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "7b5804c3a32e3dbf13f53f54148972e8a935619202bddad304f8e26210788013", "target": "4d5a84ee47af534548ada1a658edceec54cce658934f31d3394eb554355820b7"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "7b5804c3a32e3dbf13f53f54148972e8a935619202bddad304f8e26210788013", "target": "21797b85fd975c8a0f6ea8a9fcb16e05560d1f88ad209fde71e973b58a09c5c1"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "4d5a84ee47af534548ada1a658edceec54cce658934f31d3394eb554355820b7", "target": "db285722b32876f1f4913f2dcabf1ac82d35cbbe9ecacdef8b1582a0caaba77b"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "4d5a84ee47af534548ada1a658edceec54cce658934f31d3394eb554355820b7", "target": "58a675a3b4e920a111172ea95efaceb192591f2fbbbf57d218ee221b629854bb"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "4d5a84ee47af534548ada1a658edceec54cce658934f31d3394eb554355820b7", "target": "d33cda776b6174e2305b7623fb0aed61c70132ab4d46227337ca8438be2d5b9b"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d33cda776b6174e2305b7623fb0aed61c70132ab4d46227337ca8438be2d5b9b", "target": "2d1ecb28290c778c1bec2dcb2c93e729e81db7e1011c079bec0ec94fa296a98f"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d33cda776b6174e2305b7623fb0aed61c70132ab4d46227337ca8438be2d5b9b", "target": "fe80920d9e29c5726fad6cecdc8f1d637b221e50952b295221cc3c47982817c9"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2d1ecb28290c778c1bec2dcb2c93e729e81db7e1011c079bec0ec94fa296a98f", "target": "262327b5f3e1fa1d5aa3f6139f6562ecfea9e393553a7f0be00abfb7fb3f2f98"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2d1ecb28290c778c1bec2dcb2c93e729e81db7e1011c079bec0ec94fa296a98f", "target": "d33cda776b6174e2305b7623fb0aed61c70132ab4d46227337ca8438be2d5b9b"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2d1ecb28290c778c1bec2dcb2c93e729e81db7e1011c079bec0ec94fa296a98f", "target": "b069a17f9dd96a4bfcb48b057eb1c2cd796dc34867524b45a8f171539162c154"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "262327b5f3e1fa1d5aa3f6139f6562ecfea9e393553a7f0be00abfb7fb3f2f98", "target": "f9abf6adfc27b5383dc95d3ebca6703c403dc054b6bc441effbaaf19b5efdc6a"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "262327b5f3e1fa1d5aa3f6139f6562ecfea9e393553a7f0be00abfb7fb3f2f98", "target": "d33cda776b6174e2305b7623fb0aed61c70132ab4d46227337ca8438be2d5b9b"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "262327b5f3e1fa1d5aa3f6139f6562ecfea9e393553a7f0be00abfb7fb3f2f98", "target": "b069a17f9dd96a4bfcb48b057eb1c2cd796dc34867524b45a8f171539162c154"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "262327b5f3e1fa1d5aa3f6139f6562ecfea9e393553a7f0be00abfb7fb3f2f98", "target": "1b47f939a7a61d438e5be0ce8066e562f14f4ebb0e23907986c75fb978cdc2cd"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 5571, "start": 5556}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5702, "start": 5681}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5701, "start": 5695}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 5745, "start": 5704}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5735, "start": 5722}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5745, "start": 5738}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5793, "start": 5778}}
+{"kind": "call_effect_not_inferred", "span": {"end": 5909, "start": 5897}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6004, "start": 5964}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6003, "start": 5979}}
+{"kind": "range_binding_unknown", "span": {"end": 6132, "start": 6006}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6046, "start": 6039}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6056, "start": 6050}}
+{"kind": "call_effect_not_inferred", "span": {"end": 6092, "start": 6076}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "getNode", "span": {"end": 5694, "start": 5687}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "ID", "span": {"end": 5699, "start": 5697}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Seq", "span": {"end": 5733, "start": 5730}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Seq", "span": {"end": 5743, "start": 5740}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Secp256k1", "span": {"end": 5892, "start": 5883}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Load", "span": {"end": 5903, "start": 5899}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PublicKey", "span": {"end": 5996, "start": 5987}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "ID", "span": {"end": 6044, "start": 6042}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "ID", "span": {"end": 6054, "start": 6052}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

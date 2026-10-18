@@ -1,0 +1,387 @@
+// Source/CFG observations for AI DEV drafts, NOT the candidate valueflow engine.
+// Uses the same pinned x/tools CFG constructor: common-mode bias is explicit.
+package main
+
+import (
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"go/types"
+	"os"
+	"sort"
+	"strings"
+
+	"golang.org/x/tools/go/cfg"
+)
+
+type Input struct {
+	Path, Source string
+	Starts       []int
+}
+type Span struct {
+	Start int `json:"start"`
+	End   int `json:"end"`
+}
+type Binding struct {
+	ID     string   `json:"id"`
+	Name   string   `json:"name"`
+	Decl   Span     `json:"declaration"`
+	Kind   string   `json:"value_kind"`
+	Origin string   `json:"origin"`
+	Flags  []string `json:"flags"`
+}
+type Occurrence struct {
+	ID      string `json:"id"`
+	Binding string `json:"binding"`
+	Role    string `json:"role"`
+	Span    Span   `json:"span"`
+	Owner   string `json:"owner"`
+	Reason  string `json:"mapping_reason"`
+}
+type Node struct {
+	ID        string `json:"id"`
+	Block     int    `json:"block"`
+	Span      Span   `json:"span"`
+	Kind      string `json:"kind"`
+	Synthetic bool   `json:"synthetic"`
+}
+type Block struct {
+	ID         int      `json:"id"`
+	Kind       string   `json:"kind"`
+	Span       Span     `json:"anchor"`
+	Live       bool     `json:"live"`
+	Nodes      []string `json:"nodes"`
+	Successors []int    `json:"successors"`
+}
+type Observation struct {
+	Path        string           `json:"path"`
+	Name        string           `json:"name"`
+	Span        Span             `json:"span"`
+	SHA         string           `json:"function_sha256"`
+	TypeErrors  int              `json:"partial_file_type_errors"`
+	Bindings    []Binding        `json:"bindings"`
+	Occurrences []Occurrence     `json:"occurrences"`
+	Nodes       []Node           `json:"nodes"`
+	Blocks      []Block          `json:"blocks"`
+	Boundaries  []map[string]any `json:"boundaries"`
+	Quarantined []map[string]any `json:"quarantined_signature_occurrences"`
+}
+
+func observe(in Input) []Observation {
+	fs := token.NewFileSet()
+	file, err := parser.ParseFile(fs, in.Path, in.Source, parser.SkipObjectResolution)
+	if err != nil {
+		panic(err)
+	}
+	span := func(n ast.Node) Span {
+		if n == nil {
+			return Span{}
+		}
+		return Span{fs.Position(n.Pos()).Offset, fs.Position(n.End()).Offset}
+	}
+	info := &types.Info{Defs: map[*ast.Ident]types.Object{}, Uses: map[*ast.Ident]types.Object{}}
+	errors := 0
+	tc := types.Config{DisableUnusedImportCheck: true, Error: func(error) { errors++ }}
+	_, _ = tc.Check(file.Name.Name, fs, []*ast.File{file}, info)
+	output := []Observation{}
+	for _, declaration := range file.Decls {
+		fn, ok := declaration.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+		selected := false
+		for _, start := range in.Starts {
+			selected = selected || start == span(fn).Start
+		}
+		if !selected {
+			continue
+		}
+		loc := span(fn)
+		out := Observation{Path: in.Path, Name: fn.Name.Name, Span: loc, SHA: fmt.Sprintf("%x", sha256.Sum256([]byte(in.Source)[loc.Start:loc.End])), TypeErrors: errors, Bindings: []Binding{}, Occurrences: []Occurrence{}, Nodes: []Node{}, Blocks: []Block{}, Boundaries: []map[string]any{}}
+		entries := map[types.Object]string{}
+		signatureOnly := map[types.Object]bool{}
+		ast.Inspect(fn, func(n ast.Node) bool {
+			if _, ok := n.(*ast.FuncLit); ok {
+				return false
+			}
+			if ft, ok := n.(*ast.FuncType); ok && ft != fn.Type {
+				for _, list := range []*ast.FieldList{ft.Params, ft.Results} {
+					if list != nil {
+						for _, field := range list.List {
+							for _, id := range field.Names {
+								signatureOnly[info.Defs[id]] = true
+							}
+						}
+					}
+				}
+			}
+			return true
+		})
+		out.Quarantined = []map[string]any{}
+		for group, list := range []*ast.FieldList{fn.Recv, fn.Type.Params, fn.Type.Results} {
+			if list != nil {
+				for _, field := range list.List {
+					for _, id := range field.Names {
+						if obj := info.Defs[id]; obj != nil {
+							entries[obj] = []string{"receiver", "parameter", "result_zero"}[group]
+						}
+					}
+				}
+			}
+		}
+		roles := map[*ast.Ident]string{}
+		origins := map[types.Object]string{}
+		flags := map[types.Object]map[string]bool{}
+		flag := func(obj types.Object, kind string) {
+			if obj == nil {
+				return
+			}
+			if flags[obj] == nil {
+				flags[obj] = map[string]bool{}
+			}
+			flags[obj][kind] = true
+		}
+		object := func(id *ast.Ident) types.Object {
+			if obj := info.Defs[id]; obj != nil {
+				return obj
+			}
+			return info.Uses[id]
+		}
+		ast.Inspect(fn.Body, func(n ast.Node) bool {
+			if n == nil {
+				return true
+			}
+			if literal, ok := n.(*ast.FuncLit); ok {
+				out.Boundaries = append(out.Boundaries, map[string]any{"kind": "closure_not_executed", "span": span(literal)})
+				ast.Inspect(literal, func(x ast.Node) bool {
+					if id, ok := x.(*ast.Ident); ok {
+						obj := info.Uses[id]
+						if obj != nil && obj.Pos() < literal.Pos() {
+							flag(obj, "captured_by_closure")
+						}
+					}
+					return true
+				})
+				return false
+			}
+			switch x := n.(type) {
+			case *ast.AssignStmt:
+				for _, lhs := range x.Lhs {
+					if id, ok := ast.Unparen(lhs).(*ast.Ident); ok {
+						role := "write"
+						if x.Tok != token.ASSIGN && x.Tok != token.DEFINE {
+							role = "read_write"
+						}
+						roles[id] = role
+					} else {
+						ast.Inspect(lhs, func(y ast.Node) bool {
+							if id, ok := y.(*ast.Ident); ok {
+								roles[id] = "address_read"
+							}
+							return true
+						})
+					}
+				}
+			case *ast.IncDecStmt:
+				if id, ok := ast.Unparen(x.X).(*ast.Ident); ok {
+					roles[id] = "read_write"
+				}
+			case *ast.RangeStmt:
+				out.Boundaries = append(out.Boundaries, map[string]any{"kind": "range_binding_unknown", "span": span(x)})
+				for _, expr := range []ast.Expr{x.Key, x.Value} {
+					if id, ok := expr.(*ast.Ident); ok {
+						roles[id] = "write"
+						origins[object(id)] = "range"
+						flag(object(id), "range_assignment_unknown")
+					}
+				}
+			case *ast.UnaryExpr:
+				if x.Op == token.AND {
+					ast.Inspect(x.X, func(y ast.Node) bool {
+						if id, ok := y.(*ast.Ident); ok {
+							flag(object(id), "address_exposed")
+							roles[id] = "address_read"
+						}
+						return true
+					})
+				}
+			case *ast.BinaryExpr:
+				if x.Op == token.LAND || x.Op == token.LOR {
+					out.Boundaries = append(out.Boundaries, map[string]any{"kind": "short_circuit_not_expanded", "span": span(x)})
+				}
+			case *ast.CallExpr:
+				out.Boundaries = append(out.Boundaries, map[string]any{"kind": "call_effect_not_inferred", "span": span(x)})
+			case *ast.GoStmt:
+				out.Boundaries = append(out.Boundaries, map[string]any{"kind": "async_not_interleaved", "span": span(x)})
+			case *ast.DeferStmt:
+				out.Boundaries = append(out.Boundaries, map[string]any{"kind": "defer_effect_not_executed", "span": span(x)})
+			case *ast.SelectStmt:
+				out.Boundaries = append(out.Boundaries, map[string]any{"kind": "select_runtime_readiness_unknown", "span": span(x)})
+			}
+			return true
+		})
+		graph := cfg.New(fn.Body, func(*ast.CallExpr) bool { return true })
+		roots := map[string]ast.Node{}
+		for _, block := range graph.Blocks {
+			row := Block{ID: int(block.Index), Kind: block.Kind.String(), Span: span(block.Stmt), Live: block.Live, Nodes: []string{}, Successors: []int{}}
+			for index, node := range block.Nodes {
+				id := fmt.Sprintf("n%d.%d", block.Index, index)
+				synthetic := false
+				site := span(node)
+				if ret, ok := node.(*ast.ReturnStmt); ok && ret.Pos() == fn.Body.Rbrace {
+					synthetic = true
+					site = Span{fs.Position(fn.Body.Rbrace).Offset, fs.Position(fn.Body.Rbrace).Offset + 1}
+				}
+				out.Nodes = append(out.Nodes, Node{id, int(block.Index), site, strings.TrimPrefix(fmt.Sprintf("%T", node), "*ast."), synthetic})
+				row.Nodes = append(row.Nodes, id)
+				roots[id] = node
+			}
+			for _, successor := range block.Succs {
+				row.Successors = append(row.Successors, int(successor.Index))
+			}
+			out.Blocks = append(out.Blocks, row)
+		}
+		bindings := map[types.Object]string{}
+		ensure := func(obj types.Object) string {
+			if key, ok := bindings[obj]; ok {
+				return key
+			}
+			decl := Span{fs.Position(obj.Pos()).Offset, fs.Position(obj.Pos()).Offset + len(obj.Name())}
+			key := fmt.Sprintf("v@%d", decl.Start)
+			origin := "local"
+			if value, ok := entries[obj]; ok {
+				origin = value
+			}
+			if value, ok := origins[obj]; ok {
+				origin = value
+			}
+			kind := "unknown"
+			if obj.Type() != nil {
+				switch t := obj.Type().Underlying().(type) {
+				case *types.Basic:
+					if t.Kind() != types.Invalid {
+						kind = "scalar"
+					}
+				case *types.Pointer, *types.Slice, *types.Map, *types.Chan, *types.Signature, *types.Interface:
+					kind = "reference_binding"
+				case *types.Array, *types.Struct:
+					kind = "aggregate_binding"
+				}
+			}
+			if _, ok := obj.(*types.Const); ok {
+				origin = "constant"
+			}
+			fs := []string{}
+			for value := range flags[obj] {
+				fs = append(fs, value)
+			}
+			sort.Strings(fs)
+			out.Bindings = append(out.Bindings, Binding{key, obj.Name(), decl, kind, origin, fs})
+			bindings[obj] = key
+			return key
+		}
+		ast.Inspect(fn, func(n ast.Node) bool {
+			if _, ok := n.(*ast.FuncLit); ok {
+				return false
+			}
+			id, ok := n.(*ast.Ident)
+			if !ok || id.Name == "_" {
+				return true
+			}
+			obj := object(id)
+			if obj != nil && signatureOnly[obj] {
+				out.Quarantined = append(out.Quarantined, map[string]any{"name": id.Name, "span": span(id), "reason": "nested_function_signature_not_outer_runtime_binding"})
+				return true
+			}
+			local := false
+			if obj == nil && id.Pos() >= fn.Body.Pos() {
+				out.Boundaries = append(out.Boundaries, map[string]any{"kind": "unresolved_identifier_not_negative_gold", "name": id.Name, "span": span(id)})
+			}
+			switch x := obj.(type) {
+			case *types.Var:
+				local = !x.IsField()
+			case *types.Const:
+				local = true
+			}
+			if !local || obj.Pos() < fn.Pos() || obj.Pos() >= fn.End() {
+				return true
+			}
+			binding := ensure(obj)
+			role := "read"
+			if info.Defs[id] != nil {
+				role = "definition"
+			} else if value := roles[id]; value != "" {
+				role = value
+			}
+			site := span(id)
+			owner := ""
+			reason := "not_in_CFG_or_signature_boundary"
+			if _, ok := entries[obj]; ok && info.Defs[id] != nil {
+				owner = "entry"
+				reason = "function_entry"
+			}
+			if _, ok := obj.(*types.Const); ok && info.Defs[id] != nil {
+				owner = "entry"
+				reason = "compile_time_constant"
+			}
+			if owner == "" {
+				matches := []string{}
+				for key, node := range roots {
+					found := false
+					ast.Inspect(node, func(x ast.Node) bool {
+						if _, ok := x.(*ast.FuncLit); ok {
+							return false
+						}
+						found = found || x == id
+						return true
+					})
+					if found {
+						matches = append(matches, key)
+					}
+				}
+				if len(matches) == 1 {
+					owner = matches[0]
+					reason = "unique_AST_identity_owner"
+				} else if len(matches) > 1 {
+					reason = "ambiguous_CFG_AST_identity"
+				}
+			}
+			out.Occurrences = append(out.Occurrences, Occurrence{fmt.Sprintf("o@%d", site.Start), binding, role, site, owner, reason})
+			return true
+		})
+		// A bare return reads the named result at the actual return site.
+		for _, node := range out.Nodes {
+			ret, ok := roots[node.ID].(*ast.ReturnStmt)
+			if !ok || len(ret.Results) != 0 || node.Synthetic {
+				continue
+			}
+			for obj, origin := range entries {
+				if origin == "result_zero" {
+					key := ensure(obj)
+					out.Occurrences = append(out.Occurrences, Occurrence{fmt.Sprintf("return@%d:%s", node.Span.Start, key), key, "read", Span{node.Span.Start, node.Span.Start + 6}, node.ID, "implicit_named_result_at_return"})
+				}
+			}
+		}
+		sort.Slice(out.Bindings, func(i, j int) bool { return out.Bindings[i].Decl.Start < out.Bindings[j].Decl.Start })
+		sort.Slice(out.Occurrences, func(i, j int) bool { return out.Occurrences[i].ID < out.Occurrences[j].ID })
+		output = append(output, out)
+	}
+	return output
+}
+
+func main() {
+	var inputs []Input
+	if err := json.NewDecoder(os.Stdin).Decode(&inputs); err != nil {
+		panic(err)
+	}
+	out := []Observation{}
+	for _, in := range inputs {
+		out = append(out, observe(in)...)
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(out); err != nil {
+		panic(err)
+	}
+}
