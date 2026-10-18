@@ -1,0 +1,6 @@
+func GetMintProposalAmount(govMinterAddress common.Address, state StateReader, proposalId *big.Int) *big.Int {
+	mintProposalAmountsSlot := common.HexToHash(SLOT_GOV_MINTER_mintProposalAmounts)
+	key := CalculateMappingSlot(mintProposalAmountsSlot, common.BigToHash(proposalId))
+	value := state.GetState(govMinterAddress, key)
+	return value.Big()
+}

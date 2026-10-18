@@ -84,6 +84,15 @@ class PreparationGuardTests(unittest.TestCase):
             value['wi6_dev_gold_preparation']['status'] = 'independent_approved'
         self.assertTrue(self.errors())
 
+    def test_WISP_manual_metadata_cannot_be_independent_security_gold(self):
+        for value in (self.protocol, self.ledger):
+            value['wisp_dev_gold_preparation']['status'] = 'independent_approved'
+        self.assertTrue(self.errors())
+
+    def test_real_name_collection_is_not_an_acceptance_requirement(self):
+        self.protocol['reviewer_identity_policy']['real_name_required'] = True
+        self.assertTrue(self.errors())
+
     def test_previous_authoring_source_must_stay_pinned(self):
         self.protocol['independent_freeze_preparation']['historical_source_revision'] = 'HEAD'
         self.assertTrue(self.errors())
@@ -221,6 +230,17 @@ class PreparationGuardTests(unittest.TestCase):
         digest = guard.protocol_hash(self.protocol)
         receipt = {"kind": "ai", "name": "test model", "decision": "approved", "protocol_sha256": digest}
         self.assertFalse(guard.human_receipt(receipt, digest))
+
+    def test_pseudonymous_role_receipt_needs_no_personal_name(self):
+        digest = guard.protocol_hash(self.protocol)
+        receipt = {'kind':'human','reviewer_id':'acceptance-reviewer','decision':'approved','protocol_sha256':digest}
+        self.assertTrue(guard.human_receipt(receipt,digest))
+
+    def test_role_alias_cannot_approve_or_bind_itself(self):
+        digest = guard.protocol_hash(self.protocol)
+        for fields in ({'decision':'pending'},{'kind':'AI'},{'protocol_sha256':'0'*64}):
+            receipt = dict(kind='human',reviewer_id='acceptance-reviewer',decision='approved',protocol_sha256=digest)
+            receipt.update(fields);self.assertFalse(guard.human_receipt(receipt,digest))
 
     def test_positive_verdict_requires_hash_bound_evidence(self):
         self.ledger["items"][0]["operational_gate"] = "pass"

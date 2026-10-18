@@ -1,5 +1,30 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
+## 2026-10-19 단계53: WI-SP DEV12·수동 overlay/출처·거부 경계 AI 초안
+
+[단계53 보고서](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/WORKLIST.json)이 최신 진입점이다. **D04미정·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다.
+
+검토자 개인정보 정책: 실명·이메일·연락처는 요구하지 않는다. 새 승인 기록은 `reviewer_id`에 gold-reviewer / acceptance-reviewer 같은 익명 역할 ID를 사용할 수 있다. 기존 name 필드는 과거 식별자 형식의 호환성으로만 유지한다. 역할 ID는 실제 검토나 승인을 대신하지 않으며, 근거 hash·승인 결정·역할 분리/독립성만 별도로 검증한다. D04미정은 실명 제출 대기가 아니라 실제 검토·승인 상태를 뜻한다. [익명 역할 정책](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/reviewer-identity-policy.json)을 따른다.
+
+| 작성·검증 범위 | 결과와 한계 |
+|---|---|
+| 기존 DEV·원문 | 원래12심볼/5파일·함수 전체 body·Git/file/span 확인. 승인 평가용 policy42개와 기존 미적용 AI security proposal4개를 완전 목록으로 보존 |
+| 유한 관계 AI 정답 | 12×46=552개 명시 selector 단위 전수 분류: 직접 지정9·지정없음543. 모든 semantic applicability는unknown. 문자열/본문 언급이 governs/matches 관계를 만들지 않음 |
+| 두 overlay 조건 | policy-only 예상5관계/상대 미태그8심볼. security제안까지 정확히 별도 ingest한 조건의 예상9관계/상대 미태그4심볼. 현재 retained 응답·security ingest 결과가 아님 |
+| typed/legacy·출처 | 실제 enum Policy/SecurityPattern과 typed operator description/hint/severity·known 빈 문자열을 유지. legacy 혼합 설명에서 severity/hint 추측금지. 원래 YAML hash/row/version/reviewer/time/approval는 runtime unknown |
+| 실제 경계 공백 | query wire에 project/dataset 명시필드가 없어 실제 routed store/session/canonical·source blob/commit/snapshot 결속 필요. 전체 파일 SHA를 retained 함수 blob SHA로 넣지 않음. YAML 작성 근거/graph metadata SHA는 검토자 인증이 아님 |
+| 거부 제안16개 | strict decode/selector/cap·pin·private·위조관계·snapshot_changed·peer ACL/forwarded spoof·빈/미발견/부분/자동출처·다른 저장소를 분리. ACL은 per-symbol/project 권한이나 검토자 인증을 증명하지 않음 |
+
+[정답 초안](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/private/AI-gold.json.gz), [전체 overlay·YAML 근거](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/private/overlay-catalog.json), [거부/경계 제안](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/private/controls.json)을 따른다. 수동low는 운영자 검토 제안값이며 취약점 판정/정책 준수 정답이 아니다. no_annotations는 알려진 심볼/완전 페이지의 선택 overlay 범위이며 not_found/unavailable/unsupported/partial과 다르고 안전을 뜻하지 않는다. actual automatic rule query는 별도 opt-in이다.
+
+새 graph ingest·수동/자동 MCP·listener·모델/대상 실행0·품질 점수null이다. 동일 정책/파일/계약의12심볼을 독립12가족으로 승인하지 않는다. 100% annotation/refusal 기준은 실제 경로·독립 정답·분모 동결 후 평가한다. 소스1738(Go1282)/승인 입력5 동일성으로 이전 전체 Go 검증을 재사용한다. 단계52 자료는fc4186b9에서 원형 보존한다.
+
+다음은 **WI-C 필수/선택·우선순위·보고서/그림·인수인계/설치 역할 AI 초안**이다. 남은 AI1개는 WI-C다. 남은 전체는 WI-C, WI1~3 부채와 WI4/V1/V2 경로/oracle·WI6 nonseed gold/쌍/warm·WI-SP 의미/ingest/store-session/수동자동/ACL/역할, D04·새 DEV/FINAL·완전 독립 gold·matching/충분성·F01~08, 정식9개(0/9), 온톨로지 독립 효과다. 선택12개는 별도 backlog다.
+
+현재 회귀159개(WI-SP36·공통 수용53·익명 검토자 GoldAndSplit25·문서20·notice3·비교22),fc4186b9 원래 소스의 과거 회귀35개, 문서134개·정책/전체 보고서를 포함한 생성24파일 동일 재생·Python compile/공백 검사를 통과했다. 실명 없이 reviewer_id로 형식 검증하되 실제 승인/hash/독립성을 요구하며, 미승인 gold·미동결 실행은 거부한다. 원문·데이터·운영 설정 보존, 소스1738(Go1282)/승인 입력5 동일성으로 이전 native 전체 검증을 재사용한다.
+
+이하 단계52 이전 항목은 당시의 기록이다.
+
 ## 2026-10-19 단계52: WI-6 DEV20·관련성/잡음 AI 초안·시작 함수 제외 매칭
 
 [단계52 보고서](./operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/WORKLIST.json)이 최신 진입점이다. **D04미정·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다.

@@ -186,7 +186,7 @@ def gold_errors(gold):
     if set(covered) != set(units) or len(set(covered)) != len(covered):
         errors.append('universe has unlabelled or multiply labelled units')
     receipt = gold.get('independent_review_receipt')
-    if not isinstance(receipt, dict) or not all(receipt.get(k) for k in ('name', 'role', 'artifact_sha256', 'independence_declaration', 'evidence_path')) or receipt.get('kind') != 'human' or receipt.get('decision') != 'approved':
+    if not isinstance(receipt, dict) or not reviewer_identity(receipt) or not all(receipt.get(k) for k in ('role', 'artifact_sha256', 'independence_declaration', 'evidence_path')) or receipt.get('kind') != 'human' or receipt.get('decision') != 'approved':
         errors.append('human review receipt incomplete')
     elif receipt['artifact_sha256'] != gold_content_hash(gold):
         errors.append('review receipt is not bound to current gold content')
@@ -195,6 +195,24 @@ def gold_errors(gold):
     if gold.get('host_access_policy') != 'public_input_only_no_gold_or_private_review_paths':
         errors.append('private gold exposure policy differs')
     return errors
+
+
+def reviewer_identity(receipt):
+    """A pseudonymous role ID is sufficient. Never require or infer a real name."""
+    if not isinstance(receipt, dict):
+        return None
+    # Existing receipts keep their bytes; legacy `name` was an identifier field.
+    value = receipt.get('reviewer_id') if 'reviewer_id' in receipt else receipt.get('name')
+    return value.strip() if isinstance(value, str) and value.strip() and len(value) <= 128 else None
+
+
+def reviewer_identity_policy():
+    return dict(real_name_required=False, personal_contact_required=False,
+                preferred_receipt_field='reviewer_id', legacy_field='name_optional_identifier_compatibility',
+                role_alias_examples=['gold-reviewer', 'acceptance-reviewer', 'execution-operator'],
+                alias_assignment='not_assigned_by_AI',
+                approval='alias_identifies_role_only_actual_review_decision_artifact_hash_and_independence_still_required',
+                user_preference='do_not_request_real_names_or_personal_contact_information')
 
 
 def gold_content_hash(gold):

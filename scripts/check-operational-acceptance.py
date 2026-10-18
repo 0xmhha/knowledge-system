@@ -28,8 +28,9 @@ def protocol_hash(protocol):
 
 
 def human_receipt(receipt, digest):
+    from independent_acceptance import reviewer_identity
     return (isinstance(receipt, dict) and receipt.get("kind") == "human"
-            and bool(receipt.get("name")) and receipt.get("decision") == "approved"
+            and bool(reviewer_identity(receipt)) and receipt.get("decision") == "approved"
             and receipt.get("protocol_sha256") == digest)
 
 
@@ -151,6 +152,10 @@ def check(root, protocol, ledger, require_frozen=False):
                 import independent_acceptance
                 errors.extend(independent_acceptance.packet_errors(root, (root / refreshed["manifest"]).parent))
                 errors.extend(independent_acceptance.current_index_errors(root))
+            elif refreshed.get("kind") == "WISP_bounded_overlay_AI_DEV_not_formal_execution":
+                import wisp_dev_gold
+                errors.extend(wisp_dev_gold.validate(root, (root / refreshed["manifest"]).parent))
+                errors.extend(wisp_dev_gold.current_indices(root, protocol, ledger))
             elif refreshed.get("kind") == "WI6_bounded_paired_AI_DEV_not_formal_execution":
                 import wi6_dev_gold
                 errors.extend(wi6_dev_gold.validate(root, (root / refreshed["manifest"]).parent))
@@ -195,7 +200,7 @@ def check(root, protocol, ledger, require_frozen=False):
                 errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
             else:
                 raise ValueError("current readiness scope or hash differs")
-            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution", "WI1_consumer_matching_AI_DEV_not_formal_execution", "WI2_complete_bounded_AI_DEV_not_formal_execution", "WI2_consumer_context_AI_DEV_not_formal_execution", "WI3_bounded_AI_DEV_not_formal_execution", "WI3_observed_consumer_AI_DEV_not_formal_execution", "WI4_bounded_schedule_AI_DEV_not_formal_execution", "WIV1_V2_bounded_ticket_AI_DEV_not_formal_execution", "WI6_bounded_paired_AI_DEV_not_formal_execution"):
+            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution", "WI1_consumer_matching_AI_DEV_not_formal_execution", "WI2_complete_bounded_AI_DEV_not_formal_execution", "WI2_consumer_context_AI_DEV_not_formal_execution", "WI3_bounded_AI_DEV_not_formal_execution", "WI3_observed_consumer_AI_DEV_not_formal_execution", "WI4_bounded_schedule_AI_DEV_not_formal_execution", "WIV1_V2_bounded_ticket_AI_DEV_not_formal_execution", "WI6_bounded_paired_AI_DEV_not_formal_execution", "WISP_bounded_overlay_AI_DEV_not_formal_execution"):
                 historical = protocol.get("historical_readiness_preparation")
                 if (historical != ledger.get("historical_readiness_preparation")
                         or not isinstance(historical, dict)

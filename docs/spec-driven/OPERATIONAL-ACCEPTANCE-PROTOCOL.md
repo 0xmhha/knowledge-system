@@ -1,5 +1,30 @@
 # 운영 검증 실행 protocol과 동결 준비
 
+## 2026-10-19 단계53: WI-SP DEV12·수동 overlay/출처·거부 경계 AI 초안
+
+[단계53 보고서](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/WORKLIST.json)이 최신 진입점이다. **D04미정·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다.
+
+검토자 개인정보 정책: 실명·이메일·연락처는 요구하지 않는다. 새 승인 기록은 `reviewer_id`에 gold-reviewer / acceptance-reviewer 같은 익명 역할 ID를 사용할 수 있다. 기존 name 필드는 과거 식별자 형식의 호환성으로만 유지한다. 역할 ID는 실제 검토나 승인을 대신하지 않으며, 근거 hash·승인 결정·역할 분리/독립성만 별도로 검증한다. D04미정은 실명 제출 대기가 아니라 실제 검토·승인 상태를 뜻한다. [익명 역할 정책](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/reviewer-identity-policy.json)을 따른다.
+
+| 작성·검증 범위 | 결과와 한계 |
+|---|---|
+| 기존 DEV·원문 | 원래12심볼/5파일·함수 전체 body·Git/file/span 확인. 승인 평가용 policy42개와 기존 미적용 AI security proposal4개를 완전 목록으로 보존 |
+| 유한 관계 AI 정답 | 12×46=552개 명시 selector 단위 전수 분류: 직접 지정9·지정없음543. 모든 semantic applicability는unknown. 문자열/본문 언급이 governs/matches 관계를 만들지 않음 |
+| 두 overlay 조건 | policy-only 예상5관계/상대 미태그8심볼. security제안까지 정확히 별도 ingest한 조건의 예상9관계/상대 미태그4심볼. 현재 retained 응답·security ingest 결과가 아님 |
+| typed/legacy·출처 | 실제 enum Policy/SecurityPattern과 typed operator description/hint/severity·known 빈 문자열을 유지. legacy 혼합 설명에서 severity/hint 추측금지. 원래 YAML hash/row/version/reviewer/time/approval는 runtime unknown |
+| 실제 경계 공백 | query wire에 project/dataset 명시필드가 없어 실제 routed store/session/canonical·source blob/commit/snapshot 결속 필요. 전체 파일 SHA를 retained 함수 blob SHA로 넣지 않음. YAML 작성 근거/graph metadata SHA는 검토자 인증이 아님 |
+| 거부 제안16개 | strict decode/selector/cap·pin·private·위조관계·snapshot_changed·peer ACL/forwarded spoof·빈/미발견/부분/자동출처·다른 저장소를 분리. ACL은 per-symbol/project 권한이나 검토자 인증을 증명하지 않음 |
+
+[정답 초안](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/private/AI-gold.json.gz), [전체 overlay·YAML 근거](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/private/overlay-catalog.json), [거부/경계 제안](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/private/controls.json)을 따른다. 수동low는 운영자 검토 제안값이며 취약점 판정/정책 준수 정답이 아니다. no_annotations는 알려진 심볼/완전 페이지의 선택 overlay 범위이며 not_found/unavailable/unsupported/partial과 다르고 안전을 뜻하지 않는다. actual automatic rule query는 별도 opt-in이다.
+
+새 graph ingest·수동/자동 MCP·listener·모델/대상 실행0·품질 점수null이다. 동일 정책/파일/계약의12심볼을 독립12가족으로 승인하지 않는다. 100% annotation/refusal 기준은 실제 경로·독립 정답·분모 동결 후 평가한다. 소스1738(Go1282)/승인 입력5 동일성으로 이전 전체 Go 검증을 재사용한다. 단계52 자료는fc4186b9에서 원형 보존한다.
+
+다음은 **WI-C 필수/선택·우선순위·보고서/그림·인수인계/설치 역할 AI 초안**이다. 남은 AI1개는 WI-C다. 남은 전체는 WI-C, WI1~3 부채와 WI4/V1/V2 경로/oracle·WI6 nonseed gold/쌍/warm·WI-SP 의미/ingest/store-session/수동자동/ACL/역할, D04·새 DEV/FINAL·완전 독립 gold·matching/충분성·F01~08, 정식9개(0/9), 온톨로지 독립 효과다. 선택12개는 별도 backlog다.
+
+현재 회귀159개(WI-SP36·공통 수용53·익명 검토자 GoldAndSplit25·문서20·notice3·비교22),fc4186b9 원래 소스의 과거 회귀35개, 문서134개·정책/전체 보고서를 포함한 생성24파일 동일 재생·Python compile/공백 검사를 통과했다. 실명 없이 reviewer_id로 형식 검증하되 실제 승인/hash/독립성을 요구하며, 미승인 gold·미동결 실행은 거부한다. 원문·데이터·운영 설정 보존, 소스1738(Go1282)/승인 입력5 동일성으로 이전 native 전체 검증을 재사용한다.
+
+이하 단계52 이전 항목은 당시의 기록이다.
+
 ## 2026-10-19 단계52: WI-6 DEV20·관련성/잡음 AI 초안·시작 함수 제외 매칭
 
 [단계52 보고서](./operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/WORKLIST.json)이 최신 진입점이다. **D04미정·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다.
@@ -249,14 +274,14 @@ host의 API 응답은 로컬 스크립트이고 실제 역할의 추론/판단�
 | F-02 | 현재 source3a530a25·기존 채택 b7e7868/bdf5ad27·go-stablenet0bf2f4d1 후보 | source/복제/submodule 포함 범위 채택 |
 | F-03 |9개별 baseline/표본 단위/위치 매칭/분모 초안 | 비교·채점 계약과 실제 baseline 경로 채택 |
 | F-04 | family 단위 paired bootstrap·부족/undefined/inconclusive 제안 | 방법·gate·FINAL 충분성 결정 |
-| F-05 | AI 초안과 사람 검토를 구분하는 역할 표 | gold 작성·독립 검토·최종 수용 담당 이름/독립성 |
+| F-05 | AI 초안과 사람 검토를 구분하는 역할 표 | gold 작성·독립 검토·최종 수용 익명 역할/독립성(실명 불필요) |
 | F-06 | 현재 준비 비용은 실제 모델 호출0 | 실제 LLM pilot을 선택할 때 provider/model/auth/비용/자원 상한 |
 | F-07 | 함수40/review10/확장20·rubric45는 후보 초안 | 새 ticket/case·독립 gold·family/DEV/FINAL 봉인 |
 | F-08 | 새 host5개와 metadata 계약/종료 검증 | HTTP·전체 역할·노드/권한·정확한 actual recipe와 cleanup |
 
 이번 준비 검증: snapshot 보호16개·운영 수용 보호36개·문서 계약20개·문서134개 검사 통과. 구조 guard의 pending101개는8개 F 결정 영역 아래의 세부 필드/입력/receipt이며101개 결함이나101개 구현 작업이 아니다. --require-frozen은 예상 exit1로 실행을 거부한다. 새 Go 변경 없이1275개 Go와 결속 입력이 동일한 직전 서명 전체4078/race1066 결과를 참조했고, 새 격리 CLI 빌드·metadata·현재 host 시험은 이번에 실행했다.
 
-F-01–08의 decision은 모두 pending이고 freeze=null·execution_allowed=false다. 사람 이름과 독립 정답을 임의 생성하거나 반복/번역/한 함수의 edge를 독립 표본으로 늘리지 않는다. 준비 검증을 마쳐도 정식9개 수용의 선행 조건이 사라지지 않는다. 다음은 위 구체 자료의 역할·범위 검토와 새 독립 입력/정답 준비다. 선택 후속12개는 별도 범위다.
+F-01–08의 decision은 모두 pending이고 freeze=null·execution_allowed=false다. 검토 역할의 승인과 독립 정답을 임의 생성하거나 반복/번역/한 함수의 edge를 독립 표본으로 늘리지 않는다. 준비 검증을 마쳐도 정식9개 수용의 선행 조건이 사라지지 않는다. 다음은 위 구체 자료의 역할·범위 검토와 새 독립 입력/정답 준비다. 선택 후속12개는 별도 범위다.
 
 
 2026-10-15: 이 문서와 JSON의 미동결 gate는9개 정식 평가를 위한 것이다. [지식 매니저·비교 명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)의 로컬 설계/개발/회귀를 막는 조건이 아니다. 담당자·실제 모델/비용 지정은 해당 실제 실행·독립 수용 범위에 적용한다. 온톨로지 효과 평가 OE-01은 별도 필수 우선 범위이며 새7개 작업의 구현 완료와9개 독립 수용의 분모를 합치지 않는다.
@@ -290,12 +315,12 @@ CKS source schema와 coding-agent 소비자 schema는 각각33개다. 이름은 
 | F-02 | 4개 source pin·tree·schema inventory | 실행 source 후보 채택, clone/submodule 포함 범위 |
 | F-03 | 9개 입력군의 최소 표본·metric 초안 | baseline·canonical 위치/edge 매칭·기권/분모·표본 추출 확정 |
 | F-04 | family 단위 paired bootstrap 초안 | 방법·표본 충분성·각 gate/구간 판정·지연 percentile 계산법 채택 |
-| F-05 | gold/독립 내용 검토/최종 수용/실행 역할 필드 | 사람·역할·독립성 제한 지정 |
+| F-05 | gold/독립 내용 검토/최종 수용/실행 역할 필드 | 익명 역할 ID·독립성 제한 지정(실명·개인연락처 불필요) |
 | F-06 | BGE-M3/native1024 후보, 자원 한도 초안 | LLM provider/model/version·비용/통화·계량 출처와 시간/node 한도 |
 | F-07 | public input/gold·DEV/FINAL record 필드 | 새 사례·gold·원문 span/hash·작성/검토 receipt와 manifest |
 | F-08 | runtime preflight·raw evidence 필드 | 실제 설치 방식·정확한 argv/cwd/env/timeout·owned node/port/lease·중단/cleanup recipe |
 
-현재 F-01/03/04는 검토 가능한 초안, F-02는 source 준비 관측이다. F-05/06 담당·모델 정보는 미정이며 F-07/08에는 source 후보·recipe 초안을 추가했다. 정답·분리·runtime 설정·종료/게시 차단 경계는 미확정이다. **어떤 ID도 approved가 아니다.** 사용자의 ‘다음 진행’은 준비 작업을 계속하라는 요청이며 지정되지 않은 사람이나 새 정답을 생성하지 않는다.
+현재 F-01/03/04는 검토 가능한 초안, F-02는 source 준비 관측이다. F-05/06 담당·모델 정보는 미정이며 F-07/08에는 source 후보·recipe 초안을 추가했다. 정답·분리·runtime 설정·종료/게시 차단 경계는 미확정이다. **어떤 ID도 approved가 아니다.** 사용자의 ‘다음 진행’은 준비 작업을 계속하라는 요청이며 기록되지 않은 검토 승인이나 새 정답을 생성하지 않는다.
 
 ## 새로 준비한 입력 후보와 host 관측
 

@@ -39,6 +39,30 @@ class GoldAndSplitTests(unittest.TestCase):
     def test_bounded_structural_example_not_semantic_acceptance(self):
         self.assertEqual(guard.gold_errors(example_gold()), [])
 
+    def test_pseudonymous_reviewer_id_requires_no_name(self):
+        gold = example_gold(); receipt = gold['independent_review_receipt']
+        receipt.pop('name'); receipt['reviewer_id'] = 'gold-reviewer'
+        self.assertEqual(guard.gold_errors(gold), [])
+
+    def test_alias_does_not_replace_actual_review_decision(self):
+        gold = example_gold(); receipt = gold['independent_review_receipt']
+        receipt.pop('name'); receipt.update(reviewer_id='gold-reviewer', decision='pending')
+        self.assertIn('human review receipt incomplete', guard.gold_errors(gold))
+
+    def test_alias_does_not_replace_gold_hash_binding(self):
+        gold = example_gold(); receipt = gold['independent_review_receipt']
+        receipt.pop('name'); receipt.update(reviewer_id='gold-reviewer', artifact_sha256='0'*64)
+        self.assertIn('review receipt is not bound to current gold content', guard.gold_errors(gold))
+
+    def test_invalid_alias_is_not_rescued_by_legacy_name(self):
+        for value in ('', ' ', None, True, [], 'x'*129):
+            self.assertIsNone(guard.reviewer_identity({'reviewer_id':value,'name':'legacy-test-identifier'}))
+
+    def test_privacy_policy_does_not_assign_or_authenticate_reviewers(self):
+        p = guard.reviewer_identity_policy()
+        self.assertFalse(p['real_name_required']);self.assertFalse(p['personal_contact_required'])
+        self.assertEqual(p['alias_assignment'],'not_assigned_by_AI')
+
     def test_all_authoring_forms_are_unscoreable(self):
         for work_id in (*guard.WORK_IDS, 'ONTOLOGY'):
             with self.subTest(work_id=work_id):

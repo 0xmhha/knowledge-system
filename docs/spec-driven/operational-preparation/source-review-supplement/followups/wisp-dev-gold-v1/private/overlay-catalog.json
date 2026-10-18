@@ -1,0 +1,1062 @@
+[
+  {
+    "id": "A1.concurrency.core_lock_discipline",
+    "name": "WBFT Core lock discipline — never read Core.current off currentMutex",
+    "category": "A1",
+    "description": "The WBFT Core's `current` round-state pointer is guarded by\n`currentMutex` (consensus/wbft/core/core.go:106 — a sync.RWMutex).\nEvery accessor that reads `c.current` MUST hold currentMutex.RLock\n(read) or currentMutex.Lock (write). Examples in-repo: the\ncurrent-proposal accessor at core.go:155-157 acquires RLock around\nthe read; the round-state mutator at core.go:162-166 acquires\nLock for the entire write region.\n\nThe priorState struct (core.go:72) embeds its own sync.RWMutex —\nthis is a SEPARATE lock, NOT a substitute. Reading `c.current.X`\nwhile holding only priorState's lock (or no lock) is a data race\nagainst round-change writers and produces non-deterministic\nconsensus outcomes (e.g. accepting a Prepare for a stale round).\n\nThe trap: an LLM adding telemetry, a new RPC, or a fast-path early\nreturn that touches `c.current` outside the locked region. The\nrace is subtle — tests pass under low contention — but under real\nnetwork load it shows up as occasional fork or stall. Any new\nread of `c.current` (or its sub-fields like Sequence/Round/\npendingRequest) MUST be inside currentMutex's read region; any\nwrite MUST be inside the write region.\n",
+    "governs": [
+      "core.Core.currentMutex",
+      "core.priorState"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A1.concurrency.core_lock_discipline",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 16,
+      "end_byte_exclusive": 1575,
+      "span_sha256": "bd51175aa64196b29ad264a375c63d1d19e7749a87548354905143d3255cd9d7",
+      "start_line": 2,
+      "end_line": 30
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A1.wbft_core.consensus_flow_architecture",
+    "name": "WBFT consensus flow — actors and message sequence per height",
+    "category": "A1",
+    "description": "The WBFT consensus engine drives one block per height through four\nphases inside Core: handleRequest emits a Preprepare from the\ncurrent proposer; every validator broadcasts a Prepare in response;\nonce each validator has seen a Prepare quorum it broadcasts a Commit;\nonce each validator has seen a Commit quorum the block is finalised\nand Core advances to the next height via startNewRound. RoundChange\nfires on RequestTimeout and selects a new proposer for the same\nheight. Backend (consensus/wbft/backend) is the bridge between Core\nand the blockchain — it broadcasts/gossips messages, signs with BLS,\nfetches Validators, and commits sealed blocks back. Engine\n(consensus/wbft/engine) handles header validation, BaseFee\ndistribution, and epoch construction. The Istanbul/100 P2P\nsubprotocol (A9) carries the messages between nodes.\n",
+    "governs": [
+      "core.Core.startNewRound"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A1.wbft_core.consensus_flow_architecture",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 1577,
+      "end_byte_exclusive": 2730,
+      "span_sha256": "ceda068655686c50a8aab9dd16da16ad4a86b019ce368a55093d7b18c12ea93e",
+      "start_line": 30,
+      "end_line": 49
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A1.wbft_core.message_handlers",
+    "name": "WBFT consensus message handlers: preprepare, prepare, commit",
+    "category": "A1",
+    "description": "Three handlers drive the per-round state machine. handlePreprepareMsg\nvalidates the proposer's block and transitions to StatePreprepared;\nhandlePrepareMsg accumulates PREPARE votes and transitions to\nStatePrepared at quorum; handleCommitMsg accumulates COMMIT votes and\nfinalises the block at quorum. Every handler verifies the message\nsignature, the sequence/round view, and the sender's authorisation\nbefore applying state changes.\n",
+    "governs": [
+      "core.Core.handleCommitMsg",
+      "core.Core.handlePrepareMsg",
+      "core.Core.handlePreprepareMsg"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A1.wbft_core.message_handlers",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 2732,
+      "end_byte_exclusive": 3503,
+      "span_sha256": "c4f0d0eee0cc425210f1a5e618ec47cba6410314fabd99019d42446f5c4c4f34",
+      "start_line": 49,
+      "end_line": 64
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A1.wbft_core.quorum_calc",
+    "name": "WBFT quorum size calculation",
+    "category": "A1",
+    "description": "WBFT requires QuorumSize = ceil(N - F) where N is the validator set\nsize and F = (N-1)/3 evaluated in float64. The quorum is the minimum\ncount of Prepare or Commit messages needed before the consensus core\nadvances state. State advancement in handlePrepareMsg uses the\nexpression WBFTPrepares.Size() >= valSet.QuorumSize().\n\nceil(N - F) is the AUTHORITATIVE quorum; any reimplementation MUST\nreproduce it exactly. The dangerous refactor is not int-vs-float (see\nthe correctness note below) but swapping the FORMULA: the PBFT-textbook\n2f+1 or a simple majority N/2+1 DIVERGE from ceil(N - F) for N not of\nthe form 3f+1, and a lower quorum finalizes with too few honest nodes\n(a safety violation). Examples: N=5 -> ceil=4 but 2f+1=3; N=6 -> ceil=5\nbut 2f+1=3; N=8 -> ceil=6 but 2f+1=5.\n",
+    "governs": [
+      "core.Core.handlePrepareMsg",
+      "validator.defaultSet.F",
+      "validator.defaultSet.QuorumSize",
+      "wbft.ValidatorSet"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A1.wbft_core.quorum_calc",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 3505,
+      "end_byte_exclusive": 4654,
+      "span_sha256": "68c976ff40593c8ca8d18255a1460b19a59fc4e7389959ffe6ca3d119d7b2c13",
+      "start_line": 64,
+      "end_line": 86
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A1.wbft_core.round_change_protocol",
+    "name": "WBFT round change: timeout-triggered round bump with prepared-block justification",
+    "category": "A1",
+    "description": "WBFT recovers from a stuck round (PRE-PREPARE or COMMIT quorum not\nreached within RequestTimeout) by broadcasting a ROUND-CHANGE message\nfor round+1. The message carries the highest prepared block and its\nPREPARE justification from prior rounds; a node accepts the view\nchange once it has collected a quorum of ROUND-CHANGE messages for\nthe same target round.\n",
+    "governs": [
+      "core.Core.broadcastNextRoundChange",
+      "core.Core.broadcastRoundChange",
+      "core.Core.handleRoundChangeMsg",
+      "messages.RoundChange",
+      "messages.SignedRoundChangePayload"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A1.wbft_core.round_change_protocol",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 4656,
+      "end_byte_exclusive": 5460,
+      "span_sha256": "ce7f97ef48984cbe15412c44b75b07332d14ca6741efcbce2ed9e31ca2d9f140",
+      "start_line": 86,
+      "end_line": 102
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A10.codegen.contract_regen_procedure",
+    "name": "System contract artifact regeneration: solc 0.8.14 to artifacts/v1 and v2",
+    "category": "A10",
+    "description": "System contract bytecode (governance v1 and v2, NativeCoinAdapter) is\nproduced by systemcontracts/compile. The tool downloads solc 0.8.14\nto ~/.solc-bin if absent, invokes it on the Solidity sources under\nsystemcontracts/solidity/, and writes binaries to\nsystemcontracts/artifacts/v1 and artifacts/v2/. Those binaries are\ngo:embed'd into contracts.go and consumed at genesis time via\nInjectContracts. The do-not-edit constraint on the artifacts (see\nA10.codegen.no_edit_zones) is enforced by re-running this procedure,\nnot by static checks.\n",
+    "governs": [
+      "compile.Compile",
+      "compile.compiledTy.ExportContractCode",
+      "compile.solcVersion"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A10.codegen.contract_regen_procedure",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 5462,
+      "end_byte_exclusive": 6368,
+      "span_sha256": "066ebe9b0c80acbd0ff925c42da3bb54626c7f7b495e96873eeefb54ed8a5b6b",
+      "start_line": 102,
+      "end_line": 119
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A10.codegen.no_edit_zones",
+    "name": "Codegen no-edit zones: which files are generated and how to regenerate",
+    "category": "A10",
+    "description": "Four categories of files in go-stablenet are produced by tools and\nmust never be hand-edited: trezor protobuf bindings under\naccounts/usbwallet/trezor/*.pb.go (regenerated with protoc), JSON\nmarshalling helpers core/types/gen_*.go and similar in beacon/,\ntests/, eth/tracers/, cmd/evm/ (regenerated with fjl/gencodec), RLP\nhelpers core/types/gen_*_rlp.go (regenerated with rlp/rlpgen), and\nSolidity bytecode artifacts under systemcontracts/artifacts/v{N}/\n(regenerated by go run ./systemcontracts/compile). Direct edits\ndrift the file out of sync with its source and the next regenerator\nrun produces a noisy CI-breaking diff. Adding a new code-generated\nfile (or a new Solidity contract version) requires registering it\nin the corresponding generator config (e.g. compile/main.go for\nSolidity) so subsequent runs preserve it.\n",
+    "kind": "policy",
+    "annotation_id": "policy:A10.codegen.no_edit_zones",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 6370,
+      "end_byte_exclusive": 7461,
+      "span_sha256": "578a68e6130e29688860a9788e7f01e99cffd81c8b2670cf7ad5cbb41ca3baaf",
+      "start_line": 119,
+      "end_line": 136
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A11.state_transition.blacklist_check_points",
+    "name": "Blacklist check points along the state transition path",
+    "category": "A11",
+    "description": "When rules.IsAnzeon is active, a transaction can be rejected for\nblacklist reasons at four distinct points before its state changes\npersist. Three live in core/state_transition.go TransitionDb (Sender,\nRecipient, FeePayer) and one lives in core/vm/evm.go Call (zero\naddress / native precompile transfer). Adding a new transaction type\nor a new transfer path requires confirming every one of these gates\nstill fires; missing one creates a route by which a blacklisted\naccount can move value.\n",
+    "governs": [
+      "vm.EVM.Call"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A11.state_transition.blacklist_check_points",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 7463,
+      "end_byte_exclusive": 8215,
+      "span_sha256": "411641742a71dc4760ce9a4ead15c7f0a057c8c111fdf4d9f732d54856f9db2e",
+      "start_line": 136,
+      "end_line": 150
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A11.txpool.type_taxonomy_admission",
+    "name": "Transaction type taxonomy and txpool admission fork gates",
+    "category": "A11",
+    "description": "StableNet inherits geth's typed-transaction envelope and adds one\nproprietary type. The full taxonomy (core/types/transaction.go) is:\nLegacyTxType 0x00, AccessListTxType 0x01, DynamicFeeTxType 0x02,\nBlobTxType 0x03, SetCodeTxType 0x04, and StableNet's\nFeeDelegateDynamicFeeTxType 0x16 (decimal 22) for fee-delegated txs.\n\nPool admission runs through txpool.ValidateTransaction (core/txpool/\nvalidation.go). After a per-pool capability check (opts.Accept bitmask)\nand a size check, each non-legacy type is gated behind a fork\nactivation, in this source order: any non-legacy type requires Berlin;\nDynamicFee additionally requires London; FeeDelegateDynamicFee requires\nApplepie (StableNet's fee-delegation fork); Blob requires Cancun;\nSetCode requires Anzeon (checked via AnzeonEnabled(), a global enable\nrather than a block-number gate). A type whose fork is not yet active\nis rejected with core.ErrTxTypeNotSupported before any signature or\nstate work.\n\nAfter the common gas/fee/sender checks, fee-delegated txs get an extra\nadmission gate: types.RecoverFeePayer(chainID, tx) requires a declared\nFeePayer (else types.ErrFeePayerNotSet), recovers the fee-payer signer\nvia FeePayer(NewFeeDelegateSigner(chainID), tx), and rejects with\ntypes.ErrInvalidFeePayer when recovery fails or the recovered address\ndoes not equal the declared FeePayer. This is\nthe stateless half; the stateful fee-payer balance check lives later in\nValidateTransactionWithState (ErrFeePayerInsufficientFunds).\n",
+    "governs": [
+      "params.ChainConfig.AnzeonEnabled",
+      "params.ChainConfig.IsApplepie",
+      "txpool.ValidateTransaction",
+      "txpool.ErrInvalidFeePayer",
+      "types.FeeDelegateDynamicFeeTx",
+      "types.FeeDelegateDynamicFeeTx.txType",
+      "types.FeePayer",
+      "types.LegacyTxType",
+      "types.SetCodeTx.txType"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A11.txpool.type_taxonomy_admission",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 8217,
+      "end_byte_exclusive": 10383,
+      "span_sha256": "f31839df0d96019d13e81253f247d0f114a438c7df8d37980173ae7e518951a6",
+      "start_line": 150,
+      "end_line": 189
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A12.seals.bls_seal_scheme",
+    "name": "WBFT BLS seal scheme — 96-byte aggregate + SealerSet bitpack",
+    "category": "A12",
+    "description": "WBFT consensus seals are BLS aggregate signatures. The data structure\nis WBFTAggregatedSeal (core/types/istanbul.go:52) carrying a\nSealerSet bitpack (which validators signed, by ordered index) plus\nthe aggregate 96-byte BLS signature. Two such seals live in\nWBFTExtra (core/types/istanbul.go:81): PrevPreparedSeal and\nPrevCommittedSeal, the latter being the previous block's commit\nattestation. BLS primitives are in crypto/bls/.\n\nThe trap: an LLM editing seal encoding, hashing, or verification\noften assumes Ethereum's secp256k1 ECDSA signatures (65 bytes,\nrecoverable v/r/s) and mis-sizes buffers, mis-computes hashes (using\nKeccak over the wrong payload), or attempts ecrecover on a BLS\nsignature. The SealerSet bitpack also encodes WHO signed; dropping\nor reordering bits changes the attested validator set without\nchanging the signature, which a naive verifier will accept. Any\nchange to extra-data, seal serialization, or filtered-header hashing\nMUST preserve the WBFTAggregatedSeal byte layout exactly.\n",
+    "governs": [
+      "types.WBFTAggregatedSeal",
+      "types.WBFTExtra",
+      "types.WBFTExtra.PrevCommittedSeal"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A12.seals.bls_seal_scheme",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 10385,
+      "end_byte_exclusive": 11794,
+      "span_sha256": "e802398ccff34183b31ab208846bc5038ba33ae8f8167811342161cff32ce850",
+      "start_line": 189,
+      "end_line": 214
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A12.seals.feepayer_sighash",
+    "name": "Fee-delegation sigHash — feepayer signs the wrapped, not the inner, tx",
+    "category": "A12",
+    "description": "StableNet's FeeDelegateDynamicFeeTx (tx type 0x16) is DOUBLE-signed:\nthe sender signs the inner DynamicFee tx, then the feepayer signs a\nWRAPPER over [[inner-incl-sender-V/R/S], FeePayer]. The feepayer's\nsigHash is therefore computed by RLP-encoding the inner tx WITH the\nsender's V/R/S already populated, followed by the FeePayer address —\nNOT by re-hashing the bare inner tx. See sigHash at\ncore/types/tx_fee_delegation.go:158 (the prefix-list payload at line\n170-178 explicitly includes the inner tx values then FeePayer);\nsetSignatureValues at :147 places the feepayer signature on the\nouter struct without touching the sender's signature.\n\nThe trap: a naive sigHash implementation that hashes only the inner\npayload (omitting V/R/S) or omits the FeePayer trailing field will\nproduce a different digest, accept a valid-looking but unrelated\nsignature, and allow a feepayer to be substituted server-side\nwithout the sender's consent. Worse, the chain will still accept the\nmalformed tx if the verifier follows the same broken hash. Any\nrefactor of fee-delegation signing must preserve the exact\npayload-shape (inner-with-VRS, then FeePayer) byte for byte.\n",
+    "governs": [
+      "types.FeeDelegateDynamicFeeTx.FeePayer",
+      "types.FeeDelegateDynamicFeeTx.setSignatureValues",
+      "types.FeeDelegateDynamicFeeTx.sigHash"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A12.seals.feepayer_sighash",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 11796,
+      "end_byte_exclusive": 13433,
+      "span_sha256": "7e7330fd1249edc816188aaf81d0476daab1fd689f1bbd43ea7a222f3994f623",
+      "start_line": 214,
+      "end_line": 241
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A13.sealing.reorg_serialization",
+    "name": "Txpool mutation must serialize through the reorg loop",
+    "category": "A13",
+    "description": "The legacy txpool runs a single goroutine — `pool.loop()` (started at\ncore/txpool/legacypool/legacypool.go:366 `go pool.loop()`) — that\nowns the txpool's internal maps (pending/queue/all). All mutation\nevents (head change, new tx, reorg) are queued and applied INSIDE\nthat loop, which is why the txpool data structures are not\nindividually locked: the loop is the serializer.\n\nThe sealer (miner/) and the txpool reorg loop interact across this\nboundary: when the sealer requests a payload, it observes the\ntxpool's state at a point AFTER a reorg-run; mutating txpool maps\ndirectly from the sealer (or from a tx-submission handler) WITHOUT\ngoing through the loop is a data race that can either lose pending\ntxs or double-include them.\n\nThe trap: an LLM adding a \"fast path\" that mutates pool.pending /\npool.queue / pool.all from outside the loop (e.g. inside an RPC\nhandler, or inside the sealer's payload-building hook). Symptoms are\nintermittent: tx drops, double-spend rejection on a tx that was\nvalidly removed, occasional miner crash on map iteration. Any new\ntxpool mutation MUST enqueue into the loop's channel, not call the\nmap mutators directly.\n",
+    "governs": [
+      "legacypool.LegacyPool.loop",
+      "legacypool.LegacyPool.queueTxEvent"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A13.sealing.reorg_serialization",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 13435,
+      "end_byte_exclusive": 14989,
+      "span_sha256": "0b2fd394ef4d299121f4ebf6a11fe3cad705dd13e9beea54cfa35cf612b55b16",
+      "start_line": 241,
+      "end_line": 269
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.foundations.base_fee_redistribution",
+    "name": "Base fee is redistributed to validators (not burned)",
+    "category": "A14",
+    "description": "Ethereum EIP-1559 BURNS the base fee. go-stablenet does NOT — under\nWBFT the base fee is REDISTRIBUTED to validators as part of block\nfinalization, because StableNet's economic model treats validators\nas the operational counterparty rather than burning the native\nstablecoin (WKRC) supply away. The redistribution happens in the WBFT\nengine's Finalize path: consensus/wbft/backend/engine.go:180\nBackend.Finalize delegates to the underlying Engine().Finalize(),\nwhich performs the per-validator base-fee crediting (see also A3\nvalidator-set + A6 fee-delegation for the tip path).\n\nThe trap: an LLM editing finalization, fee accounting, or block\nreward code may apply Ethereum's burn assumption — leaving the base\nfee unaccounted, or worse, calling state.SubBalance against a \"burn\naddress.\" Both break WKRC supply integrity and the validator\nincentive contract. Any change to fee accounting must preserve the\nredistribution invariant and be cross-checked against the WBFT\nFinalize implementation, not against Ethereum EIP-1559 references.\n",
+    "governs": [
+      "backend.Backend.Finalize"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A14.foundations.base_fee_redistribution",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 14991,
+      "end_byte_exclusive": 16365,
+      "span_sha256": "036c9e7a9c66060aff1b53fe0deda05c170f3ef53b894d0639070373a301b3ce",
+      "start_line": 269,
+      "end_line": 292
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.foundations.cherry_pick_principle",
+    "name": "Isolate StableNet code so upstream geth fixes stay cherry-pickable",
+    "category": "A14",
+    "description": "go-stablenet keeps an active \"cherry-pick channel\" from upstream\ngo-ethereum: when upstream lands a security or correctness fix, the\nStableNet team wants to cherry-pick it cleanly. To preserve that,\nStableNet-unique code is ISOLATED into new files, not interleaved\ninto geth files. Canonical example: WBFT P2P glue lives in\n`eth/handler_istanbul.go` (a NEW file), not as edits inside\n`eth/handler.go` (geth's file). The \"StableNet 고유\" column in\n`.claude/docs/build-source-files.md` (table at :114, :140, :176,\n:296) enumerates which files are unique to StableNet vs. inherited\nfrom geth; that mapping IS the cherry-pick boundary.\n\nThe trap: an LLM \"fixing\" or \"tidying\" geth-origin code by inlining\nStableNet logic into it (e.g. adding a feepayer-sigHash branch\ninside `core/types/transaction_signing.go` instead of the existing\n`tx_fee_delegation.go`) silently destroys cherry-pickability — the\nnext upstream merge will conflict in subtle, security-relevant\nspots. Any new logic that is StableNet-specific must live in a\nStableNet-owned file; only minimal hook points (interface\nsatisfaction, dispatch glue) belong in geth files.\n",
+    "kind": "policy",
+    "annotation_id": "policy:A14.foundations.cherry_pick_principle",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 16367,
+      "end_byte_exclusive": 17814,
+      "span_sha256": "49ea24b66ebd7582239f10cd11cc61a879dcc34dc55a48d49968642c6ae9c436",
+      "start_line": 292,
+      "end_line": 315
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.foundations.equal_power",
+    "name": "Equal-power validators — every validator has voting power = 1",
+    "category": "A14",
+    "description": "go-stablenet is PoA with equal-weight validators: every validator's\nvoting power is 1, with no stake field, no weight field, no slashing.\nThe defaultValidator struct (consensus/wbft/validator/default.go:32)\ncarries only Address + BLSPublicKey — no Power/Weight/Stake field\nexists anywhere in the validator set. Quorum is computed by COUNT\n(ceil(N − F), see A1.wbft_core.quorum_calc), not by stake sum.\n\nAny change that introduces stake-weighted voting, weighted quorum,\nproposer selection biased by stake, or stake-conditioned rewards is\na STABILITY-VIOLATING bug — even if the test suite passes — because\nit imports Ethereum/WEMIX validator economics that go-stablenet\nexplicitly does NOT follow. This trap fires when an LLM extrapolates\nfrom generic PBFT / PoS literature without checking the validator\ntype.\n",
+    "governs": [
+      "validator.defaultSet",
+      "validator.defaultSet.QuorumSize",
+      "validator.defaultValidator"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A14.foundations.equal_power",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 17816,
+      "end_byte_exclusive": 19017,
+      "span_sha256": "6b8204ec80566d98baeb8b889ab5f61f4fe6d6267c7378c75b06c5a4589ccce8",
+      "start_line": 315,
+      "end_line": 337
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.foundations.instant_finality_inert_reorg",
+    "name": "Instant BFT finality — geth reorg / Td code is inert (a trap)",
+    "category": "A14",
+    "description": "Under WBFT consensus a Commit-quorum block is FINAL the moment it is\nwritten; there is no probabilistic finality and no honest reorg.\nHowever, geth's fork-choice machinery is still present in the tree:\nForkChoice (core/forkchoice.go) compares TotalDifficulty, BlockChain\nhas a forker field (core/blockchain.go:260), and ReorgNeeded is\ncalled at ~6 call sites (core/blockchain.go:1143, :1459, :1604,\n:1819, :1983, …). Under WBFT, ReorgNeeded effectively never returns\ntrue on honest input, but the code paths exist and compile.\n\nThe trap: an LLM editing block-import, finalization, or\nconsensus-glue code may \"fix\" or extend these reorg/Td paths on the\nassumption that they govern real behaviour. They do not — touching\nthem invites correctness drift (e.g. accidentally accepting a\ncompeting chain on the wrong side of finality). Treat the forker / Td\ncode as inert geth residue; do not extend it for StableNet logic. Any\nconsensus-related fork-choice change belongs in consensus/wbft/, not\nin core/forkchoice.go.\n",
+    "governs": [
+      "core.BlockChain.forker",
+      "core.ForkChoice.ReorgNeeded"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A14.foundations.instant_finality_inert_reorg",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 19019,
+      "end_byte_exclusive": 20420,
+      "span_sha256": "001e6c7da61bb44fa92c0a2dab673370fc12ebb1735c25e28d721b9de61779e5",
+      "start_line": 337,
+      "end_line": 361
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.foundations.wkrc_not_eth",
+    "name": "Native asset is WKRC (KRW stablecoin), not ETH",
+    "category": "A14",
+    "description": "The native coin on go-stablenet is **WKRC** — a KRW-pegged\nstablecoin — not ETH. Source of truth: params/config.go genesis\nalloc carries name=\"WKRC\", symbol=\"WKRC\", currency=\"KRW\", decimals=18;\ncore/genesis_mainnet.json:58 mirrors the same. Mint/burn is\nbank-backed via GovMinter (A4) and the NativeCoinManager precompile\n(A5), tied to off-chain deposit/withdrawal.\n\nETH-denominated assumptions baked into geth (`Ether=1e18`,\n`GasFloor`, gas-price units assumed to be ETH-wei) survive in the\ntree as residue but do NOT describe StableNet semantics — the unit\nis WKRC-wei, the asset is a KRW stablecoin, and supply changes are\nauthorized real-asset events, not protocol issuance. An LLM that\ndesigns fee/reward/transfer logic against \"ETH\" assumptions will\nemit code that is silently wrong for regulatory reporting, fee\naccounting, and user-facing balances.\n",
+    "kind": "policy",
+    "annotation_id": "policy:A14.foundations.wkrc_not_eth",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 20422,
+      "end_byte_exclusive": 21534,
+      "span_sha256": "418fab3fdbb8c54881871d46e2fdbbd3b13063d1b79477925da2e442e3125d07",
+      "start_line": 361,
+      "end_line": 380
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.theory.3f1_intersection",
+    "name": "BFT 3f+1 quorum intersection — why ceil(N − F) is the safety floor",
+    "category": "A14",
+    "description": "Classical BFT (Castro–Liskov PBFT, QBFT) proves SAFETY under up to F\nbyzantine nodes only if any two quorums intersect in at least one\nhonest node. With N validators and F = floor((N−1)/3), the minimum\nquorum that satisfies the intersection lemma is Q = ceil(N − F).\nWBFT instantiates exactly this Q in defaultSet.QuorumSize\n(consensus/wbft/validator/default.go:226) using F() = (N−1)/3 as\nfloat64 (:222). Examples that surprise int-only refactors:\nN=5 → Q=4 (not 2f+1=3); N=6 → Q=5 (not 3); N=8 → Q=6 (not 5).\n\nImplication for designs: any code path that \"approves\" something on\nfewer than Q distinct validators violates the intersection lemma and\nmay finalize on an unsafe quorum (a safety violation — two\nconflicting blocks both reach quorum). This applies not only to the\nconsensus state machine but to ANY validator-signature aggregation\nadded later (e.g. a custom-precompile attestation, a system-contract\nvote count). Use valSet.QuorumSize(), do not hardcode 2f+1.\n",
+    "governs": [
+      "core.Core.handlePrepareMsg",
+      "validator.defaultSet.F",
+      "validator.defaultSet.QuorumSize"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A14.theory.3f1_intersection",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 21536,
+      "end_byte_exclusive": 22931,
+      "span_sha256": "cf0eb82e243c626c48adc0c3300ffe703ba998d3c5c83f24fc741867d3157f01",
+      "start_line": 380,
+      "end_line": 404
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.theory.equivocation",
+    "name": "Equivocation — byzantine validators may send conflicting messages",
+    "category": "A14",
+    "description": "EQUIVOCATION is the byzantine behaviour where one validator emits\ntwo (or more) DIFFERENT messages for the same (Sequence, Round,\nMessageType) — e.g. two different Prepare votes for the same view.\nHonest BFT must tolerate this: a validator's \"vote\" is counted at\nmost ONCE per view, and the second message either replaces the\nfirst deterministically or is dropped. WBFT inherits QBFT/PBFT's\nmessage-handling discipline in consensus/wbft/core/handler.go\n(signature verification + per-sender deduplication in the message\nset) and in the typed Set structures behind WBFTPrepares /\nWBFTCommits used by handlePrepareMsg (consensus/wbft/core/prepare.go\n:121) and the analogous commit path.\n\nImplication: code that aggregates validator signatures (consensus\nitself, but also any later-added precompile vote / system-contract\nattestation / off-chain bridge proof) MUST deduplicate by sender\nbefore counting toward quorum. A naive `count := len(messages)`\nlets a single byzantine validator stuff the set and forge quorum.\nThe flip side is liveness: when an equivocator is detected, WBFT\ndoes NOT slash (validators have no stake — see\nA14.foundations.equal_power); the protocol relies on the byzantine\nbound F to bound the damage, not on punishment.\n",
+    "governs": [
+      "core.Core.handlePrepareMsg",
+      "core.Core.handlePreprepareMsg"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A14.theory.equivocation",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 22933,
+      "end_byte_exclusive": 24582,
+      "span_sha256": "00c24a4d71f3af4043ca7eebb4f14afbd31f8e10280aa15e4460b87e13bb2d0c",
+      "start_line": 404,
+      "end_line": 432
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.theory.flp_partial_synchrony",
+    "name": "FLP impossibility — WBFT trades termination for partial synchrony",
+    "category": "A14",
+    "description": "The FLP result (Fischer–Lynch–Paterson, 1985) proves no deterministic\nconsensus algorithm can guarantee both SAFETY and LIVENESS in a\npurely asynchronous system with even one crash. Practical BFT\nalgorithms (PBFT, QBFT, WBFT) escape FLP by assuming PARTIAL\nSYNCHRONY: there exists a Global Stabilization Time (GST) after which\nmessage delays are bounded by a known Δ. WBFT implements this\nassumption via the round-change timer (consensus/wbft/core/core.go:\n110 `roundChangeTimer`, :409 `time.AfterFunc(timeout, ...)`); when a\nround times out before quorum is reached, the protocol advances to\nthe next round with the same view-change machinery PBFT/QBFT use.\n\nImplication: LIVENESS is NOT unconditional — it requires GST + a\ncorrect timeout. Setting RequestTimeout too low can cause perpetual\nround-changes (no round ever finishes before the timer fires);\nsetting it too high stalls progress under transient asymmetry. The\ndefault 1000ms (see A3.timing.wbft_config_defaults) is the\ncalibrated value; design changes that touch timer scheduling,\nRequestTimeout, or round-change backoff MUST reason about\npartial-synchrony implications, not just throughput.\n",
+    "governs": [
+      "core.Core.roundChangeTimer",
+      "validator.defaultSet.QuorumSize"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A14.theory.flp_partial_synchrony",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 24584,
+      "end_byte_exclusive": 26146,
+      "span_sha256": "7ffc8742b26bbf4e7f9713c9239819425ed4ca524e20be6ed857d7cf71838764",
+      "start_line": 432,
+      "end_line": 458
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A14.theory.justification_locking",
+    "name": "Justification + locking — why view changes preserve safety",
+    "category": "A14",
+    "description": "In PBFT/QBFT/WBFT, a PRE-PREPARE proposed in round r > 0 MUST carry\na JUSTIFICATION proving it is consistent with what previous rounds\nmay have committed: a quorum of ROUND-CHANGE messages plus, if any\nvalidator was already \"locked\" on a value, the PREPARE certificate\nfor that locked value. WBFT enforces this in preprepare.go: a new\nproposal attaches `JustificationRoundChanges` and `Justification\nPrepares` (preprepare.go:69, :79); the receiver validates them via\n`isJustified(...)` (preprepare.go:135) before accepting the\npreprepare. The locking discipline says: once you Prepare on a\nvalue, you stay locked until a higher round shows a quorum-justified\ndifferent value — this is what guarantees that a view change cannot\nsilently overwrite a previously Committed block.\n\nImplication: any change to the preprepare validator, round-change\npayload format, or the message handler that handles justification\npayloads (consensus/wbft/core/handler.go:265–292) directly affects\nthe SAFETY proof. Skipping `isJustified` for a \"fast path\", or\nloosening which payloads count as justification, is a SAFETY\nviolation — two conflicting blocks can both reach quorum. This is\nthe single most subtle place in WBFT and the most common\nhand-rolled-PBFT bug.\n",
+    "governs": [
+      "core.Core.handlePreprepareMsg"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A14.theory.justification_locking",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 26148,
+      "end_byte_exclusive": 27769,
+      "span_sha256": "7ec31eecb8d2b28b00a7e1e840a079c19410de52577d9bfacfd2edd79685f47d",
+      "start_line": 458,
+      "end_line": 485
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A2.block_encoding.filtered_header_hash",
+    "name": "Block hash computation requires WBFTFilteredHeader first",
+    "category": "A2",
+    "description": "WBFT block hashing has a non-obvious requirement: before computing a\nblock hash you must strip the round number and the PreparedSeal /\nCommittedSeal from the header's WBFTExtra, because those fields are\nfilled in by the consensus layer after the header is created and\ntherefore differ between proposer and recipient. WBFTFilteredHeader\nreturns a copy of the header with Round set to 0 and Seal fields\ncleared; WBFTFilteredHeaderWithRound does the same but preserves a\ncaller-supplied round. Hashing the raw header instead of the filtered\none produces a hash nobody else can reproduce, breaking signature\nverification and block lookup.\n",
+    "governs": [
+      "types.ExtractWBFTExtra",
+      "types.WBFTFilteredHeader",
+      "types.WBFTFilteredHeaderWithRound"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A2.block_encoding.filtered_header_hash",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 27771,
+      "end_byte_exclusive": 28769,
+      "span_sha256": "73c7c16fa2ad8758acdf9c411ccecc537ad12298750300ceaeb04f783906c8c2",
+      "start_line": 485,
+      "end_line": 503
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A2.block_encoding.wbft_extra_struct",
+    "name": "WBFTExtra struct layout and contained types",
+    "category": "A2",
+    "description": "WBFTExtra is the RLP-encoded payload that lives inside every WBFT\nblock's Header.Extra. It carries vanity bytes, randao reveal, the\nprevious and current round numbers, the previous and current\nPreparedSeal / CommittedSeal aggregated BLS signatures, the\ngovernance-voted GasTip for this block, and (on epoch-boundary\nblocks only) the EpochInfo that pins the next epoch's validator\nset. AggregatedSeal pairs a SealerSet bit-packed bitmap with a 96-byte\nBLS aggregate signature; the bit index in SealerSet corresponds to\nthe validator index in the active ValidatorSet. EpochInfo lists\nCandidate {Addr, Diligence} entries plus a Validators slice of\n*indices* (not addresses) into Candidates, and a parallel\nBLSPublicKeys slice.\n",
+    "governs": [
+      "types.Candidate",
+      "types.EpochInfo",
+      "types.IstanbulExtraSeal",
+      "types.IstanbulExtraVanity",
+      "types.SealerSet",
+      "types.WBFTAggregatedSeal",
+      "types.WBFTExtra"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A2.block_encoding.wbft_extra_struct",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 28771,
+      "end_byte_exclusive": 29955,
+      "span_sha256": "2ff3e7a433ba781851ce57663b34aea4d651feacf0414caba26e7a762b18bd9a",
+      "start_line": 503,
+      "end_line": 527
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A3.timing.wbft_config_defaults",
+    "name": "WBFT timing and config defaults: RequestTimeout, BlockPeriod, EpochLength",
+    "category": "A3",
+    "description": "WBFT consensus timing is parameterised by RequestTimeoutSeconds (per-\nround timeout before bumping rounds), BlockPeriodSeconds (target\ninter-block interval enforced by the proposer), and EpochLength\n(blocks per epoch, after which the validator set transitions). The\nAnzeon default config (params/config_wbft.go DefaultAnzeonConfig) sets\nthese to 2 / 1 / 10 respectively; chains may override per-network.\nCheckValidity enforces ranges at genesis load time.\n\nTWO LAYERS (the unit trap): the chain-config field RequestTimeoutSeconds\nis in SECONDS despite its struct comment saying \"milliseconds\"\n(config_wbft.go:187 comment is misleading). The runtime engine config\n(consensus/wbft/config.go) holds RequestTimeout in MILLISECONDS, and\nGetConfig bridges chain-config -> engine by multiplying x1000\n(config.go:167: RequestTimeout = RequestTimeoutSeconds * 1000). So the\nAnzeon 2 (seconds) becomes 2000ms at the engine. Separately, the engine\nstruct DefaultConfig.RequestTimeout = 1000 (ms) is a fallback used when\nno chain-config transition supplies the value -- do NOT read the two\ndefaults as one number.\n",
+    "governs": [
+      "params.DefaultAnzeonConfig",
+      "params.WBFTConfig",
+      "wbft.Config.GetConfig",
+      "wbft.DefaultConfig"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A3.timing.wbft_config_defaults",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 29957,
+      "end_byte_exclusive": 31503,
+      "span_sha256": "160094b895d55437fe4b7d7697004896e12326c7133e54df3ba2277dfd477601",
+      "start_line": 527,
+      "end_line": 554
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A3.validator_set.epoch_transition",
+    "name": "Epoch transition: how the next epoch's validator set is selected and pinned",
+    "category": "A3",
+    "description": "go-stablenet's validator set is fixed for the duration of an epoch\n(10 blocks on Mainnet, 140 on Testnet). On the last block of each\nepoch, the engine calls buildEpochInfo: it queries GovValidator\n(system contract 0x1001) for the new candidate list and validator\nindices, then writes an EpochInfo into that block's\nHeader.Extra.WBFTExtra.EpochInfo. From the next block onward,\nGetValidators returns the new set; intra-epoch blocks omit\nEpochInfo. Backend.GetValidatorsForVerifying provides the previous\nepoch's set in parallel so cross-epoch block verification can match\nsigners against the correct validator set.\n",
+    "governs": [
+      "backend.Backend.GetValidatorsForVerifying",
+      "wbftengine.Engine.GetValidators",
+      "params.WBFTConfig.EpochLength",
+      "types.EpochInfo"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A3.validator_set.epoch_transition",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 31505,
+      "end_byte_exclusive": 32547,
+      "span_sha256": "f38bdc96d7eebe1a35e31e90505cd26ef18352faf090c9ee982d387038bcd279",
+      "start_line": 554,
+      "end_line": 573
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A3.validator_set.set_construction",
+    "name": "WBFT validator set construction and proposer selection",
+    "category": "A3",
+    "description": "An in-memory WBFT validator set is built by the validator package:\nNew(addr, blsKey) wraps one validator (defaultValidator) and\nNewSet(addrs, blsKeys, policy) / NewSetByValidators(validators, policy)\nbuild a defaultSet. newDefaultSet seeds the set's validators slice in\nthe order the caller supplied — there is no internal sort — and picks\nthe proposer selector based on policy.Id: roundRobinProposer for the\nRoundRobin policy (advances by seed = lastProposerIndex + round + 1)\nand stickyProposer for the Sticky policy (same seed minus the +1, so\nthe proposer stays put across rounds with the same lastProposer).\ndefaultSet protects mutations of validators with validatorMu (RWMutex);\nCalcProposer recomputes the active proposer via the selected selector,\nand QuorumSize returns ceil(N - (N-1)/3) — the WBFT 2N/3 quorum over\nequal-power validators. The deterministic order that callers feed in\nis the ordering that all selectors then index into.\n",
+    "governs": [
+      "validator.NewSet",
+      "validator.NewSetByValidators",
+      "validator.defaultSet.CalcProposer",
+      "validator.defaultSet.QuorumSize",
+      "validator.newDefaultSet",
+      "validator.roundRobinProposer",
+      "validator.stickyProposer"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A3.validator_set.set_construction",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 32549,
+      "end_byte_exclusive": 34037,
+      "span_sha256": "7afd683c37cbdd7de998fafd36a7f7a1c2c3cd16b8cf1abac950fe2313152643",
+      "start_line": 573,
+      "end_line": 599
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A4.gov_minter.mint_proposal_allowance",
+    "name": "Coin mint proposals, MintProof, and minter allowance management (GovMinter + GovMasterMinter)",
+    "category": "A4",
+    "description": "Native-coin issuance is gated by two contracts: GovMasterMinter (0x1002) holds\nthe registry of authorised minters and the per-minter maxMinterAllowance ceiling;\nGovMinter (0x1003) holds per-proposal reservations and the off-chain deposit proof.\nMintProof carries the (beneficiary, amount, timestamp, depositId, bankReference,\nmemo) tuple bridging an off-chain deposit to an on-chain mint; GovMinter tracks\nusedProofHashes (replay protection), reservedMintAmount (running ceiling) and\nmintProposalAmounts (per-proposal reservation read back by GetMintProposalAmount).\nGovMasterMinter tracks fiatToken, maxMinterAllowance (default DefaultMaxMinterAllowance\n= 10B * 10^18), the isMinter mapping and the minterList; IsMinter, GetMinterCount,\nGetMinterAt and GetMaxMinterAllowance expose those slots. Per-minter remaining\nallowance is held on FiatToken, not GovMasterMinter.\n",
+    "governs": [
+      "systemcontracts.GetMaxMinterAllowance",
+      "systemcontracts.GetMintProposalAmount",
+      "systemcontracts.IsMinter",
+      "systemcontracts.MintProof",
+      "systemcontracts.initializeMasterMinter"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A4.gov_minter.mint_proposal_allowance",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 34039,
+      "end_byte_exclusive": 35420,
+      "span_sha256": "f649fb7c672fbd08e12a9304a4c70040a22b154df4a93f3976445006b283c24f",
+      "start_line": 599,
+      "end_line": 620
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A4.gov_validator.genesis_initialization",
+    "name": "GovValidator genesis initialization (initializeValidator)",
+    "category": "A4",
+    "description": "initializeValidator is the Go-side seeder that writes the GovValidator\n(0x1001) contract storage at genesis from systemContracts.govValidator.params.\nIt runs initializeBase to seed inherited GovBase fields, writes the blsPoP\nprecompile address and the gasTip (supplied value or params.InitialGasTip),\nthen — when the validators/blsPublicKeys params are supplied — cross-validates\nlen(members) == len(validators) == len(blsPublicKeys) and walks the validator\nlist, emitting StateParam writes for the __validators EnumerableSet (length +\narray element + index mapping), the validatorToOperator / operatorToValidator\ninverse mappings, the validatorToBlsKey bytes mapping, and the\nblsKeyToValidator mapping keyed by raw BLS bytes. Duplicate addresses are\nskipped; the length write fires only if at least one validator was seeded.\n",
+    "governs": [
+      "systemcontracts.CalculateMappingSlot",
+      "systemcontracts.MakeMultipleParam",
+      "systemcontracts.initializeValidator"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A4.gov_validator.genesis_initialization",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 35422,
+      "end_byte_exclusive": 36650,
+      "span_sha256": "179fbdcf4bf7be532a214057165f4ad97feb1c6ce84fd28bf7d2888702bf8634",
+      "start_line": 620,
+      "end_line": 639
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A4.system_contracts.addresses",
+    "name": "System contract canonical addresses (Anzeon)",
+    "category": "A4",
+    "description": "Five governance system contracts and two native precompiles are\ndeployed at well-known fixed addresses on go-stablenet. Source of\ntruth for the 0x100x governance addresses is params/config_wbft.go;\nthe 0xB000xx precompile address literals are params/protocol_params.go\n(NativeCoinManager 0xB00002, AccountManager 0xB00003), which\ncore/vm/native_manager.go references when registering their method\ntables. These values are referenced everywhere in hardfork wiring,\ngenesis JSON, and ABI tooling.\n",
+    "governs": [
+      "params.DefaultGovCouncilAddress",
+      "params.DefaultGovMasterMinterAddress",
+      "params.DefaultGovMinterAddress",
+      "params.DefaultGovValidatorAddress",
+      "params.DefaultNativeCoinAdapterAddress",
+      "params.NativeCoinManagerAddress"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A4.system_contracts.addresses",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 36652,
+      "end_byte_exclusive": 37626,
+      "span_sha256": "bc0113319118b5db80a9e2d3d44b81e7a7c781a9e9a79eecf8bee08cfc814d89",
+      "start_line": 639,
+      "end_line": 658
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A4.system_contracts.build_deploy_pipeline",
+    "name": "System contract lifecycle: Solidity source to genesis state and e2e tests",
+    "category": "A4",
+    "description": "System contracts travel a five-stage pipeline. (1) Solidity sources live\nunder systemcontracts/solidity/ (v1/, v2/, plus abstracts/, interfaces/,\nlibraries/, openzeppelin/ shared code and test/ contracts). (2) The Go\ntool systemcontracts/compile invokes pinned solc 0.8.14 on them.\n(3) Compiled bytecode lands in systemcontracts/artifacts/{v1,v2}/ as\nhex-encoded files — codegen output, never hand-edited. (4) Native Go\nloads the artifacts at process start: go:embed directives in\ncontracts.go populate SystemContractCodes; at genesis,\ncore.InjectContracts -> GetSystemContractsTransition turns them into\nCodeParam/state entries so the chain database is initialized with the\ncontracts' code and storage. (5) systemcontracts/test/ exercises the\nwhole chain end to end (native + governance flows against a simulated\nbackend). Consequence for indexing/search: the shipped binary depends on\n.sol sources through the embedded artifacts even though `go list` never\nsees them — a build-graph-only view misses stages 1-3 and 5\n(systemcontracts/test is outside the dependency graph, and the compile\ntool is its own main). The knowledge dataset scope therefore adds them\nexplicitly (projects/stablenet/filelist.yaml: extra_packages\nsystemcontracts/test + systemcontracts/compile/..., extra_globs\nsystemcontracts/**/*.sol).\n",
+    "governs": [
+      "compile.solcVersion",
+      "core.InjectContracts",
+      "systemcontracts.GetSystemContractsTransition",
+      "systemcontracts.SystemContractCodes"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A4.system_contracts.build_deploy_pipeline",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 37628,
+      "end_byte_exclusive": 39460,
+      "span_sha256": "79679fd8c7f977649ac2bb84b9e932f2a589a7087b1f06a45fb013ee1247db4a",
+      "start_line": 658,
+      "end_line": 687
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A4.system_contracts.gov_minter",
+    "name": "GovMinter (0x1003): native coin minting authority with v1/v2 versions",
+    "category": "A4",
+    "description": "GovMinter is the system contract at address 0x1003 that holds the\nmint authority for native coin. The MasterMinter (0x1002) approves\nmint proposals which GovMinter executes against NativeCoinAdapter\n(0x1000). Two versioned implementations exist: v1 (initial) and v2\n(current). ChainConfig.Anzeon.SystemContracts.GovMinter selects the\nversion per chain. Storage tracks the fiat-token reference, mint\nproposals, per-account burn balances, refundable balances, and\nemergency-pause state.\n",
+    "governs": [
+      "systemcontracts.GetBurnBalance",
+      "systemcontracts.GetMintProposalAmount",
+      "systemcontracts.GovMinterContractV1",
+      "systemcontracts.GovMinterContractV2",
+      "systemcontracts.initializeMinter"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A4.system_contracts.gov_minter",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 39462,
+      "end_byte_exclusive": 40413,
+      "span_sha256": "88dc1e629bc3f73189e488943dbaf78e6dff3f49cd0e628e5a54935564a9d86f",
+      "start_line": 687,
+      "end_line": 705
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A4.system_contracts.storage_slot_layout",
+    "name": "System contract storage slot layout helpers (CalculateMappingSlot / CalculateDynamicSlot / EncodeBytesToSlots)",
+    "category": "A4",
+    "description": "All Go-side genesis seeders for the 0x100x governance contracts follow the\nEVM/Solidity storage-slot rules through a toolbox in systemcontracts/stateutil.go:\nCalculateMappingSlot(baseSlot, key) = keccak256(leftPad32(key) || baseSlot) for\nmapping fields; CalculateDynamicSlot(baseSlot, i) = keccak256(leftPad32(baseSlot)) + i\nfor the i-th element of dynamic arrays / spilled bytes chunks; IncrementHash(baseSlot, n)\n= baseSlot + n to pair an EnumerableSet value slot with its companion index slot;\nVarLenBytesToMultipleHash / EncodeBytesToSlots implement Solidity short/long bytes\npacking (<=31B packed in the base slot, >31B spills 32B chunks); GetBytes reverses it\nfor reads; EnumerableSet (NewEnumerableSet / NewAddressSet) bundles the value+index\nslot pair used by ValidatorList and minterList. Every storage write a Go initializer\nemits is a params.StateParam with Key = a slot hash derived above and a 32-byte Value.\n",
+    "governs": [
+      "systemcontracts.CalculateDynamicSlot",
+      "systemcontracts.CalculateMappingSlot",
+      "systemcontracts.EnumerableSet"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A4.system_contracts.storage_slot_layout",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 40415,
+      "end_byte_exclusive": 41785,
+      "span_sha256": "0b6e2adea48d695119a453d18e26d33b5a517421c8f1ed09767a23d909d1e0cc",
+      "start_line": 705,
+      "end_line": 724
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A5.account_extra.bit_layout",
+    "name": "StateAccount.Extra bit layout and immutability invariants",
+    "category": "A5",
+    "description": "StateAccount.Extra is a uint64 carrying per-account flags. Bit 63\n(MSB) marks Blacklisted; bit 62 marks Authorized; bits 0-61 are\nreserved. All mutation helpers (SetBlacklisted, ClearBlacklisted,\nSetAuthorized, ClearAuthorized) follow an immutable pattern — they\ntake the existing uint64 and return a new uint64 with the requested\nbit toggled. The original value is never modified in place. New\nflags must claim a previously unused bit and may require hardfork\ngating if they affect consensus-reachable state.\n",
+    "governs": [
+      "types.AccountExtraMaskAuthorized",
+      "types.AccountExtraMaskBlacklisted",
+      "types.AccountExtraValidMask",
+      "types.IsAuthorized",
+      "types.IsBlacklisted"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A5.account_extra.bit_layout",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 41787,
+      "end_byte_exclusive": 42708,
+      "span_sha256": "70d0ebb8b5e51cb365345a4384820b5b5cd29fa9b95fac8e2176cfacdb86e4b6",
+      "start_line": 724,
+      "end_line": 742
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A5.native_coin.issuance_burn_flow",
+    "name": "Native coin issuance and burn via NativeCoinManager precompile",
+    "category": "A5",
+    "description": "Native coin mint, burn, and transfer are precompile operations on\nNativeCoinManager. coinManagerMint credits a target address;\ncoinManagerBurn debits an account; coinManagerTransfer moves between\naccounts without changing total supply. All three gate on\ncanRunCoinManger, which requires the caller to be NativeCoinAdapter\n(0x1000) and the opcode to be CALL (not DELEGATECALL or STATICCALL).\nTotal-supply changes therefore route exclusively through 0x1000.\n",
+    "governs": [
+      "vm.canRunCoinManger",
+      "vm.coinManagerBurn.Run",
+      "vm.coinManagerMint.CanRun",
+      "vm.coinManagerMint.Run",
+      "vm.coinManagerTransfer.Run"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A5.native_coin.issuance_burn_flow",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 42710,
+      "end_byte_exclusive": 43563,
+      "span_sha256": "bb76db6735b95b4880c8e5043a2beccafa319bd2ba27bfde7fe04fb08de6f0f9",
+      "start_line": 742,
+      "end_line": 759
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A6.anzeon_gas.tip_override",
+    "name": "Anzeon authorized-account gas tip override",
+    "category": "A6",
+    "description": "Under the Anzeon hardfork, AnzeonTipEnv overrides the effective gas\ntip for transactions signed by authorised accounts. GetAnzeonTipCap\nreturns the transaction's own GasTipCap (the sender's chosen tip)\nfor authorised senders, and the block header's GasTip for everyone\nelse. Authorisation is read from StateAccount.Extra at the current\nblock's state root; AnzeonTipEnv caches the lookup per block to avoid\nre-reading state on every transaction.\n",
+    "governs": [
+      "gasprice.AnzeonTipEnv",
+      "gasprice.AnzeonTipEnv.GetAnzeonTipCap",
+      "gasprice.AnzeonTipEnv.IsAnzeon",
+      "gasprice.AnzeonTipEnv.SetCurrentBlock"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A6.anzeon_gas.tip_override",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 43565,
+      "end_byte_exclusive": 44380,
+      "span_sha256": "4484e3be8eddd1cab46807ffe3697eac69be2e437e4b2523aca17f7fdacd43cc",
+      "start_line": 759,
+      "end_line": 775
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A6.fee_delegation.signing_model",
+    "name": "Fee delegation signing model: setSignatureValues writes the FeePayer, not the Sender",
+    "category": "A6",
+    "description": "FeeDelegateDynamicFeeTx (tx type 0x16) is a double-signed transaction:\nthe Sender signs the inner DynamicFeeTx, then the FeePayer signs the\nwhole envelope. The method names on the outer type are easy to\nmisread. setSignatureValues writes the FeePayer's V/R/S\n(tx.FV/FR/FS); rawSignatureValues returns the Sender's signature by\ndelegating to SenderTx.rawSignatureValues; rawFeePayerSignatureValues\nreturns the FeePayer's signature. Confusing these breaks both\nsignature verification paths and trips the blacklist guard for the\nFeePayer in TransitionDb.\n",
+    "governs": [
+      "types.FeeDelegateDynamicFeeTx.rawFeePayerSignatureValues",
+      "types.FeeDelegateDynamicFeeTx.rawSignatureValues",
+      "types.FeeDelegateDynamicFeeTx.setSignatureValues"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A6.fee_delegation.signing_model",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 44382,
+      "end_byte_exclusive": 45385,
+      "span_sha256": "bd097905c857fe4163cb6f30de86ed97de65d44ade55f17add72da05258d984e",
+      "start_line": 775,
+      "end_line": 792
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A7.hardfork.add_new_fork_procedure",
+    "name": "Procedure: adding a new hardfork to go-stablenet",
+    "category": "A7",
+    "description": "Adding a hardfork requires changes in seven distinct sites:\nChainConfig field, isFork check method, Rules struct + Rules() build,\nruntime branch in the relevant subsystem, optional NativeManager\nswitch update, optional system contract version pinning via\nCollectUpgrades, and updates to SetConfigFromChainConfig when WBFT\nparameters change. The block number must be >= the previous fork's\nblock number; switch-case ordering must place the newest fork on top\nbecause the first matching case wins.\n",
+    "governs": [
+      "ethconfig.SetConfigFromChainConfig",
+      "params.ChainConfig",
+      "params.ChainConfig.CheckConfigForkOrder",
+      "params.ChainConfig.CollectUpgrades",
+      "vm.ActiveNativeManagers"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A7.hardfork.add_new_fork_procedure",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 45387,
+      "end_byte_exclusive": 46311,
+      "span_sha256": "9fc4ab012b62adbb617585246bee325af828b9fec29bb453a9424abf0af2cf08",
+      "start_line": 792,
+      "end_line": 810
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A8.genesis.bootstrap_architecture",
+    "name": "Genesis bootstrap architecture: from JSON to first block on disk",
+    "category": "A8",
+    "description": "Node startup with an empty DB takes a Genesis struct (parsed from\nembedded JSON for Mainnet/Testnet) through three sequential stages:\n(1) validateAnzeonGenesisConfig enforces that the Anzeon section is\nwell-formed; (2) initializeAnzeonGenesis builds the initial block\nExtra (vanity + initial validator set + initial BLS keys) and calls\nInjectContracts which deploys every system contract listed in\nconfig.Anzeon.SystemContracts plus any block-0 hardfork overlays\ncollected from CollectUpgrades; (3) genesis.ToBlock writes the\nresulting Alloc to the state DB, computes the state root, and\nembeds it in the block header; finally genesis.Commit flushes the\ntrie to disk. The genesis_generator CLI uses the same path with\nuser-supplied parameters and serialises the result to JSON for\nbootstrapping a new network.\n",
+    "governs": [
+      "core.DefaultStableNetMainnetGenesisBlock",
+      "core.Genesis.Commit",
+      "core.Genesis.ToBlock",
+      "core.InjectContracts",
+      "core.SetupGenesisBlockWithOverride",
+      "core.initializeAnzeonGenesis",
+      "core.validateAnzeonGenesisConfig"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A8.genesis.bootstrap_architecture",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 46313,
+      "end_byte_exclusive": 47673,
+      "span_sha256": "56c6b16db08d74e78970f97905c4e515fcd0123d0ae162f29a5ebeece39c41e4",
+      "start_line": 810,
+      "end_line": 835
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A8.genesis.inject_contracts_two_phase",
+    "name": "InjectContracts two-phase deploy: baseline then block-0 hardfork overlay",
+    "category": "A8",
+    "description": "InjectContracts seeds genesis.Alloc with system contract code and\nstorage in two ordered phases. Phase 1 calls\nGetSystemContractsTransition with config.Anzeon.SystemContracts —\nthis deploys every v1 contract and runs each initializeXxx() to\npopulate its full Solidity storage layout. Phase 2 iterates\nconfig.CollectUpgrades() and applies, for each upgrade whose block\nis 0, applyUpgradeOverlay onto the same Alloc. The overlay path\nREPLACES the contract Code only and merges any explicit State\nentries; pre-existing Balance and Storage from Phase 1 are\npreserved. Upgrades whose Block is not 0 are skipped at genesis\ntime and are instead applied at runtime by Engine.processFinalize\nwhen the chain reaches their activation height.\n",
+    "governs": [
+      "core.InjectContracts",
+      "core.applyUpgradeOverlay",
+      "params.ChainConfig.CollectUpgrades",
+      "systemcontracts.GetSystemContractsTransition"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A8.genesis.inject_contracts_two_phase",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 47675,
+      "end_byte_exclusive": 48858,
+      "span_sha256": "f3aeeff1905ecf8d2d47a00677d02fdc3d80b853ac6a424840c3d05a441f1b41",
+      "start_line": 835,
+      "end_line": 856
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A8.genesis.json_authoring_checklist",
+    "name": "Genesis JSON authoring checklist for stablenet chains",
+    "category": "A8",
+    "description": "validateAnzeonGenesisConfig is the gate every stablenet genesis JSON\npasses through before initializeAnzeonGenesis materialises the\nblock-zero state. The authoring checklist captures every section the\nvalidator requires: ChainConfig with the Anzeon hardfork block, WBFT\nconsensus parameters, the Init section (validators plus matching BLS\nkeys), the SystemContracts section selecting versions for each of\nthe five governance contracts, and per-account Extra bits that must\nsatisfy ValidateExtra. cmd/genesis_generator provides an interactive\ntool for filling these in.\n",
+    "governs": [
+      "core.initializeAnzeonGenesis",
+      "core.validateAnzeonGenesisConfig"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A8.genesis.json_authoring_checklist",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 48860,
+      "end_byte_exclusive": 49748,
+      "span_sha256": "94237659ac035f78d986fd24e1f0ae9d5d978593bc25761def1b4ad35bfb9709",
+      "start_line": 856,
+      "end_line": 872
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A9.istanbul_p2p.protocol_architecture",
+    "name": "istanbul/100 subprotocol architecture: piggy-backed on eth peers",
+    "category": "A9",
+    "description": "WBFT consensus messages travel over a dedicated P2P subprotocol\nnamed istanbul, version 100, registered alongside the standard\neth protocol. The 22-message subprotocol does not create its own\npeer set — every istanbul peer is an existing eth Peer whose\nEthPeerRegistered channel signals when it is ready to carry\nconsensus traffic. When an istanbul message arrives, the handler\ndispatches it into the consensus engine's HandleMsg, which routes\nit to Core.handleEvents. Messages exceeding protocolMaxMsgSize\nare rejected before any consensus parsing. wbft.ErrStoppedEngine\nduring peer-receive while the eth downloader is synchronising is\nexpected and downgraded to debug-level logging — the engine starts\nconsuming messages only after sync completes.\n",
+    "governs": [
+      "eth.Istanbul100",
+      "eth.quorumConsensusProtocolName"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A9.istanbul_p2p.protocol_architecture",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 49750,
+      "end_byte_exclusive": 50848,
+      "span_sha256": "08b44718d2f341a936033ba33d61482c5e30d6b65a5e7bac908178cdc99af125",
+      "start_line": 872,
+      "end_line": 891
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "A9.istanbul_rpc.api_reference",
+    "name": "WBFT custom RPC API (istanbul namespace) — method reference",
+    "category": "A9",
+    "description": "The WBFT consensus engine exposes a JSON-RPC API under the istanbul\nnamespace via consensus/wbft/backend/api.go. The methods cover\nnode identity (NodeAddress, IsValidator), block-attestation lookup\n(GetCommitSignersFromBlock / ByHash), validator-set introspection\n(GetValidators / AtHash), aggregate activity stats over a range\n(Status), and raw WBFTExtra inspection (GetWbftExtraInfo). These\nare the operational entry points for monitoring tools and any\nexternal client that needs to confirm who signed which block.\n",
+    "governs": [
+      "backend.API.GetCommitSignersFromBlock",
+      "backend.API.GetCommitSignersFromBlockByHash",
+      "backend.API.GetValidators",
+      "backend.API.GetValidatorsAtHash",
+      "backend.API.NodeAddress",
+      "backend.API.Status",
+      "backend.BlockSigners",
+      "backend.Status"
+    ],
+    "kind": "policy",
+    "annotation_id": "policy:A9.istanbul_rpc.api_reference",
+    "authoring_source": {
+      "path": "projects/stablenet/evaluation/policy-0bf2f4d1.yaml",
+      "sha256": "5bb3e98f985e4c00f20b7a38f9b25fba4520a92bd6ef48b3a2653f04e2edfb8a",
+      "start_byte": 50850,
+      "end_byte_exclusive": 51893,
+      "span_sha256": "67745b0433a062e2f40d2d5d7cea01dd0532d95d1e12b9ca7130cd134ffadbd3",
+      "start_line": 891,
+      "end_line": 912
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "spc-005-manual-review",
+    "name": "GetMinterAt manual review proposal",
+    "category": "evaluation-proposal",
+    "severity": "low",
+    "description": "운영자가 검토할 수 있도록 제안한 메타데이터. 확인된 취약점이나 독립 판정이 아니다.",
+    "remediation": "원문·호출자 가정을 독립 검토한 뒤 수정 필요 여부를 판단한다.",
+    "matches": [
+      "systemcontracts.GetMinterAt"
+    ],
+    "kind": "security",
+    "annotation_id": "security:spc-005-manual-review",
+    "authoring_source": {
+      "path": "docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1/private-symbol-gaps.json",
+      "sha256": "6919a513c6499c2b625465976f444e51b375476f1a26acd64d05fba67480f423",
+      "symbol_row": "SPC-005",
+      "status": "previous_AI_proposal_not_applied_or_approved"
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "spc-006-manual-review",
+    "name": "GetBLSPublicKey manual review proposal",
+    "category": "evaluation-proposal",
+    "severity": "low",
+    "description": "운영자가 검토할 수 있도록 제안한 메타데이터. 확인된 취약점이나 독립 판정이 아니다.",
+    "remediation": "원문·호출자 가정을 독립 검토한 뒤 수정 필요 여부를 판단한다.",
+    "matches": [
+      "systemcontracts.GetBLSPublicKey"
+    ],
+    "kind": "security",
+    "annotation_id": "security:spc-006-manual-review",
+    "authoring_source": {
+      "path": "docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1/private-symbol-gaps.json",
+      "sha256": "6919a513c6499c2b625465976f444e51b375476f1a26acd64d05fba67480f423",
+      "symbol_row": "SPC-006",
+      "status": "previous_AI_proposal_not_applied_or_approved"
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "spc-007-manual-review",
+    "name": "GetRefundableBalance manual review proposal",
+    "category": "evaluation-proposal",
+    "severity": "low",
+    "description": "운영자가 검토할 수 있도록 제안한 메타데이터. 확인된 취약점이나 독립 판정이 아니다.",
+    "remediation": "원문·호출자 가정을 독립 검토한 뒤 수정 필요 여부를 판단한다.",
+    "matches": [
+      "systemcontracts.GetRefundableBalance"
+    ],
+    "kind": "security",
+    "annotation_id": "security:spc-007-manual-review",
+    "authoring_source": {
+      "path": "docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1/private-symbol-gaps.json",
+      "sha256": "6919a513c6499c2b625465976f444e51b375476f1a26acd64d05fba67480f423",
+      "symbol_row": "SPC-007",
+      "status": "previous_AI_proposal_not_applied_or_approved"
+    },
+    "semantic_approval": null
+  },
+  {
+    "id": "spc-008-manual-review",
+    "name": "VarLenBytesToMultipleHash manual review proposal",
+    "category": "evaluation-proposal",
+    "severity": "low",
+    "description": "운영자가 검토할 수 있도록 제안한 메타데이터. 확인된 취약점이나 독립 판정이 아니다.",
+    "remediation": "원문·호출자 가정을 독립 검토한 뒤 수정 필요 여부를 판단한다.",
+    "matches": [
+      "systemcontracts.VarLenBytesToMultipleHash"
+    ],
+    "kind": "security",
+    "annotation_id": "security:spc-008-manual-review",
+    "authoring_source": {
+      "path": "docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1/private-symbol-gaps.json",
+      "sha256": "6919a513c6499c2b625465976f444e51b375476f1a26acd64d05fba67480f423",
+      "symbol_row": "SPC-008",
+      "status": "previous_AI_proposal_not_applied_or_approved"
+    },
+    "semantic_approval": null
+  }
+]

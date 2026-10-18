@@ -1,0 +1,6 @@
+func GetMinterAt(govMasterMinterAddress common.Address, state StateReader, index uint64) common.Address {
+	minterListSlot := common.HexToHash(SLOT_GOV_MASTER_MINTER_minterList)
+	key := CalculateDynamicSlot(minterListSlot, new(big.Int).SetUint64(index))
+	value := state.GetState(govMasterMinterAddress, key)
+	return common.BytesToAddress(value.Bytes())
+}

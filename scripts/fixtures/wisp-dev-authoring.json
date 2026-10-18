@@ -1,0 +1,35 @@
+{
+  "kind":"AI_DEV_manual_annotation_contract_not_semantic_security_gold",
+  "symbols":[
+    {"id":"SPC-001","behavior":"Reads maxMinterAllowance from GovMasterMinter storage and returns a big integer; no independent policy-compliance proof.","policies":["A4.gov_minter.mint_proposal_allowance"],"security":[],"semantic_unknown":"Reading a policy-named slot does not prove mint authority or allowance enforcement."},
+    {"id":"SPC-002","behavior":"Derives proposalId mapping slot and reads mint proposal amount from GovMinter state.","policies":["A4.gov_minter.mint_proposal_allowance","A4.system_contracts.gov_minter"],"security":[],"semantic_unknown":"The read accessor does not prove proposal authorization or reservation invariants."},
+    {"id":"SPC-003","behavior":"Builds validator genesis StateParams, validates supplied list lengths and gas tip parsing, skips duplicate validators and writes key/operator mappings.","policies":["A4.gov_validator.genesis_initialization"],"security":[],"semantic_unknown":"List-length and duplicate handling do not establish cryptographic BLS proof, address validity or complete genesis policy compliance."},
+    {"id":"SPC-004","behavior":"Computes keccak256 padded base slot plus index and converts the result into a hash.","policies":["A4.system_contracts.storage_slot_layout"],"security":[],"semantic_unknown":"This exact operator relation is metadata; slot-domain correctness, nil arguments and index policy need separate semantic review."},
+    {"id":"SPC-005","behavior":"GetMinterAt reads a dynamic minter list slot for index and converts stored bytes to address.","policies":[],"security":["spc-005-manual-review"],"semantic_unknown":"The low-severity evaluation proposal is a manual review placeholder, not a validated bounds or authorization vulnerability."},
+    {"id":"SPC-006","behavior":"GetBLSPublicKey derives validator mapping slot and delegates bytes decoding to GetBytes.","policies":[],"security":["spc-006-manual-review"],"semantic_unknown":"The proposal does not validate BLS keys or prove a security defect, and omitted GetBytes semantics remain outside this source body."},
+    {"id":"SPC-007","behavior":"GetRefundableBalance derives address mapping slot and returns stored amount as big integer.","policies":[],"security":["spc-007-manual-review"],"semantic_unknown":"A read accessor and manual low tag do not prove refund authorization, accounting correctness or exploitability."},
+    {"id":"SPC-008","behavior":"VarLenBytesToMultipleHash emits empty/short packed encoding or length flag and zero-padded 32-byte chunks for long data.","policies":[],"security":["spc-008-manual-review"],"semantic_unknown":"The proposal is not a validated overflow/storage-layout finding. A policy description mentioning this helper is not an explicit governs relation."},
+    {"id":"SPC-009","behavior":"GetMinterCount reads the minterList slot and truncates its integer to Uint64.","policies":[],"security":[],"semantic_unknown":"No selected direct annotation does not mean safety or no applicable minting policy; a YAML description explicitly mentions this accessor without listing it in governs."},
+    {"id":"SPC-010","behavior":"HashToAddress converts hash bytes to a common.Address.","policies":[],"security":[],"semantic_unknown":"No exact selected annotation is only a finite overlay fact, not security absence or whole-project untagged proof."},
+    {"id":"SPC-011","behavior":"IncrementHash adds a big integer to the base slot then converts to common.Hash.","policies":[],"security":[],"semantic_unknown":"Storage-slot policy description mentions IncrementHash but its governs list does not select it. Never substitute substring relevance for a retained relation."},
+    {"id":"SPC-012","behavior":"checkSystemContractVersions rejects absent validator/adapter versions and conditionally checks minter/master-minter/council version entries.","policies":[],"security":[],"semantic_unknown":"No selected tag does not establish supported-version security or absence of other applicable policies."}
+  ],
+  "controls":[
+    {"id":"SP-CTRL-01","case":"duplicate/null/unknown field or wrong type","expected":"input_error","scope":"strict decoder; never execute backend or report annotation success"},
+    {"id":"SP-CTRL-02","case":"both node_id and canonical_id, or neither","expected":"input_error","scope":"exactly one selector; name-only/source-name hint is not scope identity"},
+    {"id":"SP-CTRL-03","case":"max_annotations129 or timeout_ms5001","expected":"input_error","scope":"declared positive integer caps128/5000"},
+    {"id":"SP-CTRL-04","case":"wrong expected commit","expected":"source_mismatch","scope":"bound retained manifest; not a negative annotation example"},
+    {"id":"SP-CTRL-05","case":"wrong source blob hash","expected":"source_mismatch","scope":"exact symbol blob, not full file hash replacement"},
+    {"id":"SP-CTRL-06","case":"wrong graph snapshot hash","expected":"source_mismatch","scope":"retained graph pin and actual backend receipt required"},
+    {"id":"SP-CTRL-07","case":"private code .claude or logs root","expected":"unsupported","scope":"path boundary only, not general per-project/user authorization"},
+    {"id":"SP-CTRL-08","case":"private annotation or edge source","expected":"unsupported","scope":"no private metadata disclosure"},
+    {"id":"SP-CTRL-09","case":"spoofed relation source or target kind","expected":"source_mismatch","scope":"retain no mixed relation payload"},
+    {"id":"SP-CTRL-10","case":"final manifest/blob/symbol/tag/page/more changed","expected":"snapshot_changed","scope":"clear all symbol/annotation results on the final drift recheck; cooperative deadline may separately yield budget_exhausted; no transaction or ABA guarantee"},
+    {"id":"SP-CTRL-11","case":"peer address outside configured HTTP ACL","expected":"HTTP403_before_tool","scope":"ignore spoofed forwarding headers; peer ACL does not authenticate reviewer or authorize each project/symbol"},
+    {"id":"SP-CTRL-12","case":"known public symbol with complete empty selected overlay page","expected":"no_annotations","scope":"not not_found/unavailable/unsupported/partial; safety unknown"},
+    {"id":"SP-CTRL-13","case":"unknown symbol","expected":"not_found","scope":"not no_annotations or a known safe symbol"},
+    {"id":"SP-CTRL-14","case":"deadline, unavailable reader or page truncation","expected":"budget_exhausted_unavailable_or_partial","scope":"preserve exact actual status/cap/denominator; do not zero-fill missing tags"},
+    {"id":"SP-CTRL-15","case":"automatic rule output substituted for a manual operator relation","expected":"consumer_reject_or_unknown","scope":"separate opt-in cks.context.rule_candidates; no vulnerability or policy-compliance acceptance"},
+    {"id":"SP-CTRL-16","case":"foreign project/store or same name in another project","expected":"consumer_refuse_or_unknown_scope","scope":"annotation wire lacks explicit project/dataset fields; require independently bound routed store/session/canonical/source/commit/snapshot, never infer identity from name"}
+  ]
+}
