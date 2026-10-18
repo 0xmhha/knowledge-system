@@ -44,6 +44,11 @@ class PreparationGuardTests(unittest.TestCase):
             value['wi1_dev_gold_preparation']['status'] = 'independent_approved'
         self.assertTrue(self.errors())
 
+    def test_WI1_consumer_mapping_cannot_be_independent_gold(self):
+        for value in (self.protocol, self.ledger):
+            value['wi1_consumer_matching_preparation']['status'] = 'independent_approved'
+        self.assertTrue(self.errors())
+
     def test_previous_authoring_source_must_stay_pinned(self):
         self.protocol['independent_freeze_preparation']['historical_source_revision'] = 'HEAD'
         self.assertTrue(self.errors())

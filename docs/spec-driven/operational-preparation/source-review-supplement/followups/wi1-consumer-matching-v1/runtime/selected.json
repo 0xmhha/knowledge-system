@@ -1,0 +1,452 @@
+[
+  {
+    "case_id": "SRC-001",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/backend.(*API).Status",
+      "confidence": "EXTRACTED",
+      "file": "consensus/wbft/backend/api.go",
+      "id": "ba159e3b50baca08",
+      "line": 169,
+      "name": "Status",
+      "qname": "backend.API.Status",
+      "signature": "func (API) Status(startBlockNum *rpc.BlockNumber, endBlockNum *rpc.BlockNumber) (*Status, error)",
+      "type": "Method",
+      "usage_score": 0
+    }
+  },
+  {
+    "case_id": "SRC-002",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/backend.(*Backend).Gossip",
+      "confidence": "EXTRACTED",
+      "file": "consensus/wbft/backend/backend.go",
+      "id": "ffb6974946cec1cb",
+      "line": 176,
+      "name": "Gossip",
+      "qname": "backend.Backend.Gossip",
+      "signature": "func (Backend) Gossip(valSet wbft.ValidatorSet, code uint64, payload []byte) error",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-003",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).handleRoundChangeMsg",
+      "confidence": "EXTRACTED",
+      "file": "consensus/wbft/core/roundchange.go",
+      "id": "d199d10f1ddc963a",
+      "line": 103,
+      "name": "handleRoundChangeMsg",
+      "qname": "core.Core.handleRoundChangeMsg",
+      "signature": "func (Core) handleRoundChangeMsg(roundChange *wbfmessage.RoundChange) error",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-004",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/messages.(*Preprepare).DecodeRLP",
+      "confidence": "EXTRACTED",
+      "file": "consensus/wbft/messages/preprepare.go",
+      "id": "ce300122b95f6a91",
+      "line": 73,
+      "name": "DecodeRLP",
+      "qname": "messages.Preprepare.DecodeRLP",
+      "signature": "func (Preprepare) DecodeRLP(stream *rlp.Stream) error",
+      "type": "Method",
+      "usage_score": 0
+    }
+  },
+  {
+    "case_id": "SRC-006",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/rawdb.ReadHeaderRange",
+      "confidence": "EXTRACTED",
+      "file": "core/rawdb/accessors_chain.go",
+      "id": "7f798e06a45f618b",
+      "line": 295,
+      "name": "ReadHeaderRange",
+      "qname": "rawdb.ReadHeaderRange",
+      "signature": "func ReadHeaderRange(db ethdb.Reader, number uint64, count uint64) []rlp.RawValue",
+      "type": "Function",
+      "usage_score": 2
+    }
+  },
+  {
+    "case_id": "SRC-007",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/rawdb.ReadAllBadBlocks",
+      "confidence": "EXTRACTED",
+      "file": "core/rawdb/accessors_chain.go",
+      "id": "83632de0850e7330",
+      "line": 875,
+      "name": "ReadAllBadBlocks",
+      "qname": "rawdb.ReadAllBadBlocks",
+      "signature": "func ReadAllBadBlocks(db ethdb.Reader) []*types.Block",
+      "type": "Function",
+      "usage_score": 4
+    }
+  },
+  {
+    "case_id": "SRC-009",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/rawdb.inspectFreezers",
+      "confidence": "EXTRACTED",
+      "file": "core/rawdb/ancient_utils.go",
+      "id": "0a132d8122a36ce1",
+      "line": 80,
+      "name": "inspectFreezers",
+      "qname": "rawdb.inspectFreezers",
+      "signature": "func inspectFreezers(db ethdb.Database) ([]freezerInfo, error)",
+      "type": "Function",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-010",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/rawdb.InitDatabaseFromFreezer",
+      "confidence": "EXTRACTED",
+      "file": "core/rawdb/chain_iterator.go",
+      "id": "86429059af8d6ad3",
+      "line": 35,
+      "name": "InitDatabaseFromFreezer",
+      "qname": "rawdb.InitDatabaseFromFreezer",
+      "signature": "func InitDatabaseFromFreezer(db ethdb.Database)",
+      "type": "Function",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-011",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/state.(*StateDB).DumpToCollector",
+      "confidence": "EXTRACTED",
+      "file": "core/state/dump.go",
+      "id": "21acce5d91aa1a36",
+      "line": 118,
+      "name": "DumpToCollector",
+      "qname": "state.StateDB.DumpToCollector",
+      "signature": "func (StateDB) DumpToCollector(c DumpCollector, conf *DumpConfig) (nextKey []byte)",
+      "type": "Method",
+      "usage_score": 3
+    }
+  },
+  {
+    "case_id": "SRC-012",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/state/pruner.(*Pruner).Prune",
+      "confidence": "EXTRACTED",
+      "file": "core/state/pruner/pruner.go",
+      "id": "5be5ca2d107d4c10",
+      "line": 238,
+      "name": "Prune",
+      "qname": "pruner.Pruner.Prune",
+      "signature": "func (Pruner) Prune(root common.Hash) error",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-013",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/state/pruner.RecoverPruning",
+      "confidence": "EXTRACTED",
+      "file": "core/state/pruner/pruner.go",
+      "id": "8b9f13b6518ab7c6",
+      "line": 343,
+      "name": "RecoverPruning",
+      "qname": "pruner.RecoverPruning",
+      "signature": "func RecoverPruning(datadir string, db ethdb.Database) error",
+      "type": "Function",
+      "usage_score": 2
+    }
+  },
+  {
+    "case_id": "SRC-014",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/state/snapshot.generateStorages",
+      "confidence": "EXTRACTED",
+      "file": "core/state/snapshot/generate.go",
+      "id": "c8c270568bbcad7b",
+      "line": 520,
+      "name": "generateStorages",
+      "qname": "snapshot.generateStorages",
+      "signature": "func generateStorages(ctx *generatorContext, dl *diskLayer, stateRoot common.Hash, account common.Hash, storageRoot common.Hash, storeMarker []byte) error",
+      "type": "Function",
+      "usage_score": 2
+    }
+  },
+  {
+    "case_id": "SRC-016",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/txpool/blobpool.(*BlobPool).Init",
+      "confidence": "EXTRACTED",
+      "file": "core/txpool/blobpool/blobpool.go",
+      "id": "83281cabfbd59a56",
+      "line": 347,
+      "name": "Init",
+      "qname": "blobpool.BlobPool.Init",
+      "signature": "func (BlobPool) Init(gasTip uint64, head *types.Header, reserver txpool.Reserver) error",
+      "type": "Method",
+      "usage_score": 6
+    }
+  },
+  {
+    "case_id": "SRC-017",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/txpool/blobpool.(*BlobPool).Reset",
+      "confidence": "EXTRACTED",
+      "file": "core/txpool/blobpool/blobpool.go",
+      "id": "1270adea42c36506",
+      "line": 784,
+      "name": "Reset",
+      "qname": "blobpool.BlobPool.Reset",
+      "signature": "func (BlobPool) Reset(oldHead, newHead *types.Header)",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-018",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/txpool/blobpool.newLimbo",
+      "confidence": "EXTRACTED",
+      "file": "core/txpool/blobpool/limbo.go",
+      "id": "163cd5ed086c1ae2",
+      "line": 51,
+      "name": "newLimbo",
+      "qname": "blobpool.newLimbo",
+      "signature": "func newLimbo(datadir string) (*limbo, error)",
+      "type": "Function",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-019",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/core/txpool/legacypool.(*LegacyPool).scheduleReorgLoop",
+      "confidence": "EXTRACTED",
+      "file": "core/txpool/legacypool/legacypool.go",
+      "id": "8b677e8078ea1315",
+      "line": 1294,
+      "name": "scheduleReorgLoop",
+      "qname": "legacypool.LegacyPool.scheduleReorgLoop",
+      "signature": "func (LegacyPool) scheduleReorgLoop()",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-021",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/eth/downloader.(*DownloaderAPI).eventLoop",
+      "confidence": "EXTRACTED",
+      "file": "eth/downloader/api.go",
+      "id": "453db8e631e55918",
+      "line": 67,
+      "name": "eventLoop",
+      "qname": "downloader.DownloaderAPI.eventLoop",
+      "signature": "func (DownloaderAPI) eventLoop()",
+      "type": "Method",
+      "usage_score": 2
+    }
+  },
+  {
+    "case_id": "SRC-022",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).findBeaconAncestor",
+      "confidence": "EXTRACTED",
+      "file": "eth/downloader/beaconsync.go",
+      "id": "00ed4ad3b1e377d2",
+      "line": 195,
+      "name": "findBeaconAncestor",
+      "qname": "downloader.Downloader.findBeaconAncestor",
+      "signature": "func (Downloader) findBeaconAncestor() (uint64, error)",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-023",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).findAncestorSpanSearch",
+      "confidence": "EXTRACTED",
+      "file": "eth/downloader/downloader.go",
+      "id": "a9ccc5c3bae79be3",
+      "line": 894,
+      "name": "findAncestorSpanSearch",
+      "qname": "downloader.Downloader.findAncestorSpanSearch",
+      "signature": "func (Downloader) findAncestorSpanSearch(p *peerConnection, mode SyncMode, remoteHeight, localHeight uint64, floor int64) (uint64, error)",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-024",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/eth/downloader.(*queue).deliver",
+      "confidence": "EXTRACTED",
+      "file": "eth/downloader/queue.go",
+      "id": "a81bb46eff203d6c",
+      "line": 862,
+      "name": "deliver",
+      "qname": "downloader.queue.deliver",
+      "signature": "func (queue) deliver(id string, taskPool map[common.Hash]*types.Header, taskQueue *prque.Prque[int64, *types.Header], pendPool map[string]*fetchRequest, reqTimer *metrics.Timer, resInMeter *metrics.Meter, resDropMeter *metrics.Meter, results int, validate func(index int, header *types.Header) error, reconstruct func(index int, result *fetchResult)) (int, error)",
+      "type": "Method",
+      "usage_score": 4
+    }
+  },
+  {
+    "case_id": "SRC-027",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/miner.(*worker).newWorkLoopOrigin",
+      "confidence": "EXTRACTED",
+      "file": "miner/worker.go",
+      "id": "e08865e3cfce2ff8",
+      "line": 510,
+      "name": "newWorkLoopOrigin",
+      "qname": "miner.worker.newWorkLoopOrigin",
+      "signature": "func (worker) newWorkLoopOrigin(recommit time.Duration)",
+      "type": "Method",
+      "usage_score": 8
+    }
+  },
+  {
+    "case_id": "SRC-028",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/miner.newTransactionsByPriceAndNonce",
+      "confidence": "EXTRACTED",
+      "file": "miner/ordering.go",
+      "id": "53a2cdf96713070b",
+      "line": 134,
+      "name": "newTransactionsByPriceAndNonce",
+      "qname": "miner.newTransactionsByPriceAndNonce",
+      "signature": "func newTransactionsByPriceAndNonce(signer types.Signer, txs map[common.Address][]*txpool.LazyTransaction, baseFee *big.Int, headerTip *big.Int, anzeonEnabled bool, stateDB *state.StateDB) *transactionsByPriceAndNonce",
+      "type": "Function",
+      "usage_score": 14
+    }
+  },
+  {
+    "case_id": "SRC-029",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/miner.(*worker).newWorkLoopWBFT",
+      "confidence": "EXTRACTED",
+      "file": "miner/worker.go",
+      "id": "bc198f56ca4f9b6b",
+      "line": 608,
+      "name": "newWorkLoopWBFT",
+      "qname": "miner.worker.newWorkLoopWBFT",
+      "signature": "func (worker) newWorkLoopWBFT()",
+      "type": "Method",
+      "usage_score": 6
+    }
+  },
+  {
+    "case_id": "SRC-030",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/miner.(*worker).mainLoop",
+      "confidence": "EXTRACTED",
+      "file": "miner/worker.go",
+      "id": "592572e2874cac68",
+      "line": 686,
+      "name": "mainLoop",
+      "qname": "miner.worker.mainLoop",
+      "signature": "func (worker) mainLoop()",
+      "type": "Method",
+      "usage_score": 2
+    }
+  },
+  {
+    "case_id": "SRC-031",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/p2p/discover.(*UDPv4).Resolve",
+      "confidence": "EXTRACTED",
+      "file": "p2p/discover/v4_udp.go",
+      "id": "2b798d97f7dcb5e3",
+      "line": 175,
+      "name": "Resolve",
+      "qname": "discover.UDPv4.Resolve",
+      "signature": "func (UDPv4) Resolve(n *enode.Node) *enode.Node",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-033",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/p2p/discover.(*UDPv5).waitForNodes",
+      "confidence": "EXTRACTED",
+      "file": "p2p/discover/v5_udp.go",
+      "id": "728d58ccf08e4b13",
+      "line": 391,
+      "name": "waitForNodes",
+      "qname": "discover.UDPv5.waitForNodes",
+      "signature": "func (UDPv5) waitForNodes(c *callV5, distances []uint) ([]*enode.Node, error)",
+      "type": "Method",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-034",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/p2p/enr.decodeRecord",
+      "confidence": "EXTRACTED",
+      "file": "p2p/enr/enr.go",
+      "id": "fa12c05798267a57",
+      "line": 216,
+      "name": "decodeRecord",
+      "qname": "enr.decodeRecord",
+      "signature": "func decodeRecord(s *rlp.Stream) (dec Record, raw []byte, err error)",
+      "type": "Function",
+      "usage_score": 1
+    }
+  },
+  {
+    "case_id": "SRC-036",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/rpc.DialOptions",
+      "confidence": "EXTRACTED",
+      "file": "rpc/client.go",
+      "id": "d66b540268286c7b",
+      "line": 193,
+      "name": "DialOptions",
+      "qname": "rpc.DialOptions",
+      "signature": "func DialOptions(ctx context.Context, rawurl string, options ...ClientOption) (*Client, error)",
+      "type": "Function",
+      "usage_score": 6
+    }
+  },
+  {
+    "case_id": "SRC-039",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/rpc.StartIPCEndpoint",
+      "confidence": "EXTRACTED",
+      "file": "rpc/endpoints.go",
+      "id": "621bf7584830f69c",
+      "line": 27,
+      "name": "StartIPCEndpoint",
+      "qname": "rpc.StartIPCEndpoint",
+      "signature": "func StartIPCEndpoint(ipcEndpoint string, apis []API) (net.Listener, *Server, error)",
+      "type": "Function",
+      "usage_score": 2
+    }
+  },
+  {
+    "case_id": "SRC-040",
+    "node": {
+      "canonical_id": "github.com/ethereum/go-ethereum/rpc.(*handler).handleBatch",
+      "confidence": "EXTRACTED",
+      "file": "rpc/handler.go",
+      "id": "11e3a2d01b9bc74e",
+      "line": 168,
+      "name": "handleBatch",
+      "qname": "rpc.handler.handleBatch",
+      "signature": "func (handler) handleBatch(msgs []*jsonrpcMessage)",
+      "type": "Method",
+      "usage_score": 4
+    }
+  }
+]

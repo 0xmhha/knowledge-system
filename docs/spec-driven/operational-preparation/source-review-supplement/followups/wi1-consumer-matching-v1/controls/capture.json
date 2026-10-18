@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "reference": "n0.0",
+      "consumer": "b0/n0",
+      "candidates": [
+        "b0/n0"
+      ],
+      "span": {
+        "end": 62,
+        "start": 46
+      },
+      "synthetic": false
+    },
+    {
+      "reference": "n0.1",
+      "consumer": "b0/n1",
+      "candidates": [
+        "b0/n1"
+      ],
+      "span": {
+        "end": 67,
+        "start": 64
+      },
+      "synthetic": false
+    },
+    {
+      "reference": "n0.2",
+      "consumer": "b0/n2",
+      "candidates": [
+        "b0/n2"
+      ],
+      "span": {
+        "end": 77,
+        "start": 69
+      },
+      "synthetic": false
+    }
+  ],
+  "bindings": [
+    {
+      "reference": "v@33",
+      "consumer": "v33",
+      "candidates": [
+        "v33"
+      ]
+    },
+    {
+      "reference": "v@46",
+      "consumer": "v46",
+      "candidates": [
+        "v46"
+      ]
+    }
+  ],
+  "occurrences": [
+    {
+      "reference": "d:o@33",
+      "consumer": "entry/definition/v33/33",
+      "consumer_roles": [
+        "definition"
+      ],
+      "candidates": [
+        "entry/definition/v33/33"
+      ],
+      "reference_owner": "entry",
+      "phase": "definition",
+      "span": {
+        "end": 34,
+        "start": 33
+      }
+    },
+    {
+      "reference": "d:o@46",
+      "consumer": "b0/n0/definition/v46/46",
+      "consumer_roles": [
+        "definition"
+      ],
+      "candidates": [
+        "b0/n0/definition/v46/46"
+      ],
+      "reference_owner": "n0.0",
+      "phase": "definition",
+      "span": {
+        "end": 47,
+        "start": 46
+      }
+    },
+    {
+      "reference": "u:o@64",
+      "consumer": "b0/n1/reference/v46/64",
+      "consumer_roles": [
+        "reference"
+      ],
+      "candidates": [
+        "b0/n1/reference/v46/64"
+      ],
+      "reference_owner": "n0.1",
+      "phase": "use",
+      "span": {
+        "end": 65,
+        "start": 64
+      }
+    },
+    {
+      "reference": "u:o@76",
+      "consumer": "b0/n2/use/v33/76",
+      "consumer_roles": [
+        "use"
+      ],
+      "candidates": [
+        "b0/n2/use/v33/76"
+      ],
+      "reference_owner": "n0.2",
+      "phase": "use",
+      "span": {
+        "end": 77,
+        "start": 76
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "reference": 0,
+      "candidates": [
+        0
+      ],
+      "consumer": 0
+    },
+    {
+      "reference": 1,
+      "candidates": [
+        1
+      ],
+      "consumer": 1
+    }
+  ],
+  "branches": [],
+  "unmatched_nodes": 0,
+  "unmatched_bindings": 0,
+  "unmatched_occurrence_phases": 0,
+  "unmatched_blocks": 0
+}

@@ -1,0 +1,110 @@
+// Partial source typing evidence only; never a value-flow or independent oracle.
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"go/types"
+	"os"
+)
+
+type Input struct {
+	Path, Source string
+	Starts       []int
+}
+type TypeRow struct {
+	Start      int    `json:"start"`
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	Underlying string `json:"underlying"`
+	Domain     string `json:"domain"`
+}
+type Audit struct {
+	Path    string    `json:"path"`
+	Start   int       `json:"start"`
+	Context string    `json:"context"`
+	Errors  []string  `json:"errors"`
+	Rows    []TypeRow `json:"rows"`
+}
+
+func audit(path, source string, start, offset int, context string) Audit {
+	fs := token.NewFileSet()
+	file, err := parser.ParseFile(fs, path, source, parser.SkipObjectResolution)
+	if err != nil {
+		panic(err)
+	}
+	out := Audit{Path: path, Start: start, Context: context, Errors: []string{}, Rows: []TypeRow{}}
+	info := &types.Info{Defs: map[*ast.Ident]types.Object{}}
+	tc := types.Config{DisableUnusedImportCheck: true, Error: func(err error) { out.Errors = append(out.Errors, err.Error()) }}
+	_, _ = tc.Check(file.Name.Name, fs, []*ast.File{file}, info)
+	ast.Inspect(file, func(n ast.Node) bool {
+		id, ok := n.(*ast.Ident)
+		if !ok {
+			return true
+		}
+		obj := info.Defs[id]
+		if obj == nil {
+			return true
+		}
+		switch obj.(type) {
+		case *types.Var, *types.Const:
+		default:
+			return true
+		}
+		t := obj.Type()
+		u := t.Underlying()
+		domain := "unknown"
+		switch x := u.(type) {
+		case *types.Basic:
+			if x.Kind() != types.Invalid {
+				domain = "scalar"
+			}
+		case *types.Pointer, *types.Slice, *types.Map, *types.Chan, *types.Interface, *types.Signature:
+			domain = "reference_binding"
+		case *types.Struct, *types.Array:
+			domain = "aggregate_binding"
+		}
+		if _, ok := t.(*types.TypeParam); ok {
+			domain = "unknown"
+		}
+		out.Rows = append(out.Rows, TypeRow{fs.Position(id.Pos()).Offset + offset, id.Name, t.String(), u.String(), domain})
+		return true
+	})
+	return out
+}
+func main() {
+	var inputs []Input
+	if err := json.NewDecoder(os.Stdin).Decode(&inputs); err != nil {
+		panic(err)
+	}
+	out := []Audit{}
+	for _, in := range inputs {
+		fs := token.NewFileSet()
+		f, err := parser.ParseFile(fs, in.Path, in.Source, parser.SkipObjectResolution)
+		if err != nil {
+			panic(err)
+		}
+		for _, d := range f.Decls {
+			fn, ok := d.(*ast.FuncDecl)
+			if !ok || fn.Body == nil {
+				continue
+			}
+			start := fs.Position(fn.Pos()).Offset
+			for _, wanted := range in.Starts {
+				if wanted != start {
+					continue
+				}
+				out = append(out, audit(in.Path, in.Source, start, 0, "partial_single_file"))
+				prefix := "package isolated\n"
+				end := fs.Position(fn.End()).Offset
+				out = append(out, audit(in.Path, prefix+in.Source[start:end], start, start-len(prefix), "isolated_function"))
+			}
+		}
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(out); err != nil {
+		panic(fmt.Sprint(err))
+	}
+}

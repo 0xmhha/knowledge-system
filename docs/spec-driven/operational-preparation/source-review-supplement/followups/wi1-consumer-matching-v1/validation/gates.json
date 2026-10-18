@@ -1,0 +1,67 @@
+[
+  {
+    "name": "formal-gold-refusal",
+    "argv": [
+      "python3",
+      "scripts/check-wi1-consumer-matching.py",
+      "--require-formal-gold"
+    ],
+    "exit_code": 1,
+    "expected_exit": 1
+  },
+  {
+    "name": "formal-freeze-refusal",
+    "argv": [
+      "python3",
+      "scripts/check-operational-acceptance.py",
+      "--require-frozen"
+    ],
+    "exit_code": 1,
+    "expected_exit": 1
+  },
+  {
+    "name": "aux-fmt",
+    "argv": [
+      "gofmt",
+      "-d",
+      "scripts/wi1_type_audit.go.txt"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0
+  },
+  {
+    "name": "aux-vet",
+    "argv": [
+      "go",
+      "vet",
+      "/private/tmp/ks-wi1-match-20261018/type-audit.go"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0
+  },
+  {
+    "name": "python-syntax",
+    "argv": [
+      "python3",
+      "-m",
+      "py_compile",
+      "scripts/wi1_consumer_matching.py",
+      "scripts/prepare-wi1-consumer-matching.py",
+      "scripts/check-wi1-consumer-matching.py",
+      "scripts/test_wi1_consumer_matching.py",
+      "scripts/verify-wi1-consumer-runtime.py"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0
+  },
+  {
+    "name": "whitespace",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0
+  }
+]

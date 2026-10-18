@@ -1,0 +1,13 @@
+import sys,importlib.util,json,pathlib
+R=pathlib.Path.cwd();sys.path.insert(0,str(R/'scripts'));import wi1_dev_gold as g
+p=pathlib.Path('/private/tmp/ks-wi1-match-20261018/final/runtime');spec=importlib.util.spec_from_file_location('wire',R/'scripts/eval-value-dependencies.py');w=importlib.util.module_from_spec(spec);spec.loader.exec_module(w)
+rows=g.read(p/'project-results.json');(p/'project-attempts.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');d=p/'cks-retry';d.mkdir();c=w.Client(None,None,d,command=['/private/tmp/ks-snp04-20261018-01/read-cks','mcp','--config','/private/tmp/ks-snp04-20261018-01/go-stablenet.yaml'],namespace='cks.context.')
+try:
+ c.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'wi1-single-budget-recheck','version':'1'}})
+ for row in rows:
+  if row['response']['analysis'] is not None:continue
+  out=c.tool('value_dependencies',row['arguments']);print(row['case_id'],out['status'],flush=True);assert out['analysis'] is not None and not out['analysis']['truncated'];row['response']=out
+finally:c.close();c.proc.stdout.close()
+(p/'project-results.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');receipt=g.read(p/'receipt.json');receipt['EOF_exit_codes'].append(c.proc.returncode);receipt['bounded_retry_calls']=1;receipt['initial_budget_exhausted_calls']=1;(p/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+# Recheck exact protected content inventory after the retry.
+a=g.read(p/'before.json');base=pathlib.Path('/private/tmp/ks-snp04-20261018-01/stablenet/retained-origins-v2');assert a=={key:g.sha((base/key).read_bytes()) for key in a};(p/'after.json').write_text(json.dumps(a,indent=2)+'\n')
