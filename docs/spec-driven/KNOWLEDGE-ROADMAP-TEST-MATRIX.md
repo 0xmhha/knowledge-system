@@ -1,3 +1,19 @@
+# 단계58 — WI-1 select 수신 정의 보정 / 2026-10-19
+
+[단계58 보고서](./operational-preparation/source-review-supplement/followups/wi1-select-review-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi1-select-review-v1/WORKLIST.json)이 최신 진입점이다. **AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처를 요구하지 않는다. 익명 역할 ID는 검토 여부와 근거를 구분하기 위한 선택지이며, 개인정보 제출 대기가 아니다.
+
+원래30함수·1,654쌍·소스·과거 정답/실제 응답은 보존하고 별도 보완 reference만 생성했다. 고정 CFG가 select 진입의 전체 수신 대입과 선택 분기의 LHS를 모두 담아 원래 관측기가 정의 위치를 미확정으로 남겼다. 새 관측기는 해당 CommClause의 SelectCaseBody에 있는 정확한 AST identifier만 연결한다. 6함수의16정의 위치를 보정하여37쌍 기록이 달라졌다: 구조 unknown→도달32, 도달→비도달2, 도달 유지·이유 변경3. SRC-027의 이전 반복→다음 guard/log 연결2개는 새 수신 정의가 차단한다.
+
+8개 완전한 합성 문맥은 타입 검사에 성공했고, 기존 변수 대입·선언·shadow·send/default·다중 case·closure·comma-ok를 구분했다. CFG에 없는 두 번째 수신 LHS는 unknown으로 남긴다. 실제 컴파일한 단일 합성 witness는 두 번의 수신 전 값3/8, 보정 후5/8을 관찰했다. 프로젝트 전체 타입·모든 스케줄·새 독립 표본의 증거로 확대하지 않는다.
+
+원래30개 실제 MCP 응답을 **오프라인 재매칭**했을 때 구조 차이는0개다. 새 native 호출이나 엔진 수정은 없다. 발생 지점53개와 빈 블록3개는 여전히 매칭 미확정이고, 소비자의 일부 정의 위치가 수신 분기와 다르므로 매칭을 느슨하게 하지 않았다. 값 의미의 unknown1427/positive212/negative15는 그대로이며, 구조 관계만 positive1459/negative195다. 독립 정답·정확도 점수로 사용하지 않는다. 유지 Go 소스가 같아738c4a51의 최신 native 결속·일반/race 각4107통과/18skip을 재사용한다.
+
+다음: WI-3 계측 래퍼의 선택적 CitationResolver 보존과 unanchored traversal 계약을 점검한다. 남은 전체: WI-1~3 의미/부분응답/실제설치경로, WI-4/V1/V2 실제경로·오라클, WI-6 nonseed/쌍/warm, WI-SP overlay/ACL, WI-C 필수항목/전달, 새 독립 DEV/FINAL·완전 정답·매칭·표본 충분성·F01~08, 정식9개, 온톨로지 효과 평가, 별도 선택 백로그12개다. 실제 LLM 답변 평가는 모델·인증·비용 상한 결정 후 진행한다.
+
+현재 회귀91개(WI1 select10·공통 수용58·문서20·notice3), 문서134개·생성15파일 동일 재생·Python7파일 구문·보완 Go helper fmt·공백 검사와 미승인 gold/미동결 실행 거부를 확인했다. [검증 요약](./operational-preparation/source-review-supplement/followups/wi1-select-review-v1/validation/SUMMARY.json)은 새 소비자 호출0과 기존 source/native 결과 재사용을 명시한다.
+
+이하 단계57 이전은 당시 기록이다.
+
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
 ## 2026-10-19 단계57: WI2 호출 계약·별칭·opaque helper·index 범위 점검
