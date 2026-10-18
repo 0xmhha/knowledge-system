@@ -737,6 +737,9 @@ func resolveDatasetPaths(cfg *config.Config) string {
 // Pin each concrete version before opening backends or retained source. Backend
 // and temporary source cleanup defers run before these reader leases close.
 func pinDatasetReaders(cfg *config.Config) ([]*setup.ReaderLease, error) {
+	if err := validatePinnedBackendPair(cfg); err != nil {
+		return nil, err
+	}
 	leases := []*setup.ReaderLease{}
 	seen := map[string]bool{}
 	for _, path := range []string{cfg.Backends.CKG.Path, cfg.Backends.CKV.Path, cfg.Semantic.StorePath} {
