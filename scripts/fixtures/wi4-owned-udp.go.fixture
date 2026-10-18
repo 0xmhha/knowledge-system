@@ -1,0 +1,170 @@
+// Test-only observations of the unchanged upstream UDP loop. No socket/table
+// or node is created. Synthetic deadline injection is explicitly recorded.
+package discover
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net"
+	"os"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/ethereum/go-ethereum/p2p/discover/v4wire"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+)
+
+type wi4UDPRecorder struct {
+	mu    sync.Mutex
+	f     *os.File
+	start time.Time
+	seq   int
+	id    string
+}
+
+func (r *wi4UDPRecorder) emit(event string, fields map[string]interface{}) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if fields == nil {
+		fields = map[string]interface{}{}
+	}
+	r.seq++
+	fields["event"], fields["case_id"] = event, r.id
+	fields["sequence"], fields["elapsed_ns"] = r.seq, time.Since(r.start).Nanoseconds()
+	if err := json.NewEncoder(r.f).Encode(fields); err != nil {
+		panic(err)
+	}
+}
+
+func wi4UDPError(t *testing.T, ch <-chan error) error {
+	t.Helper()
+	select {
+	case err := <-ch:
+		return err
+	case <-time.After(2 * time.Second):
+		t.Fatal("source result not received within step watchdog")
+		return nil
+	}
+}
+
+func TestWI4OwnedUDP(t *testing.T) {
+	id, path := os.Getenv("WI4_CASE"), os.Getenv("WI4_TRACE_PATH")
+	if path == "" {
+		t.Fatal("owned trace path required")
+	}
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := &wi4UDPRecorder{f: f, start: time.Now(), id: id}
+	t.Cleanup(func() {
+		r.emit("trace_end", map[string]interface{}{"test_failed": t.Failed()})
+		if err := f.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	r.emit("trace_begin", map[string]interface{}{"source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8", "resp_timeout_ns": int64(respTimeout), "step_watchdog_ms": 2000, "constructed_listener": false, "opened_socket": false})
+	ctx, cancel := context.WithCancel(context.Background())
+	u := &UDPv4{addReplyMatcher: make(chan *replyMatcher), gotreply: make(chan reply), closeCtx: ctx, cancelCloseCtx: cancel}
+	u.wg.Add(1)
+	done := make(chan struct{})
+	go func() { u.loop(); close(done) }()
+	t.Cleanup(func() {
+		r.emit("cleanup_begin", nil)
+		cancel()
+		select {
+		case <-done:
+			u.wg.Wait()
+			r.emit("cleanup_end", map[string]interface{}{"joined": true})
+		case <-time.After(2 * time.Second):
+			r.emit("cleanup_end", map[string]interface{}{"joined": false})
+			t.Error("owned UDP loop did not join")
+		}
+	})
+	r.emit("actual_loop_started", map[string]interface{}{"route": "minimal_owned_channels_actual_UDPv4_loop"})
+	ip, idA, idB := net.IP{127, 0, 0, 1}, enode.ID{1}, enode.ID{2}
+	packet := &v4wire.Pong{}
+	barrier := func() {
+		if u.handleReply(enode.ID{99}, ip, packet) {
+			t.Fatal("unmatched registration barrier unexpectedly matched")
+		}
+		r.emit("actual_registration_barrier", nil)
+	}
+	switch id {
+	case "UDP-near":
+		p1 := u.pending(idA, ip, packet.Kind(), func(v4wire.Packet) (bool, bool) { return true, true })
+		p2 := u.pending(idB, ip, packet.Kind(), func(v4wire.Packet) (bool, bool) { return true, true })
+		barrier()
+		delta := p2.deadline.Sub(p1.deadline)
+		if delta < 0 || delta >= respTimeout {
+			t.Fatal("near registration readiness not proved")
+		}
+		r.emit("actual_pending_pair", map[string]interface{}{"deadline_order_ns": int64(delta), "synthetic_deadlines": false, "single_reset_invocation_count_known": false})
+		for i, ch := range []<-chan error{p1.errc, p2.errc} {
+			if err := wi4UDPError(t, ch); err != errTimeout {
+				t.Fatalf("native timeout %d: %v", i, err)
+			}
+			r.emit(fmt.Sprintf("native_timeout_%d", i+1), nil)
+		}
+		r.emit("observation_frozen", map[string]interface{}{"timeouts": 2, "reset_invocations": nil, "full_original_driver_acceptance": false})
+	case "UDP-response-timeout":
+		calls := [2]int{}
+		p1 := u.pending(idA, ip, packet.Kind(), func(v4wire.Packet) (bool, bool) { calls[0]++; return true, true })
+		p2 := u.pending(idA, ip, packet.Kind(), func(v4wire.Packet) (bool, bool) { calls[1]++; return true, true })
+		barrier()
+		r.emit("one_reply_invoke", map[string]interface{}{"registered": 2, "selected_arm": "response"})
+		if !u.handleReply(idA, ip, packet) {
+			t.Fatal("actual response did not match")
+		}
+		if err := wi4UDPError(t, p1.errc); err != nil {
+			t.Fatalf("first completion: %v", err)
+		}
+		if calls != [2]int{1, 0} {
+			t.Fatalf("unmodelled one-event callback counts: %v", calls)
+		}
+		select {
+		case err := <-p2.errc:
+			t.Fatalf("second result before frozen one-event observation: %v", err)
+		default:
+		}
+		r.emit("observation_frozen", map[string]interface{}{"selected_arm": "response", "callback_counts": calls, "first_result": "nil", "second_pending": true, "synthetic_deadlines": false, "product_violation_established": false})
+	case "UDP-far-pair", "UDP-far-near":
+		var p1, p2 *replyMatcher
+		gate := u.pending(idB, ip, packet.Kind(), func(v4wire.Packet) (bool, bool) {
+			now := time.Now()
+			p1.deadline = now.Add(4 * respTimeout)
+			if id == "UDP-far-pair" {
+				p2.deadline = now.Add(5 * respTimeout)
+			} else {
+				p2.deadline = now.Add(respTimeout)
+			}
+			r.emit("synthetic_deadlines_injected", map[string]interface{}{"inside_actual_loop_callback": true, "head_distance_ns": int64(p1.deadline.Sub(now)), "tail_distance_ns": int64(p2.deadline.Sub(now)), "production_reachability_proved": false})
+			return true, true
+		})
+		p1 = u.pending(idA, ip, packet.Kind(), func(v4wire.Packet) (bool, bool) { return true, true })
+		p2 = u.pending(idA, ip, packet.Kind(), func(v4wire.Packet) (bool, bool) { return true, true })
+		barrier()
+		r.emit("gate_reply_invoke", map[string]interface{}{"registered": 3, "remaining_after_gate": 2})
+		if !u.handleReply(idB, ip, packet) {
+			t.Fatal("gate did not match")
+		}
+		if err := wi4UDPError(t, gate.errc); err != nil {
+			t.Fatalf("gate completion: %v", err)
+		}
+		if err := wi4UDPError(t, p1.errc); err != errClockWarp {
+			t.Fatalf("far head outcome: %v", err)
+		}
+		r.emit("actual_clockwarp_head_received", nil)
+		r.emit("tail_pending_window_begin", nil)
+		select {
+		case err := <-p2.errc:
+			t.Fatalf("tail completed during original observation: %v", err)
+		case <-time.After(2 * time.Second):
+		}
+		r.emit("observation_frozen", map[string]interface{}{"head_result": "errClockWarp", "tail_pending": true, "observation_ms": 2000, "synthetic_deadlines": true, "timer_stop_directly_observed": false, "production_reachability_proved": false})
+	default:
+		t.Fatal("case outside declared plan")
+	}
+}

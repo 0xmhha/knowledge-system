@@ -84,6 +84,11 @@ class PreparationGuardTests(unittest.TestCase):
             value['wi6_dev_gold_preparation']['status'] = 'independent_approved'
         self.assertTrue(self.errors())
 
+    def test_WI4_actual_UDP_injected_state_cannot_be_formal_acceptance(self):
+        for value in (self.protocol,self.ledger):
+            value["wi4_target_udp"]["status"] = "independent_approved"
+        self.assertTrue(self.errors())
+
     def test_WI4_actual_source_trials_cannot_be_formal_acceptance(self):
         for value in (self.protocol,self.ledger):
             value["wi4_target_subscription"]["status"] = "independent_approved"
