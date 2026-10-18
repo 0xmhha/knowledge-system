@@ -1,0 +1,1092 @@
+{
+  "source_unknowns": [
+    {
+      "case_id": "RQ-003",
+      "location_id": "RQ-004",
+      "location_key": "2c5d04b19ce6d1557bae3edb12be1b620815da2ddbba8f8b25435034fbc9c848",
+      "rationale": "freezer 복원과 검사 제외는 같은 저장 흐름이나 함수 내 계약은 다르다. 요구된 증상의 전이/공통 원인은 미확정이다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-004",
+      "location_id": "RQ-003",
+      "location_key": "4b04909346089a394ecc72383f5758c6e22b3b6e09ead0cdeeec5012d606f2ed",
+      "rationale": "freezer 검사 정책이 인덱스 복원 반복에 영향을 주는지 이20함수만으로 확인하지 않았다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-006",
+      "location_id": "RQ-005",
+      "location_key": "16b2886d7e0e2c5f2b2e3053bc7448a6180b62858259527478e46d905f1babbc",
+      "rationale": "storage 범위 생성이 계정 재개 잔재의 원인인지 및 caller 외부 계약은 미확정이다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-009",
+      "location_id": "RQ-011",
+      "location_key": "9011c42ba1eef9cb462bd1854dfdb87966f0740d00a8aad0c7178757d87a09bd",
+      "rationale": "skeleton 재개와 ancestor 검색은 동기화 문맥을 공유하지만 공통 원인이나 직접 관련성은 미확정이다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-011",
+      "location_id": "RQ-009",
+      "location_key": "22695c1848b1e6b710476c3579d39816158f1c17e0ac31f48ca16db362da4f06",
+      "rationale": "헤더 조상 검사가 재시작 subchain 조정의 관련 위치인지 추가 계약이 필요하다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-014",
+      "location_id": "RQ-012",
+      "location_key": "b5091e983246be22fa5e7c0773a30a6844e29fc5cfab47f650485f534ee61ab3",
+      "rationale": "선택기 초기화가 실제 tcount 증가에 미치는 효과는 comparator/commitTransactions 등 범위 밖 구현이 필요하다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-014",
+      "location_id": "RQ-013",
+      "location_key": "9c08815135dc1ec0dd7898e33ab1c5862702b9580784166d0399504adf05cc1b",
+      "rationale": "WBFT head 작업 예약이 새 거래 pending 화면 갱신의 직접 관련 위치인지는 engine/실행 상태 계약 검토가 필요하다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-015",
+      "location_id": "RQ-016",
+      "location_key": "bf600ae5cf0ee641955d3ec57133c136caebac957e647142a08ff921cfce6a9c",
+      "rationale": "탐색 record 검증에서 이 RLP decode 함수까지의 실제 경로/형식 계약은 범위 밖이다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-016",
+      "location_id": "RQ-015",
+      "location_key": "eafd802ded97b516a17850349f95611f8671d57bc01e3c818abc23aa2844ecaa",
+      "rationale": "탐색 응답 검증과 ENR decode 오류의 연결은 직접 body 증거만으로 확정하지 않는다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-018",
+      "location_id": "RQ-020",
+      "location_key": "7f0569df6f960ea26970df51d6e5fc2bb5d522aa233d69adc342d2cca452a84b",
+      "rationale": "dispatch가 batch 처리를 호출하지만 재연결 정리와 batch의 시간/응답 계약이 어떤 요청을 공유하는지는 미확정이다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    },
+    {
+      "case_id": "RQ-020",
+      "location_id": "RQ-018",
+      "location_key": "d4e9d58dd5e6ffe7376950297ea4927e0b36a77cd5879944f8ac78c843c7217d",
+      "rationale": "client 재연결과 server batch 상한의 end-to-end 영향은 미검증이다.",
+      "meaning": "bounded source relevance unresolved; not negative, safety, runtime cause or failed retrieval"
+    }
+  ],
+  "source_support_refinements": {
+    "path": "core/txpool/legacypool/legacypool.go",
+    "file_sha256": "9aeac17494e1900db5454c3331153aa510954e9ba3130485e8e6efeec36442b3",
+    "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "function_sha256": "e4c7200a5531f4874840882bebd0bce31ce0def14e7772bd0be6cebd1b71d7d6",
+    "function_span": {
+      "start_byte": 49834,
+      "end_byte_exclusive": 52572
+    },
+    "witnesses": [
+      {
+        "start_byte": 51021,
+        "end_byte_exclusive": 51070,
+        "span_sha256": "e67869aabec4d5d663616978b5140e47a1f2285a5fd9417c449077a8560c6b3d",
+        "text": "promoted := pool.promoteExecutables(promoteAddrs)"
+      },
+      {
+        "start_byte": 52523,
+        "end_byte_exclusive": 52567,
+        "span_sha256": "6ec37bd22ad8fb367e325fe2f5c181e24243d5e23c8fe48cb12c7e5253d12dcf",
+        "text": "pool.txFeed.Send(core.NewTxsEvent{Txs: txs})"
+      }
+    ],
+    "explanation": "scheduleReorgLoop launches runReorg; runReorg promotes executable transactions and merges promoted/queued events before txFeed.Send. Static support, not runtime cause or scheduling fairness.",
+    "changes": [
+      {
+        "case_id": "RQ-007",
+        "location_id": "RQ-008",
+        "previous_label": "unknown",
+        "review_label": "relevant",
+        "relevance_kind": "supporting_static_call_context"
+      },
+      {
+        "case_id": "RQ-008",
+        "location_id": "RQ-007",
+        "previous_label": "unknown",
+        "review_label": "relevant",
+        "relevance_kind": "supporting_static_call_context"
+      }
+    ],
+    "root_cause_established": false,
+    "independent_review": null,
+    "caller_witness": {
+      "start_byte": 48435,
+      "end_byte_exclusive": 48497,
+      "span_sha256": "43f1591241f1accd601f2c9acf573d1346425c212a0b5a82f361512b4a9ce1dd",
+      "text": "go pool.runReorg(nextDone, reset, dirtyAccounts, queuedEvents)"
+    }
+  },
+  "partial_cases": [
+    {
+      "case_id": "RQ-001",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-002",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-003",
+      "status": "partial",
+      "stop_reasons": [
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-004",
+      "status": "partial",
+      "stop_reasons": [
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-005",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-006",
+      "status": "partial",
+      "stop_reasons": [
+        "edge_budget",
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-007",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-008",
+      "status": "partial",
+      "stop_reasons": [
+        "edge_budget",
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-009",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-010",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-011",
+      "status": "partial",
+      "stop_reasons": [
+        "edge_budget",
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-012",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-013",
+      "status": "partial",
+      "stop_reasons": [
+        "call_budget",
+        "candidate_budget",
+        "edge_budget",
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-014",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable"
+      ]
+    },
+    {
+      "case_id": "RQ-015",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-016",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-017",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-018",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-019",
+      "status": "partial",
+      "stop_reasons": [
+        "seed_budget",
+        "unanchored_edge"
+      ]
+    },
+    {
+      "case_id": "RQ-020",
+      "status": "partial",
+      "stop_reasons": [
+        "symbol_identity_unavailable",
+        "unanchored_edge"
+      ]
+    }
+  ],
+  "unlabelled_or_unmapped_slots": [
+    {
+      "case_id": "RQ-001",
+      "rank": 1,
+      "source": {
+        "path": "node/errors.go",
+        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+        "start_byte": 1333,
+        "end_byte_exclusive": 1509,
+        "span_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-001",
+      "rank": 2,
+      "source": {
+        "path": "consensus/wbft/backend/backend.go",
+        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+        "start_byte": 7846,
+        "end_byte_exclusive": 8562,
+        "span_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-001",
+      "rank": 3,
+      "source": {
+        "path": "rpc/errors.go",
+        "file_sha256": "c6f96a10deec180841b0f0b5f99188f980c2699e2bd042cbb0deaa141d810b53",
+        "start_byte": 4270,
+        "end_byte_exclusive": 4391,
+        "span_sha256": "5c20ebf43c55e383dee790d50b659583a61ea8bbab87ff17b46e3f6afad20ed9"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-002",
+      "rank": 1,
+      "source": {
+        "path": "consensus/wbft/backend/api.go",
+        "file_sha256": "a1bc409a7e68126f611ee6c339d3814b90f7711e25740a2f1119f9af2f6c2a49",
+        "start_byte": 2850,
+        "end_byte_exclusive": 3292,
+        "span_sha256": "24e3055f798d104ee3497ef9bb65c7f72a97b6e9f136238851d14d5a0e88ed3e"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-002",
+      "rank": 2,
+      "source": {
+        "path": "consensus/wbft/backend/api.go",
+        "file_sha256": "a1bc409a7e68126f611ee6c339d3814b90f7711e25740a2f1119f9af2f6c2a49",
+        "start_byte": 5986,
+        "end_byte_exclusive": 7649,
+        "span_sha256": "5e167d70a2c6f5d78ade47f126bcf068674cb517bd574a3fab44384d116aa57b"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-002",
+      "rank": 3,
+      "source": {
+        "path": "consensus/clique/api.go",
+        "file_sha256": "e4de34b46ea458886c1f2ffb5237b1309f9677fdb4ed6d974d6a6ab8a7d417ac",
+        "start_byte": 4444,
+        "end_byte_exclusive": 5621,
+        "span_sha256": "18c5fa7561bf74671e6503f91ef2dfaa4f8b4b8aab57341ecc6a758d86bcf904"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-003",
+      "rank": 1,
+      "source": {
+        "path": "cmd/gstable/snapshot.go",
+        "file_sha256": "9381248a07136eecd13a9827b34abe2f33ab8bd8a1b68701f0253603a5a8197c",
+        "start_byte": 8303,
+        "end_byte_exclusive": 8647,
+        "span_sha256": "ffbdbc663f2556685ffbe9373478cbf822bc66a6325e0dc5230b30256489e35f"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-003",
+      "rank": 2,
+      "source": {
+        "path": "trie/secure_trie.go",
+        "file_sha256": "98b6eaa7c5b2f62efbe29c5749fb91a9062c128d1b2db05854ce502c081bd036",
+        "start_byte": 6926,
+        "end_byte_exclusive": 7304,
+        "span_sha256": "398c04d2742a6362302fdd0af1fd8810f8bd492d3158300dee0b3a64010c356e"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-003",
+      "rank": 3,
+      "source": {
+        "path": "core/state/snapshot/utils.go",
+        "file_sha256": "1d646d932f79ee76c92be361c6a4a0e8851315d71e5fa5a57546b46554b23eeb",
+        "start_byte": 1062,
+        "end_byte_exclusive": 1404,
+        "span_sha256": "be688a817558e6d39ec8700e827b3ef68a1e36f8f191eef15d341e447cc7ba8f"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-004",
+      "rank": 1,
+      "source": {
+        "path": "core/chain_indexer.go",
+        "file_sha256": "ed8bec7c1e418e5c083287a7a9b3bd20f289fa297244468969e40062e3ea96be",
+        "start_byte": 14582,
+        "end_byte_exclusive": 14986,
+        "span_sha256": "3f45a4eaeeb598b41600ebad1077bd7d698b04b58c91f680a6a5008eb6b0e2c5"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-004",
+      "rank": 2,
+      "source": {
+        "path": "core/chain_indexer.go",
+        "file_sha256": "ed8bec7c1e418e5c083287a7a9b3bd20f289fa297244468969e40062e3ea96be",
+        "start_byte": 12717,
+        "end_byte_exclusive": 14080,
+        "span_sha256": "c65abe6c823fd15ebcaffbb72cf8c89423f32b21fbcffe5bdf62227d78d1ff80"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-004",
+      "rank": 3,
+      "source": {
+        "path": "core/blockchain_reader.go",
+        "file_sha256": "d1ebf159397124f442b064b5288988eede17ad45e57e0da406e491d769fdf8eb",
+        "start_byte": 13772,
+        "end_byte_exclusive": 14039,
+        "span_sha256": "9b3d2c19b28a71bb2f302d253bab9d0e76a79ce188d5fb594b4bbbd7a35faa8b"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-005",
+      "rank": 1,
+      "source": {
+        "path": "eth/protocols/snap/sync.go",
+        "file_sha256": "106b5dd421b8667c6fe7d2b440c6e2a2b35f4d51603a9364f6ce60848f4cd7bc",
+        "start_byte": 17621,
+        "end_byte_exclusive": 18808,
+        "span_sha256": "11725cd98887a09206b06e443afa96693a0cfe66d39047d4b5f5b5dba08d4b66"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-005",
+      "rank": 2,
+      "source": {
+        "path": "core/rawdb/accessors_snapshot.go",
+        "file_sha256": "d69c5e68c2efc0a3f83c888e8e473d659cb02951fa9569be14bee5ccf972c429",
+        "start_byte": 7583,
+        "end_byte_exclusive": 7867,
+        "span_sha256": "96977a1d310788ee724836b9bccfa2c8106aa381a5e6e6831befcee1a5f4024c"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-005",
+      "rank": 3,
+      "source": {
+        "path": "eth/protocols/snap/sync.go",
+        "file_sha256": "106b5dd421b8667c6fe7d2b440c6e2a2b35f4d51603a9364f6ce60848f4cd7bc",
+        "start_byte": 37228,
+        "end_byte_exclusive": 39147,
+        "span_sha256": "946897ec7fa95d4c272bd3aa5d18093a5aa4ea7bea7585eca77fe7b30abfc34b"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-006",
+      "rank": 1,
+      "source": {
+        "path": "core/rawdb/accessors_snapshot.go",
+        "file_sha256": "d69c5e68c2efc0a3f83c888e8e473d659cb02951fa9569be14bee5ccf972c429",
+        "start_byte": 2904,
+        "end_byte_exclusive": 3193,
+        "span_sha256": "9fefdc44bba3095ebaf2216c66a127bd902bcb42f6515d51c296454bab1827ce"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-006",
+      "rank": 3,
+      "source": {
+        "path": "eth/protocols/snap/sync.go",
+        "file_sha256": "106b5dd421b8667c6fe7d2b440c6e2a2b35f4d51603a9364f6ce60848f4cd7bc",
+        "start_byte": 17621,
+        "end_byte_exclusive": 18808,
+        "span_sha256": "11725cd98887a09206b06e443afa96693a0cfe66d39047d4b5f5b5dba08d4b66"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-007",
+      "rank": 1,
+      "source": {
+        "path": "trie/sync.go",
+        "file_sha256": "d907c8f57ed4488db488004239a90515bdedce9a4e628651728d7a7d4854e0b8",
+        "start_byte": 14985,
+        "end_byte_exclusive": 16123,
+        "span_sha256": "da1f5f6c987cfa5dc4c5f9c43795f7afae8b51da9484d2705684fe012e6d37b6"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-007",
+      "rank": 2,
+      "source": {
+        "path": "trie/sync.go",
+        "file_sha256": "d907c8f57ed4488db488004239a90515bdedce9a4e628651728d7a7d4854e0b8",
+        "start_byte": 14291,
+        "end_byte_exclusive": 14984,
+        "span_sha256": "7969ed29fe92306475c5b4b78eee91afcac7441a5cc92cb67578bd7f2b9dc776"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-007",
+      "rank": 3,
+      "source": {
+        "path": "ethclient/ethclient.go",
+        "file_sha256": "5ca922b05060b0c290155e6301b77a10d3416e83c7e28040e811080adef3625a",
+        "start_byte": 19511,
+        "end_byte_exclusive": 19814,
+        "span_sha256": "5e1f88d9bfddb7f4bb338aca376a554f596d4b1e20ed60d52c84757cb56f5d46"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-008",
+      "rank": 1,
+      "source": {
+        "path": "eth/api_debug.go",
+        "file_sha256": "b495c09fb5f73f564884fcf7a18b9f0f22086f28f976f14ca413b072f068fdd8",
+        "start_byte": 4492,
+        "end_byte_exclusive": 6641,
+        "span_sha256": "9f91be367ccf8302751acb3d28d78d46aec3e5e9fd5ce9b4df80f170cb48f767"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-008",
+      "rank": 2,
+      "source": {
+        "path": "core/state/access_list.go",
+        "file_sha256": "50911eef2be808c32019a7cbeb96c22a72e45a35ab2d88a19eab1e86359fdadd",
+        "start_byte": 1147,
+        "end_byte_exclusive": 1677,
+        "span_sha256": "e8adae786c8eb47508c43a07e1465be15b304cfc0ea969ac8c5362b26b8e2c83"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-008",
+      "rank": 3,
+      "source": {
+        "path": "accounts/manager.go",
+        "file_sha256": "90c46681f9c12a5b62d0161525241f802c77819e863743bca0d2256b3eda1ca9",
+        "start_byte": 6877,
+        "end_byte_exclusive": 7319,
+        "span_sha256": "8cd96580097227fcd8250d1120bcd096fd7cca91fd6121d8fb74cab968d9c0e9"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-009",
+      "rank": 1,
+      "source": {
+        "path": "consensus/beacon/consensus.go",
+        "file_sha256": "25af1aad65d7ac7017255bc94ab710a81719fd86e6d0296546970bcdf24c5063",
+        "start_byte": 10820,
+        "end_byte_exclusive": 11997,
+        "span_sha256": "24d1ca7eb4203d70b27000b57dc620732b7edd24b6d5d4bc4f13752eecf029e1"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-009",
+      "rank": 2,
+      "source": {
+        "path": "eth/catalyst/api.go",
+        "file_sha256": "9bdc7f391a62ab785308fa87c9224b4331e4bd2d4e6ca96d8c324f5f0c23caf5",
+        "start_byte": 32923,
+        "end_byte_exclusive": 33283,
+        "span_sha256": "8125dd91d5ed562a004d970e95b2f7247312d117dac206e98f6c073ad924bbab"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-009",
+      "rank": 3,
+      "source": {
+        "path": "consensus/wbft/backend/engine.go",
+        "file_sha256": "6d95bfc7fa8d36f546ce3879ba28c0c9efede2a4165276646221aa7c4b0cd1eb",
+        "start_byte": 3366,
+        "end_byte_exclusive": 4180,
+        "span_sha256": "38facf4bc87a532a7c79edeb2117a942cdb71fe4bae1eeb4c16fec56f595082d"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-010",
+      "rank": 1,
+      "source": {
+        "path": "trie/sync.go",
+        "file_sha256": "d907c8f57ed4488db488004239a90515bdedce9a4e628651728d7a7d4854e0b8",
+        "start_byte": 17418,
+        "end_byte_exclusive": 17572,
+        "span_sha256": "4d2a4d754dd287e70daf2905f444ad7db86085a3f0233ed9ebdc9a510aa75f1e"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-010",
+      "rank": 2,
+      "source": {
+        "path": "graphql/graphql.go",
+        "file_sha256": "d3f6e9e5127f1ad37dd7b88a39e1674d42119f54df53949d823c917119313a7d",
+        "start_byte": 41206,
+        "end_byte_exclusive": 42849,
+        "span_sha256": "ad47cad0c1f4e24b12182454907638c191735ac4abb37fc05e3dfd8855ad9996"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-010",
+      "rank": 3,
+      "source": {
+        "path": "core/types/receipt.go",
+        "file_sha256": "2fa1a9627b188382d77edd30ebdce53d01f3d0fa188610301a02434007948cce",
+        "start_byte": 1615,
+        "end_byte_exclusive": 1865,
+        "span_sha256": "7cf918ced19173480d3c49f588f2d80f95a6e809d8f6ccc1c78f725b58d5d055"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-011",
+      "rank": 1,
+      "source": {
+        "path": "eth/downloader/skeleton.go",
+        "file_sha256": "ba2d240856c67710efc078e7afe9ad4f7be5b767fb4aca282fe58a253dd5f858",
+        "start_byte": 25383,
+        "end_byte_exclusive": 27822,
+        "span_sha256": "f04605c6d759ea3911f795ca256d45853431caae17b1c279b0f778d3d3a12b05"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-011",
+      "rank": 3,
+      "source": {
+        "path": "eth/downloader/skeleton.go",
+        "file_sha256": "ba2d240856c67710efc078e7afe9ad4f7be5b767fb4aca282fe58a253dd5f858",
+        "start_byte": 11745,
+        "end_byte_exclusive": 14289,
+        "span_sha256": "0afbf3a0bf2f6743e380965babffa4ebca92edaaea692cf589dfeb8e82fbdfc4"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-012",
+      "rank": 1,
+      "source": {
+        "path": "core/txpool/blobpool/blobpool.go",
+        "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+        "start_byte": 11761,
+        "end_byte_exclusive": 16926,
+        "span_sha256": "f65ee1741059f3ac193548ebc5b266519fe5c605277514f4f242ea32a3dd6b53"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-012",
+      "rank": 2,
+      "source": {
+        "path": "core/txpool/blobpool/evictheap.go",
+        "file_sha256": "812c341fe6659669a634339e80bdcb037ca8f53946ebe3306141f7f959b0ff41",
+        "start_byte": 1811,
+        "end_byte_exclusive": 2668,
+        "span_sha256": "a1e498aab895c67816ecb8bf132bc0e5c65b4260226ee5dfa0f58a89565d0f64"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-012",
+      "rank": 3,
+      "source": {
+        "path": "core/txpool/blobpool/priority.go",
+        "file_sha256": "049e36427dc709c21f62d5b9e139f040b6cc6bd0dc3f34d64da3c6bc1d76fbb5",
+        "start_byte": 970,
+        "end_byte_exclusive": 1589,
+        "span_sha256": "0c78686bd2de5f4da9b500958ed68f313edd579b45dbf13f85b3347c2d5cd551"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 1,
+      "source": {
+        "path": "eth/downloader/skeleton.go",
+        "file_sha256": "ba2d240856c67710efc078e7afe9ad4f7be5b767fb4aca282fe58a253dd5f858",
+        "start_byte": 25383,
+        "end_byte_exclusive": 27822,
+        "span_sha256": "f04605c6d759ea3911f795ca256d45853431caae17b1c279b0f778d3d3a12b05"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 2,
+      "source": {
+        "path": "eth/catalyst/api.go",
+        "file_sha256": "9bdc7f391a62ab785308fa87c9224b4331e4bd2d4e6ca96d8c324f5f0c23caf5",
+        "start_byte": 25432,
+        "end_byte_exclusive": 30617,
+        "span_sha256": "153839db173c9dadcf5b2b26bb79e48f3e722e7e1413e1e364eefd7dd3a84c4f"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 3,
+      "source": {
+        "path": "miner/worker.go",
+        "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+        "start_byte": 5281,
+        "end_byte_exclusive": 5536,
+        "span_sha256": "2744d24ce789cdaff6af52f5354fe15300890f53f0ba1a1cdc21f0ee57c72d8c"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 4,
+      "source": {
+        "path": "eth/catalyst/api.go",
+        "file_sha256": "9bdc7f391a62ab785308fa87c9224b4331e4bd2d4e6ca96d8c324f5f0c23caf5",
+        "start_byte": 22505,
+        "end_byte_exclusive": 22815,
+        "span_sha256": "93c01f6bcbf8d9d9f32b88554e8bae7f8dfa95adf183e737757357d7850bdbbd"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 5,
+      "source": {
+        "path": "eth/catalyst/api.go",
+        "file_sha256": "9bdc7f391a62ab785308fa87c9224b4331e4bd2d4e6ca96d8c324f5f0c23caf5",
+        "start_byte": 22917,
+        "end_byte_exclusive": 24067,
+        "span_sha256": "6674191502619eaf1c9b8b189ece80b47df5ca48849da1cdddf4ffb0644e6bb7"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 6,
+      "source": {
+        "path": "eth/catalyst/api.go",
+        "file_sha256": "9bdc7f391a62ab785308fa87c9224b4331e4bd2d4e6ca96d8c324f5f0c23caf5",
+        "start_byte": 24169,
+        "end_byte_exclusive": 25431,
+        "span_sha256": "3f72416fbd63ed46ed66771ed7fadf02126befd4723321a5f29b757498885ab0"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 7,
+      "source": {
+        "path": "eth/catalyst/simulated_beacon.go",
+        "file_sha256": "f85665f1b9c2d5dfea62f6ef2ed3d3c6b66db4b13ea1bf00705d0e628c8d3387",
+        "start_byte": 4249,
+        "end_byte_exclusive": 6076,
+        "span_sha256": "84126d7221e8593ef42970e05355096a98e8b2f23bf40d8f5abdec75af4b9e39"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 8,
+      "source": {
+        "path": "log/root.go",
+        "file_sha256": "1c033c441ed6bf9e14aaf5a106783719d7101e599eafe4480aa5b12163879b51",
+        "start_byte": 842,
+        "end_byte_exclusive": 928,
+        "span_sha256": "e2f55c976148ac1e2fff12bd303b31944791a4d15de26b78c1a540d3f1101990"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 9,
+      "source": {
+        "path": "beacon/engine/types.go",
+        "file_sha256": "de53230e8e71e2fa51f9fab4453a1011e09c7cd55dc01c75f863c03e2d65f18a",
+        "start_byte": 7319,
+        "end_byte_exclusive": 9956,
+        "span_sha256": "484ecb3dfd1cab0e6a8fb973da1138eac56b608582608101466e3ff299782cd0"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-013",
+      "rank": 10,
+      "source": {
+        "path": "log/root.go",
+        "file_sha256": "1c033c441ed6bf9e14aaf5a106783719d7101e599eafe4480aa5b12163879b51",
+        "start_byte": 1831,
+        "end_byte_exclusive": 1920,
+        "span_sha256": "6aa5ad2063e1f81846072e825a9432efeb4a3d675b6457edbb8242d91bd35de3"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-014",
+      "rank": 1,
+      "source": {
+        "path": "interfaces.go",
+        "file_sha256": "e7912205e4a1b25eeacf2f97ef8c8cd2ddc45ac9b452aca9b9cd6789d61f5684",
+        "start_byte": 11423,
+        "end_byte_exclusive": 12274,
+        "span_sha256": "28b51b1ba29d9c69a6cbd22b4083deb3b49961f4345f83a7a0623b8f4a794df6"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-014",
+      "rank": 2,
+      "source": {
+        "path": "core/blockchain.go",
+        "file_sha256": "8dabbec127ed903c0f1df31d3e2f6a22e3dcdf0ffcc3b939d9c0115e0f95352d",
+        "start_byte": 68345,
+        "end_byte_exclusive": 74052,
+        "span_sha256": "b65d8c238614021744bba7eea76598b89c7660bfb6fc7deec8300324d8bb9dc4"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-014",
+      "rank": 3,
+      "source": {
+        "path": "eth/protocols/snap/sync.go",
+        "file_sha256": "106b5dd421b8667c6fe7d2b440c6e2a2b35f4d51603a9364f6ce60848f4cd7bc",
+        "start_byte": 18809,
+        "end_byte_exclusive": 19101,
+        "span_sha256": "c03db66f4095797675d3410504cd9b6fc58cae46f2e623d2b1468920ca92f85c"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-015",
+      "rank": 1,
+      "source": {
+        "path": "node/errors.go",
+        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+        "start_byte": 1333,
+        "end_byte_exclusive": 1509,
+        "span_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-015",
+      "rank": 2,
+      "source": {
+        "path": "trie/sync.go",
+        "file_sha256": "d907c8f57ed4488db488004239a90515bdedce9a4e628651728d7a7d4854e0b8",
+        "start_byte": 14985,
+        "end_byte_exclusive": 16123,
+        "span_sha256": "da1f5f6c987cfa5dc4c5f9c43795f7afae8b51da9484d2705684fe012e6d37b6"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-015",
+      "rank": 3,
+      "source": {
+        "path": "trie/errors.go",
+        "file_sha256": "60f3da32b036d77034c11b479e3c7317bfdbf7c96ebe96b13f0c9b71148ff22a",
+        "start_byte": 1117,
+        "end_byte_exclusive": 1607,
+        "span_sha256": "3ab18233ffaa0b5d362fa25d4666a989809c8e533f0e9a71eb4746e584320581"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-016",
+      "rank": 1,
+      "source": {
+        "path": "triedb/hashdb/database.go",
+        "file_sha256": "e6b433681e29926cb8e40f34f4e1c7a23fbfc2f7e026ee829033b0c6e3500d99",
+        "start_byte": 23056,
+        "end_byte_exclusive": 23405,
+        "span_sha256": "4dff1ba0800904bd18894cc6dc8ade4f94cea009b23a6da7ddf451f29e6f7329"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-016",
+      "rank": 2,
+      "source": {
+        "path": "triedb/database.go",
+        "file_sha256": "78026f53f6f5f50065dc893760f32f5def23a889f0107a451ad64f44e9feac8a",
+        "start_byte": 4668,
+        "end_byte_exclusive": 5084,
+        "span_sha256": "b6586cf6eecb8df7e25ab7e2efcdd9b7e9ca7cac510709f975a7f3983d9b8f39"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-016",
+      "rank": 3,
+      "source": {
+        "path": "trie/trie_reader.go",
+        "file_sha256": "661b130380e83f9b48112640129d90db78911bfbab345a32d9b0d2c93d4ee946",
+        "start_byte": 1047,
+        "end_byte_exclusive": 1300,
+        "span_sha256": "c20a9fd4b911b8b21f7d5ffbcaf31e863d81f8d36562c907f211dd3d5425a094"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-017",
+      "rank": 1,
+      "source": {
+        "path": "triedb/pathdb/database.go",
+        "file_sha256": "a5fa68bbb472a185a13298aa413a482ac129b695bf0d450e6f6dda65ec8325ff",
+        "start_byte": 17452,
+        "end_byte_exclusive": 17727,
+        "span_sha256": "85d6bbe084a071adee181c597f8a4a89d106262d88b1f8b11dc9ff4689ef669e"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-017",
+      "rank": 2,
+      "source": {
+        "path": "cmd/devp2p/internal/v5test/framework.go",
+        "file_sha256": "68d822265639592dd6fc485bbeab3eb4024b0182e8d0030a16871b6d02a0af5e",
+        "start_byte": 1053,
+        "end_byte_exclusive": 1218,
+        "span_sha256": "d4d3dca97b3f7387b1b73e359c4382a9e7e1949088e00b8572e6419aabe45928"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-017",
+      "rank": 3,
+      "source": {
+        "path": "triedb/pathdb/errors.go",
+        "file_sha256": "cf20657ee848eb755e5c304907f09892a976e5a3e6ff64bb5d5bb9bbe2f8cf68",
+        "start_byte": 930,
+        "end_byte_exclusive": 2094,
+        "span_sha256": "2023703058c4b56afe03dd24acde570edacd74f74cec7cdcffcc09186860e56b"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-018",
+      "rank": 1,
+      "source": {
+        "path": "eth/protocols/eth/dispatcher.go",
+        "file_sha256": "16630afee74aacfa069b0a65092a5ad05b2e286f49ca2ff3c3d4602627c4f780",
+        "start_byte": 930,
+        "end_byte_exclusive": 1526,
+        "span_sha256": "b3d26951029048ef729118a81567e4887e7aff5b7faa092f20dcc4fe772a0a24"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-018",
+      "rank": 2,
+      "source": {
+        "path": "eth/protocols/eth/dispatcher.go",
+        "file_sha256": "16630afee74aacfa069b0a65092a5ad05b2e286f49ca2ff3c3d4602627c4f780",
+        "start_byte": 2292,
+        "end_byte_exclusive": 2861,
+        "span_sha256": "eb7dbe88a07213b22ac9dcf966ba486b8e3ca7ea180bec4468ef34aeefe41948"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-018",
+      "rank": 3,
+      "source": {
+        "path": "eth/protocols/snap/sync.go",
+        "file_sha256": "106b5dd421b8667c6fe7d2b440c6e2a2b35f4d51603a9364f6ce60848f4cd7bc",
+        "start_byte": 64520,
+        "end_byte_exclusive": 65447,
+        "span_sha256": "12d6728ae6743636f3cecb4876a2c54528decb8c2868a11a4a01eabf16492d33"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-019",
+      "rank": 1,
+      "source": {
+        "path": "node/node.go",
+        "file_sha256": "8a069d05eb47a6516360a18c9cb45ae77feea0ff62feab3582e96a5ff35552c0",
+        "start_byte": 16361,
+        "end_byte_exclusive": 16648,
+        "span_sha256": "6ead38b3226637d72e19fd6f5e95cca15ef2fb0cad86b3c276b9bd2684384a30"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-019",
+      "rank": 2,
+      "source": {
+        "path": "node/node.go",
+        "file_sha256": "8a069d05eb47a6516360a18c9cb45ae77feea0ff62feab3582e96a5ff35552c0",
+        "start_byte": 15135,
+        "end_byte_exclusive": 15392,
+        "span_sha256": "43173af9eb575f3432707294758e013466d84631ab67cba3ac1bd48c46e505c2"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-019",
+      "rank": 3,
+      "source": {
+        "path": "node/rpcstack.go",
+        "file_sha256": "b1d6602f48300be75f6d12419bac0199ff271a51df88a86a0c937a71c6a55795",
+        "start_byte": 16613,
+        "end_byte_exclusive": 17079,
+        "span_sha256": "2b246702839159b40a771885cc4e71210f4d498692f476f6ceb3bf203c280913"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-019",
+      "rank": 4,
+      "source": {
+        "path": "cmd/clef/main.go",
+        "file_sha256": "d470fc4398199bb9537d3a542dd463eac14d826cb40ce366cab0d62fddfc0813",
+        "start_byte": 18994,
+        "end_byte_exclusive": 19023,
+        "span_sha256": "e5f58fc4bbec501cd6b4a42b6de78855252f7d7d4abcaae04932c97ee2cddccf"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-020",
+      "rank": 1,
+      "source": {
+        "path": "eth/downloader/queue.go",
+        "file_sha256": "90772dedd66066a5178f3c2c9d3bce710678b61646a2e5c8cfdfe87864db63cc",
+        "start_byte": 12172,
+        "end_byte_exclusive": 14649,
+        "span_sha256": "e3a9ddb1d598e10e9cc3efa12dccc474d5bae75fe414dbfadcdcea3cd37b119e"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-020",
+      "rank": 2,
+      "source": {
+        "path": "rpc/client.go",
+        "file_sha256": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+        "start_byte": 12572,
+        "end_byte_exclusive": 14519,
+        "span_sha256": "c3a2131515c4bad09a1ce9dc84178feb756922f621889f3860379154da9ec9a7"
+      },
+      "status": "outside_selected_universe_unknown"
+    },
+    {
+      "case_id": "RQ-020",
+      "rank": 3,
+      "source": {
+        "path": "rpc/client.go",
+        "file_sha256": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+        "start_byte": 12089,
+        "end_byte_exclusive": 12571,
+        "span_sha256": "0c8d6f2985b2c1c47df8bb2b4d14dfde8888165b6fc5e17283ca1f1c47b24c9d"
+      },
+      "status": "outside_selected_universe_unknown"
+    }
+  ],
+  "quality_scores": null,
+  "independent_review": null,
+  "remaining": "partial/provider/canonical/span coverage, outside20 semantic labels, independent family/gold/metric freeze and installed-agent investigation are not accepted"
+}
