@@ -1,3 +1,27 @@
+<!-- WI4-SCHEDULES-CURRENT -->
+# 단계63 — WI-4 WORK·GOSSIP·POOL 실제 소유 DEV 경로 / 2026-10-19
+
+[사전 명세](./operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/SCOPE.json) · [GOSSIP 보완 계획](./operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/GOSSIP-CORRECTIVE-SCOPE.json) · [결과](./operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/SUMMARY.json) · [검증 근거](./operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/validation/SUMMARY.json) · [현재·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/WORKLIST.json).
+
+**AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다. D04는 미정이며 실명·이메일·연락처를 요청하지 않는다.
+
+| 이번 기술 범위 | 결과와 한계 |
+|---|---|
+| 소스·실행 | go-stablenet `0bf2f4d1` 추적2228개 보존. 시험 파일만 추가·지정 Go1.23.12 일반/race binary 빌드. 최초72+보완24=96실행 모두 보존하며 유효 관측72·초기 구성 실패24를 구분 |
+| WORK24 | 실제 newWorkLoop→Origin을 Anzeon nil로 선택. 실제 pendingMu 대기 장벽에서 송신·exit 준비를 정한 후 해제. 양쪽 준비 시 두 결과 모두 기록하고 유한 backlog 처리만 관측. 정상 대조는 빈 버퍼이며 unbuffered 수신자·무한 공정성·운영 종료SLA 증거가 아님 |
+| GOSSIP24 유효 | 실제 Broadcast의 validator membership→Gossip/cache와 소유 self-event mux 사용. 가짜 peer의 성공·오류·지연·같은 hash 중복과 다른 hash 대조를 구분. nil 반환·가짜 성공을 네트워크 전달로 세지 않음 |
+| POOL24 | 실제 New/Init/Reset/reorg/reinject/SubscribeTransactions/Stats, 소유 임시 blob 저장소·새 시험 키·제어 chain 사용. 성공 StateAt와 비어 있지 않은 재주입1개 확인. 수신 후Stats·빈 버퍼 정상군, Stats 후수신 제어 구독자의 실제 Send/lock 대기2초, 소유 unsubscribe의 대기 해제 검증. 운영 소비자의 같은 순서 도달성은 미검증 |
+| 실패 보존 | 첫 오프라인 빌드는 캐시 경로 누락으로 시험 전에 실패하여 원문·입력을 보존. 기존 로컬 캐시를 명시. 초기 GOSSIP24는 시험 Backend의 Engine 누락으로 송신 전 exit2. panic cleanup의 t.Failed=false를 통과 근거로 쓰지 않음. 별도24계획에서 실제 NewEngine을 초기화하고 엔진/노드는 시작하지 않음 |
+| 경계·정리 | 외부 peer/socket·운영 노드 제어·시스템 시각·글로벌 설정·게시·유료모델0. credential 환경변수 상속 없이 오프라인 빌드. 관측과 cleanup/rescue를 분리하고 모든 소유 process group·helper·store 정리 확인. unsubscribe 사례의 해제는 명세에 정한 시험 단계 |
+| 범위·회귀 | 이전 SUB5·UDP4와 이번12로 기존21개 ID 모두에 제한된 DEV 실행 근거가 있음. 전체 원래 드라이버·운영 host·독립 수용은0. 관리 CKS native1738·승인5·설정2개 동일하며 이전 일반/race 각4158통과·18skip 근거를 재사용 |
+
+[보고서](./operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/REPORT.txt)를 따른다. 관측을 독립 가족/정답/seed/동결 arm·제품 결함·품질 점수로 승격하지 않는다. 회귀106개(이번20·공통63·문서20·notice3)·문서134개·원자료709개 파일 동일 재생을 통과했다. 서명 저장은 실제 Git과 `--require-stored`로 확인한다.
+
+다음: **WI-V1/V2 실제API·독립 티켓·오라클·수용 가능 후보 집합의 부채 점검**. 남은 전체: WI1의53발생/3블록·타입/값/메모리·독립 의미, WI2 독립 의미/build profile/지원/설치역할, WI3 독립 의미/새가족·기본예산/시작SLA/site거부 원인, WI4 전체 진입·수신자·시간·독립 계약·가족/오라클/충분성, WI-V1/V2 실제API/독립티켓/수용후보, WI6 nonseed/기본·확장쌍/관련성·잡음/warm, WI-SP 실제overlay/ACL/출처, WI-C 필수항목/우선순위/보고서·그림/전달/설치역할, 새독립DEV/FINAL·완전정답·matching·충분성·F01~08, 정식9개, 온톨로지 독립정답/구현·개념연결/검색효과다. 실제LLM답변 평가는 모델·인증·비용상한 결정 후 진행하며 선택 백로그12개는 별도다.
+<!-- END-WI4-SCHEDULES-CURRENT -->
+
+이하 단계62 이전은 당시 기록이다.
+
 <!-- WI4-UDP-CURRENT -->
 # 단계62 — WI-4 실제 UDP 등록·응답·합성 deadline 경로 / 2026-10-19
 

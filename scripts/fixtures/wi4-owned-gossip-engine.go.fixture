@@ -1,0 +1,187 @@
+// Test-only Broadcast/Gossip/cache observations with an owned fake peer.
+package backend
+
+import (
+	"encoding/json"
+	"errors"
+	"os"
+	"runtime"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"testing"
+	"time"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/lru"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/wbft"
+	wbftengine "github.com/ethereum/go-ethereum/consensus/wbft/engine"
+	"github.com/ethereum/go-ethereum/consensus/wbft/validator"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/event"
+)
+
+type wi4Recorder struct {
+	mu    sync.Mutex
+	f     *os.File
+	start time.Time
+	seq   int
+	id    string
+}
+
+func (r *wi4Recorder) emit(e string, d map[string]interface{}) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if d == nil {
+		d = map[string]interface{}{}
+	}
+	r.seq++
+	d["event"] = e
+	d["case_id"] = r.id
+	d["sequence"] = r.seq
+	d["elapsed_ns"] = time.Since(r.start).Nanoseconds()
+	if err := json.NewEncoder(r.f).Encode(d); err != nil {
+		panic(err)
+	}
+}
+
+type wi4Peer struct {
+	calls    atomic.Int32
+	started  chan struct{}
+	finished chan struct{}
+	release  chan struct{}
+	err      error
+	r        *wi4Recorder
+}
+
+func (p *wi4Peer) SendWBFTConsensus(code uint64, payload []byte) error {
+	p.calls.Add(1)
+	p.started <- struct{}{}
+	<-p.release
+	p.r.emit("fake_sender_completed", map[string]interface{}{"error": p.err != nil, "network_delivery_proved": false})
+	p.finished <- struct{}{}
+	return p.err
+}
+
+type wi4Broadcaster struct {
+	address common.Address
+	peer    *wi4Peer
+}
+
+func (b *wi4Broadcaster) Enqueue(string, *types.Block) {}
+func (b *wi4Broadcaster) FindPeers(targets map[common.Address]bool) map[common.Address]consensus.Peer {
+	if !targets[b.address] {
+		panic("owned peer outside actual target set")
+	}
+	return map[common.Address]consensus.Peer{b.address: b.peer}
+}
+func wi4Receive(t *testing.T, ch <-chan struct{}) {
+	t.Helper()
+	select {
+	case <-ch:
+	case <-time.After(2 * time.Second):
+		t.Fatal("owned sender event missing")
+	}
+}
+
+func TestWI4OwnedSchedules(t *testing.T) {
+	id, path := os.Getenv("WI4_CASE"), os.Getenv("WI4_TRACE_PATH")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := &wi4Recorder{f: f, start: time.Now(), id: id}
+	t.Cleanup(func() {
+		r.emit("trace_end", map[string]interface{}{"test_failed": t.Failed()})
+		if err := f.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	r.emit("trace_begin", map[string]interface{}{"source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8", "step_watchdog_ms": 2000, "production_host": false})
+	p := &wi4Peer{started: make(chan struct{}, 4), finished: make(chan struct{}, 4), release: make(chan struct{}), r: r}
+	if id == "GOSSIP-fail-repeat" {
+		p.err = errors.New("owned fake transport error")
+	}
+	var releaseOnce sync.Once
+	release := func() { releaseOnce.Do(func() { close(p.release) }) }
+	if id != "GOSSIP-delay-repeat" {
+		release()
+	}
+	self, other := common.Address{1}, common.Address{2}
+	mux := new(event.TypeMux)
+	sub := mux.Subscribe(wbft.MessageEvent{})
+	sb := &Backend{address: self, istanbulEventMux: mux, knownMessages: lru.NewCache[common.Hash, bool](16), recentMessages: lru.NewCache[common.Address, *lru.Cache[common.Hash, bool]](16), broadcaster: &wi4Broadcaster{address: other, peer: p}}
+	sb.wbftEngine = wbftengine.NewEngine(wbft.DefaultConfig, self, nil, nil)
+	set := validator.NewSet([]common.Address{self, other}, [][]byte{nil, nil}, wbft.NewRoundRobinProposerPolicy())
+	selfCount := 0
+	completed := 0
+	t.Cleanup(func() {
+		r.emit("cleanup_begin", nil)
+		release()
+		for completed < int(p.calls.Load()) {
+			wi4Receive(t, p.finished)
+			completed++
+		}
+		sub.Unsubscribe()
+		mux.Stop()
+		deadline := time.Now().Add(2 * time.Second)
+		for {
+			b := make([]byte, 2<<20)
+			n := runtime.Stack(b, true)
+			s := string(b[:n])
+			if !strings.Contains(s, "(*wi4Peer).SendWBFTConsensus") && !strings.Contains(s, "(*TypeMux).Post") {
+				break
+			}
+			if time.Now().After(deadline) {
+				t.Fatal("owned sender/mux goroutine exit not proved")
+			}
+			time.Sleep(time.Millisecond)
+		}
+		r.emit("cleanup_end", map[string]interface{}{"joined": true, "fake_calls": p.calls.Load()})
+	})
+	broadcast := func(payload []byte) {
+		if err := sb.Broadcast(set, 999999, payload); err != nil {
+			t.Fatal(err)
+		}
+		select {
+		case <-sub.Chan():
+			selfCount++
+		case <-time.After(2 * time.Second):
+			t.Fatal("actual self notification missing")
+		}
+	}
+	payload := []byte("owned-wi4-message-A")
+	broadcast(payload)
+	wi4Receive(t, p.started)
+	if id != "GOSSIP-delay-repeat" {
+		wi4Receive(t, p.finished)
+		completed++
+	}
+	peerCache, ok := sb.recentMessages.Get(other)
+	if !ok {
+		t.Fatal("actual peer cache missing")
+	}
+	if _, ok := peerCache.Get(wbft.RLPHash(payload)); !ok {
+		t.Fatal("cache mark missing before repeat")
+	}
+	r.emit("actual_first_cache_and_send", map[string]interface{}{"calls": p.calls.Load(), "self_notifications": selfCount, "fake_error": p.err != nil, "sender_held": id == "GOSSIP-delay-repeat"})
+	expected := 1
+	switch id {
+	case "GOSSIP-normal":
+	case "GOSSIP-fail-repeat", "GOSSIP-delay-repeat":
+		broadcast(payload)
+	case "GOSSIP-cache-control":
+		broadcast([]byte("owned-wi4-message-B"))
+		wi4Receive(t, p.started)
+		wi4Receive(t, p.finished)
+		completed++
+		expected = 2
+	default:
+		t.Fatal("case outside plan")
+	}
+	if int(p.calls.Load()) != expected {
+		t.Fatal("cache/send count differs")
+	}
+	r.emit("observation_frozen", map[string]interface{}{"fake_send_attempts": p.calls.Load(), "broadcast_calls": selfCount, "all_Broadcast_returns_nil": true, "first_fake_error": p.err != nil, "first_sender_still_held": id == "GOSSIP-delay-repeat", "network_delivery_proved": false, "product_violation_established": false})
+}

@@ -1,0 +1,255 @@
+// Test-only actual Reset/reorg/reinject and subscription/Stats probes.
+package blobpool
+
+import (
+	"encoding/json"
+	"math/big"
+	"os"
+	"runtime"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"testing"
+	"time"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb/memorydb"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/holiman/uint256"
+)
+
+type wi4Recorder struct {
+	mu    sync.Mutex
+	f     *os.File
+	start time.Time
+	seq   int
+	id    string
+}
+
+func (r *wi4Recorder) emit(e string, d map[string]interface{}) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if d == nil {
+		d = map[string]interface{}{}
+	}
+	r.seq++
+	d["event"] = e
+	d["case_id"] = r.id
+	d["sequence"] = r.seq
+	d["elapsed_ns"] = time.Since(r.start).Nanoseconds()
+	if err := json.NewEncoder(r.f).Encode(d); err != nil {
+		panic(err)
+	}
+}
+
+type wi4Chain struct {
+	testBlockChain
+	blocks     map[common.Hash]*types.Block
+	stateCalls atomic.Int32
+}
+
+func (c *wi4Chain) GetBlock(h common.Hash, n uint64) *types.Block { return c.blocks[h] }
+func (c *wi4Chain) StateAt(h common.Hash) (*state.StateDB, error) {
+	c.stateCalls.Add(1)
+	return c.statedb, nil
+}
+func wi4Await(t *testing.T, ch <-chan struct{}) {
+	t.Helper()
+	select {
+	case <-ch:
+	case <-time.After(2 * time.Second):
+		t.Fatal("owned Reset/Stats/helper did not join")
+	}
+}
+func wi4Stacks() string { b := make([]byte, 2<<20); n := runtime.Stack(b, true); return string(b[:n]) }
+func wi4Until(t *testing.T, fn func() bool) {
+	t.Helper()
+	end := time.Now().Add(2 * time.Second)
+	for time.Now().Before(end) {
+		if fn() {
+			return
+		}
+		time.Sleep(time.Millisecond)
+	}
+	t.Fatal("actual source blocking precondition missing")
+}
+
+func TestWI4OwnedSchedules(t *testing.T) {
+	id, path := os.Getenv("WI4_CASE"), os.Getenv("WI4_TRACE_PATH")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := &wi4Recorder{f: f, start: time.Now(), id: id}
+	t.Cleanup(func() {
+		r.emit("trace_end", map[string]interface{}{"test_failed": t.Failed()})
+		if err := f.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	r.emit("trace_begin", map[string]interface{}{"source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8", "step_watchdog_ms": 2000, "production_host": false})
+	cfg := new(params.ChainConfig)
+	*cfg = *testChainConfig
+	cfg.LondonBlock = big.NewInt(0)
+	s, err := state.New(types.EmptyRootHash, state.NewDatabase(rawdb.NewDatabase(memorydb.New())), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	key, err := crypto.GenerateKey()
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := crypto.PubkeyToAddress(key.PublicKey)
+	s.AddBalance(addr, uint256.NewInt(1_000_000_000_000_000_000))
+	c := &wi4Chain{testBlockChain: testBlockChain{config: cfg, basefee: uint256.NewInt(1050), blobfee: uint256.NewInt(105), statedb: s}, blocks: make(map[common.Hash]*types.Block)}
+	header := c.CurrentBlock()
+	genH := types.CopyHeader(header)
+	genH.Number = big.NewInt(0)
+	gen := types.NewBlockWithHeader(genH)
+	c.blocks[gen.Hash()] = gen
+	tx := types.MustSignNewTx(key, types.LatestSigner(cfg), makeUnsignedTx(0, 1, 3000, 300))
+	oldH := types.CopyHeader(header)
+	oldH.ParentHash = gen.Hash()
+	oldH.Extra = []byte("owned-old")
+	old := types.NewBlockWithHeader(oldH).WithBody([]*types.Transaction{tx.WithoutBlobTxSidecar()}, nil)
+	newH := types.CopyHeader(header)
+	newH.ParentHash = gen.Hash()
+	newH.Extra = []byte("owned-new")
+	newBlock := types.NewBlockWithHeader(newH)
+	c.blocks[old.Hash()] = old
+	c.blocks[newBlock.Hash()] = newBlock
+	p := New(Config{Datadir: t.TempDir()}, c, nil)
+	if err := p.Init(1, old.Header(), newReserver()); err != nil {
+		t.Fatal(err)
+	}
+	if err := p.limbo.push(tx, old.NumberU64()); err != nil {
+		t.Fatal(err)
+	}
+	r.emit("actual_pool_initialized", map[string]interface{}{"limbo_seeded_blob": true, "StateAt_successes": c.stateCalls.Load(), "owned_chain_not_operational": true})
+	capacity := 0
+	if id == "POOL-buffer" {
+		capacity = 1
+	}
+	events := make(chan core.NewTxsEvent, capacity)
+	sub := p.SubscribeTransactions(events, true)
+	resetDone, statsDone, receiverDone := make(chan struct{}), make(chan struct{}), make(chan struct{})
+	statsStarted := false
+	receiverStarted := false
+	resetStarted := false
+	t.Cleanup(func() {
+		r.emit("cleanup_begin", nil)
+		sub.Unsubscribe()
+		close(events)
+		if resetStarted {
+			wi4Await(t, resetDone)
+		}
+		if statsStarted {
+			wi4Await(t, statsDone)
+		}
+		if receiverStarted {
+			wi4Await(t, receiverDone)
+		}
+		if err := p.Close(); err != nil {
+			t.Error(err)
+		}
+		r.emit("cleanup_end", map[string]interface{}{"joined": true})
+	})
+	stats := func() {
+		statsStarted = true
+		go func() {
+			r.emit("Stats_invoke", nil)
+			p.Stats()
+			r.emit("Stats_returned", nil)
+			if id == "POOL-lock-cycle" {
+				ev, ok := <-events
+				r.emit("subscriber_receive_after_Stats", map[string]interface{}{"received": ok, "txs": len(ev.Txs)})
+			}
+			close(statsDone)
+		}()
+	}
+	if id == "POOL-normal" {
+		receiverStarted = true
+		go func() {
+			defer close(receiverDone)
+			ev := <-events
+			if len(ev.Txs) != 1 || ev.Txs[0].Hash() != tx.Hash() {
+				t.Error("nonempty reinjected event differs")
+			}
+			r.emit("actual_event_received", map[string]interface{}{"txs": len(ev.Txs)})
+			p.Stats()
+			r.emit("subscriber_Stats_returned", nil)
+		}()
+	}
+	resetStarted = true
+	go func() {
+		p.Reset(old.Header(), newBlock.Header())
+		r.emit("actual_Reset_returned", nil)
+		close(resetDone)
+	}()
+	if id == "POOL-lock-cycle" || id == "POOL-unsubscribe" {
+		wi4Until(t, func() bool {
+			for _, g := range strings.Split(wi4Stacks(), "\n\n") {
+				if strings.Contains(g, "(*BlobPool).Reset") && strings.Contains(g, "(*Feed).Send") {
+					return true
+				}
+			}
+			return false
+		})
+		r.emit("actual_Reset_Send_blocked", map[string]interface{}{"nonempty_reinject_proved": true, "StateAt_successes": c.stateCalls.Load()})
+		if id == "POOL-lock-cycle" {
+			stats()
+			wi4Until(t, func() bool {
+				for _, g := range strings.Split(wi4Stacks(), "\n\n") {
+					if strings.Contains(g, "(*BlobPool).Stats") && strings.Contains(g, "sync.(*Mutex).lockSlow") {
+						return true
+					}
+				}
+				return false
+			})
+			r.emit("actual_Stats_lock_blocked", nil)
+		}
+		if err := os.WriteFile(path+".before-observation.stack", []byte(wi4Stacks()), 0600); err != nil {
+			t.Fatal(err)
+		}
+		r.emit("blocked_window_begin", nil)
+		select {
+		case <-resetDone:
+			t.Fatal("Reset unexpectedly returned before rescue")
+		case <-time.After(2 * time.Second):
+		}
+		if err := os.WriteFile(path+".after-observation.stack", []byte(wi4Stacks()), 0600); err != nil {
+			t.Fatal(err)
+		}
+		r.emit("blocked_observation_frozen", map[string]interface{}{"observation_ms": 2000, "Stats_waiting": id == "POOL-lock-cycle", "source_Send_waiting": true})
+		if id == "POOL-unsubscribe" {
+			r.emit("owned_unsubscribe_invoke", nil)
+			sub.Unsubscribe()
+			wi4Await(t, resetDone)
+			stats()
+			wi4Await(t, statsDone)
+			r.emit("observation_frozen", map[string]interface{}{"Reset_and_Stats_returned": true, "nonempty_reinject_proved": true})
+		} else {
+			r.emit("observation_frozen", map[string]interface{}{"controlled_wait_cycle": true, "production_reachability_proved": false})
+		}
+	} else if id == "POOL-normal" {
+		wi4Await(t, resetDone)
+		wi4Await(t, receiverDone)
+		r.emit("observation_frozen", map[string]interface{}{"Reset_and_subscriber_returned": true, "nonempty_reinject_proved": true})
+	} else if id == "POOL-buffer" {
+		wi4Await(t, resetDone)
+		stats()
+		wi4Await(t, statsDone)
+		ev := <-events
+		if len(ev.Txs) != 1 || ev.Txs[0].Hash() != tx.Hash() {
+			t.Fatal("buffered reorg event differs")
+		}
+		r.emit("observation_frozen", map[string]interface{}{"Reset_and_Stats_returned": true, "nonempty_reinject_proved": true, "one_empty_buffer_slot": true})
+	} else {
+		t.Fatal("case outside plan")
+	}
+}
