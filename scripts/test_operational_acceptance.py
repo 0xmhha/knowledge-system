@@ -84,6 +84,11 @@ class PreparationGuardTests(unittest.TestCase):
             value['wi6_dev_gold_preparation']['status'] = 'independent_approved'
         self.assertTrue(self.errors())
 
+    def test_WI3_verified_walk_budget_cannot_be_formal_acceptance(self):
+        for value in (self.protocol,self.ledger):
+            value["wi3_walk_budget"]["status"] = "independent_approved"
+        self.assertTrue(self.errors())
+
     def test_WI3_resolver_parity_cannot_be_formal_acceptance(self):
         for value in (self.protocol,self.ledger):
             value["wi3_resolver_fix"]["status"] = "independent_approved"

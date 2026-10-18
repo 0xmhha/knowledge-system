@@ -108,6 +108,40 @@ func TestGraphResolverDelegatesWithoutMeasurementScope(t *testing.T) {
 	}
 }
 
+func TestSuspectLogicalMeasurementsPreserveProviderFailures(t *testing.T) {
+	for _, method := range []string{"get_node_prs", "impact_analysis", "concurrency_impact"} {
+		t.Run(method, func(t *testing.T) {
+			cause := fmt.Errorf("PRIVATE_BACKEND: %w", ckgclient.ErrSeedUnresolved)
+			base := &ckgclient.Fake{PRErr: cause, ImpactErr: cause, ConcurrencyErr: cause}
+			client := WrapCKG(base)
+			ctx, scope := (&Recorder{}).Begin(context.Background(), "labels", "label_suspects")
+			var err error
+			switch method {
+			case "get_node_prs":
+				_, err = client.GetNodePRs(ctx, "PRIVATE_SYMBOL", ckgclient.PRRefOpts{MaxCount: 10})
+			case "impact_analysis":
+				_, err = client.ImpactOfChange(ctx, "PRIVATE_SYMBOL", ckgclient.ImpactOpts{Depth: 2, MaxTotal: 10})
+			case "concurrency_impact":
+				_, err = client.ConcurrencyImpact(ctx, "PRIVATE_SYMBOL", ckgclient.ConcurrencyOpts{Depth: 2, MaxTotal: 10})
+			}
+			if err != cause {
+				t.Fatal("provider error identity changed")
+			}
+			report := scope.Finish("done")
+			if len(report.Calls) != 1 || report.Calls[0].Method != method || report.Calls[0].Outcome != "backend_error" || report.Calls[0].ResultCount != 0 {
+				t.Fatal("failed logical attempt lost/relabelled", report)
+			}
+			if method != "get_node_prs" && report.Calls[0].ErrorKind != "seed_unresolved" {
+				t.Fatal("typed seed error lost")
+			}
+			raw, _ := json.Marshal(report)
+			if strings.Contains(string(raw), "PRIVATE_") {
+				t.Fatal("logical measurement released symbol/error")
+			}
+		})
+	}
+}
+
 func TestNeighborMeasurementBindsSourceWithoutReleasingPrivatePath(t *testing.T) {
 	backend := &ckgclient.Fake{}
 	client := WrapCKG(backend)

@@ -1,3 +1,28 @@
+<!-- WI3-WALK-CURRENT -->
+# 단계60 — WI-3 출처 연결·총 예산·요청 계측 / 2026-10-19
+
+[보고서](./operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/REPORT.txt) · [사전 명세](./operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/SCOPE.json) · [검증 근거](./operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/acceptance-review.json) · [현재·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/WORKLIST.json). AI 초안6/6 준비, **독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다.
+
+실명·이메일·연락처는 요청하지 않는다. 검토 기록은 익명 역할 ID와 근거 hash·결정·독립성으로 구분한다. D04미정은 개인정보 제출 대기가 아니며, 로컬 준비·기술 검증을 중단하는 조건이 아니다. 실제 검토·승인이 없는데 승인으로 기록하지 않는다.
+
+| 이번 기술 범위 | 확인한 결과와 한계 |
+|---|---|
+| 출처 연결 | 원래 검색 인용·순서·점수는 보존하고, snapshot에 결속된 resolver가 확인한 정확한 선언 identity만 그래프 간선·멤버십에 사용. 포함·겹침·동명만으로 연결하지 않음. 캐시의 성공/실패와 원래 행 유지 |
+| 예산·오류 | 기존 총 시간과 부모 deadline 안에서 최종 확인 시간을10%(최대100ms) 예약. 예산/취소/실제 snapshot변경·증거 크기/정책 거부를 구분하고 불명 공급자 원문을 노출하지 않음. identity 의존 영향/동시성 신호는 예산과 공급자 오류를 seed 부재로 오인하지 않음 |
+| 실제 stdio | 이전62/새62=124호출 모두 보존, 세션4개 EOF0. 제어4개와 기존20입력 모두 계측on/off 결과가 경과 시간만 제외하고 일치. 넓은 주석 포함 인용과 선언 인용의 확장 집합 같음. 주석줄·미존재 위치·잘못된pin·상한 등 나머지7개 제어는 구조화 결과 없이 거부 |
+| 요청 계측 | 새 요청 summary31개·논리 호출629회·물리 로컬 모델 HTTP63회, pending0. 논리 호출수와 응답 budget.calls 일치. 원문 query/심볼/오류를 호출 계측에 저장하지 않음. 내부 추론 횟수·품질 점수로 바꾸지 않음 |
+| 전체 새 검증 | 일반/race 각4158pass·기존18skip·실패0. 이전4123개 통과ID 누락없음, 새35개 parent/subtest 확인. build·fmt·vet·고정lint2.14.0·경계·문서134개 통과. c18821b5+7Go파일 작업 트리/1738native·승인5와 설정2개 hash결속. 실제 호출 binary와 최종 검증 binary bytes 동일 |
+| 실패 보존 | 첫 소유 시험은 구체적인 예산 분류 반례로 종료/정리를 확인. 다음 전체 일반/race 통과 뒤lint QF1003 실패를 별도 보존하고 테스트 문법만 수정하여 전체를 다시 검증. 과거 실패를 현재 통과로 바꿔 쓰지 않음 |
+
+요청 검증·회귀 결과는 [검증 요약](./operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/validation/SUMMARY.json)과 원자료를 따른다. 새 독립 가족·운영/설치역할·게시·유료/외부LLM 실행은0이며, 기본 예산의 일반적 지연SLA·독립 검색 품질·온톨로지 효과를 수용한 결과가 아니다. site resolver의 일부 거부는 기존 일반 seed_unresolved 계약을 유지하므로 세부 원인 구분은 남은 WI3 검토에 포함한다.
+
+기술 검증은 완료했으나 W09서명 커밋/커밋 후 출처 결속은 아직 대기다. 완료 마감으로 표시하지 않는다.
+
+다음: WI-4 실제 도달성·스케줄·반복 실행의 경로와 관측 근거를 검증한다. 남은 전체: WI1의53발생지점/3블록·타입/값/메모리·독립 의미, WI2 독립 의미/build profile/지원/설치역할, WI3 독립 의미/새가족·기본예산/startup/site거부 원인, WI4 도달성/스케줄/반복, WI-V1/V2 실제API/독립티켓/오라클/수용후보, WI6 nonseed/기본·확장쌍/관련성·잡음/warm, WI-SP 실제overlay/ACL/출처, WI-C 필수항목/우선순위/보고서·그림/전달/설치역할, 새독립DEV/FINAL·완전정답·matching·충분성·F01~08, 정식9개, 온톨로지 독립정답/구현·개념연결/검색효과다. 실제LLM답변 평가는 모델·인증·비용상한 결정 후 진행하며 선택 백로그12개는 별도다.
+<!-- END-WI3-WALK-CURRENT -->
+
+이하 단계59 이전은 당시 기록이다.
+
 # 단계59 — WI-3 계측 시 출처 식별 기능 보존 / 2026-10-19
 
 [단계59 보고서](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/REPORT.txt), [명세와 검증 근거](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/acceptance-review.json), [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/WORKLIST.json)이 최신 진입점이다. **AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처는 요구하지 않는다.

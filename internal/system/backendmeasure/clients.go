@@ -105,6 +105,32 @@ func (g *graph) Neighbors(ctx context.Context, src contract.Citation, opts ckgcl
 	finish(len(result), err)
 	return result, err
 }
+
+func (g *graph) GetNodePRs(ctx context.Context, symbol string, opts ckgclient.PRRefOpts) ([]contract.PRRef, error) {
+	finish := begin(ctx, "ckg", "get_node_prs", symbol, opts)
+	result, err := g.Client.GetNodePRs(ctx, symbol, opts)
+	finish(len(result), err)
+	return result, err
+}
+
+func (g *graph) ImpactOfChange(ctx context.Context, symbol string, opts ckgclient.ImpactOpts) (contract.ImpactResult, error) {
+	finish := begin(ctx, "ckg", "impact_analysis", symbol, opts)
+	result, err := g.Client.ImpactOfChange(ctx, symbol, opts)
+	count := 0
+	for _, group := range result.Groups {
+		count += len(group.Hits)
+	}
+	finish(count, err)
+	return result, err
+}
+
+func (g *graph) ConcurrencyImpact(ctx context.Context, symbol string, opts ckgclient.ConcurrencyOpts) (contract.ConcurrencyResult, error) {
+	finish := begin(ctx, "ckg", "concurrency_impact", symbol, opts)
+	result, err := g.Client.ConcurrencyImpact(ctx, symbol, opts)
+	finish(len(result.Modules), err)
+	return result, err
+}
+
 func (g *graph) Health(ctx context.Context) (ckgclient.Health, error) {
 	finish := begin(ctx, "ckg", "health", "", nil)
 	result, err := g.Client.Health(ctx)
