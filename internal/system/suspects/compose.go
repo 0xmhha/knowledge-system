@@ -124,6 +124,8 @@ func failed[T any](err error, tool, snapshot string, c contract.Citation) contra
 	state, reason := "error", "backend_error"
 	if errors.Is(err, errBudget) {
 		state, reason = "budget_exhausted", "budget_exhausted"
+	} else if errors.Is(err, ckgclient.ErrSeedUnresolved) {
+		reason = "seed_unresolved"
 	}
 	return contract.Signal[T]{Status: state, Reason: reason, Provenance: []contract.SignalFrom{{Tool: tool, Snapshot: snapshot, Anchor: c}}}
 }

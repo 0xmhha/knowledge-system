@@ -367,3 +367,62 @@ func TestInvalidModesPathsAndBoundsRejectedBeforeBackend(t *testing.T) {
 		}
 	}
 }
+
+func TestFailureReasonsDoNotConflateSeedBackendAndBudget(t *testing.T) {
+	for _, tc := range []struct {
+		name, state, reason string
+		err                 error
+	}{
+		{"unresolved", "error", "seed_unresolved", ckgclient.ErrSeedUnresolved},
+		{"wrapped_unresolved", "error", "seed_unresolved", fmt.Errorf("private seed detail: %w", ckgclient.ErrSeedUnresolved)},
+		{"backend", "error", "backend_error", errors.New("private backend detail")},
+		{"budget", "budget_exhausted", "budget_exhausted", errBudget},
+		{"wrapped_budget", "budget_exhausted", "budget_exhausted", fmt.Errorf("private budget detail: %w", errBudget)},
+		{"budget_precedes_joined_seed", "budget_exhausted", "budget_exhausted", errors.Join(errBudget, ckgclient.ErrSeedUnresolved)},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			s := failed[[]contract.ImpactCategory](tc.err, "graph.impact_analysis", head, cite("a.go"))
+			if s.Status != tc.state || s.Reason != tc.reason || s.Value != nil || len(s.Provenance) != 1 || s.Provenance[0].Anchor != cite("a.go") {
+				t.Fatalf("failure classification or provenance lost: %+v", s)
+			}
+			raw, err := json.Marshal(s)
+			if err != nil || strings.Contains(string(raw), "private") {
+				t.Fatal("private backend detail leaked", err)
+			}
+		})
+	}
+}
+
+func TestUnresolvedSeedSharedSignalsStayPartialBeforeOrAfterSuccess(t *testing.T) {
+	for _, missingFirst := range []bool{true, false} {
+		t.Run(fmt.Sprint(missingFirst), func(t *testing.T) {
+			g, v := fixture()
+			missing := "a.go"
+			if !missingFirst {
+				missing = "b.go"
+			}
+			delete(g.SymbolIdentities, cite(missing).String())
+			out := run(t, g, v, Request{Expand: []contract.Citation{cite("a.go"), cite("b.go")}, MaxEnriched: 2})
+			if !out.Partial {
+				t.Fatal("unresolved seed became a complete result")
+			}
+			for _, c := range out.Candidates {
+				if c.Signals.Impact.Status != "error" || c.Signals.Concurrency.Status != "error" || c.Signals.Impact.Reason != "seed_unresolved" || c.Signals.Concurrency.Reason != "seed_unresolved" || c.Signals.Impact.Value != nil || c.Signals.Concurrency.Value != nil {
+					t.Fatalf("missing seed was erased or mislabeled: %+v", c.Signals)
+				}
+				for _, provenance := range [][]contract.SignalFrom{c.Signals.Impact.Provenance, c.Signals.Concurrency.Provenance} {
+					seen := map[contract.Citation]bool{}
+					for _, from := range provenance {
+						seen[from.Anchor] = true
+					}
+					if !seen[cite("a.go")] || !seen[cite("b.go")] {
+						t.Fatal("shared failure lost a seed's provenance", provenance)
+					}
+				}
+			}
+			if len(g.Calls.ImpactOfChange) != 1 || len(g.Calls.ConcurrencyImpact) != 1 {
+				t.Fatal("unresolved seed must not be sent to analysis providers", g.Calls)
+			}
+		})
+	}
+}

@@ -1,0 +1,1776 @@
+[
+  {
+    "case_id": "missing_only",
+    "arguments": {
+      "symptom": "controlled source-qualified seed identity regression",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "max_candidates": 10,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000,
+      "expand": [
+        {
+          "file": "node/errors.go",
+          "start_line": 42,
+          "end_line": 47,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+          "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+        }
+      ]
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 23,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Factual candidate signals; symptom judgments remain with the agent."
+          }
+        ],
+        "structuredContent": {
+          "schema_version": 1,
+          "symptom": "controlled source-qualified seed identity regression",
+          "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "coordinates": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "candidates": [
+            {
+              "citation": {
+                "file": "node/errors.go",
+                "start_line": 42,
+                "end_line": 47,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "retained_citation": {
+                "file": "node/errors.go",
+                "start_line": 42,
+                "end_line": 47,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+              },
+              "symbol": null,
+              "signals": {
+                "distance": {
+                  "value": 0,
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "relations": {
+                  "value": [],
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "impact_category": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "recency": {
+                  "value": null,
+                  "status": "not_requested",
+                  "reason": "enrichment budget",
+                  "provenance": []
+                },
+                "concurrency": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "retrieval": {
+                  "value": null,
+                  "status": "unavailable",
+                  "reason": "not retrieved",
+                  "provenance": []
+                },
+                "security_tag": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "policy/security provider not yet connected",
+                  "provenance": []
+                },
+                "dataflow_on_path": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "value dependency provider not yet connected",
+                  "provenance": []
+                }
+              }
+            }
+          ],
+          "partial": true,
+          "budget": {
+            "max_candidates": 10,
+            "max_seeds": 3,
+            "max_enriched": 3,
+            "max_calls": 32,
+            "calls": 5,
+            "depth": 2,
+            "elapsed_ms": 534,
+            "time_budget_ms": 1000,
+            "stop_reasons": [
+              "symbol_identity_unavailable"
+            ]
+          },
+          "notes": [
+            "Signals are observations, not cause probabilities. The agent supplies symptom-specific judgments.",
+            "Search scores remain per backend; they are not comparable cause scores.",
+            "Distance is the shortest observed path within bounded traversal; an incomplete walk may miss a shorter path.",
+            "Empty impact or concurrency membership is scoped to returned bounded seed queries; it does not prove absence in the entire graph.",
+            "History counts are returned PR references, not total commit counts. Empty results are scoped observations.",
+            "Deadline is cooperative; a non-cancellable local store may finish one in-flight query after the budget."
+          ]
+        }
+      }
+    },
+    "wall_seconds": 0.5821356670930982
+  },
+  {
+    "case_id": "missing_then_known",
+    "arguments": {
+      "symptom": "controlled source-qualified seed identity regression",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "max_candidates": 10,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000,
+      "expand": [
+        {
+          "file": "node/errors.go",
+          "start_line": 42,
+          "end_line": 47,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+          "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+        },
+        {
+          "file": "consensus/wbft/backend/backend.go",
+          "start_line": 257,
+          "end_line": 278,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+        }
+      ]
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 24,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Factual candidate signals; symptom judgments remain with the agent."
+          }
+        ],
+        "structuredContent": {
+          "schema_version": 1,
+          "symptom": "controlled source-qualified seed identity regression",
+          "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "coordinates": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "candidates": [
+            {
+              "citation": {
+                "file": "node/errors.go",
+                "start_line": 42,
+                "end_line": 47,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "retained_citation": {
+                "file": "node/errors.go",
+                "start_line": 42,
+                "end_line": 47,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+              },
+              "symbol": null,
+              "signals": {
+                "distance": {
+                  "value": 0,
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "relations": {
+                  "value": [],
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "impact_category": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    },
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "recency": {
+                  "value": null,
+                  "status": "not_requested",
+                  "reason": "enrichment budget",
+                  "provenance": []
+                },
+                "concurrency": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    },
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "retrieval": {
+                  "value": null,
+                  "status": "unavailable",
+                  "reason": "not retrieved",
+                  "provenance": []
+                },
+                "security_tag": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "policy/security provider not yet connected",
+                  "provenance": []
+                },
+                "dataflow_on_path": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "value dependency provider not yet connected",
+                  "provenance": []
+                }
+              }
+            },
+            {
+              "citation": {
+                "file": "consensus/wbft/backend/backend.go",
+                "start_line": 257,
+                "end_line": 278,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "retained_citation": {
+                "file": "consensus/wbft/backend/backend.go",
+                "start_line": 257,
+                "end_line": 278,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+              },
+              "symbol": "github.com/ethereum/go-ethereum/consensus/wbft/backend.(*Backend).Verify",
+              "signals": {
+                "distance": {
+                  "value": 0,
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "relations": {
+                  "value": [],
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "impact_category": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    },
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "recency": {
+                  "value": {
+                    "last_merged_at": "2025-09-09T01:45:42Z",
+                    "pr_count": 6,
+                    "scope": "returned PR references (max 10), not commit count"
+                  },
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "graph.change_history",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "concurrency": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    },
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "retrieval": {
+                  "value": null,
+                  "status": "unavailable",
+                  "reason": "not retrieved",
+                  "provenance": []
+                },
+                "security_tag": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "policy/security provider not yet connected",
+                  "provenance": []
+                },
+                "dataflow_on_path": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "value dependency provider not yet connected",
+                  "provenance": []
+                }
+              }
+            }
+          ],
+          "partial": true,
+          "budget": {
+            "max_candidates": 10,
+            "max_seeds": 3,
+            "max_enriched": 3,
+            "max_calls": 32,
+            "calls": 11,
+            "depth": 2,
+            "elapsed_ms": 889,
+            "time_budget_ms": 1000,
+            "stop_reasons": [
+              "symbol_identity_unavailable",
+              "unanchored_edge"
+            ]
+          },
+          "notes": [
+            "Signals are observations, not cause probabilities. The agent supplies symptom-specific judgments.",
+            "Search scores remain per backend; they are not comparable cause scores.",
+            "Distance is the shortest observed path within bounded traversal; an incomplete walk may miss a shorter path.",
+            "Empty impact or concurrency membership is scoped to returned bounded seed queries; it does not prove absence in the entire graph.",
+            "History counts are returned PR references, not total commit counts. Empty results are scoped observations.",
+            "Deadline is cooperative; a non-cancellable local store may finish one in-flight query after the budget."
+          ]
+        }
+      }
+    },
+    "wall_seconds": 1.2593969171866775
+  },
+  {
+    "case_id": "known_then_missing",
+    "arguments": {
+      "symptom": "controlled source-qualified seed identity regression",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "max_candidates": 10,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000,
+      "expand": [
+        {
+          "file": "consensus/wbft/backend/backend.go",
+          "start_line": 257,
+          "end_line": 278,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+        },
+        {
+          "file": "node/errors.go",
+          "start_line": 42,
+          "end_line": 47,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+          "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+        }
+      ]
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 25,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Factual candidate signals; symptom judgments remain with the agent."
+          }
+        ],
+        "structuredContent": {
+          "schema_version": 1,
+          "symptom": "controlled source-qualified seed identity regression",
+          "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "coordinates": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "candidates": [
+            {
+              "citation": {
+                "file": "consensus/wbft/backend/backend.go",
+                "start_line": 257,
+                "end_line": 278,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "retained_citation": {
+                "file": "consensus/wbft/backend/backend.go",
+                "start_line": 257,
+                "end_line": 278,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+              },
+              "symbol": "github.com/ethereum/go-ethereum/consensus/wbft/backend.(*Backend).Verify",
+              "signals": {
+                "distance": {
+                  "value": 0,
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "relations": {
+                  "value": [],
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "impact_category": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    },
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "recency": {
+                  "value": {
+                    "last_merged_at": "2025-09-09T01:45:42Z",
+                    "pr_count": 6,
+                    "scope": "returned PR references (max 10), not commit count"
+                  },
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "graph.change_history",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "concurrency": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    },
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "retrieval": {
+                  "value": null,
+                  "status": "unavailable",
+                  "reason": "not retrieved",
+                  "provenance": []
+                },
+                "security_tag": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "policy/security provider not yet connected",
+                  "provenance": []
+                },
+                "dataflow_on_path": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "value dependency provider not yet connected",
+                  "provenance": []
+                }
+              }
+            },
+            {
+              "citation": {
+                "file": "node/errors.go",
+                "start_line": 42,
+                "end_line": 47,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "retained_citation": {
+                "file": "node/errors.go",
+                "start_line": 42,
+                "end_line": 47,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+              },
+              "symbol": null,
+              "signals": {
+                "distance": {
+                  "value": 0,
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "relations": {
+                  "value": [],
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "impact_category": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    },
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "recency": {
+                  "value": null,
+                  "status": "not_requested",
+                  "reason": "enrichment budget",
+                  "provenance": []
+                },
+                "concurrency": {
+                  "value": null,
+                  "status": "error",
+                  "reason": "seed_unresolved",
+                  "provenance": [
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    },
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "node/errors.go",
+                        "start_line": 42,
+                        "end_line": 47,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+                        "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+                      }
+                    }
+                  ]
+                },
+                "retrieval": {
+                  "value": null,
+                  "status": "unavailable",
+                  "reason": "not retrieved",
+                  "provenance": []
+                },
+                "security_tag": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "policy/security provider not yet connected",
+                  "provenance": []
+                },
+                "dataflow_on_path": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "value dependency provider not yet connected",
+                  "provenance": []
+                }
+              }
+            }
+          ],
+          "partial": true,
+          "budget": {
+            "max_candidates": 10,
+            "max_seeds": 3,
+            "max_enriched": 3,
+            "max_calls": 32,
+            "calls": 11,
+            "depth": 2,
+            "elapsed_ms": 809,
+            "time_budget_ms": 1000,
+            "stop_reasons": [
+              "symbol_identity_unavailable",
+              "unanchored_edge"
+            ]
+          },
+          "notes": [
+            "Signals are observations, not cause probabilities. The agent supplies symptom-specific judgments.",
+            "Search scores remain per backend; they are not comparable cause scores.",
+            "Distance is the shortest observed path within bounded traversal; an incomplete walk may miss a shorter path.",
+            "Empty impact or concurrency membership is scoped to returned bounded seed queries; it does not prove absence in the entire graph.",
+            "History counts are returned PR references, not total commit counts. Empty results are scoped observations.",
+            "Deadline is cooperative; a non-cancellable local store may finish one in-flight query after the budget."
+          ]
+        }
+      }
+    },
+    "wall_seconds": 1.092907958664
+  },
+  {
+    "case_id": "known_only",
+    "arguments": {
+      "symptom": "controlled source-qualified seed identity regression",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "max_candidates": 10,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000,
+      "expand": [
+        {
+          "file": "consensus/wbft/backend/backend.go",
+          "start_line": 257,
+          "end_line": 278,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+        }
+      ]
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 26,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Factual candidate signals; symptom judgments remain with the agent."
+          }
+        ],
+        "structuredContent": {
+          "schema_version": 1,
+          "symptom": "controlled source-qualified seed identity regression",
+          "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "coordinates": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "candidates": [
+            {
+              "citation": {
+                "file": "consensus/wbft/backend/backend.go",
+                "start_line": 257,
+                "end_line": 278,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+              },
+              "retained_citation": {
+                "file": "consensus/wbft/backend/backend.go",
+                "start_line": 257,
+                "end_line": 278,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+              },
+              "symbol": "github.com/ethereum/go-ethereum/consensus/wbft/backend.(*Backend).Verify",
+              "signals": {
+                "distance": {
+                  "value": 0,
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "relations": {
+                  "value": [],
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "seed",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "impact_category": {
+                  "value": [],
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "graph.impact_analysis",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "recency": {
+                  "value": {
+                    "last_merged_at": "2025-09-09T01:45:42Z",
+                    "pr_count": 6,
+                    "scope": "returned PR references (max 10), not commit count"
+                  },
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "graph.change_history",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "concurrency": {
+                  "value": {
+                    "touched": false,
+                    "direction": []
+                  },
+                  "status": "observed",
+                  "provenance": [
+                    {
+                      "tool": "graph.concurrency_impact",
+                      "snapshot": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                      "anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                      },
+                      "retained_anchor": {
+                        "file": "consensus/wbft/backend/backend.go",
+                        "start_line": 257,
+                        "end_line": 278,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+                        "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+                      }
+                    }
+                  ]
+                },
+                "retrieval": {
+                  "value": null,
+                  "status": "unavailable",
+                  "reason": "not retrieved",
+                  "provenance": []
+                },
+                "security_tag": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "policy/security provider not yet connected",
+                  "provenance": []
+                },
+                "dataflow_on_path": {
+                  "value": null,
+                  "status": "unsupported",
+                  "reason": "value dependency provider not yet connected",
+                  "provenance": []
+                }
+              }
+            }
+          ],
+          "partial": true,
+          "budget": {
+            "max_candidates": 10,
+            "max_seeds": 3,
+            "max_enriched": 3,
+            "max_calls": 32,
+            "calls": 8,
+            "depth": 2,
+            "elapsed_ms": 861,
+            "time_budget_ms": 1000,
+            "stop_reasons": [
+              "unanchored_edge"
+            ]
+          },
+          "notes": [
+            "Signals are observations, not cause probabilities. The agent supplies symptom-specific judgments.",
+            "Search scores remain per backend; they are not comparable cause scores.",
+            "Distance is the shortest observed path within bounded traversal; an incomplete walk may miss a shorter path.",
+            "Empty impact or concurrency membership is scoped to returned bounded seed queries; it does not prove absence in the entire graph.",
+            "History counts are returned PR references, not total commit counts. Empty results are scoped observations.",
+            "Deadline is cooperative; a non-cancellable local store may finish one in-flight query after the budget."
+          ]
+        }
+      }
+    },
+    "wall_seconds": 1.5960211250931025
+  },
+  {
+    "case_id": "foreign_project",
+    "arguments": {
+      "symptom": "controlled source-qualified seed identity regression",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "max_candidates": 10,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000,
+      "expand": [
+        {
+          "file": "consensus/wbft/backend/backend.go",
+          "start_line": 257,
+          "end_line": 278,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "other-project",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+        }
+      ]
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 27,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "snapshot_mismatch: expansion belongs to a different retained source"
+          }
+        ],
+        "isError": true
+      }
+    },
+    "wall_seconds": 0.2271804171614349
+  },
+  {
+    "case_id": "invalid_candidate_cap",
+    "arguments": {
+      "symptom": "controlled source-qualified seed identity regression",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "max_candidates": 21,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000,
+      "expand": [
+        {
+          "file": "consensus/wbft/backend/backend.go",
+          "start_line": 257,
+          "end_line": 278,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+        }
+      ]
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 28,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "invalid_request: candidate/seed/enrichment/call/depth/time budget outside bounds"
+          }
+        ],
+        "isError": true
+      }
+    },
+    "wall_seconds": 0.1672297501936555
+  },
+  {
+    "case_id": "wrong_commit",
+    "arguments": {
+      "symptom": "controlled source-qualified seed identity regression",
+      "commit": "0000000000000000000000000000000000000000",
+      "max_candidates": 10,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000,
+      "expand": [
+        {
+          "file": "consensus/wbft/backend/backend.go",
+          "start_line": 257,
+          "end_line": 278,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+          "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+          "content_sha256": "bcf152ba219a3ad63c28edbfcb106ae56dabcd9e5d2bfab841f97a45a9c17fdc"
+        }
+      ]
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 29,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "label_suspects: snapshot_mismatch"
+          }
+        ],
+        "isError": true
+      }
+    },
+    "wall_seconds": 0.9536307500675321
+  }
+]

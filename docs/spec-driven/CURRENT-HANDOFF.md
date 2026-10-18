@@ -1,5 +1,27 @@
 # 현재 인수인계
 
+## 2026-10-19 단계56: WI3 오류 사유 구분·새 native/실제 MCP 검증
+
+[단계56 보고서](./operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/WORKLIST.json)이 최신 진입점이다. **AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처는 요구하지 않으며, D04미정은 실제 검토·승인 대기다.
+
+| 구현·검증 | 결과와 한계 |
+|---|---|
+| 실패 분류 | typed/wrapped 미해석 심볼은 error/seed_unresolved, 다른 불명 백엔드 실패는 backend_error, 예산 소진은 budget_exhausted. 원래 null·partial·출처·이후 성공에도 남는 실패 상태와 내부 오류 내용 비노출 유지 |
+| 새 native 검증 | 전체 빌드·일반/race 각각4107pass/18skip/0fail, fmt·vet·고정 golangci-lint2.14.0(0issues)·경계·CLI 문서 통과. 이전에 통과했던4097개 테스트 누락없음. 이전 native 결과를 현재 결과로 바꾸지 않음 |
+| 새 source/binary | 소유 복제본3869a548+정확히2개Go 변경, native/의존 입력1738(Go1282)·승인5 hash 결속. working-tree 빌드이며 현재 HEAD의 clean binary로 주장하지 않음. 시험 candidate와 전체 native에서 만든 binary bytes 동일 |
+| 순차 MCP | native 프로세스 종료 후 원래20입력·검색1초 예산 그대로20partial. 후보68개의 출처 신원·순서는20건 모두 이전과 동일. 신호별51error는 이제seed_unresolved, 신호별9observed·8not_requested 유지. 의미 검색 품질 점수는null |
+| 제어7건 | 미해석 단독·미해석/정상 양순서의 error/null/partial, 정상 단독의observed, 다른project·잘못된cap·stalecommit 거부를 실제 경로에서 확인 |
+| 모든 시도 | 첫 initialize20초 제한은 검색0/미도달20/EOF0. 다음120초 초기 준비 한도 시도는 native 동시 실행 중20호출에서11tool_error/9partial. 순차 실행과 별도 보존하며 앞선 오류를 삭제하거나1초 예산을 늘리지 않음 |
+| 모델·자원 | 실제 BGE-M3/native1024 digest와 Ollama0.40.4·graph/source/vector 전후 동일성·EOF0 확인. 초기화와 동시 부하의 배타적 원인·production SLA를 입증하지 않음. 시작 anchor embedding 물리 호출수미측정, 외부/유료LLM·설치역할·운영적용·게시0 |
+
+[현재20건](./operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/private/current-cases.json)과 원자료는 실제 관측만 기록한다. aggregate reason은 완전한 per-call 실패 이력이나 유일 원인 증명이 아니다. 기존20결과·독립 정답·표본을 변경하지 않았다. 새 전체 source binding은 커밋 후 별도 결속하여 완료 검사를 통과시킨다.
+
+다음은 **WI2 syntax-only 호출 계약/alias·WI1 select 수신 범위의 reference 반례·WI3 traversal/계측 wrapper 경계 검토**다. 남은 전체는 이 부채와 값 종류/지원 밖/실제 설치역할·독립 의미, WI4/V1/V2 실제경로/oracle·WI6 nonseed/쌍/warm·WI-SP overlay/ACL·WI-C 독립필수항목/실제전달, 새독립DEV/FINAL·완전gold·matching/충분성·F01~08, 정식9개와 온톨로지 효과다. 실제 LLM 답변 효과는 모델/인증/비용 상한 확정 후다. 선택12개는 별도 backlog다.
+
+추가·공통 회귀115개(오류 사유36·공통 수용56·문서20·notice3), 새 일반/race 각4107pass/18skip/0fail과 전체 빌드/fmt/vet/lint, 문서134개·원자료를 포함한 생성72파일 동일 재생·Python8파일 구문을 확인했다. [검증 요약](./operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/validation/SUMMARY.json)은 초기화 실패·동시 실행20건·순차20건을 전부 유지하며 독립 점수를 만들지 않는다. 변경된 Go 소스의 완료 검사는 새 결속 파일 커밋 후 별도로 갱신한다.
+
+이하 단계55 이전은 당시 기록이다.
+
 ## 2026-10-19 단계55: WI1~3 검토 부채와 실제 graph provider 진단
 
 [단계55 보고서](./operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/WORKLIST.json)이 최신 진입점이다. AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false다. 실명/연락처를 요구하지 않으며 검토 승인만 대기한다.
