@@ -1,0 +1,110 @@
+{
+  "complete": false,
+  "independent_approved": 0,
+  "actual_pairs": 0,
+  "warm_raw_samples": null,
+  "unknowns": [
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-001",
+      "location_id": "SRC-003",
+      "rationale": "Round-change consensus state may affect analyzed blocks, but no argument/return or runtime path between these selected bodies is proved."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-002",
+      "location_id": "SRC-003",
+      "rationale": "Round-change broadcasting may reach backend Gossip through omitted functions; the selected bodies do not establish the full static receiver/argument path."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-003",
+      "location_id": "SRC-002",
+      "rationale": "Potential backend broadcasting implementation needs the intermediate broadcastRoundChange/Broadcast receiver path, not a same-consensus-label assumption."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-006",
+      "location_id": "SRC-022",
+      "rationale": "Beacon ancestor lookup uses blockchain interfaces; whether those consumers call ReadHeaderRange is not shown in these selected bodies."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-007",
+      "location_id": "SRC-008",
+      "rationale": "WriteBadBlock shares badBlockKey/encoding but is not a caller of ReadAllBadBlocks. Its effect on the question's caller-visible failure contract is unresolved."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-016",
+      "location_id": "SRC-017",
+      "rationale": "Reset consumes pool state and limbo, but full lifecycle ordering and cleanup ownership across Init/Reset are not established by these bodies alone."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-017",
+      "location_id": "SRC-016",
+      "rationale": "Init establishes state and limbo fields but actual lifecycle/initialization guarantees and concurrent Reset entry are not proved."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-017",
+      "location_id": "SRC-018",
+      "rationale": "newLimbo creates an object later used by Reset; the omitted finalize implementation and lifecycle preconditions prevent treating it as the question's direct guard implementation."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-021",
+      "location_id": "SRC-022",
+      "rationale": "Both use Downloader but findBeaconAncestor does not establish Progress/getProgress ownership or eventLoop cancellation in these bodies."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-022",
+      "location_id": "SRC-006",
+      "rationale": "Possible raw header access through omitted blockchain methods is unresolved; same block-number types are not proven argument/return transfer."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-022",
+      "location_id": "SRC-021",
+      "rationale": "eventLoop consumes Downloader.Progress indirectly; a relevant ancestor-to-progress value path is not established here."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-031",
+      "location_id": "SRC-032",
+      "rationale": "UDP loop handles matcher timeout/close but full RequestENR/pending call-chain and caller-visible error identity require additional source witnesses; not inferred from sharing receiver."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-032",
+      "location_id": "SRC-031",
+      "rationale": "Resolve is a potential high-level request consumer through omitted RequestENR/pending functions; selected bodies alone do not prove timeout propagation or resource ownership."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-036",
+      "location_id": "SRC-037",
+      "rationale": "BatchCallContext later branches on Client.isHTTP, but the omitted newClient/transport initialization must bind this source choice to that state before asserting value transfer."
+    },
+    {
+      "case_id": "EXPANSION-DRAFT-SRC-037",
+      "location_id": "SRC-036",
+      "rationale": "DialOptions configures a reconnect choice, but the omitted Client construction path and isHTTP initialization prevent an automatic argument/result mapping."
+    }
+  ],
+  "seed_excluded_empty_relevant": [
+    "EXPANSION-DRAFT-SRC-001",
+    "EXPANSION-DRAFT-SRC-002",
+    "EXPANSION-DRAFT-SRC-003",
+    "EXPANSION-DRAFT-SRC-006",
+    "EXPANSION-DRAFT-SRC-007",
+    "EXPANSION-DRAFT-SRC-011",
+    "EXPANSION-DRAFT-SRC-017",
+    "EXPANSION-DRAFT-SRC-021",
+    "EXPANSION-DRAFT-SRC-022",
+    "EXPANSION-DRAFT-SRC-026",
+    "EXPANSION-DRAFT-SRC-027",
+    "EXPANSION-DRAFT-SRC-031",
+    "EXPANSION-DRAFT-SRC-032",
+    "EXPANSION-DRAFT-SRC-036",
+    "EXPANSION-DRAFT-SRC-037"
+  ],
+  "missing": [
+    "reviewed_broader_nonseed_relevance_universe",
+    "independent20_production_families_and4intents",
+    "actual_retained_seed_resolution_and_paired_calls",
+    "frozen_same_snapshot_scope_caps_and_arm_order",
+    "source_adapter_for_actual_returned_function_envelopes",
+    "warm_definition_order_raw_samples_and_environment",
+    "independent_semantics_matching_sufficiency",
+    "D04_F01_F08_and_installed_consumer_roles"
+  ]
+}
