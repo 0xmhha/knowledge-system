@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-snp04-packet.py", line 70, in <module>
+    s=importlib.util.spec_from_file_location('comparisoncheck',R/'scripts/check-stablenet-comparison.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);result=m.derive(P);dump(P/'result.json',result)
+                                                                                                                                                                              ^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/check-stablenet-comparison.py", line 154, in derive
+    require(sha(raw) == c['file_sha256'] and sha(lines(raw, c['start_line'], c['end_line'])) == c['content_sha256'] and c['body'] == lines(raw, c['start_line'], c['end_line']).decode(), 'factory excerpt source mismatch')
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/check-stablenet-comparison.py", line 51, in lines
+    require(1 <= start <= end <= len(values), 'invalid source range')
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/check-stablenet-comparison.py", line 20, in require
+    raise ValueError(message)
+ValueError: invalid source range

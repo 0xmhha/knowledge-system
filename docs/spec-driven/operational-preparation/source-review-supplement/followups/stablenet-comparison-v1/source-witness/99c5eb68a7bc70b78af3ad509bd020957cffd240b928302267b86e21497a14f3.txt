@@ -1,0 +1,39 @@
+# System contract lifecycle: Solidity source to genesis state and e2e tests
+
+**Status:** verified · **Subsystem:** A4 (System Contracts (Governance × 5)) · **Type:** B3
+
+System contracts travel a five-stage pipeline. (1) Solidity sources live
+under systemcontracts/solidity/ (v1/, v2/, plus abstracts/, interfaces/,
+libraries/, openzeppelin/ shared code and test/ contracts). (2) The Go
+tool systemcontracts/compile invokes pinned solc 0.8.14 on them.
+(3) Compiled bytecode lands in systemcontracts/artifacts/{v1,v2}/ as
+hex-encoded files — codegen output, never hand-edited. (4) Native Go
+loads the artifacts at process start: go:embed directives in
+contracts.go populate SystemContractCodes; at genesis,
+core.InjectContracts -> GetSystemContractsTransition turns them into
+CodeParam/state entries so the chain database is initialized with the
+contracts' code and storage. (5) systemcontracts/test/ exercises the
+whole chain end to end (native + governance flows against a simulated
+backend). Consequence for indexing/search: the shipped binary depends on
+.sol sources through the embedded artifacts even though `go list` never
+sees them — a build-graph-only view misses stages 1-3 and 5
+(systemcontracts/test is outside the dependency graph, and the compile
+tool is its own main). The knowledge dataset scope therefore adds them
+explicitly (projects/stablenet/filelist.yaml: extra_packages
+systemcontracts/test + systemcontracts/compile/..., extra_globs
+systemcontracts/**/*.sol).
+
+## Code anchors
+- `systemcontracts/solidity/v1` — stage 1: governance v1 Solidity sources (v2/ for GovMinter v2; test/ holds test contracts)
+- `systemcontracts/compile/main.go` — stage 2 entry point: compiles v1+v2 sources and exports bytecode
+- `systemcontracts/compile/compiler/compiler.go` solcVersion:37 — pinned solc 0.8.14; artifacts are only reproducible under this version
+- `systemcontracts/contracts.go` SystemContractCodes:37 — stage 3->4 boundary: go:embed lines (37-52) load artifacts/{v1,v2} into the version-keyed code map
+- `systemcontracts/systemcontracts.go` GetSystemContractsTransition:78 — stage 4: builds the genesis StateTransition (code + initialized storage) from SystemContractCodes
+- `core/genesis.go` InjectContracts:735 — stage 4 call-site: applies the transition to genesis so the chain DB starts with the contracts
+- `systemcontracts/test/coin_adapter_test.go` — stage 5: representative of systemcontracts/test/ — 25 e2e tests over the full pipeline, a package outside the build dependency graph
+
+## Aliases
+시스템 컨트랙트 라이프사이클, 컨트랙트 빌드 배포 파이프라인, 제네시스 컨트랙트 주입, system contract lifecycle, contract build deploy pipeline, genesis contract injection, solidity to genesis pipeline, InjectContracts, GetSystemContractsTransition, SystemContractCodes, StateTransition, CodeParam, solcVersion, go:embed, artifacts
+
+## Related
+A10.codegen.contract_regen_procedure, A10.codegen.no_edit_zones, A4.gov_validator.genesis_initialization, A4.system_contracts.addresses

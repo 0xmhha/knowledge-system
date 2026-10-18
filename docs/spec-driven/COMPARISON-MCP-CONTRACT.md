@@ -1,6 +1,6 @@
 # 읽기 전용 다중 프로젝트 비교 MCP
 
-2026-10-16 기준 KM-06의4/4를 구현·검증했다. 전체 로드맵은24/28 세부 작업·6/7 기능 완료이며 다음은 OE-01 온톨로지 효과 평가4개 단계다. [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다. 실제 원문/MCP 시험과 독립 품질 수용을 구분한다.
+2026-10-16 기준 KM-06의4/4를 구현·검증했다. 당시 KM-06 checkpoint는24/28·6/7이었고 이후 OE-01의 제한 연구까지 완료해 현재28/28·7/7이다. 독립 품질 수용은 별도다. [전체 시험표](./KNOWLEDGE-ROADMAP-TEST-MATRIX.md), [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md), [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)을 따른다. 실제 원문/MCP 시험과 독립 품질 수용을 구분한다.
 
 ## 사용 목적과 공개 도구
 
@@ -61,3 +61,10 @@ body 예산은 출력 셀의 source 본문 byte 합계다. citation 예산은 �
 실제 비교MCP22항목·19도구호출·3EOF0, 원문/범위 hash와 본문·프로젝트/모드별 인용·양쪽 후보·기본 미검토 제외·live 소스 삭제 후 동일 응답·한쪽 archive 누락/오매핑·범위/예산 거부·원본/DB 보존을 검증했다. mock embedding과 유료 모델0회이며 의미 품질/온톨로지 효과·독립 수용은 아니다. 이전 계약/실행/부분 실패의 source-bound 증거는 각각 km-06-contract, km-06-runtime, km-06-failures packet에 보존한다.
 
 Go1273개와 모든 결속 입력이 직전 서명 커밋dd554e79와 동일함을 확인해 전체Go4054(4036통과18skip)·race1028(1026통과2skip,7패키지)·빌드/fmt/vet/lint 결과를 재사용했다. 새 corpus/MCP 시험과 과거 Go 실행을 구분한다. 기존 온톨로지 기본 off·quality=inconclusive는 유지한다. 다음은 OE-01의 새 질문/기대 근거·동일 자료4모드·근거/순위/unknown/지연·다중 프로젝트 효과 평가이며 정책 생성기 보완·운영/독립 수용9개·선택 후속12개는 별도 남는다.
+
+
+## SN-P04 동일 BGE 실제 프로젝트 재검증 (2026-10-18)
+
+새 go-wemix BGE-M3/native1024 held 버전과 기존 go-stablenet retained 버전으로6개념·40셀·22검사를 재실행했다. 기존 mock64 자료는 그대로 보존한다. 두 프로젝트의 같은 canonical symbol도 다른 원문 hash를 가지며, source/version/project pin을 포함해 구분한다. 미검토 매핑은 기본 제외하고 staking 미수집과 finality unknown을 유지한다. 실제 엔진 선택은 설정에 의존하며 선택한 WBFT/Clique excerpt를 운영망 전체 정책으로 확대하지 않는다. 비교 question은 자동 개념 추론이 아니므로 concept/facets/조건·근거 연결을 명시해야 한다.
+
+legacy raw hits는 자체 project 좌표가 없어 선택 서버/버전과 결속해야 하며 working-tree raw 요청은 requires_v2로 거부된다. Text는 색인 설명/추출 문구 또는 밀도 축약이며 코드 인용문이 아니다. 실제 v2 body는 보관 원문 byte로 다시 읽어 검증한다. 프로젝트 결과를 함께 전달할 때는 v2/비교의 전체 좌표를 유지한다. 실제 graph/vector 교차 구성2개는 요청 전 기동 거부했고 정상 세션은 EOF0으로 종료했다. corpus/정책 범위 비대칭 때문에 같은 모델의 결과 차이를 검색 우열/온톨로지 독립 효과로 판정하지 않는다. [SN-P04 증거](./operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/manifest.json)와 작업리스트를 따른다.

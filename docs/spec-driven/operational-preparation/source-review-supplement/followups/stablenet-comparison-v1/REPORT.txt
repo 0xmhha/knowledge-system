@@ -1,0 +1,58 @@
+42단계 — SN-P04 실제 go-wemix / go-stablenet 비교 / 기술 범위 완료
+검증일: 2026-10-18 (KST)
+
+목적과 식별
+- 실제 프로젝트 원문을 같은 BGE-M3로 검색하며 프로젝트별 근거를 모으고, 잘못된 pin·오매핑·서로 바뀐 데이터가 다른 프로젝트 구현으로 채택되지 않는지 검증했다.
+- 기존 KM-06 go-wemix 데이터는 실제 소스의 mock-feature-hash-v1/64차원 자료다. 이를 BGE 측정으로 재표기하지 않고 원본 identity를 보존했다. 같은 코드 snapshot의 새 BGE 데이터는 dataset ID가 달라진다.
+- 두 BGE 데이터는 bge-m3:latest digest7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab/native1024, raw:v1 query/passage·reject:v1 및 같은 전체 embedding identity다. 로컬 Ollama0.40.4를 사용하고 전후 digest·실제1024차원 추론을 확인했다. 로컬 자원/시간은 사용했으며 유료 LLM0이다.
+
+| 프로젝트 | 코드 commit | source mode | 보관 파일 | vector chunks | dataset | snapshot |
+|---|---|---|---:|---:|---|---|
+| go-stablenet | 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8 | committed | 2295 | 21304 | 7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6 | 5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4 |
+| go-wemix | 1350376a680489298b3203a44d9ebddb7747f9cc | working-tree | 2019 | 23408 | 47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844 | dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2 |
+
+- go-stablenet은 기존 SN-P02 소유 보관 버전의 byte 복사본, go-wemix는 공개 setup --hold-for-review로 만든 새 비운영 버전이다. 둘 다 이번 시험의 current는 생성하지 않았다. builder3종과 clean reader의 소스/바이너리 hash를 분리해 기록했다. reader는 새 보완 커밋38dd5c54의 clean 바이너리다.
+- go-wemix 원본은 clean1350376a다. 소유 복제본의 cmd/gwemix→geth 디렉터리 symlink 별칭만 제외했고 일반 cmd/geth를 보존했다. 그래서 working-tree/D cmd/gwemix를 명시하며 committed로 위장하지 않는다. 두 프로젝트 repo4243파일을 각각 원본 Git archive의 byte와 전수 대조했다.
+- go-stablenet에는 repo2224+외부 문서44+flow27과 기존 policy/convention이 있고, go-wemix는 repo2019만 있다. 동일 모델이라도 corpus/정책 조건은 대칭이 아니므로 순위/근거 개수 차이를 품질 우열·온톨로지 효과로 판정하지 않는다. 별도 graph/vector 모델 비교의 recall gold도 만들지 않았다.
+
+실제 검색 경로
+- 공개된 진단 질문6개를 각 프로젝트에 동일하게 keyword, Go vector, 전체 vector, v2로 요청했다. raw 36회는 go-stablenet 성공18회와 working-tree go-wemix의 기대한 requires_v2 거부18회다. 두 프로젝트의 v2 12회는 모두 성공했다. legacy raw 순위를 양쪽에서 동등하게 비교했다고 주장하지 않는다. 빈 keyword 결과는 기능 부재로 채점하지 않았다. 입력/빈 결과/실패/응답 분모는 원시 wire·attempts·search-results.json에 보존한다.
+- 최종/초기 진단의 인용 검사 합계1010건, 최종 v2 본문119건을 각 선택 archive의 좌표·원문·범위·SHA와 대조했다. non-citable convention metadata0건은 원문 인용으로 세지 않았다. 이는 무결성/격리 검사이며 의미 관련성100%나 독립 정답 수용이 아니다.
+- raw Text는 원문 본문이 아니라 색인된 힌트다. flow_step 설명은 보관 corpus의 prose+symbol+branch 조건에서 재계산하고 코드 anchor는 별도로 검증한다. invariant 문구도 추출된 힌트이며 줄 전체의 인용문으로 취급하지 않는다. source/density 축약을 포함한 고유86개 힌트 투영을 실제 선택 vector DB와 대조했다. v2/비교 body는 실제 보관 원문 byte·범위 hash와 엄격히 일치했다. 초기 preflight의 Text=code 가정 실패와 수집기 보완도 보존했다.
+- legacy raw hits에는 프로젝트 좌표가 자체 포함되지 않는다. 이번 검사는 명시적으로 선택한 서버 설정/버전과 원문을 결속했다. 여러 프로젝트 결과를 합치는 소비자는 v2/비교의 전체 좌표를 유지해야 하며 path·canonical ID·node ID만으로 출처를 추정하면 안 된다. working-tree legacy raw 요청은 requires_v2로 거부되며 v2의 source mode·전체 좌표·보관 원문 SHA를 함께 확인한다.
+- 실제 두 저장소는 같은 모듈/canonical 함수 이름을 공유한다. types.Transaction.Size를 각 프로젝트에서 따로 조회해 서로 다른 원문 SHA를 확인했다(node ID 관측: 서로 다름). node/canonical 이름만으로 전역 신원을 만들지 않고, 다른 프로젝트 commit·잘못된 source/snapshot pin6건은 source_mismatch/analysis=null, go-wemix의 WBFT 전용 node는 not_found였다. 정확 pin 복구 조회도 성공했다.
+
+개념 비교와 미확인 정보
+- 별도 읽기 전용 comparison MCP의 describe/extract2도구로6개념·40셀·22검사를 새 데이터와 같은 reader에서 실행했다. binding7개는 모두 proposed이며 사람 검토/신원·독립 수용을 만들지 않았다. 기본 reviewed-only에서는 제외된다.
+- consensus: 선택한 go-stablenet WBFT validator/quorum·commit excerpt와 go-wemix Clique verifySeal excerpt를 나눠 반환했다. 양쪽 membership 근거와 한쪽 quorum을 수집했지만 fault assumptions 등은 unknown이다.
+- mempool-admission: 각 프로젝트의 ValidateTransaction / TxPool.validateTx 원문을 구분한다. transaction-ordering: miner.txByPriceAndTime.Less / types.TxByPriceAndTime.Less를 나눠 모은다. 양쪽 근거가 있는 비교 후보3개를 보존하며 우월성·공정성·전체 실행 성질을 추론하지 않는다.
+- staking/staking-policy의12개 미수집 셀을 기능 없음으로 바꾸지 않았다. finality는 commit dispatch의 관련 근거가 있어도 rollback/불가역성/settlement를 증명하지 않아 unknown, 다른 쪽 미수집도 그대로다. 전체40셀은 similar7/unknown18/not_collected15다. similar는 공통 개념에 대한 제안 연결 상태이며 두 프로젝트의 알고리즘·정책이 같다는 판정이 아니다.
+- 양쪽 CreateConsensusEngine 원문도 보존했다. go-stablenet은 Clique/Anzeon WBFT 등 설정 분기가 있고, go-wemix는 Clique/ethash 선택 후 beacon wrapper가 있다. 실제 실행 network/genesis/config를 선택하지 않았으므로 ‘프로젝트 전체 또는 운영망의 유일한 합의’ 비교가 아니다.
+- comparison question은 자동 자연어 해석기가 아니다. concept/facets/조건과 명시 binding을 입력해야 한다. comparison.extract는 지정한 binding의 보관 원문을 직접 읽으며 BGE 순위를 자동 개념 매핑으로 바꾸지 않는다. 이번 검색 ontology_mode는 off이며, 어휘/연결만으로 의미 gold가 자동 생성되거나 온톨로지 효과가 수용된 것으로 보지 않는다.
+
+혼입·손상·복구
+- foreign scope·implementation mode·주입 target·미정의 축4건을 request_invalid로 거부했다. 미일치 source mapping은 unavailable/본문 제외, 한쪽 archive 누락은 해당쪽 unavailable와 양측 후보 없음으로 처리하고 정상쪽은 보존했다.
+- live 원문을 소유 복제본에서 지워도 retained 응답이 같았다. source body/citation 예산 부족은 완전 항목을 제외하고 원문을 잘라 근거처럼 반환하지 않았다. 모든 소유 파일 bytes/mode를 복구했다.
+- 보완 전 실제 교차 구성은 alignment=false·v2/legacy pack 거부에도 direct keyword3개가 응답했다. 진단 raw와 첫 기동 기대 실패를 보존했다. 별도 진단에서 일반 텍스트 오류를 JSON으로만 읽던 수집기 공백도 보존·수정했다. 버전 경로가 달라지면 legacy wiring으로 내려가던 공백을 validatePinnedBackendPair로 차단했다. legacy 독립 인덱스의 기존 진단 동작은 유지한다.
+- 수정 후 실제 graph/vector를 서로 다른 프로젝트로 뒤바꾼 설정2개는 초기화 전에 operation_failed/exit1로 거부했다. 이는 의도한 잘못된 구성의 기동 거부이며 정상 실행 중 서버 중단이 아니다.
+- 최초 실행은 정상 C5 keyword 응답의 hits=null에서 수집기가 len(None)을 호출해 중단됐다. 첫4질문의 raw/v2와 C5 keyword까지19도구 요청·원시 응답·수집기 exit1을 diagnostics/initial-empty-hit-run에 보존했다. CKS는 EOF0/reap·강제종료0이며 제품 오류가 아니다. null을 빈 결과0개로 처리하도록 수집기만 보완하고 소스·데이터·바이너리·질문을 바꾸지 않은 채 전체를 재실행했다. 초기4개와 보완 전 전체12개, 합계16개 v2의 본문/인용도 별도로 검증했다.
+- 최종 정상 CKS5세션과 초기/보완 전 진단6세션은 EOF0/reap·강제종료0, 잘못된 구성2세션은 기대한 exit1/reap·강제종료0이다. 모델 중단/신호0. 최종 도구85회+초기/진단93회=전체 도구 요청178회와 모든 초기화/실패 시도를 보존했다.
+- 재검산 중 factory 범위의 마지막 줄이 원문을1줄 넘던 수집기 가정도 실제 줄 수로 교정했다. 비교 예산 요청 dict의 후속 변경이 파생 transcript의 앞 요청1건을 바꾼 것도 발견했다. 원시 stdin/stdout는 그대로 보존하고 원시 요청을 기준으로 파생 messages/attempts만 재구성했다. 최초 뷰·교정 영수증을 보존하고 새 수집기는 입력을 깊은 복사하며, 재검산기는 모든 요청을 실제 stdin과 대조한다. 이 과정은 새 도구 호출이나 제품 결과 변경이 아니다.
+- 원본/이전 데이터 SHA·current, 소유 데이터, reader lease, 원본/소유 source scope, 전역32·운영metadata42·기존checkout5·비소유엔진11을 전후 확인했다. 운영 전환·외부 게시0이다.
+
+검증과 완료 범위
+- 새 소스38dd5c54(Go1738개·승인 입력5개)에서 전체 검증을 새로 실행했다. 일반4097pass/18skip/0fail, race4097pass/18skip/0fail, build/fmt/vet/golangci/boundaries/docs/build-bins 모두 통과했다. 비교/collection 별도 race232개와 pinned pair11개 상위/하위 사례도 통과했다. 이전 소스의 232개 결과는 진단으로 분리했고 이전4086개 전체 결과를 이번 소스의 새 통과로 재사용하지 않는다.
+- 재검산기 scripts/check-stablenet-comparison.py와 의미 있는 반례 검사 scripts/test_stablenet_comparison.py를 추가했다. 최종 비교 증거보호22·역사source의이전 오류보호13·문서계약20·고지3(총58), live문서134·기존완료guard·새 재검산·이전 오류 및 역사 rebuild 재검산·공백검사가 통과했다. validation-summary.json을 따른다.
+- 비운영 pilot SN-P01~04 4/4, 로컬 로드맵7/7·28/28, 격리 준비22/22 완료 유지. 정식 수용0/9·D04미정·freeze null/execution_allowed false, 기존 제한 온톨로지 연구완료/quality=inconclusive는 그대로다.
+
+다음 작업: FORMAL-PREP — 독립 수용용 새 DEV/FINAL·완전 gold·matching·충분성·F01~08 동결 준비. 담당자와 독립성은 지정되지 않았고 AI가 사람 정답/수용 결정을 대신하지 않는다. 필수 온톨로지 독립 평가도 포함한다.
+
+이전 패킷 재현성 보완: SN-P03 manifest가 선언한 로그21개는 원문이 로컬에 존재했지만 Gitignore로 이전 커밋에 없었다. 기존 byte·SHA·manifest는 바꾸지 않고 이번 커밋에 해당 원문을 명시적으로 포함해 최신 checkout에서 재현 가능하게 보완했다. 역사652e977c 소스에서 원문을 복원해13개 보호검사를 통과했고 이번 소스의 새 검사와 구분한다. historical-archive-completeness.json을 따른다.
+
+남은 전체 작업
+1. FORMAL-PREP: D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결
+2. FORMAL-9: WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 정식 실행·수용 (0/9)
+3. ONTOLOGY: 독립 의미/검색 gold, 검토된 구현-개념 연결/가족 coverage, 승인 DEV/FINAL 효과 gate; 실제 LLM 답변 효과는 모델/인증/상한 지정 후
+4. OPTIONAL-12: 조직 인증/권한; 공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사; viewer; 배포/downstream
+
+커밋 전 공백 검사: 복원한 과거 공백 거부 진단1파일에 의도된 trailing space가 있어 최초 exit2였다. 원문을 고치지 않고 followups/.gitattributes의 정확한 해당 경로1개에만 공백 검사 예외를 선언한 후 exit0을 확인했다. 실제 Go fmt/lint와 원문 SHA 검증은 그대로 유지한다.

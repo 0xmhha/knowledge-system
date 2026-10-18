@@ -1,0 +1,29 @@
+# WBFT consensus message handlers: preprepare, prepare, commit
+
+**Status:** verified · **Subsystem:** A1 (WBFT Consensus Core) · **Type:** B3
+
+Three handlers drive the per-round state machine. handlePreprepareMsg
+validates the proposer's block and transitions to StatePreprepared;
+handlePrepareMsg accumulates PREPARE votes and transitions to
+StatePrepared at quorum; handleCommitMsg accumulates COMMIT votes and
+finalises the block at quorum. Every handler verifies the message
+signature, the sequence/round view, and the sender's authorisation
+before applying state changes.
+
+## Invariants
+- Each handler is idempotent for duplicate messages from the same sender at the same view (sequence, round).
+- Per-round state progresses strictly StatePreprepared -> StatePrepared -> StateCommitted; out-of-order messages are buffered or rejected.
+
+## Pitfalls
+- Treating a PREPARE quorum as committable proof: PREPARE quorum only justifies the prepared block inside ROUND-CHANGE messages. Block finalisation requires a COMMIT quorum.
+
+## Code anchors
+- `consensus/wbft/core/preprepare.go` Core.handlePreprepareMsg:115 — validates proposer signature and block, transitions to StatePreprepared
+- `consensus/wbft/core/prepare.go` Core.handlePrepareMsg:87 — accumulates PREPARE messages, transition to StatePrepared at QuorumSize
+- `consensus/wbft/core/commit.go` Core.handleCommitMsg:90 — accumulates COMMIT messages, finalises block at QuorumSize
+
+## Aliases
+프리프리페어, 프리페어, 커밋 메시지, 합의 메시지 처리, BFT 메시지 핸들러, BFT message handlers, preprepare prepare commit, WBFT state transitions, consensus phase handlers, handlePreprepareMsg, handlePrepareMsg, handleCommitMsg, StatePreprepared, StatePrepared, StateCommitted, WBFTPrepares, WBFTCommits
+
+## Related
+A1.wbft_core.consensus_flow_architecture, A1.wbft_core.quorum_calc, A1.wbft_core.round_change_protocol

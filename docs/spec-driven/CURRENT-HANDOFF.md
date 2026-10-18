@@ -1,5 +1,15 @@
 # 현재 인수인계
 
+## 최신 상태 — 2026-10-18 / SN-P04
+
+비운영 pilot **4/4 완료**. 실제 go-wemix1350376a의 새 BGE-M3/native1024 held DB와 go-stablenet0bf2f4d1의 보관 DB에서 같은6진단 입력·검색·v2·6개념 비교·출처/혼입 경계를 검증했다. 기존 go-wemix 자료는 mock64이며 새 BGE 자료와 구분한다. 서로 바뀐 실제 graph/vector 설정2개는 기동 거부, 최종정상5+초기/보완전진단6세션은 EOF0·모든 소유 프로세스 회수·강제종료0이다. corpus/정책 범위가 다르며 매핑은 proposed라 품질 우열·운영망 합의·온톨로지 독립 효과를 승인한 결과가 아니다.
+
+새 소스38dd5c54(Go1738개)에서 일반/race 각4097pass/18skip, build/fmt/vet/lint/boundaries/docs/build-bins 및 별도 비교/격리 race232개가 새로 통과했다. 이전 결과 재사용으로 대신하지 않았다. [최신 보고서](./operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/REPORT.txt)와 [현재 작업리스트](./operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/WORKLIST.json)가 최신 상태다.
+
+다음은 독립 DEV/FINAL·완전 gold·matching/충분성·F01~08 동결 준비다. 남은 전체는 해당 준비, 정식 WI9개(0/9), 필수 온톨로지 독립 효과 평가, 별도 후속12개다. D04미정·freeze null/execution_allowed=false, 로컬 로드맵7/7·28/28·준비22/22 및 기존 제한 온톨로지 연구완료/inconclusive를 유지한다. 운영 current·전역 설정·외부 게시를 변경하지 않았다.
+
+이하 이전 시점의 구현/연구 기록은 당시 범위이며 현재 상태는 위 최신 보고서·원장을 우선한다.
+
 운영·독립 수용 준비 갱신(2026-10-16): source3a530a25 격리 빌드·CKS33개 스키마 일치/ChainBench81개 metadata·현재 Claude Code2.1.301의 로컬 scripted5개를 새로 검증했다. 실제 모델/노드0, 정식9개 수용0/9·F-01–08 pending이다.9개 baseline/표본/위치 매칭/분모 제안과 역할·입력·recipe의 남은 결정을 [현재 protocol](./OPERATIONAL-ACCEPTANCE-PROTOCOL.md)에 정리했다. 다음은 검토자·범위·독립 입력/gold 검토다.
 
 

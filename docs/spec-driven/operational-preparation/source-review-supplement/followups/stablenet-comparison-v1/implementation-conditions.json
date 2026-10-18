@@ -1,0 +1,36 @@
+[
+  {
+    "project": "go-stablenet",
+    "coordinates": {
+      "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+      "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+      "source_mode": "committed",
+      "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+      "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+    },
+    "file": "eth/ethconfig/config.go",
+    "start_line": 182,
+    "end_line": 211,
+    "file_sha256": "0b25a28dc84babfc3fe5b01c80af2909b36c68004e020cb0b2251fae15cbb58f",
+    "content_sha256": "9bf7d7a06c2bf143ca648ee384181ea6b7f2efe0706d4f9e165c287b0ed7582f",
+    "body": "func CreateConsensusEngine(config *params.ChainConfig, privKey *ecdsa.PrivateKey, db ethdb.Database) (consensus.Engine, error) {\n\t// If proof-of-authority is requested, set it up\n\tif config.Clique != nil {\n\t\tif config.TerminalTotalDifficulty == nil {\n\t\t\t// clique engine without supporting beacon logic\n\t\t\treturn clique.New(config.Clique, db), nil\n\t\t}\n\t\treturn beacon.New(clique.New(config.Clique, db)), nil\n\t}\n\n\tif config.AnzeonEnabled() {\n\t\twbftCfg := new(wbft.Config)\n\t\terr := SetConfigFromChainConfig(wbftCfg, config)\n\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\n\t\treturn wbftBackend.New(wbftCfg, privKey, db), nil\n\t}\n\n\t// If defaulting to proof-of-work, enforce an already merged network since\n\t// we cannot run PoW algorithms anymore, so we cannot even follow a chain\n\t// not coordinated by a beacon node.\n\tif !config.TerminalTotalDifficultyPassed {\n\t\t// no beacon and pure ethash faker\n\t\treturn ethash.NewFaker(), nil\n\t}\n\treturn beacon.New(ethash.NewFaker()), nil\n}\n",
+    "interpretation": "source selection depends on configuration; no running network selected or policy inferred"
+  },
+  {
+    "project": "go-wemix",
+    "coordinates": {
+      "project_id": "comparison-go-wemix",
+      "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+      "source_mode": "working-tree",
+      "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+      "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+    },
+    "file": "eth/ethconfig/config.go",
+    "start_line": 217,
+    "end_line": 246,
+    "file_sha256": "f351beb3142e278b6d90fb364cdb29134a00e2b566cc598d0bee0677a5fcb145",
+    "content_sha256": "1eb94d7d0db2f74652f4fb39ca961f20160e1e7bd5afa07ed8f5624e7886634e",
+    "body": "func CreateConsensusEngine(stack *node.Node, chainConfig *params.ChainConfig, config *ethash.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {\n\t// If proof-of-authority is requested, set it up\n\tvar engine consensus.Engine\n\tif chainConfig.Clique != nil {\n\t\tengine = clique.New(chainConfig.Clique, db)\n\t} else {\n\t\tswitch config.PowMode {\n\t\tcase ethash.ModeFake:\n\t\t\tlog.Warn(\"Ethash used in fake mode\")\n\t\tcase ethash.ModeTest:\n\t\t\tlog.Warn(\"Ethash used in test mode\")\n\t\tcase ethash.ModeShared:\n\t\t\tlog.Warn(\"Ethash used in shared mode\")\n\t\t}\n\t\tengine = ethash.New(ethash.Config{\n\t\t\tPowMode:          config.PowMode,\n\t\t\tCacheDir:         stack.ResolvePath(config.CacheDir),\n\t\t\tCachesInMem:      config.CachesInMem,\n\t\t\tCachesOnDisk:     config.CachesOnDisk,\n\t\t\tCachesLockMmap:   config.CachesLockMmap,\n\t\t\tDatasetDir:       config.DatasetDir,\n\t\t\tDatasetsInMem:    config.DatasetsInMem,\n\t\t\tDatasetsOnDisk:   config.DatasetsOnDisk,\n\t\t\tDatasetsLockMmap: config.DatasetsLockMmap,\n\t\t\tNotifyFull:       config.NotifyFull,\n\t\t}, notify, noverify)\n\t\tengine.(*ethash.Ethash).SetThreads(-1) // Disable CPU mining\n\t}\n\treturn beacon.New(engine)\n}\n",
+    "interpretation": "source selection depends on configuration; no running network selected or policy inferred"
+  }
+]

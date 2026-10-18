@@ -1,5 +1,20 @@
 # 지식 매니저·프로젝트 비교 전체 작업·시험표
 
+## 최신 비운영 pilot 진행표 — 2026-10-18
+
+| 단계 | 검증 범위 | 상태 |
+|---|---|---|
+| SN-P01 | 실제 go-stablenet 소스·데이터·모델 식별·검색 경로 | 기술 범위 완료; 최초 원문 누락은 SN-P02 보완으로 연결 |
+| SN-P02 | 외부 원문 보관·convention 구분·기존/새 버전 비교 | 완료 |
+| SN-P03 | 출처/무결성과 모델 실패 분류·재시작 없는 복구 | 완료 |
+| SN-P04 | 실제 go-wemix BGE 데이터·개념/검색·출처·혼입 비교 | 완료; 새 race232pass·5정상EOF0·2기대기동거부 |
+| 정식 준비 | 담당자·독립 DEV/FINAL·완전 gold·matching/충분성·F01~08 | 미완료; D04미정·freeze null |
+| 정식 수용9개 | WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C | 0/9; 실행 미허용 |
+| 필수 온톨로지 독립 효과 | 독립 의미/검색 gold·검토 연결·coverage/효과 gate | 미수용; 기존 제한 연구완료/inconclusive 유지 |
+| 선택 후속 | 별도 후속12개 | 별도 backlog |
+
+[SN-P04 최신 검증](./operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/REPORT.txt), [남은 전체 작업](./operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/WORKLIST.json). 아래28/28 표는 기존 로컬 로드맵의 완료 기록이며 정식 수용 완료 수와 합산하지 않는다.
+
 2026-10-16 현재 KM-01–06을 완료했다. 전체28개 중28개 완료·0개 진행 중·0개 미착수다. 로컬 구현·개발 효과 관찰 범위를 완료했으며 독립 품질 수용과 구분한다. [원장](./KNOWLEDGE-ROADMAP-PROGRESS.json)과 [명세](./KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md)를 따른다.
 
 표의 **통과**는 명시한 시험 범위만 뜻한다. **부분 검증**은 완료 표시가 아니며 **미실행**을 통과0건으로 바꾸지 않는다. 신규7개 기능 전체 완료는7/7이다.
