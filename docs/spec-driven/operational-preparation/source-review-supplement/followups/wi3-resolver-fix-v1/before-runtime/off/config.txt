@@ -1,0 +1,28 @@
+version: 1
+name: snp04-go-stablenet
+backends:
+  ckg:
+    path: /private/tmp/ks-snp04-20261018-01/stablenet/retained-origins-v2/graph/graph.db
+    source_root: /private/tmp/ks-snp04-20261018-01/stablenet-source
+  ckv:
+    path: /private/tmp/ks-snp04-20261018-01/stablenet/retained-origins-v2/vector
+    provider: ollama
+    embed_model: bge-m3:latest
+    embed_dim: 1024
+    ollama_url: http://127.0.0.1:11434
+listen:
+  transport: stdio
+logging:
+  level: info
+  mode: prod
+  footprint_dir: /private/tmp/ks-wi3-resolver-20261019/before-runtime-declaration/off/footprints
+  measure_backend_calls: false
+sanitize:
+  rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true
+semantic:
+  ontology_mode: off
+retrieval:
+  recall_k: 10
+  type_neighbors: false

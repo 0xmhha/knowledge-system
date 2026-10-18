@@ -1,3 +1,21 @@
+# 단계59 — WI-3 계측 시 출처 식별 기능 보존 / 2026-10-19
+
+[단계59 보고서](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/REPORT.txt), [명세와 검증 근거](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/acceptance-review.json), [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/WORKLIST.json)이 최신 진입점이다. **AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처는 요구하지 않는다.
+
+`logging.measure_backend_calls`를 켜면 래퍼가 선택적 CitationResolver를 숨겨 실제 선언 위치 입력이 거부되고 후보 심볼이 사라졌다. 수정 전 어댑터/실제 MCP handler 회귀가 실패했고, 수정 후 관련332개가 통과했다. 래퍼는 공급자가 지원할 때만 그 기능을 보존하고 문맥·인용·반환값·오류를 그대로 전달한다. 기존 계측 scope 안에서는 입력 hash/길이와 안전한 오류 종류만 기록하며 원문 경로·심볼·오류 문구를 기록하지 않는다. 지원하지 않는 공급자에 기능을 만들어 붙이지 않는다.
+
+전체 빌드·일반/race 각4123통과/기존18skip/실패0, fmt·vet·고정 lint2.14.0·경계·문서134개 검증을 새로 수행했다. 소유 복사본의30e43a34 +4Go파일 작업 트리 변경을1738native/5승인 입력과 결속했고 lint/docs 설정2개도 실행 전후 동일함을 확인했다. 최종 커밋 clean build로 이름을 바꿔 기록하지 않는다. [native 원자료](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/native/receipts.json)를 따른다.
+
+실제 이전/새 CKS stdio 비교에서 선언 위치·심볼·보존 인용 확장3경로는 새 계측 on/off 결과가 경과 시간만 제외하고 일치하며, off의 이전/새 결과도 같다. 첫14회 시도의 주석 줄257 오류를 보존했고 선언 줄258·주석 줄을 분리한 이전16회/새16회를 추가했다. 총46호출·소유 세션6개 EOF0, 기존 source/graph/vector 전후 동일이다. 잘못된 commit·dataset·hash, 주석/없는 위치는 구조화 결과 없이 거부한다. 5000ms 상한의 기능 회귀이며 기본1초·warm 지연 수용이나 새 독립 표본으로 세지 않는다.
+
+새 결속 manifest를 커밋한 뒤 완료 주장 guard가 그 실제 revision을 읽도록 출처 참조를 갱신한다. 이 결속 정리가 끝나기 전에는 전체 단계 저장을 완료로 표시하지 않는다. 기존 작업 완료 상태는 변경하지 않는다. 자동 label_suspects 계측 scope와 unanchored traversal 정규화는 이번에 추가하지 않았다.
+
+다음: WI-3의 주석 포함 인용/정확한 선언 identity와 최종 검증 예산 계약. 남은 전체: WI-1의53발생 지점/3블록·타입/값/메모리 의미, WI-2의 독립 의미/build profile/지원/설치역할, WI-3 traversal/예산/startup/전체 호출 관측, WI-4/V1/V2 실제경로·오라클, WI-6 nonseed/쌍/warm, WI-SP overlay/ACL, WI-C 필수항목/전달, 새 독립 DEV/FINAL·완전 정답·매칭·충분성·F01~08, 정식9개, 온톨로지 효과 평가, 별도 선택 백로그12개다. 실제 LLM 답변 평가는 모델·인증·상한 결정 후 진행한다.
+
+현재 Python 회귀96개(resolver14·공통 수용59·문서20·notice3), 문서134개·생성91파일 동일 재생·Python8파일 구문·공백 검사와 미승인 gold/미동결 실행 거부를 확인했다. [검증 요약](./operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/validation/SUMMARY.json)은 새 native4123/race4123·기존 skip18·실제46호출/EOF6과 커밋 후 출처 결속 필요를 명시한다.
+
+이하 단계58 이전은 당시 기록이다.
+
 # 단계58 — WI-1 select 수신 정의 보정 / 2026-10-19
 
 [단계58 보고서](./operational-preparation/source-review-supplement/followups/wi1-select-review-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wi1-select-review-v1/WORKLIST.json)이 최신 진입점이다. **AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처를 요구하지 않는다. 익명 역할 ID는 검토 여부와 근거를 구분하기 위한 선택지이며, 개인정보 제출 대기가 아니다.

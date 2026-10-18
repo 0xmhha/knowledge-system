@@ -160,7 +160,7 @@ func start(ctx context.Context, backend, method, input string, opts any) func(in
 			// Add a safe typed diagnostic without removing the failed attempt
 			// from its historical outcome/denominator. Never classify by raw
 			// error text, or assert that an unresolved citation is expected.
-			if call.Outcome == "backend_error" && backend == "ckg" && method == "neighbors" && errors.Is(err, ckgclient.ErrSeedUnresolved) {
+			if call.Outcome == "backend_error" && backend == "ckg" && (method == "neighbors" || method == "resolve_citation") && errors.Is(err, ckgclient.ErrSeedUnresolved) {
 				call.ErrorKind = "seed_unresolved"
 			}
 		}

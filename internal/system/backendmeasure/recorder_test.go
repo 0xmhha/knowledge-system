@@ -20,6 +20,94 @@ import (
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
+type graphWithoutResolver struct{ ckgclient.Client }
+
+type resolverProbe struct {
+	ckgclient.Client
+	ctx      context.Context
+	citation contract.Citation
+	result   ckgclient.SymbolIdentity
+	err      error
+	calls    int
+}
+
+func (p *resolverProbe) ResolveCitation(ctx context.Context, c contract.Citation) (ckgclient.SymbolIdentity, error) {
+	p.ctx, p.citation = ctx, c
+	p.calls++
+	return p.result, p.err
+}
+
+func TestGraphMeasurementPreservesOptionalResolverCapability(t *testing.T) {
+	plain := graphWithoutResolver{Client: &ckgclient.Fake{}}
+	if _, ok := WrapCKG(plain).(ckgclient.CitationResolver); ok {
+		t.Fatal("measurement invented an unsupported resolver")
+	}
+	probe := &resolverProbe{Client: &ckgclient.Fake{}}
+	if _, ok := WrapCKG(probe).(ckgclient.CitationResolver); !ok {
+		t.Fatal("measurement erased the supported resolver")
+	}
+}
+
+func TestGraphResolverMeasurementDelegatesWithoutPrivateData(t *testing.T) {
+	for _, tc := range []struct {
+		name, outcome, errorKind string
+		err                      error
+	}{
+		{name: "success", outcome: "returned"},
+		{name: "unresolved", outcome: "backend_error", errorKind: "seed_unresolved", err: fmt.Errorf("PRIVATE_BACKEND: %w", ckgclient.ErrSeedUnresolved)},
+		{name: "opaque", outcome: "backend_error", err: errors.New("PRIVATE_BACKEND")},
+		{name: "canceled", outcome: "cancelled", err: context.Canceled},
+		{name: "deadline", outcome: "deadline_exceeded", err: context.DeadlineExceeded},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			citation := contract.Citation{File: "PRIVATE_SOURCE/a.go", StartLine: 2, EndLine: 3, CommitHash: strings.Repeat("a", 40)}
+			identity := ckgclient.SymbolIdentity{Symbol: "PRIVATE_SYMBOL", CanonicalID: "PRIVATE_CANONICAL", Citation: citation}
+			probe := &resolverProbe{Client: &ckgclient.Fake{}, result: identity, err: tc.err}
+			ctx, scope := (&Recorder{}).Begin(context.Background(), "resolver", "probe")
+			client, ok := WrapCKG(probe).(ckgclient.CitationResolver)
+			if !ok {
+				t.Fatal("measurement erased resolver")
+			}
+			got, err := client.ResolveCitation(ctx, citation)
+			if got != identity || err != tc.err || probe.ctx != ctx || probe.citation != citation || probe.calls != 1 {
+				t.Fatal("resolver delegation changed input, result, error or number of attempts")
+			}
+			report := scope.Finish("done")
+			if len(report.Calls) != 1 {
+				t.Fatalf("resolver attempts lost or duplicated: %d", len(report.Calls))
+			}
+			call := report.Calls[0]
+			encoded, _ := json.Marshal(citation)
+			digest := sha256.Sum256(encoded)
+			count := 0
+			if tc.err == nil {
+				count = 1
+			}
+			if call.Backend != "ckg" || call.Method != "resolve_citation" || call.InputSHA256 != hex.EncodeToString(digest[:]) || call.InputBytes != len(encoded) || call.ResultCount != count || call.Outcome != tc.outcome || call.ErrorKind != tc.errorKind {
+				t.Fatalf("resolver measurement contract changed: %+v", call)
+			}
+			raw, _ := json.Marshal(report)
+			if strings.Contains(string(raw), "PRIVATE_") || strings.Contains(string(raw), citation.CommitHash) {
+				t.Fatal("measurement released source, identity or backend message")
+			}
+		})
+	}
+}
+
+func TestGraphResolverDelegatesWithoutMeasurementScope(t *testing.T) {
+	probe := &resolverProbe{Client: &ckgclient.Fake{}, err: ckgclient.ErrSeedUnresolved}
+	client, ok := WrapCKG(probe).(ckgclient.CitationResolver)
+	if !ok {
+		t.Fatal("measurement erased resolver")
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	c := contract.Citation{File: "a.go", StartLine: 1, EndLine: 2}
+	if _, err := client.ResolveCitation(ctx, c); err != probe.err || probe.ctx != ctx || probe.citation != c || probe.calls != 1 {
+		t.Fatal("scope-free delegation changed")
+	}
+}
+
 func TestNeighborMeasurementBindsSourceWithoutReleasingPrivatePath(t *testing.T) {
 	backend := &ckgclient.Fake{}
 	client := WrapCKG(backend)

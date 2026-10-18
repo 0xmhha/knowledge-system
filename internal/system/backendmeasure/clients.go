@@ -45,9 +45,39 @@ func (v *vector) Freshness(ctx context.Context) (ckvclient.FreshnessReport, erro
 	return result, err
 }
 
-func WrapCKG(base ckgclient.Client) ckgclient.Client { return &graph{Client: base} }
+// WrapCKG preserves optional citation identity resolution. Providers without
+// that capability must remain distinguishable from supported, failing ones.
+func WrapCKG(base ckgclient.Client) ckgclient.Client {
+	g := &graph{Client: base}
+	if resolver, ok := base.(ckgclient.CitationResolver); ok {
+		return &graphWithResolver{graph: g, resolver: resolver}
+	}
+	return g
+}
 
 type graph struct{ ckgclient.Client }
+type graphWithResolver struct {
+	*graph
+	resolver ckgclient.CitationResolver
+}
+
+func (g *graphWithResolver) ResolveCitation(ctx context.Context, citation contract.Citation) (ckgclient.SymbolIdentity, error) {
+	input := ""
+	if scope, _ := ctx.Value(scopeKey{}).(*Scope); scope != nil {
+		// As with neighbors, retain a hash/length only. Identity results and
+		// backend error messages never enter the measurement record.
+		encoded, _ := json.Marshal(citation)
+		input = string(encoded)
+	}
+	finish := begin(ctx, "ckg", "resolve_citation", input, nil)
+	result, err := g.resolver.ResolveCitation(ctx, citation)
+	count := 0
+	if err == nil {
+		count = 1
+	}
+	finish(count, err)
+	return result, err
+}
 
 func (g *graph) BM25Search(ctx context.Context, query string, opts ckgclient.SearchOpts) ([]contract.Hit, error) {
 	finish := begin(ctx, "ckg", "bm25_search", query, opts)
