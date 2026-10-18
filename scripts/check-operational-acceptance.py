@@ -151,6 +151,10 @@ def check(root, protocol, ledger, require_frozen=False):
                 import independent_acceptance
                 errors.extend(independent_acceptance.packet_errors(root, (root / refreshed["manifest"]).parent))
                 errors.extend(independent_acceptance.current_index_errors(root))
+            elif refreshed.get("kind") == "WI2_consumer_context_AI_DEV_not_formal_execution":
+                import wi2_consumer_matching
+                errors.extend(wi2_consumer_matching.validate(root, (root / refreshed["manifest"]).parent))
+                errors.extend(wi2_consumer_matching.current_indices(root, protocol, ledger))
             elif refreshed.get("kind") == "WI2_complete_bounded_AI_DEV_not_formal_execution":
                 import wi2_dev_gold
                 errors.extend(wi2_dev_gold.validate(root, (root / refreshed["manifest"]).parent))
@@ -171,7 +175,7 @@ def check(root, protocol, ledger, require_frozen=False):
                 errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
             else:
                 raise ValueError("current readiness scope or hash differs")
-            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution", "WI1_consumer_matching_AI_DEV_not_formal_execution", "WI2_complete_bounded_AI_DEV_not_formal_execution"):
+            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution", "WI1_consumer_matching_AI_DEV_not_formal_execution", "WI2_complete_bounded_AI_DEV_not_formal_execution", "WI2_consumer_context_AI_DEV_not_formal_execution"):
                 historical = protocol.get("historical_readiness_preparation")
                 if (historical != ledger.get("historical_readiness_preparation")
                         or not isinstance(historical, dict)

@@ -1,0 +1,484 @@
+[
+  {
+    "kind": "wrong_expected_source_sha256",
+    "arguments": {
+      "rule_pack": "go-local-review@1.0.0",
+      "function": {
+        "node_id": "79f8a4cced5ad806",
+        "expected_commit": "2cfc84fa456e8c71825e3c2ea507b781ad69947e",
+        "expected_source_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "expected_snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c"
+      },
+      "max_candidates": 64,
+      "max_flow_steps": 4096
+    },
+    "response": {
+      "schema_version": 1,
+      "status": "source_mismatch",
+      "reason": "expected function blob differs",
+      "snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c",
+      "analysis": null,
+      "elapsed_micros": 566
+    }
+  },
+  {
+    "kind": "wrong_expected_snapshot_sha256",
+    "arguments": {
+      "rule_pack": "go-local-review@1.0.0",
+      "function": {
+        "node_id": "79f8a4cced5ad806",
+        "expected_commit": "2cfc84fa456e8c71825e3c2ea507b781ad69947e",
+        "expected_source_sha256": "9f638f30288cdbf62d3169aa624a5194e45eaa5628b6ea29921fc9c3d2b23355",
+        "expected_snapshot_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "max_candidates": 64,
+      "max_flow_steps": 4096
+    },
+    "response": {
+      "schema_version": 1,
+      "status": "source_mismatch",
+      "reason": "expected retained snapshot differs",
+      "snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c",
+      "analysis": null,
+      "elapsed_micros": 350
+    }
+  },
+  {
+    "kind": "wrong_expected_commit",
+    "arguments": {
+      "rule_pack": "go-local-review@1.0.0",
+      "function": {
+        "node_id": "79f8a4cced5ad806",
+        "expected_commit": "0000000000000000000000000000000000000000",
+        "expected_source_sha256": "9f638f30288cdbf62d3169aa624a5194e45eaa5628b6ea29921fc9c3d2b23355",
+        "expected_snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c"
+      },
+      "max_candidates": 64,
+      "max_flow_steps": 4096
+    },
+    "response": {
+      "schema_version": 1,
+      "status": "source_mismatch",
+      "reason": "expected retained source commit differs",
+      "snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c",
+      "analysis": null,
+      "elapsed_micros": 395
+    }
+  },
+  {
+    "kind": "invalid_rule_pack",
+    "arguments": {
+      "rule_pack": "unsupported@0",
+      "function": {
+        "node_id": "79f8a4cced5ad806",
+        "expected_commit": "2cfc84fa456e8c71825e3c2ea507b781ad69947e",
+        "expected_source_sha256": "9f638f30288cdbf62d3169aa624a5194e45eaa5628b6ea29921fc9c3d2b23355",
+        "expected_snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c"
+      },
+      "max_candidates": 64,
+      "max_flow_steps": 4096
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 86,
+      "error": {
+        "code": -32603,
+        "message": "explicit supported rule_pack required"
+      }
+    }
+  },
+  {
+    "kind": "invalid_max_candidates",
+    "arguments": {
+      "rule_pack": "go-local-review@1.0.0",
+      "function": {
+        "node_id": "79f8a4cced5ad806",
+        "expected_commit": "2cfc84fa456e8c71825e3c2ea507b781ad69947e",
+        "expected_source_sha256": "9f638f30288cdbf62d3169aa624a5194e45eaa5628b6ea29921fc9c3d2b23355",
+        "expected_snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c"
+      },
+      "max_candidates": 65,
+      "max_flow_steps": 4096
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 87,
+      "error": {
+        "code": -32603,
+        "message": "rule limits outside supported bounds"
+      }
+    }
+  },
+  {
+    "kind": "invalid_max_flow_steps",
+    "arguments": {
+      "rule_pack": "go-local-review@1.0.0",
+      "function": {
+        "node_id": "79f8a4cced5ad806",
+        "expected_commit": "2cfc84fa456e8c71825e3c2ea507b781ad69947e",
+        "expected_source_sha256": "9f638f30288cdbf62d3169aa624a5194e45eaa5628b6ea29921fc9c3d2b23355",
+        "expected_snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c"
+      },
+      "max_candidates": 64,
+      "max_flow_steps": 4097
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 88,
+      "error": {
+        "code": -32603,
+        "message": "rule limits outside supported bounds"
+      }
+    }
+  },
+  {
+    "kind": "bounded_incomplete",
+    "arguments": {
+      "rule_pack": "go-local-review@1.0.0",
+      "function": {
+        "node_id": "79f8a4cced5ad806",
+        "expected_commit": "2cfc84fa456e8c71825e3c2ea507b781ad69947e",
+        "expected_source_sha256": "9f638f30288cdbf62d3169aa624a5194e45eaa5628b6ea29921fc9c3d2b23355",
+        "expected_snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c"
+      },
+      "max_candidates": 64,
+      "max_flow_steps": 1
+    },
+    "response": {
+      "schema_version": 1,
+      "status": "partial",
+      "snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c",
+      "analysis": {
+        "schema_version": 1,
+        "source": {
+          "node_id": "79f8a4cced5ad806",
+          "canonical_id": "example.invalid/wi2-dev/controlled.F",
+          "file": "controlled/RULE-1-01.go",
+          "commit": "2cfc84fa456e8c71825e3c2ea507b781ad69947e",
+          "sha256": "9f638f30288cdbf62d3169aa624a5194e45eaa5628b6ea29921fc9c3d2b23355",
+          "language": "go",
+          "start_line": 7,
+          "start_byte": 196,
+          "bytes": 47,
+          "snapshot_sha256": "89387fb2c60f74792df89d1d285362b32315619372ddcd573f4eedaa21f6711c",
+          "function_name": "F"
+        },
+        "limits": {
+          "max_source_bytes": 262144,
+          "max_ast_nodes": 4096,
+          "max_blocks": 256,
+          "max_nodes": 1024,
+          "max_edges": 4096,
+          "max_iterations": 128,
+          "timeout_ms": 1000,
+          "max_facts": 65536
+        },
+        "status": "partial",
+        "capability": {
+          "cfg": "bounded_go",
+          "control_dependence": "normal_exit_postdominators",
+          "data_dependence": "local_scalar_may_reach",
+          "def_use": "lexical_may_reach",
+          "exceptions": "unsupported",
+          "local_binding": "isolated_go_types",
+          "memory_alias": "unsupported",
+          "package_types": "unavailable_function_blob",
+          "short_circuit": "unsupported"
+        },
+        "blocks": [
+          {
+            "id": 0,
+            "kind": "Body",
+            "reachable": true,
+            "nodes": [
+              "entry",
+              "b0/n0",
+              "b0/n1",
+              "b0/n2",
+              "b0/n3"
+            ]
+          }
+        ],
+        "nodes": [
+          {
+            "id": "b0/n0",
+            "block": 0,
+            "kind": "AssignStmt",
+            "location": {
+              "start_byte": 215,
+              "end_byte": 221,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "text": "a:=cmd",
+            "synthetic": false
+          },
+          {
+            "id": "b0/n1",
+            "block": 0,
+            "kind": "AssignStmt",
+            "location": {
+              "start_byte": 222,
+              "end_byte": 226,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "text": "b:=a",
+            "synthetic": false
+          },
+          {
+            "id": "b0/n2",
+            "block": 0,
+            "kind": "ExprStmt",
+            "location": {
+              "start_byte": 227,
+              "end_byte": 242,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "text": "exec.Command(b)",
+            "synthetic": false
+          },
+          {
+            "id": "b0/n3",
+            "block": 0,
+            "kind": "ReturnStmt",
+            "location": {
+              "start_byte": 242,
+              "end_byte": 243,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "text": "}",
+            "synthetic": true
+          },
+          {
+            "id": "entry",
+            "block": 0,
+            "kind": "entry",
+            "location": {
+              "start_byte": 196,
+              "end_byte": 214,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "text": "",
+            "synthetic": true
+          }
+        ],
+        "edges": [
+          {
+            "from": "entry",
+            "to": "b0/n0",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v203"
+          },
+          {
+            "from": "b0/n0",
+            "to": "b0/n1",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v215"
+          },
+          {
+            "from": "b0/n1",
+            "to": "b0/n2",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v222"
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "isolated_type_info_partial",
+            "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+          },
+          {
+            "code": "opaque_call",
+            "message": "Isolated function source has no interprocedural effects or abnormal-exit proof",
+            "location": {
+              "start_byte": 227,
+              "end_byte": 242,
+              "start_line": 7,
+              "end_line": 7
+            }
+          },
+          {
+            "code": "external_value_unknown",
+            "message": "Value read has no local lexical definition; no source edge is invented",
+            "location": {
+              "start_byte": 227,
+              "end_byte": 231,
+              "start_line": 7,
+              "end_line": 7
+            }
+          }
+        ],
+        "truncated": false,
+        "elapsed_micros": 77,
+        "variables": [
+          {
+            "id": "v203",
+            "name": "cmd",
+            "kind": "parameter",
+            "declaration": {
+              "start_byte": 203,
+              "end_byte": 206,
+              "start_line": 7,
+              "end_line": 7
+            }
+          },
+          {
+            "id": "v215",
+            "name": "a",
+            "kind": "local",
+            "declaration": {
+              "start_byte": 215,
+              "end_byte": 216,
+              "start_line": 7,
+              "end_line": 7
+            }
+          },
+          {
+            "id": "v222",
+            "name": "b",
+            "kind": "local",
+            "declaration": {
+              "start_byte": 222,
+              "end_byte": 223,
+              "start_line": 7,
+              "end_line": 7
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "id": "b0/n0/definition/v215/215",
+            "node": "b0/n0",
+            "variable": "v215",
+            "role": "definition",
+            "location": {
+              "start_byte": 215,
+              "end_byte": 216,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "reachable": true
+          },
+          {
+            "id": "b0/n0/use/v203/218",
+            "node": "b0/n0",
+            "variable": "v203",
+            "role": "use",
+            "location": {
+              "start_byte": 218,
+              "end_byte": 221,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "reachable": true
+          },
+          {
+            "id": "b0/n1/definition/v222/222",
+            "node": "b0/n1",
+            "variable": "v222",
+            "role": "definition",
+            "location": {
+              "start_byte": 222,
+              "end_byte": 223,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "reachable": true
+          },
+          {
+            "id": "b0/n1/use/v215/225",
+            "node": "b0/n1",
+            "variable": "v215",
+            "role": "use",
+            "location": {
+              "start_byte": 225,
+              "end_byte": 226,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "reachable": true
+          },
+          {
+            "id": "b0/n2/use/v222/240",
+            "node": "b0/n2",
+            "variable": "v222",
+            "role": "use",
+            "location": {
+              "start_byte": 240,
+              "end_byte": 241,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "reachable": true
+          },
+          {
+            "id": "entry/definition/v203/203",
+            "node": "entry",
+            "variable": "v203",
+            "role": "definition",
+            "location": {
+              "start_byte": 203,
+              "end_byte": 206,
+              "start_line": 7,
+              "end_line": 7
+            },
+            "reachable": true
+          }
+        ],
+        "def_use": [
+          {
+            "definition": "entry/definition/v203/203",
+            "use": "b0/n0/use/v203/218",
+            "variable": "v203",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b0/n0/definition/v215/215",
+            "use": "b0/n1/use/v215/225",
+            "variable": "v215",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "b0/n1/definition/v222/222",
+            "use": "b0/n2/use/v222/240",
+            "variable": "v222",
+            "certainty": "lexical_may_reach"
+          }
+        ],
+        "iterations": 6,
+        "facts_peak": 22,
+        "rules": {
+          "pack_id": "go-local-review",
+          "pack_version": "1.0.0",
+          "pack_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
+          "engine_version": "2",
+          "origin": "automatic",
+          "status": "incomplete",
+          "stop_reason": "flow_steps",
+          "limits": {
+            "max_candidates": 64,
+            "max_flow_steps": 1
+          },
+          "flow_steps": 1,
+          "candidates": [],
+          "limitations": [
+            "empty_candidates_do_not_establish_safety",
+            "syntax_targets_unresolved",
+            "parameters_not_proven_attacker_controlled",
+            "lexical_may_reach_not_path_feasibility",
+            "sanitizers_and_opaque_call_effects_not_proven",
+            "aliases_closures_fields_and_indirect_sinks_unsupported"
+          ]
+        }
+      },
+      "elapsed_micros": 868
+    }
+  }
+]
