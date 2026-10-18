@@ -1,0 +1,28 @@
+func ReadDir(dir, network string) ([]string, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, fmt.Errorf("error reading directory %s: %w", dir, err)
+	}
+	var (
+		next = uint64(0)
+		eras []string
+	)
+	for _, entry := range entries {
+		if path.Ext(entry.Name()) != ".era1" {
+			continue
+		}
+		parts := strings.Split(entry.Name(), "-")
+		if len(parts) != 3 || parts[0] != network {
+			// invalid era1 filename, skip
+			continue
+		}
+		if epoch, err := strconv.ParseUint(parts[1], 10, 64); err != nil {
+			return nil, fmt.Errorf("malformed era1 filename: %s", entry.Name())
+		} else if epoch != next {
+			return nil, fmt.Errorf("missing epoch %d", next)
+		}
+		next += 1
+		eras = append(eras, entry.Name())
+	}
+	return eras, nil
+}

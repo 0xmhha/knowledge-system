@@ -1,0 +1,46 @@
+[
+  {
+    "helper": "syntax",
+    "phase": "build",
+    "command": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/ks-wi2-dev-20261018/syntax-verified",
+      "/private/tmp/ks-wi2-dev-20261018/syntax.go"
+    ],
+    "exit_code": 0
+  },
+  {
+    "helper": "syntax",
+    "phase": "vet",
+    "command": [
+      "go",
+      "vet",
+      "/private/tmp/ks-wi2-dev-20261018/syntax.go"
+    ],
+    "exit_code": 0
+  },
+  {
+    "helper": "flow",
+    "phase": "build",
+    "command": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/ks-wi2-dev-20261018/flow-verified",
+      "/private/tmp/ks-wi2-dev-20261018/flow.go"
+    ],
+    "exit_code": 0
+  },
+  {
+    "helper": "flow",
+    "phase": "vet",
+    "command": [
+      "go",
+      "vet",
+      "/private/tmp/ks-wi2-dev-20261018/flow.go"
+    ],
+    "exit_code": 0
+  }
+]

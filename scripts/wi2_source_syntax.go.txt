@@ -1,0 +1,260 @@
+// Source syntax evidence only. No candidate valueflow/rule engine is imported.
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"go/types"
+	"os"
+	"strconv"
+	"strings"
+)
+
+type Input struct {
+	Path, Source string
+	Starts       []int
+}
+type Span struct {
+	Start int `json:"start"`
+	End   int `json:"end"`
+}
+type Expr struct {
+	Kind     string `json:"kind"`
+	Span     Span   `json:"span"`
+	Text     string `json:"text"`
+	Binding  string `json:"binding"`
+	Children []Expr `json:"children"`
+}
+type Write struct {
+	Target     Span   `json:"target"`
+	Binding    string `json:"binding"`
+	Expression Expr   `json:"expression"`
+	Operation  string `json:"operation"`
+	TupleIndex int    `json:"tuple_index"`
+	TupleSize  int    `json:"tuple_size"`
+}
+type Call struct {
+	Span         Span   `json:"span"`
+	Fun          Expr   `json:"fun"`
+	Owner        string `json:"owner"`
+	Member       string `json:"member"`
+	Import       string `json:"import"`
+	OwnerBinding string `json:"owner_binding"`
+	ClosureDepth int    `json:"closure_depth"`
+	Arguments    []Expr `json:"arguments"`
+	Assignment   []Expr `json:"assignment"`
+}
+type Return struct {
+	Span         Span   `json:"span"`
+	ClosureDepth int    `json:"closure_depth"`
+	Values       []Expr `json:"values"`
+}
+type Output struct {
+	Path       string   `json:"path"`
+	Span       Span     `json:"span"`
+	Calls      []Call   `json:"calls"`
+	Returns    []Return `json:"returns"`
+	Writes     []Write  `json:"writes"`
+	TypeErrors int      `json:"partial_file_type_errors"`
+}
+
+func scan(in Input) []Output {
+	fs := token.NewFileSet()
+	file, err := parser.ParseFile(fs, in.Path, in.Source, parser.SkipObjectResolution)
+	if err != nil {
+		panic(err)
+	}
+	sp := func(n ast.Node) Span {
+		if n == nil {
+			return Span{}
+		}
+		return Span{fs.Position(n.Pos()).Offset, fs.Position(n.End()).Offset}
+	}
+	info := &types.Info{Defs: map[*ast.Ident]types.Object{}, Uses: map[*ast.Ident]types.Object{}}
+	errors := 0
+	tc := types.Config{DisableUnusedImportCheck: true, Error: func(error) { errors++ }}
+	_, _ = tc.Check(file.Name.Name, fs, []*ast.File{file}, info)
+	imports := map[string]string{}
+	for _, im := range file.Imports {
+		p, _ := strconv.Unquote(im.Path.Value)
+		name := p[strings.LastIndex(p, "/")+1:]
+		if im.Name != nil {
+			name = im.Name.Name
+		}
+		imports[name] = p
+	}
+	binding := func(id *ast.Ident) string {
+		obj := info.Defs[id]
+		if obj == nil {
+			obj = info.Uses[id]
+		}
+		if obj == nil {
+			return ""
+		}
+		switch obj.(type) {
+		case *types.Var, *types.Const:
+			return fmt.Sprintf("v@%d", fs.Position(obj.Pos()).Offset)
+		}
+		return ""
+	}
+	var ex func(ast.Expr) Expr
+	ex = func(n ast.Expr) Expr {
+		if n == nil {
+			return Expr{Kind: "zero_initialization", Children: []Expr{}}
+		}
+		s := sp(n)
+		e := Expr{Kind: strings.TrimPrefix(fmt.Sprintf("%T", n), "*ast."), Span: s, Text: in.Source[s.Start:s.End], Children: []Expr{}}
+		switch x := n.(type) {
+		case *ast.Ident:
+			e.Binding = binding(x)
+		case *ast.ParenExpr:
+			e.Children = append(e.Children, ex(x.X))
+		case *ast.BinaryExpr:
+			e.Kind = "BinaryExpr:" + x.Op.String()
+			e.Children = append(e.Children, ex(x.X), ex(x.Y))
+		case *ast.UnaryExpr:
+			e.Kind = "UnaryExpr:" + x.Op.String()
+			e.Children = append(e.Children, ex(x.X))
+		case *ast.CallExpr:
+			e.Children = append(e.Children, ex(x.Fun))
+			for _, a := range x.Args {
+				e.Children = append(e.Children, ex(a))
+			}
+		case *ast.SelectorExpr:
+			e.Children = append(e.Children, ex(x.X))
+		case *ast.IndexExpr:
+			e.Children = append(e.Children, ex(x.X), ex(x.Index))
+		case *ast.StarExpr:
+			e.Children = append(e.Children, ex(x.X))
+		}
+		return e
+	}
+	out := []Output{}
+	for _, decl := range file.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+		chosen := false
+		for _, start := range in.Starts {
+			chosen = chosen || start == sp(fn).Start
+		}
+		if !chosen {
+			continue
+		}
+		o := Output{Path: in.Path, Span: sp(fn), Calls: []Call{}, Returns: []Return{}, Writes: []Write{}, TypeErrors: errors}
+		stack := []ast.Node{}
+		ast.Inspect(fn.Body, func(n ast.Node) bool {
+			if n == nil {
+				stack = stack[:len(stack)-1]
+				return true
+			}
+			var parent ast.Node
+			if len(stack) > 0 {
+				parent = stack[len(stack)-1]
+			}
+			depth := 0
+			for _, p := range stack {
+				if _, ok := p.(*ast.FuncLit); ok {
+					depth++
+				}
+			}
+			stack = append(stack, n)
+			switch x := n.(type) {
+			case *ast.CallExpr:
+				c := Call{Span: sp(x), Fun: ex(x.Fun), ClosureDepth: depth, Arguments: []Expr{}, Assignment: []Expr{}}
+				if s, ok := x.Fun.(*ast.SelectorExpr); ok {
+					c.Member = s.Sel.Name
+					if id, ok := s.X.(*ast.Ident); ok {
+						c.Owner = id.Name
+						c.Import = imports[id.Name]
+						c.OwnerBinding = binding(id)
+					}
+				}
+				for _, a := range x.Args {
+					c.Arguments = append(c.Arguments, ex(a))
+				}
+				if a, ok := parent.(*ast.AssignStmt); ok {
+					for _, e := range a.Lhs {
+						c.Assignment = append(c.Assignment, ex(e))
+					}
+				}
+				if a, ok := parent.(*ast.ValueSpec); ok {
+					for _, e := range a.Names {
+						c.Assignment = append(c.Assignment, ex(e))
+					}
+				}
+				o.Calls = append(o.Calls, c)
+			case *ast.ReturnStmt:
+				r := Return{Span: sp(x), ClosureDepth: depth, Values: []Expr{}}
+				for _, e := range x.Results {
+					r.Values = append(r.Values, ex(e))
+				}
+				o.Returns = append(o.Returns, r)
+			case *ast.AssignStmt:
+				if depth > 0 {
+					break
+				}
+				for i, lhs := range x.Lhs {
+					id, ok := lhs.(*ast.Ident)
+					if !ok || id.Name == "_" {
+						continue
+					}
+					var rhs ast.Expr
+					if len(x.Rhs) == len(x.Lhs) {
+						rhs = x.Rhs[i]
+					} else if len(x.Rhs) == 1 {
+						rhs = x.Rhs[0]
+					}
+					e := ex(rhs)
+					if x.Tok != token.ASSIGN && x.Tok != token.DEFINE {
+						e = Expr{Kind: "compound_value", Span: sp(id), Children: []Expr{ex(id), e}}
+					}
+					o.Writes = append(o.Writes, Write{sp(id), binding(id), e, x.Tok.String(), i, len(x.Lhs)})
+				}
+			case *ast.IncDecStmt:
+				if depth > 0 {
+					break
+				}
+				if id, ok := x.X.(*ast.Ident); ok {
+					o.Writes = append(o.Writes, Write{sp(id), binding(id), Expr{Kind: "compound_value", Span: sp(id), Children: []Expr{ex(id)}}, x.Tok.String(), 0, 1})
+				}
+			case *ast.ValueSpec:
+				if depth > 0 {
+					break
+				}
+				for i, id := range x.Names {
+					if id.Name == "_" {
+						continue
+					}
+					var rhs ast.Expr
+					if len(x.Values) == len(x.Names) {
+						rhs = x.Values[i]
+					} else if len(x.Values) == 1 {
+						rhs = x.Values[0]
+					}
+					o.Writes = append(o.Writes, Write{sp(id), binding(id), ex(rhs), "declaration", i, len(x.Names)})
+				}
+			}
+			return true
+		})
+		out = append(out, o)
+	}
+	return out
+}
+func main() {
+	var inputs []Input
+	if e := json.NewDecoder(os.Stdin).Decode(&inputs); e != nil {
+		panic(e)
+	}
+	outputs := []Output{}
+	for _, in := range inputs {
+		outputs = append(outputs, scan(in)...)
+	}
+	if e := json.NewEncoder(os.Stdout).Encode(outputs); e != nil {
+		panic(e)
+	}
+}

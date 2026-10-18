@@ -1,0 +1,22 @@
+......F......................
+======================================================================
+FAIL: test_current_packet (test_wi1_consumer_matching.EvidenceMutations.test_current_packet)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-wi2-dev-20261018/historical-5d84449e/scripts/test_wi1_consumer_matching.py", line 57, in test_current_packet
+    def test_current_packet(self):self.assertEqual(g.validate(),[]);self.assertEqual(g.current_indices(),[])
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["[Errno 2] No such file or directory: '/p[165 chars]on'"] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+"[Errno 2] No such file or directory: '/private/tmp/ks-wi2-dev-20261018/historical-5d84449e/docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/binary-pins.json'"
+
++ []
+- ['[Errno 2] No such file or directory: '
+-  "'/private/tmp/ks-wi2-dev-20261018/historical-5d84449e/docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/binary-pins.json'"]
+
+----------------------------------------------------------------------
+Ran 29 tests in 16.346s
+
+FAILED (failures=1)
