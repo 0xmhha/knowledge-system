@@ -1,5 +1,26 @@
 # 현재 인수인계
 
+## 2026-10-19 단계54: WI-C DEV10·필수 항목/우선순위·현재 소비자 전달 계약 AI 초안
+
+[단계54 보고서](./operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/WORKLIST.json)이 최신 진입점이다. **요청한 AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**다. 실명·연락처는 요구하지 않는다. 익명 역할 ID와 실제 검토/승인·근거 hash·독립성을 구분한다. D04미정은 개인정보 제출 대기가 아니라 검토·승인 대기다.
+
+| 작성·검증 범위 | 결과와 한계 |
+|---|---|
+| 기존 DEV·원문 | 노출된10함수/8모듈. 원래 Git/file/function/span과 소스 관찰45개+호출자/문맥19개를 확인 |
+| 유한 AI 필수 목록 | 소스 관찰64개와 추가 확인 질문20개. 질문의 답은unknown이며 실제 측정/계약을 지어내지 않음. 선택 실험10개 미실행. 완전한 제품 요구·독립 gold가 아님 |
+| 이름/우선순위 | 원래 getStartEnd 질문을 보존하며 실제 calculateBlockRange로 정규화. 요구·도달성·영향에 따른 조건부 검토만 작성, 확정 우선순위와 omission 점수null |
+| 채택 소비자 대조 | coding-agent d1ebafb8의 Git/파일 proof와 채택 hash 확인. Analyzer5도구 노출·Planner high/medium/low 최대32는 이미 해결됐으며 과거 공백을 재등록하지 않음 |
+| 보고서/그림 | typed JSON·근거 JSON·Markdown·Mermaid2개의 정확한5개 산출물. sequence는 지역 CFG flowchart, modules는 파일 소속이며 runtime trace/호출 그래프가 아님. 형식/바이트 검증은 렌더링·의미 품질 승인이 아님 |
+| 인수인계/역할 | Analyzer→Planner→Orchestrator, 실제 CLI/hook/state/hash 전달 계약을 기록. 현재 소스 계약·합성 fixture 검증과 실제 설치된 모델 역할 실행을 구분 |
+
+[AI 초안](./operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/private/AI-gold.json.gz), [현재 소비자 계약](./operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/consumer-contract.json), [남은 검토](./operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/REVIEW-LEDGER.json)을 따른다. 같은 기준 ID나6절·우선순위 enum만으로 필수 내용/중요도 정확성을 채점하지 않는다. structural snapshot은 identity_only_unverified_snapshot 한계를 유지한다. 실제 프로젝트 dual-tool·설치 역할·렌더링0, 품질 점수null이다.
+
+다음은 **WI1~3 미확정 의미·partial·공급자 오류·범위 밖·설치 소비자 경로 부채 점검**이다. 남은 전체는 해당 부채, WI4/V1/V2 실제경로/oracle·WI6 nonseed gold/실제쌍/warm·WI-SP 독립 의미/실제overlay/ACL·WI-C 독립필수항목/우선순위/실제보고서/역할, 새 독립 DEV/FINAL·완전 gold·matching/충분성·F01~08, 정식9개(0/9), 온톨로지 효과다. 실제 LLM 답변 효과는 모델·인증·비용 상한 확정 후 수행한다. 선택12개는 별도 backlog다.
+
+현재 회귀136개(WI-C37·공통 수용54·문서20·notice3·비교22), 3bdf444f 기준 과거 WI-SP36개, 문서134개·생성36파일 동일 재생·Python6파일 구문·공백 검사를 통과했다. 초기 검증 중 발생한 fixture cache와 변경 후 이전 tool hash 불일치를 보존하고, 소유 cache 제거·새 미동결 packet 결속 후 전체를 재검증했다. 정식 gold/미동결 실행 거부를 확인했다. [검증 요약](./operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/validation/SUMMARY.json)에 범위를 기록한다. 소스1738(Go1282)/승인 입력5 동일성으로 이전 native 전체 검증을 재사용한다.
+
+이하 단계53 이전 내용은 당시 기록이다.
+
 ## 2026-10-19 단계53: WI-SP DEV12·수동 overlay/출처·거부 경계 AI 초안
 
 [단계53 보고서](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/REPORT.txt)와 [현재 단계·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/WORKLIST.json)이 최신 진입점이다. **D04미정·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다.
