@@ -1,0 +1,44 @@
+func generateStorages(ctx *generatorContext, dl *diskLayer, stateRoot common.Hash, account common.Hash, storageRoot common.Hash, storeMarker []byte) error {
+	onStorage := func(key []byte, val []byte, write bool, delete bool) error {
+		defer func(start time.Time) {
+			snapStorageWriteCounter.Inc(time.Since(start).Nanoseconds())
+		}(time.Now())
+
+		if delete {
+			rawdb.DeleteStorageSnapshot(ctx.batch, account, common.BytesToHash(key))
+			snapWipedStorageMeter.Mark(1)
+			return nil
+		}
+		if write {
+			rawdb.WriteStorageSnapshot(ctx.batch, account, common.BytesToHash(key), val)
+			snapGeneratedStorageMeter.Mark(1)
+		} else {
+			snapRecoveredStorageMeter.Mark(1)
+		}
+		ctx.stats.storage += common.StorageSize(1 + 2*common.HashLength + len(val))
+		ctx.stats.slots++
+
+		// If we've exceeded our batch allowance or termination was requested, flush to disk
+		if err := dl.checkAndFlush(ctx, append(account[:], key...)); err != nil {
+			return err
+		}
+		return nil
+	}
+	// Loop for re-generating the missing storage slots.
+	var origin = common.CopyBytes(storeMarker)
+	for {
+		id := trie.StorageTrieID(stateRoot, account, storageRoot)
+		exhausted, last, err := dl.generateRange(ctx, id, append(rawdb.SnapshotStoragePrefix, account.Bytes()...), snapStorage, origin, storageCheckRange, onStorage, nil)
+		if err != nil {
+			return err // The procedure it aborted, either by external signal or internal error.
+		}
+		// Abort the procedure if the entire contract storage is generated
+		if exhausted {
+			break
+		}
+		if origin = increaseKey(last); origin == nil {
+			break // special case, the last is 0xffffffff...fff
+		}
+	}
+	return nil
+}
