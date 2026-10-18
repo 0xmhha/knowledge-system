@@ -16,7 +16,7 @@
 
 요청 검증·회귀 결과는 [검증 요약](./operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/validation/SUMMARY.json)과 원자료를 따른다. 새 독립 가족·운영/설치역할·게시·유료/외부LLM 실행은0이며, 기본 예산의 일반적 지연SLA·독립 검색 품질·온톨로지 효과를 수용한 결과가 아니다. site resolver의 일부 거부는 기존 일반 seed_unresolved 계약을 유지하므로 세부 원인 구분은 남은 WI3 검토에 포함한다.
 
-기술 검증은 완료했으나 W09서명 커밋/커밋 후 출처 결속은 아직 대기다. 완료 마감으로 표시하지 않는다.
+기술 범위 저장 완료: 서명 커밋 `ad944ac6`의 실제 증거/source-binding을 연결했고 완료 guard와 저장 검증을 통과했다. W09마감은 [별도 결속 기록](./operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1-finalization.json)을 따른다. 기존 작업 상태는 보존했다.
 
 다음: WI-4 실제 도달성·스케줄·반복 실행의 경로와 관측 근거를 검증한다. 남은 전체: WI1의53발생지점/3블록·타입/값/메모리·독립 의미, WI2 독립 의미/build profile/지원/설치역할, WI3 독립 의미/새가족·기본예산/startup/site거부 원인, WI4 도달성/스케줄/반복, WI-V1/V2 실제API/독립티켓/오라클/수용후보, WI6 nonseed/기본·확장쌍/관련성·잡음/warm, WI-SP 실제overlay/ACL/출처, WI-C 필수항목/우선순위/보고서·그림/전달/설치역할, 새독립DEV/FINAL·완전정답·matching·충분성·F01~08, 정식9개, 온톨로지 독립정답/구현·개념연결/검색효과다. 실제LLM답변 평가는 모델·인증·비용상한 결정 후 진행하며 선택 백로그12개는 별도다.
 <!-- END-WI3-WALK-CURRENT -->
