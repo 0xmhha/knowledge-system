@@ -1,0 +1,289 @@
+{
+  "groups": [
+    {
+      "work_item_id": "WI-V1",
+      "available_exposed_draft_count": 1,
+      "draft_count_unit": "exposed development ticket",
+      "known_gap": "two additional source hypotheses and extracted-method runs are not two independently confirmed tickets",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "independent_defect_tickets_min": 2,
+        "normal_controls": true,
+        "symptom_reintroduction_mutants": true,
+        "overfit_mutants": true,
+        "oracles": [
+          "primary",
+          "independently_derived"
+        ]
+      },
+      "metrics_unchanged": {
+        "declared_oracle_and_normal_control_pass_fraction": 1.0,
+        "expected_invalid_refusal_fraction": 1.0
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "WI-V2",
+      "available_exposed_draft_count": 1,
+      "draft_count_unit": "same ticket shared with V1",
+      "known_gap": "acceptable membership null; two candidate patches do not supply independent ticket sufficiency",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "shared_ticket_group": "WI-V1",
+        "candidates_per_ticket_min": 2,
+        "independent_acceptable_candidate_set": true
+      },
+      "metrics_unchanged": {
+        "selected_candidates_satisfy_hard_gates_and_gold": true,
+        "all_bad_selection": null,
+        "ties_and_insufficiency_explicit": true
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "WI-3",
+      "available_exposed_draft_count": 20,
+      "draft_count_unit": "input cards /15 proposed families",
+      "known_gap": "five-family floor shortfall even before independence/split review; all cards exposed",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "independent_fact_families_min": 20,
+        "symptom_types_min": 4,
+        "top_k": 10
+      },
+      "metrics_unchanged": {
+        "macro_case_recall_at_10_min": 0.8
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "WI-4",
+      "available_exposed_draft_count": 5,
+      "draft_count_unit": "proposed mechanisms",
+      "known_gap": "actual entry reachability/oracles/plans missing in all five; 21 schedules are correlated variants",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "independent_seed_schedule_families_min": 5,
+        "planned_runs_per_arm_min": 100,
+        "baseline_symptom_events_min": 10
+      },
+      "metrics_unchanged": {
+        "fix_to_baseline_symptom_rate_ratio_max": 0.5,
+        "no_recurrence_verdict": "inconclusive"
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "WI-1",
+      "available_exposed_draft_count": 30,
+      "draft_count_unit": "functions",
+      "known_gap": "30/30 data and control sets incomplete; 24 lack any prior relation material",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "independent_functions_min": 30,
+        "constructs": [
+          "declaration_redefinition",
+          "branch",
+          "loop",
+          "shadow",
+          "return"
+        ],
+        "functions_per_construct_min": 4,
+        "gold_semantics": "structural_lexical_may_reach_not_path_feasibility"
+      },
+      "metrics_unchanged": {
+        "data_edge_precision_min": 0.95,
+        "data_edge_recall_min": 0.9,
+        "control_edge_precision_min": 0.95,
+        "control_edge_recall_min": 0.9
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "WI-2",
+      "available_exposed_draft_count": 40,
+      "draft_count_unit": "controlled drafts; plus 68 project rule calls",
+      "known_gap": "2 rules; 10 positive +10 negative per rule proposed, approved labels zero; project/controlled separate",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "metrics_unchanged": {
+        "candidate_precision_min": 0.8,
+        "candidate_recall_min": 0.8,
+        "vulnerability_acceptance_separate": true
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "WI-C",
+      "available_exposed_draft_count": 10,
+      "draft_count_unit": "review proposals /8 module labels",
+      "known_gap": "45 source anchors are not complete required-item/priority/report gold; all proposed",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "metrics_unchanged": {
+        "required_rubric_omissions_max": 0,
+        "source_artifact_state_binding_match_fraction": 1.0
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "WI-6",
+      "available_exposed_draft_count": 20,
+      "draft_count_unit": "intent inputs /19 operational sources +1 stress source",
+      "known_gap": "stress main excluded from operational denominator; 16 seed overlaps with WI1; relevant/noise gold absent",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "metrics_unchanged": {
+        "macro_recall_delta_min": 0.1,
+        "macro_noise_fraction_delta_max": 0.1,
+        "warm_p95_latency_ratio_max": 2.0,
+        "delta_unit": "fraction_difference_0.10_equals_10_percentage_points",
+        "empty_return_noise_fraction": null
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "WI-SP",
+      "available_exposed_draft_count": 12,
+      "draft_count_unit": "symbol proposals:4 policy/4 security/4 relative untagged",
+      "known_gap": "source-only saved policy edges cannot prove absent security labels; provenance and refusal gold absent",
+      "minimum_requirements_scope_approved_not_run_frozen": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "metrics_unchanged": {
+        "annotation_match_fraction": 1.0,
+        "expected_permission_refusal_fraction": 1.0,
+        "unavailable_yaml_or_reviewer_provenance": "unknown"
+      },
+      "FINAL_minimum_independent_units": null,
+      "DEV_allocation": null,
+      "reviewed_independent_FINAL_units": 0,
+      "precision_or_power_evidence": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "allocation_rule": "declare FINAL count/coverage and separate DEV needs before collection; shared family counted once per relevant denominator"
+    },
+    {
+      "work_item_id": "ONTOLOGY",
+      "available_exposed_draft_count": null,
+      "reviewed_independent_FINAL_units": 0,
+      "FINAL_minimum_independent_units": 20,
+      "intent_types_min": 4,
+      "DEV_allocation": null,
+      "sufficiency_verdict": "inconclusive_not_reviewed",
+      "precision_or_power_evidence": null,
+      "known_gap": "old language variants, 512 calls,40 cells and new six diagnostic concepts are not independent untouched FINAL families"
+    }
+  ],
+  "method": {
+    "status": "method_scope_approved_run_freeze_pending",
+    "method": "paired cluster bootstrap on independent fact/function/seed families",
+    "confidence_percent": 95,
+    "replicates": 10000,
+    "seed": 20261015,
+    "percentiles": [
+      2.5,
+      97.5
+    ],
+    "undefined_fraction_inconclusive_above": 0.05,
+    "scope": "descriptive scoped assessment; not population-wide production failure or success proof"
+  },
+  "count_floor_never_certifies_precision": true,
+  "precision_plan_before_FINAL": {
+    "target_interval_width_or_power": null,
+    "expected_effect_and_variance": null,
+    "reviewer_receipt": null,
+    "optional_stopping": "forbidden",
+    "method": "use independent DEV family-level paired deltas for planning; fix sample size before FINAL; retain inconclusive if interval/gate undefined or too broad"
+  },
+  "repeat_plan": {
+    "warmup_calls": 2,
+    "retrieval_repeats": 5,
+    "warm_repeats": 20,
+    "cold_repeats": 3,
+    "cold_definition": "fresh_CKS_process_model_cache_residency_recorded_separately",
+    "paired_order": "counterbalanced_record_each_arm_order",
+    "latency_percentile_method": null,
+    "owned_server_shutdown_modes": [
+      "EOF",
+      "idle_SIGTERM",
+      "active_SIGTERM"
+    ],
+    "shutdown_repeats_per_mode": 3,
+    "shutdown_seconds_max": 5,
+    "forced_kills_allowed": 0,
+    "unmeasured_cost": null
+  },
+  "latency_method_proposal": "nearest_rank_ceiling_p_times_n; preserve raw times/sample_count;20 warm samples do not certify tail stability",
+  "latency_warning": "20 warm timings are descriptive; no tail stability certification; keep process/model residency, arm order, raw timings and serial ownership",
+  "missing_runs": "keep planned/success/cancelled/infra/unreached/symptom separately; never silently drop missing results",
+  "bootstrap_unit": "independent family with all within-family repeats/languages/edges/cells clustered; paired arms resample together"
+}

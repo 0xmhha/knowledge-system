@@ -578,9 +578,12 @@
     "historical_source_validation": true
   },
   "current_execution_state": {
-    "current_stage": "42_SN-P04_scoped_real_project_comparison_pass",
+    "current_stage": "43_independent_freeze_authoring_prepared_not_frozen",
     "completed_in_this_scope": [
-      "SN-P04"
+      "FP01_exposure_inventory",
+      "FP02_gold_matching_authoring_contract",
+      "FP03_sufficiency_freeze_preparation",
+      "FP04_ontology_evaluation_preparation"
     ],
     "pilot_steps_completed": [
       "SN-P01",
@@ -589,11 +592,11 @@
       "SN-P04"
     ],
     "pilot_steps_total": 4,
-    "next_task": "FORMAL-PREP",
+    "next_task": "FORMAL-PREP_assign_roles_collect_new_families_complete_and_review_gold",
     "remaining_all": [
       {
         "id": "FORMAL-PREP",
-        "status": "pending",
+        "status": "mechanical_preparation_complete_human_and_new_inputs_pending",
         "task": "D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결"
       },
       {
@@ -657,5 +660,24 @@
     "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/REPORT.txt",
     "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/WORKLIST.json"
   },
-  "stablenet_comparison_authorization": "User requested SN-P04 actual source/data/model comparison, project confusion verification, docs and local commit; the observed versioned cross-root fallback is corrected within that boundary. No production activation or publication."
+  "stablenet_comparison_authorization": "User requested SN-P04 actual source/data/model comparison, project confusion verification, docs and local commit; the observed versioned cross-root fallback is corrected within that boundary. No production activation or publication.",
+  "independent_freeze_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/manifest.json",
+    "sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b",
+    "status": "authoring_prepared_not_frozen_not_accepted",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json"
+  },
+  "historical_readiness_preparation": {
+    "kind": "preparation_only_not_formal_execution",
+    "manifest": "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json",
+    "manifest_sha256": "fffff1112ee82a82eb7e9a2c3bd16db57afea20af443cbb888724d06969804ea",
+    "source_revision": "9de07a8264bc4aea7054dcea8abb6559801d1cef",
+    "status": "historical_not_current_source_validation"
+  },
+  "current_readiness_preparation": {
+    "kind": "independent_freeze_authoring_not_formal_execution",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/manifest.json",
+    "manifest_sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b"
+  }
 }

@@ -1,0 +1,68 @@
+{
+  "status": "approved_method_scope_preparation_only_not_run_frozen",
+  "gate": {
+    "status": "not_approved_not_frozen_not_a_change_to_WI6",
+    "FINAL_independent_families_min": 20,
+    "intent_types_min": 4,
+    "DEV_modes": [
+      "off",
+      "concept_text",
+      "relations",
+      "combined"
+    ],
+    "FINAL_primary": "off_vs_one_predeclared_mode_selected_before_holdout",
+    "same_corpus_source_snapshot_model_top_k_and_budget": true,
+    "recall_at_10_delta_min": 0.05,
+    "recall_delta_CI95_lower_strictly_positive": true,
+    "precision_delta_min": -0.02,
+    "warm_p95_ratio_max": 1.25,
+    "cross_project_contamination_max": 0,
+    "citation_source_match_fraction": 1.0,
+    "sample_sufficiency_required": true,
+    "multiple_arm_claims_require_multiplicity_plan": true,
+    "answer_quality_evaluated_by_retrieval_metrics": false,
+    "no_gain_or_insufficient_result": "keep_default_off; inconclusive_or_no_demonstrated_benefit",
+    "WI6_unchanged": {
+      "recall_delta_min": 0.1,
+      "noise_delta_max": 0.1,
+      "warm_p95_ratio_max": 2.0
+    }
+  },
+  "scope_approval_source": "D06 direct user approval in decision proposal; nested gate historical status is not a formal freeze receipt",
+  "DEV_modes": [
+    "off",
+    "concept_text",
+    "relations",
+    "combined"
+  ],
+  "FINAL_mode": null,
+  "execution_allowed": false,
+  "reviewed_link_count": null,
+  "primary_estimand": "off vs one DEV-selected treatment on independent FINAL family-level macro recall@10; CI95 paired family clusters",
+  "mapping_input_effect_separate": "annotations withheld vs supplied is a separate contrast; cannot attribute to ontology vocabulary/ranking alone",
+  "link_review": "verify implementation→concept semantics and project/version/applicability/source spans before relations/combined; zero reviewed links is an inactive-arm limitation, not evidence of no ontology value",
+  "pin_controls": [
+    "same source/corpus/data/model digest/dimension/preprocessing",
+    "same top-k and candidate/local/aggregate caps",
+    "same tool route and owned hardware/concurrency",
+    "frozen ontology vocabulary and reviewed link bytes",
+    "counterbalanced order; warm/cold raw times separate"
+  ],
+  "coverage": [
+    "at least20 independent FINAL families and4 intent types",
+    "consensus/transaction/mempool and staking/finality only where source applicability verified",
+    "multiple projects explicit; different algorithms under shared concept need not have identical behavior",
+    "negative target-project controls and unavailable/unknown/not_collected/not_applicable distinguished",
+    "paraphrases/languages/repeats/cells remain within family"
+  ],
+  "semantic_gold": "source-reviewed full bounded relevant/irrelevant/unknown universe independent of returned hits, keyword match, or candidate-produced ontology mapping",
+  "failure_policy": "contamination>0 or citation/source mismatch blocks boundary; missing/undefined/small-sample result inconclusive; no demonstrated benefit keeps default off",
+  "LLM_answer_quality": {
+    "executed": false,
+    "inferred_from_retrieval": false,
+    "model_auth_budget": null,
+    "future_requirement": "separate paired blinded answer rubric/factuality/citation/abstention review with approved actual model and cost cap"
+  },
+  "WI6_thresholds_unchanged": true,
+  "multiplicity": "one primary FINAL contrast; exploratory arms labelled or predeclared adjusted multiplicity plan"
+}

@@ -33,14 +33,14 @@
     {
       "id": "F-03",
       "topic": "sampling_and_scoring",
-      "preparation_status": "method_scope_approved_independent_gold_matching_and_samples_pending",
+      "preparation_status": "complete_gold_authoring_and_matching_forms_prepared_independent_gold_pending",
       "decision_status": "pending",
       "receipt": null
     },
     {
       "id": "F-04",
       "topic": "statistical_method_and_sufficiency",
-      "preparation_status": "method_scope_approved_actual_sample_sufficiency_pending",
+      "preparation_status": "family_and_exposure_inventory_prepared_FINAL_allocation_precision_review_pending",
       "decision_status": "pending",
       "receipt": null
     },
@@ -61,14 +61,14 @@
     {
       "id": "F-07",
       "topic": "new_inputs_gold_and_holdout",
-      "preparation_status": "source_review_annotation_and_rule_census_drafts_prepared_independent_gold_pending",
+      "preparation_status": "206_exposed_DEV_material_rows_indexed_new_FINAL_and_reviewed_complete_gold_pending",
       "decision_status": "pending",
       "receipt": null
     },
     {
       "id": "F-08",
       "topic": "runtime_recipes_and_owned_resources",
-      "preparation_status": "fresh_pinned_scripted_host_native_stdio_verified_actual_project_pilot_pending",
+      "preparation_status": "SN_P01_P04_scoped_pilots_complete_exact_formal_API_runtime_recipes_pending",
       "decision_status": "pending",
       "receipt": null,
       "remaining_source_risks": [
@@ -697,9 +697,9 @@
     "kind": "unapproved_unapplied_ast_probe_only"
   },
   "current_readiness_preparation": {
-    "kind": "preparation_only_not_formal_execution",
-    "manifest": "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json",
-    "manifest_sha256": "fffff1112ee82a82eb7e9a2c3bd16db57afea20af443cbb888724d06969804ea"
+    "kind": "independent_freeze_authoring_not_formal_execution",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/manifest.json",
+    "manifest_sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b"
   },
   "reviewer_assignment_response": {
     "path": "docs/spec-driven/operational-preparation/reviewer-assignment-2026-10-16.json",
@@ -888,8 +888,8 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "b4cb169a2591f04c7dfb58e22632779fd9375a27825cda62011dbf72d2912c48",
-    "status": "D01_D08_scope_approved_D04_unassigned_SN-P04_scoped_pass_no_formal_freeze"
+    "sha256": "38899fb5a44473102852b96df9bc00e110e37e14b50cbeb0bb7bb94d3af05d64",
+    "status": "D01_D08_scope_approved_D04_unassigned_FP01_FP04_prepared_no_formal_freeze"
   },
   "consumer_adoption": {
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
@@ -925,9 +925,12 @@
     "historical_source_validation": true
   },
   "current_execution_state": {
-    "current_stage": "42_SN-P04_scoped_real_project_comparison_pass",
+    "current_stage": "43_independent_freeze_authoring_prepared_not_frozen",
     "completed_in_this_scope": [
-      "SN-P04"
+      "FP01_exposure_inventory",
+      "FP02_gold_matching_authoring_contract",
+      "FP03_sufficiency_freeze_preparation",
+      "FP04_ontology_evaluation_preparation"
     ],
     "pilot_steps_completed": [
       "SN-P01",
@@ -936,11 +939,11 @@
       "SN-P04"
     ],
     "pilot_steps_total": 4,
-    "next_task": "FORMAL-PREP",
+    "next_task": "FORMAL-PREP_assign_roles_collect_new_families_complete_and_review_gold",
     "remaining_all": [
       {
         "id": "FORMAL-PREP",
-        "status": "pending",
+        "status": "mechanical_preparation_complete_human_and_new_inputs_pending",
         "task": "D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결"
       },
       {
@@ -983,5 +986,19 @@
     "status": "SN-P04_scoped_real_project_comparison_pass",
     "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/REPORT.txt",
     "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/WORKLIST.json"
+  },
+  "independent_freeze_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/manifest.json",
+    "sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b",
+    "status": "authoring_prepared_not_frozen_not_accepted",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json"
+  },
+  "historical_readiness_preparation": {
+    "kind": "preparation_only_not_formal_execution",
+    "manifest": "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json",
+    "manifest_sha256": "fffff1112ee82a82eb7e9a2c3bd16db57afea20af443cbb888724d06969804ea",
+    "source_revision": "9de07a8264bc4aea7054dcea8abb6559801d1cef",
+    "status": "historical_not_current_source_validation"
   }
 }

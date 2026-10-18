@@ -1,6 +1,18 @@
 # 현재 인수인계
 
-## 최신 상태 — 2026-10-18 / SN-P04
+## 최신 상태 — 2026-10-18 / 독립 수용 동결 준비
+
+**단계43의 준비 작업 FP01~04를 완료했다.** 기존 후보206행을 원본 SHA/행 좌표·노출 이력과 연결하고,9개 WI와 온톨로지의 완전 정답·매칭 작성 양식10개, 표본 충분성 원장, F01~08 준비표와 FINAL 접근·봉인 절차를 작성했다.206행은 독립 표본206개가 아니다. 모두 노출된 DEV 작성 자료이고, 새 FINAL·승인 gold는0개다. WI3의20입력은 제안 가족15개, WI6은 운영19개+stress1개, V1/V2는 공유 개발 티켓1개다.
+
+검사기는 정답의 null/빈 집합·범위 누락·중복 분류·출처·검토 hash·DEV/FINAL 가족 중복·프로젝트별 위치 매칭을 구분한다. 온톨로지는 DEV4모드 후 FINAL primary1모드 사전 선택, 검토된 구현-개념 연결, 독립 의미 정답, 동일 pin/cap과 혼입·인용·지연 gate를 준비했다. 검색 개선을 실제 LLM 답변 품질로 판정하지 않는다. 검사 통과는 의미 정답의 정확성이나 사람 검토를 증명하지 않는다.
+
+[현재 보고서](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt), [현재 단계와 남은 전체 작업](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json), [F01~08 준비표](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/freeze-readiness.json), [검증 기록](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/validation-summary.json)을 따른다. 다음은 D04 역할·독립성 지정과 새 가족/입력·완전 gold의 작성·검토다. D04미정, 정식0/9, freeze null/execution_allowed=false를 유지한다. 로컬 로드맵7/7·28/28, 격리 준비22/22, 비운영 pilot4/4는 완료 상태를 유지한다. 선택 후속12개는 별도 backlog다.
+
+이번 변경은 Python/문서이며, 결속 소스1738개와 승인 입력5개의 hash가 이전 검증과 동일하다. Go 전체 시험을 새로 수행한 것으로 기록하지 않는다. 원문·데이터·운영 current·전역 설정·이전 증거는 보존했다.
+
+현재 회귀133개·원래 버전9de07a82의 과거 준비 회귀36개, 문서134개·완료 보호·미동결 실행 거부 검증을 통과했다. 현재 준비 참조와 과거 host 준비 참조를 분리해 원래 증거의 소스 범위를 보존한다.
+
+## 이전 검증 — 2026-10-18 / SN-P04
 
 비운영 pilot **4/4 완료**. 실제 go-wemix1350376a의 새 BGE-M3/native1024 held DB와 go-stablenet0bf2f4d1의 보관 DB에서 같은6진단 입력·검색·v2·6개념 비교·출처/혼입 경계를 검증했다. 기존 go-wemix 자료는 mock64이며 새 BGE 자료와 구분한다. 서로 바뀐 실제 graph/vector 설정2개는 기동 거부, 최종정상5+초기/보완전진단6세션은 EOF0·모든 소유 프로세스 회수·강제종료0이다. corpus/정책 범위가 다르며 매핑은 proposed라 품질 우열·운영망 합의·온톨로지 독립 효과를 승인한 결과가 아니다.
 

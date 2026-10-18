@@ -1,0 +1,35 @@
+...F..........................F.......
+======================================================================
+FAIL: test_current_documents_are_consistent (__main__.PreparationGuardTests.test_current_documents_are_consistent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_operational_acceptance.py", line 62, in test_current_documents_are_consistent
+    self.assertEqual(guard.check(guard.ROOT, self.actual_protocol, self.actual_ledger)[0], [])
+AssertionError: Lists differ: ['source/input bytes differ'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'source/input bytes differ'
+
+- ['source/input bytes differ']
++ []
+
+======================================================================
+FAIL: test_preparation_draft_is_consistent (__main__.PreparationGuardTests.test_preparation_draft_is_consistent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_operational_acceptance.py", line 65, in test_preparation_draft_is_consistent
+    self.assertEqual(self.errors(), [])
+AssertionError: Lists differ: ['source/input bytes differ'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'source/input bytes differ'
+
+- ['source/input bytes differ']
++ []
+
+----------------------------------------------------------------------
+Ran 38 tests in 20.358s
+
+FAILED (failures=2)

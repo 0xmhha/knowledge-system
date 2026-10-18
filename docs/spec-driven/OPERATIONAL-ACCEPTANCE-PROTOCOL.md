@@ -1,5 +1,23 @@
 # 운영 검증 실행 protocol과 동결 준비
 
+## 2026-10-18 독립 입력·완전 정답·온톨로지 동결 준비
+
+D04는 사용자 결정대로 **미정**이다. [단계43 보고서](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt)의 FP01~04는 준비 작업의 완료이며 정식 실행·gold 승인·F01~08 동결의 완료가 아니다. [현재 준비표](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/freeze-readiness.json)는8개 항목의 준비 자료와 남은 결정을 분리한다. 이전 시점의 source/host/도구 수는 아래 당시 기록으로 보존하며, 최신 실행 근거는 현재 JSON의 source-bound packet 참조를 따른다.
+
+현재 준비 참조는 새 `independent_freeze_authoring_not_formal_execution` 종류다. 과거 host/metadata 준비는 `historical_readiness_preparation`에 원래 manifest/hash와9de07a82 소스 버전을 명시해 보존했다. 과거 소스 검사를 현재 코드에 적용해 생긴 불일치를 현재 통과로 바꾸지 않는다. 과거 회귀는 원래 버전에서, 현재 준비·운영 수용 회귀는 현재 코드에서 검증한다. 새 준비 참조는 과거 host 실행을 새 host 실행으로 갱신했다는 뜻이 아니다.
+
+| 준비 결과 | 의미와 남은 조건 |
+|---|---|
+| 노출 후보206행 | DEV 작성·회귀 자료; 정식 DEV/FINAL 배정0, 독립 승인 단위0 |
+| 완전 정답 양식10개 | WI9개+온톨로지; 원문·완전 universe·positive/negative/unknown·매칭·검토 receipt를 실제로 채워야 함 |
+| 충분성 원장 | WI3 제안 가족15개/20입력, WI6 운영19개+stress1개, V1/V2 공유 티켓1개; 반복·번역·edge·셀은 가족 수를 늘리지 않음 |
+| FINAL 절차 | 새 미노출 가족·독립 의미 검토·별도 gold 접근 통제/열람 기록·manifest/hash 사전 동결; 이미 Git에 노출한 자료는 봉인 FINAL로 재명명하지 않음 |
+| 온톨로지 설계 | D06 방법 범위 승인 유지; DEV4모드 후 primary1모드 선택, FINAL20가족/4의도·의미 gold·검토 연결·동일 pin/cap·혼입/인용/지연 gate |
+
+`scripts/check-independent-freeze.py`는 준비 자료 결속을 검사한다. `--require-ready`는 현재 준비 packet의 실행 승격을 거부한다. 기계 검사는 정답의 의미적 진실·독립성·표본 대표성을 대신하지 않는다. 빈 정답 집합에는 검토된 이유가 필요하며 null을 음성 정답으로 세지 않는다.20회 warm 지연의 p95는 기술적 관찰이며 tail 안정성을 증명하지 않는다. FINAL 최소 배정과 정밀도 계획은9개 항목에서 여전히 검토 전이다. 기존 요구·점수·bootstrap 임계치는 변경하지 않았다. 새 LLM 평가를 선택하기 전에는 모델·인증·비용 상한을 요구하지 않으며, 실제 LLM 답변 효과만 별도 승인 실행 범위로 남긴다.
+
+다음은 역할·독립성 지정, 새 입력/완전 gold의 의미 작성·검토, 매칭·표본·실제 recipe의 동결이다. 정식 수용0/9·freeze=null·execution_allowed=false 및 기존 제한 온톨로지 연구완료/inconclusive·기본 off를 유지한다. [전체 남은 작업](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json)을 따른다.
+
 ## 2026-10-16 현재 준비 결과와 검토할 결정
 
 로컬 로드맵28/28과 명시적 소스 대조 정책 생성기를 완료한 뒤, 운영·독립 수용의 준비 자료를 현재 코드와 대조했다. 새 준비 검증은 정식 운영/품질/사람 수용의0/9를 바꾸지 않는다. 기존 source inventory와 과거 packet은 당시 관측으로 보존한다.

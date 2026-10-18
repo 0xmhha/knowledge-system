@@ -43,6 +43,22 @@ class PreparationGuardTests(unittest.TestCase):
         self.protocol.pop('current_readiness_preparation')
         self.assertTrue(self.errors())
 
+    def test_historical_readiness_cannot_be_current_acceptance(self):
+        for value in (self.protocol, self.ledger):
+            value['historical_readiness_preparation']['status'] = 'current_source_validated'
+        self.assertTrue(self.errors())
+
+    def test_historical_readiness_reference_must_be_preserved(self):
+        self.protocol.pop('historical_readiness_preparation')
+        self.assertTrue(self.errors())
+
+    def test_unrelated_manifest_cannot_replace_historical_readiness(self):
+        for value in (self.protocol, self.ledger):
+            value['historical_readiness_preparation'].update(
+                manifest=value['current_readiness_preparation']['manifest'],
+                manifest_sha256=value['current_readiness_preparation']['manifest_sha256'])
+        self.assertTrue(self.errors())
+
     def test_current_readiness_hash_is_bound(self):
         for value in (self.protocol,self.ledger):
             value['current_readiness_preparation']['manifest_sha256']='0'*64

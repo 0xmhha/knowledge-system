@@ -145,14 +145,28 @@ def check(root, protocol, ledger, require_frozen=False):
         errors.append("protocol/ledger current readiness references differ")
     if refreshed is not None:
         try:
-            if (refreshed.get("kind") != "preparation_only_not_formal_execution"
-                    or not file_hash(refreshed.get("manifest"), refreshed.get("manifest_sha256"))):
+            if not file_hash(refreshed.get("manifest"), refreshed.get("manifest_sha256")):
                 raise ValueError("current readiness scope or hash differs")
-            import importlib.util
-            spec = importlib.util.spec_from_file_location("current_readiness", Path(__file__).with_name("check-acceptance-readiness.py"))
-            readiness = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(readiness)
-            errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+            if refreshed.get("kind") == "independent_freeze_authoring_not_formal_execution":
+                import independent_acceptance
+                errors.extend(independent_acceptance.packet_errors(root, (root / refreshed["manifest"]).parent))
+                errors.extend(independent_acceptance.current_index_errors(root))
+                historical = protocol.get("historical_readiness_preparation")
+                if (historical != ledger.get("historical_readiness_preparation")
+                        or not isinstance(historical, dict)
+                        or historical.get("source_revision") != "9de07a8264bc4aea7054dcea8abb6559801d1cef"
+                        or historical.get("manifest") != "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json"
+                        or historical.get("status") != "historical_not_current_source_validation"
+                        or not file_hash(historical.get("manifest"), historical.get("manifest_sha256"))):
+                    raise ValueError("historical readiness evidence lost or promoted")
+            elif refreshed.get("kind") == "preparation_only_not_formal_execution":
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("current_readiness", Path(__file__).with_name("check-acceptance-readiness.py"))
+                readiness = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(readiness)
+                errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+            else:
+                raise ValueError("current readiness scope or hash differs")
         except (OSError, ValueError, KeyError, TypeError) as exc:
             errors.append("current readiness preparation invalid: " + str(exc))
     for field in ("input_candidate_pool", "host_preflight"):

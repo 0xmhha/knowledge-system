@@ -2,13 +2,16 @@
 
 ## 최신 비운영 pilot 진행표 — 2026-10-18
 
+단계43: 독립 수용 **준비 작업 FP01~04 완료**, 정식 수용 **0/9**. [준비·검증 보고서](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt), [전체 작업리스트](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json), [검증 기록](./operational-preparation/source-review-supplement/followups/independent-freeze-v1/validation-summary.json)이 최신이다. 아래 pilot4/4와 로컬 로드맵28/28을 독립 정답·동결·수용 완료 수와 합산하지 않는다.
+
 | 단계 | 검증 범위 | 상태 |
 |---|---|---|
 | SN-P01 | 실제 go-stablenet 소스·데이터·모델 식별·검색 경로 | 기술 범위 완료; 최초 원문 누락은 SN-P02 보완으로 연결 |
 | SN-P02 | 외부 원문 보관·convention 구분·기존/새 버전 비교 | 완료 |
 | SN-P03 | 출처/무결성과 모델 실패 분류·재시작 없는 복구 | 완료 |
 | SN-P04 | 실제 go-wemix BGE 데이터·개념/검색·출처·혼입 비교 | 완료; 새 race232pass·5정상EOF0·2기대기동거부 |
-| 정식 준비 | 담당자·독립 DEV/FINAL·완전 gold·matching/충분성·F01~08 | 미완료; D04미정·freeze null |
+| FP01~04 | 후보206행 노출/작성 인덱스·정답/매칭 양식·충분성/F01~08·온톨로지 설계 | 준비 작업 완료; 새 FINAL/승인 gold0 |
+| 정식 준비 | 담당자·새 DEV/FINAL·완전 gold·matching/충분성·F01~08 동결 | 미완료; D04미정·freeze null |
 | 정식 수용9개 | WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C | 0/9; 실행 미허용 |
 | 필수 온톨로지 독립 효과 | 독립 의미/검색 gold·검토 연결·coverage/효과 gate | 미수용; 기존 제한 연구완료/inconclusive 유지 |
 | 선택 후속 | 별도 후속12개 | 별도 backlog |
