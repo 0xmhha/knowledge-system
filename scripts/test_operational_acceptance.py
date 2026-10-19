@@ -84,6 +84,11 @@ class PreparationGuardTests(unittest.TestCase):
             value['wi6_dev_gold_preparation']['status'] = 'independent_approved'
         self.assertTrue(self.errors())
 
+    def test_WIV1_V2_native60_progress_cannot_be_independent_approved(self):
+        for value in (self.protocol,self.ledger):
+            value["ticket_native_progress"]["status"] = "independent_approved"
+        self.assertTrue(self.errors())
+
     def test_WIV1_V2_actual_RPC_candidates_cannot_be_independent_approved(self):
         for value in (self.protocol,self.ledger):
             value["ticket_actual_rpc"]["status"] = "independent_approved"

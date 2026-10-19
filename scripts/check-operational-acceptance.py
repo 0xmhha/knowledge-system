@@ -152,6 +152,10 @@ def check(root, protocol, ledger, require_frozen=False):
                 import independent_acceptance
                 errors.extend(independent_acceptance.packet_errors(root, (root / refreshed["manifest"]).parent))
                 errors.extend(independent_acceptance.current_index_errors(root))
+            elif refreshed.get("kind") == "WIV1_V2_native60_progress_RPC_DEV_not_independent_acceptance":
+                import ticket_native_progress
+                errors.extend(ticket_native_progress.validate(root, (root / refreshed["manifest"]).parent))
+                errors.extend(ticket_native_progress.current_indices(root, protocol, ledger))
             elif refreshed.get("kind") == "WIV1_V2_actual_inprocess_RPC_DEV_not_independent_acceptance":
                 import ticket_actual_rpc
                 errors.extend(ticket_actual_rpc.validate(root, (root / refreshed["manifest"]).parent))
@@ -244,7 +248,7 @@ def check(root, protocol, ledger, require_frozen=False):
                 errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
             else:
                 raise ValueError("current readiness scope or hash differs")
-            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution", "WI1_consumer_matching_AI_DEV_not_formal_execution", "WI2_complete_bounded_AI_DEV_not_formal_execution", "WI2_consumer_context_AI_DEV_not_formal_execution", "WI3_bounded_AI_DEV_not_formal_execution", "WI3_observed_consumer_AI_DEV_not_formal_execution", "WI4_bounded_schedule_AI_DEV_not_formal_execution", "WIV1_V2_bounded_ticket_AI_DEV_not_formal_execution", "WI6_bounded_paired_AI_DEV_not_formal_execution", "WISP_bounded_overlay_AI_DEV_not_formal_execution", "WIC_bounded_review_AI_DEV_not_formal_execution", "WI123_readonly_debt_diagnostic_not_formal_execution", "WI3_typed_failure_reason_native_MCP_not_formal_execution", "WI2_source_contract_compiler_MCP_audit_not_formal_execution", "WI1_select_reference_supplement_not_formal_execution", "WI3_optional_resolver_measurement_parity_not_formal_execution", "WI3_verified_walk_budget_and_logical_measurement_not_formal_execution", "WI4_actual_subscription_DEV_routes_not_formal_execution", "WI4_actual_UDP_DEV_paths_not_independent_acceptance", "WI4_actual_WORK_GOSSIP_POOL_DEV_not_independent_acceptance", "WIV1_V2_actual_inprocess_RPC_DEV_not_independent_acceptance"):
+            if refreshed.get("kind") in ("independent_freeze_authoring_not_formal_execution", "WI1_DEV_AI_gold_not_formal_execution", "WI1_consumer_matching_AI_DEV_not_formal_execution", "WI2_complete_bounded_AI_DEV_not_formal_execution", "WI2_consumer_context_AI_DEV_not_formal_execution", "WI3_bounded_AI_DEV_not_formal_execution", "WI3_observed_consumer_AI_DEV_not_formal_execution", "WI4_bounded_schedule_AI_DEV_not_formal_execution", "WIV1_V2_bounded_ticket_AI_DEV_not_formal_execution", "WI6_bounded_paired_AI_DEV_not_formal_execution", "WISP_bounded_overlay_AI_DEV_not_formal_execution", "WIC_bounded_review_AI_DEV_not_formal_execution", "WI123_readonly_debt_diagnostic_not_formal_execution", "WI3_typed_failure_reason_native_MCP_not_formal_execution", "WI2_source_contract_compiler_MCP_audit_not_formal_execution", "WI1_select_reference_supplement_not_formal_execution", "WI3_optional_resolver_measurement_parity_not_formal_execution", "WI3_verified_walk_budget_and_logical_measurement_not_formal_execution", "WI4_actual_subscription_DEV_routes_not_formal_execution", "WI4_actual_UDP_DEV_paths_not_independent_acceptance", "WI4_actual_WORK_GOSSIP_POOL_DEV_not_independent_acceptance", "WIV1_V2_actual_inprocess_RPC_DEV_not_independent_acceptance", "WIV1_V2_native60_progress_RPC_DEV_not_independent_acceptance"):
                 historical = protocol.get("historical_readiness_preparation")
                 if (historical != ledger.get("historical_readiness_preparation")
                         or not isinstance(historical, dict)

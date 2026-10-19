@@ -1,0 +1,66 @@
+[
+  {
+    "scenario_id": "normal_delivery_then_unsubscribe",
+    "new_native_normal_observations": [
+      "ORIGINAL-general-native60-progress",
+      "ORIGINAL-race-native60-progress",
+      "CAND-A-general-native60-progress",
+      "CAND-A-race-native60-progress",
+      "CAND-B-general-native60-progress",
+      "CAND-B-race-native60-progress",
+      "MUT-REINTRO-general-native60-progress",
+      "MUT-REINTRO-race-native60-progress",
+      "MUT-EARLY-general-native60-progress",
+      "MUT-EARLY-race-native60-progress"
+    ],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "fresh installed subscription",
+      "receiver accepts first notification",
+      "event loop removes and acknowledges uninstall"
+    ]
+  },
+  {
+    "scenario_id": "blocked_delivery_then_consumer_exit",
+    "new_native_normal_observations": [],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "same event loop blocked on unbuffered status",
+      "sole receiver exited",
+      "observe before rescue",
+      "loop stays live after send"
+    ]
+  },
+  {
+    "scenario_id": "late_delivery_before_confirmation",
+    "new_native_normal_observations": [],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "uninstall accepted",
+      "finite additional status offered",
+      "acknowledgement follows deletion",
+      "do not acknowledge early"
+    ]
+  },
+  {
+    "scenario_id": "confirmation_delayed",
+    "new_native_normal_observations": [],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "uninstall accepted",
+      "ack held then released by owner",
+      "no previous Once completion"
+    ]
+  },
+  {
+    "scenario_id": "concurrent_unsubscribe_once",
+    "new_native_normal_observations": [],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "two calls same exact subscription object",
+      "one request accepted",
+      "ack eventually released",
+      "join both calls"
+    ]
+  }
+]

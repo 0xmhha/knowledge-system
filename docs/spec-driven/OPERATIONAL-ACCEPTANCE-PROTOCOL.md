@@ -1,3 +1,28 @@
+<!-- TICKET-NATIVE-CURRENT -->
+# 단계65 — WI-V1/V2 실제60초 진행 알림·완료·새 구독 경로 / 2026-10-19
+
+[사전 명세](./operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/SCOPE.json) · [결과](./operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/SUMMARY.json) · [12요건 매칭](./operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/requirements.json) · [원래5일정의 남은 조건](./operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/original-schedules.json) · [검증 근거](./operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/validation/SUMMARY.json) · [현재·다음·남은13항목](./operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/WORKLIST.json).
+
+**AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다. D04는 미정이며 실명·이메일·연락처를 요구하거나 승인 기록을 대신 만들지 않는다.
+
+| 이번 범위 | 결과와 한계 |
+|---|---|
+| 소스·실행 | go-stablenet `0bf2f4d1`, 기준 추적2228개에서 기존 후보 API overlay만 적용·시험1개 추가. 소유 checkout5개·역할5개/메서드4종·실제 프로젝트tree4종과 별도 build tree·지정Go1.23.12의 새 일반/race binary10개를 결속. 고정10실행 모두 정상이며 숨은 재시도0 |
+| 실제 진행 알림 | 원래60초 timer를 줄이거나 강제로 발화하지 않음. 실제 타이머20회와 알림30개: 진행중 true/19개정수필드 전체 일치 → 제어 높이 변경 후 다음 native timer의 false → 완료 후 새 구독의 즉시false. 두 구독ID와 각 알림·해지 응답을 연결 |
+| 실제 RPC | 소유 `rpc.Server.ServeCodec/rpc.NewCodec/net.Pipe`에서 eth 등록·Syncing 실행. 실제 호출자 요청70개와 직접 notifier 대조10개를 분리. 알 수 없는/잘못된 구독과 반복 해지의 실제 코드·메시지 확인. 직접 no-notifier는 RPC transport 검사로 세지 않음 |
+| 의존성 범위 | 소유 메모리 core.BlockChain·Ethash 가짜 엔진, 실제 snap.NewSyncer/Downloader.Progress/NewDownloaderAPI 사용. Downloader 객체/높이는 시험에서 구성·갱신하고 StartEvent는 소유mux가 공급. 전체 Ethereum/Downloader 시작, 실제 peer syncWithPeer, 활성tx indexer 경로는 미검증. disabled-indexer 오류 분기만 확인 |
+| 후보 판정 | 원본/재도입/조기반환까지 모두 이 정상 알림 경로를 통과. 이 결과로 수용 가능 후보를 선정하지 않음. backend map 삭제·ack·ack후 모든 채널 사용·같은 객체의 동시Once·late drain·실제소비자 종료와 송신 겹침은 별도 검증 필요 |
+| 12요건·원래5일정 | 10관측×12=120항목: 제한 관측과 남은 범위를 함께 기록한60개·이번 경로에서 미실행60개. 전체충족0. 원래5일정 각각의 미충족 조건을 보존하며 normal 관측을 전체 시나리오 수용으로 승격하지 않음 |
+| 정리·경계 | 관측확정 뒤 소유 callback/eventLoop/ServeCodec을 join하고 memory chain.Stop·db.Close·모든 process group reaped/잔존0·빈 소유TMP를 확인. 기존 package-init worker 전체를 개별join했다고 주장하지 않음. 외부 listener/운영노드/credential상속/글로벌설정·설치/시스템시각변경/게시/유료·외부LLM0 |
+| 검증 | 판정기26·공통65·문서20·notice3=114개 통과. 원자료180개 파일 동일 재생 확인(새 대상 실행0). 현재 문서 검증 결과는 연결된 검증 근거를 따른다. CKS native1738·승인5·설정2 동일: 이전 일반/race 각4158통과·18skip 및 build/fmt/vet/lint 근거를 재사용하며 새 CKS 전체 실행으로 표시하지 않음 |
+
+[보고서](./operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/REPORT.txt)를 따른다. 1역할/profile당1회이며 독립 반복·표본 충분성을 충족했다고 표시하지 않는다. 남은 목록·부분 요건을 재봉인만으로 완료 승격하는 것은 거부한다. 서명 저장은 실제 Git과 `--require-stored`로 확인한다.
+
+다음은 **WI-V1/V2 원래5일정의 같은 객체 Once·늦은 송신·ack/삭제/사용 순서·실제 송신/소비자 종료 겹침**, 전체 시작/활성인덱서/설치4역할/finalHEAD·독립티켓/오라클/수용후보다. 이후 WI-6 검색쌍/관련성·잡음/warm, WI-SP 실제overlay/출처/ACL·비공개·위조 경계, WI-C 리뷰계약·필수항목/보고서·그림/전달/설치역할, WI-1의53발생/3블록·값/타입/unknown/메모리·독립의미, WI-2 독립표본/완전정답·명령/호출자/build profile/지원/MCP/설치역할, WI-3 독립가족/노출·중복/정답·기본예산/시작SLA/site거부/부분·공급자오류·범위밖, WI-4 전체드라이버/host/수신자/시간/반복·독립가족/오라클/충분성, 익명 역할/독립성·새DEV/FINAL·완전정답/matching/충분성·F01~08 동결, 온톨로지 독립정답/구현·개념연결/검색효과, 정식9개 수용0/9가 남는다. 실제 LLM 답변 평가는 모델·인증·상한 결정 후 진행한다. 조직 인증/권한·공개CLI/HTTP/graph export·graph점수/확장·domain flow gold·대규모corpus/긴함수·PR/as-of·legacy출처·CoreML·embedding cache·운영감사·viewer·배포/downstream의 선택12개는 별도다.
+<!-- END-TICKET-NATIVE-CURRENT -->
+
+이하 단계64 및 이전은 당시 기록이다.
+
 <!-- TICKET-RPC-CURRENT -->
 # 단계64 — WI-V1/V2 실제 in-process RPC 후보 경로 / 2026-10-19
 

@@ -1,0 +1,248 @@
+// Owned native60s progress/JSON-RPC observations, not a full Ethereum host.
+package downloader
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"net"
+	"os"
+	"reflect"
+	"runtime"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/eth/protocols/snap"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rpc"
+)
+
+type nativeTicketLog struct {
+	f     *os.File
+	start time.Time
+	seq   int
+	role  string
+	path  string
+}
+
+func (r *nativeTicketLog) emit(name string, fields map[string]interface{}) {
+	if fields == nil {
+		fields = map[string]interface{}{}
+	}
+	r.seq++
+	fields["event"], fields["sequence"], fields["elapsed_ns"], fields["candidate"] = name, r.seq, time.Since(r.start).Nanoseconds(), r.role
+	if err := json.NewEncoder(r.f).Encode(fields); err != nil {
+		panic(err)
+	}
+}
+func nativeTicketStacks() string { b := make([]byte, 2<<20); return string(b[:runtime.Stack(b, true)]) }
+func nativeTicketFrames(name string) int {
+	n := 0
+	for _, g := range strings.Split(nativeTicketStacks(), "\n\n") {
+		if strings.Contains(g, name) && strings.Contains(g, "/eth/downloader/api.go:") {
+			n++
+		}
+	}
+	return n
+}
+func nativeTicketUntil(t *testing.T, predicate func() bool) {
+	t.Helper()
+	end := time.Now().Add(2 * time.Second)
+	for time.Now().Before(end) {
+		if predicate() {
+			return
+		}
+		time.Sleep(time.Millisecond)
+	}
+	t.Fatal("owned native progress precondition/cleanup not proved")
+}
+func (r *nativeTicketLog) snapshot(t *testing.T, label string) {
+	t.Helper()
+	if err := os.WriteFile(r.path+"."+label+".stack", []byte(nativeTicketStacks()), 0600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+type nativeTicketFrame struct {
+	JSONRPC string          `json:"jsonrpc"`
+	ID      json.RawMessage `json:"id"`
+	Result  json.RawMessage `json:"result"`
+	Error   *struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	} `json:"error"`
+	Method string `json:"method"`
+	Params struct {
+		Subscription string          `json:"subscription"`
+		Result       json.RawMessage `json:"result"`
+	} `json:"params"`
+}
+
+func TestTicketNativeProgress(t *testing.T) {
+	path, role := os.Getenv("TICKET_NATIVE_TRACE"), os.Getenv("TICKET_NATIVE_ROLE")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := &nativeTicketLog{f: f, start: time.Now(), role: role, path: path}
+	t.Cleanup(func() {
+		r.emit("trace_end", map[string]interface{}{"test_failed": t.Failed()})
+		if err := f.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	r.emit("trace_begin", map[string]interface{}{"base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8", "native_timer_seconds": 60, "transport": "rpc.Server.ServeCodec/rpc.NewCodec/net.Pipe", "external_listener": false, "Ethereum_factory": false, "real_network_sync": false, "independent_oracle": false})
+	db := rawdb.NewMemoryDatabase()
+	chain, err := core.NewBlockChain(db, nil, &core.Genesis{Config: params.AllEthashProtocolChanges}, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
+	if err != nil {
+		db.Close()
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		chain.Stop()
+		if err := db.Close(); err != nil {
+			t.Error(err)
+		}
+		r.emit("owned_chain_stopped", map[string]interface{}{"memory_database": true})
+	})
+	if _, err := chain.TxIndexProgress(); err == nil || err.Error() != "tx indexer is not enabled" {
+		t.Fatalf("unexpected owned index profile: %v", err)
+	}
+	d := &Downloader{blockchain: chain, SnapSyncer: snap.NewSyncer(db, chain.TrieDB().Scheme()), syncStatsChainHeight: 1}
+	want := d.Progress()
+	if want.Done() || want.CurrentBlock != 0 || want.HighestBlock != 1 {
+		t.Fatalf("controlled native progress differs: %+v", want)
+	}
+	r.emit("owned_progress_dependencies", map[string]interface{}{"memory_chain": true, "snap_constructor": true, "downloader_constructor": false, "indexer": "disabled_error_branch", "network_peers": 0, "expected_progress": want})
+	mux := new(event.TypeMux)
+	r.emit("native_API_constructor_begin", nil)
+	api := NewDownloaderAPI(d, chain, mux)
+	server := rpc.NewServer()
+	if err := server.RegisterName("eth", api); err != nil {
+		t.Fatal(err)
+	}
+	clientEnd, serverEnd := net.Pipe()
+	served := make(chan struct{})
+	go func() { defer close(served); server.ServeCodec(rpc.NewCodec(serverEnd), 0) }()
+	t.Cleanup(func() {
+		r.emit("owned_RPC_cleanup_begin", nil)
+		clientEnd.Close()
+		server.Stop()
+		mux.Stop()
+		nativeTicketUntil(t, func() bool {
+			return nativeTicketFrames("(*DownloaderAPI).Syncing.func1") == 0 && nativeTicketFrames("(*DownloaderAPI).eventLoop") == 0
+		})
+		select {
+		case <-served:
+		case <-time.After(2 * time.Second):
+			t.Fatal("owned ServeCodec not joined")
+		}
+		r.emit("owned_RPC_cleanup_end", map[string]interface{}{"callbacks": 0, "event_loops": 0, "ServeCodec_joined": true, "peer_connections": 0})
+	})
+	encoder, decoder := json.NewEncoder(clientEnd), json.NewDecoder(clientEnd)
+	read := func(wait time.Duration) nativeTicketFrame {
+		t.Helper()
+		clientEnd.SetReadDeadline(time.Now().Add(wait))
+		var v nativeTicketFrame
+		if err := decoder.Decode(&v); err != nil {
+			t.Fatal(err)
+		}
+		if v.JSONRPC != "2.0" {
+			t.Fatal("not JSON-RPC2")
+		}
+		return v
+	}
+	call := func(id int, method string, args ...interface{}) nativeTicketFrame {
+		t.Helper()
+		clientEnd.SetWriteDeadline(time.Now().Add(2 * time.Second))
+		if err := encoder.Encode(map[string]interface{}{"jsonrpc": "2.0", "id": id, "method": method, "params": args}); err != nil {
+			t.Fatal(err)
+		}
+		v := read(2 * time.Second)
+		b, _ := json.Marshal(id)
+		if string(v.ID) != string(b) || v.Method != "" {
+			t.Fatal("response id/route mismatch")
+		}
+		return v
+	}
+	if _, err := api.Syncing(context.Background()); !errors.Is(err, rpc.ErrNotificationsUnsupported) {
+		t.Fatal("missing notifier control differs")
+	}
+	r.emit("direct_notifier_control", map[string]interface{}{"RPC_request": false, "typed_error": true})
+	for i, args := range [][]interface{}{{"native_ticket_unknown"}, {}} {
+		v := call(i+1, "eth_subscribe", args...)
+		if v.Error == nil || len(v.Result) != 0 {
+			t.Fatal("invalid subscription accepted")
+		}
+		r.emit([]string{"unknown_subscription_error", "malformed_subscription_error"}[i], map[string]interface{}{"request_id": i + 1, "code": v.Error.Code, "message": v.Error.Message, "callbacks": nativeTicketFrames("(*DownloaderAPI).Syncing.func1")})
+	}
+	subscribe := func(id int, label string) string {
+		v := call(id, "eth_subscribe", "syncing")
+		var sid string
+		if v.Error != nil || json.Unmarshal(v.Result, &sid) != nil || sid == "" {
+			t.Fatal("actual subscribe failed")
+		}
+		r.emit(label, map[string]interface{}{"request_id": id, "subscription_id": sid, "namespace": "eth", "callback": "syncing"})
+		return sid
+	}
+	sid := subscribe(3, "first_RPC_subscription")
+	nativeTicketUntil(t, func() bool {
+		return nativeTicketFrames("(*DownloaderAPI).Syncing.func1") == 1 && !strings.Contains(nativeTicketStacks(), "(*DownloaderAPI).SubscribeSyncStatus")
+	})
+	r.snapshot(t, "installed")
+	if err := mux.Post(StartEvent{}); err != nil {
+		t.Fatal(err)
+	}
+	r.emit("owned_StartEvent_posted", map[string]interface{}{"source": "test_owned_mux_not_syncWithPeer"})
+	v := read(75 * time.Second)
+	expected, _ := json.Marshal(&SyncingResult{Syncing: true, Status: want})
+	var a, b interface{}
+	if v.Method != "eth_subscription" || v.Params.Subscription != sid || len(v.ID) != 0 || v.Error != nil || json.Unmarshal(v.Params.Result, &a) != nil || json.Unmarshal(expected, &b) != nil || !reflect.DeepEqual(a, b) {
+		t.Fatalf("native progress notification differs: %s", v.Params.Result)
+	}
+	r.emit("native_in_progress_notification", map[string]interface{}{"subscription_id": sid, "payload": json.RawMessage(v.Params.Result), "expected_payload": json.RawMessage(expected), "actual_source_progress": true})
+	d.syncStatsLock.Lock()
+	d.syncStatsChainHeight = 0
+	d.syncStatsLock.Unlock()
+	if !d.Progress().Done() {
+		t.Fatal("controlled completion input differs")
+	}
+	r.emit("controlled_highest_block_updated", map[string]interface{}{"highest_block": 0, "under_syncStatsLock": true, "network_sync_completed": false})
+	v = read(75 * time.Second)
+	if v.Method != "eth_subscription" || v.Params.Subscription != sid || string(v.Params.Result) != "false" || v.Error != nil || len(v.ID) != 0 {
+		t.Fatal("native completed notification differs")
+	}
+	r.emit("native_done_notification", map[string]interface{}{"subscription_id": sid, "payload": false})
+	sid2 := subscribe(4, "post_done_RPC_subscription")
+	if sid2 == sid {
+		t.Fatal("different subscription identity collapsed")
+	}
+	v = read(2 * time.Second)
+	if v.Method != "eth_subscription" || v.Params.Subscription != sid2 || string(v.Params.Result) != "false" || v.Error != nil || len(v.ID) != 0 {
+		t.Fatal("post-done immediate false differs")
+	}
+	r.emit("post_done_immediate_notification", map[string]interface{}{"subscription_id": sid2, "payload": false})
+	unsubscribe := func(id int, s string, count int, label string) {
+		v := call(id, "eth_unsubscribe", s)
+		if v.Error != nil || string(v.Result) != "true" {
+			t.Fatal("actual unsubscribe true missing")
+		}
+		nativeTicketUntil(t, func() bool { return nativeTicketFrames("(*DownloaderAPI).Syncing.func1") == count })
+		r.emit(label, map[string]interface{}{"request_id": id, "subscription_id": s, "RPC_result": true, "remaining_callbacks": count, "backend_membership_proved": false})
+	}
+	unsubscribe(5, sid, 1, "first_RPC_unsubscribe")
+	v = call(6, "eth_unsubscribe", sid)
+	if v.Error == nil || v.Error.Message != rpc.ErrSubscriptionNotFound.Error() {
+		t.Fatal("repeat unsubscribe control differs")
+	}
+	r.emit("repeat_unsubscribe_error", map[string]interface{}{"request_id": 6, "subscription_id": sid, "code": v.Error.Code, "message": v.Error.Message})
+	unsubscribe(7, sid2, 0, "second_RPC_unsubscribe")
+	r.snapshot(t, "observed")
+	r.emit("observation_frozen", map[string]interface{}{"notifications": 3, "caller_RPC_requests": 7, "native_timer_fires_observed": 2, "full_original5_schedules": false, "full12_requirements": false, "independent_acceptable_candidate_set": nil})
+}
