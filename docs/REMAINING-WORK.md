@@ -1,24 +1,16 @@
-# 남은 전체 작업 / 2026-10-19
+# 남은 전체 작업 / 2026-10-20
 
-[정본 원장](./spec-driven/REMAINING-13-EXECUTION.json) · [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) · [단계77 근거](./spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/SUMMARY.json)
+[정본 원장](./spec-driven/REMAINING-13-EXECUTION.json) · [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) · [최신 소스 검증](./spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/SUMMARY.json)
 
-로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
+사용자 지시 “coreml은 안해도되”에 따라 CoreML을 개발·평가·배포 및 완료 조건에서 제외했다. 모델·토크나이저·배포 대상은 더 이상 요청하지 않는다. 제외는 완료가 아니며 기존 코드와 서명된 검증 기록은 보존한다. 기본 Ollama + BGE-M3를 유지한다. [범위 제외 기록](./spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json).
 
-단계77 로컬 검증 완료: 시작 embedding HTTP66→2, 일반/계측에서 동일 원문 partial 유지.
-최초 계측1건의 unavailable 결함을 보존하고 CKG 선택 기능16조합을 보완했다.
-실제16세션 중 정상 종료8·의도한 공급자 시작 거부8이며, 출처 일치 성공은7이다.
-새 전체 일반4214/race4214통과·각18skip, build/fmt/vet/고정 lint/docs134 통과.
-입력1746(Go1290)/승인5·변경Go10, 실제 runtime과 최종 native binary bytes 동일.
-시험 fixture2개만 runtime 이후 수정했으며 해당 차이도 hash로 대조했다.
+로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처를 요구하지 않으며 익명 역할로 검토할 수 있다.
 
+## 현재 검증과 다음 작업
 
-## 현재 단계78: 실제 피어 동기화
+최신 고정 소스의 기본 일반/race는 각각4272통과·18skip, build/fmt/vet/고정lint/docs 통과다. 기존 BGE 반복/새 버전의 검색10개는 출처·본문·순서·점수까지 일치했다. 최초 전체race의 guardian 종료 시한 검사1회 실패는 후속 통과에도 원인 미확정으로 유지한다.
 
-일반/race 각각 loopback2노드의 실제 Start/Done·3블록 일치·활성 인덱스4/남은0·원래60초 false·구독 해제·노드 종료를 확인했다. 총4개 시험 노드·운영0·소유 프로세스/데이터 잔여0이다. legacy Ethash fixture1가족/각1회로 운영WBFT·전체5일정/12계약·독립 수용을 완료하지 않는다. 다음은 WI-C 실제5산출물 전달·그림 검증의 별도 체크포인트다.
-
-## 현재 단계79: 실제 리뷰 전달과 그림
-
-실제 두 역할이 두 MCP 응답으로 만든5파일을 같은 bytes로 전달하고 CLI·실제 hook의 잘못된 완료 거부를 확인했다. 실제SVG2개 렌더·직접 시각 확인을 보존했다. 이전 실패4hosts와 최종2hosts, 모두6hosts/6CKS·18PIDs 부재다. 실제 모델/독립 의미/필수 항목/우선순위 정답은 수용하지 않는다. 다음은 선택 viewer의 소유 backend 정상 종료와 상호작용 검증이다.
+다음 우선순위는 이 종료 시한 실패의 원인 추적이다. 실제 peer 동기화·리뷰5산출물 전달·viewer 소유 backend/UI·공개 CLI/HTTP 및 원시 그래프 v2의 앞선 로컬 검증은 보존한다. 독립 정답·품질 수용은 별도다.
 
 ## 전체13묶음 — 완료0/13
 
@@ -36,9 +28,6 @@
 |독립 수용 준비|익명 검토 역할 미정; 새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|
 |온톨로지|독립 의미/검색 정답·구현/개념 연결·동일 corpus off/on 효과 판단|
 |정식9개 실행·수용|독립 승인·동결 후 WI-1/2/3/4/V1/V2/6/SP/C 실행; 현재0/9|
-|선택 기능11개|캐시 로컬 완료. 공개 v2/graph tuning/flow gold/규모/as-of/legacy 출처/CoreML/audit/viewer/deploy 남음|
+|활성 선택 기능9개|캐시 로컬 완료. 공개 형식·graph tuning·flow gold·규모·as-of·legacy 출처·viewer·배포 남음. CoreML 사용자 제외, 보안 감사 사용자 보류|
 
-
-다음은 실제 peer 동기화 근거의 별도 커밋과 WI-C 실제5산출물 전달 검증이다. 각 작업은 검증·정본 문서 갱신·서명 커밋·저장된 bytes 대조 후 체크한다. 독립 수용이나 전체 묶음 완료를 로컬 시험으로 대신하지 않는다.
-
-선택 기능에서 캐시는 로컬 구현/실제 장애 경로 검증까지 완료했다. 다른10개는 기능별 기준과 입력이 남아 있다. CoreML 실물 모델과 배포 대상은 사용자 결정 대기다. 보안 전용 평가와 조직 인증은 사용자 보류다. 실제 LLM 답변 평가에는 모델·인증·비용 상한이 필요하며 실제 호출 없이 완료 처리하지 않는다. 검토 역할은 실명 없이 지정할 수 있지만 승인 내용과 독립성 근거는 별도로 필요하다.
+활성 선택 기능9개 중 캐시는 로컬 완료이며 나머지8개는 각 기준과 입력이 남아 있다. CoreML은 제외하고 보안 전용 평가·조직 인증·보안 감사는 사용자 보류로 유지한다. 실제 LLM 답변 평가는 모델·인증·비용 상한 결정 후 진행한다. 각 작업은 검증·정본 문서 갱신·서명 커밋·저장 내용 대조 후 체크하며 독립 수용을 로컬 시험으로 대신하지 않는다.

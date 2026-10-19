@@ -1,4 +1,8 @@
-# 현재 인수인계 — 단계86 로컬 CoreML 보완 검증 / 2026-10-20
+# 현재 인수인계 — CoreML 작업 범위 제외 / 2026-10-20
+
+사용자가 “coreml은 안해도되”라고 지시하여 CoreML을 활성 개발·평가·운영 및 완료 조건에서 제외했다. 모델·tokenizer·배포 대상은 더 이상 요청하거나 기다리지 않는다. 제외는 완료 판정이 아니며 기존 코드·서명된 시험 기록은 보존한다. 기본 Ollama + BGE-M3는 유지한다. [범위 제외 기록](./operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json).
+
+아래 단계86은 기존 소스의 검증 이력이며 활성 CoreML 작업을 뜻하지 않는다.
 
 단계86 구현·검증은 서명 커밋 `d5efe8f10b79`에 저장했고387개 파일의 실제 저장 내용과 서명을 대조했다.
 
@@ -28,7 +32,7 @@ CoreML 선택 CKV 경로의 토큰 전송·출력 텐서·모델 소유 수명�
 
 ## 다음 작업
 
-최초 guardian 종료 시한 실패를 원래 검사와 조건을 유지하며 조사한다. 재현하지 못한 문제를 통과 반복만으로 해결 처리하지 않는다. 실제 CoreML 모델 품질 평가는 호환 패키지·tokenizer·배포 대상·reference 입력 확보 후 진행하며 기본 BGE 기준선을 유지한다.
+최초 guardian 종료 시한 실패를 원래 검사와 조건을 유지하며 조사한다. 재현하지 못한 문제를 통과 반복만으로 해결 처리하지 않는다. CoreML은 추가 작업과 완료 조건에서 제외하며 나머지 작업은 기본 Ollama + BGE-M3 기준으로 진행한다.
 
 로컬 Qwen3 임베딩0.6b/4b는 실제 존재하며1024/2560차원 Ollama GGUF이다. CoreML 패키지·별도 tokenizer는 지정 루트/색인에서 찾지 못했으며 전체 홈의 부재 증명은 아니다. GGUF를 CoreML 실물로 기록하거나 BGE 기준선을 바꾸지 않았다.
 
@@ -48,7 +52,7 @@ CoreML 선택 CKV 경로의 토큰 전송·출력 텐서·모델 소유 수명�
 |독립 수용 준비|익명 검토 역할 미정; 새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|
 |온톨로지|독립 의미/검색 정답·구현/개념 연결·같은 corpus off/on 효과 판단|
 |정식9개 실행·수용|독립 승인·동결 후 WI-1/2/3/4/V1/V2/6/SP/C 실행; 현재0/9|
-|활성 후속10개|캐시 로컬 완료. 공개 형식 후속·graph tuning·flow gold·규모 수용·as-of·legacy 출처·CoreML 실모델/운영·viewer Atlas/접근성·배포/downstream 남음|
+|활성 후속9개|캐시 로컬 완료. 공개 형식 후속·graph tuning·flow gold·규모 수용·as-of·legacy 출처·viewer Atlas/접근성·배포/downstream 남음. CoreML은 사용자 제외이며 완료 조건이 아님|
 
 D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처를 요구하지 않으며 익명 역할로 검토할 수 있다. 보안 전용 정답/ACL/비공개/위조와 감사 기능 평가는 사용자 요청으로 보류하며 완료로 세지 않는다. 실제 LLM 답변 평가는 모델·인증·총 비용 상한 결정 후 진행한다. AI 초안과 기술 시험을 사람의 독립 승인으로 승격하지 않는다.
 

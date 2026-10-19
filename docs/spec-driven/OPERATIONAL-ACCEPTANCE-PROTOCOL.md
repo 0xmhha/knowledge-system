@@ -1,4 +1,4 @@
-# 운영·독립 수용 프로토콜 / 2026-10-19
+# 운영·독립 수용 프로토콜 / 2026-10-20
 
 정본은 [프로토콜 JSON](./OPERATIONAL-ACCEPTANCE-PROTOCOL.json), [수용 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json), [결정 제안](./OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json)이다. 이 문서는 현재 계약을 요약하며 승인·역할·정답·동결을 대신 생성하지 않는다.
 
@@ -45,10 +45,10 @@
 
 단계72의 WI-6은627쌍을 기록했으나 본570쌍 모두 partial/budget·완전쌍0이다. 단계73의 실제30함수·캐시/모델 경계46도구·50요청과 새 전체 native 검사는 로컬 계약 근거다. 최초 종료 시험1건의 원인은 반복 진단에서 확정하지 못했고, 반환 후 쓰기를 판별하는 시험을 강화했다. 모든 시도·실패·범위를 유지하며 정식0/9·독립승인0·freeze null을 변경하지 않는다.
 
-실제 LLM 답변 평가는 모델·인증 방식·총 비용 상한이 정해진 뒤 수행한다. CoreML 실제 가중치/토크나이저와 배포는 구체적인 입력/대상이 필요하다. 이 정보가 없어도 다른 로컬 개발과 검증을 중단할 이유로 사용하지 않는다.
+실제 LLM 답변 평가는 모델·인증 방식·총 비용 상한이 정해진 뒤 수행한다. CoreML은 사용자 지시로 작업·평가·배포 및 완료 조건에서 제외했다. CoreML 모델·토크나이저·배포 대상은 요구하지 않는다. 기존 소스 검증 기록은 보존하며 기본 Ollama + BGE-M3를 유지한다. [제외 기록](./operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json).
 
 단계74의 [실제 factory/indexer 검증](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json)은 일반/race 각1회의 원래60초 RPC 알림·구독 해제·노드 종료를 확인했다. 이벤트는 소유 mux 입력이며 실제 피어 동기화가 아니다. 전체 시도8노드와 별도 컴파일 실패1회를 유지하며 F01~08의 승인/동결과 정식 수용은 바꾸지 않는다.
 
-단계75 [실제 factory owner 기록](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json)은10노드/40일정에서 기준·수정·빠른 반환 오류를 구별했다. source hook/ack gate·직접 status API·정리14회의 [범위](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/REPORT.txt)를 유지한다. 원래5일정의 [범위 제안](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/PROPOSAL.json)은 결정 대기이며 독립 수용/표본 충분성을 바꾸지 않는다. 정식 JSON의 latest_scoped_followup과 active_remaining_worklist가 최신 진행을 가리키며 current_execution_state는 기존 native 체크포인트를 보존한다.
+단계75 [실제 factory owner 기록](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json)은10노드/40일정에서 기준·수정·빠른 반환 오류를 구별했다. source hook/ack gate·직접 status API·정리14회의 [범위](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/REPORT.txt)를 유지한다. 원래5일정의 [범위 제안](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/PROPOSAL.json)은 단계81에서 실제 owner4·별도 통제 late-drain1 및 옛 구독·새 등록 전 범위로 채택됐다. 이 범위 채택은 독립 수용/표본 충분성을 바꾸지 않는다. 정식 JSON의 latest_scoped_followup과 active_remaining_worklist가 최신 진행을 가리키며 current_execution_state는 기존 native 체크포인트를 보존한다.
 
 단계76 [실제4역할 전달](./operational-preparation/source-review-supplement/followups/four-role-current-v1/SUMMARY.json)은 실제원문 partial 보존·선택/완료 거부를 확인했다. 최초 누락2건과 총8hosts·로컬embedding528회·24PIDs 부재를 포함한 [한계](./operational-preparation/source-review-supplement/followups/four-role-current-v1/REPORT.txt)를 유지한다. 정본 JSON의 latest_consumer_role_followup은 소비자 전달, latest_scoped_followup은 owner, current_execution_state는 native 체크포인트를 가리킨다. active_remaining_worklist가 전체 진행 단계의 기준이다. 독립/정식0 및 미동결을 바꾸지 않는다.

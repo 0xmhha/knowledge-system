@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "phase86_local_CoreML_transport_and_default_regression_verified_initial_guardian_failure_unresolved",
+  "current_activity": "user_excluded_CoreML_from_active_scope_non_CoreML_work_remains",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -257,7 +257,7 @@
     {
       "id": "OPTIONAL-12",
       "status": "separate_backlog",
-      "task": "공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사(사용자 보류); viewer; 배포/downstream",
+      "task": "공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; embedding cache; 운영 감사(사용자 보류); viewer; 배포/downstream",
       "priority": 13,
       "user_deferred": [
         "organization authentication/authorization",
@@ -266,8 +266,8 @@
       "completion_status": "not_complete",
       "implementation_status": "not_applicable_or_mixed",
       "done_when": [
-        "ten active non-security followups each has explicit supported surface and evidence",
-        "CoreML weights and deployment target supplied when required",
+        "nine active non-security non-CoreML followups each has explicit supported surface and evidence",
+        "CoreML is user-excluded, not complete, and its model/tokenizer/deployment inputs are not completion prerequisites",
         "organization auth remains user-deferred"
       ],
       "independent_approval_invented": false,
@@ -277,10 +277,30 @@
         "organization auth remains user-deferred"
       ],
       "scope_change_receipt": {
-        "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-deferred-security-scope-v1/SCOPE.json",
-        "sha256": "cbf9ab52dba5da47a2e1287939a74cd8c8eec4baf7f0999181faa3635aef639a",
-        "deferred_not_complete": true
-      }
+        "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json",
+        "sha256": "938605d7f35dc8b7c2783dbc334134b69d4c0e212e910ea2a9234bea0c36bcb9",
+        "excluded_not_complete": true
+      },
+      "done_when_before_CoreML_exclusion": [
+        "ten active non-security followups each has explicit supported surface and evidence",
+        "CoreML weights and deployment target supplied when required",
+        "organization auth remains user-deferred"
+      ],
+      "scope_change_history": [
+        {
+          "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-deferred-security-scope-v1/SCOPE.json",
+          "sha256": "cbf9ab52dba5da47a2e1287939a74cd8c8eec4baf7f0999181faa3635aef639a",
+          "deferred_not_complete": true
+        },
+        {
+          "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json",
+          "sha256": "938605d7f35dc8b7c2783dbc334134b69d4c0e212e910ea2a9234bea0c36bcb9",
+          "excluded_not_complete": true
+        }
+      ],
+      "user_excluded": [
+        "COREML"
+      ]
     }
   ],
   "optional_followups": [
@@ -364,8 +384,8 @@
         "cmd/vector/coreml.go",
         "internal/vector/embed/coreml/identity.go"
       ],
-      "observation": "native token copy corrected; Float32/Double/Float16/stride, bounded output and two owned contexts verified with model-free fixtures; tagged general/race28+1skip and CGO-off3 passed; whole default general/race4272+18skip passed after initial unresolved guardian failure; actual BGE old-repeat/new10hits identical; actual CoreML weights/positive compile/cleanup/reference/target and managed CKS runtime remain unverified",
-      "status": "local_CKV_native_transport_verified_actual_model_target_absent",
+      "observation": "User excluded CoreML: no further development/model/tokenizer/conversion/evaluation/deployment work is required. Existing local CKV implementation and signed evidence remain historical; exclusion is not implementation or model acceptance.",
+      "status": "user_excluded_not_complete",
       "input_inventory": {
         "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-local-model-inventory-v1/INVENTORY.json",
         "sha256": "bbceaa83710ff0af3736c193a67b49181b00ea10b3fcf30b6c02d30f96add354",
@@ -376,6 +396,14 @@
         "kind": "CoreML_local_native_transport_CLI_default_regression_DEV_not_real_model_acceptance",
         "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/manifest.json",
         "manifest_sha256": "dc79310029bb434dee6911227441e4b033bfc179c639191ada96179d59ea6a42"
+      },
+      "active": false,
+      "user_excluded": true,
+      "completion_status": "excluded_not_complete",
+      "scope_change_receipt": {
+        "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json",
+        "sha256": "938605d7f35dc8b7c2783dbc334134b69d4c0e212e910ea2a9234bea0c36bcb9",
+        "excluded_not_complete": true
       }
     },
     {
@@ -432,7 +460,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "investigate initial guardian deadline intermittence without weakening original test; actual CoreML model/target and independent gold remain required inputs",
+  "next": "investigate initial guardian deadline intermittence without weakening original test; continue non-CoreML work while independent gold/freeze and concrete non-CoreML deployment inputs remain required",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -571,7 +599,7 @@
     "model_inference_calls": 0,
     "CoreML_executed": false
   },
-  "optional_active_followups": 10,
+  "optional_active_followups": 9,
   "optional_user_deferred_followups": 1,
   "current_scale_profile": {
     "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/scale-long-functions-v1/manifest.json",
@@ -589,13 +617,21 @@
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/public-v2-surface-v1/manifest.json",
     "manifest_sha256": "c0e27997085c7a401ae27e831e60f075fd2f28a70d57e4347d60befaf6adcd16"
   },
-  "next_coreml_transport_spec": {
+  "optional_user_excluded_followups": 1,
+  "user_scope_exclusions": [
+    {
+      "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json",
+      "sha256": "938605d7f35dc8b7c2783dbc334134b69d4c0e212e910ea2a9234bea0c36bcb9",
+      "excluded_not_complete": true
+    }
+  ],
+  "historical_coreml_transport_spec": {
     "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/SPEC.json",
     "sha256": "64906ceedb0bec092188d0bf153dc736285227b95fb64a9860a90834a0f4d11e",
     "stage": 86,
     "status": "local_transport_verified_real_model_not_executed"
   },
-  "current_coreml_followup": {
+  "historical_coreml_followup": {
     "kind": "CoreML_local_native_transport_CLI_default_regression_DEV_not_real_model_acceptance",
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/manifest.json",
     "manifest_sha256": "dc79310029bb434dee6911227441e4b033bfc179c639191ada96179d59ea6a42"
