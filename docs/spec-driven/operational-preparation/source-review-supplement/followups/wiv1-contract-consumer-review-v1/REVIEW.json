@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "kind": "WI_V1_full12_and_installed_consumer_AI_source_review_not_independent_acceptance",
+  "review_date": "2026-10-20",
+  "purpose": "빈약한 성공률이나 반환 속도로 내부 구독 해제 계약 충족을 오판하지 않고 실제 설치 소비자가 같은 근거로 판정할 수 있도록 공백을 분리한다.",
+  "requirements": [
+    {
+      "id": "API-ENTRY",
+      "tier": "actual_API",
+      "anchors": [
+        "API-01",
+        "API-02",
+        "API-03",
+        "API-04",
+        "API-05",
+        "API-08",
+        "API-11"
+      ],
+      "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+      "unknown": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "실제 factory 등록 RPC 구독·원래 60초 알림·실제 peer 동기화의 별도 근거가 있다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-factory-v1",
+      "remaining": "모든 후보·실제 RPC callback·blocked 일정이 하나의 trace와 최종 HEAD로 연결된 것은 아니다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "API-UNSUB",
+      "tier": "actual_API",
+      "anchors": [
+        "API-06",
+        "API-07",
+        "API-11"
+      ],
+      "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+      "unknown": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "실제 RPC 해제와 owner delete→ack 관측은 존재하지만 서로 구분한 경로다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "RPC true/registry 삭제와 내부 deferred Unsubscribe 반환의 시각·객체를 같은 trace로 연결해야 한다. peer 시험은 client error channel close를 명시 관측하지 않았다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "API-NEGATIVE",
+      "tier": "actual_API",
+      "anchors": [
+        "API-05",
+        "API-06"
+      ],
+      "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+      "unknown": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "실제 API에서 unsupported notifier 오류를 관측했다. 이전 직접 RPC 음성 경로는 별도 범위다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "unsupported transport·malformed/unknown name·unknown id 전체 오류 형태를 실제 factory/후보/고정 버전에서 연결 검증해야 한다. 오류는 symptom RED가 아니다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "METHOD-RETURN",
+      "tier": "bounded_method",
+      "anchors": [
+        "API-10",
+        "API-12"
+      ],
+      "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+      "unknown": "No unconditional timeout guarantee, event-loop shutdown behavior or infinite status-producer fairness contract is established.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "후보 A/B는 실제 owner blocked 상태를 drain하여 delete/ack 뒤 반환했고 원본/재도입 대기는 rescue 전에 고정했다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "finite live-loop 조건이며 임의 스케줄·종료 중 event loop·무한 producer fairness·독립 반복 충분성은 증명하지 않았다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "METHOD-ONCE",
+      "tier": "bounded_method",
+      "anchors": [
+        "API-12"
+      ],
+      "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+      "unknown": "Different subscription objects are distinct request populations; shared channel or equal names alone do not prove object identity.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "같은 객체의 동시 호출과 owner 요청 1개·ack 전 반환 없음이 선언된 gate 아래 관측됐다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "객체/채널/등록 세대 구분과 개별 호출 전원 join을 새 표본에서도 확인해야 한다. 0개 요청인 early mutant는 성공이 아니다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "METHOD-REMOVE",
+      "tier": "bounded_method",
+      "anchors": [
+        "API-10",
+        "API-12"
+      ],
+      "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+      "unknown": "A closed acknowledgement generated by an arbitrary fake does not prove real map removal.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "실제 owner map에서 delete 뒤 ack close를 관측했다. source도 같은 순서다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "관찰 hook/gate가 타이밍에 영향을 준다. 실제 RPC overlap과 모든 후보의 무계측 보편 보장은 별도다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "METHOD-ACK",
+      "tier": "bounded_method",
+      "anchors": [
+        "API-10",
+        "API-12"
+      ],
+      "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+      "unknown": "Observe channel use, not just delivered messages; zero observed messages with incomplete instrumentation is unknown.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "실제 owner의 ack 지연 중 반환 보류 및 조기 반환 오류 후보를 구별했다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "옛 구독·새 등록 전의 모든 channel-use 부재를 완전 계측으로 관측한 것은 아니다. 새 등록을 영구 금지하는 기준으로 바꾸지 않는다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "NORMAL-DELIVERY",
+      "tier": "bounded_method",
+      "anchors": [
+        "API-10",
+        "API-11",
+        "API-13"
+      ],
+      "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+      "unknown": "The extracted producer is not a real syncing-progress source or RPC notifier.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "factory RPC 원래 알림·post-done 직접 상태·별도 실제 peer sync 근거가 있다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-factory-v1",
+      "remaining": "post-done 직접 호출과 native broadcast 중 실제 RPC callback 종료 overlap은 같은 증거가 아니다. source/notification/id 연결이 필요하다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "LATE-DRAIN",
+      "tier": "bounded_method",
+      "anchors": [
+        "API-12"
+      ],
+      "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+      "unknown": "An infinite competing stream cannot justify deterministic fairness or immediate registration/ack selection.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "원래 단일 owner는 uninstall 수락→삭제→ack 사이에 상태를 보내지 않는다. 별도 통제 owner의 finite late send 24개를 관측했다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1",
+      "remaining": "승인된 실제4/별도통제1로 판정한다. 실제 owner에서 도달 불가능한 중간 송신을 인위적으로 넣거나 통제 증거를 실제 owner 증거로 승격하지 않는다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "BLOCKED-DELIVERY",
+      "tier": "bounded_method",
+      "anchors": [
+        "API-10",
+        "API-11",
+        "API-12"
+      ],
+      "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+      "unknown": "Only an actual callback/close trace can establish the production overlap; the conditional wait graph alone does not.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "실제 factory의 post-done 직접 status send와 sole receiver 종료를 겹쳐 원본의 양방향 대기와 A/B 복구를 구별했다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "native timer broadcast·실제 Syncing RPC callback 종료·동일 객체의 overlap은 미완이다. peer sync 성공만으로 이 조건을 충족했다고 볼 수 없다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "OWNED-CLEANUP",
+      "tier": "all_tiers",
+      "anchors": [
+        "API-10",
+        "API-11",
+        "API-12"
+      ],
+      "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+      "unknown": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "관측 후 rescue 개입 14개를 별도 기록했고 owner 자원·프로세스 잔여 0, 원본 보존을 검증했다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "rescue는 후보 성공이 아니다. 이전 실패와 package-init goroutine 개별 join 제한을 보존하며 새 실행도 종료/복구 증거를 남겨야 한다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "SOURCE-BOUNDARY",
+      "tier": "all_tiers",
+      "anchors": [
+        "API-09",
+        "API-10",
+        "API-11",
+        "API-12",
+        "API-13"
+      ],
+      "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+      "unknown": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+      "review_status": "reviewed_bounded_evidence_full_contract_not_accepted",
+      "observed": "원본 commit·full-file overlay·project/build tree·실제 binary·드라이버 및 소비자 고정 revision 근거가 있다.",
+      "evidence_packet": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+      "remaining": "기존 실제 4역할의 CKS는 49197f0f이며 최신 고정 소스 87fed3d9가 아니다. 최종 agent HEAD와 승인 oracle의 실제 성공 경로 연결이 남았다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    }
+  ],
+  "consumer_criteria": [
+    {
+      "id": "IC-01",
+      "title": "고정 설치·버전",
+      "criterion": "격리 설치된 consumer d1ebafb8와 역할/host/CKS 해시를 결속한다. 전역 설치나 최신 source 실행으로 자동 확장하지 않는다.",
+      "evidence_and_limit": "원본 역할 invocation·소비자 파일 6개 SHA 재대조; 최신 CKS 실제4역할 재실행은 미수행"
+    },
+    {
+      "id": "IC-02",
+      "title": "출처와 부분 응답",
+      "criterion": "project/dataset/source commit/snapshot/node/function hash와 원 응답 partial/unknown을 전달한다. meta에서 보충한 pin과 tool 반환 필드를 구분한다.",
+      "evidence_and_limit": "실제2 MCP 호출·2 context write·3 downstream Read의 과거 원자료 재판독"
+    },
+    {
+      "id": "IC-03",
+      "title": "정답 독립성",
+      "criterion": "서로 다른 oracle ID·command·파일·해시는 구조 조건이다. 동일 AI의 별도 표현이나 fixture panel은 독립 의미 승인으로 인정하지 않는다.",
+      "evidence_and_limit": "코드의 independent_human_acceptance=not_recorded 확인; 독립 승인 기록 없음"
+    },
+    {
+      "id": "IC-04",
+      "title": "RED/GREEN/ERROR",
+      "criterion": "base의 지정 symptom assertion만 RED, head와 정상 controls는 GREEN, reintroduce/overfit 대조는 선언된 기대와 일치해야 한다. 빌드 실패·timeout·다른 assertion·미완 자료는 ERROR다.",
+      "evidence_and_limit": "소비자 실제 Python fixture 회귀 7개; WI-V1 전체 e2e oracle 성공은 아님"
+    },
+    {
+      "id": "IC-05",
+      "title": "계약과 일정 완전성",
+      "criterion": "12계약마다 출처·관측·미확정·오류·cleanup을 구분하고 승인된 실제4/통제1 범위를 적용한다. 120개 범위 행은 120개 성공이나 독립 표본이 아니다.",
+      "evidence_and_limit": "12계약 전수 검토·owner40 재판독; 전체12 수용 false"
+    },
+    {
+      "id": "IC-06",
+      "title": "회귀와 tier",
+      "criterion": "oracle PASS만으로 다른 완료 gate를 대신하지 않는다. simulation fixture와 e2e를 구분하고 e2e 필수 chain 검증 누락을 허용하지 않는다.",
+      "evidence_and_limit": "완료 gate 코드 확인; 이번 요청은 새 보안 평가나 chain e2e 실행을 포함하지 않음"
+    },
+    {
+      "id": "IC-07",
+      "title": "후보·자료 동결",
+      "criterion": "baseline/source replacement·frozen oracle·carrier·candidate commit/tree·driver/report hash가 맞아야 한다. 같은 source tree 별칭을 독립 후보로 세지 않는다.",
+      "evidence_and_limit": "후보 실제 fixture·기준 변경·중복 tree 회귀 통과"
+    },
+    {
+      "id": "IC-08",
+      "title": "선택 기준",
+      "criterion": "correctness/regression/maintainability 세 역할이 근거를 남기며 필수 측정 누락·unknown·관측 미완이면 선택 보류한다.",
+      "evidence_and_limit": "decision 회귀9개; 서로 다른 judge ID만으로 사람/의미 독립성이 생기지는 않음"
+    },
+    {
+      "id": "IC-09",
+      "title": "보류·동률",
+      "criterion": "합의·필수 관측·유일 Pareto 우위가 없으면 DEFERRED/TIED/REJECTED로 유지한다. 첫 후보·임의 가중합·실행 오류 난 경쟁자의 제거로 우승을 만들지 않는다.",
+      "evidence_and_limit": "decision 회귀9개와 failed panel 회귀; A/B 독립 수용 집합·canonical selection은 null"
+    },
+    {
+      "id": "IC-10",
+      "title": "실제 적용 소스",
+      "criterion": "선택 tree와 실제 HEAD tree를 대조하고 별도로 현재 HEAD에 결속된 oracle report를 확인한다. --applied의 tree 비교 하나로 최종 HEAD 전체 oracle를 대체하지 않는다.",
+      "evidence_and_limit": "fixture에서 적용 전 거부·적용 후 성공 확인; 실제 WI-V1 agent 최종 HEAD 판정은 미완"
+    },
+    {
+      "id": "IC-11",
+      "title": "완료와 게시",
+      "criterion": "evaluation_only 상태에서 완료/게시를 거부한다. 로컬 mechanical PASS·선택 성공은 독립 수용 승인이나 push/PR 권한이 아니다.",
+      "evidence_and_limit": "과거 실제4역할 completion 거부4/selection 거부2 재판독; 이번 게시 없음"
+    },
+    {
+      "id": "IC-12",
+      "title": "실제 역할 성공 경로",
+      "criterion": "최신 CKS와 고정 consumer에서 Analyzer→Planner→Implementer→Evaluator가 승인 oracle와 허용된 후보 자료를 읽고 최종 소스를 검증하는 양성 경로가 필요하다.",
+      "evidence_and_limit": "현재 실제4역할 근거는 미승인 거부 경로이다. positive fixture 회귀를 실제 WI-V1 성공으로 세지 않음"
+    }
+  ],
+  "user_adopted_schedule_scope": {
+    "actual_owner": [
+      {
+        "id": "normal_delivery_then_unsubscribe",
+        "preconditions": [
+          "fresh installed subscription",
+          "receiver accepts first notification",
+          "event loop removes and acknowledges uninstall"
+        ],
+        "required": [
+          "METHOD-RETURN",
+          "METHOD-ONCE",
+          "METHOD-REMOVE",
+          "METHOD-ACK",
+          "NORMAL-DELIVERY",
+          "OWNED-CLEANUP",
+          "SOURCE-BOUNDARY"
+        ]
+      },
+      {
+        "id": "blocked_delivery_then_consumer_exit",
+        "preconditions": [
+          "same event loop blocked on unbuffered status",
+          "sole receiver exited",
+          "observe before rescue",
+          "loop stays live after send"
+        ],
+        "required": [
+          "METHOD-RETURN",
+          "METHOD-ONCE",
+          "METHOD-REMOVE",
+          "METHOD-ACK",
+          "BLOCKED-DELIVERY",
+          "OWNED-CLEANUP",
+          "SOURCE-BOUNDARY"
+        ]
+      },
+      {
+        "id": "confirmation_delayed",
+        "preconditions": [
+          "uninstall accepted",
+          "ack held then released by owner",
+          "no previous Once completion"
+        ],
+        "required": [
+          "METHOD-RETURN",
+          "METHOD-ONCE",
+          "METHOD-REMOVE",
+          "METHOD-ACK",
+          "OWNED-CLEANUP",
+          "SOURCE-BOUNDARY"
+        ]
+      },
+      {
+        "id": "concurrent_unsubscribe_once",
+        "preconditions": [
+          "two calls same exact subscription object",
+          "one request accepted",
+          "ack eventually released",
+          "join both calls"
+        ],
+        "required": [
+          "METHOD-RETURN",
+          "METHOD-ONCE",
+          "METHOD-REMOVE",
+          "METHOD-ACK",
+          "OWNED-CLEANUP",
+          "SOURCE-BOUNDARY"
+        ]
+      }
+    ],
+    "controlled_owner": {
+      "id": "late_delivery_before_confirmation",
+      "preconditions": [
+        "uninstall accepted",
+        "finite additional status offered",
+        "acknowledgement follows deletion",
+        "do not acknowledge early"
+      ],
+      "required": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "LATE-DRAIN",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ]
+    },
+    "post_ack": "old_subscription_until_explicit_new_registration",
+    "same_channel_new_registration_allowed": true
+  },
+  "source_revisions": {
+    "original": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "consumer": "d1ebafb8ddf4eb487b8f1d6285135e174c40834b",
+    "historical_actual_four_role_CKS": "49197f0f3d5967913355278ba5d45d4a32ae614a",
+    "latest_verified_CKS": "87fed3d970cfd32931cb278cde70b5d6fbdc7209"
+  },
+  "reviewed_contracts": 12,
+  "formal_accepted_contracts": 0,
+  "full12_acceptance": false,
+  "installed_positive_WIV1_oracle": false,
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "FINAL": 0,
+  "freeze": null,
+  "execution_allowed": false,
+  "anonymous_reviewer_role_status": "미정",
+  "personal_names_required": false,
+  "next_tasks": [
+    {
+      "priority": 1,
+      "task": "최신 CKS 실제4역할의 미승인/partial 전달 재검증 계획과 전체 negative API matrix를 작성; 비용 없는 경로부터 실행",
+      "prerequisite": "소유 fixture·hash pin·정리 가능한 자원; 캐시를 유지하지 않음"
+    },
+    {
+      "priority": 2,
+      "task": "native broadcast와 실제 RPC callback 종료 overlap·전 channel-use 경계 관측을 12계약별 trace로 연결",
+      "prerequisite": "계측/gate·복구 개입과 실제 도달성 명시"
+    },
+    {
+      "priority": 3,
+      "task": "새 독립 티켓/완전 정답·primary/derived 의미 검토·매칭·반복 충분성·F01~08 동결",
+      "prerequisite": "익명 역할 승인 기록; 사용자 범위 승인을 gold 승인으로 대체하지 않음"
+    },
+    {
+      "priority": 4,
+      "task": "승인 자료 기반 실제 소비자 양성 oracle·final HEAD 검증 후 정식 WI-V1 판정",
+      "prerequisite": "정식 실행 허용·적합한 tier·다른 필수 완료 gate 충족"
+    }
+  ]
+}
