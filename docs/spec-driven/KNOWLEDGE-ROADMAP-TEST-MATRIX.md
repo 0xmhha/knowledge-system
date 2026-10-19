@@ -17,6 +17,10 @@
 
 [원자료·실패를 포함한 근거](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/SUMMARY.json). 독립 승인0·정식0/9 유지. 다음은 실제 peer 동기화 별도 기록과 WI-C 전체5산출물 실제 전달이다.
 
+## 현재 단계78: 실제 피어 동기화
+
+일반/race 각각 loopback2노드의 실제 Start/Done·3블록 일치·활성 인덱스4/남은0·원래60초 false·구독 해제·노드 종료를 확인했다. 총4개 시험 노드·운영0·소유 프로세스/데이터 잔여0이다. legacy Ethash fixture1가족/각1회로 운영WBFT·전체5일정/12계약·독립 수용을 완료하지 않는다. 다음은 WI-C 실제5산출물 전달·그림 검증의 별도 체크포인트다.
+
 ## 기존28개 로컬 작업
 
 | ID | 목적 | 상태 | 근거·범위 |

@@ -1,0 +1,30 @@
+단계78: 변경하지 않은 실제 node/eth factory와 loopback peer 동기화
+
+0bf2f4d1의2228개 기존 tracked 파일은 그대로이며 소유 cmd program1개만 추가했다.
+node.New→eth.New→Start 실제 factory2개에서 seeder에3개 블록을 넣고 receiver가
+명시적으로 seeder의127.0.0.1 peer만 연결한다. discovery/DNS/external peers는 없다.
+실제 Downloader.LegacySync→syncWithPeer가 발행한 Start/Done을 수신했고, receiver의
+head hash/height가 seeder와 일치했다. 활성 인덱스는4/남은0이며 기존60초 timer의
+RPC false와 unsubscribe 반환을 확인했다. 일반/race 각각1회, 모두4개 소유 시험
+노드다. 운영 노드를 시작하지 않았고 기존 프로젝트 파일 변경도0이다.
+
+모든 프로그램/컴파일exit0, timeout/TERM/KILL 없음. 두 노드 Close가 반환한 뒤
+프로그램의 defers까지 실행되고 complete가 출력됐다. 임시 data children0·소유 process
+group0·원본/사본 source inventory 및 원본 status 동일을 보존했다. 실제 동기화 이벤트를
+mux.Post로 넣지 않았으며 Go fixture bytes와15개 실제 event 순서를 대조한다.
+
+초기 SCOPE의 planned_events 일부 이름은 이전 factory driver에서 상속됐다. 이를
+실제 event 이름으로 사후 교체하지 않고 원래 SCOPE와 실행 전 고정 fixture/driver를
+보존했다. 실제 required 순서에는 seeder_imported, loopback_peer_added,
+receiver_close_returned, seeder_close_returned가 있다. client_subscription_error_channel_closed는
+명시 관측하지 않았으며 unsubscribe 반환과 child reap만 관측했다.
+
+Go1.23.12/darwin/arm64/CGO1, 이미 있는 고정 module cache만 사용했다. Root CKS의
+전체 source 검증은 단계77의1746입력/Go1290/승인5·일반/race4214각18skip을 정확한
+동일 Go/input hashes로 재사용한다. 새로운 Root Go 변경은 없다.
+
+한계: AllEthashProtocolChanges의 unmerged legacy-PoW 생성기 fixture로 production WBFT
+동작을 검증하지 않는다. 정상 동기화/구독 해제 경로이며 후보A/B의 전체5일정/12계약,
+실제 RPC 종료와 모든 경쟁 조건의 겹침, 독립 oracle/가족/반복 충분성은 별도다.
+한 공통 source/fixture의 일반/race 두 실행은 독립2가족이 아니다. 독립승인0·정식0/9·
+FINAL0·미동결·D04미정을 유지한다. 실제 LLM/유료호출/게시/전역설치0.
