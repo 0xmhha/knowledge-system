@@ -1,0 +1,326 @@
+// Owned observation bridge, added only to temporary source checkouts.
+// Compiler atomic coverage counters and transport gating affect scheduling.
+package downloader
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net"
+	"os"
+
+	"runtime"
+	"sort"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"time"
+
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/eth/protocols/snap"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rpc"
+)
+
+type overlapLog struct {
+	file       *os.File
+	path, role string
+	start      time.Time
+	seq        int
+}
+
+func (r *overlapLog) emit(name string, d map[string]interface{}) {
+	if d == nil {
+		d = map[string]interface{}{}
+	}
+	r.seq++
+	d["event"], d["sequence"], d["candidate"], d["elapsed_ns"] = name, r.seq, r.role, time.Since(r.start).Nanoseconds()
+	if err := json.NewEncoder(r.file).Encode(d); err != nil {
+		panic(err)
+	}
+}
+func overlapAssert(ok bool, why string) {
+	if !ok {
+		panic(why)
+	}
+}
+func overlapStacks() string {
+	b := make([]byte, 2<<20)
+	n := runtime.Stack(b, true)
+	overlapAssert(n < len(b), "truncated goroutine snapshot")
+	return string(b[:n])
+}
+func overlapFrame(s, name, site, state string) bool {
+	for _, g := range strings.Split(s, "\n\n") {
+		if strings.Contains(g, name) && strings.Contains(g, site) && strings.Contains(strings.SplitN(g, "\n", 2)[0], state) {
+			return true
+		}
+	}
+	return false
+}
+func overlapCallbacks(s string) int {
+	n := 0
+	for _, g := range strings.Split(s, "\n\n") {
+		if strings.Contains(g, "(*DownloaderAPI).Syncing.func1") && strings.Contains(g, "/eth/downloader/api.go:") {
+			n++
+		}
+	}
+	return n
+}
+func overlapUntil(p func() bool, wait time.Duration) {
+	end := time.Now().Add(wait)
+	for time.Now().Before(end) {
+		if p() {
+			return
+		}
+		time.Sleep(time.Millisecond)
+	}
+	panic("bounded owned overlap precondition/join failed")
+}
+func (r *overlapLog) snapshot(label string) string {
+	s := overlapStacks()
+	if err := os.WriteFile(r.path+"."+label+".stack", []byte(s), 0600); err != nil {
+		panic(err)
+	}
+	return s
+}
+
+// Source hooks serialize observation records, never retain the live map.
+type lifecycleRecorder struct {
+	mu    sync.Mutex
+	file  *os.File
+	start time.Time
+	role  string
+	seq   int
+	ids   map[chan interface{}]int
+}
+
+var ksOwnedRecorder *lifecycleRecorder
+
+func ksOwnedLifecycle(kind string, c chan interface{}, members map[chan interface{}]struct{}) {
+	r := ksOwnedRecorder
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	id := r.ids[c]
+	if id == 0 {
+		id = len(r.ids) + 1
+		r.ids[c] = id
+	}
+	observed := members != nil
+	var membership interface{}
+	var keys []int
+	if observed {
+		_, present := members[c]
+		membership = present
+		for ch := range members {
+			k := r.ids[ch]
+			if k == 0 {
+				k = len(r.ids) + 1
+				r.ids[ch] = k
+			}
+			keys = append(keys, k)
+		}
+		sort.Ints(keys)
+	}
+	r.seq++
+	e := map[string]interface{}{"sequence": r.seq, "elapsed_ns": time.Since(r.start).Nanoseconds(), "candidate": r.role, "event": kind, "channel_id": id, "map_observed": observed, "membership": membership, "member_ids": keys}
+	if err := json.NewEncoder(r.file).Encode(e); err != nil {
+		panic(err)
+	}
+}
+func (r *overlapLog) counters(label string) {
+	t := ksOwnedRecorder
+	t.mu.Lock()
+	seq := t.seq
+	t.mu.Unlock()
+	r.emit("lifecycle_fence", map[string]interface{}{"label": label, "through_sequence": seq, "before_rescue": true, "global_transactional_snapshot": false})
+}
+
+type overlapConn struct {
+	net.Conn
+	entered, release chan struct{}
+	first            atomic.Bool
+	once             sync.Once
+}
+
+func (c *overlapConn) Write(p []byte) (int, error) {
+	if bytes.Contains(p, []byte(`"method":"eth_subscription"`)) && !c.first.Swap(true) {
+		close(c.entered)
+		<-c.release
+	}
+	return c.Conn.Write(p)
+}
+func (c *overlapConn) unblock() { c.once.Do(func() { close(c.release) }) }
+
+// OwnedRPCLifecycle is called only by the declared temporary observation main.
+// It does not start an Ethereum host, peer sync or a network listener.
+func OwnedRPCLifecycle() (err error) {
+	path, role := os.Getenv("TICKET_LIFECYCLE_TRACE"), os.Getenv("TICKET_LIFECYCLE_ROLE")
+	f, e := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if e != nil {
+		return e
+	}
+	r := &overlapLog{file: f, path: path, role: role, start: time.Now()}
+	life, openErr := os.OpenFile(path+".lifecycle.jsonl", os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if openErr != nil {
+		f.Close()
+		return openErr
+	}
+	ksOwnedRecorder = &lifecycleRecorder{file: life, start: r.start, role: role, ids: make(map[chan interface{}]int)}
+	defer func() {
+		if v := recover(); v != nil {
+			err = fmt.Errorf("owned overlap: %v", v)
+		}
+		r.emit("trace_end", map[string]interface{}{"failed": err != nil})
+		f.Close()
+		life.Close()
+	}()
+	r.emit("trace_begin", map[string]interface{}{"base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8", "native_timer_seconds": 60, "standalone_program": true, "original_package_tests_executed": false, "source_lifecycle_hooks": true, "temporary_instrumented_API": true, "independent_oracle": false, "external_listener": false})
+	db := rawdb.NewMemoryDatabase()
+	chain, e := core.NewBlockChain(db, nil, &core.Genesis{Config: params.AllEthashProtocolChanges}, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
+	if e != nil {
+		db.Close()
+		panic(e)
+	}
+	d := &Downloader{blockchain: chain, SnapSyncer: snap.NewSyncer(db, chain.TrieDB().Scheme()), syncStatsChainHeight: 1}
+	overlapAssert(!d.Progress().Done(), "owned progress input must remain in progress")
+	mux := new(event.TypeMux)
+	api := NewDownloaderAPI(d, chain, mux)
+	server := rpc.NewServer()
+	if e := server.RegisterName("eth", api); e != nil {
+		panic(e)
+	}
+	client, serverEnd := net.Pipe()
+	gate := &overlapConn{Conn: serverEnd, entered: make(chan struct{}), release: make(chan struct{})}
+	served := make(chan struct{})
+	go func() { defer close(served); server.ServeCodec(rpc.NewCodec(gate), 0) }()
+	defer func() {
+		r.emit("cleanup_begin", nil)
+		client.Close()
+		server.Stop()
+		gate.unblock()
+		stop, joined := make(chan struct{}), make(chan struct{})
+		rescued := false
+		if overlapCallbacks(overlapStacks()) != 0 {
+			select {
+			case req := <-api.uninstallSyncSubscription:
+				rescued = true
+				overlapAssert(cap(req.c) == 0, "cleanup received buffered or foreign request")
+				go func() {
+					defer close(joined)
+					for {
+						select {
+						case <-req.c:
+						case <-stop:
+							return
+						}
+					}
+				}()
+				close(req.uninstalled)
+			case <-time.After(2 * time.Second):
+				panic("owned callback rescue request unavailable")
+			}
+		}
+		overlapUntil(func() bool { return overlapCallbacks(overlapStacks()) == 0 }, 2*time.Second)
+		mux.Stop()
+		overlapUntil(func() bool { return !strings.Contains(overlapStacks(), "(*DownloaderAPI).eventLoop") }, 2*time.Second)
+		if rescued {
+			close(stop)
+			select {
+			case <-joined:
+			case <-time.After(2 * time.Second):
+				panic("owned rescue drain not joined")
+			}
+		}
+		select {
+		case <-served:
+		case <-time.After(2 * time.Second):
+			panic("owned ServeCodec not joined")
+		}
+		chain.Stop()
+		if e := db.Close(); e != nil {
+			panic(e)
+		}
+		r.emit("cleanup_end", map[string]interface{}{"rescue_used": rescued, "rescue_ack_is_controlled_not_real_map_ack": rescued, "callbacks": 0, "event_loops": 0, "ServeCodec_joined": true, "memory_chain_stopped": true})
+	}()
+	client.SetWriteDeadline(time.Now().Add(2 * time.Second))
+	if e := json.NewEncoder(client).Encode(map[string]interface{}{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": []interface{}{"syncing"}}); e != nil {
+		panic(e)
+	}
+	client.SetReadDeadline(time.Now().Add(2 * time.Second))
+	var response struct {
+		JSONRPC string          `json:"jsonrpc"`
+		ID      int             `json:"id"`
+		Result  string          `json:"result"`
+		Error   json.RawMessage `json:"error"`
+	}
+	if e := json.NewDecoder(client).Decode(&response); e != nil {
+		panic(e)
+	}
+	overlapAssert(response.JSONRPC == "2.0" && response.ID == 1 && response.Result != "" && len(response.Error) == 0, "actual RPC subscribe response differs")
+	overlapUntil(func() bool {
+		return overlapCallbacks(overlapStacks()) == 1 && !strings.Contains(overlapStacks(), "(*DownloaderAPI).SubscribeSyncStatus")
+	}, 2*time.Second)
+	r.emit("actual_RPC_subscription", map[string]interface{}{"subscription_id": response.Result, "caller_RPC_requests": 1, "route": "Server.ServeCodec_NewCodec_net.Pipe", "controlled_height": 1, "network_sync": false})
+	if e := mux.Post(StartEvent{}); e != nil {
+		panic(e)
+	}
+	r.emit("test_owned_StartEvent", nil)
+	select {
+	case <-gate.entered:
+	case <-time.After(75 * time.Second):
+		panic("first native notification did not reach owned write gate")
+	}
+	s := r.snapshot("first-write-held")
+	overlapAssert(overlapCallbacks(s) == 1 && strings.Contains(s, "(*Notifier).Notify") && strings.Contains(s, "(*overlapConn).Write"), "actual callback not held inside notifier write")
+	r.emit("first_native_write_held", map[string]interface{}{"wire_notification_delivered": false, "actual_notifier": true, "owned_transport_gate": true})
+	overlapUntil(func() bool {
+		return overlapFrame(overlapStacks(), "(*DownloaderAPI).eventLoop", os.Getenv("TICKET_LIFECYCLE_BROADCAST_SITE"), "[chan send")
+	}, 75*time.Second)
+	s = r.snapshot("native-broadcast-blocked")
+	overlapAssert(overlapCallbacks(s) == 1 && strings.Contains(s, "(*Notifier).Notify") && strings.Contains(s, "(*overlapConn).Write"), "callback no longer held at native broadcast")
+	r.emit("second_native_broadcast_blocked", map[string]interface{}{"eventLoop_send_site": os.Getenv("TICKET_LIFECYCLE_BROADCAST_SITE"), "sole_RPC_consumer_in_Notify": true, "unbuffered_status_channel": true, "native_timer_fires": 2})
+	r.counters("before-close")
+	client.Close()
+	server.Stop()
+	r.snapshot("server-stopped-gate-held")
+	r.emit("actual_server_connection_closed", map[string]interface{}{"write_gate_still_held": true, "RPC_unsubscribe_response": false})
+	gate.unblock()
+	r.emit("write_gate_released", nil)
+	overlapUntil(func() bool {
+		s := overlapStacks()
+		return overlapCallbacks(s) == 0 || overlapFrame(s, "(*SyncStatusSubscription).Unsubscribe", os.Getenv("TICKET_LIFECYCLE_UNINSTALL_SITE"), "[chan send")
+	}, 2*time.Second)
+	time.Sleep(300 * time.Millisecond)
+	s = r.snapshot("before-rescue")
+	callbacks := overlapCallbacks(s)
+	blocked := overlapFrame(s, "(*DownloaderAPI).eventLoop", os.Getenv("TICKET_LIFECYCLE_BROADCAST_SITE"), "[chan send")
+	methodSend := overlapFrame(s, "(*SyncStatusSubscription).Unsubscribe", os.Getenv("TICKET_LIFECYCLE_UNINSTALL_SITE"), "[chan send")
+	r.emit("observation_frozen", map[string]interface{}{"callbacks": callbacks, "eventLoop_send_pending": blocked, "method_uninstall_send_pending": methodSend, "rescue_started": false, "uninstrumented_API_map_directly_observed": false, "all_post_ack_channel_use_proved": false, "independent_acceptable_candidate_set": nil, "select_exit_vs_second_status_controlled": false})
+	r.counters("before-rescue")
+	if callbacks == 0 {
+		probe := make(chan interface{})
+		sub := api.SubscribeSyncStatus(probe)
+		select {
+		case v := <-probe:
+			result, ok := v.(*SyncingResult)
+			overlapAssert(ok && result.Syncing, "post-ack native probe differs")
+		case <-time.After(75 * time.Second):
+			panic("post-ack native probe did not return")
+		}
+		sub.Unsubscribe()
+		r.snapshot("after-post-ack-probe")
+		r.emit("post_ack_native_probe", map[string]interface{}{"executed": true, "native_timer_fires": 3, "probe_unsubscribed": true, "observer_scope": "instrumented_API_only", "universal_future_nonuse_proved": false})
+	} else {
+		r.emit("post_ack_native_probe", map[string]interface{}{"executed": false, "native_timer_fires": 2, "reason": "no_actual_owner_ack_or_method_return_before_rescue", "universal_future_nonuse_proved": false})
+	}
+	r.counters("final-before-rescue")
+	return nil
+}

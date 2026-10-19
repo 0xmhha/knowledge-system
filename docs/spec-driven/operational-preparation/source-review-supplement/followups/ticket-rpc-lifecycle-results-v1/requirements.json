@@ -1,0 +1,998 @@
+[
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_in_this_route",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_instrumented_route_only",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite perturbed source-hook observation only; original paired waits require controlled cleanup ack. Full original schedules/late/Once/normal route matrix, uninstrumented all-future-use semantics, full host/sync/indexer, installed roles, independent gold and sufficient repeats remain."
+  }
+]

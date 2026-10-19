@@ -1,3 +1,59 @@
+<!-- LIFECYCLE-RUNTIME-CURRENT -->
+# 단계70 — 구독 생명주기 추가 실행 검증 / 2026-10-19
+
+[사전 명세](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-results-v1/SCOPE.json) · [결과](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-results-v1/SUMMARY.json) · [실행별 관측](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-results-v1/observations.json) · [전체 작업목록](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-results-v1/WORKLIST.json) · [검증 기록](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-results-v1/validation/SUMMARY.json).
+
+| 단계/대상 | 현재 결과 |
+|---|---|
+| 빌드·실행 | 원본/A/B × 일반/race 프로그램6개 새 빌드·실행, exit0·프로세스그룹 잔존0. 원래 추적2228개와 임시 API 관측 코드/프로그램2개·실제 Git tree·지정 Go1.23.12·binary 지문 결속 |
+| 원본2개 | 이벤트루프 송신과 해지 요청의 쌍대기 관측. 관측 확정 뒤 소유 cleanup으로 정리. 이 cleanup ack는 실제 owner map 삭제/ack 성공으로 세지 않음 |
+| A/B4개 | owner map 삭제→ack→메서드 반환과 다음 실제60초 타이머의 새 구독 동작·해지 관측. 3개는 해지 메서드의 송신 배출 겹침, B-general1개는 callback이 두 번째 상태를 먼저 소비한 뒤 종료. 후자를 겹침으로 세지 않음 |
+| 관측 범위 | 실제60초 타이머16회·source hook108개·cleanup 전 fence18개. 임시 코드가 스케줄에 영향을 주며 receive 후 로그는 I/O의 정확한 선후관계가 아님. 유한 구간 관측이며 모든 미래의 채널 비사용/비계측 환경/실제 네트워크 timeout 보장이 아님 |
+| 검증 | 최종84개 통과·skip0. 처음83개 중1개가 판정기의 JSON 표현 비교 문제로 실패한 기록 보존, 판정기만 보완해 원자료 재대조/대상 재실행0. 기술 게이트 통과, 정식/커밋전 저장 게이트는 예상 거부. 문서/실제 서명저장은 연결된 검증 기록과 실제 Git 확인 결과를 따름 |
+| 남은 기준 | 원래12요건×6=72개 모두 전체충족false. 전체5일정/Once/late/정상 경로·full host/sync/indexer·설치 역할/최종HEAD·독립 정답/반복/후보집합은 미완료 |
+
+**정식0/9·독립승인0·FINAL0·D04미정·freeze null·execution_allowed=false**를 유지한다. 익명 역할을 허용하고 실명/연락처를 요구하거나 승인을 만들지 않는다. 보안 전용 항목은 사용자 보류이며 완료가 아니다. 유지보수 CKS Go 입력은 같으므로 기존 전체 build/test/fmt/vet/lint 근거를 재사용하며 새 전체 실행으로 표시하지 않는다. 최상위 수용 JSON은 단계67 준비 기준을 유지하고, 이번 자료는 전체 준비/수용으로 승격하지 않는 추가 실행 근거다.
+
+다음은 **WI-6 실제 retained 함수/데이터셋/스냅샷 식별 → 기본/확장 검색쌍 → 오류·부분 응답과 warm 원자료**다. 남은13묶음은 WI-V1, WI-V2, WI-6, WI-SP 비보안, WI-C, WI-1, WI-2, WI-3, WI-4, 독립수용 준비, 온톨로지 효과 평가, 정식9개 수용, 별도 선택 기능이다. 실제 LLM 답변은 모델·인증·비용상한 결정 뒤 진행한다. 아래 단계68/69의 실행·커밋 차단은 당시 기록이며, 실행 요청6번째에 승인되어 이번6개 실행을 완료했다.
+<!-- END-LIFECYCLE-RUNTIME-CURRENT -->
+
+이하 이전 단계는 당시 기록이다.
+
+<!-- WI6-VERSION-CURRENT -->
+# 단계69 — WI-6 과거/현재 버전 검증 보완 / 2026-10-19
+
+[검증 범위](./operational-preparation/source-review-supplement/followups/wi6-version-readiness-v1/SCOPE.json) · [결과](./operational-preparation/source-review-supplement/followups/wi6-version-readiness-v1/SUMMARY.json) · [검색쌍 계획](./operational-preparation/source-review-supplement/followups/wi6-version-readiness-v1/PAIR-PROPOSAL.json) · [전체 작업목록](./operational-preparation/source-review-supplement/followups/wi6-version-readiness-v1/WORKLIST.json).
+
+| 단계 | 상태 |
+|---|---|
+| WI-6 과거 자료 | 당시 커밋의 자료54개·도구14개 지문 대조, 질문20개·범위가 한정된 AI 정답400개 재도출 일치. 현재 바뀐 수용도구3개를 과거 지문에 덮어쓰지 않음 |
+| 현재 기준 | 검증된 단계67의 자료252개·도구13개 및 현재 native 입력1738개·승인입력5개 동일. 기존 검증 근거 재사용이며 새 전체 시험/서명 검증으로 표시하지 않음 |
+| 검색쌍 준비 | 실행 대상 제안19개/소스 전용 제외1개. 기본·확장 요청의 동일 함수/출처/스냅샷/제한값 계약과 실제 API 구조 보완. 새 정적검사17개+기존38개=55개 통과 |
+| 실제 실행 | 새 검색 호출·검색쌍·warm 표본0. 노드/데이터셋/스냅샷 실제 식별은 미완료. 3회 준비+30회 측정/사례의 미동결 계획이며 수용 기준 승인이나 표본 충분성을 대신하지 않음 |
+| 앞 단계 대기 | 생명주기6개 빌드·실행0. 정상 승인 경로의 실행 요청5회가 검토 모델 용량 부족으로 실행 전 실패. 위험 판정/승인 우회가 아님. 로컬 서명 커밋 요청도 같은 용량 오류로 실행되지 않았으며, 스테이징·커밋 미시작/변경 보존 |
+
+**정식0/9·독립승인0·FINAL0·D04미정·freeze null·execution_allowed=false.** 실명/연락처는 요구하지 않는다. 소스 전용 사례를 실행하지 않으며, seed를 제외하면 관련 정답이 정의된5개/미정의15개이므로 현재 자료만으로 검색 개선을 주장하지 않는다. 과거 자료와 최상위 JSON 프로토콜의 검증된 실행 기준은 보존한다. 보안전용 항목은 사용자 보류이며 완료가 아니다.
+
+다음은 승인 서비스 복구 후 생명주기6개 실제 검증·저장, WI-6의 실제 retained 함수/출처 식별·기본/확장 검색쌍·오류/부분 응답·warm 측정이다. 남은13묶음은 WI-V1, WI-V2, WI-6, WI-SP 비보안, WI-C, WI-1, WI-2, WI-3, WI-4, 독립수용 준비, 온톨로지 효과, 정식9개 수용, 별도 선택 기능이다. 실제 LLM 답변 평가는 모델·인증·비용상한 결정 뒤 진행한다.
+<!-- END-WI6-VERSION-CURRENT -->
+
+이하 단계68은 실행 미완료 준비 기록이며, 단계67 및 이전은 당시 검증 기록이다.
+
+<!-- TICKET-LIFECYCLE-PREPARATION -->
+# 단계68 — 구독 생명주기 관측 준비 / 실제 실행 미완료 / 2026-10-19
+
+[명세](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-v1/SCOPE.json) · [준비 상태](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-v1/PREPARATION.json) · [실행 요청 기록](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-v1/EXECUTION-REQUEST.json) · [전체 작업목록](./operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-v1/WORKLIST.json).
+
+**정적 검사15개 통과, 새 프로그램 빌드0·실행0.** 원본/A/B의 임시 API에 실제 owner map 멤버십·삭제 전후·ack close 전후와 채널 I/O 관측 지점을 명시했다. 세 송신 지점과 메서드 수신/ack/return-defer를 대조하며, 해지 후 다음 실제60초 timer의 새 구독 probe를 계획했다. 관측용 코드가 스케줄에 영향을 주고 receive 후 로그는 I/O의 정확한 선후관계를 뜻하지 않는다. 유한 관측을 모든 미래의 비사용으로 승격하지 않는다.
+
+실행 시작 요청5회는 자동 승인 검토 서비스의 모델 용량 오류로 **실행되지 않았다**. 위험하다는 판정이 아니며 승인 절차를 우회하지 않았다. Go parser/서식과 정적 관측 계약 검사는 완료했지만 타입 검사·빌드·실제 map/ack/후속 timer 검증은 미완료다. 보안 전용 항목은 사용자 보류로 유지한다. **정식0/9·독립승인0·FINAL0·D04미정·freeze null·execution_allowed=false**이며, 최상위 프로토콜의 검증된 실행 근거는 서명된 단계67을 유지한다.
+
+다음은 승인 서비스 복구 후 같은 경로의6개 생명주기 실행·검증·기록을 마치고 WI-6 비보안 검색쌍/관련성·잡음/warm으로 진행하는 것이다. 남은13묶음은 WI-V1, WI-V2, WI-6, WI-SP 비보안, WI-C, WI-1, WI-2, WI-3, WI-4, 독립 수용 준비, 온톨로지 효과 평가, 정식9개 수용, 별도 선택 기능이다. 사용자 보류 항목은 완료로 세지 않는다.
+로컬 서명 커밋 요청도 같은 검토 서비스 용량 오류로 실행되지 않았다. 스테이징·커밋은 시작되지 않았으며 변경은 작업 폴더에 보존되어 있다. 새 커밋·푸시·PR 완료로 표시하지 않는다.
+<!-- END-TICKET-LIFECYCLE-PREPARATION -->
+
+이하 단계67 및 이전은 검증이 완료된 당시 기록이다.
+
 <!-- TICKET-OVERLAP-CURRENT -->
 # 단계67 — 실제 RPC 종료·native 송신 겹침의 계측 관측 / 2026-10-19
 
