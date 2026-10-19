@@ -1,0 +1,1376 @@
+{
+  "kind": "real_factory_owner_schedules_DEV_not_independent",
+  "planned_node_attempts": 10,
+  "actual_node_attempts": 10,
+  "fresh_unique_builds": 8,
+  "candidate_roles": 5,
+  "unique_method_variants": 4,
+  "actual_factory_owner_schedules": 40,
+  "original60s_native_notifications": 10,
+  "cleanup_interventions": 14,
+  "paired_waits_pending_before_rescue": 4,
+  "actual_status_drain_and_owner_ack_observations": 4,
+  "early_return_without_owner_remove_observations": 8,
+  "all_original_and_owned_source_preserved": true,
+  "owned_data_remaining": 0,
+  "owned_process_groups_remaining": 0,
+  "source_hooks_observe_actual_owner": true,
+  "ack_gate_changes_timing_under_declared_control": true,
+  "real_network_sync": false,
+  "repetitions_per_role_profile": 1,
+  "new_independent_families": 0,
+  "full_original5_complete": false,
+  "full12_requirement_acceptance": false,
+  "independent_acceptable_candidate_set": null,
+  "canonical_selection": null,
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "FINAL": 0,
+  "freeze": null,
+  "execution_allowed": false,
+  "historical_full_factory_bytes_verified": true,
+  "slots": [
+    {
+      "slot_id": "ORIGINAL-general",
+      "candidate": "ORIGINAL",
+      "variant": "general",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60345579875,
+      "unsubscribe_elapsed_ns": 546500,
+      "close_elapsed_ns": 23187792,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_after_actual_owner_remove_and_ack",
+          "observation_elapsed_ns": 60395642250
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "paired_waits_pending_before_rescue",
+          "observation_elapsed_ns": 60498351584
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60600282000
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60701757750
+        }
+      ],
+      "owner_events": 68,
+      "cleanup_interventions": 1,
+      "RPC_backend_members_before_cleanup": 0
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "candidate": "ORIGINAL",
+      "variant": "race",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60399121875,
+      "unsubscribe_elapsed_ns": 508667,
+      "close_elapsed_ns": 28942875,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_after_actual_owner_remove_and_ack",
+          "observation_elapsed_ns": 60456786250
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "paired_waits_pending_before_rescue",
+          "observation_elapsed_ns": 60562437375
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60665633458
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60767803916
+        }
+      ],
+      "owner_events": 68,
+      "cleanup_interventions": 1,
+      "RPC_backend_members_before_cleanup": 0
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "candidate": "CAND-A",
+      "variant": "general",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60337171708,
+      "unsubscribe_elapsed_ns": 161042,
+      "close_elapsed_ns": 54700667,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_after_actual_owner_remove_and_ack",
+          "observation_elapsed_ns": 60386742166
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "drained_real_status_then_returned_after_owner_ack",
+          "observation_elapsed_ns": 60492689416
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60597848416
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60700479375
+        }
+      ],
+      "owner_events": 68,
+      "cleanup_interventions": 0,
+      "RPC_backend_members_before_cleanup": 0
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "candidate": "CAND-A",
+      "variant": "race",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60341927916,
+      "unsubscribe_elapsed_ns": 1204000,
+      "close_elapsed_ns": 106828750,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_after_actual_owner_remove_and_ack",
+          "observation_elapsed_ns": 60394257875
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "drained_real_status_then_returned_after_owner_ack",
+          "observation_elapsed_ns": 60502282333
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60604441541
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60706253291
+        }
+      ],
+      "owner_events": 68,
+      "cleanup_interventions": 0,
+      "RPC_backend_members_before_cleanup": 0
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "candidate": "CAND-B",
+      "variant": "general",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60398772875,
+      "unsubscribe_elapsed_ns": 123417,
+      "close_elapsed_ns": 34032834,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_after_actual_owner_remove_and_ack",
+          "observation_elapsed_ns": 60433988667
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "drained_real_status_then_returned_after_owner_ack",
+          "observation_elapsed_ns": 60535560958
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60636658375
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60739199458
+        }
+      ],
+      "owner_events": 68,
+      "cleanup_interventions": 0,
+      "RPC_backend_members_before_cleanup": 0
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "candidate": "CAND-B",
+      "variant": "race",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60332546792,
+      "unsubscribe_elapsed_ns": 276250,
+      "close_elapsed_ns": 26208291,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_after_actual_owner_remove_and_ack",
+          "observation_elapsed_ns": 60381620250
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "drained_real_status_then_returned_after_owner_ack",
+          "observation_elapsed_ns": 60485547875
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60587745083
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60689815708
+        }
+      ],
+      "owner_events": 68,
+      "cleanup_interventions": 0,
+      "RPC_backend_members_before_cleanup": 0
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "candidate": "MUT-REINTRO",
+      "variant": "general",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60349920334,
+      "unsubscribe_elapsed_ns": 67875,
+      "close_elapsed_ns": 34402459,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_after_actual_owner_remove_and_ack",
+          "observation_elapsed_ns": 60398215584
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "paired_waits_pending_before_rescue",
+          "observation_elapsed_ns": 60507555292
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60609308667
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60711579250
+        }
+      ],
+      "owner_events": 68,
+      "cleanup_interventions": 1,
+      "RPC_backend_members_before_cleanup": 0
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "candidate": "MUT-REINTRO",
+      "variant": "race",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60326461291,
+      "unsubscribe_elapsed_ns": 615750,
+      "close_elapsed_ns": 30185500,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_after_actual_owner_remove_and_ack",
+          "observation_elapsed_ns": 60384829125
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "paired_waits_pending_before_rescue",
+          "observation_elapsed_ns": 60497858875
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60599788416
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "held_until_actual_owner_ack_then_once_calls_joined",
+          "observation_elapsed_ns": 60702550833
+        }
+      ],
+      "owner_events": 68,
+      "cleanup_interventions": 1,
+      "RPC_backend_members_before_cleanup": 0
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "candidate": "MUT-EARLY",
+      "variant": "general",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60324985625,
+      "unsubscribe_elapsed_ns": 155875,
+      "close_elapsed_ns": 32724250,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_without_actual_owner_remove_or_ack",
+          "observation_elapsed_ns": 60372144334
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "returned_without_actual_owner_remove_or_ack",
+          "observation_elapsed_ns": 60475205209
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "returned_without_actual_owner_remove_or_ack",
+          "observation_elapsed_ns": 60726057875
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "returned_without_actual_owner_remove_or_ack",
+          "observation_elapsed_ns": 60980255917
+        }
+      ],
+      "owner_events": 67,
+      "cleanup_interventions": 5,
+      "RPC_backend_members_before_cleanup": 1
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "candidate": "MUT-EARLY",
+      "variant": "race",
+      "repetition": 1,
+      "native_notification_elapsed_ns": 60330926417,
+      "unsubscribe_elapsed_ns": 287125,
+      "close_elapsed_ns": 33581083,
+      "observations": [
+        {
+          "scenario": "normal_delivery_then_unsubscribe",
+          "channel_id": 2,
+          "outcome": "returned_without_actual_owner_remove_or_ack",
+          "observation_elapsed_ns": 60381961958
+        },
+        {
+          "scenario": "blocked_delivery_then_consumer_exit",
+          "channel_id": 3,
+          "outcome": "returned_without_actual_owner_remove_or_ack",
+          "observation_elapsed_ns": 60485848916
+        },
+        {
+          "scenario": "confirmation_delayed",
+          "channel_id": 4,
+          "outcome": "returned_without_actual_owner_remove_or_ack",
+          "observation_elapsed_ns": 60737733291
+        },
+        {
+          "scenario": "concurrent_unsubscribe_once",
+          "channel_id": 5,
+          "outcome": "returned_without_actual_owner_remove_or_ack",
+          "observation_elapsed_ns": 60994485875
+        }
+      ],
+      "owner_events": 67,
+      "cleanup_interventions": 5,
+      "RPC_backend_members_before_cleanup": 1
+    }
+  ],
+  "original_requirement_units": [
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-general",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "ORIGINAL-race",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-general",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-A-race",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-general",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "CAND-B-race",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-general",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-REINTRO-race",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-general",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "API-ENTRY",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "API-UNSUB",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "API-NEGATIVE",
+      "original_tier": "actual_API",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "METHOD-RETURN",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "METHOD-ONCE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "METHOD-REMOVE",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "METHOD-ACK",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "NORMAL-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_registered_RPC",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "LATE-DRAIN",
+      "original_tier": "bounded_method",
+      "scope": "not_exercised_real_owner_post_accept_status",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "BLOCKED-DELIVERY",
+      "original_tier": "bounded_method",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "OWNED-CLEANUP",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    },
+    {
+      "slot_id": "MUT-EARLY-race",
+      "requirement_id": "SOURCE-BOUNDARY",
+      "original_tier": "all_tiers",
+      "scope": "actual_factory_direct_status_owner_with_declared_gates_and_cleanup",
+      "independent_acceptance": false,
+      "full_original_requirement_satisfied": false
+    }
+  ]
+}

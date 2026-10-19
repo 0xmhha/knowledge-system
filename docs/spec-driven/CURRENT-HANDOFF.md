@@ -1,10 +1,20 @@
-# 현재 인수인계 — 단계74 / 2026-10-19
+# 현재 인수인계 — 단계75 / 2026-10-19
 
 [코드·검증 결과](./operational-preparation/source-review-supplement/followups/local-reliability-v1/SUMMARY.json) · [실제 경로](./operational-preparation/source-review-supplement/followups/local-reliability-v1/runtime-summary.json) · [13개 실행 원장](./REMAINING-13-EXECUTION.json) · [남은 전체 작업](../REMAINING-WORK.md)
 
 로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
 
-## 현재 단계74: 실제 생성 경로 검증 완료
+## 현재 단계75: 실제 owner 일정·후보 구별
+
+[실행/분류 원자료](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json) · [범위와 정리 개입](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/REPORT.txt) · [일정 범위 제안](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/PROPOSAL.json)
+
+실제 factory가 만든 API와 downloader/blockchain/mux 동일성을 확인했다. 5역할(고유 method4)×일반/race의10노드·40일정을 실행했다. 기준/재도입4개는 막힌 owner/method 대기, A/B4개는 상태 소비→실제 삭제/ack 후 반환, 빠른 반환 오류8개 일정은 삭제/ack 없는 반환으로 구별됐다. ack gate와 동일 객체3회/요청1개를 실제 owner에서 관측했다.
+
+초기 실제 RPC 뒤 후기4일정은 직접 status API이며 관찰 hook/ack gate/100ms 창을 명시했다. 관측 후 정리14회가 있고 이를 자력 복구로 세지 않는다. 모든 프로그램 exit0·소유 map/data/process 잔여0, 원본 source 유지. source-scope 제안의 사람 결정은 pending이고 원래5일정·12요구의 독립 수용 완료로 승격하지 않는다. 반복1/역할/profile·공통 source는 독립 표본이 아니다.
+
+다음은 승인된 소비자 source의 실제4역할과 최신 CKS pin/출처/partial·unknown·오류·oracle 전달 연결이다. 전역 설치·유료 모델은 추가하지 않는다. 정식0/9·독립0·D04미정·미동결을 유지한다. 단계74는0bbc94c4에 서명 저장하고175개 변경 blob/깨끗한 상태를 대조했다.
+
+## 이전 단계74: 실제 생성 경로 검증 완료
 
 [실행 근거](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json) · [실패를 포함한 보고서](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/REPORT.txt)
 
@@ -27,8 +37,8 @@
 
 |묶음|남은 내용|
 |---|---|
-|WI-V1|factory/indexer 확인. 실제 피어 sync·전체5일정/12계약·독립 티켓/오라클|
-|WI-V2|독립 후보 적격 집합·행렬·비교/선택/유보|
+|WI-V1|factory/owner40 확인. 피어 sync·범위 결정·설치 역할/독립 오라클|
+|WI-V2|5역할 기계 관측 완료. 독립 적격 집합·설치 oracle·선택/유보|
 |WI-6|반복627쌍 기록. 독립 nonseed 정답·가족/충분성·설치 경로·품질|
 |WI-SP|비보안 출처·정책/미태그·실제 소비자·독립 의미|
 |WI-C|설치 리뷰 역할·필수 항목/우선순위·보고서/그림/인수인계|
@@ -43,12 +53,12 @@
 
 ## 다음 작업과 실행 경계
 
-다음은 WI-V1 원래5일정의 전제조건과 실제 owner 경로의 도달성 대조다. 실제 factory/indexer 경로는 단계74에서 관측했다. 전체5일정/12계약과 이미 관측한 통제 메모리·유한 source hook 경로를 혼동하지 않는다. 범위·진입·정리·실패 분모를 먼저 고정하고 구현/검증/문서/서명 커밋 순서로 진행한다.
+다음은 실제4개 소비자 역할의 최신 CKS pin과 oracle 전달 연결이다. 원래5일정 범위 제안의 사람 결정과 독립 수용은 별도 유지한다. 전체5일정/12계약과 이미 관측한 통제 메모리·유한 source hook 경로를 혼동하지 않는다. 범위·진입·정리·실패 분모를 먼저 고정하고 구현/검증/문서/서명 커밋 순서로 진행한다.
 
 보안 전용 gold·권한/비공개/위조 경계와 조직 인증은 사용자 보류다. 실제 LLM 답변 평가는 모델·인증 방식·비용 상한이 정해진 뒤 진행한다. CoreML의 실제 모델/토크나이저 경로와 배포 대상은 확인 중이다. 로컬 개발 검증을 게시·운영 배포나 독립 승인으로 표시하지 않는다.
 
 ```bash
-python3 scripts/full_host_factory.py check --require-stored
+python3 scripts/full_host_owner.py check --require-stored
 python3 scripts/check-remaining-13.py
 ```
 

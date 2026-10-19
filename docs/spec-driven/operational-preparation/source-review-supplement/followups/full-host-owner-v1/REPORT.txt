@@ -1,0 +1,19 @@
+단계75 — 실제 factory API의 owner 일정·후보 구별
+
+원래 node.New/eth.New/node.Start와 활성 tx indexer를 유지한 source에서 factory가 만든 유일 DownloaderAPI를 관찰용 capture로 연결했다. 실제 downloader/blockchain/mux 포인터 동일성을 검사했다. 초기 in-process RPC 구독/60초 false 알림/해제 뒤 같은 API에서 새 직접 status 구독의 정상·막힌 송신·ack 지연·동일 객체 Once 일정4개를 관찰했다. 별도 API 생성/가짜 downloader progress/가짜 ack는 사용하지 않았다. 기존 API 파일에는 명시한 capture/관찰 hook과 후보별 method만 적용했고 bridge/main2개를 추가했다. project/build Git tree와 모든 원래 source/hash를 결속한다.
+
+계획한5역할×일반/race=10노드/40일정, 고유 method4개/새 binary8개를 모두 실행했다. MUT-REINTRO는 ORIGINAL의 정확한 별칭이며 binary를 재사용했다. 각 노드는 실제 블록1개/인덱싱2개/남은0 및 원래60초 완료 알림을 받았다. 모든 프로그램 exit0·reap·잔존0·소유 데이터잔여0, 원본 소스/소유 source/binary 전후 동일, 자동 재시도0. 실제 피어 syncWithPeer/운영 노드/실제 LLM은 실행하지 않았다.
+
+기준·재도입의4개 막힌 송신 관측은 owner send와 method uninstall send가 함께 대기하는 source stack을 보존했다. 관측 후 status를 받아 실제 owner를 진행시켜 호출들을 정리했다. 수정 후보A/B의4개 같은 관측은 실제 상태를 소비하고 owner 삭제/ack 후 정리 개입 없이 반환했다. 빠른 반환 오류 후보의8개 일정은 삭제/ack 없이 반환하는 것을 구별했다. owner 확인을 받기 전 반환을 성공으로 세지 않는다. ack 지연과 동시 Once에서는 실제 map 삭제 후 close 직전에만 gate를 멈췄고, gate를 풀기 전/후 상태와3회 호출에 요청1개인 상태를 관측했다. 오류 후보의0개 요청은 Once 성공으로 간주하지 않는다.
+
+정리를 위한 개입은 총14회다: 기준/재도입의 막힘4회와 빠른 반환 후보의 RPC/직접 구독 정리10회. 개입 전에 관측을 고정했고 정리 때도 실제 owner가 delete/ack하도록 요청했다. 개입을 후보의 자력 복구/계약 충족으로 바꾸지 않았다. gate와 관찰 mutex가 타이밍을 바꾸므로 무계측 스케줄의 보편 증명이 아니다. 후기4일정은 실제 factory에 연결된 직접 status API이며 실제 RPC 연결 종료와 막힘이 겹치는 모든 경로를 새로 증명한 것은 아니다.
+
+원래12요구×10노드=120개 범위 기록을 남기되 모든 요구의 독립 수용/전체5일정 완료는 false다. 같은 단일 owner는 uninstall receive→delete→ack 중 추가 status를 송신하지 않는다. post-accept late-drain은 별도 통제 owner 범위라는 제안을 작성하고 사용자에게 물었다. 같은 channel을 새 구독으로 등록하는 것은 허용하므로 무조건 영원한 불사용과 옛 구독의 사용 종료를 구별한다. 범위 결정은 pending이고 원래 완료 기준은 변경하지 않았다. 독립 후보 수용집합/선택/정답 승인/새 가족/FINAL은 없다.
+
+분류 replay는 이미 노출된 DEV와 source를 대조하는 AI 진단이며 사전 등록된 독립 gold가 아니다. 반복1/역할/profile, 공통 ticket/source, alias 재사용을 독립 표본으로 세지 않는다. 실제 peer 동기화·installed4역할/finalHEAD·독립 티켓/oracle·반복 충분성은 남았다.
+
+원자료 묶기 전에 binary metadata를 추출하던 첫 명령은 ROOT 모듈/상속 환경 때문에 toolchain 전환을 시도했고 lock 권한에서 중단됐다. binary를 재빌드하지 않고 GOTOOLCHAIN=local·네트워크 off·소유 모듈 밖 cwd로 기존8개 metadata와 전후 SHA를 추출했다. 완료된 toolchain 설치0이며 runtime을 재실행하지 않았다. 최초 prepare는 과거 manifest tools가 dictionary인데 list용 reader를 사용해 TypeError로 중단했다. 과거 commit0bbc94c4의 도구/원자료 bytes를 직접 검증하는 호환 reader로 보정했고, 이전 runtime raw는 덮어쓰지 않았다. 이 보정과 초기 로그를 metadata-initial-attempt에 보존했다.
+
+ROOT native1741/승인5와 Go inventory는 commit38b4c5e2의 전체 일반/race 각4172통과·18skip 이후 같다. 새로운 bridge/main은 대상 Go1.23.12로 일반/race 각각 새로 빌드했다. 정식0/9·독립0·FINAL0·D04미정·freeze null·execution_allowed=false·실명 불필요·보류 범위 유지.
+
+다음은 승인된 소비자 source의 실제4역할과 최신 CKS binary에서 API/출처/부분·미정·오류·oracle 전달을 연결 검증한다. 유료 모델 품질 검증과 전역 설치는 포함하지 않는다. 남은 전체13묶음은 실행 원장을 따른다.

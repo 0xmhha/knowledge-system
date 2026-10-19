@@ -69,3 +69,5 @@ KM-03 host 기록은 실제 설치 host와 로컬 통제 응답의 연결 시험
 현재13묶음의 완료 기준과 다음 작업은 [전체 실행 원장](./REMAINING-13-EXECUTION.json)을 따른다. 데이터 원본·프로세스 정리·호출/실패 분모·실제 서명 저장을 검증하며, 노출된 DEV·반복 호출·AI 초안을 독립 표본으로 세지 않는다.
 
 단계74의 [실제 생성 경로 원자료](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json)는 기존 구현28개 완료를 추가 확대하지 않는다. 실패6회와 실행 전 컴파일 실패1회를 포함한 [보고서](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/REPORT.txt)를 함께 따른다.
+
+단계75 [실제 factory owner 기록](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json)은10노드/40일정에서 기준·수정·빠른 반환 오류를 구별했다. source hook/ack gate·직접 status API·정리14회의 [범위](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/REPORT.txt)를 유지한다. 원래5일정의 [범위 제안](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/PROPOSAL.json)은 결정 대기이며 독립 수용/표본 충분성을 바꾸지 않는다. 정식 JSON의 latest_scoped_followup과 active_remaining_worklist가 최신 진행을 가리키며 current_execution_state는 기존 native 체크포인트를 보존한다.

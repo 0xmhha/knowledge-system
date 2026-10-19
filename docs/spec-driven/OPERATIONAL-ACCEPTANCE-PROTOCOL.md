@@ -48,3 +48,5 @@
 실제 LLM 답변 평가는 모델·인증 방식·총 비용 상한이 정해진 뒤 수행한다. CoreML 실제 가중치/토크나이저와 배포는 구체적인 입력/대상이 필요하다. 이 정보가 없어도 다른 로컬 개발과 검증을 중단할 이유로 사용하지 않는다.
 
 단계74의 [실제 factory/indexer 검증](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json)은 일반/race 각1회의 원래60초 RPC 알림·구독 해제·노드 종료를 확인했다. 이벤트는 소유 mux 입력이며 실제 피어 동기화가 아니다. 전체 시도8노드와 별도 컴파일 실패1회를 유지하며 F01~08의 승인/동결과 정식 수용은 바꾸지 않는다.
+
+단계75 [실제 factory owner 기록](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json)은10노드/40일정에서 기준·수정·빠른 반환 오류를 구별했다. source hook/ack gate·직접 status API·정리14회의 [범위](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/REPORT.txt)를 유지한다. 원래5일정의 [범위 제안](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/PROPOSAL.json)은 결정 대기이며 독립 수용/표본 충분성을 바꾸지 않는다. 정식 JSON의 latest_scoped_followup과 active_remaining_worklist가 최신 진행을 가리키며 current_execution_state는 기존 native 체크포인트를 보존한다.

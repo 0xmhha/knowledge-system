@@ -1,0 +1,161 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"math/big"
+	"os"
+	"time"
+
+	"github.com/ethereum/go-ethereum/consensus/beacon"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/eth"
+	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/eth/ethconfig"
+	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/params"
+)
+
+var start = time.Now()
+
+func emit(kind string, value interface{}) {
+	_ = json.NewEncoder(os.Stdout).Encode(map[string]interface{}{"event": kind, "elapsed_ns": time.Since(start).Nanoseconds(), "value": value})
+}
+func main() {
+	if err := run(); err != nil {
+		emit("error", err.Error())
+		os.Exit(1)
+	}
+	emit("complete", map[string]interface{}{"formal_completed": 0, "independent_approved": 0, "original_timer_seconds": 60, "full_matrix_complete": false})
+}
+func run() error {
+	dir, err := os.MkdirTemp("", "ks-full-host-")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(dir)
+	stack, err := node.New(&node.Config{Name: "ks-owned-full-host", DataDir: dir, P2P: p2p.Config{NoDiscovery: true, NoDial: true, MaxPeers: 0}})
+	if err != nil {
+		return fmt.Errorf("node factory: %w", err)
+	}
+	closed := false
+	defer func() {
+		if !closed {
+			_ = stack.Close()
+		}
+	}()
+	chain := *params.AllEthashProtocolChanges
+	chain.TerminalTotalDifficulty = big.NewInt(0)
+	chain.TerminalTotalDifficultyPassed = true
+	cfg := ethconfig.Defaults
+	cfg.Genesis = &core.Genesis{Config: &chain, GasLimit: 30000000, BaseFee: big.NewInt(params.InitialBaseFee), Difficulty: big.NewInt(0)}
+	cfg.SyncMode = downloader.FullSync
+	cfg.TxLookupLimit = 128
+	cfg.EthDiscoveryURLs = nil
+	cfg.SnapDiscoveryURLs = nil
+	if err = downloader.OwnedFactoryInit(os.Getenv("KS_OWNER_TRACE")); err != nil {
+		return err
+	}
+	service, err := eth.New(stack, &cfg)
+	if err != nil {
+		return fmt.Errorf("eth factory: %w", err)
+	}
+	if err = stack.Start(); err != nil {
+		return fmt.Errorf("node start: %w", err)
+	}
+	emit("factory_started", map[string]interface{}{"real_downloader": service.Downloader() != nil, "listen_addr": stack.Server().ListenAddr, "no_dial": stack.Server().NoDial, "no_discovery": stack.Server().NoDiscovery, "max_peers": stack.Server().MaxPeers, "consensus_fixture": "merged_ethash_not_WBFT", "tx_lookup_limit": cfg.TxLookupLimit})
+	engine := beacon.New(ethash.NewFaker())
+	generatedDB, blocks, _ := core.GenerateChainWithGenesis(cfg.Genesis, engine, 1, func(_ int, block *core.BlockGen) { block.SetPoS() })
+	defer generatedDB.Close()
+	defer engine.Close()
+	if _, err = service.BlockChain().InsertChain(blocks); err != nil {
+		return fmt.Errorf("actual block import: %w", err)
+	}
+	emit("actual_block_imported", map[string]interface{}{"count": len(blocks), "head": service.BlockChain().CurrentBlock().Number.Uint64()})
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		index, indexErr := service.BlockChain().TxIndexProgress()
+		if indexErr != nil {
+			return fmt.Errorf("active indexer readiness: %w", indexErr)
+		}
+		if index.Done() {
+			emit("active_tx_index_ready", index)
+			break
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("active indexer not complete within declared5s: %+v", index)
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	tx, err := service.BlockChain().TxIndexProgress()
+	if err != nil {
+		return fmt.Errorf("enabled tx indexer: %w", err)
+	}
+	emit("real_tx_index_progress", tx)
+	progress := service.Downloader().Progress()
+	emit("real_downloader_progress", progress)
+	if !progress.Done() {
+		return fmt.Errorf("fixture unexpectedly incomplete")
+	}
+	client := stack.Attach()
+	defer client.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var syncing json.RawMessage
+	if err = client.CallContext(ctx, &syncing, "eth_syncing"); err != nil {
+		return fmt.Errorf("actual RPC syncing: %w", err)
+	}
+	emit("rpc_syncing", syncing)
+	notifications := make(chan json.RawMessage, 1)
+	sub, err := client.EthSubscribe(ctx, notifications, "syncing")
+	if err != nil {
+		return fmt.Errorf("actual RPC subscription: %w", err)
+	}
+	emit("rpc_subscription_response", true)
+	// The RPC response is not treated as an event-loop installation barrier.
+	// A missed StartEvent or installation remains a failed observation, with no retry.
+	time.Sleep(time.Second)
+	if err = service.EventMux().Post(downloader.StartEvent{}); err != nil {
+		return fmt.Errorf("actual event mux post: %w", err)
+	}
+	emit("start_event_posted", true)
+	select {
+	case notification := <-notifications:
+		emit("native_timer_notification", notification)
+		if string(notification) != "false" {
+			return fmt.Errorf("unexpected native complete notification: %s", notification)
+		}
+	case err := <-sub.Err():
+		return fmt.Errorf("subscription ended before native notification: %v", err)
+	case <-time.After(68 * time.Second):
+		return fmt.Errorf("native timer notification not observed")
+	}
+	begin := time.Now()
+	sub.Unsubscribe()
+	emit("rpc_unsubscribe_returned", map[string]interface{}{"elapsed_ns": time.Since(begin).Nanoseconds()})
+	select {
+	case _, ok := <-sub.Err():
+		emit("client_subscription_error_channel_closed", !ok)
+		if ok {
+			return fmt.Errorf("client subscription error channel open")
+		}
+	default:
+		return fmt.Errorf("client unsubscribe acknowledgement absent")
+	}
+	client.Close()
+	if err = downloader.OwnedFactorySchedules(service.Downloader(), service.BlockChain(), service.EventMux()); err != nil {
+		return err
+	}
+	emit("actual_owner_schedules_returned", true)
+	begin = time.Now()
+	err = stack.Close()
+	closed = true
+	emit("node_close_returned", map[string]interface{}{"elapsed_ns": time.Since(begin).Nanoseconds(), "error": fmt.Sprint(err)})
+	if err != nil {
+		return err
+	}
+	return nil
+}

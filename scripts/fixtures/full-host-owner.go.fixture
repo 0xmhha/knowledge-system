@@ -1,0 +1,377 @@
+package downloader
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"runtime"
+	"sync"
+	"sync/atomic"
+	"time"
+
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/rpc"
+)
+
+type ownedFactoryRecorder struct {
+	mu          sync.Mutex
+	file        *os.File
+	path        string
+	start       time.Time
+	ids         map[chan interface{}]int
+	members     map[chan interface{}]bool
+	counts      map[chan interface{}]map[string]int
+	notify      chan struct{}
+	gateFor     chan interface{}
+	gateEntered chan struct{}
+	gateRelease chan struct{}
+	gateSeen    bool
+	phase       string
+}
+
+var factoryRecorder *ownedFactoryRecorder
+var factoryAPI atomic.Pointer[DownloaderAPI]
+
+func OwnedFactoryInit(path string) error {
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+	factoryRecorder = &ownedFactoryRecorder{file: f, path: path, start: time.Now(), ids: make(map[chan interface{}]int), members: make(map[chan interface{}]bool), counts: make(map[chan interface{}]map[string]int), notify: make(chan struct{}), phase: "actual_RPC"}
+	return nil
+}
+func ksOwnedFactoryCapture(api *DownloaderAPI) { factoryAPI.Store(api) }
+func (r *ownedFactoryRecorder) emitLocked(event string, c chan interface{}, owner bool, member bool, extra interface{}) {
+	id := 0
+	if c != nil {
+		id = r.ids[c]
+		if id == 0 {
+			id = len(r.ids) + 1
+			r.ids[c] = id
+		}
+		if r.counts[c] == nil {
+			r.counts[c] = make(map[string]int)
+		}
+		r.counts[c][event]++
+		if owner {
+			r.members[c] = member
+		}
+	}
+	if err := json.NewEncoder(r.file).Encode(map[string]interface{}{"event": event, "phase": r.phase, "elapsed_ns": time.Since(r.start).Nanoseconds(), "channel_id": id, "owner_map_observed": owner, "member": member, "value": extra}); err != nil {
+		panic(err)
+	}
+	close(r.notify)
+	r.notify = make(chan struct{})
+}
+func ksOwnedLifecycle(event string, c chan interface{}, members map[chan interface{}]struct{}) {
+	r := factoryRecorder
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	_, member := members[c]
+	r.emitLocked(event, c, members != nil, member, nil)
+	var wait chan struct{}
+	if event == "ack_close_begin" && c == r.gateFor {
+		if !r.gateSeen {
+			r.gateSeen = true
+			close(r.gateEntered)
+		}
+		wait = r.gateRelease
+	}
+	r.mu.Unlock()
+	if wait != nil {
+		<-wait
+	}
+}
+func ownedEmit(event string, c chan interface{}, v interface{}) {
+	r := factoryRecorder
+	r.mu.Lock()
+	r.emitLocked(event, c, false, false, v)
+	r.mu.Unlock()
+}
+func ownedCount(c chan interface{}, event string) int {
+	r := factoryRecorder
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.counts[c][event]
+}
+func ownedMember(c chan interface{}) bool {
+	r := factoryRecorder
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.members[c]
+}
+func ownedPhase(phase string) { r := factoryRecorder; r.mu.Lock(); r.phase = phase; r.mu.Unlock() }
+func ownedWait(c chan interface{}, event string, count int, limit time.Duration) bool {
+	deadline := time.NewTimer(limit)
+	defer deadline.Stop()
+	r := factoryRecorder
+	for {
+		r.mu.Lock()
+		ok := r.counts[c][event] >= count
+		notify := r.notify
+		r.mu.Unlock()
+		if ok {
+			return true
+		}
+		select {
+		case <-notify:
+		case <-deadline.C:
+			return false
+		}
+	}
+}
+func ownedJoined(done <-chan struct{}, limit time.Duration) bool {
+	select {
+	case <-done:
+		return true
+	case <-time.After(limit):
+		return false
+	}
+}
+func ownedDone(done <-chan struct{}) bool {
+	select {
+	case <-done:
+		return true
+	default:
+		return false
+	}
+}
+func ownedCall(s *SyncStatusSubscription) <-chan struct{} {
+	done := make(chan struct{})
+	go func() { s.Unsubscribe(); close(done) }()
+	return done
+}
+func ownedStack(name string) error {
+	r := factoryRecorder
+	buf := make([]byte, 2<<20)
+	n := runtime.Stack(buf, true)
+	if n == len(buf) {
+		return fmt.Errorf("stack truncated")
+	}
+	return os.WriteFile(r.path+"."+name+".stack", buf[:n], 0600)
+}
+func ownedCleanup(api *DownloaderAPI, c chan interface{}) error {
+	if !ownedMember(c) {
+		return nil
+	}
+	ownedEmit("owned_cleanup_intervention", c, nil)
+	if ownedCount(c, "send_begin_install_false") > ownedCount(c, "send_end_install_false") {
+		select {
+		case <-c:
+		case <-time.After(2 * time.Second):
+			return fmt.Errorf("cleanup failed to drain actual pending owner")
+		}
+	}
+	beforeAck := ownedCount(c, "ack_close_end")
+	req := uninstallSyncSubscriptionRequest{c, make(chan interface{})}
+	sent := make(chan struct{})
+	go func() { api.uninstallSyncSubscription <- &req; close(sent) }()
+	if !ownedJoined(sent, 2*time.Second) {
+		return fmt.Errorf("cleanup actual owner request not accepted")
+	}
+	select {
+	case <-req.uninstalled:
+	case <-time.After(2 * time.Second):
+		return fmt.Errorf("cleanup actual owner acknowledgement missing")
+	}
+	if !ownedWait(c, "ack_close_end", beforeAck+1, 2*time.Second) {
+		return fmt.Errorf("cleanup owner observer not joined")
+	}
+	return nil
+}
+func ownedFresh(api *DownloaderAPI, buffer int) (*SyncStatusSubscription, chan interface{}, error) {
+	c := make(chan interface{}, buffer)
+	result := make(chan *SyncStatusSubscription, 1)
+	go func() { result <- api.SubscribeSyncStatus(c) }()
+	select {
+	case sub := <-result:
+		return sub, c, nil
+	case <-time.After(2 * time.Second):
+		return nil, c, fmt.Errorf("real API install not accepted")
+	}
+}
+func ownedFalse(c chan interface{}) error {
+	select {
+	case value := <-c:
+		if value != false {
+			return fmt.Errorf("expected post-done false, got %v", value)
+		}
+		return nil
+	case <-time.After(2 * time.Second):
+		return fmt.Errorf("post-done owner status missing")
+	}
+}
+func ownedNormal(api *DownloaderAPI) error {
+	ownedPhase("normal_delivery_then_unsubscribe")
+	sub, c, err := ownedFresh(api, 1)
+	if err != nil {
+		return err
+	}
+	if err = ownedFalse(c); err != nil {
+		return err
+	}
+	done := ownedCall(sub)
+	joined := ownedJoined(done, 2*time.Second)
+	if joined && ownedCount(c, "after_delete") > 0 {
+		if !ownedWait(c, "ack_close_end", 1, 2*time.Second) {
+			return fmt.Errorf("normal owner ack observer not joined")
+		}
+	}
+	ownedEmit("schedule_observation", c, map[string]interface{}{"returned": joined, "owner_member": ownedMember(c), "owner_delete": ownedCount(c, "after_delete"), "owner_ack": ownedCount(c, "ack_close_end")})
+	if !joined {
+		return fmt.Errorf("normal method did not return")
+	}
+	return ownedCleanup(api, c)
+}
+func ownedBlocked(api *DownloaderAPI) error {
+	ownedPhase("blocked_delivery_then_consumer_exit")
+	sub, c, err := ownedFresh(api, 0)
+	if err != nil {
+		return err
+	}
+	if !ownedWait(c, "send_begin_install_false", 1, 2*time.Second) {
+		return fmt.Errorf("owner send entry missing")
+	}
+	exited := make(chan struct{})
+	go func() { close(exited) }()
+	<-exited
+	ownedEmit("sole_receiver_exited_without_read", c, nil)
+	done := ownedCall(sub)
+	_ = ownedWait(c, "method_entry", 1, 2*time.Second)
+	time.Sleep(100 * time.Millisecond)
+	if err = ownedStack("blocked-before-rescue"); err != nil {
+		return err
+	}
+	returned := ownedDone(done)
+	ownedEmit("schedule_observation", c, map[string]interface{}{"returned_before_rescue": returned, "owner_member": ownedMember(c), "owner_send_begin": ownedCount(c, "send_begin_install_false"), "owner_send_end": ownedCount(c, "send_end_install_false"), "owner_delete": ownedCount(c, "after_delete"), "owner_ack": ownedCount(c, "ack_close_end")})
+	if !returned {
+		ownedEmit("owned_cleanup_intervention", c, "drain blocked actual owner; not pre-rescue satisfaction")
+		if err = ownedFalse(c); err != nil {
+			return err
+		}
+		if !ownedJoined(done, 2*time.Second) {
+			return fmt.Errorf("blocked method not joined after actual owner drain")
+		}
+	}
+	if ownedCount(c, "after_delete") > 0 {
+		if !ownedWait(c, "ack_close_end", 1, 2*time.Second) {
+			return fmt.Errorf("blocked owner observer not joined")
+		}
+	}
+	return ownedCleanup(api, c)
+}
+func ownedGate(api *DownloaderAPI, concurrent bool) error {
+	phase := "confirmation_delayed"
+	if concurrent {
+		phase = "concurrent_unsubscribe_once"
+	}
+	ownedPhase(phase)
+	sub, c, err := ownedFresh(api, 1)
+	if err != nil {
+		return err
+	}
+	if err = ownedFalse(c); err != nil {
+		return err
+	}
+	r := factoryRecorder
+	r.mu.Lock()
+	r.gateFor = c
+	r.gateEntered = make(chan struct{})
+	r.gateRelease = make(chan struct{})
+	r.gateSeen = false
+	entered, release := r.gateEntered, r.gateRelease
+	r.mu.Unlock()
+	first := ownedCall(sub)
+	var second <-chan struct{}
+	if concurrent {
+		second = ownedCall(sub)
+	}
+	reached := ownedJoined(entered, 250*time.Millisecond)
+	if reached {
+		if !ownedWait(c, "method_entry", 1, 2*time.Second) {
+			return fmt.Errorf("method entry missing")
+		}
+		if concurrent {
+			_ = ownedWait(c, "method_entry", 2, 2*time.Second)
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	ownedEmit("held_ack_observation", c, map[string]interface{}{"gate_entered": reached, "first_returned": ownedDone(first), "second_returned": concurrent && ownedDone(second), "method_entries": ownedCount(c, "method_entry"), "owner_delete": ownedCount(c, "after_delete"), "owner_member": ownedMember(c), "owner_ack_end": ownedCount(c, "ack_close_end")})
+	close(release)
+	if !ownedJoined(first, 2*time.Second) || (concurrent && !ownedJoined(second, 2*time.Second)) {
+		return fmt.Errorf("method not joined after actual owner ack gate released")
+	}
+	if ownedCount(c, "after_delete") > 0 {
+		if !ownedWait(c, "ack_close_end", 1, 2*time.Second) {
+			return fmt.Errorf("gated owner observer not joined")
+		}
+	}
+	if concurrent {
+		third := ownedCall(sub)
+		if !ownedJoined(third, 2*time.Second) {
+			return fmt.Errorf("third Once call did not return")
+		}
+	}
+	ownedEmit("schedule_observation", c, map[string]interface{}{"gate_entered": reached, "all_calls_joined": true, "method_entries": ownedCount(c, "method_entry"), "owner_delete": ownedCount(c, "after_delete"), "owner_ack": ownedCount(c, "ack_close_end"), "owner_member": ownedMember(c)})
+	r.mu.Lock()
+	r.gateFor = nil
+	r.mu.Unlock()
+	return ownedCleanup(api, c)
+}
+func OwnedFactorySchedules(d *Downloader, chain *core.BlockChain, mux *event.TypeMux) (err error) {
+	r := factoryRecorder
+	api := factoryAPI.Load()
+	if r == nil || api == nil {
+		return fmt.Errorf("actual factory API was not captured")
+	}
+	defer func() { ownedEmit("probe_end", nil, map[string]interface{}{"error": fmt.Sprint(err)}); r.file.Close() }()
+	if api.d != d || api.chain != chain || api.mux != mux {
+		return fmt.Errorf("captured API differs from actual backend objects")
+	}
+	ownedEmit("factory_api_identity", nil, map[string]interface{}{"same_downloader": true, "same_blockchain": true, "same_mux": true, "new_API_calls_from_probe": 0})
+	_, negative := api.Syncing(context.Background())
+	if negative != rpc.ErrNotificationsUnsupported {
+		return fmt.Errorf("actual unsupported notifier result: %v", negative)
+	}
+	ownedEmit("actual_notifier_unsupported", nil, negative.Error())
+	// Wait for the real RPC callback; a client-side unsubscribe ACK is not backend deletion proof.
+	time.Sleep(50 * time.Millisecond)
+	r.mu.Lock()
+	left := make([]chan interface{}, 0)
+	for c, member := range r.members {
+		if member {
+			left = append(left, c)
+		}
+	}
+	r.mu.Unlock()
+	ownedEmit("after_RPC_backend_members", nil, len(left))
+	for _, c := range left {
+		if err = ownedCleanup(api, c); err != nil {
+			return err
+		}
+	}
+	for _, run := range []func(*DownloaderAPI) error{ownedNormal, ownedBlocked, func(api *DownloaderAPI) error { return ownedGate(api, false) }, func(api *DownloaderAPI) error { return ownedGate(api, true) }} {
+		if err = run(api); err != nil {
+			return err
+		}
+	}
+	ownedPhase("source_scope")
+	ownedEmit("late_after_accept_not_injected", nil, map[string]interface{}{"actual_owner_has_no_send_between_delete_and_ack": true, "separate_controlled_owner_required": true, "full_original5_complete": false, "independent_approved": 0})
+	r.mu.Lock()
+	remaining := 0
+	for _, member := range r.members {
+		if member {
+			remaining++
+		}
+	}
+	r.mu.Unlock()
+	ownedEmit("cleanup_members_after", nil, remaining)
+	if remaining != 0 {
+		return fmt.Errorf("owned backend members remain")
+	}
+	return nil
+}
