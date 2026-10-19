@@ -63,6 +63,9 @@ KM-03 host 기록은 실제 설치 host와 로컬 통제 응답의 연결 시험
 |모델 장애·회복|실제9호출·오류 중계·캐시 뒤 장애 표시·fresh probe 회복|로컬 BGE·소유 중계기; 유료 LLM 아님|
 |종료 판정|반환 후 게이트10회·유지보수171개·새 전체 검사|최초1건 원인 미확정·이전 실패 원자료 보존|
 |WI-6 반복|627쌍·본570 partial/budget·완전0|독립 품질/완전 응답 지연 판정유보|
+|실제 node/eth factory|일반/race·활성 indexer·원래60초 RPC·unsubscribe/node.Close·exit0|전체8노드 중 최종2회 성공; 실제 피어 sync/5일정12계약/독립 수용은 남음|
 |정식 수용|0/9|D04/새 DEV·FINAL/gold/F01~08 미정·미동결|
 
 현재13묶음의 완료 기준과 다음 작업은 [전체 실행 원장](./REMAINING-13-EXECUTION.json)을 따른다. 데이터 원본·프로세스 정리·호출/실패 분모·실제 서명 저장을 검증하며, 노출된 DEV·반복 호출·AI 초안을 독립 표본으로 세지 않는다.
+
+단계74의 [실제 생성 경로 원자료](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json)는 기존 구현28개 완료를 추가 확대하지 않는다. 실패6회와 실행 전 컴파일 실패1회를 포함한 [보고서](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/REPORT.txt)를 함께 따른다.

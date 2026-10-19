@@ -1,10 +1,20 @@
-# 현재 인수인계 — 단계73 / 2026-10-19
+# 현재 인수인계 — 단계74 / 2026-10-19
 
 [코드·검증 결과](./operational-preparation/source-review-supplement/followups/local-reliability-v1/SUMMARY.json) · [실제 경로](./operational-preparation/source-review-supplement/followups/local-reliability-v1/runtime-summary.json) · [13개 실행 원장](./REMAINING-13-EXECUTION.json) · [남은 전체 작업](../REMAINING-WORK.md)
 
 로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
 
-## 이번 단계에서 확인한 것
+## 현재 단계74: 실제 생성 경로 검증 완료
+
+[실행 근거](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json) · [실패를 포함한 보고서](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/REPORT.txt)
+
+변경하지 않은 원래 API에서 node.New→eth.New→node.Start→실제 downloader/활성 indexer→in-process RPC 구독을 일반/race 각각1회 검증했다. 실제 블록1개·인덱스2개/남은0·원래60초 false알림·unsubscribe ack·node.Close·exit0·소유 데이터/프로세스 잔여0이다. 외부 listener/dial은 열지 않았다.
+
+실행 전 오프라인 의존성 실패1회와 이전 노드 실패6회(genesis 완료 기대2·시험 생성기 Close2·생성 블록 규칙2)를 포함한 전체8노드 시도를 보존했다. 최종2회만 성공했다. 수집 driver의 exit0를 개별 노드 성공으로 사용하지 않는다. StartEvent는 소유 mux 입력이므로 실제 syncWithPeer가 아니다. 전체5일정/12계약·installed oracle·독립 수용은 남아 있다. 다음은 원래5일정 전제조건과 실제 owner 경로의 도달성을 대조한다.
+
+단계73의 코드/자료는38b4c5e2, 소스 연결 원장은0a81a7f2로 서명 저장하고 전체298개 변경 blob 및 깨끗한 상태를 확인했다. 아래 단계73 근거는 이 기록의 검증 범위다.
+
+## 이전 단계73에서 확인한 것
 
 - 실제 CKS에서 원래30함수를 다시 분석해 선택 수신 정의16건을 선택된 분기 안으로 연결했다. 반복문 정의37건은 명시된 지원 밖이며 빈 비도달 블록3은 구분자가 없어 미확정이다. 이를 값 의미/독립 정답의 완료로 바꾸지 않았다.
 - 캐시는 기본0(비활성)이다. CKV 선택 옵션과 CKS 구성/health를 연결하고 질의/문서 전처리·모델 식별 검증·벡터 복사·공급자 결과 검증·취소를 보존했다. 모델 상태 확인은 캐시를 우회하며 캐시 검색 성공으로 실패 상태나 TTL을 갱신하지 않는다.
@@ -17,7 +27,7 @@
 
 |묶음|남은 내용|
 |---|---|
-|WI-V1|실제 host/factory/sync/indexer·전체5일정/12계약·독립 티켓/오라클|
+|WI-V1|factory/indexer 확인. 실제 피어 sync·전체5일정/12계약·독립 티켓/오라클|
 |WI-V2|독립 후보 적격 집합·행렬·비교/선택/유보|
 |WI-6|반복627쌍 기록. 독립 nonseed 정답·가족/충분성·설치 경로·품질|
 |WI-SP|비보안 출처·정책/미태그·실제 소비자·독립 의미|
@@ -33,12 +43,12 @@
 
 ## 다음 작업과 실행 경계
 
-다음은 WI-V1의 실제 node/eth 생성→downloader·활성 tx indexer→RPC 구독 경로다. 전체5일정/12계약과 이미 관측한 통제 메모리·유한 source hook 경로를 혼동하지 않는다. 범위·진입·정리·실패 분모를 먼저 고정하고 구현/검증/문서/서명 커밋 순서로 진행한다.
+다음은 WI-V1 원래5일정의 전제조건과 실제 owner 경로의 도달성 대조다. 실제 factory/indexer 경로는 단계74에서 관측했다. 전체5일정/12계약과 이미 관측한 통제 메모리·유한 source hook 경로를 혼동하지 않는다. 범위·진입·정리·실패 분모를 먼저 고정하고 구현/검증/문서/서명 커밋 순서로 진행한다.
 
 보안 전용 gold·권한/비공개/위조 경계와 조직 인증은 사용자 보류다. 실제 LLM 답변 평가는 모델·인증 방식·비용 상한이 정해진 뒤 진행한다. CoreML의 실제 모델/토크나이저 경로와 배포 대상은 확인 중이다. 로컬 개발 검증을 게시·운영 배포나 독립 승인으로 표시하지 않는다.
 
 ```bash
-python3 scripts/native_reliability.py check --require-stored
+python3 scripts/full_host_factory.py check --require-stored
 python3 scripts/check-remaining-13.py
 ```
 

@@ -12,11 +12,13 @@
 
 - 단계73: 실제30함수의 선택 수신 정의16건 수정. 캐시 옵션·질의 전처리/식별/모델 상태 계약을 실제46도구/50요청으로 검증했다. 전체 일반/race 각4172통과·18skip, build/fmt/vet/lint 통과. 최초 종료 시험1건 원인 미확정 및 모든 중간 시도는 보존했다. [근거](./spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1/SUMMARY.json).
 
+- 단계74: 원래 API를 유지한 실제 node/eth factory·다운로더·활성 인덱서·60초 RPC 알림·구독 해제·node.Close를 일반/race2회 확인했다. 전체8노드 시도와 실행 전 컴파일 실패1회를 보존했다. 실제 피어 동기화/5일정/12계약·독립 수용은 남아 있다. [근거](./spec-driven/operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json).
+
 ## 남은13개 묶음과 완료 기준
 
 | 순서 | 묶음 | 남은 기능·검증·결정 | 상태 |
 |---|---|---|---|
-|1|WI-V1|전체 API/host·factory/sync/indexer, 원래5일정/12계약, 설치 소비자 오라클/완료 차단·독립 검토|미완료|
+|1|WI-V1|factory/활성 indexer 검증 완료. 실제 피어 sync·원래5일정/12계약, 설치 소비자 오라클/완료 차단·독립 검토|미완료|
 |2|WI-V2|후보 적격성/행렬·독립 오라클/수용 후보집합·선택/기각/유보|미완료|
 |3|WI-6|실제 검색쌍은 기록. warm 원자료·중단 의미·넓은 nonseed 정답/가족·독립 품질|반복 측정 완료·품질 미수용|
 |4|WI-SP|비보안 수동/자동 출처·정책/미태그·실제 소비자와 독립 의미|미완료|
