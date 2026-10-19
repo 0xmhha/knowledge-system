@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""Explicit fixed corrective plan; keep initial race pre-entry failures intact."""
+import argparse,concurrent.futures,importlib.util,json,os,time
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('original',Path(__file__).with_name('run-ticket-actual-rpc.py'));o=importlib.util.module_from_spec(spec);spec.loader.exec_module(o);m=o.m
+
+
+def run(work):
+    original=work/'rpc-trials-v1'
+    # No overlap with the first plan: avoid changing its resource contention.
+    while not(original/'receipt.json').is_file():time.sleep(1)
+    scope=json.loads((o.PACKET/'RECOVERY-SCOPE.json').read_text());out=work/'rpc-startup-recovery-v1';out.mkdir();m.write(out/'SCOPE.json',scope)
+    original_attempts=json.loads((original/'attempts.json').read_text())
+    if len(original_attempts)!=90:raise ValueError('initial full denominator missing')
+    for slot in scope['planned_slots']:
+        r=next(x for x in original_attempts if x['slot_id']==slot['slot_id'])
+        q=original/'slots'/slot['slot_id']
+        if r['exit_code']!=-15 or not r['timeout']or r['remaining_live_group_members']or(q/'events.jsonl').exists()or(q/'process/stdout').read_bytes()or(q/'process/stderr').read_bytes():raise ValueError('initial failed-before-entry population differs; do not retry silently')
+    e=json.loads((original/'environment.json').read_text());env={k:os.environ[k]for k in e['allowed_inherited_keys']if k in os.environ};env.update(e['task_settings']);env['PATH']=e['PATH'];m.write(out/'environment.json',e);m.write(out/'planned.json',scope['planned_slots'])
+    bindings={}
+    for role in o.ROLES if hasattr(o,'ROLES')else ['ORIGINAL','CAND-A','CAND-B','MUT-REINTRO','MUT-EARLY']:
+        q=original/'candidates'/role;bindings[role]=json.loads((q/'binaries.json').read_text())['race']
+        if m.sha(Path(bindings[role]['path']).read_bytes())!=bindings[role]['sha256']:raise ValueError('reused binary changed')
+        binding=json.loads((q/'source-binding.json').read_text());src=work/('source-'+role)
+        if m.source_inventory(src)!=binding['applied_tracked']or(src/o.TEST).read_bytes()!=o.FIXTURE.read_bytes():raise ValueError('reused source/fixture changed')
+    m.write(out/'reused-binaries.json',bindings)
+    def execute(slot):
+        q=out/'slots'/slot['slot_id'];q.mkdir(parents=True);tmp=q/'tmp';tmp.mkdir();binary=bindings[slot['candidate']]
+        local={**env,'TMPDIR':str(tmp),'TICKET_ROLE':slot['candidate'],'TICKET_CASE':slot['case_id'],'TICKET_TRACE_PATH':str(q/'events.jsonl')}
+        argv=[binary['path'],'-test.v=true','-test.run=^TestTicketOwnedRPC$','-test.count=1','-test.timeout=20s']
+        r=m.command(argv,work/('source-'+slot['candidate']),q/'process',local,scope['owned_process_timeout_seconds']);r.update(slot,binary_sha256=binary['sha256'],fixture_sha256=m.sha(o.FIXTURE.read_bytes()),tmp_children_after=sorted(p.name for p in tmp.iterdir()));m.write(q/'receipt.json',r)
+        print(json.dumps(dict(slot_id=slot['slot_id'],exit_code=r['exit_code'],timeout=r['timeout'],remaining_live_group_members=r['remaining_live_group_members'])),flush=True);return r
+    results=[]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=scope['parallelism'])as pool:
+        futures=[pool.submit(execute,s)for s in scope['planned_slots']]
+        for f in futures:results.append(f.result());m.write(out/'attempts.json',results)
+    for role,b in bindings.items():
+        if m.sha(Path(b['path']).read_bytes())!=b['sha256']:raise ValueError('reused binary changed during corrective plan')
+        binding=json.loads((original/'candidates'/role/'source-binding.json').read_text());src=work/('source-'+role)
+        if m.source_inventory(src)!=binding['applied_tracked']or(src/o.TEST).read_bytes()!=o.FIXTURE.read_bytes():raise ValueError('source/fixture changed during corrective plan')
+    m.write(out/'receipt.json',dict(planned=45,attempted=len(results),corrective_reattempts=45,automatic_retries=0,initial_attempts_retained=90,same_source_fixture_binary=True,observation_watchdog_ms=2000,test_timeout_seconds=20,owned_process_timeout_seconds=150,operational_nodes_started=0,paid_or_external_LLM_calls=0,independent_approved=0,formal_completed=0,formal_total=9))
+
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser();p.add_argument('--workspace',type=Path,required=True);a=p.parse_args();run(a.workspace.resolve())

@@ -1,3 +1,28 @@
+<!-- TICKET-RPC-CURRENT -->
+# 단계64 — WI-V1/V2 실제 in-process RPC 후보 경로 / 2026-10-19
+
+[최초 명세](./operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/SCOPE.json) · [명시적 보정 계획](./operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/RECOVERY-SCOPE.json) · [결과](./operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/SUMMARY.json) · [검증 근거](./operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/validation/SUMMARY.json) · [우선순위·다음·남은 전체 작업](./operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/WORKLIST.json).
+
+**AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다. D04는 미정이며 실명·이메일·연락처를 요구하거나 승인 기록을 대신 만들지 않는다.
+
+| 이번 기술 범위 | 확인한 결과와 한계 |
+|---|---|
+| 후보·소스 | go-stablenet `0bf2f4d1`의 추적2228개를 기준으로 기존 full-file overlay만 적용. 소유 checkout5개, 역할5개·메서드4종·프로젝트 tree4종. 실제 Git 프로젝트 tree와 시험 파일을 포함한 build tree를 따로 재계산하고 소스·fixture·binary hash를 결속. 후보 commit은 만들지 않음 |
+| 최초90건 | 일반45+race1 완료 관측, race3 부분 실행, race41 미진입. 외부25초 한도에 패키지 초기화가 포함됨. 소유 OS 스택2개에서 기존 test init/newTestBlockchain/InsertChain/race 계측 확인. 실패·부분 원문을 삭제하거나 전체 통과로 표시하지 않음 |
+| 보정44건 | 첫45건 계획은 이미 완료된1건 때문에, 다음44건 계획은 부분 trace3건 때문에 사전 검사에서 각각 exit1·대상 실행0으로 거부됨. 두 기록을 보존. 최종 고정44건은 원래 시험 파일·소스·같은 race binary를 유지하고 외부 한도만150초로 보정. test20초·관찰2초 유지. 모두 완료 관측 |
+| 전체 집계 | 134시도 중 유효 완료 관측90·초기 부분3·미진입41. 실제 RPC465호출(완료450+부분15), 직접 notifier 대조93개(완료90+부분3). 초기 실패와 보정 재시도를 합산하며 자동 숨은 재시도0 |
+| 실제 RPC | 소유 `eth` 등록과 `rpc.DialInProc/net.Pipe`에서 실제 Syncing 호출. 알 수 없는 구독 오류, 다른 세션의 같은 ID 해지 거부, 올바른 세션 true, 반복 해지 거부를 각각 확인. 직접 no-notifier 호출은 RPC로 세지 않음 |
+| 분기·정리 | 실제 eventLoop 정상30건과 제어 백엔드 완료60건을 분리. 백엔드 ack 보류 시 RPC true와 deferred Unsubscribe 대기를 구분. 상태 송신을 먼저 제시하면 A/B만 요청 수신 전 drain하며 원본/재도입/조기반환은 관찰 뒤 cleanup에서 송신자를 해제. 완료90건은 콜백·sender·loop 종료를 확인. 초기 부분3건의 내부 cleanup은 미증명이며 모든134건 OS process group만 reaped·잔존0으로 확인 |
+| 수용 한계 | 같은 노출 DEV 티켓1개의 상관된3일정이다. 전체 Ethereum factory·progress 알림·원래60초 timer 발화·원래5일정·12요건 전체·설치4역할/finalHEAD·독립 oracle/수용 가능 후보 집합은 미완료. 조기반환 후보의 backend membership도 추론하지 않음 |
+| 경계·회귀 | 외부 listener·운영 노드·글로벌 설치/설정·게시·유료/외부LLM0. credential 환경변수 상속 없이 기존 캐시로 오프라인 빌드. 새 대상 binary10개와 판정기39·공통64·문서20·notice3 =126개 회귀 검사 통과. 원자료1057개 파일 동일 재생 확인. 현재 문서 검증 결과는 연결된 검증 근거를 따른다. CKS native1738·승인5·설정2 동일: 이전 일반/race 각4158통과·18skip 및 build/fmt/lint 근거를 재사용하며 새 CKS 전체 실행으로 표시하지 않음 |
+
+[보고서](./operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/REPORT.txt)를 따른다. 남은 목록/우선순위 삭제나 제한된 관측의 정식 완료 승격은 재봉인해도 거부한다. 초기 판정기 회귀의 예외 형식 오류1개와 공통 검사 중단130도 검증 근거에 보존하고, 명시적 종료 신호 거부를 보강한 뒤126개를 재검증했다. 서명 저장은 실제 Git과 `--require-stored`로 확인한다.
+
+다음 우선순위는 **WI-V1/V2 알림·원래 일정·12요건 및 오라클/설치역할 → WI-6 실제 검색 쌍·관련성/잡음·warm → WI-SP·WI-C**다. 남은 전체는 위 작업 외 WI-1의53발생/3블록·값/타입/unknown/메모리·독립 의미, WI-2 독립 표본/정답·호출자/build profile/지원/MCP/설치역할, WI-3 독립 가족·노출/중복/정답·기본 예산/시작SLA/site거부/부분·공급자오류·범위밖, WI-4 전체 드라이버/host/수신자/시간/반복·독립 가족/오라클/충분성, 익명 역할/독립성·새 DEV/FINAL·완전정답/matching/충분성·F01~08, 정식9개 수용0/9, 온톨로지 독립정답/구현·개념연결/검색효과다. 실제 LLM 답변 평가는 모델·인증·비용상한 결정 후 진행한다. 조직 인증/권한·공개CLI/HTTP/graph export·graph점수/확장·domain flow gold·대규모corpus/긴함수·PR/as-of·legacy출처·CoreML·embedding cache·운영감사·viewer·배포/downstream의 선택12개는 별도 백로그다.
+<!-- END-TICKET-RPC-CURRENT -->
+
+이하 단계63 및 이전은 당시 기록이다.
+
 <!-- WI4-SCHEDULES-CURRENT -->
 # 단계63 — WI-4 WORK·GOSSIP·POOL 실제 소유 DEV 경로 / 2026-10-19
 
