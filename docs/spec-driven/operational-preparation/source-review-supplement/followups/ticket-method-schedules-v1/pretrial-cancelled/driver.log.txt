@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/run-ticket-method-schedules.py", line 85, in <module>
+    p=argparse.ArgumentParser();p.add_argument('--workspace',type=Path,required=True);a=p.parse_args();run(a.workspace.resolve())
+                                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/run-ticket-method-schedules.py", line 63, in run
+    if r['exit_code']or r['remaining_live_group_members']:raise ValueError('target build failed '+role+' '+variant)
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: target build failed MUT-REINTRO race

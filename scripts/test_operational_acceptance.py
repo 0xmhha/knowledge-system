@@ -345,6 +345,11 @@ class PreparationGuardTests(unittest.TestCase):
             reference[hash_field] = hashlib.sha256(path.read_bytes()).hexdigest()
             return guard.check_review_draft_packet(root, reference)
 
+    def test_actual_method_schedules_cannot_enable_formal_execution(self):
+        self.protocol["execution_allowed"] = True
+        self.protocol["roles"]["gold_reviewer"] = {"kind": "AI", "decision": "approved"}
+        self.assertTrue(self.errors())
+
     def test_gold_labels_cannot_leak_into_public_input(self):
         errors = self.mutated_packet_errors("public", lambda d: d["cases"][0].update(expected_answer="fake answer"))
         self.assertTrue(any("contains gold" in e for e in errors))

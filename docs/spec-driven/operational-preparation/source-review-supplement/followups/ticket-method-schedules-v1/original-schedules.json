@@ -1,0 +1,411 @@
+[
+  {
+    "scenario_id": "normal_delivery_then_unsubscribe",
+    "new_observations": [
+      {
+        "slot_id": "ORIGINAL-general-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "ORIGINAL-race-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "CAND-A-general-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "CAND-A-race-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "CAND-B-general-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "CAND-B-race-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "MUT-REINTRO-general-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "MUT-REINTRO-race-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "MUT-EARLY-general-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "slot_id": "MUT-EARLY-race-method5",
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      }
+    ],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "fresh installed subscription",
+      "receiver accepts first notification",
+      "event loop removes and acknowledges uninstall"
+    ],
+    "scope_gaps": [
+      "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map.",
+      "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+    ]
+  },
+  {
+    "scenario_id": "blocked_delivery_then_consumer_exit",
+    "new_observations": [
+      {
+        "slot_id": "ORIGINAL-general-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "paired_sends_pending_before_rescue"
+      },
+      {
+        "slot_id": "ORIGINAL-race-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "paired_sends_pending_before_rescue"
+      },
+      {
+        "slot_id": "CAND-A-general-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "drained_returned_loop_live"
+      },
+      {
+        "slot_id": "CAND-A-race-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "drained_returned_loop_live"
+      },
+      {
+        "slot_id": "CAND-B-general-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "drained_returned_loop_live"
+      },
+      {
+        "slot_id": "CAND-B-race-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "drained_returned_loop_live"
+      },
+      {
+        "slot_id": "MUT-REINTRO-general-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "paired_sends_pending_before_rescue"
+      },
+      {
+        "slot_id": "MUT-REINTRO-race-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "paired_sends_pending_before_rescue"
+      },
+      {
+        "slot_id": "MUT-EARLY-general-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "early_return_loop_still_blocked"
+      },
+      {
+        "slot_id": "MUT-EARLY-race-method5",
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "early_return_loop_still_blocked"
+      }
+    ],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "same event loop blocked on unbuffered status",
+      "sole receiver exited",
+      "observe before rescue",
+      "loop stays live after send"
+    ],
+    "scope_gaps": [
+      "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map.",
+      "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented.",
+      "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+    ]
+  },
+  {
+    "scenario_id": "late_delivery_before_confirmation",
+    "new_observations": [
+      {
+        "slot_id": "ORIGINAL-general-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "ORIGINAL-race-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-A-general-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-A-race-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-B-general-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-B-race-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-REINTRO-general-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-REINTRO-race-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-EARLY-general-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-EARLY-race-method5",
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "uninstall accepted",
+      "finite additional status offered",
+      "acknowledgement follows deletion",
+      "do not acknowledge early"
+    ],
+    "scope_gaps": [
+      "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map.",
+      "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+    ]
+  },
+  {
+    "scenario_id": "confirmation_delayed",
+    "new_observations": [
+      {
+        "slot_id": "ORIGINAL-general-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "ORIGINAL-race-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-A-general-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-A-race-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-B-general-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-B-race-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-REINTRO-general-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-REINTRO-race-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-EARLY-general-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-EARLY-race-method5",
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "uninstall accepted",
+      "ack held then released by owner",
+      "no previous Once completion"
+    ],
+    "scope_gaps": [
+      "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map.",
+      "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+    ]
+  },
+  {
+    "scenario_id": "concurrent_unsubscribe_once",
+    "new_observations": [
+      {
+        "slot_id": "ORIGINAL-general-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "ORIGINAL-race-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-A-general-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-A-race-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-B-general-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "CAND-B-race-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-REINTRO-general-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-REINTRO-race-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-EARLY-general-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      },
+      {
+        "slot_id": "MUT-EARLY-race-method5",
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "full_original_scenario_satisfied": false,
+    "remaining_preconditions": [
+      "two calls same exact subscription object",
+      "one request accepted",
+      "ack eventually released",
+      "join both calls"
+    ],
+    "scope_gaps": [
+      "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map.",
+      "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+    ]
+  }
+]

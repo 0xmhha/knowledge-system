@@ -1,3 +1,28 @@
+<!-- TICKET-METHOD-CURRENT -->
+# 단계66 — WI-V1/V2 해지 메서드 5일정의 실제 관측 / 2026-10-19
+
+[사전 명세](./operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/SCOPE.json) · [명시 보정 명세](./operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/CORRECTION-SCOPE.json) · [결과](./operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/SUMMARY.json) · [12요건](./operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/requirements.json) · [원래5일정](./operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/original-schedules.json) · [전체 작업목록](./operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/WORKLIST.json).
+
+**AI 초안6/6 준비·독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false**를 유지한다. D04미정·익명 역할 정책을 유지하며 실명/연락처를 요구하거나 승인 기록을 만들지 않는다.
+
+| 범위 | 관측과 한계 |
+|---|---|
+| 전체 시도 | 최초 준비는 소스 대기 위치 오류를 실행 전에 확인해 빌드7성공/1명시중단·미시작2·대상0회·그룹잔존0으로 보존. 이후 고정10회는9정상/1부분실패. 런타임의 경과분 표기를 놓친 시험 predicate와 무제한 probe를 보완한 명시 보정1회가 정상 종료. 총11시도·최종10묶음/50상관일정이며 숨은 자동 재시도0 |
+| 실제 루프 | 소유 memory chain/실제 snap/제어 높이/소유 StartEvent로 원래60초 timer를 유지. 실제 발화는 전체시도11회. 완료 후 새 설치의 정상false→해지, 같은 실제 eventLoop의 비버퍼 송신에서 유일한 직접 소비자가 종료하는 경로를 관측. 실제 RPC callback 종료와 native broadcast의 겹침으로 표시하지 않음 |
+| 결함 구분 | 정상 전달은 모든 역할에서 관측. blocked 경로에서 A/B는 drain·반환 뒤 새 설치 요청도 처리(4개 최종묶음). 원본/동일 재도입은 두 송신이 대기(4개), 조기반환 변형은 메서드가 반환해도 루프송신이 대기(2개). rescue 전 스택/결과를 확정하며 독립 수용 후보를 선정하지 않음 |
+| 제어 수신 측 | 실제 Unsubscribe에서 요청 수신 후 유한3개 late송신·ack 지연·같은 객체3개 동시호출을 관측. 조기반환을 제외하면 요청1개/ack전 개별반환0·ack후join. 조기반환은 요청/ack 없음. 이 수신 측에는 실제 backend map이 없으므로 map 삭제·실제ack·ack후 모든 채널 사용 없음의 증거로 승격하지 않음 |
+| 소스·정리 | 기준 추적2228개·정확한 API overlay·시험1개·실제 Git project/build tree·Go1.23.12 일반/race binary를 결속. 최초준비8+고정실행용10+보정용2=빌드receipt20. 최종10묶음의 메서드80호출/소유drain·loop·chain을join. 최초 실패의 내부정리는 미입증으로 보존하고 모든 실제 프로세스그룹 잔존0을 구분 |
+| 요건 매칭 | 12요건×10=120항목 중 제한 관측/남은 범위70·미실행/미계측50. 전체충족0. 원래5일정마다 관측과 미충족 조건을 보존. 1역할/profile당1최종묶음이며 상관일정·원본alias·보정시도를 독립반복/독립티켓으로 세지 않음 |
+| 검증 상태 | 판정기34·공통66·문서계약20·notice3=123개 통과. 원자료321파일 동일 재생(추가 대상실행0), 기술/공통 게이트 통과, 정식·동결·커밋전 저장은 예상 거부. [검증 근거](./operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/validation/SUMMARY.json)의 문서검사 결과를 따르며 서명저장은 실제 커밋 뒤 확인한다. CKS native1738·승인5·설정2 동일 입력의 기존 일반/race 각4158통과18skip 및 build/fmt/vet/lint 증거를 재사용하며 새 CKS 전체실행으로 표시하지 않음 |
+
+[보고서](./operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/REPORT.txt)를 따른다. 운영노드/외부통신/자격증명상속/글로벌설정·설치/시각변경/게시/유료·외부LLM0을 유지한다. 최초 실패는 시험 자체100초 제한으로 종료됐으며 외부 process watchdog 종료와 구분한다.
+
+다음은 **실제 Syncing RPC callback 종료와 native broadcast 겹침·실제 삭제/ack/모든 사용 경계**, 전체 시작/실제sync/활성indexer·설치4역할/finalHEAD·독립티켓/오라클/수용후보다. 이후 WI-6 검색쌍/관련성·잡음/warm, WI-SP 출처/정책·ACL·비공개·위조, WI-C 리뷰계약/필수항목·보고서/그림/전달·설치역할, WI-1 의미/값·타입/unknown/메모리·독립검토, WI-2 독립표본/완전정답·명령/호출자/build지원/MCP·설치, WI-3 독립가족/노출·중복/정답·기본예산/시작SLA/부분·공급자오류·범위밖, WI-4 전체driver/host/시간/반복·독립가족/정답/충분성, 독립준비(익명역할/독립성·새DEV/FINAL·완전정답/매칭/충분성·F01~08), 온톨로지 독립정답/구현·개념/검색효과, 정식9개 수용0/9가 남는다. 실제 LLM 답변은 모델·인증·비용상한 결정 뒤 진행한다. 조직 인증/권한·공개CLI/HTTP/graph export·graph점수/확장·domain flow gold·대규모corpus/긴함수·PR/as-of·legacy출처·CoreML·embedding cache·운영감사·viewer·배포/downstream 선택12개는 별도다.
+<!-- END-TICKET-METHOD-CURRENT -->
+
+
+이하 단계65 및 이전은 당시 기록이다.
+
 <!-- TICKET-NATIVE-CURRENT -->
 # 단계65 — WI-V1/V2 실제60초 진행 알림·완료·새 구독 경로 / 2026-10-19
 

@@ -1,0 +1,70 @@
+{
+  "phase": 66,
+  "tests": {
+    "method_schedule_mutation": 34,
+    "common_regression": 66,
+    "documentation_contract": 20,
+    "package_notice": 3,
+    "total": 123,
+    "all_passed": true
+  },
+  "target_attempts": {
+    "initial_preparation_target_attempts": 0,
+    "initial_slots": 10,
+    "initial_complete": 9,
+    "initial_failed_partial": 1,
+    "explicit_corrective": 1,
+    "all_actual_target_attempts": 11,
+    "final_valid_bundles": 10,
+    "correlated_schedule_observations": 50,
+    "automatic_retries": 0
+  },
+  "replay": {
+    "artifact_files": 321,
+    "all_bytes_identical": true,
+    "target_executions_during_replay": 0,
+    "source_manifest_sha256": "786a4dbe6127e740fa35d095087ffacb0a6ed2f076b3712f64f09da4aa1dfa7f"
+  },
+  "gates": [
+    {
+      "name": "technical",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "common",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "formal",
+      "exit_code": 1,
+      "expected_exit": 1
+    },
+    {
+      "name": "freeze",
+      "exit_code": 1,
+      "expected_exit": 1
+    },
+    {
+      "name": "storage_before_commit",
+      "exit_code": 1,
+      "expected_exit": 1
+    }
+  ],
+  "source_guard": {
+    "pre_exit": 0,
+    "final_exit": 0,
+    "stdout": "private_not_copied"
+  },
+  "CKS_native": "unchanged_input_identity_reuse_not_new_full_execution",
+  "docs_exit": 0,
+  "live_documents": 134,
+  "stored_gate": "expected_refusal_before_commit; actual_signed_Git_storage_checked_after_commit",
+  "formal_completed": 0,
+  "formal_total": 9,
+  "independent_approved": 0,
+  "FINAL": 0,
+  "freeze": null,
+  "execution_allowed": false
+}

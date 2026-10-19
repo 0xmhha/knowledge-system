@@ -1,0 +1,137 @@
+{
+  "phase": 66,
+  "kind": "WIV1_V2_actual_method5_schedules_DEV_not_independent_acceptance",
+  "previous_revision": "5db56cfa43189aadc55a928052dc4a6418376fb5",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "planned_slots": [
+    {
+      "slot_id": "ORIGINAL-general-method5",
+      "candidate": "ORIGINAL",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "ORIGINAL-race-method5",
+      "candidate": "ORIGINAL",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "CAND-A-general-method5",
+      "candidate": "CAND-A",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "CAND-A-race-method5",
+      "candidate": "CAND-A",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "CAND-B-general-method5",
+      "candidate": "CAND-B",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "CAND-B-race-method5",
+      "candidate": "CAND-B",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "MUT-REINTRO-general-method5",
+      "candidate": "MUT-REINTRO",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "MUT-REINTRO-race-method5",
+      "candidate": "MUT-REINTRO",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "MUT-EARLY-general-method5",
+      "candidate": "MUT-EARLY",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "method5"
+    },
+    {
+      "slot_id": "MUT-EARLY-race-method5",
+      "candidate": "MUT-EARLY",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "method5"
+    }
+  ],
+  "candidate_roles": [
+    "ORIGINAL",
+    "CAND-A",
+    "CAND-B",
+    "MUT-REINTRO",
+    "MUT-EARLY"
+  ],
+  "unique_method_variants": 4,
+  "planned_attempts": 10,
+  "correlated_schedules_per_attempt": 5,
+  "repetitions_per_role_profile": 1,
+  "independent_repeated_execution_criterion_satisfied": false,
+  "fixture_sha256": "686fecfead2b54307143d23419464b8831b2cec41f4982746aed54ef133e5812",
+  "target_toolchain": {
+    "GOVERSION": "go1.23.12",
+    "GOOS": "darwin",
+    "GOARCH": "arm64",
+    "CGO_ENABLED": "1"
+  },
+  "build_timeout_seconds": 600,
+  "test_timeout_seconds": 100,
+  "owned_process_timeout_seconds": 180,
+  "parallelism": 2,
+  "automatic_retries": 0,
+  "native_timer_seconds": 60,
+  "observation_milliseconds": 300,
+  "finite_late_sends": 3,
+  "same_object_concurrent_calls": 3,
+  "actual_routes": [
+    "native60s_completion_primer",
+    "actual_eventLoop_post_done_install_normal",
+    "actual_eventLoop_post_done_install_blocked_sole_direct_consumer_exit",
+    "controlled_receiver_actual_method_late_ack_once"
+  ],
+  "scope": "one exposed DEV ticket;50 correlated schedule observations over10 processes; actual method and real eventLoop for normal/blocked; controlled receiver for late/ack/once; native timer unchanged; no actual RPC callback overlap; no map/ack instrumentation",
+  "full_original5_schedules": false,
+  "full12_requirements": false,
+  "security": {
+    "external_network": false,
+    "operational_node": false,
+    "global_settings": false,
+    "system_clock_change": false,
+    "credential_environment_inheritance": false,
+    "publication": false,
+    "paid_or_external_LLM": false,
+    "owned_process_group_only": true
+  },
+  "acceptance_limits": {
+    "independent_approved": 0,
+    "independent_tickets": 0,
+    "FINAL": 0,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "freeze": null,
+    "execution_allowed": false,
+    "independent_acceptable_candidate_set": null,
+    "canonical_selection": null,
+    "quality_score": null
+  }
+}
