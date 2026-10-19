@@ -1,0 +1,42 @@
+{
+  "kind": "CoreML_native_transport_followup_DEV_not_real_Qwen_model_acceptance",
+  "predecessor_stage": 85,
+  "status": "reproduction_complete_no_production_source_changes",
+  "trigger": "actual native array reproduction reads int64 token storage as int32 and changes token sequence",
+  "baseline_source_sha256": {
+    "internal/vector/embed/coreml/coreml_darwin.go": "42dd3383afa51311319dfda2648b97c8371c44abfa61dc3efdbf475bd61095ad",
+    "internal/vector/embed/coreml/bridge_darwin.m": "10bfb63861c21567b5af8b579bf05be00579b440240bf2eb7c33472138859ef4",
+    "internal/vector/embed/coreml/bridge.h": "74e2dd75e590e913dcbe4f440385f304c996dbb665b00c0dee766e629d83823e"
+  },
+  "observed": {
+    "input": [
+      101,
+      102,
+      103
+    ],
+    "current_read": [
+      101,
+      0,
+      102
+    ],
+    "model_inference_calls": 0
+  },
+  "priority_reason": "correctness of model input precedes optional new output surfaces",
+  "planned_checks": [
+    "checked int64-to-CoreML input conversion with exact token/attention values",
+    "output type/shape/stride contract before copying into Go destination",
+    "per-adapter native model ownership and close/error cleanup",
+    "optional native profile compile and model-free native runtime tests on current macOS",
+    "whole default native regression after adopting any production Go/C changes"
+  ],
+  "remaining_model_inputs": "actual CoreML package/tokenizer and deployment target still unprovided; known Qwen3 local weights are GGUF",
+  "scope_boundary": {
+    "actual_Qwen_inference": false,
+    "actual_LLM_calls": 0,
+    "paid_external_calls": 0,
+    "model_downloads": 0,
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "no_new_security_specific_evaluation": true
+  }
+}

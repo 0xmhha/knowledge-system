@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "phase85_local_public_v2_interfaces_and_whole_native_verified",
+  "current_activity": "phase86_CoreML_token_transport_reproduced_no_production_source_changes",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -363,7 +363,7 @@
         "internal/vector/embed/coreml"
       ],
       "observation": "actual qwen3-embedding0.6b1024 and4b2560 found as Ollama GGUF; headers/provider metadata read, inference0; no CoreML package/tokenizer found in scoped roots; no conversion or baseline change; model-free actual CoreML array reproduction: int64 input101/102/103 read as101/0/102 by current int32 view; no production change or inference yet; transport correction next",
-      "status": "not_complete",
+      "status": "native_transport_defect_reproduced_actual_model_inputs_pending",
       "input_inventory": {
         "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-local-model-inventory-v1/INVENTORY.json",
         "sha256": "bbceaa83710ff0af3736c193a67b49181b00ea10b3fcf30b6c02d30f96add354",
@@ -579,5 +579,11 @@
     "kind": "public_v2_CLI_HTTP_graph_native_DEV_not_independent_acceptance",
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/public-v2-surface-v1/manifest.json",
     "manifest_sha256": "c0e27997085c7a401ae27e831e60f075fd2f28a70d57e4347d60befaf6adcd16"
+  },
+  "next_coreml_transport_spec": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/SPEC.json",
+    "sha256": "b7655ee45eedf971dcf73f1a51ff0557ce96de298a0855a1bbeb2b12d16f6538",
+    "stage": 86,
+    "status": "preflight_only"
   }
 }
