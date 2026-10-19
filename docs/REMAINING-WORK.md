@@ -1,6 +1,6 @@
 # 남은 전체 작업 / 2026-10-20
 
-[정본 원장](./spec-driven/REMAINING-13-EXECUTION.json) · [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) · [최신 소스 검증](./spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/SUMMARY.json)
+[정본 원장](./spec-driven/REMAINING-13-EXECUTION.json) · [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) · [최신 소스 검증](./spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/SUMMARY.json)
 
 사용자 지시 “coreml은 안해도되”에 따라 CoreML을 개발·평가·배포 및 완료 조건에서 제외했다. 모델·토크나이저·배포 대상은 더 이상 요청하지 않는다. 제외는 완료가 아니며 기존 코드와 서명된 검증 기록은 보존한다. 기본 Ollama + BGE-M3를 유지한다. [범위 제외 기록](./spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json).
 
@@ -8,9 +8,9 @@
 
 ## 현재 검증과 다음 작업
 
-최신 고정 소스의 기본 일반/race는 각각4272통과·18skip, build/fmt/vet/고정lint/docs 통과다. 기존 BGE 반복/새 버전의 검색10개는 출처·본문·순서·점수까지 일치했다. 최초 전체race의 guardian 종료 시한 검사1회 실패는 후속 통과에도 원인 미확정으로 유지한다.
+최신 고정 소스의 기본 일반/race는 각각4273통과·18skip, build/fmt/vet/고정lint/docs 통과다. 기존 BGE 반복/새 버전의 검색10개는 출처·본문·순서·점수까지 일치했다. 같은 조건400회에서2회의 오탐을 재현해 반환 전 파일 생성으로 확인했다. 대기 성공 조건을 사용한 한 줄 대조400회는 통과했으며, 반환 후 쓰기 gate·실제 후손 잔존 대조군도 검증했다. 과거 최초1회의 정확한 내부 순서는 상세 로그가 없어 사후 확정하지 않는다.
 
-다음 우선순위는 이 종료 시한 실패의 원인 추적이다. 실제 peer 동기화·리뷰5산출물 전달·viewer 소유 backend/UI·공개 CLI/HTTP 및 원시 그래프 v2의 앞선 로컬 검증은 보존한다. 독립 정답·품질 수용은 별도다.
+다음 우선순위는 WI-V1의 전체12계약·설치 소비자 oracle 범위 검토다. 실제 peer 동기화·리뷰5산출물 전달·viewer 소유 backend/UI·공개 CLI/HTTP 및 원시 그래프 v2의 앞선 로컬 검증은 보존한다. 독립 정답·품질 수용은 별도다.
 
 ## 전체13묶음 — 완료0/13
 

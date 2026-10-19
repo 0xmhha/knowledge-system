@@ -1,0 +1,123 @@
+{
+  "kind": "guardian_absolute_deadline_first_failure_diagnosis",
+  "base_revision": "471dcddfbd668715b4cdf64e22c5527cd0bf7eec",
+  "original_failure": {
+    "test": "TestGuardianAbsoluteDeadlineWorksWhileOwnerSocketStaysOpen",
+    "stage": 86,
+    "failures": 1,
+    "root_cause": "unresolved",
+    "message_is_ambiguous": true
+  },
+  "scope": [
+    "preserve original200ms deadline, owner socket open and1second worker schedule",
+    "distinguish stat error, marker present before guardian return, and new write after return",
+    "record actual group cancellation and command reap ordering with private Go overlay",
+    "bound concurrent diagnostic runs and retain every attempt",
+    "make a production or oracle correction only when evidence supports it",
+    "verify owner/deadline/writer-lease regressions and required whole-module checks for committed Go changes"
+  ],
+  "initial_plan": {
+    "variants": [
+      "race"
+    ],
+    "groups": 8,
+    "repetitions_per_group": 50,
+    "total": 400,
+    "parallel_group_bound": 8,
+    "no_quality_acceptance_claim": true
+  },
+  "CoreML_excluded": true,
+  "actual_model_calls": 0,
+  "paid_external_calls": 0,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "production_change_before_diagnosis": false,
+  "diagnosis": {
+    "same_condition_original": {
+      "pass": 398,
+      "fail": 2,
+      "total": 400
+    },
+    "failed_cases_have_marker_already_at_return": 2,
+    "marker_created_between_kill_before_and_after": 2,
+    "stat_error_cases": 0,
+    "historical_first_failure_has_no_return_time_or_stat_error_trace": true,
+    "exact_historical_event_forensically_proven": false,
+    "confirmed_reproduced_cause": "unconditional shell printf can run when sleep is killed before its waiting shell; this pre-return write is misclassified by the test",
+    "single_change_control": {
+      "pass": 400,
+      "fail": 0,
+      "total": 400,
+      "difference": "sleep1 && printf instead of sleep1; printf",
+      "same_deadline_and_observation": true
+    }
+  },
+  "planned_correction": {
+    "production_runtime_changed": false,
+    "test_changes": [
+      "require successful sleep before deadline/cancellation fixture writes",
+      "record marker and stat failure separately",
+      "add writer gated until after guardian return with owner socket still open"
+    ],
+    "new_oracle_control": "private mutant kills only shell and skips descendant quiescence; must fail post-return gate"
+  },
+  "additional_runtime_logging_control": {
+    "plan_added_after_initial_diagnosis": true,
+    "runtime_sources_instrumented": false,
+    "same_observation_test_as_diagnosis": true,
+    "total": 400,
+    "passed": 400,
+    "failed": 0,
+    "conclusion": "did not reproduce in this sample; does not prove exact historical causation"
+  },
+  "acceptance_criteria": [
+    {
+      "id": "GD-01",
+      "criterion": "preserve initial historical failure and explain captured same-condition failures with marker/kill/return ordering; do not invent missing historical trace"
+    },
+    {
+      "id": "GD-02",
+      "criterion": "one-line successful-sleep control uses same200ms deadline,1second worker and1.1second observation; retain all400 cases and actual start counts"
+    },
+    {
+      "id": "GD-03",
+      "criterion": "ready writer released only after guardian return is refused on intact runtime and detected when descendants deliberately survive; diagnostic pipes must not hide this contract"
+    },
+    {
+      "id": "GD-04",
+      "criterion": "fresh whole-module build/general/race/fmt/vet/pinned-lint/docs with unchanged prior passing and skip IDs; only one test Go file changes, no production runtime change"
+    },
+    {
+      "id": "GD-05",
+      "criterion": "update live worklist and source-bound evidence; preserve anonymous-review, independent acceptance, user exclusions and local signed commit boundaries"
+    }
+  ],
+  "harness_attempts_to_preserve": [
+    "initial diagnostic overlay variable declaration compile failure",
+    "initial post-return mutant blocked by inherited output pipe; recovered owned worker/data",
+    "final post-return diagnostic uses regular file and detects the expected real surviving writer"
+  ],
+  "status": "local_diagnosis_and_test_correction_verified",
+  "verification": {
+    "default_general": {
+      "pass": 4273,
+      "skip": 18,
+      "fail": 0
+    },
+    "default_race": {
+      "pass": 4273,
+      "skip": 18,
+      "fail": 0
+    },
+    "build_fmt_vet_pinned_lint_docs": true,
+    "focused_general_race_each": {
+      "pass": 27,
+      "fail": 0,
+      "skip": 0
+    },
+    "post_return_mutant_rejected": true,
+    "production_runtime_changed": false,
+    "CoreML_excluded": true,
+    "actual_model_calls": 0
+  }
+}

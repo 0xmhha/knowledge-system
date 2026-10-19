@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "user_excluded_CoreML_from_active_scope_non_CoreML_work_remains",
+  "current_activity": "phase87_deadline_false_positive_mechanism_reproduced_test_fixed_and_post_return_contract_verified",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -460,7 +460,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "investigate initial guardian deadline intermittence without weakening original test; continue non-CoreML work while independent gold/freeze and concrete non-CoreML deployment inputs remain required",
+  "next": "review WI-V1 full12 contract and installed consumer oracle scope; preserve independent gold/freeze requirements and CoreML user exclusion",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -545,15 +545,15 @@
     "production_guardian_changed": false
   },
   "last_native_validation": {
-    "stage": 86,
-    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/SUMMARY.json",
-    "general_pass": 4272,
-    "race_pass": 4272,
+    "stage": 87,
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/SUMMARY.json",
+    "general_pass": 4273,
+    "race_pass": 4273,
     "skip_each": 18,
     "fresh_Go_source": true,
-    "initial_race_failures": 1,
-    "guardian_intermittence_resolved": false,
-    "passed_build_general_reused_same_source": true
+    "changed_Go_files": 1,
+    "test_only_change": true,
+    "production_runtime_changed": false
   },
   "current_intent_batch_followup": "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/manifest.json",
   "current_real_peer_followup": "docs/spec-driven/operational-preparation/source-review-supplement/followups/real-peer-sync-v1/manifest.json",
@@ -635,5 +635,21 @@
     "kind": "CoreML_local_native_transport_CLI_default_regression_DEV_not_real_model_acceptance",
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/manifest.json",
     "manifest_sha256": "dc79310029bb434dee6911227441e4b033bfc179c639191ada96179d59ea6a42"
+  },
+  "current_guardian_deadline_followup": {
+    "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/manifest.json",
+    "manifest_sha256": "c1213bce8e84df32b3597bbc57f46c6e955ce76246731fe6a623f0e2fbc7ed37"
+  },
+  "guardian_deadline_disposition": {
+    "same_condition_failure_mechanism_reproduced": true,
+    "original_diagnostic_failures": 2,
+    "original_diagnostic_total": 400,
+    "one_line_control_passed": 400,
+    "post_return_mutant_rejected": true,
+    "test_fixture_corrected": true,
+    "production_runtime_changed": false,
+    "exact_historical_event_ordering": "not_available_in_original_trace",
+    "historical_failure_preserved": true
   }
 }

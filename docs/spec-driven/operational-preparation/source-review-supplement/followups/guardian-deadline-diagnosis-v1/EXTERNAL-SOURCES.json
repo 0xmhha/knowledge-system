@@ -1,0 +1,13 @@
+{
+  "context_only_not_local_runtime_attestation": [
+    {
+      "url": "https://pubs.opengroup.org/onlinepubs/009604499/functions/kill.html",
+      "use": "negative PID addresses every process in a group; observed cancellation ordering comes from local traces"
+    },
+    {
+      "url": "https://github.com/apple-oss-distributions/xnu/blob/main/bsd/kern/kern_sig.c",
+      "use": "official Apple signal implementation reference; main branch is not asserted identical to installed kernel"
+    }
+  ],
+  "primary_local_evidence": "two reproduced failures with marker present at guardian return, plus one-change control and post-return mutant"
+}

@@ -66,7 +66,7 @@ func TestGuardianCancellationStopsSameGroupLateWriter(t *testing.T) {
 	defer cancel()
 	root := t.TempDir()
 	ready, late := filepath.Join(root, "ready"), filepath.Join(root, "late")
-	cmd := setupCommandContext(guardianContext(ctx), "/bin/sh", "-c", `printf ready > "$1"; (sleep 1; printf orphan > "$2") & wait`, "owned", ready, late)
+	cmd := setupCommandContext(guardianContext(ctx), "/bin/sh", "-c", `printf ready > "$1"; (sleep 1 && printf orphan > "$2") & wait`, "owned", ready, late)
 	if err := cmd.Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +187,10 @@ func TestGuardianAbsoluteDeadlineWorksWhileOwnerSocketStaysOpen(t *testing.T) {
 	defer func() { _ = parent.Close(); _ = child.Close() }()
 	root := t.TempDir()
 	late := filepath.Join(root, "late")
-	payload := guardedCommand{SchemaVersion: 1, Argv: []string{"/bin/sh", "-c", `sleep 1; printf late > "$1"`, "owned", late}, DeadlineUnixNano: time.Now().Add(200 * time.Millisecond).UnixNano()}
+	// A group signal can terminate sleep before its waiting shell. With ';',
+	// that shell can briefly execute printf during cancellation, before it too
+	// is killed. Require a successful full sleep to arm this delayed writer.
+	payload := guardedCommand{SchemaVersion: 1, Argv: []string{"/bin/sh", "-c", `sleep 1 && printf late > "$1"`, "owned", late}, DeadlineUnixNano: time.Now().Add(200 * time.Millisecond).UnixNano()}
 	raw, err := json.Marshal(payload)
 	if err != nil {
 		t.Fatal(err)
@@ -196,16 +199,86 @@ func TestGuardianAbsoluteDeadlineWorksWhileOwnerSocketStaysOpen(t *testing.T) {
 	defer cancel()
 	cmd := exec.CommandContext(ctx, os.Args[0], "__dataset-step", base64.RawURLEncoding.EncodeToString(raw))
 	cmd.ExtraFiles = []*os.File{child}
+	diagnostic, err := os.Create(filepath.Join(root, "guardian-output"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = diagnostic.Close() }()
+	cmd.Stdout, cmd.Stderr = diagnostic, diagnostic
 	start := time.Now()
 	if err := cmd.Run(); err == nil {
 		t.Fatal("expired deadline reported success")
 	}
+	finished := time.Now()
 	if time.Since(start) > 3*time.Second {
 		t.Fatal("guardian ignored absolute deadline")
 	}
+	returnInfo, returnErr := os.Stat(late)
+	if returnErr != nil && !os.IsNotExist(returnErr) {
+		t.Fatalf("inspect marker at guardian return: %v", returnErr)
+	}
 	time.Sleep(1100 * time.Millisecond)
+	if info, err := os.Stat(late); err == nil {
+		output, _ := os.ReadFile(diagnostic.Name())
+		t.Fatalf("deadline writer marker: existed_at_return=%t mtime_after_return=%t guardian=%s", returnInfo != nil, info.ModTime().After(finished), output)
+	} else if !os.IsNotExist(err) {
+		t.Fatalf("inspect deadline writer marker: %v", err)
+	}
+}
+
+func TestGuardianDeadlineStopsWriterReleasedOnlyAfterReturn(t *testing.T) {
+	pair, err := unix.Socketpair(unix.AF_UNIX, unix.SOCK_STREAM, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	parent, child := os.NewFile(uintptr(pair[0]), "owner"), os.NewFile(uintptr(pair[1]), "guardian")
+	defer func() { _ = parent.Close(); _ = child.Close() }()
+	root := t.TempDir()
+	ready, release, late := filepath.Join(root, "ready"), filepath.Join(root, "release"), filepath.Join(root, "late")
+	// Also release a faulty fixture when an earlier assertion fails.
+	t.Cleanup(func() { _ = os.WriteFile(release, []byte("cleanup"), 0o600) })
+	payload := guardedCommand{SchemaVersion: 1, Argv: []string{"/bin/sh", "-c", `(printf ready > "$1"; while [ ! -f "$2" ]; do sleep .01; done; printf late > "$3") & wait`, "owned", ready, release, late}, DeadlineUnixNano: time.Now().Add(3 * time.Second).UnixNano()}
+	raw, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, os.Args[0], "__dataset-step", base64.RawURLEncoding.EncodeToString(raw))
+	cmd.ExtraFiles = []*os.File{child}
+	// A regular file must not make Cmd.Wait wait for inherited output pipes;
+	// otherwise a surviving writer would prevent the test from opening its gate.
+	diagnostic, err := os.Create(filepath.Join(root, "guardian-output"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = diagnostic.Close() }()
+	cmd.Stdout, cmd.Stderr = diagnostic, diagnostic
+	start := time.Now()
+	if err := cmd.Run(); err == nil {
+		t.Fatal("expired deadline reported success")
+	}
+	if time.Since(start) > 6*time.Second {
+		t.Fatal("guardian ignored gated writer deadline")
+	}
+	if _, err := os.Stat(ready); err != nil {
+		output, _ := os.ReadFile(diagnostic.Name())
+		t.Fatalf("gated writer never became ready: %v guardian=%s", err, output)
+	}
 	if _, err := os.Stat(late); !os.IsNotExist(err) {
-		t.Fatal("deadline left a late writer")
+		t.Fatalf("writer crossed unopened gate: %v", err)
+	}
+	// The owner socket stays open. Only the absolute deadline stops the
+	// guardian; a surviving writer can now demonstrate a post-return write.
+	if err := os.WriteFile(release, []byte("after-guardian-return"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	time.Sleep(1100 * time.Millisecond)
+	if _, err := os.Stat(late); err == nil {
+		output, _ := os.ReadFile(diagnostic.Name())
+		t.Fatalf("deadline left a post-return writer: guardian=%s", output)
+	} else if !os.IsNotExist(err) {
+		t.Fatalf("inspect post-return writer marker: %v", err)
 	}
 }
 
