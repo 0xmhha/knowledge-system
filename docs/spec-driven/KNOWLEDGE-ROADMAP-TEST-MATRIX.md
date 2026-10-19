@@ -1,3 +1,25 @@
+<!-- WI6-PAIRED-CURRENT -->
+# 단계71 — WI-6 실제 DEV19 기본/확장 검색쌍 / 2026-10-19
+
+[고정 범위](./operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1/SCOPE.json) · [명시 보정1](./operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1/CORRECTIVE-SCOPE.json) · [실측 결과](./operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1/SUMMARY.json) · [사례별 관측](./operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1/observations.json) · [전체 작업목록](./operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1/WORKLIST.json).
+
+| 단계 | 현재 결과와 한계 |
+|---|---|
+| 실제 식별 | 원문 모듈/수신자 기반 canonical·파일/함수 SHA·좌표로19개 선언 식별. 같은 위치의 승격 메서드 복제3개는 원래 선언 canonical로 구분. 실제 CKS 심볼 인용→소유 SQL 노드ID 연결→실제 값 분석 probe. 심볼 인용만으로 노드ID를 얻을 수 없어 별도 평가 어댑터가 필요했으며, 설치 에이전트 경로 검증으로 표시하지 않음 |
+| 기동·정리 | 처음1회는 사본 상위 읽기 조정 파일 누락으로 검색 전 기동 거부(exit1/검색0/19쌍미도달), 프로세스 잔존0. 원자료·당시 코드 보존. 프로토콜을 유지하고 소유 상위 조정 파일을 복원한 보정1회 성공. 성공 세션·driver exit0/잔존0, 숨은 자동 재시도0 |
+| 실제 검색쌍 | 사례19개×기본/확장1쌍=38호출, 식별/probe38호출 포함 전체76도구/78요청. 같은 실제 스냅샷1개·함수·기본제한/확장제한을 유지하고 사례순 AB/BA. 원래/소유 사본2248파일 전후 동일, 빈 live source 유지. 함수34개 원문을 원래 Git blob·함수 범위와 대조 |
+| 결과 | 기본19개 모두 partial, 확장19개 모두 budget_exhausted. 기본19슬롯/확장57슬롯 보존. 확장에는 seed19·원문확인된 정답범위밖 보조함수19·분석누락19가 있으며 후자 두 범주를 구분해 미확정으로 유지. 잡음·성공으로 바꾸지 않음 |
+| 수용 한계 | 완전한 쌍0·품질점수null·warm표본0. 확장 중단은 hop_boundary19/function_budget_exhausted19/deadline19/candidates1. 기존1초/1hop/4함수 결과를 유지하며 개선·온톨로지 효과·warm p95를 주장하지 않음 |
+
+**완료한 것은 실제 식별·호출·출처 매칭과 실패/부분응답의 기록이다. WI-6 전체 수용은 미완료다.** [검증 보고서](./operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1/REPORT.txt)를 따르며 최종 검사·문서·서명저장 결과는 해당 검증 기록과 실제 Git에서 확인한다. 유지보수 Go 입력은 동일해 기존 전체 build/test/fmt/vet/lint 근거를 재사용하며 새 전체 실행으로 표시하지 않는다. 모델은 저장된 BGE-M3 메타데이터이며 실행 중 임베딩 호출수는 미측정(null), 외부/유료 LLM 호출0이다.
+
+**정식0/9·독립승인0·FINAL0·D04미정·freeze null·execution_allowed=false**를 유지한다. 실명/연락처나 승인을 대신 만들지 않는다. 보안 전용 항목은 사용자 보류다. 최상위 수용 JSON은 단계67 준비 기준을 유지하고 이번 자료는 추가 DEV 근거다.
+
+다음은 **WI-6 부분 의미/예산 중단 조건의 구분과 같은 pin·세션에서의 warm 원자료 수집**이다. 부분 응답 시간과 완전한 응답 시간을 섞어 품질 수용으로 표시하지 않는다. 남은13묶음은 WI-V1, WI-V2, WI-6, WI-SP 비보안, WI-C, WI-1, WI-2, WI-3, WI-4, 독립수용 준비, 온톨로지 효과 평가, 정식9개 수용, 별도 선택 기능이다. 실제 LLM 답변 평가는 모델·인증·비용상한 결정 후 진행한다.
+<!-- END-WI6-PAIRED-CURRENT -->
+
+이하 이전 단계는 당시 기록이다.
+
 <!-- LIFECYCLE-RUNTIME-CURRENT -->
 # 단계70 — 구독 생명주기 추가 실행 검증 / 2026-10-19
 
