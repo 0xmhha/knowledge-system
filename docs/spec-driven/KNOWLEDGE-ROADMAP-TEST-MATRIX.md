@@ -1,3 +1,16 @@
+<!-- PHASE72-CURRENT -->
+# 단계72 — WI-6 반복 측정·13개 묶음 재대조 / 2026-10-19
+
+[13개 실행 원장](./REMAINING-13-EXECUTION.json) · [전체 잔여](../REMAINING-WORK.md) · [실측 결과](./operational-preparation/source-review-supplement/followups/wi6-warm-runtime-v1/SUMMARY.json) · [검증 기록](./operational-preparation/source-review-supplement/followups/wi6-warm-runtime-v1/REPORT.txt).
+
+- 같은 실제 pin·세션·상한에서19사례×(준비3쌍+본30쌍)=627쌍 완료. 도구1273회/전체1275요청, 숨은 재시도0. 서버/driver exit0·잔존0, 원래/소유2248파일 전후 동일. 원문34함수를 원래 Git blob과 대조했다.
+- 본570쌍의 기본570개 모두 partial, 확장570개 모두 budget_exhausted. 완전한 쌍0. 부분/예산 응답의 진단용 p95는 기본403.70ms·확장1152.86ms, 두 p95의 비율2.856이다. 완전 응답 지연·품질·온톨로지 효과의 통과 결과로 사용하지 않는다. 하드웨어/모델 메타데이터는 동일했으나 자원 독점은 증명하지 않았다. 기록/JSON 해석 시간이 포함된다.
+- WI-1 잔여53정의 위치를 전수 분류: range_unknown37, 선택 전 대입문에 연결된 수신 정의16. 빈 비도달 블록3은 공개 구분자가 없어 미확정이다. 분류 완료와 소비자 수정 완료를 구분한다. [상세 근거](./operational-preparation/source-review-supplement/followups/wi1-residual-classification-v1.json).
+- 기존 로컬 구현9/9·매니저 로드맵7/7(28/28)과 이번 전체13묶음 수용0/13을 구분한다. 각 완료 기준의 근거 없이는 완료 집계를 거부하는 검사를 추가했다. 새 전체 Go 검사는 실행하지 않았으며 기존1738입력·승인5입력이 동일한 근거로 이전 전체 검사를 재사용한다.
+
+다음은 **WI-1 선택 수신 정의의 실제 소비자 위치 수정 → 임베딩 캐시 opt-in 생성 경로 연결**이다. 13묶음 전체는 실행 원장을 따른다. 독립 승인0·정식0/9·FINAL0·D04미정·freeze null·execution_allowed=false를 유지한다. 익명 역할을 허용하고 실명/연락처는 요구하지 않는다. 사용자 보류인 보안 전용 범위는 건너뛴다. 유료/외부 LLM0, 실행 중 임베딩 호출수는 미측정(null)이다. 게시/운영 적용은 수행하지 않았다.
+<!-- /PHASE72-CURRENT -->
+
 <!-- WI6-PAIRED-CURRENT -->
 # 단계71 — WI-6 실제 DEV19 기본/확장 검색쌍 / 2026-10-19
 
