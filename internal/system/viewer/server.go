@@ -2,7 +2,6 @@ package viewer
 
 import (
 	"fmt"
-	"io/fs"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -27,7 +26,7 @@ func Handler(apiBase *url.URL, devDir string) (http.Handler, error) {
 		mux.Handle("/", http.FileServerFS(os.DirFS(devDir)))
 		return loopbackHostOnly(mux), nil
 	}
-	sub, err := fs.Sub(viewerFS, "web_assets")
+	sub, err := embeddedAssets()
 	if err != nil {
 		// Compile-time `go:embed all:web_assets` guarantees the directory
 		// exists; an error here is unrecoverable startup state.

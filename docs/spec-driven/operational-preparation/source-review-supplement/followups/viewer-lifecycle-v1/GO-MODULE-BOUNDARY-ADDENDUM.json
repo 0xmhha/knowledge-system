@@ -1,0 +1,18 @@
+{
+  "kind": "frontend_workspace_module_boundary_after_retained_lint_failure",
+  "failed_native_directory": "ks-phase80-native-20261019",
+  "general_pass": 4231,
+  "race_pass": 4231,
+  "test_skips_each": 18,
+  "lint_exit": 2,
+  "cause": "npm flatted ships Go implementation without nested module; root ./... traverses tools/viewer/node_modules and govet reports2 third-party reflect.Ptr inline diagnostics",
+  "proposed_fix": "tools/viewer/go.mod declares frontend workspace as separate module; no root owned Go source/test exclusion and no lint rule/config change",
+  "required_checks": [
+    "whole native rerun",
+    "prior passing and skip test IDs preserved",
+    "Go package inventory loses exactly external flatted package",
+    "current CKS/CKG binaries byte-identical to actual runtime before metadata-only boundary change"
+  ],
+  "formal_completed": 0,
+  "independent_approved": 0
+}

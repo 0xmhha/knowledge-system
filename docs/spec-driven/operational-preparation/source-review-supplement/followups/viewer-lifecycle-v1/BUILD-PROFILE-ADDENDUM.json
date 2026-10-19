@@ -1,0 +1,19 @@
+{
+  "kind": "predeclared_real_viewer_profile_after_actual_embedded_stub_observation",
+  "finding": "graph viewer target copies export then restores tracked stub index before Go build; actual binary serves not-built page",
+  "behavior": [
+    "keep tracked stub as explicit no-build fallback",
+    "put generated Next export under separate ignored web_assets/app payload",
+    "both embedded HTTP serving and static export prefer built app when present",
+    "remove stub restoration over generated entry; npm ci uses existing lock; no npm security audit",
+    "correct stale viewer build instructions; no frontend feature rewrite"
+  ],
+  "verification": [
+    "asset FS built/fallback/malformed cases",
+    "npm typecheck/lint/build",
+    "actual embedded binary browser interaction on pinned owned graph",
+    "full native build/test/race/fmt/vet/lint with generated embed payload hashed and archived separately"
+  ],
+  "independent_approved": 0,
+  "formal_completed": 0
+}

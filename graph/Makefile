@@ -9,18 +9,14 @@ all: build
 # ../internal/system/viewer/web_assets/, where the composition engine's
 # go:embed picks it up (`cks viewer` serves it; this engine serves /api only).
 #
-# We rm -rf the embed dir before copying to drop stale files from the
-# previous build. Rebuild cks afterwards (`make -C .. build-bins`) so the
-# binary carries the fresh assets; the tracked stub is restored so
-# `git status` stays clean.
+# The generated app is separate from the tracked no-build stub. Never restore
+# the stub over a successful export before compiling cks. Sources/lock stay
+# tracked; the optional embedded payload is a generated build input.
 viewer:
-	cd ../tools/viewer && npm install && npm run build
-	rm -rf ../internal/system/viewer/web_assets
-	mkdir -p ../internal/system/viewer/web_assets
-	cp -R ../tools/viewer/out/. ../internal/system/viewer/web_assets/
-	@if git rev-parse --git-dir >/dev/null 2>&1; then \
-	    git checkout -- ../internal/system/viewer/web_assets/index.html 2>/dev/null || true; \
-	fi
+	cd ../tools/viewer && npm ci --no-audit --no-fund && NEXT_TELEMETRY_DISABLED=1 npm run build
+	rm -rf ../internal/system/viewer/web_assets/app
+	mkdir -p ../internal/system/viewer/web_assets/app
+	cp -R ../tools/viewer/out/. ../internal/system/viewer/web_assets/app/
 
 # build: the ckg binary. The dashboard is not embedded here — it lives with
 # the composition engine (internal/system/viewer, served by `cks viewer`).

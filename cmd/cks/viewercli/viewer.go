@@ -10,6 +10,7 @@ package viewercli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -53,8 +54,19 @@ func NewCmd() *cobra.Command {
 	return cmd
 }
 
+type backendLauncher func(context.Context, string, int, interface{ Write([]byte) (int, error) }) (*graphBackend, error)
+
 func runViewer(ctx context.Context, graph, apiURL string, port int, open bool, stderr interface{ Write([]byte) (int, error) }) error {
+	return runViewerWithBackend(ctx, graph, apiURL, port, open, stderr, func(ctx context.Context, graph string, port int, stderr interface{ Write([]byte) (int, error) }) (*graphBackend, error) {
+		return startGraphBackend(ctx, siblingCkg(), []string{"api", "--graph", graph, "--port", fmt.Sprint(port)}, stderr, 5*time.Second)
+	})
+}
+
+func runViewerWithBackend(parent context.Context, graph, apiURL string, port int, open bool, stderr interface{ Write([]byte) (int, error) }, launch backendLauncher) (resultErr error) {
+	ctx, cancel := context.WithCancel(parent)
+	defer cancel()
 	base := apiURL
+	var ownedBackend *graphBackend
 	if graph != "" {
 		// Spawn the graph engine's API server as a sibling subprocess on a
 		// free loopback port — the same engine-CLI contract cks setup uses.
@@ -62,15 +74,18 @@ func runViewer(ctx context.Context, graph, apiURL string, port int, open bool, s
 		if err != nil {
 			return err
 		}
-		bin := siblingCkg()
-		child := exec.CommandContext(ctx, bin, "api", "--graph", graph, "--port", fmt.Sprint(apiPort))
-		child.Stderr = os.Stderr
-		if err := child.Start(); err != nil {
-			return fmt.Errorf("spawn %s api: %w", bin, err)
+		child, err := launch(ctx, graph, apiPort, stderr)
+		if err != nil {
+			return fmt.Errorf("spawn graph API: %w", err)
 		}
-		defer func() { _ = child.Process.Kill() }()
+		defer func() {
+			if err := child.stopError(); err != nil {
+				resultErr = errors.Join(resultErr, err)
+			}
+		}()
+		ownedBackend = child
 		base = fmt.Sprintf("http://127.0.0.1:%d", apiPort)
-		if err := waitReady(ctx, base+"/api/manifest", 30*time.Second); err != nil {
+		if err := waitReady(ctx, base+"/api/manifest", 30*time.Second, child); err != nil {
 			return fmt.Errorf("graph API backend not ready: %w", err)
 		}
 	}
@@ -91,14 +106,37 @@ func runViewer(ctx context.Context, graph, apiURL string, port int, open bool, s
 	}
 
 	srv := &http.Server{Addr: addr, Handler: h, ReadHeaderTimeout: 5 * time.Second}
+	stopped := make(chan struct{})
 	go func() {
+		defer close(stopped)
 		<-ctx.Done()
 		shutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		_ = srv.Shutdown(shutCtx)
 	}()
+	watched := make(chan struct{})
+	go func() {
+		defer close(watched)
+		if ownedBackend == nil {
+			<-ctx.Done()
+			return
+		}
+		select {
+		case <-ctx.Done():
+		case <-ownedBackend.done:
+			cancel()
+		}
+	}()
+	defer func() { cancel(); <-stopped; <-watched }()
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return err
+	}
+	if ownedBackend != nil && parent.Err() == nil {
+		select {
+		case <-ownedBackend.done:
+			return fmt.Errorf("graph API exited while serving: %v", ownedBackend.err)
+		default:
+		}
 	}
 	return nil
 }
@@ -148,27 +186,50 @@ func freePort() (int, error) {
 	return port, nil
 }
 
-func waitReady(ctx context.Context, probeURL string, timeout time.Duration) error {
-	deadline := time.Now().Add(timeout)
-	for time.Now().Before(deadline) {
-		if ctx.Err() != nil {
-			return ctx.Err()
+func waitReady(parent context.Context, probeURL string, timeout time.Duration, backend *graphBackend) error {
+	ctx, cancel := context.WithTimeout(parent, timeout)
+	defer cancel()
+	ticker := time.NewTicker(300 * time.Millisecond)
+	defer ticker.Stop()
+	client := &http.Client{Timeout: 500 * time.Millisecond}
+	var exited <-chan struct{}
+	if backend != nil {
+		exited = backend.done
+	}
+	for {
+		if err := ctx.Err(); err != nil {
+			return err
 		}
-		res, err := http.Get(probeURL)
+		if err := backend.exited(); err != nil {
+			return err
+		}
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, probeURL, nil)
+		if err != nil {
+			return err
+		}
+		res, err := client.Do(req)
 		if err == nil {
 			_ = res.Body.Close()
-			if res.StatusCode == http.StatusOK {
+			if ctx.Err() == nil && res.StatusCode == http.StatusOK {
+				if err := backend.exited(); err != nil {
+					return err
+				}
 				return nil
 			}
 		}
-		time.Sleep(300 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-exited:
+			return backend.exited()
+		case <-ticker.C:
+		}
 	}
-	return fmt.Errorf("no 200 from %s within %s", probeURL, timeout)
 }
 
 // openBrowser launches the platform's default URL handler. The child
-// process is intentionally detached (no Wait) — the browser may outlive
-// `cks viewer`, and blocking on it would defeat the goroutine.
+// launcher is reaped in the existing asynchronous caller. The user's browser
+// remains independent and may outlive `cks viewer`.
 func openBrowser(url string) {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
@@ -179,5 +240,5 @@ func openBrowser(url string) {
 	default:
 		cmd = exec.Command("xdg-open", url)
 	}
-	_ = cmd.Start()
+	_ = cmd.Run()
 }
