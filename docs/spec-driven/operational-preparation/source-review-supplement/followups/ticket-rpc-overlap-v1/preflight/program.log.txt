@@ -1,0 +1,12 @@
+['/Users/kevin/.gvm/gos/go1.23.12/bin/go', 'build', '-cover', '-covermode=atomic', '-coverpkg=owned.test/coverageprobe', '-o', '/private/tmp/ks-rpc-coverage-preflight-20261019/program', './cmd']
+['/private/tmp/ks-rpc-coverage-preflight-20261019/program']
+panic: error: no meta-data available (binary not built with -cover?)
+
+goroutine 1 [running]:
+main.main()
+	/private/tmp/ks-rpc-coverage-preflight-20261019/cmd/main.go:3 +0x11c
+Traceback (most recent call last):
+  File "<stdin>", line 5, in <module>
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/private/tmp/ks-rpc-coverage-preflight-20261019/program']' returned non-zero exit status 2.

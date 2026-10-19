@@ -1,0 +1,125 @@
+{
+  "phase": 67,
+  "kind": "WIV1_V2_native_RPC_overlap_atomic_counter_DEV_not_independent_acceptance",
+  "previous_revision": "4b7b9decb76e234de8d2bae12575355f5f8415c1",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "candidate_roles": [
+    "ORIGINAL",
+    "CAND-A",
+    "CAND-B"
+  ],
+  "previously_retained_roles_not_fresh": [
+    "MUT-REINTRO",
+    "MUT-EARLY"
+  ],
+  "unique_method_variants": 3,
+  "planned_slots": [
+    {
+      "slot_id": "ORIGINAL-general-rpc-overlap",
+      "candidate": "ORIGINAL",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "rpc-overlap"
+    },
+    {
+      "slot_id": "ORIGINAL-race-rpc-overlap",
+      "candidate": "ORIGINAL",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "rpc-overlap"
+    },
+    {
+      "slot_id": "CAND-A-general-rpc-overlap",
+      "candidate": "CAND-A",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "rpc-overlap"
+    },
+    {
+      "slot_id": "CAND-A-race-rpc-overlap",
+      "candidate": "CAND-A",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "rpc-overlap"
+    },
+    {
+      "slot_id": "CAND-B-general-rpc-overlap",
+      "candidate": "CAND-B",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "rpc-overlap"
+    },
+    {
+      "slot_id": "CAND-B-race-rpc-overlap",
+      "candidate": "CAND-B",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "rpc-overlap"
+    }
+  ],
+  "planned_attempts": 6,
+  "repetitions_per_role_profile": 1,
+  "independent_repeated_execution_criterion_satisfied": false,
+  "fixture_sha256": "e305c4a9992866016af9f3c358eadead13e4ec61de6a4bd174b38bea458de7b9",
+  "main_fixture_sha256": "59e823c5358485830f1ffcf01f67a9ac2025b9ca1ad492dc1a2eea95753898f1",
+  "target_toolchain": {
+    "GOVERSION": "go1.23.12",
+    "GOOS": "darwin",
+    "GOARCH": "arm64",
+    "CGO_ENABLED": "1"
+  },
+  "build_timeout_seconds": 600,
+  "owned_process_timeout_seconds": 210,
+  "parallelism": 2,
+  "build_parallelism": 2,
+  "automatic_retries": 0,
+  "native_timer_seconds": 60,
+  "minimum_first_native_ns": 60000000000,
+  "minimum_second_native_ns": 120000000000,
+  "observation_milliseconds": 300,
+  "caller_RPC_requests_per_slot": 1,
+  "flow": [
+    "actual_memory_chain_snap_controlled_height1_not_full_Downloader_or_real_peer_sync",
+    "actual_Server_ServeCodec_NewCodec_netPipe_syncing_callback",
+    "owned_first_notification_write_gate_ignores_transport_deadline_while_held",
+    "first_native60s_notification_received_by_callback_but_not_delivered_to_wire",
+    "second_native60s_broadcast_blocks_exact_only_status_channel_callback_in_Notify",
+    "atomic_counters_and_stacks_before_connection_close",
+    "actual_server_Stop_client_Close_with_gate_held_then_release",
+    "select_exit_vs_second_status_not_forced_observe_conditional_outcomes",
+    "atomic_counters_and_stacks_before_any_rescue",
+    "bounded_owned_rescue_callback_loop_codec_chain_and_process_group"
+  ],
+  "runtime_counter_snapshots": "nontransactional_atomic_per_counter_snapshot_before_cleanup; no independent oracle; source exact but compiled counters and bridge perturb schedule",
+  "program_additions": [
+    "eth/downloader/ks_owned_rpc_overlap.go",
+    "cmd/ks-owned-rpc-overlap/main.go"
+  ],
+  "original_package_tests_executed": false,
+  "backend_map_directly_observed": false,
+  "all_post_ack_channel_use_proved": false,
+  "full_original5_schedules": false,
+  "full12_requirements": false,
+  "acceptance_limits": {
+    "independent_approved": 0,
+    "independent_tickets": 0,
+    "FINAL": 0,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "freeze": null,
+    "execution_allowed": false,
+    "independent_acceptable_candidate_set": null,
+    "canonical_selection": null,
+    "quality_score": null
+  },
+  "security": {
+    "external_network": false,
+    "operational_node": false,
+    "global_settings": false,
+    "system_clock_change": false,
+    "credential_environment_inheritance": false,
+    "publication": false,
+    "paid_or_external_LLM": false,
+    "owned_process_group_only": true
+  }
+}

@@ -345,6 +345,10 @@ class PreparationGuardTests(unittest.TestCase):
             reference[hash_field] = hashlib.sha256(path.read_bytes()).hexdigest()
             return guard.check_review_draft_packet(root, reference)
 
+    def test_native_rpc_overlap_counters_cannot_approve_independent_candidates(self):
+        self.protocol["execution_allowed"] = True
+        self.assertTrue(self.errors())
+
     def test_actual_method_schedules_cannot_enable_formal_execution(self):
         self.protocol["execution_allowed"] = True
         self.protocol["roles"]["gold_reviewer"] = {"kind": "AI", "decision": "approved"}

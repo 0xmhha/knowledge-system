@@ -1,0 +1,11 @@
+['/Users/kevin/.gvm/gos/go1.23.12/bin/go', 'test', '-cover', '-covermode=atomic', '-c', '-o', '/private/tmp/ks-rpc-coverage-preflight-20261019/probe.test']
+['/private/tmp/ks-rpc-coverage-preflight-20261019/probe.test', '-test.run=TestSnapshot', '-test.timeout=20s']
+--- FAIL: TestSnapshot (0.00s)
+    probe_test.go:3: error: no meta-data available (binary not built with -cover?)
+FAIL
+coverage: 66.7% of statements
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/private/tmp/ks-rpc-coverage-preflight-20261019/probe.test', '-test.run=TestSnapshot', '-test.timeout=20s']' returned non-zero exit status 1.

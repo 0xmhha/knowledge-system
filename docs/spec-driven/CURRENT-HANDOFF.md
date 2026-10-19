@@ -1,3 +1,25 @@
+<!-- TICKET-OVERLAP-CURRENT -->
+# 단계67 — 실제 RPC 종료·native 송신 겹침의 계측 관측 / 2026-10-19
+
+[사전 명세](./operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/SCOPE.json) · [결과](./operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/SUMMARY.json) · [실행별 관측](./operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/observations.json) · [12요건](./operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/requirements.json) · [전체 작업목록](./operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/WORKLIST.json).
+
+**독립 승인0·FINAL0·정식0/9·freeze null·execution_allowed=false·D04미정**을 유지한다. 익명 역할을 허용하고 실명/연락처 또는 승인 기록을 대신 만들지 않는다.
+
+| 범위 | 결과와 한계 |
+|---|---|
+| 실제 경로 | 원본/A/B의 일반·race 소유 프로그램6개를 새로 빌드·실행. 실제 memory chain/snap·제어높이1·소유 StartEvent와 NewDownloaderAPI/Server.ServeCodec/NewCodec/net.Pipe/Syncing을 연결. 실제60초 timer12회·RPC구독요청6회. 첫 알림의 쓰기를 소유 gate가 막으므로 wire 알림 전달0이며 해지true응답을 만들어 세지 않음 |
+| 실제 겹침 | 두 번째 native timer가 같은 유일한 비버퍼 상태 채널로 송신하다 대기하는 동안 실제 RPC callback은 Notify의 소유 write gate 안에 있음. 연결 Close/server Stop 뒤 gate를 해제. 4실행은 실제종료·defer메서드와 native송신 겹침(원본 쌍대기2/A·B 배출-ack-반환2), 다른2실행은 callback이 두 번째 상태를 먼저 소비한 뒤 종료. select 순서를 강제하거나 후자를 겹침 증거로 승격하지 않음 |
+| 계측 | 정확한 API overlay와 소유 bridge/main2개·컴파일러 atomic coverage를 사용. 원래 추적2228개·실제project/build Git tree·Go1.23.12·binary지문을 결속. cleanup 전 카운터12스냅샷을 각기 분리하고, 종료 자동coverage와 병합하지 않음. 원자료의 binary counter/meta를 지정 SDK로 다시 변환해 보존한 text와 대조. 개별 atomic값이며 전역트랜잭션/독립오라클이 아님 |
+| 시험 범위 | 독립 소유 프로그램으로 실행하므로 원래 upstream 시험과 무거운 시험init은 소스에 남기되 실행하지 않음. 전체upstream시험 통과로 표시하지 않음. compiler counter/관측코드/transport gate가 스케줄에 영향을 줌. 특히 gate는 보류 중 원래 write deadline을 의도적으로 적용하지 않으므로 실제 네트워크의 timeout 동작을 입증하지 않음 |
+| 정리 | 관측 확정 뒤 원본 쌍대기의 실제요청만 받아 해당상태 채널을 drain하고 소유 cleanup ack를 닫음. 이 ack를 실제 backend map삭제/ack 증거로 세지 않음. callback/eventLoop/codec/chain 및 실제프로세스그룹 모두 종료·잔존0. map 직접관측·삭제-ack의 계측순서·ack후 모든채널사용 없음은 미입증 |
+| 보안 항목 | 사용자 요청에 따라 WI-SP의 보안정답·권한/비공개/위조 경계 평가와 선택기능의 조직인증/권한을 보류. 완료로 세지 않음. WI-SP의 출처/정책·미태그·소비자 경로와 일반 안정성 검증은 계속. 프로세스 시간제한과 소유자원 정리는 종료안정성 요건으로 유지 |
+| 진행 상태 | 대상6개 exit0·숨은재시도0. 12요건×6=72항목 모두 전체충족false. 원본alias/조기반환변형은 기존 증거만 유지하며 새 실행으로 세지 않음. 판정기29·공통67(3개분할/중복없이각1회)·문서계약20·notice3=119개 통과. 원자료232파일 동일 재생/추가대상실행0. 기술/공통 게이트 통과, 정식/동결/커밋전저장은 예상거부. 문서검사는 [검증근거](./operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/validation/SUMMARY.json)를 따르며 서명저장은 실제 커밋 뒤 확인한다. CKS native 동일입력의 기존 전체검증을 재사용하며 새 전체실행으로 표시하지 않음 |
+
+다음은 **실제map멤버십·삭제/ack/모든사용 경계의 계측 범위 확정과 WI-6의 비보안 검색쌍·관련성/잡음·warm 검증**이다. [작업목록](./operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/WORKLIST.json)의 13묶음은 유지하되 보안전용 항목은 사용자 보류로 구분한다. 나머지는 WI-V1/V2 전체시작/실제sync/indexer·설치역할/독립티켓·후보집합, WI-6, WI-SP 비보안 출처/소비자, WI-C 리뷰계약/보고서·그림/전달·설치, WI-1 의미/값·타입/unknown/메모리, WI-2 독립표본·완전정답/명령·호출자/MCP, WI-3 독립가족/정답·예산/부분·오류·범위밖, WI-4 전체driver/host/시간·반복/충분성, 독립수용 준비(익명역할/독립성·새DEV/FINAL·완전정답/매칭/충분성·F01~08), 온톨로지 정답/구현·개념/검색효과, 정식9개 수용0/9, 별도선택기능이다. 실제 LLM 답변은 모델·인증·상한 결정 뒤 진행한다.
+<!-- END-TICKET-OVERLAP-CURRENT -->
+
+이하 단계66 및 이전은 당시 기록이다.
+
 <!-- TICKET-METHOD-CURRENT -->
 # 단계66 — WI-V1/V2 해지 메서드 5일정의 실제 관측 / 2026-10-19
 

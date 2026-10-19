@@ -1,0 +1,3 @@
+package main
+import("os";"runtime/coverage";probe "owned.test/coverageprobe")
+func main(){probe.Branch(true);d:=os.Getenv("OWNED_COVER_DIR");if err:=coverage.WriteMetaDir(d);err!=nil{panic(err)};if err:=coverage.WriteCountersDir(d);err!=nil{panic(err)}}
