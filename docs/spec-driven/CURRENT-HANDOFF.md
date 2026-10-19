@@ -1,5 +1,7 @@
 # 현재 인수인계 — 종료 시한 검사 원인 추적 / 2026-10-20
 
+단계87 구현·검증은 서명 커밋 `87fed3d970cf`에 저장했고 변경303개 파일의 실제 저장 내용과 서명을 대조했다. [최종 회귀 기록](./operational-preparation/source-review-supplement/followups/guardian-deadline-verification-v1/REPORT.json).
+
 동일 조건의 실제 시각 계측400회 중2회에서 기존 실패를 재현했다. sleep이 먼저 종료되고 셸이 뒤의 무조건 printf를 실행하면서, 파일이 group kill 호출 중·guardian 반환 전에 생겼다. 기존 검사는 이것도 “종료 후 쓰기”로 보고했다. 두 파일은 반환 시점에 이미 존재했고 stat 오류/반환 후 새 생성은 그 사례들에서 관측되지 않았다.
 
 sleep1;printf를 sleep1&&printf로 한 줄만 바꾼 별도 대조400회는 모두 통과했다. 기존200ms 시한·1초 worker·반환 후1.1초 관찰을 유지했다. 채택한 변경은 시험 파일1개이며 운영 종료 코드는 바꾸지 않았다. 파일 조회 오류와 실제 marker 존재를 별도로 보고한다.
