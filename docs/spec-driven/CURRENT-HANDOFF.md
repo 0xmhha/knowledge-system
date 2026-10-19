@@ -1,4 +1,4 @@
-# 현재 인수인계 — 단계83 / 2026-10-19
+# 현재 인수인계 — 단계84 / 2026-10-20
 
 현재 코드의 Go6개 변경과 선택 UI build profile을 검증했다. 전체 일반4231/race4231통과·각18skip, build/fmt/vet/고정lint/docs134통과. 실제 UI에서 검색·본문 출처·2D/상한500·키보드 검색·도움말을 확인하고 CKS/CKG exit0/reap/강제정리0·원본/소유2248파일 보존을 확인했다.
 
@@ -6,7 +6,7 @@
 
 기본 no-frontend 경로도 집중 race20·build·stub export를 확인하고 app46개를 복구했다. 증거 검사12·운영 기준67·작업 원장4가 통과했다. 외부 npm Go 샘플의 lint 실패와 하네스 출력/로그 폴더 중복 실패를 보존했고, 유지 Go package137개는 모두 검증했다.
 
-승인 범위 적용을 완료했다. 실제 owner4일정/통제 late-drain1일정, 옛 구독·새 등록 전 경계를 현재 원장에 연결했다. 과거 pending AI 제안과 제한 결과는 그대로 보존하고 독립 승인으로 승격하지 않았다. WI1/2/3/4/V1/V2/6/C의 AI 초안은 당시 커밋의 격리 복사본에서 검사기7개가 모두 통과했다. 현재 소스에서 구형 검사기가 거부한7건은 그대로 보존하고 당시 유효성과 현재 정답 승인을 구분한다. 보안 혼합 WI-SP 검사는 실행하지 않았다. 로컬 Qwen3 임베딩0.6b/4b는 실제 존재하며1024/2560차원 Ollama GGUF이다. 헤더/metadata만 확인하고 추론·전환은0, BGE 기준선도 바꾸지 않았다. 지정된 모델 루트/색인에서 CoreML 패키지·별도 tokenizer를 찾지 못했으며 전체 홈 부재 증명은 아니다. 보안 전용 audit 연동도 사용자 보류로 분리해 활성 후속10개를 유지한다. 다음은 검증된 native80 binary로 실제21회 규모 검증이다. 모든13묶음은 독립 조건 등 남은 기준이 있어0/13, 정식0/9를 유지한다.
+승인 범위 적용을 완료했다. 실제 owner4일정/통제 late-drain1일정, 옛 구독·새 등록 전 경계를 현재 원장에 연결했다. 과거 pending AI 제안과 제한 결과는 그대로 보존하고 독립 승인으로 승격하지 않았다. WI1/2/3/4/V1/V2/6/C의 AI 초안은 당시 커밋의 격리 복사본에서 검사기7개가 모두 통과했다. 현재 소스에서 구형 검사기가 거부한7건은 그대로 보존하고 당시 유효성과 현재 정답 승인을 구분한다. 보안 혼합 WI-SP 검사는 실행하지 않았다. 로컬 Qwen3 임베딩0.6b/4b는 실제 존재하며1024/2560차원 Ollama GGUF이다. 헤더/metadata만 확인하고 추론·전환은0, BGE 기준선도 바꾸지 않았다. 지정된 모델 루트/색인에서 CoreML 패키지·별도 tokenizer를 찾지 못했으며 전체 홈 부재 증명은 아니다. 보안 전용 audit 연동도 사용자 보류로 분리해 활성 후속10개를 유지한다. 실제21회 규모 검증을 완료했다. 1.242GB/244989노드/1964193관계에서 긴 함수3개·요청21개가 partial18/budget_exhausted3을 반환했다. 측정15응답 약2.400/s·CKS 최대RSS표본162.45MiB, 각 budget 뒤 원문 일치 응답·EOFexit0/잔여0·원본/소유 데이터 보존을 확인했다. BGE HTTP4/input68, 실제LLM0이며 용량·완전 의미 분석 수용은 아니다. 시작 캡처가 첫 health까지 포함한 측정 명칭 오류와 초기 validator 거부도 보존했다. 다음은 기존 public v2 CLI/HTTP·독립 graph export 계약을 확인해 구현한다. 모든13묶음은 독립 조건 등 남은 기준이 있어0/13, 정식0/9를 유지한다.
 
 [단계77 실행 근거](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/SUMMARY.json) · [실패/범위 보고서](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/REPORT.txt) · [13개 정본 원장](./REMAINING-13-EXECUTION.json)
 

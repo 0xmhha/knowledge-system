@@ -1,0 +1,22 @@
+{
+  "kind": "measurement_phase_label_correction_after_completed_execution",
+  "original_capture_name": "startup-HTTP",
+  "actual_capture_end": "after explicit health_before response, not immediately after initialize",
+  "original_validator_failure": "required exactly[1,65] even though capture included first health; initial failure preserved",
+  "retained_input_counts": [
+    1,
+    65,
+    1,
+    1
+  ],
+  "captured_through_first_health": [
+    1,
+    65,
+    1
+  ],
+  "accepted_contract": "fixed probe1+anchor65 prefix; explicit health-before/after may each add single-input probe; all4 requests and68items counted; no isolated initialize-only timing/count claim",
+  "raw_execution_modified": false,
+  "new_retry_or_query": false,
+  "capacity_threshold_changed": false,
+  "independent_approval": false
+}
