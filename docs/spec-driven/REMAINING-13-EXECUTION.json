@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "phase82_seven_AI_draft_historical_replays_verified_current_source_approval_separate",
+  "current_activity": "phase83_actual_local_Qwen_GGUF_inventory_recorded_CoreML_inputs_unconfirmed",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -257,19 +257,30 @@
     {
       "id": "OPTIONAL-12",
       "status": "separate_backlog",
-      "task": "공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사; viewer; 배포/downstream",
+      "task": "공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사(사용자 보류); viewer; 배포/downstream",
       "priority": 13,
       "user_deferred": [
-        "organization authentication/authorization"
+        "organization authentication/authorization",
+        "security-only operational audit wiring"
       ],
       "completion_status": "not_complete",
       "implementation_status": "not_applicable_or_mixed",
       "done_when": [
+        "ten active non-security followups each has explicit supported surface and evidence",
+        "CoreML weights and deployment target supplied when required",
+        "organization auth remains user-deferred"
+      ],
+      "independent_approval_invented": false,
+      "original_done_when_before_security_deferral": [
         "eleven active followups each has explicit supported surface and evidence",
         "CoreML weights and deployment target supplied when required",
         "organization auth remains user-deferred"
       ],
-      "independent_approval_invented": false
+      "scope_change_receipt": {
+        "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-deferred-security-scope-v1/SCOPE.json",
+        "sha256": "cbf9ab52dba5da47a2e1287939a74cd8c8eec4baf7f0999181faa3635aef639a",
+        "deferred_not_complete": true
+      }
     }
   ],
   "optional_followups": [
@@ -336,8 +347,14 @@
       "source_paths": [
         "internal/vector/embed/coreml"
       ],
-      "observation": "native adapter exists; CLI dispatch/actual weights validation remain",
-      "status": "not_complete"
+      "observation": "actual qwen3-embedding0.6b1024 and4b2560 found as Ollama GGUF; headers/provider metadata read, inference0; no CoreML package/tokenizer found in scoped roots; no conversion or baseline change",
+      "status": "not_complete",
+      "input_inventory": {
+        "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-local-model-inventory-v1/INVENTORY.json",
+        "sha256": "bbceaa83710ff0af3736c193a67b49181b00ea10b3fcf30b6c02d30f96add354",
+        "model_inference_calls": 0,
+        "CoreML_executed": false
+      }
     },
     {
       "id": "EMBED-CACHE",
@@ -356,8 +373,13 @@
       "source_paths": [
         "internal/system/auditlog/auditlog.go"
       ],
-      "observation": "library exists; composer wiring/retention/failure policy remain",
-      "status": "not_complete"
+      "observation": "security/decision audit library integration deferred under direct user instruction; not implemented or accepted",
+      "status": "user_deferred_security_only_not_complete",
+      "scope_decision": {
+        "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-deferred-security-scope-v1/SCOPE.json",
+        "sha256": "cbf9ab52dba5da47a2e1287939a74cd8c8eec4baf7f0999181faa3635aef639a",
+        "deferred_not_complete": true
+      }
     },
     {
       "id": "VIEWER",
@@ -388,7 +410,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "record actual local Qwen GGUF inventory and run21 actual long-function queries after current native gate",
+  "next": "execute21 owned long-function queries under verified native80 gate; validate and commit all measured outcomes",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -542,5 +564,13 @@
     "sha256": "ff8ba28b17a18f2f19dba6a07aac5aea4fc252649cd014168006cf12a72702b1",
     "formal_completed": 0,
     "independent_approved": 0
-  }
+  },
+  "current_local_model_inventory": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-local-model-inventory-v1/INVENTORY.json",
+    "sha256": "bbceaa83710ff0af3736c193a67b49181b00ea10b3fcf30b6c02d30f96add354",
+    "model_inference_calls": 0,
+    "CoreML_executed": false
+  },
+  "optional_active_followups": 10,
+  "optional_user_deferred_followups": 1
 }

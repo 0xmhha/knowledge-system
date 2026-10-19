@@ -1,4 +1,4 @@
-# 현재 인수인계 — 단계82 / 2026-10-19
+# 현재 인수인계 — 단계83 / 2026-10-19
 
 현재 코드의 Go6개 변경과 선택 UI build profile을 검증했다. 전체 일반4231/race4231통과·각18skip, build/fmt/vet/고정lint/docs134통과. 실제 UI에서 검색·본문 출처·2D/상한500·키보드 검색·도움말을 확인하고 CKS/CKG exit0/reap/강제정리0·원본/소유2248파일 보존을 확인했다.
 
@@ -6,7 +6,7 @@
 
 기본 no-frontend 경로도 집중 race20·build·stub export를 확인하고 app46개를 복구했다. 증거 검사12·운영 기준67·작업 원장4가 통과했다. 외부 npm Go 샘플의 lint 실패와 하네스 출력/로그 폴더 중복 실패를 보존했고, 유지 Go package137개는 모두 검증했다.
 
-승인 범위 적용을 완료했다. 실제 owner4일정/통제 late-drain1일정, 옛 구독·새 등록 전 경계를 현재 원장에 연결했다. 과거 pending AI 제안과 제한 결과는 그대로 보존하고 독립 승인으로 승격하지 않았다. WI1/2/3/4/V1/V2/6/C의 AI 초안은 당시 커밋의 격리 복사본에서 검사기7개가 모두 통과했다. 현재 소스에서 구형 검사기가 거부한7건은 그대로 보존하고 당시 유효성과 현재 정답 승인을 구분한다. 보안 혼합 WI-SP 검사는 실행하지 않았다. 다음은 Qwen/CoreML 입력 기록과 실제 규모 검증이다. 모든13묶음은 독립 조건 등 남은 기준이 있어0/13, 정식0/9를 유지한다.
+승인 범위 적용을 완료했다. 실제 owner4일정/통제 late-drain1일정, 옛 구독·새 등록 전 경계를 현재 원장에 연결했다. 과거 pending AI 제안과 제한 결과는 그대로 보존하고 독립 승인으로 승격하지 않았다. WI1/2/3/4/V1/V2/6/C의 AI 초안은 당시 커밋의 격리 복사본에서 검사기7개가 모두 통과했다. 현재 소스에서 구형 검사기가 거부한7건은 그대로 보존하고 당시 유효성과 현재 정답 승인을 구분한다. 보안 혼합 WI-SP 검사는 실행하지 않았다. 로컬 Qwen3 임베딩0.6b/4b는 실제 존재하며1024/2560차원 Ollama GGUF이다. 헤더/metadata만 확인하고 추론·전환은0, BGE 기준선도 바꾸지 않았다. 지정된 모델 루트/색인에서 CoreML 패키지·별도 tokenizer를 찾지 못했으며 전체 홈 부재 증명은 아니다. 보안 전용 audit 연동도 사용자 보류로 분리해 활성 후속10개를 유지한다. 다음은 검증된 native80 binary로 실제21회 규모 검증이다. 모든13묶음은 독립 조건 등 남은 기준이 있어0/13, 정식0/9를 유지한다.
 
 [단계77 실행 근거](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/SUMMARY.json) · [실패/범위 보고서](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/REPORT.txt) · [13개 정본 원장](./REMAINING-13-EXECUTION.json)
 
@@ -54,7 +54,7 @@
 |독립 수용 준비|익명 검토 역할 미정; 새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|
 |온톨로지|독립 의미/검색 정답·구현/개념 연결·동일 corpus off/on 효과 판단|
 |정식9개 실행·수용|독립 승인·동결 후 WI-1/2/3/4/V1/V2/6/SP/C 실행; 현재0/9|
-|선택 기능11개|캐시 로컬 완료. 공개 v2/graph tuning/flow gold/규모/as-of/legacy 출처/CoreML/audit/deploy 및 viewer Atlas/전체 접근성 남음|
+|활성 후속10개|캐시 로컬 완료. 공개 v2/graph tuning/flow gold/규모/as-of/legacy 출처/CoreML/deploy 및 viewer Atlas/전체 접근성 남음|
 
 보안 전용 정답/ACL/비공개/위조 평가는 사용자 요청으로 보류한다. 정식 수용을 AI가 승인하지 않는다. 실제 LLM 답변 평가는 모델·인증·총 비용 상한 결정 후 진행한다. CoreML 실물 모델과 배포 대상도 임의로 만들어내지 않는다.
 
