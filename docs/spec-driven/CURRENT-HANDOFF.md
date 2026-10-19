@@ -1,4 +1,4 @@
-# 현재 인수인계 — 단계80 / 2026-10-19
+# 현재 인수인계 — 단계81 / 2026-10-19
 
 현재 코드의 Go6개 변경과 선택 UI build profile을 검증했다. 전체 일반4231/race4231통과·각18skip, build/fmt/vet/고정lint/docs134통과. 실제 UI에서 검색·본문 출처·2D/상한500·키보드 검색·도움말을 확인하고 CKS/CKG exit0/reap/강제정리0·원본/소유2248파일 보존을 확인했다.
 
@@ -6,7 +6,7 @@
 
 기본 no-frontend 경로도 집중 race20·build·stub export를 확인하고 app46개를 복구했다. 증거 검사12·운영 기준67·작업 원장4가 통과했다. 외부 npm Go 샘플의 lint 실패와 하네스 출력/로그 폴더 중복 실패를 보존했고, 유지 Go package137개는 모두 검증했다.
 
-다음은 승인 owner 일정 적용과 초안의 당시 source 유효성 기록이다. 모든13묶음은 독립 조건 등 남은 기준이 있어0/13, 정식0/9를 유지한다.
+승인 범위 적용을 완료했다. 실제 owner4일정/통제 late-drain1일정, 옛 구독·새 등록 전 경계를 현재 원장에 연결했다. 과거 pending AI 제안과 제한 결과는 그대로 보존하고 독립 승인으로 승격하지 않았다. 다음은 초안의 당시 source 유효성과 Qwen/CoreML 입력 기록, 실제 규모 검증이다. 모든13묶음은 독립 조건 등 남은 기준이 있어0/13, 정식0/9를 유지한다.
 
 [단계77 실행 근거](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/SUMMARY.json) · [실패/범위 보고서](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/REPORT.txt) · [13개 정본 원장](./REMAINING-13-EXECUTION.json)
 
