@@ -118,6 +118,8 @@ func TestGuardianOwnerProcessHelper(t *testing.T) {
 	root := os.Getenv("KS_GUARDIAN_OWNER_ROOT")
 	ready := os.Getenv("KS_GUARDIAN_OWNER_READY")
 	late := os.Getenv("KS_GUARDIAN_OWNER_LATE")
+	childReady := os.Getenv("KS_GUARDIAN_OWNER_CHILD_READY")
+	release := os.Getenv("KS_GUARDIAN_OWNER_RELEASE")
 	lock, err := acquireReindexLock(root)
 	if err != nil {
 		t.Fatal(err)
@@ -126,7 +128,7 @@ func TestGuardianOwnerProcessHelper(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	ctx = context.WithValue(guardianContext(ctx), mutationLeaseKey{}, lock.file)
-	cmd := setupCommandContext(ctx, "/bin/sh", "-c", `printf ready > "$1"; (sleep 2; printf orphan > "$2") & wait`, "owned", ready, late)
+	cmd := setupCommandContext(ctx, "/bin/sh", "-c", `(printf ready > "$2"; while [ ! -f "$3" ]; do sleep .01; done; printf orphan > "$4") & printf ready > "$1"; wait`, "owned", ready, childReady, release, late)
 	if err := cmd.Run(); err != nil {
 		t.Fatal(err)
 	}
@@ -137,10 +139,15 @@ func TestGuardianActualOwnerKillStopsWriterAndReleasesLease(t *testing.T) {
 	root := t.TempDir()
 	evidence := t.TempDir()
 	ready, late := filepath.Join(evidence, "ready"), filepath.Join(evidence, "late")
+	childReady, release := filepath.Join(evidence, "child-ready"), filepath.Join(evidence, "release")
+	// Release only after the owner has died and the mutation lease is free.
+	// A fixed sleep could write before a descheduled test gets to kill the owner.
+	// Cleanup releases a stranded fixture even when an earlier assertion fails.
+	t.Cleanup(func() { _ = os.WriteFile(release, []byte("cleanup"), 0o600) })
 	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
 	defer cancel()
 	owner := exec.CommandContext(ctx, os.Args[0], "-test.run=^TestGuardianOwnerProcessHelper$")
-	owner.Env = append(os.Environ(), "KS_GUARDIAN_OWNER_HELPER=1", "KS_GUARDIAN_OWNER_ROOT="+root, "KS_GUARDIAN_OWNER_READY="+ready, "KS_GUARDIAN_OWNER_LATE="+late)
+	owner.Env = append(os.Environ(), "KS_GUARDIAN_OWNER_HELPER=1", "KS_GUARDIAN_OWNER_ROOT="+root, "KS_GUARDIAN_OWNER_READY="+ready, "KS_GUARDIAN_OWNER_LATE="+late, "KS_GUARDIAN_OWNER_CHILD_READY="+childReady, "KS_GUARDIAN_OWNER_RELEASE="+release)
 	if err := owner.Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -151,6 +158,10 @@ func TestGuardianActualOwnerKillStopsWriterAndReleasesLease(t *testing.T) {
 		}
 	})
 	waitOwnedMarker(t, ready)
+	waitOwnedMarker(t, childReady)
+	if _, err := os.Stat(late); !os.IsNotExist(err) {
+		t.Fatal("writer crossed the unopened release gate")
+	}
 	if err := owner.Process.Kill(); err != nil {
 		t.Fatal(err)
 	}
@@ -158,6 +169,9 @@ func TestGuardianActualOwnerKillStopsWriterAndReleasesLease(t *testing.T) {
 		t.Fatal("owner did not lose process")
 	}
 	assertWriterEventuallyFree(t, root)
+	if err := os.WriteFile(release, []byte("after-owner-and-lease"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	time.Sleep(2100 * time.Millisecond)
 	if _, err := os.Stat(late); !os.IsNotExist(err) {
 		t.Fatal("owner loss left a live late writer")

@@ -1,0 +1,57 @@
+단계77 / 시작 anchor 배치와 측정 시 출처 기능 보존
+
+목적: 기존 anchor65개·전처리·threshold0.55·모델 식별을 유지하면서 fresh CKS의
+시작 embedding HTTP66건(차원 probe1 + anchor65)을2건으로 줄인다. 같은 provider의
+기존 batch API만 사용하고 unknown budget/transform은 단건 전달한다. 긴 단일 입력은
+임의 절단하지 않는다. batch 실패 뒤 scalar 재시도는 하지 않는다.
+
+추가로 발견한 실제 결함: 계측 래퍼가 선택 인터페이스를 가렸다.
+첫 보완으로 intent BatchEmbedder를 보존했으나, 실제 원문 응답을 비교한 검사에서
+계측 CKG의 ValueAnalysisClient도 사라져 partial 대신 unavailable인 것을 확인했다.
+정상 process exit를 출처 전달 성공으로 처리하지 않는다. 원래/계측/보정 시도 전부 보존한다.
+최종 보완은 제공된 CKG 선택 기능의 정확한 조합16개를 보존한다. 값/규칙/확장 위임은
+context·입력·partial·오류를 그대로 전달한다. annotation은 method set만 보존하며,
+사용자가 미룬 보안 정답/ACL/비공개/위조 평가는 실행하지 않았다.
+
+실제 로컬 관찰: 초기4 + 계측 보완6 + 출처 보완6 =16 CKS sessions.
+8개는 의도한 공급자503/잘못된 cardinality로 listen 전에 시작을 거부했다.
+정상 process exit8 중 초기 계측1건은 출처 unavailable로 실패한 증거다.
+나머지7건만 동일 출처 partial을 확인했다. 최종6개 중 정상3건의 입력별66벡터
+(차원 probe 포함)를 text 기준으로 대응시켜 predeclared 수치 기준을 검증한다.
+같은 기본/계측 startup 모두 embedding HTTP66→2이며, 논리 embed_batch1회/65행과
+실제 HTTP를 구분한다. HTTP 요청 수는 inference item 수가 아니다. 모든 session은
+강제 종료 없이 EOF/거부 후 reap·reader join·group0. 원본/소유2248파일 전후 동일이다.
+같은 binary와 source/model/data pin을 사용한다. 전체 native의 최종 test fixture와
+관측 runtime 사이 차이는 graph_capabilities_test.go와 command_guard_test.go이며 binary bytes가 동일하다.
+
+검사 실패도 보존:
+- 최초 전체 일반 검사는12개 fixture Git commit이 전역 서명 설정을 상속했으나
+  격리 PATH에 gpg가 없어 실패했다. 수정은 검사 프로세스의 GIT_CONFIG_GLOBAL=/dev/null,
+  GIT_CONFIG_NOSYSTEM=1이며 사용자 설정 파일/제품 코드는 이 원인으로 바꾸지 않았다.
+- 새 선택 기능 테스트의 무기능 fixture에 CitationResolver를 제공하는 Fake를 사용해
+ 2개 test records(parent/subtest)가 실패했다. 기대 입력을 정확히 좁혀 수정했다.
+  그 소스의 전체 검사1회는 수정 전에 명시 SIGTERM으로 중단·정리했다. 제품 서버 실패가 아니다.
+- 빌드/집중 검사 수집의 ps가 sandbox에서 거부된 시도는 채택하지 않고 보존했다.
+  같은 로컬 소유 검사와 정리 확인을 허용된 권한으로 명시 재실행했다.
+- 초기 증거 검사는 타이밍을 포함한 request wrapper를 raw stdout과 비교한 수집 형식 오류였다.
+  실제 payload/wire 비교로 바로잡은 뒤 위 unavailable 결함을 탐지했다. 입력을 완화하지 않았다.
+
+- 이후 전체 race의 실제 owner-loss 시험1건이 late file을 관측했다. 원래 fixture의
+  focused race20회는 통과하여 근본 원인은 미확정이다. 기존 sleep2는 쓰기가 실제 owner
+  kill 전/후인지 구분하지 못한다. descendant 진입을 확인하고 실제 owner kill/reap와
+  lease 해제 이후에만 release gate를 열어 쓰기를 판별하도록 시험만 보완했다.
+  같은2.1초 관찰을 유지하고 일반/race 각10회를 통과했다. 제품 guardian은 바꾸지
+  않았으며, 해당 전체 race는 실제 실패를 보존한 뒤 명시 중단했다.
+
+최종 전체 build/general/race/fmt/vet/lint/docs 결과는 SUMMARY.json과 native/receipts.json이 정본이다.
+실행 전 고정한 입력과 이전4172 passing IDs/18skip을 대조한다. 명령 실패/의도한 중단을
+성공으로 덮어쓰지 않는다. 각 이전 단계의 불변 manifest는 해당 Git revision에서 검사한다.
+
+범위: 로컬 개발 검증. 실제 LLM0·유료 외부 호출0·전역 설치0·운영 데이터 변경0.
+자원은 독점하지 않았고 모델은 이미 warm 상태였다. elapsed는 진단이며 p95/SLA나
+검색/온톨로지/답변 품질을 수용하지 않는다. 독립승인0·정식0/9·FINAL0·D04미정·미동결 유지.
+다음: 실제 loopback peer sync 근거를 별도 단계로 갱신하고 남은13묶음을 계속 처리한다.
+
+최종 확정: 입력1746/Go1290·승인5·변경Go10에서 build/general4214pass18skip/race4214pass18skip/fmt/vet/lint2.14.0/docs134/build-bins/runtime-build 모두exit0.7개 소유 명령 그룹 잔여0. 실제 runtime binary와 최종 검증 binary 동일.
+
+문서 최종 회귀: 최초91개 중 로드맵4개 실패(28개 상태/근거 열 누락); 표 복원 후7개 중4개 실패(고정 라이브러리17개 시험 목록 누락); 원래 source/log로 목록을 복원한 최종7개는 모두 통과했다. 영향 없는84개는 최초 통과를 유지한다. 검사 규칙·완료 수·독립 상태를 완화하지 않았다. 전체134개 문서 검사도 통과했다. 두 실패 시도와 최종 결과를 함께 보존한다.

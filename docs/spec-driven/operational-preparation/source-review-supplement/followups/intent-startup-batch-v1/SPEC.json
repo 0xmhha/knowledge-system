@@ -1,0 +1,47 @@
+{
+  "kind": "WI3_intent_startup_batch_local_implementation_spec",
+  "base_revision": "7d5a5537c24a73a2a191d2f94b6243fb98c0d059",
+  "problem": "fresh four-role CKS sessions used66 local embedding HTTP requests each:1 dimension probe and65 anchors; first proxy response3.16to4.05s is diagnostic, no SLA acceptance",
+  "baseline_source_sha256": {
+    "internal/system/composer/intent/embedder.go": "07d49ce818718716628ac82391a22f283ee48eaa9800822c19f4204f7bb2ea4a",
+    "internal/system/composer/intent/classifier.go": "13a12b2cfbd2c9bdc9029b711e3d0c038bfea1165b4816f3aa0524ac5edacbb0",
+    "internal/system/composer/intent/anchors.go": "4ba58420960da9646908fa8f761f644e32752776ed5c84b0356299e77dc44a54",
+    "cmd/cks/mcpcli/serve.go": "4149f0402679f7f7110e63f64aa7ea7d9d7e472ffa0f81544af54703c2f4db23",
+    "pkg/vector/embed/ollama/adapter.go": "6628f9318273813665a1ce7b4c3303d0b543435d5bcc16cd0cc22b6dd430f0e5"
+  },
+  "baseline_binary_revision": "49197f0f3d5967913355278ba5d45d4a32ae614a",
+  "default_anchor_count": 65,
+  "default_anchor_UTF8_bytes": 2445,
+  "model": "local bge-m3:latest unchanged digest/dimension/transforms",
+  "behavior": [
+    "optional intent BatchEmbedder path; only absence of capability uses scalar constructor fallback",
+    "flatten deterministic intent/text order and restore each vector to its original anchor",
+    "batch provider error/cardinality/empty/inconsistent dimension/nonfinite outputs abort startup; no silent retry/scalar recovery after provider error",
+    "existing scalar custom Embedder remains supported",
+    "production adapter uses existing vector Embed API; raw:v1 and known RuntimeBatchTokens pack conservatively by UTF8 bytes plus4per-input tokens; unknown budget/transform keeps one-input calls",
+    "long single input is forwarded alone as before, never silently truncated",
+    "preserve anchor strings, default threshold, Classify single-text preprocessing, model identity and cache/liveness contracts"
+  ],
+  "verification": [
+    "unit batch mapping/copying/fallback/cancellation/errors/cardinality/dimension/nonfinite/empty-anchors",
+    "adapter packing and unknown capability fallback; do not cross advertised runtime budget",
+    "same pinned owned dataset/source/model actual CKS baseline66 and candidate2 startup embedding HTTP calls expected",
+    "record returned vector pairs matched by exact input text, not request order; predeclared diagnostic max_abs_difference<=0.001 and min_cosine>=0.9999",
+    "same-source value_dependencies response and source identity preserved, ignoring only elapsed_micros",
+    "owned startup provider failure returns nonzero cleanly with no silent fallback or abandoned processes",
+    "fresh whole native build/general/race/fmt/vet/pinned lint/docs on new source; compare previous4172 passing IDs and18skip population",
+    "document all attempts/unknowns and signed exact-byte checkpoint"
+  ],
+  "limits": {
+    "anchor_inputs_unchanged": true,
+    "LLM_calls": 0,
+    "paid_external_calls": 0,
+    "global_model_changes": false,
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "FINAL": 0,
+    "freeze": null,
+    "execution_allowed": false
+  },
+  "quality_acceptance": "none; numeric consistency and request counts are development checks, not retrieval/ontology/answer quality acceptance"
+}

@@ -48,11 +48,7 @@ func (v *vector) Freshness(ctx context.Context) (ckvclient.FreshnessReport, erro
 // WrapCKG preserves optional citation identity resolution. Providers without
 // that capability must remain distinguishable from supported, failing ones.
 func WrapCKG(base ckgclient.Client) ckgclient.Client {
-	g := &graph{Client: base}
-	if resolver, ok := base.(ckgclient.CitationResolver); ok {
-		return &graphWithResolver{graph: g, resolver: resolver}
-	}
-	return g
+	return preserveGraphCapabilities(&graph{Client: base}, base)
 }
 
 type graph struct{ ckgclient.Client }
@@ -138,9 +134,29 @@ func (g *graph) Health(ctx context.Context) (ckgclient.Health, error) {
 	return result, err
 }
 
-func WrapIntent(base intent.Embedder) intent.Embedder { return &embedding{Embedder: base} }
+func WrapIntent(base intent.Embedder) intent.Embedder {
+	scalar := &embedding{Embedder: base}
+	if batch, ok := base.(intent.BatchEmbedder); ok {
+		return &batchEmbedding{embedding: scalar, batch: batch}
+	}
+	return scalar
+}
 
 type embedding struct{ intent.Embedder }
+
+type batchEmbedding struct {
+	*embedding
+	batch intent.BatchEmbedder
+}
+
+func (e *batchEmbedding) EmbedBatch(ctx context.Context, texts []string) ([][]float32, error) {
+	input, _ := json.Marshal(texts)
+	finish := begin(ctx, "intent", "embed_batch", string(input), nil)
+	result, err := e.batch.EmbedBatch(ctx, texts)
+	// This count describes returned vector rows, not model inference items.
+	finish(len(result), err)
+	return result, err
+}
 
 func (e *embedding) Embed(ctx context.Context, text string) ([]float32, error) {
 	finish := begin(ctx, "intent", "embed", text, nil)

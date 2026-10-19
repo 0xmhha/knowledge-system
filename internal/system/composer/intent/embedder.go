@@ -31,6 +31,14 @@ type Embedder interface {
 	Embed(ctx context.Context, text string) ([]float32, error)
 }
 
+// BatchEmbedder is an optional startup capability. Output positions must match
+// input positions and each vector must share one finite, nonempty dimension.
+// Implementations may split physical requests to respect their provider budget.
+// A batch error aborts construction; it does not trigger scalar retries.
+type BatchEmbedder interface {
+	EmbedBatch(ctx context.Context, texts []string) ([][]float32, error)
+}
+
 // FakeEmbedder is a deterministic in-memory Embedder for tests.
 //
 // Vectors maps known text -> canned vector. Texts not in the map fall

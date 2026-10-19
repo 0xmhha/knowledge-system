@@ -1,0 +1,20 @@
+{
+  "kind": "owner_kill_test_pre_post_write_gate_not_production_guardian_change",
+  "original_test_sha256": "4bd0f6e1c76790d9629007e65c3455ecb39f0102ad838f1bc1b3c511368993c8",
+  "failure": "whole race owner-loss test saw late file; time of write relative to owner kill not captured",
+  "root_cause": "unconfirmed after original focused race20 passed",
+  "behavior": [
+    "same actual helper owner kill, same production guardian and mutation lease",
+    "wait until descendant enters explicit release gate before owner kill",
+    "only release potential writes after killed owner reaped and writer lease free",
+    "keep original2.1s post-release observation; surviving writer must still fail",
+    "cleanup opens fixture gate after owner cleanup to avoid stranded test resources"
+  ],
+  "verification": [
+    "focused general/race repetitions",
+    "fresh whole build/general/race/fmt/vet/lint on source10",
+    "same product binary as actual runtime; only tests differ from runtime source"
+  ],
+  "independent_approved": 0,
+  "formal_completed": 0
+}

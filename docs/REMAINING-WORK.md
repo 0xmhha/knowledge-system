@@ -1,61 +1,36 @@
-# 남은 전체 작업 — 13개 묶음 실행 기준
+# 남은 전체 작업 / 2026-10-19
 
-2026-10-19 사용자가 남은13개 묶음 전체 완료까지 진행하도록 요청했다. 현재 기준은 [13개 실행 원장](./spec-driven/REMAINING-13-EXECUTION.json)과 [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md)다. 기존 로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 독립 수용0/9를 구분한다. 과거 미구현 감사 문서를 현재 구현 잔여로 다시 집계하지 않는다.
+[정본 원장](./spec-driven/REMAINING-13-EXECUTION.json) · [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) · [단계77 근거](./spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/SUMMARY.json)
 
-완료 체크는 목적에 맞는 기능/설계, 실제 소비자 경로, 원자료와 매칭, 정리·실패 경로, 필요한 독립 검토가 모두 확보된 경우에만 한다. 준비·AI 초안·bounded 시험·문서 등록을 전체 완료나 독립 승인으로 바꾸지 않는다. 실명/연락처는 요구하지 않으며, 독립 검토는 익명 역할로 기록할 수 있다. 담당자 미정과 미동결은 실제 상태로 유지한다.
+로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
 
-## 현재 진행
+단계77 로컬 검증 완료: 시작 embedding HTTP66→2, 일반/계측에서 동일 원문 partial 유지.
+최초 계측1건의 unavailable 결함을 보존하고 CKG 선택 기능16조합을 보완했다.
+실제16세션 중 정상 종료8·의도한 공급자 시작 거부8이며, 출처 일치 성공은7이다.
+새 전체 일반4214/race4214통과·각18skip, build/fmt/vet/고정 lint/docs134 통과.
+입력1746(Go1290)/승인5·변경Go10, 실제 runtime과 최종 native binary bytes 동일.
+시험 fixture2개만 runtime 이후 수정했으며 해당 차이도 hash로 대조했다.
 
-- 단계70: 구독 생명주기6개 새 일반/race 프로그램 실행·출처/유한 관측·잔존0 확인. 전체 host/독립 수용과 구분한다.
-- 단계71: 실제 DEV19 식별·기본/확장19쌍/도구76호출 기록. 기본 partial19/확장 budget_exhausted19, 품질점수null. 초기 기동 실패와 명시 보정1회 모두 보존했다.
-- 단계72: 같은 pin/세션/상한의 전체627쌍 완료(준비57/본570). 본 측정 기본 partial570/확장 budget_exhausted570, 완전쌍0으로 품질/완전응답 지연 판정유보. 정상 종료·잔존0·원본/사본 보존. WI-1의 미매칭53정의와 빈 블록3을 분류했고 소비자 수정16건을 다음 작업으로 지정했다.
 
-- 단계73: 실제30함수의 선택 수신 정의16건 수정. 캐시 옵션·질의 전처리/식별/모델 상태 계약을 실제46도구/50요청으로 검증했다. 전체 일반/race 각4172통과·18skip, build/fmt/vet/lint 통과. 최초 종료 시험1건 원인 미확정 및 모든 중간 시도는 보존했다. [근거](./spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1/SUMMARY.json).
+## 전체13묶음 — 완료0/13
 
-- 단계74: 원래 API를 유지한 실제 node/eth factory·다운로더·활성 인덱서·60초 RPC 알림·구독 해제·node.Close를 일반/race2회 확인했다. 전체8노드 시도와 실행 전 컴파일 실패1회를 보존했다. 실제 피어 동기화/5일정/12계약·독립 수용은 남아 있다. [근거](./spec-driven/operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json).
+|묶음|현재 남은 내용|
+|---|---|
+|WI-V1|실제 host/factory/indexer/owner 확인; 실제 peer 결과 별도 기록 예정; 전체 조건·installed oracle·독립 티켓|
+|WI-V2|유한 후보 구별 완료; 독립 oracle·수용 후보 집합·선정 판단|
+|WI-6|warm 쌍627회 보존; 독립 nonseed 관련성/잡음 정답·표본 충분성|
+|WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 부분은 사용자 보류|
+|WI-C|설치 역할의 전체5산출물·그림·인수인계와 독립 필수 항목/우선순위 검토|
+|WI-1|선택 수신16수정; range37/빈 블록3 미확정 구분; 값/종류/메모리 매칭·독립 완전 정답|
+|WI-2|독립 비보안 표본·호출 대상/호출자·명령/build/MCP 소비자 매칭|
+|WI-3|시작 배치·계측 기능 보존 검증 완료; 가족/노출/중복·기본 상한/partial/오류/범위 밖·독립 관련성|
+|WI-4|실제 host·receiver 일정·반복 기준·독립 가족/oracle/충분성; 새 실제 peer 근거 별도 기록 예정|
+|독립 수용 준비|익명 검토 역할 미정; 새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|
+|온톨로지|독립 의미/검색 정답·구현/개념 연결·동일 corpus off/on 효과 판단|
+|정식9개 실행·수용|독립 승인·동결 후 WI-1/2/3/4/V1/V2/6/SP/C 실행; 현재0/9|
+|선택 기능11개|캐시 로컬 완료. 공개 v2/graph tuning/flow gold/규모/as-of/legacy 출처/CoreML/audit/viewer/deploy 남음|
 
-- 단계75: 실제 factory API에서5역할/4method·10노드·40일정을 실행해 삭제/ack/Once·막힘·빠른 반환 오류를 구별했다. 모든 exit0·잔존0. 관측 후 정리14회, 직접 API/관찰 gate 범위를 유지하며 원래5일정 범위 결정·설치 역할·독립 수용은 남긴다. [근거](./spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json).
 
-- 단계76: 최신 clean CKS·실제4역할·실제원문에서 partial2건/Write2건/Read3회·선택거부2회·완료거부4회를 확인했다. 최초 handoff 오류2건 포함8hosts/8CKS·24PIDs 부재·데이터 보존. startup66 embedding HTTP(차원확인1+anchor65)/신생CKS를 식별해 WI-3 배치 보완을 다음 개발로 선정했다. [근거](./spec-driven/operational-preparation/source-review-supplement/followups/four-role-current-v1/SUMMARY.json).
+다음은 실제 peer 동기화 근거의 별도 커밋과 WI-C 실제5산출물 전달 검증이다. 각 작업은 검증·정본 문서 갱신·서명 커밋·저장된 bytes 대조 후 체크한다. 독립 수용이나 전체 묶음 완료를 로컬 시험으로 대신하지 않는다.
 
-## 남은13개 묶음과 완료 기준
-
-| 순서 | 묶음 | 남은 기능·검증·결정 | 상태 |
-|---|---|---|---|
-|1|WI-V1|factory/owner40 확인. 실제 피어 sync·일정 범위 결정·설치 역할/독립12계약, 설치 소비자 오라클/완료 차단·독립 검토|미완료|
-|2|WI-V2|5역할 기술 관측 기록. 설치 oracle·독립 적격/수용 집합·선택/기각/유보|미완료|
-|3|WI-6|실제 검색쌍은 기록. warm 원자료·중단 의미·넓은 nonseed 정답/가족·독립 품질|반복 측정 완료·품질 미수용|
-|4|WI-SP|비보안 수동/자동 출처·정책/미태그·실제 소비자와 독립 의미|미완료|
-|5|WI-C|설치 리뷰 역할·필수 항목/우선순위·구조화 보고서/그림·인수인계·독립 검토|미완료|
-|6|WI-1|정의16보정·range37지원밖/빈블록3미확정·값/타입/메모리·독립 정답|미완료|
-|7|WI-2|독립 비보안 표본/정답·실제 명령/호출자/build지원/MCP 경계|미완료|
-|8|WI-3|실제4역할 연결 확인. startup anchor65개 배치·가족/정답·기본 예산/부분·오류·범위 밖|미완료|
-|9|WI-4|전체 driver/host/receiver·시간/스케줄·반복·독립 가족/정답·충분성|미완료|
-|10|독립 수용 준비|익명 역할/독립성·새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|담당자 미정|
-|11|온톨로지 효과|독립 의미/검색 정답·구현-개념 연결·동일 corpus off/on 효과·오인/누락|미완료|
-|12|정식9개 수용|동결된 독립 입력에 따른9개 실제 실행·수용 receipt|0/9|
-|13|별도 후속 기능|캐시 로컬 검증 완료·나머지10개 활성 범위의 명세/구현/실제 검증|개별 대조 중|
-
-## 13번째 묶음의 활성11개
-
-기존 코드가 있는 것과 필요한 공개 연결·확대 검증을 구분한다. 코드가 존재한다는 이유만으로 완료 처리하지 않는다.
-
-|항목|현재 확인한 코드|남은 범위|
-|---|---|---|
-|공개 v2 CLI/HTTP·graph export|MCP v2·기존 graph export 있음|일반 공개 표면별 v2 지원/거부·소비자/출처 계약|
-|graph 점수/관계 튜닝|intent 가중치/상한 있음|독립 입력/분모·회수율/잡음/비용 비교|
-|domain flow 정답|flow 도구/corpus parser 있음|정본 corpus·get_flow/find_branches 정답 평가|
-|대형 corpus/긴 함수|기존 처리 코드/작은 fixture 있음|실제 입력·모델/환경 pin·처리량/회수율|
-|PR 시점 지식|원문 snapshot 있음|domain as-of 정책·과거 원천/평가|
-|legacy 출처|FilesystemFetcher 있음|명시 byte 검증/실패/health 계약|
-|CoreML|native adapter 있음|선택 dispatch·실제 model weights/환경 검증|
-|embedding cache|CKV/CKS 옵션·방어적 LRU·모델 상태 연결|로컬 구현/실제 검증 완료. 기본0; 정식 품질 수용과 구분|
-|운영 감사|auditlog library 있음|실제 composer 연결·보관/실패 정책|
-|viewer 상호작용|통합 viewer 있음|선택 상호작용·성능/접근성|
-|배포/downstream|로컬 코드와 동기화 문서 있음|구체적인 대상/운영 권한·실제 상태 확인|
-
-## 사용자 보류와 외부 결정
-
-보안 전용 정답·권한/비공개/위조 경계와 조직 인증/권한은 사용자 보류를 유지하며 완료로 세지 않는다. 일반 종료 안정성과 소유 자원 정리는 계속 검증한다. 실제 LLM 답변 평가는 모델·인증·총 비용상한이 정해진 뒤 수행한다. 배포·게시·글로벌 설치·다른 저장소의 변경은 구체적인 대상과 기존 승인 범위를 확인하고 진행한다.
-
-이 목록의 독립 승인·동결·수용을 AI가 대신 생성하지 않는다. 가능한 로컬 개발/검증은 계속 수행하고, 필요한 결정은 실제 검토 가능한 근거와 함께 요청한다.
+선택 기능에서 캐시는 로컬 구현/실제 장애 경로 검증까지 완료했다. 다른10개는 기능별 기준과 입력이 남아 있다. CoreML 실물 모델과 배포 대상은 사용자 결정 대기다. 보안 전용 평가와 조직 인증은 사용자 보류다. 실제 LLM 답변 평가에는 모델·인증·비용 상한이 필요하며 실제 호출 없이 완료 처리하지 않는다. 검토 역할은 실명 없이 지정할 수 있지만 승인 내용과 독립성 근거는 별도로 필요하다.

@@ -510,6 +510,49 @@ func buildBackends(ctx context.Context, cfg *config.Config, reader sourcepath.Re
 // the ckv chunk space and the intent anchor space.
 type intentEmbedderAdapter struct{ e ckvtypes.Embedder }
 
+var _ intent.BatchEmbedder = intentEmbedderAdapter{}
+
+// EmbedBatch uses the existing passage API, exactly as scalar intent embedding
+// does. Only a declared raw transform and physical batch budget permit grouping.
+// Unknown capabilities retain one-input requests; errors never cause retries.
+func (a intentEmbedderAdapter) EmbedBatch(ctx context.Context, texts []string) ([][]float32, error) {
+	id := a.e.Identity()
+	budget := id.RuntimeBatchTokens
+	dim := a.e.Dimension()
+	group := id.PassageTransform == "raw:v1" && budget > 4
+	result := make([][]float32, 0, len(texts))
+	for start := 0; start < len(texts); {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		end := start + 1
+		if group && len(texts[start]) <= budget-4 {
+			// Raw UTF-8 bytes conservatively bound input tokens; reserve four
+			// additional tokens per input for encoder boundary markers.
+			used := len(texts[start]) + 4
+			for end < len(texts) && len(texts[end]) <= budget-4 && len(texts[end])+4 <= budget-used {
+				used += len(texts[end]) + 4
+				end++
+			}
+		}
+		vecs, err := a.e.Embed(ctx, append([]string(nil), texts[start:end]...))
+		if err != nil {
+			return nil, err
+		}
+		if len(vecs) != end-start {
+			return nil, fmt.Errorf("intent batch returned %d vectors for %d texts", len(vecs), end-start)
+		}
+		for _, vec := range vecs {
+			if len(vec) == 0 || (dim > 0 && len(vec) != dim) {
+				return nil, fmt.Errorf("intent batch returned dimension %d, expected %d", len(vec), dim)
+			}
+			result = append(result, append([]float32(nil), vec...))
+		}
+		start = end
+	}
+	return result, nil
+}
+
 func (a intentEmbedderAdapter) Embed(ctx context.Context, text string) ([]float32, error) {
 	vecs, err := a.e.Embed(ctx, []string{text})
 	if err != nil {

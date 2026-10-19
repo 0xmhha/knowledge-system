@@ -1,0 +1,21 @@
+{
+  "kind": "predeclared_measurement_capability_addendum_after_initial_default_runtime",
+  "base_revision": "7d5a5537c24a73a2a191d2f94b6243fb98c0d059",
+  "reason": "WrapIntent currently returns a scalar-only wrapper; optional batching would disappear when measure_backend_calls is enabled",
+  "source_sha256": "c9686bb1ab54e5dc2320720501f2e49ec0caa2395ca2f020863e7240d7bc4b68",
+  "behavior": [
+    "WrapIntent preserves BatchEmbedder only when the underlying client has it",
+    "batch delegate preserves context/input/results/errors and never retries",
+    "record one logical embed_batch call with vector-row count; HTTP attempts remain separately measured and never interpreted as inference-item count",
+    "scalar-only providers retain exactly the existing wrapper method set"
+  ],
+  "verification": [
+    "negative and positive optional capability type assertions",
+    "batch context/error/input fingerprint/result count and no raw prompt in measurement",
+    "actual measured-mode CKS startup still2 embedding HTTP requests and preserves source result",
+    "measured startup provider failure exits cleanly without scalar retry",
+    "repeat final runtime on final source-bound binary; preserve initial default-only4-arm evidence"
+  ],
+  "independent_approved": 0,
+  "formal_completed": 0
+}

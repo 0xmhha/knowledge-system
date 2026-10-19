@@ -148,7 +148,11 @@ def check(root, protocol, ledger, require_frozen=False):
         try:
             if not file_hash(refreshed.get("manifest"), refreshed.get("manifest_sha256")):
                 raise ValueError("current readiness scope or hash differs")
-            if refreshed.get("kind") == "local_native_reliability_DEV_not_independent_acceptance":
+            if refreshed.get("kind") == "WI3_source_bound_intent_batch_DEV_not_independent_acceptance":
+                import intent_startup_batch
+                errors.extend(intent_startup_batch.validate(root, (root / refreshed["manifest"]).parent))
+                errors.extend(intent_startup_batch.current_indices(root, protocol, ledger))
+            elif refreshed.get("kind") == "local_native_reliability_DEV_not_independent_acceptance":
                 import native_reliability
                 errors.extend(native_reliability.validate(root, (root / refreshed["manifest"]).parent))
                 errors.extend(native_reliability.current_indices(root, protocol, ledger))

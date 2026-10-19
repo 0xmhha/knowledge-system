@@ -611,7 +611,7 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "e3c0b2f0de0471c79b05b894b898f5c59a4e850dbdaa58d885d60f16e9356770",
+    "sha256": "bad671044c5fdc280d4f6a1de965dfb3b566f3317700d73a0cbbcc3432b8b6e0",
     "status": "D04_review_pending_local_native_DEV_not_independent_acceptance"
   },
   "consumer_adoption": {
@@ -639,12 +639,13 @@
     "historical_source_validation": true
   },
   "current_execution_state": {
-    "current_stage": "73_selected_receive_actual30_and_opt_in_cache_native_verified_DEV",
+    "current_stage": "77_source_bound_intent_batch_native_and_real_runtime_verified_DEV",
     "completed_in_this_scope": [
-      "selected_receive_owner16_corrected_actual30_replayed",
-      "public_query_aware_defensive_LRU_CKV_CKS_opt_in_and_health",
-      "actual_local_BGE_cache_off2_on1_calls_same_search_source",
-      "fresh_whole_native_build_general_race_fmt_vet_lint"
+      "batch_anchor65_mapping_copy_bounds_error_and_cancellation",
+      "measurement_intent_batch_and_exact_CKG_optional_method_sets",
+      "actual16_CKS_sessions_all_failures_preserved_and_final_source_parity",
+      "owner_test_post_kill_release_gate_without_guardian_change",
+      "fresh_source10_whole_build_general_race_fmt_vet_lint_docs"
     ],
     "pilot_steps_completed": [
       "SN-P01",
@@ -653,7 +654,7 @@
       "SN-P04"
     ],
     "pilot_steps_total": 4,
-    "next_task": "WI_V1_full_host_factory_sync_indexer_contract_then_remaining13",
+    "next_task": "WI4_real_peer_sync_and_remaining13",
     "remaining_all": [
       {
         "id": "WI-V1",
@@ -947,6 +948,278 @@
       "execution_allowed": false,
       "quality_score": null,
       "personal_names_required": false
+    },
+    "current_intent_batch": {
+      "kind": "WI3_source_bound_intent_batch_DEV_not_independent_acceptance",
+      "native": {
+        "source_files": 1746,
+        "Go_files": 1290,
+        "changed_Go_files": 10,
+        "approved_inputs": 5,
+        "tests": {
+          "test": {
+            "pass": 4214,
+            "fail": 0,
+            "skip": 18
+          },
+          "race": {
+            "pass": 4214,
+            "fail": 0,
+            "skip": 18
+          }
+        },
+        "full_build_fmt_vet_lint_docs": true,
+        "binary_sha256": "eb2d3227904753aedca86502b5ea160a8b1101e3363d3446eba195b12f4b507c",
+        "process_groups_remaining": 0
+      },
+      "initial": {
+        "sessions": 4,
+        "arms": [
+          {
+            "arm": "baseline",
+            "exit": 0,
+            "embedding_HTTP": 66,
+            "initialized": true,
+            "source_response_preserved": true,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": {
+              "text_matched_vectors": 66,
+              "dimension": 1024,
+              "max_absolute_difference": 0.0,
+              "minimum_cosine": 1.0,
+              "quality_acceptance": false
+            }
+          },
+          {
+            "arm": "batch",
+            "exit": 0,
+            "embedding_HTTP": 2,
+            "initialized": true,
+            "source_response_preserved": true,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": {
+              "text_matched_vectors": 66,
+              "dimension": 1024,
+              "max_absolute_difference": 0.0,
+              "minimum_cosine": 1.0,
+              "quality_acceptance": false
+            }
+          },
+          {
+            "arm": "batch_unavailable",
+            "exit": 1,
+            "embedding_HTTP": 2,
+            "initialized": false,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": null
+          },
+          {
+            "arm": "batch_short",
+            "exit": 1,
+            "embedding_HTTP": 2,
+            "initialized": false,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": null
+          }
+        ],
+        "embedding_HTTP": 72,
+        "successful_sessions": 2,
+        "expected_provider_startup_refusals": 2,
+        "actual_LLM_calls": 0,
+        "independent_approved": 0,
+        "formal_completed": 0
+      },
+      "intermediate": {
+        "sessions": 6,
+        "arms": [
+          {
+            "arm": "baseline",
+            "exit": 0,
+            "embedding_HTTP": 66,
+            "initialized": true,
+            "source_response_preserved": true,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": {
+              "text_matched_vectors": 66,
+              "dimension": 1024,
+              "max_absolute_difference": 0.0,
+              "minimum_cosine": 1.0,
+              "quality_acceptance": false
+            }
+          },
+          {
+            "arm": "batch",
+            "exit": 0,
+            "embedding_HTTP": 2,
+            "initialized": true,
+            "source_response_preserved": true,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": {
+              "text_matched_vectors": 66,
+              "dimension": 1024,
+              "max_absolute_difference": 0.0,
+              "minimum_cosine": 1.0,
+              "quality_acceptance": false
+            }
+          },
+          {
+            "arm": "batch_unavailable",
+            "exit": 1,
+            "embedding_HTTP": 2,
+            "initialized": false,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": null
+          },
+          {
+            "arm": "batch_short",
+            "exit": 1,
+            "embedding_HTTP": 2,
+            "initialized": false,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": null
+          },
+          {
+            "arm": "batch_measured",
+            "exit": 0,
+            "embedding_HTTP": 2,
+            "initialized": true,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": {
+              "text_matched_vectors": 66,
+              "dimension": 1024,
+              "max_absolute_difference": 0.0,
+              "minimum_cosine": 1.0,
+              "quality_acceptance": false
+            }
+          },
+          {
+            "arm": "batch_measured_unavailable",
+            "exit": 1,
+            "embedding_HTTP": 2,
+            "initialized": false,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": null
+          }
+        ],
+        "embedding_HTTP": 76,
+        "successful_sessions": 3,
+        "expected_provider_startup_refusals": 3,
+        "actual_LLM_calls": 0,
+        "independent_approved": 0,
+        "formal_completed": 0
+      },
+      "actual": {
+        "sessions": 6,
+        "arms": [
+          {
+            "arm": "baseline",
+            "exit": 0,
+            "embedding_HTTP": 66,
+            "initialized": true,
+            "source_response_preserved": true,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": {
+              "text_matched_vectors": 66,
+              "dimension": 1024,
+              "max_absolute_difference": 0.0,
+              "minimum_cosine": 1.0,
+              "quality_acceptance": false
+            }
+          },
+          {
+            "arm": "batch",
+            "exit": 0,
+            "embedding_HTTP": 2,
+            "initialized": true,
+            "source_response_preserved": true,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": {
+              "text_matched_vectors": 66,
+              "dimension": 1024,
+              "max_absolute_difference": 0.0,
+              "minimum_cosine": 1.0,
+              "quality_acceptance": false
+            }
+          },
+          {
+            "arm": "batch_unavailable",
+            "exit": 1,
+            "embedding_HTTP": 2,
+            "initialized": false,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": null
+          },
+          {
+            "arm": "batch_short",
+            "exit": 1,
+            "embedding_HTTP": 2,
+            "initialized": false,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": null
+          },
+          {
+            "arm": "batch_measured",
+            "exit": 0,
+            "embedding_HTTP": 2,
+            "initialized": true,
+            "source_response_preserved": true,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": {
+              "text_matched_vectors": 66,
+              "dimension": 1024,
+              "max_absolute_difference": 0.0,
+              "minimum_cosine": 1.0,
+              "quality_acceptance": false
+            }
+          },
+          {
+            "arm": "batch_measured_unavailable",
+            "exit": 1,
+            "embedding_HTTP": 2,
+            "initialized": false,
+            "source_response_preserved": false,
+            "no_forced_cleanup": true,
+            "vector_diagnostic": null
+          }
+        ],
+        "embedding_HTTP": 76,
+        "successful_sessions": 3,
+        "expected_provider_startup_refusals": 3,
+        "actual_LLM_calls": 0,
+        "independent_approved": 0,
+        "formal_completed": 0
+      },
+      "all_CKS_sessions": 16,
+      "all_normal_process_exits": 8,
+      "all_source_parity_successes": 7,
+      "all_expected_provider_startup_refusals": 8,
+      "intermediate_measured_source_parity_failures": 1,
+      "earlier_general_test_environment_failures": 12,
+      "earlier_owner_kill_race_assertion_failures": 1,
+      "original_owner_failure_root_cause": "unconfirmed_after_original20_passes",
+      "owner_test_post_kill_release_gate": true,
+      "production_guardian_changed": false,
+      "prior_role_evidence_verified_at_own_commit": true,
+      "independent_approved": 0,
+      "formal_completed": 0,
+      "formal_total": 9,
+      "FINAL": 0,
+      "freeze": null,
+      "execution_allowed": false,
+      "D04": "미정",
+      "quality_score": null,
+      "real_LLM_calls": 0,
+      "paid_external_calls": 0,
+      "request_counts_are_HTTP_not_inference_items": true,
+      "latency_SLA_accepted": false
     }
   },
   "stablenet_error_recovery": {
@@ -980,9 +1253,9 @@
     "status": "historical_not_current_source_validation"
   },
   "current_readiness_preparation": {
-    "kind": "local_native_reliability_DEV_not_independent_acceptance",
-    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1/manifest.json",
-    "manifest_sha256": "a347d32880e42f9172718d5bf2055a861cee79ebf25483882862932b1cb50e7e"
+    "kind": "WI3_source_bound_intent_batch_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/manifest.json",
+    "manifest_sha256": "a6996f321955d71adb56e7e18238adb516a951a7e435e98a52338350bf18c0be"
   },
   "wi1_dev_gold_preparation": {
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/manifest.json",
@@ -1204,7 +1477,7 @@
   },
   "active_remaining_worklist": {
     "path": "docs/spec-driven/REMAINING-13-EXECUTION.json",
-    "sha256": "3e706bbc9da3c2469457eb072b2f50ad376d61a1e0a26dd4fd9bbd28ed6cbb76"
+    "sha256": "f56f1e290bbe4c2c0ed56ef97a1165d026a68b3ad1fcafa297c644782d87ec9a"
   },
   "latest_consumer_role_followup": {
     "kind": "four_actual_roles_current_CKS_transport_not_model_quality",
@@ -1212,5 +1485,10 @@
     "manifest_sha256": "d35d876033df50c17de1c242275df9b8009943dec91712c913db6be50d4d1e2d",
     "independent_approved": 0,
     "formal_completed": 0
+  },
+  "latest_intent_batch_followup": {
+    "kind": "WI3_source_bound_intent_batch_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/manifest.json",
+    "manifest_sha256": "a6996f321955d71adb56e7e18238adb516a951a7e435e98a52338350bf18c0be"
   }
 }

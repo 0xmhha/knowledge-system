@@ -1,0 +1,272 @@
+{
+  "kind": "WI3_source_bound_intent_batch_DEV_not_independent_acceptance",
+  "native": {
+    "source_files": 1746,
+    "Go_files": 1290,
+    "changed_Go_files": 10,
+    "approved_inputs": 5,
+    "tests": {
+      "test": {
+        "pass": 4214,
+        "fail": 0,
+        "skip": 18
+      },
+      "race": {
+        "pass": 4214,
+        "fail": 0,
+        "skip": 18
+      }
+    },
+    "full_build_fmt_vet_lint_docs": true,
+    "binary_sha256": "eb2d3227904753aedca86502b5ea160a8b1101e3363d3446eba195b12f4b507c",
+    "process_groups_remaining": 0
+  },
+  "initial": {
+    "sessions": 4,
+    "arms": [
+      {
+        "arm": "baseline",
+        "exit": 0,
+        "embedding_HTTP": 66,
+        "initialized": true,
+        "source_response_preserved": true,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": {
+          "text_matched_vectors": 66,
+          "dimension": 1024,
+          "max_absolute_difference": 0.0,
+          "minimum_cosine": 1.0,
+          "quality_acceptance": false
+        }
+      },
+      {
+        "arm": "batch",
+        "exit": 0,
+        "embedding_HTTP": 2,
+        "initialized": true,
+        "source_response_preserved": true,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": {
+          "text_matched_vectors": 66,
+          "dimension": 1024,
+          "max_absolute_difference": 0.0,
+          "minimum_cosine": 1.0,
+          "quality_acceptance": false
+        }
+      },
+      {
+        "arm": "batch_unavailable",
+        "exit": 1,
+        "embedding_HTTP": 2,
+        "initialized": false,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": null
+      },
+      {
+        "arm": "batch_short",
+        "exit": 1,
+        "embedding_HTTP": 2,
+        "initialized": false,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": null
+      }
+    ],
+    "embedding_HTTP": 72,
+    "successful_sessions": 2,
+    "expected_provider_startup_refusals": 2,
+    "actual_LLM_calls": 0,
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "intermediate": {
+    "sessions": 6,
+    "arms": [
+      {
+        "arm": "baseline",
+        "exit": 0,
+        "embedding_HTTP": 66,
+        "initialized": true,
+        "source_response_preserved": true,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": {
+          "text_matched_vectors": 66,
+          "dimension": 1024,
+          "max_absolute_difference": 0.0,
+          "minimum_cosine": 1.0,
+          "quality_acceptance": false
+        }
+      },
+      {
+        "arm": "batch",
+        "exit": 0,
+        "embedding_HTTP": 2,
+        "initialized": true,
+        "source_response_preserved": true,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": {
+          "text_matched_vectors": 66,
+          "dimension": 1024,
+          "max_absolute_difference": 0.0,
+          "minimum_cosine": 1.0,
+          "quality_acceptance": false
+        }
+      },
+      {
+        "arm": "batch_unavailable",
+        "exit": 1,
+        "embedding_HTTP": 2,
+        "initialized": false,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": null
+      },
+      {
+        "arm": "batch_short",
+        "exit": 1,
+        "embedding_HTTP": 2,
+        "initialized": false,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": null
+      },
+      {
+        "arm": "batch_measured",
+        "exit": 0,
+        "embedding_HTTP": 2,
+        "initialized": true,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": {
+          "text_matched_vectors": 66,
+          "dimension": 1024,
+          "max_absolute_difference": 0.0,
+          "minimum_cosine": 1.0,
+          "quality_acceptance": false
+        }
+      },
+      {
+        "arm": "batch_measured_unavailable",
+        "exit": 1,
+        "embedding_HTTP": 2,
+        "initialized": false,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": null
+      }
+    ],
+    "embedding_HTTP": 76,
+    "successful_sessions": 3,
+    "expected_provider_startup_refusals": 3,
+    "actual_LLM_calls": 0,
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "actual": {
+    "sessions": 6,
+    "arms": [
+      {
+        "arm": "baseline",
+        "exit": 0,
+        "embedding_HTTP": 66,
+        "initialized": true,
+        "source_response_preserved": true,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": {
+          "text_matched_vectors": 66,
+          "dimension": 1024,
+          "max_absolute_difference": 0.0,
+          "minimum_cosine": 1.0,
+          "quality_acceptance": false
+        }
+      },
+      {
+        "arm": "batch",
+        "exit": 0,
+        "embedding_HTTP": 2,
+        "initialized": true,
+        "source_response_preserved": true,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": {
+          "text_matched_vectors": 66,
+          "dimension": 1024,
+          "max_absolute_difference": 0.0,
+          "minimum_cosine": 1.0,
+          "quality_acceptance": false
+        }
+      },
+      {
+        "arm": "batch_unavailable",
+        "exit": 1,
+        "embedding_HTTP": 2,
+        "initialized": false,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": null
+      },
+      {
+        "arm": "batch_short",
+        "exit": 1,
+        "embedding_HTTP": 2,
+        "initialized": false,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": null
+      },
+      {
+        "arm": "batch_measured",
+        "exit": 0,
+        "embedding_HTTP": 2,
+        "initialized": true,
+        "source_response_preserved": true,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": {
+          "text_matched_vectors": 66,
+          "dimension": 1024,
+          "max_absolute_difference": 0.0,
+          "minimum_cosine": 1.0,
+          "quality_acceptance": false
+        }
+      },
+      {
+        "arm": "batch_measured_unavailable",
+        "exit": 1,
+        "embedding_HTTP": 2,
+        "initialized": false,
+        "source_response_preserved": false,
+        "no_forced_cleanup": true,
+        "vector_diagnostic": null
+      }
+    ],
+    "embedding_HTTP": 76,
+    "successful_sessions": 3,
+    "expected_provider_startup_refusals": 3,
+    "actual_LLM_calls": 0,
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "all_CKS_sessions": 16,
+  "all_normal_process_exits": 8,
+  "all_source_parity_successes": 7,
+  "all_expected_provider_startup_refusals": 8,
+  "intermediate_measured_source_parity_failures": 1,
+  "earlier_general_test_environment_failures": 12,
+  "earlier_owner_kill_race_assertion_failures": 1,
+  "original_owner_failure_root_cause": "unconfirmed_after_original20_passes",
+  "owner_test_post_kill_release_gate": true,
+  "production_guardian_changed": false,
+  "prior_role_evidence_verified_at_own_commit": true,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "FINAL": 0,
+  "freeze": null,
+  "execution_allowed": false,
+  "D04": "미정",
+  "quality_score": null,
+  "real_LLM_calls": 0,
+  "paid_external_calls": 0,
+  "request_counts_are_HTTP_not_inference_items": true,
+  "latency_SLA_accepted": false
+}

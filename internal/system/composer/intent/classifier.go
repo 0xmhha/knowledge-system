@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"sort"
 	"strings"
 
 	"go.uber.org/zap"
@@ -92,8 +93,20 @@ func New(ctx context.Context, embedder Embedder, opts ...Option) (*Classifier, e
 	if err := validateAnchors(c.anchors); err != nil {
 		return nil, err
 	}
+	if ctx == nil {
+		return nil, errors.New("intent: nil context")
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 
 	c.embedded = make(map[contract.Intent][]anchor, len(c.anchors))
+	if batch, ok := embedder.(BatchEmbedder); ok {
+		if err := c.embedAnchorBatch(ctx, batch); err != nil {
+			return nil, err
+		}
+		return c, nil
+	}
 	for intentVal, texts := range c.anchors {
 		for _, text := range texts {
 			vec, err := embedder.Embed(ctx, text)
@@ -104,6 +117,49 @@ func New(ctx context.Context, embedder Embedder, opts ...Option) (*Classifier, e
 		}
 	}
 	return c, nil
+}
+
+func (c *Classifier) embedAnchorBatch(ctx context.Context, batch BatchEmbedder) error {
+	keys := make([]string, 0, len(c.anchors))
+	for key := range c.anchors {
+		keys = append(keys, string(key))
+	}
+	sort.Strings(keys)
+	var texts []string
+	var owners []contract.Intent
+	for _, key := range keys {
+		owner := contract.Intent(key)
+		for _, text := range c.anchors[owner] {
+			texts = append(texts, text)
+			owners = append(owners, owner)
+		}
+	}
+	if len(texts) == 0 {
+		return nil
+	}
+	vecs, err := batch.EmbedBatch(ctx, append([]string(nil), texts...))
+	if err != nil {
+		return fmt.Errorf("intent: pre-embed anchor batch: %w", err)
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if len(vecs) != len(texts) {
+		return fmt.Errorf("intent: pre-embed anchor batch returned %d vectors for %d texts", len(vecs), len(texts))
+	}
+	dim := len(vecs[0])
+	for i, vec := range vecs {
+		if dim == 0 || len(vec) != dim {
+			return fmt.Errorf("intent: pre-embed anchor batch has inconsistent or empty dimension at %d", i)
+		}
+		for _, value := range vec {
+			if math.IsNaN(float64(value)) || math.IsInf(float64(value), 0) {
+				return fmt.Errorf("intent: pre-embed anchor batch has nonfinite vector at %d", i)
+			}
+		}
+		c.embedded[owners[i]] = append(c.embedded[owners[i]], anchor{Text: texts[i], Vec: append([]float32(nil), vec...)})
+	}
+	return nil
 }
 
 // validateAnchors rejects anchor maps with structural problems before any
