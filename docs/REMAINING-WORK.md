@@ -16,6 +16,8 @@
 
 - 단계75: 실제 factory API에서5역할/4method·10노드·40일정을 실행해 삭제/ack/Once·막힘·빠른 반환 오류를 구별했다. 모든 exit0·잔존0. 관측 후 정리14회, 직접 API/관찰 gate 범위를 유지하며 원래5일정 범위 결정·설치 역할·독립 수용은 남긴다. [근거](./spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json).
 
+- 단계76: 최신 clean CKS·실제4역할·실제원문에서 partial2건/Write2건/Read3회·선택거부2회·완료거부4회를 확인했다. 최초 handoff 오류2건 포함8hosts/8CKS·24PIDs 부재·데이터 보존. startup66 embedding HTTP(차원확인1+anchor65)/신생CKS를 식별해 WI-3 배치 보완을 다음 개발로 선정했다. [근거](./spec-driven/operational-preparation/source-review-supplement/followups/four-role-current-v1/SUMMARY.json).
+
 ## 남은13개 묶음과 완료 기준
 
 | 순서 | 묶음 | 남은 기능·검증·결정 | 상태 |
@@ -27,7 +29,7 @@
 |5|WI-C|설치 리뷰 역할·필수 항목/우선순위·구조화 보고서/그림·인수인계·독립 검토|미완료|
 |6|WI-1|정의16보정·range37지원밖/빈블록3미확정·값/타입/메모리·독립 정답|미완료|
 |7|WI-2|독립 비보안 표본/정답·실제 명령/호출자/build지원/MCP 경계|미완료|
-|8|WI-3|가족/노출/중복/정답·설치 역할·기본 예산/시작/부분·공급자 오류·범위 밖|미완료|
+|8|WI-3|실제4역할 연결 확인. startup anchor65개 배치·가족/정답·기본 예산/부분·오류·범위 밖|미완료|
 |9|WI-4|전체 driver/host/receiver·시간/스케줄·반복·독립 가족/정답·충분성|미완료|
 |10|독립 수용 준비|익명 역할/독립성·새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|담당자 미정|
 |11|온톨로지 효과|독립 의미/검색 정답·구현-개념 연결·동일 corpus off/on 효과·오인/누락|미완료|

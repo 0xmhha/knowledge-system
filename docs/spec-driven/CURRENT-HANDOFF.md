@@ -1,10 +1,22 @@
-# 현재 인수인계 — 단계75 / 2026-10-19
+# 현재 인수인계 — 단계76 / 2026-10-19
 
 [코드·검증 결과](./operational-preparation/source-review-supplement/followups/local-reliability-v1/SUMMARY.json) · [실제 경로](./operational-preparation/source-review-supplement/followups/local-reliability-v1/runtime-summary.json) · [13개 실행 원장](./REMAINING-13-EXECUTION.json) · [남은 전체 작업](../REMAINING-WORK.md)
 
 로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
 
-## 현재 단계75: 실제 owner 일정·후보 구별
+## 현재 단계76: 최신 CKS와 실제4역할의 전달 확인
+
+[실제 역할·wire 근거](./operational-preparation/source-review-supplement/followups/four-role-current-v1/SUMMARY.json) · [초기 실패/보정/범위](./operational-preparation/source-review-supplement/followups/four-role-current-v1/REPORT.txt)
+
+49197f0f의 깨끗한 source로 새 CKS를 빌드했다. 실제 go-stablenet Unsubscribe 원문·node·SHA를 사용해 Analyzer/Planner partial2건을 실제 Write로 저장하고 downstream Read3회로 전달했다. 실제4역할의 도구 catalog25/19/4/4, CKS 노출21/15/0/0을 확인했다. 선택 CLI거부2회와 완료 상태 Write거부4회 뒤 미수용 state를 유지했다.
+
+최초4hosts는exit0였어도 동적 동작 wrapper 오류로 handoff2건이 누락돼 성공이 아니다. 명시 보정4hosts의 전달을 확인했으며 총8hosts/8CKS sessions·기록24PIDs 부재·원본/사본/consumer source 보존이다. 로컬 BGE HTTP embedding528회와 실제 LLM0을 구분한다. SDK 명목USD는 과금이 아니다. 역할 의미 판단/전체 pipeline/독립 정답/positive finalHEAD 선택은 남아 있다.
+
+다음은 WI-3 startup anchor65개의 단건 호출을 기존 provider batch API로 묶는 보완이다. 기존 단건 fallback, 같은 anchor/전처리/threshold/출처를 보존하고 오류/취소·실제 요청·출력을 검증한다. 현재 Go source에 대한4172/18skip 일반/race 근거는 재사용했으며 Go 변경 후에는 전체 검사를 새로 수행한다.
+
+단계75는49197f0f에 서명 저장하고180개 변경 blob과 깨끗한 상태를 대조했다. 원래5일정 범위 제안은 사용자 결정 대기다. 정본 JSON은 native/owner/consumer 검증 reference를 별도로 보존하고 active_remaining_worklist가 전체 최신 단계를 가리킨다.
+
+## 이전 단계75: 실제 owner 일정·후보 구별
 
 [실행/분류 원자료](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json) · [범위와 정리 개입](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/REPORT.txt) · [일정 범위 제안](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/PROPOSAL.json)
 
@@ -53,12 +65,12 @@
 
 ## 다음 작업과 실행 경계
 
-다음은 실제4개 소비자 역할의 최신 CKS pin과 oracle 전달 연결이다. 원래5일정 범위 제안의 사람 결정과 독립 수용은 별도 유지한다. 전체5일정/12계약과 이미 관측한 통제 메모리·유한 source hook 경로를 혼동하지 않는다. 범위·진입·정리·실패 분모를 먼저 고정하고 구현/검증/문서/서명 커밋 순서로 진행한다.
+다음은 WI-3 startup anchor batch/fallback 계약의 구현·검증이다. 네 역할의 연결은 단계76에서 관측했으며 positive oracle/선택·실제 의미 판단·독립 수용은 남아 있다. 전체5일정/12계약과 이미 관측한 통제 메모리·유한 source hook 경로를 혼동하지 않는다. 범위·진입·정리·실패 분모를 먼저 고정하고 구현/검증/문서/서명 커밋 순서로 진행한다.
 
 보안 전용 gold·권한/비공개/위조 경계와 조직 인증은 사용자 보류다. 실제 LLM 답변 평가는 모델·인증 방식·비용 상한이 정해진 뒤 진행한다. CoreML의 실제 모델/토크나이저 경로와 배포 대상은 확인 중이다. 로컬 개발 검증을 게시·운영 배포나 독립 승인으로 표시하지 않는다.
 
 ```bash
-python3 scripts/full_host_owner.py check --require-stored
+python3 scripts/four_role_readiness.py check --require-stored
 python3 scripts/check-remaining-13.py
 ```
 

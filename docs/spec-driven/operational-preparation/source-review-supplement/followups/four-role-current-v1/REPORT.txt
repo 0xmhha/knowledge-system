@@ -1,0 +1,17 @@
+단계76 — 최신 CKS·실제4역할의 출처/부분 응답 전달
+
+깨끗한 commit49197f0f에서 Go1.26.8로 CKS를 새로 빌드했다(vcs.modified=false). ROOT native1741/승인5는 일반/race 각4172통과/18skip을 기록한 source와 동일하다. 승인된 coding-agent d1ebafb8 source, 설치된 Claude Code2.1.300과 별도 plugin-dir/격리 config/상수 dummy credential/로컬 scripted API를 사용했다. 실제 역할은 Analyzer/Planner/Implementer/Evaluator이며 도구 catalog는25/19/4/4, CKS 노출은21/15/0/0이었다. 전역 plugin 등록이나 실제 LLM 실행이 아니다.
+
+P05의 합성 Seed 대신 실제 go-stablenet0bf2f4d1의 SyncStatusSubscription.Unsubscribe를 사용했다. 보존 graph node/원문 blob347bytes와 실제 Git file/반개구간 좌표/SHA를 대조했다. 원본 dataset2248payload files를 복사하고 빈 live source를 사용했다. project/dataset/snapshot은 보존 metadata에서 결속했으며 v1 value API가 반환하지 않은 project 필드를 반환했다고 주장하지 않는다.
+
+보정 실행4hosts/4CKS sessions 모두exit0·EOF/reap·강제 종료0. Analyzer value_dependencies와 Planner rule_candidates의 실제 partial 결과를 역할의 Write로 저장하고 Planner/Implementer/Evaluator의 Read3회로 전달했다. 저장한 actual_tool_response는 wire payload와 동일하며 unknown/partial/source/limits를 그대로 보존했다. 선택 자료가 없는 실제 --check/--check --applied2회는exit2로 거부됐다. 네 역할의 COMPLETED 변경 시도는 실제 plugin hook에서 evaluation_only 경계로 차단됐고 초기 BLOCKED state와 policy lock을 유지했다. fixture BLOCKED는 이 평가 입력의 미수용 상태이며 독립 수용 승인이 아니다.
+
+최초4hosts도exit0였지만 기존 ActionPlan wrapper가 동적 동작을 일반 row로 복사해 derived_handoff를 잘못된 tool block으로 전송했다. 로컬 gateway KeyError2건과 Analyzer/Planner 전달 파일 누락, Planner의 앞선 Read 실패를 보존했다. 호스트exit0만으로 성공으로 세지 않았다. 보정1회는 wrapper에서 동적 accessor만 보존했으며 실제 host/CKS/hook/원문/컷오프는 그대로다. 총8hosts/8CKS sessions, 자동 재시도0. 수신 SDK의 네트워크 재시도나 end-turn 내부 재요청과 독립 host 시도를 구분한다.
+
+기록한 host/wrapper/CKS24PIDs와 host group이 모두 부재, 로컬 gateway/model proxy 주 thread 종료 확인. 원본/사본 dataset·target source·consumer tracked source 전후 동일. profile과 전역 설정은 분리했으며 전역 전체filesystem 불변을 새로 측정한 것은 아니다. 역할별 설치 binary와 명시 plugin-dir을 사용한 연결 검사이며 전역 설치나 실제 모델의 자율 준수·의미 판단·전체 pipeline 완료를 입증하지 않는다.
+
+로컬 BGE embedding HTTP 요청은 최초264/보정264=528이고 LLM 요청과 다르다. 요청 수이지 문장별 inference 수로 환산하지 않았다. SDK가 표시하는 소액USD는 scripted usage를 가격표에 넣은 명목 counter이며 실제 API 과금이 아니다. 실제 LLM/paid external calls0. 신생 CKS4개에서 첫 응답은약3.16~4.05초였고, code/HTTP계수로 startup당 차원 확인1회와 intent anchor65개 단건 요청(합계66회)을 확인했다. 입출력·모델·기동을 포함한 유한 진단이며 표본4개로 SLA나 p95 수용을 주장하지 않는다.
+
+원래5일정 범위 결정·실제 peer sync·positive finalHEAD oracle/선택·독립 티켓/정답/반복 충분성·구조화 review 의미 판정은 남았다. 정식0/9·독립0·FINAL0·D04미정·freeze null·execution_allowed=false. 실명/연락처 불필요. 보안 전용 평가와 실제 LLM/배포 입력의 보류를 유지한다.
+
+다음 개발은 WI-3 startup의65개 anchor 단건 호출을 배치 가능한 기존 provider 경로로 묶는 것이다. 선택 가능한 batch interface와 기존 단건 fallback을 명세하고, anchor/전처리/모델/threshold/출처를 유지하면서 cardinality/오류/취소 및 실제 요청 수·결과 차이를 검증한다. 독립 품질 수용과 구분하고 전체 native 검사를 새 source에 대해 수행한다.
