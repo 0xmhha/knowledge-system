@@ -1,0 +1,193 @@
+{
+  "kind": "WIC_actual_installed_typed_delivery_and_render_DEV",
+  "initial": {
+    "actual_roles": 2,
+    "host_and_CKS_exit0": true,
+    "typed_handoff_verified": false,
+    "artifact_files": 0,
+    "roles": [
+      {
+        "role": "analyzer",
+        "host_exit": 0,
+        "CKS_exit": 0,
+        "actual_tool_calls": 2,
+        "actions": 6,
+        "CLI_calls": 2,
+        "errors": [
+          {
+            "tool": "Bash",
+            "text": "Exit code 2\n{\"status\": \"invalid\", \"reason\": \"[Errno 2] No such file or directory: '/private/tmp/ks-phase79-review-delivery-20261019/source/.coding-agent/tickets/KS-P06-REVIEW/judgments-input.json'\"}"
+          },
+          {
+            "tool": "Bash",
+            "text": "Exit code 2\n{\"status\": \"invalid\", \"reason\": \"[Errno 2] No such file or directory: '/private/tmp/ks-phase79-review-delivery-20261019/source/.coding-agent/tickets/KS-P06-REVIEW/deep-review.json'\"}"
+          }
+        ]
+      },
+      {
+        "role": "planner",
+        "host_exit": 0,
+        "CKS_exit": 0,
+        "actual_tool_calls": 0,
+        "actions": 10,
+        "CLI_calls": 2,
+        "errors": [
+          {
+            "tool": "Read",
+            "text": "File does not exist. Note: your current working directory is /private/tmp/ks-phase79-review-delivery-20261019/source."
+          },
+          {
+            "tool": "Read",
+            "text": "File does not exist. Note: your current working directory is /private/tmp/ks-phase79-review-delivery-20261019/source."
+          },
+          {
+            "tool": "Read",
+            "text": "File does not exist. Note: your current working directory is /private/tmp/ks-phase79-review-delivery-20261019/source."
+          },
+          {
+            "tool": "Read",
+            "text": "File does not exist. Note: your current working directory is /private/tmp/ks-phase79-review-delivery-20261019/source."
+          },
+          {
+            "tool": "Read",
+            "text": "File does not exist. Note: your current working directory is /private/tmp/ks-phase79-review-delivery-20261019/source."
+          },
+          {
+            "tool": "Bash",
+            "text": "Exit code 2\n{\"status\": \"invalid\", \"reason\": \"[Errno 2] No such file or directory: '/private/tmp/ks-phase79-review-delivery-20261019/source/.coding-agent/tickets/KS-P06-REVIEW/deep-review.json'\"}"
+          },
+          {
+            "tool": "Bash",
+            "text": "Exit code 2\n{\"status\": \"invalid\", \"reason\": \"[Errno 2] No such file or directory: '/private/tmp/ks-phase79-review-delivery-20261019/source/.coding-agent/tickets/KS-P06-REVIEW/deep-review.json'\"}"
+          },
+          {
+            "tool": "Write",
+            "text": "PreToolUse:Write hook error: Bugfix completion blocked: evaluation_only requires an intake policy lock"
+          }
+        ]
+      }
+    ],
+    "actual_LLM_calls": 0,
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "unsupported_policy": {
+    "actual_roles": 2,
+    "host_and_CKS_exit0": true,
+    "typed_handoff_verified": false,
+    "artifact_files": 5,
+    "roles": [
+      {
+        "role": "analyzer",
+        "host_exit": 0,
+        "CKS_exit": 0,
+        "actual_tool_calls": 2,
+        "actions": 8,
+        "CLI_calls": 2,
+        "errors": [
+          {
+            "tool": "Write",
+            "text": "PreToolUse:Write hook error: Bugfix completion blocked: evaluation_only requires an intake policy lock"
+          },
+          {
+            "tool": "Bash",
+            "text": "Exit code 2\n{\"status\": \"invalid\", \"reason\": \"analysis must bind exact validated deep review bytes\"}"
+          }
+        ]
+      },
+      {
+        "role": "planner",
+        "host_exit": 0,
+        "CKS_exit": 0,
+        "actual_tool_calls": 0,
+        "actions": 11,
+        "CLI_calls": 2,
+        "errors": [
+          {
+            "tool": "Bash",
+            "text": "Exit code 2\n{\"status\": \"invalid\", \"reason\": \"analysis must bind exact validated deep review bytes\"}"
+          },
+          {
+            "tool": "Write",
+            "text": "PreToolUse:Write hook error: Bugfix completion blocked: evaluation_only requires an intake policy lock"
+          },
+          {
+            "tool": "Bash",
+            "text": "Exit code 2\n{\"status\": \"invalid\", \"reason\": \"analysis must bind exact validated deep review bytes\"}"
+          },
+          {
+            "tool": "Write",
+            "text": "PreToolUse:Write hook error: Bugfix completion blocked: evaluation_only requires an intake policy lock"
+          }
+        ]
+      }
+    ],
+    "actual_LLM_calls": 0,
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "actual": {
+    "actual_roles": 2,
+    "host_and_CKS_exit0": true,
+    "typed_handoff_verified": true,
+    "artifact_files": 5,
+    "roles": [
+      {
+        "role": "analyzer",
+        "host_exit": 0,
+        "CKS_exit": 0,
+        "actual_tool_calls": 2,
+        "actions": 8,
+        "CLI_calls": 2,
+        "errors": []
+      },
+      {
+        "role": "planner",
+        "host_exit": 0,
+        "CKS_exit": 0,
+        "actual_tool_calls": 0,
+        "actions": 11,
+        "CLI_calls": 2,
+        "errors": [
+          {
+            "tool": "Write",
+            "text": "PreToolUse:Write hook error: Structured review delivery blocked: completion requires bound delivered review report"
+          }
+        ]
+      }
+    ],
+    "actual_LLM_calls": 0,
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "render": {
+    "actual_SVGs": 2,
+    "visual_inspection": true,
+    "clipped_labels": false,
+    "renderer_version": "11.12.1",
+    "semantic_acceptance": false
+  },
+  "actual_hosts": 6,
+  "actual_CKS_sessions": 6,
+  "initial_script_selector_failed": true,
+  "unsupported_policy_fixture_failed": true,
+  "explicit_corrective_attempts": 2,
+  "legacy_review_only_route_used": true,
+  "bugfix_full_evaluation_only_extended_to_review": false,
+  "normal_terminal_transition_not_requested": true,
+  "paid_external_LLM_calls": 0,
+  "actual_LLM_calls": 0,
+  "local_embedding_total_HTTP_requests": null,
+  "SDK_USD": "nominal_scripted_usage_not_billing",
+  "required_item_omission_score": null,
+  "priority_correctness": null,
+  "actual_priority_path": "medium_only",
+  "exposed_source_case_reused": true,
+  "fresh_independent_cases": 0,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "FINAL": 0,
+  "freeze": null,
+  "execution_allowed": false
+}

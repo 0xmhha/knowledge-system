@@ -1,4 +1,4 @@
-# 현재 인수인계 — 단계78 / 2026-10-19
+# 현재 인수인계 — 단계79 / 2026-10-19
 
 [단계77 실행 근거](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/SUMMARY.json) · [실패/범위 보고서](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/REPORT.txt) · [13개 정본 원장](./REMAINING-13-EXECUTION.json)
 
@@ -19,9 +19,16 @@
 변경 없는 원래 source2228파일에서 loopback2노드씩 일반/race를 실행했다. 실제 source의 Start/Done·수신3블록 동일·인덱스4/남은0·원래60초 false·구독 해제·두 노드 종료·소유 data/process 잔여0을 확인했다. StartEvent를 시험 코드로 넣지 않았다. 모두4개 시험 노드이며 운영 노드는0이다. legacy Ethash fixture로 운영WBFT를 수용하지 않으며, 공통 fixture1개/각1회는 독립 가족이 아니다.
 초기 scope의 일부 event label이 이전 factory 시험에서 상속돼 실제 이름과 달랐다. 원래 scope를 수정하지 않고 실행 전 고정한 Go fixture와 실제 events를 모두 보존해 정확한15개 event 순서를 검증했다. 원래5일정/12계약의 전체 범위·installed oracle·독립 수용은 남아 있다.
 
+## 현재 단계79: 설치 역할의 구조화 리뷰·그림
+
+[실제 역할/CLI/그림 근거](./operational-preparation/source-review-supplement/followups/review-delivery-current-v1/SUMMARY.json) · [초기 실패와 범위](./operational-preparation/source-review-supplement/followups/review-delivery-current-v1/REPORT.txt).
+실제 Analyzer가 두 MCP 응답으로5산출물을 만들고 Planner가 Read/CLI/보고서 hash로 인수인계했다.5개 bytes는 동일하며 잘못된 terminal Write는 실제 deep-review hook이 거부했다. 최종PLANNING이고 정상 terminal을 요청하지 않았다. 실제SVG2개를 브라우저 렌더/직접 시각 확인했다.
+초기 source 선택 script 오류2hosts와 지원 밖 policy 조합 거부2hosts를 보존했고, 새 지원되는 legacy review_only 입력의 최종2hosts에서 전달을 확인했다. 전체6hosts/6CKS·18PIDs 부재·원본/사본/consumer source 보존. 실제 LLM0·명목USD는 과금 아님. 한 노출 source/medium 후보의 구조 시험으로 독립 필수 항목/우선순위/의미 판단을 완료하지 않는다.
+
 ## 다음 작업
 
-단계79의 WI-C 실제 설치 역할5산출물 전달·CLI·훅·그림 렌더링 결과를 별도 문서와 서명 커밋으로 확정한다. 이어 선택 viewer의 실제 상호작용과 소유 backend 정리 경로를 진행한다. 단계77은84969638의349개 변경 blob/서명/clean을 검증했고, 소스 연결은 별도 서명 원장에서 실제 binding checksum까지 대조했다.
+선택 viewer의 실제 상호작용과 소유 graph API의 종료/대기/reap 경로를 보완한다. 현재 코드에는 backend Start 뒤 Kill만 있고 Wait가 없는 정리 공백이 있어, 소유 자원 범위에서 정상 취소·준비/바인드 실패·자식 조기 종료를 검증한다. 보안 전용 평가는 추가하지 않는다.
+단계77은84969638의349개 변경 blob/서명을 검증했다. 단계78은dccf6d02의54개 변경 blob/서명/clean을 검증했고, source 연결 원장도 별도 서명 및 실제 checksum 대조를 마쳤다.
 
 ## 남은 전체13묶음 — 완료0/13
 
@@ -31,7 +38,7 @@
 |WI-V2|유한 후보 구별 완료; 독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|warm 쌍627회 보존; 독립 nonseed 관련성/잡음 정답·표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 부분은 사용자 보류|
-|WI-C|설치 역할의 전체5산출물·그림·인수인계와 독립 필수 항목/우선순위 검토|
+|WI-C|설치 역할5산출물·렌더·인수인계 확인; 독립 필수 항목/우선순위 검토|
 |WI-1|선택 수신16수정; range37/빈 블록3 미확정 구분; 값/종류/메모리 매칭·독립 완전 정답|
 |WI-2|독립 비보안 표본·호출 대상/호출자·명령/build/MCP 소비자 매칭|
 |WI-3|시작 배치·계측 기능 보존 검증 완료; 가족/노출/중복·기본 상한/partial/오류/범위 밖·독립 관련성|

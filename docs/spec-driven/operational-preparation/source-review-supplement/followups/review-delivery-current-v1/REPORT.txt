@@ -1,0 +1,48 @@
+단계79 / 실제 설치 역할의 구조화 리뷰 전달과 그림 렌더링
+
+승인된 consumer d1ebafb8/실제 Claude Code2.1.300와 단계77과 같은 bytes의 CKS를
+소유 별도 profile·MCP stdio·localhost scripted gateway로 연결했다. 실제 LLM0,
+유료 외부 호출0이며 SDK의 명목USD/토큰 수는 scripted 사용량으로 과금이 아니다.
+전역 설치/운영 source/외부 tracker/PR/게시를 실행하지 않았다.
+
+최종 Analyzer는 실제 structured-review skill Read와 rule_candidates + review_function
+두 MCP 호출을 수행했다. 실제 request/result로 bundle을 Write하고 AI 판단 초안을
+분리해 입력했다. 실제 deep_review build CLI가 다음5개를 만들었다:
+deep-review-evidence.json, deep-review.json, review-report.md, sequence.mmd, modules.mmd.
+ANALYSIS의 typed hash를 연결한 실제 Write 후 PLANNING으로 넘겼고 CLI verified다.
+Planner는 skill/state와5개 파일을 실제 Read한 뒤 CLI를 검증하고 report hash를
+연결했다.5개 bytes는 Analyzer 이후 그대로이며, 잘못된 report hash로 COMPLETED를
+쓰려는 시도는 실제 deep-review hook의 completion requires bound delivered review report로
+거부됐다. 최종 상태는 PLANNING, PLANNING.status=completed; 정상 terminal은 요청하지 않았다.
+
+초기 실패도 포함한다. 첫2hosts는exit0였어도 scripted judgment selector가 actual
+s.unsubOnce.Do 대신 once.Do를 찾아 source 선택에 실패했고 최종 artifact0이었다.
+명시 보정1의2hosts는5개 생성까지 성공했으나 code_review에 bugfix-full 전용
+publication_policy=evaluation_only를 잘못 넣어 intake lock이 없다는 실제 hook 거부를
+받았다. 이 fixture/거부/원래 state를 바꾸지 않고 보존했다.
+명시 보정2는 해당 정책을 임의 확장하지 않고, 새 소유 영역의 원래 지원하는 legacy
+review_only 입력(해당 bugfix 전용 필드 없음)으로 실행했다. 게시 action은 제공하지 않았고
+유효 terminal 승인도 요청하지 않았다. 성공2hosts를 포함해 합계6hosts/6CKS sessions,
+기록18PIDs 부재·모든 host/CKS exit0·EOF/reap·gateway 종료·강제 종료0을 대조했다.
+원본/사본2248파일, target tracked2228파일, 승인 consumer tracked source는 전후 동일하다.
+
+두 .mmd 파일은 실제 전달된 SHA 그대로 pinned Mermaid11.12.1과 격리 Playwright
+Chrome155 세션의 loopback HTML에서 SVG로 렌더했다. 오류0·두 SVG의 양수 bbox,
+No CFG successors; no safety conclusion, retained-file 및 interprocedural unknown 표기를
+확인했다.1280wide 스크린샷을 직접 보아 node/edge label이 잘리지 않음을 확인했다.
+HTML/library만 로컬 제공했고 프로젝트 자료를 CDN에 보내지 않았다. 렌더러/CLI버전,
+원본 .mmd hashes·실제SVG·화면·범위·서버 요청3건·브라우저/서버 종료를 남겼다.
+Mermaid 원본 공개 release: https://github.com/mermaid-js/mermaid/releases/tag/mermaid@11.12.1
+렌더러 파일은 공개 고정 URL/SHA를 기록하며 npm cache/CLI profile/다운로드 library를
+저장소 산출물로 복제하지 않는다.
+
+한계: 같은 노출 source1개를 재사용한 로컬 전달 시험이며 새 독립 사례0이다.6개 reasoning
+section, medium priority 후보와 근거/가정/unknown의 구조를 확인했지만 의미의 필수 항목
+완전성·우선순위 정답·진짜 모델 reasoning을 수용하지 않는다. 구조 review의 snapshot은
+identity_only_unverified_snapshot이고 CFG는 실행 trace가 아니다. closure 내부는 이
+bounded outer CFG에서 추론하지 않았다. Rendering은 의미 정확성의 증거가 아니다.
+bugfix-full evaluation_only가 code_review까지 지원된 것으로 바꾸지 않았다.
+독립승인0·정식0/9·FINAL0·D04미정·미동결·품질 점수null을 유지한다. 보안 전용 평가0.
+
+다음: 현재 선택 viewer의 소유 backend 종료와 실제 상호작용을 검증한다. 독립 gold,
+새 DEV/FINAL·매칭·충분성·F01~08·온톨로지 효과 및 다른13묶음 완료 조건은 그대로 남는다.
