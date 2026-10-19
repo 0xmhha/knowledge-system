@@ -29,6 +29,14 @@ func newExportStaticCmd() *cobra.Command {
 			}
 			defer func() { _ = store.Close() }()
 
+			manifest, err := store.GetManifest()
+			if err != nil {
+				return fmt.Errorf("read manifest: %w", err)
+			}
+			if err := legacyGraphExportAllowed(manifest); err != nil {
+				return err
+			}
+
 			// Chunk sizes match spec §6.6: 5k nodes, 10k edges per chunk —
 			// small enough to stream incrementally, big enough to keep
 			// manifest/directory overhead bounded on repos with ~100k nodes.

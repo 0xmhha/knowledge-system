@@ -1,0 +1,155 @@
+{
+  "kind": "public_v2_surface_contract_and_incremental_implementation_DEV",
+  "base_revision": "deb61f8af2b3cdb1cca6134d2c76b8d938260ea3",
+  "requirements": {
+    "path": "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+    "sha256": "ec019a0c4f79fa6bb1c2473ff891b08ec2a5a0977db418dc05f00ca52e7c78e9"
+  },
+  "observed": {
+    "CLI": "cks agent calls legacy get_for_task and renders markdown only",
+    "HTTP": "existing cks mcp Streamable HTTP at /mcp dispatches the same registered v2 tool; require actual verification rather than duplicate server",
+    "graph_export": "legacy1.8 JSON header omits project/dataset/snapshot/source-mode; independent v2 path pending",
+    "vector_query": "direct CKV legacy query refuses noncommitted source; explicit v2 remains separate subtask"
+  },
+  "steps": [
+    {
+      "id": "P85-A",
+      "task": "opt-in cks agent --format=v2 using get_for_task_v2, existing DTO/verifier, typed bounded errors, successful child close before output; unchanged default markdown",
+      "status": "local_implementation_and_verification_complete"
+    },
+    {
+      "id": "P85-B",
+      "task": "real isolated HTTP MCP v2 coordinate/hash and failure parity on owned fixtures; no auth/ACL expansion",
+      "status": "local_implementation_and_verification_complete"
+    },
+    {
+      "id": "P85-C",
+      "task": "independent graph export v2 source identity/legacy compatibility, output lifecycle and noncommitted-source contract",
+      "status": "local_implementation_and_verification_complete"
+    },
+    {
+      "id": "P85-D",
+      "task": "direct vector CLI explicit v2 requirements and archive ownership contract; retain legacy rejection until implemented",
+      "status": "requirements_documented_implementation_pending"
+    }
+  ],
+  "verification": [
+    "focused general/race and no-model mock consumer tests",
+    "v1 output fixtures and public error messages unchanged",
+    "no artifact publication before validation and successful owned child shutdown",
+    "all production changes receive fresh whole build/test/race/fmt/vet/lint/docs proof before completion",
+    "real local interfaces only on owned data/resources, no actual LLM/paid endpoint",
+    "review actual duplicate surfaces before adding new API paths"
+  ],
+  "out_of_scope": [
+    "new organizational authentication/ACL/forgery evaluation",
+    "global installation",
+    "push or publication",
+    "independent gold approval"
+  ],
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "actual_LLM_calls": 0,
+  "paid_external_calls": 0,
+  "output_contract_assumption": {
+    "choice": "whole graph JSON plus project/dataset/source coordinates",
+    "status": "recommended default used after optional preference window, not a user approval",
+    "evidence_pack": false
+  },
+  "direct_CKV_followup_contract": {
+    "implementation_status": "not_implemented",
+    "current_exposed_sources": {
+      "cmd/vector/query.go": "c37ed17ae08376e379a277b2b019a639e0e4fb2825ca9e1fafa3982e3a62456c",
+      "internal/vector/query/engine.go": "eb112354c66edfe4923c586b30633d543ef72bdf4548a813ce0dd6ba6464ac8f",
+      "internal/setup/gc.go": "ac11413418fb6d604544e2de5720c313313ca04b6d85f8725824fa550c16a0f9",
+      "internal/setup/source_reader.go": "b395df64e2b30a16fbeeaeda44a41f24090dcc66efa83f4e7c13208e4c596e01",
+      "internal/system/evidencev2/pack.go": "51e56809e19669174e165158335e4dfa0ac31305dd86ce4b7ddf0f34d892b83d",
+      "internal/system/composer/sanitize/engine.go": "5e16b99b57c3cdf433823095a7ee2f2ca6e6094f2fcc61477975be4fe9babb9b",
+      "scripts/check-boundaries.sh": "1d34c99b81de7102655a7458a6cd18ab2a63364db704f2bc26d811d627a08701"
+    },
+    "source_observations": [
+      "query.Options already supports verified SourceReader and RetainedSource; public direct CLI does not admit them",
+      "setup.PinVersionReader must precede artifact open; nil lease means older candidate retained conservatively, not an acquired GC-aware lease",
+      "OpenRetainedSourceReader is authoritative and does not fall back to mutable checkout",
+      "current EvidencePack builder imports system sanitizer/config/footprint; importing that engine internal from vector violates boundaries",
+      "a shared public evidence/cleaner seam or another reviewed engine-independent adapter is required before direct CKV v2 is implemented"
+    ],
+    "required_sequence": [
+      "validate explicit v2 format, root/version and options before provider work",
+      "admit reader before opening source/index artifacts; document older-reader compatibility",
+      "inspect immutable dataset and require actual vector manifest coordinates to match",
+      "open verified archive reader; preserve namespaced origins and never infer mutable --src as retained",
+      "search using actual query engine retained reader; handle partial, empty and provider error separately",
+      "resolve selected retained spans; apply mandatory existing sanitation through an engine-independent shared seam",
+      "retain 32000-body-byte/12-citation bounds and real source hashes; preserve source-mode commit rules",
+      "verify pack and recheck source/index identity",
+      "close query/embedder and release reader successfully before publishing",
+      "publish verified whole pack or new output file; refuse replacing existing output; distinguish durability uncertainty"
+    ],
+    "test_candidate_contracts": [
+      {
+        "id": "CKV2-01",
+        "case": "committed retained positive",
+        "expected": "source archive bytes and full v2 coordinates; no working-tree body"
+      },
+      {
+        "id": "CKV2-02",
+        "case": "working-tree retained positive",
+        "expected": "no commit citation claim; base commit preserved"
+      },
+      {
+        "id": "CKV2-03",
+        "case": "snapshot-only retained positive",
+        "expected": "base commit and commit citation empty; exact snapshot and hashes"
+      },
+      {
+        "id": "CKV2-04",
+        "case": "legacy without v2 pins",
+        "expected": "reindex_required; no guessed coordinates"
+      },
+      {
+        "id": "CKV2-05",
+        "case": "source absent or metadata mismatched",
+        "expected": "source_missing or snapshot_mismatch; no successful artifact"
+      },
+      {
+        "id": "CKV2-06",
+        "case": "registered same-name repository/corpus paths",
+        "expected": "origin remains distinct; no fallback"
+      },
+      {
+        "id": "CKV2-07",
+        "case": "empty, partial or oversized selected spans",
+        "expected": "declared empty/partial/budget result, never truncated full-source claim"
+      },
+      {
+        "id": "CKV2-08",
+        "case": "provider unavailable or cancellation",
+        "expected": "bounded typed failure and all owned resources closed"
+      },
+      {
+        "id": "CKV2-09",
+        "case": "close failure or existing destination",
+        "expected": "no new success artifact; old file preserved"
+      },
+      {
+        "id": "CKV2-10",
+        "case": "reader admitted while current changes",
+        "expected": "same pinned version throughout; no mixed coordinates"
+      },
+      {
+        "id": "CKV2-11",
+        "case": "legacy direct command default",
+        "expected": "v1 DTO/default behavior and noncommitted rejection unchanged"
+      },
+      {
+        "id": "CKV2-12",
+        "case": "shared producer/independent consumer hash golden",
+        "expected": "same canonical bytes/hash and all existing native IDs preserved"
+      }
+    ],
+    "case_classification": "AI-authored exposed DEV contract candidates; not independently approved gold or FINAL",
+    "formal_completed": 0,
+    "independent_approved": 0
+  }
+}

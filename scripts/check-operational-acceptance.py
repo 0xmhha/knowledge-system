@@ -148,7 +148,11 @@ def check(root, protocol, ledger, require_frozen=False):
         try:
             if not file_hash(refreshed.get("manifest"), refreshed.get("manifest_sha256")):
                 raise ValueError("current readiness scope or hash differs")
-            if refreshed.get("kind") == "viewer_owned_UI_lifecycle_native_DEV_not_independent_acceptance":
+            if refreshed.get("kind") == "public_v2_CLI_HTTP_graph_native_DEV_not_independent_acceptance":
+                import public_v2_readiness
+                errors.extend(public_v2_readiness.validate(root, (root / refreshed["manifest"]).parent))
+                errors.extend(public_v2_readiness.current_indices(root, protocol, ledger))
+            elif refreshed.get("kind") == "viewer_owned_UI_lifecycle_native_DEV_not_independent_acceptance":
                 import viewer_readiness
                 errors.extend(viewer_readiness.validate(root, (root / refreshed["manifest"]).parent))
                 errors.extend(viewer_readiness.current_indices(root, protocol, ledger))

@@ -1,64 +1,45 @@
-# 현재 인수인계 — 단계84 / 2026-10-20
+# 현재 인수인계 — 단계85 로컬 검증 완료 / 2026-10-20
 
-현재 코드의 Go6개 변경과 선택 UI build profile을 검증했다. 전체 일반4231/race4231통과·각18skip, build/fmt/vet/고정lint/docs134통과. 실제 UI에서 검색·본문 출처·2D/상한500·키보드 검색·도움말을 확인하고 CKS/CKG exit0/reap/강제정리0·원본/소유2248파일 보존을 확인했다.
+선택형 CKS CLI v2·기존 HTTP MCP·독립 원시 그래프 JSON v2를 구현했다. 전체 일반4265/race4265통과·각18skip·실패0, build/fmt/vet/고정lint/docs134통과다. 새 Go 변경14개와 입력1807개를 고정했고, 실제 실행과 최종 native CKS/CKG bytes가 같다. 전체 검증 뒤 공개 계약 문서의 낡은 문장1개만 바로잡아 docs-check를 재실행했으며 기본 CKS/CKG/CKV bytes가 모두 같았다. 코드 검증과 문서 정정의 근거를 분리했다.
 
-[현재 단계80 증거](./operational-preparation/source-review-supplement/followups/viewer-lifecycle-v1/SUMMARY.json) · [범위/실패/한계](./operational-preparation/source-review-supplement/followups/viewer-lifecycle-v1/REPORT.txt). 초기 실제 화면은 stub이어서 성공 처리하지 않았다. 현재 앱 payload는 선택 frontend build 이후 Go binary에 내장된다. Atlas backend/전체 접근성은 검증하지 않았다. Native 후 Python readiness dispatch만 별도 검증한 차이가 있고 Go/frontend/승인 입력은 같다.
+검증 원장 회귀67개·새 v2 증거 검사8개·작업 원장4개가 통과했다. 최초 새 원장 검사에서 전달된 검토 자료를 직접 대조하지 않아27개가 실패한 결함을 고쳤고, 최초 검사기/manifest/실패 로그를 보존했다.
 
-기본 no-frontend 경로도 집중 race20·build·stub export를 확인하고 app46개를 복구했다. 증거 검사12·운영 기준67·작업 원장4가 통과했다. 외부 npm Go 샘플의 lint 실패와 하네스 출력/로그 폴더 중복 실패를 보존했고, 유지 Go package137개는 모두 검증했다.
+[단계85 요약](./operational-preparation/source-review-supplement/followups/public-v2-surface-v1/SUMMARY.json) · [범위·실패·한계](./operational-preparation/source-review-supplement/followups/public-v2-surface-v1/REPORT.txt) · [구현 계약과 후속 입력 후보](./operational-preparation/source-review-supplement/followups/public-v2-surface-v1/SPEC.json) · [공개 형식 계약](./PUBLIC-CONTRACT-V2.md) · [13묶음 정본 원장](./REMAINING-13-EXECUTION.json).
 
-승인 범위 적용을 완료했다. 실제 owner4일정/통제 late-drain1일정, 옛 구독·새 등록 전 경계를 현재 원장에 연결했다. 과거 pending AI 제안과 제한 결과는 그대로 보존하고 독립 승인으로 승격하지 않았다. WI1/2/3/4/V1/V2/6/C의 AI 초안은 당시 커밋의 격리 복사본에서 검사기7개가 모두 통과했다. 현재 소스에서 구형 검사기가 거부한7건은 그대로 보존하고 당시 유효성과 현재 정답 승인을 구분한다. 보안 혼합 WI-SP 검사는 실행하지 않았다. 로컬 Qwen3 임베딩0.6b/4b는 실제 존재하며1024/2560차원 Ollama GGUF이다. 헤더/metadata만 확인하고 추론·전환은0, BGE 기준선도 바꾸지 않았다. 지정된 모델 루트/색인에서 CoreML 패키지·별도 tokenizer를 찾지 못했으며 전체 홈 부재 증명은 아니다. 보안 전용 audit 연동도 사용자 보류로 분리해 활성 후속10개를 유지한다. 실제21회 규모 검증을 완료했다. 1.242GB/244989노드/1964193관계에서 긴 함수3개·요청21개가 partial18/budget_exhausted3을 반환했다. 측정15응답 약2.400/s·CKS 최대RSS표본162.45MiB, 각 budget 뒤 원문 일치 응답·EOFexit0/잔여0·원본/소유 데이터 보존을 확인했다. BGE HTTP4/input68, 실제LLM0이며 용량·완전 의미 분석 수용은 아니다. 시작 캡처가 첫 health까지 포함한 측정 명칭 오류와 초기 validator 거부도 보존했다. 다음은 기존 public v2 CLI/HTTP·독립 graph export 계약을 확인해 구현한다. 모든13묶음은 독립 조건 등 남은 기준이 있어0/13, 정식0/9를 유지한다.
+실제 CLI/HTTP는 좌표·질의·인용11개·무결성 해시가 일치했다. 기본 markdown을 유지하고, v2는 소유 MCP의 성공 종료 뒤 출력한다. 기존 파일은 덮어쓰지 않는다. 원시 그래프 v2는 프로젝트·데이터·소스 좌표와 캡처 digest를 보존한다. 실제347378485바이트/244989노드/1964193관계를 SQLite와 전 행 대조했다. 실행 중 종료 요청은 취소 오류·exit1이며 미완성 출력/임시 파일/잔여 프로세스0, 데이터 보존이다. 이 원시 그래프는 검색 EvidencePack의 원문 검증·정화·sha256-v2가 아니다.
 
-[단계77 실행 근거](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/SUMMARY.json) · [실패/범위 보고서](./operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/REPORT.txt) · [13개 정본 원장](./REMAINING-13-EXECUTION.json)
-
-로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
-
-단계77 로컬 검증 완료: 시작 embedding HTTP66→2, 일반/계측에서 동일 원문 partial 유지.
-최초 계측1건의 unavailable 결함을 보존하고 CKG 선택 기능16조합을 보완했다.
-실제16세션 중 정상 종료8·의도한 공급자 시작 거부8이며, 출처 일치 성공은7이다.
-새 전체 일반4214/race4214통과·각18skip, build/fmt/vet/고정 lint/docs134 통과.
-입력1746(Go1290)/승인5·변경Go10, 실제 runtime과 최종 native binary bytes 동일.
-시험 fixture2개만 runtime 이후 수정했으며 해당 차이도 hash로 대조했다.
-
-검사 시도의 Git fixture 서명 환경 실패12건, 잘못된 무기능 fixture 실패2records, 수정 전 의도한 전체 검사 중단1회와 sandbox 수집 실패를 보존했다. 사용자 전역 설정은 바꾸지 않았다. 실제 LLM0·유료 호출0·전역 설치0·게시0이다. 수치 일치/요청 감소는 검색·온톨로지·답변 품질 수용이 아니다.
-
-## 앞선 단계78: 실제 피어의 동기화
-
-[실제 peer 근거](./operational-preparation/source-review-supplement/followups/real-peer-sync-v1/SUMMARY.json) · [범위와 한계](./operational-preparation/source-review-supplement/followups/real-peer-sync-v1/REPORT.txt).
-변경 없는 원래 source2228파일에서 loopback2노드씩 일반/race를 실행했다. 실제 source의 Start/Done·수신3블록 동일·인덱스4/남은0·원래60초 false·구독 해제·두 노드 종료·소유 data/process 잔여0을 확인했다. StartEvent를 시험 코드로 넣지 않았다. 모두4개 시험 노드이며 운영 노드는0이다. legacy Ethash fixture로 운영WBFT를 수용하지 않으며, 공통 fixture1개/각1회는 독립 가족이 아니다.
-초기 scope의 일부 event label이 이전 factory 시험에서 상속돼 실제 이름과 달랐다. 원래 scope를 수정하지 않고 실행 전 고정한 Go fixture와 실제 events를 모두 보존해 정확한15개 event 순서를 검증했다. 원래5일정/12계약의 전체 범위·installed oracle·독립 수용은 남아 있다.
-
-## 앞선 단계79: 설치 역할의 구조화 리뷰·그림
-
-[실제 역할/CLI/그림 근거](./operational-preparation/source-review-supplement/followups/review-delivery-current-v1/SUMMARY.json) · [초기 실패와 범위](./operational-preparation/source-review-supplement/followups/review-delivery-current-v1/REPORT.txt).
-실제 Analyzer가 두 MCP 응답으로5산출물을 만들고 Planner가 Read/CLI/보고서 hash로 인수인계했다.5개 bytes는 동일하며 잘못된 terminal Write는 실제 deep-review hook이 거부했다. 최종PLANNING이고 정상 terminal을 요청하지 않았다. 실제SVG2개를 브라우저 렌더/직접 시각 확인했다.
-초기 source 선택 script 오류2hosts와 지원 밖 policy 조합 거부2hosts를 보존했고, 새 지원되는 legacy review_only 입력의 최종2hosts에서 전달을 확인했다. 전체6hosts/6CKS·18PIDs 부재·원본/사본/consumer source 보존. 실제 LLM0·명목USD는 과금 아님. 한 노출 source/medium 후보의 구조 시험으로 독립 필수 항목/우선순위/의미 판단을 완료하지 않는다.
+최종 연결 시험은 로컬 BGE embedding HTTP28회/입력284개다. 초기 별도 후보의 연결 시험도 원자료로 보존했고 최종 후보 수치에 합치지 않았다. 실제 LLM·유료 호출·전역 설치·push/PR은0이다. 초기 그래프 시험 상수명 오류, 하네스 모듈 경로/출력 폴더 오류와 sandbox lint cache 경고를 숨기지 않았다. 직접 CKV retained v2와 정적 분할 v2는 아직 구현하지 않았다. 기존 v1은 비커밋 소스를 거부하며, 직접 CKV에는 보관 원문·reader lease·필수 본문 처리의 엔진 독립 공유 경로가 먼저 필요하다.
 
 ## 다음 작업
 
-선택 viewer의 실제 상호작용과 소유 graph API의 종료/대기/reap 경로를 보완한다. 현재 코드에는 backend Start 뒤 Kill만 있고 Wait가 없는 정리 공백이 있어, 소유 자원 범위에서 정상 취소·준비/바인드 실패·자식 조기 종료를 검증한다. 보안 전용 평가는 추가하지 않는다.
-단계77은84969638의349개 변경 blob/서명을 검증했다. 단계78은dccf6d02의54개 변경 blob/서명/clean을 검증했고, source 연결 원장도 별도 서명 및 실제 checksum 대조를 마쳤다.
+CoreML의 토큰 전송 오류를 먼저 수정한다. 원본 Go/C는 아직 바꾸지 않은 별도 실제 CoreML 배열 시험에서 입력 `[101,102,103]`을 기존 int32 view가 `[101,0,102]`로 읽는 것을 재현했다. 모델 추론·다운로드0이다. 전송·출력 텐서·모델 소유 수명과 선택 native build 경로를 점검한다. 실제 CoreML 모델 품질 수용은 별도다.
+
+로컬 Qwen3 임베딩0.6b/4b는 실제 존재하며1024/2560차원 Ollama GGUF이다. CoreML 패키지·별도 tokenizer는 지정 루트/색인에서 찾지 못했으며 전체 홈의 부재 증명은 아니다. GGUF를 CoreML 실물로 기록하거나 BGE 기준선을 바꾸지 않았다.
 
 ## 남은 전체13묶음 — 완료0/13
 
 |묶음|현재 남은 내용|
 |---|---|
-|WI-V1|실제 host/factory/indexer/owner 확인; 실제 peer 일반/race 확인; 전체 조건·installed oracle·독립 티켓|
-|WI-V2|유한 후보 구별 완료; 독립 oracle·수용 후보 집합·선정 판단|
+|WI-V1|실제 host/factory/indexer/owner·peer 근거와 승인된 실제4/통제1 범위를 유지; 전체12계약·설치 oracle·독립 티켓|
+|WI-V2|유한 후보 구별 근거 유지; 독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|warm 쌍627회 보존; 독립 nonseed 관련성/잡음 정답·표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 부분은 사용자 보류|
-|WI-C|설치 역할5산출물·렌더·인수인계 확인; 독립 필수 항목/우선순위 검토|
-|WI-1|선택 수신16수정; range37/빈 블록3 미확정 구분; 값/종류/메모리 매칭·독립 완전 정답|
+|WI-C|설치 역할5산출물·렌더·인수인계 근거 유지; 독립 필수 항목/우선순위|
+|WI-1|선택 수신16수정, range37/빈 블록3 미확정 구분; 값/종류/메모리 매칭·독립 완전 정답|
 |WI-2|독립 비보안 표본·호출 대상/호출자·명령/build/MCP 소비자 매칭|
-|WI-3|시작 배치·계측 기능 보존 검증 완료; 가족/노출/중복·기본 상한/partial/오류/범위 밖·독립 관련성|
-|WI-4|실제 host·receiver 일정·반복 기준·독립 가족/oracle/충분성; 실제 peer 일반/race 근거 확인|
+|WI-3|시작 배치66→2와 계측 기능16조합 보존; 가족/노출/중복·기본 상한/partial/오류/범위 밖·독립 관련성|
+|WI-4|실제 host·receiver 일정·반복 기준·독립 가족/oracle/충분성|
 |독립 수용 준비|익명 검토 역할 미정; 새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|
-|온톨로지|독립 의미/검색 정답·구현/개념 연결·동일 corpus off/on 효과 판단|
+|온톨로지|독립 의미/검색 정답·구현/개념 연결·같은 corpus off/on 효과 판단|
 |정식9개 실행·수용|독립 승인·동결 후 WI-1/2/3/4/V1/V2/6/SP/C 실행; 현재0/9|
-|활성 후속10개|캐시 로컬 완료. 공개 v2/graph tuning/flow gold/규모/as-of/legacy 출처/CoreML/deploy 및 viewer Atlas/전체 접근성 남음|
+|활성 후속10개|캐시 로컬 완료. 공개 형식 후속·graph tuning·flow gold·규모 수용·as-of·legacy 출처·CoreML·viewer Atlas/접근성·배포/downstream 남음|
 
-보안 전용 정답/ACL/비공개/위조 평가는 사용자 요청으로 보류한다. 정식 수용을 AI가 승인하지 않는다. 실제 LLM 답변 평가는 모델·인증·총 비용 상한 결정 후 진행한다. CoreML 실물 모델과 배포 대상도 임의로 만들어내지 않는다.
+D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처를 요구하지 않으며 익명 역할로 검토할 수 있다. 보안 전용 정답/ACL/비공개/위조와 감사 기능 평가는 사용자 요청으로 보류하며 완료로 세지 않는다. 실제 LLM 답변 평가는 모델·인증·총 비용 상한 결정 후 진행한다. AI 초안과 기술 시험을 사람의 독립 승인으로 승격하지 않는다.
 
-## 앞선 근거
+## 보존한 앞선 근거
 
-[단계73 코드/캐시/실제30함수](./operational-preparation/source-review-supplement/followups/local-reliability-v1/SUMMARY.json) · [단계74 실제 factory](./operational-preparation/source-review-supplement/followups/full-host-factory-v1/SUMMARY.json) · [단계75 실제 owner](./operational-preparation/source-review-supplement/followups/full-host-owner-v1/SUMMARY.json) · [단계76 실제4역할](./operational-preparation/source-review-supplement/followups/four-role-current-v1/SUMMARY.json).
-이전 source1741의4172/18skip은 해당 당시 소스의 근거다. 단계77 검증은 당시 소스의 근거이고 현재 소스는 단계80 검증을 따른다. 원래5일정은 사용자가 실제 owner4개/통제 late-drain1개와 옛 구독·새 등록 전 범위를 채택했다. 독립 정답·12개 계약 수용과 구분한다.
+- [단계80 viewer](./operational-preparation/source-review-supplement/followups/viewer-lifecycle-v1/SUMMARY.json): 당시 실제 UI 검색·본문·2D/상한/키보드·탐색과 소유 API 종료 검증. Atlas backend·전체 접근성은 미검증이다. 현재 Go의 전체 근거는 단계85이며 실제 UI 관찰은 당시 소스의 근거다.
+- [단계81 승인 범위 적용](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json): 실제 owner4·통제 late-drain1과 옛 구독·새 등록 전 경계, 독립 정답 승인과 구분한다.
+- [단계82 AI 초안 당시 검사](./operational-preparation/source-review-supplement/followups/draft-history-reconciliation-v1/SUMMARY.json): 8범위/검사기7개가 각 원래 커밋의 격리 복사본에서 통과했다. 현재 정답 승인과 다르다.
+- [단계83 모델 목록](./operational-preparation/source-review-supplement/followups/coreml-local-model-inventory-v1/INVENTORY.json): Qwen3 GGUF 헤더·metadata만 확인했다.
+- [단계84 실규모](./operational-preparation/source-review-supplement/followups/scale-long-functions-v1/SUMMARY.json): 1.242GB에서 긴 함수3개/21요청 partial18·budget_exhausted3과 복구·EOFexit0을 확인했다. 용량 SLA나 의미 품질 수용은 아니다.

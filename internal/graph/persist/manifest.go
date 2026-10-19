@@ -1,6 +1,8 @@
 package persist
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 )
@@ -187,7 +189,15 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 
 // GetManifest reads all manifest rows and reassembles the struct.
 func (s *sqliteStore) GetManifest() (Manifest, error) {
-	rows, err := s.db.Query(`SELECT key, value FROM manifest`)
+	return readManifest(context.Background(), s.db)
+}
+
+type manifestQueryer interface {
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+}
+
+func readManifest(ctx context.Context, q manifestQueryer) (Manifest, error) {
+	rows, err := q.QueryContext(ctx, `SELECT key, value FROM manifest`)
 	if err != nil {
 		return Manifest{}, err
 	}

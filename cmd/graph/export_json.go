@@ -92,7 +92,7 @@ func toMinimalEdge(e types.Edge) minimalEdge {
 }
 
 func newExportJSONCmd() *cobra.Command {
-	var graph, out string
+	var graph, out, format string
 	var pretty, minimal bool
 	cmd := &cobra.Command{
 		Use:   "export-json",
@@ -116,6 +116,12 @@ Each Node / Edge row matches pkg/types/{node,edge}.go field names —
 preserves confidence labels, dispatch_kind, in/out degree, PageRank,
 and language so the export is lossless against the SQLite source.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if format != "v1" && format != "v2" {
+				return graphExportError("invalid_request")
+			}
+			if format == "v2" {
+				return exportGraphV2(cmd.Context(), graph, out, pretty, minimal)
+			}
 			_, cleanup, err := newLogger(rootVerbose, rootLogFile)
 			if err != nil {
 				return fmt.Errorf("init logger: %w", err)
@@ -132,6 +138,9 @@ and language so the export is lossless against the SQLite source.`,
 			manifest, err := store.GetManifest()
 			if err != nil {
 				return fmt.Errorf("read manifest: %w", err)
+			}
+			if err := legacyGraphExportAllowed(manifest); err != nil {
+				return err
 			}
 			nodes, err := store.AllNodes()
 			if err != nil {
@@ -163,6 +172,7 @@ and language so the export is lossless against the SQLite source.`,
 			return nil
 		},
 	}
+	cmd.Flags().StringVar(&format, "format", "v1", "output format: v1 (legacy) or v2 (project/dataset/source coordinates)")
 	cmd.Flags().StringVar(&graph, "graph", "", "graph directory (required)")
 	cmd.Flags().StringVar(&out, "out", "", "output JSON file path (required)")
 	cmd.Flags().BoolVar(&pretty, "pretty", false,

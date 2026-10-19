@@ -45,23 +45,34 @@ func placeholders(n int) string {
 func scanNodes(rows *sql.Rows) ([]types.Node, error) {
 	var out []types.Node
 	for rows.Next() {
-		var n types.Node
-		var conf, attrs string
-		if err := rows.Scan(&n.ID, &n.Type, &n.Name, &n.QualifiedName, &n.FilePath,
-			&n.StartLine, &n.EndLine, &n.StartByte, &n.EndByte, &n.Language,
-			&n.Visibility, &n.Signature, &n.DocComment, &n.Complexity,
-			&n.InDegree, &n.OutDegree, &n.PageRank, &n.UsageScore,
-			&conf, &n.SubKind, &attrs, &n.CanonicalID); err != nil {
-			return nil, fmt.Errorf("scan node row: %w", err)
+		n, err := scanNode(rows)
+		if err != nil {
+			return nil, err
 		}
-		n.Confidence = types.Confidence(conf)
-		unmarshalNodeAttrs(attrs, &n)
 		out = append(out, n)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("iterate node rows: %w", err)
 	}
 	return out, nil
+}
+
+// rowScanner is shared by bounded graph export and ordinary node queries.
+type rowScanner interface{ Scan(...any) error }
+
+func scanNode(rows rowScanner) (types.Node, error) {
+	var n types.Node
+	var conf, attrs string
+	if err := rows.Scan(&n.ID, &n.Type, &n.Name, &n.QualifiedName, &n.FilePath,
+		&n.StartLine, &n.EndLine, &n.StartByte, &n.EndByte, &n.Language,
+		&n.Visibility, &n.Signature, &n.DocComment, &n.Complexity,
+		&n.InDegree, &n.OutDegree, &n.PageRank, &n.UsageScore,
+		&conf, &n.SubKind, &attrs, &n.CanonicalID); err != nil {
+		return n, fmt.Errorf("scan node row: %w", err)
+	}
+	n.Confidence = types.Confidence(conf)
+	unmarshalNodeAttrs(attrs, &n)
+	return n, nil
 }
 
 // scanSearchHits drains rows that project the standard nodeColumns set
