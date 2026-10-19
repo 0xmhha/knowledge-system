@@ -1,9 +1,50 @@
 package main
 
 import (
+	"context"
+	"github.com/0xmhha/knowledge-system/pkg/vector/embed/cache"
 	"strings"
 	"testing"
 )
+
+func TestResolveEmbedderOptInCacheAndInvalidCapacity(t *testing.T) {
+	saved := globalFlags
+	t.Cleanup(func() { globalFlags = saved })
+	globalFlags.embeddingCacheEntries = 2
+	emb, cleanup, err := resolveEmbedder("mock", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanup()
+	cached, ok := emb.(*cache.Cached)
+	if !ok {
+		t.Fatal("cache option did not reach CLI factory")
+	}
+	for range 2 {
+		if _, err := emb.Embed(context.Background(), []string{"repeat"}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	hits, miss, size := cached.Stats()
+	if hits != 1 || miss != 1 || size != 1 {
+		t.Fatal("factory cache unused", hits, miss, size)
+	}
+	globalFlags.embeddingCacheEntries = 0
+	plain, closePlain, err := resolveEmbedder("mock", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer closePlain()
+	if _, ok := plain.(*cache.Cached); ok {
+		t.Fatal("default unexpectedly cached")
+	}
+	for _, entries := range []int{-1, cache.MaxSize + 1} {
+		globalFlags.embeddingCacheEntries = entries
+		if _, _, err := resolveEmbedder("ollama", ""); err == nil {
+			t.Fatal("invalid cache size accepted before provider open")
+		}
+	}
+}
 
 // TestResolveEmbedder_BgeonnxForwardsModelName proves the bgeonnx case forwards
 // globalFlags.modelName into bgeonnx.Options (02 §3). We use an unknown model

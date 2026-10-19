@@ -108,8 +108,8 @@ func TestCache_ForwardsName(t *testing.T) {
 
 func TestCache_DefaultSize(t *testing.T) {
 	c := New(mkEmb(), 0)
-	if c.size != DefaultSize {
-		t.Errorf("size = %d, want default %d", c.size, DefaultSize)
+	if c.Capacity() != DefaultSize {
+		t.Errorf("size = %d, want default %d", c.Capacity(), DefaultSize)
 	}
 }
 

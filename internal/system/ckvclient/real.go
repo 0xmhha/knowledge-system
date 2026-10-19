@@ -221,6 +221,14 @@ func (r *Real) recordQueryResult(ctx context.Context, err error) {
 	if ctx.Err() != nil || (err != nil && !errors.Is(err, ckv.ErrEmbeddingFailed)) {
 		return
 	}
+	// A cached query can succeed while provider inference is unavailable.
+	// Keep either previous observation until an independent fresh probe;
+	// successful cache hits must neither clear failure nor renew a success TTL.
+	if err == nil {
+		if _, mayCache := r.emb.(ckvtypes.EmbeddingProber); mayCache {
+			return
+		}
+	}
 	r.probeMu.Lock()
 	defer r.probeMu.Unlock()
 	r.lastProbe = time.Now()
@@ -240,12 +248,18 @@ func (r *Real) probeModel(ctx context.Context) (bool, string) {
 	if !r.lastProbe.IsZero() && time.Since(r.lastProbe) < modelProbeTTL {
 		return r.lastProbeOK, r.lastProbeReason
 	}
-	vectors, err := r.emb.Embed(ctx, []string{"liveness probe"})
+	var err error
+	if prober, ok := r.emb.(ckvtypes.EmbeddingProber); ok {
+		err = prober.ProbeEmbedding(ctx)
+	} else {
+		var vectors [][]float32
+		vectors, err = r.emb.Embed(ctx, []string{"liveness probe"})
+		if err == nil && (len(vectors) == 0 || len(vectors[0]) == 0) {
+			err = ckv.ErrEmbeddingFailed
+		}
+	}
 	if ctx.Err() != nil {
 		return false, "embedding model probe canceled by caller"
-	}
-	if err == nil && (len(vectors) == 0 || len(vectors[0]) == 0) {
-		err = ckv.ErrEmbeddingFailed
 	}
 	r.lastProbe = time.Now()
 	if err != nil {

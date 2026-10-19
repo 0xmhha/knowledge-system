@@ -85,6 +85,12 @@ type IdentityVerifier interface {
 	VerifyIdentity(context.Context) error
 }
 
+// EmbeddingProber makes a fresh provider inference for liveness. Caches must
+// bypass stored vectors; a cache hit cannot establish model availability.
+type EmbeddingProber interface {
+	ProbeEmbedding(context.Context) error
+}
+
 // QueryEmbedder is an optional Embedder capability for asymmetric models —
 // models whose query representation differs from their passage representation.
 // Retrieval code type-asserts an Embedder to QueryEmbedder and calls EmbedQuery

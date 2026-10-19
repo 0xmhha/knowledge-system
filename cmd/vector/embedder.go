@@ -6,6 +6,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/bgeonnx"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
+	"github.com/0xmhha/knowledge-system/pkg/vector/embed/cache"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
@@ -20,6 +21,17 @@ import (
 // Empty modelDir lets bgeonnx fall back to its conventional cache
 // location (~/.cache/ckv/models/<name>).
 func resolveEmbedder(name, modelDir string) (types.Embedder, func(), error) {
+	if err := cache.ValidateSize(globalFlags.embeddingCacheEntries); err != nil {
+		return nil, func() {}, err
+	}
+	emb, cleanup, err := resolveUncachedEmbedder(name, modelDir)
+	if err != nil || globalFlags.embeddingCacheEntries == 0 {
+		return emb, cleanup, err
+	}
+	return cache.New(emb, globalFlags.embeddingCacheEntries), cleanup, nil
+}
+
+func resolveUncachedEmbedder(name, modelDir string) (types.Embedder, func(), error) {
 	noop := func() {}
 	switch name {
 	case "", "mock":

@@ -107,7 +107,23 @@ ckv mcp --out=.ckv-data --embedder=mock
 
 For an Ollama index, use `--embedder=ollama --model-name=bge-m3` instead. MCP runs over stdio; [the 19-tool reference](./mcp-tools.md) defines names and arguments. Response wrapper schema is currently 1.1; storage schema is a separate contract. Consumers must reject unsupported major schemas rather than guess that an incompatible parser is safe. In-process callers avoid subprocess lifecycle overhead; no old machine timing is a current speed guarantee.
 
-## 5. Runtime settings and verification
+## 5. Optional process-local embedding cache
+
+Caching is disabled by default. A long-lived CKV process can enable a bounded LRU:
+
+```bash
+ckv mcp --out=.ckv-data --embedder=ollama --model-name=bge-m3 --embedding-cache-entries=1024
+```
+
+For CKS, set `backends.ckv.embedding_cache_entries: 1024` in the existing configuration. Accepted values are 0..65536; zero disables caching. CKS shares the selected embedder between retrieval and intent embedding and reports a nonzero configured capacity as `backends.vector.embedding_cache_entries` in health.
+
+In-process consumers can wrap their adapter with [pkg/vector/embed/cache](../../pkg/vector/embed/cache/lru.go). Validate a configured capacity with `ValidateSize`, keep zero as disabled, and call `New` for a positive capacity. The constructor retains its historical nonpositive default of 1024. Keep the original adapter's cleanup responsibility. The cache belongs to one process and adapter instance; restarting clears it. It preserves embedding identity and query-specific preprocessing, with separate query/passage entries for asymmetric adapters. Returned vectors are copied so caller mutation cannot corrupt later results. Provider failures, malformed batches, invalid dimensions and nonfinite vectors are rejected without inserting the failed batch. Cancellation is checked before provider work and cache insertion.
+
+The local BGE-M3 trial observed two repeated CKS searches making two query embedding HTTP calls with caching disabled and one with caching enabled, while preserving the returned search result and source. This establishes the tested connection and repeated-input behavior; it does not establish retrieval-quality improvement, general latency acceptance or a larger-corpus result.
+
+Model identity verification still runs for cached reads, so a cache hit can avoid inference while still making metadata requests. CKS model-health probes bypass cached vectors. Successful cached searches do not clear a failed model-health observation or renew its lifetime; fresh probes provide recovery evidence under the existing five-second health policy.
+
+## 6. Runtime settings and verification
 
 Ollama uses CKV_OLLAMA_ENDPOINT when Endpoint is unset, with a default per-request timeout of 60 seconds. Optional ONNX environment settings are defined in [session_impl.go](../../internal/vector/embed/bgeonnx/session_impl.go); CoreML tuning and ORT thread choices need measurements on the target model and machine. The memory guard is defined in [build/memory.go](../../internal/vector/build/memory.go); it does not establish large-corpus throughput acceptance.
 

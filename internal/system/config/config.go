@@ -185,6 +185,8 @@ type CKVConfig struct {
 	EmbedModel        string `yaml:"embed_model"`
 	EmbedDim          int    `yaml:"embed_dim,omitempty"`
 	QueryPrefixPolicy string `yaml:"query_prefix_policy,omitempty"`
+	// EmbeddingCacheEntries enables a shared process-local LRU. Zero disables it.
+	EmbeddingCacheEntries int `yaml:"embedding_cache_entries,omitempty"`
 	// OllamaURL is the Ollama daemon endpoint. Empty resolves to
 	// http://localhost:11434 (and the CKV_OLLAMA_ENDPOINT env override).
 	OllamaURL string `yaml:"ollama_url"`
@@ -337,6 +339,9 @@ func (c *Config) Validate() error {
 	}
 	if c.Backends.CKV.EmbedDim < 0 {
 		return fmt.Errorf("config: backends.ckv.embed_dim must be nonnegative")
+	}
+	if c.Backends.CKV.EmbeddingCacheEntries < 0 || c.Backends.CKV.EmbeddingCacheEntries > 65536 {
+		return fmt.Errorf("config: backends.ckv.embedding_cache_entries must be 0..65536")
 	}
 	switch c.Semantic.OntologyMode {
 	case "", "off", "baseline", "relations", "concept_text", "combined":

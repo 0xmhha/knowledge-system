@@ -54,9 +54,10 @@ type backendStat struct {
 	Provider       string     `json:"provider,omitempty"`        // vector embedding provider
 	Model          string     `json:"model,omitempty"`           // vector embedding model
 	Dim            int        `json:"dim,omitempty"`             // vector embedding dimension
-	Endpoint       string     `json:"endpoint,omitempty"`        // vector model endpoint
-	DataPath       string     `json:"data_path,omitempty"`       // backend DB path
-	Reason         string     `json:"reason,omitempty"`          // why not serviceable
+	CacheEntries   int        `json:"embedding_cache_entries,omitempty"`
+	Endpoint       string     `json:"endpoint,omitempty"`  // vector model endpoint
+	DataPath       string     `json:"data_path,omitempty"` // backend DB path
+	Reason         string     `json:"reason,omitempty"`    // why not serviceable
 	Error          string     `json:"error,omitempty"`
 }
 
@@ -85,6 +86,7 @@ func handleHealth(ctx context.Context, d Deps, _ mcpgo.CallToolRequest) (*mcpgo.
 	ckv.Provider = d.Embed.Provider
 	ckv.Model = d.Embed.Model
 	ckv.Dim = d.Embed.Dim
+	ckv.CacheEntries = d.Embed.CacheEntries
 	ckv.Endpoint = d.Embed.Endpoint
 	ckv.DataPath = d.Index.CKVDataPath
 	if ckvErr != nil {

@@ -458,7 +458,7 @@ func buildBackends(ctx context.Context, cfg *config.Config, reader sourcepath.Re
 		if cfg.Logging.MeasureBackendCalls {
 			observer = backendmeasure.BeginHTTP
 		}
-		emb, c, embErr := embedder.OpenWithOptions(cfg.Backends.CKV.Provider, cfg.Backends.CKV.EmbedModel, cfg.Backends.CKV.OllamaURL, cfg.Backends.CKV.EmbedDim, cfg.Backends.CKV.QueryPrefixPolicy, observer)
+		emb, c, embErr := embedder.OpenWithCache(cfg.Backends.CKV.Provider, cfg.Backends.CKV.EmbedModel, cfg.Backends.CKV.OllamaURL, cfg.Backends.CKV.EmbedDim, cfg.Backends.CKV.QueryPrefixPolicy, cfg.Backends.CKV.EmbeddingCacheEntries, observer)
 		cap = c
 		if embErr != nil {
 			degradedReason = embErr.Error()

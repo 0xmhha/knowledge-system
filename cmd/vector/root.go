@@ -10,14 +10,15 @@ var Version = "dev"
 // rootFlags holds CLI flags that apply to every subcommand. They are
 // set via PersistentFlags so any leaf command can read them.
 type rootFlags struct {
-	noFootprint       bool
-	embedder          string // mock | bgeonnx | ollama
-	modelDir          string // override default model cache directory
-	modelName         string // model name for backends that support multiple models (ollama)
-	embedDim          int    // >0 → MRL-truncate ollama embeddings to this dimension (0 = native)
-	queryPrefixPolicy string // registry | none
-	logLevel          string // debug | info | warn | error; empty → $CKV_LOG_LEVEL → info
-	profile           string // path to write profile.json on Close (empty = disabled)
+	noFootprint           bool
+	embedder              string // mock | bgeonnx | ollama
+	modelDir              string // override default model cache directory
+	modelName             string // model name for backends that support multiple models (ollama)
+	embedDim              int    // >0 → MRL-truncate ollama embeddings to this dimension (0 = native)
+	queryPrefixPolicy     string // registry | none
+	logLevel              string // debug | info | warn | error; empty → $CKV_LOG_LEVEL → info
+	profile               string // path to write profile.json on Close (empty = disabled)
+	embeddingCacheEntries int    // process-local LRU; zero disables
 }
 
 var globalFlags rootFlags
@@ -48,6 +49,8 @@ func newRootCmd() *cobra.Command {
 		"slog minimum level: debug | info | warn | error (default info; falls back to $CKV_LOG_LEVEL)")
 	cmd.PersistentFlags().StringVar(&globalFlags.profile, "profile", "",
 		"write per-event latency profile (count + p50/p95/sum ms) to this path on exit; empty = disabled")
+	cmd.PersistentFlags().IntVar(&globalFlags.embeddingCacheEntries, "embedding-cache-entries", 0,
+		"process-local embedding LRU entries (0 disables; maximum 65536)")
 
 	cmd.AddCommand(
 		newBuildCmd(),

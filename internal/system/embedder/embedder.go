@@ -10,6 +10,7 @@ package embedder
 
 import (
 	"fmt"
+	"github.com/0xmhha/knowledge-system/pkg/vector/embed/cache"
 
 	"github.com/0xmhha/knowledge-system/pkg/vector/ckv"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
@@ -23,10 +24,25 @@ const DefaultProvider = "ollama"
 // from config even when Open fails (Dim stays 0), so health can report the
 // intended model/endpoint while signaling the backend is down.
 type Capability struct {
-	Provider string `json:"provider,omitempty"`
-	Model    string `json:"model,omitempty"`
-	Endpoint string `json:"endpoint,omitempty"`
-	Dim      int    `json:"dim,omitempty"`
+	Provider     string `json:"provider,omitempty"`
+	Model        string `json:"model,omitempty"`
+	Endpoint     string `json:"endpoint,omitempty"`
+	Dim          int    `json:"dim,omitempty"`
+	CacheEntries int    `json:"cache_entries,omitempty"`
+}
+
+// OpenWithCache shares one opt-in cache between retrieval and intent embedding.
+// Validate the capacity before opening a provider or making network requests.
+func OpenWithCache(provider, model, endpoint string, targetDim int, queryPrefixPolicy string, entries int, observers ...ollama.HTTPObserver) (ckvtypes.Embedder, Capability, error) {
+	if err := cache.ValidateSize(entries); err != nil {
+		return nil, Capability{Provider: provider, Model: model, Endpoint: endpoint, CacheEntries: entries}, err
+	}
+	emb, cap, err := OpenWithOptions(provider, model, endpoint, targetDim, queryPrefixPolicy, observers...)
+	cap.CacheEntries = entries
+	if err != nil || entries == 0 {
+		return emb, cap, err
+	}
+	return cache.New(emb, entries), cap, nil
 }
 
 // knownDims pins the expected vector dimension for models whose mismatch the

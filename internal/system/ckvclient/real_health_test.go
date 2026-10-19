@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/0xmhha/knowledge-system/pkg/vector/ckv"
+	"github.com/0xmhha/knowledge-system/pkg/vector/embed/cache"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
@@ -28,7 +29,35 @@ func (e *healthEmbedder) Embed(context.Context, []string) ([][]float32, error) {
 	if e.empty {
 		return nil, e.err
 	}
+	if e.Embedder != nil {
+		vector := make([]float32, e.Dimension())
+		vector[0] = 1
+		return [][]float32{vector}, e.err
+	}
 	return [][]float32{{1}}, e.err
+}
+
+func TestModelHealthDoesNotReuseCachedLivenessVector(t *testing.T) {
+	inner := &healthEmbedder{Embedder: ckv.MockEmbedder()}
+	cached := cache.New(inner, 2)
+	if _, err := cached.Embed(context.Background(), []string{"liveness probe"}); err != nil {
+		t.Fatal(err)
+	}
+	r := &Real{emb: cached}
+	inner.err = errors.New("offline")
+	if up, _ := r.probeModel(context.Background()); up || inner.calls != 2 {
+		t.Fatal("cached probe masked unavailable model", inner.calls)
+	}
+	previousProbe := r.lastProbe
+	r.recordQueryResult(context.Background(), nil)
+	if up, _ := r.probeModel(context.Background()); up || r.lastProbe != previousProbe || inner.calls != 2 {
+		t.Fatal("successful cached query cleared or renewed model-health evidence")
+	}
+	inner.err = nil
+	expireProbe(r)
+	if up, _ := r.probeModel(context.Background()); !up || inner.calls != 3 {
+		t.Fatal("cache-aware health could not recover", inner.calls)
+	}
 }
 func expireProbe(r *Real) {
 	r.probeMu.Lock()

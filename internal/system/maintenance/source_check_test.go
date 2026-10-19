@@ -140,12 +140,23 @@ func TestSourceCheckPinsStillMatchAfterExecution(t *testing.T) {
 }
 
 func TestSourceCheckHasDeadlineAndStopsLateDescendant(t *testing.T) {
-	check := sourceCheckFixture(t, "(sleep 2; printf orphan > \"$1\") & wait\n")
+	// Only a descendant surviving the returned deadline can create the marker.
+	// A fixed sleep cannot distinguish a write before return from a late write
+	// when the process scheduler or an instrumented guardian is delayed.
+	check := sourceCheckFixture(t, "(while [ ! -f \"$2\" ]; do /bin/sleep 0.01; done; printf orphan > \"$1\") &\nprintf '%s\\n' \"$!\" > \"$3\"\nwait\n")
 	marker := filepath.Join(filepath.Dir(check.Command[1]), "late")
-	check.Command = append(check.Command, marker)
+	release := marker + ".release"
+	ready := marker + ".ready"
+	check.Command = append(check.Command, marker, release, ready)
 	check.TimeoutSeconds = 1
 	if err := runSourceCheck(context.Background(), check, os.Args[0]); ErrorResult(err).Code != "deadline_exceeded" {
 		t.Fatalf("timeout accepted: %v", err)
+	}
+	if _, err := os.Stat(ready); err != nil {
+		t.Fatalf("descendant was not entered before the deadline: %v", err)
+	}
+	if err := os.WriteFile(release, []byte("check returned"), 0600); err != nil {
+		t.Fatal(err)
 	}
 	time.Sleep(1200 * time.Millisecond)
 	if _, err := os.Stat(marker); !os.IsNotExist(err) {
