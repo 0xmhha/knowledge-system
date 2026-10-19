@@ -2,25 +2,26 @@
 #define CKV_COREML_BRIDGE_H
 
 #include <stdint.h>
+#include <stddef.h>
 
-// Load a CoreML model from the given path (.mlpackage or .mlmodelc).
-// Returns 0 on success, non-zero on failure.
-int ckv_coreml_load(const char* model_path);
+typedef void* ckv_coreml_handle;
 
-// Unload the currently loaded CoreML model and free resources.
-void ckv_coreml_unload(void);
+// Each successful load returns an independently owned model handle. A package
+// is compiled into an owned temporary model; unload releases it after the model.
+int ckv_coreml_load(const char* model_path, ckv_coreml_handle* handle);
+int ckv_coreml_unload(ckv_coreml_handle handle);
 
-// Run inference on tokenized input. input_ids and attention_mask are
-// flat arrays of shape [batch_size * seq_len]. output is a pre-allocated
-// buffer of shape [batch_size * seq_len * hidden_dim] that receives
-// the last_hidden_state. Returns 0 on success.
+// Inputs are int64 Go buffers, converted value-by-value to CoreML Int32.
+// The supported output is [batch, sequence, hidden], converted by logical
+// indices (including non-contiguous strides) into the supplied float buffer.
 int ckv_coreml_predict(
+    ckv_coreml_handle handle,
     const int64_t* input_ids,
     const int64_t* attention_mask,
     int batch_size,
     int seq_len,
     int hidden_dim,
-    float* output
+    float* output,
+    size_t output_capacity
 );
-
 #endif

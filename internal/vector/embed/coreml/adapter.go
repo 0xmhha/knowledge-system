@@ -13,8 +13,6 @@
 //	ckv build --embedder=coreml --model-dir=./models/bge-m3.mlpackage
 package coreml
 
-import "fmt"
-
 // Options configures the CoreML adapter.
 type Options struct {
 	ModelPath     string // path to .mlpackage or .mlmodelc directory
@@ -23,6 +21,3 @@ type Options struct {
 	Dim           int    // output vector dimension (must match model)
 	MaxSeqLen     int    // max sequence length for tokenization (default 512)
 }
-
-// errNotAvailable is returned on non-macOS platforms.
-var errNotAvailable = fmt.Errorf("coreml: only available on macOS (darwin)")

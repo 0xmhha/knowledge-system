@@ -1,7 +1,7 @@
 {
   "kind": "CoreML_native_transport_followup_DEV_not_real_Qwen_model_acceptance",
   "predecessor_stage": 85,
-  "status": "reproduction_complete_no_production_source_changes",
+  "status": "local_transport_verified_real_model_not_executed",
   "trigger": "actual native array reproduction reads int64 token storage as int32 and changes token sequence",
   "baseline_source_sha256": {
     "internal/vector/embed/coreml/coreml_darwin.go": "42dd3383afa51311319dfda2648b97c8371c44abfa61dc3efdbf475bd61095ad",
@@ -38,5 +38,88 @@
     "formal_completed": 0,
     "independent_approved": 0,
     "no_new_security_specific_evaluation": true
+  },
+  "base_revision": "75749926fdd5b1119881915fd6c7ff62015736c2",
+  "delivery_scope": {
+    "CLI": "explicit coreml backend using caller model/tokenizer and registered CLS hidden-state profile; existing Ollama/default unchanged",
+    "native": "checked token conversion, bounded tensor conversion, instance-owned model and serialized close/cancellation",
+    "model_support": "known Qwen3 entries remain Ollama-only; GGUF is not accepted as CoreML",
+    "evaluation_target": "local macOS development fixtures only; deployment target and actual model remain unassigned"
+  },
+  "acceptance_criteria": [
+    {
+      "id": "CM-01",
+      "criterion": "native CoreML feature inputs preserve complete token and attention arrays instead of viewing int64 storage as int32"
+    },
+    {
+      "id": "CM-02",
+      "criterion": "output tensor shape/type/strides and destination capacity checked before publication; float32/double/float16 conversion tested with native arrays"
+    },
+    {
+      "id": "CM-03",
+      "criterion": "each adapter owns its model handle; closing/failing one cannot unload another; idempotent Go close and cooperative cancellation"
+    },
+    {
+      "id": "CM-04",
+      "criterion": "CLI recognizes explicit coreml, validates known profile/model/tokenizer/sequence/dimension, reports missing build support; baseline providers and help regression preserved"
+    },
+    {
+      "id": "CM-05",
+      "criterion": "model and tokenizer content plus pooling/context form a versioned identity; no Qwen/Ollama identity reuse"
+    },
+    {
+      "id": "CM-06",
+      "criterion": "native model-free fixture/optional tagged general/race and full default build/test/race/fmt/vet/lint/docs verified, with skips/failures/dependencies retained"
+    }
+  ],
+  "real_model_acceptance": {
+    "status": "not_executed",
+    "needs": [
+      "actual .mlpackage/.mlmodelc and compatible tokenizer",
+      "declared deployment target",
+      "reference embedding/pooling equivalence before production dataset build"
+    ],
+    "actual_Qwen_inference": false,
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "unresolved_regression": {
+    "test": "TestGuardianAbsoluteDeadlineWorksWhileOwnerSocketStaysOpen",
+    "initial_whole_race_failures": 1,
+    "root_cause": "unresolved",
+    "same_source_focus_passed": 20,
+    "private_diagnostic_overlay_passed": 80,
+    "production_fix_claimed": false
+  },
+  "verification": {
+    "default_general": {
+      "pass": 4272,
+      "skip": 18,
+      "fail": 0
+    },
+    "corrective_default_race": {
+      "pass": 4272,
+      "skip": 18,
+      "fail": 0
+    },
+    "initial_default_race_failures": 1,
+    "guardian_cause_resolved": false,
+    "tagged_general_race_each": {
+      "pass": 28,
+      "skip": 1,
+      "fail": 0
+    },
+    "CGO_off": {
+      "pass": 3,
+      "skip": 0,
+      "fail": 0
+    },
+    "native_fixture_modes": [
+      "MRC",
+      "ARC"
+    ],
+    "actual_CoreML_model_inference_calls": 0,
+    "actual_BGE_old_old_new_hits_each": 10,
+    "build_fmt_vet_lint_docs_passed": true
   }
 }

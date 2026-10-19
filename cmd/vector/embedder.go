@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/bgeonnx"
+	"github.com/0xmhha/knowledge-system/internal/vector/embed/coreml"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/cache"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
@@ -45,6 +46,19 @@ func resolveUncachedEmbedder(name, modelDir string) (types.Embedder, func(), err
 			return nil, noop, fmt.Errorf("embedder bgeonnx: %w", err)
 		}
 		return a, func() { _ = a.Close() }, nil
+	case "coreml":
+		if !coreml.Available() {
+			return nil, noop, fmt.Errorf("embedder coreml: requires macOS, CGO, and a build with the tokenizers tag")
+		}
+		opts, err := coreMLOptions(modelDir, globalFlags.modelName, globalFlags.coreMLTokenizer, globalFlags.coreMLMaxSeq, globalFlags.embedDim)
+		if err != nil {
+			return nil, noop, err
+		}
+		a, err := coreml.Open(opts)
+		if err != nil {
+			return nil, noop, fmt.Errorf("embedder coreml: %w", err)
+		}
+		return a, func() { _ = a.Close() }, nil
 	case "ollama":
 		modelName := globalFlags.modelName
 		if modelName == "" {
@@ -56,6 +70,6 @@ func resolveUncachedEmbedder(name, modelDir string) (types.Embedder, func(), err
 		}
 		return a, func() { _ = a.Close() }, nil
 	default:
-		return nil, noop, errors.New("unknown --embedder " + name + " (supported: mock, bgeonnx, ollama)")
+		return nil, noop, errors.New("unknown --embedder " + name + " (supported: mock, bgeonnx, ollama, coreml)")
 	}
 }

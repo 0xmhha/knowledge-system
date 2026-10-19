@@ -11,9 +11,11 @@ var Version = "dev"
 // set via PersistentFlags so any leaf command can read them.
 type rootFlags struct {
 	noFootprint           bool
-	embedder              string // mock | bgeonnx | ollama
+	embedder              string // mock | bgeonnx | ollama | coreml
 	modelDir              string // override default model cache directory
 	modelName             string // model name for backends that support multiple models (ollama)
+	coreMLTokenizer       string
+	coreMLMaxSeq          int
 	embedDim              int    // >0 → MRL-truncate ollama embeddings to this dimension (0 = native)
 	queryPrefixPolicy     string // registry | none
 	logLevel              string // debug | info | warn | error; empty → $CKV_LOG_LEVEL → info
@@ -36,11 +38,13 @@ func newRootCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVar(&globalFlags.noFootprint, "no-footprint", false,
 		"disable the JSONL footprint log written to <out>/footprint.jsonl")
 	cmd.PersistentFlags().StringVar(&globalFlags.embedder, "embedder", "ollama",
-		"embedder backend: mock | bgeonnx | ollama")
+		"embedder backend: mock | bgeonnx | ollama | coreml")
+	cmd.PersistentFlags().StringVar(&globalFlags.coreMLTokenizer, "coreml-tokenizer", "", "CoreML tokenizer.json override (default beside the selected model)")
+	cmd.PersistentFlags().IntVar(&globalFlags.coreMLMaxSeq, "coreml-max-seq", 512, "CoreML exported sequence length (positive; must match the model)")
 	cmd.PersistentFlags().StringVar(&globalFlags.modelDir, "model-dir", "",
 		"override the model cache directory")
 	cmd.PersistentFlags().StringVar(&globalFlags.modelName, "model-name", "",
-		"model name (for ollama: default bge-m3, also qwen3-embedding:0.6b|4b; for bgeonnx: overrides default)")
+		"model name (for ollama: default bge-m3, also qwen3-embedding:0.6b|4b; for bgeonnx: overrides default; CoreML requires an explicit registered CLS model)")
 	cmd.PersistentFlags().IntVar(&globalFlags.embedDim, "embed-dim", 0,
 		"MRL-truncate ollama embeddings to this dimension (0 = model native; must be a supported dim — qwen3:4b 512|1024|2560, qwen3:0.6b 256|512|1024)")
 	cmd.PersistentFlags().StringVar(&globalFlags.queryPrefixPolicy, "query-prefix-policy", "registry",

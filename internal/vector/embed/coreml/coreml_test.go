@@ -1,4 +1,4 @@
-//go:build darwin && tokenizers
+//go:build darwin && cgo && tokenizers
 
 package coreml
 
