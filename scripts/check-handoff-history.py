@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Check portable evidence history without using the previous machine's paths."""
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -10,6 +11,10 @@ ROOT = Path(__file__).resolve().parents[1]
 def check(root=ROOT):
     manifest = json.loads((root / 'docs/spec-driven/HANDOFF-HISTORY.json').read_text())
     errors = []
+    for name, digest in manifest.get('restored_artifacts', {}).items():
+        p = root / name
+        if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != digest:
+            errors.append('missing or changed retained artifact: ' + name)
     roots = []
     for row in manifest['history_tags']:
         result = subprocess.run(['git', 'rev-parse', '--verify', row['ref'] + '^{commit}'],

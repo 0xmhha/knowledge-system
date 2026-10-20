@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-stablenet-pilot-probe.py", line 6, in <module>
+    c.initialize()
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-consumer-stdio-readiness.py", line 120, in initialize
+    r=self.request('initialize','initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'owned-consumer-P05','version':'1'}})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-consumer-stdio-readiness.py", line 114, in request
+    line=self.queue.get(timeout=max(.001,deadline-time.monotonic()));require(line is not None,'premature stdio EOF')
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-consumer-stdio-readiness.py", line 76, in require
+    if not ok:raise ValueError(message)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: premature stdio EOF
