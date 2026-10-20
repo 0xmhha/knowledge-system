@@ -12,7 +12,7 @@ These entry points describe the current repository. Source files, registered too
 | Read completed implementations and pending independent acceptance | [implementation specification and progress](./spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md) |
 | Prepare operational and independent acceptance | [targets and criteria](./spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md), [acceptance ledger](./spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json), [protocol and freeze checklist](./spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.md) |
 | Find all remaining work | [remaining work](./REMAINING-WORK.md) |
-| Resume development and verify completion | [current handoff](./spec-driven/CURRENT-HANDOFF.md), [execution specification](./spec-driven/REFACTORING-EXECUTION-SPEC.md), [progress ledger](./spec-driven/REFACTORING-PROGRESS.json) |
+| Resume development and verify completion | [new-machine handoff](./spec-driven/MACHINE-HANDOFF.md), [current handoff](./spec-driven/CURRENT-HANDOFF.md), [execution specification](./spec-driven/REFACTORING-EXECUTION-SPEC.md), [progress ledger](./spec-driven/REFACTORING-PROGRESS.json) |
 | Query code and meaning over MCP | [system](../system/README.md), [ontology](../system/docs/ontology-mcp.md), [tool mapping](../system/docs/coding-agent-mcp-mapping.md) |
 | Graph APIs, schema and cache | [graph index](./graph/DOC-MAP.md) |
 | Vector APIs, schema and models | [vector index](./vector/README.md) |

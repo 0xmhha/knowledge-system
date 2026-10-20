@@ -1,5 +1,7 @@
 # 현재 인수인계 — 실제 native broadcast·RPC callback 종료 연결 / 2026-10-20
 
+새 머신/새 세션에서는 [머신 간 인수인계](./MACHINE-HANDOFF.md)를 먼저 따라 증거 태그·실행 도구·외부 DB/모델·삭제된 임시 경로를 확인한다.
+
 단계90 요청 범위의 연결 검증을 완료했다. [명세](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SPEC.json) · [결과](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json) · [회귀·시도 이력](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/VALIDATION.json) · [자원 정리](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/CLEANUP.json).
 
 ## 현재 단계 — 일반/race10슬롯·실제20노드 종료·회귀121종 통과
