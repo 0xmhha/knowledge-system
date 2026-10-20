@@ -1,0 +1,103 @@
+{
+  "restore_checks": {
+    "evidence_tags_fetched": true,
+    "check_handoff_history": "PASS without restore; --restore-generated-inputs no-op PASS",
+    "check_refactoring_progress": "PASS 17/18; next N-16",
+    "check_operational_acceptance": "PASS structural; runtime/quality/human semantics not verified",
+    "factory_native_overlap": "PASS",
+    "test_factory_native_overlap": "9 OK",
+    "working_tree_before": "clean at 95c32e12691730e013bae1ac13c93f799d4eb7a2"
+  },
+  "host_verification": [
+    {
+      "run": "run1-go1.26.8",
+      "build": "rc0",
+      "lint": "rc0",
+      "test_race": "rc2: internal/graph/buildpipe exceeded default 10m package timeout while TestPipelineMultilangV6Markers ran (machine load avg 11-13 on 10 CPUs; cause not established)",
+      "manager_test": "rc2: broker 11 of 31 failed with gate_failed at build_graph",
+      "diagnosis": "broker fixture go.mod declares go 1.26.9; with GOTOOLCHAIN=local go1.26.8 the same command reproduces \"go.mod requires go >= 1.26.9 (running go 1.26.8; GOTOOLCHAIN=local)\"; CI pins 1.26.9",
+      "logs": "checks/host/run1-go1.26.8/"
+    },
+    {
+      "run": "run2-go1.26.9",
+      "toolchain": "official go1.26.9 fetched by the go command into an owned cache with sum.golang.org verification; removed after run",
+      "build": "rc0",
+      "lint": "rc0 (golangci-lint v2.14.0, 0 issues; docs-check OK)",
+      "test_race": "rc0: 126 packages ok, 0 FAIL",
+      "manager_test": "rc0: 268 tests OK across 9 suites",
+      "logs": "checks/host/run2-go1.26.9/"
+    }
+  ],
+  "adapter": {
+    "preflight": "adapter/PREFLIGHT.json PASS",
+    "retained_phase90_inputs_reproduced": 4,
+    "adapter_diff": "adapter/phase90-instrument.adapter.diff (GOFMT path only)",
+    "location_map": "adapter/phase90-run-corrective1.location-map.json",
+    "retained_packets_modified": 0
+  },
+  "development_attempts": [
+    {
+      "name": "compile probe out1",
+      "result": "vet failed for all 5 roles: bridge helper named snapshot collided with imported package snapshot; nodes 0",
+      "fix": "bridge-internal helpers prefixed gen*; unused helper removed",
+      "evidence": "checks/compile-probe/out1.json.gz"
+    },
+    {
+      "name": "compile probe out2",
+      "result": "vet rc0 for all 5 roles",
+      "evidence": "checks/compile-probe/out2.json.gz"
+    },
+    {
+      "name": "smoke1",
+      "result": "both programs exited 1 before starting nodes: harness passed a relative trace path while the program ran in the source directory; nodes 0",
+      "fix": "smoke harness resolves output path; fixture unchanged",
+      "evidence": "checks/smoke/smoke1/"
+    },
+    {
+      "name": "smoke2 (overlap CAND-A, timer MUT-STALE-ACK general)",
+      "result": "both exit 0 in about 62s; traces as designed; 4 owned nodes; not counted in the matrix",
+      "evidence": "checks/smoke/smoke2/"
+    }
+  ],
+  "matrix": {
+    "run": "run-gen1",
+    "planned": 16,
+    "attempted": 16,
+    "failed": 0,
+    "automatic_retries": 0,
+    "source_preserved": true,
+    "summary": "SUMMARY.json"
+  },
+  "archive_attempts": [
+    {
+      "name": "first archive",
+      "result": "scan found the local account name and per-user temporary root inside actual/SCOPE.json environment before any commit",
+      "fix": "archive.py scrub for ${USER}/${TMPDIR}; run-time ks_adapter.py restored byte-identical to the scope-bound hash; packet re-archived"
+    }
+  ],
+  "validator": [
+    {
+      "name": "first unittest",
+      "result": "mutation of frozen observation rejected by TypeError instead of ValueError",
+      "fix": "explicit payload shape check"
+    },
+    {
+      "name": "post-cleanup check",
+      "result": "manifest guard reported packet bytes changed after CLEANUP.json was added; resealed after VALIDATION.json"
+    }
+  ],
+  "regression_after_packet": {
+    "check_handoff_history": "PASS",
+    "check_refactoring_progress": "PASS",
+    "check_operational_acceptance": "PASS",
+    "factory_native_overlap": "PASS",
+    "check_remaining_13": "PASS",
+    "test_factory_native_overlap": "9 OK",
+    "test_wiv1_generation_boundary": "11 OK after reseal"
+  },
+  "KS_production_Go_changed": 0,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "freeze": null,
+  "execution_allowed": false
+}

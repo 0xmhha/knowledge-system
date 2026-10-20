@@ -8,17 +8,17 @@
 
 ## 현재 검증과 다음 작업
 
-실제 factory·실제 loopback peer 동기화·원래60초 done broadcast와 같은 RPC 구독의 callback Err 종료를 연결했다. 선언한 송신 직전 gate 아래 일반/race10슬롯·20노드를 실행해 원본/재도입 쌍 대기4건, A/B native drain·실제 owner ack 후 반환4건, 조기 반환2건을 구분했다. 고유 source4개이며 별칭을 독립 표본으로 세지 않는다. 모든 노드·소유 프로세스를 정리했고 cache/시험 루트3개 약2.06GiB를 제거했다. [검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json).
+새 머신에서 evidence 이력을 복원해 검사했고 실행 adapter를 만들었다. adapter는 단계90 입력 4역할을 바이트 단위로 재현했다. 이어서 실제 owner ack 이후 옛 구독 세대의 status channel 사용과 명시적 새 등록 세대 경계를 일반/race 16슬롯, 실제32노드로 관측했다. 대조군이 아닌 슬롯에서 ack 후 같은 세대 사용은 0이다. delete 없이 ack한 대조군은 2슬롯 모두 위반으로 검출됐다. 같은 channel 재등록(세대2)은 8건, 새 RPC 등록은 16건 전달됐다. 가짜 ack는 0이다. [검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json)
 
-회귀121종과 최종 결속 집중9개가 통과했다. 최초 보조 fixture 채널 타입 컴파일 오류와 검증기 변경 후 manifest guard 실패는 보존하고, 각각 별도 수정·재결속 뒤 검증했다. KS 운영 Go 변경0이며 이전 본체 전체 일반/race4273개씩의 같은 입력 검증을 재사용한다. gate 없는 보편 동작·모든 post-ack channel-use·독립 수용으로 승격하지 않는다.
+본체 검증은 Go 1.26.8에서 race 제한 시간 초과와 manager broker 11개 실패를 냈다. broker fixture가 Go 1.26.9를 요구하기 때문이다. CI와 같은 1.26.9로 다시 돌려 모두 통과했고, 두 기록을 보존했다. KS 운영 Go 변경은 0이다. gate 없는 보편 동작, transport close 경로, 독립 수용으로 승격하지 않는다.
 
-다음은 실제 owner ack 후 옛 구독의 channel-use와 명시적 새 등록 세대 경계다. 승인된 독립 oracle 기반 실제 역할 성공 경로와 최종 HEAD 판정도 남아 있다. 앞선 최신 CKS 실제4역할·RPC 오류120건·MCP 오류/미확정35건 근거는 보존한다.
+다음은 WI-V1의 transport close와 같은 channel timer broadcast 세대 경로, 독립 oracle 기반 실제 역할 성공 경로와 최종 HEAD 판정이다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
 
 ## 전체13묶음 — 완료0/13
 
 |묶음|현재 남은 내용|
 |---|---|
-|WI-V1|최신 CKS 4역할·API 오류·native done/RPC Err overlap 확인; channel-use/새 세대·승인 oracle/final HEAD·독립 티켓|
+|WI-V1|최신 CKS 4역할·API 오류·native done/RPC Err overlap·ack 후 세대 경계 확인; transport close/같은 channel timer 경로·승인 oracle/final HEAD·독립 티켓|
 |WI-V2|유한 후보 구별 완료; 독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|warm 쌍627회 보존; 독립 nonseed 관련성/잡음 정답·표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 부분은 사용자 보류|

@@ -1,0 +1,132 @@
+{
+  "adapter": {
+    "placeholders": [
+      "WORK_ROOT",
+      "UPSTREAM_SOURCE",
+      "GOMODCACHE",
+      "GOROOT",
+      "KS_ROOT",
+      "HOME"
+    ],
+    "go_env": {
+      "GOTOOLCHAIN": "local",
+      "GOFLAGS": "-mod=readonly",
+      "GOWORK": "off",
+      "GOPROXY": "off",
+      "GOSUMDB": "off",
+      "GOPRIVATE": "",
+      "GONOPROXY": "",
+      "GONOSUMDB": "",
+      "GOVCS": "*:off"
+    },
+    "go_version": "go1.23.12",
+    "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "previous_locations": [
+      {
+        "previous": "/Users/kevin/.gvm/gos/go1.23.12",
+        "replaced_by": "GOROOT"
+      },
+      {
+        "previous": "/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod",
+        "replaced_by": "GOMODCACHE"
+      },
+      {
+        "previous": "/private/tmp/ks-wi4-target-20261019/source",
+        "replaced_by": "UPSTREAM_SOURCE"
+      },
+      {
+        "previous": "/private/tmp/ks-wi4-target-20261019/dependency-plan.json",
+        "replaced_by": "retained wi4 preflight/dependency-plan.json"
+      },
+      {
+        "previous": "/private/tmp/ks-phase90-go-build-cache",
+        "replaced_by": "WORK_ROOT/go-build-cache"
+      },
+      {
+        "previous": "/private/tmp/ks-phase90-native-rpc-corrective1-20261020",
+        "replaced_by": "WORK_ROOT/run-<name>"
+      },
+      {
+        "previous": "/private/tmp/phase90-*.go|py",
+        "replaced_by": "WORK_ROOT/tools (extracted from packet drivers/*.gz)"
+      }
+    ],
+    "live_paths_committed": false
+  },
+  "checks": {
+    "go_version": {
+      "output": "go version go1.23.12 darwin/arm64",
+      "ok": true
+    },
+    "upstream_source": {
+      "head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "clean": true,
+      "tracked_files": 2228,
+      "inventory_matches_retained": true,
+      "ok": true
+    },
+    "offline_dependencies": {
+      "exit_code": 0,
+      "packages": 536,
+      "stderr": "",
+      "ok": true
+    },
+    "phase90_inputs_reproduced": {
+      "roles": {
+        "ORIGINAL": {
+          "retained_overlay_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+          "retained_overlay_matches": true,
+          "instrumented_api_sha256": "0ed55b4bc30b8f1fb3cccb6383fba592673754ba08cc4d6107fb4ecf6a276125",
+          "instrumented_api_matches": true,
+          "instrumentation_counts_match": true,
+          "applied_project_tree": "1f8dc16f591e7afb091b3ada67645479a455a78f",
+          "applied_project_tree_matches": true,
+          "build_input_tree": "5f8b7ea02fa883ddc50d5f7921754b157a456cc1",
+          "build_input_tree_matches": true,
+          "ok": true
+        },
+        "CAND-A": {
+          "retained_overlay_sha256": "9e39e2fbfc53c3683f244ea916c88bcb21ed9a1f324808787908ae18a93778be",
+          "retained_overlay_matches": true,
+          "instrumented_api_sha256": "811590f858569b0c60bdd4af9de107c65c32ab62167e6b4f8effcb101a451e6a",
+          "instrumented_api_matches": true,
+          "instrumentation_counts_match": true,
+          "applied_project_tree": "ed5915332b178372f16607d51a7bb60362dd2497",
+          "applied_project_tree_matches": true,
+          "build_input_tree": "b1ff7e2d7d3ed1bfe088cf0b4b37ac5d06456701",
+          "build_input_tree_matches": true,
+          "ok": true
+        },
+        "CAND-B": {
+          "retained_overlay_sha256": "2093ff16754b44ee6103a177bab1ed1d99adba038509c2787c1c2186c1a0b4e9",
+          "retained_overlay_matches": true,
+          "instrumented_api_sha256": "276a2b7b22701be9e07a9e964af5bc9222fcb57dd6d1d6e9446a60606ca54368",
+          "instrumented_api_matches": true,
+          "instrumentation_counts_match": true,
+          "applied_project_tree": "57b449a5469af9374ce609d488bd7cd65487c0a9",
+          "applied_project_tree_matches": true,
+          "build_input_tree": "7801123d2803264b87a4f594e8e8364f8b2df439",
+          "build_input_tree_matches": true,
+          "ok": true
+        },
+        "MUT-EARLY": {
+          "retained_overlay_sha256": "dcfd718f5487c71966c82a60bed219aad96e954ba752d7fe9f2d12dffcf4de97",
+          "retained_overlay_matches": true,
+          "instrumented_api_sha256": "0da0f430a9970d4ac9bfd8df8f8944e09069d54ad048a31a106233e3c401610c",
+          "instrumented_api_matches": true,
+          "instrumentation_counts_match": true,
+          "applied_project_tree": "d6ad0d0b311ed7c2a41b5a8dc237b13bd3ef5767",
+          "applied_project_tree_matches": true,
+          "build_input_tree": "b7ae10cb69bf952bca351d450eef37c726dd479c",
+          "build_input_tree_matches": true,
+          "ok": true
+        }
+      },
+      "ok": true
+    }
+  },
+  "ok": true,
+  "nodes_started": 0,
+  "builds": 0,
+  "owned_trees_removed": true
+}

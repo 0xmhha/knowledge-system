@@ -1,0 +1,9 @@
+--- retained/phase90-instrument.py
++++ adapted/phase90-instrument.py
+@@ -1,5 +1,5 @@
+ import subprocess
+-GOFMT='/Users/kevin/.gvm/gos/go1.23.12/bin/gofmt'
++GOFMT='${GOROOT}/bin/gofmt'
+ def instrument(raw,role):
+  s=raw.decode();rules=[
+  ('go api.eventLoop()','ksNativeCapture(api)\ngo api.eventLoop()'),
