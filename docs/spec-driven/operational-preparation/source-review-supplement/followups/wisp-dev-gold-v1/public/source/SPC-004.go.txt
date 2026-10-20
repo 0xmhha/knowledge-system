@@ -1,0 +1,11 @@
+func CalculateDynamicSlot(baseSlot interface{ Bytes() []byte }, index *big.Int) common.Hash {
+	// Calculate the starting position of the array using keccak256(baseSlot)
+	hash := sha3.NewLegacyKeccak256()
+	hash.Write(common.LeftPadBytes(baseSlot.Bytes(), 32))
+	arrayStartSlot := new(big.Int).SetBytes(hash.Sum(nil))
+
+	// arrayStartSlot + index
+	elementSlot := new(big.Int).Add(arrayStartSlot, index)
+
+	return common.BigToHash(elementSlot)
+}

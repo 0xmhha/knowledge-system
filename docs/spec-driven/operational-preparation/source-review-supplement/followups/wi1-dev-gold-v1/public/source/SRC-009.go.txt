@@ -1,0 +1,37 @@
+func inspectFreezers(db ethdb.Database) ([]freezerInfo, error) {
+	var infos []freezerInfo
+	for _, freezer := range freezers {
+		switch freezer {
+		case ChainFreezerName:
+			info, err := inspect(ChainFreezerName, chainFreezerNoSnappy, db)
+			if err != nil {
+				return nil, err
+			}
+			infos = append(infos, info)
+
+		case StateFreezerName:
+			if ReadStateScheme(db) != PathScheme {
+				continue
+			}
+			datadir, err := db.AncientDatadir()
+			if err != nil {
+				return nil, err
+			}
+			f, err := NewStateFreezer(datadir, true)
+			if err != nil {
+				return nil, err
+			}
+			defer f.Close()
+
+			info, err := inspect(StateFreezerName, stateFreezerNoSnappy, f)
+			if err != nil {
+				return nil, err
+			}
+			infos = append(infos, info)
+
+		default:
+			return nil, fmt.Errorf("unknown freezer, supported ones: %v", freezers)
+		}
+	}
+	return infos, nil
+}

@@ -1,0 +1,59 @@
+[
+  {
+    "label": "prepare-reviewed-input",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-knowledge-manager-review.py",
+      "--out",
+      "/private/tmp/ks-KM034A-documents-final-20261015/prepared"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "review-current",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review",
+      "--registration",
+      "/private/tmp/ks-KM034A-documents-final-20261015/prepared/manager-a/registration.json",
+      "--review-file",
+      "/private/tmp/ks-KM034A-documents-final-20261015/review-input.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "adopt-current",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adopt",
+      "--registration",
+      "/private/tmp/ks-KM034A-documents-final-20261015/prepared/manager-a/registration.json",
+      "--draft-id",
+      "eec2028fafd7da5fd36bdfcf715913f4ad5e9011d1094009a49cfbbc527d036b",
+      "--review-revision",
+      "1e785e64173d9f11a915b0b36f605876abd14ab749ab9a0db02cf179cbc343a3"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "gen-reader",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-KM034A-documents-final-20261015/prepared/dataset-a/reviewed-doc-v1",
+      "--source-root",
+      "/private/tmp/ks-KM034A-documents-final-20261015/prepared/manager-a/adoptions/94afda9a5f0f92148c0cca27c7090f9bdd133c69131121c9d6923d05594b2c62/project",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--sanitize-rules",
+      "/private/tmp/ks-KM034A-documents-final-20261015/prepared/manager-a/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-KM034A-documents-final-20261015/reader.yaml"
+    ],
+    "exit_code": 0
+  }
+]

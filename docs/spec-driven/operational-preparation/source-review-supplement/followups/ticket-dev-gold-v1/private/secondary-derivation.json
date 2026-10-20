@@ -1,0 +1,23 @@
+{
+  "kind": "AI_source_wait_dependency_graph_draft_not_independent",
+  "nodes": [
+    "eventLoop synchronous send to sole status receiver",
+    "Unsubscribe uninstall offer before draining",
+    "eventLoop receive uninstall then delete and acknowledge",
+    "Unsubscribe receive acknowledgement then return"
+  ],
+  "edges": [
+    [
+      0,
+      1,
+      "without draining, sole receiver exit leaves status send waiting while uninstall needs eventLoop"
+    ],
+    [
+      2,
+      3,
+      "deletion precedes acknowledgement; acknowledgement precedes call return"
+    ]
+  ],
+  "candidate_question": "Does the candidate add a status receive reachable before uninstall succeeds, without removing the acknowledgement dependency?",
+  "shared_bias": "Same AI author and source hypothesis; different representation is not an independently derived executable oracle."
+}

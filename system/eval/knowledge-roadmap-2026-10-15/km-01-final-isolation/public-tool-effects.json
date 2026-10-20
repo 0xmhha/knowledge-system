@@ -1,0 +1,193 @@
+{
+  "scope": "CKS registered tool mutation surfaces; standalone engine/CLI contracts remain separate",
+  "tools": [
+    {
+      "name": "cks.collection.get_context",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.collection.status",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.change_history",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.concurrency_impact",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.expand_flow",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.find_branches",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.find_callees",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.find_callers",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.find_invariants",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.find_symbol",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.get_conventions",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.get_flow",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.get_for_task",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.get_for_task_v2",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.get_invariant_enforcement",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.get_subgraph",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.impact_analysis",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.label_suspects",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.policy_security",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.review_function",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.rule_candidates",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.search_text",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.semantic_search",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.value_dependencies",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.context.value_dependency_expansion",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.ops.freshness",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.ops.health",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.ops.index",
+      "effect": "dataset_mutation",
+      "source": "internal/system/mcp/ops_index.go"
+    },
+    {
+      "name": "cks.ops.reindex",
+      "effect": "dataset_mutation",
+      "source": "internal/system/mcp/reindex_tool.go"
+    },
+    {
+      "name": "cks.ops.setup",
+      "effect": "dataset_mutation",
+      "source": "internal/system/mcp/setup_tool.go"
+    },
+    {
+      "name": "cks.ops.setup_status",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.semantic.get_concept",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.semantic.lookup_term",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.semantic.status",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    },
+    {
+      "name": "cks.semantic.trace_requirement",
+      "effect": "query_or_status",
+      "source": "internal/system/mcp"
+    }
+  ],
+  "mutation_modes": {
+    "cks.ops.index": [
+      "full",
+      "incremental"
+    ],
+    "cks.ops.setup": [
+      "async_build"
+    ],
+    "cks.ops.reindex": [
+      "async_blue_green"
+    ]
+  },
+  "future_versioned_mutation_tools_added": false
+}

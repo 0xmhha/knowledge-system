@@ -1,0 +1,30 @@
+# WBFT round change: timeout-triggered round bump with prepared-block justification
+
+**Status:** verified · **Subsystem:** A1 (WBFT Consensus Core) · **Type:** B3
+
+WBFT recovers from a stuck round (PRE-PREPARE or COMMIT quorum not
+reached within RequestTimeout) by broadcasting a ROUND-CHANGE message
+for round+1. The message carries the highest prepared block and its
+PREPARE justification from prior rounds; a node accepts the view
+change once it has collected a quorum of ROUND-CHANGE messages for
+the same target round.
+
+## Invariants
+- A ROUND-CHANGE carries the highest prepared block this node has seen, so a quorum of view changes resumes from that prepared state and never from a lower round.
+- ROUND-CHANGE quorum threshold matches the PREPARE/COMMIT quorum (see A1.wbft_core.quorum_calc).
+
+## Pitfalls
+- Bumping rounds without attaching the prepared-block justification when one exists: the cluster can fork by accepting two different blocks at different rounds for the same height.
+
+## Code anchors
+- `consensus/wbft/core/roundchange.go` Core.broadcastNextRoundChange:40 — entry point fired on RequestTimeout; increments round and broadcasts a signed ROUND-CHANGE
+- `consensus/wbft/core/roundchange.go` Core.broadcastRoundChange:52 — builds and signs ROUND-CHANGE for a target round, attaches prepared-block justification
+- `consensus/wbft/core/roundchange.go` Core.handleRoundChangeMsg:103 — validates and accumulates incoming ROUND-CHANGE messages, triggers view change at quorum
+- `consensus/wbft/messages/roundchange.go` RoundChange:37 — message struct: Sequence, Round, PreparedRound, PreparedBlock
+- `consensus/wbft/messages/roundchange.go` SignedRoundChangePayload:64 — signed payload, encodePayloadInternal defines the digest used for signing
+
+## Aliases
+라운드 체인지, 라운드 변경, 뷰 체인지, 타임아웃 처리, 재라운드, view change, round bump, consensus timeout recovery, BFT round change, broadcastNextRoundChange, broadcastRoundChange, handleRoundChangeMsg, RoundChange, SignedRoundChangePayload, PreparedRound, PreparedBlock, StateNewRound
+
+## Related
+A1.wbft_core.consensus_flow_architecture, A1.wbft_core.message_handlers, A1.wbft_core.quorum_calc, A3.timing.wbft_config_defaults

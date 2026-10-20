@@ -1,0 +1,599 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Versioned dataset maintenance design contract v1 (not yet exposed MCP)",
+  "contract_scope": "KM-02.1 design conformance only",
+  "$defs": {
+    "coordinates": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "dataset_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "snapshot_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_mode": {
+          "enum": [
+            "committed",
+            "working-tree",
+            "snapshot-only"
+          ]
+        },
+        "base_commit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+            },
+            {
+              "const": ""
+            }
+          ]
+        }
+      },
+      "required": [
+        "project_id",
+        "dataset_id",
+        "snapshot_id",
+        "source_mode",
+        "base_commit"
+      ],
+      "additionalProperties": false
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "not": {
+        "pattern": "^[cC][uU][rR][rR][eE][nN][tT]$"
+      }
+    },
+    "sourcePin": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "committed",
+            "working-tree",
+            "snapshot-only"
+          ]
+        },
+        "snapshot_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "base_commit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+            },
+            {
+              "const": ""
+            }
+          ]
+        }
+      },
+      "required": [
+        "mode",
+        "snapshot_id",
+        "base_commit"
+      ],
+      "additionalProperties": false
+    },
+    "base": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "const": "absent"
+            }
+          },
+          "required": [
+            "state"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "const": "pinned"
+            },
+            "version": {
+              "$ref": "#/$defs/version"
+            },
+            "coordinates": {
+              "$ref": "#/$defs/coordinates"
+            }
+          },
+          "required": [
+            "state",
+            "version",
+            "coordinates"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "buildRequest": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "profile_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "profile_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_pin": {
+          "$ref": "#/$defs/sourcePin"
+        },
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "embedding_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "base": {
+          "$ref": "#/$defs/base"
+        },
+        "new_version": {
+          "$ref": "#/$defs/version"
+        },
+        "activation": {
+          "enum": [
+            "hold_for_review",
+            "activate_after_gate"
+          ]
+        },
+        "idempotency_key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{15,127}$"
+        },
+        "deadline_seconds": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 86400
+        }
+      },
+      "required": [
+        "schema_version",
+        "project_id",
+        "profile_id",
+        "profile_digest",
+        "source_pin",
+        "input_digest",
+        "embedding_digest",
+        "base",
+        "new_version",
+        "activation",
+        "idempotency_key",
+        "deadline_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "jobReference": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "profile_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "job_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        }
+      },
+      "required": [
+        "schema_version",
+        "project_id",
+        "profile_id",
+        "job_id"
+      ],
+      "additionalProperties": false
+    },
+    "gateResults": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "not_run",
+            "passed",
+            "failed",
+            "not_configured"
+          ]
+        },
+        "identity": {
+          "enum": [
+            "not_run",
+            "passed",
+            "failed",
+            "not_configured"
+          ]
+        },
+        "graph": {
+          "enum": [
+            "not_run",
+            "passed",
+            "failed",
+            "not_configured"
+          ]
+        },
+        "vector": {
+          "enum": [
+            "not_run",
+            "passed",
+            "failed",
+            "not_configured"
+          ]
+        },
+        "knowledge": {
+          "enum": [
+            "not_run",
+            "passed",
+            "failed",
+            "not_configured"
+          ]
+        },
+        "semantic": {
+          "enum": [
+            "not_run",
+            "passed",
+            "failed",
+            "not_configured"
+          ]
+        }
+      },
+      "required": [
+        "source",
+        "identity",
+        "graph",
+        "vector",
+        "knowledge",
+        "semantic"
+      ],
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "coordinates": {
+          "$ref": "#/$defs/coordinates"
+        },
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "embedding_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "version",
+        "coordinates",
+        "input_digest",
+        "embedding_digest"
+      ],
+      "additionalProperties": false
+    },
+    "publication": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "$ref": "#/$defs/base"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "coordinates": {
+          "$ref": "#/$defs/coordinates"
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "receipt_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "base",
+        "version",
+        "coordinates",
+        "published_at",
+        "receipt_digest"
+      ],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "profile_unknown",
+            "profile_stale",
+            "project_mismatch",
+            "source_stale",
+            "input_stale",
+            "embedding_stale",
+            "base_stale",
+            "version_exists",
+            "idempotency_conflict",
+            "writer_busy",
+            "unsupported_capability",
+            "job_unknown",
+            "cancel_too_late",
+            "reconcile_required",
+            "gate_failed",
+            "deadline_exceeded",
+            "canceled",
+            "interrupted",
+            "operation_failed"
+          ]
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "phase": {
+          "enum": [
+            "accepted",
+            "capture",
+            "build_graph",
+            "build_vector",
+            "build_knowledge",
+            "build_semantic",
+            "gate",
+            "publish",
+            "reconcile",
+            "finished"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "retryable",
+        "phase"
+      ],
+      "additionalProperties": false
+    },
+    "jobStatus": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "job_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "profile_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "request_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "target_version": {
+          "$ref": "#/$defs/version"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "cancel_requested",
+            "recovering",
+            "held_for_review",
+            "succeeded",
+            "failed",
+            "canceled",
+            "interrupted"
+          ]
+        },
+        "phase": {
+          "enum": [
+            "accepted",
+            "capture",
+            "build_graph",
+            "build_vector",
+            "build_knowledge",
+            "build_semantic",
+            "gate",
+            "publish",
+            "reconcile",
+            "finished"
+          ]
+        },
+        "terminal": {
+          "type": "boolean"
+        },
+        "build_complete": {
+          "type": "boolean"
+        },
+        "activated": {
+          "type": "boolean"
+        },
+        "candidate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/candidate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "publication": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/publication"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gates": {
+          "$ref": "#/$defs/gateResults"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/error"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "serving_adoption": {
+          "const": "not_observed"
+        }
+      },
+      "required": [
+        "schema_version",
+        "job_id",
+        "project_id",
+        "profile_id",
+        "request_digest",
+        "target_version",
+        "revision",
+        "state",
+        "phase",
+        "terminal",
+        "build_complete",
+        "activated",
+        "candidate",
+        "publication",
+        "gates",
+        "error",
+        "serving_adoption"
+      ],
+      "additionalProperties": false
+    },
+    "profileContext": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "profile_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "profile_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_pin": {
+          "$ref": "#/$defs/sourcePin"
+        },
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "embedding_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "observed_base": {
+          "$ref": "#/$defs/base"
+        },
+        "existing_versions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/version"
+          },
+          "uniqueItems": true,
+          "maxItems": 10000
+        },
+        "allowed_activation": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "hold_for_review",
+              "activate_after_gate"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "required_gates": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "source",
+              "identity",
+              "graph",
+              "vector",
+              "knowledge",
+              "semantic"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 4,
+          "maxItems": 6
+        },
+        "timeout_max_seconds": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 86400
+        }
+      },
+      "required": [
+        "project_id",
+        "profile_id",
+        "profile_digest",
+        "source_pin",
+        "input_digest",
+        "embedding_digest",
+        "observed_base",
+        "existing_versions",
+        "allowed_activation",
+        "required_gates",
+        "timeout_max_seconds"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

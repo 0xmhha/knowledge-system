@@ -359,11 +359,334 @@ func TestDeadlineDiscardsLateBackendResults(t *testing.T) {
 		t.Fatal("subsequent query started after deadline")
 	}
 }
+
+func wideAnchorFixture() (*graph, *ckvclient.Fake, contract.Citation, contract.Citation) {
+	g, v := fixture()
+	wide, canonical := cite("a.go"), cite("a.go")
+	canonical.StartLine = 3
+	g.SymbolCitations = []contract.Citation{wide}
+	identity := ckgclient.SymbolIdentity{Symbol: "a.go", CanonicalID: "a.go", Citation: canonical}
+	g.SymbolIdentities[wide.String()], g.SymbolIdentities[canonical.String()] = identity, identity
+	forward := contract.Neighbor{Source: canonical, Target: cite("b.go"), Relation: contract.RelationCalls, Distance: 1}
+	reverse := contract.Neighbor{Source: cite("b.go"), Target: canonical, Relation: contract.RelationCalledBy, Distance: 1}
+	for _, src := range []contract.Citation{wide, canonical} {
+		g.edges[src.String()+string(contract.RelationCalls)] = []contract.Neighbor{forward}
+		g.edges[src.String()+string(contract.RelationCalledBy)] = []contract.Neighbor{reverse}
+	}
+	g.edges[cite("b.go").String()+string(contract.RelationCalls)] = []contract.Neighbor{{Source: cite("b.go"), Target: canonical, Relation: contract.RelationCalls, Distance: 1}}
+	g.ImpactResult = contract.ImpactResult{Groups: []contract.ImpactGroup{{Category: contract.ImpactCallers, Hits: []contract.Citation{canonical, cite("b.go")}}}}
+	g.ConcurrencyResult = contract.ConcurrencyResult{Modules: []contract.ConcurrencyModule{{Citation: canonical, Direction: "both"}}}
+	return g, v, wide, canonical
+}
+
+func TestVerifiedWideAnchorPreservesRetrievalAndReachesCanonicalEdges(t *testing.T) {
+	g, v, wide, canonical := wideAnchorFixture()
+	v.SearchHits = []contract.Hit{{Citation: wide, Rank: 1, Score: .9, Source: contract.HitSourceCKV}}
+	g.BM25Hits = []contract.Hit{{Citation: wide, Rank: 2, Score: 37, Source: contract.HitSourceCKG}}
+	out, err := Compose(context.Background(), g, v, Request{Symptom: "wide source", Depth: 2, MaxCalls: 32})
+	if err != nil || len(out.Candidates) != 2 {
+		t.Fatal("verified canonical edges lost or cycle duplicated seed", err, out)
+	}
+	a, b := find(t, out, "a.go"), find(t, out, "b.go")
+	if a.Citation != wide || a.Signals.Retrieval.Value == nil || len(*a.Signals.Retrieval.Value) != 2 || (*a.Signals.Retrieval.Value)[1].Score != 37 || (*a.Signals.Retrieval.Value)[1].Rank != 2 {
+		t.Fatal("original retrieval row/rank/score changed", a)
+	}
+	for _, from := range a.Signals.Retrieval.Provenance {
+		if from.Anchor != wide {
+			t.Fatal("original retrieval provenance was normalized away")
+		}
+	}
+	if b.Signals.Distance.Value == nil || *b.Signals.Distance.Value != 1 || a.Signals.Distance.Value == nil || *a.Signals.Distance.Value != 0 {
+		t.Fatal("canonical alias changed hop distance", a, b)
+	}
+	if a.Signals.Impact.Value == nil || len(*a.Signals.Impact.Value) != 1 || a.Signals.Concurrency.Value == nil || !a.Signals.Concurrency.Value.Touched {
+		t.Fatal("verified canonical membership became a negative", a.Signals)
+	}
+	queriedCanonical := false
+	for _, call := range g.Calls.Neighbors {
+		queriedCanonical = queriedCanonical || call.Src == canonical
+		if call.Opts.Hops != 1 {
+			t.Fatal("one-hop walk changed")
+		}
+	}
+	if !queriedCanonical || out.Budget.Calls > out.Budget.MaxCalls {
+		t.Fatal("canonical walk/call budget contract lost")
+	}
+}
+
+func TestWideAnchorRejectsUnverifiedIdentityAndInterfaceBridge(t *testing.T) {
+	for _, mode := range []string{"foreign_file", "foreign_commit", "disjoint", "overlap_only", "empty_symbol", "ambiguous", "interface_bridge"} {
+		t.Run(mode, func(t *testing.T) {
+			g, v, wide, canonical := wideAnchorFixture()
+			identity := g.SymbolIdentities[wide.String()]
+			switch mode {
+			case "foreign_file":
+				identity.Citation.File = "foreign.go"
+			case "foreign_commit":
+				identity.Citation.CommitHash = strings.Repeat("2", 40)
+			case "disjoint":
+				identity.Citation.StartLine, identity.Citation.EndLine = 8, 10
+			case "overlap_only":
+				identity.Citation.StartLine, identity.Citation.EndLine = 4, 8
+			case "empty_symbol":
+				identity.Symbol = ""
+			case "ambiguous":
+				g.SymbolIdentityErr = fmt.Errorf("private ambiguity: %w", ckgclient.ErrSeedUnresolved)
+			case "interface_bridge":
+				for _, src := range []contract.Citation{wide, canonical} {
+					g.edges[src.String()+string(contract.RelationCalls)] = []contract.Neighbor{{Source: cite("interface.go"), Target: cite("b.go"), Relation: contract.RelationCalls, Distance: 1}}
+					g.edges[src.String()+string(contract.RelationCalledBy)] = nil
+				}
+			}
+			g.SymbolIdentities[wide.String()] = identity
+			out := run(t, g, v, Request{})
+			if len(out.Candidates) != 1 || !out.Partial {
+				t.Fatal("unverified/foreign/bridge anchor admitted", out)
+			}
+		})
+	}
+}
+
+type deadlineWalkGraph struct {
+	*graph
+	workDeadline, finalDeadline time.Time
+	drift                       bool
+}
+
+func (g *deadlineWalkGraph) Neighbors(ctx context.Context, c contract.Citation, o ckgclient.NeighborsOpts) ([]contract.Neighbor, error) {
+	g.workDeadline, _ = ctx.Deadline()
+	<-ctx.Done()
+	return nil, ctx.Err()
+}
+
+func (g *deadlineWalkGraph) Health(ctx context.Context) (ckgclient.Health, error) {
+	h, err := g.graph.Health(ctx)
+	if g.Calls.Health > 1 {
+		g.finalDeadline, _ = ctx.Deadline()
+		if g.drift {
+			h.GraphDigest = "changed"
+		}
+	}
+	return h, err
+}
+
+func TestWorkDeadlineReservesFinalVerificationInsideTotalBudget(t *testing.T) {
+	for _, drift := range []bool{false, true} {
+		t.Run(fmt.Sprint(drift), func(t *testing.T) {
+			base, v := fixture()
+			g := &deadlineWalkGraph{graph: base, drift: drift}
+			parentDeadline := time.Now().Add(time.Second)
+			parent, cancel := context.WithDeadline(context.Background(), parentDeadline)
+			defer cancel()
+			out, err := Compose(parent, g, v, Request{Symptom: "bounded walk", Symbol: "a.go", BudgetMS: 1000})
+			if drift {
+				if err == nil || len(out.Candidates) != 0 || !strings.Contains(err.Error(), "snapshot_verification_failed") {
+					t.Fatal("snapshot drift became publishable", out, err)
+				}
+			} else if err != nil || !out.Partial || len(out.Candidates) != 1 || out.Budget.Calls > out.Budget.MaxCalls {
+				t.Fatal("cooperative work expiry prevented reserved verification", out, err)
+			}
+			if g.Calls.Health != 2 || !g.finalDeadline.After(g.workDeadline) || g.finalDeadline.After(parentDeadline) {
+				t.Fatal("verification reservation extended/missed total deadline")
+			}
+		})
+	}
+}
+
+type identityCountingGraph struct {
+	*graph
+	resolved map[string]int
+	failOnce bool
+}
+
+func (g *identityCountingGraph) ResolveCitation(ctx context.Context, c contract.Citation) (ckgclient.SymbolIdentity, error) {
+	g.resolved[c.String()]++
+	if g.failOnce && g.resolved[c.String()] == 1 {
+		return ckgclient.SymbolIdentity{}, ckgclient.ErrSeedUnresolved
+	}
+	return g.Fake.ResolveCitation(ctx, c)
+}
+
+func TestWalkIdentityCacheKeepsSuccessAndFailureObservations(t *testing.T) {
+	for _, fail := range []bool{false, true} {
+		t.Run(fmt.Sprint(fail), func(t *testing.T) {
+			base, v, wide, _ := wideAnchorFixture()
+			g := &identityCountingGraph{graph: base, resolved: map[string]int{}, failOnce: fail}
+			out, err := Compose(context.Background(), g, v, Request{Symptom: "cached identity", Symbol: "a.go", Depth: 2})
+			if err != nil || g.resolved[wide.String()] != 1 {
+				t.Fatal("identity observation retried/duplicated", err, g.resolved)
+			}
+			if fail && (len(out.Candidates) != 1 || out.Candidates[0].Symbol != nil || !out.Partial) {
+				t.Fatal("failed identity was replaced by a later success", out)
+			}
+			if !fail && len(out.Candidates) != 2 {
+				t.Fatal("successful canonical identity not reused", out)
+			}
+		})
+	}
+}
+
+func TestCanonicalAliasesDoNotMergeOriginalRetrievalRows(t *testing.T) {
+	g, v, wide, canonical := wideAnchorFixture()
+	v.SearchHits = []contract.Hit{{Citation: wide, Rank: 1, Score: .9, Source: contract.HitSourceCKV}, {Citation: canonical, Rank: 2, Score: .8, Source: contract.HitSourceCKV}}
+	out, err := Compose(context.Background(), g, v, Request{Symptom: "distinct original citations", MaxCalls: 32})
+	if err != nil || len(out.Candidates) != 3 || out.Candidates[0].Citation != wide || out.Candidates[1].Citation != canonical {
+		t.Fatal("original retrieval rows reordered/merged", out, err)
+	}
+	for i, original := range []contract.Citation{wide, canonical} {
+		s := out.Candidates[i].Signals.Retrieval
+		if s.Value == nil || len(*s.Value) != 1 || (*s.Value)[0].Rank != i+1 || s.Provenance[0].Anchor != original {
+			t.Fatal("per-row original retrieval provenance lost", s)
+		}
+	}
+}
+
+func TestVerificationFailuresDistinguishBudgetCancelAndDrift(t *testing.T) {
+	for _, tc := range []struct {
+		err  error
+		want string
+	}{
+		{errBudget, "snapshot_verification_budget_exhausted"},
+		{fmt.Errorf("private: %w", context.DeadlineExceeded), "snapshot_verification_budget_exhausted"},
+		{context.Canceled, "snapshot_verification_cancelled"},
+		{errors.New("private backend"), "snapshot_verification_failed"},
+	} {
+		if got := verificationError(context.Background(), tc.err).Error(); got != tc.want {
+			t.Errorf("safe verification error = %q, want %q", got, tc.want)
+		}
+	}
+}
+
+func TestWorkBudgetDoesNotMasqueradeAsMissingSeed(t *testing.T) {
+	base, v := fixture()
+	g := &deadlineWalkGraph{graph: base}
+	out, err := Compose(context.Background(), g, v, Request{Symptom: "work deadline", Symbol: "a.go", BudgetMS: 1000})
+	if err != nil || len(out.Candidates) != 1 || !out.Partial {
+		t.Fatal("reserved verification did not preserve partial result", out, err)
+	}
+	s := out.Candidates[0].Signals
+	if s.Impact.Status != "budget_exhausted" || s.Impact.Reason != "budget_exhausted" || s.Concurrency.Status != "budget_exhausted" || s.Concurrency.Reason != "budget_exhausted" || s.Impact.Value != nil || s.Concurrency.Value != nil {
+		t.Fatalf("work budget mislabeled as source/provider absence: impact=%s/%s concurrency=%s/%s", s.Impact.Status, s.Impact.Reason, s.Concurrency.Status, s.Concurrency.Reason)
+	}
+}
+
+type graphWithoutIdentity struct{ ckgclient.Client }
+
+func TestIdentityDependencyDistinguishesProviderFailureAndUnsupported(t *testing.T) {
+	for _, mode := range []string{"provider_error", "unsupported"} {
+		t.Run(mode, func(t *testing.T) {
+			g, v := fixture()
+			var provider ckgclient.Client = g
+			wantStatus, wantReason := "error", "backend_error"
+			if mode == "unsupported" {
+				provider = graphWithoutIdentity{Client: g}
+				wantStatus, wantReason = "unsupported", "symbol_resolver_unsupported"
+			} else {
+				g.SymbolIdentityErr = errors.New("PRIVATE_PROVIDER_FAILURE")
+			}
+			out, err := Compose(context.Background(), provider, v, Request{Symptom: "dependency failure", Symbol: "a.go"})
+			if err != nil || !out.Partial || len(out.Candidates) != 1 {
+				t.Fatal(out, err)
+			}
+			s := out.Candidates[0].Signals
+			if s.Impact.Status != wantStatus || s.Impact.Reason != wantReason || s.Impact.Value != nil || s.Concurrency.Status != wantStatus || s.Concurrency.Reason != wantReason || s.Concurrency.Value != nil {
+				t.Fatal("identity dependency mislabeled", s)
+			}
+			if len(g.Calls.ImpactOfChange) != 0 || len(g.Calls.ConcurrencyImpact) != 0 {
+				t.Fatal("unresolved identity contacted enrichment providers")
+			}
+			raw, _ := json.Marshal(out)
+			if strings.Contains(string(raw), "PRIVATE_PROVIDER_FAILURE") {
+				t.Fatal("provider message escaped")
+			}
+		})
+	}
+}
+
+func TestSeedProviderFailuresExposeSafeClassificationOnly(t *testing.T) {
+	for _, mode := range []string{"symbol", "semantic"} {
+		t.Run(mode, func(t *testing.T) {
+			g, v := fixture()
+			request := Request{Symptom: "seed failure"}
+			want := "semantic_seed_failed: backend_error"
+			if mode == "symbol" {
+				request.Symbol = "a.go"
+				g.SymbolErr = errors.New("PRIVATE_PROVIDER_MESSAGE")
+				want = "seed_unresolved: backend_error"
+			} else {
+				v.SearchErr = errors.New("PRIVATE_PROVIDER_MESSAGE")
+			}
+			out, err := Compose(context.Background(), g, v, request)
+			if err == nil || err.Error() != want || len(out.Candidates) != 0 {
+				t.Fatal("opaque seed provider error not safely classified", err)
+			}
+		})
+	}
+}
 func TestInvalidModesPathsAndBoundsRejectedBeforeBackend(t *testing.T) {
 	for _, r := range []Request{{Symptom: ""}, {Symptom: "hang", Symbol: "x", File: "a.go", Line: 1}, {Symptom: "hang", File: "../a.go", Line: 1}, {Symptom: "hang", File: "logs/a.go", Line: 1}, {Symptom: "hang", File: ".claude/a.go", Line: 1}, {Symptom: "hang", MaxCalls: 3}, {Symptom: "hang", Depth: 4}, {Symptom: "hang", MaxCandidates: 21}, {Symptom: "hang", Expand: []contract.Citation{{File: "/tmp/a.go", StartLine: 1, EndLine: 1}}}} {
 		g, v := fixture()
 		if _, e := Compose(context.Background(), g, v, r); e == nil || g.Calls.Health != 0 {
 			t.Fatalf("invalid request touched backend: %+v %v", r, e)
 		}
+	}
+}
+
+func TestFailureReasonsDoNotConflateSeedBackendAndBudget(t *testing.T) {
+	for _, tc := range []struct {
+		name, state, reason string
+		err                 error
+	}{
+		{"unresolved", "error", "seed_unresolved", ckgclient.ErrSeedUnresolved},
+		{"wrapped_unresolved", "error", "seed_unresolved", fmt.Errorf("private seed detail: %w", ckgclient.ErrSeedUnresolved)},
+		{"backend", "error", "backend_error", errors.New("private backend detail")},
+		{"budget", "budget_exhausted", "budget_exhausted", errBudget},
+		{"wrapped_budget", "budget_exhausted", "budget_exhausted", fmt.Errorf("private budget detail: %w", errBudget)},
+		{"budget_precedes_joined_seed", "budget_exhausted", "budget_exhausted", errors.Join(errBudget, ckgclient.ErrSeedUnresolved)},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			s := failed[[]contract.ImpactCategory](tc.err, "graph.impact_analysis", head, cite("a.go"))
+			if s.Status != tc.state || s.Reason != tc.reason || s.Value != nil || len(s.Provenance) != 1 || s.Provenance[0].Anchor != cite("a.go") {
+				t.Fatalf("failure classification or provenance lost: %+v", s)
+			}
+			raw, err := json.Marshal(s)
+			if err != nil || strings.Contains(string(raw), "private") {
+				t.Fatal("private backend detail leaked", err)
+			}
+		})
+	}
+}
+
+func TestUnresolvedSeedSharedSignalsStayPartialBeforeOrAfterSuccess(t *testing.T) {
+	for _, missingFirst := range []bool{true, false} {
+		t.Run(fmt.Sprint(missingFirst), func(t *testing.T) {
+			g, v := fixture()
+			missing := "a.go"
+			if !missingFirst {
+				missing = "b.go"
+			}
+			delete(g.SymbolIdentities, cite(missing).String())
+			out := run(t, g, v, Request{Expand: []contract.Citation{cite("a.go"), cite("b.go")}, MaxEnriched: 2})
+			if !out.Partial {
+				t.Fatal("unresolved seed became a complete result")
+			}
+			for _, c := range out.Candidates {
+				if c.Signals.Impact.Status != "error" || c.Signals.Concurrency.Status != "error" || c.Signals.Impact.Reason != "seed_unresolved" || c.Signals.Concurrency.Reason != "seed_unresolved" || c.Signals.Impact.Value != nil || c.Signals.Concurrency.Value != nil {
+					t.Fatalf("missing seed was erased or mislabeled: %+v", c.Signals)
+				}
+				for _, provenance := range [][]contract.SignalFrom{c.Signals.Impact.Provenance, c.Signals.Concurrency.Provenance} {
+					seen := map[contract.Citation]bool{}
+					for _, from := range provenance {
+						seen[from.Anchor] = true
+					}
+					if !seen[cite("a.go")] || !seen[cite("b.go")] {
+						t.Fatal("shared failure lost a seed's provenance", provenance)
+					}
+				}
+			}
+			if len(g.Calls.ImpactOfChange) != 1 || len(g.Calls.ConcurrencyImpact) != 1 {
+				t.Fatal("unresolved seed must not be sent to analysis providers", g.Calls)
+			}
+		})
 	}
 }

@@ -1,0 +1,114 @@
+{
+  "kind": "actual_controlled_analyzer_not_project_mcp_or_independent_acceptance",
+  "go_version": "go version go1.26.9 darwin/arm64",
+  "lint_version": "golangci-lint has version 2.14.0 built with go1.26.8 from (unknown, modified: ?, mod sum: \"h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=\") on (unknown)",
+  "go_source_reference_commit": "335892887053e1d126eab1c3717cb4e284cf536d",
+  "quality_checks": [
+    {
+      "kind": "build",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-rule-observations-final-20261016/work/overlay.json",
+        "-c",
+        "-o",
+        "/private/tmp/ks-rule-observations-final-20261016/work/rules.test",
+        "./pkg/graph/valueflow"
+      ]
+    },
+    {
+      "kind": "fmt",
+      "exit_code": 0,
+      "command": [
+        "-l",
+        "/private/tmp/ks-rule-observations-final-20261016/work/rules_test.go"
+      ]
+    },
+    {
+      "kind": "vet",
+      "exit_code": 0,
+      "command": [
+        "vet",
+        "-overlay=/private/tmp/ks-rule-observations-final-20261016/work/overlay.json",
+        "./pkg/graph/valueflow"
+      ]
+    },
+    {
+      "kind": "lint",
+      "exit_code": 0,
+      "command": [
+        "run",
+        "--timeout=120s",
+        "./pkg/graph/valueflow"
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "mode": "normal",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-rule-observations-final-20261016/work/overlay.json",
+        "-json",
+        "-count=1",
+        "-run=^TestRulePreparation",
+        "-timeout=60s",
+        "./pkg/graph/valueflow"
+      ],
+      "source_observations": 40,
+      "control_observations": 14
+    },
+    {
+      "mode": "race",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-overlay=/private/tmp/ks-rule-observations-final-20261016/work/overlay.json",
+        "-json",
+        "-count=1",
+        "-run=^TestRulePreparation",
+        "-timeout=60s",
+        "-race",
+        "./pkg/graph/valueflow"
+      ],
+      "source_observations": 40,
+      "control_observations": 14
+    }
+  ],
+  "existing_rule_regressions": [
+    {
+      "mode": "normal",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-json",
+        "-count=1",
+        "-run=^TestRule(Pack|Bounds|Query|Range)",
+        "-timeout=60s",
+        "./pkg/graph/valueflow"
+      ],
+      "named_tests_passed": 28
+    },
+    {
+      "mode": "race",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "-json",
+        "-count=1",
+        "-run=^TestRule(Pack|Bounds|Query|Range)",
+        "-timeout=60s",
+        "-race",
+        "./pkg/graph/valueflow"
+      ],
+      "named_tests_passed": 28
+    }
+  ],
+  "normalized_normal_race_equal": true,
+  "existing_tests_preserved": true,
+  "maintained_go_source_unchanged": true,
+  "public_input_scope": "packaging_separation_not_os_filesystem_isolation",
+  "source_analysis_invocations_per_mode": 80,
+  "analyzed_source_executed": false
+}

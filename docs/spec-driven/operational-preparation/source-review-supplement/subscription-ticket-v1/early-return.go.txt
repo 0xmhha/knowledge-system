@@ -1,0 +1,3 @@
+func (s *SyncStatusSubscription) Unsubscribe() {
+	s.unsubOnce.Do(func() {})
+}

@@ -50,6 +50,11 @@ type Hit struct {
 	// budget allocator's knowledge quota) without a second query. Empty
 	// for ckg-sourced hits.
 	ChunkKind string `json:"chunk_kind,omitempty"`
+	// NonCitableMetadata marks derived summaries without an archived source
+	// location. Their text can inform a review, but File/lines must never be
+	// promoted into a source citation or a v2 body. False does not attest
+	// source integrity: callers must still verify the dataset and source pins.
+	NonCitableMetadata bool `json:"non_citable_metadata,omitempty"`
 	// Text is the chunk's indexed content, carried through from ckv's
 	// Snippet. Most citations resolve to file lines and do not need it,
 	// but synthesized chunks have no file to read: a `convention` chunk
@@ -64,5 +69,5 @@ type Hit struct {
 // IsValid reports whether h carries a valid Citation and a sane Rank.
 // Score is unconstrained (negative scores are valid in some fusion schemes).
 func (h Hit) IsValid() bool {
-	return h.Citation.IsValid() && h.Rank >= 1
+	return !h.NonCitableMetadata && h.Citation.IsValid() && h.Rank >= 1
 }

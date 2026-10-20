@@ -1,0 +1,507 @@
+{
+  "schema_version": 1,
+  "state": "partial",
+  "profile_digest": "89995bc406ad956995dfc94ae39b992311df00ba64ca3a56ea4003d07040a157",
+  "catalog_digest": "51d1f9081989af8872309faa01ddfce0a3e87c254f12c1f3358347d8710c1883",
+  "collection_id": "real-chains",
+  "mode": "comparison",
+  "concept": {
+    "key": {
+      "pack_id": "industry.blockchain",
+      "version": "1.0.0",
+      "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+      "concept_id": "transaction-ordering"
+    },
+    "definition": "The mechanism choosing and ordering transactions for proposed execution.",
+    "view": {
+      "id": "transaction-ordering",
+      "aliases": [
+        "transaction-ordering",
+        "거래 순서",
+        "sequencing",
+        "정렬"
+      ],
+      "includes": [
+        "proposer or sequencer selection and ordering rules"
+      ],
+      "excludes": [
+        "ordering does not itself establish consensus or finality"
+      ],
+      "applicable_roles": [
+        "l1",
+        "l2",
+        "sequencer"
+      ],
+      "facets": [
+        {
+          "id": "selection",
+          "question": "Who chooses transactions for a proposal?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "ordering",
+          "question": "Which ordering rule and tie breakers are implemented?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "fairness",
+          "question": "Which fairness or censorship properties are stated and evidenced?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        }
+      ]
+    }
+  },
+  "facets": [
+    "selection",
+    "ordering",
+    "fairness"
+  ],
+  "as_of": "2026-10-15T19:49:02Z",
+  "question": "고정 원문으로 transaction-ordering 근거와 모르는 부분을 프로젝트별로 비교한다.",
+  "groups": [
+    {
+      "participant": {
+        "scope_id": "9c9b8751646eb1eda07ddf2b25086e65cfe1351360e56b7f7da2a17b11a7eb3c",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-stablenet",
+            "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+            "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "wbft-source-excerpts-no-live-network",
+            "component_role": "l1",
+            "observed_at": "2026-10-15T19:48:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "transaction-ordering"
+          },
+          "facet": "selection",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "transaction-ordering"
+          },
+          "facet": "ordering",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "transaction-ordering",
+                "binding_digest": "abd614e21e42ee5bcdf781ed48e8a7c31bdbee40d7947d0a0d55d1ffe20d1044",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "transaction-ordering"
+                },
+                "coordinates": {
+                  "project_id": "comparison-go-stablenet",
+                  "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                  "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                },
+                "conditions": {
+                  "network": "not-selected-source-study",
+                  "configuration": "wbft-source-excerpts-no-live-network",
+                  "component_role": "l1",
+                  "observed_at": "2026-10-15T19:48:59+00:00"
+                },
+                "local_concept": "go-stablenet transaction-ordering source excerpts",
+                "mapping": "close",
+                "reason": "Proposed mapping of pinned go-stablenet transaction-ordering source excerpts for an unexecuted study; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "source-1",
+                      "kind": "code",
+                      "facets": [
+                        "ordering"
+                      ],
+                      "citation": {
+                        "file": "miner/ordering.go",
+                        "start_line": 69,
+                        "end_line": 100,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "comparison-go-stablenet",
+                        "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+                        "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                        "content_sha256": "c7138b5ff6eeef5304ff8cd3c7306b1fb91a842e32c0a5daed3a0ab67b3801f9"
+                      }
+                    },
+                    "body": "func (s *txByPriceAndTime) Less(i, j int) bool {\n\t// If Anzeon is not enabled, use the original fee-based ordering\n\tif !s.anzeonEnabled {\n\t\tcmp := s.txs[i].fees.Cmp(s.txs[j].fees)\n\t\tif cmp == 0 {\n\t\t\treturn s.txs[i].tx.Time.Before(s.txs[j].tx.Time)\n\t\t}\n\t\treturn cmp > 0\n\t}\n\n\t// Check if accounts are authorized (using pre-computed map for performance)\n\tiAuthorized := s.isAuthorized[s.txs[i].from]\n\tjAuthorized := s.isAuthorized[s.txs[j].from]\n\n\t// If both are authorized or both are not authorized, use fee-based ordering within the same group\n\tif iAuthorized == jAuthorized {\n\t\tif iAuthorized {\n\t\t\t// Both authorized: compare by fee (higher first), then by time (earlier first)\n\t\t\tcmp := s.txs[i].fees.Cmp(s.txs[j].fees)\n\t\t\tif cmp == 0 {\n\t\t\t\treturn s.txs[i].tx.Time.Before(s.txs[j].tx.Time)\n\t\t\t}\n\t\t\treturn cmp > 0\n\t\t} else {\n\t\t\t// Both not authorized: compare by time only (earlier first, no fee comparison)\n\t\t\t// General accounts are ordered by FIFO regardless of fee\n\t\t\treturn s.txs[i].tx.Time.Before(s.txs[j].tx.Time)\n\t\t}\n\t}\n\n\t// If one is authorized and the other is not, authorized always comes first\n\treturn iAuthorized\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "transaction-ordering"
+          },
+          "facet": "fairness",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    },
+    {
+      "participant": {
+        "scope_id": "26573c59af384727efb3d96bcd44940b322df9862147ff2484444e58b3c21f68",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-wemix",
+            "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+            "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+            "source_mode": "working-tree",
+            "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "clique-source-excerpts-no-live-network",
+            "component_role": "l1",
+            "observed_at": "2026-10-15T19:48:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "transaction-ordering"
+          },
+          "facet": "selection",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "transaction-ordering"
+          },
+          "facet": "ordering",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "transaction-ordering",
+                "binding_digest": "822379efa7a05483657d98c7492fc29232e4d73571e82d48ad345bf90d111dca",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "transaction-ordering"
+                },
+                "coordinates": {
+                  "project_id": "comparison-go-wemix",
+                  "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+                  "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+                  "source_mode": "working-tree",
+                  "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+                },
+                "conditions": {
+                  "network": "not-selected-source-study",
+                  "configuration": "clique-source-excerpts-no-live-network",
+                  "component_role": "l1",
+                  "observed_at": "2026-10-15T19:48:59+00:00"
+                },
+                "local_concept": "go-wemix transaction-ordering source excerpts",
+                "mapping": "close",
+                "reason": "Proposed mapping of pinned go-wemix transaction-ordering source excerpts for an unexecuted study; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "source-1",
+                      "kind": "code",
+                      "facets": [
+                        "ordering"
+                      ],
+                      "citation": {
+                        "file": "core/types/transaction.go",
+                        "start_line": 572,
+                        "end_line": 580,
+                        "commit_hash": "",
+                        "project_id": "comparison-go-wemix",
+                        "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+                        "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+                        "source_mode": "working-tree",
+                        "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc",
+                        "origin_id": "repo",
+                        "file_sha256": "d69de0c4166531878b8224515b0c180a09956e0a5add19806ccee405cd6c41a3",
+                        "content_sha256": "c21605f12236d78ffb4e9d2a275d1bfc57fb14ab05a8ae52104a9a9fdbd4c374"
+                      }
+                    },
+                    "body": "func (s TxByPriceAndTime) Less(i, j int) bool {\n\t// If the prices are equal, use the time the transaction was first seen for\n\t// deterministic sorting\n\tcmp := s[i].minerFee.Cmp(s[j].minerFee)\n\tif cmp == 0 {\n\t\treturn s[i].tx.time.Before(s[j].tx.time)\n\t}\n\treturn cmp > 0\n}\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "transaction-ordering"
+          },
+          "facet": "fairness",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    }
+  ],
+  "candidates": [],
+  "used_body_bytes": 1398,
+  "used_citations": 2,
+  "completeness_scope": "requested_project_facet_rows_only_not_all_project_evidence",
+  "final_assessment": "LLM_or_user_evaluates_tradeoffs_from_cited_evidence",
+  "omitted_candidates": 1,
+  "candidate_state": "budget_exceeded"
+}

@@ -1,0 +1,552 @@
+{
+  "phase": 63,
+  "kind": "WI4_actual_WORK_GOSSIP_POOL_DEV_not_independent_acceptance",
+  "previous_revision": "6094049ffc65e3ee77aec6469b74fc65c186a422",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "target_toolchain": {
+    "GOVERSION": "go1.23.12",
+    "GOOS": "darwin",
+    "GOARCH": "arm64",
+    "CGO_ENABLED": "1"
+  },
+  "planned_slots": [
+    {
+      "slot_id": "general-r1-WORK-normal",
+      "variant": "general",
+      "repetition": 1,
+      "group": "WORK",
+      "case_id": "WORK-normal"
+    },
+    {
+      "slot_id": "general-r1-WORK-exit",
+      "variant": "general",
+      "repetition": 1,
+      "group": "WORK",
+      "case_id": "WORK-exit"
+    },
+    {
+      "slot_id": "general-r1-WORK-both",
+      "variant": "general",
+      "repetition": 1,
+      "group": "WORK",
+      "case_id": "WORK-both"
+    },
+    {
+      "slot_id": "general-r1-WORK-backlog",
+      "variant": "general",
+      "repetition": 1,
+      "group": "WORK",
+      "case_id": "WORK-backlog"
+    },
+    {
+      "slot_id": "general-r1-GOSSIP-normal",
+      "variant": "general",
+      "repetition": 1,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-normal"
+    },
+    {
+      "slot_id": "general-r1-GOSSIP-fail-repeat",
+      "variant": "general",
+      "repetition": 1,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-fail-repeat"
+    },
+    {
+      "slot_id": "general-r1-GOSSIP-delay-repeat",
+      "variant": "general",
+      "repetition": 1,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-delay-repeat"
+    },
+    {
+      "slot_id": "general-r1-GOSSIP-cache-control",
+      "variant": "general",
+      "repetition": 1,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-cache-control"
+    },
+    {
+      "slot_id": "general-r1-POOL-normal",
+      "variant": "general",
+      "repetition": 1,
+      "group": "POOL",
+      "case_id": "POOL-normal"
+    },
+    {
+      "slot_id": "general-r1-POOL-lock-cycle",
+      "variant": "general",
+      "repetition": 1,
+      "group": "POOL",
+      "case_id": "POOL-lock-cycle"
+    },
+    {
+      "slot_id": "general-r1-POOL-buffer",
+      "variant": "general",
+      "repetition": 1,
+      "group": "POOL",
+      "case_id": "POOL-buffer"
+    },
+    {
+      "slot_id": "general-r1-POOL-unsubscribe",
+      "variant": "general",
+      "repetition": 1,
+      "group": "POOL",
+      "case_id": "POOL-unsubscribe"
+    },
+    {
+      "slot_id": "general-r2-WORK-normal",
+      "variant": "general",
+      "repetition": 2,
+      "group": "WORK",
+      "case_id": "WORK-normal"
+    },
+    {
+      "slot_id": "general-r2-WORK-exit",
+      "variant": "general",
+      "repetition": 2,
+      "group": "WORK",
+      "case_id": "WORK-exit"
+    },
+    {
+      "slot_id": "general-r2-WORK-both",
+      "variant": "general",
+      "repetition": 2,
+      "group": "WORK",
+      "case_id": "WORK-both"
+    },
+    {
+      "slot_id": "general-r2-WORK-backlog",
+      "variant": "general",
+      "repetition": 2,
+      "group": "WORK",
+      "case_id": "WORK-backlog"
+    },
+    {
+      "slot_id": "general-r2-GOSSIP-normal",
+      "variant": "general",
+      "repetition": 2,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-normal"
+    },
+    {
+      "slot_id": "general-r2-GOSSIP-fail-repeat",
+      "variant": "general",
+      "repetition": 2,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-fail-repeat"
+    },
+    {
+      "slot_id": "general-r2-GOSSIP-delay-repeat",
+      "variant": "general",
+      "repetition": 2,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-delay-repeat"
+    },
+    {
+      "slot_id": "general-r2-GOSSIP-cache-control",
+      "variant": "general",
+      "repetition": 2,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-cache-control"
+    },
+    {
+      "slot_id": "general-r2-POOL-normal",
+      "variant": "general",
+      "repetition": 2,
+      "group": "POOL",
+      "case_id": "POOL-normal"
+    },
+    {
+      "slot_id": "general-r2-POOL-lock-cycle",
+      "variant": "general",
+      "repetition": 2,
+      "group": "POOL",
+      "case_id": "POOL-lock-cycle"
+    },
+    {
+      "slot_id": "general-r2-POOL-buffer",
+      "variant": "general",
+      "repetition": 2,
+      "group": "POOL",
+      "case_id": "POOL-buffer"
+    },
+    {
+      "slot_id": "general-r2-POOL-unsubscribe",
+      "variant": "general",
+      "repetition": 2,
+      "group": "POOL",
+      "case_id": "POOL-unsubscribe"
+    },
+    {
+      "slot_id": "general-r3-WORK-normal",
+      "variant": "general",
+      "repetition": 3,
+      "group": "WORK",
+      "case_id": "WORK-normal"
+    },
+    {
+      "slot_id": "general-r3-WORK-exit",
+      "variant": "general",
+      "repetition": 3,
+      "group": "WORK",
+      "case_id": "WORK-exit"
+    },
+    {
+      "slot_id": "general-r3-WORK-both",
+      "variant": "general",
+      "repetition": 3,
+      "group": "WORK",
+      "case_id": "WORK-both"
+    },
+    {
+      "slot_id": "general-r3-WORK-backlog",
+      "variant": "general",
+      "repetition": 3,
+      "group": "WORK",
+      "case_id": "WORK-backlog"
+    },
+    {
+      "slot_id": "general-r3-GOSSIP-normal",
+      "variant": "general",
+      "repetition": 3,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-normal"
+    },
+    {
+      "slot_id": "general-r3-GOSSIP-fail-repeat",
+      "variant": "general",
+      "repetition": 3,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-fail-repeat"
+    },
+    {
+      "slot_id": "general-r3-GOSSIP-delay-repeat",
+      "variant": "general",
+      "repetition": 3,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-delay-repeat"
+    },
+    {
+      "slot_id": "general-r3-GOSSIP-cache-control",
+      "variant": "general",
+      "repetition": 3,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-cache-control"
+    },
+    {
+      "slot_id": "general-r3-POOL-normal",
+      "variant": "general",
+      "repetition": 3,
+      "group": "POOL",
+      "case_id": "POOL-normal"
+    },
+    {
+      "slot_id": "general-r3-POOL-lock-cycle",
+      "variant": "general",
+      "repetition": 3,
+      "group": "POOL",
+      "case_id": "POOL-lock-cycle"
+    },
+    {
+      "slot_id": "general-r3-POOL-buffer",
+      "variant": "general",
+      "repetition": 3,
+      "group": "POOL",
+      "case_id": "POOL-buffer"
+    },
+    {
+      "slot_id": "general-r3-POOL-unsubscribe",
+      "variant": "general",
+      "repetition": 3,
+      "group": "POOL",
+      "case_id": "POOL-unsubscribe"
+    },
+    {
+      "slot_id": "race-r1-WORK-normal",
+      "variant": "race",
+      "repetition": 1,
+      "group": "WORK",
+      "case_id": "WORK-normal"
+    },
+    {
+      "slot_id": "race-r1-WORK-exit",
+      "variant": "race",
+      "repetition": 1,
+      "group": "WORK",
+      "case_id": "WORK-exit"
+    },
+    {
+      "slot_id": "race-r1-WORK-both",
+      "variant": "race",
+      "repetition": 1,
+      "group": "WORK",
+      "case_id": "WORK-both"
+    },
+    {
+      "slot_id": "race-r1-WORK-backlog",
+      "variant": "race",
+      "repetition": 1,
+      "group": "WORK",
+      "case_id": "WORK-backlog"
+    },
+    {
+      "slot_id": "race-r1-GOSSIP-normal",
+      "variant": "race",
+      "repetition": 1,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-normal"
+    },
+    {
+      "slot_id": "race-r1-GOSSIP-fail-repeat",
+      "variant": "race",
+      "repetition": 1,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-fail-repeat"
+    },
+    {
+      "slot_id": "race-r1-GOSSIP-delay-repeat",
+      "variant": "race",
+      "repetition": 1,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-delay-repeat"
+    },
+    {
+      "slot_id": "race-r1-GOSSIP-cache-control",
+      "variant": "race",
+      "repetition": 1,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-cache-control"
+    },
+    {
+      "slot_id": "race-r1-POOL-normal",
+      "variant": "race",
+      "repetition": 1,
+      "group": "POOL",
+      "case_id": "POOL-normal"
+    },
+    {
+      "slot_id": "race-r1-POOL-lock-cycle",
+      "variant": "race",
+      "repetition": 1,
+      "group": "POOL",
+      "case_id": "POOL-lock-cycle"
+    },
+    {
+      "slot_id": "race-r1-POOL-buffer",
+      "variant": "race",
+      "repetition": 1,
+      "group": "POOL",
+      "case_id": "POOL-buffer"
+    },
+    {
+      "slot_id": "race-r1-POOL-unsubscribe",
+      "variant": "race",
+      "repetition": 1,
+      "group": "POOL",
+      "case_id": "POOL-unsubscribe"
+    },
+    {
+      "slot_id": "race-r2-WORK-normal",
+      "variant": "race",
+      "repetition": 2,
+      "group": "WORK",
+      "case_id": "WORK-normal"
+    },
+    {
+      "slot_id": "race-r2-WORK-exit",
+      "variant": "race",
+      "repetition": 2,
+      "group": "WORK",
+      "case_id": "WORK-exit"
+    },
+    {
+      "slot_id": "race-r2-WORK-both",
+      "variant": "race",
+      "repetition": 2,
+      "group": "WORK",
+      "case_id": "WORK-both"
+    },
+    {
+      "slot_id": "race-r2-WORK-backlog",
+      "variant": "race",
+      "repetition": 2,
+      "group": "WORK",
+      "case_id": "WORK-backlog"
+    },
+    {
+      "slot_id": "race-r2-GOSSIP-normal",
+      "variant": "race",
+      "repetition": 2,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-normal"
+    },
+    {
+      "slot_id": "race-r2-GOSSIP-fail-repeat",
+      "variant": "race",
+      "repetition": 2,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-fail-repeat"
+    },
+    {
+      "slot_id": "race-r2-GOSSIP-delay-repeat",
+      "variant": "race",
+      "repetition": 2,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-delay-repeat"
+    },
+    {
+      "slot_id": "race-r2-GOSSIP-cache-control",
+      "variant": "race",
+      "repetition": 2,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-cache-control"
+    },
+    {
+      "slot_id": "race-r2-POOL-normal",
+      "variant": "race",
+      "repetition": 2,
+      "group": "POOL",
+      "case_id": "POOL-normal"
+    },
+    {
+      "slot_id": "race-r2-POOL-lock-cycle",
+      "variant": "race",
+      "repetition": 2,
+      "group": "POOL",
+      "case_id": "POOL-lock-cycle"
+    },
+    {
+      "slot_id": "race-r2-POOL-buffer",
+      "variant": "race",
+      "repetition": 2,
+      "group": "POOL",
+      "case_id": "POOL-buffer"
+    },
+    {
+      "slot_id": "race-r2-POOL-unsubscribe",
+      "variant": "race",
+      "repetition": 2,
+      "group": "POOL",
+      "case_id": "POOL-unsubscribe"
+    },
+    {
+      "slot_id": "race-r3-WORK-normal",
+      "variant": "race",
+      "repetition": 3,
+      "group": "WORK",
+      "case_id": "WORK-normal"
+    },
+    {
+      "slot_id": "race-r3-WORK-exit",
+      "variant": "race",
+      "repetition": 3,
+      "group": "WORK",
+      "case_id": "WORK-exit"
+    },
+    {
+      "slot_id": "race-r3-WORK-both",
+      "variant": "race",
+      "repetition": 3,
+      "group": "WORK",
+      "case_id": "WORK-both"
+    },
+    {
+      "slot_id": "race-r3-WORK-backlog",
+      "variant": "race",
+      "repetition": 3,
+      "group": "WORK",
+      "case_id": "WORK-backlog"
+    },
+    {
+      "slot_id": "race-r3-GOSSIP-normal",
+      "variant": "race",
+      "repetition": 3,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-normal"
+    },
+    {
+      "slot_id": "race-r3-GOSSIP-fail-repeat",
+      "variant": "race",
+      "repetition": 3,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-fail-repeat"
+    },
+    {
+      "slot_id": "race-r3-GOSSIP-delay-repeat",
+      "variant": "race",
+      "repetition": 3,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-delay-repeat"
+    },
+    {
+      "slot_id": "race-r3-GOSSIP-cache-control",
+      "variant": "race",
+      "repetition": 3,
+      "group": "GOSSIP",
+      "case_id": "GOSSIP-cache-control"
+    },
+    {
+      "slot_id": "race-r3-POOL-normal",
+      "variant": "race",
+      "repetition": 3,
+      "group": "POOL",
+      "case_id": "POOL-normal"
+    },
+    {
+      "slot_id": "race-r3-POOL-lock-cycle",
+      "variant": "race",
+      "repetition": 3,
+      "group": "POOL",
+      "case_id": "POOL-lock-cycle"
+    },
+    {
+      "slot_id": "race-r3-POOL-buffer",
+      "variant": "race",
+      "repetition": 3,
+      "group": "POOL",
+      "case_id": "POOL-buffer"
+    },
+    {
+      "slot_id": "race-r3-POOL-unsubscribe",
+      "variant": "race",
+      "repetition": 3,
+      "group": "POOL",
+      "case_id": "POOL-unsubscribe"
+    }
+  ],
+  "retries": 0,
+  "parallelism": 2,
+  "build_timeout_seconds": 600,
+  "test_timeout_seconds": 20,
+  "owned_process_timeout_seconds": 25,
+  "source_patch": "test_only_additions_in_three_packages_no_tracked_source_changes",
+  "routes": {
+    "WORK": "actual newWorkLoop dispatch to Origin with Anzeon nil and controlled head events; pendingMu barrier establishes exit/send readiness before commit; both legal outcomes retained; finite backlog not fairness/production termination SLA",
+    "GOSSIP": "actual Broadcast validator check/Gossip/cache/mux with one owned fake peer; fake success/failure/delay is not network delivery; serialized duplicate and distinct hash controls",
+    "POOL": "actual New/Init/Reset/reorg/reinject/SubscribeTransactions/Stats with owned temporary blob stores and test chain; nonempty reinjected adds and successful StateAt must be proved before source Send lock observation; controlled subscriber is not production reachability"
+  },
+  "security": {
+    "external_network_or_node_control": false,
+    "system_clock_change": false,
+    "credential_environment_inheritance": false,
+    "global_install_or_settings": false,
+    "publication": false,
+    "paid_or_external_LLM": false,
+    "owned_process_groups_only": true,
+    "observation_frozen_before_cleanup_rescue": true
+  },
+  "failure_policy": "preserve every failed build/slot and actual error; no unrecorded retries or outcome replacement; missing/unproved preconditions cannot pass",
+  "acceptance_limits": {
+    "new_independent_families": 0,
+    "independent_approved": 0,
+    "FINAL": 0,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "full_original_driver_acceptance": 0,
+    "freeze": null,
+    "execution_allowed": false,
+    "quality_score": null
+  },
+  "remaining": "independent semantics/families/oracles/sufficiency, full host and timing contracts; all other WI and ontology debts stay pending"
+}

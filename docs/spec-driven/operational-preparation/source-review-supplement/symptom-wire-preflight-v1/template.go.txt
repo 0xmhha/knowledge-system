@@ -1,0 +1,116 @@
+package mcp
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"testing"
+)
+
+type symptomWireEnvelope struct {
+	Kind             string `json:"kind"`
+	ExecutionAllowed bool   `json:"execution_allowed"`
+	SourceCommit     string `json:"source_commit"`
+	Requests         []struct {
+		CaseID    string         `json:"case_id"`
+		Name      string         `json:"name"`
+		Arguments map[string]any `json:"arguments"`
+	} `json:"requests"`
+}
+
+// This public-input policy is narrower than the general MCP tool schema.
+// Symbol/site/expansion seeds remain valid API modes, but are not this test's input.
+func validatePublicSymptomArgs(args map[string]any) error {
+	allowed := map[string]bool{"symptom": true, "commit": true, "max_candidates": true,
+		"max_seeds": true, "max_enriched": true, "max_calls": true, "depth": true, "budget_ms": true}
+	if len(args) != len(allowed) {
+		return fmt.Errorf("public request must have exactly the declared fields")
+	}
+	for key := range args {
+		if !allowed[key] {
+			return fmt.Errorf("private field or seed hint: %s", key)
+		}
+	}
+	return nil
+}
+
+func TestSymptomWirePreflight(t *testing.T) {
+	raw, err := os.ReadFile(os.Getenv("KS_SYMPTOM_WIRE_PATH"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var wire symptomWireEnvelope
+	if err = json.Unmarshal(raw, &wire); err != nil {
+		t.Fatal(err)
+	}
+	if wire.Kind != "public_symptom_wire_preflight_only" || wire.ExecutionAllowed || len(wire.Requests) != 20 {
+		t.Fatal("invalid preparation envelope")
+	}
+	for _, request := range wire.Requests {
+		t.Run(request.CaseID, func(t *testing.T) {
+			if request.Name != ToolNameLabelSuspects {
+				t.Fatal("wrong tool")
+			}
+			if err := validatePublicSymptomArgs(request.Arguments); err != nil {
+				t.Fatal(err)
+			}
+			r, expand, err := parseSuspectRequest(callToolReq(request.Arguments))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = r.Defaults(); err != nil {
+				t.Fatal(err)
+			}
+			if r.Symbol != "" || r.File != "" || r.Line != 0 || len(expand) != 0 || len(r.Expand) != 0 {
+				t.Fatal("request contains a location seed")
+			}
+			if r.Commit != wire.SourceCommit || r.MaxCandidates != 10 || r.MaxSeeds != 3 || r.MaxEnriched != 3 || r.MaxCalls != 32 || r.Depth != 2 || r.BudgetMS != 1000 {
+				t.Fatal("source assertion or bounds mismatch")
+			}
+			observation := map[string]any{"case_id": request.CaseID, "name": request.Name,
+				"symptom_bytes": len(r.Symptom), "commit": r.Commit, "seed_mode": "text_only",
+				"parser_accepted": true, "defaults_accepted": true, "backend_calls": 0}
+			encoded, _ := json.Marshal(observation)
+			t.Log("WIRE_OBSERVATION " + string(encoded))
+		})
+	}
+}
+
+func TestSymptomWirePreflightControls(t *testing.T) {
+	controls := []struct {
+		name, stage string
+		args        map[string]any
+		valid       bool
+	}{
+		{"minimal_defaults", "parser_defaults", map[string]any{"symptom": "controlled input"}, true},
+		{"unknown_gold_field", "parser_defaults", map[string]any{"symptom": "controlled input", "expected_answer": "synthetic control"}, false},
+		{"fractional_candidates", "parser_defaults", map[string]any{"symptom": "controlled input", "max_candidates": 1.5}, false},
+		{"insufficient_call_budget", "parser_defaults", map[string]any{"symptom": "controlled input", "max_calls": 3}, false},
+		{"site_without_line", "parser_defaults", map[string]any{"symptom": "controlled input", "file": "synthetic.go"}, false},
+		{"public_seed_hint", "public_input_policy", map[string]any{"symptom": "controlled input", "symbol": "SyntheticControl"}, false},
+	}
+	for _, c := range controls {
+		t.Run(c.name, func(t *testing.T) {
+			var err error
+			if c.stage == "public_input_policy" {
+				err = validatePublicSymptomArgs(c.args)
+			} else {
+				r, _, e := parseSuspectRequest(callToolReq(c.args))
+				err = e
+				if err == nil {
+					err = r.Defaults()
+					if c.valid && err == nil && (r.MaxCandidates != 10 || r.MaxCalls != 32 || r.Depth != 2 || r.BudgetMS != 1000) {
+						t.Fatal("minimal request defaults changed")
+					}
+				}
+			}
+			if (err == nil) != c.valid {
+				t.Fatalf("control validity mismatch: %v", err)
+			}
+			observation := map[string]any{"control_id": c.name, "stage": c.stage,
+				"expected_valid": c.valid, "observed_valid": err == nil, "backend_calls": 0}
+			encoded, _ := json.Marshal(observation)
+			t.Log("WIRE_CONTROL " + string(encoded))
+		})
+	}
+}

@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Validate and persist bounded CKS observations separately from agent judgments."""
+import argparse
+import hashlib
+import json
+import math
+from pathlib import Path
+
+SIGNALS=('distance','relations','impact_category','recency','concurrency','retrieval','security_tag','dataflow_on_path')
+ABSENT={'unavailable','not_requested','unsupported','error','budget_exhausted'}
+STOP={'sufficient_evidence','no_new_candidates','budget_exhausted','awaiting_observation','backend_unavailable'}
+MAX_ROUNDS=3
+MAX_CANDIDATES=20
+MAX_CALLS=96
+
+class Invalid(ValueError):pass
+
+def require(ok,message):
+    if not ok:raise Invalid(message)
+
+def number(v):return isinstance(v,(int,float)) and not isinstance(v,bool) and math.isfinite(v)
+def integer(v,lo=0,hi=1_000_000):return number(v) and int(v)==v and lo<=v<=hi
+
+def citation(c,snapshot):
+    require(isinstance(c,dict),'citation must be object')
+    file=c.get('file');require(isinstance(file,str) and file and not file.startswith(('/','../','.claude/','logs/','@cks/')) and '\\' not in file and all(part not in ('','..','.') for part in file.split('/')),'invalid citation file')
+    require(integer(c.get('start_line'),1) and integer(c.get('end_line'),c['start_line']),'invalid citation lines')
+    require(c.get('commit_hash')==snapshot,'citation snapshot mismatch')
+    return (file,c['start_line'],c['end_line'],snapshot)
+
+def retained(c,base,coords):
+    require(isinstance(c,dict),'retained citation missing')
+    require(all(c.get(k)==coords.get(k) for k in ('project_id','dataset_id','snapshot_id','source_mode','base_commit')),'retained coordinates mismatch')
+    require(c.get('file')==base['file'] and c.get('start_line')==base['start_line'] and c.get('end_line')==base['end_line'] and c.get('origin_id')=='repo','retained source location mismatch')
+    require(c.get('commit_hash')==(coords['base_commit'] if coords['source_mode']=='committed' else ''),'retained commit misrepresented')
+    for key in ('file_sha256','content_sha256'):
+        value=c.get(key);require(isinstance(value,str) and len(value)==64 and all(ch in '0123456789abcdef' for ch in value),'invalid source hash')
+
+def validate_response(r):
+    require(isinstance(r,dict) and r.get('schema_version')==1,'wrong label schema')
+    require(isinstance(r.get('symptom'),str) and r['symptom'].strip(),'symptom missing')
+    snapshot=r.get('snapshot');require(isinstance(snapshot,str),'snapshot missing')
+    coords=r.get('coordinates')
+    if coords is not None:
+        require(isinstance(coords,dict) and all(isinstance(coords.get(k),str) for k in ('project_id','dataset_id','snapshot_id','source_mode','base_commit')),'invalid coordinates')
+        require(all(coords[k] for k in ('project_id','dataset_id','snapshot_id')) and coords['base_commit']==snapshot and coords['source_mode'] in ('committed','working-tree','snapshot-only'),'invalid pinned source identity')
+    else:require(bool(snapshot),'unpinned snapshot missing')
+    require(type(r.get('partial')) is bool,'partial must be boolean')
+    b=r.get('budget');require(isinstance(b,dict),'budget missing')
+    for key,lo,hi in [('max_candidates',1,20),('max_seeds',1,8),('max_enriched',1,8),('max_calls',4,64),('depth',1,3),('time_budget_ms',10,5000)]:require(integer(b.get(key),lo,hi),'invalid '+key)
+    require(integer(b.get('calls'),0,b['max_calls']) and integer(b.get('elapsed_ms')),'budget count invalid')
+    require(isinstance(b.get('stop_reasons'),list) and all(isinstance(x,str) for x in b['stop_reasons']),'stop reasons missing')
+    require(not b['stop_reasons'] or r['partial'],'incomplete observations marked complete')
+    candidates=r.get('candidates');require(isinstance(candidates,list) and 0<len(candidates)<=b['max_candidates'],'candidate cap invalid')
+    seen=set()
+    for c in candidates:
+        key=citation(c.get('citation'),snapshot);require(key not in seen,'duplicate candidate');seen.add(key)
+        require(c.get('symbol') is None or isinstance(c['symbol'],str),'invalid symbol')
+        if coords is not None:retained(c.get('retained_citation'),c['citation'],coords)
+        else:require(c.get('retained_citation') is None,'unbound retained citation')
+        signals=c.get('signals');require(isinstance(signals,dict) and set(signals)==set(SIGNALS),'signal set mismatch')
+        for name in SIGNALS:
+            s=signals[name];require(isinstance(s,dict) and 'value' in s,'explicit signal value missing')
+            status=s.get('status');require(status=='observed' or status in ABSENT,'unknown signal status')
+            value=s['value'];provenance=s.get('provenance');require(isinstance(provenance,list),'provenance missing')
+            if status in ABSENT:require(value is None and isinstance(s.get('reason'),str) and bool(s['reason']),'unavailable signal must be null with reason')
+            else:
+                require(value is not None and len(provenance)>0,'observed signal requires value and provenance')
+                if name=='distance':require(integer(value,0,b['depth']),'invalid distance')
+                elif name in ('relations','impact_category','security_tag'):require(isinstance(value,list) and all(isinstance(x,str) for x in value),'invalid list signal')
+                elif name=='dataflow_on_path':require(type(value) is bool,'invalid dataflow signal')
+                elif name=='recency':require(isinstance(value,dict) and integer(value.get('pr_count'),0,10) and isinstance(value.get('scope'),str) and 'not commit count' in value['scope'] and (value.get('last_merged_at') is None or isinstance(value.get('last_merged_at'),str)),'unscoped history signal')
+                elif name=='concurrency':require(isinstance(value,dict) and type(value.get('touched')) is bool and isinstance(value.get('direction'),list) and all(x in ('affects','affected_by','both') for x in value['direction']),'invalid concurrency signal')
+                elif name=='retrieval':require(isinstance(value,list) and len(value)>0 and all(isinstance(x,dict) and integer(x.get('rank'),1) and number(x.get('score')) and x.get('source') in ('graph','vector') for x in value),'invalid retrieval observation')
+            for p in provenance:
+                require(isinstance(p,dict) and isinstance(p.get('tool'),str) and p['tool'] and p.get('snapshot')==snapshot,'signal provenance mismatch')
+                citation(p.get('anchor'),snapshot)
+                if coords is not None:retained(p.get('retained_anchor'),p['anchor'],coords)
+    return r
+
+def canonical(value):return json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()
+def digest(value):return hashlib.sha256(canonical(value)).hexdigest()
+
+def check_contract(tools,contract_path=None):
+    path=contract_path or Path(__file__).resolve().parents[1]/'contracts'/'cks-tools.schema.json'
+    # Installed plugin layouts may place the repository contract separately.
+    contract=json.loads(Path(path).read_text())['providers']['cks']['tools']
+    observed={t['name']:t for t in tools};expected={t['wire_name']:t for t in contract.values()}
+    require(set(observed)==set(expected),'registered CKS tool set differs from consumer contract')
+    def semantics(v):
+        if isinstance(v,dict):return {k:semantics(x) for k,x in v.items() if k not in ('description','title')}
+        if isinstance(v,list):return [semantics(x) for x in v]
+        return v
+    for name,want in expected.items():require(semantics(observed[name]['inputSchema'])==semantics(want['input']),'input schema differs: '+name)
+    require(len({name.replace('.','_') for name in expected})==len(expected),'host normalization collision')
+    for alias,tool in contract.items():require(alias==tool['wire_name'].replace('.','_'),'host alias differs from explicit wire name')
+    return len(expected)
+
+def append_round(state,response,stop=None,judgments=None):
+    validate_response(response)
+    if state is None:state={'schema_version':1,'symptom':response['symptom'],'snapshot':response['snapshot'],'coordinates':response['coordinates'],'rounds':[],'judgments':[],'stop_reason':None,'acceptance':'not_recorded'}
+    require(state.get('schema_version')==1 and state.get('acceptance')=='not_recorded','labels cannot assert cause acceptance')
+    require(state.get('stop_reason') is None,'investigation already stopped')
+    require(len(state['rounds'])<MAX_ROUNDS,'round cap reached')
+    for prior in state['rounds']:
+        validate_response(prior['response']);require(digest(prior['response'])==prior['sha256'],'prior response hash mismatch')
+    require(all(state[k]==response[k] for k in ('symptom','snapshot','coordinates')),'mixed investigation context')
+    total_calls=sum(x['response']['budget']['calls'] for x in state['rounds'])+response['budget']['calls'];require(total_calls<=MAX_CALLS,'total call cap reached')
+    all_candidates={citation(c['citation'],state['snapshot']) for x in state['rounds'] for c in x['response']['candidates']}
+    all_candidates.update(citation(c['citation'],state['snapshot']) for c in response['candidates']);require(len(all_candidates)<=MAX_CANDIDATES,'total candidate cap reached')
+    for j in judgments or []:
+        require(isinstance(j,dict) and j.get('origin')=='agent_judgment' and j.get('state') in ('candidate','rejected','unknown') and isinstance(j.get('rationale'),str) and j['rationale'].strip(),'invalid separate agent judgment')
+        require(citation(j.get('citation'),state['snapshot']) in all_candidates,'judgment refers to unknown candidate')
+        require(isinstance(j.get('unknowns'),list) and all(isinstance(u,str) for u in j['unknowns']),'judgment unknowns required')
+    require(stop is None or stop in STOP,'unknown stop reason')
+    state['rounds'].append({'sha256':digest(response),'response':response});state['judgments'].extend(judgments or [])
+    state['total_calls']=total_calls;state['candidate_count']=len(all_candidates)
+    state['stop_reason']=stop or ('budget_exhausted' if len(state['rounds'])>=MAX_ROUNDS or total_calls>=MAX_CALLS else None)
+    return state
+
+def verify_state(state,finished=True):
+    require(isinstance(state,dict) and state.get('schema_version')==1 and state.get('acceptance')=='not_recorded','labels cannot assert cause acceptance')
+    if state.get('status')=='unavailable':
+        failure=state.get('failure');require(isinstance(failure,dict),'failed tool receipt required')
+        request=failure.get('request');response=failure.get('response')
+        require(isinstance(request,dict) and request.get('name')=='cks.context.label_suspects' and isinstance(request.get('arguments'),dict) and isinstance(request['arguments'].get('symptom'),str) and request['arguments']['symptom'].strip(),'actual label request required')
+        require(isinstance(response,dict) and response.get('isError') is True and bool(response.get('content')),'actual failed tool result required')
+        require(isinstance(state.get('reason'),str) and state['reason'].strip(),'failure reason missing')
+        return state
+    rounds=state.get('rounds');require(isinstance(rounds,list) and 0<len(rounds)<=MAX_ROUNDS,'invalid investigation rounds')
+    require(not finished or state.get('stop_reason') in STOP,'finished investigation needs stop reason')
+    rebuilt=None
+    for i,prior in enumerate(rounds):
+        require(isinstance(prior,dict) and digest(prior.get('response'))==prior.get('sha256'),'prior response hash mismatch')
+        last=i==len(rounds)-1
+        rebuilt=append_round(rebuilt,prior['response'],state.get('stop_reason') if last else None,state.get('judgments',[]) if last else [])
+    require(rebuilt==state,'investigation metadata differs from verified responses')
+    return state
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--check');p.add_argument('--round');p.add_argument('--state');p.add_argument('--judgments');p.add_argument('--stop',choices=sorted(STOP));p.add_argument('--check-contract');p.add_argument('--contract');a=p.parse_args()
+    if a.check:
+        verify_state(json.loads(Path(a.check).read_text()));print('factual label artifact: PASS; cause acceptance not recorded');return
+    if a.check_contract:
+        print('CKS input contract: PASS (%d tools)'%check_contract(json.loads(Path(a.check_contract).read_text()),a.contract));return
+    require(a.round and a.state,'round and state required');path=Path(a.state)
+    response=json.loads(Path(a.round).read_text());state=json.loads(path.read_text()) if path.exists() else None
+    if state is not None:verify_state(state,finished=False)
+    judgments=json.loads(Path(a.judgments).read_text()) if a.judgments else []
+    state=append_round(state,response,a.stop,judgments);raw=json.dumps(state,indent=2,ensure_ascii=False,allow_nan=False)+'\n'
+    temp=path.with_name(path.name+'.pending');temp.write_text(raw);temp.replace(path)
+    print('factual labels recorded: rounds=%d candidates=%d calls=%d acceptance=not_recorded'%(len(state['rounds']),state['candidate_count'],state['total_calls']))
+
+if __name__=='__main__':
+    try:main()
+    except (Invalid,ValueError,KeyError,TypeError,OSError) as e:raise SystemExit('suspect labels refused: '+str(e))

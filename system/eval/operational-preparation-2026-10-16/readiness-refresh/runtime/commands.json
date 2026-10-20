@@ -1,0 +1,196 @@
+[
+  {
+    "label": "toolchain-root",
+    "argv": [
+      "go",
+      "env",
+      "GOROOT"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "b0adc50fc2f16a967880db34ffe8fd90376cc7f8706cfd923be4cdb281044d1d",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "knowledge-head",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "68bc711dcc094240e30ac1baacbcdfb1ae332e6586892e83cc9cac306545eb97",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "clone",
+    "argv": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+      "/private/tmp/ks-acceptance-readiness-final-20261016/knowledge-source"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "sparse",
+    "argv": [
+      "git",
+      "sparse-checkout",
+      "set",
+      "cmd",
+      "internal",
+      "pkg"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-final-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "checkout",
+    "argv": [
+      "git",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "3a530a25b6a96b7f3bc2bcfb2605806316b221f0"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-final-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "source-status",
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-final-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "source-tree",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD^{tree}"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-final-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "bb0870ace021eca5763a140a899120309dc309d6f87db2f9a4bc3ee4ba56f786",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/ks-acceptance-readiness-final-20261016/cks",
+      "./cmd/cks"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-final-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "buildinfo",
+    "argv": [
+      "go",
+      "version",
+      "-m",
+      "/private/tmp/ks-acceptance-readiness-final-20261016/cks"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "bcbb7eba80b3a7adefcfd738c9caa70628053b13430740223b39c057427c3033",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "coding_agent-head",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/private/tmp/ks-isolated-host-20261015/coding-agent",
+    "exit_code": 0,
+    "stdout_sha256": "b2551ddb74c9c163c994397c0b06982afdfeaa7ffdb65e340169be20007d6cab",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "coding_agent-status",
+    "argv": [
+      "git",
+      "status",
+      "--porcelain",
+      "--untracked-files=no"
+    ],
+    "cwd": "/private/tmp/ks-isolated-host-20261015/coding-agent",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "chainbench-head",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/private/tmp/ks-isolated-host-20261015/chainbench",
+    "exit_code": 0,
+    "stdout_sha256": "4180213c1fc8cd2907cb0c6e070e394951cde249e163bf753980a99901fcebf4",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "chainbench-status",
+    "argv": [
+      "git",
+      "status",
+      "--porcelain",
+      "--untracked-files=no"
+    ],
+    "cwd": "/private/tmp/ks-isolated-host-20261015/chainbench",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "claude-version",
+    "argv": [
+      "/Users/kevin/.local/share/claude/versions/2.1.301",
+      "--version"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "f98cef0381704b555d9188ed0ac009867d71df3478510517617c28f5a5054953",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "chainbench-buildinfo",
+    "argv": [
+      "go",
+      "version",
+      "-m",
+      "/private/tmp/ks-isolated-host-20261015/bin/chainbench-mcp"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "39a6fc6ce8ae5de9343c91904b3ba1740fc04f982c7da6fbd70f61986fe2c666",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

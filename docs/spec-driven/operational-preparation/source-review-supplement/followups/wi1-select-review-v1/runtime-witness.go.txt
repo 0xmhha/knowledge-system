@@ -1,0 +1,12 @@
+package main
+import("encoding/json"; "os")
+func main(){
+ ch:=make(chan int,2);ch<-3;ch<-8
+ seen:=[]int{};after:=[]int{}
+ for i:=0;i<2;i++ { select { case interval:=<-ch:
+  seen=append(seen,interval)
+  if interval<5 { interval=5 }
+  after=append(after,interval)
+ } }
+ json.NewEncoder(os.Stdout).Encode(map[string]any{"before":seen,"after":after})
+}

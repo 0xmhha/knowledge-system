@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "read_only_host_cli_and_consumer_source_not_workflow_execution",
+  "observed_at": "2026-10-14T21:20:05.607471+00:00",
+  "host": {
+    "path": "/Users/kevin/.local/bin/claude",
+    "version": "2.1.299 (Claude Code)",
+    "provider_model": null,
+    "authentication_status": "not_inspected",
+    "installed_plugin_status": "not_verified"
+  },
+  "captures": [
+    {
+      "path": "docs/spec-driven/operational-preparation/cks-mcp-help.txt",
+      "sha256": "b251d451e78194a4a4381812be7e4a888932378c53f5e4c170ba03b51f7c29a8"
+    },
+    {
+      "path": "docs/spec-driven/operational-preparation/claude-help.txt",
+      "sha256": "550db4f88ae1d97bf7244ca96dc89554aabd3978241ceb69f79001e816c35f09"
+    },
+    {
+      "path": "docs/spec-driven/operational-preparation/claude-version.txt",
+      "sha256": "ef4d2897d99d5c08a3b3983ad569ca6dff51c2bb752b5974abb610572da3c18e"
+    }
+  ],
+  "consumer_source_commit": "fdb4d515d891cbacef032ac0c431c94dc20aa946",
+  "consumer_sources": [
+    {
+      "repository": "/private/tmp/ks-upper-wi-coding-agent",
+      "path": "plugin/.mcp.json",
+      "sha256": "db1d562dea3144bb1a59fab06ff14baa7890c5788e19b51fb0a72bf342943596",
+      "source_commit": "fdb4d515d891cbacef032ac0c431c94dc20aa946"
+    },
+    {
+      "repository": "/private/tmp/ks-upper-wi-coding-agent",
+      "path": "plugin/hooks/hooks.json",
+      "sha256": "96854cabf7c619be8373e5b1ab9c89966cbda0aeeca0a8370b1c111baf166a9c",
+      "source_commit": "fdb4d515d891cbacef032ac0c431c94dc20aa946"
+    },
+    {
+      "repository": "/private/tmp/ks-upper-wi-coding-agent",
+      "path": "plugin/commands/analyze.md",
+      "sha256": "3ec56ddac34c8fbd8221b470972ae62927374c7b9d743c244589506fce8de707",
+      "source_commit": "fdb4d515d891cbacef032ac0c431c94dc20aa946"
+    },
+    {
+      "repository": "/private/tmp/ks-upper-wi-coding-agent",
+      "path": "plugin/agents/orchestrator.md",
+      "sha256": "9ada2d7a2bc080acdf5c51c74ac2d0159f12c03d9b9ec1f2a87e184a3233a761",
+      "source_commit": "fdb4d515d891cbacef032ac0c431c94dc20aa946"
+    },
+    {
+      "repository": "/private/tmp/ks-upper-wi-coding-agent",
+      "path": "plugin/hooks/git-guard.py",
+      "sha256": "b37613192b1f448ba8acd392fd5cf3ca775cc0430ca34f25a0cb9030b5080b40",
+      "source_commit": "fdb4d515d891cbacef032ac0c431c94dc20aa946"
+    },
+    {
+      "repository": "/private/tmp/ks-upper-wi-chainbench",
+      "path": "cmd/chainbench-mcp/main.go",
+      "sha256": "32807a5ef584e783c9dc4252768a04e0fea630cab793b054c10cfeda5cebe83b",
+      "source_commit": "df464d4b97fde4ab308c5c422024dc80518e5956"
+    },
+    {
+      "repository": "/private/tmp/ks-upper-wi-coding-agent",
+      "source_commit": "fdb4d515d891cbacef032ac0c431c94dc20aa946",
+      "path": "plugin/hooks/on-stop.py",
+      "sha256": "1fae7cc653c9a6af18c04b02843bf78780724a10d38ca23f46bad2bb6dce7d93"
+    }
+  ],
+  "source_findings": [
+    {
+      "id": "HOST-01",
+      "finding": "local requirement entry does not eliminate push/PR after evaluation; auto_merge=false only guards merge",
+      "basis": [
+        "plugin/commands/analyze.md",
+        "plugin/agents/orchestrator.md"
+      ],
+      "runtime_confirmed": false
+    },
+    {
+      "id": "HOST-02",
+      "finding": "plugin MCP defaults include jira-gateway, HTTP CKS and stdio chainbench; isolated explicit server configuration compatibility requires actual host verification",
+      "basis": [
+        "plugin/.mcp.json"
+      ],
+      "runtime_confirmed": false
+    },
+    {
+      "id": "LIFECYCLE-01",
+      "finding": "ChainBench stdio main uses context.Background and Scanner with no signal.NotifyContext in entrypoint; SIGTERM exit0 is not established",
+      "basis": [
+        "cmd/chainbench-mcp/main.go"
+      ],
+      "runtime_confirmed": false
+    },
+    {
+      "id": "HOST-03",
+      "finding": "auto-mode Stop hook blocks a recent nonterminal workspace stop and asks to continue; stopping at evaluation by prompt is not a verified publication boundary",
+      "basis": [
+        "plugin/hooks/on-stop.py"
+      ],
+      "runtime_confirmed": false
+    }
+  ],
+  "model_calls": 0,
+  "agent_sessions_started": 0,
+  "nodes_started": 0
+}

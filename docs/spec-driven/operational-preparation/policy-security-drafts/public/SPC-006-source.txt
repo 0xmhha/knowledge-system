@@ -1,0 +1,3 @@
+func GetBLSPublicKey(govValidatorAddress common.Address, state StateReader, val common.Address) []byte {
+	return GetBytes(state, govValidatorAddress, CalculateMappingSlot(common.HexToHash(SLOT_VALIDATOR_validatorToBlsKey), val))
+}

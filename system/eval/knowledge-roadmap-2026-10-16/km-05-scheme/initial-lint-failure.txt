@@ -1,0 +1,9 @@
+go build ./...
+go vet ./...
+/Users/kevin/.gvm/pkgsets/go1.26.8/global/bin/golangci-lint run --timeout 15m ./...
+internal/system/comparison/scheme.go:142:6: QF1001: could apply De Morgan's law (staticcheck)
+		if !(r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '-') {
+		   ^
+1 issues:
+* staticcheck: 1
+make: *** [golangci] Error 1

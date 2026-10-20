@@ -1,0 +1,13 @@
+import hashlib,json,os
+from pathlib import Path
+owned=Path('/private/tmp/ks-collection-isolation-20261015-final').resolve()
+packet=Path.cwd()/'system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation'
+preservation=json.loads((packet/'preservation.json').read_text())
+after={'files':{},'current_pointers':{},'capture_stage':'after all three MCP processes exited and intentional rollback restored','owned_fixture':str(owned)}
+for name in preservation['files']:
+ p=Path(name);assert p.resolve().is_relative_to(owned);after['files'][name]=hashlib.sha256(p.read_bytes()).hexdigest()
+for name in preservation['current_pointers']:
+ p=Path(name);assert p.parent.resolve().is_relative_to(owned);after['current_pointers'][name]=os.readlink(p)
+assert after['files']==preservation['files'] and after['current_pointers']==preservation['current_pointers']
+(packet/'post-run-state.json').write_text(json.dumps(after,indent=2)+'\n')
+print('independent post-run capture:',len(after['files']),'file hashes and',len(after['current_pointers']),'pointers match runtime-before')

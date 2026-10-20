@@ -1,0 +1,352 @@
+// This test-only probe is compiled inside the unchanged upstream downloader
+// package. It uses the upstream test helper and actual API methods; it never
+// substitutes the eventLoop or Unsubscribe implementation.
+package downloader
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"runtime"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/ethereum/go-ethereum/event"
+)
+
+type wi4Recorder struct {
+	mu           sync.Mutex
+	file         *os.File
+	start        time.Time
+	seq          int
+	caseID, path string
+}
+
+func (r *wi4Recorder) emit(event string, fields map[string]interface{}) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.seq++
+	if fields == nil {
+		fields = map[string]interface{}{}
+	}
+	fields["event"] = event
+	fields["case_id"] = r.caseID
+	fields["sequence"] = r.seq
+	fields["elapsed_ns"] = time.Since(r.start).Nanoseconds()
+	if err := json.NewEncoder(r.file).Encode(fields); err != nil {
+		panic(err)
+	}
+}
+func wi4Stacks() string { b := make([]byte, 2<<20); n := runtime.Stack(b, true); return string(b[:n]) }
+func wi4Frame(s, method string, line int) bool {
+	for _, g := range strings.Split(s, "\n\n") {
+		if strings.Contains(g, method) && strings.Contains(g, fmt.Sprintf("/eth/downloader/api.go:%d", line)) && strings.Contains(g, "[chan send]") {
+			return true
+		}
+	}
+	return false
+}
+func (r *wi4Recorder) snapshot(t *testing.T, name string) string {
+	t.Helper()
+	s := wi4Stacks()
+	if err := os.WriteFile(r.path+"."+name+".stack", []byte(s), 0600); err != nil {
+		t.Fatal(err)
+	}
+	return s
+}
+func wi4Until(t *testing.T, timeout time.Duration, what string, predicate func() bool) {
+	t.Helper()
+	end := time.Now().Add(timeout)
+	for time.Now().Before(end) {
+		if predicate() {
+			return
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	_ = os.WriteFile(os.Getenv("WI4_TRACE_PATH")+".precondition-timeout.stack", []byte(wi4Stacks()), 0600)
+	t.Fatalf("precondition/cleanup not proved: %s", what)
+}
+func wi4Await(t *testing.T, ch <-chan struct{}, what string) bool {
+	t.Helper()
+	select {
+	case <-ch:
+		return true
+	case <-time.After(2 * time.Second):
+		t.Errorf("join not proved: %s", what)
+		return false
+	}
+}
+func wi4Pending(t *testing.T, done <-chan struct{}) {
+	t.Helper()
+	select {
+	case <-done:
+		t.Fatal("unmodelled early return")
+	case <-time.After(2 * time.Second):
+	}
+}
+
+func TestWI4OwnedSubscription(t *testing.T) {
+	id, path := os.Getenv("WI4_CASE"), os.Getenv("WI4_TRACE_PATH")
+	if path == "" {
+		t.Fatal("owned trace path required")
+	}
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := &wi4Recorder{file: f, start: time.Now(), caseID: id, path: path}
+	t.Cleanup(func() {
+		r.emit("trace_end", map[string]interface{}{"test_failed": t.Failed()})
+		if err := f.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	r.emit("trace_begin", map[string]interface{}{"native_timer_seconds": 60, "step_watchdog_ms": 2000, "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"})
+	switch id {
+	case "SUB-normal", "SUB-blocked":
+		wi4RealAPI(t, r)
+	case "SUB-late", "SUB-ack", "SUB-once":
+		wi4ControlledReceiver(t, r)
+	default:
+		t.Fatal("case not in frozen slot plan")
+	}
+}
+
+func wi4RealAPI(t *testing.T, r *wi4Recorder) {
+	tester := newTester(t)
+	mux := new(event.TypeMux)
+	managed := false
+	t.Cleanup(func() {
+		if managed {
+			return
+		}
+		r.emit("cleanup_begin", map[string]interface{}{"fallback_before_install": true})
+		stopped := make(chan struct{})
+		go func() { mux.Stop(); close(stopped) }()
+		ok := wi4Await(t, stopped, "early mux stop")
+		terminated := make(chan struct{})
+		go func() { tester.terminate(); close(terminated) }()
+		ok = wi4Await(t, terminated, "early helper stop") && ok
+		r.emit("cleanup_end", map[string]interface{}{"joined": ok, "actual_loop_absent": !strings.Contains(wi4Stacks(), "(*DownloaderAPI).eventLoop")})
+	})
+	api := NewDownloaderAPI(tester.downloader, tester.chain, mux)
+	r.emit("actual_constructor_returned", map[string]interface{}{"route": "real_API_eventLoop", "status_capacity": 0})
+	statuses := make(chan interface{})
+	var sub *SyncStatusSubscription
+	installed := make(chan struct{})
+	go func() { sub = api.SubscribeSyncStatus(statuses); close(installed) }()
+	if !wi4Await(t, installed, "actual subscription install") {
+		return
+	}
+	r.emit("actual_subscription_installed", nil)
+	unsubDone := make(chan struct{})
+	started := false
+	startUnsub := func() {
+		if started {
+			return
+		}
+		started = true
+		r.emit("unsubscribe_invoke", nil)
+		go func() { sub.Unsubscribe(); r.emit("unsubscribe_returned", nil); close(unsubDone) }()
+	}
+	readerStop, readerDone := make(chan struct{}), make(chan struct{})
+	received := make(chan interface{}, 1)
+	readerStarted := make(chan struct{})
+	readerStopped := false
+	go func() {
+		defer close(readerDone)
+		defer r.emit("receiver_returned", nil)
+		r.emit("receiver_started", nil)
+		close(readerStarted)
+		select {
+		case v := <-statuses:
+			received <- v
+		case <-readerStop:
+		}
+	}()
+	if !wi4Await(t, readerStarted, "unique receiver start") {
+		return
+	}
+	if r.caseID == "SUB-blocked" {
+		close(readerStop)
+		readerStopped = true
+		if !wi4Await(t, readerDone, "unique receiver exit before trigger") {
+			return
+		}
+		r.emit("receiver_exited_before_trigger", nil)
+	}
+	t.Cleanup(func() {
+		r.emit("cleanup_begin", nil)
+		if !readerStopped {
+			close(readerStop)
+			readerStopped = true
+		}
+		ok := wi4Await(t, readerDone, "initial reader")
+		drainStop, drainDone := make(chan struct{}), make(chan struct{})
+		go func() {
+			defer close(drainDone)
+			for {
+				select {
+				case <-statuses:
+				case <-drainStop:
+					return
+				}
+			}
+		}()
+		startUnsub()
+		ok = wi4Await(t, unsubDone, "Unsubscribe rescue") && ok
+		stopped := make(chan struct{})
+		go func() { mux.Stop(); close(stopped) }()
+		ok = wi4Await(t, stopped, "mux stop") && ok
+		end := time.Now().Add(2 * time.Second)
+		gone := false
+		for time.Now().Before(end) {
+			if !strings.Contains(wi4Stacks(), "(*DownloaderAPI).eventLoop") {
+				gone = true
+				break
+			}
+			time.Sleep(20 * time.Millisecond)
+		}
+		if !gone {
+			r.snapshot(t, "cleanup-unjoined")
+			t.Error("actual API loop not joined")
+		}
+		ok = gone && ok
+		close(drainStop)
+		ok = wi4Await(t, drainDone, "rescue reader") && ok
+		terminated := make(chan struct{})
+		go func() { tester.terminate(); close(terminated) }()
+		ok = wi4Await(t, terminated, "upstream chain/downloader helper") && ok
+		r.emit("cleanup_end", map[string]interface{}{"joined": ok, "actual_loop_absent": gone})
+	})
+	managed = true
+	if err := mux.Post(StartEvent{}); err != nil {
+		t.Fatal(err)
+	}
+	r.emit("start_event_post_returned", nil)
+	if r.caseID == "SUB-normal" {
+		select {
+		case value := <-received:
+			v, valid := value.(bool)
+			if !valid || v {
+				t.Fatal("expected actual done notification")
+			}
+			r.emit("actual_done_notification_received", nil)
+		case <-time.After(75 * time.Second):
+			r.snapshot(t, "entry-unreached")
+			t.Fatal("native timer/notification not reached")
+		}
+		startUnsub()
+		if !wi4Await(t, unsubDone, "normal Unsubscribe") {
+			return
+		}
+		r.emit("observation_frozen", map[string]interface{}{"outcome": "notification_then_return", "route": "real_API_eventLoop"})
+		return
+	}
+	wi4Until(t, 75*time.Second, "actual eventLoop done broadcast blocked", func() bool { return wi4Frame(wi4Stacks(), "(*DownloaderAPI).eventLoop", 125) })
+	r.emit("actual_broadcast_block_proved", nil)
+	startUnsub()
+	wi4Until(t, 2*time.Second, "actual Unsubscribe registration blocked", func() bool { return wi4Frame(wi4Stacks(), "(*SyncStatusSubscription).Unsubscribe", 186) })
+	before := r.snapshot(t, "before-observation")
+	if !wi4Frame(before, "(*DownloaderAPI).eventLoop", 125) || !wi4Frame(before, "(*SyncStatusSubscription).Unsubscribe", 186) {
+		t.Fatal("paired source stacks absent")
+	}
+	r.emit("two_waits_begin", map[string]interface{}{"broadcast_line": 125, "registration_line": 186})
+	wi4Pending(t, unsubDone)
+	after := r.snapshot(t, "after-observation")
+	if !wi4Frame(after, "(*DownloaderAPI).eventLoop", 125) || !wi4Frame(after, "(*SyncStatusSubscription).Unsubscribe", 186) {
+		t.Fatal("paired waits did not persist")
+	}
+	r.emit("observation_frozen", map[string]interface{}{"outcome": "two_waits_before_rescue", "route": "real_API_eventLoop", "observation_ms": 2000})
+}
+
+func wi4ControlledReceiver(t *testing.T, r *wi4Recorder) {
+	statuses := make(chan interface{})
+	api := &DownloaderAPI{uninstallSyncSubscription: make(chan *uninstallSyncSubscriptionRequest)}
+	sub := &SyncStatusSubscription{api: api, c: statuses}
+	count := 1
+	if r.caseID == "SUB-once" {
+		count = 2
+	}
+	done := make(chan struct{})
+	start := make(chan struct{})
+	var callers sync.WaitGroup
+	callers.Add(count)
+	for i := 0; i < count; i++ {
+		go func() { defer callers.Done(); <-start; sub.Unsubscribe() }()
+	}
+	go func() { callers.Wait(); close(done) }()
+	var req *uninstallSyncSubscriptionRequest
+	var ackOnce sync.Once
+	ack := func() {
+		if req != nil {
+			ackOnce.Do(func() { close(req.uninstalled) })
+		}
+	}
+	t.Cleanup(func() {
+		r.emit("cleanup_begin", nil)
+		ack()
+		stop, joined := make(chan struct{}), make(chan struct{})
+		go func() {
+			defer close(joined)
+			for {
+				select {
+				case q := <-api.uninstallSyncSubscription:
+					close(q.uninstalled)
+				case <-statuses:
+				case <-stop:
+					return
+				}
+			}
+		}()
+		ok := wi4Await(t, done, "actual controlled calls")
+		close(stop)
+		ok = wi4Await(t, joined, "controlled rescue") && ok
+		r.emit("cleanup_end", map[string]interface{}{"joined": ok, "actual_loop_absent": true})
+	})
+	r.emit("actual_method_invoked", map[string]interface{}{"route": "controlled_receiver_actual_Unsubscribe", "concurrent_calls": count})
+	close(start)
+	select {
+	case req = <-api.uninstallSyncSubscription:
+	case <-time.After(2 * time.Second):
+		t.Fatal("registration not reached")
+	}
+	if req.c != statuses {
+		t.Fatal("different source channel")
+	}
+	r.emit("registration_received", map[string]interface{}{"registrations": 1})
+	if r.caseID == "SUB-late" {
+		select {
+		case statuses <- false:
+			r.emit("late_notification_consumed", nil)
+		case <-time.After(2 * time.Second):
+			t.Fatal("late notification not consumed")
+		}
+	}
+	r.snapshot(t, "before-observation")
+	r.emit("ack_withheld_begin", nil)
+	select {
+	case <-done:
+		t.Fatal("returned before controlled ack")
+	case duplicate := <-api.uninstallSyncSubscription:
+		close(duplicate.uninstalled)
+		t.Fatal("duplicate registration before ack")
+	case <-time.After(2 * time.Second):
+	}
+	r.snapshot(t, "after-observation")
+	r.emit("observation_frozen", map[string]interface{}{"outcome": "waiting_for_controlled_ack", "route": "controlled_receiver_actual_Unsubscribe", "observation_ms": 2000})
+	ack()
+	r.emit("controlled_ack_released", nil)
+	if !wi4Await(t, done, "controlled ack return") {
+		return
+	}
+	select {
+	case duplicate := <-api.uninstallSyncSubscription:
+		close(duplicate.uninstalled)
+		t.Fatal("extra registration after all calls returned")
+	default:
+	}
+	r.emit("all_calls_returned", map[string]interface{}{"calls": count, "registrations": 1})
+}

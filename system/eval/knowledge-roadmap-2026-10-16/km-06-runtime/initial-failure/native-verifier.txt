@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-comparison-MCP.py", line 78, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-comparison-MCP.py", line 40, in main
+    check('actual native graph vector and retained source build '+label,row['outcome']=='succeeded'and(version/'graph/graph.db').is_file()and(version/'vector/index_manifest.json').is_file())
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-comparison-MCP.py", line 24, in check
+    def check(label,value):manager.require(value,label);checks.append(label);write('checks.json',checks);print('PASS: '+label,flush=True)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py", line 33, in require
+    raise Failure(code)
+manager.Failure: actual native graph vector and retained source build a

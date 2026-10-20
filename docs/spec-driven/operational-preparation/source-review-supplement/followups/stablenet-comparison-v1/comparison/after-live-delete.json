@@ -1,0 +1,730 @@
+{
+  "schema_version": 1,
+  "state": "partial",
+  "profile_digest": "c91b2efc2d8f95c112aa3a202bc9489ca6a37c49537b4e258465bedda55a00ea",
+  "catalog_digest": "dc057379eb097af750515b7bf82c40e6a307004244a2d7e64a5b368a2cbec6c1",
+  "collection_id": "real-chains",
+  "mode": "comparison",
+  "concept": {
+    "key": {
+      "pack_id": "industry.blockchain",
+      "version": "1.0.0",
+      "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+      "concept_id": "mempool-admission"
+    },
+    "definition": "The local handling of pending transactions before inclusion, including acceptance, replacement and removal.",
+    "view": {
+      "id": "mempool-admission",
+      "aliases": [
+        "mempool-admission",
+        "mempool",
+        "txpool",
+        "메모리풀",
+        "트랜잭션 풀",
+        "검증"
+      ],
+      "includes": [
+        "admission, queueing, replacement, eviction and capacity"
+      ],
+      "excludes": [
+        "a pending pool is not evidence of consensus or staking"
+      ],
+      "applicable_roles": [
+        "l1",
+        "l2",
+        "sequencer"
+      ],
+      "facets": [
+        {
+          "id": "admission",
+          "question": "What checks determine pool admission?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "ordering",
+          "question": "How are pending transactions prioritized?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "replacement",
+          "question": "When can one transaction replace another?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "eviction",
+          "question": "Which capacity or timeout rules remove pending transactions?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "concurrency",
+          "question": "Which synchronization protects pending-pool state?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        }
+      ]
+    }
+  },
+  "facets": [
+    "admission",
+    "ordering",
+    "replacement",
+    "eviction",
+    "concurrency"
+  ],
+  "as_of": "2026-10-18T06:53:26Z",
+  "question": "고정 원문으로 mempool-admission 근거와 모르는 부분을 프로젝트별로 비교한다.",
+  "groups": [
+    {
+      "participant": {
+        "scope_id": "d2a8b3a40948ebf44cb8451f1c7d831818d31e45ff1e690ae3b22783de90d8d7",
+        "scope": {
+          "coordinates": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+            "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "wbft-source-excerpts-no-live-network",
+            "component_role": "l1",
+            "observed_at": "2026-10-18T06:53:22+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+              "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "admission",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "mempool-admission",
+                "binding_digest": "b512fbbe20ffb025c512e23c96aa98be69da3a47e7afe75c4052b48e20f88588",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "mempool-admission"
+                },
+                "coordinates": {
+                  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                  "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                  "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                  "source_mode": "committed",
+                  "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+                },
+                "conditions": {
+                  "network": "not-selected-source-study",
+                  "configuration": "wbft-source-excerpts-no-live-network",
+                  "component_role": "l1",
+                  "observed_at": "2026-10-18T06:53:22+00:00"
+                },
+                "local_concept": "go-stablenet mempool-admission source excerpts",
+                "mapping": "close",
+                "reason": "Proposed mapping of pinned go-stablenet mempool-admission source excerpts for an exposed technical comparison; independent acceptance unexecuted; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "source-1",
+                      "kind": "code",
+                      "facets": [
+                        "admission"
+                      ],
+                      "citation": {
+                        "file": "core/txpool/validation.go",
+                        "start_line": 55,
+                        "end_line": 174,
+                        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                        "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+                        "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+                        "source_mode": "committed",
+                        "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                        "origin_id": "repo",
+                        "file_sha256": "96ddf08d24b21eb31821e6223180395e5f9f76518133585a096914181c8da11c",
+                        "content_sha256": "bbe8152b613006fc4d9380c9d997f7649a193b04bc862016a2ac38ef6c404242"
+                      }
+                    },
+                    "body": "func ValidateTransaction(tx *types.Transaction, head *types.Header, signer types.Signer, opts *ValidationOptions) error {\n\t// Ensure transactions not implemented by the calling pool are rejected\n\tif opts.Accept&(1<<tx.Type()) == 0 {\n\t\treturn fmt.Errorf(\"%w: tx type %v not supported by this pool\", core.ErrTxTypeNotSupported, tx.Type())\n\t}\n\t// Before performing any expensive validations, sanity check that the tx is\n\t// smaller than the maximum limit the pool can meaningfully handle\n\tif tx.Size() > opts.MaxSize {\n\t\treturn fmt.Errorf(\"%w: transaction size %v, limit %v\", ErrOversizedData, tx.Size(), opts.MaxSize)\n\t}\n\t// Ensure only transactions that have been enabled are accepted\n\tif !opts.Config.IsBerlin(head.Number) && tx.Type() != types.LegacyTxType {\n\t\treturn fmt.Errorf(\"%w: type %d rejected, pool not yet in Berlin\", core.ErrTxTypeNotSupported, tx.Type())\n\t}\n\tif !opts.Config.IsLondon(head.Number) && tx.Type() == types.DynamicFeeTxType {\n\t\treturn fmt.Errorf(\"%w: type %d rejected, pool not yet in London\", core.ErrTxTypeNotSupported, tx.Type())\n\t}\n\tif !opts.Config.IsApplepie(head.Number) && tx.Type() == types.FeeDelegateDynamicFeeTxType {\n\t\treturn fmt.Errorf(\"%w: type %d rejected, pool not yet in Applepie\", core.ErrTxTypeNotSupported, tx.Type())\n\t}\n\tif !opts.Config.IsCancun(head.Number, head.Time) && tx.Type() == types.BlobTxType {\n\t\treturn fmt.Errorf(\"%w: type %d rejected, pool not yet in Cancun\", core.ErrTxTypeNotSupported, tx.Type())\n\t}\n\tif !opts.Config.AnzeonEnabled() && tx.Type() == types.SetCodeTxType {\n\t\treturn fmt.Errorf(\"%w: type %d rejected, pool not yet in Anzeon\", core.ErrTxTypeNotSupported, tx.Type())\n\t}\n\t// Check whether the init code size has been exceeded\n\tif opts.Config.IsShanghai(head.Number, head.Time) && tx.To() == nil && len(tx.Data()) > params.MaxInitCodeSize {\n\t\treturn fmt.Errorf(\"%w: code size %v, limit %v\", core.ErrMaxInitCodeSizeExceeded, len(tx.Data()), params.MaxInitCodeSize)\n\t}\n\t// Transactions can't be negative. This may never happen using RLP decoded\n\t// transactions but may occur for transactions created using the RPC.\n\tif tx.Value().Sign() < 0 {\n\t\treturn ErrNegativeValue\n\t}\n\t// Ensure the transaction doesn't exceed the current block limit gas\n\tif head.GasLimit < tx.Gas() {\n\t\treturn ErrGasLimit\n\t}\n\t// Sanity check for extremely large numbers (supported by RLP or RPC)\n\tif tx.GasFeeCap().BitLen() > 256 {\n\t\treturn core.ErrFeeCapVeryHigh\n\t}\n\tif tx.GasTipCap().BitLen() > 256 {\n\t\treturn core.ErrTipVeryHigh\n\t}\n\t// Ensure gasFeeCap is greater than or equal to gasTipCap\n\tif tx.GasFeeCapIntCmp(tx.GasTipCap()) < 0 {\n\t\treturn core.ErrTipAboveFeeCap\n\t}\n\t// Make sure the transaction is signed properly\n\tif _, err := types.Sender(signer, tx); err != nil {\n\t\treturn ErrInvalidSender\n\t}\n\t// Ensure the transaction has more gas than the bare minimum needed to cover\n\t// the transaction metadata\n\tintrGas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.SetCodeAuthorizations(), tx.To() == nil, true, opts.Config.IsIstanbul(head.Number), opts.Config.IsShanghai(head.Number, head.Time))\n\tif err != nil {\n\t\treturn err\n\t}\n\tif tx.Gas() < intrGas {\n\t\treturn fmt.Errorf(\"%w: gas %v, minimum needed %v\", core.ErrIntrinsicGas, tx.Gas(), intrGas)\n\t}\n\t// Ensure the gasprice is high enough to cover the requirement of the calling pool\n\tif tx.GasTipCapIntCmp(opts.MinTip) < 0 {\n\t\treturn fmt.Errorf(\"%w: gas tip cap %v, minimum needed %v\", ErrUnderpriced, tx.GasTipCap(), opts.MinTip)\n\t}\n\tif opts.Config.IsLondon(head.Number) && opts.Config.AnzeonEnabled() {\n\t\tminBaseFee := opts.Config.MinBaseFee()\n\t\tminFee := new(big.Int).Add(minBaseFee, opts.MinTip)\n\n\t\t// NOTE: For LegacyTx and AccessListTx, GasFeeCap() returns GasPrice.\n\t\t// So this rule also enforces gasPrice >= MinBaseFee + MinTip for legacy-style txs.\n\t\tif tx.GasFeeCapIntCmp(minFee) < 0 {\n\t\t\treturn fmt.Errorf(\"%w: gas fee cap %v, minimum needed %v\", ErrUnderpriced, tx.GasFeeCap(), minFee)\n\t\t}\n\t}\n\n\tif tx.Type() == types.FeeDelegateDynamicFeeTxType {\n\t\t// Make sure the transaction is signed properly.\n\t\tif tx.FeePayer() == nil {\n\t\t\treturn ErrInvalidFeePayer\n\t\t}\n\t\tfeePayer, err := types.FeePayer(types.NewFeeDelegateSigner(opts.Config.ChainID), tx)\n\t\tif err != nil || *tx.FeePayer() != feePayer {\n\t\t\treturn ErrInvalidFeePayer\n\t\t}\n\t}\n\n\tif tx.Type() == types.SetCodeTxType {\n\t\tif len(tx.SetCodeAuthorizations()) == 0 {\n\t\t\treturn fmt.Errorf(\"set code tx must have at least one authorization tuple\")\n\t\t}\n\t}\n\n\tif tx.Type() == types.BlobTxType {\n\t\t// Ensure the blob fee cap satisfies the minimum blob gas price\n\t\tif tx.BlobGasFeeCapIntCmp(blobTxMinBlobGasPrice) < 0 {\n\t\t\treturn fmt.Errorf(\"%w: blob fee cap %v, minimum needed %v\", ErrUnderpriced, tx.BlobGasFeeCap(), blobTxMinBlobGasPrice)\n\t\t}\n\t\tsidecar := tx.BlobTxSidecar()\n\t\tif sidecar == nil {\n\t\t\treturn fmt.Errorf(\"missing sidecar in blob transaction\")\n\t\t}\n\t\t// Ensure the number of items in the blob transaction and various side\n\t\t// data match up before doing any expensive validations\n\t\thashes := tx.BlobHashes()\n\t\tif len(hashes) == 0 {\n\t\t\treturn fmt.Errorf(\"blobless blob transaction\")\n\t\t}\n\t\tif len(hashes) > params.MaxBlobGasPerBlock/params.BlobTxBlobGasPerBlob {\n\t\t\treturn fmt.Errorf(\"too many blobs in transaction: have %d, permitted %d\", len(hashes), params.MaxBlobGasPerBlock/params.BlobTxBlobGasPerBlob)\n\t\t}\n\t\t// Ensure commitments, proofs and hashes are valid\n\t\tif err := validateBlobSidecar(hashes, sidecar); err != nil {\n\t\t\treturn err\n\t\t}\n\t}\n\treturn nil\n}\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+              "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "ordering",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+              "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "replacement",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+              "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "eviction",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+              "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "concurrency",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    },
+    {
+      "participant": {
+        "scope_id": "eac3d47751ea60ba19050262a89d6d384657c8eefd43e14f6b280e501f2ffdc0",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-wemix",
+            "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+            "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+            "source_mode": "working-tree",
+            "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "clique-source-excerpts-no-live-network",
+            "component_role": "l1",
+            "observed_at": "2026-10-18T06:53:22+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "admission",
+          "state": "similar",
+          "reasons": [
+            "direct_role_overlap_not_entity_equivalence"
+          ],
+          "mappings": [
+            {
+              "binding": {
+                "binding_id": "mempool-admission",
+                "binding_digest": "24690474bbc342820400da86f27d339c5ad5f378c7999f4e1711f805d4c4a51b",
+                "concept": {
+                  "pack_id": "industry.blockchain",
+                  "version": "1.0.0",
+                  "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+                  "concept_id": "mempool-admission"
+                },
+                "coordinates": {
+                  "project_id": "comparison-go-wemix",
+                  "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+                  "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+                  "source_mode": "working-tree",
+                  "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+                },
+                "conditions": {
+                  "network": "not-selected-source-study",
+                  "configuration": "clique-source-excerpts-no-live-network",
+                  "component_role": "l1",
+                  "observed_at": "2026-10-18T06:53:22+00:00"
+                },
+                "local_concept": "go-wemix mempool-admission source excerpts",
+                "mapping": "close",
+                "reason": "Proposed mapping of pinned go-wemix mempool-admission source excerpts for an exposed technical comparison; independent acceptance unexecuted; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+                "review_state": "proposed",
+                "verification": "archived_source_hash_and_span_only",
+                "evidence": [
+                  {
+                    "reference": {
+                      "id": "source-1",
+                      "kind": "code",
+                      "facets": [
+                        "admission"
+                      ],
+                      "citation": {
+                        "file": "core/tx_pool.go",
+                        "start_line": 645,
+                        "end_line": 739,
+                        "commit_hash": "",
+                        "project_id": "comparison-go-wemix",
+                        "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+                        "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+                        "source_mode": "working-tree",
+                        "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc",
+                        "origin_id": "repo",
+                        "file_sha256": "966a73509ef2fcd58fb746a802e98cb5f9ea3aa2cd69e8a3b1c582b1e2117643",
+                        "content_sha256": "7aba5b4a35b49db9cc38f9a0c08d95cec9646bfde78993c640e32d59d759305b"
+                      }
+                    },
+                    "body": "func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {\n\t// Check nonce limit\n\tif params.NonceLimit != 0 && tx.Nonce() > params.NonceLimit {\n\t\treturn fmt.Errorf(\"Too many transactions (%d) for an account\", params.NonceLimit)\n\t}\n\t// Accept only legacy transactions until EIP-2718/2930 activates.\n\tif !pool.eip2718 && tx.Type() != types.LegacyTxType {\n\t\treturn ErrTxTypeNotSupported\n\t}\n\t// Reject dynamic fee transactions until EIP-1559 activates.\n\tif !pool.eip1559 && tx.Type() == types.DynamicFeeTxType {\n\t\treturn ErrTxTypeNotSupported\n\t}\n\t// fee delegation\n\t// Reject fee delegation dynamic fee transactions until feedelegation activates.\n\tif !pool.feedelegation && tx.Type() == types.FeeDelegateDynamicFeeTxType {\n\t\treturn ErrTxTypeNotSupported\n\t}\n\t// Reject transactions over defined size to prevent DOS attacks\n\tif uint64(tx.Size()) > txMaxSize {\n\t\treturn ErrOversizedData\n\t}\n\t// Transactions can't be negative. This may never happen using RLP decoded\n\t// transactions but may occur if you create a transaction using the RPC.\n\tif tx.Value().Sign() < 0 {\n\t\treturn ErrNegativeValue\n\t}\n\t// Ensure the transaction doesn't exceed the current block limit gas.\n\tif pool.currentMaxGas < tx.Gas() {\n\t\treturn ErrGasLimit\n\t}\n\t// Sanity check for extremely large numbers\n\tif tx.GasFeeCap().BitLen() > 256 {\n\t\treturn ErrFeeCapVeryHigh\n\t}\n\tif tx.GasTipCap().BitLen() > 256 {\n\t\treturn ErrTipVeryHigh\n\t}\n\t// Ensure gasFeeCap is greater than or equal to gasTipCap.\n\tif tx.GasFeeCapIntCmp(tx.GasTipCap()) < 0 {\n\t\treturn ErrTipAboveFeeCap\n\t}\n\t// Make sure the transaction is signed properly.\n\tfrom, err := types.Sender(pool.signer, tx)\n\tif err != nil {\n\t\treturn ErrInvalidSender\n\t}\n\t// Drop non-local transactions under our own minimal accepted gas price or tip\n\tif !local && tx.GasTipCapIntCmp(pool.gasPrice) < 0 {\n\t\treturn ErrUnderpriced\n\t}\n\t// Wemix: drop transactions if given fees are less than maxPriorityFeePerGas + baseFee\n\tif local && params.DropUnderPriced && tx.EffectiveGasTipIntCmp(pool.gasPrice, pool.priced.urgent.baseFee) < 0 {\n\t\treturn ErrUnderpriced\n\t}\n\t// Ensure the transaction adheres to nonce ordering\n\tif pool.currentState.GetNonce(from) > tx.Nonce() {\n\t\treturn ErrNonceTooLow\n\t}\n\t// Transactor should have enough funds to cover the costs\n\t// cost == V + GP * GL\n\n\t// fee delegation\n\tif tx.Type() == types.FeeDelegateDynamicFeeTxType {\n\t\tfeePayer, err := types.RecoverFeePayer(pool.chainconfig.ChainID, tx)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tif pool.currentState.GetBalance(feePayer).Cmp(tx.FeePayerCost()) < 0 {\n\t\t\treturn ErrFeePayerInsufficientFunds\n\t\t}\n\t\tif pool.currentState.GetBalance(from).Cmp(tx.Cost()) < 0 {\n\t\t\treturn ErrSenderInsufficientFunds\n\t\t}\n\t} else {\n\t\tif pool.currentState.GetBalance(from).Cmp(tx.Cost()) < 0 {\n\t\t\treturn ErrInsufficientFunds\n\t\t}\n\t}\n\t// Ensure the transaction has more gas than the basic tx fee.\n\tintrGas, err := IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, true, pool.istanbul)\n\tif err != nil {\n\t\treturn err\n\t}\n\tif tx.Gas() < intrGas {\n\t\treturn ErrIntrinsicGas\n\t}\n\treturn nil\n}\n\n// add validates a transaction and inserts it into the non-executable queue for later\n// pending promotion and execution. If the transaction is a replacement for an already\n// pending or queued one, it overwrites the previous transaction if its price is higher.\n//\n// If a newly added transaction is marked as local, its sending account will be\n"
+                  }
+                ],
+                "warnings": [
+                  "mapping_semantics_not_reviewed",
+                  "evidence_kind_is_declared_not_inferred",
+                  "test_source_is_not_test_execution",
+                  "reviewer_identity_not_authenticated",
+                  "mapping_review_does_not_approve_policy_contents"
+                ]
+              },
+              "review": {
+                "state": "proposed",
+                "validity": "unknown",
+                "required_approvals": 1,
+                "approvals": 0,
+                "rejections": 0,
+                "used_review_digests": [],
+                "stale_review_count": 0,
+                "future_review_count": 0,
+                "reviewer_identity_authenticated": false,
+                "independent_quality_acceptance": false
+              },
+              "semantics": {
+                "kind": "close",
+                "direction": "local_to_shared",
+                "meaning": "The proposed local role has substantial overlap; differences must remain explicit.",
+                "automatic_transitivity": false,
+                "entity_identity": false
+              }
+            }
+          ],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": true
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "ordering",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "replacement",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "eviction",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "l1",
+              "observed_at": "2026-10-18T06:53:22+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "mempool-admission"
+          },
+          "facet": "concurrency",
+          "state": "unknown",
+          "reasons": [
+            "facet_evidence_not_collected",
+            "no_usable_reviewed_evidence_for_requested_facet"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "different_evidence_or_conditions_candidate",
+      "facet": "admission",
+      "participants": [
+        "d2a8b3a40948ebf44cb8451f1c7d831818d31e45ff1e690ae3b22783de90d8d7",
+        "eac3d47751ea60ba19050262a89d6d384657c8eefd43e14f6b280e501f2ffdc0"
+      ],
+      "binding_digests": [
+        "b512fbbe20ffb025c512e23c96aa98be69da3a47e7afe75c4052b48e20f88588",
+        "24690474bbc342820400da86f27d339c5ad5f378c7999f4e1711f805d4c4a51b"
+      ],
+      "evidence": [
+        {
+          "scope_id": "d2a8b3a40948ebf44cb8451f1c7d831818d31e45ff1e690ae3b22783de90d8d7",
+          "binding_digest": "b512fbbe20ffb025c512e23c96aa98be69da3a47e7afe75c4052b48e20f88588",
+          "citations": [
+            {
+              "file": "core/txpool/validation.go",
+              "start_line": 55,
+              "end_line": 174,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+              "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "96ddf08d24b21eb31821e6223180395e5f9f76518133585a096914181c8da11c",
+              "content_sha256": "bbe8152b613006fc4d9380c9d997f7649a193b04bc862016a2ac38ef6c404242"
+            }
+          ]
+        },
+        {
+          "scope_id": "eac3d47751ea60ba19050262a89d6d384657c8eefd43e14f6b280e501f2ffdc0",
+          "binding_digest": "24690474bbc342820400da86f27d339c5ad5f378c7999f4e1711f805d4c4a51b",
+          "citations": [
+            {
+              "file": "core/tx_pool.go",
+              "start_line": 645,
+              "end_line": 739,
+              "commit_hash": "",
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "47e4db882a5c1174a3004abe6254250e28ccc74007a3dbe7d19fad1b00b40844",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc",
+              "origin_id": "repo",
+              "file_sha256": "966a73509ef2fcd58fb746a802e98cb5f9ea3aa2cd69e8a3b1c582b1e2117643",
+              "content_sha256": "7aba5b4a35b49db9cc38f9a0c08d95cec9646bfde78993c640e32d59d759305b"
+            }
+          ]
+        }
+      ],
+      "reasons": [
+        "Proposed mapping of pinned go-stablenet mempool-admission source excerpts for an exposed technical comparison; independent acceptance unexecuted; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown.",
+        "Proposed mapping of pinned go-wemix mempool-admission source excerpts for an exposed technical comparison; independent acceptance unexecuted; no human review, live network policy, superiority, TPS or security proof. Missing facets remain unknown."
+      ]
+    }
+  ],
+  "used_body_bytes": 8835,
+  "used_citations": 4,
+  "completeness_scope": "requested_project_facet_rows_only_not_all_project_evidence",
+  "final_assessment": "LLM_or_user_evaluates_tradeoffs_from_cited_evidence",
+  "omitted_candidates": 0,
+  "candidate_state": "complete"
+}

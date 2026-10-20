@@ -1,0 +1,32 @@
+{
+  "kind": "development_failures_observed_in_tool_results_not_final_success",
+  "events": [
+    {
+      "phase": "initial_manual_build",
+      "exit_code": 1,
+      "message": "relative helper path did not exist in the temporary module; no Go files in probe command",
+      "correction": "copy helper using absolute primary path, then build succeeded"
+    },
+    {
+      "phase": "initial_generator",
+      "exit_code": 1,
+      "probe_exit": 0,
+      "message": "TypeError: object of type 'NoneType' has no len() while summarizing proposed Warnings=null",
+      "initial_probe_sha256": "1380cda286077028572bc3661f5fba4288f61f1db66606be67c14e060634e769",
+      "correction": "count len(v or []) and rerun entire generator into fresh packet"
+    },
+    {
+      "phase": "guard_before_generator_completion",
+      "exit_code": 1,
+      "message": "manifest.json missing; incomplete packet rejected",
+      "final_success": false
+    },
+    {
+      "phase": "protocol_ledger_reference_update",
+      "exit_code": 1,
+      "message": "phase uses evidence key, not artifacts; protocol updated but ledger write aborted; guard rejected mismatch",
+      "correction": "use phase.evidence and resynchronize both manifest references",
+      "final_success": false
+    }
+  ]
+}

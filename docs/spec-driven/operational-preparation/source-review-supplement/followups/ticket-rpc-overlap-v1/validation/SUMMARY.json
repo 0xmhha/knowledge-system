@@ -1,0 +1,78 @@
+{
+  "phase": 67,
+  "tests": {
+    "RPC_overlap_mutation": 29,
+    "common_regression": 67,
+    "documentation_contract": 20,
+    "package_notice": 3,
+    "total": 119,
+    "all_passed": true,
+    "common_shards": 3,
+    "common_each_test_executed_once": true
+  },
+  "replay": {
+    "files": 232,
+    "all_bytes_identical": true,
+    "target_executions_during_replay": 0,
+    "source_manifest_sha256": "44eb4afa4dff55702daef86dda23a308541333f3890603f8bfeeb39837bb0511",
+    "current_non_validation_files_match": 231,
+    "lossless_packaging_verified": true
+  },
+  "gates": [
+    {
+      "name": "technical",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "common",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "formal",
+      "exit_code": 1,
+      "expected_exit": 1
+    },
+    {
+      "name": "freeze",
+      "exit_code": 1,
+      "expected_exit": 1
+    },
+    {
+      "name": "stored_before_commit",
+      "exit_code": 1,
+      "expected_exit": 1
+    }
+  ],
+  "target": {
+    "programs": 6,
+    "all_exit0": true,
+    "native_timer_fires": 12,
+    "actual_exit_method_native_overlap": 4,
+    "select_consumed_second_status_before_exit": 2,
+    "original_paired_waits": 2,
+    "candidate_drained_then_ack_return": 2,
+    "process_groups_remaining": 0,
+    "automatic_retries": 0,
+    "compiler_atomic_coverage": true,
+    "ordinary_write_deadline_behavior_proved": false,
+    "original_upstream_package_tests_executed": false
+  },
+  "CKS_native": "unchanged_input_identity_reuse_not_new_full_execution",
+  "source_guard": {
+    "exit_code": 0,
+    "stdout": "private_not_copied"
+  },
+  "security_specific_evaluations": "user_deferred_not_completed",
+  "docs_exit": 0,
+  "live_documents": 134,
+  "stored_gate": "expected_refusal_before_commit; actual_Git_and_signature_checked_after_commit",
+  "independent_approved": 0,
+  "FINAL": 0,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "freeze": null,
+  "execution_allowed": false,
+  "raw_log_format_finalization": "preflight/program-main-covered.log.txt stored losslessly as gzip after cached whitespace check; source data unchanged"
+}

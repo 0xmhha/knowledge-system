@@ -57,7 +57,7 @@ func TestValueDependenciesRegisteredWithRuntimeContractAndReadonlyAnnotation(t *
 	if e = json.Unmarshal(raw, &schema); e != nil {
 		t.Fatal(e)
 	}
-	if schema.Annotations["readOnlyHint"] != true || schema.Input["additionalProperties"] != false || len(schema.Input["oneOf"].([]any)) != 2 {
+	if schema.Annotations["readOnlyHint"] != true || schema.Input["additionalProperties"] != false || schema.Input["oneOf"] != nil || schema.Input["anyOf"] != nil || schema.Input["allOf"] != nil {
 		t.Fatal("input/readonly schema mismatch", string(raw))
 	}
 	req := mcp.CallToolRequest{}

@@ -1,0 +1,80 @@
+{
+  "stage": 61,
+  "status": "declared_before_target_trials_not_completion",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "knowledge_revision": "bab348916fdb615c56fa31285ed72a70635a5afe",
+  "scope": "SCHED-001 five existing subscription schedules; all21 original schedules retained and remaining16 schedules stay pending",
+  "routes": {
+    "SUB-normal": "unmodified NewDownloaderAPI + eventLoop + actual status + Unsubscribe",
+    "SUB-blocked": "unmodified constructor/eventLoop native60s timer, observed broadcast block + Unsubscribe registration block, observe2s before rescue",
+    "SUB-late": "actual Unsubscribe with explicitly controlled request/notification/ack receiver; not full eventLoop route",
+    "SUB-ack": "actual Unsubscribe controlled acknowledgement receiver; not full eventLoop route",
+    "SUB-once": "actual Unsubscribe concurrent3 calls controlled receiver; not full eventLoop route"
+  },
+  "target_production_patch": false,
+  "test_only_addition": "eth/downloader/wi4_owned_test.go",
+  "toolchain": "project declared installed go1.23.12, darwin/arm64 CGO1; not production platform adoption",
+  "plan": {
+    "variants": [
+      "general",
+      "race"
+    ],
+    "repetitions": [
+      1,
+      2,
+      3
+    ],
+    "cases": [
+      "SUB-normal",
+      "SUB-blocked",
+      "SUB-late",
+      "SUB-ack",
+      "SUB-once"
+    ],
+    "total_slots": 30,
+    "max_concurrent_owned_test_processes": 2,
+    "native_timer_unchanged_seconds": 60,
+    "real_branch_setup_watchdog_seconds": 75,
+    "original_per_step_observation_watchdog_ms": 2000,
+    "blocked_observation_before_rescue_ms": 2000,
+    "process_watchdog_seconds": 110
+  },
+  "acceptance": [
+    {
+      "id": "S01",
+      "requirement": "Retain all21 original schedules and150 AI draft units byte-identical; distinguish real full API and controlled method receiver routes; no new independent family/oracle"
+    },
+    {
+      "id": "S02",
+      "requirement": "Exact retained bundle/source commit, original7source hashes, project declared toolchain/profile, whole target tracked source unchanged; only test addition; bound general/race binaries"
+    },
+    {
+      "id": "S03",
+      "requirement": "Use native60s timer unchanged; prove actual branch/both blocked method source stacks before2s observation, freeze original observation before rescue; never infer target success from timeout"
+    },
+    {
+      "id": "S04",
+      "requirement": "Normal actual notification and unsubscribe return; controlled late drain, withheld ack no early return, three concurrent actual calls register once; no full eventLoop claim for controlled receivers"
+    },
+    {
+      "id": "S05",
+      "requirement": "Predeclare30slots and include every attempt, timeout, entry/precondition/driver/cleanup failure, raw stdout/stderr/events/stacks; no successful-only denominator or result reruns to hide failures"
+    },
+    {
+      "id": "S06",
+      "requirement": "Own process/session/tempdirs, bounded rescue/join and actual loop exit, zero live child group members on terminal; source/data/global/operational state preserved"
+    },
+    {
+      "id": "S07",
+      "requirement": "Update tests, evidence, all current entry/worklist indices and signed local commit; reuse unchanged native CKS source binding transparently"
+    },
+    {
+      "id": "S08",
+      "requirement": "Formal0/9, independent0, FINAL0, freeze null/execution false; no names/contact, network, node startup, installed roles, paid/external LLM; local in-memory upstream blockchain helper is not an operational node"
+    }
+  ],
+  "quality_score": null,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "formal_total": 9
+}

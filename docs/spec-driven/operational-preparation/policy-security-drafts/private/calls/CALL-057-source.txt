@@ -1,0 +1,23 @@
+func (s *Server) StartMocker(w http.ResponseWriter, req *http.Request) {
+	s.mockerMtx.Lock()
+	defer s.mockerMtx.Unlock()
+	if s.mockerStop != nil {
+		http.Error(w, "mocker already running", http.StatusInternalServerError)
+		return
+	}
+	mockerType := req.FormValue("mocker-type")
+	mockerFn := LookupMocker(mockerType)
+	if mockerFn == nil {
+		http.Error(w, fmt.Sprintf("unknown mocker type %q", html.EscapeString(mockerType)), http.StatusBadRequest)
+		return
+	}
+	nodeCount, err := strconv.Atoi(req.FormValue("node-count"))
+	if err != nil {
+		http.Error(w, "invalid node-count provided", http.StatusBadRequest)
+		return
+	}
+	s.mockerStop = make(chan struct{})
+	go mockerFn(s.network, s.mockerStop, nodeCount)
+
+	w.WriteHeader(http.StatusOK)
+}

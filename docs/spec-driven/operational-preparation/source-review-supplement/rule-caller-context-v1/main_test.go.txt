@@ -1,0 +1,74 @@
+package main
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestCallerScanner(t *testing.T) {
+	cases := []struct {
+		name, source string
+		count        int
+		check        func(*testing.T, result)
+	}{
+		{"literal", `package p; import "github.com/ethereum/go-ethereum/internal/build"; func f(){build.MustRunCommand("git","status")}`, 1, func(t *testing.T, r result) {
+			if r.References[0].FirstArgument.Kind != "string_literal" || r.References[0].FirstArgument.Literal != "git" || !r.References[0].BuildImportSpelling {
+				t.Fatal(r)
+			}
+		}},
+		{"renamed_import", `package p; import b "github.com/ethereum/go-ethereum/internal/build"; func f(){b.MustRunCommandWithOutput(name)}`, 1, func(t *testing.T, r result) {
+			if r.References[0].Owner != "b" || !r.References[0].BuildImportSpelling || r.References[0].FirstArgument.Kind != "identifier" {
+				t.Fatal(r)
+			}
+		}},
+		{"comments_strings", "package p\n// build.MustRunCommand(\"git\")\nvar text=`build.MustRunCommand(\"git\")`", 0, nil},
+		{"value_reference", `package p; import "github.com/ethereum/go-ethereum/internal/build"; func f(){g:=build.MustRunCommand;g("git")}`, 1, func(t *testing.T, r result) {
+			if r.References[0].Kind != "function_value_or_unresolved_reference" || r.References[0].FirstArgument != nil {
+				t.Fatal("dynamic call falsely resolved", r)
+			}
+		}},
+		{"unqualified", `package build; func f(){MustRunCommand("git")}`, 1, func(t *testing.T, r result) {
+			if r.References[0].BuildImportSpelling || r.References[0].Resolution != "syntax_only_unverified" {
+				t.Fatal("unqualified binding promoted", r)
+			}
+		}},
+		{"shadowed_owner", `package p; import "github.com/ethereum/go-ethereum/internal/build"; func f(build Fake){build.MustRunCommand("git")}`, 1, func(t *testing.T, r result) {
+			if r.References[0].Resolution != "syntax_only_unverified" {
+				t.Fatal("shadowed qualifier resolved", r)
+			}
+		}},
+		{"nested_closure", `package p; func f(){g:=func(){h:=func(){b.MustRunCommand("git")};_=h};_=g;b.MustRunCommand("git")}`, 2, func(t *testing.T, r result) {
+			if r.References[0].ClosureDepth != 2 || r.References[1].ClosureDepth != 0 {
+				t.Fatal("closure sibling ownership lost", r)
+			}
+		}},
+		{"crlf_utf8", "package p\r\nfunc f(){build.MustRunCommand(\"도구\")}\r\n", 1, func(t *testing.T, r result) {
+			if r.References[0].FirstArgument.Literal != "도구" || r.References[0].Site.StartLine != 2 {
+				t.Fatal("byte/line encoding drift", r)
+			}
+		}},
+		{"foreign_import", `package p; import build "example.invalid/other"; func f(){build.MustRunCommand("git")}`, 1, func(t *testing.T, r result) {
+			if r.References[0].BuildImportSpelling {
+				t.Fatal("foreign package resolved", r)
+			}
+		}},
+	}
+	for _, row := range cases {
+		t.Run(row.name, func(t *testing.T) {
+			r, err := scan(input{Path: "fixture.go", Source: row.source})
+			if err != nil || len(r.References) != row.count {
+				t.Fatal(r, err)
+			}
+			for _, ref := range r.References {
+				span := row.source[ref.Site.StartByte:ref.Site.EndByte]
+				if !strings.Contains(span, ref.Target) {
+					t.Fatal("source span drift", ref)
+				}
+			}
+			if row.check != nil {
+				row.check(t, r)
+			}
+			t.Log("CALLER_SYNTAX_CONTROL " + row.name + " pass=true")
+		})
+	}
+}

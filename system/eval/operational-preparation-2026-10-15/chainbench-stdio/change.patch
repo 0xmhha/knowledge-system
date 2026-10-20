@@ -1,0 +1,885 @@
+diff --git a/README.md b/README.md
+index 6cac42a8..5479b25d 100644
+--- a/README.md
++++ b/README.md
+@@ -110,6 +110,15 @@ network.
+ 
+ ---
+ 
++For an isolated local pilot or test run, set `CHAINBENCH_DATA_ROOT` to an absolute
++owned directory. It contains default key sets, sessions, compositions and allocation
++locks; an unset value keeps `~/.chainbench`. Relative overrides are rejected.
++
++The stdio MCP server cancels cooperative requests on EOF/SIGINT/SIGTERM. On Unix
++it uses pollable owned descriptor copies and restores the original status flags.
++A clean transport exit does not make a canceled tool successful; active real-node
++cleanup and shutdown on another platform require their own verification.
++
+ ## Quick Start
+ 
+ Compose a four-producer stablenet network into a workspace, verify it, and tear
+diff --git a/cmd/chainbench-mcp/main.go b/cmd/chainbench-mcp/main.go
+index 38de0f78..755876cc 100644
+--- a/cmd/chainbench-mcp/main.go
++++ b/cmd/chainbench-mcp/main.go
+@@ -7,8 +7,11 @@ package main
+ import (
+ 	"bufio"
+ 	"context"
++	"errors"
+ 	"fmt"
+ 	"os"
++	"os/signal"
++	"syscall"
+ 
+ 	_ "github.com/0xmhha/chainbench/internal/chains/all"
+ 
+@@ -26,31 +29,118 @@ func main() {
+ 
+ func serve(in *os.File, out *os.File) error {
+ 	srv := mcp.Default("chainbench", version)
+-	ctx := context.Background()
++	return serveSignals(in, out, srv.Handle)
++}
+ 
+-	scanner := bufio.NewScanner(in)
+-	scanner.Buffer(make([]byte, 0, 64*1024), 8*1024*1024)
+-	w := bufio.NewWriter(out)
+-	defer w.Flush()
++func serveSignals(in *os.File, out *os.File, handle func(context.Context, []byte) []byte) (err error) {
++	input, restoreInput, err := cancellableStdio(in)
++	if err != nil {
++		return err
++	}
++	defer func() { err = errors.Join(err, restoreInput()) }()
++	output, restoreOutput, err := cancellableStdio(out)
++	if err != nil {
++		_ = input.Close()
++		return err
++	}
++	defer func() { err = errors.Join(err, restoreOutput()) }()
++	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
++	defer stop()
++	return serveContext(ctx, input, output, handle)
++}
+ 
+-	for scanner.Scan() {
+-		line := scanner.Bytes()
+-		if len(line) == 0 {
+-			continue
++// serveContext owns the stdio files. Requests remain serial, but reading runs
++// independently so EOF or a signal can cancel a cooperative active handler.
++// Cancellation also closes the files to release blocked reads and writes.
++// Handler errors stay in their MCP responses; unrelated transport errors stay
++// errors. A clean server shutdown is not a successful tool execution.
++func serveContext(ctx context.Context, in *os.File, out *os.File, handle func(context.Context, []byte) []byte) error {
++	transportCtx, stopTransport := context.WithCancel(ctx)
++	requestCtx, cancelRequests := context.WithCancel(ctx)
++	frames := make(chan []byte)
++	readDone := make(chan struct{})
++	watchDone := make(chan struct{})
++	var readErr error
++	go func() {
++		defer close(readDone)
++		defer close(frames)
++		scanner := bufio.NewScanner(in)
++		scanner.Buffer(make([]byte, 0, 64*1024), 8*1024*1024)
++		for scanner.Scan() {
++			if len(scanner.Bytes()) == 0 {
++				continue
++			}
++			// Scanner reuses its buffer while the previous request is running.
++			line := append([]byte(nil), scanner.Bytes()...)
++			select {
++			case frames <- line:
++			case <-transportCtx.Done():
++				return
++			}
++		}
++		readErr = scanner.Err()
++	}()
++	go func() {
++		defer close(watchDone)
++		inputDone := readDone
++		for {
++			select {
++			case <-inputDone:
++				cancelRequests()
++				inputDone = nil
++			case <-transportCtx.Done():
++				cancelRequests()
++				// These files belong to this server, never another process.
++				_ = in.Close()
++				_ = out.Close()
++				return
++			}
++		}
++	}()
++	defer func() {
++		stopTransport()
++		<-watchDone
++		<-readDone
++		cancelRequests()
++	}()
++
++	w := bufio.NewWriter(out)
++	for {
++		var line []byte
++		select {
++		case <-ctx.Done():
++			<-readDone
++			return shutdownError(ctx, readErr)
++		case next, ok := <-frames:
++			if !ok {
++				<-readDone
++				return shutdownError(ctx, readErr)
++			}
++			line = next
++		}
++		resp := handle(requestCtx, line)
++		if ctx.Err() != nil {
++			<-readDone
++			return shutdownError(ctx, readErr)
+ 		}
+-		resp := srv.Handle(ctx, line)
+ 		if resp == nil {
+ 			continue // notification: no reply
+ 		}
+ 		if _, err := w.Write(resp); err != nil {
+-			return err
++			return shutdownError(ctx, err)
+ 		}
+ 		if err := w.WriteByte('\n'); err != nil {
+-			return err
++			return shutdownError(ctx, err)
+ 		}
+ 		if err := w.Flush(); err != nil {
+-			return err
++			return shutdownError(ctx, err)
+ 		}
+ 	}
+-	return scanner.Err()
++}
++
++func shutdownError(ctx context.Context, err error) error {
++	if ctx.Err() != nil && errors.Is(err, os.ErrClosed) {
++		return nil // only the close used to interrupt owned stdio on shutdown
++	}
++	return err
+ }
+diff --git a/cmd/chainbench-mcp/main_test.go b/cmd/chainbench-mcp/main_test.go
+new file mode 100644
+index 00000000..2675f45a
+--- /dev/null
++++ b/cmd/chainbench-mcp/main_test.go
+@@ -0,0 +1,317 @@
++package main
++
++import (
++	"bufio"
++	"bytes"
++	"context"
++	"encoding/json"
++	"errors"
++	"fmt"
++	"io"
++	"os"
++	"os/exec"
++	"path/filepath"
++	"strings"
++	"syscall"
++	"testing"
++	"time"
++
++	"github.com/0xmhha/chainbench/internal/mcp"
++)
++
++const initializeRequest = `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}` + "\n"
++
++type testSession struct {
++	input  *os.File
++	output *os.File
++	cancel context.CancelFunc
++	done   chan error
++}
++
++func session(t *testing.T, handle func(context.Context, []byte) []byte) *testSession {
++	t.Helper()
++	in, input, err := os.Pipe()
++	if err != nil {
++		t.Fatal(err)
++	}
++	output, out, err := os.Pipe()
++	if err != nil {
++		t.Fatal(err)
++	}
++	ctx, cancel := context.WithCancel(context.Background())
++	s := &testSession{input: input, output: output, cancel: cancel, done: make(chan error, 1)}
++	t.Cleanup(func() { cancel(); _ = input.Close(); _ = output.Close(); _ = in.Close(); _ = out.Close() })
++	go func() { s.done <- serveContext(ctx, in, out, handle) }()
++	return s
++}
++
++func waitServer(t *testing.T, s *testSession) error {
++	t.Helper()
++	select {
++	case err := <-s.done:
++		return err
++	case <-time.After(3 * time.Second):
++		t.Fatal("server did not stop cooperatively")
++		return nil
++	}
++}
++
++func send(t *testing.T, s *testSession, request string) {
++	t.Helper()
++	if _, err := io.WriteString(s.input, request); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestEOFRepliesInOrder(t *testing.T) {
++	s := session(t, mcp.NewServer("fixture", "test").Handle)
++	send(t, s, initializeRequest+`{"jsonrpc":"2.0","id":2,"method":"tools/list"}`+"\n")
++	_ = s.input.Close()
++	raw, err := io.ReadAll(s.output)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := waitServer(t, s); err != nil {
++		t.Fatal(err)
++	}
++	lines := bytes.Split(bytes.TrimSpace(raw), []byte("\n"))
++	if len(lines) != 2 {
++		t.Fatalf("responses: %s", raw)
++	}
++	for i, line := range lines {
++		var r struct {
++			ID int `json:"id"`
++		}
++		if err := json.Unmarshal(line, &r); err != nil {
++			t.Fatal(err)
++		}
++		if r.ID != i+1 {
++			t.Fatalf("response order: %s", raw)
++		}
++	}
++}
++
++func TestEOFActiveToolCancelsAndKeepsErrorResponse(t *testing.T) {
++	srv := mcp.NewServer("fixture", "test")
++	started := make(chan struct{})
++	cleaned := make(chan struct{})
++	srv.Register(mcp.Tool{Name: "wait", Handler: func(ctx context.Context, _ map[string]any) (string, error) {
++		close(started)
++		<-ctx.Done()
++		defer close(cleaned)
++		return "", ctx.Err()
++	}})
++	s := session(t, srv.Handle)
++	send(t, s, `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"wait"}}`+"\n")
++	select {
++	case <-started:
++	case <-time.After(3 * time.Second):
++		t.Fatal("handler not called")
++	}
++	_ = s.input.Close()
++	raw, err := io.ReadAll(s.output)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := waitServer(t, s); err != nil {
++		t.Fatal(err)
++	}
++	select {
++	case <-cleaned:
++	default:
++		t.Fatal("handler cleanup was skipped")
++	}
++	var result struct {
++		Result struct {
++			IsError bool `json:"isError"`
++		} `json:"result"`
++	}
++	if err := json.Unmarshal(raw, &result); err != nil {
++		t.Fatalf("response %q: %v", raw, err)
++	}
++	if !result.Result.IsError || !bytes.Contains(raw, []byte("context canceled")) {
++		t.Fatalf("cancellation masked as successful tool result: %s", raw)
++	}
++}
++
++func TestCancelUnblocksIdleRead(t *testing.T) {
++	s := session(t, mcp.NewServer("fixture", "test").Handle)
++	s.cancel()
++	if err := waitServer(t, s); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestCancelUnblocksOutputWrite(t *testing.T) {
++	s := session(t, func(context.Context, []byte) []byte { return bytes.Repeat([]byte("x"), 16*1024*1024) })
++	send(t, s, initializeRequest)
++	first := make(chan error, 1)
++	go func() { _, err := io.ReadFull(s.output, make([]byte, 1)); first <- err }()
++	select {
++	case err := <-first:
++		if err != nil {
++			t.Fatal(err)
++		}
++	case <-time.After(3 * time.Second):
++		t.Fatal("output write did not begin")
++	}
++	s.cancel()
++	if err := waitServer(t, s); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestOversizeInputRemainsAnError(t *testing.T) {
++	s := session(t, mcp.NewServer("fixture", "test").Handle)
++	writerDone := make(chan struct{})
++	go func() {
++		defer close(writerDone)
++		_, _ = io.Copy(s.input, strings.NewReader(strings.Repeat("x", 9*1024*1024)))
++		_ = s.input.Close()
++	}()
++	err := waitServer(t, s)
++	if err == nil || !strings.Contains(err.Error(), "token too long") {
++		t.Fatalf("expected frame limit error, got %v", err)
++	}
++	<-writerDone
++}
++
++func TestOutputFailureRemainsAnError(t *testing.T) {
++	s := session(t, mcp.NewServer("fixture", "test").Handle)
++	_ = s.output.Close()
++	send(t, s, initializeRequest)
++	if err := waitServer(t, s); err == nil {
++		t.Fatal("broken output masked as graceful shutdown")
++	}
++}
++
++func TestCancellationDoesNotMaskUnrelatedErrors(t *testing.T) {
++	ctx, cancel := context.WithCancel(context.Background())
++	cancel()
++	for _, err := range []error{syscall.EPIPE, errors.New("scanner limit"), errors.New("disk error")} {
++		if got := shutdownError(ctx, err); !errors.Is(got, err) {
++			t.Fatalf("masked %v: %v", err, got)
++		}
++	}
++}
++
++// Subprocesses exercise the actual signal registration and owned stdio. The
++// active tool is a cooperative fixture, not an actual chain/node integration.
++func TestSignalShutdownProcesses(t *testing.T) {
++	for _, mode := range []string{"idle", "active", "blocked_output"} {
++		for i := 0; i < 3; i++ {
++			t.Run(fmt.Sprintf("%s/%d", mode, i), func(t *testing.T) {
++				cmd := exec.Command(os.Args[0], "-test.run=^TestProcessHelper$")
++				marker := filepath.Join(t.TempDir(), "cleanup")
++				cmd.Env = append(os.Environ(), "CHAINBENCH_MCP_TEST_CHILD="+mode, "CHAINBENCH_MCP_TEST_CLEANUP="+marker)
++				input, err := cmd.StdinPipe()
++				if err != nil {
++					t.Fatal(err)
++				}
++				output, err := cmd.StdoutPipe()
++				if err != nil {
++					t.Fatal(err)
++				}
++				stderr, err := cmd.StderrPipe()
++				if err != nil {
++					t.Fatal(err)
++				}
++				if err := cmd.Start(); err != nil {
++					t.Fatal(err)
++				}
++				exited := false
++				t.Cleanup(func() {
++					_ = input.Close()
++					if !exited {
++						_ = cmd.Process.Kill()
++						_ = cmd.Wait()
++					}
++				})
++				ready := make(chan error, 1)
++				if mode == "idle" {
++					if _, err := io.WriteString(input, initializeRequest); err != nil {
++						t.Fatal(err)
++					}
++					go func() { _, err := bufio.NewReader(output).ReadString('\n'); ready <- err }()
++				} else {
++					if _, err := io.WriteString(input, `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"wait"}}`+"\n"); err != nil {
++						t.Fatal(err)
++					}
++					go func() {
++						if mode == "blocked_output" {
++							_, err := io.ReadFull(output, make([]byte, 1))
++							ready <- err
++						} else {
++							line, err := bufio.NewReader(stderr).ReadString('\n')
++							if err == nil && !strings.Contains(line, "handler-active") {
++								err = fmt.Errorf("unexpected readiness: %q", line)
++							}
++							ready <- err
++						}
++					}()
++				}
++				select {
++				case err := <-ready:
++					if err != nil {
++						t.Fatal(err)
++					}
++				case <-time.After(5 * time.Second):
++					t.Fatal("child not ready")
++				}
++				start := time.Now()
++				if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
++					t.Fatal(err)
++				}
++				done := make(chan error, 1)
++				go func() { done <- cmd.Wait() }()
++				select {
++				case err := <-done:
++					exited = true
++					if err != nil {
++						t.Fatalf("SIGTERM exit: %v", err)
++					}
++				case <-time.After(5 * time.Second):
++					_ = cmd.Process.Kill()
++					err := <-done
++					exited = true
++					t.Fatalf("forced kill required: %v", err)
++				}
++				if mode == "active" {
++					raw, err := os.ReadFile(marker)
++					if err != nil || string(raw) != "canceled" {
++						t.Fatalf("missing handler cleanup: %q %v", raw, err)
++					}
++				}
++				t.Logf("mode=%s signal=SIGTERM exit=0 forced_kill=false elapsed=%s", mode, time.Since(start))
++			})
++		}
++	}
++}
++
++func TestProcessHelper(t *testing.T) {
++	mode := os.Getenv("CHAINBENCH_MCP_TEST_CHILD")
++	if mode == "" {
++		return
++	}
++	if mode == "idle" {
++		main()
++		os.Exit(0)
++	}
++	srv := mcp.NewServer("fixture", "test")
++	srv.Register(mcp.Tool{Name: "wait", Handler: func(ctx context.Context, _ map[string]any) (string, error) {
++		if mode == "blocked_output" {
++			return strings.Repeat("x", 16*1024*1024), nil
++		}
++		_, _ = fmt.Fprintln(os.Stderr, "handler-active")
++		<-ctx.Done()
++		if err := os.WriteFile(os.Getenv("CHAINBENCH_MCP_TEST_CLEANUP"), []byte("canceled"), 0o600); err != nil {
++			return "", err
++		}
++		return "", ctx.Err()
++	}})
++	if err := serveSignals(os.Stdin, os.Stdout, srv.Handle); err != nil {
++		_, _ = fmt.Fprintln(os.Stderr, err)
++		os.Exit(1)
++	}
++	os.Exit(0)
++}
+diff --git a/cmd/chainbench-mcp/stdio_other.go b/cmd/chainbench-mcp/stdio_other.go
+new file mode 100644
+index 00000000..b93f4ed5
+--- /dev/null
++++ b/cmd/chainbench-mcp/stdio_other.go
+@@ -0,0 +1,11 @@
++//go:build !unix
++
++package main
++
++import "os"
++
++// Keep the platform's native descriptor handling. Unix subprocess cancellation
++// receipts do not establish shutdown behavior on another platform.
++func cancellableStdio(file *os.File) (*os.File, func() error, error) {
++	return file, func() error { return nil }, nil
++}
+diff --git a/cmd/chainbench-mcp/stdio_unix.go b/cmd/chainbench-mcp/stdio_unix.go
+new file mode 100644
+index 00000000..ab121f64
+--- /dev/null
++++ b/cmd/chainbench-mcp/stdio_unix.go
+@@ -0,0 +1,53 @@
++//go:build unix
++
++package main
++
++import (
++	"errors"
++	"fmt"
++	"os"
++
++	"golang.org/x/sys/unix"
++)
++
++// os.Stdin/Stdout may be blocking, non-pollable wrappers even when connected
++// to a pipe. A Close then waits for Read/Write instead of interrupting it.
++// Duplicate the owned descriptor in nonblocking mode before NewFile, so Go's
++// runtime poller can interrupt it. Restore the original file-status flags at
++// the end; dup descriptors share those flags with the original open file.
++func cancellableStdio(original *os.File) (*os.File, func() error, error) {
++	raw, err := original.SyscallConn()
++	if err != nil {
++		return nil, nil, err
++	}
++	var descriptor, flags int
++	var setupErr error
++	err = raw.Control(func(fd uintptr) {
++		flags, setupErr = unix.FcntlInt(fd, unix.F_GETFL, 0)
++		if setupErr != nil {
++			return
++		}
++		descriptor, setupErr = unix.Dup(int(fd))
++	})
++	if err != nil || setupErr != nil {
++		return nil, nil, errors.Join(err, setupErr)
++	}
++	unix.CloseOnExec(descriptor)
++	restore := func() error {
++		var restoreErr error
++		err := raw.Control(func(fd uintptr) {
++			_, restoreErr = unix.FcntlInt(fd, unix.F_SETFL, flags)
++		})
++		return errors.Join(err, restoreErr)
++	}
++	if err := unix.SetNonblock(descriptor, true); err != nil {
++		_ = unix.Close(descriptor)
++		return nil, nil, err
++	}
++	file := os.NewFile(uintptr(descriptor), original.Name())
++	if file == nil {
++		_ = unix.Close(descriptor)
++		return nil, nil, errors.Join(fmt.Errorf("invalid owned stdio descriptor"), restore())
++	}
++	return file, restore, nil
++}
+diff --git a/cmd/chainbench-mcp/stdio_unix_test.go b/cmd/chainbench-mcp/stdio_unix_test.go
+new file mode 100644
+index 00000000..7fc842d9
+--- /dev/null
++++ b/cmd/chainbench-mcp/stdio_unix_test.go
+@@ -0,0 +1,68 @@
++//go:build unix
++
++package main
++
++import (
++	"errors"
++	"golang.org/x/sys/unix"
++	"os"
++	"testing"
++	"time"
++)
++
++func TestStdioDuplicateIsPollableAndRestoresSharedFlags(t *testing.T) {
++	in, writer, err := os.Pipe()
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer func() { _ = in.Close(); _ = writer.Close() }()
++	raw, err := in.SyscallConn()
++	if err != nil {
++		t.Fatal(err)
++	}
++	var flags int
++	var operationErr error
++	if err := raw.Control(func(fd uintptr) {
++		flags, operationErr = unix.FcntlInt(fd, unix.F_GETFL, 0)
++		if operationErr == nil {
++			_, operationErr = unix.FcntlInt(fd, unix.F_SETFL, flags&^unix.O_NONBLOCK)
++		}
++	}); err != nil || operationErr != nil {
++		t.Fatalf("stdio setup: %v %v", err, operationErr)
++	}
++	originalFlags := flags &^ unix.O_NONBLOCK
++	duplicate, restore, err := cancellableStdio(in)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := duplicate.SetReadDeadline(time.Now()); err != nil {
++		t.Fatal("duplicate is not pollable:", err)
++	}
++	if _, err := duplicate.Read(make([]byte, 1)); !errors.Is(err, os.ErrDeadlineExceeded) {
++		t.Fatal("pollable deadline failed:", err)
++	}
++	if err := duplicate.Close(); err != nil {
++		t.Fatal(err)
++	}
++	if err := restore(); err != nil {
++		t.Fatal(err)
++	}
++	if err := raw.Control(func(fd uintptr) { flags, operationErr = unix.FcntlInt(fd, unix.F_GETFL, 0) }); err != nil || operationErr != nil {
++		t.Fatalf("flags query: %v %v", err, operationErr)
++	}
++	if flags != originalFlags {
++		t.Fatalf("shared original flags changed: before=%d after=%d", originalFlags, flags)
++	}
++}
++
++func TestClosedStdioSetupReturnsError(t *testing.T) {
++	in, writer, err := os.Pipe()
++	if err != nil {
++		t.Fatal(err)
++	}
++	_ = in.Close()
++	_ = writer.Close()
++	if _, _, err := cancellableStdio(in); err == nil {
++		t.Fatal("closed descriptor accepted")
++	}
++}
+diff --git a/cmd/chainbench/chaincmd/chain_test.go b/cmd/chainbench/chaincmd/chain_test.go
+index 05be56ac..409ac3a1 100644
+--- a/cmd/chainbench/chaincmd/chain_test.go
++++ b/cmd/chainbench/chaincmd/chain_test.go
+@@ -66,11 +66,11 @@ func TestChainCmd_RemoteTargetRecorded(t *testing.T) {
+ }
+ 
+ // TestChainCmd_DefaultsTheWorkspace pins the omitted-flag behaviour: a fresh
+-// timestamped directory under the (test-scoped) home, and the path printed
++// timestamped directory under the test-scoped state root, and the path printed
+ // before anything uses it, so it is never a guess.
+ func TestChainCmd_DefaultsTheWorkspace(t *testing.T) {
+ 	home := t.TempDir()
+-	t.Setenv("HOME", home)
++	t.Setenv("CHAINBENCH_DATA_ROOT", home)
+ 	out, err := run(t, "chain", "new", "--chain", "stablenet")
+ 	if err != nil {
+ 		t.Fatalf("chain new without --workspace-dir: %v\n%s", err, out)
+diff --git a/cmd/chainbench/chaincmd/equivalence_test.go b/cmd/chainbench/chaincmd/equivalence_test.go
+index 73a15a38..460b908c 100644
+--- a/cmd/chainbench/chaincmd/equivalence_test.go
++++ b/cmd/chainbench/chaincmd/equivalence_test.go
+@@ -204,8 +204,7 @@ func TestEquivalence_ChainStatusReportsTheSameComposition(t *testing.T) {
+ // before using it, precisely so this is observable.
+ func TestEquivalence_TheWorkspaceDefaultIsOneDefault(t *testing.T) {
+ 	home := t.TempDir()
+-	t.Setenv("HOME", home)
+-	t.Setenv("USERPROFILE", home) // the same variable's name on Windows
++	t.Setenv("CHAINBENCH_DATA_ROOT", home)
+ 
+ 	preset := filepath.Join("..", "..", "..", "presets", "keys")
+ 	out, err := run(t, "chain", "new", "--chain", "stablenet", "--keys", preset)
+@@ -213,7 +212,7 @@ func TestEquivalence_TheWorkspaceDefaultIsOneDefault(t *testing.T) {
+ 		t.Fatalf("chain new with no workspace: %v\n%s", err, out)
+ 	}
+ 	if !strings.Contains(out, home) {
+-		t.Fatalf("the default workspace is not under this test's home, so the surface computed its own:\n%s", out)
++		t.Fatalf("the default workspace is not under this test's state root, so the surface computed its own:\n%s", out)
+ 	}
+ 
+ 	// And it is the path app would have chosen, not one this surface invented.
+diff --git a/cmd/chainbench/resourcecmd/parity_test.go b/cmd/chainbench/resourcecmd/parity_test.go
+index 31441f69..18bafa59 100644
+--- a/cmd/chainbench/resourcecmd/parity_test.go
++++ b/cmd/chainbench/resourcecmd/parity_test.go
+@@ -91,12 +91,11 @@ func decode(t *testing.T, out string) any {
+ // directly, or picks up a different default, the two answers separate and this
+ // fails — which is the whole point, since nothing else would notice.
+ func TestParity_ResourcePool(t *testing.T) {
+-	// A home of this test's own, so the pool is read from an empty tree rather
++	// A state root of this test's own, so the pool is read from an empty tree rather
+ 	// than from whatever the developer's machine happens to hold. Both surfaces
+ 	// see the same one, which is what makes the comparison meaningful.
+ 	home := t.TempDir()
+-	t.Setenv("HOME", home)
+-	t.Setenv("USERPROFILE", home) // the same variable's name on Windows
++	t.Setenv("CHAINBENCH_DATA_ROOT", home)
+ 
+ 	cli, err := run(t, "resource", "pool", "--json")
+ 	if err != nil {
+@@ -111,7 +110,7 @@ func TestParity_ResourcePool(t *testing.T) {
+ 	if !ok || len(m) == 0 {
+ 		t.Fatalf("the answer is empty, so agreeing about it proves nothing: %#v", got)
+ 	}
+-	if _, ok := os.LookupEnv("HOME"); !ok {
+-		t.Fatal("HOME was not set, so the test read the developer's real tree")
++	if _, ok := os.LookupEnv("CHAINBENCH_DATA_ROOT"); !ok {
++		t.Fatal("state root was not set, so the test read the developer's real tree")
+ 	}
+ }
+diff --git a/cmd/chainbench/resourcecmd/resource_test.go b/cmd/chainbench/resourcecmd/resource_test.go
+index 4f7a97b2..6674404b 100644
+--- a/cmd/chainbench/resourcecmd/resource_test.go
++++ b/cmd/chainbench/resourcecmd/resource_test.go
+@@ -148,9 +148,9 @@ func composedWorkspace(t *testing.T) string {
+ // TestPool_CountsUsedSlots pins the arithmetic an operator otherwise does by
+ // hand: capacity from the pool, used from the workspace.
+ func TestPool_CountsUsedSlots(t *testing.T) {
+-	// The pool also adopts every composition under ~/.chainbench; point HOME
+-	// at an empty dir so the operator's own workspaces do not leak in.
+-	t.Setenv("HOME", t.TempDir())
++	// Give default-root discovery an empty owned directory so the operator's
++	// own workspaces do not enter this pool.
++	t.Setenv("CHAINBENCH_DATA_ROOT", t.TempDir())
+ 	dir := composedWorkspace(t)
+ 	out, err := run(t, "resource", "pool", "--workspace-dir", dir)
+ 	if err != nil {
+@@ -169,9 +169,9 @@ func TestPool_CountsUsedSlots(t *testing.T) {
+ // one's claims end — and the pool counts both and names both.
+ func TestPool_CountsEveryCompositionUnderTheRoot(t *testing.T) {
+ 	home := t.TempDir()
+-	t.Setenv("HOME", home)
++	t.Setenv("CHAINBENCH_DATA_ROOT", home)
+ 	for _, stamp := range []string{"20260828-100000", "20260828-100100"} {
+-		dir := filepath.Join(home, ".chainbench", stamp, "chainsetup")
++		dir := filepath.Join(home, stamp, "chainsetup")
+ 		ws, err := chainsetup.Open(dir, time.Now)
+ 		if err != nil {
+ 			t.Fatal(err)
+diff --git a/docs/dev/architecture/package-tree.md b/docs/dev/architecture/package-tree.md
+index f2adc4a8..03478a57 100644
+--- a/docs/dev/architecture/package-tree.md
++++ b/docs/dev/architecture/package-tree.md
+@@ -24,11 +24,11 @@
+ 
+ | 묶음 | 패키지 | 줄 |
+ |---|---|---|
+-| `internal/` | 55 | 84,903 |
+-| `cmd/` | 20 | 5,830 |
++| `internal/` | 55 | 84,913 |
++| `cmd/` | 20 | 5,984 |
+ | `scripts/inventory/` | 3 | 790 |
+ | `tests/` | 1 | 135 |
+-| **합계** | **79** | **91,658** |
++| **합계** | **79** | **91,822** |
+ 
+ 이 묶음의 숫자는 `internal/arch/packagetree_test.go` 가 `go list ./...` 와 맞춰 본다. `layers.md` §3 의
+ 제목에 있던 개수가 43 에서 멈춰 실제 48 과 갈라져 있었기 때문에 — 개수는 사람이 세면 늦는다 —
+@@ -36,11 +36,11 @@
+ 
+ ---
+ 
+-## 1. `internal/core` — 26패키지 19,979줄 · 프로젝트 공용 기반
++## 1. `internal/core` — 26패키지 19,989줄 · 프로젝트 공용 기반
+ 
+ ```
+ internal/core/
+-├── home            52  [L0] 약속된 위치의 소유자 ~/.chainbench. 경로를 안 대면 키셋·세션·구성이 다 여기로 (요구 7)
++├── home            62  [L0] 약속된 위치의 소유자 ~/.chainbench. 경로를 안 대면 키셋·세션·구성이 다 여기로 (요구 7)
+ ├── node         1,381  [L0] 노드에 대해 아는 것 전부 — Node·NodeSet·Role·Endpoints·Label·Placement·Map·
+ │                            Peering·Layout·Enode + 노드 레이아웃 선언(Topology·Entry·Load).
+ │                            최다 피참조. 내부 import 0
+@@ -195,7 +195,7 @@ internal/testsupport  26  [L0] 교차 패키지 테스트 게이트 — ServersB
+ 
+ ---
+ 
+-## 4. `cmd/` — 20패키지 5,830줄 · [L6] 표면
++## 4. `cmd/` — 20패키지 5,984줄 · [L6] 표면
+ 
+ `layers.md` §3 의 배치 검사는 `internal/` 만 대상으로 한다 — `cmd` 는 정의상 최상위이고 무엇이든
+ import 할 수 있다.
+@@ -224,7 +224,7 @@ cmd/chainbench           310  main. 사용자용 CLI(요구 15) 루트 조립
+ ├── resourcecmd          332  네트워크가 무엇으로 구성될 수 있는지를 질문으로 — 서버·포트 슬롯·용량
+ ├── filecmd              145  서버 데이터 플레인과 파일 주고받기
+ └── catalogcmd           145  "이 빌드가 무엇을 아는가" — 구성 가능한 체인, 등록된 capability. 네트워크를 건드리지 않는다
+-cmd/chainbench-mcp        56  main. MCP 표면(요구 14)을 stdio 로 — stdin 의 줄 단위 JSON-RPC 를 읽어 mcp 도구로 디스패치
++cmd/chainbench-mcp       210  main. MCP 표면(요구 14)을 stdio 로 — stdin 의 줄 단위 JSON-RPC 를 읽어 mcp 도구로 디스패치
+ cmd/chainbench-dashboard 195  main. 대시보드 데몬(요구 19) — obs 이벤트 버스와 run 저장소를 HTTP+SSE 로 호스팅
+ ```
+ 
+diff --git a/internal/chainsetup/resume_test.go b/internal/chainsetup/resume_test.go
+index d4f391b5..4f9c740d 100644
+--- a/internal/chainsetup/resume_test.go
++++ b/internal/chainsetup/resume_test.go
+@@ -240,8 +240,8 @@ func TestSetLock_SerializesAllocation(t *testing.T) {
+ 	// Two allocators on one set: the second sees the first's lock as live
+ 	// (same host, this very process would nest — so it is a foreign pid).
+ 	root := t.TempDir()
+-	t.Setenv("HOME", root)
+-	path := filepath.Join(root, ".chainbench", "local.lock")
++	t.Setenv("CHAINBENCH_DATA_ROOT", root)
++	path := filepath.Join(root, "local.lock")
+ 	held, _, state, err := session.AcquireLock(path, "test", nil)
+ 	if err != nil || state != session.LockFree {
+ 		t.Fatalf("first acquire: state=%s err=%v", state, err)
+diff --git a/internal/chainsetup/stale_test.go b/internal/chainsetup/stale_test.go
+index 82483f65..dac43f30 100644
+--- a/internal/chainsetup/stale_test.go
++++ b/internal/chainsetup/stale_test.go
+@@ -36,7 +36,7 @@ func TestCompositionsOn_OnlyCompositionIDsCount(t *testing.T) {
+ // ~/.chainbench is found by searching the directories the operator names, and
+ // its composition id is the one compose gave it.
+ func TestKnownCompositions_AWorkspaceUnderKeepUnderIsKept(t *testing.T) {
+-	t.Setenv("HOME", t.TempDir())
++	t.Setenv("CHAINBENCH_DATA_ROOT", t.TempDir())
+ 	base := t.TempDir()
+ 	ws := filepath.Join(base, "manual", "basic-consensus")
+ 	if err := os.MkdirAll(ws, 0o755); err != nil {
+diff --git a/internal/core/home/home.go b/internal/core/home/home.go
+index 3c360822..6a0a94a8 100644
+--- a/internal/core/home/home.go
++++ b/internal/core/home/home.go
+@@ -23,8 +23,18 @@ import (
+ // state: key sets, compositions, and session artifacts.
+ const Dir = ".chainbench"
+ 
+-// Root is the promised location: ~/.chainbench.
++// RootEnv names an explicit state root. It isolates test/pilot artifacts and
++// locks without changing the operator's home or the default location.
++const RootEnv = "CHAINBENCH_DATA_ROOT"
++
++// Root uses an explicitly named absolute state root, or ~/.chainbench.
+ func Root() (string, error) {
++	if root := os.Getenv(RootEnv); root != "" {
++		if !filepath.IsAbs(root) {
++			return "", fmt.Errorf("home: %s must be an absolute path", RootEnv)
++		}
++		return filepath.Clean(root), nil
++	}
+ 	h, err := os.UserHomeDir()
+ 	if err != nil {
+ 		return "", fmt.Errorf("home: no home directory to place chainbench's files under: %w", err)
+diff --git a/internal/core/home/home_test.go b/internal/core/home/home_test.go
+index acf136bb..09123b2e 100644
+--- a/internal/core/home/home_test.go
++++ b/internal/core/home/home_test.go
+@@ -16,6 +16,7 @@ import (
+ // and sessions landed wherever the operator happened to be. A promised
+ // location that moves with the working directory is not a promised location.
+ func TestRoot_IsNotRelativeToWhereYouStand(t *testing.T) {
++	t.Setenv(home.RootEnv, "")
+ 	root, err := home.Root()
+ 	if err != nil {
+ 		t.Skipf("no home directory on this machine: %v", err)
+@@ -32,6 +33,28 @@ func TestRoot_IsNotRelativeToWhereYouStand(t *testing.T) {
+ 	}
+ }
+ 
++func TestExplicitRootKeepsAllStateAndLocksInAnOwnedDirectory(t *testing.T) {
++	root := t.TempDir()
++	t.Setenv(home.RootEnv, root)
++	got, err := home.Root()
++	if err != nil || got != root {
++		t.Fatalf("explicit root: %q %v", got, err)
++	}
++	for _, part := range []string{"keys", "sessions", "local.lock"} {
++		got, err := home.Under(part)
++		if err != nil || got != filepath.Join(root, part) {
++			t.Fatalf("owned %s: %q %v", part, got, err)
++		}
++	}
++}
++
++func TestRelativeRootIsRejectedRatherThanFollowingTheWorkingDirectory(t *testing.T) {
++	t.Setenv(home.RootEnv, "relative-state")
++	if _, err := home.Root(); err == nil {
++		t.Fatal("relative state root accepted")
++	}
++}
++
+ // TestUnder_KeepsTheKindsApart: the three kinds of asset share one root and
+ // keep their own place under it, so an operator can find any of them without
+ // remembering which command wrote it.

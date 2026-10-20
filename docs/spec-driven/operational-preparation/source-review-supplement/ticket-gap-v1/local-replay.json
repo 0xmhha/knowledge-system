@@ -1,0 +1,225 @@
+{
+  "kind": "local_synthetic_pure_function_replay_not_cli_api_or_host",
+  "observations": [
+    {
+      "id": "bound_symptom",
+      "kind": "oracle_classification",
+      "expected": "RED",
+      "actual": "RED",
+      "reason": "bound symptom assertion failed"
+    },
+    {
+      "id": "bound_pass",
+      "kind": "oracle_classification",
+      "expected": "GREEN",
+      "actual": "GREEN",
+      "reason": "bound assertion passed"
+    },
+    {
+      "id": "timeout",
+      "kind": "oracle_classification",
+      "expected": "ERROR",
+      "actual": "ERROR",
+      "reason": "driver failed to execute within its budget"
+    },
+    {
+      "id": "launch_error",
+      "kind": "oracle_classification",
+      "expected": "ERROR",
+      "actual": "ERROR",
+      "reason": "driver failed to execute within its budget"
+    },
+    {
+      "id": "source_changed",
+      "kind": "oracle_classification",
+      "expected": "ERROR",
+      "actual": "ERROR",
+      "reason": "driver modified its source snapshot"
+    },
+    {
+      "id": "wrong_assertion",
+      "kind": "oracle_classification",
+      "expected": "ERROR",
+      "actual": "ERROR",
+      "reason": "driver assertion identity does not match the frozen case"
+    },
+    {
+      "id": "wrong_subject",
+      "kind": "oracle_classification",
+      "expected": "ERROR",
+      "actual": "ERROR",
+      "reason": "driver assertion identity does not match the frozen case"
+    },
+    {
+      "id": "non_assertion_exit",
+      "kind": "oracle_classification",
+      "expected": "ERROR",
+      "actual": "ERROR",
+      "reason": "driver failed to execute within its budget"
+    },
+    {
+      "id": "missing_output",
+      "kind": "oracle_classification",
+      "expected": "ERROR",
+      "actual": "ERROR",
+      "reason": "driver did not emit a single JSON assertion result"
+    },
+    {
+      "id": "selected_assertion",
+      "kind": "go_adapter_outcome",
+      "expected": "symptom_fail",
+      "actual": "symptom_fail"
+    },
+    {
+      "id": "build_failure",
+      "kind": "go_adapter_outcome",
+      "expected": "error",
+      "actual": "error"
+    },
+    {
+      "id": "wrong_failure",
+      "kind": "go_adapter_outcome",
+      "expected": "error",
+      "actual": "error"
+    },
+    {
+      "id": "no_test",
+      "kind": "go_adapter_outcome",
+      "expected": "error",
+      "actual": "error"
+    },
+    {
+      "id": "selected_pass",
+      "kind": "go_adapter_outcome",
+      "expected": "pass",
+      "actual": "pass"
+    },
+    {
+      "id": "sole_supported",
+      "kind": "candidate_decision",
+      "expected": "SELECTED",
+      "actual": "SELECTED",
+      "decision": {
+        "status": "SELECTED",
+        "selected_candidate": "A",
+        "selected_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "selected_tree": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "reason": "hard-eligible, unanimous preference and sole observed Pareto candidate",
+        "axes_used": [
+          "cost"
+        ],
+        "rejections": {}
+      }
+    },
+    {
+      "id": "all_bad",
+      "kind": "candidate_decision",
+      "expected": "REJECTED",
+      "actual": "REJECTED",
+      "decision": {
+        "status": "REJECTED",
+        "reason": "no unanimously accepted candidate with all required evidence",
+        "selected_candidate": null,
+        "rejections": {
+          "A": "oracle/regression/execution hard condition failed",
+          "B": "oracle/regression/execution hard condition failed"
+        }
+      }
+    },
+    {
+      "id": "tie",
+      "kind": "candidate_decision",
+      "expected": "TIED",
+      "actual": "TIED",
+      "decision": {
+        "status": "TIED",
+        "reason": "multiple Pareto candidates; no arbitrary first-plausible choice",
+        "selected_candidate": null,
+        "frontier": [
+          "A",
+          "B"
+        ],
+        "rejections": {}
+      }
+    },
+    {
+      "id": "incomplete_alternative",
+      "kind": "candidate_decision",
+      "expected": "DEFERRED",
+      "actual": "DEFERRED",
+      "decision": {
+        "status": "DEFERRED",
+        "reason": "potential candidates have unresolved judgment or required measurements",
+        "selected_candidate": null,
+        "unresolved": [
+          "B"
+        ],
+        "rejections": {
+          "B": "candidate execution incomplete; no inference of a bad alternative"
+        }
+      }
+    },
+    {
+      "id": "missing_metric",
+      "kind": "candidate_decision",
+      "expected": "DEFERRED",
+      "actual": "DEFERRED",
+      "decision": {
+        "status": "DEFERRED",
+        "reason": "potential candidates have unresolved judgment or required measurements",
+        "selected_candidate": null,
+        "unresolved": [
+          "B"
+        ],
+        "rejections": {
+          "B": "required comparison measurement missing/unknown"
+        }
+      }
+    },
+    {
+      "id": "panel_disagreement",
+      "kind": "candidate_decision",
+      "expected": "DEFERRED",
+      "actual": "DEFERRED",
+      "decision": {
+        "status": "DEFERRED",
+        "reason": "potential candidates have unresolved judgment or required measurements",
+        "selected_candidate": null,
+        "unresolved": [
+          "B"
+        ],
+        "rejections": {
+          "B": "panel abstention or disagreement"
+        }
+      }
+    },
+    {
+      "id": "panel_missing",
+      "kind": "candidate_decision",
+      "expected": "DEFERRED",
+      "actual": "DEFERRED",
+      "decision": {
+        "status": "DEFERRED",
+        "reason": "missing/invalid panel execution",
+        "selected_candidate": null
+      }
+    },
+    {
+      "id": "preference_disagrees",
+      "kind": "candidate_decision",
+      "expected": "DEFERRED",
+      "actual": "DEFERRED",
+      "decision": {
+        "status": "DEFERRED",
+        "reason": "panel preference is absent or disagrees with measured dominance",
+        "selected_candidate": null,
+        "rejections": {}
+      }
+    }
+  ],
+  "new_model_calls": 0,
+  "new_go_executions": 0,
+  "new_api_calls": 0,
+  "independent_units": 0,
+  "formal_runs": 0
+}

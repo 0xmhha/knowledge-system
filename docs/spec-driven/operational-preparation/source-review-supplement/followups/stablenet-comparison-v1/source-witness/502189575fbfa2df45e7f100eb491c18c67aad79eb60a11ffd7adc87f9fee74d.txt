@@ -1,0 +1,38 @@
+# WBFT quorum size calculation
+
+**Status:** verified · **Subsystem:** A1 (WBFT Consensus Core) · **Type:** B3
+
+WBFT requires QuorumSize = ceil(N - F) where N is the validator set
+size and F = (N-1)/3 evaluated in float64. The quorum is the minimum
+count of Prepare or Commit messages needed before the consensus core
+advances state. State advancement in handlePrepareMsg uses the
+expression WBFTPrepares.Size() >= valSet.QuorumSize().
+
+ceil(N - F) is the AUTHORITATIVE quorum; any reimplementation MUST
+reproduce it exactly. The dangerous refactor is not int-vs-float (see
+the correctness note below) but swapping the FORMULA: the PBFT-textbook
+2f+1 or a simple majority N/2+1 DIVERGE from ceil(N - F) for N not of
+the form 3f+1, and a lower quorum finalizes with too few honest nodes
+(a safety violation). Examples: N=5 -> ceil=4 but 2f+1=3; N=6 -> ceil=5
+but 2f+1=3; N=8 -> ceil=6 but 2f+1=5.
+
+## Invariants
+- QuorumSize is exactly ceil(N - F) with F = (N-1)/3; the live code computes it in float64 via math.Ceil (default.go:226). Any alternative formula must yield the identical value for every N.
+- QuorumSize is always >= 1, including N = 1 (ceil(1 - 0) = 1).
+- Prepare/Commit state transitions compare with >= QuorumSize, not >.
+
+## Pitfalls
+- Reimplementing the quorum with a DIFFERENT formula. PBFT-textbook 2f+1 and simple-majority N/2+1 diverge from ceil(N-F) for N != 3f+1, producing a LOWER quorum that finalizes with too few honest nodes (safety violation). N=5: ceil=4, 2f+1=3; N=6: ceil=5, 2f+1=3; N=8: ceil=6, 2f+1=5.
+- Forgetting that QuorumSize covers both Prepare and Commit independently — each phase needs its own quorum.
+
+## Code anchors
+- `consensus/wbft/validator/default.go` defaultSet.F:222 — F = (N-1)/3 as float64 — integer cast would lose precision
+- `consensus/wbft/validator/default.go` defaultSet.QuorumSize:226 — QuorumSize = ceil(N - F) using math.Ceil over float64
+- `consensus/wbft/core/prepare.go` Core.handlePrepareMsg:87 — threshold check that gates StatePrepared transition
+- `consensus/wbft/types.go` ValidatorSet:216 — interface declaration; F() returns float64 (not int)
+
+## Aliases
+쿼럼, 쿼럼 크기, 쿼럼 미달, 최소 동의 수, consensus threshold, minimum agreement, voting quorum, QuorumSize, F(), math.Ceil, WBFTPrepares, StatePrepared, defaultSet, ValidatorSet
+
+## Related
+A1.wbft_core.consensus_flow_architecture, A3.validator_set.epoch_transition

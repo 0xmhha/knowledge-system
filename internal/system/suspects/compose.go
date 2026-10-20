@@ -124,6 +124,8 @@ func failed[T any](err error, tool, snapshot string, c contract.Citation) contra
 	state, reason := "error", "backend_error"
 	if errors.Is(err, errBudget) {
 		state, reason = "budget_exhausted", "budget_exhausted"
+	} else if errors.Is(err, ckgclient.ErrSeedUnresolved) {
+		reason = "seed_unresolved"
 	}
 	return contract.Signal[T]{Status: state, Reason: reason, Provenance: []contract.SignalFrom{{Tool: tool, Snapshot: snapshot, Anchor: c}}}
 }
@@ -141,6 +143,43 @@ func key(c contract.Citation) string {
 	return fmt.Sprintf("%s:%d:%d@%s", c.File, c.StartLine, c.EndLine, c.CommitHash)
 }
 
+type symbolResolution struct {
+	identity ckgclient.SymbolIdentity
+	err      error
+}
+
+// Containment guards a resolver result; it never establishes identity by
+// itself. Walk edges must still exactly match the declared citation returned
+// by the snapshot-bound resolver.
+func validResolvedIdentity(c contract.Citation, identity ckgclient.SymbolIdentity, snapshot string) bool {
+	d := identity.Citation
+	return identity.Symbol != "" && d.IsValid() && safeFile(d.File) && d.File == c.File && d.CommitHash == snapshot &&
+		((d.StartLine <= c.StartLine && c.EndLine <= d.EndLine) || (c.StartLine <= d.StartLine && d.EndLine <= c.EndLine))
+}
+
+func verificationError(ctx context.Context, err error) error {
+	if errors.Is(ctx.Err(), context.Canceled) || errors.Is(err, context.Canceled) {
+		return fmt.Errorf("snapshot_verification_cancelled")
+	}
+	if ctx.Err() != nil || errors.Is(err, errBudget) || errors.Is(err, context.DeadlineExceeded) {
+		return fmt.Errorf("snapshot_verification_budget_exhausted")
+	}
+	return fmt.Errorf("snapshot_verification_failed")
+}
+
+func seedError(ctx context.Context, prefix string, err error) error {
+	reason := "backend_error"
+	switch {
+	case errors.Is(ctx.Err(), context.Canceled), errors.Is(err, context.Canceled):
+		reason = "request_cancelled"
+	case ctx.Err() != nil, errors.Is(err, errBudget), errors.Is(err, context.DeadlineExceeded):
+		reason = "budget_exhausted"
+	case errors.Is(err, ckgclient.ErrSeedUnresolved):
+		reason = "seed_unresolved"
+	}
+	return fmt.Errorf("%s: %s", prefix, reason)
+}
+
 // Compose uses bounded backend calls. Deadlines are cooperative: old local
 // stores that ignore context may finish one in-flight query after the budget;
 // that result is discarded and no subsequent query is started.
@@ -152,8 +191,18 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 		return contract.SuspectCandidates{}, fmt.Errorf("missing backend")
 	}
 	start := time.Now()
-	ctx, cancel := context.WithTimeout(parent, time.Duration(r.BudgetMS)*time.Millisecond)
+	finalCtx, cancel := context.WithTimeout(parent, time.Duration(r.BudgetMS)*time.Millisecond)
 	defer cancel()
+	totalDeadline, _ := finalCtx.Deadline()
+	reserve := time.Until(totalDeadline) / 10
+	if reserve > 100*time.Millisecond {
+		reserve = 100 * time.Millisecond
+	}
+	if reserve < 0 {
+		reserve = 0
+	}
+	ctx, stopWork := context.WithDeadline(finalCtx, totalDeadline.Add(-reserve))
+	defer stopWork()
 	b := &meter{max: r.MaxCalls - 1, reasons: map[string]bool{}}
 	gh, err := observe(ctx, b, g.Health)
 	if err != nil || !gh.Reachable {
@@ -201,12 +250,52 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 		"Empty impact or concurrency membership is scoped to returned bounded seed queries; it does not prove absence in the entire graph.",
 		"History counts are returned PR references, not total commit counts. Empty results are scoped observations.",
 		"Deadline is cooperative; a non-cancellable local store may finish one in-flight query after the budget.",
+		"Verified declared-source aliases may anchor graph walks and membership; original retrieval citations, ranks and scores remain unchanged.",
+		"Work ends early to reserve final backend identity checks inside the same total deadline (10 percent, at most 100ms).",
 	}}
 	if snapshot == "" && r.Coordinates == nil {
 		out.Partial = true
 		b.reasons["unknown_snapshot"] = true
 	}
 	index := map[string]int{}
+	resolver, canResolve := g.(ckgclient.CitationResolver)
+	identities := map[string]symbolResolution{}
+	resolve := func(c contract.Citation) (ckgclient.SymbolIdentity, error) {
+		if old, ok := identities[key(c)]; ok {
+			return old.identity, old.err
+		}
+		identity, e := observe(ctx, b, func(ctx context.Context) (ckgclient.SymbolIdentity, error) {
+			return resolver.ResolveCitation(ctx, c)
+		})
+		if e == nil && !validResolvedIdentity(c, identity, snapshot) {
+			e = ckgclient.ErrSeedUnresolved
+		}
+		identities[key(c)] = symbolResolution{identity: identity, err: e}
+		if e == nil {
+			// A successful declaration also proves its own exact source key.
+			// Never erase an earlier failed observation for another input.
+			if _, exists := identities[key(identity.Citation)]; !exists {
+				identities[key(identity.Citation)] = symbolResolution{identity: identity}
+			}
+		}
+		return identity, e
+	}
+	bindAlias := func(original, canonical contract.Citation) {
+		if i, ok := index[key(original)]; ok {
+			if _, exists := index[key(canonical)]; !exists {
+				index[key(canonical)] = i
+			}
+		}
+	}
+	knownKey := func(c contract.Citation) string {
+		if resolved, ok := identities[key(c)]; ok && resolved.err == nil {
+			return key(resolved.identity.Citation)
+		}
+		return key(c)
+	}
+	sameKnownCitation := func(a, b contract.Citation) bool {
+		return key(a) == key(b) || knownKey(a) == knownKey(b)
+	}
 	seeds := []contract.Citation{}
 	admit := func(c contract.Citation) int {
 		if !c.IsValid() || !safeFile(c.File) {
@@ -257,14 +346,11 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 			addSeed(c)
 		}
 	} else if r.File != "" {
-		resolver, ok := g.(ckgclient.CitationResolver)
-		if !ok {
+		if !canResolve {
 			return out, fmt.Errorf("site_resolver_unavailable")
 		}
 		site := contract.Citation{File: r.File, StartLine: r.Line, EndLine: r.Line, CommitHash: snapshot}
-		identity, e := observe(ctx, b, func(ctx context.Context) (ckgclient.SymbolIdentity, error) {
-			return resolver.ResolveCitation(ctx, site)
-		})
+		identity, e := resolve(site)
 		if e != nil || identity.Symbol == "" {
 			return out, fmt.Errorf("seed_unresolved")
 		}
@@ -274,7 +360,7 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 			return g.FindSymbol(ctx, r.Symbol, ckgclient.SymbolOpts{CommitHash: snapshot})
 		})
 		if e != nil {
-			return out, fmt.Errorf("seed_unresolved: %w", e)
+			return out, seedError(ctx, "seed_unresolved", e)
 		}
 		for _, c := range citations {
 			addSeed(c)
@@ -288,7 +374,7 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 			return v.SemanticSearch(ctx, r.Symptom, ckvclient.SearchOpts{K: r.MaxSeeds, Filter: ckvclient.SearchFilter{CommitHash: snapshot, ExcludeTests: true}})
 		})
 		if e != nil {
-			return out, fmt.Errorf("semantic_seed_failed: %w", e)
+			return out, seedError(ctx, "semantic_seed_failed", e)
 		}
 		keyword, e2 := observe(ctx, b, func(ctx context.Context) ([]contract.Hit, error) {
 			return g.BM25Search(ctx, keywordQuery(r.Symptom), ckgclient.SearchOpts{K: r.MaxSeeds, Filter: ckgclient.SearchFilter{CommitHash: snapshot, ExcludeTests: true}})
@@ -345,8 +431,14 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 				if at.distance >= r.Depth {
 					continue
 				}
+				anchorSource := at.citation
+				if known, ok := identities[key(at.citation)]; ok && known.err == nil {
+					anchorSource = known.identity.Citation
+					bindAlias(at.citation, anchorSource)
+					seen[key(anchorSource)] = true
+				}
 				edges, e := observe(ctx, b, func(ctx context.Context) ([]contract.Neighbor, error) {
-					return g.Neighbors(ctx, at.citation, ckgclient.NeighborsOpts{Hops: 1, Relations: []contract.Relation{rel}, MaxTotal: r.MaxCandidates, ExcludeTests: true})
+					return g.Neighbors(ctx, anchorSource, ckgclient.NeighborsOpts{Hops: 1, Relations: []contract.Relation{rel}, MaxTotal: r.MaxCandidates, ExcludeTests: true})
 				})
 				if e != nil {
 					out.Partial = true
@@ -365,7 +457,15 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 					if rel == contract.RelationCalledBy {
 						anchor, c = edge.Target, edge.Source
 					}
-					if edge.Relation != rel || edge.Distance != 1 || key(anchor) != key(at.citation) {
+					if edge.Relation == rel && edge.Distance == 1 && key(anchor) != key(anchorSource) && canResolve {
+						identity, e := resolve(at.citation)
+						if e == nil {
+							anchorSource = identity.Citation
+							bindAlias(at.citation, anchorSource)
+							seen[key(anchorSource)] = true
+						}
+					}
+					if edge.Relation != rel || edge.Distance != 1 || key(anchor) != key(anchorSource) {
 						out.Partial = true
 						b.reasons["unanchored_edge"] = true
 						continue
@@ -397,13 +497,10 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 			}
 		}
 	}
-	resolver, canResolve := g.(ckgclient.CitationResolver)
 	for i := range out.Candidates {
 		c := &out.Candidates[i]
 		if c.Symbol == nil && canResolve {
-			identity, e := observe(ctx, b, func(ctx context.Context) (ckgclient.SymbolIdentity, error) {
-				return resolver.ResolveCitation(ctx, c.Citation)
-			})
+			identity, e := resolve(c.Citation)
 			if e == nil && identity.Symbol != "" && (snapshot == "" || identity.Citation.CommitHash == snapshot) {
 				name := identity.Symbol
 				c.Symbol = &name
@@ -445,16 +542,24 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 	for _, seed := range seeds {
 		si, ok := index[key(seed)]
 		if !ok || out.Candidates[si].Symbol == nil {
+			cause := error(ckgclient.ErrSeedUnresolved)
+			if observation, exists := identities[key(seed)]; exists && observation.err != nil {
+				cause = observation.err
+			}
 			for i := range out.Candidates {
 				if i >= r.MaxEnriched {
 					break
 				}
 				c := &out.Candidates[i]
 				impactFrom, concurrencyFrom := c.Signals.Impact.Provenance, c.Signals.Concurrency.Provenance
-				c.Signals.Impact = failed[[]contract.ImpactCategory](ckgclient.ErrSeedUnresolved, "graph.impact_analysis", snapshot, seed)
+				c.Signals.Impact = failed[[]contract.ImpactCategory](cause, "graph.resolve_citation", snapshot, seed)
 				c.Signals.Impact.Provenance = appendFrom(impactFrom, c.Signals.Impact.Provenance...)
-				c.Signals.Concurrency = failed[contract.SuspectConcurrency](ckgclient.ErrSeedUnresolved, "graph.concurrency_impact", snapshot, seed)
+				c.Signals.Concurrency = failed[contract.SuspectConcurrency](cause, "graph.resolve_citation", snapshot, seed)
 				c.Signals.Concurrency.Provenance = appendFrom(concurrencyFrom, c.Signals.Concurrency.Provenance...)
+				if !canResolve {
+					c.Signals.Impact = unknown[[]contract.ImpactCategory]("unsupported", "symbol_resolver_unsupported")
+					c.Signals.Concurrency = unknown[contract.SuspectConcurrency]("unsupported", "symbol_resolver_unsupported")
+				}
 			}
 			out.Partial = true
 			continue
@@ -494,7 +599,7 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 			}
 			for _, group := range impact.Groups {
 				for _, hit := range group.Hits {
-					if key(hit) == key(c.Citation) {
+					if sameKnownCitation(hit, c.Citation) {
 						seen := false
 						for _, old := range groups {
 							if old == group.Category {
@@ -546,7 +651,7 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 				value = *c.Signals.Concurrency.Value
 			}
 			for _, module := range concurrency.Modules {
-				if key(module.Citation) == key(c.Citation) {
+				if sameKnownCitation(module.Citation, c.Citation) {
 					value.Touched = true
 					seen := false
 					for _, old := range value.Direction {
@@ -567,13 +672,19 @@ func Compose(parent context.Context, g ckgclient.Client, v ckvclient.Client, r R
 	// Reserve identity verification calls even when enrichment exhausts its
 	// cap. Never publish observations across a backend revision change.
 	b.max = r.MaxCalls
-	finalGraph, e := observe(ctx, b, g.Health)
-	if e != nil || !finalGraph.Reachable || graphCoordinates(finalGraph) != graphCoordinates(gh) || finalGraph.GraphDigest != gh.GraphDigest {
+	finalGraph, e := observe(finalCtx, b, g.Health)
+	if e != nil {
+		return contract.SuspectCandidates{}, verificationError(finalCtx, e)
+	}
+	if !finalGraph.Reachable || graphCoordinates(finalGraph) != graphCoordinates(gh) || finalGraph.GraphDigest != gh.GraphDigest {
 		return contract.SuspectCandidates{}, fmt.Errorf("snapshot_verification_failed")
 	}
 	if textSeed {
-		finalVector, e := observe(ctx, b, v.Health)
-		if e != nil || !finalVector.Reachable || !finalVector.ModelReachable || vectorCoordinates(finalVector) != vectorCoordinates(vh) || finalVector.StatsHash != vh.StatsHash {
+		finalVector, e := observe(finalCtx, b, v.Health)
+		if e != nil {
+			return contract.SuspectCandidates{}, verificationError(finalCtx, e)
+		}
+		if !finalVector.Reachable || !finalVector.ModelReachable || vectorCoordinates(finalVector) != vectorCoordinates(vh) || finalVector.StatsHash != vh.StatsHash {
 			return contract.SuspectCandidates{}, fmt.Errorf("snapshot_verification_failed")
 		}
 	}

@@ -1,0 +1,147 @@
+{
+  "nodes": [
+    {
+      "reference": "n0.0",
+      "consumer": "b0/n0",
+      "candidates": [
+        "b0/n0"
+      ],
+      "span": {
+        "end": 51,
+        "start": 48
+      },
+      "synthetic": false
+    },
+    {
+      "reference": "n0.1",
+      "consumer": "b0/n1",
+      "candidates": [
+        "b0/n1"
+      ],
+      "span": {
+        "end": 59,
+        "start": 53
+      },
+      "synthetic": false
+    }
+  ],
+  "bindings": [
+    {
+      "reference": "v@31",
+      "consumer": "v31",
+      "candidates": [
+        "v31"
+      ]
+    },
+    {
+      "reference": "v@39",
+      "consumer": "v39",
+      "candidates": [
+        "v39"
+      ]
+    }
+  ],
+  "occurrences": [
+    {
+      "reference": "d:o@31",
+      "consumer": "entry/definition/v31/31",
+      "consumer_roles": [
+        "definition"
+      ],
+      "candidates": [
+        "entry/definition/v31/31"
+      ],
+      "reference_owner": "entry",
+      "phase": "definition",
+      "span": {
+        "end": 32,
+        "start": 31
+      }
+    },
+    {
+      "reference": "d:o@39",
+      "consumer": "entry/definition/v39/39",
+      "consumer_roles": [
+        "definition"
+      ],
+      "candidates": [
+        "entry/definition/v39/39"
+      ],
+      "reference_owner": "entry",
+      "phase": "definition",
+      "span": {
+        "end": 40,
+        "start": 39
+      }
+    },
+    {
+      "reference": "d:o@48",
+      "consumer": "b0/n0/definition/v39/48",
+      "consumer_roles": [
+        "definition"
+      ],
+      "candidates": [
+        "b0/n0/definition/v39/48"
+      ],
+      "reference_owner": "n0.0",
+      "phase": "definition",
+      "span": {
+        "end": 49,
+        "start": 48
+      }
+    },
+    {
+      "reference": "u:o@50",
+      "consumer": "b0/n0/use/v31/50",
+      "consumer_roles": [
+        "use"
+      ],
+      "candidates": [
+        "b0/n0/use/v31/50"
+      ],
+      "reference_owner": "n0.0",
+      "phase": "use",
+      "span": {
+        "end": 51,
+        "start": 50
+      }
+    },
+    {
+      "reference": "u:return@53:v@39",
+      "consumer": "b0/n1/implicit_return/v39/53",
+      "consumer_roles": [
+        "implicit_return"
+      ],
+      "candidates": [
+        "b0/n1/implicit_return/v39/53"
+      ],
+      "reference_owner": "n0.1",
+      "phase": "use",
+      "span": {
+        "end": 59,
+        "start": 53
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "reference": 0,
+      "candidates": [
+        0
+      ],
+      "consumer": 0
+    },
+    {
+      "reference": 1,
+      "candidates": [
+        1
+      ],
+      "consumer": 1
+    }
+  ],
+  "branches": [],
+  "unmatched_nodes": 0,
+  "unmatched_bindings": 0,
+  "unmatched_occurrence_phases": 0,
+  "unmatched_blocks": 0
+}

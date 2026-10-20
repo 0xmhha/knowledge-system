@@ -1,0 +1,90 @@
+func (p *BlobPool) Init(gasTip uint64, head *types.Header, reserver txpool.Reserver) error {
+	p.reserver = reserver
+
+	var (
+		queuedir string
+		limbodir string
+	)
+	if p.config.Datadir != "" {
+		queuedir = filepath.Join(p.config.Datadir, pendingTransactionStore)
+		if err := os.MkdirAll(queuedir, 0700); err != nil {
+			return err
+		}
+		limbodir = filepath.Join(p.config.Datadir, limboedTransactionStore)
+		if err := os.MkdirAll(limbodir, 0700); err != nil {
+			return err
+		}
+	}
+	// Initialize the state with head block, or fallback to empty one in
+	// case the head state is not available (might occur when node is not
+	// fully synced).
+	state, err := p.chain.StateAt(head.Root)
+	if err != nil {
+		state, err = p.chain.StateAt(types.EmptyRootHash)
+	}
+	if err != nil {
+		return err
+	}
+	p.head, p.state = head, state
+
+	// Index all transactions on disk and delete anything unprocessable
+	var fails []uint64
+	index := func(id uint64, size uint32, blob []byte) {
+		if p.parseTransaction(id, size, blob) != nil {
+			fails = append(fails, id)
+		}
+	}
+	store, err := billy.Open(billy.Options{Path: queuedir, Repair: true}, newSlotter(), index)
+	if err != nil {
+		return err
+	}
+	p.store = store
+
+	if len(fails) > 0 {
+		log.Warn("Dropping invalidated blob transactions", "ids", fails)
+		dropInvalidMeter.Mark(int64(len(fails)))
+
+		for _, id := range fails {
+			if err := p.store.Delete(id); err != nil {
+				p.Close()
+				return err
+			}
+		}
+	}
+	// Sort the indexed transactions by nonce and delete anything gapped, create
+	// the eviction heap of anyone still standing
+	for addr := range p.index {
+		p.recheck(addr, nil)
+	}
+	var (
+		basefee = uint256.MustFromBig(eip1559.CalcBaseFee(p.chain.Config(), p.head))
+		blobfee = uint256.NewInt(params.BlobTxMinBlobGasprice)
+	)
+	if p.head.ExcessBlobGas != nil {
+		blobfee = uint256.MustFromBig(eip4844.CalcBlobFee(*p.head.ExcessBlobGas))
+	}
+	p.evict = newPriceHeap(basefee, blobfee, &p.index)
+
+	// Pool initialized, attach the blob limbo to it to track blobs included
+	// recently but not yet finalized
+	p.limbo, err = newLimbo(limbodir)
+	if err != nil {
+		p.Close()
+		return err
+	}
+	// Set the configured gas tip, triggering a filtering of anything just loaded
+	basefeeGauge.Update(int64(basefee.Uint64()))
+	blobfeeGauge.Update(int64(blobfee.Uint64()))
+
+	p.SetGasTip(new(big.Int).SetUint64(gasTip))
+
+	// Since the user might have modified their pool's capacity, evict anything
+	// above the current allowance
+	for p.stored > p.config.Datacap {
+		p.drop()
+	}
+	// Update the metrics and return the constructed pool
+	datacapGauge.Update(int64(p.config.Datacap))
+	p.updateStorageMetrics()
+	return nil
+}

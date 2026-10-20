@@ -1,0 +1,22 @@
+func getFiles() []string {
+	cmd := exec.Command("git", "ls-tree", "-r", "--name-only", "HEAD")
+	var files []string
+	err := doLines(cmd, func(line string) {
+		if skipFile(line) {
+			return
+		}
+		ext := filepath.Ext(line)
+		for _, wantExt := range extensions {
+			if ext == wantExt {
+				goto keep
+			}
+		}
+		return
+	keep:
+		files = append(files, line)
+	})
+	if err != nil {
+		log.Fatal("error getting files:", err)
+	}
+	return files
+}

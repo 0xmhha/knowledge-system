@@ -2,10 +2,10 @@ package setup
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -229,6 +229,17 @@ func VerifyContent(o Options, emit func(Event)) error {
 	}
 
 	var missing []string
+	documents, err := ExtraDocumentRoots(o)
+	if err != nil {
+		return err
+	}
+	for _, root := range documents {
+		if !rooted(root) {
+			missing = append(missing, "a selected document corpus is not among the index's docs roots")
+		} else if cm.Languages["markdown"] == 0 {
+			missing = append(missing, "selected document corpora produced no Markdown chunks")
+		}
+	}
 	if o.DomainKnowledge != "" {
 		if !rooted(o.DomainCorpusDir()) {
 			missing = append(missing, fmt.Sprintf("the domain corpus %s is not among the index's docs roots", o.DomainCorpusDir()))
@@ -265,14 +276,19 @@ func VerifyContent(o Options, emit func(Event)) error {
 // files to reason about, and the build would quietly stop agreeing with what
 // reviewers had approved.
 func VerifyDerivedFresh(step, label string, argv []string, committed string, emit func(Event)) error {
-	dir, err := os.MkdirTemp("", "knowledge-setup-fresh-")
+	return VerifyDerivedFreshContext(context.Background(), step, label, argv, committed, emit)
+}
+
+func VerifyDerivedFreshContext(ctx context.Context, step, label string, argv []string, committed string, emit func(Event)) error {
+	scratch, _ := ctx.Value(buildScratchKey{}).(string)
+	dir, err := os.MkdirTemp(scratch, "knowledge-setup-fresh-")
 	if err != nil {
 		return fmt.Errorf("verify: %s: %w", label, err)
 	}
 	defer func() { _ = os.RemoveAll(dir) }()
 
 	fresh := filepath.Join(dir, filepath.Base(committed))
-	cmd := exec.Command(argv[0], append(append([]string{}, argv[1:]...), fresh)...)
+	cmd := setupCommandContext(ctx, argv[0], append(append([]string{}, argv[1:]...), fresh)...)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("verify: %s: regenerating to compare failed: %w\n%s", label, err, out)
 	}

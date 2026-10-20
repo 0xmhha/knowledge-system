@@ -1,0 +1,30 @@
+{
+  "exit_code": 0,
+  "passed_test_records": 7,
+  "tests": [
+    "TestReviewFunctionResolvesTheSeedAndWrapsIndexErrors",
+    "TestHandleReviewFunctionSeparatesTheViews",
+    "TestHandleReviewFunctionErrors",
+    "TestRebuildReviewIndex",
+    "TestReviewContainsQueryUsesTheSourceIndex",
+    "TestReviewCallerWalkIsBounded",
+    "TestReviewCallerQueryUsesTheDestinationIndex"
+  ],
+  "packages": [
+    "github.com/0xmhha/knowledge-system/internal/system/ckgclient",
+    "github.com/0xmhha/knowledge-system/internal/system/mcp",
+    "github.com/0xmhha/knowledge-system/internal/graph/persist"
+  ],
+  "command": [
+    "/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/bin/go",
+    "test",
+    "-json",
+    "-count=1",
+    "-race",
+    "./internal/system/mcp",
+    "./internal/system/ckgclient",
+    "./internal/graph/persist",
+    "-run",
+    "^Test(HandleReviewFunction|ReviewFunctionResolves|RebuildReviewIndex$|ReviewContainsQuery|ReviewCaller)"
+  ]
+}

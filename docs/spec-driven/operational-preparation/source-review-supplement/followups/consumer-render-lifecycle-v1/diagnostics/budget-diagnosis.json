@@ -1,0 +1,36 @@
+{
+  "initial_controller_exit": 1,
+  "completed_actual_host_cases": [
+    "normal",
+    "sigterm",
+    "sigint",
+    "deadline",
+    "sigkill"
+  ],
+  "failure": "CKG discovery tool alias was sent to CKS during proxy budget setup",
+  "failed_request": {
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+      "name": "flow_probe.context.find_symbol",
+      "arguments": {
+        "name": "Seed",
+        "exact": false,
+        "include_blobs": true
+      }
+    }
+  },
+  "failed_response": {
+    "jsonrpc": "2.0",
+    "id": 3,
+    "error": {
+      "code": -32602,
+      "message": "tool 'flow_probe.context.find_symbol' not found: tool not found"
+    }
+  },
+  "initial_budget_tool_attempts": 1,
+  "source_version": "driver-initial.py.txt",
+  "correction": "use cks.context.value_dependencies with retained P05 query in a fresh retry folder",
+  "new_runtime_changes": 0
+}

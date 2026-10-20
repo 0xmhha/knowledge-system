@@ -1,0 +1,7 @@
+실제 owner 일정 범위의 검토 초안
+
+원래 API의 해제 case는 receive→delete→close의 단일 goroutine 순서이며 그 사이에 status 송신이 없다. 따라서 해제 요청 수락 후 유한 추가 status를 같은 owner가 제공한다는 초안 전제는 이 코드의 실제 경로로 도달하지 않는다. 외부 writer나 별도 통제 owner를 넣어 시험할 수 있지만 그것은 생산자 경로와 구분해야 한다.
+
+또한 API는 같은 실제 channel을 새 구독에 재사용하는 것을 금지하지 않는다. 해제된 옛 구독의 사용 종료와 모든 미래의 동일 channel 사용 금지를 구분해야 한다. 제안은 실제 owner의4일정과 통제 owner의 late-drain1일정을 분리하고, 해제 뒤 불사용 주장을 옛 구독/새 등록 전까지로 한정하는 것이다. 이는 독립 정답/수용 승인이 아니며 원래 완료 기준은 사용자 결정 전 유지한다.
+
+다음 실제 검증은 단계74의 node/eth factory를 그대로 사용하고, factory가 생성한 유일 API 객체를 관찰용 capture로 연결한다. 기존 API의 제어 흐름·timer·getProgress·다운로더 값은 바꾸지 않는다. 정상/막힌 송신/ack 지연/동일 객체 Once를 실제 owner에서 관찰하며 요청 수락·map 삭제·ack의 순서를 기록한다. 지연 게이트와 정리 개입은 통제 일정으로 표시한다. 실제 피어 동기화·독립 티켓·installed consumer oracle은 별도 남긴다.

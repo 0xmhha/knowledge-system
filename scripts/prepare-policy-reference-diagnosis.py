@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+"""Run the pinned CKG AST frontend/resolver in an owned temporary module copy."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[1]
+PREFIX = Path('docs/spec-driven/operational-preparation/policy-reference-diagnosis')
+FRONTEND_COMMIT = '179d1c8d'
+REPLACEMENTS = {
+    'compiler.compiledTy.ExportContractCode': 'compile.compiledTy.ExportContractCode',
+    'compiler.solcVersion': 'compile.solcVersion',
+    'types.ErrInvalidFeePayer': 'txpool.ErrInvalidFeePayer',
+    'legacypool.queueTxEvent': 'legacypool.LegacyPool.queueTxEvent',
+    'engine.Engine.GetValidators': 'wbftengine.Engine.GetValidators',
+    'compiler.Compile': 'compile.Compile',
+}
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+def write_json(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--repo', type=Path, required=True)
+    parser.add_argument('--out', type=Path, required=True)
+    args = parser.parse_args()
+    args.out = args.out.resolve()
+    if args.out.exists():
+        raise ValueError('fresh output directory required')
+    args.out.mkdir(parents=True)
+    reader = ROOT / 'scripts/prepare-policy-security-inputs.py'
+    spec = importlib.util.spec_from_file_location('source_reader', reader)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    prior_path = ROOT / 'docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json'
+    prior = json.loads(prior_path.read_text())
+    files = mod.source_files(args.repo, prior['source_commit'])
+    bound = [{'path': r['Path'], 'git_blob': r['Blob'], 'sha256': sha(r['Source'].encode())} for r in files]
+    if bound != prior['files']:
+        raise ValueError('source bytes differ from previous pinned preparation')
+    write_json(args.out / 'source-files.json', bound)
+    raw = (prior_path.parent / 'private/existing-policy.yaml.txt').read_bytes()
+    proposed = raw.decode()
+    for old, new in REPLACEMENTS.items():
+        proposed = proposed.replace('        - ' + old + '\n', '        - ' + new + '\n')
+    (args.out / 'original-policy.yaml.txt').write_bytes(raw)
+    (args.out / 'proposed-policy.yaml.txt').write_text(proposed)
+    helper = ROOT / 'scripts/policy_reference_probe.go.txt'
+    (args.out / helper.name).write_bytes(helper.read_bytes())
+    (args.out / Path(__file__).name).write_bytes(Path(__file__).read_bytes())
+    rev = subprocess.check_output(['git', 'rev-parse', FRONTEND_COMMIT], cwd=ROOT, text=True).strip()
+    archive = subprocess.check_output(['git', 'archive', rev], cwd=ROOT)
+    env = dict(os.environ, GOTOOLCHAIN='go1.26.9', GOCACHE='/private/tmp/ks-corpus-go-cache', GOPROXY='off')
+    with tempfile.TemporaryDirectory(prefix='ks-policy-frontend-', dir='/private/tmp') as tmp:
+        module = Path(tmp) / 'module'
+        module.mkdir()
+        subprocess.run(['tar', '-x', '-C', str(module)], input=archive, check=True)
+        command_dir = module / 'cmd/policy-reference-probe'
+        command_dir.mkdir()
+        (command_dir / 'main.go').write_bytes(helper.read_bytes())
+        command = ['go', 'build', '-o', str(Path(tmp) / 'probe'), './cmd/policy-reference-probe']
+        build = subprocess.run(command, cwd=module, env=env, capture_output=True, timeout=180)
+        (args.out / 'build.stdout.log').write_bytes(build.stdout)
+        (args.out / 'build.stderr.log').write_bytes(build.stderr)
+        build.check_returncode()
+        payload = {'Files': files, 'OriginalPolicy': str(args.out / 'original-policy.yaml.txt'),
+                   'ProposedPolicy': str(args.out / 'proposed-policy.yaml.txt')}
+        run = subprocess.run([str(Path(tmp) / 'probe')], input=json.dumps(payload).encode(),
+                             capture_output=True, env=env, timeout=120)
+        (args.out / 'probe.stdout.json').write_bytes(run.stdout)
+        (args.out / 'probe.stderr.log').write_bytes(run.stderr)
+        run.check_returncode()
+        report = json.loads(run.stdout)
+        write_json(args.out / 'commands.json', {
+            'module_copy': 'git archive pinned frontend commit; temporary helper added under cmd only in owned copy',
+            'build': command, 'build_exit': build.returncode, 'probe_exit': run.returncode,
+            'go_version': subprocess.check_output(['go', 'version'], env=env, text=True).strip(),
+            'environment': {k: env[k] for k in ('GOTOOLCHAIN', 'GOCACHE', 'GOPROXY')},
+            'probe_input': '882 pinned non-test Git blobs; original and proposed YAML file paths',
+            'target_package_build_or_execution': False,
+        })
+    changes = []
+    for before, after in zip(report['original']['references'], report['proposed']['references'], strict=True):
+        if before['target'] != after['target']:
+            changes.append({'policy_id': before['policy_id'], 'old': before['target'], 'new': after['target'],
+                            'original_matches': before['matches'], 'proposed_matches': after['matches'],
+                            'approved': False, 'applied': False})
+    write_json(args.out / 'correction-proposals.json', {'kind': 'unapproved_unapplied_overlay_corrections', 'changes': changes})
+    paths = {m['path'] for r in changes for key in ('original_matches', 'proposed_matches') for m in r[key]}
+    (args.out / 'sources').mkdir()
+    source_map = {r['Path']: r for r in files}
+    for path in sorted(paths):
+        dest = args.out / 'sources' / (path.replace('/', '__') + '.txt')
+        dest.write_bytes(source_map[path]['Source'].encode())
+    frontend_paths = subprocess.check_output(['git', 'ls-tree', '-rz', rev, '--',
+        'internal/graph/parse', 'pkg/graph/policy', 'pkg/graph/types', 'go.mod', 'go.sum'], cwd=ROOT)
+    frontend_files = []
+    entries = []
+    for row in frontend_paths.split(b'\0'):
+        if not row:
+            continue
+        meta, path = row.split(b'\t', 1)
+        if meta.split()[1] != b'blob':
+            continue
+        blob = meta.split()[2].decode()
+        entries.append((path.decode(), blob))
+    packed = subprocess.run(['git', 'cat-file', '--batch'], cwd=ROOT,
+                            input=('\n'.join(blob for _, blob in entries) + '\n').encode(),
+                            check=True, capture_output=True).stdout
+    offset = 0
+    for path, blob in entries:
+        end = packed.index(b'\n', offset)
+        oid, kind, size = packed[offset:end].split()
+        if oid.decode() != blob or kind != b'blob':
+            raise ValueError('frontend Git blob mismatch')
+        start = end + 1
+        data = packed[start:start + int(size)]
+        offset = start + int(size) + 1
+        frontend_files.append({'path': path, 'git_blob': blob, 'sha256': sha(data)})
+    write_json(args.out / 'frontend-source-inventory.json', frontend_files)
+    manifest = {
+        'schema_version': 1, 'kind': 'local_ast_resolver_diagnosis_not_operational_acceptance',
+        'source_commit': prior['source_commit'], 'frontend_commit': rev,
+        'previous_source_manifest': str(prior_path.relative_to(ROOT)),
+        'previous_source_manifest_sha256': sha(prior_path.read_bytes()),
+        'helper': {'path': str(helper.relative_to(ROOT)), 'sha256': sha(helper.read_bytes())},
+        'generator': {'path': str(Path(__file__).relative_to(ROOT)), 'sha256': sha(Path(__file__).read_bytes())},
+        'source_reader': {'path': str(reader.relative_to(ROOT)), 'sha256': sha(reader.read_bytes())},
+        'probe_executed': True, 'operational_runtime_executed': False,
+        'original_overlay_modified': False, 'proposed_overlay_applied': False,
+        'approved_corrections': 0, 'gold_records': 0, 'independent_acceptance': 'not_recorded',
+        'artifacts': [],
+    }
+    manifest['artifacts'] = [{'path': p.relative_to(args.out).as_posix(), 'sha256': sha(p.read_bytes()), 'bytes': p.stat().st_size}
+                             for p in sorted(args.out.rglob('*')) if p.is_file()]
+    write_json(args.out / 'manifest.json', manifest)
+    print(json.dumps({'source_files': len(files), 'nodes': report['code_node_count'], 'corrections_proposed': len(changes),
+        'before': {k: len(v or []) for k, v in report['original']['result'].items()},
+        'after': {k: len(v or []) for k, v in report['proposed']['result'].items()}}, indent=2))
+
+if __name__ == '__main__':
+    main()

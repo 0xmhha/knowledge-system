@@ -1,0 +1,109 @@
+[
+  {
+    "label": "toolchain-root",
+    "argv": [
+      "go",
+      "env",
+      "GOROOT"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "b0adc50fc2f16a967880db34ffe8fd90376cc7f8706cfd923be4cdb281044d1d",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "knowledge-head",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "68bc711dcc094240e30ac1baacbcdfb1ae332e6586892e83cc9cac306545eb97",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "clone",
+    "argv": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+      "/private/tmp/ks-acceptance-readiness-second-20261016/knowledge-source"
+    ],
+    "cwd": "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "sparse",
+    "argv": [
+      "git",
+      "sparse-checkout",
+      "set",
+      "cmd",
+      "internal",
+      "pkg"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-second-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "checkout",
+    "argv": [
+      "git",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "3a530a25b6a96b7f3bc2bcfb2605806316b221f0"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-second-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "source-status",
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-second-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "source-tree",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD^{tree}"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-second-20261016/knowledge-source",
+    "exit_code": 0,
+    "stdout_sha256": "bb0870ace021eca5763a140a899120309dc309d6f87db2f9a4bc3ee4ba56f786",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/ks-acceptance-readiness-second-20261016/cks",
+      "./cmd/cks"
+    ],
+    "cwd": "/private/tmp/ks-acceptance-readiness-second-20261016/knowledge-source",
+    "exit_code": 1,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "6cc6d1ae6adf7266eb23176bd5a154bcfc506ed2fa397d4d429d6a8d4a38716b"
+  }
+]

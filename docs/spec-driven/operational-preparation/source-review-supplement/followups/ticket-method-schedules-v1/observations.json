@@ -1,0 +1,542 @@
+[
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "variant": "general",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "paired_sends_pending_before_rescue"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 3,
+    "finite_late_sends": 3,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "d2ba9f3e6b24c639f1297044426d8d0b507dd451007d6752cc69b6811258cfe6",
+    "binary_sha256": "20fbbff7b602dd2123540b5c5c9d0d5306a19e4f4c81d5dc784ab854eedb22b3",
+    "fixture_sha256": "30f13f406547286266c6a1788e2a798dab6ddaf2136014d03afe30b1623f9fc6",
+    "applied_project_tree": "eefa4a0deead9c853f8b73cf4d4012d096274aa9",
+    "build_input_tree": "5bf9d72bfe63de9d3237ab7c1189ed05c668894c",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "explicit_corrective"
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "variant": "race",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "paired_sends_pending_before_rescue"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 3,
+    "finite_late_sends": 3,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "003ec7b03f4d0ed2920ab20bb3b18ba34e3a0349300b406b630f7ae17fae0f0a",
+    "binary_sha256": "db06dbcdebce255d0f80265080244da6e28948370ef8ccdb466caaf2c33cbcfe",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "eefa4a0deead9c853f8b73cf4d4012d096274aa9",
+    "build_input_tree": "c590830f82cbcf570dc33e703143cab9f21429ce",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "variant": "general",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "drained_returned_loop_live"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 3,
+    "finite_late_sends": 3,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "069a937d826384ac772c5c46f4ddb1ddd3dc7453550161e8656de0afede0d2d6",
+    "binary_sha256": "22faf91c8d590cc1f489425449f1df72eb759a0b86fcec3e37d4bed6aa3bc703",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "0be6bd22b81649242d07974f97ba268b574ba120",
+    "build_input_tree": "237cfc3ca4ee3ebba1d4c3bc212efa0d93f74db8",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "variant": "race",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "drained_returned_loop_live"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 3,
+    "finite_late_sends": 3,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "6c468851f89adbf0933c8b7da1c92b86cc41dd38c367e9774ec9e218296ee213",
+    "binary_sha256": "48a971bd63ee47e1b0bf7d2c06fec314e19f5d5cd714fadcfd61c5a4316621f0",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "0be6bd22b81649242d07974f97ba268b574ba120",
+    "build_input_tree": "237cfc3ca4ee3ebba1d4c3bc212efa0d93f74db8",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "variant": "general",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "drained_returned_loop_live"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 3,
+    "finite_late_sends": 3,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "d8e4bb95668282dc648eeae1d9f4003e35a2acaec01682ccb4df6479358777c1",
+    "binary_sha256": "0acfbaf20315ddf099359647e16378ce09acb4dcd2078a37720283241e6dd028",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "275219efe1493be44929d60282dd783748ff03e2",
+    "build_input_tree": "18aea685613abdc6bdcfa944c13a2097fa9425cf",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "variant": "race",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "drained_returned_loop_live"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 3,
+    "finite_late_sends": 3,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "3ee83c7cd2952524fca4ffde807bdc9fd4236c52423f2bf94ac33761d009b816",
+    "binary_sha256": "e4c1382cde69def2fb32b8535a0cbd75b859f63e76105d4ac392f2d2942a412f",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "275219efe1493be44929d60282dd783748ff03e2",
+    "build_input_tree": "18aea685613abdc6bdcfa944c13a2097fa9425cf",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "variant": "general",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "paired_sends_pending_before_rescue"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 3,
+    "finite_late_sends": 3,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "5fba371c42a543ecf2dd229a20bee6dee465e3de277a775e43ece91655c0516b",
+    "binary_sha256": "b2fd770e21b72ebcbb6ec9171d104f2a9170868b138d1bfd1da1d5c5f489bd67",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "eefa4a0deead9c853f8b73cf4d4012d096274aa9",
+    "build_input_tree": "c590830f82cbcf570dc33e703143cab9f21429ce",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "variant": "race",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "paired_sends_pending_before_rescue"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_finite_late3_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_wait_then_ack_return",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "one_request_all3_calls_wait_then_ack_join",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 3,
+    "finite_late_sends": 3,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "1ca558ace1218f6f281a8367fc6ebbdd3f11372f230c1898f346d1f3c3a1fdfe",
+    "binary_sha256": "284cb10a35a316bc87803065fe4baecb55f09483d2054b3c4a036a8fa5e31176",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "eefa4a0deead9c853f8b73cf4d4012d096274aa9",
+    "build_input_tree": "c590830f82cbcf570dc33e703143cab9f21429ce",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "variant": "general",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "early_return_loop_still_blocked"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 0,
+    "finite_late_sends": 0,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "e3f8c5ff694518aaf8a4500029333807c60303cae73af2c97a6a36cd5f067807",
+    "binary_sha256": "c41c6605ced7bff771d42c299534f675adbdbbdaefd94a6f236c27a16424ee4e",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "596f7416b63b2fdeb32b09de0ac47d7071957954",
+    "build_input_tree": "6e1fa3a278971ac918c26d523a8480e1535dc693",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "variant": "race",
+    "repetition": 1,
+    "case_id": "method5",
+    "valid_technical_observation": true,
+    "schedules": [
+      {
+        "scenario": "normal_delivery_then_unsubscribe",
+        "route": "actual_eventLoop_post_done_install",
+        "outcome": "notification_then_method_return_not_map_ack_proof"
+      },
+      {
+        "scenario": "blocked_delivery_then_consumer_exit",
+        "route": "actual_eventLoop_post_done_install_not_RPC_callback",
+        "outcome": "early_return_loop_still_blocked"
+      },
+      {
+        "scenario": "late_delivery_before_confirmation",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "confirmation_delayed",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      },
+      {
+        "scenario": "concurrent_unsubscribe_once",
+        "route": "controlled_receiver_actual_Unsubscribe",
+        "outcome": "returned_without_request_or_ack",
+        "backend_map_removal_proved": false
+      }
+    ],
+    "native_timer_fires": 1,
+    "controlled_requests": 0,
+    "finite_late_sends": 0,
+    "same_object_calls": 3,
+    "all_controlled_calls_joined": 5,
+    "real_calls_joined": 3,
+    "trace_sha256": "b06fa50c79c5b3977989c1e94b38d28837f5b04b8edeba3d784f22ac84137684",
+    "binary_sha256": "8124a892095812aeb8eeb12aedbbe9a78f52d15b8d37719e177e827218d386e6",
+    "fixture_sha256": "42ed4595ece9f1e4c50e61e41d7baee3b1ba0afba707b3b856a896aeafc1961c",
+    "applied_project_tree": "596f7416b63b2fdeb32b09de0ac47d7071957954",
+    "build_input_tree": "6e1fa3a278971ac918c26d523a8480e1535dc693",
+    "full_original5_scenarios_satisfied": 0,
+    "independent_oracle": false,
+    "independent_acceptable_candidate_set": null,
+    "quality_score": null,
+    "attempt_kind": "initial"
+  }
+]

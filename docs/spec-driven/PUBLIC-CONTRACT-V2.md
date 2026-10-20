@@ -2,6 +2,18 @@
 
 상태: 선택형 v2 DTO·MCP 도구·보관 원문 인용·정화·무결성 해시와 CKS MCP의 보관본 후보 검색 경로를 검증했다. 선택 팩의 외부 origin 보관·인용, 검토된 정책/ADR 오버레이, 정렬된 의미 투영에 한정한 ADR→요구→코드→테스트 추적 경로를 구현했다. 조직 인증 어댑터와 운영 도메인 사실의 사람 검토는 별도다. 직렬화는 pkg/system/contract와 internal/system/evidencev2를 기준으로 아래 경계를 고정한다. D1-02 사용자 승인에 따라 의미 술어 계약을 아래처럼 개정했다.
 
+## 선택형 CLI·HTTP·독립 그래프 출력
+
+`cks agent --format=v2 --prompt "<작업>"`는 같은 `cks.context.get_for_task_v2`를 호출하고 공개 DTO·좌표·sha256-v2를 검증한다. 기본 출력은 기존 markdown이다. `--intent`, `--explain-ontology`, `--include-knowledge`, `--knowledge-as-of`, `--knowledge-subsystem`은 명시 v2에서만 사용한다. knowledge 범위에는 날짜와 subsystem을 함께 지정한다. CLI는 소유 MCP 서버의 성공 종료를 기다린 뒤 stdout 또는 `--output`의 새 파일을 게시한다. 기존 파일은 덮어쓰지 않으며 `output_exists`를 반환한다. 게시 뒤 디렉터리 sync를 확인하지 못하면 `durability_uncertain`이다.
+
+HTTP는 기존 `cks mcp --http-addr 127.0.0.1:8080`의 `/mcp` Streamable HTTP에 같은 등록 도구를 사용한다. 별도 REST 검색 서버를 추가하지 않는다. 실제 소유 데이터로 CLI/HTTP의 좌표·질의·인용11개·무결성 해시 일치와 잘못된 intent 오류를 확인했다. 이는 인증 어댑터나 독립 검색 품질 수용이 아니다.
+
+`ckg export-json --graph <graph-directory> --out <new-file> --format=v2`는 독립적인 **원시 그래프 스냅샷** `ckg-graph-v2`를 출력한다. `format_version=2`, `coordinates={project_id,dataset_id,snapshot_id,source_mode,base_commit}`, `source={file_manifest_digest,capture_policy_digest}`, 기존 `header`, `nodes`, `edges`, 실제 행 수 `counts`를 갖는다. `--minimal`은 기존 최소 행 모양을 유지하고 좌표를 삭제하지 않는다. node ID와 edge ID의 범위는 이 좌표 안이며 다른 프로젝트의 같은 ID를 전역 동일 심볼로 합치면 안 된다. source의 digest는 원본 매니페스트의 선언을 보존하는 값이다. 원문 바이트 검증·인용·본문 정화·EvidencePack의 sha256-v2를 제공한다고 해석하지 않는다.
+
+전체 행을 배열에 적재하지 않고 하나의 읽기 트랜잭션에서 node ID/edge ID 순으로 출력한다. 파일은 읽기·flush·DB close·fsync·close 후 새 경로에 게시하며 기존 목적지는 보존한다. 취소·출력 실패 시 임시 파일을 정리한다. `counts`는 실제 읽은 행 수이고 `header.stats`의 과거 선언과 구분한다. 완료된 SQLite의 rename 교체를 지원하며 같은 inode의 제자리 재작성은 지원하지 않는다. 구형 `export-json` 기본 형식과 `export-static`은 working-tree/snapshot-only에서 `requires_v2`로 거부한다. 원시 그래프 v2에는 완전한 프로젝트/데이터/스냅샷/캡처 digest가 필요하며 과거 빈 좌표를 추측해 채우지 않는다.
+
+직접 `ckv query`의 retained v2 출력과 정적 분할 그래프의 별도 v2 형식은 아직 구현하지 않았다. v2 검색 답변은 CKS의 검증된 보관 원문 경로를 이용한다. 직접 CKV v2는 버전 디렉터리의 reader lease, source.json/manifest/DB 일치, 실제 archive 읽기·줄 hash·정화·한도·종료 후 게시를 먼저 설계·시험해야 하며 v1 결과에 좌표만 덧붙여 허용하지 않는다.
+
 ## 버전 선택
 
 | 입력/도구 | committed v1 | committed v2 | working-tree v2 | snapshot-only v2 |
@@ -12,7 +24,7 @@
 | `ckv query`/CKG export 구 형식 | 기존 응답 | 기존 커밋형 응답 | `requires_v2` | `requires_v2` |
 | 명시 `cks.context.get_for_task_v2` | `reindex_required` | v2 응답 | v2 응답 | v2 응답 |
 
-구현 상태: `cks.context.get_for_task_v2`와 비커밋 데이터셋의 기존 CKS 문맥 도구 거부는 실제 MCP 스모크로 검증했다. 고정된 main 기준선의 v1 MCP 응답을 가짜 Ollama와 별도 바이너리로 재생했고, 새 `doctor`의 `legacy_unpinned` 및 새 v2 MCP의 `reindex_required`를 확인했다. 직접 `ckv query`는 보관본 마운트 없이 비커밋 데이터셋을 거부한다. CKG 독립 export와 일반 `--format=v2`/HTTP 표면은 아직 이 표의 설계 계약에 머무른다.
+구현 상태: `cks.context.get_for_task_v2`와 비커밋 데이터셋의 기존 CKS 문맥 도구 거부는 실제 MCP 스모크로 검증했다. 고정된 main 기준선의 v1 MCP 응답을 가짜 Ollama와 별도 바이너리로 재생했고, 새 `doctor`의 `legacy_unpinned` 및 새 v2 MCP의 `reindex_required`를 확인했다. 직접 `ckv query`는 보관본 마운트 없이 비커밋 데이터셋을 거부한다. 선택형 CKS CLI v2, 기존 HTTP MCP의 v2 도구, CKG 독립 원시 그래프 JSON v2는 위 구현 경로를 따른다. 직접 CKV retained v2와 정적 분할 v2는 별도 미구현 경로로 구분한다.
 
 구 바이너리가 새 pinned v2 DB를 읽는 역방향 호환은 제공하지 않는다. 새 CKV의 임베딩 신원 포맷을 구 CKV가 이해하지 못하므로 새 데이터셋에는 새 바이너리를 사용한다.
 

@@ -1,0 +1,77 @@
+WI-1 선정 함수 전체의 선언/use·이동 경계 관측 — 2026-10-16
+
+목적과 완료 범위
+검토용 표본 30개 중 기존 4개에 이어 나머지 26개 함수의 위치 자료를 수집했다.
+30개/25개 파일의 비완전 관측을 준비한 단계이며 독립 정답·의미 검토·수용 완료가 아니다.
+기존 4개 함수의 원자료는 이번 관측과 정확히 일치하고 과거 패킷도 보존했다.
+현재 함수별 상태는 sample-locations-v1/function-checklist.json에 기록했다.
+function-sample-v1의 체크표는 11단계 표본 제안 당시의 스냅샷이다.
+
+관측 결과
+함수: 전체 30개, 추가 수집 26개, 기존 자료 일치 4개.
+원시 식별자 관측: 1725개. 기존 4개 241개와 추가 26개 1484개를 합한 수량이다.
+기존 lexical 선언 위치와 대조되는 해당 함수 변수 관측: 1721개.
+본문 변수로 편입하지 않고 signature 범위로 분리: 4개.
+구문 marker: 409개. 범위 내 관측의 모호/미일치 바인딩은 0개다.
+기존 변수 선언 목록에서 관측되지 않은 선언은 0개다. 이것은 모든 use를 수집했다는 의미가 아니다.
+range binding이 있는 함수는 22개이며 익명 함수 본문 14개는 상위 함수 관측에서 제외했다.
+위 수량을 함수 독립성·edge 개수·precision/recall 분모로 쓰지 않는다.
+
+signature 범위 4개를 분리한 이유
+SRC-024 deliver — eth/downloader/queue.go:865~866
+validate func(index int, header *types.Header) error
+reconstruct func(index int, result *fetchResult)
+위 index/header/index/result는 함수형 내부 파라미터 선언이다. 바깥 deliver의 본문 변수와 다르다.
+부분 Go 타입 정보는 이 위치들도 변수로 보고하지만 기존 본문 lexical census에는 속하지 않는다.
+원자료를 삭제하지 않고 quarantined_non_body_signature_scope로 표시했다.
+실제 함수 파라미터는 선언 위치 대조가 먼저 성립하므로 signature 앞에 있어도 잘못 격리하지 않는다.
+모호한 후보가 여러 개면 첫 번째를 고르지 않고 모두 보존한다. 미일치는 임의로 본문 변수로 만들지 않는다.
+
+관측한 것과 계산하지 않은 것
+Go 표준 타입 정보의 로컬 선언 위치와 별도 lexical census를 대조했다.
+return/break/continue 등은 구문상 소유 함수·loop·switch를 관측했다.
+실행 가능한 CFG, reaching definitions, 정상 종료 postdominator, data/control edge는 계산하지 않았다.
+구문상 이동 대상이 확인됐어도 runtime 도달성·종료 보장·제어 의존성은 미확정이다.
+scalar/reference/aggregate kind와 메모리 alias·외부 호출·채널·동시 실행 효과는 확정하지 않는다.
+range_binding_unsupported는 현재 backend의 범위 제한이며 함수 전체가 분석 불가라는 뜻은 아니다.
+범위 밖 사실을 자동 negative edge로 바꾸지 않고 관측 자료와 지원 제한을 분리한다.
+data_edges/control_edges/quality_scores는 null이며 모든 독립 승인·gold·scoring은 false/미작성이다.
+
+부분 타입 검사와 원문 경계
+고정 commit 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8의 Git proof를 검증한 원문만 읽었다.
+외부 importer를 연결하지 않는 파일 단위 관측이며 전체 프로젝트 타입 검사나 빌드가 아니다.
+25개 전체 파일에서 미해결 외부 타입 진단 1000건을 보존했다. 선정 함수 외의 코드 진단도 포함된다.
+이 수치는 새 운영 장애나 실패한 프로젝트 테스트 수가 아니다. 부분 검사 조건에 따른 진단이며
+full_project_typecheck_passed=false를 유지하고 원문/예시와 함께 기록했다.
+구조적 대조가 일치한 위치라도 모든 사용·타입·메모리 의미가 검증됐다고 간주하지 않는다.
+실제 프로젝트 원문 실행·프로젝트 빌드·의존성 backend·모델·노드는 모두 0회다.
+
+검증
+기존 검사 도구의 원문을 변경하지 않고 Go 1.26.9 임시 모듈에서 build/fmt/vet/lint 4건 통과.
+개발 대조군 14개를 일반/race 두 모드에서 총 28건 검사했다.
+shadow·짧은 선언 재사용·loop 이동·return·closure·struct key·panic 및 부분 타입 경계를 포함한다.
+비공개 원자료를 신뢰하는 live 검사기로 재생하여 전체 30개 함수의 위치와 marker를 대조한다.
+연관 Python 회귀 272개·문서 134개·기존 구현 완료 상태 검사도 통과했다.
+이전 동결 패킷 11개와 유지보수 Go 소스는 변경하지 않았다.
+전용 Python 회귀 24개로 scope 오인·모호 후보 합치기·원문/이동 대상 변조·지원 제한 삭제·
+완전한 정답/전체 타입 검사/독립 수용 승격 및 원자료와 다른 실행 주장을 거부한다.
+
+재검증
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_sample_locations.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-sample-locations.py docs/spec-driven/operational-preparation/source-review-supplement/sample-locations-v1
+재수집은 prepare-sample-locations.py에 새 --output, Go 1.26.9 --goroot, --lint 경로를 지정한다.
+설치된 도구와 캐시를 사용하며 도구·모듈 다운로드는 비활성화한다. 과거 원자료를 덮어쓰지 않는다.
+
+남은 WI-1 작업
+새 관측은 30개에 있지만 비완전 관계 해석 초안은 기존 4개 함수에만 있다.
+전체의 의미 검토·완전한 독립 data/control 정답·value kind/범위 처리·정확한 매칭이 남는다.
+30개 이상 독립 함수·문법별 표본 충분성·DEV/FINAL·baseline·F-01~F-08 동결 후 실제 평가해야 한다.
+담당자 미정·freeze null·execution_allowed false·정식 독립 수용 0/9는 유지한다.
+
+다음 가능한 준비 작업
+WI-2의 실제 지원 규칙 두 개에 대해 양성/음성 후보와 sanitizer·branch·shadow·external target
+범위를 점검한다. 기존 source query 12개를 규칙별 독립 사례 각 10개로 합산하지 않는다.
+
+후속 기록 (2026-10-17): 준비 18단계에서 선정 30함수의 의미·gold·matching 공백을 점검했다.
+SEMANTIC-GAP-REVIEW.txt 및 semantic-gap-v1 참조. 기존 관측·제안은 그대로 보존하며
+독립 정답·정식 수용으로 승격하지 않았다. 다음은 PROGRESS.txt의 준비 19단계 WI-3 점검이다.

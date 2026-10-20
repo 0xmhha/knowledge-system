@@ -1,0 +1,94 @@
+{
+  "test_id": "T04",
+  "status": "isolated_workflow_pass_not_model_adherence_or_adoption",
+  "host_sessions": [
+    {
+      "case": "feature-default",
+      "role": "analyzer",
+      "CKS_calls": 0,
+      "host_exit": 0,
+      "CKS_exit": 0,
+      "fixture_adapter_expected_error": false
+    },
+    {
+      "case": "feature-value",
+      "role": "analyzer",
+      "CKS_calls": 1,
+      "host_exit": 0,
+      "CKS_exit": 0,
+      "fixture_adapter_expected_error": false
+    },
+    {
+      "case": "review-build",
+      "role": "analyzer",
+      "CKS_calls": 2,
+      "host_exit": 0,
+      "CKS_exit": 0,
+      "fixture_adapter_expected_error": false
+    },
+    {
+      "case": "analyzer-reuse",
+      "role": "analyzer",
+      "CKS_calls": 0,
+      "host_exit": 0,
+      "CKS_exit": 0,
+      "fixture_adapter_expected_error": false
+    },
+    {
+      "case": "planner-delivery",
+      "role": "planner",
+      "CKS_calls": 0,
+      "host_exit": 0,
+      "CKS_exit": 0,
+      "fixture_adapter_expected_error": false
+    },
+    {
+      "case": "planner-reuse",
+      "role": "planner",
+      "CKS_calls": 0,
+      "host_exit": 0,
+      "CKS_exit": 0,
+      "fixture_adapter_expected_error": false
+    },
+    {
+      "case": "duplicate-control",
+      "role": "analyzer",
+      "CKS_calls": 3,
+      "host_exit": 0,
+      "CKS_exit": 0,
+      "fixture_adapter_expected_error": true
+    }
+  ],
+  "native_tool_requests": 7,
+  "native_invalid_refusals": 4,
+  "actual_role_CKS_requests": 6,
+  "all_CKS_requests": 13,
+  "CKS_processes_exit0_reaped": 8,
+  "reused_artifact_sha256": {
+    "deep-review-evidence.json": "30671a536d7bee8b591e9f1e337df4d09384d7cb015bf78f101eaadd22f0bba7",
+    "deep-review.json": "6c8cc9e2e8caf083b2675ec228ec4614a968e7e02ddeae5c0766487675b01306",
+    "review-report.md": "2e14a41cf361f6cc2b8d9427dc236543dd2411fd507ee7bfc2679703d4cff703",
+    "sequence.mmd": "a212968346e985fc11d925e7353b81536d3130af206aabe88fc08e3dcd2ca739",
+    "modules.mmd": "121f3a5e7083949a4144ebf3e212eb6d6360790ce68f7b411eaf4ae8c3f9883a"
+  },
+  "audited_owned_pids_absent": 22,
+  "duplicate_native_requests_allowed": true,
+  "duplicate_fixture_adapter_refusals": 1,
+  "consumer_graph_projection_verified": true,
+  "server_cache_or_duplicate_blocker_verified": false,
+  "autonomous_model_adherence": "not_evaluated",
+  "formal_completed": 0,
+  "formal_total": 9,
+  "ontology_effect_acceptance": "not_evaluated",
+  "candidate_adopted": false,
+  "real_model_calls": 0,
+  "formal_runs": 0,
+  "full_plan_passed": 18,
+  "full_plan_pending": [
+    "T09",
+    "T10",
+    "T16",
+    "T22"
+  ],
+  "next": "T09 foreign/pins, then T10/T16 and P08/T22"
+}

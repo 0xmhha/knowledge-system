@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "tier": "simulation",
+  "base_ref": "1bae1c16ec6b1af9d6585a497e2930b7d76a5d22",
+  "symptom_id": "ledger-total",
+  "symptom_case": "symptom",
+  "controls": [
+    "empty",
+    "single"
+  ],
+  "ticket_file": "ticket.json",
+  "ticket_sha256": "504a5013d5e8cb7d67623b00b42f962bcc6ce1059226a4d9b906c429cf7e7275",
+  "requirement_file": "acceptance.json",
+  "independent_derivation_file": "derivation.md",
+  "frozen_files": {
+    "acceptance.json": "5e7cf6067e2a07bff04d1a5b994fa84abf96fa928e583e7e86eb3218c0eaaeb7",
+    "derivation.md": "fc3f994c6969206ab176bb4f9eaab0d19897ec12cd8c96bb5502d5fcbeca1457",
+    "oracles/primary.py": "fd57f6a86a912a8ea731f20b0f1ecd081107e582522f044cfb50478d87592870",
+    "oracles/independent.py": "7421e50fdb3ba43b4a8734dcc627b4572e82d83011e54d89665caf3a084b0644",
+    "oracles/regression.py": "ddb4cac835d85afd802c3ba3ad27c6bc690e547bea22698682735a1a95be0972"
+  },
+  "oracles": [
+    {
+      "id": "primary",
+      "role": "primary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "oracles/primary.py"
+      ],
+      "assertion_id": "ticket_balance",
+      "files": [
+        "oracles/primary.py"
+      ]
+    },
+    {
+      "id": "independent",
+      "role": "independent",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "oracles/independent.py"
+      ],
+      "assertion_id": "conservation",
+      "files": [
+        "oracles/independent.py"
+      ]
+    }
+  ],
+  "mutants": [
+    {
+      "id": "lost-credit",
+      "kind": "reintroduce_symptom",
+      "patches": [
+        {
+          "path": "ledger.py",
+          "before": "sum(entries)",
+          "after": "entries[-1] if entries else 0"
+        }
+      ]
+    },
+    {
+      "id": "literal-overfit",
+      "kind": "overfit",
+      "patches": [
+        {
+          "path": "ledger.py",
+          "before": "sum(entries)",
+          "after": "42"
+        }
+      ]
+    }
+  ],
+  "timeout_seconds": 5
+}

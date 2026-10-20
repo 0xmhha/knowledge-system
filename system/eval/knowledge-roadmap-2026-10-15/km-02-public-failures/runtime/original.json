@@ -1,0 +1,127 @@
+{
+  "request": {
+    "schema_version": 1,
+    "project_id": "project-a",
+    "profile_id": "project-a-default",
+    "profile_digest": "724e052534ffd8ae45c46afd22a29b8229564894994033eb33c775b3893484e1",
+    "source_pin": {
+      "mode": "snapshot-only",
+      "snapshot_id": "309ddce77e8a5213557c76aae07706e08a4e172a6abde6ab911593c63ed64661",
+      "base_commit": ""
+    },
+    "input_digest": "b9eea7b9b1bb5368327897d6a38613faf59305c4262b20df2c421295e265648e",
+    "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+    "base": {
+      "state": "pinned",
+      "version": "v1",
+      "coordinates": {
+        "project_id": "project-a",
+        "dataset_id": "de6d3cbe1c312dbb5667c29ffe24e104950b6ca68e7641d03f2a4e5eb5878ce1",
+        "snapshot_id": "ccc92e7118fec524c03bdc7b9e3559c60fdae2c78b36b4d82d1ad8bdecbc3e93",
+        "source_mode": "snapshot-only",
+        "base_commit": ""
+      }
+    },
+    "new_version": "v3",
+    "activation": "activate_after_gate",
+    "idempotency_key": "owned-request-key-project-a-v3",
+    "deadline_seconds": 120
+  },
+  "profile": {
+    "project_id": "project-a",
+    "profile_id": "project-a-default",
+    "profile_digest": "724e052534ffd8ae45c46afd22a29b8229564894994033eb33c775b3893484e1",
+    "source_pin": {
+      "mode": "snapshot-only",
+      "snapshot_id": "309ddce77e8a5213557c76aae07706e08a4e172a6abde6ab911593c63ed64661",
+      "base_commit": ""
+    },
+    "input_digest": "b9eea7b9b1bb5368327897d6a38613faf59305c4262b20df2c421295e265648e",
+    "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+    "observed_base": {
+      "state": "pinned",
+      "version": "v1",
+      "coordinates": {
+        "project_id": "project-a",
+        "dataset_id": "de6d3cbe1c312dbb5667c29ffe24e104950b6ca68e7641d03f2a4e5eb5878ce1",
+        "snapshot_id": "ccc92e7118fec524c03bdc7b9e3559c60fdae2c78b36b4d82d1ad8bdecbc3e93",
+        "source_mode": "snapshot-only",
+        "base_commit": ""
+      }
+    },
+    "existing_versions": [
+      "v1",
+      "v2"
+    ],
+    "allowed_activation": [
+      "hold_for_review",
+      "activate_after_gate"
+    ],
+    "required_gates": [
+      "source",
+      "identity",
+      "graph",
+      "vector"
+    ],
+    "timeout_max_seconds": 120
+  },
+  "status": {
+    "schema_version": 1,
+    "job_id": "2547fb0ff854cf3be69a760c60cf596e",
+    "project_id": "project-a",
+    "profile_id": "project-a-default",
+    "request_digest": "9c0edc84f26da0b68fbb2da2bd363c5a8a251497fc878dd78389757d179d907a",
+    "target_version": "v3",
+    "revision": 7,
+    "state": "succeeded",
+    "phase": "finished",
+    "terminal": true,
+    "build_complete": true,
+    "activated": true,
+    "candidate": {
+      "version": "v3",
+      "coordinates": {
+        "project_id": "project-a",
+        "dataset_id": "afa461d7fdb91f77fe9cfbdb94b2634923e3b42de1f831a3e704b1441731c012",
+        "snapshot_id": "309ddce77e8a5213557c76aae07706e08a4e172a6abde6ab911593c63ed64661",
+        "source_mode": "snapshot-only",
+        "base_commit": ""
+      },
+      "input_digest": "b9eea7b9b1bb5368327897d6a38613faf59305c4262b20df2c421295e265648e",
+      "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370"
+    },
+    "publication": {
+      "base": {
+        "state": "pinned",
+        "version": "v1",
+        "coordinates": {
+          "project_id": "project-a",
+          "dataset_id": "de6d3cbe1c312dbb5667c29ffe24e104950b6ca68e7641d03f2a4e5eb5878ce1",
+          "snapshot_id": "ccc92e7118fec524c03bdc7b9e3559c60fdae2c78b36b4d82d1ad8bdecbc3e93",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        }
+      },
+      "version": "v3",
+      "coordinates": {
+        "project_id": "project-a",
+        "dataset_id": "afa461d7fdb91f77fe9cfbdb94b2634923e3b42de1f831a3e704b1441731c012",
+        "snapshot_id": "309ddce77e8a5213557c76aae07706e08a4e172a6abde6ab911593c63ed64661",
+        "source_mode": "snapshot-only",
+        "base_commit": ""
+      },
+      "published_at": "2026-10-15T09:34:14.942072Z",
+      "receipt_digest": "613dc227fc666eea98a8697ef37cc7332872b0a9d5447c7b04d328295bfa5da6"
+    },
+    "gates": {
+      "graph": "passed",
+      "identity": "passed",
+      "knowledge": "not_configured",
+      "semantic": "not_configured",
+      "source": "passed",
+      "vector": "passed"
+    },
+    "error": null,
+    "serving_adoption": "not_observed"
+  }
+}

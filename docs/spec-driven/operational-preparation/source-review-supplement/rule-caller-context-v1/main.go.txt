@@ -1,0 +1,188 @@
+package main
+
+// This scanner records syntax only; target source is parsed, never executed.
+import (
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"strconv"
+	"strings"
+)
+
+const buildImport = "github.com/ethereum/go-ethereum/internal/build"
+
+type input struct{ Path, Source string }
+type site struct {
+	StartByte int `json:"start_byte"`
+	EndByte   int `json:"end_byte_exclusive"`
+	StartLine int `json:"start_line"`
+	EndLine   int `json:"end_line"`
+}
+type anchor struct {
+	Name string `json:"name"`
+	Site site   `json:"site"`
+}
+type argument struct {
+	Kind    string `json:"kind"`
+	Text    string `json:"text"`
+	Literal string `json:"literal,omitempty"`
+	Site    site   `json:"site"`
+}
+type reference struct {
+	Target              string    `json:"target"`
+	Kind                string    `json:"kind"`
+	Owner               string    `json:"owner_spelling"`
+	Import              string    `json:"import_path_spelling"`
+	Resolution          string    `json:"resolution"`
+	Site                site      `json:"site"`
+	Function            string    `json:"function_name"`
+	FunctionSite        *site     `json:"function_site,omitempty"`
+	ClosureDepth        int       `json:"closure_depth"`
+	FirstArgument       *argument `json:"first_argument,omitempty"`
+	BuildImportSpelling bool      `json:"matches_build_import_spelling"`
+}
+type result struct {
+	Path         string            `json:"path"`
+	SHA256       string            `json:"sha256"`
+	Package      string            `json:"package"`
+	Imports      map[string]string `json:"imports"`
+	BuildTags    []anchor          `json:"build_constraints"`
+	Declarations []anchor          `json:"target_declarations"`
+	Contexts     []anchor          `json:"context_functions"`
+	References   []reference       `json:"references"`
+}
+
+func wanted(name string) bool {
+	return name == "MustRunCommand" || name == "MustRunCommandWithOutput"
+}
+
+func scan(in input) (result, error) {
+	fs := token.NewFileSet()
+	file, err := parser.ParseFile(fs, in.Path, in.Source, parser.ParseComments|parser.SkipObjectResolution)
+	if err != nil {
+		return result{}, err
+	}
+	out := result{Path: in.Path, SHA256: fmt.Sprintf("%x", sha256.Sum256([]byte(in.Source))), Package: file.Name.Name,
+		Imports: map[string]string{}, BuildTags: []anchor{}, Declarations: []anchor{}, Contexts: []anchor{}, References: []reference{}}
+	loc := func(n ast.Node) site {
+		a, b := fs.Position(n.Pos()), fs.Position(n.End())
+		return site{a.Offset, b.Offset, a.Line, b.Line}
+	}
+	for _, im := range file.Imports {
+		p, err := strconv.Unquote(im.Path.Value)
+		if err != nil {
+			return out, err
+		}
+		name := p[strings.LastIndex(p, "/")+1:]
+		if im.Name != nil {
+			name = im.Name.Name
+		}
+		out.Imports[name] = p
+	}
+	for _, group := range file.Comments {
+		for _, comment := range group.List {
+			if strings.HasPrefix(comment.Text, "//go:build ") || strings.HasPrefix(comment.Text, "// +build ") {
+				out.BuildTags = append(out.BuildTags, anchor{comment.Text, loc(comment)})
+			}
+		}
+	}
+	stack := []ast.Node{}
+	ast.Inspect(file, func(n ast.Node) bool {
+		if n == nil {
+			stack = stack[:len(stack)-1]
+			return true
+		}
+		var parent ast.Node
+		if len(stack) > 0 {
+			parent = stack[len(stack)-1]
+		}
+		stack = append(stack, n)
+		if fn, ok := n.(*ast.FuncDecl); ok {
+			if wanted(fn.Name.Name) {
+				out.Declarations = append(out.Declarations, anchor{fn.Name.Name, loc(fn)})
+			}
+			switch fn.Name.Name {
+			case "main", "doLint", "downloadLinter", "MustRun", "MustRunCommand", "MustRunCommandWithOutput":
+				out.Contexts = append(out.Contexts, anchor{fn.Name.Name, loc(fn)})
+			}
+		}
+		ref := reference{Resolution: "syntax_only_unverified", Kind: "function_value_or_unresolved_reference"}
+		var expression ast.Expr
+		switch x := n.(type) {
+		case *ast.SelectorExpr:
+			if !wanted(x.Sel.Name) {
+				return true
+			}
+			expression, ref.Target = x, x.Sel.Name
+			if owner, ok := x.X.(*ast.Ident); ok {
+				ref.Owner, ref.Import = owner.Name, out.Imports[owner.Name]
+				ref.BuildImportSpelling = ref.Import == buildImport
+			}
+		case *ast.Ident:
+			if !wanted(x.Name) {
+				return true
+			}
+			if sel, ok := parent.(*ast.SelectorExpr); ok && sel.Sel == x {
+				return true
+			}
+			if fn, ok := parent.(*ast.FuncDecl); ok && fn.Name == x {
+				return true
+			}
+			expression, ref.Target = x, x.Name
+		default:
+			return true
+		}
+		ref.Site = loc(expression)
+		for _, owner := range stack {
+			if fn, ok := owner.(*ast.FuncDecl); ok {
+				ref.Function = fn.Name.Name
+				s := loc(fn)
+				ref.FunctionSite = &s
+			}
+			if _, ok := owner.(*ast.FuncLit); ok {
+				ref.ClosureDepth++
+			}
+		}
+		if call, ok := parent.(*ast.CallExpr); ok && call.Fun == expression {
+			ref.Kind, ref.Site = "direct_call_syntax", loc(call)
+			if len(call.Args) > 0 {
+				arg := call.Args[0]
+				s := loc(arg)
+				a := argument{Kind: "expression", Text: in.Source[s.StartByte:s.EndByte], Site: s}
+				if _, ok := arg.(*ast.Ident); ok {
+					a.Kind = "identifier"
+				}
+				if literal, ok := arg.(*ast.BasicLit); ok && literal.Kind == token.STRING {
+					a.Kind = "string_literal"
+					a.Literal, _ = strconv.Unquote(literal.Value)
+				}
+				ref.FirstArgument = &a
+			}
+		}
+		out.References = append(out.References, ref)
+		return true
+	})
+	return out, nil
+}
+
+func main() {
+	var inputs []input
+	if err := json.NewDecoder(os.Stdin).Decode(&inputs); err != nil {
+		panic(err)
+	}
+	out := []result{}
+	for _, in := range inputs {
+		r, err := scan(in)
+		if err != nil {
+			panic(err)
+		}
+		out = append(out, r)
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(out); err != nil {
+		panic(err)
+	}
+}

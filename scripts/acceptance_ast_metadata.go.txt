@@ -1,0 +1,89 @@
+package main
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/format"
+	"go/parser"
+	"go/token"
+	"os"
+)
+
+type Input struct {
+	Path   string
+	Source string
+	Blob   string
+}
+
+func main() {
+	var files []Input
+	if err := json.NewDecoder(os.Stdin).Decode(&files); err != nil {
+		panic(err)
+	}
+	out := []map[string]any{}
+	for _, in := range files {
+		fs := token.NewFileSet()
+		f, err := parser.ParseFile(fs, in.Path, in.Source, parser.ParseComments)
+		if err != nil {
+			panic(err)
+		}
+		if ast.IsGenerated(f) {
+			continue
+		}
+		for _, d := range f.Decls {
+			fn, ok := d.(*ast.FuncDecl)
+			if !ok || fn.Body == nil {
+				continue
+			}
+			start, end := fs.Position(fn.Pos()), fs.Position(fn.End())
+			if end.Line-start.Line < 4 || end.Line-start.Line > 110 {
+				continue
+			}
+			features := map[string]bool{}
+			names := map[string]int{}
+			ast.Inspect(fn.Body, func(n ast.Node) bool {
+				switch x := n.(type) {
+				case *ast.AssignStmt:
+					if x.Tok == token.DEFINE {
+						features["short_declaration"] = true
+						for _, v := range x.Lhs {
+							if id, ok := v.(*ast.Ident); ok && id.Name != "_" {
+								names[id.Name]++
+							}
+						}
+					} else {
+						features["assignment"] = true
+					}
+				case *ast.DeclStmt:
+					features["declaration"] = true
+				case *ast.IfStmt, *ast.SwitchStmt, *ast.TypeSwitchStmt:
+					features["branch"] = true
+				case *ast.ForStmt, *ast.RangeStmt:
+					features["loop"] = true
+				case *ast.ReturnStmt:
+					features["return"] = true
+				}
+				return true
+			})
+			for _, n := range names {
+				if n > 1 {
+					features["repeated_short_declaration_name_hint"] = true
+				}
+			}
+			recv := ""
+			if fn.Recv != nil {
+				var b bytes.Buffer
+				format.Node(&b, fs, fn.Recv.List[0].Type)
+				recv = b.String()
+			}
+			source := []byte(in.Source)
+			out = append(out, map[string]any{"path": in.Path, "package": f.Name.Name, "name": fn.Name.Name, "receiver": recv, "start_line": start.Line, "end_line": end.Line, "start_byte": start.Offset, "end_byte_exclusive": end.Offset, "file_sha256": fmt.Sprintf("%x", sha256.Sum256(source)), "function_sha256": fmt.Sprintf("%x", sha256.Sum256(source[start.Offset:end.Offset])), "git_blob": in.Blob, "syntax_features": features})
+		}
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(out); err != nil {
+		panic(err)
+	}
+}

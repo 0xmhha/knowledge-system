@@ -1,0 +1,151 @@
+{
+  "observation_date": "2026-10-18",
+  "checks": [
+    {
+      "label": "comparison-guards",
+      "argv": [
+        "python3",
+        "scripts/test_stablenet_comparison.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 42.79802595824003,
+      "raw_sha256": "84f6a96b291f56216ec41ead563769cb4c58a590fb0a013f24d4722fe1ee6ece",
+      "raw_file": "comparison-guards.log"
+    },
+    {
+      "label": "prior-error-guards",
+      "argv": [
+        "python3",
+        "/private/tmp/ks-snp04-20261018-01/historical-source/scripts/test_stablenet_errors.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 8.296126917004585,
+      "raw_sha256": "cd4b5876b3c8ae38d338368ea2e5c0719bf6e55486c314ab24fa3bee41376897",
+      "raw_file": "prior-error-guards.log"
+    },
+    {
+      "label": "documentation-contract",
+      "argv": [
+        "python3",
+        "scripts/test_documentation_contract.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.18256837502121925,
+      "raw_sha256": "10a866d088c98e6d44e75b2313d408cfdcd2175dd81a06de5aa3ae6fe17e7135",
+      "raw_file": "documentation-contract.log"
+    },
+    {
+      "label": "package-notice",
+      "argv": [
+        "python3",
+        "scripts/test_package_notice_recipe.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.39140466693788767,
+      "raw_sha256": "95c7aae1b69ae1bcdceb90d016ad192647842838943689e76a9b422bb3c7a162",
+      "raw_file": "package-notice.log"
+    },
+    {
+      "label": "live-documentation",
+      "argv": [
+        "python3",
+        "scripts/check-docs.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.224595499690622,
+      "raw_sha256": "5932c92b1d962cafa4f4e3d23f5873c23b5de5d729e1748da42137cc6bea4841",
+      "raw_file": "live-documentation.log"
+    },
+    {
+      "label": "original-completion-guard",
+      "argv": [
+        "python3",
+        "scripts/check-refactoring-progress.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 25.644917957950383,
+      "raw_sha256": "9f978ee04e58c0b7eb5f5184cb72298f9871d0c0c9228a878d6948e210c5e3c6",
+      "raw_file": "original-completion-guard.log"
+    },
+    {
+      "label": "comparison-check",
+      "argv": [
+        "python3",
+        "scripts/check-stablenet-comparison.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.4620216246694326,
+      "raw_sha256": "611e9d0ab013fbfd53bedb8bcc913bd477bda979cfdbfedf79fb51a44106caa3",
+      "raw_file": "comparison-check.log"
+    },
+    {
+      "label": "prior-error-check",
+      "argv": [
+        "python3",
+        "scripts/check-stablenet-errors.py",
+        "--no-live-source"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.3385757920332253,
+      "raw_sha256": "c317d43f4f405618f53289fc208be4faa3704c9749165d86d859e7255e5e400e",
+      "raw_file": "prior-error-check.log"
+    },
+    {
+      "label": "rebuild-historical-check",
+      "argv": [
+        "python3",
+        "scripts/check-stablenet-rebuild.py",
+        "--no-live-source"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.5029330421239138,
+      "raw_sha256": "ea7360bc6218f015023c0dee703488274f635cc8234ac478b83101466ea63348",
+      "raw_file": "rebuild-historical-check.log"
+    },
+    {
+      "label": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.49825312523171306,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_file": "whitespace.log"
+    }
+  ],
+  "guard_tests": {
+    "comparison-guards": 22,
+    "prior-error-guards": 13,
+    "documentation-contract": 20,
+    "package-notice": 3
+  },
+  "scoped_Python_tests": 58,
+  "raw_Text_contract": "indexed hint/prose or density rendering, not a literal code quotation; 86 projections checked against actual selected DB, flow corpus independently regenerated; v2/compare body bytes strict",
+  "fresh_native_comparison_collection_race": {
+    "pass": 232,
+    "skip": 0,
+    "fail": 0
+  },
+  "full_native_validation": "fresh full build/test/race/fmt/vet/lint/boundaries/docs/build-bins from clean38dd5c54; historical pre-fix observations not counted as current-source passes",
+  "live_documents": 134,
+  "original_completion_guard_raw_log": "private_only_not_published",
+  "original_completion_guard_exit_code": 0,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "reviewer_assignment": "미정",
+  "historical_packets_unchanged": true,
+  "previously_ignored_historical_logs_to_track": 21,
+  "staged_packet_completeness": "all sealed artifacts will be checked against the staged Git blob bytes before signed final commit; private receipt avoids self hashing",
+  "historical_validation": "13 prior error evidence guard tests executed in clean652e977c; prior error/rebuild artifact guards explicitly --no-live-source; not current-source native results",
+  "self_containing_commit": "signed local commit/signature/clean tree verified after creation; no circular self hash",
+  "staged_raw_log_whitespace": {
+    "initial_exit_code": 2,
+    "cause": "the restored historical diagnostic intentionally contains the trailing whitespace that it reported as rejected",
+    "resolution": "one exact historical diagnostic path has whitespace checks disabled; its original bytes and prior manifest hash are unchanged",
+    "policy": "docs/spec-driven/operational-preparation/source-review-supplement/followups/.gitattributes",
+    "policy_sha256": "f6c3bf4fed25be538e6491df6bea1802d83d5e9542996f8cb5ee2905b293bd7e",
+    "final_exit_code": 0
+  }
+}

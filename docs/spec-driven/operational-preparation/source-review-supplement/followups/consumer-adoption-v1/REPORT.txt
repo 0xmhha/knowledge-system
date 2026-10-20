@@ -1,0 +1,71 @@
+승인된 후보 통합·로컬 검증 — 현재 인수인계 / 2026-10-17
+
+현재 단계: A-통합·로컬 검증 완료. 비운영 실제 프로젝트 pilot은 다음 단계.
+D01~D08 권고 범위 승인. D04 담당자 미정 유지. 정식 수용0/9, freeze=null, 실행허용false.
+기존 로드맵 로컬 구현7/7·세부28/28 및 격리 준비22/22 완료를 유지한다.
+
+완료 증거
+[완료] CKS 유지 브랜치에 후보5파일 정확 통합. 소스 서명 커밋 fdb43ae2412d071f02b6b0dc5df0e50d3966b59e.
+[완료] coding-agent 별도 소유 브랜치에서 main3a66d91f 대비 후보 의존16커밋/61파일 통합.
+       승인 기록8581ca97b6dc28686ac3b07f05c9bd8e117628ec 이후 기존main Go4파일 형식 수정·리뷰 계약CI2개 추가.
+       최종 서명 커밋d1ebafb8ddf4eb487b8f1d6285135e174c40834b: main 대비18커밋/66파일.
+       실제 host는8581을 실행했다. 최종d1의 plugin tree가 정확히 동일하므로 호스트 실행 소스가 보존된다.
+       위치 /private/tmp/ks-adopted-consumer-20261017, 브랜치 codex/approved-consumer-integration-20261017.
+       consumer.bundle은 위main을 prerequisite로 하는 복구용 커밋 묶음이다. 원격 게시가 아니다.
+[완료] CKS fresh build, 일반 전체4063pass/18skip/0fail, race 전체4063pass/18skip/0fail,
+       fmt/vet/golangci/boundaries/docs 포함 make lint, make build-bins 통과.
+       새 CKS/CKG private binary의 vcs.revision=fdb43…, vcs.modified=false 및 SHA 기록.
+[완료] coding-agent Python 단위188개, tool reference137개/68도구, project 해석/hook 계약,
+       Jira Go build/test/race/vet, timing guard race, fixture oracle/selection/evaluation-exit smoke 통과.
+       최초 fmt에서 기존main4파일 차이를 발견했으며 수정 후 fmt/Jira4검사/CI2계약을 다시 통과했다.
+[완료] 실제 Claude Code2.1.300 + fake local scripted API: Analyzer5/Planner2=7역할/도구 쌍,
+       실제3host, 변조CLI exit2·Write거부 후 복구/정상전달, partial/unknown5 및 independent_acceptance 미기록 유지.
+       진단용 Planner 도구 노출 세션은 정상 워크플로 재사용/중복 시험으로 세지 않는다.
+[완료] 이전/새 CKS 각각47도구 비교94회. elapsed_micros만 제외한 구조/오류/이중raw selector 처리 동일.
+       새 CKS exit0/reap5건·host3건·owned PID11개 부재·loopback listener/worker 종료, 강제kill/rescue0.
+[완료] 기존667보호검사는 통합 전ba6d1d22 소스 복사본에서 재실행 통과. 현재Go의667검사로 합산하지 않는다.
+       동결 패킷/기존 후보 체크아웃/이전 binary 보존. 과거 CKS 종료 영수증 미확인1건은 미확인으로 유지한다.
+[완료] 새 증거 보호12검사 통과. 정식승격/검토자추정/위조계수/변조허용/미종료/과거재표시/운영변경을 거부한다.
+[완료] 전역 설정32항목과 운영 metadata/pointer42항목 동일, 기존 비소유 엔진10개 보존.
+       다른 사용자 세션의 추가 엔진은 그대로 보존했고 race 중 임시 Go검사 자식은 종료됐다.
+       이는 관측 시점의 hash/metadata/pointer 비교이며 운영 DB 전체bytes·가용성·인증/다른플랫폼 검증이 아니다.
+
+실패·한계도 보존
+- 최초 native 빌드/개별 바이너리 빌드는 공유 Go캐시 파일 누락으로 실패. 공유 캐시를 삭제하지 않고 전용 캐시로 새 전체 검증을 통과했다.
+- 소비자 최초 컨트롤러는 기존4파일 fmt 차이로 실패. 최종 수정 및 재검증을 별도 기록했다.
+- 로컬 응답기는 모델 호출 없이 실제 host/hook/MCP 통신만 검증한다. 모델의 자율 준수·자연어 품질·온톨로지 개선 증거가 아니다.
+- 입력/정답/검토자/실제 runtime pin이 동결되지 않아 정식9건과 독립 ontology 효과는 완료 처리하지 않는다.
+
+다음 작업 / 남은 전체 작업(우선순위)
+P1 [대기] 별도 소유 go-stablenet 비운영 pilot: 실제 소스·dataset/snapshot·BGE-M3 runtime identity를 읽기 전용 조사·pin,
+          CKV/CKG 정렬·semantic off 검색·타프로젝트 혼입·인용/출처 경계 검증. 기존current 포인터를 바꾸지 않는다.
+P1 [대기] 위pilot 후 명시적 go-wemix 비교: 별도 project namespace/source pin/동일 개념·기능 근거 추출·혼입0 확인.
+P2 [담당자 미정] 사람gold 검토자/최종 수용 역할·독립성 지정; DEV/FINAL·새 독립 입력·완전gold·매칭·표본충분성 확정.
+          승인된 방법/수치 범위와 정식 실행별 F01~08 동결 영수증을 구분한다. 실제 LLM은 모델/인증/상한 별도 지정 후 실행.
+P3 [미완료] 정식9건(0/9)
+  WI-1: 독립30함수 data/control 의미·완전gold·매칭, data/control precision≥.95/recall≥.90.
+  WI-2: 지원 규칙별 새 양성/음성 각10, sanitizer/branch/shadow/external, 명령/호출자/MCP, precision/recall≥.80.
+  WI-3: 독립20사실가족·4증상, 실제 symptom-only 검색 top10 macro recall≥.80.
+  WI-4: 독립5seed/schedule가족·100회/arm·baseline증상10이상, 600초 관측·fix/baseline비≤.50. 재현0은inconclusive.
+  WI-V1: 독립2결함티켓·실제API·primary/독립oracle·정상/재도입/overfit 대조 및 올바른 거부.
+  WI-V2: 티켓별2후보 이상·독립 수용집합·hard gate·선택/동률/전부탈락·불충분 판정.
+  WI-6: 독립20가족·4의도·기본/확장쌍 관련성/잡음gold·실제검색·warm지연. 기존+10%p/잡음+10%p/지연비≤2 유지.
+  WI-SP: 독립12symbol(정책4/보안4/미태그4), 수동/자동 provenance·ACL/private/위조·실제소비자.
+  WI-C: 독립10review/5module·필수항목/priority gold·구조화보고서/그림·인수인계·설치 역할.
+P3 [필수 미완료] 온톨로지 독립 효과: 의미/검색gold·검토된 구현-개념 연결·가족 coverage·독립 품질 수용.
+          DEV off/concept_text/relations/combined 진단 후 사전 primary 선택, FINAL20독립가족/4의도 이상.
+          off대비 recall@10 +5%p·95%CI하한>0, precision하락≤2%p, warm p95비≤1.25,
+          타프로젝트혼입0·인용원문일치100%. 효과없음/악화/불충분도 기록하며 기본off 유지.
+          실제LLM 답변품질 효과는 모델 범위가 지정된 뒤 별도 평가. 기존 제한 연구 완료/quality inconclusive는 유지.
+P4 [별도 후속12건] 조직인증/권한; 공개CLI/HTTP·graph export; graph점수/확장조정; domain flow gold;
+          대규모corpus/긴함수; PR/as-of지식; legacy출처; CoreML; embedding cache연결; 운영감사연결;
+          viewer상호작용; 배포/downstream동기화.
+P4 [별도 결정] push/PR/merge·운영설치/포인터전환·전역plugin등록·유료모델 실행은 이번 범위에 포함하지 않는다.
+
+복구/연속성
+- Native 이전ba6와 후보0c6를 보존했다. 변경5파일과 committed source-binding을 사용하며 기존 완료 task 상태를 바꾸지 않는다.
+- coding-agent 원본/이전 후보는 손대지 않았다. 새clone과 bundle·changes.patch·signature/source hash를 다음 세션에 전달한다.
+- 최종 증거/문서 커밋은 위 native 소스 커밋 뒤에 위치한다. 이 문서는 자기 자신의 최종 commit hash를 주장하지 않는다.
+- 통합 검증 명령: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-consumer-adoption.py --packet docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1
+- 증거 보호 검사: PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_consumer_adoption.py
+- 과거 동결 source 검사들은 현재 채택 source를 위한 검사로 재작성하지 않는다. 현재 구현 guard는 승인된 새 source-binding을 사용한다.

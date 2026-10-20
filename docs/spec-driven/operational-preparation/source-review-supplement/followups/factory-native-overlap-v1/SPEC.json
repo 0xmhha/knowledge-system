@@ -1,0 +1,57 @@
+{
+  "purpose": "실제 factory·실제 peer 동기화의 native60초 broadcast와 같은 RPC 구독의 취소/Syncing callback/Unsubscribe/owner 삭제·ack를 연결해 충돌 및 후보 복구를 검증",
+  "knowledge_revision": "4dc018dfacf9d3748eeae50c04267d0a24ebeeb4",
+  "upstream_source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "runtime_scope": {
+    "roles": [
+      "ORIGINAL",
+      "CAND-A",
+      "CAND-B",
+      "MUT-REINTRO",
+      "MUT-EARLY"
+    ],
+    "unique_source_variants": 4,
+    "profiles": [
+      "general",
+      "race"
+    ],
+    "repetitions": 1,
+    "planned_slots": 10,
+    "owned_nodes_per_slot": 2,
+    "source_sync": "actual two-node loopback legacy PoW ethash fixture; actual StartEvent/DoneEvent; no Post or fake height",
+    "original_timer_seconds": 60,
+    "gate": "selected receiver native done-broadcast just before unbuffered send; actual same-session eth_unsubscribe; observe actual callback rpcSub.Err and method entry before releasing",
+    "callback_route": "rpc_unsubscribe; transport-close/notifier.Closed is not exercised by this matrix",
+    "no_clock_or_timer_replacement": true,
+    "original_five_scope": "actual owner4/separate controlled late1 remains unchanged"
+  },
+  "completion_checks": [
+    "source/API/channel/RPC id and before-rescue event trace all refer to same factory subscription",
+    "original/reintroduction show pending actual native send plus uninstall send before rescue",
+    "A/B drain exactly one real native status and await real owner delete/ack before method and callback return",
+    "early-return mutant distinguished by return without owner delete/ack and native send still pending",
+    "original real-node/consumer source preserved; full project/build trees and native general/race binaries bound",
+    "cleanup after observation uses owned actual status receive/manual real-owner uninstall only; no fake ack",
+    "all declared slots retained including failures; no automatic retry; source-bound validator and regression pass",
+    "documents/worklist/signed local commit; new cache/temporary source/data/binaries removed after evidence archived"
+  ],
+  "limits": [
+    "before-send gate and source observation hooks deliberately perturb scheduling; no ungated probability/fairness claim",
+    "single exposed correlated DEV family, not independent gold/repeats/sufficiency",
+    "no universal all-post-ack channel-use or full12 acceptance",
+    "legacy PoW fixture does not establish production WBFT behavior",
+    "no actual LLM, paid calls, operational nodes, deployment or publication"
+  ],
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "FINAL": 0,
+  "freeze": null,
+  "execution_allowed": false,
+  "attempt_history": {
+    "initial": "one invalid fixture compile before any runtime nodes: ack channel declared chan struct instead of source chan interface",
+    "corrective1": "only cleanup request acknowledgement channel type corrected; fresh source clones, same declared ten slots; all raw attempts retained",
+    "automatic_retries": 0,
+    "initial_runtime_nodes": 0,
+    "valid_runtime_nodes": 20
+  }
+}

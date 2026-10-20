@@ -1,0 +1,43 @@
+go build ./...
+go vet ./...
+/Users/kevin/.gvm/pkgsets/go1.26.8/global/bin/golangci-lint run --timeout 15m ./...
+0 issues.
+engine boundaries: OK
+go build  -o bin/ckg ./cmd/graph
+go build  -o bin/ckv ./cmd/vector
+go build  -o bin/cks ./cmd/cks
+....................
+----------------------------------------------------------------------
+Ran 20 tests in 0.028s
+
+OK
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.018s
+
+OK
+documentation: OK (132 live documents)
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_registration.py
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 0.553s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_collection.py
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 1.955s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_review.py
+...................................
+----------------------------------------------------------------------
+Ran 35 tests in 13.949s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_broker.py
+...............................
+----------------------------------------------------------------------
+Ran 31 tests in 57.680s
+
+OK

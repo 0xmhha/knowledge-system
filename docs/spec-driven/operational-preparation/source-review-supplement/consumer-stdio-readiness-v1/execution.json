@@ -1,0 +1,62 @@
+{
+  "candidate_commit": "af4ff8b1b7778cb8dd783af684ecefd01b76283c",
+  "candidate_adopted": false,
+  "candidate_before": {
+    "commit": "af4ff8b1b7778cb8dd783af684ecefd01b76283c",
+    "porcelain": ""
+  },
+  "candidate_after": {
+    "commit": "af4ff8b1b7778cb8dd783af684ecefd01b76283c",
+    "porcelain": ""
+  },
+  "original_before": {
+    "commit": "b7e78689676769e8536626e76eed7165d870e1ba",
+    "porcelain": ""
+  },
+  "original_after": {
+    "commit": "b7e78689676769e8536626e76eed7165d870e1ba",
+    "porcelain": ""
+  },
+  "fixture_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+  "fixture_sha256": {
+    "go.mod": "2c4e6f7836aea17be6701c515e40f432a10c7c59800efe49e891f2cdec5880cf",
+    "logic.go": "6a075aced66b169ce706ecbe8d7a1e0fc6920a178bc49bcca9dfb097ddb505e4",
+    "logic_test.go": "36717bd6fa14c3388b2faab06fd5bc0b53853289e1393d8610f38d3748054675",
+    "policy.yaml": "2ba0c3cfcb628c0f805abffa08c39a1b8fb34528b318454ff0a8c92693c02d00",
+    "security.yaml": "1236b9eb5b6d4ddb34e401510bf203e4acba112fe09e04f01de679632cd21ecb",
+    "a/same.go": "21db9c705f6b9a7b0cb81505045692bb23d469db6a24d4b4492e123413ca71ac",
+    "b/same.go": "0be2cc29eb5cd053cf9747dbd882493ad9eb19a1bcbcd310bfb72e7890521794"
+  },
+  "binary_sha256": {
+    "cks": "0bfead69d672f4f2001b3584e72ad19d9f6b1487026dc28c110d3e1c353f11c1",
+    "ckg": "08699e90a81a0e7ce5ac67d15aac0fa60b05a6186605867e7b2d89adbaa513cb"
+  },
+  "go_source_changes": [],
+  "selected": {
+    "canonical_id": "example.invalid/consumer-stdio-fixture.Seed",
+    "confidence": "EXTRACTED",
+    "file": "logic.go",
+    "id": "ea016a756cff1cc8",
+    "line": 7,
+    "name": "Seed",
+    "qname": "fixture.Seed",
+    "signature": "func Seed(command string, values []int, strict bool) *exec.Cmd",
+    "source": "func Seed(command string, values []int, strict bool) *exec.Cmd {\n\ttotal := 0\n\tfor _, value := range values {\n\t\ttotal += value\n\t}\n\tif strict && total < 0 {\n\t\tcommand = \"fixed\"\n\t}\n\tHelper(total)\n\tEmpty(total)\n\treturn exec.Command(command)\n}",
+    "type": "Function",
+    "usage_score": 1
+  },
+  "query": {
+    "node_id": "ea016a756cff1cc8",
+    "expected_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+    "expected_source_sha256": "98a061081afd57403a5988b03b6662a23b095e56ec9f204c214ac2334bc4c35b"
+  },
+  "index_sha256": {
+    "index": "37aa6c3d00eb6f76f75048415960accb722b937b40ff09ac61ec9df8db7b8791",
+    "old-index": "5bcc8d36efea972d809f0c5d1e1c24b20e9198a680980f0200e42a4d2185f75e"
+  },
+  "owned_root": "/private/tmp/ks-consumer-stdio-20261017-r2",
+  "actual_role_sessions": 0,
+  "model_calls": 0,
+  "listeners": 0,
+  "formal_runs": 0
+}

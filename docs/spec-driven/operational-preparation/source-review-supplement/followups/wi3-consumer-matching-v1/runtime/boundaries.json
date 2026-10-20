@@ -1,0 +1,99 @@
+[
+  {
+    "case_id": "wrong_commit",
+    "arguments": {
+      "symptom": "블록 제안 메시지를 읽는 중 포함된 증명 항목 하나가 잘못되면 전체 처리가 중단되는 증상을 가정한다. 관련 코드와 오류 반환 위치를 찾아줘.",
+      "commit": "0000000000000000000000000000000000000000",
+      "max_candidates": 10,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 23,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "label_suspects: snapshot_mismatch"
+          }
+        ],
+        "isError": true
+      }
+    },
+    "wall_seconds": 0.1668777079321444
+  },
+  {
+    "case_id": "invalid_candidate_cap",
+    "arguments": {
+      "symptom": "블록 제안 메시지를 읽는 중 포함된 증명 항목 하나가 잘못되면 전체 처리가 중단되는 증상을 가정한다. 관련 코드와 오류 반환 위치를 찾아줘.",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "max_candidates": 21,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 24,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "invalid_request: candidate/seed/enrichment/call/depth/time budget outside bounds"
+          }
+        ],
+        "isError": true
+      }
+    },
+    "wall_seconds": 0.010426625143736601
+  },
+  {
+    "case_id": "foreign_expansion",
+    "arguments": {
+      "symptom": "블록 제안 메시지를 읽는 중 포함된 증명 항목 하나가 잘못되면 전체 처리가 중단되는 증상을 가정한다. 관련 코드와 오류 반환 위치를 찾아줘.",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "max_candidates": 10,
+      "max_seeds": 3,
+      "max_enriched": 3,
+      "max_calls": 32,
+      "depth": 2,
+      "budget_ms": 1000,
+      "expand": [
+        {
+          "file": "node/errors.go",
+          "start_line": 42,
+          "end_line": 47,
+          "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "project_id": "other-project",
+          "dataset_id": "other-dataset",
+          "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+          "source_mode": "committed",
+          "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+          "origin_id": "repo",
+          "file_sha256": "dfe7f7a72038e87e1fa9e49099d8d45fc5642818c3df748c574751797cb76d15",
+          "content_sha256": "d5d86a37771368bf6ae43311e26910b9232e179288009db3031d18e35b205027"
+        }
+      ]
+    },
+    "raw_response": {
+      "jsonrpc": "2.0",
+      "id": 25,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "snapshot_mismatch: expansion belongs to a different retained source"
+          }
+        ],
+        "isError": true
+      }
+    },
+    "wall_seconds": 0.007544958032667637
+  }
+]

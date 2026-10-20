@@ -1,0 +1,565 @@
+diff --git a/plugin/agents/analyzer.md b/plugin/agents/analyzer.md
+index 01d31e0767789a0aefe9a9ab24f70930c363909f..7a51506ae5805d1fd0d540eb9d6ac3d79bb5147b 100644
+--- a/plugin/agents/analyzer.md
++++ b/plugin/agents/analyzer.md
+@@ -8,6 +8,8 @@ description: |
+   project-built binary across a multi-node network and accumulates under chainbench
+   tests/repro/), and root-cause identification (with a running findings.log), then
+   hands a root cause + reproduction over to the Planner for design and planning.
++  For "code_review", creates source-bound structured partial review artifacts
++  and hands their validated ANALYSIS hash to the Planner in PLANNING.
+   Handles "fresh", "bugfix" (incl. EVALUATION_FAIL re-entry), and "code_review".
+   Does NOT design or plan the fix, and does NOT modify production code.
+ tools:
+@@ -61,6 +63,11 @@ tools:
+   - mcp__plugin_coding-agent_chainbench__chainbench_log_timeline
+   - mcp__plugin_coding-agent_chainbench__chainbench_failure_context
+   - mcp__plugin_coding-agent_chainbench__chainbench_events_get
++  - mcp__plugin_coding-agent_cks__cks_context_value_dependencies
++  - mcp__plugin_coding-agent_cks__cks_context_rule_candidates
++  - mcp__plugin_coding-agent_cks__cks_context_value_dependency_expansion
++  - mcp__plugin_coding-agent_cks__cks_context_policy_security
++  - mcp__plugin_coding-agent_cks__cks_context_review_function
+ skills:
+   - timing-investigation
+   - oracle-validity
+@@ -166,7 +173,7 @@ Optional (bugfix re-entry, set by the Orchestrator on EVALUATION_FAIL):
+ | fresh        | §3 SITUATION → (bugfix-only: skip §5) → §6 hand off         |
+ | bugfix       | §3 SITUATION → §4 ROOT CAUSE → §5 REPRODUCE → §5c DIAGNOSE → §6 |
+ | bugfix (re)  | §3b RE-ANALYZE (reuse repro; §5c loop if e2e) → §6 hand off  |
+-| code_review  | §3 SITUATION (light) → §7 Review report → DONE              |
++| code_review  | §3 SITUATION (light) → §7 structured handoff → PLANNING     |
+ +--------------+------------------------------------------------------------+
+ ```
+ For a `fresh` **feature**, §4/§5 are skipped (nothing to reproduce). For `bugfix`,
+@@ -899,23 +906,58 @@ design. If `mode == "code_review"`, go to §7 instead of transitioning to PLANNI
+ 
+ ---
+ 
+-## 7. Review report (mode: code_review)
+-Code review uses the source-bound `structured-review` contract. Select an exact
+-retained function identity and explicit go-local-review@1.0.0 pack, capture real
+-CKS review_function and rule_candidates responses, and reuse the value/control
+-analysis already included in the rule envelope. Never compute a parallel graph.
+-Record six reasoning sections, original-node anchors, assumptions/unknowns,
+-findings with priority/tradeoff, and review criteria. Unsupported/unavailable
+-responses do not establish safety. The structural review lacks its own snapshot
+-pin: its association is identity-only and must remain explicitly unverified.
+-
+-Build deep-review.json, deep-review-evidence.json, source-bound diagrams and a
+-report draft with plugin/scripts/deep_review.py. Run the same verifier and bind
+-states.ANALYSIS.deep_review_sha256 to exact artifact bytes before handoff. Follow
+-review_only ANALYSIS -> PLANNING -> COMPLETION. The Planner validates the report
+-and binds states.PLANNING.review_report_sha256. The delivery hook checks both;
+-report delivery never grants independent human acceptance. No reproduction,
+-production change, fix plan, tracker message or PR publication is implied.
++## 7. Structured review handoff (mode: code_review)
++
++Resolve `{plugin_root}` to the absolute installed coding-agent plugin directory
++from the active plugin metadata or explicit task input; do not assume the
++current working directory is the plugin checkout. Read
++`{plugin_root}/skills/structured-review/SKILL.md`. Select an exact retained
++function and explicit `go-local-review@1.0.0` pack. Capture actual
++`cks.context.rule_candidates` and `cks.context.review_function` requests/results
++in `deep-review-evidence.json`, using supported expected commit/source/snapshot
++pins. The explicit role aliases are
++`mcp__plugin_coding-agent_cks__cks_context_rule_candidates` and
++`mcp__plugin_coding-agent_cks__cks_context_review_function`; record an actual
++failed attempt if the host cannot expose/call them. Reuse the value/control
++analysis included in the rule envelope; never compute a parallel graph.
++
++Record six reasoning sections: data_state, guards_exceptions, complexity,
++resources, io, priority_tradeoffs. Keep original-node evidence, assumptions and
++unknowns. Findings stay `review_candidate`, priority `high | medium | low`, at
++most 32 findings. Priority correctness, required-item completeness and safety
++are not proven by a valid enum, six sections, one criterion or empty findings.
++Unsupported/unavailable, truncated, stale or all-unknown placeholder results
++cannot establish a completed review. Preserve existing partial-result limits.
++
++Build `deep-review.json`, `deep-review-evidence.json`, `review-report.md`,
++`sequence.mmd` and `modules.mmd` with the owned `{bundle_path}` and `{judgments_path}` inputs:
++`python3 "{plugin_root}/scripts/deep_review.py" build --workspace "{workspace_dir}" --bundle "{bundle_path}" --judgments "{judgments_path}"`.
++While current_state is ANALYSIS and its status is in_progress, bind
++`states.ANALYSIS.deep_review_sha256` to the exact `deep-review.json` bytes and
++clear the stale completed PLANNING report binding. Then run the same script's
++`python3 "{plugin_root}/scripts/deep_review.py" verify --workspace "{workspace_dir}"` command and record the actual outcome.
++Only after successful verification mark ANALYSIS completed and transition to
++PLANNING; the hook validates the proposed handoff. The structural review remains
++`identity_only_unverified_snapshot`. A CFG is not a runtime trace, and the
++module diagram is retained-file membership with interprocedural edges unknown.
++Local hashes do not authenticate MCP transport or reviewers.
++
++Bind `states.ANALYSIS.deep_review_sha256` to exact typed artifact bytes before
++the state-machine handoff to PLANNING. The review_only route is
++ANALYSIS -> PLANNING -> COMPLETION; do not complete the ticket here. The Planner
++validates this same handoff and binds `states.PLANNING.review_report_sha256`.
++On re-entry, validate and reuse an unchanged handoff. A reasoning revision must
++return to ANALYSIS, regenerate/verify all five artifacts and replace the
++ANALYSIS hash; clear the stale completed PLANNING report binding. Do not edit
++generated Markdown/diagrams or rebind a frozen identity from PLANNING.
++
++Write/Edit state changes pass through the registered deep-review hook. Direct
++shell edits are outside that hook and require the same CLI before delivery.
++Keep manual policy/security annotations separate from opt-in automatic rules;
++other retained tools are explicit purpose-specific queries, not a global rule
++analysis mode. This stage returns a structured partial review handoff with
++independent acceptance `not_recorded`; no production change, fix plan, external
++tracker message or publication is implied.
+ 
+ ---
+ 
+@@ -942,3 +984,6 @@ Return a short status only (the artifacts are the real output): mode, retrieval
+ the one-line root cause + broken edge (bugfix), reproduction tier (simulation/e2e) + RED
+ confirmed (yes/no), the count of surviving `side_findings` (§4.2, with the highest-confidence
+ one named — "found-while-here, not fixed"), and the next state.
++
++For `code_review`, return the validated partial-review handoff status and
++ANALYSIS hash; next state is PLANNING, independent acceptance not_recorded.
+diff --git a/plugin/agents/planner.md b/plugin/agents/planner.md
+index 32864ef526440c19b886a49591b65239bdeb27fc..5648eb1e795016b96c637ebdaa7aa67f81f29458 100644
+--- a/plugin/agents/planner.md
++++ b/plugin/agents/planner.md
+@@ -5,8 +5,9 @@ description: |
+   Performs PLANNING → DESIGN for go-stablenet tickets. The Analyzer agent now owns
+   the ANALYSIS stage for "full"/"bugfix" (situation analysis, reproduction, root
+   cause); the Planner turns the Analyzer's root cause into a design and fix plan.
+-  The Planner still does the light ANALYSIS for "code_review" and the "release"
+-  summary. Handles "full", "code_review", "release", and "bugfix" modes.
++  For "code_review", validates the Analyzer structured handoff in PLANNING and
++  prepares validated partial review delivery without repeating ANALYSIS. The
++  Planner still handles the "release" summary and "full"/"bugfix" planning.
+ tools:
+   - Read
+   - Write
+@@ -25,6 +26,8 @@ tools:
+   - mcp__plugin_coding-agent_cks__cks_ops_health
+   - mcp__plugin_coding-agent_cks__cks_ops_freshness
+   - mcp__plugin_coding-agent_cks__cks_ops_index
++  - mcp__plugin_coding-agent_cks__cks_context_review_function
++  - mcp__plugin_coding-agent_cks__cks_context_rule_candidates
+ skills:
+   - fix-selection
+   - oracle-validity
+@@ -56,6 +59,9 @@ documented decisions; it does not modify production code.
+ You MUST `Write` these files into `workspace_dir` as you produce them:
+ `ticket-parsed.json`, `analysis.md`, `related-code.json`, `plan.md`,
+ `design-v{N}.md`, `design-changelog.md` (mode-dependent — see §2).
++For `code_review`, use only the five structured-review artifacts in §7; reuse
++the completed Analyzer handoff. Do not start another ANALYSIS or create a fix
++plan/design as part of review delivery.
+ 
+ These are **pipeline state artifacts**, not proactive documentation. The
+ `state-machine.transition()` gate and the Orchestrator/Implementer READ these
+@@ -105,7 +111,7 @@ Optional, mode-dependent:
+ | fresh         | §4 PLANNING → §5 DESIGN   (Analyzer did §3 ANALYSIS)     |
+ | bugfix        | §6 Bug-fix PLANNING (from Analyzer's analysis +         |
+ |               |   reproduction) → §5 DESIGN                              |
+-| code_review   | §3 ANALYSIS (light) → §7 Review report → DONE           |
++| code_review   | §7 validate handoff in PLANNING → COMPLETION             |
+ | release       | §8 Release summary → DONE                               |
+ +---------------+---------------------------------------------------------+
+ ```
+@@ -114,7 +120,9 @@ Optional, mode-dependent:
+ > ANALYSIS (situation, reproduction, root cause) and hands off at PLANNING. The
+ > Planner is then dispatched in the PLANNING state and READS the Analyzer's
+ > `analysis.md` / `related-code.json` / `reproduction.json` /
+-> `analysis-revisited-{N}.md`. §3 below runs only for `code_review`/`release`.
++> `analysis-revisited-{N}.md`. §3 below runs only for `release`.
++> For `code_review`, the Analyzer owns ANALYSIS and its structured artifacts;
++> the Planner enters §7 in PLANNING and validates that handoff.
+ 
+ Each section ends by writing its artifact(s) and calling
+ `state-machine.transition` to move the pipeline forward. If transition
+@@ -122,12 +130,13 @@ returns an error, the Planner reports the missing artifacts and stops.
+ 
+ ---
+ 
+-## 3. ANALYSIS (modes: code_review light, release; fresh/bugfix are the Analyzer's)
++## 3. ANALYSIS (release only; fresh/bugfix/code_review are the Analyzer's)
+ 
+ > The Analyzer agent (`agents/analyzer.md`) now performs ANALYSIS for `fresh` and
+ > `bugfix` and writes `analysis.md` / `related-code.json` / `reproduction.json`.
+-> This §3 runs only when the Planner is dispatched for `code_review` (light) or
+-> `release`. Its retrieval contract below is mirrored by the Analyzer.
++> This §3 runs only for `release`. A `code_review` Planner enters §7 in
++> PLANNING; it does not repeat the Analyzer stage. The retrieval contract below
++> is mirrored by the Analyzer.
+ 
+ ### 3.0 cks health check (record retrieval mode)
+ 
+@@ -409,7 +418,8 @@ state-machine.transition(workspace_dir, "ANALYSIS", "PLANNING",
+                         artifacts=["analysis.md","related-code.json"])
+ ```
+ 
+-If `mode == "code_review"`, instead jump to §7 (Review report) here.
++`code_review` does not enter this ANALYSIS section; validate the completed
++Analyzer handoff in §7 from PLANNING.
+ 
+ ---
+ 
+@@ -816,56 +826,80 @@ redesign, revise it explicitly during diagnosis and re-freeze before the next
+ fix; do not silently drop a mutant. The gate must execute these changes, not
+ score a declared mutation list. Consult `oracle-validity` for the protocol.
+ 
+-## 7. Review report (mode: code_review)
+-
+-Code Review tickets stop after analysis. Replace §4–5 with:
+-
+-### 7.1 Produce review-report.md
+-
+-```
+-# Code Review Report — {ticket_id}
+-
+-## Review Target
+-- Modules: {parsed.fields.review_target.files_or_modules}
+-- Perspective: {parsed.fields.review_target.perspective}
+-
+-## Findings
+-### [severity] {finding title}
+-- Location: {file}:{line}
+-- Code:
+-  ```go
+-  {code excerpt}
+-  ```
+-- Explanation: ...
+-- Recommendation: ...
+-
+-(repeat per finding)
+-
+-## Suggestions
+-- {priority}: {suggestion}
+-
+-## Code Quality Summary
+-- Overall: good | needs-improvement | critical
+-- Concurrency safety: {assessment}
+-- Test coverage: {assessment}
+-- Error handling: {assessment}
+-```
+-
+-Severities are: `critical | high | medium | low`. Cap at 30 findings; pick
+-the highest-severity ones first if more are detected.
+-
+-### 7.2 Hand back to Orchestrator
+-
+-The Planner just writes review-report.md and updates state.json:
+-
+-```
+-state.current_state = "PLANNING"   # signals to Orchestrator that review is ready
+-states.PLANNING.status = "completed"
+-write state.json
+-```
+-
+-The Orchestrator's "review_only" terminal handler takes over from here
+-(see Orchestrator §6).
++## 7. Structured review delivery (mode: code_review)
++
++### 7.1 Validate the Analyzer handoff in PLANNING
++
++Resolve `{plugin_root}` to the absolute installed coding-agent plugin directory
++from the active plugin metadata or explicit task input; do not assume the
++current working directory is the plugin checkout. Read
++`{plugin_root}/skills/structured-review/SKILL.md` and the ticket state. The
++review_only route is ANALYSIS -> PLANNING -> COMPLETION. The Analyzer owns
++ANALYSIS; do not repeat it or jump directly to a terminal. Require the same
++`ticket_id`, `ticket_type=code_review`, retained function identity and the exact
++`states.ANALYSIS.deep_review_sha256` already bound to `deep-review.json`.
++
++Reuse these five artifacts from the Analyzer:
++- `deep-review-evidence.json`: actual rule_candidates and review_function request/results;
++- `deep-review.json`: typed structured partial review;
++- `review-report.md`: exact Markdown generated from that typed review;
++- `sequence.mmd` and `modules.mmd`: exact source-bound generated diagrams.
++
++Run `python3 "{plugin_root}/scripts/deep_review.py" verify --workspace "{workspace_dir}"` before
++accepting the handoff. Record the actual CLI result and error. Missing,
++unavailable, unsupported, truncated, stale, foreign or tampered inputs cannot be
++replaced with an empty/safe report. A partial result is usable only under the
++existing verifier conditions and with its limitations preserved. A denied
++transition or failed verification stays unresolved; do not mark delivery done.
++
++When additional factual evidence is required, the explicit aliases are
++`mcp__plugin_coding-agent_cks__cks_context_review_function` and
++`mcp__plugin_coding-agent_cks__cks_context_rule_candidates`. If unavailable,
++record the actual failed attempt. Select the exact retained function, explicit
++`go-local-review@1.0.0` pack and supported commit/source/snapshot pins; keep real
++requests/results and reuse the rule result's value/control view. Do not compute
++another graph or quietly substitute a different function or snapshot.
++
++### 7.2 Preserve typed scope and revise through ANALYSIS
++
++Preserve all six reasoning sections: data_state, guards_exceptions, complexity,
++resources, io, priority_tradeoffs; original-node evidence, assumptions/unknowns,
++computed/agent origins and `review_candidate` findings. Use priority
++`high | medium | low`, at most 32 findings. Do not introduce a critical severity
++or map another severity vocabulary silently. Section presence, one criterion,
++empty findings or changing a valid priority do not establish required-item
++completeness, priority correctness, safety or independent quality acceptance.
++
++The structural review stays `identity_only_unverified_snapshot`: matching
++identity is not an atomic snapshot or authenticated transport. The CFG is not
++a runtime trace; the module diagram is retained-file membership, with
++interprocedural relationships unknown. Byte equality is not rendering or
++semantic quality. Local receipt hashes do not authenticate reviewers.
++
++If the existing artifacts validate, reuse them on re-entry. Do not hand-edit
++Markdown, diagrams or computed data. If a reasoning/criteria revision is needed,
++return to ANALYSIS using the state-machine contract and hand the change back to
++the Analyzer. It rebuilds all five artifacts with `deep_review.py build`,
++revalidates and binds a new ANALYSIS hash. Clear the prior completed PLANNING
++report binding; do not reuse a stale report hash or rebind frozen identity in
++PLANNING. Then validate the new handoff here.
++
++### 7.3 Bind PLANNING and hand back to Orchestrator
++
++After successful validation, bind the exact bytes of `review-report.md` to
++`states.PLANNING.review_report_sha256`, set PLANNING.status=completed and keep
++current_state=PLANNING for the Orchestrator. Before terminal delivery, require
++the completion-state hook check and the same CLI verification of the recorded
++completion state: both the ANALYSIS and completed PLANNING bindings must match.
++The Orchestrator owns COMPLETION and must not report delivery before that check.
++
++The registered deep-review hook checks identified Write/Edit state changes;
++direct shell state edits are outside that hook and require the same CLI before
++delivery. Do not treat Bash as an automatic hook or permission bypass proof.
++Do not overwrite the validated report with the old free-form Markdown template.
++Report `validated_delivery` / `structured_partial_review` with independent
++acceptance `not_recorded`. No fix plan, production change, publication or tracker
++message is implied by this review delivery.
+ 
+ ---
+ 
+@@ -941,5 +975,5 @@ A short summary, e.g.:
+ 
+ - `fresh`: "ANALYSIS+PLANNING+DESIGN complete. {N} steps, design revision={R}."
+ - `bugfix`: "Bug cycle {N} plan ready. Root cause hypothesis: {one line}."
+-- `code_review`: "Review report ready: {finding_count} findings ({by severity})."
++- `code_review`: "Validated partial review ready: {finding_count} findings ({by priority}); ANALYSIS/report hashes bound, independent acceptance not_recorded."
+ - `release`: "Release summary ready: {N} tickets, {risks_count} outstanding risks."
+diff --git a/plugin/scripts/tests/test_review_role_contract.py b/plugin/scripts/tests/test_review_role_contract.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..13dbdff634534b5c81eabffd22c7c14e1c7ff499
+--- /dev/null
++++ b/plugin/scripts/tests/test_review_role_contract.py
+@@ -0,0 +1,222 @@
++import copy
++import hashlib
++import importlib.util
++import json
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++ROOT = Path(__file__).resolve().parents[2]
++spec = importlib.util.spec_from_file_location("original_review_tests", ROOT / "scripts/tests/test_deep_review.py")
++original = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(original)
++review = original.review
++
++BASE_TOOLS = {'analyzer': ['mcp__plugin_coding-agent_chainbench__chainbench_experiment', 'mcp__plugin_coding-agent_chainbench__chainbench_prepare_log_observation', 'mcp__plugin_coding-agent_chainbench__chainbench_observe_logs', 'Read', 'Write', 'Edit', 'Bash', 'mcp__plugin_coding-agent_cks__cks_context_semantic_search', 'mcp__plugin_coding-agent_cks__cks_context_search_text', 'mcp__plugin_coding-agent_cks__cks_context_find_symbol', 'mcp__plugin_coding-agent_cks__cks_context_get_subgraph', 'mcp__plugin_coding-agent_cks__cks_context_find_callers', 'mcp__plugin_coding-agent_cks__cks_context_find_callees', 'mcp__plugin_coding-agent_cks__cks_context_impact_analysis', 'mcp__plugin_coding-agent_cks__cks_context_concurrency_impact', 'mcp__plugin_coding-agent_cks__cks_context_change_history', 'mcp__plugin_coding-agent_cks__cks_context_get_for_task', 'mcp__plugin_coding-agent_cks__cks_context_label_suspects', 'mcp__plugin_coding-agent_cks__cks_context_find_invariants', 'mcp__plugin_coding-agent_cks__cks_context_get_conventions', 'mcp__plugin_coding-agent_cks__cks_ops_health', 'mcp__plugin_coding-agent_cks__cks_ops_freshness', 'mcp__plugin_coding-agent_cks__cks_ops_index', 'mcp__plugin_coding-agent_chainbench__chainbench_init', 'mcp__plugin_coding-agent_chainbench__chainbench_start', 'mcp__plugin_coding-agent_chainbench__chainbench_stop', 'mcp__plugin_coding-agent_chainbench__chainbench_restart', 'mcp__plugin_coding-agent_chainbench__chainbench_status', 'mcp__plugin_coding-agent_chainbench__chainbench_state_compact', 'mcp__plugin_coding-agent_chainbench__chainbench_test_list', 'mcp__plugin_coding-agent_chainbench__chainbench_test_run', 'mcp__plugin_coding-agent_chainbench__chainbench_report', 'mcp__plugin_coding-agent_chainbench__chainbench_contract_deploy', 'mcp__plugin_coding-agent_chainbench__chainbench_contract_call', 'mcp__plugin_coding-agent_chainbench__chainbench_tx_send', 'mcp__plugin_coding-agent_chainbench__chainbench_tx_wait', 'mcp__plugin_coding-agent_chainbench__chainbench_txpool_inspect', 'mcp__plugin_coding-agent_chainbench__chainbench_node_rpc', 'mcp__plugin_coding-agent_chainbench__chainbench_consensus_status', 'mcp__plugin_coding-agent_chainbench__chainbench_consensus_health', 'mcp__plugin_coding-agent_chainbench__chainbench_consensus_validators', 'mcp__plugin_coding-agent_chainbench__chainbench_consensus_block_info', 'mcp__plugin_coding-agent_chainbench__chainbench_network_partition', 'mcp__plugin_coding-agent_chainbench__chainbench_network_peers', 'mcp__plugin_coding-agent_chainbench__chainbench_network_topology', 'mcp__plugin_coding-agent_chainbench__chainbench_log_search', 'mcp__plugin_coding-agent_chainbench__chainbench_log_timeline', 'mcp__plugin_coding-agent_chainbench__chainbench_failure_context', 'mcp__plugin_coding-agent_chainbench__chainbench_events_get'], 'planner': ['Read', 'Write', 'Edit', 'Bash', 'mcp__plugin_coding-agent_cks__cks_context_semantic_search', 'mcp__plugin_coding-agent_cks__cks_context_search_text', 'mcp__plugin_coding-agent_cks__cks_context_find_symbol', 'mcp__plugin_coding-agent_cks__cks_context_get_subgraph', 'mcp__plugin_coding-agent_cks__cks_context_find_callers', 'mcp__plugin_coding-agent_cks__cks_context_find_callees', 'mcp__plugin_coding-agent_cks__cks_context_impact_analysis', 'mcp__plugin_coding-agent_cks__cks_context_concurrency_impact', 'mcp__plugin_coding-agent_cks__cks_context_change_history', 'mcp__plugin_coding-agent_cks__cks_context_get_for_task', 'mcp__plugin_coding-agent_cks__cks_ops_health', 'mcp__plugin_coding-agent_cks__cks_ops_freshness', 'mcp__plugin_coding-agent_cks__cks_ops_index']}
++ADDITIONS = {"analyzer": ["value_dependencies", "rule_candidates", "value_dependency_expansion", "policy_security", "review_function"], "planner": ["review_function", "rule_candidates"]}
++
++def role_tools(text):
++    front = text.split("---", 2)[1]
++    return [line.strip()[2:] for line in front.split("tools:\n", 1)[1].split("\nskills:", 1)[0].splitlines() if line.strip().startswith("- ")]
++
++
++def check_tools(role, text):
++    expected = BASE_TOOLS[role] + ["mcp__plugin_coding-agent_cks__cks_context_" + name for name in ADDITIONS[role]]
++    if role_tools(text) != expected:
++        raise ValueError("exact role tools differ")
++    schema = json.loads((ROOT / "contracts/cks-tools.schema.json").read_text())["providers"]["cks"]["tools"]
++    for name in ADDITIONS[role]:
++        if schema["cks_context_" + name]["wire_name"] != "cks.context." + name:
++            raise ValueError("wire namespace differs")
++
++
++class RoleContractTests(unittest.TestCase):
++    def make_workspace(self, root):
++        return original.DeepReviewTests().make_workspace(root)
++
++    def hook(self, workspace, state, tool="Write"):
++        before = (workspace / "state.json").read_text()
++        data = {"tool_name": tool, "cwd": str(workspace), "tool_input": {"file_path": str(workspace / "state.json"), "content": json.dumps(state)}}
++        if tool == "Edit":
++            data["tool_input"] = {"file_path": str(workspace / "state.json"), "old_string": before, "new_string": json.dumps(state)}
++        result = subprocess.run([sys.executable, str(ROOT / "hooks/deep-review-guard.py")], input=json.dumps(data), text=True, capture_output=True, timeout=20)
++        self.assertEqual(result.returncode, 0, result.stderr)
++        self.assertEqual(result.stderr, "")
++        return json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] if result.stdout.strip() else "allow"
++
++    def test_exact_role_tools_and_schema(self):
++        for role, count in [("analyzer", 54), ("planner", 19)]:
++            with self.subTest(role=role):
++                text = (ROOT / "agents" / (role + ".md")).read_text()
++                check_tools(role, text)
++                self.assertEqual(len(role_tools(text)), count)
++
++    def test_each_missing_new_alias_rejected(self):
++        for role, names in ADDITIONS.items():
++            text = (ROOT / "agents" / (role + ".md")).read_text()
++            for name in names:
++                with self.subTest(role=role, name=name):
++                    altered = text.replace("  - mcp__plugin_coding-agent_cks__cks_context_" + name + "\n", "")
++                    with self.assertRaises(ValueError):
++                        check_tools(role, altered)
++
++    def test_existing_tool_removal_wildcard_duplicate_and_reorder_rejected(self):
++        text = (ROOT / "agents/analyzer.md").read_text()
++        for changed in [text.replace("  - Read\n", ""), text.replace("cks_context_rule_candidates\n", "*\n"), text.replace("  - Read\n", "  - Read\n  - Read\n"), text.replace("  - Read\n  - Write\n", "  - Write\n  - Read\n")]:
++            with self.subTest(change=changed[:20]):
++                with self.assertRaises(ValueError):
++                    check_tools("analyzer", changed)
++
++    def test_no_legacy_review_dispatch_or_severity_template(self):
++        for role in ADDITIONS:
++            text = (ROOT / "agents" / (role + ".md")).read_text()
++            rows = [line for line in text.splitlines() if line.lstrip().startswith("| code_review")]
++            self.assertEqual(len(rows), 1)
++            self.assertNotIn("DONE", rows[0])
++            self.assertNotIn("§3 ANALYSIS", rows[0])
++        text = (ROOT / "agents/planner.md").read_text()
++        self.assertNotIn('light ANALYSIS for "code_review"', text)
++        section = text.split("## 7.", 1)[1].split("## 8.", 1)[0]
++        self.assertNotIn("Cap at 30", section)
++        self.assertNotIn("critical | high", section)
++        self.assertIn("at most 32", section)
++        self.assertIn("high | medium | low", section)
++
++    def test_typed_handoff_guidance_present(self):
++        for role in ADDITIONS:
++            text = (ROOT / "agents" / (role + ".md")).read_text()
++            section = text.split("## 7.", 1)[1].split("## 8.", 1)[0]
++            for required in ["deep-review-evidence.json", "deep-review.json", "review-report.md", "sequence.mmd", "modules.mmd", "ANALYSIS.deep_review_sha256", "PLANNING.review_report_sha256", "identity_only_unverified_snapshot", "not_recorded"]:
++                self.assertIn(required, section)
++            for required in ["data_state", "guards_exceptions", "complexity", "resources", "io", "priority_tradeoffs"]:
++                self.assertIn(required, section)
++            self.assertIn("Direct", section.replace("direct", "Direct"))
++            self.assertIn("shell", section)
++            self.assertIn("{plugin_root}/scripts/deep_review.py", section)
++            self.assertIn("python3", section)
++            self.assertIn("do not assume", section)
++            self.assertIn("not a runtime trace", " ".join(section.split()))
++
++    def test_planner_enters_planning_and_returns_priority_summary(self):
++        text = (ROOT / "agents/planner.md").read_text()
++        self.assertIn("do not repeat", text)
++        self.assertIn("current_state=PLANNING", text)
++        self.assertIn("independent acceptance not_recorded", text)
++        self.assertIn("{by priority}", text)
++        self.assertNotIn("{by severity}", text)
++
++    def test_priority_three_values_and_finding_cap(self):
++        bundle, judgments = original.bundle(), original.judgments()
++        template = judgments["findings"][0]
++        for priority in ["high", "medium", "low"]:
++            item = copy.deepcopy(judgments); item["findings"][0]["priority"] = priority
++            review.build(bundle, item)
++        for priority in ["critical", "safe"]:
++            item = copy.deepcopy(judgments); item["findings"][0]["priority"] = priority
++            with self.assertRaises(review.Invalid):
++                review.build(bundle, item)
++        judgments["findings"] = [{**copy.deepcopy(template), "id": "finding-" + str(i)} for i in range(32)]
++        review.build(bundle, judgments)
++        judgments["findings"].append({**copy.deepcopy(template), "id": "finding-32"})
++        with self.assertRaises(review.Invalid):
++            review.build(bundle, judgments)
++
++    def test_partial_shape_is_not_independent_gold(self):
++        b, j = original.bundle(), original.judgments()
++        j["findings"] = []; j["criteria"] = j["criteria"][:1]
++        report = review.build(b, j)
++        self.assertEqual(report["status"], "structured_partial_review")
++        self.assertEqual(report["independent_acceptance"], "not_recorded")
++        self.assertEqual(report["structural_review"]["snapshot_association"], "identity_only_unverified_snapshot")
++
++    def test_structural_identity_is_not_atomic_snapshot_or_runtime_trace(self):
++        bundle = original.bundle()
++        bundle["function_review"]["result"]["code"]["signature"] = "unverified structural content control"
++        report = review.build(bundle, original.judgments())
++        self.assertEqual(report["structural_review"]["snapshot_association"], "identity_only_unverified_snapshot")
++        self.assertEqual(report["computed"]["sequence"]["kind"], "bounded_cfg_not_execution_trace")
++        self.assertEqual(report["computed"]["module"]["interprocedural_edges"], "unknown")
++        self.assertEqual(report["independent_acceptance"], "not_recorded")
++
++    def test_analysis_hash_must_be_bound_before_cli_verification(self):
++        with tempfile.TemporaryDirectory() as temp:
++            w, state = self.make_workspace(temp)
++            state["current_state"] = "ANALYSIS"; state["states"]["ANALYSIS"] = {"status": "in_progress"}
++            with self.assertRaises(review.Invalid):
++                review.verify_workspace(w, state)
++            state["states"]["ANALYSIS"]["deep_review_sha256"] = review.sha((w / "deep-review.json").read_bytes())
++            review.verify_workspace(w, state)
++
++    def test_planning_hash_completion_and_idempotent_reentry(self):
++        with tempfile.TemporaryDirectory() as temp:
++            w, state = self.make_workspace(temp)
++            state["current_state"] = "COMPLETION"; state["states"]["PLANNING"] = {"status": "completed"}
++            self.assertEqual(self.hook(w, state), "deny")
++            state["states"]["PLANNING"]["review_report_sha256"] = review.sha((w / "review-report.md").read_bytes())
++            self.assertEqual(self.hook(w, state), "allow")
++            first = review.verify_workspace(w, state)
++            self.assertEqual(first, review.verify_workspace(w, state))
++            (w / "state.json").write_text(json.dumps(state))
++            result = subprocess.run([sys.executable, str(ROOT / "scripts/deep_review.py"), "verify", "--workspace", str(w)], capture_output=True, text=True, timeout=20)
++            self.assertEqual(result.returncode, 0, result.stdout)
++            self.assertEqual(json.loads(result.stdout)["independent_acceptance"], "not_recorded")
++
++    def test_revision_returns_to_analysis_and_replaces_both_bindings(self):
++        with tempfile.TemporaryDirectory() as temp:
++            w, state = self.make_workspace(temp)
++            state["states"]["PLANNING"] = {"status": "completed", "review_report_sha256": review.sha((w / "review-report.md").read_bytes())}
++            (w / "state.json").write_text(json.dumps(state))
++            revised = original.judgments(); revised["sections"]["priority_tradeoffs"]["claim"] += " Clarify ownership first."
++            review.write_review(w, original.bundle(), revised)
++            changed = copy.deepcopy(state); changed["states"]["ANALYSIS"]["deep_review_sha256"] = review.sha((w / "deep-review.json").read_bytes())
++            self.assertEqual(self.hook(w, changed), "deny")
++            changed["current_state"] = "ANALYSIS"; changed["states"]["ANALYSIS"]["status"] = "in_progress"; changed["states"]["PLANNING"] = {"status": "pending"}
++            self.assertEqual(self.hook(w, changed), "allow")
++            (w / "state.json").write_text(json.dumps(changed)); review.verify_workspace(w, changed)
++            changed["current_state"] = "PLANNING"; changed["states"]["ANALYSIS"]["status"] = "completed"
++            self.assertEqual(self.hook(w, changed), "allow"); (w / "state.json").write_text(json.dumps(changed))
++            changed["current_state"] = "COMPLETED"; changed["states"]["PLANNING"] = {"status": "completed", "review_report_sha256": state["states"]["PLANNING"]["review_report_sha256"]}
++            self.assertEqual(self.hook(w, changed), "deny")
++            changed["states"]["PLANNING"]["review_report_sha256"] = review.sha((w / "review-report.md").read_bytes())
++            self.assertEqual(self.hook(w, changed), "allow")
++
++    def test_write_and_edit_type_and_hash_bypass_denied(self):
++        with tempfile.TemporaryDirectory() as temp:
++            w, state = self.make_workspace(temp)
++            for tool in ["Write", "Edit"]:
++                for bad in [dict(state, ticket_type="feature"), dict(state, ticket_id="OTHER")]:
++                    with self.subTest(tool=tool):
++                        self.assertEqual(self.hook(w, bad, tool), "deny")
++
++    def test_every_missing_artifact_and_generated_content_tamper_denied(self):
++        with tempfile.TemporaryDirectory() as temp:
++            w, state = self.make_workspace(temp)
++            for name in ["deep-review-evidence.json", "deep-review.json", "review-report.md", "sequence.mmd", "modules.mmd"]:
++                with self.subTest(name=name):
++                    review.write_review(w, original.bundle(), original.judgments()); (w / name).unlink()
++                    self.assertEqual(self.hook(w, state), "deny")
++            for name in ["review-report.md", "sequence.mmd", "modules.mmd"]:
++                review.write_review(w, original.bundle(), original.judgments()); (w / name).write_text("forged content")
++                self.assertEqual(self.hook(w, state), "deny")
++
++    def test_shell_is_outside_hook_and_cli_still_refuses_forgery(self):
++        with tempfile.TemporaryDirectory() as temp:
++            w, state = self.make_workspace(temp); (w / "review-report.md").write_text("shell-written forgery")
++            self.assertEqual(self.hook(w, state, "Bash"), "allow")
++            result = subprocess.run([sys.executable, str(ROOT / "scripts/deep_review.py"), "verify", "--workspace", str(w)], capture_output=True, text=True, timeout=20)
++            self.assertEqual(result.returncode, 2)
++
++    def test_old_planner_markdown_only_completion_refused(self):
++        with tempfile.TemporaryDirectory() as temp:
++            w, state = self.make_workspace(temp)
++            state["current_state"] = "COMPLETED"; state["states"]["PLANNING"] = {"status": "completed"}
++            self.assertEqual(self.hook(w, state), "deny")
++            (w / "review-report.md").write_text("# Free form report")
++            state["states"]["PLANNING"]["review_report_sha256"] = review.sha((w / "review-report.md").read_bytes())
++            self.assertEqual(self.hook(w, state), "deny")
++
++
++if __name__ == "__main__":
++    unittest.main()

@@ -1,0 +1,43 @@
+import importlib.util,json,sqlite3,pathlib,stat,hashlib,fcntl
+s=importlib.util.spec_from_file_location('queries','/private/tmp/ks-stablenet-rebuild-queries.py');q=importlib.util.module_from_spec(s);s.loader.exec_module(q);O=q.O;V=O/'dataset/retained-origins-v2';c=q.Client('boundaries-new',q.config('new'));faults=[]
+def save():q.dump(O/'boundary-results.json',faults)
+def normalized(v):
+ if isinstance(v,dict):return{k:normalized(x)for k,x in v.items()if k!='elapsed_micros'}
+ if isinstance(v,list):return[normalized(x)for x in v]
+ return v
+try:
+ c.initialize()
+ with sqlite3.connect((V/'graph/graph.db').as_uri()+'?mode=ro&immutable=1',uri=True)as db:node=db.execute("SELECT id,canonical_id,file_path FROM nodes WHERE qualified_name='validator.defaultSet.QuorumSize'").fetchone()
+ args={'node_id':node[0]};base=c.call('value-baseline','cks.context.value_dependencies',args);assert q.payload(base)['status']=='partial'
+ for label,key in [('wrong-commit','expected_commit'),('wrong-source','expected_source_sha256'),('wrong-snapshot','expected_snapshot_sha256')]:
+  r=c.call(label,'cks.context.value_dependencies',{**args,key:'0'*(40 if key=='expected_commit'else 64)});p=q.payload(r);assert p['status']=='source_mismatch'and p['analysis']is None;faults.append({'id':label,'status':p['status'],'analysis':None});save()
+ r=c.call('foreign-node','cks.context.value_dependencies',{'node_id':'ea016a756cff1cc8'});assert q.payload(r)['status']=='not_found';faults.append({'id':'foreign-node','status':'not_found','actual_foreign_fixture_node':True});save()
+ # Corrupt a retained external blob, never the original or the old frozen dataset.
+ manifest=json.load(open(V/'sources/manifest.json'));entry=next(x for x in manifest['files']if x['origin_id']=='docs:corpus.0'and x['path'].endswith('.md'));blob=V/'sources/blobs'/entry['sha256'];raw=blob.read_bytes();mode=stat.S_IMODE(blob.stat().st_mode)
+ try:
+  blob.chmod(mode|stat.S_IWUSR);blob.write_bytes(raw+b'\ncontrolled owned external blob mutation\n');r=c.call('external-retained-tamper','cks.context.get_for_task_v2',{'prompt':'Explain WBFT validator quorum size in go-stablenet','intent':'arch_explain'});assert q.failed(r)and q.payload(r)['code']=='snapshot_mismatch';faults.append({'id':'external-retained-tamper','code':q.payload(r)['code'],'origin':entry['origin_id'],'path':entry['path'],'original_sha256':entry['sha256'],'original_mode':mode});save()
+ finally:blob.write_bytes(raw);blob.chmod(mode)
+ live=O/'corpora/domain'/entry['path'];raw=live.read_bytes();probe={'query':'Explain WBFT validator quorum size in go-stablenet','k':10,'exclude_tests':True};before=c.call('external-live-before','cks.context.semantic_search',probe)
+ try:
+  live.write_bytes(raw+b'\ncontrolled owned external live origin mutation\n');r=c.call('external-live-tamper','cks.context.semantic_search',probe);assert normalized(q.payload(r))==normalized(q.payload(before));faults.append({'id':'external-live-tamper','retained_result_equal':True});save()
+ finally:live.write_bytes(raw)
+ pin=q.payload(base);src=pin['analysis']['source'];r=c.call('exact-pin-restored','cks.context.value_dependencies',{**args,'expected_commit':src['commit'],'expected_source_sha256':src['sha256'],'expected_snapshot_sha256':pin['snapshot_sha256']});assert q.payload(r)['analysis']['source']==src
+ r=c.call('restored-v2','cks.context.get_for_task_v2',{'prompt':'Explain WBFT validator quorum size in go-stablenet','intent':'arch_explain','explain_ontology':True});assert not q.failed(r)
+finally:c.close()
+manifest=V/'vector/manifest.json';original=manifest.read_bytes();(O/'fault-inputs').mkdir()
+for name,key,value in [('foreign-project-new','project_id','foreign-controlled-project'),('foreign-snapshot-new','snapshot_id','0'*64)]:
+ data=json.loads(original);data[key]=value;mutation=json.dumps(data,ensure_ascii=False,indent=2).encode();(O/'fault-inputs'/(name+'.json')).write_bytes(mutation);manifest.write_bytes(mutation);cl=q.Client(name,q.config('new'))
+ try:
+  try:cl.initialize();raise AssertionError('coordinate mismatch admitted startup')
+  except ValueError:pass
+ finally:cl.close();manifest.write_bytes(original)
+ life=json.load(open(O/name/'lifecycle.json'));assert life['exit_code']==1 and life['child_reaped'];faults.append({'id':name,'field':key,'public_code':json.load(open(O/name/'stderr.txt'))['code'],'startup_refused':True,'fault_manifest_sha256':hashlib.sha256(mutation).hexdigest()});save()
+cl=q.Client('boundary-restored-new',q.config('new'))
+try:
+ cl.initialize();assert q.payload(cl.call('health','cks.ops.health'))['serviceable'];assert not q.failed(cl.call('v2','cks.context.get_for_task_v2',{'prompt':'Explain WBFT validator quorum size in go-stablenet','intent':'arch_explain','explain_ontology':True}))
+finally:cl.close()
+leases=[]
+for p in [O/'old-dataset/.readers/old-v1.lock',O/'dataset/.readers/retained-origins-v2.lock']:
+ with p.open('rb')as f:fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB);fcntl.flock(f,fcntl.LOCK_UN);leases.append(str(p))
+q.dump(O/'lease-release.json',{'owned_leases_exclusive_lock_after_sessions':leases,'released':True})
+print('new dataset negative/retained-vs-live/restore/reader-lease checks complete',flush=True)

@@ -1,0 +1,486 @@
+[
+  {
+    "slot_id": "ORIGINAL-general-rpc-lifecycle",
+    "candidate": "ORIGINAL",
+    "variant": "general",
+    "repetition": 1,
+    "case_id": "rpc-lifecycle",
+    "actual_owner_delete_ack_observed": false,
+    "RPC_callback_method_returned": false,
+    "exit_method_drain_overlap_observed": false,
+    "select_consumed_second_status_before_exit": false,
+    "original_paired_wait_observed": true,
+    "post_ack_native_probe_executed": false,
+    "native_timer_fires": 2,
+    "pre_rescue_prefixes": [
+      {
+        "records": 4,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {},
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 5,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {
+          "1": "entered"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 5,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {
+          "1": "entered"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      }
+    ],
+    "lifecycle_records_total": 8,
+    "pre_rescue_records": 5,
+    "cleanup_records_excluded_from_success": 3,
+    "finite_followup_interval_only": true,
+    "all_future_nonuse_proved": false,
+    "receive_IO_linearization_proved": false,
+    "independent_approved": false,
+    "elapsed_seconds": 121.35242450004444,
+    "process_group_remaining": 0
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-lifecycle",
+    "candidate": "ORIGINAL",
+    "variant": "race",
+    "repetition": 1,
+    "case_id": "rpc-lifecycle",
+    "actual_owner_delete_ack_observed": false,
+    "RPC_callback_method_returned": false,
+    "exit_method_drain_overlap_observed": false,
+    "select_consumed_second_status_before_exit": false,
+    "original_paired_wait_observed": true,
+    "post_ack_native_probe_executed": false,
+    "native_timer_fires": 2,
+    "pre_rescue_prefixes": [
+      {
+        "records": 4,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {},
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 5,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {
+          "1": "entered"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 5,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {
+          "1": "entered"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      }
+    ],
+    "lifecycle_records_total": 9,
+    "pre_rescue_records": 5,
+    "cleanup_records_excluded_from_success": 4,
+    "finite_followup_interval_only": true,
+    "all_future_nonuse_proved": false,
+    "receive_IO_linearization_proved": false,
+    "independent_approved": false,
+    "elapsed_seconds": 123.3315598340705,
+    "process_group_remaining": 0
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-lifecycle",
+    "candidate": "CAND-A",
+    "variant": "general",
+    "repetition": 1,
+    "case_id": "rpc-lifecycle",
+    "actual_owner_delete_ack_observed": true,
+    "RPC_callback_method_returned": true,
+    "exit_method_drain_overlap_observed": true,
+    "select_consumed_second_status_before_exit": false,
+    "original_paired_wait_observed": false,
+    "post_ack_native_probe_executed": true,
+    "native_timer_fires": 3,
+    "pre_rescue_prefixes": [
+      {
+        "records": 4,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {},
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 13,
+        "installed_ids": [],
+        "pending_send": null,
+        "owner_delete_states": {
+          "1": "finished"
+        },
+        "owner_ack_states": {
+          "1": "finished"
+        },
+        "method_states": {
+          "1": "return_defer_observed"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 23,
+        "installed_ids": [],
+        "pending_send": null,
+        "owner_delete_states": {
+          "1": "finished",
+          "2": "finished"
+        },
+        "owner_ack_states": {
+          "1": "finished",
+          "2": "finished"
+        },
+        "method_states": {
+          "1": "return_defer_observed",
+          "2": "return_defer_observed"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      }
+    ],
+    "lifecycle_records_total": 23,
+    "pre_rescue_records": 23,
+    "cleanup_records_excluded_from_success": 0,
+    "finite_followup_interval_only": true,
+    "all_future_nonuse_proved": false,
+    "receive_IO_linearization_proved": false,
+    "independent_approved": false,
+    "elapsed_seconds": 181.05082479212433,
+    "process_group_remaining": 0
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-lifecycle",
+    "candidate": "CAND-A",
+    "variant": "race",
+    "repetition": 1,
+    "case_id": "rpc-lifecycle",
+    "actual_owner_delete_ack_observed": true,
+    "RPC_callback_method_returned": true,
+    "exit_method_drain_overlap_observed": true,
+    "select_consumed_second_status_before_exit": false,
+    "original_paired_wait_observed": false,
+    "post_ack_native_probe_executed": true,
+    "native_timer_fires": 3,
+    "pre_rescue_prefixes": [
+      {
+        "records": 4,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {},
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 13,
+        "installed_ids": [],
+        "pending_send": null,
+        "owner_delete_states": {
+          "1": "finished"
+        },
+        "owner_ack_states": {
+          "1": "finished"
+        },
+        "method_states": {
+          "1": "return_defer_observed"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 23,
+        "installed_ids": [],
+        "pending_send": null,
+        "owner_delete_states": {
+          "1": "finished",
+          "2": "finished"
+        },
+        "owner_ack_states": {
+          "1": "finished",
+          "2": "finished"
+        },
+        "method_states": {
+          "1": "return_defer_observed",
+          "2": "return_defer_observed"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      }
+    ],
+    "lifecycle_records_total": 23,
+    "pre_rescue_records": 23,
+    "cleanup_records_excluded_from_success": 0,
+    "finite_followup_interval_only": true,
+    "all_future_nonuse_proved": false,
+    "receive_IO_linearization_proved": false,
+    "independent_approved": false,
+    "elapsed_seconds": 182.14322487497702,
+    "process_group_remaining": 0
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-lifecycle",
+    "candidate": "CAND-B",
+    "variant": "general",
+    "repetition": 1,
+    "case_id": "rpc-lifecycle",
+    "actual_owner_delete_ack_observed": true,
+    "RPC_callback_method_returned": true,
+    "exit_method_drain_overlap_observed": false,
+    "select_consumed_second_status_before_exit": true,
+    "original_paired_wait_observed": false,
+    "post_ack_native_probe_executed": true,
+    "native_timer_fires": 3,
+    "pre_rescue_prefixes": [
+      {
+        "records": 4,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {},
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 12,
+        "installed_ids": [],
+        "pending_send": null,
+        "owner_delete_states": {
+          "1": "finished"
+        },
+        "owner_ack_states": {
+          "1": "finished"
+        },
+        "method_states": {
+          "1": "return_defer_observed"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 22,
+        "installed_ids": [],
+        "pending_send": null,
+        "owner_delete_states": {
+          "1": "finished",
+          "2": "finished"
+        },
+        "owner_ack_states": {
+          "1": "finished",
+          "2": "finished"
+        },
+        "method_states": {
+          "1": "return_defer_observed",
+          "2": "return_defer_observed"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      }
+    ],
+    "lifecycle_records_total": 22,
+    "pre_rescue_records": 22,
+    "cleanup_records_excluded_from_success": 0,
+    "finite_followup_interval_only": true,
+    "all_future_nonuse_proved": false,
+    "receive_IO_linearization_proved": false,
+    "independent_approved": false,
+    "elapsed_seconds": 181.08949758298695,
+    "process_group_remaining": 0
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-lifecycle",
+    "candidate": "CAND-B",
+    "variant": "race",
+    "repetition": 1,
+    "case_id": "rpc-lifecycle",
+    "actual_owner_delete_ack_observed": true,
+    "RPC_callback_method_returned": true,
+    "exit_method_drain_overlap_observed": true,
+    "select_consumed_second_status_before_exit": false,
+    "original_paired_wait_observed": false,
+    "post_ack_native_probe_executed": true,
+    "native_timer_fires": 3,
+    "pre_rescue_prefixes": [
+      {
+        "records": 4,
+        "installed_ids": [
+          1
+        ],
+        "pending_send": [
+          1,
+          "progress"
+        ],
+        "owner_delete_states": {},
+        "owner_ack_states": {},
+        "method_states": {},
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 13,
+        "installed_ids": [],
+        "pending_send": null,
+        "owner_delete_states": {
+          "1": "finished"
+        },
+        "owner_ack_states": {
+          "1": "finished"
+        },
+        "method_states": {
+          "1": "return_defer_observed"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      },
+      {
+        "records": 23,
+        "installed_ids": [],
+        "pending_send": null,
+        "owner_delete_states": {
+          "1": "finished",
+          "2": "finished"
+        },
+        "owner_ack_states": {
+          "1": "finished",
+          "2": "finished"
+        },
+        "method_states": {
+          "1": "return_defer_observed",
+          "2": "return_defer_observed"
+        },
+        "finite_prefix_only": true,
+        "receive_IO_linearization_proved": false,
+        "universal_future_nonuse_proved": false,
+        "independent_approved": false
+      }
+    ],
+    "lifecycle_records_total": 23,
+    "pre_rescue_records": 23,
+    "cleanup_records_excluded_from_success": 0,
+    "finite_followup_interval_only": true,
+    "all_future_nonuse_proved": false,
+    "receive_IO_linearization_proved": false,
+    "independent_approved": false,
+    "elapsed_seconds": 182.00388375017792,
+    "process_group_remaining": 0
+  }
+]

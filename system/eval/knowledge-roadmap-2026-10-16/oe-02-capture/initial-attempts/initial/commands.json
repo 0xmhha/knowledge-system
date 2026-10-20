@@ -1,0 +1,62 @@
+[
+  {
+    "label": "semantic-build",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "semantic",
+      "build",
+      "--repo",
+      "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-o03-accepted-i10n284z/source",
+      "--project-id",
+      "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+      "--dataset-id",
+      "4894eaf2f1f14b049d8a262f04327f92e7eacf73a5b4cd0401f9f9df30eb9ff4",
+      "--graph",
+      "/private/tmp/ks-ontology-effect-20261015/version/graph",
+      "--vector",
+      "/private/tmp/ks-ontology-effect-20261015/version/vector",
+      "--version-dir",
+      "/private/tmp/ks-ontology-effect-20261015/version",
+      "--store",
+      "/private/tmp/ks-OE012-expanded-initial-20261016/semantic.sqlite",
+      "--out",
+      "/private/tmp/ks-OE012-expanded-initial-20261016/projection.json",
+      "--ontology",
+      "docs/approved-meaning/ontology.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.1086602499708533
+  },
+  {
+    "label": "config-off",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-ontology-effect-20261015/version",
+      "--source-root",
+      "/private/var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/ks-o03-accepted-i10n284z/source",
+      "--name",
+      "ontology-expanded-development",
+      "--semantic-store",
+      "/private/tmp/ks-OE012-expanded-initial-20261016/semantic.sqlite",
+      "--ontology-mode",
+      "off",
+      "--ontology-budget-ms",
+      "5000",
+      "--embed-model",
+      "bge-m3:latest",
+      "--embed-dim",
+      "1024",
+      "--ollama-url",
+      "http://127.0.0.1:60710",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-OE012-expanded-initial-20261016/off.yaml"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.025013874750584364
+  }
+]

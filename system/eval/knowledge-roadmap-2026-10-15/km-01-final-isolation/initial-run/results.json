@@ -1,0 +1,2625 @@
+[
+  {
+    "session": "public",
+    "tool": "cks.collection.status",
+    "arguments": {},
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "configured immutable collection membership"
+        }
+      ],
+      "structuredContent": {
+        "state": "configured",
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collections": [
+          {
+            "id": "a-only",
+            "members": [
+              {
+                "project_id": "project-a",
+                "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                "source_mode": "committed",
+                "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+              },
+              {
+                "project_id": "project-a",
+                "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              }
+            ]
+          },
+          {
+            "id": "all",
+            "members": [
+              {
+                "project_id": "project-a",
+                "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                "source_mode": "committed",
+                "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+              },
+              {
+                "project_id": "project-a",
+                "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              {
+                "project_id": "project-b",
+                "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              {
+                "project_id": "project-b",
+                "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              }
+            ]
+          }
+        ],
+        "member_count": 4,
+        "write_enabled": false
+      }
+    },
+    "http_start": 845,
+    "http_end": 845
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-a",
+        "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+        "source_mode": "committed",
+        "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-a",
+              "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+              "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-a",
+                "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "71086e975d5d0a19f705611aa79e55a7e3b5d7401498c9b582e33bfa10701ef9"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 845,
+    "http_end": 845
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-b",
+        "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+        "source_mode": "committed",
+        "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-b",
+              "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+              "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-b",
+                "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "f56eeaef6edfe613006226c7c1c2a929ae35f62ae3a93575405037241be83b02"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 845,
+    "http_end": 857
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-b",
+        "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+        "source_mode": "committed",
+        "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-b",
+              "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+              "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-b",
+                "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "bd04be092c20f5f74b38061ffd1b4f4f46c6595ead1554b18d11cf964275d249"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 857,
+    "http_end": 869
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-a",
+        "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+        "source_mode": "committed",
+        "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+        "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-a",
+              "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+              "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+              "source_mode": "committed",
+              "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-a",
+                "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                "source_mode": "committed",
+                "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "f733b13dd78824aec0b3c0c12962328c09298ab57d9f1b5206af006b3bda56e0"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "5e3d8c5f9ca639a153a1051d1179ca86affa081f1a37baa4178920b13eacc20e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "f733b13dd78824aec0b3c0c12962328c09298ab57d9f1b5206af006b3bda56e0"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "5e3d8c5f9ca639a153a1051d1179ca86affa081f1a37baa4178920b13eacc20e"
+                  },
+                  "text": "func SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "902840d6d01a587a408be64d686552adbc02fac761ed399691882931fc2a8581"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 869,
+    "http_end": 869
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-b",
+        "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+        "source_mode": "committed",
+        "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-b",
+              "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+              "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-b",
+                "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "f56eeaef6edfe613006226c7c1c2a929ae35f62ae3a93575405037241be83b02"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 869,
+    "http_end": 878
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-a",
+        "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+        "source_mode": "committed",
+        "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-a",
+              "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+              "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-a",
+                "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "71086e975d5d0a19f705611aa79e55a7e3b5d7401498c9b582e33bfa10701ef9"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 878,
+    "http_end": 878
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-b",
+        "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+        "source_mode": "committed",
+        "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-b",
+              "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+              "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-b",
+                "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "bd04be092c20f5f74b38061ffd1b4f4f46c6595ead1554b18d11cf964275d249"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 878,
+    "http_end": 887
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-a",
+        "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+        "source_mode": "committed",
+        "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+        "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-a",
+              "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+              "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+              "source_mode": "committed",
+              "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-a",
+                "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                "source_mode": "committed",
+                "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "f733b13dd78824aec0b3c0c12962328c09298ab57d9f1b5206af006b3bda56e0"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "5e3d8c5f9ca639a153a1051d1179ca86affa081f1a37baa4178920b13eacc20e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "f733b13dd78824aec0b3c0c12962328c09298ab57d9f1b5206af006b3bda56e0"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "5e3d8c5f9ca639a153a1051d1179ca86affa081f1a37baa4178920b13eacc20e"
+                  },
+                  "text": "func SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "902840d6d01a587a408be64d686552adbc02fac761ed399691882931fc2a8581"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 887,
+    "http_end": 887
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "comparison",
+      "query": "SharedConsensus",
+      "participants": [
+        {
+          "project_id": "project-a",
+          "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+          "source_mode": "committed",
+          "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+          "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+        },
+        {
+          "project_id": "project-b",
+          "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+          "source_mode": "committed",
+          "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+          "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+        },
+        {
+          "project_id": "project-b",
+          "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+          "source_mode": "committed",
+          "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+          "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+        },
+        {
+          "project_id": "project-a",
+          "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+          "source_mode": "committed",
+          "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+          "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+        }
+      ]
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "comparison",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-a",
+              "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+              "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-a",
+                "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "71086e975d5d0a19f705611aa79e55a7e3b5d7401498c9b582e33bfa10701ef9"
+              }
+            }
+          },
+          {
+            "coordinates": {
+              "project_id": "project-b",
+              "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+              "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-b",
+                "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "f56eeaef6edfe613006226c7c1c2a929ae35f62ae3a93575405037241be83b02"
+              }
+            }
+          },
+          {
+            "coordinates": {
+              "project_id": "project-b",
+              "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+              "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-b",
+                "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-b",
+                  "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                  "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-b",
+                    "dataset_id": "b19497514db38ca411ed749cbc1960a699e5ff3d9c95276a60ffb86e3d56b436",
+                    "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "bd04be092c20f5f74b38061ffd1b4f4f46c6595ead1554b18d11cf964275d249"
+              }
+            }
+          },
+          {
+            "coordinates": {
+              "project_id": "project-a",
+              "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+              "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+              "source_mode": "committed",
+              "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-a",
+                "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                "source_mode": "committed",
+                "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "f733b13dd78824aec0b3c0c12962328c09298ab57d9f1b5206af006b3bda56e0"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "5e3d8c5f9ca639a153a1051d1179ca86affa081f1a37baa4178920b13eacc20e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "project_id": "project-a",
+                  "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                  "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                  "source_mode": "committed",
+                  "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                  "origin_id": "repo",
+                  "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "f733b13dd78824aec0b3c0c12962328c09298ab57d9f1b5206af006b3bda56e0"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "5e3d8c5f9ca639a153a1051d1179ca86affa081f1a37baa4178920b13eacc20e"
+                  },
+                  "text": "func SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 303 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "project_id": "project-a",
+                    "dataset_id": "6d9586e702f431f3b0fd802404f2157e4e96fa7ab7e750deff669ea9963acef7",
+                    "snapshot_id": "1ff9dd291c17bf980f3612f5bbecbc8bdd6db48eeb97d6a009d29e23cb5c6f7e",
+                    "source_mode": "committed",
+                    "base_commit": "36cd964ef8a429d3bf0762141456eb14646f3c6f",
+                    "origin_id": "repo",
+                    "file_sha256": "19b556ade9c430f4926758028825425cbffbaa476bf0461f58069827e21b62bb",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "902840d6d01a587a408be64d686552adbc02fac761ed399691882931fc2a8581"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 887,
+    "http_end": 905
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "a-only",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-b",
+        "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+        "source_mode": "committed",
+        "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "collection request refused: scope_mismatch"
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "scope_mismatch",
+        "message": "The collection request could not be verified or completed."
+      }
+    },
+    "http_start": 905,
+    "http_end": 905
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-b",
+        "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+        "source_mode": "committed",
+        "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "collection request refused: scope_mismatch"
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "scope_mismatch",
+        "message": "The collection request could not be verified or completed."
+      }
+    },
+    "http_start": 905,
+    "http_end": 905
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "comparison",
+      "query": "SharedConsensus",
+      "target": null,
+      "participants": [
+        {
+          "project_id": "project-a",
+          "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+          "source_mode": "committed",
+          "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+          "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+        },
+        {
+          "project_id": "project-a",
+          "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+          "source_mode": "committed",
+          "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+          "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+        }
+      ]
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "collection request refused: scope_mismatch"
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "scope_mismatch",
+        "message": "The collection request could not be verified or completed."
+      }
+    },
+    "http_start": 905,
+    "http_end": 905
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-b",
+        "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+        "source_mode": "committed",
+        "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "collection request refused: fetch_failed"
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "fetch_failed",
+        "message": "The collection request could not be verified or completed."
+      }
+    },
+    "http_start": 905,
+    "http_end": 907
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-a",
+        "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+        "source_mode": "committed",
+        "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "project-separated retained evidence"
+        }
+      ],
+      "structuredContent": {
+        "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+        "collection_id": "all",
+        "mode": "implementation",
+        "groups": [
+          {
+            "coordinates": {
+              "project_id": "project-a",
+              "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+              "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+              "source_mode": "committed",
+              "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+            },
+            "evidence": {
+              "format_version": 2,
+              "coordinates": {
+                "project_id": "project-a",
+                "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                "source_mode": "committed",
+                "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+              },
+              "query": "SharedConsensus",
+              "citations": [
+                {
+                  "file": "consensus.go",
+                  "start_line": 3,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 4,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 4,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                },
+                {
+                  "file": "consensus.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "project_id": "project-a",
+                  "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                  "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                  "source_mode": "committed",
+                  "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                  "origin_id": "repo",
+                  "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                  "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 3,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "7fecdbcb87d55bf1c0de41bd7ed99e1e6f2cf95f23ca60d8a5a93274fe8d8d38"
+                  },
+                  "text": "// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 4,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "15e56e67002e385bc5df50a9d5d1a0b65b7d70fdf306dbb4bc0106b0fb87011e"
+                  },
+                  "text": "func SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1"
+                  },
+                  "text": "package common\n\n// SharedConsensus returns the retained test marker.\nfunc SharedConsensus() int { return 101 }\n"
+                },
+                {
+                  "citation": {
+                    "file": "consensus.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "project_id": "project-a",
+                    "dataset_id": "a95cf51e54bab639db35b17300374484a16fd44a00557915fa848b3e2256286d",
+                    "snapshot_id": "e81da9bf00ed9ff76924a724433b1cf21e07ea7d8743265f41303511dab08628",
+                    "source_mode": "committed",
+                    "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc",
+                    "origin_id": "repo",
+                    "file_sha256": "41dea4d7a31db3a75e2f94adac425f082c1fa2821be71813643392b37cf574e1",
+                    "content_sha256": "26a852f66ba9b46a0100fba91de5885ded321eba25ead7bd95e8e8733e665cf4"
+                  },
+                  "text": "package common\n"
+                }
+              ],
+              "graph_neighbors": [],
+              "semantic": null,
+              "evidence_state": "complete",
+              "metadata": {
+                "integrity_hash_algo": "sha256-v2",
+                "integrity_hash": "71086e975d5d0a19f705611aa79e55a7e3b5d7401498c9b582e33bfa10701ef9"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "http_start": 907,
+    "http_end": 907
+  },
+  {
+    "session": "public",
+    "tool": "cks.collection.get_context",
+    "arguments": {
+      "catalog_digest": "8e109b041644159d887d667a6aadc4a340933e9b05a1dbf1ad14cb04069aa008",
+      "collection_id": "all",
+      "mode": "implementation",
+      "query": "SharedConsensus",
+      "target": {
+        "project_id": "project-b",
+        "snapshot_id": "8be3e54590fd31f0e5710243e3969cd01fe9fcfc6e58f5c3d751ac01aae5eb3d",
+        "source_mode": "committed",
+        "dataset_id": "c92ba6d8137179c1fa6b1ed4621af71510f4ccbd672155ef20d361c5c812076d",
+        "base_commit": "4dae0940237315a35279cdcd31b8024b6bc492bc"
+      }
+    },
+    "response": {
+      "content": [
+        {
+          "type": "text",
+          "text": "collection request refused: fetch_failed"
+        }
+      ],
+      "isError": true,
+      "structuredContent": {
+        "code": "fetch_failed",
+        "message": "The collection request could not be verified or completed."
+      }
+    },
+    "http_start": 907,
+    "http_end": 907
+  }
+]

@@ -1,0 +1,16 @@
+실제 host 도구 admission 호환성 후속 명세 초안 — 미구현
+문제: tools/list33개·소비자 mirror가 일치해도 host2.1.300은 최상위 oneOf를 가진2도구를 모델 tool 목록에서 제외한다.
+근거: analyzer-03 host.debug.txt의 두 Skipping tool 진단, gateway의 두 No such tool available, stdio에 해당 호출0.
+동결된 P01~P05·consumer 계약·기존 binary/원자료는 바꾸지 않는다. 현재 범위는 backend_schema_or_permission_model_change=false이다.
+권고 후보: 새 버전의 top-level tool metadata에서 host가 수용하는 object/properties 형태를 제공하고 정확히 한 selector 계약은 설명·기존 runtime parser가 계속 강제한다. 이는 metadata 표현 변경이며 무변경으로 포장하지 않는다.
+필요 변경의 예상 범위: CKS/CKG 도구 schema 선언·golden metadata와 consumer mirror·schema 회귀. 실제 query/ACL/출처 계산 및 permission 우회는 금지.
+첫 구현은 별도 소유 CKS/consumer checkout·commit·binary에서 진행한다. 현재 ROOT의 schema/harness와 동결 input_binding을 덮어쓰지 않는다. 새 버전 guard/실행기와 기존 기록 source 문맥의 guard를 구분하며 과거 hash를 새 값으로 바꿔 통과시키지 않는다.
+수용 기준:
+1. object metadata가 host에서 두 도구 모두 노출됨. Analyzer5/Planner2의7쌍 실제 호출·응답이 모두 확인됨.
+2. node/canonical 정상 요청 및 둘다/둘다없음/null/잘못된 타입/unknown key/중복 JSON/상한 초과가 기존 runtime과 동등하게 처리됨.
+3. commit/source/snapshot·private/ACL·bounded 상태와 수동/자동 provenance 계약 보존.
+4. 새 schema와 consumer mirror 정합·잘못된/오래된 schema 거부. 필요한 별도 후보·새 binary pin 및 원자료 보존.
+5. Go 변경이 생기면 build/test/race/fmt/vet/lint 및 관련 회귀 통과 후 별도 서명 커밋. 기존 동결 packet 덮어쓰기 금지.
+6. 실패했던 T05/T19/T20을 새 실제 역할 원자료로 재평가. 우회 proxy·직접 client로 host 성공을 대체하지 않음.
+7. P06 전체 충족 후 P07 renderer/host취소·정리, P08 최종 준비 판정. 독립 gold/품질·온톨로지 효과 수용은 별도.
+현재 상태: 원인 및 보완 명세 초안만 작성. 구현·새 schema 승인/채택·P06 완료를 주장하지 않는다.

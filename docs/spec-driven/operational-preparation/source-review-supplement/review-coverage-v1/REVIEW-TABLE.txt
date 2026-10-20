@@ -1,0 +1,74 @@
+WI-C 검토 자료 점검 — 비공개 AI 초안; 독립 정답·수용 아님
+입력 10개 / 모듈 표기 8개 / 파일 9개 / 기존 근거 45곳 / 같은 사례 문맥 5개·19곳
+상태/guard·자원/비용 연결은 자료 위치 제안이며 필수 항목의 충분성 검증이 아니다.
+우선순위 10개 전부 미정. 독립 리뷰·gold·typed 보고서·그림·handoff·host 실행 증거는 미확보.
+
+SRC-001 consensus/wbft consensus/wbft/backend/api.go:169
+상태/guard 근거 제안: SRC-001-R1, SRC-001-R2, SRC-001-R3, SRC-001-R4, SRC-001-R5
+자원/비용 근거 제안: SRC-001-R3, SRC-001-R4
+블록 순회와 map 집계 위치만 확인했다. 상한·잠금·실제 조회 비용은 미판정이다.
+기존 외부 문맥: 3곳 (동일 사례)
+판정 질문: RPC 허용 범위·최대 처리량·응답시간 요구와 analyzeBlock 계약을 확인한 뒤 범위/비용 항목의 필수 여부와 우선순위를 정할 수 있는가?
+
+SRC-002 consensus/wbft consensus/wbft/backend/backend.go:176
+상태/guard 근거 제안: SRC-002-R1, SRC-002-R2, SRC-002-R3, SRC-002-R4, SRC-002-R5
+자원/비용 근거 제안: SRC-002-R3, SRC-002-R4, SRC-002-R5
+cache 갱신과 비동기 전송 시작·즉시 반환 위치만 확인했다. 전송 완료·payload 소유권·동시성은 미판정이다.
+기존 외부 문맥: 0곳 (동일 사례)
+판정 질문: 재전송 보장·peer 수신 성공·payload 소유권·동시성 요구 중 필수 검토 항목은 무엇이며 실패 영향에 따라 어떤 우선순위를 부여해야 하는가?
+
+SRC-006 core/rawdb core/rawdb/accessors_chain.go:295
+상태/guard 근거 제안: SRC-006-R1, SRC-006-R2, SRC-006-R3, SRC-006-R4
+자원/비용 근거 제안: SRC-006-R2, SRC-006-R3, SRC-006-R5
+live/ancient 조회와 count*8000 계산·주석 대비를 확인했다. 상위 요청 제한·산술 입력 범위·실제 할당량은 미판정이다.
+기존 외부 문맥: 4곳 (동일 사례)
+판정 질문: count 상한과 부분 결과 계약·산술 허용 범위·메모리 예산을 확정하면 어떤 경계가 필수 항목이며 영향과 우선순위는 무엇인가?
+
+SRC-007 core/rawdb core/rawdb/accessors_chain.go:875
+상태/guard 근거 제안: SRC-007-R1, SRC-007-R2, SRC-007-R3
+자원/비용 근거 제안: SRC-007-R3
+decode 결과를 순회하며 block slice를 구성하는 위치를 자원 검토 후보로 연결했다. 입력 크기 제한·호출 비용·메모리 상한 근거는 없다.
+기존 외부 문맥: 0곳 (동일 사례)
+판정 질문: 오류와 빈 목록의 구분 요구·badBlock 데이터 규모·할당 예산을 확인한 뒤 누락하면 안 되는 항목과 우선순위를 정할 수 있는가?
+
+SRC-011 core/state core/state/dump.go:118
+상태/guard 근거 제안: SRC-011-R1, SRC-011-R2, SRC-011-R3, SRC-011-R4, SRC-011-R5
+자원/비용 근거 제안: SRC-011-R1, SRC-011-R3, SRC-011-R4
+iterator·storage 순회·skip·Max 중단 위치를 확인했다. collector/trie 계약·panic 영향·실제 메모리 비용은 미판정이다.
+기존 외부 문맥: 0곳 (동일 사례)
+판정 질문: dump 완전성·panic 허용·collector 소유권·Max/skip 요구에서 필수 항목은 무엇이며 데이터 누락이나 중단의 영향을 어떻게 우선순위에 반영하는가?
+
+SRC-016 core/txpool core/txpool/blobpool/blobpool.go:347
+상태/guard 근거 제안: SRC-016-R1, SRC-016-R2, SRC-016-R3, SRC-016-R4, SRC-016-R5
+자원/비용 근거 제안: SRC-016-R1, SRC-016-R3, SRC-016-R4, SRC-016-R5
+directory/store/limbo 준비·오류 Close·Datacap drop 위치를 확인했다. 해제 보장·drop 진행성·잠금은 미판정이다.
+기존 외부 문맥: 3곳 (동일 사례)
+판정 질문: 초기화 실패 시 rollback/소유권·Datacap 초과 처리·진행 보장 계약을 확인한 뒤 어떤 자원/상태 항목을 필수로 하고 어떤 우선순위를 부여하는가?
+
+SRC-021 eth/downloader eth/downloader/api.go:67
+상태/guard 근거 제안: SRC-021-R1, SRC-021-R2, SRC-021-R3, SRC-021-R4, SRC-021-R5
+자원/비용 근거 제안: SRC-021-R1, SRC-021-R4, SRC-021-R5
+subscription/timer 생성·Stop·notification 전송 위치를 확인했다. 실제 소비자·buffer·종료 계약 없는 deadlock/누수 판정은 허용하지 않는다.
+기존 외부 문맥: 5곳 (동일 사례)
+판정 질문: 소비자 종료·송신 대기·subscription 해제 계약과 실제 도달성을 확인한 뒤 요구 위반 여부 및 영향/우선순위를 어떻게 판정하는가?
+
+SRC-027 miner miner/worker.go:510
+상태/guard 근거 제안: SRC-027-R1, SRC-027-R2, SRC-027-R3, SRC-027-R4, SRC-027-R5
+자원/비용 근거 제안: SRC-027-R1, SRC-027-R2, SRC-027-R3, SRC-027-R4
+timer/WaitGroup 정리·channel/lock·recommit 조정 위치를 확인했다. happens-before·실제 timeout/race·비용은 미판정이다.
+기존 외부 문맥: 0곳 (동일 사례)
+판정 질문: worker 종료·commit 요청·timer 재설정·recommit 비용의 요구 계약을 확인한 뒤 필수 guard/자원 항목과 영향별 우선순위를 정할 수 있는가?
+
+SRC-031 p2p p2p/discover/v4_udp.go:175
+상태/guard 근거 제안: SRC-031-R1, SRC-031-R2, SRC-031-R3
+자원/비용 근거 제안: SRC-031-R1, SRC-031-R2, SRC-031-R3
+직접 요청·table 재시도·lookup 결과 순회 위치를 비용 검토 후보로 연결했다. deadline·요청 수 상한·최신성 보장은 미판정이다.
+기존 외부 문맥: 0곳 (동일 사례)
+판정 질문: Resolve의 최신성/identity 요구·deadline·재시도 예산을 확인한 뒤 fallback 반환과 요청 비용 중 필수 검토 항목 및 우선순위는 무엇인가?
+
+SRC-036 rpc rpc/client.go:193
+상태/guard 근거 제안: SRC-036-R1, SRC-036-R2, SRC-036-R3, SRC-036-R4
+자원/비용 근거 제안: SRC-036-R2, SRC-036-R3, SRC-036-R4
+transport 선택·constructor 오류·ctx 전달 위치를 소유권 검토 후보로 연결했다. 연결 성공·자원 해제·TLS/취소 계약의 충분한 근거는 아니다.
+기존 외부 문맥: 4곳 (동일 사례)
+판정 질문: transport별 연결/취소·재연결·소유권·TLS 요구를 확인한 뒤 어떤 항목이 필수이며 실패 영향별 우선순위는 무엇인가?

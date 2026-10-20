@@ -2,12 +2,14 @@
 //
 // and hands it to the `cks viewer` command. Assets are bundled via embed.FS
 // so the binary needs no sidecar files. The build assumes
-// `make viewer` has been run so web_assets/{index.html,
-// assets/viewer.js[.map]} exist before `go build`.
+// `make -C graph viewer` has been run so web_assets/app/ contains the
+// static export before `go build`. Without that optional payload, a tracked
+// no-build page remains available.
 package viewer
 
 import (
 	"embed"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -21,11 +23,35 @@ import (
 //go:embed all:web_assets
 var viewerFS embed.FS
 
+// activeAssets uses the generated app without overwriting the tracked stub.
+// The same selection serves HTTP and static exports, so neither silently
+// picks a stale placeholder after a successful frontend build.
+func activeAssets(root fs.FS) (fs.FS, error) {
+	info, err := fs.Stat(root, "app/index.html")
+	if errors.Is(err, fs.ErrNotExist) {
+		return root, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("inspect viewer payload: %w", err)
+	}
+	if info.IsDir() {
+		return nil, fmt.Errorf("viewer payload index is not a file")
+	}
+	return fs.Sub(root, "app")
+}
+func embeddedAssets() (fs.FS, error) {
+	root, err := fs.Sub(viewerFS, "web_assets")
+	if err != nil {
+		return nil, fmt.Errorf("viewer FS missing web_assets: %w", err)
+	}
+	return activeAssets(root)
+}
+
 // CopyAssetsTo materialises the embedded viewer onto disk under dst.
 // Used by `cks viewer export` so the same assets that ship with the
 // server can be pinned into a static export bundle.
 func CopyAssetsTo(dst string) error {
-	sub, err := fs.Sub(viewerFS, "web_assets")
+	sub, err := embeddedAssets()
 	if err != nil {
 		return fmt.Errorf("sub web_assets: %w", err)
 	}

@@ -1,0 +1,106 @@
+ok  	github.com/0xmhha/chainbench/cmd/chainbench	66.426s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/accountcmd	2.241s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/catalogcmd	2.721s
+--- FAIL: TestChainCmd_DefaultsTheWorkspace (0.02s)
+    chain_test.go:79: the default path was not announced:
+        workspace: /private/tmp/ks-op-chainbench-owned-state/20261015-084943/chainsetup (--workspace-dir omitted)
+        stablenet: family wbft, chain id 8283, bootstrap static; keys presets/keys; target local /private/tmp/ks-op-chainbench-owned-state/20261015-084943/chainsetup
+--- FAIL: TestEquivalence_TheWorkspaceDefaultIsOneDefault (0.01s)
+    equivalence_test.go:216: the default workspace is not under this test's home, so the surface computed its own:
+        workspace: /private/tmp/ks-op-chainbench-owned-state/20261015-084943/chainsetup (--workspace-dir omitted)
+        stablenet: family wbft, chain id 8283, bootstrap static; keys ../../../presets/keys; target local /private/tmp/ks-op-chainbench-owned-state/20261015-084943/chainsetup
+FAIL
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench/chaincmd	1.124s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/exitcode	(cached)
+?   	github.com/0xmhha/chainbench/cmd/chainbench/experimentcmd	[no test files]
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/filecmd	(cached)
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/keyringcmd	16.420s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/lifecyclecmd	1.367s
+?   	github.com/0xmhha/chainbench/cmd/chainbench/networkcmd	[no test files]
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/nodecmd	3.642s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/reportcmd	3.113s
+--- FAIL: TestPool_CountsEveryCompositionUnderTheRoot (0.01s)
+    resource_test.go:194: want both compositions counted, 2 slots each:
+        HOST
+        local (127.0.0.1)
+        1 host(s) x 100 slot(s) = 100 node(s); 0 used, 100 free
+        ports: built-in defaults (no server config)
+    resource_test.go:198: want 20260828-100000 named as holding 2:
+        HOST
+        local (127.0.0.1)
+        1 host(s) x 100 slot(s) = 100 node(s); 0 used, 100 free
+        ports: built-in defaults (no server config)
+    resource_test.go:198: want 20260828-100100 named as holding 2:
+        HOST
+        local (127.0.0.1)
+        1 host(s) x 100 slot(s) = 100 node(s); 0 used, 100 free
+        ports: built-in defaults (no server config)
+FAIL
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench/resourcecmd	4.085s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/suitecmd	5.284s
+?   	github.com/0xmhha/chainbench/cmd/chainbench/surface	[no test files]
+?   	github.com/0xmhha/chainbench/cmd/chainbench/testcmd	[no test files]
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/txcmd	4.866s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/upgradecmd	5.162s
+?   	github.com/0xmhha/chainbench/cmd/chainbench-dashboard	[no test files]
+ok  	github.com/0xmhha/chainbench/cmd/chainbench-mcp	4.946s
+ok  	github.com/0xmhha/chainbench/internal/accounts	4.691s
+ok  	github.com/0xmhha/chainbench/internal/app	51.144s
+ok  	github.com/0xmhha/chainbench/internal/arch	12.529s
+ok  	github.com/0xmhha/chainbench/internal/chains/all	(cached)
+?   	github.com/0xmhha/chainbench/internal/chains/common	[no test files]
+ok  	github.com/0xmhha/chainbench/internal/chains/external	(cached)
+ok  	github.com/0xmhha/chainbench/internal/chains/stablenet	(cached)
+ok  	github.com/0xmhha/chainbench/internal/chains/stablenet/govbind	(cached)
+ok  	github.com/0xmhha/chainbench/internal/chains/wbft	(cached)
+?   	github.com/0xmhha/chainbench/internal/chains/wemix	[no test files]
+ok  	github.com/0xmhha/chainbench/internal/chainsetup	38.864s
+ok  	github.com/0xmhha/chainbench/internal/chainsetup/verb	4.026s
+ok  	github.com/0xmhha/chainbench/internal/consensus/poa	7.100s
+ok  	github.com/0xmhha/chainbench/internal/consensus/wbft	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/blueprint	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/chainsurface	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/collector	5.004s
+ok  	github.com/0xmhha/chainbench/internal/core/filestore	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/genesis	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/hardfork	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/health	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/home	3.327s
+ok  	github.com/0xmhha/chainbench/internal/core/inspector	3.507s
+ok  	github.com/0xmhha/chainbench/internal/core/keyring	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/keyring/derive	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/keyring/operation	5.141s
+ok  	github.com/0xmhha/chainbench/internal/core/keyring/store	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/lifecycle	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/node	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/nodeconfig	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/origin	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/preflight	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/process	24.222s
+ok  	github.com/0xmhha/chainbench/internal/core/registry	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/remote	2.183s
+ok  	github.com/0xmhha/chainbench/internal/core/report	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/rpc	1.164s
+ok  	github.com/0xmhha/chainbench/internal/core/session	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/statemachine	(cached)
+ok  	github.com/0xmhha/chainbench/internal/core/wait	(cached)
+ok  	github.com/0xmhha/chainbench/internal/dashboard	18.492s
+ok  	github.com/0xmhha/chainbench/internal/dsl	(cached)
+ok  	github.com/0xmhha/chainbench/internal/dsl/assert	(cached)
+ok  	github.com/0xmhha/chainbench/internal/dsl/interp	(cached)
+ok  	github.com/0xmhha/chainbench/internal/experiment	7.095s
+ok  	github.com/0xmhha/chainbench/internal/feature	1.430s
+ok  	github.com/0xmhha/chainbench/internal/mcp	7.634s
+ok  	github.com/0xmhha/chainbench/internal/nodemonitor	(cached)
+?   	github.com/0xmhha/chainbench/internal/preset	[no test files]
+ok  	github.com/0xmhha/chainbench/internal/resource	(cached)
+ok  	github.com/0xmhha/chainbench/internal/testengine	6.098s
+ok  	github.com/0xmhha/chainbench/internal/testhelper	11.144s
+?   	github.com/0xmhha/chainbench/internal/testsupport	[no test files]
+ok  	github.com/0xmhha/chainbench/internal/validatorset	(cached)
+ok  	github.com/0xmhha/chainbench/internal/webcli	5.544s
+?   	github.com/0xmhha/chainbench/scripts/inventory/chain-flag-graph	[no test files]
+?   	github.com/0xmhha/chainbench/scripts/inventory/code-graph	[no test files]
+?   	github.com/0xmhha/chainbench/scripts/inventory/surface-graph	[no test files]
+?   	github.com/0xmhha/chainbench/tests/webui/fixtures/legacykeys	[no test files]
+FAIL

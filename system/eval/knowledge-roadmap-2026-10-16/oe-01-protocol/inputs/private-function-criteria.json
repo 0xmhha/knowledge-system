@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "kind": "preregistered_finite_function_retrieval_criteria_not_general_semantic_gold",
+  "author": "assistant_source_derived",
+  "human_approval": false,
+  "independent_quality_gold": false,
+  "independent_units_approved": 0,
+  "units": [
+    {
+      "id": "quorum-f",
+      "file": "consensus/wbft/validator/default.go",
+      "start_line": 222,
+      "end_line": 222,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).F",
+      "qualified_name": "validator.defaultSet.F",
+      "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+      "span_sha256": "f696ea78a3cb2ddd4e8eeb92bd5c0a31396c07d6a0c758f1c8502852dc8e96be",
+      "expected_code_body": "func (valSet *defaultSet) F() float64 { return float64(valSet.Size()-1) / 3 }\n"
+    },
+    {
+      "id": "quorum-size",
+      "file": "consensus/wbft/validator/default.go",
+      "start_line": 226,
+      "end_line": 229,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).QuorumSize",
+      "qualified_name": "validator.defaultSet.QuorumSize",
+      "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+      "span_sha256": "fc6a0988e30e13163cd59b9e50efd8b409a8673af3012a915205ff2258efb1ad",
+      "expected_code_body": "func (valSet *defaultSet) QuorumSize() int {\n\t//c.currentLogger(true, nil).Trace(\"WBFT: confirmation Formula used ceil(2N/3)\")\n\treturn int(math.Ceil(float64(valSet.Size()) - valSet.F()))\n}\n"
+    },
+    {
+      "id": "round-broadcast",
+      "file": "consensus/wbft/core/roundchange.go",
+      "start_line": 52,
+      "end_line": 98,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).broadcastRoundChange",
+      "qualified_name": "core.Core.broadcastRoundChange",
+      "file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+      "span_sha256": "2d29fb1afa4b157c6427af3d3bbb99cfd900f8724d06e27a156509cadd793dd1",
+      "expected_code_body": "func (c *Core) broadcastRoundChange(round *big.Int) {\n\tc.newRetrySendingRoundChangeTimer()\n\tlogger := c.currentLogger(true, nil)\n\n\t// Validates new round corresponds to current view\n\tcv := c.currentView()\n\tif cv.Round.Cmp(round) > 0 {\n\t\tlogger.Warn(\"WBFT: invalid past target round\", \"current\", cv.Round, \"target\", round)\n\t\treturn\n\t}\n\n\troundChange := wbfmessage.NewRoundChange(c.current.Sequence(), round, c.current.preparedRound, c.current.preparedBlock)\n\n\t// Sign message\n\tencodedPayload, err := roundChange.EncodePayloadForSigning()\n\tif err != nil {\n\t\twithMsg(logger, roundChange).Error(\"WBFT: failed to encode ROUND-CHANGE message\", \"err\", err)\n\t\treturn\n\t}\n\tsignature, err := c.backend.Sign(encodedPayload)\n\tif err != nil {\n\t\twithMsg(logger, roundChange).Error(\"WBFT: failed to sign ROUND-CHANGE message\", \"err\", err)\n\t\treturn\n\t}\n\troundChange.SetSignature(signature)\n\n\t// Extend ROUND-CHANGE message with PREPARE justification\n\tif c.WBFTPreparedPrepares != nil {\n\t\troundChange.Justification = c.WBFTPreparedPrepares\n\t\twithMsg(logger, roundChange).Debug(\"WBFT: extended ROUND-CHANGE message with PREPARE justification\", \"justification\", roundChange.Justification)\n\t}\n\n\t// RLP-encode message\n\tdata, err := rlp.EncodeToBytes(roundChange)\n\tif err != nil {\n\t\twithMsg(logger, roundChange).Error(\"WBFT: failed to encode ROUND-CHANGE message\", \"err\", err)\n\t\treturn\n\t}\n\n\twithMsg(logger, roundChange).Info(\"WBFT: broadcast ROUND-CHANGE message\", \"payload\", hexutil.Encode(data))\n\n\t// Broadcast RLP-encoded message\n\tif err = c.backend.Broadcast(c.valSet, roundChange.Code(), data); err != nil {\n\t\twithMsg(logger, roundChange).Error(\"WBFT: failed to broadcast ROUND-CHANGE message\", \"err\", err)\n\t\treturn\n\t}\n}\n"
+    },
+    {
+      "id": "round-collect",
+      "file": "consensus/wbft/core/roundchange.go",
+      "start_line": 254,
+      "end_line": 276,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*roundChangeSet).Add",
+      "qualified_name": "core.roundChangeSet.Add",
+      "file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+      "span_sha256": "a9d52afe00f983495a4b1ad0ae09205012f81df502631ebbfc9cdee7e948b5c4",
+      "expected_code_body": "func (rcs *roundChangeSet) Add(r *big.Int, msg wbfmessage.WBFTMessage, preparedRound *big.Int, preparedBlock wbft.Proposal, prepareMessages []*wbfmessage.Prepare, quorumSize int) error {\n\trcs.mu.Lock()\n\tdefer rcs.mu.Unlock()\n\n\tround := r.Uint64()\n\tif rcs.roundChanges[round] == nil {\n\t\trcs.roundChanges[round] = newWBFTMsgSet(rcs.validatorSet)\n\t}\n\tif err := rcs.roundChanges[round].Add(msg); err != nil {\n\t\treturn err\n\t}\n\n\tif preparedRound != nil && (rcs.highestPreparedRound[round] == nil || preparedRound.Cmp(rcs.highestPreparedRound[round]) > 0) {\n\t\troundChange := msg.(*wbfmessage.RoundChange)\n\t\tif hasMatchingRoundChangeAndPrepares(roundChange, prepareMessages, quorumSize) == nil {\n\t\t\trcs.highestPreparedRound[round] = preparedRound\n\t\t\trcs.highestPreparedBlock[round] = preparedBlock\n\t\t\trcs.prepareMessages[round] = prepareMessages\n\t\t}\n\t}\n\n\treturn nil\n}\n"
+    },
+    {
+      "id": "handler-preprepare",
+      "file": "consensus/wbft/core/preprepare.go",
+      "start_line": 113,
+      "end_line": 181,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).handlePreprepareMsg",
+      "qualified_name": "core.Core.handlePreprepareMsg",
+      "file_sha256": "486771c7444c2be120da08af776cb33ea75129a754c3d54e3ca5b74b3f0ad335",
+      "span_sha256": "af2090afc145fcc7f1fd0c4e86fa65e553d6d32853ee85ee7c22bffcd2013e69",
+      "expected_code_body": "func (c *Core) handlePreprepareMsg(preprepare *wbfmessage.Preprepare) error {\n\tlogger := c.currentLogger(true, preprepare)\n\n\tlogger = logger.New(\"proposal.number\", preprepare.Proposal.Number().Uint64(), \"proposal.hash\", preprepare.Proposal.Hash().String())\n\n\tc.logger.Debug(\"WBFT: handle PRE-PREPARE message\")\n\n\t// Validates PRE-PREPARE message comes from current proposer\n\tif !c.valSet.IsProposer(preprepare.Source()) {\n\t\tlogger.Warn(\"WBFT: ignore PRE-PREPARE message from non proposer\", \"proposer\", c.valSet.GetProposer().Address())\n\t\treturn errNotFromProposer\n\t}\n\n\t// Reject if sequence ≠ proposal number\n\tif preprepare.Sequence.Uint64() != preprepare.Proposal.Number().Uint64() {\n\t\tlogger.Warn(\"WBFT: ignore PRE-PREPARE with mismatched sequence and proposal number\")\n\t\treturn errInvalidPreparedBlock\n\t}\n\n\t// Validates PRE-PREPARE message justification\n\tif preprepare.Round.Uint64() > 0 {\n\t\tif err := isJustified(preprepare.Proposal, preprepare.JustificationRoundChanges, preprepare.JustificationPrepares, c.valSet.QuorumSize()); err != nil {\n\t\t\tlogger.Warn(\"WBFT: invalid PRE-PREPARE message justification\", \"err\", err)\n\t\t\treturn errInvalidPreparedBlock\n\t\t}\n\t}\n\n\t// Validates PRE-PREPARE block proposal we received\n\tif duration, err := c.backend.Verify(preprepare.Proposal); err != nil {\n\t\t// if it's a future block, we will handle it again after the duration\n\t\tif err == consensus.ErrFutureBlock {\n\t\t\tlogger.Info(\"WBFT: PRE-PREPARE block proposal is in the future (will be treated again later)\", \"duration\", duration)\n\n\t\t\t// start a timer to re-input PRE-PREPARE message as a backlog event\n\t\t\tc.timerMu.Lock()\n\t\t\tc.stopFuturePreprepareTimer()\n\t\t\tc.futurePreprepareTimer = time.AfterFunc(duration, func() {\n\t\t\t\t_, validator := c.valSet.GetByAddress(preprepare.Source())\n\t\t\t\tc.sendEvent(backlogEvent{\n\t\t\t\t\tsrc: validator,\n\t\t\t\t\tmsg: preprepare,\n\t\t\t\t})\n\t\t\t})\n\t\t\tc.timerMu.Unlock()\n\t\t} else {\n\t\t\tlogger.Warn(\"WBFT: invalid PRE-PREPARE block proposal\", \"err\", err)\n\t\t}\n\n\t\treturn err\n\t}\n\n\t// Here is about to accept the PRE-PREPARE\n\tif c.state == StateAcceptRequest {\n\t\tc.logger.Debug(\"WBFT: accepted PRE-PREPARE message\")\n\n\t\t// Re-initialize ROUND-CHANGE timer\n\t\tc.newRoundChangeTimer()\n\t\tc.consensusTimestamp = time.Now()\n\n\t\t// Update current state\n\t\tc.current.SetPreprepare(preprepare)\n\t\tc.setState(StatePreprepared)\n\n\t\t// Broadcast prepare message to other validators\n\t\tc.broadcastPrepare()\n\t}\n\n\treturn nil\n}\n"
+    },
+    {
+      "id": "handler-prepare",
+      "file": "consensus/wbft/core/prepare.go",
+      "start_line": 87,
+      "end_line": 146,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).handlePrepareMsg",
+      "qualified_name": "core.Core.handlePrepareMsg",
+      "file_sha256": "9d19c7ad96cc171d1abd33cb4d88d1c792cfb24a3e8d2b9468bf87fa067cdf2b",
+      "span_sha256": "416a292c1ad288e1237d09d4cdbeae5b1067fa5a13232a0eb48c6187c51ddcea",
+      "expected_code_body": "func (c *Core) handlePrepareMsg(prepare *wbfmessage.Prepare) error {\n\tlogger := c.currentLogger(true, prepare).New()\n\n\tlogger.Debug(\"WBFT: handle PREPARE message\", \"prepares.count\", c.current.WBFTPrepares.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Check digest\n\tif prepare.Digest != c.current.Proposal().Hash() {\n\t\tlogger.Warn(\"WBFT: invalid PREPARE message digest\")\n\t\treturn errInvalidMessage\n\t}\n\n\t// Check prepareSeal\n\tblock, ok := c.current.Proposal().(*types.Block)\n\tif !ok {\n\t\tlogger.Warn(\"WBFT: failed to cast proposal from PREPARE message to *types.Block\")\n\t\treturn errInvalidMessage\n\t}\n\n\tif verifySeal(c.valSet, block.Header(), uint32(prepare.CommonPayload.Round.Uint64()), SealTypePrepare,\n\t\tprepare.PrepareSeal, prepare.Source()) != nil {\n\t\tlogger.Warn(\"WBFT: failed to verify seal from PREPARE message\", \"number\", block.Header().Number, \"from\", prepare.Source())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Save PREPARE messages\n\tif err := c.current.WBFTPrepares.Add(prepare); err != nil {\n\t\tlogger.Error(\"WBFT: failed to save PREPARE message\", \"err\", err)\n\t\treturn err\n\t}\n\n\tlogger = logger.New(\"prepares.count\", c.current.WBFTPrepares.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Change to \"Prepared\" state if we've received quorum of PREPARE messages\n\t// and we are in earlier state than \"Prepared\"\n\tif (c.current.WBFTPrepares.Size() >= c.valSet.QuorumSize()) && c.state.Cmp(StatePrepared) < 0 {\n\t\tlogger.Info(\"WBFT: received quorum of PREPARE messages\")\n\n\t\t// Accumulates PREPARE messages\n\t\tc.current.preparedRound = c.currentView().Round\n\t\tc.WBFTPreparedPrepares = make([]*wbfmessage.Prepare, 0)\n\t\tfor _, m := range c.current.WBFTPrepares.Values() {\n\t\t\tc.WBFTPreparedPrepares = append(\n\t\t\t\tc.WBFTPreparedPrepares,\n\t\t\t\twbfmessage.NewPrepareWithSigAndSource(\n\t\t\t\t\tm.View().Sequence, m.View().Round, m.(*wbfmessage.Prepare).Digest, m.Signature(), m.Source(), m.(*wbfmessage.Prepare).PrepareSeal))\n\t\t}\n\n\t\tif c.current.Proposal() != nil && c.current.Proposal().Hash() == prepare.Digest {\n\t\t\tlogger.Trace(\"WBFT: PREPARE message matches proposal\", \"proposal\", c.current.Proposal().Hash(), \"prepare\", prepare.Digest)\n\t\t\tc.current.preparedBlock = c.current.Proposal()\n\t\t}\n\n\t\tc.setState(StatePrepared)\n\t\tc.broadcastCommit()\n\t} else {\n\t\tlogger.Trace(\"WBFT: accepted PREPARE messages\")\n\t}\n\n\treturn nil\n}\n"
+    },
+    {
+      "id": "handler-commit",
+      "file": "consensus/wbft/core/commit.go",
+      "start_line": 90,
+      "end_line": 131,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).handleCommitMsg",
+      "qualified_name": "core.Core.handleCommitMsg",
+      "file_sha256": "70203895ba56ed36ce1a0e70e6addb3d1a1965c87a056acedad078cdc00be114",
+      "span_sha256": "f6d43002b5c5798f295e3273ab3139e76e6ed4ac535f290bd4ad8bd3cfa205c0",
+      "expected_code_body": "func (c *Core) handleCommitMsg(commit *wbfmessage.Commit) error {\n\tlogger := c.currentLogger(true, commit)\n\n\tlogger.Debug(\"WBFT: handle COMMIT message\", \"commits.count\", c.current.WBFTCommits.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// Check digest\n\tif commit.Digest != c.current.Proposal().Hash() {\n\t\tlogger.Warn(\"WBFT: invalid COMMIT message digest\", \"digest\", commit.Digest, \"proposal\", c.current.Proposal().Hash().String())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Check commitSeal\n\tblock, ok := c.current.Proposal().(*types.Block)\n\tif !ok {\n\t\tlogger.Warn(\"WBFT: failed to cast proposal from COMMIT message to *types.Block\")\n\t\treturn errInvalidMessage\n\t}\n\n\tif verifySeal(c.valSet, block.Header(), uint32(commit.CommonPayload.Round.Uint64()), SealTypeCommit,\n\t\tcommit.CommitSeal, commit.Source()) != nil {\n\t\tlogger.Warn(\"WBFT: failed to verify seal from COMMIT message\", \"number\", block.Header().Number, \"from\", commit.Source())\n\t\treturn errInvalidMessage\n\t}\n\n\t// Add to received msgs\n\tif err := c.current.WBFTCommits.Add(commit); err != nil {\n\t\tc.logger.Error(\"WBFT: failed to save COMMIT message\", \"err\", err)\n\t\treturn err\n\t}\n\n\tlogger = logger.New(\"commits.count\", c.current.WBFTCommits.Size(), \"quorum\", c.valSet.QuorumSize())\n\n\t// If we reached threshold\n\tif c.current.WBFTCommits.Size() >= c.valSet.QuorumSize() {\n\t\tlogger.Info(\"WBFT: received quorum of COMMIT messages\")\n\t\tc.commitWBFT()\n\t} else {\n\t\tlogger.Trace(\"WBFT: accepted new COMMIT messages\")\n\t}\n\n\treturn nil\n}\n"
+    },
+    {
+      "id": "current-read",
+      "file": "consensus/wbft/core/core.go",
+      "start_line": 154,
+      "end_line": 158,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).IsCurrentProposal",
+      "qualified_name": "core.Core.IsCurrentProposal",
+      "file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+      "span_sha256": "7a3b58a7cf1f8967a7eeca88aea53e2f03777c9b8543237a32ef646af1aa71de",
+      "expected_code_body": "func (c *Core) IsCurrentProposal(blockHash common.Hash) bool {\n\tc.currentMutex.RLock()\n\tdefer c.currentMutex.RUnlock()\n\treturn c.current != nil && c.current.pendingRequest != nil && c.current.pendingRequest.Proposal.Hash() == blockHash\n}\n"
+    },
+    {
+      "id": "current-round",
+      "file": "consensus/wbft/core/core.go",
+      "start_line": 161,
+      "end_line": 265,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/core.(*Core).startNewRound",
+      "qualified_name": "core.Core.startNewRound",
+      "file_sha256": "356235d5fb2e668713db6635af6d2d2ea67be07b3dbbb0ca0bdeecd985f0b7a7",
+      "span_sha256": "0efc230658dd2059aeb4bc8eef9fa9b88b68b154a6b3d9dd1735f7ce8e088c2d",
+      "expected_code_body": "func (c *Core) startNewRound(round *big.Int) {\n\tc.currentMutex.Lock()\n\tdefer c.currentMutex.Unlock()\n\n\tvar logger log.Logger\n\tif c.current == nil {\n\t\tlogger = c.logger.New(\"old.round\", -1, \"old.seq\", 0)\n\t} else {\n\t\tlogger = c.currentLogger(false, nil)\n\t}\n\tlogger = logger.New(\"target.round\", round)\n\n\troundChange := false\n\n\t// Try to get last proposal\n\tlastProposal, lastProposer := c.backend.LastProposal()\n\tif lastProposal != nil {\n\t\tlogger = logger.New(\"lastProposal.number\", lastProposal.Number().Uint64(), \"lastProposal.hash\", lastProposal.Hash())\n\t}\n\n\tlogger.Debug(\"WBFT: initialize new round\")\n\n\tif c.current == nil {\n\t\tlogger.Debug(\"WBFT: start at the initial round\")\n\t} else if lastProposal.Number().Cmp(c.current.Sequence()) >= 0 {\n\t\tdiff := new(big.Int).Sub(lastProposal.Number(), c.current.Sequence())\n\t\tsequenceMeter.Mark(new(big.Int).Add(diff, common.Big1).Int64())\n\n\t\tif !c.consensusTimestamp.IsZero() {\n\t\t\tconsensusTimer.UpdateSince(c.consensusTimestamp)\n\t\t\tc.consensusTimestamp = time.Time{}\n\t\t}\n\t\tlogger.Debug(\"WBFT: catch up last block proposal\")\n\t} else if lastProposal.Number().Cmp(big.NewInt(c.current.Sequence().Int64()-1)) == 0 {\n\t\tif round.Cmp(common.Big0) == 0 {\n\t\t\t// same seq and round, don't need to start new round\n\t\t\tlogger.Debug(\"WBFT: same round, no need to start new round\")\n\t\t\treturn\n\t\t} else if round.Cmp(c.current.Round()) < 0 {\n\t\t\tlogger.Warn(\"WBFT: next round is inferior to current round\")\n\t\t\treturn\n\t\t}\n\t\troundChange = true\n\t} else {\n\t\tlogger.Warn(\"WBFT: next sequence is before last block proposal\")\n\t\treturn\n\t}\n\n\tvar oldLogger log.Logger\n\tif c.current == nil {\n\t\toldLogger = c.logger.New(\"old.round\", -1, \"old.seq\", 0)\n\t} else {\n\t\toldLogger = c.logger.New(\"old.round\", c.current.Round().Uint64(), \"old.sequence\", c.current.Sequence().Uint64(), \"old.state\", c.state.String(), \"old.proposer\", c.valSet.GetProposer())\n\t}\n\n\tif c.current != nil && round.Cmp(c.current.Round()) > 0 {\n\t\troundMeter.Mark(new(big.Int).Sub(round, c.current.Round()).Int64())\n\t}\n\n\t// Create next view\n\tvar newView *wbft.View\n\tvar nextValSet wbft.ValidatorSet\n\tif roundChange {\n\t\tnewView = &wbft.View{\n\t\t\tSequence: new(big.Int).Set(c.current.Sequence()),\n\t\t\tRound:    new(big.Int).Set(round),\n\t\t}\n\t\tnextValSet = c.valSet\n\t} else {\n\t\tnewView = &wbft.View{\n\t\t\tSequence: new(big.Int).Add(lastProposal.Number(), common.Big1),\n\t\t\tRound:    new(big.Int),\n\t\t}\n\t\tnextValSet = c.backend.Validators(lastProposal)\n\n\t\t// Add extra seal that contributed to consensus\n\t\tc.addEffectiveSealToExtraSeal()\n\t}\n\n\t// New snapshot for new round\n\tc.updateRoundState(nextValSet, newView, roundChange)\n\n\t// Calculate new proposer\n\tc.valSet.CalcProposer(lastProposer, newView.Round.Uint64())\n\tc.setState(StateAcceptRequest)\n\n\t// Update RoundChangeSet by deleting older round messages\n\tif round.Uint64() == 0 {\n\t\tc.WBFTPreparedPrepares = nil\n\t\tc.roundChangeSet = newRoundChangeSet(c.valSet)\n\t\tc.ClearExtraSeals(lastProposal.Number())\n\t} else {\n\t\t// Clear earlier round messages\n\t\tc.roundChangeSet.ClearLowerThan(round)\n\t}\n\tc.roundChangeSet.NewRound(round)\n\n\tc.backend.NotifyNewRound(round)\n\n\t// the order of NotifyNewRound() and newRoundChangeTimer() does not matter on actual consensus, but\n\t// it matters on multi-engine test, so we keep the order as it is\n\tc.newRoundChangeTimer()\n\n\toldLogger.Info(\"WBFT: start new round\", \"next.round\", newView.Round, \"next.seq\", newView.Sequence, \"next.proposer\", c.valSet.GetProposer(), \"next.valSet\", c.valSet.List(), \"next.size\", c.valSet.Size(), \"next.IsProposer\", c.IsProposer())\n}\n"
+    },
+    {
+      "id": "validator-size",
+      "file": "consensus/wbft/validator/default.go",
+      "start_line": 91,
+      "end_line": 95,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).Size",
+      "qualified_name": "validator.defaultSet.Size",
+      "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+      "span_sha256": "d1a0e732d3c4b96c800372c51e96572849d19c895ff3101e2f5cf3643d120b1a",
+      "expected_code_body": "func (valSet *defaultSet) Size() int {\n\tvalSet.validatorMu.RLock()\n\tdefer valSet.validatorMu.RUnlock()\n\treturn len(valSet.validators)\n}\n"
+    },
+    {
+      "id": "validator-list",
+      "file": "consensus/wbft/validator/default.go",
+      "start_line": 97,
+      "end_line": 101,
+      "canonical_id": "github.com/ethereum/go-ethereum/consensus/wbft/validator.(*defaultSet).List",
+      "qualified_name": "validator.defaultSet.List",
+      "file_sha256": "beca9d9b8c844bece2f469c71cc44ee1887976e722b96d0550f456fbc851269c",
+      "span_sha256": "20f69993b362cd562511500e29f39289bf4d6d84e85264d51e6500beba360e8f",
+      "expected_code_body": "func (valSet *defaultSet) List() []wbft.Validator {\n\tvalSet.validatorMu.RLock()\n\tdefer valSet.validatorMu.RUnlock()\n\treturn valSet.validators\n}\n"
+    }
+  ],
+  "families": {
+    "quorum": {
+      "unit_ids": [
+        "quorum-f",
+        "quorum-size"
+      ],
+      "intended_ontology_concepts": [
+        "wbft-quorum"
+      ]
+    },
+    "round-change": {
+      "unit_ids": [
+        "round-broadcast",
+        "round-collect"
+      ],
+      "intended_ontology_concepts": [
+        "wbft-round-change"
+      ]
+    },
+    "message-handlers": {
+      "unit_ids": [
+        "handler-preprepare",
+        "handler-prepare",
+        "handler-commit"
+      ],
+      "intended_ontology_concepts": [
+        "wbft-message-handlers"
+      ]
+    },
+    "current-lock": {
+      "unit_ids": [
+        "current-read",
+        "current-round"
+      ],
+      "intended_ontology_concepts": [
+        "wbft-current-lock"
+      ]
+    },
+    "validator-lock": {
+      "unit_ids": [
+        "validator-size",
+        "validator-list"
+      ],
+      "intended_ontology_concepts": []
+    }
+  },
+  "scoring": {
+    "unit_hit": "a top10 unique published source citation covers the complete expected function span and contains its verified function body",
+    "precision": "unique published citation item with >=1 complete expected function and its body / all unique published citation items in top10; no items=0; macro question/family averages",
+    "recall": "unique expected function units fully covered / declared expected units for this code-location question",
+    "rank": "first relevant returned evidence reciprocal rank and hit@10",
+    "not_scored": "EX15/16 unknown/foreign questions have no exhaustive source relevance set; only ontology-intent scope and source integrity are observed",
+    "limits": "closed-world function-finding tasks; not exhaustive behavior/policy relevance or generated answer quality"
+  }
+}

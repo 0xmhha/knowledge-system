@@ -1,0 +1,64 @@
+import json,importlib.util,sys,sqlite3,hashlib,subprocess,time
+from pathlib import Path
+R=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=Path('/private/tmp/ks-stablenet-pilot-20261017-01');V=O/'dataset/pilot-v1';sys.path.insert(0,str(R/'scripts'));spec=importlib.util.spec_from_file_location('stdio',R/'scripts/prepare-consumer-stdio-readiness.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def payload(r):
+ result=r.get('result',{});p=result.get('structuredContent')
+ if p is None:
+  try:p=json.loads(result['content'][0]['text'])
+  except (KeyError,ValueError):p={'error_text':str(result.get('content',r))}
+ return p
+def fail(r):return 'error'in r or r.get('result',{}).get('isError')is True
+class Client(m.OwnedClient):
+ def __init__(self,label):self.attempts=[];super().__init__([str(json.load(open(O/'binary-pin.json'))['path']),'mcp','--config',str(O/'cks.yaml')],O/label)
+ def request(self,label,method,params=None):
+  a={'label':label,'method':method,'params':params,'outcome':'attempted'};self.attempts.append(a);dump(self.path/'attempts.json',self.attempts)
+  try:r=super().request(label,method,params);a.update(outcome='response',response=r);return r
+  except Exception as e:a.update(outcome=type(e).__name__);raise
+  finally:dump(self.path/'attempts.json',self.attempts)
+ def call(self,label,name,args=None):return self.request(label,'tools/call',{'name':name,'arguments':args or{}})
+inputs=[{'id':'Q1','keyword':'QuorumSize','prompt':'Explain WBFT validator quorum size in go-stablenet','intent':'arch_explain'},{'id':'Q2','keyword':'ValidateTransaction','prompt':'Review transaction admission validation in the transaction pool','intent':'qa_review'},{'id':'Q3','keyword':'txByPriceAndTime','prompt':'Explain transaction price and time ordering in the miner','intent':'arch_explain'},{'id':'Q4','keyword':'handleCommitMsg','prompt':'Trace WBFT commit message handling and quorum checks','intent':'arch_explain'},{'id':'Q5','keyword':'GasTip','prompt':'Investigate transaction pool gas tip policy when a pending transaction is restored','intent':'bug_fix'},{'id':'Q6','keyword':'Unsubscribe','prompt':'Review subscription unsubscribe shutdown concurrency and cleanup','intent':'concurrency_safety'}];dump(O/'query-inputs.json',{'scope':'exposed purposive diagnostics, not independent gold/holdout or quality acceptance','inputs':inputs,'k':10,'filtered_vector_language':'go','unfiltered_vector_and_v2_errors_retained':True})
+c=Client('retrieval');results=[];faults=[]
+try:
+ c.initialize();health=c.call('health-start','cks.ops.health');assert payload(health)['serviceable'];c.call('ontology-off','cks.semantic.status');c.call('find-symbol','cks.context.find_symbol',{'name':'QuorumSize','language':'go','exclude_tests':True})
+ for q in inputs:
+  common={'query':q['keyword'],'k':10,'exclude_tests':True}
+  keyword=c.call(q['id']+'-keyword','cks.context.search_text',common)
+  filtered=c.call(q['id']+'-vector-go','cks.context.semantic_search',{'query':q['prompt'],'k':10,'language':'go','exclude_tests':True})
+  unfiltered=c.call(q['id']+'-vector-all','cks.context.semantic_search',{'query':q['prompt'],'k':10,'exclude_tests':True})
+  if fail(unfiltered):c.call(q['id']+'-vector-go-recover','cks.context.semantic_search',{'query':q['prompt'],'k':10,'language':'go','exclude_tests':True})
+  pack=c.call(q['id']+'-pack-v2','cks.context.get_for_task_v2',{'prompt':q['prompt'],'intent':q['intent'],'explain_ontology':True})
+  results.append({'id':q['id'],'keyword_ok':not fail(keyword),'filtered_vector_ok':not fail(filtered),'unfiltered_vector_ok':not fail(unfiltered),'v2_ok':not fail(pack),'keyword_hits':len(payload(keyword).get('hits',[])),'filtered_vector_hits':len(payload(filtered).get('hits',[])),'unfiltered_error':payload(unfiltered)if fail(unfiltered)else None,'v2_error':payload(pack)if fail(pack)else None});dump(O/'retrieval-results.json',results);print(q['id'],json.dumps(results[-1]),flush=True)
+ # Same filter/query, two explicit repeats. Ranking reproducibility is descriptive, not relevance gold.
+ for i in range(2):c.call('repeat-vector-go-'+str(i),'cks.context.semantic_search',{'query':inputs[0]['prompt'],'k':10,'language':'go','exclude_tests':True})
+ with sqlite3.connect((V/'graph/graph.db').as_uri()+'?mode=ro&immutable=1',uri=True)as db:node=db.execute("SELECT id,canonical_id,file_path FROM nodes WHERE qualified_name='validator.defaultSet.QuorumSize'").fetchone()
+ dump(O/'selected-symbol.json',{'id':node[0],'canonical_id':node[1],'file':node[2],'selection':'read-only exact graph symbol resolution matched actual MCP QuorumSize citations'})
+ args={'node_id':node[0]};baseline=c.call('value-baseline','cks.context.value_dependencies',args);dump(O/'value-baseline.json',baseline)
+ for label,key in [('wrong-commit','expected_commit'),('wrong-source','expected_source_sha256'),('wrong-snapshot','expected_snapshot_sha256')]:
+  r=c.call(label,'cks.context.value_dependencies',{**args,key:('0'*40 if key=='expected_commit'else'0'*64)});faults.append({'id':label,'refused':fail(r),'response':payload(r)})
+ foreign=json.load(open(R/'docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1/execution.json'))['selected'];r=c.call('foreign-fixture-node','cks.context.value_dependencies',{'node_id':foreign['id']});faults.append({'id':'foreign-fixture-node','foreign_node_id':foreign['id'],'source':'actual independent owned fixture graph','refused':fail(r),'response':payload(r)})
+ records=json.load(open(V/'sources/manifest.json'))['files'];entry=next(x for x in records if x['origin_id']=='repo'and x['path']==node[2]);blob=V/'sources/blobs'/entry['sha256'];old=blob.read_bytes()
+ try:
+  blob.write_bytes(old+b'\n// controlled owned retained blob fault\n');r=c.call('retained-blob-tamper','cks.context.get_for_task_v2',{'prompt':inputs[0]['prompt'],'intent':'arch_explain'});faults.append({'id':'retained-blob-tamper','refused':fail(r),'response':payload(r)})
+ finally:blob.write_bytes(old)
+ live=O/'source'/node[2];old=live.read_bytes()
+ try:
+  live.write_bytes(old+b'\n// controlled owned live source tamper\n');r=c.call('live-checkout-tamper','cks.context.value_dependencies',args);faults.append({'id':'live-checkout-tamper','refused':fail(r),'response_equal_to_retained_baseline':payload(r)==payload(baseline),'response':payload(r),'meaning':'runtime result must still use retained graph source; elapsed_micros may differ'})
+ finally:live.write_bytes(old)
+ c.call('value-restored','cks.context.value_dependencies',args);c.call('health-after','cks.ops.health')
+finally:c.close();dump(O/'fault-results.json',faults)
+# Independent startup scopes for manifest-coordinate faults. EOF-before-init is retained as fail-closed startup.
+manifest=V/'vector/manifest.json';raw=manifest.read_bytes()
+for label,key,value in [('foreign-project-manifest','project_id','foreign-controlled-pilot-project'),('wrong-snapshot-manifest','snapshot_id','0'*64)]:
+ obj=json.loads(raw);obj[key]=value;manifest.write_text(json.dumps(obj));cl=Client(label)
+ try:
+  try:
+   cl.initialize();h=cl.call('health','cks.ops.health');pack=cl.call('pack','cks.context.get_for_task_v2',{'prompt':inputs[0]['prompt'],'intent':'arch_explain'});row={'id':label,'controlled_manifest_fault':True,'metadata_key':key,'startup_refused':False,'health':payload(h),'refused':fail(pack),'response':payload(pack)}
+  except (ValueError,EOFError,BrokenPipeError)as e:row={'id':label,'controlled_manifest_fault':True,'metadata_key':key,'startup_refused':True,'failure':type(e).__name__,'refused':True}
+ finally:cl.close();manifest.write_bytes(raw)
+ faults.append(row);dump(O/'fault-results.json',faults);print(label,'refused',row['refused'],flush=True)
+cl=Client('restored')
+try:
+ cl.initialize();r=cl.call('health','cks.ops.health');assert payload(r)['serviceable'];cl.call('keyword','cks.context.search_text',{'query':'QuorumSize','k':10,'exclude_tests':True});cl.call('vector-go','cks.context.semantic_search',{'query':inputs[0]['prompt'],'k':10,'language':'go','exclude_tests':True})
+finally:cl.close()
+print('PILOT MEASUREMENTS COMPLETE; preserve actual failures as readiness gaps',flush=True)

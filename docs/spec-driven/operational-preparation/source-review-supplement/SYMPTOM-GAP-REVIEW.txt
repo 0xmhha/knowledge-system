@@ -1,0 +1,89 @@
+WI-3 가족·노출/중복·정답·실제 검색 경로 공백 — 준비 19단계
+작성일 2026-10-17 (Asia/Seoul)
+상태: 준비 19단계 공백 점검·검증 완료. 정식 독립 수용 아님.
+
+목적
+기존 증상 입력 20개와 15개 가족 제안·원문·과거 질문·실행 증거를 대조하여
+최소 독립 사실 가족 20개와 top-10 평가를 충족하지 못한 부분을 기록한다.
+이번에는 독립 가족·root cause·gold·검색 결과를 새로 확정하지 않는다.
+
+가족 제안과 노출
+- 운영 원문 후보 20함수/17파일/8모듈, 증상 label 7종, 기존 source 근거 40곳.
+- 15개 가족 제안: 단일 카드 10그룹·두 카드 5그룹. 독립 가족 승인 0개.
+  제안 그룹을 유지할 경우 수량만으로도 5그룹 부족하다. 이는 기존 그룹을 임의로
+  나누어 독립 가족 20개로 승인한다는 뜻이 아니다. 독립 최소 20개는 여전히 미확보다.
+- G03 freezer 검사/진행, G04 snapshot storage/account 재개, G05 reorg 예약/승격,
+  G06 ancestor/skeleton, G09 worker 작업 예약/화면 갱신은 원인·계약을 독립 검토해야 한다.
+  나머지 단일 그룹도 하나의 독립 사실 가족이라는 승인이 아니다.
+- 카드 190쌍: 같은 제안 그룹 5쌍, 같은 파일 3쌍, 같은 함수 byte 0쌍.
+  서로 다른 파일/함수·다른 증상 label은 의미적 독립성의 증명이 아니다.
+- 과거 질문 42개와 840건 비교. 함수 이름 literal 및 exact prompt match 0건.
+  기존 AI topic flag 29건/16카드. 표시 없는 4카드도 미검토이며 fresh holdout이 아니다.
+- 선정 함수 표본/의미 점검과 14카드가 겹친다. 기존 공개 리뷰의 정확한 함수와는
+  0카드지만 같은 파일로는 4카드가 겹친다. 파일/주제 메타데이터는 가족 판정이 아니다.
+- 모든 입력은 이미 공개 source pool에서 AI가 골라 비공개 사실 초안도 작성했다.
+  public bundle 분리는 입력 포장 정책이며 OS 수준의 자료 접근 격리가 아니다.
+- 가족별 판정 질문 15개와 카드별 원문/unknown/노출/미수집 영수증은 symptom-gap-v1 참조.
+
+정답과 채점 기준의 공백
+- 20개 입력 모두 hypothetical_input_not_verified_incident이다. 정상 거부·부분 반환·
+  정책 제한일 수 있으며 실제 결함/원인으로 확정하지 않는다.
+- 카드별 independent root cause·gold 위치·exhaustive relevance labels·canonical matching은 미작성.
+  미작성 null을 빈 정답 집합이나 자동 음성/안전으로 바꾸지 않는다.
+- top-10의 대상 단계(각 backend 검색/확장 후보/agent의 조사 결과), 순서·dedup·
+  다중 round 합산과 case/family macro 집계는 미동결이다.
+- 현재 public 요청은 max_candidates=10, max_seeds=3, max_enriched=3,
+  max_calls=32, depth=2, budget_ms=1000이다. candidates10은 vector K10과 다르다.
+- Compose는 semantic 검색 후 keyword 검색을 각 MaxSeeds로 요청하고 후보를 citation으로
+  중복 제거하여 발견 순서로 추가한 뒤 그래프를 확장한다. 공통 원인 점수 정렬 근거는 없다.
+  후보와 backend별 rank/score를 원인 확률 순위로 해석하지 않는다.
+- project/commit/retained snapshot·원문 hash·위치 정합, 부분/예산 소진/기권/실패의
+  원래 분모와 coverage, zero denominator 처리·baseline·DEV/FINAL이 미동결이다.
+- macro case recall@10>=0.80은 기존 제안이며 이번 점검에서 점수를 계산하지 않았다.
+
+실제 경로와 기존 증거의 범위
+1. 현재 구현: symptom-only 요청→MCP retained identity/sanitizer→graph/vector health와
+   embedding 검색 준비 확인→semantic/keyword seed→bounded graph expansion→
+   identity 재확인→retained candidate/signal source 검증→typed factual response.
+2. 기존 20개 public 요청의 일반/race 파서 관측 40건·대조군 12건은 parser/default 검증이다.
+   backend/search/model/agent-role 실행은 0건으로 기록되어 있다.
+3. 과거 WI-3 실제 SQLite 그래프 시험은 Leaf/Middle/Top 3함수와 symbol/expand 입력이다.
+   MCP 도구 호출 3건(정상 2round 및 미해결 symbol 대조), factual consumer 자료가 존재한다.
+   별도 HTTP host 별칭 도구 호출 1건도 symbol=Leaf 입력이다. vector backend·이번 20개
+   symptom-only 텍스트 검색·전체 설치 plugin-role 조사 수용 증거로 합산하지 않는다.
+   이 과거 시험의 core/consumer revision도 현재 채택 원문과 구분해 보존했다.
+4. 후속 격리 Claude Code host의 최종 5세션에서 tools/call은 chainbench_chains 1건이다.
+   이는 ChainBench 목록 조회의 연결 증거이며 이번 WI-3 검색/분석 역할 실행이 아니다.
+5. 채택 consumer revision b7e78689676769e8536626e76eed7165d870e1ba의 analyzer,
+   suspect-labeling 지시, suspect_labels.py 3개 원문을 commit→tree→blob 증명과
+   기존 채택 source inventory SHA로 대조했다. 현재 설치/실행 상태를 추정하지 않는다.
+   해당 SKILL.md는 감사 대상 원문이며 이번 작업에 실행한 skill이 아니다.
+6. 채택 지시는 factual 자료·agent 가설을 구분하고 조사당 3round/20citation/96call 상한을
+   둔다. consumer의 형식/상한 검증과 acceptance=not_recorded는 독립 원인 승인과 다르다.
+현재 repository·채택 consumer의 source-bound 경로 검토 근거 12곳을 보존했다.
+
+검증
+- 전용 변조/경계 테스트 29개 통과: 카드→독립 가족 승격, 임의 가족 분리, 노출/중복
+  은폐, missing→empty gold, parser/symbol/ChainBench 증거의 검색 승격, 허구 설치/recall,
+  source proof 변조·공개 정답 주입·무승인 실행 허용을 거부했다.
+- 신규 검색/backend/model/host/node/정식 평가 실행 0건. 유지보수 Go 변경 없음.
+  새 native 코드를 작성하지 않았으며 연관 회귀는 이전 로컬 관측을 별도로 재생한다.
+- 연관 Python 회귀 470개(22개 suite), 현재 문서 134개, 기존 구현 완료 상태 검사 통과.
+- 30파일 재생성 바이트 일치·public wire 불변. 이전 동결 패킷 18개·유지보수 Go 변경 없음.
+- suite별 테스트 수는 진행 장부 phase 0의 symptom_gap_preparation에 기록.
+- 담당자 '미정', F-01~F-08 pending, freeze null, execution_allowed false,
+  독립 gold 0개·정식 수용 0/9·기존 구현 완료 상태 유지.
+
+다음 작업
+준비 20단계: WI-4 실제 도달성·후보 계약·독립 schedule/seed 가족과 반복 실행 기준의
+미충족분을 기존 source 가설·로컬 probe 증거에 대조한다. 합성/추출 관측을 실제 운영
+발생률이나 독립 가족 승인으로 바꾸지 않는다.
+전체 정식 작업 9개와 별도 후속 후보 12개는 PROGRESS.txt 및 GAPS.json 참조.
+
+Git 증명 객체 보존: 서명된 commit 객체의 필수 공백을 정규화하지 않는다. 패킷 내
+.gitattributes로 commit/tree 객체를 binary로 지정했으며 원문 객체와 증명 SHA는 보존했다.
+이 보완 후 전용/연관 검사와 재생성 일치를 다시 검증했다.
+
+후속 기록 (2026-10-17): 준비 20단계에서 WI-4 도달성·계약·가족·반복/판정 연결 공백을 점검했다.
+SCHEDULE-GAP-REVIEW.txt 및 schedule-gap-v1 참조. 기존 관측과 generic 판정을 정식 가족·
+상대 비율 평가·운영/독립 수용으로 승격하지 않았다. 다음은 PROGRESS.txt의 준비 21단계 WI-V1/WI-V2다.

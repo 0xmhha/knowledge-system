@@ -43,6 +43,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/0xmhha/knowledge-system/internal/system/maintenance"
 	"github.com/0xmhha/knowledge-system/pkg/vector/embed/ollama"
 	ckvtypes "github.com/0xmhha/knowledge-system/pkg/vector/types"
 
@@ -132,6 +133,7 @@ func NewCmd(version string) *cobra.Command {
 	// service: this instance as a launchd agent (macOS), its watchdog, and the
 	// recovery routine both the watchdog and a remote operator call.
 	mcpCmd.AddCommand(newServiceCmd())
+	mcpCmd.AddCommand(newComparisonCmd())
 	mcpCmd.AddCommand(&cobra.Command{
 		Use:                "client-config",
 		Short:              "Print a ready-to-paste MCP client entry for a --config'd instance",
@@ -317,6 +319,26 @@ func run(ctx context.Context, configPath, nameOverride, httpAddrOverride, portOv
 			Jobs:         jobs,
 		},
 	}
+	collections, err := buildCollection(ctx, cfg, ruleset, evidenceSanitizer, fp)
+	if err != nil {
+		return fmt.Errorf("config_invalid: collection backends could not be verified: %w", err)
+	}
+	if collections != nil {
+		defer func() { _ = collections.Close() }()
+		deps.Collection = collections
+	}
+	if len(cfg.Maintenance.Profiles) > 0 {
+		self, err := os.Executable()
+		if err != nil {
+			return fmt.Errorf("config_invalid: maintenance executable unavailable")
+		}
+		service, err := maintenance.New(cfg.Maintenance.Profiles, self)
+		if err != nil {
+			return fmt.Errorf("config_invalid: maintenance profiles could not be verified: %w", err)
+		}
+		defer service.Close()
+		deps.Maintenance = service
+	}
 	if cfg.Listen.ResolvedTransport() == "http" {
 		name := cfg.Name // already defaulted to the namespace root above
 		log.Printf("cks-mcp[%s]: serving Streamable HTTP on %s (allow_remote=%v, allowed_cidrs=%v)",
@@ -436,7 +458,7 @@ func buildBackends(ctx context.Context, cfg *config.Config, reader sourcepath.Re
 		if cfg.Logging.MeasureBackendCalls {
 			observer = backendmeasure.BeginHTTP
 		}
-		emb, c, embErr := embedder.OpenWithOptions(cfg.Backends.CKV.Provider, cfg.Backends.CKV.EmbedModel, cfg.Backends.CKV.OllamaURL, cfg.Backends.CKV.EmbedDim, cfg.Backends.CKV.QueryPrefixPolicy, observer)
+		emb, c, embErr := embedder.OpenWithCache(cfg.Backends.CKV.Provider, cfg.Backends.CKV.EmbedModel, cfg.Backends.CKV.OllamaURL, cfg.Backends.CKV.EmbedDim, cfg.Backends.CKV.QueryPrefixPolicy, cfg.Backends.CKV.EmbeddingCacheEntries, observer)
 		cap = c
 		if embErr != nil {
 			degradedReason = embErr.Error()
@@ -487,6 +509,49 @@ func buildBackends(ctx context.Context, cfg *config.Config, reader sourcepath.Re
 // intent package's single-text Embedder, so one Ollama adapter serves both
 // the ckv chunk space and the intent anchor space.
 type intentEmbedderAdapter struct{ e ckvtypes.Embedder }
+
+var _ intent.BatchEmbedder = intentEmbedderAdapter{}
+
+// EmbedBatch uses the existing passage API, exactly as scalar intent embedding
+// does. Only a declared raw transform and physical batch budget permit grouping.
+// Unknown capabilities retain one-input requests; errors never cause retries.
+func (a intentEmbedderAdapter) EmbedBatch(ctx context.Context, texts []string) ([][]float32, error) {
+	id := a.e.Identity()
+	budget := id.RuntimeBatchTokens
+	dim := a.e.Dimension()
+	group := id.PassageTransform == "raw:v1" && budget > 4
+	result := make([][]float32, 0, len(texts))
+	for start := 0; start < len(texts); {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		end := start + 1
+		if group && len(texts[start]) <= budget-4 {
+			// Raw UTF-8 bytes conservatively bound input tokens; reserve four
+			// additional tokens per input for encoder boundary markers.
+			used := len(texts[start]) + 4
+			for end < len(texts) && len(texts[end]) <= budget-4 && len(texts[end])+4 <= budget-used {
+				used += len(texts[end]) + 4
+				end++
+			}
+		}
+		vecs, err := a.e.Embed(ctx, append([]string(nil), texts[start:end]...))
+		if err != nil {
+			return nil, err
+		}
+		if len(vecs) != end-start {
+			return nil, fmt.Errorf("intent batch returned %d vectors for %d texts", len(vecs), end-start)
+		}
+		for _, vec := range vecs {
+			if len(vec) == 0 || (dim > 0 && len(vec) != dim) {
+				return nil, fmt.Errorf("intent batch returned dimension %d, expected %d", len(vec), dim)
+			}
+			result = append(result, append([]float32(nil), vec...))
+		}
+		start = end
+	}
+	return result, nil
+}
 
 func (a intentEmbedderAdapter) Embed(ctx context.Context, text string) ([]float32, error) {
 	vecs, err := a.e.Embed(ctx, []string{text})
@@ -715,6 +780,9 @@ func resolveDatasetPaths(cfg *config.Config) string {
 // Pin each concrete version before opening backends or retained source. Backend
 // and temporary source cleanup defers run before these reader leases close.
 func pinDatasetReaders(cfg *config.Config) ([]*setup.ReaderLease, error) {
+	if err := validatePinnedBackendPair(cfg); err != nil {
+		return nil, err
+	}
 	leases := []*setup.ReaderLease{}
 	seen := map[string]bool{}
 	for _, path := range []string{cfg.Backends.CKG.Path, cfg.Backends.CKV.Path, cfg.Semantic.StorePath} {

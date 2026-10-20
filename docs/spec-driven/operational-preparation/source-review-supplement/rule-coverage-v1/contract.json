@@ -1,0 +1,57 @@
+{
+  "pack_definition": {
+    "id": "go-local-review",
+    "version": "1.0.0",
+    "rules": [
+      {
+        "id": "parameter-command-name",
+        "source": "named scalar parameter",
+        "sink": "exec.Command arg0 or exec.CommandContext arg1 direct identifier"
+      },
+      {
+        "id": "discarded-conversion-error",
+        "source": "strconv.Atoi/ParseInt/ParseUint first result with blank second target",
+        "sink": "explicit return direct identifier"
+      }
+    ],
+    "flow": "lexical reaching definitions and corresponding RHS uses",
+    "target_resolution": "syntax_only",
+    "sanitizer": "not_proven"
+  },
+  "pack_definition_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
+  "kind": "implementation_contract_review_not_semantic_gold",
+  "engine_version": "2",
+  "target_resolution": "syntax_only_unverified",
+  "sanitizer": "not_proven",
+  "command": {
+    "owner_spelling": "exec",
+    "sink_arguments": {
+      "Command": 0,
+      "CommandContext": 1
+    },
+    "sink_shape": "direct_identifier",
+    "source": "named_scalar_parameter_entry_definition"
+  },
+  "conversion": {
+    "owner_spelling": "strconv",
+    "callees": [
+      "Atoi",
+      "ParseInt",
+      "ParseUint"
+    ],
+    "source_assignment": "two_lhs_one_rhs_blank_second_lhs",
+    "sink_shape": "explicit_return_direct_identifier"
+  },
+  "flow": "lexical_may_reach_corresponding_rhs_uses_not_path_feasibility",
+  "uncertainties": [
+    "import_alias_and_callee_identity_unresolved",
+    "spoofed_owner_may_match",
+    "opaque_sanitizer_effects_not_proven",
+    "parameters_not_proven_attacker_controlled",
+    "zero_candidates_never_establish_safety",
+    "closure_memory_alias_indirect_sinks_unsupported",
+    "structural_range_condition_may_be_unlocated"
+  ],
+  "manual_annotations": "separate_from_automatic_candidate_detection",
+  "vulnerability_verdict": null
+}

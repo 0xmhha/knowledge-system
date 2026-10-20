@@ -1,0 +1,429 @@
+{
+  "complete": false,
+  "independent_approved": 0,
+  "current_scores": null,
+  "unresolved_product_contracts": [
+    {
+      "case_id": "SUB-normal",
+      "questions": [
+        "운영 API 종료 상한과 notifier 종료 순서의 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 RPC 종료 경로에서 제안한 순서에 도달 가능한지는 미검증",
+        "기존 추출 시험 50건은 실제 API 빈도나 독립 표본이 아니다"
+      ]
+    },
+    {
+      "case_id": "SUB-blocked",
+      "questions": [
+        "운영 API 종료 상한과 notifier 종료 순서의 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 RPC 종료 경로에서 제안한 순서에 도달 가능한지는 미검증",
+        "기존 추출 시험 50건은 실제 API 빈도나 독립 표본이 아니다"
+      ]
+    },
+    {
+      "case_id": "SUB-late",
+      "questions": [
+        "운영 API 종료 상한과 notifier 종료 순서의 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 RPC 종료 경로에서 제안한 순서에 도달 가능한지는 미검증",
+        "기존 추출 시험 50건은 실제 API 빈도나 독립 표본이 아니다"
+      ]
+    },
+    {
+      "case_id": "SUB-ack",
+      "questions": [
+        "운영 API 종료 상한과 notifier 종료 순서의 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 RPC 종료 경로에서 제안한 순서에 도달 가능한지는 미검증",
+        "기존 추출 시험 50건은 실제 API 빈도나 독립 표본이 아니다"
+      ]
+    },
+    {
+      "case_id": "SUB-once",
+      "questions": [
+        "운영 API 종료 상한과 notifier 종료 순서의 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 RPC 종료 경로에서 제안한 순서에 도달 가능한지는 미검증",
+        "기존 추출 시험 50건은 실제 API 빈도나 독립 표본이 아니다"
+      ]
+    },
+    {
+      "case_id": "UDP-near",
+      "questions": [
+        "한 번의 순회에서 처리할 pending 원소 범위는 무엇인가",
+        "먼 미래 deadline의 실제 유입 경로가 있는가"
+      ],
+      "unknown": [
+        "먼 미래 deadline은 합성 입력이다. 운영 pending 경로의 도달 가능성은 검증하지 않았다",
+        "Go 1.26.9의 Now.Add/Sub는 monotonic 값을 사용하므로 wall-clock rollback만으로 이 분기를 유발했다고 주장하지 않는다",
+        "응답·timeout·clockwarp 세 분기는 같은 삭제 순회 메커니즘으로 묶는다"
+      ]
+    },
+    {
+      "case_id": "UDP-far-pair",
+      "questions": [
+        "한 번의 순회에서 처리할 pending 원소 범위는 무엇인가",
+        "먼 미래 deadline의 실제 유입 경로가 있는가"
+      ],
+      "unknown": [
+        "먼 미래 deadline은 합성 입력이다. 운영 pending 경로의 도달 가능성은 검증하지 않았다",
+        "Go 1.26.9의 Now.Add/Sub는 monotonic 값을 사용하므로 wall-clock rollback만으로 이 분기를 유발했다고 주장하지 않는다",
+        "응답·timeout·clockwarp 세 분기는 같은 삭제 순회 메커니즘으로 묶는다"
+      ]
+    },
+    {
+      "case_id": "UDP-far-near",
+      "questions": [
+        "한 번의 순회에서 처리할 pending 원소 범위는 무엇인가",
+        "먼 미래 deadline의 실제 유입 경로가 있는가"
+      ],
+      "unknown": [
+        "먼 미래 deadline은 합성 입력이다. 운영 pending 경로의 도달 가능성은 검증하지 않았다",
+        "Go 1.26.9의 Now.Add/Sub는 monotonic 값을 사용하므로 wall-clock rollback만으로 이 분기를 유발했다고 주장하지 않는다",
+        "응답·timeout·clockwarp 세 분기는 같은 삭제 순회 메커니즘으로 묶는다"
+      ]
+    },
+    {
+      "case_id": "UDP-response-timeout",
+      "questions": [
+        "한 번의 순회에서 처리할 pending 원소 범위는 무엇인가",
+        "먼 미래 deadline의 실제 유입 경로가 있는가"
+      ],
+      "unknown": [
+        "먼 미래 deadline은 합성 입력이다. 운영 pending 경로의 도달 가능성은 검증하지 않았다",
+        "Go 1.26.9의 Now.Add/Sub는 monotonic 값을 사용하므로 wall-clock rollback만으로 이 분기를 유발했다고 주장하지 않는다",
+        "응답·timeout·clockwarp 세 분기는 같은 삭제 순회 메커니즘으로 묶는다"
+      ]
+    },
+    {
+      "case_id": "WORK-normal",
+      "questions": [
+        "종료 신호 관측과 작업 수락의 선형화 지점은 어디인가",
+        "이미 시작한 작업의 인계가 허용되는가"
+      ],
+      "unknown": [
+        "select 동시 준비에서 어느 분기를 택할지 하나의 고정 결과로 가정하지 않는다",
+        "종료 후 허용되는 이미 진행 중 작업의 범위는 미정이다",
+        "closure 반환만으로 전체 worker가 누수된다고 단정하지 않는다"
+      ]
+    },
+    {
+      "case_id": "WORK-exit",
+      "questions": [
+        "종료 신호 관측과 작업 수락의 선형화 지점은 어디인가",
+        "이미 시작한 작업의 인계가 허용되는가"
+      ],
+      "unknown": [
+        "select 동시 준비에서 어느 분기를 택할지 하나의 고정 결과로 가정하지 않는다",
+        "종료 후 허용되는 이미 진행 중 작업의 범위는 미정이다",
+        "closure 반환만으로 전체 worker가 누수된다고 단정하지 않는다"
+      ]
+    },
+    {
+      "case_id": "WORK-both",
+      "questions": [
+        "종료 신호 관측과 작업 수락의 선형화 지점은 어디인가",
+        "이미 시작한 작업의 인계가 허용되는가"
+      ],
+      "unknown": [
+        "select 동시 준비에서 어느 분기를 택할지 하나의 고정 결과로 가정하지 않는다",
+        "종료 후 허용되는 이미 진행 중 작업의 범위는 미정이다",
+        "closure 반환만으로 전체 worker가 누수된다고 단정하지 않는다"
+      ]
+    },
+    {
+      "case_id": "WORK-backlog",
+      "questions": [
+        "종료 신호 관측과 작업 수락의 선형화 지점은 어디인가",
+        "이미 시작한 작업의 인계가 허용되는가"
+      ],
+      "unknown": [
+        "select 동시 준비에서 어느 분기를 택할지 하나의 고정 결과로 가정하지 않는다",
+        "종료 후 허용되는 이미 진행 중 작업의 범위는 미정이다",
+        "closure 반환만으로 전체 worker가 누수된다고 단정하지 않는다"
+      ]
+    },
+    {
+      "case_id": "GOSSIP-normal",
+      "questions": [
+        "캐시는 송신 시도 또는 전달 성공 중 무엇을 나타내는가",
+        "동일 payload의 송신 실패 후 재시도를 보장하는가"
+      ],
+      "unknown": [
+        "Gossip의 best-effort·중복 억제 의도가 아직 검토되지 않았다",
+        "peer별 캐시 만료·제거와 다른 송신 경로는 미검토",
+        "실제 네트워크는 사용하지 않고 가짜 peer 응답으로만 설계한다"
+      ]
+    },
+    {
+      "case_id": "GOSSIP-fail-repeat",
+      "questions": [
+        "캐시는 송신 시도 또는 전달 성공 중 무엇을 나타내는가",
+        "동일 payload의 송신 실패 후 재시도를 보장하는가"
+      ],
+      "unknown": [
+        "Gossip의 best-effort·중복 억제 의도가 아직 검토되지 않았다",
+        "peer별 캐시 만료·제거와 다른 송신 경로는 미검토",
+        "실제 네트워크는 사용하지 않고 가짜 peer 응답으로만 설계한다"
+      ]
+    },
+    {
+      "case_id": "GOSSIP-delay-repeat",
+      "questions": [
+        "캐시는 송신 시도 또는 전달 성공 중 무엇을 나타내는가",
+        "동일 payload의 송신 실패 후 재시도를 보장하는가"
+      ],
+      "unknown": [
+        "Gossip의 best-effort·중복 억제 의도가 아직 검토되지 않았다",
+        "peer별 캐시 만료·제거와 다른 송신 경로는 미검토",
+        "실제 네트워크는 사용하지 않고 가짜 peer 응답으로만 설계한다"
+      ]
+    },
+    {
+      "case_id": "GOSSIP-cache-control",
+      "questions": [
+        "캐시는 송신 시도 또는 전달 성공 중 무엇을 나타내는가",
+        "동일 payload의 송신 실패 후 재시도를 보장하는가"
+      ],
+      "unknown": [
+        "Gossip의 best-effort·중복 억제 의도가 아직 검토되지 않았다",
+        "peer별 캐시 만료·제거와 다른 송신 경로는 미검토",
+        "실제 네트워크는 사용하지 않고 가짜 peer 응답으로만 설계한다"
+      ]
+    },
+    {
+      "case_id": "POOL-normal",
+      "questions": [
+        "Reset이 구독자 수신을 기다리는 동안 조회가 대기하는 것은 허용되는가",
+        "호출자가 지켜야 하는 버퍼·수신 순서 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 구독자가 수신 전 Stats를 호출하는 경로는 확인하지 않았다",
+        "충분한 버퍼가 권고되므로 backpressure 자체가 결함이라는 의미는 아니다",
+        "제안한 잠금 순서는 통제된 subscriber 대역에서만 구성한다"
+      ]
+    },
+    {
+      "case_id": "POOL-lock-cycle",
+      "questions": [
+        "Reset이 구독자 수신을 기다리는 동안 조회가 대기하는 것은 허용되는가",
+        "호출자가 지켜야 하는 버퍼·수신 순서 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 구독자가 수신 전 Stats를 호출하는 경로는 확인하지 않았다",
+        "충분한 버퍼가 권고되므로 backpressure 자체가 결함이라는 의미는 아니다",
+        "제안한 잠금 순서는 통제된 subscriber 대역에서만 구성한다"
+      ]
+    },
+    {
+      "case_id": "POOL-buffer",
+      "questions": [
+        "Reset이 구독자 수신을 기다리는 동안 조회가 대기하는 것은 허용되는가",
+        "호출자가 지켜야 하는 버퍼·수신 순서 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 구독자가 수신 전 Stats를 호출하는 경로는 확인하지 않았다",
+        "충분한 버퍼가 권고되므로 backpressure 자체가 결함이라는 의미는 아니다",
+        "제안한 잠금 순서는 통제된 subscriber 대역에서만 구성한다"
+      ]
+    },
+    {
+      "case_id": "POOL-unsubscribe",
+      "questions": [
+        "Reset이 구독자 수신을 기다리는 동안 조회가 대기하는 것은 허용되는가",
+        "호출자가 지켜야 하는 버퍼·수신 순서 계약은 무엇인가"
+      ],
+      "unknown": [
+        "실제 구독자가 수신 전 Stats를 호출하는 경로는 확인하지 않았다",
+        "충분한 버퍼가 권고되므로 backpressure 자체가 결함이라는 의미는 아니다",
+        "제안한 잠금 순서는 통제된 subscriber 대역에서만 구성한다"
+      ]
+    }
+  ],
+  "unknown_outcomes": [
+    {
+      "case_id": "SUB-normal",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "A two-second fixture watchdog is not an API latency contract or production liveness proof."
+    },
+    {
+      "case_id": "SUB-blocked",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Absent a verified pair of blocked sends, timeout alone is unknown rather than a detected cycle."
+    },
+    {
+      "case_id": "SUB-late",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "If no finite-drain or acknowledgement ordering receipt exists, do not infer which select case ran."
+    },
+    {
+      "case_id": "SUB-ack",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Host starvation after acknowledgement is not automatically an implementation deadlock."
+    },
+    {
+      "case_id": "SUB-once",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "A call blocked behind the same unfinished Once is not a second independent failure family."
+    },
+    {
+      "case_id": "UDP-near",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "A recorded Reset request does not prove real timer firing, and equality at twice respTimeout is outside this near precondition."
+    },
+    {
+      "case_id": "UDP-far-pair",
+      "outcome_id": "saved_successor_both_removed",
+      "rationale": "Both far matchers removed may describe a separately pinned cursor-fix candidate; it is not the outcome of the declared original source."
+    },
+    {
+      "case_id": "UDP-far-pair",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Synthetic far deadlines cannot establish wall-clock rollback reachability with monotonic timestamps."
+    },
+    {
+      "case_id": "UDP-far-near",
+      "outcome_id": "tail_reset_after_head_removed",
+      "rationale": "A next-before-remove candidate can reach tail, but candidate identity and timer state must be recorded separately from original-source expectation."
+    },
+    {
+      "case_id": "UDP-far-near",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Later outer-loop events may reset the timer; this bounded single invocation does not prove indefinite loss."
+    },
+    {
+      "case_id": "UDP-response-timeout",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "A response callback's ok and requestDone are different values; matching is not identical to completion. These branches remain one proposed mechanism family."
+    },
+    {
+      "case_id": "WORK-normal",
+      "outcome_id": "closure_return_from_exit",
+      "rationale": "An exit return would require a readiness change inconsistent with the stipulated select; inspect actual trace before assigning a fault."
+    },
+    {
+      "case_id": "WORK-normal",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "No deterministic outer-loop termination bound follows from source or a fixture's watchdog."
+    },
+    {
+      "case_id": "WORK-exit",
+      "outcome_id": "outer_loop_event_or_exit",
+      "rationale": "After closure return the outer select can process another ready event or exit; closure return alone does not prove worker leak or whole-function return."
+    },
+    {
+      "case_id": "WORK-exit",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Distinguish closure and goroutine/function return coordinates and counters."
+    },
+    {
+      "case_id": "WORK-both",
+      "outcome_id": "either_means_shutdown_violation",
+      "rationale": "Neither allowed branch is a product violation until cancellation linearization and accepted-work policy are independently defined."
+    },
+    {
+      "case_id": "WORK-both",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Do not require a 50/50 frequency, priority for exit, or infer bug from a single ready-send choice."
+    },
+    {
+      "case_id": "WORK-backlog",
+      "outcome_id": "finite_window_no_return",
+      "rationale": "Finite observation without return alone establishes neither unbounded starvation nor a leak; record window and events."
+    },
+    {
+      "case_id": "WORK-backlog",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Multiple outer-loop iterations remain correlated traces, not independent shutdown defects."
+    },
+    {
+      "case_id": "GOSSIP-normal",
+      "outcome_id": "nil_is_delivery_proof",
+      "rationale": "Gossip nil and SendWBFTConsensus nil do not prove network delivery or consensus acceptance."
+    },
+    {
+      "case_id": "GOSSIP-normal",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Missing broadcaster/targets/peers yields no attempt and is outside this ready-peer precondition, not automatic send failure."
+    },
+    {
+      "case_id": "GOSSIP-fail-repeat",
+      "outcome_id": "suppression_violates_retry",
+      "rationale": "Whether suppression after an error violates product retry policy requires independent best-effort/cache-contract review; no defect is asserted."
+    },
+    {
+      "case_id": "GOSSIP-fail-repeat",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Other routes, cache eviction or expiration may enable later delivery; no permanent/global loss conclusion."
+    },
+    {
+      "case_id": "GOSSIP-delay-repeat",
+      "outcome_id": "late_sender_result_is_parent_error",
+      "rationale": "Parent nil is not the asynchronous sender result; ownership and result timestamps must remain separate."
+    },
+    {
+      "case_id": "GOSSIP-delay-repeat",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "A delayed fake sender is not observed network backpressure or a leak in a live deployment."
+    },
+    {
+      "case_id": "GOSSIP-cache-control",
+      "outcome_id": "same_payload_global_suppression",
+      "rationale": "Global knownMessages insertion here is not used as the per-peer skip condition; distinct peer/hash policy must be evaluated locally."
+    },
+    {
+      "case_id": "GOSSIP-cache-control",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Fresh cache does not imply independent family or prove eventual delivery."
+    },
+    {
+      "case_id": "POOL-normal",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "If reorg has no adds or StateAt fails, the stipulated send was not reached; do not count an easy return as a valid normal trial."
+    },
+    {
+      "case_id": "POOL-lock-cycle",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Documented buffering/backpressure obligations may assign responsibility to caller; no operational defect or safety verdict."
+    },
+    {
+      "case_id": "POOL-buffer",
+      "outcome_id": "finite_buffer_all_load_safe",
+      "rationale": "This one-event control proves no claim about full buffers, multiple subscribers, repeated events or all-load safety."
+    },
+    {
+      "case_id": "POOL-buffer",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "Free capacity must be captured at Send, not assumed from channel capacity at construction."
+    },
+    {
+      "case_id": "POOL-unsubscribe",
+      "outcome_id": "unsubscribe_implies_immediate_unlock",
+      "rationale": "Subscription removal is not the pool unlock itself and imposes no immediate end-to-end timing bound."
+    },
+    {
+      "case_id": "POOL-unsubscribe",
+      "outcome_id": "unmodelled_trace",
+      "rationale": "If another subscriber still blocks Send, lack of return does not refute removal of this subscriber."
+    }
+  ],
+  "missing": [
+    "actual_API_entry_reachability",
+    "primary_and_independently_derived_oracles",
+    "reviewed_source_and_target_toolchain",
+    "reviewed_independent_families_DEV_FINAL",
+    "frozen_baseline_fix_and_counterexample_arms",
+    "planned_seed_order_and_valid_trial_receipts",
+    "family_paired_uncertainty",
+    "owned_cancel_cleanup_and_600sec_observation",
+    "instrumentation_effect_and_installed_host_role",
+    "explicit_unknown_formal_schema",
+    "D04_reviewers_and_F01_F08"
+  ]
+}

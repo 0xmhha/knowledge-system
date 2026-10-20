@@ -14,6 +14,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"regexp"
 	"strings"
@@ -57,6 +58,7 @@ func main() {
 	root.AddCommand(agentcli.NewCmd())
 	root.AddCommand(evalcli.NewCmd())
 	root.AddCommand(setupcli.NewCmd())
+	root.AddCommand(setupcli.NewDatasetStepCmd())
 	root.AddCommand(setupcli.NewRollbackCmd())
 	root.AddCommand(setupcli.NewGCCmd())
 	root.AddCommand(semanticcli.NewCmd())
@@ -84,7 +86,11 @@ var publicErrorCode = regexp.MustCompile(`(?:^|[^a-z_])(resource_limit|build_tim
 // contain source bytes, credentials, or temporary staging paths.
 func publicCLIError(err error) cliError {
 	code := "operation_failed"
-	if err != nil {
+	var typed interface{ PublicCode() string }
+	typedError := errors.As(err, &typed)
+	if typedError {
+		code = typed.PublicCode()
+	} else if err != nil {
 		if match := publicErrorCode.FindStringSubmatch(strings.ToLower(err.Error())); len(match) == 2 {
 			code = match[1]
 		}
@@ -108,6 +114,22 @@ func publicCLIError(err error) cliError {
 		"output_exists":            "The output file already exists; choose another --out or remove the existing file.",
 		"skip_vector_unversioned":  "--skip-vector builds an unversioned graph-only dataset; drop --version, or build both indexes.",
 		"operation_failed":         "The operation failed; inspect project status for details.",
+		"invalid_request":          "The request arguments or output format are invalid; inspect command help.",
+		"embedding_failed":         "The query embedding could not be produced.",
+		"request_canceled":         "The request was canceled.",
+		"request_timeout":          "The request deadline expired.",
+		"retrieval_failed":         "The search could not be completed.",
+		"budget_exceeded":          "No complete retained evidence span fits the response budget.",
+		"compose_failed":           "The base evidence could not be composed.",
+		"v2_evidence_failed":       "The v2 evidence response could not be verified.",
+		"invalid_knowledge_scope":  "A valid date and subsystem are required for knowledge context.",
+		"knowledge_context_failed": "The knowledge context could not be verified.",
+	}
+	if _, ok := messages[code]; !ok {
+		code = "operation_failed"
+	}
+	if typedError && code == "durability_uncertain" {
+		return cliError{Code: code, Message: "Output may exist; verify it before retrying."}
 	}
 	return cliError{Code: code, Message: messages[code]}
 }

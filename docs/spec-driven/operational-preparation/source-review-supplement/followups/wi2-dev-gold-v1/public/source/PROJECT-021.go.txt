@@ -1,0 +1,34 @@
+func importLDBdata(ctx *cli.Context) error {
+	start := 0
+	switch ctx.NArg() {
+	case 1:
+		break
+	case 2:
+		s, err := strconv.Atoi(ctx.Args().Get(1))
+		if err != nil {
+			return fmt.Errorf("second arg must be an integer: %v", err)
+		}
+		start = s
+	default:
+		return fmt.Errorf("required arguments: %v", ctx.Command.ArgsUsage)
+	}
+	var (
+		fName     = ctx.Args().Get(0)
+		stack, _  = makeConfigNode(ctx)
+		interrupt = make(chan os.Signal, 1)
+		stop      = make(chan struct{})
+	)
+	defer stack.Close()
+	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(interrupt)
+	defer close(interrupt)
+	go func() {
+		if _, ok := <-interrupt; ok {
+			log.Info("Interrupted during ldb import, stopping at next batch")
+		}
+		close(stop)
+	}()
+	db := utils.MakeChainDatabase(ctx, stack, false)
+	defer db.Close()
+	return utils.ImportLDBData(db, fName, int64(start), stop)
+}

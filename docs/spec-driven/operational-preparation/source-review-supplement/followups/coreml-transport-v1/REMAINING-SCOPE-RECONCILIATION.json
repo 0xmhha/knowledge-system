@@ -1,0 +1,175 @@
+{
+  "kind": "supported_surface_reconciliation_not_completion_receipt",
+  "parent_groups_completed": 0,
+  "parent_groups_total": 13,
+  "formal_completed": 0,
+  "personal_names_required": false,
+  "scope_change_approved": false,
+  "purpose": "show actual supported surfaces and unmet criteria; do not silently turn new extension proposals into accepted required scope or count unsupported surfaces complete",
+  "active_optional_scopes": [
+    {
+      "id": "PUBLIC-V2",
+      "supported_surface": [
+        "cks agent --format=v2",
+        "existing MCP HTTP v2",
+        "raw graph JSON v2 with source coordinates"
+      ],
+      "remaining_conditions": [
+        "direct retained CKV v2 is not implemented",
+        "static chunked v2 is not implemented; original standing scope needs review before treating these as required new deliveries"
+      ],
+      "recorded_status": "local_CKS_CLI_HTTP_raw_graph_verified_extensions_remain",
+      "source_paths": [
+        "cmd/graph/export_json.go",
+        "cmd/graph/export_static.go",
+        "cmd/cks/mcpcli/serve.go",
+        "cmd/cks/agentcli/v2.go",
+        "cmd/graph/export_v2.go",
+        "internal/graph/persist/visit_graph.go"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "GRAPH-TUNING",
+      "supported_surface": [
+        "bounded graph relation/scoring implementation and native regressions"
+      ],
+      "remaining_conditions": [
+        "independent effect/relevance gold and tuning acceptance"
+      ],
+      "recorded_status": "not_complete",
+      "source_paths": [
+        "internal/system/composer/stage3"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "FLOW-GOLD",
+      "supported_surface": [
+        "flow corpus parsing and extraction tools"
+      ],
+      "remaining_conditions": [
+        "canonical independently reviewed flow gold and usefulness evaluation"
+      ],
+      "recorded_status": "not_complete",
+      "source_paths": [
+        "internal/system/mcp/flow.go",
+        "internal/vector/flowcorpus"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "SCALE",
+      "supported_surface": [
+        "retained1.242GB/244989 nodes/1964193 edges and3 long-function measured cases"
+      ],
+      "remaining_conditions": [
+        "capacity/SLA and complete semantic quality acceptance"
+      ],
+      "recorded_status": "local_large_corpus_long_function_profile_measured_not_capacity_accepted",
+      "source_paths": [
+        "internal/vector"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "AS-OF",
+      "supported_surface": [
+        "explicit dated knowledge policy context and source snapshots"
+      ],
+      "remaining_conditions": [
+        "PR-time domain gold and declared temporal policy acceptance"
+      ],
+      "recorded_status": "not_complete",
+      "source_paths": [
+        "internal/system/semantic"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "LEGACY-SOURCE",
+      "supported_surface": [
+        "legacy working-tree body reader; archive-backed pinned v2 path"
+      ],
+      "remaining_conditions": [
+        "legacy flat body provenance hash/failure declaration and compatibility decision"
+      ],
+      "recorded_status": "not_complete",
+      "source_paths": [
+        "internal/system/composer/budget"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "COREML",
+      "supported_surface": [
+        "local CKV opt-in dispatch",
+        "native token/tensor/owned-context fixtures",
+        "model/tokenizer content identity",
+        "optional profile and disabled profile tests"
+      ],
+      "remaining_conditions": [
+        "actual CoreML weights/tokenizer and deployment target",
+        "real MLModel reference embedding/pooling and successful package cleanup",
+        "managed CKS CoreML runtime is not implemented",
+        "known Qwen3 models remain Ollama-only"
+      ],
+      "recorded_status": "local_CKV_native_transport_verified_actual_model_target_absent",
+      "source_paths": [
+        "internal/vector/embed/coreml"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "EMBED-CACHE",
+      "supported_surface": [
+        "opt-in model-identity-scoped local LRU and actual duplicate-hit verification"
+      ],
+      "remaining_conditions": [],
+      "recorded_status": "local_implementation_and_actual_validation_complete",
+      "source_paths": [
+        "pkg/vector/embed/cache/lru.go",
+        "internal/system/embedder/embedder.go",
+        "cmd/vector/embedder.go"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "VIEWER",
+      "supported_surface": [
+        "built graph UI search/source/navigation/keyboard and owned backend lifecycle"
+      ],
+      "remaining_conditions": [
+        "actual Atlas backend/data and full accessibility acceptance"
+      ],
+      "recorded_status": "local_built_UI_and_owned_lifecycle_verified_with_declared_limits",
+      "source_paths": [
+        "cmd/cks/viewercli/viewer.go",
+        "internal/system/viewer"
+      ],
+      "independent_approval_invented": false
+    },
+    {
+      "id": "DEPLOY",
+      "supported_surface": [
+        "isolated local consumer candidates and owned host/MCP tests"
+      ],
+      "remaining_conditions": [
+        "declared deployment/downstream supported target and operational acceptance"
+      ],
+      "recorded_status": "not_complete",
+      "source_paths": [
+        "docs/downstream-sync.md"
+      ],
+      "independent_approval_invented": false
+    }
+  ],
+  "guardian_intermittence": {
+    "original_full_race_failures": 1,
+    "unchanged_source_focus_passed": 20,
+    "diagnostic_overlay_passed": 80,
+    "root_cause": "unresolved",
+    "production_fix_claimed": false
+  },
+  "next": "investigate unresolved initial guardian deadline failure; preserve same-source corrective full race pass; retain independent and real-model/deployment gates"
+}

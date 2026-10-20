@@ -1,0 +1,56 @@
+UDP 목록 커서 합성 분기 시험 — 2026-10-16
+
+대상과 목적
+SCHED-002의 resetTimeout closure를 go-stablenet 고정 커밋
+0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8, p2p/discover/v4_udp.go:420~440에서 추출했다.
+목록의 현재 원소를 제거한 뒤 el.Next()로 다음 원소를 얻는 동작을 확인한다.
+원본 closure 바이트는 변경하지 않았다. 수정 초안은 삭제 전에 next를 저장한다.
+프로젝트 소스에는 적용하지 않았다.
+
+시험 대역과 한계
+Go 1.26.9의 실제 container/list·time.Now·Time.Add·Time.Sub를 사용했다.
+respTimeout은 원문과 같은 500ms다. 가까운 deadline은 250ms, 먼 deadline은 합성 24시간이다.
+타이머는 Reset/Stop 호출을 기록하는 대역이며 실제 타이머 발화를 시험하지 않는다.
+새 user goroutine·UDP 소켓·노드·호스트 시계 변경·운영 상태 쓰기는 없다.
+오류 채널은 원문의 pending과 같은 버퍼 1로 생성하며 대기 없이 결과를 읽는다.
+
+최종 결과: 원본/커서 보존 초안 × 합성 사례 5개 × 일반/race = 20건
+표의 잔존/통지는 목록 원소 수/clockwarp 오류 수, R/S는 Reset/Stop 요청 수다.
+사례                 원본 잔존/통지 R/S     초안 잔존/통지 R/S
+먼 원소 1개          0/1  0/1              0/1  0/1
+먼 원소 2개          1/1  0/1              0/2  0/1
+먼 원소→가까운 원소  1/1  0/1              1/1  1/0
+가까운 원소 2개      2/0  1/0              2/0  1/0
+가까운 원소→먼 원소  2/0  1/0              2/0  1/0
+
+원본에서는 첫 원소 제거 후 다음 커서를 잃어 두 번째 원소가 남는 분기를 관측했다.
+먼/가까운 혼합에서는 잔존 원소가 있어도 Reset 요청 없이 Stop 요청으로 끝났다.
+수정 초안은 다음 원소에 도달하고 가까운 deadline의 Reset 요청을 기록했다.
+이는 독립 gold·품질 점수가 아니라 같은 AI가 설계한 예제 관측 기준이다.
+
+운영 도달성 판정
+미확인이다. 원문 pending 등록은 deadline을 Now.Add(500ms)로 설정한다.
+Go 1.26.9의 monotonic 시각 의미를 고려하면 단순 wall-clock rollback을
+이 합성 24시간 deadline의 실제 유입 원인으로 주장할 수 없다.
+현재 결과는 먼 deadline을 직접 넣은 방어 분기 시험이며 운영 결함·운영 재발률로 세지 않는다.
+응답/timeout의 유사 순회 분기는 같은 메커니즘의 후속 검토 대상이며 독립 가족으로 늘리지 않는다.
+
+검증과 증거
+일반/race 원자료 4개, 예제 관측 20개, 명시적 시험 바이너리 빌드·fmt·vet·lint 8건 통과.
+udp-cursor-probe-v1에 컴파일 입력·추출 closure·초안·raw Go events·검사 로그를 보존했다.
+전용 증거 회귀 13개가 원문 교체·원자료 불일치·실제 시계/네트워크/타이머 검증 승격·
+독립 가족 부풀리기·운영 적용 주장·검사 실패 숨김을 거부한다.
+
+재검증
+python3 scripts/test_udp_cursor_probe.py
+python3 scripts/check-udp-cursor-probe.py docs/spec-driven/operational-preparation/source-review-supplement/udp-cursor-probe-v1
+재실행은 scripts/run-udp-cursor-probe.py에 새 --output 경로,
+Go 1.26.9 --goroot 경로, --lint 실행 파일 경로를 지정한다.
+이전 동결 패킷을 덮어쓰지 않고 새 관측으로 보존한다.
+
+현재 정식 수용: 0/9. 담당자 미정, 승인된 독립 가족 0개, 프로토콜 실행 허용 false.
+다음 작업: WI-3 증상 검색 공개 입력·비공개 근거·가족 중복 후보 정리.
+
+후속 기록 (2026-10-17): 준비 20단계에서 WI-4 도달성·계약·가족·반복/판정 연결 공백을 점검했다.
+SCHEDULE-GAP-REVIEW.txt 및 schedule-gap-v1 참조. 기존 관측과 generic 판정을 정식 가족·
+상대 비율 평가·운영/독립 수용으로 승격하지 않았다. 다음은 PROGRESS.txt의 준비 21단계 WI-V1/WI-V2다.

@@ -1,0 +1,48 @@
+=== RUN   TestEOFRepliesInOrder
+--- PASS: TestEOFRepliesInOrder (0.00s)
+=== RUN   TestEOFActiveToolCancelsAndKeepsErrorResponse
+--- PASS: TestEOFActiveToolCancelsAndKeepsErrorResponse (0.00s)
+=== RUN   TestCancelUnblocksIdleRead
+--- PASS: TestCancelUnblocksIdleRead (0.00s)
+=== RUN   TestCancelUnblocksOutputWrite
+--- PASS: TestCancelUnblocksOutputWrite (0.01s)
+=== RUN   TestOversizeInputRemainsAnError
+--- PASS: TestOversizeInputRemainsAnError (0.02s)
+=== RUN   TestOutputFailureRemainsAnError
+--- PASS: TestOutputFailureRemainsAnError (0.00s)
+=== RUN   TestCancellationDoesNotMaskUnrelatedErrors
+--- PASS: TestCancellationDoesNotMaskUnrelatedErrors (0.00s)
+=== RUN   TestSignalShutdownProcesses
+=== RUN   TestSignalShutdownProcesses/idle/0
+    main_test.go:277: forced kill required: signal: killed
+=== RUN   TestSignalShutdownProcesses/idle/1
+    main_test.go:277: forced kill required: signal: killed
+=== RUN   TestSignalShutdownProcesses/idle/2
+    main_test.go:277: forced kill required: signal: killed
+=== RUN   TestSignalShutdownProcesses/active/0
+    main_test.go:277: forced kill required: signal: killed
+=== RUN   TestSignalShutdownProcesses/active/1
+    main_test.go:277: forced kill required: signal: killed
+=== RUN   TestSignalShutdownProcesses/active/2
+    main_test.go:277: forced kill required: signal: killed
+=== RUN   TestSignalShutdownProcesses/blocked_output/0
+    main_test.go:277: forced kill required: signal: killed
+=== RUN   TestSignalShutdownProcesses/blocked_output/1
+    main_test.go:277: forced kill required: signal: killed
+=== RUN   TestSignalShutdownProcesses/blocked_output/2
+    main_test.go:277: forced kill required: signal: killed
+--- FAIL: TestSignalShutdownProcesses (45.67s)
+    --- FAIL: TestSignalShutdownProcesses/idle/0 (5.05s)
+    --- FAIL: TestSignalShutdownProcesses/idle/1 (5.03s)
+    --- FAIL: TestSignalShutdownProcesses/idle/2 (5.02s)
+    --- FAIL: TestSignalShutdownProcesses/active/0 (5.02s)
+    --- FAIL: TestSignalShutdownProcesses/active/1 (5.03s)
+    --- FAIL: TestSignalShutdownProcesses/active/2 (5.04s)
+    --- FAIL: TestSignalShutdownProcesses/blocked_output/0 (5.16s)
+    --- FAIL: TestSignalShutdownProcesses/blocked_output/1 (5.17s)
+    --- FAIL: TestSignalShutdownProcesses/blocked_output/2 (5.15s)
+=== RUN   TestProcessHelper
+--- PASS: TestProcessHelper (0.00s)
+FAIL
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench-mcp	46.210s
+FAIL

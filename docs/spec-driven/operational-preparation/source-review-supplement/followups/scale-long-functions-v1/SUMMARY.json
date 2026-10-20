@@ -1,0 +1,101 @@
+{
+  "kind": "local_retained_graph_long_function_profile_DEV_not_capacity_acceptance",
+  "corpus": {
+    "files": 2248,
+    "payload_bytes": 1242250911,
+    "graph_nodes": 244989,
+    "graph_edges": 1964193,
+    "inventory_sha256": "d2c52079665f52e0d23a243a5710a84bb0fe79e0aed7e8d1e79a39a26861d22c",
+    "read_only": true,
+    "not_capacity_limit": true
+  },
+  "source_nodes": 3,
+  "warmup_queries": 3,
+  "budget_controls": 3,
+  "measured_queries": 15,
+  "CKS_requests": 25,
+  "outcomes": [
+    {
+      "node_id": "439f4e91a6d33eb7",
+      "path": "core/vm/jump_table.go",
+      "bytes": 19237,
+      "statuses": [
+        "partial",
+        "budget_exhausted",
+        "partial",
+        "partial",
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "measured": 5,
+      "p50_ns": 377171750,
+      "p95_ns": 386855792,
+      "post_budget_source_readability": true,
+      "semantic_quality_accepted": false
+    },
+    {
+      "node_id": "810a28a764daf9d3",
+      "path": "core/blockchain.go",
+      "bytes": 14762,
+      "statuses": [
+        "partial",
+        "budget_exhausted",
+        "partial",
+        "partial",
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "measured": 5,
+      "p50_ns": 408953334,
+      "p95_ns": 465421000,
+      "post_budget_source_readability": true,
+      "semantic_quality_accepted": false
+    },
+    {
+      "node_id": "3c4c85eb15f45bc3",
+      "path": "eth/fetcher/tx_fetcher.go",
+      "bytes": 14573,
+      "statuses": [
+        "partial",
+        "budget_exhausted",
+        "partial",
+        "partial",
+        "partial",
+        "partial",
+        "partial"
+      ],
+      "measured": 5,
+      "p50_ns": 452578209,
+      "p95_ns": 461256333,
+      "post_budget_source_readability": true,
+      "semantic_quality_accepted": false
+    }
+  ],
+  "status_counts": {
+    "partial": 18,
+    "budget_exhausted": 3
+  },
+  "measured_total_ns": 6250012460,
+  "sequential_measured_responses_per_second": 2.3999952153695387,
+  "maximum_sampled_RSS_KiB": 166352,
+  "RSS_samples": 71,
+  "RSS_is_absolute_peak": false,
+  "initialize_HTTP_isolated": false,
+  "capture_ends_after_first_health": true,
+  "HTTP_through_first_health": 3,
+  "additional_single_input_health_probes": 2,
+  "local_embedding_HTTP_requests": 4,
+  "local_embedding_input_items": 68,
+  "owned_process_groups_remaining": 0,
+  "model_registry_modified": false,
+  "resource_exclusive": false,
+  "fresh_independent_families": 0,
+  "actual_LLM_calls": 0,
+  "paid_external_calls": 0,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "capacity_SLA_accepted": false,
+  "quality_score": null
+}

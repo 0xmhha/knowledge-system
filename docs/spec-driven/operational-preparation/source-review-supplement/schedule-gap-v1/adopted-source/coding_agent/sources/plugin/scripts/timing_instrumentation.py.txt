@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+"""Freeze observation-only Go source instrumentation without granting fix acceptance."""
+from __future__ import annotations
+import argparse
+import json
+from pathlib import Path
+import subprocess
+import os
+import tempfile
+import sys
+from timing_investigation import Invalid,require,sha,encode,read,write_new
+ROOT=Path(__file__).resolve().parents[1]
+HELPER=ROOT/'tools/timing-log-guard/main.go'
+RUNNER_SHA256=sha(Path(__file__).read_bytes())
+
+def git(repo,*args):return subprocess.run(['git','-C',str(repo),*args],capture_output=True,check=True).stdout
+
+def verify_sources(repo,base,probe,probe_id,helper):
+ for ref in (base,probe):
+  require(len(ref)==40 and all(c in '0123456789abcdef'for c in ref),'immutable source commits required')
+  require(git(repo,'rev-parse',ref+'^{commit}').decode().strip()==ref,'source commit unavailable')
+ changes=git(repo,'diff','--name-status',base,probe).decode().splitlines();require(0<len(changes)<=8,'instrumentation file budget1..8')
+ proof=[]
+ for line in changes:
+  status,path=line.split('\t',1)
+  require(status=='M'and path.endswith('.go')and not path.startswith(('/','.claude/','logs/'))and '..'not in path.split('/'),'instrumentation may modify only existing Go files')
+  before=git(repo,'show',base+':'+path);after=git(repo,'show',probe+':'+path);require(len(before)<=1<<20 and len(after)<=1<<20,'source byte budget exceeded')
+  result=subprocess.run([str(helper)],input=encode({'before':before.decode(),'after':after.decode(),'probe_id':probe_id}),capture_output=True)
+  require(result.returncode==0,'observation-only source guard rejected '+path+': '+result.stdout.decode(errors='replace')[:1024])
+  value=json.loads(result.stdout);require(value['status']=='PASS','instrumentation AST not verified')
+  proof.append({'file':path,'before_sha256':sha(before),'after_sha256':sha(after),'guard_result':value,'guard_stdout_sha256':sha(result.stdout)})
+ return proof
+
+def freeze(repo,workspace,base,probe,probe_id):
+ require(workspace.is_dir(),'existing owned workspace required')
+ plan=workspace/'timing-instrumentation-plan.json';require(not plan.exists(),'instrumentation plan already frozen')
+ helper=workspace/'timing-log-guard';require(not helper.exists(),'helper path already allocated')
+ built=subprocess.run(['go','build','-o',str(helper),str(HELPER)],capture_output=True,check=True)
+ proof=verify_sources(repo,base,probe,probe_id,helper)
+ value={'schema_version':1,'probe_id':probe_id,'repo_root':str(repo.resolve()),'base_commit':base,'probe_commit':probe,'runner_sha256':RUNNER_SHA256,'helper_source_sha256':sha(HELPER.read_bytes()),'helper_binary_sha256':sha(helper.read_bytes()),'source_diff_sha256':sha(git(repo,'diff','--binary',base,probe)),'files':proof,'semantic_controls':'not_executed','timing_neutrality':'not_proven','acceptance':'not_recorded'}
+ write_new(plan,encode(value));return sha(plan.read_bytes())
+
+def verify(workspace):
+ raw,p=read(workspace/'timing-instrumentation-plan.json');helper=workspace/'timing-log-guard'
+ require(p.get('schema_version')==1 and p.get('acceptance')=='not_recorded','instrumentation cannot grant fix acceptance')
+ require(p.get('runner_sha256')==RUNNER_SHA256 and p.get('helper_source_sha256')==sha(HELPER.read_bytes())and p.get('helper_binary_sha256')==sha(helper.read_bytes()),'instrumentation verifier changed')
+ repo=Path(p['repo_root']);proof=verify_sources(repo,p['base_commit'],p['probe_commit'],p['probe_id'],helper)
+ require(proof==p['files']and p['source_diff_sha256']==sha(git(repo,'diff','--binary',p['base_commit'],p['probe_commit'])),'instrumentation source/proof changed')
+ require(p['semantic_controls']=='not_executed'and p['timing_neutrality']=='not_proven','AST proof was falsely promoted to behavior/timing acceptance')
+ return p,sha(raw)
+
+CONTROL_COMMANDS = (
+ ('normal',['go','test','-count=1','-json','./...']),
+ ('race',['go','test','-race','-count=1','-json','./...']),
+ ('vet',['go','vet','./...']),
+ ('build',['go','build','./...']),
+)
+
+def source_snapshot(repo,ref,directory):
+ entries=git(repo,'ls-tree','-rz',ref).split(b'\0');count=0;size=0
+ for entry in entries:
+  if not entry:continue
+  metadata,path=entry.split(b'\t',1);path=path.decode();mode,kind,_=metadata.decode().split()
+  if path.split('/')[0]in('.claude','logs'):continue
+  require(kind=='blob'and mode in('100644','100755'),'source controls do not follow symlinks/submodules')
+  require(not path.startswith('/')and '..'not in path.split('/'),'invalid snapshot path')
+  content=git(repo,'show',ref+':'+path);count+=1;size+=len(content)
+  require(count<=512 and size<=8*1024*1024,'bounded controls require at most512 files/8MiB')
+  target=directory/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(content)
+  if mode=='100755':target.chmod(0o700)
+
+def test_ids(raw):
+ passed=[];failed=False
+ for line in raw.splitlines():
+  value=json.loads(line)
+  if value.get('Action')=='fail':failed=True
+  if value.get('Action')=='pass'and value.get('Test'):passed.append([value['Package'],value['Test']])
+ require(not failed and len(passed)>0,'normal/race controls need actual named passing tests')
+ return sorted(passed)
+
+def control_evidence(workspace):
+ p,digest=verify(workspace);root=workspace/'timing-instrumentation-controls'
+ require(not root.exists(),'control evidence already allocated; never overwrite')
+ root.mkdir(mode=0o700);trials=[];errors=[]
+ toolchain=subprocess.run(['go','version'],capture_output=True,check=True,timeout=20).stdout.decode().strip()
+ for label,ref in(('base',p['base_commit']),('probe',p['probe_commit'])):
+  with tempfile.TemporaryDirectory(prefix='ks-trace-control-')as temporary:
+   snapshot=Path(temporary);source_snapshot(Path(p['repo_root']),ref,snapshot)
+   for name,command in CONTROL_COMMANDS:
+    try:
+     result=subprocess.run(command,cwd=snapshot,capture_output=True,timeout=60)
+     stdout,stderr,code=result.stdout,result.stderr,result.returncode
+    except subprocess.TimeoutExpired as error:
+     stdout,stderr,code=error.stdout or b'',error.stderr or b'',None
+    out=root/(label+'-'+name+'.stdout.txt');err=root/(label+'-'+name+'.stderr.txt');write_new(out,stdout);write_new(err,stderr)
+    ids=[]
+    try:
+     require(code==0,'control command failed or timed out')
+     if name in('normal','race'):ids=test_ids(stdout)
+     status='PASS'
+    except (Invalid,ValueError)as error:status='ERROR';errors.append(label+'/'+name+': '+str(error))
+    trials.append({'source':label,'commit':ref,'kind':name,'command':command,'exit_code':code,'stdout':out.name,'stdout_sha256':sha(stdout),'stderr':err.name,'stderr_sha256':sha(stderr),'test_ids':ids,'status':status})
+ for name in('normal','race'):
+  pair=[trial for trial in trials if trial['kind']==name]
+  if pair[0]['test_ids']!=pair[1]['test_ids']:errors.append(name+': source test coverage changed')
+ value={'schema_version':1,'plan_sha256':digest,'runner_sha256':RUNNER_SHA256,'toolchain':toolchain,'trials':trials,'status':'ERROR'if errors else'PASS','errors':errors,'scope':'same frozen normal/race suite, build and vet at both source snapshots; no timing-neutrality proof','timing_neutrality':'not_proven','acceptance':'not_recorded'}
+ write_new(root/'report.json',encode(value));return value
+
+def verify_controls(workspace):
+ p,digest=verify(workspace);root=workspace/'timing-instrumentation-controls';raw,value=read(root/'report.json')
+ require(value.get('schema_version')==1 and value.get('plan_sha256')==digest and value.get('runner_sha256')==RUNNER_SHA256,'instrumentation controls/source binding changed')
+ require(value.get('status')=='PASS'and value.get('errors')==[]and value.get('timing_neutrality')=='not_proven'and value.get('acceptance')=='not_recorded','controls do not grant timing/fix acceptance')
+ expected=[(label,ref,name,command)for label,ref in(('base',p['base_commit']),('probe',p['probe_commit']))for name,command in CONTROL_COMMANDS]
+ require(len(value['trials'])==len(expected),'control trials missing')
+ for trial,(label,ref,name,command)in zip(value['trials'],expected):
+  require((trial['source'],trial['commit'],trial['kind'],trial['command'])==(label,ref,name,command)and trial['status']=='PASS'and trial['exit_code']==0,'control command/source/result differs')
+  for stream in('stdout','stderr'):
+   path=root/(label+'-'+name+'.'+stream+'.txt');require(trial[stream]==path.name and sha(path.read_bytes())==trial[stream+'_sha256'],'control raw evidence changed')
+  require(trial['test_ids']==(test_ids((root/trial['stdout']).read_bytes())if name in('normal','race')else[]),'control test set differs')
+ for name in('normal','race'):
+  pair=[trial for trial in value['trials']if trial['kind']==name];require(pair[0]['test_ids']==pair[1]['test_ids'],'base/probe coverage differs')
+ return value,sha(raw)
+
+def main():
+ parser=argparse.ArgumentParser();parser.add_argument('--workspace',type=Path,required=True);parser.add_argument('--repo',type=Path);parser.add_argument('--base');parser.add_argument('--probe');parser.add_argument('--probe-id');parser.add_argument('--check',action='store_true');parser.add_argument('--controls',action='store_true');a=parser.parse_args()
+ if a.controls:
+  value,digest=verify_controls(a.workspace)if a.check else(control_evidence(a.workspace),None);print(json.dumps({'controls':value['status'],'report_sha256':digest,'acceptance':'not_recorded'}));require(value['status']=='PASS','instrumentation controls failed');return
+ if a.check:p,digest=verify(a.workspace);print(json.dumps({'source_guard':'PASS','plan_sha256':digest,'semantic_controls':p['semantic_controls'],'acceptance':'not_recorded'}));return
+ require(a.repo and a.base and a.probe and a.probe_id,'repo/base/probe/probe-id required');print(json.dumps({'plan_sha256':freeze(a.repo.resolve(),a.workspace.resolve(),a.base,a.probe,a.probe_id),'semantic_controls':'not_executed','acceptance':'not_recorded'}))
+if __name__=='__main__':
+ try:main()
+ except (Invalid,OSError,ValueError,KeyError,TypeError,subprocess.SubprocessError)as e:print(json.dumps({'status':'ERROR','reason':str(e),'acceptance':'not_recorded'}));raise SystemExit(2)

@@ -1,0 +1,32 @@
+{
+  "kind": "AI_source_schedule_scope_proposal_not_independent_approval",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_path": "eth/downloader/api.go",
+  "source_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+  "uninstall_owner_branch": "delete(syncSubscriptions, u.c)\n\t\t\tclose(u.uninstalled)",
+  "source_facts": [
+    "the same event loop receives uninstall then deletes its status channel and closes this request acknowledgement without a status send between them",
+    "SubscribeSyncStatus accepts a caller-owned bidirectional channel; a later new subscription may reuse the same physical channel"
+  ],
+  "assumptions": [
+    "only the API event loop generates subscription statuses",
+    "no new registration of the same physical channel inside the lifetime assertion"
+  ],
+  "proposal": {
+    "actual_owner_schedules": [
+      "normal_delivery_then_unsubscribe",
+      "blocked_delivery_then_consumer_exit",
+      "confirmation_delayed",
+      "concurrent_unsubscribe_once"
+    ],
+    "separate_controlled_owner_schedule": "late_delivery_before_confirmation",
+    "late_scope_note": "post-accept extra status cannot originate from this single owner before its immediate ack; external writers or an injected owner are separate scope",
+    "post_ack_scope": "old subscription until a later explicit new registration; no unconditional forever claim"
+  },
+  "human_scope_decision": "pending",
+  "independent_approved": 0,
+  "full_original5_complete": false,
+  "formal_completed": 0,
+  "freeze": null,
+  "execution_allowed": false
+}

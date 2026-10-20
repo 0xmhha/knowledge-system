@@ -132,6 +132,13 @@
         "pkg/graph"
       ]
     },
+    "docs/graph/GO-RULE-CANDIDATES.md": {
+      "role": "reference",
+      "source_paths": [
+        "pkg/graph/valueflow",
+        "pkg/graph/mcphandlers"
+      ]
+    },
     "docs/graph/HYDRATION-PATTERN.md": {
       "role": "reference",
       "source_paths": [
@@ -146,6 +153,16 @@
         "cmd/graph",
         "internal/graph",
         "pkg/graph"
+      ]
+    },
+    "docs/graph/POLICY-SECURITY.md": {
+      "role": "reference",
+      "source_paths": [
+        "pkg/graph/annotations",
+        "pkg/graph/policy",
+        "pkg/graph/security",
+        "internal/system/mcp/annotations.go",
+        "internal/system/ckgclient/annotations.go"
       ]
     },
     "docs/graph/SCHEMA.md": {
@@ -164,6 +181,13 @@
         "pkg/graph"
       ]
     },
+    "docs/graph/VALUE-DEPENDENCIES.md": {
+      "role": "reference",
+      "source_paths": [
+        "pkg/graph/valueflow",
+        "pkg/graph/mcphandlers"
+      ]
+    },
     "docs/graph/VERIFICATION-CHECKLIST.md": {
       "role": "reference",
       "source_paths": [
@@ -178,6 +202,14 @@
         "cmd/graph",
         "internal/graph",
         "pkg/graph"
+      ]
+    },
+    "docs/spec-driven/COMPARISON-MCP-CONTRACT.md": {
+      "role": "contract",
+      "source_paths": [
+        "internal/system/comparison",
+        "internal/system/mcp",
+        "cmd/cks/mcpcli"
       ]
     },
     "docs/spec-driven/CURRENT-HANDOFF.md": {
@@ -237,6 +269,61 @@
         "pkg/sourcepath"
       ]
     },
+    "docs/spec-driven/INDUSTRY-CONCEPT-COMPARISON.md": {
+      "role": "contract",
+      "source_paths": [
+        "internal/system/comparison",
+        "internal/system/knowledgepack",
+        "system/packs/industry-blockchain"
+      ]
+    },
+    "docs/spec-driven/ISOLATED-HOST-ADOPTION.md": {
+      "role": "workflow",
+      "source_paths": [
+        "scripts/operational-host-probe.py",
+        "scripts/check-operational-acceptance.py",
+        "system/eval/operational-preparation-2026-10-15/isolated-host"
+      ]
+    },
+    "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md": {
+      "role": "contract",
+      "source_paths": [
+        "pkg/system/contract/v2.go",
+        "internal/setup",
+        "internal/system/mcp/setup_tool.go",
+        "internal/system/mcp/reindex_tool.go",
+        "internal/system/knowledgepack",
+        "internal/system/semantic",
+        "docs/spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json"
+      ]
+    },
+    "docs/spec-driven/KNOWLEDGE-MANAGER-PLUGIN.md": {
+      "role": "reference",
+      "source_paths": [
+        "plugins/knowledge-manager",
+        "internal/system/maintenance",
+        "internal/setup"
+      ]
+    },
+    "docs/spec-driven/KNOWLEDGE-MANAGER-UPDATES.md": {
+      "role": "workflow",
+      "source_paths": [
+        "plugins/knowledge-manager/scripts/update_contract.py",
+        "plugins/knowledge-manager/scripts/collection.py",
+        "plugins/knowledge-manager/scripts/broker.py",
+        "internal/system/maintenance",
+        "internal/setup"
+      ]
+    },
+    "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md": {
+      "role": "workflow",
+      "source_paths": [
+        "internal/system/collection",
+        "internal/setup",
+        "pkg/system/contract",
+        "scripts/check-knowledge-roadmap.py"
+      ]
+    },
     "docs/spec-driven/ONTOLOGY-20-USAGE.md": {
       "role": "contract",
       "source_paths": [
@@ -246,6 +333,51 @@
         "pkg/system"
       ]
     },
+    "docs/spec-driven/ONTOLOGY-EFFECT-DEV-OBSERVATION.md": {
+      "role": "workflow",
+      "source_paths": [
+        "scripts/eval-ontology-effect-dev.py",
+        "scripts/score-ontology-effect-dev.py",
+        "scripts/check-ontology-effect-dev.py",
+        "internal/system/semantic",
+        "internal/system/composer"
+      ]
+    },
+    "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md": {
+      "role": "reference",
+      "source_paths": [
+        "internal/system/mcp",
+        "internal/system/ckgclient",
+        "pkg/graph/valueflow",
+        "pkg/graph/annotations"
+      ]
+    },
+    "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.md": {
+      "role": "workflow",
+      "source_paths": [
+        "scripts/check-operational-acceptance.py",
+        "scripts/test_operational_acceptance.py",
+        "internal/system/mcp",
+        "scripts/prepare-operational-inputs.py",
+        "scripts/acceptance_ast_metadata.go.txt"
+      ]
+    },
+    "docs/spec-driven/OPERATIONAL-ACCEPTANCE-READINESS-FIXES.md": {
+      "role": "workflow",
+      "source_paths": [
+        "scripts/check-operational-acceptance.py",
+        "system/eval/operational-preparation-2026-10-15/chainbench-stdio",
+        "system/eval/operational-preparation-2026-10-15/coding-agent-exit",
+        "system/eval/operational-preparation-2026-10-15/isolated-host"
+      ]
+    },
+    "docs/spec-driven/OPERATIONAL-ACCEPTANCE-REVIEW-DRAFT.md": {
+      "role": "workflow",
+      "source_paths": [
+        "pkg/graph/valueflow",
+        "scripts/check-operational-acceptance.py"
+      ]
+    },
     "docs/spec-driven/PATCH-WORKFLOW.md": {
       "role": "workflow",
       "source_paths": [
@@ -253,6 +385,55 @@
         "internal/setup",
         "internal/system",
         "pkg/system"
+      ]
+    },
+    "docs/spec-driven/POLICY-OVERLAY-ADOPTION.md": {
+      "role": "workflow",
+      "source_paths": [
+        "projects/stablenet/evaluation/policy-0bf2f4d1.profile.json",
+        "scripts/eval-adopted-policy.py",
+        "scripts/check-adopted-policy.py",
+        "system/eval/operational-preparation-2026-10-15/adopted-policy",
+        "docs/spec-driven/operational-preparation/ontology-effect-dev"
+      ]
+    },
+    "docs/spec-driven/POLICY-REFERENCE-DIAGNOSIS.md": {
+      "role": "workflow",
+      "source_paths": [
+        "scripts/policy_reference_probe.go.txt",
+        "scripts/prepare-policy-reference-diagnosis.py",
+        "scripts/check-policy-reference-diagnosis.py",
+        "internal/graph/parse/golang",
+        "pkg/graph/policy",
+        "docs/spec-driven/operational-preparation/policy-reference-diagnosis"
+      ]
+    },
+    "docs/spec-driven/POLICY-SECURITY-INPUT-REVIEW.md": {
+      "role": "workflow",
+      "source_paths": [
+        "scripts/prepare-policy-security-inputs.py",
+        "scripts/acceptance_source_inventory.go.txt",
+        "scripts/check-policy-security-preparation.py",
+        "docs/spec-driven/operational-preparation/policy-security-drafts",
+        "projects/stablenet/policies/graph.yaml"
+      ]
+    },
+    "docs/spec-driven/PROJECT-COLLECTION-ISOLATION.md": {
+      "role": "workflow",
+      "source_paths": [
+        "internal/system/collection",
+        "internal/setup",
+        "pkg/system/contract",
+        "scripts/check-knowledge-roadmap.py",
+        "internal/system/config/collection.go",
+        "internal/system/mcp/collection.go",
+        "cmd/cks/mcpcli/collection.go",
+        "scripts/check-collection-public.py",
+        "scripts/verify-collection-public.py",
+        "scripts/verify-collection-isolation.py",
+        "scripts/check-collection-isolation.py",
+        "scripts/test_collection_isolation.py",
+        "scripts/test_knowledge_roadmap_current.py"
       ]
     },
     "docs/spec-driven/PUBLIC-CONTRACT-V2.md": {
@@ -325,6 +506,46 @@
         "internal/setup",
         "internal/system",
         "pkg/system"
+      ]
+    },
+    "docs/spec-driven/UPPER-WORK-ITEMS-AUDIT.md": {
+      "role": "workflow",
+      "source_paths": [
+        "internal/graph",
+        "pkg/graph",
+        "internal/system",
+        "pkg/system"
+      ]
+    },
+    "docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md": {
+      "role": "workflow",
+      "source_paths": [
+        "internal/graph",
+        "pkg/graph",
+        "internal/system",
+        "pkg/system"
+      ]
+    },
+    "docs/spec-driven/VERSIONED-MAINTENANCE-CONTRACT.md": {
+      "role": "workflow",
+      "source_paths": [
+        "system/contracts/versioned-maintenance/v1",
+        "internal/setup",
+        "internal/system/mcp",
+        "scripts/dataset_contract.py",
+        "scripts/check-versioned-maintenance-contract.py",
+        "scripts/check-maintenance-design-evidence.py"
+      ]
+    },
+    "docs/spec-driven/VERSIONED-MAINTENANCE-RUNTIME.md": {
+      "role": "workflow",
+      "source_paths": [
+        "system/contracts/versioned-maintenance/v1",
+        "internal/setup",
+        "internal/system/mcp",
+        "scripts/dataset_contract.py",
+        "scripts/check-versioned-maintenance-contract.py",
+        "scripts/check-maintenance-design-evidence.py"
       ]
     },
     "docs/spec-driven/WORKSHEET-CATALOG-CONTRACT-V1.md": {
@@ -435,6 +656,30 @@
         "internal/setup",
         "internal/system",
         "pkg/system"
+      ]
+    },
+    "plugins/knowledge-manager/README.md": {
+      "role": "reference",
+      "source_paths": [
+        "plugins/knowledge-manager",
+        "internal/system/maintenance",
+        "internal/setup"
+      ]
+    },
+    "plugins/knowledge-manager/agents/knowledge-manager.md": {
+      "role": "reference",
+      "source_paths": [
+        "plugins/knowledge-manager",
+        "internal/system/maintenance",
+        "internal/setup"
+      ]
+    },
+    "plugins/knowledge-manager/skills/manage/SKILL.md": {
+      "role": "reference",
+      "source_paths": [
+        "plugins/knowledge-manager",
+        "internal/system/maintenance",
+        "internal/setup"
       ]
     },
     "projects/stablenet/README.md": {
@@ -1154,6 +1399,176 @@
     "system/eval/ckg-4way/impact/Report-impact.md": {
       "role": "frozen_evidence"
     },
+    "system/eval/knowledge-roadmap-2026-10-16/km-06-real-projects/runtime/review.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/operational-preparation-2026-10-15/coding-agent-exit/controlled-smoke/workspace/test-report.md": {
+      "role": "frozen_evidence"
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-1-cfg-checkpoint/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-1/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-2/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-3/README.md": {
+      "role": "frozen_evidence"
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-4-consumer-checkpoint/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-4-public-checkpoint/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-4/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-acceptance/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-computed-edge/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-deleted-artifact/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-diagram/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-dimension/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-frozen-hash/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-report/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-source/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-type/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-acceptance/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-computed-edge/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-deleted-artifact/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-diagram/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-dimension/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-frozen-hash/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-report/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-source/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-type/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/README.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-acceptance/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-computed-edge/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-deleted-artifact/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-diagram/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-dimension/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-frozen-hash/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-report/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-source/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-type/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
+    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/review-report.md": {
+      "role": "frozen_evidence",
+      "source_paths": []
+    },
     "testdata/wbs-smoke/README.md": {
       "role": "fixture"
     },
@@ -1213,210 +1628,14 @@
         "pkg/vector"
       ]
     },
-    "docs/spec-driven/UPPER-WORK-ITEMS-AUDIT.md": {
+    "docs/spec-driven/MACHINE-HANDOFF.md": {
       "role": "workflow",
       "source_paths": [
-        "internal/graph",
-        "pkg/graph",
-        "internal/system",
-        "pkg/system"
+        "scripts/check-handoff-history.py",
+        "docs/spec-driven/HANDOFF-HISTORY.json",
+        "scripts/factory_native_overlap.py",
+        ".github/workflows/ci.yml"
       ]
-    },
-    "docs/spec-driven/UPPER-WORK-ITEMS-IMPLEMENTATION.md": {
-      "role": "workflow",
-      "source_paths": [
-        "internal/graph",
-        "pkg/graph",
-        "internal/system",
-        "pkg/system"
-      ]
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-3/README.md": {
-      "role": "frozen_evidence"
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-4-public-checkpoint/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-4-consumer-checkpoint/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-4/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-1-cfg-checkpoint/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "docs/graph/VALUE-DEPENDENCIES.md": {
-      "role": "reference",
-      "source_paths": [
-        "pkg/graph/valueflow",
-        "pkg/graph/mcphandlers"
-      ]
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-1/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "docs/graph/GO-RULE-CANDIDATES.md": {
-      "role": "reference",
-      "source_paths": [
-        "pkg/graph/valueflow",
-        "pkg/graph/mcphandlers"
-      ]
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-2/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-deleted-artifact/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-report/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-diagram/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-acceptance/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-source/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-frozen-hash/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-computed-edge/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-type/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-c/execution/.coding-agent/tickets/CONTROL-dimension/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-deleted-artifact/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-report/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-diagram/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-acceptance/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-source/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-frozen-hash/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-computed-edge/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-type/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-6/review-regression/.coding-agent/tickets/CONTROL-dimension/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "docs/graph/POLICY-SECURITY.md": {
-      "role": "reference",
-      "source_paths": [
-        "pkg/graph/annotations",
-        "pkg/graph/policy",
-        "pkg/graph/security",
-        "internal/system/mcp/annotations.go",
-        "internal/system/ckgclient/annotations.go"
-      ]
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/README.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-deleted-artifact/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-report/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/DEEP-REVIEW-FIXTURE/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-diagram/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-acceptance/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-source/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-frozen-hash/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-computed-edge/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-type/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
-    },
-    "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/review-regression/.coding-agent/tickets/CONTROL-dimension/review-report.md": {
-      "role": "frozen_evidence",
-      "source_paths": []
     }
   }
 }

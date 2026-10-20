@@ -1,0 +1,185 @@
+{
+  "kind": "exposed_function_sample_preparation_not_independent_acceptance",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "selected_proposal": [
+    "SRC-002",
+    "SRC-006",
+    "SRC-011",
+    "SRC-016",
+    "SRC-021",
+    "SRC-027",
+    "SRC-031",
+    "SRC-036",
+    "SRC-001",
+    "SRC-009",
+    "SRC-012",
+    "SRC-018",
+    "SRC-022",
+    "SRC-028",
+    "SRC-033",
+    "SRC-039",
+    "SRC-003",
+    "SRC-010",
+    "SRC-014",
+    "SRC-019",
+    "SRC-023",
+    "SRC-034",
+    "SRC-040",
+    "SRC-029",
+    "SRC-004",
+    "SRC-024",
+    "SRC-007",
+    "SRC-013",
+    "SRC-017",
+    "SRC-030"
+  ],
+  "reserve_proposal": [
+    "SRC-005",
+    "SRC-008",
+    "SRC-015",
+    "SRC-020",
+    "SRC-025",
+    "SRC-032",
+    "SRC-035",
+    "SRC-037",
+    "SRC-038"
+  ],
+  "excluded_development_source_only": [
+    "SRC-026"
+  ],
+  "module_quotas": {
+    "consensus/wbft": 4,
+    "core/rawdb": 4,
+    "core/state": 4,
+    "core/txpool": 4,
+    "eth/downloader": 4,
+    "miner": 4,
+    "p2p": 3,
+    "rpc": 3
+  },
+  "construct_function_counts": {
+    "declaration_redefinition": 27,
+    "branch": 30,
+    "loop": 29,
+    "shadow": 14,
+    "return": 30
+  },
+  "selected_source_file_groups": {
+    "consensus/wbft/backend/api.go": [
+      "SRC-001"
+    ],
+    "consensus/wbft/backend/backend.go": [
+      "SRC-002"
+    ],
+    "consensus/wbft/core/roundchange.go": [
+      "SRC-003"
+    ],
+    "consensus/wbft/messages/preprepare.go": [
+      "SRC-004"
+    ],
+    "core/rawdb/accessors_chain.go": [
+      "SRC-006",
+      "SRC-007"
+    ],
+    "core/rawdb/ancient_utils.go": [
+      "SRC-009"
+    ],
+    "core/rawdb/chain_iterator.go": [
+      "SRC-010"
+    ],
+    "core/state/dump.go": [
+      "SRC-011"
+    ],
+    "core/state/pruner/pruner.go": [
+      "SRC-012",
+      "SRC-013"
+    ],
+    "core/state/snapshot/generate.go": [
+      "SRC-014"
+    ],
+    "core/txpool/blobpool/blobpool.go": [
+      "SRC-016",
+      "SRC-017"
+    ],
+    "core/txpool/blobpool/limbo.go": [
+      "SRC-018"
+    ],
+    "core/txpool/legacypool/legacypool.go": [
+      "SRC-019"
+    ],
+    "eth/downloader/api.go": [
+      "SRC-021"
+    ],
+    "eth/downloader/beaconsync.go": [
+      "SRC-022"
+    ],
+    "eth/downloader/downloader.go": [
+      "SRC-023"
+    ],
+    "eth/downloader/queue.go": [
+      "SRC-024"
+    ],
+    "miner/worker.go": [
+      "SRC-027",
+      "SRC-029",
+      "SRC-030"
+    ],
+    "miner/ordering.go": [
+      "SRC-028"
+    ],
+    "p2p/discover/v4_udp.go": [
+      "SRC-031"
+    ],
+    "p2p/discover/v5_udp.go": [
+      "SRC-033"
+    ],
+    "p2p/enr/enr.go": [
+      "SRC-034"
+    ],
+    "rpc/client.go": [
+      "SRC-036"
+    ],
+    "rpc/endpoints.go": [
+      "SRC-039"
+    ],
+    "rpc/handler.go": [
+      "SRC-040"
+    ]
+  },
+  "file_groups_are_independent_families": false,
+  "counts": {
+    "production_pool": 39,
+    "selected_functions": 30,
+    "reserve_functions": 9,
+    "modules": 8,
+    "selected_source_files": 25,
+    "selected_pairs": 435,
+    "production_pairs": 741,
+    "selected_same_file_pairs": 6,
+    "selected_shared_ai_group_pairs": 2,
+    "prior_question_comparisons": 1638,
+    "selected_prior_question_comparisons": 1260,
+    "selected_literal_name_flags": 0,
+    "selected_inherited_ai_topic_flags": 19,
+    "selected_functions_with_ai_topic_flags": 11,
+    "selected_functions_without_topic_review": 16,
+    "selected_private_dependency_reviews": 4,
+    "selected_without_private_dependency_review": 26,
+    "approved_independent_functions": 0,
+    "independent_gold_records": 0
+  },
+  "reviewer": null,
+  "split_allocation": null,
+  "formal_sample_sufficiency": "not_reviewed",
+  "formal_runs": 0,
+  "dependency_backend_calls": 0,
+  "quality_scores": null,
+  "limitations": [
+    "all candidates already appear in the exposed source pool and census",
+    "purposive deterministic quotas do not establish random sampling or representativeness",
+    "same-file groups and AI topic/group flags are review prompts, not family verdicts",
+    "absence of literal/path/topic flags does not establish freshness or independence",
+    "four dependency source reviews are non-exhaustive; the other selected functions still need review",
+    "selected syntax counts do not supply approved independent functions, edge gold, DEV/FINAL or frozen matching"
+  ]
+}

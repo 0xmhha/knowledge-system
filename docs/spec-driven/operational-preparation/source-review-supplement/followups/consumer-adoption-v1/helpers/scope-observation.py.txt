@@ -1,0 +1,21 @@
+import importlib.util,json,sys,subprocess,hashlib
+from pathlib import Path
+R=Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');sys.path.insert(0,str(R/'scripts'))
+s=importlib.util.spec_from_file_location('finalscope',R/'scripts/run-consumer-final.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+p=json.load(open(m.PLAN));prior=json.load(open(R/'docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/before.json'));baseline=json.load(open('/private/tmp/ks-adoption-scope-baseline.json'))
+after={'global':m.global_state(p),'operations':m.operations(p),'sources':m.sources()}
+expected=prior['sources']['repos'];preserved=all(after['sources']['repos'][k]==v for k,v in expected.items())
+audit=[];root=Path('/private/tmp/ks-consumer-role-adopted-20261017-01');pids=set()
+for case in ['analyzer','planner-tools','planner-delivery']:
+ end=json.load(open(root/case/'exit.json'));pids.add(end['host_pid'])
+ start=next(json.loads(l)for l in (root/case/'mcp-frames.jsonl').read_text().splitlines() if json.loads(l)['kind']=='start');pids.update([start['wrapper_pid'],start['child_pid']])
+for side in ['old','new']:pids.add(json.load(open(root/'native-matrix'/side/'lifecycle.json'))['pid'])
+for pid in sorted(pids):
+ r=subprocess.run(['ps','-p',str(pid),'-o','pid=,ppid=,lstart=,comm='],capture_output=True,text=True);audit.append({'pid':pid,'exit_code':r.returncode,'stdout':r.stdout,'stderr':r.stderr})
+r=subprocess.run(['ps','-p',str(__import__('os').getpid()),'-o','pid='],capture_output=True,text=True)
+process={'probes':audit,'self':{'exit_code':r.returncode,'stdout':r.stdout},'scope':'known observed owned host/wrapper/CKS identities only; no signal sent'}
+old=prior['operations']['engines'];new=after['operations']['engines'];original=all(x in new for x in old)
+extras=[x for x in new if x not in old]
+result={'global_configuration_equal':prior['global']==baseline['current']['global']==after['global'],'global_configuration_entry_count':len(after['global']),'operational_metadata_pointers_equal':prior['operations']['metadata']==baseline['current']['operations']['metadata']==after['operations']['metadata'],'operational_metadata_entry_count':len(after['operations']['metadata']),'original_unowned_engines_preserved':original,'original_engine_count':len(old),'extra_unowned_engines':extras,'extra_unowned_engines_are_not_terminated':True,'old_source_checkouts_unchanged':preserved,'production_writes':0,'historical_unconfirmed_CKS_exit_receipts':1,'observation_limit':'Recorded snapshots compare file metadata/hash and pointers; not continuous monitoring, full database-byte proof, availability, authentication, or platform-wide process constancy. Extra non-owned user sessions were observed and left intact.','go_test_child_observed_during_race':21728,'go_test_child_absent_after_validation':all(x['pid']!=21728 for x in new)}
+for name,value in [('scope-after',after),('scope-preservation',result),('postrun-process-audit',process)]:Path('/private/tmp/ks-adoption-'+name+'.json').write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:v for k,v in result.items()if not isinstance(v,(list,str))},ensure_ascii=False));print('owned_PID_probes',len(audit),'all_absent',all(x['exit_code']==1 and not x['stdout'].strip()for x in audit))

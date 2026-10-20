@@ -84,7 +84,7 @@ func acquireReindexLock(dataset string) (*reindexLock, error) {
 		return nil, fmt.Errorf("reindex: mutation lock must be a regular file with one link")
 	}
 	if err := unix.Flock(fd, unix.LOCK_EX|unix.LOCK_NB); err != nil {
-		return nil, fmt.Errorf("reindex: another reindex or promotion is in progress")
+		return nil, fmt.Errorf("reindex: another reindex or promotion is in progress: %w", ErrDatasetWriterBusy)
 	}
 	// The acquired OS lock settles modern ownership. A pre-upgrade live PID
 	// is still protected regardless of timestamp; never unlink its inode.
@@ -117,7 +117,7 @@ func acquireReindexLock(dataset string) (*reindexLock, error) {
 
 func (l *reindexLock) release() {
 	if l != nil && l.file != nil {
-		_ = unix.Flock(int(l.file.Fd()), unix.LOCK_UN)
+		// Close ownership only after every inherited child descriptor closes.
 		_ = l.file.Close()
 		l.file = nil // Keep the inode: unlinking splits contenders into two locks.
 	}
@@ -338,6 +338,10 @@ func withPromotionLock(dataset string, action func() (string, error)) (string, e
 // Retain the old pointer lock as an additional upgrade boundary. Reindex
 // already owns the dataset lock when it calls this private function.
 func withPointerLock(dataset string, action func() (string, error)) (string, error) {
+	return withPointerLockContext(context.Background(), dataset, action)
+}
+
+func withPointerLockContext(ctx context.Context, dataset string, action func() (string, error)) (string, error) {
 	fd, err := unix.Open(filepath.Join(dataset, ".promotion.lock"), unix.O_CREAT|unix.O_RDWR|unix.O_NOFOLLOW|unix.O_CLOEXEC, 0o600)
 	if err != nil {
 		return "", fmt.Errorf("promote: open promotion lock: %w", err)
@@ -352,6 +356,9 @@ func withPointerLock(dataset string, action func() (string, error)) (string, err
 	}
 	// Unlock is best-effort: closing fd (deferred above) releases the lock anyway.
 	defer func() { _ = unix.Flock(fd, unix.LOCK_UN) }()
+	if err := reconcileManagedPublicationLocked(ctx, dataset); err != nil {
+		return "", fmt.Errorf("%w: %w", ErrPublicationUnresolved, err)
+	}
 	return action()
 }
 
@@ -424,6 +431,10 @@ func promoteLockedContext(ctx context.Context, dataset, version string, reviewed
 	if err := flushCandidateContext(ctx, vdir); err != nil {
 		return prev, fmt.Errorf("promote: candidate persistence: %w", err)
 	}
+	proof, err := beginManagedPublication(ctx, dataset, version, prev, targetIdentity)
+	if err != nil {
+		return prev, err
+	}
 	// Keep the existing rollback reference until this swap has become durable.
 	if prev != version {
 		if err := recordRollbackTargets(dataset, prev, true); err != nil {
@@ -459,6 +470,11 @@ func promoteLockedContext(ctx context.Context, dataset, version string, reviewed
 			return prev, fmt.Errorf("%w: %v", ErrDurabilityUncertain, err)
 		}
 	}
+	if proof != nil {
+		if _, err := finishManagedPublication(dataset, *proof, "committed"); err != nil {
+			return prev, fmt.Errorf("%w: %w", ErrDurabilityUncertain, err)
+		}
+	}
 	return prev, nil
 }
 
@@ -470,6 +486,15 @@ func Rollback(dataset, version string) error {
 
 // GateOptions parameterizes the pre-promote gate suite.
 type GateOptions struct {
+	// PublicationID binds a scoped job to the durable managed transition.
+	// Empty uses a fresh CLI history ID on managed roots; legacy roots stay unchanged.
+	PublicationID string
+	// Scoped callers recheck mutable request pins while the dataset lock is
+	// held. Nil preserves the existing CLI behavior.
+	BeforeCandidate func(context.Context) error
+	// Publish wraps the checked pointer swap while both mutation locks are
+	// held, so cancellation/base CAS and the publication result share a boundary.
+	Publish         func(context.Context, func() (string, error)) (string, error)
 	CaptureLimits   CaptureLimits
 	ExternalOrigins []CaptureOrigin
 	// HoldForReview keeps a fully gated immutable candidate off current until
@@ -653,6 +678,15 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		return err
 	}
 	defer lock.release()
+	ctx = context.WithValue(ctx, mutationLeaseKey{}, lock.file)
+	if subprocess, ok := r.(SubprocessRunner); ok && subprocess.GuardianBinary != "" {
+		ctx = context.WithValue(ctx, commandGuardianKey{}, subprocess.GuardianBinary)
+	}
+	if gopt.BeforeCandidate != nil {
+		if err := gopt.BeforeCandidate(ctx); err != nil {
+			return err
+		}
+	}
 
 	// Build into the version directory (o.Out/<version>/{graph,vector}).
 	vo := o
@@ -673,8 +707,9 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 	}
 	var captured CapturedSource
 	var buildCleanup func() error
+	var trackedBuild bool
 	defer func() {
-		if buildCleanup != nil {
+		if buildCleanup != nil && !trackedBuild {
 			_ = buildCleanup()
 		}
 	}()
@@ -696,24 +731,36 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		if err != nil {
 			return err
 		}
-		stageParent, err := os.MkdirTemp("", "cks-build-source-")
-		if err != nil {
-			return fmt.Errorf("reindex: prepare isolated build source: %w", err)
+
+		var stageParent string
+		var releaseStage func() error
+		if managedHash.MatchString(gopt.ExpectedDatasetID) && (captured.Identity.SourceMode == "snapshot-only" || captured.Identity.GitArchivePolicy != "") {
+			stageParent, releaseStage, err = newBuildStaging(ctx, vo.Out, captured.Identity, gopt.ExpectedDatasetID, gopt.PublicationID)
+			trackedBuild = true
+		} else {
+			stageParent, err = os.MkdirTemp("", "cks-build-source-")
+			releaseStage = func() error { return os.RemoveAll(stageParent) }
 		}
+		if err != nil {
+			return fmt.Errorf("reindex: prepare owned build source: %w", err)
+		}
+		ctx = context.WithValue(ctx, buildScratchKey{}, stageParent)
 		buildRoot := filepath.Join(stageParent, "tree")
 		buildCleanup, err = captured.MaterializeBuildTreeContext(ctx, buildRoot)
 		if err != nil {
-			_ = os.RemoveAll(stageParent)
+			if !trackedBuild {
+				_ = releaseStage()
+			}
 			return fmt.Errorf("reindex: materialize captured source: %w", err)
 		}
 		cleanupTree := buildCleanup
 		buildCleanup = func() error {
-			err := cleanupTree()
-			if cleanupErr := os.RemoveAll(stageParent); err == nil {
-				err = cleanupErr
+			if err := cleanupTree(); err != nil {
+				return err
 			}
-			return err
+			return releaseStage()
 		}
+
 		if err := captured.VerifyAgainstContext(ctx, buildRoot); err != nil {
 			return fmt.Errorf("reindex: staged source differs from capture: %w", err)
 		}
@@ -847,7 +894,13 @@ func Reindex(ctx context.Context, o Options, version string, gopt GateOptions, r
 		return nil
 	}
 
-	prev, err := withPointerLock(dataset, func() (string, error) {
+	if gopt.PublicationID != "" {
+		ctx = context.WithValue(ctx, managedPublicationKey{}, gopt.PublicationID)
+	}
+	prev, err := withPointerLockContext(ctx, dataset, func() (string, error) {
+		if gopt.Publish != nil {
+			return gopt.Publish(ctx, func() (string, error) { return promoteLockedContext(ctx, dataset, version, false) })
+		}
 		return promoteLockedContext(ctx, dataset, version, false)
 	})
 	if err != nil {

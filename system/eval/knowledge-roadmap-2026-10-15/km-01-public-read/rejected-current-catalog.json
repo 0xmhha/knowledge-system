@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "projects": [
+    {
+      "id": "project-a",
+      "name": "same-name"
+    },
+    {
+      "id": "project-b",
+      "name": "same-name",
+      "upstream_project_id": "project-a"
+    }
+  ],
+  "versions": [
+    {
+      "coordinates": {
+        "project_id": "project-a",
+        "snapshot_id": "7bbeb9a2fa0376a0fdd78be447931c166a307e6593fbbb9f7dc02d08b55fcee0",
+        "source_mode": "snapshot-only",
+        "dataset_id": "d49c323c21ad0ea16434204659e6541bb1e738d21dc0533d51cd5e8d2f2438c0",
+        "base_commit": ""
+      },
+      "version_dir": "/private/tmp/ks-collection-public-20261015-checked/project-a/dataset/current",
+      "origins": [
+        "repo"
+      ]
+    },
+    {
+      "coordinates": {
+        "project_id": "project-a",
+        "snapshot_id": "646841442f20527692c4c21f27cb3d6fa4abb61ebf57421d9aa909eb4791ef44",
+        "source_mode": "snapshot-only",
+        "dataset_id": "e84891dbd50adfb76f5ad1754bec507cc062d65afea07c2852509f680b70d225",
+        "base_commit": ""
+      },
+      "version_dir": "/private/tmp/ks-collection-public-20261015-checked/project-a/dataset/v2",
+      "origins": [
+        "repo"
+      ]
+    },
+    {
+      "coordinates": {
+        "project_id": "project-b",
+        "snapshot_id": "fd23f70cecb114c55f60d35bf84f4511229c4401b73245c40a91912a07d2a083",
+        "source_mode": "snapshot-only",
+        "dataset_id": "2eaa651c587e2539b8773735ae4260d644e04dc2a66acb72d388d31acf82ae6d",
+        "base_commit": ""
+      },
+      "version_dir": "/private/tmp/ks-collection-public-20261015-checked/project-b/dataset/v1",
+      "origins": [
+        "repo"
+      ]
+    }
+  ],
+  "collections": [
+    {
+      "id": "all",
+      "members": [
+        {
+          "project_id": "project-a",
+          "snapshot_id": "7bbeb9a2fa0376a0fdd78be447931c166a307e6593fbbb9f7dc02d08b55fcee0",
+          "source_mode": "snapshot-only",
+          "dataset_id": "d49c323c21ad0ea16434204659e6541bb1e738d21dc0533d51cd5e8d2f2438c0",
+          "base_commit": ""
+        },
+        {
+          "project_id": "project-a",
+          "snapshot_id": "646841442f20527692c4c21f27cb3d6fa4abb61ebf57421d9aa909eb4791ef44",
+          "source_mode": "snapshot-only",
+          "dataset_id": "e84891dbd50adfb76f5ad1754bec507cc062d65afea07c2852509f680b70d225",
+          "base_commit": ""
+        },
+        {
+          "project_id": "project-b",
+          "snapshot_id": "fd23f70cecb114c55f60d35bf84f4511229c4401b73245c40a91912a07d2a083",
+          "source_mode": "snapshot-only",
+          "dataset_id": "2eaa651c587e2539b8773735ae4260d644e04dc2a66acb72d388d31acf82ae6d",
+          "base_commit": ""
+        }
+      ]
+    }
+  ]
+}

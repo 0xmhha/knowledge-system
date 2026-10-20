@@ -1,0 +1,55 @@
+func (p *BlobPool) Reset(oldHead, newHead *types.Header) {
+	waitStart := time.Now()
+	p.lock.Lock()
+	resetwaitHist.Update(time.Since(waitStart).Nanoseconds())
+	defer p.lock.Unlock()
+
+	defer func(start time.Time) {
+		resettimeHist.Update(time.Since(start).Nanoseconds())
+	}(time.Now())
+
+	statedb, err := p.chain.StateAt(newHead.Root)
+	if err != nil {
+		log.Error("Failed to reset blobpool state", "err", err)
+		return
+	}
+	p.head = newHead
+	p.state = statedb
+
+	// Run the reorg between the old and new head and figure out which accounts
+	// need to be rechecked and which transactions need to be readded
+	if reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {
+		var adds []*types.Transaction
+		for addr, txs := range reinject {
+			// Blindly push all the lost transactions back into the pool
+			for _, tx := range txs {
+				if err := p.reinject(addr, tx.Hash()); err == nil {
+					adds = append(adds, tx.WithoutBlobTxSidecar())
+				}
+			}
+			// Recheck the account's pooled transactions to drop included and
+			// invalidated ones
+			p.recheck(addr, inclusions)
+		}
+		if len(adds) > 0 {
+			p.insertFeed.Send(core.NewTxsEvent{Txs: adds})
+		}
+	}
+	// Flush out any blobs from limbo that are older than the latest finality
+	if p.chain.Config().IsCancun(p.head.Number, p.head.Time) {
+		p.limbo.finalize(p.chain.CurrentFinalBlock())
+	}
+	// Reset the price heap for the new set of basefee/blobfee pairs
+	var (
+		basefee = uint256.MustFromBig(eip1559.CalcBaseFee(p.chain.Config(), newHead))
+		blobfee = uint256.MustFromBig(big.NewInt(params.BlobTxMinBlobGasprice))
+	)
+	if newHead.ExcessBlobGas != nil {
+		blobfee = uint256.MustFromBig(eip4844.CalcBlobFee(*newHead.ExcessBlobGas))
+	}
+	p.evict.reinit(basefee, blobfee, false)
+
+	basefeeGauge.Update(int64(basefee.Uint64()))
+	blobfeeGauge.Update(int64(blobfee.Uint64()))
+	p.updateStorageMetrics()
+}

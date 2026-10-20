@@ -1,0 +1,72 @@
+[
+  {
+    "pid": 63841,
+    "ppid": 63738,
+    "binary": "cks",
+    "identity": "63841 63738 Sat Oct 17 23:13:08 2026     /private/tmp/ks-stablenet-rebuild-20261017-01/bin/cks setup --config /private/tmp/ks-stablenet-rebuild-20261017-01/setup.yaml --version retained-origins-v2 --hold-for-review --progress json",
+    "identity_sha256": "38ec0d0b9145b7d9c16132483d281e994e2835323d63ef3cea6f73672438a1e6"
+  },
+  {
+    "pid": 74756,
+    "ppid": 63841,
+    "binary": "ckg",
+    "identity": "74756 63841 Sat Oct 17 23:17:07 2026     /private/tmp/ks-stablenet-rebuild-20261017-01/bin/ckg build --src /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/.build-source-d3f4f5bf9c2dfb02f371df0ca5082176/tree --out /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/graph --logical-src-root /private/tmp/ks-stablenet-rebuild-20261017-01/source --project-id p-3fa6368dd3f6757c6b6a86121f0a9b7d --snapshot-id 5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4 --dataset-id 7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6 --file-manifest-digest 74290cbabae891553494ff970e32728d5d55c7e8c3954fe760e2334e529ab2a5 --capture-policy-digest ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74 --source-mode committed --policy-file /private/tmp/ks-stablenet-rebuild-20261017-01/policies/graph.yaml",
+    "identity_sha256": "0ac74f123b0fe13c1aa15e10eb020a3af2ec26e9a9711022d7979cb3f7540f09"
+  },
+  {
+    "pid": 46341,
+    "ppid": 63841,
+    "binary": "ckv",
+    "identity": "46341 63841 Sat Oct 17 23:30:10 2026     /private/tmp/ks-stablenet-rebuild-20261017-01/bin/ckv build --src /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/.build-source-d3f4f5bf9c2dfb02f371df0ca5082176/tree --out /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/vector --ckg /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/graph --logical-src-root /private/tmp/ks-stablenet-rebuild-20261017-01/source --project-id p-3fa6368dd3f6757c6b6a86121f0a9b7d --snapshot-id 5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4 --dataset-id 7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6 --file-manifest-digest 74290cbabae891553494ff970e32728d5d55c7e8c3954fe760e2334e529ab2a5 --capture-policy-digest ca45be07583b218524a0095fe58bf2a261d1236d7506123bbe0f24cc48645d74 --source-mode committed --build-sources /private/tmp/ks-stablenet-rebuild-20261017-01/vector-build-sources.json --embedder=ollama --model-name=bge-m3:latest --embed-dim=1024 --query-prefix-policy=registry --policy /private/tmp/ks-stablenet-rebuild-20261017-01/policies/vector.yaml --docs /private/tmp/ks-stablenet-rebuild-20261017-01/corpora/domain --flow-corpus /private/tmp/ks-stablenet-rebuild-20261017-01/corpora/flow/corpus.jsonl",
+    "identity_sha256": "f4eb6eb9c96d55ec4daa2d537162e41ad6c694a46fd2b4047b7f53f46be30648"
+  },
+  {
+    "pid": 35199,
+    "ppid": 63841,
+    "binary": "git",
+    "identity": "35199 63841 Sat Oct 17 23:57:19 2026     git -C /private/tmp/ks-stablenet-rebuild-20261017-01/source fsck --no-reflogs --unreachable",
+    "identity_sha256": "69a0993b2c65266d75fc934fe519870fd4927a1ac6594f16ef27d4b5540ea91e"
+  },
+  {
+    "pid": 35576,
+    "ppid": 63841,
+    "binary": "git",
+    "identity": "35576 63841 Sat Oct 17 23:57:29 2026     git -C /private/tmp/ks-stablenet-rebuild-20261017-01/source fsck --no-reflogs --unreachable",
+    "identity_sha256": "7dedae8cee97f8e69253425ee4e011196ea3f4c3db73d52c573d5517eb722e63"
+  },
+  {
+    "pid": 35576,
+    "ppid": 63841,
+    "binary": "git",
+    "identity": "35576 63841 Sat Oct 17 23:57:29 2026     (git)",
+    "identity_sha256": "031aeca41dda454c85543aff67c53f3db5eafe1fbf577785381ae11a3f765f4e"
+  },
+  {
+    "pid": 35921,
+    "ppid": 63841,
+    "binary": "ckg",
+    "identity": "35921 63841 Sat Oct 17 23:57:37 2026     /private/tmp/ks-stablenet-rebuild-20261017-01/bin/ckg validate --graph /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/graph",
+    "identity_sha256": "f4627e5a8cbea63f40d9dd1213dfd8d4336642cfa2254159277c35df6480957a"
+  },
+  {
+    "pid": 36221,
+    "ppid": 63841,
+    "binary": "ckg",
+    "identity": "36221 63841 Sat Oct 17 23:57:44 2026     /private/tmp/ks-stablenet-rebuild-20261017-01/bin/ckg audit --src /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/.build-source-d3f4f5bf9c2dfb02f371df0ca5082176/tree --graph /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/graph",
+    "identity_sha256": "87c73e493469f65be8bb1996f9437976f5e962fc815d1c23b683472d3ea2aef9"
+  },
+  {
+    "pid": 36316,
+    "ppid": 63841,
+    "binary": "git",
+    "identity": "36316 63841 Sat Oct 17 23:57:47 2026     git -C /private/tmp/ks-stablenet-rebuild-20261017-01/source fsck --no-reflogs --unreachable",
+    "identity_sha256": "b1efc07ab147247e83d30bb2be32ca323434771909c5d29fd903b945602a066b"
+  },
+  {
+    "pid": 36732,
+    "ppid": 63841,
+    "binary": "git",
+    "identity": "36732 63841 Sat Oct 17 23:57:56 2026     git -C /private/tmp/ks-stablenet-rebuild-20261017-01/source fsck --no-reflogs --unreachable",
+    "identity_sha256": "15c707ffe2eb1f1df993218d9320e95d7074fd66e6cb168cd396fdd349c5b574"
+  }
+]

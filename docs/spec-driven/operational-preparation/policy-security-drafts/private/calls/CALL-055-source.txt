@@ -1,0 +1,46 @@
+func parseComplete(rawurl string) (*Node, error) {
+	var (
+		id               *ecdsa.PublicKey
+		tcpPort, udpPort uint64
+	)
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		return nil, err
+	}
+	if u.Scheme != "enode" {
+		return nil, errors.New("invalid URL scheme, want \"enode\"")
+	}
+	// Parse the Node ID from the user portion.
+	if u.User == nil {
+		return nil, errors.New("does not contain node ID")
+	}
+	if id, err = parsePubkey(u.User.String()); err != nil {
+		return nil, fmt.Errorf("invalid public key (%v)", err)
+	}
+	// Parse the IP address.
+	ip := net.ParseIP(u.Hostname())
+	if ip == nil {
+		ips, err := lookupIPFunc(u.Hostname())
+		if err != nil {
+			return nil, err
+		}
+		ip = ips[0]
+	}
+	// Ensure the IP is 4 bytes long for IPv4 addresses.
+	if ipv4 := ip.To4(); ipv4 != nil {
+		ip = ipv4
+	}
+	// Parse the port numbers.
+	if tcpPort, err = strconv.ParseUint(u.Port(), 10, 16); err != nil {
+		return nil, errors.New("invalid port")
+	}
+	udpPort = tcpPort
+	qv := u.Query()
+	if qv.Get("discport") != "" {
+		udpPort, err = strconv.ParseUint(qv.Get("discport"), 10, 16)
+		if err != nil {
+			return nil, errors.New("invalid discport in query")
+		}
+	}
+	return NewV4(id, ip, int(tcpPort), int(udpPort)), nil
+}

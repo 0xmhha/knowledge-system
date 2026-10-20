@@ -1,0 +1,1326 @@
+{
+  "schema_version": 1,
+  "status": "ai_drafts_awaiting_independent_review",
+  "ckg_output_used": false,
+  "independent_gold_records": 0,
+  "approved_cases": 0,
+  "runtime_executions": 0,
+  "review_drafts": [
+    {
+      "case_id": "REVIEW-DRAFT-SRC-001",
+      "candidate_id": "SRC-001",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "consensus/wbft/backend/api.go",
+        "name": "Status",
+        "receiver": "*API",
+        "start_line": 169,
+        "end_line": 220,
+        "start_byte": 6085,
+        "end_byte_exclusive": 7648,
+        "git_blob": "da0f18ae519743f0924266f80fbcb195b4462e66",
+        "file_sha256": "a1bc409a7e68126f611ee6c339d3814b90f7711e25740a2f1119f9af2f6c2a49",
+        "function_sha256": "376fd0b342ecbce4a5e1b5b0d1c969940bc3bfd92913a32eeae619fe5a1bc393",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-001-source.txt",
+        "excerpt_sha256": "376fd0b342ecbce4a5e1b5b0d1c969940bc3bfd92913a32eeae619fe5a1bc393"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-001-R1",
+          "start_line": 171,
+          "end_line": 174,
+          "start_byte": 6215,
+          "end_byte_exclusive": 6349,
+          "span_sha256": "c42463dd3aacbb6546ff7c9fc1810e8e63f0935b4ce685e88094ed150634ca41",
+          "expected_source_fact_draft": "range 계산 오류를 먼저 반환한다; 이 지점에서 validator 조회는 아직 수행하지 않았다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-001-R2",
+          "start_line": 177,
+          "end_line": 180,
+          "start_byte": 6369,
+          "end_byte_exclusive": 6456,
+          "span_sha256": "0a4ee4ef031bcc16e3d1d9e3780ccfd1d579e337d8a7ec6c1f8edefdf288ecb0",
+          "expected_source_fact_draft": "validator 조회 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-001-R3",
+          "start_line": 183,
+          "end_line": 190,
+          "start_byte": 6481,
+          "end_byte_exclusive": 6911,
+          "span_sha256": "f1658f9a456524d3afdf68985a573e55b86e43c5a82c632c6ed86e61a66bbc8c",
+          "expected_source_fact_draft": "counter들을 초기화하고 start..end 블록을 analyzeBlock으로 순회하여 roundDistribution을 갱신한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-001-R4",
+          "start_line": 193,
+          "end_line": 200,
+          "start_byte": 6988,
+          "end_byte_exclusive": 7163,
+          "span_sha256": "b32860668be303b7b672db5e1e890458386c44380667e6bee13494d9b41cf79d",
+          "expected_source_fact_draft": "round count가0이면 삭제하고 아니면 round*count를 totalRounds에 누적한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-001-R5",
+          "start_line": 201,
+          "end_line": 219,
+          "start_byte": 7163,
+          "end_byte_exclusive": 7647,
+          "span_sha256": "975d8177389f9d159b952a0e2717ad536d9d0520295cfbc151d8f2945f184c2c",
+          "expected_source_fact_draft": "결과에 block 범위·counter·round 통계를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "analyzeBlock의 map 갱신 효과·범위 제한·잠금은 이 함수 본문만으로 확정하지 않는다.",
+        "블록 수에 비례하는 조회 비용과 실제 실행시간은 미측정이다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-002",
+      "candidate_id": "SRC-002",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "consensus/wbft/backend/backend.go",
+        "name": "Gossip",
+        "receiver": "*Backend",
+        "start_line": 176,
+        "end_line": 210,
+        "start_byte": 5451,
+        "end_byte_exclusive": 6351,
+        "git_blob": "a6de34bac3a897f03166c0399ee82fc84194ea89",
+        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+        "function_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-002-source.txt",
+        "excerpt_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-002-R1",
+          "start_line": 177,
+          "end_line": 185,
+          "start_byte": 5540,
+          "end_byte_exclusive": 5762,
+          "span_sha256": "2beddbe9170927e0baceb330139016a045f8ab3af27ac5740fd04d2fb22004bd",
+          "expected_source_fact_draft": "payload hash를 knownMessages에 넣고 자기 주소를 제외한 validator 주소로 targets를 만든다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-002-R2",
+          "start_line": 186,
+          "end_line": 188,
+          "start_byte": 5762,
+          "end_byte_exclusive": 5880,
+          "span_sha256": "227505ead29e86a939e281c71a2d617466e30c11e42f1dfd6083c59ab9656f46",
+          "expected_source_fact_draft": "broadcaster가nil이 아니고 targets가 비어 있지 않을 때 peer들을 순회한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-002-R3",
+          "start_line": 189,
+          "end_line": 200,
+          "start_byte": 5880,
+          "end_byte_exclusive": 6158,
+          "span_sha256": "0ac6de1f3978b9cd5f2499855ba61f6ee8f5f79f24d9c420868ab2887de79458",
+          "expected_source_fact_draft": "peer가 hash를 이미 알면 건너뛰고, 신규 peer cache와 hash를 갱신한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-002-R4",
+          "start_line": 202,
+          "end_line": 206,
+          "start_byte": 6159,
+          "end_byte_exclusive": 6331,
+          "span_sha256": "f181c6f01a98d81e1a9421b7815c186ad7203893a80c1f8e41f9f9dbd249df87",
+          "expected_source_fact_draft": "기본 outboundCode는 istanbulMsg이고 등록된 message code이면 입력 code를 사용한다; 전송은 goroutine으로 시작한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-002-R5",
+          "start_line": 209,
+          "end_line": 209,
+          "start_byte": 6338,
+          "end_byte_exclusive": 6350,
+          "span_sha256": "ada1d7914809e3499d4573e8bfe5826ae082ea2e2a14db7cc14172577c6a735a",
+          "expected_source_fact_draft": "전송 goroutine의 성공/실패를 기다리지 않고 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "고루틴의 전송 완료·에러·payload 소유권과 cache 동시성 안전성은 별도 확인해야 한다.",
+        "nil 반환을 peer 수신 성공으로 판정하지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-006",
+      "candidate_id": "SRC-006",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/rawdb/accessors_chain.go",
+        "name": "ReadHeaderRange",
+        "receiver": "",
+        "start_line": 295,
+        "end_line": 340,
+        "start_byte": 9837,
+        "end_byte_exclusive": 11245,
+        "git_blob": "02f42753a3b76ad171163cd3a8f02b3989bfc364",
+        "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+        "function_sha256": "6ae623bfd7378b8fd99620849340544bd850af6645c65e83f870b9846d585c57",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-006-source.txt",
+        "excerpt_sha256": "6ae623bfd7378b8fd99620849340544bd850af6645c65e83f870b9846d585c57"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-006-R1",
+          "start_line": 297,
+          "end_line": 304,
+          "start_byte": 9952,
+          "end_byte_exclusive": 10092,
+          "span_sha256": "da8643f1bcfb2e7e9c8ab0ced06591bb63066c27e53a9765ed8783ba48970ff2",
+          "expected_source_fact_draft": "count==0이면 즉시 반환하며 count-1>number일 때 count를 number+1로 조정한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-006-R2",
+          "start_line": 305,
+          "end_line": 319,
+          "start_byte": 10092,
+          "end_byte_exclusive": 10581,
+          "span_sha256": "32ec9d24dfee0fd3ff7b27ecf4c58c4b64c15d84c3b6f9595d4a85fcbf53cb1c",
+          "expected_source_fact_draft": "Ancients 경계와 canonical hash를 이용해 live header를 역순 조회한다; 데이터가 없으면 loop를 중단한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-006-R3",
+          "start_line": 321,
+          "end_line": 330,
+          "start_byte": 10584,
+          "end_byte_exclusive": 10932,
+          "span_sha256": "e4b75069b761c4c96eaf209e66d5facdae75f792d0d89c4961cb6562ef8d1ca8",
+          "expected_source_fact_draft": "남은 count가0이면 반환; 아니면 maxBytes=count*8000으로 AncientRange를 호출하며 오류 시 이미 모은 결과를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-006-R4",
+          "start_line": 331,
+          "end_line": 338,
+          "start_byte": 10932,
+          "end_byte_exclusive": 11225,
+          "span_sha256": "6c1bfcd9e23489eb7aa3339ad30982ca4608a3001afcc632d80203863ca6afbb",
+          "expected_source_fact_draft": "ancient 결과 개수가 count와 다르면 부분 결과를 반환하며 일치하면 결과 순서를 역전하여 append한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-006-R5",
+          "start_line": 324,
+          "end_line": 326,
+          "start_byte": 10624,
+          "end_byte_exclusive": 10829,
+          "span_sha256": "fb7bb6f0afd34f30dbb19231ddcef3fb877c30aa7bc165aeb2f3e4a5eab9a087",
+          "expected_source_fact_draft": "주석에는 cap at 2M이 있지만 이 위치의 계산식에는 명시적인 2M 상수 clamp가 없다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "상위 호출의 요청 제한과 uint64 산술 입력 범위·overflow 가능성은 따로 확인해야 한다.",
+        "부분 반환을 완전한 요청 충족 또는 DB 안전성 입증으로 해석하지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-007",
+      "candidate_id": "SRC-007",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/rawdb/accessors_chain.go",
+        "name": "ReadAllBadBlocks",
+        "receiver": "",
+        "start_line": 875,
+        "end_line": 889,
+        "start_byte": 29411,
+        "end_byte_exclusive": 29866,
+        "git_blob": "02f42753a3b76ad171163cd3a8f02b3989bfc364",
+        "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+        "function_sha256": "811283ee84cfd8c858ed6c0e4b457b75010b4e2e630b7c008c72537b68cf7be4",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-007-source.txt",
+        "excerpt_sha256": "811283ee84cfd8c858ed6c0e4b457b75010b4e2e630b7c008c72537b68cf7be4"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-007-R1",
+          "start_line": 876,
+          "end_line": 879,
+          "start_byte": 29467,
+          "end_byte_exclusive": 29534,
+          "span_sha256": "1e6cb9141768cf4bb63ebdffe693bc29a7d7b711cc0c757b10116e53b6305bc0",
+          "expected_source_fact_draft": "DB Get 오류가 있으면 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-007-R2",
+          "start_line": 880,
+          "end_line": 883,
+          "start_byte": 29534,
+          "end_byte_exclusive": 29636,
+          "span_sha256": "72a7e73d15885fb9d4a90202e08797a00d4816c433ef4ce7f10f8fb8d0d14609",
+          "expected_source_fact_draft": "RLP decode 오류가 있으면 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-007-R3",
+          "start_line": 884,
+          "end_line": 888,
+          "start_byte": 29636,
+          "end_byte_exclusive": 29865,
+          "span_sha256": "33f1303ff0cc9a0047c0ab86067739a132d5dacb4af469d1cf1c98461c940b43",
+          "expected_source_fact_draft": "디코딩된 badBlock 각각의 header/body/withdrawals를 이용해 Block을 구성하고 slice를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "Get/decode 오류와 비어 있는 목록이 반환값만으로 구분되는지 호출자 요구를 검토한다.",
+        "decode의 pointer write·range binding은 scalar reaching-definition의 확정 근거로 쓰지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-011",
+      "candidate_id": "SRC-011",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/state/dump.go",
+        "name": "DumpToCollector",
+        "receiver": "*StateDB",
+        "start_line": 118,
+        "end_line": 213,
+        "start_byte": 4028,
+        "end_byte_exclusive": 6584,
+        "git_blob": "91806cad47669e50045dbf175c1f0be2faca1d34",
+        "file_sha256": "db8982dfac16229485d5b6d3c886c5bb907fc0953160e2cadd70d81e69294c61",
+        "function_sha256": "36541cfe1c0275972d316095770ab13ea487ae205dc76e3b71a24b5d327a8796",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-011-source.txt",
+        "excerpt_sha256": "36541cfe1c0275972d316095770ab13ea487ae205dc76e3b71a24b5d327a8796"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-011-R1",
+          "start_line": 120,
+          "end_line": 135,
+          "start_byte": 4160,
+          "end_byte_exclusive": 4536,
+          "span_sha256": "754d192cbee7cc276a39c185bba0d58b50eefb53b9b29bc1b1585ca671c424ec",
+          "expected_source_fact_draft": "nil config를 기본 config로 바꾸고 OnRoot를 호출한 뒤 iterator 생성 오류이면 로그 후 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-011-R2",
+          "start_line": 138,
+          "end_line": 142,
+          "start_byte": 4571,
+          "end_byte_exclusive": 4695,
+          "span_sha256": "02a602cf1bf668460f7d611f73ab552950c2ac1ba8753a18d7be810cc9dd999a",
+          "expected_source_fact_draft": "account RLP decode 오류는 panic으로 처리한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-011-R3",
+          "start_line": 154,
+          "end_line": 180,
+          "start_byte": 4977,
+          "end_byte_exclusive": 5637,
+          "span_sha256": "1dff94914f1f9acc0f82487ae3183cabdd96b12e4e96bddb1bfa84a2a27dce8a",
+          "expected_source_fact_draft": "주소 preimage 부족과 OnlyWithAddresses 조건에 따른 skip 및 SkipCode/SkipStorage 조건을 처리한다; storage trie 오류는 해당 account 처리를 건너뛴다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-011-R4",
+          "start_line": 183,
+          "end_line": 203,
+          "start_byte": 5683,
+          "end_byte_exclusive": 6333,
+          "span_sha256": "e183d0cd6994748118ee08cc0560d2ff1f19152b584fd24e3f53487f65dbb185",
+          "expected_source_fact_draft": "storage decode 오류는 storage loop에서 continue; OnAccount 후 count를 올리고 Max에 도달하면 다음 iterator key를 얻어 중단한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-011-R5",
+          "start_line": 206,
+          "end_line": 212,
+          "start_byte": 6340,
+          "end_byte_exclusive": 6583,
+          "span_sha256": "209e0e037a41468133c7be7b5c45884fe59ec04ac5c3806eeb1b4db7d6a999c5",
+          "expected_source_fact_draft": "missingPreimages 경고와 종료 로그를 남기고 nextKey를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "collector/trie의 외부 상태·callback 동시성·실제 메모리 비용과 panic의 호출자 계약은 미확인이다.",
+        "이 함수가 dump의 완전성을 보장한다고 단정하지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-016",
+      "candidate_id": "SRC-016",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/txpool/blobpool/blobpool.go",
+        "name": "Init",
+        "receiver": "*BlobPool",
+        "start_line": 347,
+        "end_line": 436,
+        "start_byte": 18031,
+        "end_byte_exclusive": 20665,
+        "git_blob": "c1be572ea0aa4aeca20de3f98d38a638dfff89b5",
+        "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+        "function_sha256": "6aca37f8485bf0f57d0fa4eb63f4b5dbe7bf019491014ec36cb70397987fc98b",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-016-source.txt",
+        "excerpt_sha256": "6aca37f8485bf0f57d0fa4eb63f4b5dbe7bf019491014ec36cb70397987fc98b"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-016-R1",
+          "start_line": 348,
+          "end_line": 363,
+          "start_byte": 18124,
+          "end_byte_exclusive": 18510,
+          "span_sha256": "020744f525867371ba6f548c5a8c2ad89fc28abdacd4b2913e47ec7c18957ab1",
+          "expected_source_fact_draft": "reserver를 저장하고 Datadir가 있으면 queue/limbo directory를 만든다; 생성 오류는 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-016-R2",
+          "start_line": 367,
+          "end_line": 374,
+          "start_byte": 18670,
+          "end_byte_exclusive": 18848,
+          "span_sha256": "85606561c3277187b4612037af2546b29495665495c5d35d6e89d3d8d220d3b0",
+          "expected_source_fact_draft": "head state 조회 실패 시 empty-root state로 재시도하고 둘 다 실패하면 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-016-R3",
+          "start_line": 378,
+          "end_line": 398,
+          "start_byte": 18938,
+          "end_byte_exclusive": 19465,
+          "span_sha256": "e3b72f3194b12bd9d3685f3c2d48e34d3bb02b553899db249cd99a8e619d093c",
+          "expected_source_fact_draft": "index callback으로 parse 실패 ID를 모으고 store를 연다; invalid 항목 삭제가 실패하면 Close 후 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-016-R4",
+          "start_line": 402,
+          "end_line": 425,
+          "start_byte": 19593,
+          "end_byte_exclusive": 20366,
+          "span_sha256": "4c093e4b8bf991e42b6ea6e4aa0e88a15ebba5d841b424941efc53c62eeee1b5",
+          "expected_source_fact_draft": "index recheck·fee/heap 생성·limbo 연결·gasTip 설정을 수행한다; newLimbo 실패 시 Close 후 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-016-R5",
+          "start_line": 429,
+          "end_line": 435,
+          "start_byte": 20476,
+          "end_byte_exclusive": 20664,
+          "span_sha256": "301154c36d51265ed19a03bb0eb240fee9c633ca12dd48e3e6bbe6f113940685",
+          "expected_source_fact_draft": "stored가 Datacap을 초과하는 동안 drop하고 metrics를 갱신한 뒤 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "Close/drop/parseTransaction의 실제 자원 해제·진행 보장·잠금은 별도 source와 실행으로 확인해야 한다.",
+        "callback 내부 mutation은 outer 함수의 scalar def-use gold로 자동 확정하지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-021",
+      "candidate_id": "SRC-021",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "eth/downloader/api.go",
+        "name": "eventLoop",
+        "receiver": "*DownloaderAPI",
+        "start_line": 67,
+        "end_line": 130,
+        "start_byte": 2605,
+        "end_byte_exclusive": 3994,
+        "git_blob": "6b8cb98e23bde46c9b8d7c3ec4b10d0d444425c0",
+        "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+        "function_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-021-source.txt",
+        "excerpt_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-021-R1",
+          "start_line": 69,
+          "end_line": 87,
+          "start_byte": 2652,
+          "end_byte_exclusive": 3193,
+          "span_sha256": "f2c37d61055b6f635b2eea55b1df1613b2a57904d683f36e5822fa9149bdfd03",
+          "expected_source_fact_draft": "StartEvent subscription·subscription map·60초 timer를 만들고 timer.Stop을 defer한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-021-R2",
+          "start_line": 91,
+          "end_line": 101,
+          "start_byte": 3212,
+          "end_byte_exclusive": 3490,
+          "span_sha256": "ad717323a5c77c494ffc0032033bafe24521857216400b5717d234cc54edb274",
+          "expected_source_fact_draft": "subscription 등록/해제 요청을 처리하며 event channel에서 nil이 오면 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-021-R3",
+          "start_line": 104,
+          "end_line": 111,
+          "start_byte": 3525,
+          "end_byte_exclusive": 3663,
+          "span_sha256": "63306c9e370b8c1137aac71089172805a23bf6a990cd356f8cc1cf4d070b7723",
+          "expected_source_fact_draft": "StartEvent를 받으면 started=true; 아직 시작하지 않은 timer tick에는 timer를 reset하고 continue한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-021-R4",
+          "start_line": 112,
+          "end_line": 127,
+          "start_byte": 3663,
+          "end_byte_exclusive": 3986,
+          "span_sha256": "5bf8bd57302229f942cef0b40324bee1cec2756a230dd29acd5947350079a430",
+          "expected_source_fact_draft": "진행 중에는 status notification을 보내고 timer를 reset; 완료면 subscriber에 false를 보내고 done=true로 둔다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-021-R5",
+          "start_line": 118,
+          "end_line": 125,
+          "start_byte": 3791,
+          "end_byte_exclusive": 3966,
+          "span_sha256": "121dba225ea9ab15a6505af61dc255fab4a682c6f60668184a6bb92ea449e397",
+          "expected_source_fact_draft": "notification 채널 전송에는 이 위치에서 별도 timeout/exit select가 없다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "채널 buffer와 소비자·subscription 종료 계약 없이는 deadlock/누수를 확정하지 않는다.",
+        "eventLoop의 exit는 timer.Stop을 수행하나 이 본문에는 sub.Unsubscribe 호출이 보이지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-027",
+      "candidate_id": "SRC-027",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "miner/worker.go",
+        "name": "newWorkLoopOrigin",
+        "receiver": "*worker",
+        "start_line": 510,
+        "end_line": 605,
+        "start_byte": 16657,
+        "end_byte_exclusive": 19528,
+        "git_blob": "ee8d1fbbc97d366d94cf6640bef7b6a7be9ed23a",
+        "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+        "function_sha256": "bb7614131293e36941fe3d46d740be075c914a3745fa311f45ed081f6f2ce25d",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-027-source.txt",
+        "excerpt_sha256": "bb7614131293e36941fe3d46d740be075c914a3745fa311f45ed081f6f2ce25d"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-027-R1",
+          "start_line": 511,
+          "end_line": 520,
+          "start_byte": 16718,
+          "end_byte_exclusive": 17000,
+          "span_sha256": "66ef2589c58edf38fdd55478c2312d630fa4553f091fda9cfbdda99afa9e01ee",
+          "expected_source_fact_draft": "WaitGroup Done과 timer.Stop을 defer하고 초기 timer tick을 비운다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-027-R2",
+          "start_line": 523,
+          "end_line": 545,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17637,
+          "span_sha256": "f18e03747b012a12dd8c9df8b8c8c3af4d4a6c20de9860db71f2464e39bd31b2",
+          "expected_source_fact_draft": "commit closure는 기존 interrupt를 갱신하고 새 request를 전송하거나 exitCh에 반응한다; clearPending closure는 pendingMu 아래 오래된 항목을 삭제한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-027-R3",
+          "start_line": 549,
+          "end_line": 568,
+          "start_byte": 17656,
+          "end_byte_exclusive": 18367,
+          "span_sha256": "09e0ca429a1150ffffeef98d304a339e21c30bf9c4f17c146fe53d657dfddff9",
+          "expected_source_fact_draft": "start/head event는 pending 정리·timestamp 갱신·commit을 요청하고 timer event는 실행/합의 조건 및 새 tx 여부를 확인한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-027-R4",
+          "start_line": 571,
+          "end_line": 599,
+          "start_byte": 18373,
+          "end_byte_exclusive": 19490,
+          "span_sha256": "164909af3c523e5c4002b1201ac4bee8e49ea4e57e668626d3028238b8539a55",
+          "expected_source_fact_draft": "수동 interval을 최소값으로 보정하며 feedback 분기에서 recalcRecommit을 적용하고 hook이 있으면 호출한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-027-R5",
+          "start_line": 601,
+          "end_line": 602,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19520,
+          "span_sha256": "dc812fe8153abfa950b5856ed4cefcf28fd3d5438dc2f89bea820f7a289f0f23",
+          "expected_source_fact_draft": "outer select의 exitCh에서 return한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "closure 내부·atomic/lock·channel happens-before는 지역 scalar 분석의 지원 범위와 구분한다.",
+        "실제 timeout·cancel·timer reset race와 비용은 미측정이며 mutex 사용만으로 전체 동시성 안전성을 입증하지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-031",
+      "candidate_id": "SRC-031",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "p2p/discover/v4_udp.go",
+        "name": "Resolve",
+        "receiver": "*UDPv4",
+        "start_line": 175,
+        "end_line": 201,
+        "start_byte": 5395,
+        "end_byte_exclusive": 6144,
+        "git_blob": "988f16b01df2c11af84d52f3c77784c37c65131a",
+        "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+        "function_sha256": "de50b31d7810ea501c009fb4833c3bafc8724dd8aa27a69c7d201f070714efea",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-031-source.txt",
+        "excerpt_sha256": "de50b31d7810ea501c009fb4833c3bafc8724dd8aa27a69c7d201f070714efea"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-031-R1",
+          "start_line": 177,
+          "end_line": 185,
+          "start_byte": 5541,
+          "end_byte_exclusive": 5825,
+          "span_sha256": "f7bf231ba75cca35acddc3fb02bb9ecc135ccff7711b3422071e5b711b802e44",
+          "expected_source_fact_draft": "직접 RequestENR 성공 시 반환; 실패하면 더 높은 sequence의 table node로 n을 바꾸고 다시 요청한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-031-R2",
+          "start_line": 188,
+          "end_line": 192,
+          "start_byte": 5868,
+          "end_byte_exclusive": 6005,
+          "span_sha256": "0c4082812d1ca5bd72afa997abd9cba0f66a95bef8697712ea1c1f922eb6684c",
+          "expected_source_fact_draft": "secp256k1 key를 load할 수 없으면 현재 n을 반환하고 가능하면 pubkey lookup을 수행한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-031-R3",
+          "start_line": 193,
+          "end_line": 200,
+          "start_byte": 6005,
+          "end_byte_exclusive": 6143,
+          "span_sha256": "3349bfaacc5190f1119f55fe1ef46b0b256716da46ef32433fb6fa5af8fdd6ed",
+          "expected_source_fact_draft": "lookup 결과의 ID가 현재 n과 같은 항목을 요청하여 성공하면 반환하며, 모두 실패하면 현재 n을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "lookup/request의 deadline·반환 identity 검증·외부 node의 mutation은 별도 확인 대상이다.",
+        "함수 반환을 네트워크상의 최신 node 확보 성공으로 항상 해석하지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    },
+    {
+      "case_id": "REVIEW-DRAFT-SRC-036",
+      "candidate_id": "SRC-036",
+      "origin": "ai_manual_source_reading",
+      "author": "Codex (AI draft)",
+      "independence_verified": false,
+      "approved": false,
+      "scope": "source-grounded review rubric anchors; no verified defect claim",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "rpc/client.go",
+        "name": "DialOptions",
+        "receiver": "",
+        "start_line": 193,
+        "end_line": 223,
+        "start_byte": 6694,
+        "end_byte_exclusive": 7442,
+        "git_blob": "2b0016db8f4ec2e9d33cf937efe2dde42a3ffa6a",
+        "file_sha256": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+        "function_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-036-source.txt",
+        "excerpt_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53"
+      },
+      "required_rubric_anchors_draft": [
+        {
+          "id": "SRC-036-R1",
+          "start_line": 194,
+          "end_line": 202,
+          "start_byte": 6791,
+          "end_byte_exclusive": 6942,
+          "span_sha256": "d7f47841174b5f1900a903aa57cbf75b3d92d2e8ae84f8b2064f822b17982bbc",
+          "expected_source_fact_draft": "URL parse 오류를 반환하고 options를 cfg에 적용한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-036-R2",
+          "start_line": 205,
+          "end_line": 219,
+          "start_byte": 6972,
+          "end_byte_exclusive": 7398,
+          "span_sha256": "76c683549dd4e395aead71d85979956e125991b8aa80ef68253b470694a92c29",
+          "expected_source_fact_draft": "http/https·ws/wss·stdio·빈 scheme에 대해 각각 transport constructor를 선택하고 알 수 없는 scheme이면 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-036-R3",
+          "start_line": 209,
+          "end_line": 213,
+          "start_byte": 7083,
+          "end_byte_exclusive": 7188,
+          "span_sha256": "b8fbcfab791a95291b36b99b52c61810a24051e173dd925103310691029a66ea",
+          "expected_source_fact_draft": "WS constructor 오류는 반환하고 성공한 rc를 reconnect에 넣는다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-036-R4",
+          "start_line": 222,
+          "end_line": 222,
+          "start_byte": 7402,
+          "end_byte_exclusive": 7441,
+          "span_sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9",
+          "expected_source_fact_draft": "ctx·cfg·선택한 reconnect를 newClient에 전달한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "unknowns_and_scope_limits": [
+        "constructor/newClient의 재연결·TLS·context 취소·resource 소유권은 callee 원문 및 실행이 필요하다.",
+        "scheme 선택을 실제 연결 성공 또는 transport 안전성 판정으로 쓰지 않는다."
+      ],
+      "all_defects_or_dependencies_enumerated": false,
+      "criticality_and_priority": "needs_human_requirements_review",
+      "review_receipt": null
+    }
+  ],
+  "value_control_anchor_drafts": [
+    {
+      "candidate_id": "SRC-007",
+      "origin": "ai_manual_source_reading",
+      "scope": "non_exhaustive_statement_line_anchors_not_occurrence_gold",
+      "approved": false,
+      "review_receipt": null,
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/rawdb/accessors_chain.go",
+        "name": "ReadAllBadBlocks",
+        "receiver": "",
+        "start_line": 875,
+        "end_line": 889,
+        "start_byte": 29411,
+        "end_byte_exclusive": 29866,
+        "git_blob": "02f42753a3b76ad171163cd3a8f02b3989bfc364",
+        "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+        "function_sha256": "811283ee84cfd8c858ed6c0e4b457b75010b4e2e630b7c008c72537b68cf7be4",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-007-source.txt",
+        "excerpt_sha256": "811283ee84cfd8c858ed6c0e4b457b75010b4e2e630b7c008c72537b68cf7be4"
+      },
+      "data_anchors": [
+        {
+          "variable": "blob",
+          "definition": {
+            "line": 876,
+            "start_byte": 29467,
+            "end_byte_exclusive": 29501,
+            "sha256": "4218ac1ca7b90ba51e812e94de405b26458fe7ef3e16b86cf366c80d66c928f6"
+          },
+          "use": {
+            "line": 881,
+            "start_byte": 29561,
+            "end_byte_exclusive": 29620,
+            "sha256": "09b8b390062c7c0e469d90c4c0d22dc50d21577843d3313d8bf3d657c16be2d7"
+          },
+          "meaning_draft": "local definition from db.Get to argument of rlp.DecodeBytes; external return value is opaque",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "err",
+          "definition": {
+            "line": 876,
+            "start_byte": 29467,
+            "end_byte_exclusive": 29501,
+            "sha256": "4218ac1ca7b90ba51e812e94de405b26458fe7ef3e16b86cf366c80d66c928f6"
+          },
+          "use": {
+            "line": 877,
+            "start_byte": 29501,
+            "end_byte_exclusive": 29518,
+            "sha256": "fe1b49dc72f63263dc4f81dd21df3edbfe65e965e7af28c4388af27458ee60cf"
+          },
+          "meaning_draft": "local definition from db.Get to first error predicate",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "blocks",
+          "definition": {
+            "line": 884,
+            "start_byte": 29636,
+            "end_byte_exclusive": 29663,
+            "sha256": "16699862b46938c7a8d5f7780b7252b22ad438d8ab4d802a68d9079633f3afca"
+          },
+          "use": {
+            "line": 888,
+            "start_byte": 29850,
+            "end_byte_exclusive": 29865,
+            "sha256": "f3affb1922a252b8c2387db8e072820c4c5f1f4bc580450bf99f1daa9b08c077"
+          },
+          "meaning_draft": "zero initialized slice may reach final return when range runs zero iterations",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "blocks",
+          "definition": {
+            "line": 886,
+            "start_byte": 29696,
+            "end_byte_exclusive": 29847,
+            "sha256": "1e8ca909134b7c0100bac0dfe38a515e7e0cd68270d5cc2eb465f72c365ad190"
+          },
+          "use": {
+            "line": 888,
+            "start_byte": 29850,
+            "end_byte_exclusive": 29865,
+            "sha256": "f3affb1922a252b8c2387db8e072820c4c5f1f4bc580450bf99f1daa9b08c077"
+          },
+          "meaning_draft": "append assignment may reach final return after iteration",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        }
+      ],
+      "control_anchors": [
+        {
+          "predicate": {
+            "line": 877,
+            "start_byte": 29501,
+            "end_byte_exclusive": 29518,
+            "sha256": "fe1b49dc72f63263dc4f81dd21df3edbfe65e965e7af28c4388af27458ee60cf"
+          },
+          "dependent_statement": {
+            "line": 878,
+            "start_byte": 29518,
+            "end_byte_exclusive": 29531,
+            "sha256": "790abc4e40cac256ccb7c2ec0b7a5dd3d193b4ada19a15c084a6f46517e2c858"
+          },
+          "meaning_draft": "if error branch returns nil",
+          "edge_kind_mapping": "not_fixed"
+        },
+        {
+          "predicate": {
+            "line": 881,
+            "start_byte": 29561,
+            "end_byte_exclusive": 29620,
+            "sha256": "09b8b390062c7c0e469d90c4c0d22dc50d21577843d3313d8bf3d657c16be2d7"
+          },
+          "dependent_statement": {
+            "line": 882,
+            "start_byte": 29620,
+            "end_byte_exclusive": 29633,
+            "sha256": "790abc4e40cac256ccb7c2ec0b7a5dd3d193b4ada19a15c084a6f46517e2c858"
+          },
+          "meaning_draft": "if decode error branch returns nil",
+          "edge_kind_mapping": "not_fixed"
+        },
+        {
+          "predicate": {
+            "line": 885,
+            "start_byte": 29663,
+            "end_byte_exclusive": 29696,
+            "sha256": "d57152f16ec768da7c5f579cbabacc87a2919bba66c069733a82855b347ba087"
+          },
+          "dependent_statement": {
+            "line": 886,
+            "start_byte": 29696,
+            "end_byte_exclusive": 29847,
+            "sha256": "1e8ca909134b7c0100bac0dfe38a515e7e0cd68270d5cc2eb465f72c365ad190"
+          },
+          "meaning_draft": "range body appends; iteration binding itself remains unsupported",
+          "edge_kind_mapping": "not_fixed"
+        }
+      ],
+      "missing_before_scoring": [
+        "exact_identifier_occurrence_spans",
+        "declaration_identity_and_shadow_scope_review",
+        "complete_supported_positive_and_negative_edge_sets",
+        "CFG_control_dependence_vs_source_nesting_matching",
+        "independent_reviewer",
+        "DEV_FINAL_and_family_review"
+      ],
+      "precision_recall_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-036",
+      "origin": "ai_manual_source_reading",
+      "scope": "non_exhaustive_statement_line_anchors_not_occurrence_gold",
+      "approved": false,
+      "review_receipt": null,
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "rpc/client.go",
+        "name": "DialOptions",
+        "receiver": "",
+        "start_line": 193,
+        "end_line": 223,
+        "start_byte": 6694,
+        "end_byte_exclusive": 7442,
+        "git_blob": "2b0016db8f4ec2e9d33cf937efe2dde42a3ffa6a",
+        "file_sha256": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+        "function_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-036-source.txt",
+        "excerpt_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53"
+      },
+      "data_anchors": [
+        {
+          "variable": "u",
+          "definition": {
+            "line": 194,
+            "start_byte": 6791,
+            "end_byte_exclusive": 6820,
+            "sha256": "dfe73e9fc6be1e2a9fd11dae59614f73c35b46fe7068632343cf2a7d6be11958"
+          },
+          "use": {
+            "line": 205,
+            "start_byte": 6972,
+            "end_byte_exclusive": 6991,
+            "sha256": "2a8b10e66318007bc3dd0a77144ca8580015039b0a2e1ccafc7824105dd408c2"
+          },
+          "meaning_draft": "parsed local variable used by scheme switch; selector/memory effects are not proved",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "cfg",
+          "definition": {
+            "line": 199,
+            "start_byte": 6859,
+            "end_byte_exclusive": 6885,
+            "sha256": "d32a51b43efaa6f356ec7578e47a14c24d2d50acf080249fbf1a62f6f7629f34"
+          },
+          "use": {
+            "line": 201,
+            "start_byte": 6916,
+            "end_byte_exclusive": 6939,
+            "sha256": "ea63dce021caa7e7b13abcd74d37062c5b943a64dd2234be2b438a625fc48c35"
+          },
+          "meaning_draft": "local cfg binding used as option argument; option mutation is external effect",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "cfg",
+          "definition": {
+            "line": 199,
+            "start_byte": 6859,
+            "end_byte_exclusive": 6885,
+            "sha256": "d32a51b43efaa6f356ec7578e47a14c24d2d50acf080249fbf1a62f6f7629f34"
+          },
+          "use": {
+            "line": 222,
+            "start_byte": 7402,
+            "end_byte_exclusive": 7441,
+            "sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9"
+          },
+          "meaning_draft": "local cfg binding used by newClient; contents after option effects remain unknown",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "reconnect",
+          "definition": {
+            "line": 207,
+            "start_byte": 7014,
+            "end_byte_exclusive": 7064,
+            "sha256": "495866ff9cc98edac0df12266f49eeaae861191a59f117fdb05cb6287417e35e"
+          },
+          "use": {
+            "line": 222,
+            "start_byte": 7402,
+            "end_byte_exclusive": 7441,
+            "sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9"
+          },
+          "meaning_draft": "HTTP constructor branch assignment may reach final newClient argument",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "reconnect",
+          "definition": {
+            "line": 213,
+            "start_byte": 7171,
+            "end_byte_exclusive": 7188,
+            "sha256": "51a019b6a3bda95e96f2080ef0892cdb2b1800b06bcd21b0de8f97187cecc534"
+          },
+          "use": {
+            "line": 222,
+            "start_byte": 7402,
+            "end_byte_exclusive": 7441,
+            "sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9"
+          },
+          "meaning_draft": "WS successful branch assignment may reach final newClient argument",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "reconnect",
+          "definition": {
+            "line": 215,
+            "start_byte": 7203,
+            "end_byte_exclusive": 7259,
+            "sha256": "76f8fcd5815529ff858ef3f6aaf37c6532bea307b28a8faae0a6c7818e3954f6"
+          },
+          "use": {
+            "line": 222,
+            "start_byte": 7402,
+            "end_byte_exclusive": 7441,
+            "sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9"
+          },
+          "meaning_draft": "stdio constructor branch assignment may reach final newClient argument",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "reconnect",
+          "definition": {
+            "line": 217,
+            "start_byte": 7269,
+            "end_byte_exclusive": 7313,
+            "sha256": "36bc449121200bf21f97d37cf9c1973b46a1796ca80998e3eb3f6650120c3062"
+          },
+          "use": {
+            "line": 222,
+            "start_byte": 7402,
+            "end_byte_exclusive": 7441,
+            "sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9"
+          },
+          "meaning_draft": "IPC constructor branch assignment may reach final newClient argument",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        }
+      ],
+      "control_anchors": [
+        {
+          "predicate": {
+            "line": 195,
+            "start_byte": 6820,
+            "end_byte_exclusive": 6837,
+            "sha256": "fe1b49dc72f63263dc4f81dd21df3edbfe65e965e7af28c4388af27458ee60cf"
+          },
+          "dependent_statement": {
+            "line": 196,
+            "start_byte": 6837,
+            "end_byte_exclusive": 6855,
+            "sha256": "48c03879a7b81f44793ffde5908a345f6147611b49804605c93ce150477b8a1e"
+          },
+          "meaning_draft": "parse error predicate guards early return",
+          "edge_kind_mapping": "not_fixed"
+        },
+        {
+          "predicate": {
+            "line": 210,
+            "start_byte": 7130,
+            "end_byte_exclusive": 7148,
+            "sha256": "4c154cdaef82ba33866af83a0fb4627709fde0adf6b35ece16355f457f55ed74"
+          },
+          "dependent_statement": {
+            "line": 211,
+            "start_byte": 7148,
+            "end_byte_exclusive": 7167,
+            "sha256": "3fccbe86901e3598a47eb52887f005af3d558c52ce4efccc32137e2bf9c9f971"
+          },
+          "meaning_draft": "WS construction error guards early return",
+          "edge_kind_mapping": "not_fixed"
+        }
+      ],
+      "missing_before_scoring": [
+        "exact_identifier_occurrence_spans",
+        "declaration_identity_and_shadow_scope_review",
+        "complete_supported_positive_and_negative_edge_sets",
+        "CFG_control_dependence_vs_source_nesting_matching",
+        "independent_reviewer",
+        "DEV_FINAL_and_family_review"
+      ],
+      "precision_recall_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-031",
+      "origin": "ai_manual_source_reading",
+      "scope": "non_exhaustive_statement_line_anchors_not_occurrence_gold",
+      "approved": false,
+      "review_receipt": null,
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "p2p/discover/v4_udp.go",
+        "name": "Resolve",
+        "receiver": "*UDPv4",
+        "start_line": 175,
+        "end_line": 201,
+        "start_byte": 5395,
+        "end_byte_exclusive": 6144,
+        "git_blob": "988f16b01df2c11af84d52f3c77784c37c65131a",
+        "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+        "function_sha256": "de50b31d7810ea501c009fb4833c3bafc8724dd8aa27a69c7d201f070714efea",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-031-source.txt",
+        "excerpt_sha256": "de50b31d7810ea501c009fb4833c3bafc8724dd8aa27a69c7d201f070714efea"
+      },
+      "data_anchors": [
+        {
+          "variable": "n",
+          "definition": {
+            "line": 175,
+            "start_byte": 5395,
+            "end_byte_exclusive": 5448,
+            "sha256": "96f09956a45a7516cca1eee46832db8b64fb53efa3e8525ac326b8e95540c46f"
+          },
+          "use": {
+            "line": 181,
+            "start_byte": 5666,
+            "end_byte_exclusive": 5748,
+            "sha256": "e91c6cad3f7ae147537b73d6fa74efd228b103b74a12bde3b3c31f415993071f"
+          },
+          "meaning_draft": "parameter binding used in table lookup predicate",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "n",
+          "definition": {
+            "line": 182,
+            "start_byte": 5748,
+            "end_byte_exclusive": 5762,
+            "sha256": "0f017895382c40602d8554766d307f54b8fae9a0405f6cb4b07d0c342148295d"
+          },
+          "use": {
+            "line": 183,
+            "start_byte": 5762,
+            "end_byte_exclusive": 5808,
+            "sha256": "1f7682a44453afa7768befe1db97938d2cae5bdcfd580b2ca8ddab3ae2620f0b"
+          },
+          "meaning_draft": "table-node assignment may reach second RequestENR argument",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "n",
+          "definition": {
+            "line": 175,
+            "start_byte": 5395,
+            "end_byte_exclusive": 5448,
+            "sha256": "96f09956a45a7516cca1eee46832db8b64fb53efa3e8525ac326b8e95540c46f"
+          },
+          "use": {
+            "line": 200,
+            "start_byte": 6133,
+            "end_byte_exclusive": 6143,
+            "sha256": "1c5c97ddd092c2e637196ce04408eb1ba9e75f8486f4c36aa467ccbf841b6ea6"
+          },
+          "meaning_draft": "initial parameter binding may reach fallback return",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        },
+        {
+          "variable": "n",
+          "definition": {
+            "line": 182,
+            "start_byte": 5748,
+            "end_byte_exclusive": 5762,
+            "sha256": "0f017895382c40602d8554766d307f54b8fae9a0405f6cb4b07d0c342148295d"
+          },
+          "use": {
+            "line": 200,
+            "start_byte": 6133,
+            "end_byte_exclusive": 6143,
+            "sha256": "1c5c97ddd092c2e637196ce04408eb1ba9e75f8486f4c36aa467ccbf841b6ea6"
+          },
+          "meaning_draft": "table-node assignment may reach fallback return",
+          "certainty_proposal": "lexical_may_reach_not_path_feasibility"
+        }
+      ],
+      "control_anchors": [
+        {
+          "predicate": {
+            "line": 177,
+            "start_byte": 5541,
+            "end_byte_exclusive": 5586,
+            "sha256": "3940c1e987d30b91e528d63357efcb285420899a97323ccc00e086994f09833f"
+          },
+          "dependent_statement": {
+            "line": 178,
+            "start_byte": 5586,
+            "end_byte_exclusive": 5598,
+            "sha256": "770245972712ce5fd11d980d9907cb962b928fc10083fb28c995abea7e335df7"
+          },
+          "meaning_draft": "direct request success guards return",
+          "edge_kind_mapping": "not_fixed"
+        },
+        {
+          "predicate": {
+            "line": 183,
+            "start_byte": 5762,
+            "end_byte_exclusive": 5808,
+            "sha256": "1f7682a44453afa7768befe1db97938d2cae5bdcfd580b2ca8ddab3ae2620f0b"
+          },
+          "dependent_statement": {
+            "line": 184,
+            "start_byte": 5808,
+            "end_byte_exclusive": 5821,
+            "sha256": "d7fb06f06186e1d24f0348ca566459c2b90cca9894cffa67e768c50ffd8bb6fe"
+          },
+          "meaning_draft": "second request success guards return",
+          "edge_kind_mapping": "not_fixed"
+        },
+        {
+          "predicate": {
+            "line": 189,
+            "start_byte": 5893,
+            "end_byte_exclusive": 5919,
+            "sha256": "170eac47b170ff1fc5e92042cbad78176a1f89196b2a79eec42babd5746acd2e"
+          },
+          "dependent_statement": {
+            "line": 190,
+            "start_byte": 5919,
+            "end_byte_exclusive": 5950,
+            "sha256": "bc5c94b0ed13eb994a82f06cfb8f39af156db1fc27bcc1d59e5fc9476a31860b"
+          },
+          "meaning_draft": "failed key load guards fallback return",
+          "edge_kind_mapping": "not_fixed"
+        }
+      ],
+      "missing_before_scoring": [
+        "exact_identifier_occurrence_spans",
+        "declaration_identity_and_shadow_scope_review",
+        "complete_supported_positive_and_negative_edge_sets",
+        "CFG_control_dependence_vs_source_nesting_matching",
+        "independent_reviewer",
+        "DEV_FINAL_and_family_review"
+      ],
+      "precision_recall_scoring_allowed": false
+    }
+  ],
+  "gold_access_policy": "do not mount this draft file or containing gold directory into actual host input; source excerpts/public input may be separately copied after review"
+}

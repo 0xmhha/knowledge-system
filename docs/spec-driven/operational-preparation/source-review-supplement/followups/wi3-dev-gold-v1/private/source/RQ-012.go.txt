@@ -1,0 +1,42 @@
+func newTransactionsByPriceAndNonce(signer types.Signer, txs map[common.Address][]*txpool.LazyTransaction, baseFee *big.Int, headerTip *big.Int, anzeonEnabled bool, stateDB *state.StateDB) *transactionsByPriceAndNonce {
+	// Convert the basefee from header format to uint256 format
+	var baseFeeUint *uint256.Int
+	if baseFee != nil {
+		baseFeeUint = uint256.MustFromBig(baseFee)
+	}
+	// Initialize a price and received time based heap with the head transactions
+	isAuthorizedMap := make(map[common.Address]bool, len(txs))
+	if anzeonEnabled {
+		for from := range txs {
+			if stateDB != nil {
+				isAuthorizedMap[from] = stateDB.IsAuthorized(from)
+			}
+		}
+	}
+
+	heads := txByPriceAndTime{
+		txs:           make([]*txWithMinerFee, 0, len(txs)),
+		anzeonEnabled: anzeonEnabled,
+		isAuthorized:  isAuthorizedMap,
+	}
+	for from, accTxs := range txs {
+		wrapped, err := newTxWithMinerFee(accTxs[0], from, baseFeeUint, uint256.MustFromBig(headerTip), isAuthorizedMap[from])
+		if err != nil {
+			delete(txs, from)
+			continue
+		}
+		heads.txs = append(heads.txs, wrapped)
+		txs[from] = accTxs[1:]
+	}
+	heap.Init(&heads)
+
+	// Assemble and return the transaction set
+	return &transactionsByPriceAndNonce{
+		txs:             txs,
+		heads:           heads,
+		signer:          signer,
+		baseFee:         baseFeeUint,
+		headerTip:       uint256.MustFromBig(headerTip),
+		isAuthorizedMap: isAuthorizedMap,
+	}
+}

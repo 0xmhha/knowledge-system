@@ -1,0 +1,98 @@
+[
+  {
+    "id": "SP-CTRL-01",
+    "case": "duplicate/null/unknown field or wrong type",
+    "expected": "input_error",
+    "scope": "strict decoder; never execute backend or report annotation success"
+  },
+  {
+    "id": "SP-CTRL-02",
+    "case": "both node_id and canonical_id, or neither",
+    "expected": "input_error",
+    "scope": "exactly one selector; name-only/source-name hint is not scope identity"
+  },
+  {
+    "id": "SP-CTRL-03",
+    "case": "max_annotations129 or timeout_ms5001",
+    "expected": "input_error",
+    "scope": "declared positive integer caps128/5000"
+  },
+  {
+    "id": "SP-CTRL-04",
+    "case": "wrong expected commit",
+    "expected": "source_mismatch",
+    "scope": "bound retained manifest; not a negative annotation example"
+  },
+  {
+    "id": "SP-CTRL-05",
+    "case": "wrong source blob hash",
+    "expected": "source_mismatch",
+    "scope": "exact symbol blob, not full file hash replacement"
+  },
+  {
+    "id": "SP-CTRL-06",
+    "case": "wrong graph snapshot hash",
+    "expected": "source_mismatch",
+    "scope": "retained graph pin and actual backend receipt required"
+  },
+  {
+    "id": "SP-CTRL-07",
+    "case": "private code .claude or logs root",
+    "expected": "unsupported",
+    "scope": "path boundary only, not general per-project/user authorization"
+  },
+  {
+    "id": "SP-CTRL-08",
+    "case": "private annotation or edge source",
+    "expected": "unsupported",
+    "scope": "no private metadata disclosure"
+  },
+  {
+    "id": "SP-CTRL-09",
+    "case": "spoofed relation source or target kind",
+    "expected": "source_mismatch",
+    "scope": "retain no mixed relation payload"
+  },
+  {
+    "id": "SP-CTRL-10",
+    "case": "final manifest/blob/symbol/tag/page/more changed",
+    "expected": "snapshot_changed",
+    "scope": "clear all symbol/annotation results on the final drift recheck; cooperative deadline may separately yield budget_exhausted; no transaction or ABA guarantee"
+  },
+  {
+    "id": "SP-CTRL-11",
+    "case": "peer address outside configured HTTP ACL",
+    "expected": "HTTP403_before_tool",
+    "scope": "ignore spoofed forwarding headers; peer ACL does not authenticate reviewer or authorize each project/symbol"
+  },
+  {
+    "id": "SP-CTRL-12",
+    "case": "known public symbol with complete empty selected overlay page",
+    "expected": "no_annotations",
+    "scope": "not not_found/unavailable/unsupported/partial; safety unknown"
+  },
+  {
+    "id": "SP-CTRL-13",
+    "case": "unknown symbol",
+    "expected": "not_found",
+    "scope": "not no_annotations or a known safe symbol"
+  },
+  {
+    "id": "SP-CTRL-14",
+    "case": "deadline, unavailable reader or page truncation",
+    "expected": "budget_exhausted_unavailable_or_partial",
+    "scope": "preserve exact actual status/cap/denominator; do not zero-fill missing tags"
+  },
+  {
+    "id": "SP-CTRL-15",
+    "case": "automatic rule output substituted for a manual operator relation",
+    "expected": "consumer_reject_or_unknown",
+    "scope": "separate opt-in cks.context.rule_candidates; no vulnerability or policy-compliance acceptance"
+  },
+  {
+    "id": "SP-CTRL-16",
+    "case": "foreign project/store or same name in another project",
+    "expected": "consumer_refuse_or_unknown_scope",
+    "scope": "annotation wire lacks explicit project/dataset fields; require independently bound routed store/session/canonical/source/commit/snapshot, never infer identity from name"
+  }
+]

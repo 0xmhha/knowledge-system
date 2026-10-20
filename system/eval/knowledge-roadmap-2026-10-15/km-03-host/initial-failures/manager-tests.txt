@@ -1,0 +1,33 @@
+go build  -o bin/ckg ./cmd/graph
+go build  -o bin/ckv ./cmd/vector
+go build  -o bin/cks ./cmd/cks
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_registration.py
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 6.062s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_collection.py
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 11.311s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_review.py
+...................................
+----------------------------------------------------------------------
+Ran 35 tests in 47.831s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_broker.py
+../Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/case.py:657: ResourceWarning: unclosed file <_io.TextIOWrapper name=8 encoding='UTF-8'>
+  function, args, kwargs = self._cleanups.pop()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/case.py:657: ResourceWarning: unclosed file <_io.TextIOWrapper name=8 encoding='UTF-8'>
+  function, args, kwargs = self._cleanups.pop()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+............................
+----------------------------------------------------------------------
+Ran 31 tests in 96.284s
+
+OK

@@ -1,0 +1,211 @@
+SRC-010 — AI DEV draft, NOT independently approved
+core/rawdb/chain_iterator.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-010.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 1364, "start": 1362}, "flags": [], "id": "v@1362", "name": "db", "origin": "parameter", "value_kind": "unknown"}
+{"declaration": {"end": 1446, "start": 1440}, "flags": [], "id": "v@1440", "name": "frozen", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 1451, "start": 1448}, "flags": [], "id": "v@1448", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 1527, "start": 1522}, "flags": [], "id": "v@1522", "name": "batch", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 1552, "start": 1547}, "flags": [], "id": "v@1547", "name": "start", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 1575, "start": 1569}, "flags": [], "id": "v@1569", "name": "logged", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 1663, "start": 1659}, "flags": [], "id": "v@1659", "name": "hash", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 1687, "start": 1686}, "flags": [], "id": "v@1686", "name": "i", "origin": "local", "value_kind": "scalar"}
+{"declaration": {"end": 1779, "start": 1774}, "flags": [], "id": "v@1774", "name": "count", "origin": "local", "value_kind": "scalar"}
+{"declaration": {"end": 1855, "start": 1851}, "flags": [], "id": "v@1851", "name": "data", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 1860, "start": 1857}, "flags": [], "id": "v@1857", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 2016, "start": 2015}, "flags": ["range_assignment_unknown"], "id": "v@2015", "name": "j", "origin": "range", "value_kind": "unknown"}
+{"declaration": {"end": 2019, "start": 2018}, "flags": ["range_assignment_unknown"], "id": "v@2018", "name": "h", "origin": "range", "value_kind": "unknown"}
+{"declaration": {"end": 2045, "start": 2039}, "flags": [], "id": "v@2039", "name": "number", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 2284, "start": 2281}, "flags": [], "id": "v@2281", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 2735, "start": 2732}, "flags": [], "id": "v@2732", "name": "err", "origin": "local", "value_kind": "unknown"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@1455: d:o@1362=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1473: d:o@1448=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1487: d:o@1440=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1531: d:o@1362=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1578: d:o@1547=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1702: d:o@1686=positive(kill_free_nonempty_CFG_path); d:o@2407=positive(kill_free_nonempty_CFG_path)
+u:o@1706: d:o@1440=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1804: d:o@1686=positive(kill_free_nonempty_CFG_path); d:o@2407=positive(kill_free_nonempty_CFG_path)
+u:o@1806: d:o@1774=positive(kill_free_nonempty_CFG_path); d:o@1826=negative(no_kill_free_CFG_path)
+u:o@1814: d:o@1440=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1834: d:o@1440=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1843: d:o@1686=positive(kill_free_nonempty_CFG_path); d:o@2407=positive(kill_free_nonempty_CFG_path)
+u:o@1864: d:o@1362=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@1903: d:o@1686=positive(kill_free_nonempty_CFG_path); d:o@2407=positive(kill_free_nonempty_CFG_path)
+u:o@1906: d:o@1774=positive(kill_free_nonempty_CFG_path); d:o@1826=positive(kill_free_nonempty_CFG_path)
+u:o@1916: d:o@1774=positive(kill_free_nonempty_CFG_path); d:o@1826=positive(kill_free_nonempty_CFG_path)
+u:o@1928: d:o@1857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2000: d:o@1857=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2029: d:o@1851=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2049: d:o@1686=positive(kill_free_nonempty_CFG_path); d:o@2407=positive(kill_free_nonempty_CFG_path)
+u:o@2060: d:o@2015=unknown(range_assignment_unknown)
+u:o@2092: d:o@2018=unknown(range_assignment_unknown)
+u:o@2116: d:o@1522=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2123: d:o@1659=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@2066=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2129: d:o@2039=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2231: d:o@1522=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2288: d:o@1522=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2303: d:o@2281=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2367: d:o@2281=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2382: d:o@1522=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2407: d:o@1686=positive(kill_free_nonempty_CFG_path); d:o@2407=positive(kill_free_nonempty_CFG_path)
+u:o@2423: d:o@1851=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2525: d:o@1569=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@2701=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2610: d:o@1440=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2628: d:o@1686=negative(no_kill_free_CFG_path); d:o@2407=positive(kill_free_nonempty_CFG_path)
+u:o@2639: d:o@1659=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@2066=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2689: d:o@1547=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2739: d:o@1522=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2754: d:o@2732=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2815: d:o@2732=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2824: d:o@1522=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2860: d:o@1362=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2864: d:o@1659=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@2066=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2894: d:o@1362=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2898: d:o@1659=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@2066=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@2961: d:o@1440=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@3013: d:o@1547=unknown(unresolved_value_domain_or_compile_time_mapping)
+
+Same-name shadow identity negatives:
+d:o@1857 -> u:o@1473 negative:different_lexical_declaration
+d:o@2281 -> u:o@1473 negative:different_lexical_declaration
+d:o@2732 -> u:o@1473 negative:different_lexical_declaration
+d:o@1448 -> u:o@1928 negative:different_lexical_declaration
+d:o@2281 -> u:o@1928 negative:different_lexical_declaration
+d:o@2732 -> u:o@1928 negative:different_lexical_declaration
+d:o@1448 -> u:o@2000 negative:different_lexical_declaration
+d:o@2281 -> u:o@2000 negative:different_lexical_declaration
+d:o@2732 -> u:o@2000 negative:different_lexical_declaration
+d:o@1448 -> u:o@2303 negative:different_lexical_declaration
+d:o@1857 -> u:o@2303 negative:different_lexical_declaration
+d:o@2732 -> u:o@2303 negative:different_lexical_declaration
+d:o@1448 -> u:o@2367 negative:different_lexical_declaration
+d:o@1857 -> u:o@2367 negative:different_lexical_declaration
+d:o@2732 -> u:o@2367 negative:different_lexical_declaration
+d:o@1448 -> u:o@2754 negative:different_lexical_declaration
+d:o@1857 -> u:o@2754 negative:different_lexical_declaration
+d:o@2281 -> u:o@2754 negative:different_lexical_declaration
+d:o@1448 -> u:o@2815 negative:different_lexical_declaration
+d:o@1857 -> u:o@2815 negative:different_lexical_declaration
+d:o@2281 -> u:o@2815 negative:different_lexical_declaration
+
+CFG block matching table (raw indices are only hints):
+884dbccedad29fa5b27bb2dcf52599f9880e95c6c20f234bed676ca39588fb7d {"anchor": {"end": 3023, "start": 1381}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0", "n0.1"], "successors": [1, 2]}
+9c8a721c972c1446bb3ee9de07fecbb8c7d4224e22c2d4f5c34234e3ec02a738 {"anchor": {"end": 1512, "start": 1470}, "id": 1, "kind": "IfThen", "live": true, "nodes": ["n1.0"], "successors": []}
+22eb8748508bdfdaf1a733c514133bc646f5ff2418813cfaae717f97638a97cd {"anchor": {"end": 1512, "start": 1470}, "id": 2, "kind": "IfDone", "live": true, "nodes": ["n2.0", "n2.1", "n2.2", "n2.3", "n2.4"], "successors": [6]}
+88a1fe5835518be3b29d1e617cf0588e1b957371a6e0c39739f3c32456935265 {"anchor": {"end": 1509, "start": 1503}, "id": 3, "kind": "Unreachable", "live": false, "nodes": [], "successors": [2]}
+f23b14a8e8a49eec737f1a56f71ba810047b49d668cf7a45d6e87c2b07f8e6bb {"anchor": {"end": 2727, "start": 1682}, "id": 4, "kind": "ForBody", "live": true, "nodes": ["n4.0", "n4.1"], "successors": [7, 8]}
+3773cbf14a4d4bfa8854cad03a138a438f5291f33c83f967c549cbce64b63429 {"anchor": {"end": 2727, "start": 1682}, "id": 5, "kind": "ForDone", "live": true, "nodes": ["n5.0", "n5.1"], "successors": [20, 21]}
+53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9 {"anchor": {"end": 2727, "start": 1682}, "id": 6, "kind": "ForLoop", "live": true, "nodes": ["n6.0"], "successors": [4, 5]}
+8b8318ff8a8c46c1aaf52606f7491ec44c783e0aed474a3151ff07f2e9f29759 {"anchor": {"end": 1848, "start": 1801}, "id": 7, "kind": "IfThen", "live": true, "nodes": ["n7.0"], "successors": [8]}
+8be746404cb97c70fceec318787b21185e406f0f1ec2c7cf8389f60ffa0365bd {"anchor": {"end": 1848, "start": 1801}, "id": 8, "kind": "IfDone", "live": true, "nodes": ["n8.0", "n8.1"], "successors": [9, 10]}
+a9e9b889cdf82a2df651adf407d06a4e825a85c06383ee5312e1ef4933e8326c {"anchor": {"end": 2008, "start": 1925}, "id": 9, "kind": "IfThen", "live": true, "nodes": ["n9.0"], "successors": [10]}
+52325f6851e40113b8ffed5c850db6577b1dff3dfd0014ecc1ad2e5ca944d485 {"anchor": {"end": 2008, "start": 1925}, "id": 10, "kind": "IfDone", "live": true, "nodes": ["n10.0", "n10.1", "n10.2"], "successors": [11]}
+992af81dfc4dd9a0abc82a4b719b0d49226264e97e940605a351de8f239d155f {"anchor": {"end": 2404, "start": 2011}, "id": 11, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [12, 13]}
+b489dbbff0afae53d52ffcc71855da16940798150b3345f6404a477be3f4747a {"anchor": {"end": 2404, "start": 2011}, "id": 12, "kind": "RangeBody", "live": true, "nodes": ["n12.0", "n12.1", "n12.2", "n12.3"], "successors": [14, 15]}
+a665184fb22e80ba717d3ac5fb5efbdc4a40f45434647278b2f4d3da54e32473 {"anchor": {"end": 2404, "start": 2011}, "id": 13, "kind": "RangeDone", "live": true, "nodes": ["n13.0", "n13.1"], "successors": [18, 19]}
+ec7eb7709d8879e28827a61d25731daf23fe57b858ff89a017266bd603023f14 {"anchor": {"end": 2400, "start": 2228}, "id": 14, "kind": "IfThen", "live": true, "nodes": ["n14.0", "n14.1"], "successors": [16, 17]}
+0b865a206a03a861bb43729700a88b9dffd1c2173259e54cb7e1df639bc318b3 {"anchor": {"end": 2400, "start": 2228}, "id": 15, "kind": "IfDone", "live": true, "nodes": [], "successors": [11]}
+7e970f77cba8ff3895d71b7d0850b32be396ac172c94bc259e310b1d8dd5967d {"anchor": {"end": 2377, "start": 2278}, "id": 16, "kind": "IfThen", "live": true, "nodes": ["n16.0"], "successors": [17]}
+6c75f393be90fd6df68a8eb2f178834717f70e7db1529bc9060bb80267e2ff4f {"anchor": {"end": 2377, "start": 2278}, "id": 17, "kind": "IfDone", "live": true, "nodes": ["n17.0"], "successors": [15]}
+abbc66b632355d9b0b26d33a7f91d6c9dff60efe8b70b599ec5224ac234f803a {"anchor": {"end": 2724, "start": 2511}, "id": 18, "kind": "IfThen", "live": true, "nodes": ["n18.0", "n18.1"], "successors": [19]}
+cca517ddb7376401361108dd79ab9b1294c18fa768925f600d263cdd298a4ffc {"anchor": {"end": 2724, "start": 2511}, "id": 19, "kind": "IfDone", "live": true, "nodes": [], "successors": [6]}
+dc6ccc860f24a3dcafc0709de47f87cbdd3870e745a300862beb2379b4530394 {"anchor": {"end": 2822, "start": 2729}, "id": 20, "kind": "IfThen", "live": true, "nodes": ["n20.0"], "successors": [21]}
+06d44ab1a8633a853f39da21f2d816c950337d2c37821c6af498f93fbba26ae9 {"anchor": {"end": 2822, "start": 2729}, "id": 21, "kind": "IfDone", "live": true, "nodes": ["n21.0", "n21.1", "n21.2", "n21.3", "n21.4"], "successors": []}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "884dbccedad29fa5b27bb2dcf52599f9880e95c6c20f234bed676ca39588fb7d", "target": "9c8a721c972c1446bb3ee9de07fecbb8c7d4224e22c2d4f5c34234e3ec02a738"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "884dbccedad29fa5b27bb2dcf52599f9880e95c6c20f234bed676ca39588fb7d", "target": "22eb8748508bdfdaf1a733c514133bc646f5ff2418813cfaae717f97638a97cd"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "884dbccedad29fa5b27bb2dcf52599f9880e95c6c20f234bed676ca39588fb7d", "target": "3773cbf14a4d4bfa8854cad03a138a438f5291f33c83f967c549cbce64b63429"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "884dbccedad29fa5b27bb2dcf52599f9880e95c6c20f234bed676ca39588fb7d", "target": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "884dbccedad29fa5b27bb2dcf52599f9880e95c6c20f234bed676ca39588fb7d", "target": "06d44ab1a8633a853f39da21f2d816c950337d2c37821c6af498f93fbba26ae9"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "f23b14a8e8a49eec737f1a56f71ba810047b49d668cf7a45d6e87c2b07f8e6bb", "target": "8b8318ff8a8c46c1aaf52606f7491ec44c783e0aed474a3151ff07f2e9f29759"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "3773cbf14a4d4bfa8854cad03a138a438f5291f33c83f967c549cbce64b63429", "target": "dc6ccc860f24a3dcafc0709de47f87cbdd3870e745a300862beb2379b4530394"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9", "target": "f23b14a8e8a49eec737f1a56f71ba810047b49d668cf7a45d6e87c2b07f8e6bb"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9", "target": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9", "target": "8be746404cb97c70fceec318787b21185e406f0f1ec2c7cf8389f60ffa0365bd"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9", "target": "52325f6851e40113b8ffed5c850db6577b1dff3dfd0014ecc1ad2e5ca944d485"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9", "target": "992af81dfc4dd9a0abc82a4b719b0d49226264e97e940605a351de8f239d155f"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9", "target": "a665184fb22e80ba717d3ac5fb5efbdc4a40f45434647278b2f4d3da54e32473"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "53f890a5efaebba4d9bd0d0e656b7a6c5fb764d0a22f3b1bfac9ca81d8ff5ab9", "target": "cca517ddb7376401361108dd79ab9b1294c18fa768925f600d263cdd298a4ffc"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "8be746404cb97c70fceec318787b21185e406f0f1ec2c7cf8389f60ffa0365bd", "target": "a9e9b889cdf82a2df651adf407d06a4e825a85c06383ee5312e1ef4933e8326c"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "992af81dfc4dd9a0abc82a4b719b0d49226264e97e940605a351de8f239d155f", "target": "992af81dfc4dd9a0abc82a4b719b0d49226264e97e940605a351de8f239d155f"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "992af81dfc4dd9a0abc82a4b719b0d49226264e97e940605a351de8f239d155f", "target": "b489dbbff0afae53d52ffcc71855da16940798150b3345f6404a477be3f4747a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "992af81dfc4dd9a0abc82a4b719b0d49226264e97e940605a351de8f239d155f", "target": "0b865a206a03a861bb43729700a88b9dffd1c2173259e54cb7e1df639bc318b3"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "b489dbbff0afae53d52ffcc71855da16940798150b3345f6404a477be3f4747a", "target": "ec7eb7709d8879e28827a61d25731daf23fe57b858ff89a017266bd603023f14"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "b489dbbff0afae53d52ffcc71855da16940798150b3345f6404a477be3f4747a", "target": "6c75f393be90fd6df68a8eb2f178834717f70e7db1529bc9060bb80267e2ff4f"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "a665184fb22e80ba717d3ac5fb5efbdc4a40f45434647278b2f4d3da54e32473", "target": "abbc66b632355d9b0b26d33a7f91d6c9dff60efe8b70b599ec5224ac234f803a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "ec7eb7709d8879e28827a61d25731daf23fe57b858ff89a017266bd603023f14", "target": "7e970f77cba8ff3895d71b7d0850b32be396ac172c94bc259e310b1d8dd5967d"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 1468, "start": 1455}}
+{"kind": "short_circuit_not_expanded", "span": {"end": 1498, "start": 1473}}
+{"kind": "call_effect_not_inferred", "span": {"end": 1544, "start": 1531}}
+{"kind": "call_effect_not_inferred", "span": {"end": 1566, "start": 1556}}
+{"kind": "call_effect_not_inferred", "span": {"end": 1605, "start": 1578}}
+{"kind": "call_effect_not_inferred", "span": {"end": 1700, "start": 1691}}
+{"kind": "call_effect_not_inferred", "span": {"end": 1798, "start": 1783}}
+{"kind": "call_effect_not_inferred", "span": {"end": 1922, "start": 1864}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2004, "start": 1944}}
+{"kind": "range_binding_unknown", "span": {"end": 2404, "start": 2011}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2062, "start": 2053}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2094, "start": 2073}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2136, "start": 2098}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2248, "start": 2231}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2301, "start": 2288}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2371, "start": 2321}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2395, "start": 2382}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2429, "start": 2412}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2428, "start": 2419}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2532, "start": 2514}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2697, "start": 2554}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2696, "start": 2656}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2695, "start": 2678}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2720, "start": 2710}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2752, "start": 2739}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2819, "start": 2769}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2837, "start": 2824}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2869, "start": 2840}}
+{"kind": "call_effect_not_inferred", "span": {"end": 2903, "start": 2871}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3021, "start": 2905}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3020, "start": 2980}}
+{"kind": "call_effect_not_inferred", "span": {"end": 3019, "start": 3002}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Ancients", "span": {"end": 1466, "start": 1458}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "NewBatch", "span": {"end": 1542, "start": 1534}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Now", "span": {"end": 1564, "start": 1561}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Add", "span": {"end": 1587, "start": 1584}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Second", "span": {"end": 1604, "start": 1598}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 1677, "start": 1673}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "AncientRange", "span": {"end": 1879, "start": 1867}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "ChainFreezerHashTable", "span": {"end": 1901, "start": 1880}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Crit", "span": {"end": 1952, "start": 1948}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "BytesToHash", "span": {"end": 2091, "start": 2080}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "WriteHeaderNumber", "span": {"end": 2115, "start": 2098}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "ValueSize", "span": {"end": 2246, "start": 2237}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "IdealBatchSize", "span": {"end": 2271, "start": 2257}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Write", "span": {"end": 2299, "start": 2294}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Crit", "span": {"end": 2329, "start": 2325}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Reset", "span": {"end": 2393, "start": 2388}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Since", "span": {"end": 2524, "start": 2519}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Second", "span": {"end": 2548, "start": 2542}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 2562, "start": 2558}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PrettyDuration", "span": {"end": 2677, "start": 2663}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Since", "span": {"end": 2688, "start": 2683}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Now", "span": {"end": 2718, "start": 2715}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Write", "span": {"end": 2750, "start": 2745}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Crit", "span": {"end": 2777, "start": 2773}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Reset", "span": {"end": 2835, "start": 2830}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "WriteHeadHeaderHash", "span": {"end": 2859, "start": 2840}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "WriteHeadFastBlockHash", "span": {"end": 2893, "start": 2871}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 2913, "start": 2909}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "PrettyDuration", "span": {"end": 3001, "start": 2987}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Since", "span": {"end": 3012, "start": 3007}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

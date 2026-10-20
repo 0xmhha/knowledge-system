@@ -1,0 +1,342 @@
+diff --git a/contract/agent-mcp.schema.json b/contract/agent-mcp.schema.json
+index 83ee6d6..981cc00 100644
+--- a/contract/agent-mcp.schema.json
++++ b/contract/agent-mcp.schema.json
+@@ -154,7 +154,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -183,7 +183,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -231,7 +231,7 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "kinds": {
+@@ -306,7 +306,7 @@
+           "input": {
+             "properties": {
+               "intent": {
+-                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+                 "type": "string"
+               },
+               "prompt": {
+@@ -391,7 +391,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -580,18 +580,6 @@
+             "properties": {
+               "function": {
+                 "additionalProperties": false,
+-                "oneOf": [
+-                  {
+-                    "required": [
+-                      "node_id"
+-                    ]
+-                  },
+-                  {
+-                    "required": [
+-                      "canonical_id"
+-                    ]
+-                  }
+-                ],
+                 "properties": {
+                   "canonical_id": {
+                     "maxLength": 512,
+@@ -694,11 +682,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -731,11 +719,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -768,21 +756,9 @@
+         "cks_context_value_dependencies": {
+           "owner": "cks",
+           "wire_name": "cks.context.value_dependencies",
+-          "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
++          "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol (exclusivity is enforced at runtime; metadata is a host-compatible object); no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
+           "input": {
+             "additionalProperties": false,
+-            "oneOf": [
+-              {
+-                "required": [
+-                  "node_id"
+-                ]
+-              },
+-              {
+-                "required": [
+-                  "canonical_id"
+-                ]
+-              }
+-            ],
+             "properties": {
+               "canonical_id": {
+                 "maxLength": 512,
+@@ -866,18 +842,6 @@
+             "properties": {
+               "function": {
+                 "additionalProperties": false,
+-                "oneOf": [
+-                  {
+-                    "required": [
+-                      "node_id"
+-                    ]
+-                  },
+-                  {
+-                    "required": [
+-                      "canonical_id"
+-                    ]
+-                  }
+-                ],
+                 "properties": {
+                   "canonical_id": {
+                     "maxLength": 512,
+@@ -1210,31 +1174,9 @@
+         "cks_context_policy_security": {
+           "owner": "cks",
+           "wire_name": "cks.context.policy_security",
+-          "description": "Bounded retained policy/security annotations for one exact code symbol. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass.",
++          "description": "Bounded retained policy/security annotations for one exact code symbol. Select exactly one node_id or canonical_id; exclusivity is enforced at runtime with host-compatible object metadata. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass.",
+           "input": {
+             "additionalProperties": false,
+-            "oneOf": [
+-              {
+-                "not": {
+-                  "required": [
+-                    "canonical_id"
+-                  ]
+-                },
+-                "required": [
+-                  "node_id"
+-                ]
+-              },
+-              {
+-                "not": {
+-                  "required": [
+-                    "node_id"
+-                  ]
+-                },
+-                "required": [
+-                  "canonical_id"
+-                ]
+-              }
+-            ],
+             "properties": {
+               "canonical_id": {
+                 "maxLength": 512,
+diff --git a/plugin/contracts/cks-tools.schema.json b/plugin/contracts/cks-tools.schema.json
+index 3c70f8e..f2b03f0 100644
+--- a/plugin/contracts/cks-tools.schema.json
++++ b/plugin/contracts/cks-tools.schema.json
+@@ -117,7 +117,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -146,7 +146,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -194,7 +194,7 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "kinds": {
+@@ -269,7 +269,7 @@
+           "input": {
+             "properties": {
+               "intent": {
+-                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
++                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type — the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+                 "type": "string"
+               },
+               "prompt": {
+@@ -354,7 +354,7 @@
+                 "type": "number"
+               },
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "max_total": {
+@@ -543,18 +543,6 @@
+             "properties": {
+               "function": {
+                 "additionalProperties": false,
+-                "oneOf": [
+-                  {
+-                    "required": [
+-                      "node_id"
+-                    ]
+-                  },
+-                  {
+-                    "required": [
+-                      "canonical_id"
+-                    ]
+-                  }
+-                ],
+                 "properties": {
+                   "canonical_id": {
+                     "maxLength": 512,
+@@ -657,11 +645,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -694,11 +682,11 @@
+           "input": {
+             "properties": {
+               "exclude_tests": {
+-                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
++                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, …) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                 "type": "boolean"
+               },
+               "expand": {
+-                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
++                "description": "Expand the query with project glossary concept→symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                 "type": "boolean"
+               },
+               "k": {
+@@ -731,21 +719,9 @@
+         "cks_context_value_dependencies": {
+           "owner": "cks",
+           "wire_name": "cks.context.value_dependencies",
+-          "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
++          "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol (exclusivity is enforced at runtime; metadata is a host-compatible object); no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
+           "input": {
+             "additionalProperties": false,
+-            "oneOf": [
+-              {
+-                "required": [
+-                  "node_id"
+-                ]
+-              },
+-              {
+-                "required": [
+-                  "canonical_id"
+-                ]
+-              }
+-            ],
+             "properties": {
+               "canonical_id": {
+                 "maxLength": 512,
+@@ -829,18 +805,6 @@
+             "properties": {
+               "function": {
+                 "additionalProperties": false,
+-                "oneOf": [
+-                  {
+-                    "required": [
+-                      "node_id"
+-                    ]
+-                  },
+-                  {
+-                    "required": [
+-                      "canonical_id"
+-                    ]
+-                  }
+-                ],
+                 "properties": {
+                   "canonical_id": {
+                     "maxLength": 512,
+@@ -1173,31 +1137,9 @@
+         "cks_context_policy_security": {
+           "owner": "cks",
+           "wire_name": "cks.context.policy_security",
+-          "description": "Bounded retained policy/security annotations for one exact code symbol. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass.",
++          "description": "Bounded retained policy/security annotations for one exact code symbol. Select exactly one node_id or canonical_id; exclusivity is enforced at runtime with host-compatible object metadata. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass.",
+           "input": {
+             "additionalProperties": false,
+-            "oneOf": [
+-              {
+-                "not": {
+-                  "required": [
+-                    "canonical_id"
+-                  ]
+-                },
+-                "required": [
+-                  "node_id"
+-                ]
+-              },
+-              {
+-                "not": {
+-                  "required": [
+-                    "node_id"
+-                  ]
+-                },
+-                "required": [
+-                  "canonical_id"
+-                ]
+-              }
+-            ],
+             "properties": {
+               "canonical_id": {
+                 "maxLength": 512,

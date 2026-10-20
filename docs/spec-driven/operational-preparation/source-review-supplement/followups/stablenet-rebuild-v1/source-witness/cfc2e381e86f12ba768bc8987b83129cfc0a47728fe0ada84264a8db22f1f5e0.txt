@@ -1,0 +1,31 @@
+# WBFTExtra struct layout and contained types
+
+**Status:** verified · **Subsystem:** A2 (WBFT Block Encoding & Seal) · **Type:** B2
+
+WBFTExtra is the RLP-encoded payload that lives inside every WBFT
+block's Header.Extra. It carries vanity bytes, randao reveal, the
+previous and current round numbers, the previous and current
+PreparedSeal / CommittedSeal aggregated BLS signatures, the
+governance-voted GasTip for this block, and (on epoch-boundary
+blocks only) the EpochInfo that pins the next epoch's validator
+set. AggregatedSeal pairs a SealerSet bit-packed bitmap with a 96-byte
+BLS aggregate signature; the bit index in SealerSet corresponds to
+the validator index in the active ValidatorSet. EpochInfo lists
+Candidate {Addr, Diligence} entries plus a Validators slice of
+*indices* (not addresses) into Candidates, and a parallel
+BLSPublicKeys slice.
+
+## Code anchors
+- `core/types/istanbul.go` types.WBFTExtra:81 — main struct definition
+- `core/types/istanbul.go` WBFTAggregatedSeal:52 — PreparedSeal / CommittedSeal payload (BLS aggregate)
+- `core/types/istanbul.go` SealerSet:290 — bit-packed bitmap; SetSealer / IsSealer / GetSealers helpers
+- `core/types/istanbul.go` types.EpochInfo:99 — next-epoch validator manifest
+- `core/types/istanbul.go` Candidate:94 — {Addr, Diligence} entry referenced by EpochInfo.Validators indices
+- `core/types/istanbul.go` IstanbulExtraVanity:34 — 32-byte fixed vanity prefix
+- `core/types/istanbul.go` IstanbulExtraSeal:35 — 96-byte fixed BLS signature length
+
+## Aliases
+WBFTExtra 구조, 블록 헤더 Extra, BLS 집계 시그니처, SealerSet 비트팩, EpochInfo, WBFT extra format, block header extra payload, BLS aggregate seal, sealer bitmap, WBFTExtra, WBFTAggregatedSeal, SealerSet, SetSealer, IsSealer, GetSealers, EpochInfo, Candidate, IstanbulExtraVanity, IstanbulExtraSeal, ExtractWBFTExtra, VanityData, RandaoReveal, PrevRound, PrevPreparedSeal, PrevCommittedSeal, PreparedSeal, CommittedSeal, GasTip
+
+## Related
+A1.wbft_core.consensus_flow_architecture, A2.block_encoding.filtered_header_hash, A3.validator_set.epoch_transition

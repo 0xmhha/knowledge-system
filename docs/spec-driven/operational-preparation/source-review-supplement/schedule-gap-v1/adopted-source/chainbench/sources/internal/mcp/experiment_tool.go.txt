@@ -1,0 +1,33 @@
+package mcp
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/0xmhha/chainbench/internal/app"
+)
+
+func experimentTool() Tool {
+	return Tool{Name: "chainbench_experiment", Description: "Execute one frozen bounded timing/fault/observation experiment. Requires plan, exact DSL case, source-pinned binaries and a new artifact_root. Comparison/reproduction own fresh composed networks; observation is read-only against observe_workspace. Returns factual denominators and uncertainty, never cause acceptance.", InputSchema: map[string]any{"type": "object", "properties": map[string]any{"input": experimentInputSchema()}, "required": []string{"input"}, "additionalProperties": false}, Handler: func(ctx context.Context, args map[string]any) (string, error) {
+		if len(args) != 1 || args["input"] == nil {
+			return "", fmt.Errorf("chainbench_experiment: input is required")
+		}
+		raw, e := json.Marshal(args["input"])
+		if e != nil || len(raw) > 256_000 {
+			return "", fmt.Errorf("chainbench_experiment: bounded JSON input required")
+		}
+		in, e := app.DecodeExperimentInput(raw)
+		if e != nil {
+			return "", fmt.Errorf("chainbench_experiment: %w", e)
+		}
+		report, e := app.RunExperiment(ctx, app.Deps{}, in)
+		if e != nil {
+			return "", e
+		}
+		result, e := json.Marshal(report)
+		if e != nil {
+			return "", e
+		}
+		return string(result), nil
+	}}
+}

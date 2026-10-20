@@ -1,0 +1,462 @@
+{"time":"2026-10-17T14:15:26.813307Z","step":"reindex-resources","type":"status","resources":{"capture_limits":{"max_files":100000,"max_file_bytes":33554432,"max_total_bytes":4294967296},"source_files":2295,"source_bytes":45425158,"git_history_bytes":206660136,"minimum_additional_bytes":252085294,"output_free_bytes":80478928896,"staging_free_bytes":80478928896,"minimum_output_bytes":0,"minimum_staging_bytes":252085294,"reserve_bytes":0,"deadline_utc":"2026-10-17T15:43:09.362013Z","actual_candidate_bytes":0,"engine_output_estimate_bytes":null,"estimate_scope":"remaining staging copy; engine output and filesystem overhead not predicted"}}
+{"time":"2026-10-17T14:17:07.69262Z","step":"graph-build","type":"start","message":"Build the graph index"}
+{"time":"2026-10-17T14:17:07.69684Z","step":"toolchain","type":"output","message":"resolved go=/Users/kevin/.gvm/gos/go1.26.8/bin/go (inherited_path) git=/opt/homebrew/bin/git (inherited_path)"}
+{"time":"2026-10-17T14:17:34.684608Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:17:34.680+09:00 level=INFO msg=\"detected files\" go=1256 ts=39 sol=24 proto=4"}
+{"time":"2026-10-17T14:20:33.992666Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:20:33.992+09:00 level=INFO msg=\"xlang linked\" binds_to=0"}
+{"time":"2026-10-17T14:20:34.069082Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:20:34.069+09:00 level=INFO msg=\"http client matching\" rewired=0 specific_hits=0 wildcard_hits=0 ambiguous_retained=7 placeholders_dropped=0"}
+{"time":"2026-10-17T14:20:52.167301Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:20:52.167+09:00 level=INFO msg=\"temporal G6 emitted\" commit_nodes=6400 hunk_nodes=9048 changed_in_edges=1613769 blame_edges=1323 hunk_edges=14210 hunk_blobs=9017 max_per_file=10"}
+{"time":"2026-10-17T14:30:05.074153Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:05.074+09:00 level=INFO msg=\"pr_history emitted\" nodes_with_prs=97870"}
+{"time":"2026-10-17T14:30:05.176293Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:05.175+09:00 level=WARN msg=\"policy governs[] target not found\" policy_id=A10.codegen.contract_regen_procedure target=compiler.compiledTy.ExportContractCode reason=\"no code node found with this qualified_name\""}
+{"time":"2026-10-17T14:30:05.180951Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:05.175+09:00 level=WARN msg=\"policy governs[] target not found\" policy_id=A10.codegen.contract_regen_procedure target=compiler.solcVersion reason=\"no code node found with this qualified_name\""}
+{"time":"2026-10-17T14:30:05.185869Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:05.175+09:00 level=WARN msg=\"policy governs[] target not found\" policy_id=A11.txpool.type_taxonomy_admission target=types.ErrInvalidFeePayer reason=\"no code node found with this qualified_name\""}
+{"time":"2026-10-17T14:30:05.186002Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:05.175+09:00 level=WARN msg=\"policy governs[] target not found\" policy_id=A13.sealing.reorg_serialization target=legacypool.queueTxEvent reason=\"no code node found with this qualified_name\""}
+{"time":"2026-10-17T14:30:05.190981Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:05.175+09:00 level=WARN msg=\"policy governs[] target not found\" policy_id=A3.validator_set.epoch_transition target=engine.Engine.GetValidators reason=\"no code node found with this qualified_name\""}
+{"time":"2026-10-17T14:30:05.196769Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:05.175+09:00 level=WARN msg=\"policy governs[] target not found\" policy_id=A4.system_contracts.build_deploy_pipeline target=compiler.solcVersion reason=\"no code node found with this qualified_name\""}
+{"time":"2026-10-17T14:30:05.274141Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:05.274+09:00 level=INFO msg=\"policy enrichment emitted\" policy_nodes=42 governed_by_edges=140"}
+{"time":"2026-10-17T14:30:08.917853Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:08.917+09:00 level=INFO msg=\"review index rebuilt\" test_files=640"}
+{"time":"2026-10-17T14:30:10.030415Z","step":"graph-build","type":"output","message":"time=2026-10-17T23:30:10.029+09:00 level=INFO msg=\"build complete\" nodes=244947 edges=1964053 pkg_tree_edges=228815 topic_resolutions=3"}
+{"time":"2026-10-17T14:30:10.033448Z","step":"graph-build","type":"output","message":"ckg: built 244947 nodes / 1964053 edges into /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/graph"}
+{"time":"2026-10-17T14:30:10.186234Z","step":"graph-build","type":"done"}
+{"time":"2026-10-17T14:30:10.186789Z","step":"document-corpora-verify","type":"start","message":"Verify selected document inputs before embedding"}
+{"time":"2026-10-17T14:30:10.271946Z","step":"document-corpora-verify","type":"done"}
+{"time":"2026-10-17T14:30:10.278535Z","step":"vector-preflight","type":"start","message":"Preflight the Ollama embedder"}
+{"time":"2026-10-17T14:30:10.337216Z","step":"vector-preflight","type":"output","message":"Ollama reachable at http://127.0.0.1:11434; model \"bge-m3:latest\" present (bge-m3:latest)"}
+{"time":"2026-10-17T14:30:10.337253Z","step":"vector-preflight","type":"done"}
+{"time":"2026-10-17T14:30:10.337261Z","step":"vector-build","type":"start","message":"Build the vector index aligned to the graph"}
+{"time":"2026-10-17T14:30:11.99702Z","step":"vector-build","type":"output","message":"time=2026-10-17T23:30:11.995+09:00 level=INFO msg=ckv event=project_config.loaded trace_id=c673344510f37633 run_id=bb63aae0d467f15f important_symbol_count=0 path=/private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/.build-source-d3f4f5bf9c2dfb02f371df0ca5082176/tree has_ckv_yaml=false languages_filter=[] extra_ignore_count=0 file_header_lines=0"}
+{"time":"2026-10-17T14:30:11.997148Z","step":"vector-build","type":"output","message":"time=2026-10-17T23:30:11.997+09:00 level=INFO msg=ckv event=build.start trace_id=90bcc93715581d26 run_id=bb63aae0d467f15f src_root=/private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/.build-source-d3f4f5bf9c2dfb02f371df0ca5082176/tree out_dir=/private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/vector embedder=bge-m3:latest embedder_provider=\"\""}
+{"time":"2026-10-17T14:30:12.654023Z","step":"vector-build","type":"output","message":"time=2026-10-17T23:30:12.653+09:00 level=INFO msg=ckv event=ckg_align.loaded trace_id=62097a65ffd6a011 run_id=bb63aae0d467f15f entries=32586 canonical_available=true ckg_path=/private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/graph files_indexed=1275"}
+{"time":"2026-10-17T14:30:15.944597Z","step":"vector-build","type":"output","message":"ckv: 5/1415 files (1.4 files/s, elapsed 3s, ETA 17m6s)"}
+{"time":"2026-10-17T14:30:19.211106Z","step":"vector-build","type":"output","message":"ckv: 6/1415 files (0.3 files/s, elapsed 6s, ETA 1h16m42s)"}
+{"time":"2026-10-17T14:30:23.314999Z","step":"vector-build","type":"output","message":"ckv: 8/1415 files (0.5 files/s, elapsed 11s, ETA 48m6s)"}
+{"time":"2026-10-17T14:30:25.451805Z","step":"vector-build","type":"output","message":"ckv: 12/1415 files (1.9 files/s, elapsed 13s, ETA 12m29s)"}
+{"time":"2026-10-17T14:30:28.235918Z","step":"vector-build","type":"output","message":"ckv: 15/1415 files (1.1 files/s, elapsed 15s, ETA 21m39s)"}
+{"time":"2026-10-17T14:30:38.800909Z","step":"vector-build","type":"output","message":"ckv: 17/1415 files (0.2 files/s, elapsed 26s, ETA 2h3m4s)"}
+{"time":"2026-10-17T14:30:40.849234Z","step":"vector-build","type":"output","message":"ckv: 20/1415 files (1.5 files/s, elapsed 28s, ETA 15m52s)"}
+{"time":"2026-10-17T14:30:43.046359Z","step":"vector-build","type":"output","message":"ckv: 25/1415 files (2.3 files/s, elapsed 30s, ETA 10m10s)"}
+{"time":"2026-10-17T14:30:45.149633Z","step":"vector-build","type":"output","message":"ckv: 29/1415 files (1.9 files/s, elapsed 32s, ETA 12m8s)"}
+{"time":"2026-10-17T14:30:47.318568Z","step":"vector-build","type":"output","message":"ckv: 30/1415 files (0.5 files/s, elapsed 35s, ETA 50m5s)"}
+{"time":"2026-10-17T14:30:49.686064Z","step":"vector-build","type":"output","message":"ckv: 35/1415 files (2.1 files/s, elapsed 37s, ETA 10m53s)"}
+{"time":"2026-10-17T14:30:53.210329Z","step":"vector-build","type":"output","message":"ckv: 38/1415 files (0.9 files/s, elapsed 40s, ETA 26m57s)"}
+{"time":"2026-10-17T14:30:56.537465Z","step":"vector-build","type":"output","message":"ckv: 40/1415 files (0.6 files/s, elapsed 44s, ETA 38m7s)"}
+{"time":"2026-10-17T14:30:58.796457Z","step":"vector-build","type":"output","message":"ckv: 45/1415 files (2.2 files/s, elapsed 46s, ETA 10m18s)"}
+{"time":"2026-10-17T14:31:01.679834Z","step":"vector-build","type":"output","message":"ckv: 49/1415 files (1.4 files/s, elapsed 49s, ETA 16m23s)"}
+{"time":"2026-10-17T14:31:04.192138Z","step":"vector-build","type":"output","message":"ckv: 52/1415 files (1.2 files/s, elapsed 51s, ETA 19m1s)"}
+{"time":"2026-10-17T14:31:06.251724Z","step":"vector-build","type":"output","message":"ckv: 55/1415 files (1.5 files/s, elapsed 53s, ETA 15m35s)"}
+{"time":"2026-10-17T14:31:08.319816Z","step":"vector-build","type":"output","message":"ckv: 59/1415 files (1.9 files/s, elapsed 56s, ETA 11m41s)"}
+{"time":"2026-10-17T14:31:10.434641Z","step":"vector-build","type":"output","message":"ckv: 63/1415 files (1.9 files/s, elapsed 58s, ETA 11m54s)"}
+{"time":"2026-10-17T14:31:13.006223Z","step":"vector-build","type":"output","message":"ckv: 67/1415 files (1.6 files/s, elapsed 1m0s, ETA 14m26s)"}
+{"time":"2026-10-17T14:31:15.72091Z","step":"vector-build","type":"output","message":"ckv: 68/1415 files (0.4 files/s, elapsed 1m3s, ETA 1h0m56s)"}
+{"time":"2026-10-17T14:31:18.882766Z","step":"vector-build","type":"output","message":"ckv: 73/1415 files (1.6 files/s, elapsed 1m6s, ETA 14m8s)"}
+{"time":"2026-10-17T14:31:28.102246Z","step":"vector-build","type":"output","message":"ckv: 74/1415 files (0.1 files/s, elapsed 1m15s, ETA 3h26m1s)"}
+{"time":"2026-10-17T14:31:36.360189Z","step":"vector-build","type":"output","message":"ckv: 75/1415 files (0.1 files/s, elapsed 1m24s, ETA 3h4m29s)"}
+{"time":"2026-10-17T14:31:51.75407Z","step":"vector-build","type":"output","message":"ckv: 76/1415 files (0.1 files/s, elapsed 1m39s, ETA 5h43m31s)"}
+{"time":"2026-10-17T14:31:57.054484Z","step":"vector-build","type":"output","message":"ckv: 77/1415 files (0.2 files/s, elapsed 1m44s, ETA 1h58m12s)"}
+{"time":"2026-10-17T14:31:59.894395Z","step":"vector-build","type":"output","message":"ckv: 80/1415 files (1.1 files/s, elapsed 1m47s, ETA 21m3s)"}
+{"time":"2026-10-17T14:32:03.225462Z","step":"vector-build","type":"output","message":"ckv: 85/1415 files (1.5 files/s, elapsed 1m50s, ETA 14m46s)"}
+{"time":"2026-10-17T14:32:06.536064Z","step":"vector-build","type":"output","message":"ckv: 88/1415 files (0.9 files/s, elapsed 1m54s, ETA 24m24s)"}
+{"time":"2026-10-17T14:32:09.190562Z","step":"vector-build","type":"output","message":"ckv: 93/1415 files (1.9 files/s, elapsed 1m56s, ETA 11m41s)"}
+{"time":"2026-10-17T14:32:11.448481Z","step":"vector-build","type":"output","message":"ckv: 98/1415 files (2.2 files/s, elapsed 1m59s, ETA 9m54s)"}
+{"time":"2026-10-17T14:32:16.125879Z","step":"vector-build","type":"output","message":"ckv: 104/1415 files (1.3 files/s, elapsed 2m3s, ETA 17m2s)"}
+{"time":"2026-10-17T14:32:19.379808Z","step":"vector-build","type":"output","message":"ckv: 109/1415 files (1.5 files/s, elapsed 2m7s, ETA 14m9s)"}
+{"time":"2026-10-17T14:32:22.584497Z","step":"vector-build","type":"output","message":"ckv: 110/1415 files (0.3 files/s, elapsed 2m10s, ETA 1h9m42s)"}
+{"time":"2026-10-17T14:32:24.685491Z","step":"vector-build","type":"output","message":"ckv: 113/1415 files (1.4 files/s, elapsed 2m12s, ETA 15m11s)"}
+{"time":"2026-10-17T14:32:26.698091Z","step":"vector-build","type":"output","message":"ckv: 117/1415 files (2.0 files/s, elapsed 2m14s, ETA 10m52s)"}
+{"time":"2026-10-17T14:32:28.9135Z","step":"vector-build","type":"output","message":"ckv: 121/1415 files (1.8 files/s, elapsed 2m16s, ETA 11m56s)"}
+{"time":"2026-10-17T14:32:31.540707Z","step":"vector-build","type":"output","message":"ckv: 124/1415 files (1.1 files/s, elapsed 2m19s, ETA 18m50s)"}
+{"time":"2026-10-17T14:32:34.575938Z","step":"vector-build","type":"output","message":"ckv: 127/1415 files (1.0 files/s, elapsed 2m22s, ETA 21m43s)"}
+{"time":"2026-10-17T14:32:36.611001Z","step":"vector-build","type":"output","message":"ckv: 131/1415 files (2.0 files/s, elapsed 2m24s, ETA 10m52s)"}
+{"time":"2026-10-17T14:32:38.882046Z","step":"vector-build","type":"output","message":"ckv: 132/1415 files (0.4 files/s, elapsed 2m26s, ETA 48m36s)"}
+{"time":"2026-10-17T14:32:40.981387Z","step":"vector-build","type":"output","message":"ckv: 133/1415 files (0.5 files/s, elapsed 2m28s, ETA 44m51s)"}
+{"time":"2026-10-17T14:32:43.522195Z","step":"vector-build","type":"output","message":"ckv: 136/1415 files (1.2 files/s, elapsed 2m31s, ETA 18m3s)"}
+{"time":"2026-10-17T14:32:46.049457Z","step":"vector-build","type":"output","message":"ckv: 139/1415 files (1.2 files/s, elapsed 2m33s, ETA 17m55s)"}
+{"time":"2026-10-17T14:32:48.176753Z","step":"vector-build","type":"output","message":"ckv: 143/1415 files (1.9 files/s, elapsed 2m35s, ETA 11m16s)"}
+{"time":"2026-10-17T14:32:50.666802Z","step":"vector-build","type":"output","message":"ckv: 149/1415 files (2.4 files/s, elapsed 2m38s, ETA 8m45s)"}
+{"time":"2026-10-17T14:32:54.747319Z","step":"vector-build","type":"output","message":"ckv: 156/1415 files (1.7 files/s, elapsed 2m42s, ETA 12m13s)"}
+{"time":"2026-10-17T14:32:57.9772Z","step":"vector-build","type":"output","message":"ckv: 162/1415 files (1.9 files/s, elapsed 2m45s, ETA 11m14s)"}
+{"time":"2026-10-17T14:33:00.350903Z","step":"vector-build","type":"output","message":"ckv: 166/1415 files (1.7 files/s, elapsed 2m48s, ETA 12m21s)"}
+{"time":"2026-10-17T14:33:03.18989Z","step":"vector-build","type":"output","message":"ckv: 169/1415 files (1.1 files/s, elapsed 2m50s, ETA 19m39s)"}
+{"time":"2026-10-17T14:33:05.518961Z","step":"vector-build","type":"output","message":"ckv: 173/1415 files (1.7 files/s, elapsed 2m53s, ETA 12m3s)"}
+{"time":"2026-10-17T14:33:07.561862Z","step":"vector-build","type":"output","message":"ckv: 175/1415 files (1.0 files/s, elapsed 2m55s, ETA 21m6s)"}
+{"time":"2026-10-17T14:33:09.881668Z","step":"vector-build","type":"output","message":"ckv: 185/1415 files (4.3 files/s, elapsed 2m57s, ETA 4m45s)"}
+{"time":"2026-10-17T14:33:11.93067Z","step":"vector-build","type":"output","message":"ckv: 192/1415 files (3.4 files/s, elapsed 2m59s, ETA 5m57s)"}
+{"time":"2026-10-17T14:33:14.365739Z","step":"vector-build","type":"output","message":"ckv: 195/1415 files (1.2 files/s, elapsed 3m2s, ETA 16m30s)"}
+{"time":"2026-10-17T14:33:16.47963Z","step":"vector-build","type":"output","message":"ckv: 199/1415 files (1.9 files/s, elapsed 3m4s, ETA 10m42s)"}
+{"time":"2026-10-17T14:33:19.693715Z","step":"vector-build","type":"output","message":"ckv: 202/1415 files (0.9 files/s, elapsed 3m7s, ETA 21m39s)"}
+{"time":"2026-10-17T14:33:22.216669Z","step":"vector-build","type":"output","message":"ckv: 205/1415 files (1.2 files/s, elapsed 3m9s, ETA 16m57s)"}
+{"time":"2026-10-17T14:33:24.484485Z","step":"vector-build","type":"output","message":"ckv: 207/1415 files (0.9 files/s, elapsed 3m12s, ETA 22m49s)"}
+{"time":"2026-10-17T14:33:26.642121Z","step":"vector-build","type":"output","message":"ckv: 210/1415 files (1.4 files/s, elapsed 3m14s, ETA 14m27s)"}
+{"time":"2026-10-17T14:33:28.643348Z","step":"vector-build","type":"output","message":"ckv: 214/1415 files (2.0 files/s, elapsed 3m16s, ETA 10m0s)"}
+{"time":"2026-10-17T14:33:31.240339Z","step":"vector-build","type":"output","message":"ckv: 218/1415 files (1.5 files/s, elapsed 3m18s, ETA 12m57s)"}
+{"time":"2026-10-17T14:33:34.136982Z","step":"vector-build","type":"output","message":"ckv: 221/1415 files (1.0 files/s, elapsed 3m21s, ETA 19m12s)"}
+{"time":"2026-10-17T14:33:36.29572Z","step":"vector-build","type":"output","message":"ckv: 223/1415 files (0.9 files/s, elapsed 3m23s, ETA 21m26s)"}
+{"time":"2026-10-17T14:33:44.017017Z","step":"vector-build","type":"output","message":"ckv: 228/1415 files (0.6 files/s, elapsed 3m31s, ETA 30m33s)"}
+{"time":"2026-10-17T14:33:46.885411Z","step":"vector-build","type":"output","message":"ckv: 235/1415 files (2.4 files/s, elapsed 3m34s, ETA 8m3s)"}
+{"time":"2026-10-17T14:33:48.912504Z","step":"vector-build","type":"output","message":"ckv: 237/1415 files (1.0 files/s, elapsed 3m36s, ETA 19m54s)"}
+{"time":"2026-10-17T14:33:51.194163Z","step":"vector-build","type":"output","message":"ckv: 239/1415 files (0.9 files/s, elapsed 3m38s, ETA 22m21s)"}
+{"time":"2026-10-17T14:33:53.377952Z","step":"vector-build","type":"output","message":"ckv: 246/1415 files (3.2 files/s, elapsed 3m41s, ETA 6m4s)"}
+{"time":"2026-10-17T14:33:55.941684Z","step":"vector-build","type":"output","message":"ckv: 251/1415 files (1.9 files/s, elapsed 3m43s, ETA 9m56s)"}
+{"time":"2026-10-17T14:33:58.351796Z","step":"vector-build","type":"output","message":"ckv: 252/1415 files (0.4 files/s, elapsed 3m46s, ETA 46m43s)"}
+{"time":"2026-10-17T14:34:01.415956Z","step":"vector-build","type":"output","message":"ckv: 255/1415 files (1.0 files/s, elapsed 3m49s, ETA 19m43s)"}
+{"time":"2026-10-17T14:34:04.591092Z","step":"vector-build","type":"output","message":"ckv: 260/1415 files (1.6 files/s, elapsed 3m52s, ETA 12m14s)"}
+{"time":"2026-10-17T14:34:06.77034Z","step":"vector-build","type":"output","message":"ckv: 263/1415 files (1.4 files/s, elapsed 3m54s, ETA 13m56s)"}
+{"time":"2026-10-17T14:34:09.434803Z","step":"vector-build","type":"output","message":"ckv: 267/1415 files (1.5 files/s, elapsed 3m57s, ETA 12m44s)"}
+{"time":"2026-10-17T14:34:11.467568Z","step":"vector-build","type":"output","message":"ckv: 271/1415 files (2.0 files/s, elapsed 3m59s, ETA 9m41s)"}
+{"time":"2026-10-17T14:34:13.837593Z","step":"vector-build","type":"output","message":"ckv: 276/1415 files (2.1 files/s, elapsed 4m1s, ETA 8m59s)"}
+{"time":"2026-10-17T14:34:18.411971Z","step":"vector-build","type":"output","message":"ckv: 279/1415 files (0.7 files/s, elapsed 4m6s, ETA 28m51s)"}
+{"time":"2026-10-17T14:34:22.146959Z","step":"vector-build","type":"output","message":"ckv: 281/1415 files (0.5 files/s, elapsed 4m9s, ETA 35m18s)"}
+{"time":"2026-10-17T14:34:25.691333Z","step":"vector-build","type":"output","message":"ckv: 284/1415 files (0.8 files/s, elapsed 4m13s, ETA 22m16s)"}
+{"time":"2026-10-17T14:34:28.850632Z","step":"vector-build","type":"output","message":"ckv: 287/1415 files (0.9 files/s, elapsed 4m16s, ETA 19m47s)"}
+{"time":"2026-10-17T14:34:31.720836Z","step":"vector-build","type":"output","message":"ckv: 290/1415 files (1.0 files/s, elapsed 4m19s, ETA 17m56s)"}
+{"time":"2026-10-17T14:34:33.945645Z","step":"vector-build","type":"output","message":"ckv: 294/1415 files (1.8 files/s, elapsed 4m21s, ETA 10m23s)"}
+{"time":"2026-10-17T14:34:36.095275Z","step":"vector-build","type":"output","message":"ckv: 298/1415 files (1.9 files/s, elapsed 4m23s, ETA 10m0s)"}
+{"time":"2026-10-17T14:34:38.267459Z","step":"vector-build","type":"output","message":"ckv: 301/1415 files (1.4 files/s, elapsed 4m25s, ETA 13m26s)"}
+{"time":"2026-10-17T14:34:41.11021Z","step":"vector-build","type":"output","message":"ckv: 303/1415 files (0.7 files/s, elapsed 4m28s, ETA 26m20s)"}
+{"time":"2026-10-17T14:34:43.115436Z","step":"vector-build","type":"output","message":"ckv: 304/1415 files (0.5 files/s, elapsed 4m30s, ETA 37m7s)"}
+{"time":"2026-10-17T14:34:46.354146Z","step":"vector-build","type":"output","message":"ckv: 305/1415 files (0.3 files/s, elapsed 4m34s, ETA 59m54s)"}
+{"time":"2026-10-17T14:34:49.979711Z","step":"vector-build","type":"output","message":"ckv: 308/1415 files (0.8 files/s, elapsed 4m37s, ETA 22m17s)"}
+{"time":"2026-10-17T14:34:52.136308Z","step":"vector-build","type":"output","message":"ckv: 311/1415 files (1.4 files/s, elapsed 4m39s, ETA 13m13s)"}
+{"time":"2026-10-17T14:34:54.429696Z","step":"vector-build","type":"output","message":"ckv: 313/1415 files (0.9 files/s, elapsed 4m42s, ETA 21m4s)"}
+{"time":"2026-10-17T14:34:57.430245Z","step":"vector-build","type":"output","message":"ckv: 316/1415 files (1.0 files/s, elapsed 4m45s, ETA 18m19s)"}
+{"time":"2026-10-17T14:34:59.490605Z","step":"vector-build","type":"output","message":"ckv: 320/1415 files (1.9 files/s, elapsed 4m47s, ETA 9m24s)"}
+{"time":"2026-10-17T14:35:01.954722Z","step":"vector-build","type":"output","message":"ckv: 324/1415 files (1.6 files/s, elapsed 4m49s, ETA 11m11s)"}
+{"time":"2026-10-17T14:35:04.613924Z","step":"vector-build","type":"output","message":"ckv: 328/1415 files (1.5 files/s, elapsed 4m52s, ETA 12m3s)"}
+{"time":"2026-10-17T14:35:07.087792Z","step":"vector-build","type":"output","message":"ckv: 331/1415 files (1.2 files/s, elapsed 4m54s, ETA 14m51s)"}
+{"time":"2026-10-17T14:35:14.436635Z","step":"vector-build","type":"output","message":"ckv: 334/1415 files (0.4 files/s, elapsed 5m2s, ETA 44m10s)"}
+{"time":"2026-10-17T14:35:18.286192Z","step":"vector-build","type":"output","message":"ckv: 335/1415 files (0.3 files/s, elapsed 5m5s, ETA 1h9m17s)"}
+{"time":"2026-10-17T14:35:20.468581Z","step":"vector-build","type":"output","message":"ckv: 340/1415 files (2.3 files/s, elapsed 5m8s, ETA 7m49s)"}
+{"time":"2026-10-17T14:35:22.597667Z","step":"vector-build","type":"output","message":"ckv: 344/1415 files (1.9 files/s, elapsed 5m10s, ETA 9m30s)"}
+{"time":"2026-10-17T14:35:25.94157Z","step":"vector-build","type":"output","message":"ckv: 347/1415 files (0.9 files/s, elapsed 5m13s, ETA 19m50s)"}
+{"time":"2026-10-17T14:35:28.090443Z","step":"vector-build","type":"output","message":"ckv: 350/1415 files (1.4 files/s, elapsed 5m15s, ETA 12m42s)"}
+{"time":"2026-10-17T14:35:31.427621Z","step":"vector-build","type":"output","message":"ckv: 353/1415 files (0.9 files/s, elapsed 5m19s, ETA 19m41s)"}
+{"time":"2026-10-17T14:35:35.27458Z","step":"vector-build","type":"output","message":"ckv: 355/1415 files (0.5 files/s, elapsed 5m22s, ETA 33m57s)"}
+{"time":"2026-10-17T14:35:38.23123Z","step":"vector-build","type":"output","message":"ckv: 357/1415 files (0.7 files/s, elapsed 5m25s, ETA 26m4s)"}
+{"time":"2026-10-17T14:35:40.770303Z","step":"vector-build","type":"output","message":"ckv: 361/1415 files (1.6 files/s, elapsed 5m28s, ETA 11m9s)"}
+{"time":"2026-10-17T14:35:43.24474Z","step":"vector-build","type":"output","message":"ckv: 364/1415 files (1.2 files/s, elapsed 5m30s, ETA 14m26s)"}
+{"time":"2026-10-17T14:35:45.936058Z","step":"vector-build","type":"output","message":"ckv: 366/1415 files (0.7 files/s, elapsed 5m33s, ETA 23m32s)"}
+{"time":"2026-10-17T14:35:57.594193Z","step":"vector-build","type":"output","message":"ckv: 369/1415 files (0.3 files/s, elapsed 5m45s, ETA 1h7m43s)"}
+{"time":"2026-10-17T14:36:02.093186Z","step":"vector-build","type":"output","message":"ckv: 371/1415 files (0.4 files/s, elapsed 5m49s, ETA 39m10s)"}
+{"time":"2026-10-17T14:36:11.64427Z","step":"vector-build","type":"output","message":"ckv: 372/1415 files (0.1 files/s, elapsed 5m59s, ETA 2h45m58s)"}
+{"time":"2026-10-17T14:36:20.075406Z","step":"vector-build","type":"output","message":"ckv: 373/1415 files (0.1 files/s, elapsed 6m7s, ETA 2h26m27s)"}
+{"time":"2026-10-17T14:36:38.359574Z","step":"vector-build","type":"output","message":"ckv: 375/1415 files (0.1 files/s, elapsed 6m26s, ETA 2h38m28s)"}
+{"time":"2026-10-17T14:36:40.555398Z","step":"vector-build","type":"output","message":"ckv: 377/1415 files (0.9 files/s, elapsed 6m28s, ETA 18m58s)"}
+{"time":"2026-10-17T14:36:42.962754Z","step":"vector-build","type":"output","message":"ckv: 381/1415 files (1.7 files/s, elapsed 6m30s, ETA 10m22s)"}
+{"time":"2026-10-17T14:36:45.15875Z","step":"vector-build","type":"output","message":"ckv: 383/1415 files (0.9 files/s, elapsed 6m32s, ETA 18m54s)"}
+{"time":"2026-10-17T14:36:47.859502Z","step":"vector-build","type":"output","message":"ckv: 386/1415 files (1.1 files/s, elapsed 6m35s, ETA 15m26s)"}
+{"time":"2026-10-17T14:36:50.823425Z","step":"vector-build","type":"output","message":"ckv: 387/1415 files (0.3 files/s, elapsed 6m38s, ETA 50m46s)"}
+{"time":"2026-10-17T14:36:52.915399Z","step":"vector-build","type":"output","message":"ckv: 390/1415 files (1.4 files/s, elapsed 6m40s, ETA 11m54s)"}
+{"time":"2026-10-17T14:36:55.47321Z","step":"vector-build","type":"output","message":"ckv: 394/1415 files (1.6 files/s, elapsed 6m43s, ETA 10m53s)"}
+{"time":"2026-10-17T14:36:57.91633Z","step":"vector-build","type":"output","message":"ckv: 396/1415 files (0.8 files/s, elapsed 6m45s, ETA 20m44s)"}
+{"time":"2026-10-17T14:37:01.885041Z","step":"vector-build","type":"output","message":"ckv: 398/1415 files (0.5 files/s, elapsed 6m49s, ETA 33m37s)"}
+{"time":"2026-10-17T14:42:17.252751Z","step":"vector-build","type":"output","message":"ckv: 399/1415 files (0.0 files/s, elapsed 12m4s, ETA 89h0m14s)"}
+{"time":"2026-10-17T14:42:19.585458Z","step":"vector-build","type":"output","message":"ckv: 400/1415 files (0.4 files/s, elapsed 12m7s, ETA 39m29s)"}
+{"time":"2026-10-17T14:42:21.653164Z","step":"vector-build","type":"output","message":"ckv: 401/1415 files (0.5 files/s, elapsed 12m9s, ETA 34m56s)"}
+{"time":"2026-10-17T14:42:25.779381Z","step":"vector-build","type":"output","message":"ckv: 404/1415 files (0.7 files/s, elapsed 12m13s, ETA 23m10s)"}
+{"time":"2026-10-17T14:42:28.034489Z","step":"vector-build","type":"output","message":"ckv: 405/1415 files (0.4 files/s, elapsed 12m15s, ETA 37m57s)"}
+{"time":"2026-10-17T14:42:31.056261Z","step":"vector-build","type":"output","message":"ckv: 409/1415 files (1.3 files/s, elapsed 12m18s, ETA 12m40s)"}
+{"time":"2026-10-17T14:42:33.465541Z","step":"vector-build","type":"output","message":"ckv: 412/1415 files (1.2 files/s, elapsed 12m21s, ETA 13m25s)"}
+{"time":"2026-10-17T14:42:35.635865Z","step":"vector-build","type":"output","message":"ckv: 416/1415 files (1.8 files/s, elapsed 12m23s, ETA 9m1s)"}
+{"time":"2026-10-17T14:42:38.65602Z","step":"vector-build","type":"output","message":"ckv: 418/1415 files (0.7 files/s, elapsed 12m26s, ETA 25m7s)"}
+{"time":"2026-10-17T14:42:40.819003Z","step":"vector-build","type":"output","message":"ckv: 421/1415 files (1.4 files/s, elapsed 12m28s, ETA 11m56s)"}
+{"time":"2026-10-17T14:42:44.596017Z","step":"vector-build","type":"output","message":"ckv: 426/1415 files (1.3 files/s, elapsed 12m32s, ETA 12m27s)"}
+{"time":"2026-10-17T14:42:47.45049Z","step":"vector-build","type":"output","message":"ckv: 427/1415 files (0.4 files/s, elapsed 12m35s, ETA 47m0s)"}
+{"time":"2026-10-17T14:42:49.692636Z","step":"vector-build","type":"output","message":"ckv: 430/1415 files (1.3 files/s, elapsed 12m37s, ETA 12m13s)"}
+{"time":"2026-10-17T14:42:52.843865Z","step":"vector-build","type":"output","message":"ckv: 434/1415 files (1.3 files/s, elapsed 12m40s, ETA 12m54s)"}
+{"time":"2026-10-17T14:42:55.343226Z","step":"vector-build","type":"output","message":"ckv: 439/1415 files (2.0 files/s, elapsed 12m43s, ETA 8m7s)"}
+{"time":"2026-10-17T14:42:58.233925Z","step":"vector-build","type":"output","message":"ckv: 443/1415 files (1.4 files/s, elapsed 12m45s, ETA 11m42s)"}
+{"time":"2026-10-17T14:43:00.502159Z","step":"vector-build","type":"output","message":"ckv: 447/1415 files (1.8 files/s, elapsed 12m48s, ETA 9m8s)"}
+{"time":"2026-10-17T14:43:02.835017Z","step":"vector-build","type":"output","message":"ckv: 449/1415 files (0.9 files/s, elapsed 12m50s, ETA 18m46s)"}
+{"time":"2026-10-17T14:43:06.273969Z","step":"vector-build","type":"output","message":"ckv: 452/1415 files (0.9 files/s, elapsed 12m53s, ETA 18m23s)"}
+{"time":"2026-10-17T14:43:11.780127Z","step":"vector-build","type":"output","message":"ckv: 454/1415 files (0.4 files/s, elapsed 12m59s, ETA 44m5s)"}
+{"time":"2026-10-17T14:43:13.816484Z","step":"vector-build","type":"output","message":"ckv: 457/1415 files (1.5 files/s, elapsed 13m1s, ETA 10m50s)"}
+{"time":"2026-10-17T14:43:17.881474Z","step":"vector-build","type":"output","message":"ckv: 460/1415 files (0.7 files/s, elapsed 13m5s, ETA 21m34s)"}
+{"time":"2026-10-17T14:43:21.467448Z","step":"vector-build","type":"output","message":"ckv: 463/1415 files (0.8 files/s, elapsed 13m9s, ETA 18m57s)"}
+{"time":"2026-10-17T14:43:25.135972Z","step":"vector-build","type":"output","message":"ckv: 466/1415 files (0.8 files/s, elapsed 13m12s, ETA 19m20s)"}
+{"time":"2026-10-17T14:43:30.078025Z","step":"vector-build","type":"output","message":"ckv: 469/1415 files (0.6 files/s, elapsed 13m17s, ETA 25m58s)"}
+{"time":"2026-10-17T14:43:34.45806Z","step":"vector-build","type":"output","message":"ckv: 471/1415 files (0.5 files/s, elapsed 13m22s, ETA 34m27s)"}
+{"time":"2026-10-17T14:43:36.754089Z","step":"vector-build","type":"output","message":"ckv: 473/1415 files (0.9 files/s, elapsed 13m24s, ETA 18m1s)"}
+{"time":"2026-10-17T14:43:39.304364Z","step":"vector-build","type":"output","message":"ckv: 478/1415 files (2.0 files/s, elapsed 13m27s, ETA 7m57s)"}
+{"time":"2026-10-17T14:43:42.049525Z","step":"vector-build","type":"output","message":"ckv: 479/1415 files (0.4 files/s, elapsed 13m29s, ETA 42m49s)"}
+{"time":"2026-10-17T14:43:44.112961Z","step":"vector-build","type":"output","message":"ckv: 480/1415 files (0.5 files/s, elapsed 13m31s, ETA 32m9s)"}
+{"time":"2026-10-17T14:43:49.730049Z","step":"vector-build","type":"output","message":"ckv: 483/1415 files (0.5 files/s, elapsed 13m37s, ETA 29m5s)"}
+{"time":"2026-10-17T14:43:53.524985Z","step":"vector-build","type":"output","message":"ckv: 484/1415 files (0.3 files/s, elapsed 13m41s, ETA 58m53s)"}
+{"time":"2026-10-17T14:43:55.606248Z","step":"vector-build","type":"output","message":"ckv: 488/1415 files (1.9 files/s, elapsed 13m43s, ETA 8m2s)"}
+{"time":"2026-10-17T14:43:57.639675Z","step":"vector-build","type":"output","message":"ckv: 493/1415 files (2.5 files/s, elapsed 13m45s, ETA 6m14s)"}
+{"time":"2026-10-17T14:44:04.0828Z","step":"vector-build","type":"output","message":"ckv: 497/1415 files (0.6 files/s, elapsed 13m51s, ETA 24m38s)"}
+{"time":"2026-10-17T14:44:14.265875Z","step":"vector-build","type":"output","message":"ckv: 499/1415 files (0.2 files/s, elapsed 14m1s, ETA 1h17m44s)"}
+{"time":"2026-10-17T14:44:19.192589Z","step":"vector-build","type":"output","message":"ckv: 501/1415 files (0.4 files/s, elapsed 14m6s, ETA 37m31s)"}
+{"time":"2026-10-17T14:44:21.619054Z","step":"vector-build","type":"output","message":"ckv: 505/1415 files (1.6 files/s, elapsed 14m9s, ETA 9m12s)"}
+{"time":"2026-10-17T14:44:25.779771Z","step":"vector-build","type":"output","message":"ckv: 509/1415 files (1.0 files/s, elapsed 14m13s, ETA 15m42s)"}
+{"time":"2026-10-17T14:44:28.087945Z","step":"vector-build","type":"output","message":"ckv: 512/1415 files (1.3 files/s, elapsed 14m15s, ETA 11m34s)"}
+{"time":"2026-10-17T14:44:30.196979Z","step":"vector-build","type":"output","message":"ckv: 519/1415 files (3.3 files/s, elapsed 14m17s, ETA 4m29s)"}
+{"time":"2026-10-17T14:44:32.658258Z","step":"vector-build","type":"output","message":"ckv: 526/1415 files (2.8 files/s, elapsed 14m20s, ETA 5m12s)"}
+{"time":"2026-10-17T14:44:35.050099Z","step":"vector-build","type":"output","message":"ckv: 530/1415 files (1.7 files/s, elapsed 14m22s, ETA 8m49s)"}
+{"time":"2026-10-17T14:44:38.846779Z","step":"vector-build","type":"output","message":"ckv: 532/1415 files (0.5 files/s, elapsed 14m26s, ETA 27m56s)"}
+{"time":"2026-10-17T14:44:42.738354Z","step":"vector-build","type":"output","message":"ckv: 536/1415 files (1.0 files/s, elapsed 14m30s, ETA 14m15s)"}
+{"time":"2026-10-17T14:44:46.625174Z","step":"vector-build","type":"output","message":"ckv: 538/1415 files (0.5 files/s, elapsed 14m34s, ETA 28m24s)"}
+{"time":"2026-10-17T14:44:49.419425Z","step":"vector-build","type":"output","message":"ckv: 541/1415 files (1.1 files/s, elapsed 14m37s, ETA 13m34s)"}
+{"time":"2026-10-17T14:44:51.558513Z","step":"vector-build","type":"output","message":"ckv: 544/1415 files (1.4 files/s, elapsed 14m39s, ETA 10m21s)"}
+{"time":"2026-10-17T14:44:54.227128Z","step":"vector-build","type":"output","message":"ckv: 547/1415 files (1.1 files/s, elapsed 14m41s, ETA 12m52s)"}
+{"time":"2026-10-17T14:44:56.394937Z","step":"vector-build","type":"output","message":"ckv: 554/1415 files (3.2 files/s, elapsed 14m44s, ETA 4m26s)"}
+{"time":"2026-10-17T14:45:01.177942Z","step":"vector-build","type":"output","message":"ckv: 556/1415 files (0.4 files/s, elapsed 14m48s, ETA 34m14s)"}
+{"time":"2026-10-17T14:45:03.849894Z","step":"vector-build","type":"output","message":"ckv: 558/1415 files (0.7 files/s, elapsed 14m51s, ETA 19m4s)"}
+{"time":"2026-10-17T14:45:07.093744Z","step":"vector-build","type":"output","message":"ckv: 562/1415 files (1.2 files/s, elapsed 14m54s, ETA 11m31s)"}
+{"time":"2026-10-17T14:45:09.297215Z","step":"vector-build","type":"output","message":"ckv: 565/1415 files (1.4 files/s, elapsed 14m57s, ETA 10m24s)"}
+{"time":"2026-10-17T14:45:12.986558Z","step":"vector-build","type":"output","message":"ckv: 567/1415 files (0.5 files/s, elapsed 15m0s, ETA 26m4s)"}
+{"time":"2026-10-17T14:45:15.919691Z","step":"vector-build","type":"output","message":"ckv: 568/1415 files (0.3 files/s, elapsed 15m3s, ETA 41m24s)"}
+{"time":"2026-10-17T14:45:19.241287Z","step":"vector-build","type":"output","message":"ckv: 572/1415 files (1.2 files/s, elapsed 15m6s, ETA 11m40s)"}
+{"time":"2026-10-17T14:45:23.024507Z","step":"vector-build","type":"output","message":"ckv: 579/1415 files (1.9 files/s, elapsed 15m10s, ETA 7m31s)"}
+{"time":"2026-10-17T14:45:25.165868Z","step":"vector-build","type":"output","message":"ckv: 583/1415 files (1.9 files/s, elapsed 15m12s, ETA 7m25s)"}
+{"time":"2026-10-17T14:45:28.762845Z","step":"vector-build","type":"output","message":"ckv: 587/1415 files (1.1 files/s, elapsed 15m16s, ETA 12m24s)"}
+{"time":"2026-10-17T14:45:30.785942Z","step":"vector-build","type":"output","message":"ckv: 591/1415 files (2.0 files/s, elapsed 15m18s, ETA 6m56s)"}
+{"time":"2026-10-17T14:45:50.222933Z","step":"vector-build","type":"output","message":"ckv: 597/1415 files (0.3 files/s, elapsed 15m37s, ETA 44m9s)"}
+{"time":"2026-10-17T14:45:52.797587Z","step":"vector-build","type":"output","message":"ckv: 604/1415 files (2.7 files/s, elapsed 15m40s, ETA 4m58s)"}
+{"time":"2026-10-17T14:45:55.03102Z","step":"vector-build","type":"output","message":"ckv: 608/1415 files (1.8 files/s, elapsed 15m42s, ETA 7m30s)"}
+{"time":"2026-10-17T14:45:58.877423Z","step":"vector-build","type":"output","message":"ckv: 611/1415 files (0.8 files/s, elapsed 15m46s, ETA 17m11s)"}
+{"time":"2026-10-17T14:46:02.748964Z","step":"vector-build","type":"output","message":"ckv: 619/1415 files (2.1 files/s, elapsed 15m50s, ETA 6m25s)"}
+{"time":"2026-10-17T14:46:05.337637Z","step":"vector-build","type":"output","message":"ckv: 621/1415 files (0.8 files/s, elapsed 15m53s, ETA 17m7s)"}
+{"time":"2026-10-17T14:46:08.62309Z","step":"vector-build","type":"output","message":"ckv: 626/1415 files (1.5 files/s, elapsed 15m56s, ETA 8m38s)"}
+{"time":"2026-10-17T14:46:11.421187Z","step":"vector-build","type":"output","message":"ckv: 630/1415 files (1.4 files/s, elapsed 15m59s, ETA 9m9s)"}
+{"time":"2026-10-17T14:46:15.23525Z","step":"vector-build","type":"output","message":"ckv: 632/1415 files (0.5 files/s, elapsed 16m2s, ETA 24m53s)"}
+{"time":"2026-10-17T14:46:17.476728Z","step":"vector-build","type":"output","message":"ckv: 634/1415 files (0.9 files/s, elapsed 16m5s, ETA 14m35s)"}
+{"time":"2026-10-17T14:46:19.743122Z","step":"vector-build","type":"output","message":"ckv: 636/1415 files (0.9 files/s, elapsed 16m7s, ETA 14m42s)"}
+{"time":"2026-10-17T14:46:22.09129Z","step":"vector-build","type":"output","message":"ckv: 638/1415 files (0.9 files/s, elapsed 16m9s, ETA 15m12s)"}
+{"time":"2026-10-17T14:46:24.515988Z","step":"vector-build","type":"output","message":"ckv: 641/1415 files (1.2 files/s, elapsed 16m12s, ETA 10m25s)"}
+{"time":"2026-10-17T14:46:26.600261Z","step":"vector-build","type":"output","message":"ckv: 645/1415 files (1.9 files/s, elapsed 16m14s, ETA 6m41s)"}
+{"time":"2026-10-17T14:46:28.813206Z","step":"vector-build","type":"output","message":"ckv: 650/1415 files (2.3 files/s, elapsed 16m16s, ETA 5m38s)"}
+{"time":"2026-10-17T14:46:30.86112Z","step":"vector-build","type":"output","message":"ckv: 653/1415 files (1.5 files/s, elapsed 16m18s, ETA 8m40s)"}
+{"time":"2026-10-17T14:46:33.417347Z","step":"vector-build","type":"output","message":"ckv: 660/1415 files (2.7 files/s, elapsed 16m21s, ETA 4m35s)"}
+{"time":"2026-10-17T14:46:35.540926Z","step":"vector-build","type":"output","message":"ckv: 662/1415 files (0.9 files/s, elapsed 16m23s, ETA 13m19s)"}
+{"time":"2026-10-17T14:46:37.631253Z","step":"vector-build","type":"output","message":"ckv: 665/1415 files (1.4 files/s, elapsed 16m25s, ETA 8m42s)"}
+{"time":"2026-10-17T14:46:40.172503Z","step":"vector-build","type":"output","message":"ckv: 669/1415 files (1.6 files/s, elapsed 16m27s, ETA 7m53s)"}
+{"time":"2026-10-17T14:46:43.224938Z","step":"vector-build","type":"output","message":"ckv: 673/1415 files (1.3 files/s, elapsed 16m30s, ETA 9m26s)"}
+{"time":"2026-10-17T14:46:45.963599Z","step":"vector-build","type":"output","message":"ckv: 676/1415 files (1.1 files/s, elapsed 16m33s, ETA 11m14s)"}
+{"time":"2026-10-17T14:46:48.334306Z","step":"vector-build","type":"output","message":"ckv: 681/1415 files (2.1 files/s, elapsed 16m36s, ETA 5m48s)"}
+{"time":"2026-10-17T14:46:51.44062Z","step":"vector-build","type":"output","message":"ckv: 685/1415 files (1.3 files/s, elapsed 16m39s, ETA 9m26s)"}
+{"time":"2026-10-17T14:46:54.597733Z","step":"vector-build","type":"output","message":"ckv: 690/1415 files (1.6 files/s, elapsed 16m42s, ETA 7m37s)"}
+{"time":"2026-10-17T14:46:57.825752Z","step":"vector-build","type":"output","message":"ckv: 693/1415 files (0.9 files/s, elapsed 16m45s, ETA 12m56s)"}
+{"time":"2026-10-17T14:46:59.993299Z","step":"vector-build","type":"output","message":"ckv: 704/1415 files (5.1 files/s, elapsed 16m47s, ETA 2m20s)"}
+{"time":"2026-10-17T14:47:02.007235Z","step":"vector-build","type":"output","message":"ckv: 709/1415 files (2.5 files/s, elapsed 16m49s, ETA 4m44s)"}
+{"time":"2026-10-17T14:47:04.196134Z","step":"vector-build","type":"output","message":"ckv: 714/1415 files (2.3 files/s, elapsed 16m51s, ETA 5m6s)"}
+{"time":"2026-10-17T14:47:06.369761Z","step":"vector-build","type":"output","message":"ckv: 715/1415 files (0.5 files/s, elapsed 16m54s, ETA 25m21s)"}
+{"time":"2026-10-17T14:47:10.147828Z","step":"vector-build","type":"output","message":"ckv: 719/1415 files (1.1 files/s, elapsed 16m57s, ETA 10m57s)"}
+{"time":"2026-10-17T14:47:13.067613Z","step":"vector-build","type":"output","message":"ckv: 721/1415 files (0.7 files/s, elapsed 17m0s, ETA 16m53s)"}
+{"time":"2026-10-17T14:47:17.051594Z","step":"vector-build","type":"output","message":"ckv: 722/1415 files (0.3 files/s, elapsed 17m4s, ETA 46m0s)"}
+{"time":"2026-10-17T14:47:19.057358Z","step":"vector-build","type":"output","message":"ckv: 726/1415 files (2.0 files/s, elapsed 17m6s, ETA 5m45s)"}
+{"time":"2026-10-17T14:47:25.375233Z","step":"vector-build","type":"output","message":"ckv: 731/1415 files (0.8 files/s, elapsed 17m13s, ETA 14m24s)"}
+{"time":"2026-10-17T14:47:29.46593Z","step":"vector-build","type":"output","message":"ckv: 732/1415 files (0.2 files/s, elapsed 17m17s, ETA 46m33s)"}
+{"time":"2026-10-17T14:47:31.470994Z","step":"vector-build","type":"output","message":"ckv: 737/1415 files (2.5 files/s, elapsed 17m19s, ETA 4m31s)"}
+{"time":"2026-10-17T14:47:35.566558Z","step":"vector-build","type":"output","message":"ckv: 742/1415 files (1.2 files/s, elapsed 17m23s, ETA 9m11s)"}
+{"time":"2026-10-17T14:47:40.587587Z","step":"vector-build","type":"output","message":"ckv: 745/1415 files (0.6 files/s, elapsed 17m28s, ETA 18m41s)"}
+{"time":"2026-10-17T14:47:43.200496Z","step":"vector-build","type":"output","message":"ckv: 746/1415 files (0.4 files/s, elapsed 17m30s, ETA 29m8s)"}
+{"time":"2026-10-17T14:47:45.499533Z","step":"vector-build","type":"output","message":"ckv: 750/1415 files (1.7 files/s, elapsed 17m33s, ETA 6m22s)"}
+{"time":"2026-10-17T14:47:48.797781Z","step":"vector-build","type":"output","message":"ckv: 752/1415 files (0.6 files/s, elapsed 17m36s, ETA 18m13s)"}
+{"time":"2026-10-17T14:47:51.378679Z","step":"vector-build","type":"output","message":"ckv: 753/1415 files (0.4 files/s, elapsed 17m39s, ETA 28m28s)"}
+{"time":"2026-10-17T14:47:53.780709Z","step":"vector-build","type":"output","message":"ckv: 754/1415 files (0.4 files/s, elapsed 17m41s, ETA 26m27s)"}
+{"time":"2026-10-17T14:47:59.357316Z","step":"vector-build","type":"output","message":"ckv: 755/1415 files (0.2 files/s, elapsed 17m47s, ETA 1h1m20s)"}
+{"time":"2026-10-17T14:48:01.941516Z","step":"vector-build","type":"output","message":"ckv: 758/1415 files (1.2 files/s, elapsed 17m49s, ETA 9m25s)"}
+{"time":"2026-10-17T14:48:04.428769Z","step":"vector-build","type":"output","message":"ckv: 760/1415 files (0.8 files/s, elapsed 17m52s, ETA 13m34s)"}
+{"time":"2026-10-17T14:48:07.13221Z","step":"vector-build","type":"output","message":"ckv: 761/1415 files (0.4 files/s, elapsed 17m54s, ETA 29m27s)"}
+{"time":"2026-10-17T14:48:09.756495Z","step":"vector-build","type":"output","message":"ckv: 763/1415 files (0.8 files/s, elapsed 17m57s, ETA 14m15s)"}
+{"time":"2026-10-17T14:48:12.270832Z","step":"vector-build","type":"output","message":"ckv: 767/1415 files (1.6 files/s, elapsed 17m59s, ETA 6m47s)"}
+{"time":"2026-10-17T14:48:14.604077Z","step":"vector-build","type":"output","message":"ckv: 769/1415 files (0.9 files/s, elapsed 18m2s, ETA 12m33s)"}
+{"time":"2026-10-17T14:48:16.949333Z","step":"vector-build","type":"output","message":"ckv: 771/1415 files (0.9 files/s, elapsed 18m4s, ETA 12m35s)"}
+{"time":"2026-10-17T14:48:19.261095Z","step":"vector-build","type":"output","message":"ckv: 776/1415 files (2.2 files/s, elapsed 18m6s, ETA 4m55s)"}
+{"time":"2026-10-17T14:48:22.762772Z","step":"vector-build","type":"output","message":"ckv: 781/1415 files (1.4 files/s, elapsed 18m10s, ETA 7m24s)"}
+{"time":"2026-10-17T14:48:24.902147Z","step":"vector-build","type":"output","message":"ckv: 784/1415 files (1.4 files/s, elapsed 18m12s, ETA 7m29s)"}
+{"time":"2026-10-17T14:48:27.029324Z","step":"vector-build","type":"output","message":"ckv: 787/1415 files (1.4 files/s, elapsed 18m14s, ETA 7m25s)"}
+{"time":"2026-10-17T14:48:29.042123Z","step":"vector-build","type":"output","message":"ckv: 788/1415 files (0.5 files/s, elapsed 18m16s, ETA 21m2s)"}
+{"time":"2026-10-17T14:48:31.11352Z","step":"vector-build","type":"output","message":"ckv: 792/1415 files (1.9 files/s, elapsed 18m18s, ETA 5m22s)"}
+{"time":"2026-10-17T14:48:33.747996Z","step":"vector-build","type":"output","message":"ckv: 794/1415 files (0.8 files/s, elapsed 18m21s, ETA 13m38s)"}
+{"time":"2026-10-17T14:48:37.576148Z","step":"vector-build","type":"output","message":"ckv: 799/1415 files (1.3 files/s, elapsed 18m25s, ETA 7m51s)"}
+{"time":"2026-10-17T14:48:46.190426Z","step":"vector-build","type":"output","message":"ckv: 803/1415 files (0.5 files/s, elapsed 18m33s, ETA 21m57s)"}
+{"time":"2026-10-17T14:48:51.079414Z","step":"vector-build","type":"output","message":"ckv: 804/1415 files (0.2 files/s, elapsed 18m38s, ETA 49m47s)"}
+{"time":"2026-10-17T14:48:53.117135Z","step":"vector-build","type":"output","message":"ckv: 807/1415 files (1.5 files/s, elapsed 18m40s, ETA 6m52s)"}
+{"time":"2026-10-17T14:48:56.111607Z","step":"vector-build","type":"output","message":"ckv: 809/1415 files (0.7 files/s, elapsed 18m43s, ETA 15m7s)"}
+{"time":"2026-10-17T14:48:58.921031Z","step":"vector-build","type":"output","message":"ckv: 810/1415 files (0.4 files/s, elapsed 18m46s, ETA 28m19s)"}
+{"time":"2026-10-17T14:49:01.071152Z","step":"vector-build","type":"output","message":"ckv: 812/1415 files (0.9 files/s, elapsed 18m48s, ETA 10m48s)"}
+{"time":"2026-10-17T14:49:05.698993Z","step":"vector-build","type":"output","message":"ckv: 817/1415 files (1.1 files/s, elapsed 18m53s, ETA 9m13s)"}
+{"time":"2026-10-17T14:49:08.909902Z","step":"vector-build","type":"output","message":"ckv: 818/1415 files (0.3 files/s, elapsed 18m56s, ETA 31m56s)"}
+{"time":"2026-10-17T14:49:11.603681Z","step":"vector-build","type":"output","message":"ckv: 829/1415 files (4.1 files/s, elapsed 18m59s, ETA 2m23s)"}
+{"time":"2026-10-17T14:49:14.587282Z","step":"vector-build","type":"output","message":"ckv: 832/1415 files (1.0 files/s, elapsed 19m2s, ETA 9m39s)"}
+{"time":"2026-10-17T14:49:16.962054Z","step":"vector-build","type":"output","message":"ckv: 836/1415 files (1.7 files/s, elapsed 19m4s, ETA 5m43s)"}
+{"time":"2026-10-17T14:49:19.18066Z","step":"vector-build","type":"output","message":"ckv: 840/1415 files (1.8 files/s, elapsed 19m6s, ETA 5m18s)"}
+{"time":"2026-10-17T14:49:21.68757Z","step":"vector-build","type":"output","message":"ckv: 844/1415 files (1.6 files/s, elapsed 19m9s, ETA 5m57s)"}
+{"time":"2026-10-17T14:49:26.031546Z","step":"vector-build","type":"output","message":"ckv: 849/1415 files (1.2 files/s, elapsed 19m13s, ETA 8m11s)"}
+{"time":"2026-10-17T14:49:28.381154Z","step":"vector-build","type":"output","message":"ckv: 851/1415 files (0.9 files/s, elapsed 19m16s, ETA 11m2s)"}
+{"time":"2026-10-17T14:49:30.406333Z","step":"vector-build","type":"output","message":"ckv: 856/1415 files (2.5 files/s, elapsed 19m18s, ETA 3m46s)"}
+{"time":"2026-10-17T14:49:33.150524Z","step":"vector-build","type":"output","message":"ckv: 859/1415 files (1.1 files/s, elapsed 19m20s, ETA 8m28s)"}
+{"time":"2026-10-17T14:49:35.293242Z","step":"vector-build","type":"output","message":"ckv: 862/1415 files (1.4 files/s, elapsed 19m22s, ETA 6m35s)"}
+{"time":"2026-10-17T14:49:38.378344Z","step":"vector-build","type":"output","message":"ckv: 866/1415 files (1.3 files/s, elapsed 19m26s, ETA 7m3s)"}
+{"time":"2026-10-17T14:49:40.437644Z","step":"vector-build","type":"output","message":"ckv: 868/1415 files (1.0 files/s, elapsed 19m28s, ETA 9m23s)"}
+{"time":"2026-10-17T14:49:43.524202Z","step":"vector-build","type":"output","message":"ckv: 872/1415 files (1.3 files/s, elapsed 19m31s, ETA 6m59s)"}
+{"time":"2026-10-17T14:49:45.554607Z","step":"vector-build","type":"output","message":"ckv: 878/1415 files (3.0 files/s, elapsed 19m33s, ETA 3m1s)"}
+{"time":"2026-10-17T14:49:47.780175Z","step":"vector-build","type":"output","message":"ckv: 883/1415 files (2.2 files/s, elapsed 19m35s, ETA 3m56s)"}
+{"time":"2026-10-17T14:49:49.853526Z","step":"vector-build","type":"output","message":"ckv: 888/1415 files (2.4 files/s, elapsed 19m37s, ETA 3m38s)"}
+{"time":"2026-10-17T14:49:54.684611Z","step":"vector-build","type":"output","message":"ckv: 889/1415 files (0.2 files/s, elapsed 19m42s, ETA 42m21s)"}
+{"time":"2026-10-17T14:49:57.289574Z","step":"vector-build","type":"output","message":"ckv: 892/1415 files (1.2 files/s, elapsed 19m44s, ETA 7m34s)"}
+{"time":"2026-10-17T14:50:11.879644Z","step":"vector-build","type":"output","message":"ckv: 893/1415 files (0.1 files/s, elapsed 19m59s, ETA 2h6m56s)"}
+{"time":"2026-10-17T14:50:14.315765Z","step":"vector-build","type":"output","message":"ckv: 895/1415 files (0.8 files/s, elapsed 20m2s, ETA 10m33s)"}
+{"time":"2026-10-17T14:50:16.448154Z","step":"vector-build","type":"output","message":"ckv: 899/1415 files (1.9 files/s, elapsed 20m4s, ETA 4m35s)"}
+{"time":"2026-10-17T14:50:18.689769Z","step":"vector-build","type":"output","message":"ckv: 905/1415 files (2.7 files/s, elapsed 20m6s, ETA 3m10s)"}
+{"time":"2026-10-17T14:50:21.02832Z","step":"vector-build","type":"output","message":"ckv: 908/1415 files (1.3 files/s, elapsed 20m8s, ETA 6m35s)"}
+{"time":"2026-10-17T14:50:23.193639Z","step":"vector-build","type":"output","message":"ckv: 914/1415 files (2.8 files/s, elapsed 20m10s, ETA 3m0s)"}
+{"time":"2026-10-17T14:50:31.898762Z","step":"vector-build","type":"output","message":"ckv: 919/1415 files (0.6 files/s, elapsed 20m19s, ETA 14m23s)"}
+{"time":"2026-10-17T14:50:38.580997Z","step":"vector-build","type":"output","message":"ckv: 920/1415 files (0.1 files/s, elapsed 20m26s, ETA 55m7s)"}
+{"time":"2026-10-17T14:50:41.298223Z","step":"vector-build","type":"output","message":"ckv: 924/1415 files (1.5 files/s, elapsed 20m29s, ETA 5m33s)"}
+{"time":"2026-10-17T14:50:43.379768Z","step":"vector-build","type":"output","message":"ckv: 926/1415 files (1.0 files/s, elapsed 20m31s, ETA 8m28s)"}
+{"time":"2026-10-17T14:50:45.721455Z","step":"vector-build","type":"output","message":"ckv: 929/1415 files (1.3 files/s, elapsed 20m33s, ETA 6m19s)"}
+{"time":"2026-10-17T14:50:51.095757Z","step":"vector-build","type":"output","message":"ckv: 934/1415 files (0.9 files/s, elapsed 20m38s, ETA 8m37s)"}
+{"time":"2026-10-17T14:50:53.125477Z","step":"vector-build","type":"output","message":"ckv: 936/1415 files (1.0 files/s, elapsed 20m40s, ETA 8m6s)"}
+{"time":"2026-10-17T14:50:55.156893Z","step":"vector-build","type":"output","message":"ckv: 940/1415 files (2.0 files/s, elapsed 20m42s, ETA 4m1s)"}
+{"time":"2026-10-17T14:50:57.759124Z","step":"vector-build","type":"output","message":"ckv: 947/1415 files (2.7 files/s, elapsed 20m45s, ETA 2m53s)"}
+{"time":"2026-10-17T14:51:00.170022Z","step":"vector-build","type":"output","message":"ckv: 951/1415 files (1.7 files/s, elapsed 20m47s, ETA 4m39s)"}
+{"time":"2026-10-17T14:51:02.643894Z","step":"vector-build","type":"output","message":"ckv: 955/1415 files (1.6 files/s, elapsed 20m50s, ETA 4m44s)"}
+{"time":"2026-10-17T14:51:04.732402Z","step":"vector-build","type":"output","message":"ckv: 961/1415 files (2.9 files/s, elapsed 20m52s, ETA 2m38s)"}
+{"time":"2026-10-17T14:51:06.818532Z","step":"vector-build","type":"output","message":"ckv: 971/1415 files (4.8 files/s, elapsed 20m54s, ETA 1m32s)"}
+{"time":"2026-10-17T14:51:08.921846Z","step":"vector-build","type":"output","message":"ckv: 978/1415 files (3.3 files/s, elapsed 20m56s, ETA 2m11s)"}
+{"time":"2026-10-17T14:51:11.204994Z","step":"vector-build","type":"output","message":"ckv: 986/1415 files (3.5 files/s, elapsed 20m58s, ETA 2m2s)"}
+{"time":"2026-10-17T14:51:15.430769Z","step":"vector-build","type":"output","message":"ckv: 994/1415 files (1.9 files/s, elapsed 21m3s, ETA 3m42s)"}
+{"time":"2026-10-17T14:51:17.607767Z","step":"vector-build","type":"output","message":"ckv: 1000/1415 files (2.8 files/s, elapsed 21m5s, ETA 2m30s)"}
+{"time":"2026-10-17T14:51:19.620975Z","step":"vector-build","type":"output","message":"ckv: 1005/1415 files (2.5 files/s, elapsed 21m7s, ETA 2m45s)"}
+{"time":"2026-10-17T14:51:21.881174Z","step":"vector-build","type":"output","message":"ckv: 1009/1415 files (1.8 files/s, elapsed 21m9s, ETA 3m49s)"}
+{"time":"2026-10-17T14:51:24.77517Z","step":"vector-build","type":"output","message":"ckv: 1014/1415 files (1.7 files/s, elapsed 21m12s, ETA 3m52s)"}
+{"time":"2026-10-17T14:51:27.799772Z","step":"vector-build","type":"output","message":"ckv: 1016/1415 files (0.7 files/s, elapsed 21m15s, ETA 10m3s)"}
+{"time":"2026-10-17T14:51:29.831949Z","step":"vector-build","type":"output","message":"ckv: 1019/1415 files (1.5 files/s, elapsed 21m17s, ETA 4m28s)"}
+{"time":"2026-10-17T14:51:31.844975Z","step":"vector-build","type":"output","message":"ckv: 1023/1415 files (2.0 files/s, elapsed 21m19s, ETA 3m17s)"}
+{"time":"2026-10-17T14:51:35.985935Z","step":"vector-build","type":"output","message":"ckv: 1026/1415 files (0.7 files/s, elapsed 21m23s, ETA 8m56s)"}
+{"time":"2026-10-17T14:51:41.34761Z","step":"vector-build","type":"output","message":"ckv: 1031/1415 files (0.9 files/s, elapsed 21m29s, ETA 6m51s)"}
+{"time":"2026-10-17T14:51:43.713024Z","step":"vector-build","type":"output","message":"ckv: 1033/1415 files (0.8 files/s, elapsed 21m31s, ETA 7m31s)"}
+{"time":"2026-10-17T14:51:45.719163Z","step":"vector-build","type":"output","message":"ckv: 1035/1415 files (1.0 files/s, elapsed 21m33s, ETA 6m21s)"}
+{"time":"2026-10-17T14:51:49.754663Z","step":"vector-build","type":"output","message":"ckv: 1044/1415 files (2.2 files/s, elapsed 21m37s, ETA 2m46s)"}
+{"time":"2026-10-17T14:51:51.868564Z","step":"vector-build","type":"output","message":"ckv: 1047/1415 files (1.4 files/s, elapsed 21m39s, ETA 4m19s)"}
+{"time":"2026-10-17T14:51:55.083916Z","step":"vector-build","type":"output","message":"ckv: 1049/1415 files (0.6 files/s, elapsed 21m42s, ETA 9m48s)"}
+{"time":"2026-10-17T14:51:58.577984Z","step":"vector-build","type":"output","message":"ckv: 1052/1415 files (0.9 files/s, elapsed 21m46s, ETA 7m2s)"}
+{"time":"2026-10-17T14:52:02.150582Z","step":"vector-build","type":"output","message":"ckv: 1058/1415 files (1.7 files/s, elapsed 21m49s, ETA 3m32s)"}
+{"time":"2026-10-17T14:52:05.241675Z","step":"vector-build","type":"output","message":"ckv: 1061/1415 files (1.0 files/s, elapsed 21m52s, ETA 6m4s)"}
+{"time":"2026-10-17T14:52:07.301395Z","step":"vector-build","type":"output","message":"ckv: 1062/1415 files (0.5 files/s, elapsed 21m55s, ETA 12m7s)"}
+{"time":"2026-10-17T14:52:10.666076Z","step":"vector-build","type":"output","message":"ckv: 1064/1415 files (0.6 files/s, elapsed 21m58s, ETA 9m50s)"}
+{"time":"2026-10-17T14:52:14.208513Z","step":"vector-build","type":"output","message":"ckv: 1067/1415 files (0.8 files/s, elapsed 22m1s, ETA 6m50s)"}
+{"time":"2026-10-17T14:52:16.798419Z","step":"vector-build","type":"output","message":"ckv: 1069/1415 files (0.8 files/s, elapsed 22m4s, ETA 7m28s)"}
+{"time":"2026-10-17T14:52:19.049137Z","step":"vector-build","type":"output","message":"ckv: 1071/1415 files (0.9 files/s, elapsed 22m6s, ETA 6m27s)"}
+{"time":"2026-10-17T14:52:22.458462Z","step":"vector-build","type":"output","message":"ckv: 1073/1415 files (0.6 files/s, elapsed 22m10s, ETA 9m43s)"}
+{"time":"2026-10-17T14:52:25.190394Z","step":"vector-build","type":"output","message":"ckv: 1076/1415 files (1.1 files/s, elapsed 22m12s, ETA 5m8s)"}
+{"time":"2026-10-17T14:52:28.119915Z","step":"vector-build","type":"output","message":"ckv: 1081/1415 files (1.7 files/s, elapsed 22m15s, ETA 3m15s)"}
+{"time":"2026-10-17T14:52:30.263284Z","step":"vector-build","type":"output","message":"ckv: 1085/1415 files (1.9 files/s, elapsed 22m17s, ETA 2m56s)"}
+{"time":"2026-10-17T14:52:32.28361Z","step":"vector-build","type":"output","message":"ckv: 1088/1415 files (1.5 files/s, elapsed 22m19s, ETA 3m40s)"}
+{"time":"2026-10-17T14:52:35.123719Z","step":"vector-build","type":"output","message":"ckv: 1091/1415 files (1.1 files/s, elapsed 22m22s, ETA 5m6s)"}
+{"time":"2026-10-17T14:52:37.487794Z","step":"vector-build","type":"output","message":"ckv: 1094/1415 files (1.3 files/s, elapsed 22m25s, ETA 4m12s)"}
+{"time":"2026-10-17T14:52:40.321214Z","step":"vector-build","type":"output","message":"ckv: 1097/1415 files (1.1 files/s, elapsed 22m28s, ETA 5m0s)"}
+{"time":"2026-10-17T14:52:42.931564Z","step":"vector-build","type":"output","message":"ckv: 1101/1415 files (1.5 files/s, elapsed 22m30s, ETA 3m24s)"}
+{"time":"2026-10-17T14:52:45.595166Z","step":"vector-build","type":"output","message":"ckv: 1107/1415 files (2.3 files/s, elapsed 22m33s, ETA 2m16s)"}
+{"time":"2026-10-17T14:52:47.66283Z","step":"vector-build","type":"output","message":"ckv: 1113/1415 files (2.9 files/s, elapsed 22m35s, ETA 1m44s)"}
+{"time":"2026-10-17T14:52:51.147423Z","step":"vector-build","type":"output","message":"ckv: 1117/1415 files (1.1 files/s, elapsed 22m38s, ETA 4m19s)"}
+{"time":"2026-10-17T14:52:53.616254Z","step":"vector-build","type":"output","message":"ckv: 1119/1415 files (0.8 files/s, elapsed 22m41s, ETA 6m5s)"}
+{"time":"2026-10-17T14:52:55.762031Z","step":"vector-build","type":"output","message":"ckv: 1124/1415 files (2.3 files/s, elapsed 22m43s, ETA 2m4s)"}
+{"time":"2026-10-17T14:52:59.295674Z","step":"vector-build","type":"output","message":"ckv: 1127/1415 files (0.8 files/s, elapsed 22m47s, ETA 5m39s)"}
+{"time":"2026-10-17T14:53:01.886274Z","step":"vector-build","type":"output","message":"ckv: 1128/1415 files (0.4 files/s, elapsed 22m49s, ETA 12m23s)"}
+{"time":"2026-10-17T14:53:03.913825Z","step":"vector-build","type":"output","message":"ckv: 1131/1415 files (1.5 files/s, elapsed 22m51s, ETA 3m11s)"}
+{"time":"2026-10-17T14:53:06.446577Z","step":"vector-build","type":"output","message":"ckv: 1134/1415 files (1.2 files/s, elapsed 22m54s, ETA 3m57s)"}
+{"time":"2026-10-17T14:53:08.591232Z","step":"vector-build","type":"output","message":"ckv: 1138/1415 files (1.9 files/s, elapsed 22m56s, ETA 2m28s)"}
+{"time":"2026-10-17T14:53:11.34705Z","step":"vector-build","type":"output","message":"ckv: 1142/1415 files (1.5 files/s, elapsed 22m59s, ETA 3m8s)"}
+{"time":"2026-10-17T14:53:13.521628Z","step":"vector-build","type":"output","message":"ckv: 1144/1415 files (0.9 files/s, elapsed 23m1s, ETA 4m54s)"}
+{"time":"2026-10-17T14:53:16.882743Z","step":"vector-build","type":"output","message":"ckv: 1146/1415 files (0.6 files/s, elapsed 23m4s, ETA 7m32s)"}
+{"time":"2026-10-17T14:53:19.013724Z","step":"vector-build","type":"output","message":"ckv: 1149/1415 files (1.4 files/s, elapsed 23m6s, ETA 3m8s)"}
+{"time":"2026-10-17T14:53:21.119241Z","step":"vector-build","type":"output","message":"ckv: 1154/1415 files (2.4 files/s, elapsed 23m8s, ETA 1m49s)"}
+{"time":"2026-10-17T14:53:23.218528Z","step":"vector-build","type":"output","message":"ckv: 1157/1415 files (1.4 files/s, elapsed 23m10s, ETA 3m0s)"}
+{"time":"2026-10-17T14:53:28.810601Z","step":"vector-build","type":"output","message":"ckv: 1158/1415 files (0.2 files/s, elapsed 23m16s, ETA 23m57s)"}
+{"time":"2026-10-17T14:53:31.533464Z","step":"vector-build","type":"output","message":"ckv: 1161/1415 files (1.1 files/s, elapsed 23m19s, ETA 3m50s)"}
+{"time":"2026-10-17T14:53:36.2971Z","step":"vector-build","type":"output","message":"ckv: 1167/1415 files (1.3 files/s, elapsed 23m24s, ETA 3m16s)"}
+{"time":"2026-10-17T14:53:39.8966Z","step":"vector-build","type":"output","message":"ckv: 1169/1415 files (0.6 files/s, elapsed 23m27s, ETA 7m22s)"}
+{"time":"2026-10-17T14:53:42.663664Z","step":"vector-build","type":"output","message":"ckv: 1173/1415 files (1.4 files/s, elapsed 23m30s, ETA 2m47s)"}
+{"time":"2026-10-17T14:53:44.862211Z","step":"vector-build","type":"output","message":"ckv: 1174/1415 files (0.5 files/s, elapsed 23m32s, ETA 8m49s)"}
+{"time":"2026-10-17T14:53:47.299499Z","step":"vector-build","type":"output","message":"ckv: 1179/1415 files (2.1 files/s, elapsed 23m35s, ETA 1m55s)"}
+{"time":"2026-10-17T14:53:51.227817Z","step":"vector-build","type":"output","message":"ckv: 1181/1415 files (0.5 files/s, elapsed 23m38s, ETA 7m39s)"}
+{"time":"2026-10-17T14:53:54.628574Z","step":"vector-build","type":"output","message":"ckv: 1188/1415 files (2.1 files/s, elapsed 23m42s, ETA 1m50s)"}
+{"time":"2026-10-17T14:53:56.982512Z","step":"vector-build","type":"output","message":"ckv: 1192/1415 files (1.7 files/s, elapsed 23m44s, ETA 2m11s)"}
+{"time":"2026-10-17T14:53:59.610365Z","step":"vector-build","type":"output","message":"ckv: 1197/1415 files (1.9 files/s, elapsed 23m47s, ETA 1m54s)"}
+{"time":"2026-10-17T14:54:01.637059Z","step":"vector-build","type":"output","message":"ckv: 1202/1415 files (2.5 files/s, elapsed 23m49s, ETA 1m26s)"}
+{"time":"2026-10-17T14:54:04.070098Z","step":"vector-build","type":"output","message":"ckv: 1207/1415 files (2.1 files/s, elapsed 23m51s, ETA 1m41s)"}
+{"time":"2026-10-17T14:54:06.365908Z","step":"vector-build","type":"output","message":"ckv: 1211/1415 files (1.7 files/s, elapsed 23m54s, ETA 1m57s)"}
+{"time":"2026-10-17T14:54:09.17374Z","step":"vector-build","type":"output","message":"ckv: 1230/1415 files (6.8 files/s, elapsed 23m56s, ETA 27s)"}
+{"time":"2026-10-17T14:54:11.836415Z","step":"vector-build","type":"output","message":"ckv: 1234/1415 files (1.5 files/s, elapsed 23m59s, ETA 2m0s)"}
+{"time":"2026-10-17T14:54:14.527915Z","step":"vector-build","type":"output","message":"ckv: 1236/1415 files (0.7 files/s, elapsed 24m2s, ETA 4m0s)"}
+{"time":"2026-10-17T14:54:17.071427Z","step":"vector-build","type":"output","message":"ckv: 1238/1415 files (0.8 files/s, elapsed 24m4s, ETA 3m45s)"}
+{"time":"2026-10-17T14:54:19.634485Z","step":"vector-build","type":"output","message":"ckv: 1243/1415 files (2.0 files/s, elapsed 24m7s, ETA 1m28s)"}
+{"time":"2026-10-17T14:54:22.850515Z","step":"vector-build","type":"output","message":"ckv: 1244/1415 files (0.3 files/s, elapsed 24m10s, ETA 9m9s)"}
+{"time":"2026-10-17T14:54:25.031269Z","step":"vector-build","type":"output","message":"ckv: 1250/1415 files (2.8 files/s, elapsed 24m12s, ETA 59s)"}
+{"time":"2026-10-17T14:54:27.696865Z","step":"vector-build","type":"output","message":"ckv: 1256/1415 files (2.3 files/s, elapsed 24m15s, ETA 1m10s)"}
+{"time":"2026-10-17T14:54:29.79627Z","step":"vector-build","type":"output","message":"ckv: 1257/1415 files (0.5 files/s, elapsed 24m17s, ETA 5m31s)"}
+{"time":"2026-10-17T14:54:32.003448Z","step":"vector-build","type":"output","message":"ckv: 1263/1415 files (2.7 files/s, elapsed 24m19s, ETA 55s)"}
+{"time":"2026-10-17T14:54:34.913474Z","step":"vector-build","type":"output","message":"ckv: 1268/1415 files (1.7 files/s, elapsed 24m22s, ETA 1m25s)"}
+{"time":"2026-10-17T14:54:37.187528Z","step":"vector-build","type":"output","message":"ckv: 1270/1415 files (0.9 files/s, elapsed 24m24s, ETA 2m44s)"}
+{"time":"2026-10-17T14:54:39.694215Z","step":"vector-build","type":"output","message":"ckv: 1272/1415 files (0.8 files/s, elapsed 24m27s, ETA 2m59s)"}
+{"time":"2026-10-17T14:54:41.778949Z","step":"vector-build","type":"output","message":"ckv: 1274/1415 files (1.0 files/s, elapsed 24m29s, ETA 2m26s)"}
+{"time":"2026-10-17T14:54:44.598679Z","step":"vector-build","type":"output","message":"ckv: 1277/1415 files (1.1 files/s, elapsed 24m32s, ETA 2m9s)"}
+{"time":"2026-10-17T14:54:51.491785Z","step":"vector-build","type":"output","message":"ckv: 1280/1415 files (0.4 files/s, elapsed 24m39s, ETA 5m10s)"}
+{"time":"2026-10-17T14:54:53.646393Z","step":"vector-build","type":"output","message":"ckv: 1284/1415 files (1.9 files/s, elapsed 24m41s, ETA 1m10s)"}
+{"time":"2026-10-17T14:54:55.772885Z","step":"vector-build","type":"output","message":"ckv: 1291/1415 files (3.3 files/s, elapsed 24m43s, ETA 37s)"}
+{"time":"2026-10-17T14:54:59.073189Z","step":"vector-build","type":"output","message":"ckv: 1294/1415 files (0.9 files/s, elapsed 24m46s, ETA 2m13s)"}
+{"time":"2026-10-17T14:55:01.212421Z","step":"vector-build","type":"output","message":"ckv: 1295/1415 files (0.5 files/s, elapsed 24m48s, ETA 4m16s)"}
+{"time":"2026-10-17T14:55:04.610021Z","step":"vector-build","type":"output","message":"ckv: 1296/1415 files (0.3 files/s, elapsed 24m52s, ETA 6m44s)"}
+{"time":"2026-10-17T14:55:07.613974Z","step":"vector-build","type":"output","message":"ckv: 1298/1415 files (0.7 files/s, elapsed 24m55s, ETA 2m55s)"}
+{"time":"2026-10-17T14:55:11.04624Z","step":"vector-build","type":"output","message":"ckv: 1299/1415 files (0.3 files/s, elapsed 24m58s, ETA 6m38s)"}
+{"time":"2026-10-17T14:55:13.226694Z","step":"vector-build","type":"output","message":"ckv: 1302/1415 files (1.4 files/s, elapsed 25m0s, ETA 1m22s)"}
+{"time":"2026-10-17T14:55:17.991379Z","step":"vector-build","type":"output","message":"ckv: 1305/1415 files (0.6 files/s, elapsed 25m5s, ETA 2m54s)"}
+{"time":"2026-10-17T14:55:23.228697Z","step":"vector-build","type":"output","message":"ckv: 1306/1415 files (0.2 files/s, elapsed 25m10s, ETA 9m30s)"}
+{"time":"2026-10-17T14:55:26.395221Z","step":"vector-build","type":"output","message":"ckv: 1310/1415 files (1.3 files/s, elapsed 25m14s, ETA 1m23s)"}
+{"time":"2026-10-17T14:55:29.793546Z","step":"vector-build","type":"output","message":"ckv: 1313/1415 files (0.9 files/s, elapsed 25m17s, ETA 1m55s)"}
+{"time":"2026-10-17T14:55:32.823992Z","step":"vector-build","type":"output","message":"ckv: 1315/1415 files (0.7 files/s, elapsed 25m20s, ETA 2m31s)"}
+{"time":"2026-10-17T14:55:35.677324Z","step":"vector-build","type":"output","message":"ckv: 1317/1415 files (0.7 files/s, elapsed 25m23s, ETA 2m19s)"}
+{"time":"2026-10-17T14:55:44.006803Z","step":"vector-build","type":"output","message":"ckv: 1318/1415 files (0.1 files/s, elapsed 25m31s, ETA 13m27s)"}
+{"time":"2026-10-17T14:55:46.605574Z","step":"vector-build","type":"output","message":"ckv: 1321/1415 files (1.2 files/s, elapsed 25m34s, ETA 1m21s)"}
+{"time":"2026-10-17T14:55:49.003462Z","step":"vector-build","type":"output","message":"ckv: 1324/1415 files (1.3 files/s, elapsed 25m36s, ETA 1m12s)"}
+{"time":"2026-10-17T14:55:51.342113Z","step":"vector-build","type":"output","message":"ckv: 1325/1415 files (0.4 files/s, elapsed 25m39s, ETA 3m30s)"}
+{"time":"2026-10-17T14:55:54.14334Z","step":"vector-build","type":"output","message":"ckv: 1329/1415 files (1.4 files/s, elapsed 25m41s, ETA 1m0s)"}
+{"time":"2026-10-17T14:55:56.29829Z","step":"vector-build","type":"output","message":"ckv: 1335/1415 files (2.8 files/s, elapsed 25m44s, ETA 28s)"}
+{"time":"2026-10-17T14:55:58.537045Z","step":"vector-build","type":"output","message":"ckv: 1343/1415 files (3.6 files/s, elapsed 25m46s, ETA 20s)"}
+{"time":"2026-10-17T14:56:01.310693Z","step":"vector-build","type":"output","message":"ckv: 1350/1415 files (2.5 files/s, elapsed 25m49s, ETA 25s)"}
+{"time":"2026-10-17T14:56:03.537168Z","step":"vector-build","type":"output","message":"ckv: 1354/1415 files (1.8 files/s, elapsed 25m51s, ETA 33s)"}
+{"time":"2026-10-17T14:56:06.268578Z","step":"vector-build","type":"output","message":"ckv: 1361/1415 files (2.6 files/s, elapsed 25m53s, ETA 21s)"}
+{"time":"2026-10-17T14:56:08.284075Z","step":"vector-build","type":"output","message":"ckv: 1364/1415 files (1.5 files/s, elapsed 25m55s, ETA 34s)"}
+{"time":"2026-10-17T14:56:10.598997Z","step":"vector-build","type":"output","message":"ckv: 1369/1415 files (2.2 files/s, elapsed 25m58s, ETA 21s)"}
+{"time":"2026-10-17T14:56:13.756829Z","step":"vector-build","type":"output","message":"ckv: 1371/1415 files (0.6 files/s, elapsed 26m1s, ETA 1m9s)"}
+{"time":"2026-10-17T14:56:16.396148Z","step":"vector-build","type":"output","message":"ckv: 1373/1415 files (0.8 files/s, elapsed 26m4s, ETA 55s)"}
+{"time":"2026-10-17T14:56:20.835383Z","step":"vector-build","type":"output","message":"ckv: 1377/1415 files (0.9 files/s, elapsed 26m8s, ETA 42s)"}
+{"time":"2026-10-17T14:56:23.105687Z","step":"vector-build","type":"output","message":"ckv: 1380/1415 files (1.3 files/s, elapsed 26m10s, ETA 26s)"}
+{"time":"2026-10-17T14:56:25.45557Z","step":"vector-build","type":"output","message":"ckv: 1382/1415 files (0.9 files/s, elapsed 26m13s, ETA 38s)"}
+{"time":"2026-10-17T14:56:29.791989Z","step":"vector-build","type":"output","message":"ckv: 1384/1415 files (0.5 files/s, elapsed 26m17s, ETA 1m7s)"}
+{"time":"2026-10-17T14:56:32.846858Z","step":"vector-build","type":"output","message":"ckv: 1388/1415 files (1.3 files/s, elapsed 26m20s, ETA 20s)"}
+{"time":"2026-10-17T14:56:37.175874Z","step":"vector-build","type":"output","message":"ckv: 1391/1415 files (0.7 files/s, elapsed 26m24s, ETA 34s)"}
+{"time":"2026-10-17T14:56:39.895128Z","step":"vector-build","type":"output","message":"ckv: 1393/1415 files (0.7 files/s, elapsed 26m27s, ETA 29s)"}
+{"time":"2026-10-17T14:56:41.914085Z","step":"vector-build","type":"output","message":"ckv: 1396/1415 files (1.5 files/s, elapsed 26m29s, ETA 12s)"}
+{"time":"2026-10-17T14:56:44.323135Z","step":"vector-build","type":"output","message":"ckv: 1400/1415 files (1.7 files/s, elapsed 26m32s, ETA 9s)"}
+{"time":"2026-10-17T14:56:47.02766Z","step":"vector-build","type":"output","message":"ckv: 1402/1415 files (0.7 files/s, elapsed 26m34s, ETA 17s)"}
+{"time":"2026-10-17T14:56:49.397154Z","step":"vector-build","type":"output","message":"ckv: 1405/1415 files (1.3 files/s, elapsed 26m37s, ETA 7s)"}
+{"time":"2026-10-17T14:56:51.813457Z","step":"vector-build","type":"output","message":"ckv: 1408/1415 files (1.2 files/s, elapsed 26m39s, ETA 5s)"}
+{"time":"2026-10-17T14:56:54.140998Z","step":"vector-build","type":"output","message":"ckv: 1411/1415 files (1.3 files/s, elapsed 26m41s, ETA 3s)"}
+{"time":"2026-10-17T14:56:55.914864Z","step":"vector-build","type":"output","message":"ckv: 1415/1415 files (2.3 files/s, elapsed 26m43s, ETA 0s)"}
+{"time":"2026-10-17T14:57:12.079311Z","step":"vector-build","type":"output","message":"ckv: flow-corpus warning: line 16: step \"disc-03\" missing id/file/line"}
+{"time":"2026-10-17T14:57:12.080305Z","step":"vector-build","type":"output","message":"time=2026-10-17T23:57:12.079+09:00 level=INFO msg=ckv event=flow_corpus.loaded trace_id=14ad2e0919589839 run_id=bb63aae0d467f15f path=/private/tmp/ks-stablenet-rebuild-20261017-01/corpora/flow/corpus.jsonl flows=18 steps=78 invariants=16 edges_skipped=142 records_skipped=1 steps_aligned=78 steps_total=78"}
+{"time":"2026-10-17T14:57:12.086257Z","step":"vector-build","type":"output","message":"ckv: flow steps aligned to code: 78/78 (100%)"}
+{"time":"2026-10-17T14:57:15.852516Z","step":"vector-build","type":"output","message":"time=2026-10-17T23:57:15.852+09:00 level=INFO msg=ckv event=build.done trace_id=90bcc93715581d26 run_id=bb63aae0d467f15f latency_ms=1623868 embedder=bge-m3:latest embedder_provider=\"\" db_sha256=6518f7547b8e479a47c92edfcaf7a96da4a0185e84f3558a0904f45a7c1aa400 chunks_canonical_id=18691 chunks_flow_step=78 category_counts=\"map[:2024 accounts:1318 beacon:162 cli:1146 consensus:739 crypto:1342 docs:66 domain:346 evm:488 p2p:2131 params:138 rawdb:623 rlp:294 rpc:1302 state:1077 systemcontracts:751 test:5591 tracers:360 txpool:292 types:910]\" languages=\"map[go:19489 javascript:422 markdown:633 solidity:444]\" chunks_file_header=1356 chunks_truncated=7 indexed_head=0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8 policy_loaded=true chunks_doc=633 chunks_flow_spine=18 files_indexed=1459 chunks_symbol=18837 chunks_total=21304 src_root=/private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/.build-source-d3f4f5bf9c2dfb02f371df0ca5082176/tree out_dir=/private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/vector"}
+{"time":"2026-10-17T14:57:15.852731Z","step":"vector-build","type":"output","message":"ckv: indexed 1459 files → 21304 chunks (18837 symbol, 633 doc, 1356 header, 7 truncated)"}
+{"time":"2026-10-17T14:57:15.852747Z","step":"vector-build","type":"output","message":"ckv: canonical_id 18691/18837 symbols aligned · flow 78 step / 18 spine"}
+{"time":"2026-10-17T14:57:15.852753Z","step":"vector-build","type":"output","message":"ckv: indexed_head=0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8 built_at=2026-10-17T14:57:15Z db=/private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2/vector/vector.db sha256=6518f7547b8e479a47c92edfcaf7a96da4a0185e84f3558a0904f45a7c1aa400"}
+{"time":"2026-10-17T14:57:15.855884Z","step":"vector-build","type":"done"}
+{"time":"2026-10-17T14:57:15.855908Z","step":"verify-align","type":"start","message":"Verify graph/vector alignment"}
+{"time":"2026-10-17T14:57:15.988926Z","step":"verify-align","type":"done"}
+{"time":"2026-10-17T14:57:15.991758Z","step":"verify-content","type":"start","message":"Verify the declared inputs reached the index"}
+{"time":"2026-10-17T14:57:15.993585Z","step":"verify-content","type":"output","message":"docs roots 2, markdown chunks 633"}
+{"time":"2026-10-17T14:57:15.993604Z","step":"verify-content","type":"done"}
+{"time":"2026-10-17T14:57:43.763882Z","step":"reindex-gate","type":"output","message":"── schema ──  errors=0  warnings=0  info=0"}
+{"time":"0001-01-01T00:00:00Z","step":"reindex-gate","type":"warning","message":"canonical_id coverage gate disabled (min_canonical_ratio=0) — join density not verified"}
+{"time":"2026-10-17T14:57:46.573501Z","step":"reindex-gate","type":"output","message":"ckg audit (go)"}
+{"time":"2026-10-17T14:57:46.573545Z","step":"reindex-gate","type":"output","message":"  build files: 1256"}
+{"time":"2026-10-17T14:57:46.573553Z","step":"reindex-gate","type":"output","message":"  db files:    1256"}
+{"time":"2026-10-17T14:57:46.573557Z","step":"reindex-gate","type":"output","message":"  in both:     1256"}
+{"time":"2026-10-17T14:57:46.573561Z","step":"reindex-gate","type":"output","message":"  in build only (missing from DB): 0"}
+{"time":"2026-10-17T14:57:46.573565Z","step":"reindex-gate","type":"output","message":"  in db only (over-included):       0"}
+{"time":"2026-10-17T14:57:46.573568Z","step":"reindex-gate","type":"output","message":"verdict: PARITY"}
+{"time":"2026-10-17T14:58:06.805421Z","step":"reindex-resources","type":"status","resources":{"capture_limits":{"max_files":100000,"max_file_bytes":33554432,"max_total_bytes":4294967296},"source_files":2295,"source_bytes":45425158,"git_history_bytes":206660136,"minimum_additional_bytes":0,"output_free_bytes":77895962624,"staging_free_bytes":77895962624,"minimum_output_bytes":0,"minimum_staging_bytes":0,"reserve_bytes":0,"deadline_utc":"2026-10-17T15:43:09.362013Z","actual_candidate_bytes":1242283432,"engine_output_estimate_bytes":null,"estimate_scope":"pre-promotion measured candidate; staging removed; engine output not predicted"}}
+{"time":"2026-10-17T14:58:08.444718Z","step":"reindex-review","type":"done","message":"validated retained-origins-v2; held for explicit review"}

@@ -1,0 +1,385 @@
+[
+  {
+    "label": "register-a",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "register",
+      "--source",
+      "/private/tmp/ks-KM033-review-final-20261015/source-a",
+      "--dataset",
+      "/private/tmp/ks-KM033-review-final-20261015/dataset-a",
+      "--state-dir",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a",
+      "--cks-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "--graph-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--embedder",
+      "mock",
+      "--model-name",
+      "mock"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "register-b",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "register",
+      "--source",
+      "/private/tmp/ks-KM033-review-final-20261015/source-b",
+      "--dataset",
+      "/private/tmp/ks-KM033-review-final-20261015/dataset-b",
+      "--state-dir",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-b",
+      "--cks-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "--graph-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--embedder",
+      "mock",
+      "--model-name",
+      "mock"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "collect",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "collect",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--exclude",
+      "private/**",
+      "--context-file",
+      "/private/tmp/ks-KM033-review-final-20261015/provided.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "draft",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "draft",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--collection-id",
+      "753207959d459083a2dbc6ae8d3edf01097d0314295cb2a464c3bea8ee04277f",
+      "--claims-file",
+      "/private/tmp/ks-KM033-review-final-20261015/claims.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "review-plan",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review-plan",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--draft-id",
+      "2cc033d035cf025d5f0aa7e9e7e4583ca14cb5bdf481f3aca8f7fef6b2ce61b3"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "refuse-unreviewed",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adopt",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--draft-id",
+      "2cc033d035cf025d5f0aa7e9e7e4583ca14cb5bdf481f3aca8f7fef6b2ce61b3",
+      "--review-revision",
+      "0000000000000000000000000000000000000000000000000000000000000000"
+    ],
+    "exit_code": 2,
+    "expected_error": "review_required"
+  },
+  {
+    "label": "refuse-missing-reviewer",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--review-file",
+      "/private/tmp/ks-KM033-review-final-20261015/missing-reviewer.json"
+    ],
+    "exit_code": 2,
+    "expected_error": "reviewer_required"
+  },
+  {
+    "label": "refuse-foreign-project",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--review-file",
+      "/private/tmp/ks-KM033-review-final-20261015/foreign-project.json"
+    ],
+    "exit_code": 2,
+    "expected_error": "project_or_subject_mismatch"
+  },
+  {
+    "label": "refuse-wrong-claim",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--review-file",
+      "/private/tmp/ks-KM033-review-final-20261015/wrong-claim.json"
+    ],
+    "exit_code": 2,
+    "expected_error": "review_invalid"
+  },
+  {
+    "label": "refuse-unresolved-interpretation",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--review-file",
+      "/private/tmp/ks-KM033-review-final-20261015/unresolved-interpretation.json"
+    ],
+    "exit_code": 2,
+    "expected_error": "review_conflict_resolution_required"
+  },
+  {
+    "label": "review",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--review-file",
+      "/private/tmp/ks-KM033-review-final-20261015/review-input.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "review-replay",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--review-file",
+      "/private/tmp/ks-KM033-review-final-20261015/review-input.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "refuse-stale-review",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--review-file",
+      "/private/tmp/ks-KM033-review-final-20261015/stale-review.json"
+    ],
+    "exit_code": 2,
+    "expected_error": "review_revision_conflict"
+  },
+  {
+    "label": "adopt",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adopt",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--draft-id",
+      "2cc033d035cf025d5f0aa7e9e7e4583ca14cb5bdf481f3aca8f7fef6b2ce61b3",
+      "--review-revision",
+      "e012ffdcb007d61aea0e4cce92be7778277b72014742c3125ad192bb8b5faae4"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "native-validate",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "--project-root",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/adoptions/a96e29ae72510b0da4b8290fb06b7b1166940aa1cf6c33e0d9fd5586af7909b3/project",
+      "validate"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "adopt-replay",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adopt",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--draft-id",
+      "2cc033d035cf025d5f0aa7e9e7e4583ca14cb5bdf481f3aca8f7fef6b2ce61b3",
+      "--review-revision",
+      "e012ffdcb007d61aea0e4cce92be7778277b72014742c3125ad192bb8b5faae4"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "refuse-foreign-adoption",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adoption-status",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-b/registration.json",
+      "--adoption-id",
+      "a96e29ae72510b0da4b8290fb06b7b1166940aa1cf6c33e0d9fd5586af7909b3"
+    ],
+    "exit_code": 2,
+    "expected_error": "adoption_invalid"
+  },
+  {
+    "label": "refuse-source-drift",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adoption-status",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--adoption-id",
+      "a96e29ae72510b0da4b8290fb06b7b1166940aa1cf6c33e0d9fd5586af7909b3"
+    ],
+    "exit_code": 2,
+    "expected_error": "collection_stale"
+  },
+  {
+    "label": "adoption-status-restored",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adoption-status",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--adoption-id",
+      "a96e29ae72510b0da4b8290fb06b7b1166940aa1cf6c33e0d9fd5586af7909b3"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "retract",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "retract",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--retraction-file",
+      "/private/tmp/ks-KM033-review-final-20261015/retraction-input.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "retract-replay",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "retract",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--retraction-file",
+      "/private/tmp/ks-KM033-review-final-20261015/retraction-input.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "refuse-retracted-status",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adoption-status",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--adoption-id",
+      "a96e29ae72510b0da4b8290fb06b7b1166940aa1cf6c33e0d9fd5586af7909b3"
+    ],
+    "exit_code": 2,
+    "expected_error": "adoption_not_current"
+  },
+  {
+    "label": "refuse-retracted-readopt",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "adopt",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--draft-id",
+      "2cc033d035cf025d5f0aa7e9e7e4583ca14cb5bdf481f3aca8f7fef6b2ce61b3",
+      "--review-revision",
+      "e012ffdcb007d61aea0e4cce92be7778277b72014742c3125ad192bb8b5faae4"
+    ],
+    "exit_code": 2,
+    "expected_error": "review_revision_conflict"
+  },
+  {
+    "label": "review-status",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "review-status",
+      "--registration",
+      "/private/tmp/ks-KM033-review-final-20261015/manager-a/registration.json",
+      "--draft-id",
+      "2cc033d035cf025d5f0aa7e9e7e4583ca14cb5bdf481f3aca8f7fef6b2ce61b3"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "native-plugin",
+    "command": [
+      "claude",
+      "plugin",
+      "validate",
+      "--strict",
+      "--json",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  }
+]

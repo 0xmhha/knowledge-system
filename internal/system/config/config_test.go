@@ -17,6 +17,23 @@ func TestDefault_PassesValidate(t *testing.T) {
 	}
 }
 
+func TestEmbeddingCacheCapacityValidation(t *testing.T) {
+	for _, size := range []int{0, 2, 65536} {
+		c := Default()
+		c.Backends.CKV.EmbeddingCacheEntries = size
+		if err := c.Validate(); err != nil {
+			t.Fatal(size, err)
+		}
+	}
+	for _, size := range []int{-1, 65537} {
+		c := Default()
+		c.Backends.CKV.EmbeddingCacheEntries = size
+		if err := c.Validate(); err == nil {
+			t.Fatal("invalid embedding cache bound accepted", size)
+		}
+	}
+}
+
 func TestBackendMeasurementRequiresUndroppedJSONFileRecords(t *testing.T) {
 	for _, change := range []func(*Config){
 		func(c *Config) { c.Logging.FootprintDir = "" },

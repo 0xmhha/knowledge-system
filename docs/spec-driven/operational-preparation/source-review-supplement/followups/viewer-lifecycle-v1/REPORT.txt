@@ -1,0 +1,17 @@
+단계80: 뷰어 화면 빌드와 소유 서버 수명 검증
+
+Go6개 변경. 시작 자식은 SIGTERM 요청, bounded fallback, Wait1회로 정리하고 비정상 종료는 오류로 전달한다. 준비 요청은 부모/절대 기한을 따른다. 준비 후 자식 실패는 대시보드를 종료하며 외부 API는 정리 대상이 아니다.
+
+초기 실제 API는 정상이나 추적 stub 화면이었다. 이를 UI 성공으로 처리하지 않았다. graph viewer target이 내보낸 index를 stub으로 복원하는 공백을 분리 app payload로 고쳤다. generated46개는 source lockfile/Next profile과 함께 hash로 결합하고 payload archive를 보존했다. node_modules/cache/binaries/data는 커밋하지 않는다.
+
+실제 데이터에서 SyncStatusSubscription.Unsubscribe 검색·선택, eth/downloader/api.go:183 본문, 2D 전환, 상한500, / 검색, Esc 도움말 닫기 및 캔버스 확인. CKS/CKG 모두 exit0/reap, 강제 정리0, 기록PID/그룹 잔여0, 원본/소유2248파일 동일. 외부/유료 LLM0.
+
+새 일반/race 각각4231pass/18skip, build/fmt/vet/고정lint/docs134 검증. 실제 CKS/CKG bytes와 전체 native 검증 binary가 같다. native 이후 Python 현재 readiness dispatch만 별도 검증한 차이를 명시했고 Go/frontend/승인 입력은 동일하다.
+
+모드 감지 manifest404두건과 CSS preload 경고5건, 지원되지 않는 CLI network 명령 exit1, 초기 설정/집중검사 실패를 보존했다. 2D screenshot bytes는 존재하고 직접 확인했으며 종료 별도 명령은0이다. Atlas backend·전체 접근성·검색 의미 품질·독립 승인·정식 수용은 완료하지 않았다. Optional frontend build 전 일반 Go build는 계속 stub을 제공한다.
+
+독립0·정식0/9·FINAL0·freeze null·execution_allowed false. 이름/연락처 요구 없음, 익명 검토 가능.
+
+추가 결과: Graph 뒤로·홈·Graph↔Atlas 이동, CLI export46자산을 실제 확인했다. Atlas points.json 미존재 안내를 보존했고 벡터 backend 검증은 아니다. 최초 전체 검사 일반/race4231통과 후 npm dependency의 외부 Go 샘플2개 lint 실패를 보존했다. frontend go.mod 경계로 해당 외부 package1개만 분리했고 유지 대상137개/기존 pass·skip IDs는 모두 보존했다. 새 전체 검사를 다시 통과했다. 실제 runtime과 최종 native 입력 차이는 README/module metadata2개이고 CKS/CKG bytes는 같으며, native1799가 아니라 최종1800개 입력을 검증했다. 현재 source 원장은 추가 Python guard1801개를 결합한다.
+
+기본 no-frontend profile도 집중 race20·build·CLI stub export를 통과했다. 첫 하네스는 export 자산과 명령 기록 폴더가 겹쳐 assertion 실패했고, 다른 폴더를 사용한 새 시도를 채택했다. 두 시도 모두 실제 명령은0이며 source app46개 복구를 확인했다.

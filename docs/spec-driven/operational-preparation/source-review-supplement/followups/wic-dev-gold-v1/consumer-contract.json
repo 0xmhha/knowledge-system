@@ -1,0 +1,50 @@
+{
+  "commit": "d1ebafb8ddf4eb487b8f1d6285135e174c40834b",
+  "files": {
+    "plugin/agents/analyzer.md": "b318aa1ceb33e3a607146a0a8d15613da0f29b4e5839de30f300f708db98fade",
+    "plugin/agents/planner.md": "a6afeee254133825d4e870249df2a1e4e10381232d75dc4edcdd597ba5a34c9e",
+    "plugin/scripts/deep_review.py": "83fe5f62e55b451d5a1a2ab772acc2718aa26525b50d326808f6eff85c6c8d47",
+    "plugin/contracts/cks-tools.schema.json": "ed6a80c8130935d87304af81935a9979fcfe11a0d89ad175d54aa1a04435f123",
+    "plugin/scripts/tests/fixtures/deep-review-bundle.json": "cf17fb03c63efb56ee9055643b884c81e052f1977af7a4613842076ccf8ad38d",
+    "plugin/scripts/tests/fixtures/deep-review-judgments.json": "3372b5230c823e1c0eb1b5707f2cc6403ddb9c96109edab0e7e971c438ed0bba"
+  },
+  "aliases": [
+    "mcp__plugin_coding-agent_cks__cks_context_value_dependencies",
+    "mcp__plugin_coding-agent_cks__cks_context_rule_candidates",
+    "mcp__plugin_coding-agent_cks__cks_context_value_dependency_expansion",
+    "mcp__plugin_coding-agent_cks__cks_context_policy_security",
+    "mcp__plugin_coding-agent_cks__cks_context_review_function"
+  ],
+  "priority_enum": [
+    "high",
+    "medium",
+    "low"
+  ],
+  "max_findings": 32,
+  "sections": [
+    "data_state",
+    "guards_exceptions",
+    "complexity",
+    "resources",
+    "io",
+    "priority_tradeoffs"
+  ],
+  "artifacts": [
+    "deep-review-evidence.json",
+    "deep-review.json",
+    "review-report.md",
+    "sequence.mmd",
+    "modules.mmd"
+  ],
+  "prior_alias_and_priority_conflict": "resolved_by_adopted_candidate_not_reopened",
+  "structural_snapshot": "identity_only_unverified_snapshot_not_atomic_cross_call",
+  "sequence": "bounded_CFG_flowchart_not_runtime_sequence_trace",
+  "modules": "retained_file_membership_interprocedural_unknown",
+  "handoff": "Analyzer ANALYSIS owns typed build; Planner PLANNING reuses5 exact artifacts and verifies CLI, binds report hash; Orchestrator checks completion hook and CLI. Revisions rebuild5 and clear stale PLANNING binding.",
+  "installed_role": "plugin metadata absolute root, actual exposed tools/hook dispatch/CLI and source/state hashes require installed-role receipts; source registration and unit fixtures do not prove real model execution",
+  "limitations": "Write/Edit hook coverage is not universal shell-edit protection; hashes are not reviewer/transport authentication; syntax/byte equality does not prove diagram rendering, semantic omission0 or priority correctness",
+  "quality": "required source/requirement/impact gold and independent semantic matching remain separate from6sections/criterionIDs/high-medium-low enum",
+  "actual_installed_role_receipt": null,
+  "actual_dual_tool_receipt": null,
+  "actual_render_receipt": null
+}

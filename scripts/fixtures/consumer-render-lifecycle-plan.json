@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "scope": "P07_owned_render_and_actual_host_lifecycle_not_adoption_or_quality_acceptance",
+  "base_commit": "a6a1de98bb9fca8e8b5adaf11b53895a8189b533",
+  "requirements": [
+    {
+      "id": "RL01",
+      "criterion": "Regenerate both Mermaid files from both actual P06 typed review generations with the pinned consumer verifier; retain exact bytes and static CFG/file-membership limitations."
+    },
+    {
+      "id": "RL02",
+      "criterion": "Use locally installed pinned Mermaid CLI, Mermaid, Node and Chromium with fresh owned profiles. Render both diagram types/generations to SVG and PNG, inspect outputs, and retain a malformed-input failure separately."
+    },
+    {
+      "id": "RL03",
+      "criterion": "Record actual renderer commands, versions, executable hashes, exits, PNG dimensions/SVG labels, owned observed process identities and bounded cleanup. Rendering is not semantic correctness or network sandbox proof."
+    },
+    {
+      "id": "RL04",
+      "criterion": "With pinned actual Analyzer and CKS, run normal completion, SIGTERM, SIGINT, ready-state deadline and deliberate SIGKILL scenarios after one real tool response. Record raw exits and classify cancellations/forced fault separately from successful host completion."
+    },
+    {
+      "id": "RL05",
+      "criterion": "Verify owned host/CKS/wrapper and loopback responder/handler cleanup, unchanged workspace and no unreported rescue. Exercise the actual transparent proxy64-call boundary with65 attempted native calls; the65th must not reach CKS. This boundary test is stdio, not an actual-role65-call claim."
+    },
+    {
+      "id": "RL06",
+      "criterion": "Preserve prior30 frozen packets, four original/candidate sources and maintained runtime/schema/bound docs. Keep reviewers unassigned, freeze null, execution false, formal0/9 and ontology effect not_evaluated. Save all attempts and local signed commit only."
+    },
+    {
+      "id": "RL07",
+      "criterion": "Signal handler performs append-only queuing without locks or buffered I/O. Preserve original SIGINT observer escalation/missing exit as failed observation; rerun all5 cases with repeated SIGINT and explicit CKS exit/reap proof. PID absence alone must not pass."
+    }
+  ],
+  "test_ids": [
+    "T15",
+    "T18"
+  ],
+  "resource_bounds": {
+    "render_command_seconds": 60,
+    "host_ready_seconds": 30,
+    "host_command_seconds": 90,
+    "post_ready_deadline_seconds": 1,
+    "cleanup_seconds": 8,
+    "tool_requests_per_proxy": 64,
+    "parallel_hosts": 1,
+    "parallel_renderers": 1,
+    "real_model_calls": 0,
+    "formal_runs": 0
+  },
+  "evidence_namespace": "followups/consumer-render-lifecycle-v1; historical direct-child packet inventories and frozen verifiers remain unchanged",
+  "remaining_after_P07": [
+    "T04 opt-in/reuse",
+    "T09 foreign/pin",
+    "T10 partial/unknown",
+    "T16 actual errors/denominators",
+    "T22 P08 final readiness/recovery/publication boundary"
+  ],
+  "discovered_followup": "Original observer can deadlock under repeated signals; only the new P07 observer changes, prior harnesses and CKS runtime remain frozen."
+}

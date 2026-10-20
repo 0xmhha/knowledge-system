@@ -46,16 +46,18 @@ type Config struct {
 	Name string `yaml:"name"`
 	// Description is optional human-facing metadata (e.g. "go-stablenet pr-77-2
 	// flow index") surfaced in cks.ops.health alongside Name.
-	Description string          `yaml:"description"`
-	Backends    BackendsConfig  `yaml:"backends"`
-	Listen      ListenConfig    `yaml:"listen"`
-	Logging     LoggingConfig   `yaml:"logging"`
-	Sanitize    SanitizeConfig  `yaml:"sanitize"`
-	Vocab       VocabConfig     `yaml:"vocab"`
-	Domain      DomainConfig    `yaml:"domain"`
-	Semantic    SemanticConfig  `yaml:"semantic"`
-	Service     ServiceConfig   `yaml:"service"`
-	Retrieval   RetrievalConfig `yaml:"retrieval,omitempty"`
+	Description string            `yaml:"description"`
+	Backends    BackendsConfig    `yaml:"backends"`
+	Listen      ListenConfig      `yaml:"listen"`
+	Logging     LoggingConfig     `yaml:"logging"`
+	Sanitize    SanitizeConfig    `yaml:"sanitize"`
+	Vocab       VocabConfig       `yaml:"vocab"`
+	Domain      DomainConfig      `yaml:"domain"`
+	Semantic    SemanticConfig    `yaml:"semantic"`
+	Service     ServiceConfig     `yaml:"service"`
+	Retrieval   RetrievalConfig   `yaml:"retrieval,omitempty"`
+	Collection  CollectionConfig  `yaml:"collection,omitempty"`
+	Maintenance MaintenanceConfig `yaml:"maintenance,omitempty"`
 }
 
 // RetrievalConfig pins the shared top-K for raw recall and optional concept
@@ -183,6 +185,8 @@ type CKVConfig struct {
 	EmbedModel        string `yaml:"embed_model"`
 	EmbedDim          int    `yaml:"embed_dim,omitempty"`
 	QueryPrefixPolicy string `yaml:"query_prefix_policy,omitempty"`
+	// EmbeddingCacheEntries enables a shared process-local LRU. Zero disables it.
+	EmbeddingCacheEntries int `yaml:"embedding_cache_entries,omitempty"`
 	// OllamaURL is the Ollama daemon endpoint. Empty resolves to
 	// http://localhost:11434 (and the CKV_OLLAMA_ENDPOINT env override).
 	OllamaURL string `yaml:"ollama_url"`
@@ -321,6 +325,12 @@ func (c *Config) Validate() error {
 	if c == nil {
 		return fmt.Errorf("config: nil")
 	}
+	if err := c.Collection.Validate(); err != nil {
+		return err
+	}
+	if err := c.Maintenance.Validate(); err != nil {
+		return err
+	}
 	if c.Retrieval.RecallK < 0 || c.Retrieval.RecallK > 1000 {
 		return errors.New("config: retrieval.recall_k must be 0 (default 20) or 1..1000")
 	}
@@ -329,6 +339,9 @@ func (c *Config) Validate() error {
 	}
 	if c.Backends.CKV.EmbedDim < 0 {
 		return fmt.Errorf("config: backends.ckv.embed_dim must be nonnegative")
+	}
+	if c.Backends.CKV.EmbeddingCacheEntries < 0 || c.Backends.CKV.EmbeddingCacheEntries > 65536 {
+		return fmt.Errorf("config: backends.ckv.embedding_cache_entries must be 0..65536")
 	}
 	switch c.Semantic.OntologyMode {
 	case "", "off", "baseline", "relations", "concept_text", "combined":

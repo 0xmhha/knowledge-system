@@ -1,0 +1,6 @@
+단계86의 로컬 구현은 CKV 선택 CoreML 경로와 native 전송/모델 소유 수명이다. CKS managed CoreML runtime이나 Qwen CoreML 지원을 구현한 것으로 세지 않는다.
+이전 int64 버퍼의 int32 view는101/102/103을101/0/102로 읽었다. 수정 소스의 실제 CoreML 배열/feature-provider fixture가 MRC/ARC에서 올바른 값, 자료형/stride/shape/상한 검사와 독립2모델 객체 해제를 확인했다. fixture의 prediction callback2회는 실제 MLModel/가중치 추론이 아니다.
+선택 Go 프로필 일반/race각28통과·1skip, 빌드/고정lint통과; CGO-off3통과. 공식 고정 v1.27.0 native tokenizer 라이브러리는 임시 폴더에만 받아 릴리스 SHA와 대조했고 전역 설치·모델 다운로드0이다. SDK는 실제 로컬 SDK이며 운영 배포 대상 승인과 구분한다.
+기본 전체 일반4272/18skip은 최초 고정 소스 실행에서 통과했다. 최초 전체race는 guardian absolute deadline1개가 실패했다. 원본 동일 검사20회와 시간 진단 overlay80회가 통과했지만 원인은 재현하지 못했다. 동일 소스에서 실패한 전체race와 후속검사를 다시 실행했으며 통과한 build/general은 입력 불변을 확인해 재사용했다. 최초 실패와 모든 원자료를 보존하고 guardian 문제를 해결했다고 세지 않는다.
+BGE 기존/새 비교의 최초 호출은 데이터의 명시1024 projection과 다른 native 정책을 사용해 identity mismatch로 거부됐다. 호출 설정을 맞춘 뒤 기존2회/새1회가 각각10hits·exit0이었다. 점수 dict를 숫자로 가정한 비교 하네스 오류는 원본을 보존한 오프라인 재분석으로 고쳤다. 새 모델 호출 없이 출처/본문/순서/모든 score breakdown 일치를 확인했고 데이터·프로세스 정리를 확인했다.
+실제 CoreML 모델/호환 tokenizer·배포 대상·reference embedding/pooling·실제 MLPackage 긍정 load/cleanup은 아직 검증하지 않았다. ANE 사용/성능도 측정하지 않았다. 기본 BGE/Ollama 기준선은 바꾸지 않았다. 실제 LLM·유료0·정식0/9·독립승인0·부모0/13·게시0이다.

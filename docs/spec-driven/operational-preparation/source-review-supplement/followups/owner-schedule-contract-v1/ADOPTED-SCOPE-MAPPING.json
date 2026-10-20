@@ -1,0 +1,35 @@
+{
+  "kind": "user_adopted_owner_schedule_scope_DEV_mapping",
+  "decision_sha256": "39f9a54ec73bde65da670863a448b9e50758f976edac58e30656d46dbe0dfb33",
+  "historical_inputs": {
+    "full-host-owner-v1": {
+      "revision": "49197f0f3d5967913355278ba5d45d4a32ae614a",
+      "manifest_sha256": "05462259713f3b7758dc99d89d029a2455292956137afb1bbb3dd626a73aa328",
+      "summary_sha256": "d0fbb9d73b06f1d9b029ca9f7b173780b96ed4e33f512cb9c4f376c23cbf9cb8"
+    },
+    "ticket-method-schedules-v1": {
+      "revision": "4b7b9decb76e234de8d2bae12575355f5f8415c1",
+      "manifest_sha256": "d00a25b04a509d9530b54acc8bcfa335d4593274491a1edecfa988c95e8715ab",
+      "summary_sha256": "fbd9046da4a4d8945ae183764f35433bc80bb65772049bae026cd85f133c5b5f"
+    }
+  },
+  "actual_owner_scenarios": [
+    "normal_delivery_then_unsubscribe",
+    "blocked_delivery_then_consumer_exit",
+    "confirmation_delayed",
+    "concurrent_unsubscribe_once"
+  ],
+  "actual_owner_observations": 40,
+  "separate_controlled_late_scope": "late_delivery_before_confirmation",
+  "controlled_late_sends_across_original_bundles": 24,
+  "post_ack_scope": "old subscription until a later explicit new registration; no unconditional forever claim",
+  "user_scope_decision_applied": true,
+  "original_five_all_real_owner_claim": false,
+  "full12_acceptance": false,
+  "installed_consumer_positive_oracle": false,
+  "independent_families": 0,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "freeze": null,
+  "execution_allowed": false
+}

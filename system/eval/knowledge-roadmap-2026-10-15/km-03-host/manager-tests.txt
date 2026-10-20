@@ -1,0 +1,27 @@
+go build  -o bin/ckg ./cmd/graph
+go build  -o bin/ckv ./cmd/vector
+go build  -o bin/cks ./cmd/cks
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_registration.py
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 0.290s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_collection.py
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 2.056s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_review.py
+...................................
+----------------------------------------------------------------------
+Ran 35 tests in 18.890s
+
+OK
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_knowledge_manager_broker.py
+...............................
+----------------------------------------------------------------------
+Ran 31 tests in 61.764s
+
+OK

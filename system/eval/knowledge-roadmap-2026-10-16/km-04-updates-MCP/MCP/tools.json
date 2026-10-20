@@ -1,0 +1,181 @@
+[
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Return this registration's disabled/hold update policy. Does not start a worker.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "name": "cks.manager.update_policy_template"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Pin an explicitly supplied scoped policy file. No DB build or scheduler starts.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "policy_file": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "policy_file"
+      ],
+      "type": "object"
+    },
+    "name": "cks.manager.update_configure"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Read sealed manager state and this host's owned process status. Past publication is not current/read readiness.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "name": "cks.manager.update_status"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Spawn one bounded foreground worker with an owner-stdin lease. Explicit policy controls triggers and publication. Spawn is not job success.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "max_iterations": {
+          "maximum": 10000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_seconds": {
+          "maximum": 86400,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "poll_seconds": {
+          "maximum": 60,
+          "minimum": 0.01,
+          "type": "number"
+        },
+        "trigger": {
+          "enum": [
+            "manual",
+            "periodic",
+            "change"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "trigger"
+      ],
+      "type": "object"
+    },
+    "name": "cks.manager.update_start"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Close only this host's owned worker input and wait for process shutdown. Pending intent still requires native reconciliation.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "name": "cks.manager.update_stop"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Read an explicitly selected retained held/published job and exact expected coordinates while updates may run. Never fall back to current or another project.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_coordinates": {
+          "additionalProperties": false,
+          "properties": {
+            "base_commit": {
+              "type": "string"
+            },
+            "dataset_id": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "project_id": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            "snapshot_id": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "source_mode": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "project_id",
+            "dataset_id",
+            "snapshot_id",
+            "source_mode",
+            "base_commit"
+          ],
+          "type": "object"
+        },
+        "job_id": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "prompt": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id",
+        "expected_coordinates",
+        "prompt"
+      ],
+      "type": "object"
+    },
+    "name": "cks.manager.update_read"
+  }
+]

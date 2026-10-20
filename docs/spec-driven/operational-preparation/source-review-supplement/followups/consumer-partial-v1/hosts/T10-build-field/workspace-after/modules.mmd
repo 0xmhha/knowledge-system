@@ -1,0 +1,4 @@
+flowchart LR
+%% Computed retained-file membership; interprocedural edges are unknown.
+  file["logic.go"] -->|computed membership| symbol["Selected retained function"]
+  symbol -.->|unknown, not computed| external["Interprocedural relationships unavailable"]

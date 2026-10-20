@@ -1,0 +1,26 @@
+# GovValidator genesis initialization (initializeValidator)
+
+**Status:** verified · **Subsystem:** A4 (System Contracts (Governance × 5)) · **Type:** B2
+
+initializeValidator is the Go-side seeder that writes the GovValidator
+(0x1001) contract storage at genesis from systemContracts.govValidator.params.
+It runs initializeBase to seed inherited GovBase fields, writes the blsPoP
+precompile address and the gasTip (supplied value or params.InitialGasTip),
+then — when the validators/blsPublicKeys params are supplied — cross-validates
+len(members) == len(validators) == len(blsPublicKeys) and walks the validator
+list, emitting StateParam writes for the __validators EnumerableSet (length +
+array element + index mapping), the validatorToOperator / operatorToValidator
+inverse mappings, the validatorToBlsKey bytes mapping, and the
+blsKeyToValidator mapping keyed by raw BLS bytes. Duplicate addresses are
+skipped; the length write fires only if at least one validator was seeded.
+
+## Code anchors
+- `systemcontracts/gov_validator.go` initializeValidator — entry point: seeds blsPoP, gasTip, validators array, validator<->operator and BLS-key mappings at genesis
+- `systemcontracts/gov_validator.go` MakeMultipleParam — splits a multi-slot bytes value (BLS key) into base-slot + dynamic-slot StateParam writes
+- `systemcontracts/stateutil.go` CalculateMappingSlot — keccak256(key . slot) used to derive every mapping slot written by initializeValidator
+
+## Aliases
+거버넌스 밸리데이터, 거버넌스 밸리데이터 컨트랙트, 밸리데이터 컨트랙트 초기화, 제네시스 초기화, 제네시스 시스템 컨트랙트 초기화, 초기 밸리데이터 셋업, GovValidator genesis init, validator contract initialization, initializeValidator, genesis validator seeding, initializeValidator, initializeBase, blsWrapper, MakeMultipleParam, VarLenBytesToMultipleHash, CalculateMappingSlot, CalculateDynamicSlot, IncrementHash, SLOT_VALIDATOR_blsPop, SLOT_VALIDATOR_validators, SLOT_VALIDATOR_validatorToOperator, SLOT_VALIDATOR_validatorToBlsKey, SLOT_VALIDATOR_blsKeyToValidator, SLOT_VALIDATOR_gasTip
+
+## Related
+A4.gov_validator.storage_and_governance, A4.system_contracts.addresses, A8.genesis.inject_contracts_two_phase

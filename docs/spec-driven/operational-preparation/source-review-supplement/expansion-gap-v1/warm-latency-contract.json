@@ -1,0 +1,25 @@
+{
+  "kind": "unfrozen_measurement_questions_not_benchmark",
+  "questions": [
+    "측정 대상은 client end-to-end, CKS facade, server Query/Expand 중 어느 범위인가? 두 arm에서 같은 범위·monotonic clock을 사용한다.",
+    "warm의 정의·초기 제외 횟수·안정화 기준·session/process/connection 재사용·OS/DB/cache 상태와 고정 환경을 정한다.",
+    "가족/arm별 반복 횟수·유효 표본 최소치와 p95의 quantile/interpolation 방법은 미정이다. 다른 평가의 warm20 조건을 자동 수입하지 않는다.",
+    "arm 실행 순서·교차/무작위/동시성·timeout/오류/취소/retry·상한 도달의 포함/분모 정책을 사전 동결한다.",
+    "ratio는 p95(expansion)/p95(baseline)인지 paired latency ratio의 p95인지 확정하고 family별/전체 집계·불확실성 정책을 정한다.",
+    "baseline 0·누락·극소값과 부정확한 시간해상도에서는 비율을 임의 0/1로 채우지 않고 불충분 판정을 정한다.",
+    "서버 내부 elapsed는 network/직렬화/소비자 비용을 포함하지 않는다. 함수수/노드/edge/fact/바이트 상한과 자원 사용을 함께 보고한다.",
+    "현재 프로젝트의 warm 반복/순서/완료·중단 원자료와 source/snapshot/hardware/runtime pin receipt를 수집한 뒤 수용 점수를 계산한다."
+  ],
+  "warm_definition": null,
+  "warmup_count": null,
+  "repetitions_per_arm": null,
+  "arm_order": null,
+  "clock_and_measurement_boundary": null,
+  "p95_definition": null,
+  "ratio_definition": null,
+  "invalid_samples_denominator": null,
+  "family_aggregation": null,
+  "raw_samples": null,
+  "warm_p95_ratio": null,
+  "review_receipt": null
+}

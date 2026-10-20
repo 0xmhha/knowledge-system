@@ -1,0 +1,1241 @@
+{
+  "providers": {
+    "cks": {
+      "server": "cks",
+      "namespace": "cks.",
+      "tools": {
+        "cks_context_change_history": {
+          "owner": "cks",
+          "wire_name": "cks.context.change_history",
+          "description": "Modification history for a symbol or intent: PR refs (provenance) and BM25-ranked diff hunks. Use AFTER traversal or reproduction has implicated a site -- anchoring history on an unverified hypothesis amplifies confirmation bias (history 'evidence' for the wrong suspect reads convincing).",
+          "input": {
+            "properties": {
+              "intent": {
+                "description": "Natural-language query the hunks should match against (optional if symbol is set).",
+                "type": "string"
+              },
+              "k": {
+                "description": "Maximum hunks to return when intent is set (0 = backend default).",
+                "type": "number"
+              },
+              "max_count": {
+                "description": "Maximum PR refs to return when symbol is set (0 = no cap).",
+                "type": "number"
+              },
+              "symbol": {
+                "description": "Fully-qualified symbol name to look up PR refs for (optional if intent is set).",
+                "type": "string"
+              }
+            },
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_context_concurrency_impact": {
+          "owner": "cks",
+          "wire_name": "cks.context.concurrency_impact",
+          "description": "Concurrency blast radius of a symbol: goroutines it spawns, channels it sends to/receives from, locks it acquires, plus modules reached over concurrency edges. Use when a change touches shared state or ordering -- before assuming a data race is or is not possible.",
+          "input": {
+            "properties": {
+              "depth": {
+                "description": "Maximum traversal depth over concurrency edges (default: 3).",
+                "type": "number"
+              },
+              "max_total": {
+                "description": "Cap on total modules returned (0 = no cap).",
+                "type": "number"
+              },
+              "symbol": {
+                "description": "Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_expand_flow": {
+          "owner": "cks",
+          "wire_name": "cks.context.expand_flow",
+          "description": "Steps adjacent to a flow step: direction 'up' traverses producers, 'down' traverses consumers. Use to trace a value's produce->store->consume lifecycle one hop at a time when the whole flow is too large.",
+          "input": {
+            "properties": {
+              "direction": {
+                "description": "\"up\" (producers) or \"down\" (consumers). Default \"down\".",
+                "type": "string"
+              },
+              "hops": {
+                "description": "Traversal hops (default 1).",
+                "type": "number"
+              },
+              "limit": {
+                "description": "Cap on returned neighbors (0 = backend default).",
+                "type": "number"
+              },
+              "step_id": {
+                "description": "Origin step id.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "step_id"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_find_branches": {
+          "owner": "cks",
+          "wire_name": "cks.context.find_branches",
+          "description": "Map a free-text symptom to ranked when->then@at failure-condition candidates from the flow corpus. This is the natural-language ENTRY POINT into flows -- use it before get_flow when all you have is a symptom.",
+          "input": {
+            "properties": {
+              "k": {
+                "description": "Max matches to return (default 10).",
+                "type": "number"
+              },
+              "symptom_text": {
+                "description": "Free-text symptom description.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symptom_text"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_find_callees": {
+          "owner": "cks",
+          "wire_name": "cks.context.find_callees",
+          "description": "Forward call-graph traversal: what the given symbol calls. Use to unpack what a suspicious function actually reaches downstream (which store/update/IO). Pair with find_callers to cover the produce->store->consume lifecycle in both directions.",
+          "input": {
+            "properties": {
+              "depth": {
+                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
+                "type": "number"
+              },
+              "exclude_tests": {
+                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                "type": "boolean"
+              },
+              "max_total": {
+                "description": "Cap on total neighbours (0 = no cap).",
+                "type": "number"
+              },
+              "symbol": {
+                "description": "Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_find_callers": {
+          "owner": "cks",
+          "wire_name": "cks.context.find_callers",
+          "description": "Reverse call-graph traversal: who calls the given symbol (calls/invokes edges, interface-dispatch bridged). The core cause-finding move for a stale or wrong value: from the consumer, traverse UP toward whoever produces/updates the value. depth=2 covers most producer chains.",
+          "input": {
+            "properties": {
+              "depth": {
+                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
+                "type": "number"
+              },
+              "exclude_tests": {
+                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                "type": "boolean"
+              },
+              "max_total": {
+                "description": "Cap on total neighbours (0 = no cap).",
+                "type": "number"
+              },
+              "symbol": {
+                "description": "Symbol to resolve: a ckg qualified_name (e.g. \"wbft.Finalize\"), a bare name (\"Finalize\", used only when unambiguous), or a ckg canonical_id (e.g. \"github.com/org/repo/consensus/wbft.(*Backend).Finalize\").",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_find_invariants": {
+          "owner": "cks",
+          "wire_name": "cks.context.find_invariants",
+          "description": "List curated invariants (domain rules) matching a filter. Scope by file, policy category, or minimum confidence tier. Use on the diagnose path to check a planned change against the rules that govern the touched code before implementing.",
+          "input": {
+            "properties": {
+              "category": {
+                "description": "Filter by policy category (\"\" = any).",
+                "type": "string"
+              },
+              "file": {
+                "description": "Restrict to one source file (\"\" = any).",
+                "type": "string"
+              },
+              "tier_min": {
+                "description": "Minimum confidence tier 1|2|3 (0 = backend default).",
+                "type": "number"
+              }
+            },
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_context_find_symbol": {
+          "owner": "cks",
+          "wire_name": "cks.context.find_symbol",
+          "description": "Resolve a symbol name to its definition citation(s) via ckg's qualified-name index. Suffix match by default; pass the fully-qualified name for an exact hit. Use to turn a name you already know into a traversal anchor.",
+          "input": {
+            "properties": {
+              "exclude_tests": {
+                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                "type": "boolean"
+              },
+              "kinds": {
+                "description": "Comma-separated symbol kinds (e.g., \"function,method\").",
+                "type": "string"
+              },
+              "language": {
+                "description": "Restrict to a language (e.g., \"go\").",
+                "type": "string"
+              },
+              "name": {
+                "description": "Symbol name (e.g., \"ProcessRequest\" or \"pkg.Type.Method\").",
+                "type": "string"
+              },
+              "path_glob": {
+                "description": "Restrict to file paths matching this glob.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_get_conventions": {
+          "owner": "cks",
+          "wire_name": "cks.context.get_conventions",
+          "description": "Return per-package AST-convention summaries (the codebase's idioms: error handling, locking, naming) under a package prefix. Use to match new code to how the surrounding package already does things.",
+          "input": {
+            "properties": {
+              "package_prefix": {
+                "description": "Package path prefix (\"\" = all packages).",
+                "type": "string"
+              }
+            },
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_context_get_flow": {
+          "owner": "cks",
+          "wire_name": "cks.context.get_flow",
+          "description": "Return a curated flow as a topological step sequence (cycle-safe): symbol, citation, calls/reads/writes/emits, branches, invariants per step. Select by flow_id / entry-point ID / invariant_id -- these are curated IDs matched exactly, NOT code symbols. From a natural-language symptom, call find_branches first, then get_flow(flow_id).",
+          "input": {
+            "properties": {
+              "entry_point": {
+                "description": "Entry-point symbol of the flow.",
+                "type": "string"
+              },
+              "flow_id": {
+                "description": "Flow identifier.",
+                "type": "string"
+              },
+              "invariant_id": {
+                "description": "Invariant whose enforcing flow to return.",
+                "type": "string"
+              },
+              "max_steps": {
+                "description": "Cap on returned steps (0 = backend default).",
+                "type": "number"
+              }
+            },
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_context_get_for_task": {
+          "owner": "cks",
+          "wire_name": "cks.context.get_for_task",
+          "description": "START HERE for any analysis/design/bugfix task. One call composes an EvidencePack: intent-ranked citations, code bodies, and graph_neighbors relation wiring (source->target: calls/called_by/implements/...), token-budgeted, sanitized, SHA-256 integrity-stamped. Read graph_neighbors before issuing per-edge traversal calls -- it already answers 'who calls / what does it call' for the top hits. Use the narrower tools only to go deeper on a specific point.",
+          "input": {
+            "properties": {
+              "intent": {
+                "description": "Optional task intent override (bug_fix | feature_add | refactor | test_add | arch_explain | qa_review | security | concurrency_safety | docs_update). Pass it when the caller knows the task type \u2014 the internal classifier falls back to a broad unknown on unrecognized prompts, which disables intent-tuned ranking. Invalid values error.",
+                "type": "string"
+              },
+              "prompt": {
+                "description": "Natural-language task description or symptom, as a full sentence. Example: \"restore proposal tx stays stuck in pending after GasTip revert\".",
+                "type": "string"
+              }
+            },
+            "required": [
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_get_for_task_v2": {
+          "owner": "cks",
+          "wire_name": "cks.context.get_for_task_v2",
+          "description": "Compose archive-backed v2 evidence with immutable dataset citations and sha256-v2 integrity.",
+          "input": {
+            "properties": {
+              "explain_ontology": {
+                "default": false,
+                "description": "Explain matched ontology concepts and bounded candidate score/rank changes. Does not enable ontology or claim quality; body selection is the composer stage, final v2 budget may further omit evidence.",
+                "type": "boolean"
+              },
+              "include_knowledge": {
+                "default": false,
+                "description": "Add reviewed local policy context from this retained dataset.",
+                "type": "boolean"
+              },
+              "intent": {
+                "description": "Optional task intent override.",
+                "type": "string"
+              },
+              "knowledge_as_of": {
+                "description": "Policy date (YYYY-MM-DD) when include_knowledge is true.",
+                "type": "string"
+              },
+              "knowledge_subsystem": {
+                "description": "Explicit subsystem scope when include_knowledge is true.",
+                "type": "string"
+              },
+              "prompt": {
+                "description": "Natural-language development task.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_get_invariant_enforcement": {
+          "owner": "cks",
+          "wire_name": "cks.context.get_invariant_enforcement",
+          "description": "Enumerate every site that enforces a curated invariant. Use to check a planned change against domain rules (the 'empty block implies same state root' class) before implementing.",
+          "input": {
+            "properties": {
+              "inv_id": {
+                "description": "Invariant identifier.",
+                "type": "string"
+              },
+              "max": {
+                "description": "Cap on enforcement sites (0 = backend default).",
+                "type": "number"
+              }
+            },
+            "required": [
+              "inv_id"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_get_subgraph": {
+          "owner": "cks",
+          "wire_name": "cks.context.get_subgraph",
+          "description": "Neighborhood traversal across ALL edge types (calls, implements, imports, tested_by, ...) within depth hops of the seed symbol. Use when caller/callee alone is too narrow -- e.g., mapping a type's interface/implementation web. Cost grows fast with depth; prefer depth 1-2.",
+          "input": {
+            "properties": {
+              "depth": {
+                "description": "Maximum traversal depth (default 2: one hop past the direct neighbours, so callers behind a helper chain are not silently missed).",
+                "type": "number"
+              },
+              "exclude_tests": {
+                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                "type": "boolean"
+              },
+              "max_total": {
+                "description": "Cap on total nodes (0 = no cap).",
+                "type": "number"
+              },
+              "symbol": {
+                "description": "Symbol to seed the traversal: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty neighborhood -- use find_symbol to get the canonical_id.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_impact_analysis": {
+          "owner": "cks",
+          "wire_name": "cks.context.impact_analysis",
+          "description": "Reverse-dependency closure of a symbol, grouped by coupling category (callers, interface, type_users, distributed, concurrent). Use during PLANNING to answer 'what breaks if I change this?' and to find co-consumers of a shared dependency before editing it.",
+          "input": {
+            "properties": {
+              "depth": {
+                "description": "Maximum traversal depth (default: backend default, typically 2).",
+                "type": "number"
+              },
+              "max_total": {
+                "description": "Cap on total citations across all categories (0 = no cap).",
+                "type": "number"
+              },
+              "symbol": {
+                "description": "Symbol to seed the analysis: a ckg qualified_name, a bare name (only when it resolves unambiguously), or a ckg canonical_id. An ambiguous or unknown name is an error, not an empty result -- use find_symbol to get the canonical_id.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_label_suspects": {
+          "owner": "cks",
+          "wire_name": "cks.context.label_suspects",
+          "description": "Bounded factual labels for an iterative symptom investigation. Choose symbol, file+line, expansion citations, or text-only seed discovery. Returns evidence and unknowns; never decides the root cause. Pinned datasets require retained expansion citations.",
+          "input": {
+            "properties": {
+              "budget_ms": {
+                "description": "Integer 10..5000, default 1000; cooperative backend deadline, excludes retained-source verification.",
+                "type": "number"
+              },
+              "commit": {
+                "description": "Optional exact indexed commit assertion.",
+                "type": "string"
+              },
+              "depth": {
+                "description": "Integer 1..3, default 2.",
+                "type": "number"
+              },
+              "expand": {
+                "description": "Prior CitationV2 seeds for iterative expansion (legacy unpinned datasets use Citation).",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "base_commit": {
+                      "type": "string"
+                    },
+                    "commit_hash": {
+                      "type": "string"
+                    },
+                    "content_sha256": {
+                      "type": "string"
+                    },
+                    "dataset_id": {
+                      "type": "string"
+                    },
+                    "end_line": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "file": {
+                      "type": "string"
+                    },
+                    "file_sha256": {
+                      "type": "string"
+                    },
+                    "origin_id": {
+                      "type": "string"
+                    },
+                    "project_id": {
+                      "type": "string"
+                    },
+                    "snapshot_id": {
+                      "type": "string"
+                    },
+                    "source_mode": {
+                      "type": "string"
+                    },
+                    "start_line": {
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "start_line",
+                    "end_line",
+                    "commit_hash"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 8,
+                "type": "array"
+              },
+              "file": {
+                "description": "Optional repository-relative site file; requires line.",
+                "type": "string"
+              },
+              "line": {
+                "description": "Positive integer site line.",
+                "type": "number"
+              },
+              "max_calls": {
+                "description": "Integer 4..64, default 32, includes final identity checks.",
+                "type": "number"
+              },
+              "max_candidates": {
+                "description": "Integer 1..20, default 10.",
+                "type": "number"
+              },
+              "max_enriched": {
+                "description": "Integer 1..8, default 3; expensive labels for first candidates only.",
+                "type": "number"
+              },
+              "max_seeds": {
+                "description": "Integer 1..8, default 3.",
+                "type": "number"
+              },
+              "symbol": {
+                "description": "Optional unique symbol seed.",
+                "type": "string"
+              },
+              "symptom": {
+                "description": "Symptom used for seed discovery; judgments remain the agent's responsibility.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symptom"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_review_function": {
+          "owner": "cks",
+          "wire_name": "cks.context.review_function",
+          "description": "Review one function the way a person reads it, in three separate views. code (production code only): signature, used/created types and written fields, control statements and call sites in source order, callees with the implementations behind interface calls, callers and call paths back to entry points (also through the interfaces a method implements), goroutines, channels, locks, timeout/cancellation paths. history: the commits and PRs that changed the function. tests: its test callers, listed but not followed. Cheaper and more focused than get_subgraph, which mixes all edge types.",
+          "input": {
+            "properties": {
+              "caller_depth": {
+                "description": "How far to walk callers toward entry points (1-5, default 5).",
+                "type": "number"
+              },
+              "max_items": {
+                "description": "Entries per list (default 40); totals are always reported.",
+                "type": "number"
+              },
+              "symbol": {
+                "description": "Function or method: a ckg qualified_name, a bare name that resolves unambiguously, or a canonical_id.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_rule_candidates": {
+          "owner": "cks",
+          "wire_name": "cks.context.rule_candidates",
+          "description": "Explicit opt-in go-local-review@1.0.0 retained Go rule candidates using one shared lexical value/control analysis. Parameter to command-name and discarded conversion-error to return patterns. Candidates are automatic review inputs, never verified vulnerabilities or manual policy/security annotations. Syntax-only targets, unknown sanitizers, memory/alias and feasibility limitations remain explicit. Empty results never prove safety.",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "function": {
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "required": [
+                      "node_id"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "canonical_id"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "canonical_id": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "expected_commit": {
+                    "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
+                    "type": "string"
+                  },
+                  "expected_snapshot_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "expected_source_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "limits": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "max_ast_nodes": {
+                        "maximum": 4096,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_blocks": {
+                        "maximum": 256,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_edges": {
+                        "maximum": 4096,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_facts": {
+                        "maximum": 65536,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_iterations": {
+                        "maximum": 128,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_nodes": {
+                        "maximum": 1024,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_source_bytes": {
+                        "maximum": 262144,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "timeout_ms": {
+                        "maximum": 1000,
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "node_id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              "max_candidates": {
+                "maximum": 64,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_flow_steps": {
+                "maximum": 4096,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "rule_pack": {
+                "const": "go-local-review@1.0.0",
+                "type": "string"
+              }
+            },
+            "required": [
+              "rule_pack",
+              "function"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_search_text": {
+          "owner": "cks",
+          "wire_name": "cks.context.search_text",
+          "description": "BM25 keyword search over the ckg full-text index (code-aware tokenizer). Use when terms must match exactly: function names, identifiers, error strings. Anti-pattern: stacking searches to 'find the cause' -- a text hit is a location, not a cause. After locating, traverse toward the value's producer with find_callers/find_callees instead of searching again.",
+          "input": {
+            "properties": {
+              "exclude_tests": {
+                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                "type": "boolean"
+              },
+              "expand": {
+                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                "type": "boolean"
+              },
+              "k": {
+                "description": "Maximum hits to return (0 = backend default).",
+                "type": "number"
+              },
+              "language": {
+                "description": "Restrict to a language (e.g., \"go\").",
+                "type": "string"
+              },
+              "path_glob": {
+                "description": "Restrict to file paths matching this glob.",
+                "type": "string"
+              },
+              "query": {
+                "description": "Keyword query (terms joined as OR by default).",
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_semantic_search": {
+          "owner": "cks",
+          "wire_name": "cks.context.semantic_search",
+          "description": "Vector-similarity search over the ckv index (bge-m3). Use for natural-language symptoms or intent ('restore proposal stuck pending') where wording differs from code tokens. Similar is NOT correct: hits are entry points, not causes -- confirm by traversing relations (find_callers/find_callees) from a hit. For exact identifiers prefer search_text or find_symbol.",
+          "input": {
+            "properties": {
+              "exclude_tests": {
+                "description": "Drop test files and test-only helpers (testutil*.go, test/ dirs, *_test.go, *.t.sol, \u2026) from the result. Use for design/implementation queries where tests are noise. Default false.",
+                "type": "boolean"
+              },
+              "expand": {
+                "description": "Expand the query with project glossary concept\u2192symbol mappings before searching, the same step get_for_task uses. Helps natural-language/domain queries reach the right code when plain similarity drifts to generic infrastructure. Default false.",
+                "type": "boolean"
+              },
+              "k": {
+                "description": "Maximum hits to return (0 = backend default).",
+                "type": "number"
+              },
+              "kinds": {
+                "description": "Comma-separated symbol kinds (e.g., \"function,method\").",
+                "type": "string"
+              },
+              "language": {
+                "description": "Restrict to a language (e.g., \"go\").",
+                "type": "string"
+              },
+              "path_glob": {
+                "description": "Restrict to file paths matching this glob.",
+                "type": "string"
+              },
+              "query": {
+                "description": "Natural-language query (e.g., \"validator quorum check at finalize\").",
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_value_dependencies": {
+          "owner": "cks",
+          "wire_name": "cks.context.value_dependencies",
+          "description": "Bounded on-demand Go CFG, lexical def-use, local value and normal-exit control dependence from retained function source. Select exactly one node_id/canonical_id from find_symbol; no name guessing or live source read. Returns source/blob/snapshot pins, caps, partial/unsupported/unknown and raw locations. Memory aliases, external effects, exceptions and short-circuit semantics are not proven; missing edges never establish safety.",
+          "input": {
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "required": [
+                  "node_id"
+                ]
+              },
+              {
+                "required": [
+                  "canonical_id"
+                ]
+              }
+            ],
+            "properties": {
+              "canonical_id": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "expected_commit": {
+                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
+                "type": "string"
+              },
+              "expected_snapshot_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "expected_source_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "limits": {
+                "additionalProperties": false,
+                "properties": {
+                  "max_ast_nodes": {
+                    "maximum": 4096,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_blocks": {
+                    "maximum": 256,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_edges": {
+                    "maximum": 4096,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_facts": {
+                    "maximum": 65536,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_iterations": {
+                    "maximum": 128,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_nodes": {
+                    "maximum": 1024,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_source_bytes": {
+                    "maximum": 262144,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "timeout_ms": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "node_id": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_context_value_dependency_expansion": {
+          "owner": "cks",
+          "wire_name": "cks.context.value_dependency_expansion",
+          "description": "Bounded expansion of distinct retained Go function-local value/control analyses through outgoing calls/invokes. SQL-limited candidates, function/hop/aggregate node-edge-fact/time budgets, cycle/dedup, source/snapshot pins and stop reasons. Call hops do not prove argument/return or memory transfer. Curated operator flows remain a separate get_flow surface with an unverified dataset join, never computed dependence or a safety verdict. Exact selected identity required; no live source fallback.",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "function": {
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "required": [
+                      "node_id"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "canonical_id"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "canonical_id": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "expected_commit": {
+                    "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
+                    "type": "string"
+                  },
+                  "expected_snapshot_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "expected_source_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "limits": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "max_ast_nodes": {
+                        "maximum": 4096,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_blocks": {
+                        "maximum": 256,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_edges": {
+                        "maximum": 4096,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_facts": {
+                        "maximum": 65536,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_iterations": {
+                        "maximum": 128,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_nodes": {
+                        "maximum": 1024,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "max_source_bytes": {
+                        "maximum": 262144,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "timeout_ms": {
+                        "maximum": 1000,
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "node_id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              },
+              "limits": {
+                "additionalProperties": false,
+                "properties": {
+                  "max_candidates": {
+                    "maximum": 128,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_functions": {
+                    "maximum": 8,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_hops": {
+                    "maximum": 3,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_total_edges": {
+                    "maximum": 16384,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_total_facts": {
+                    "maximum": 262144,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_total_nodes": {
+                    "maximum": 4096,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "timeout_ms": {
+                    "maximum": 5000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "required": [
+              "function"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_ops_freshness": {
+          "owner": "cks",
+          "wire_name": "cks.ops.freshness",
+          "description": "Compare the index snapshot against the source repository: indexed commit vs HEAD and the changed-file list. Call at session start and after pulls/commits -- stale files mean citations may mislead. If stale, run cks.ops.index (files you created this session are never in the index; read them directly).",
+          "input": {
+            "properties": {},
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_ops_health": {
+          "owner": "cks",
+          "wire_name": "cks.ops.health",
+          "description": "Aggregate cks backend health: ok | degraded | down from ckg/ckv reachability. Call once at session start. degraded means ckv (semantic entry) is unavailable -- keyword/graph tools still work but natural-language recall is reduced.",
+          "input": {
+            "properties": {},
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_ops_index": {
+          "owner": "cks",
+          "wire_name": "cks.ops.index",
+          "description": "Refresh a flat legacy dataset's ckv (vector) and ckg (graph) indexes for the configured source tree. Use ONLY after cks.ops.freshness reports stale. mode=incremental reindexes files changed since the indexed commit; mode=full rebuilds everything (slow). Versioned/pinned datasets are refused before any write; use cks setup with the reviewed config, project ID and a new version.",
+          "input": {
+            "properties": {
+              "mode": {
+                "description": "\"incremental\" (default) or \"full\".",
+                "type": "string"
+              },
+              "since_commit": {
+                "description": "Base commit for an incremental reindex (default: the index's recorded head).",
+                "type": "string"
+              }
+            },
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_ops_reindex": {
+          "owner": "cks",
+          "wire_name": "cks.ops.reindex",
+          "description": "Start an asynchronous blue-green reindex of a dataset to a new version: build <out>/<version>, run the alignment+quality gate, then atomically promote it to current. current is left unchanged if the gate fails, so a bad rebuild never breaks the live dataset. Returns a job_id immediately; poll ops.setup_status for progress. Legacy datasets only; pinned v2 maintenance requires cks setup with the reviewed config, project ID and a new version.",
+          "input": {
+            "properties": {
+              "embedder": {
+                "description": "vector embedding backend (mock, bgeonnx, ollama); empty uses the vector CLI default",
+                "type": "string"
+              },
+              "min_canonical_ratio": {
+                "default": 0,
+                "description": "gate floor for canonical_id coverage (CanonicalCount/SymbolCount); 0 disables the check",
+                "type": "number"
+              },
+              "model_name": {
+                "description": "vector embedding model name",
+                "type": "string"
+              },
+              "out": {
+                "description": "dataset root; the new version builds in <out>/<version> and current is flipped on success",
+                "type": "string"
+              },
+              "src": {
+                "description": "source tree to index",
+                "type": "string"
+              },
+              "version": {
+                "description": "version label for the new dataset directory; empty auto-generates one",
+                "type": "string"
+              }
+            },
+            "required": [
+              "src",
+              "out"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_ops_setup": {
+          "owner": "cks",
+          "wire_name": "cks.ops.setup",
+          "description": "Start an asynchronous knowledge-dataset build for a source tree: graph index, vector index aligned to it, and an alignment verification gate. Returns a job_id immediately; poll ops.setup_status for progress. Legacy targets only; versioned/pinned maintenance requires cks setup with the reviewed config, project ID and a new version.",
+          "input": {
+            "properties": {
+              "embedder": {
+                "description": "vector embedding backend (mock, bgeonnx, ollama); empty uses the vector CLI default",
+                "type": "string"
+              },
+              "model_name": {
+                "description": "vector embedding model name",
+                "type": "string"
+              },
+              "out": {
+                "description": "dataset root; graph index in <out>/graph, vector index in <out>/vector",
+                "type": "string"
+              },
+              "skip_vector": {
+                "default": false,
+                "description": "build only the graph index",
+                "type": "boolean"
+              },
+              "src": {
+                "description": "source tree to index",
+                "type": "string"
+              }
+            },
+            "required": [
+              "src",
+              "out"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_ops_setup_status": {
+          "owner": "cks",
+          "wire_name": "cks.ops.setup_status",
+          "description": "Progress of an asynchronous ops job (ops.setup or ops.reindex): state (running|done|failed), error if any, and the tail of the progress-event stream.",
+          "input": {
+            "properties": {
+              "job_id": {
+                "type": "string"
+              },
+              "tail": {
+                "default": 20,
+                "description": "max trailing events to return",
+                "type": "number"
+              }
+            },
+            "required": [
+              "job_id"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_semantic_get_concept": {
+          "owner": "cks",
+          "wire_name": "cks.semantic.get_concept",
+          "description": "Read a source-backed ontology concept, definition, scope, terms, review status and typed incident relations. Relations are evidence-linked records, not inferred truth.",
+          "input": {
+            "properties": {
+              "concept_id": {
+                "type": "string"
+              },
+              "limit": {
+                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
+                "type": "number"
+              }
+            },
+            "required": [
+              "concept_id"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_semantic_lookup_term": {
+          "owner": "cks",
+          "wire_name": "cks.semantic.lookup_term",
+          "description": "Read exact ontology terms in this pinned dataset, preserving all reviewed/proposed/rejected interpretations and ambiguity. Does not rewrite search or activate ontology.",
+          "input": {
+            "properties": {
+              "language": {
+                "type": "string"
+              },
+              "limit": {
+                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
+                "type": "number"
+              },
+              "term": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "language",
+              "term"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_semantic_status": {
+          "owner": "cks",
+          "wire_name": "cks.semantic.status",
+          "description": "Inspect reviewed ontology availability for this pinned dataset without changing it. Separates disabled retrieval from missing, stale, unreviewed or ready data; readiness is not a quality or test-acceptance verdict.",
+          "input": {
+            "properties": {},
+            "required": [],
+            "type": "object"
+          }
+        },
+        "cks_semantic_trace_requirement": {
+          "owner": "cks",
+          "wire_name": "cks.semantic.trace_requirement",
+          "description": "Read a requirement, Given/When/Then criteria and reviewed code/test paths without requiring policy context. Missing/unreviewed/conflicting links are explicit. Linked does not mean tests ran or criteria were accepted.",
+          "input": {
+            "properties": {
+              "limit": {
+                "description": "Maximum candidates, relations or trace paths (1..100, default 20); truncation and total are explicit.",
+                "type": "number"
+              },
+              "requirement_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "requirement_id"
+            ],
+            "type": "object"
+          }
+        },
+        "cks_context_policy_security": {
+          "owner": "cks",
+          "wire_name": "cks.context.policy_security",
+          "description": "Bounded retained policy/security annotations for one exact code symbol. Operator explanations and modification hints retain manual provenance; unavailable original YAML row/hash/version/reviewer/approval stay unknown. Metadata hashes are graph hashes, not original-source proof. No annotations does not prove safety. Automatic rule_candidates are a separate opt-in query and are not executed here. SQL row caps and cooperative timeout, snapshot/blob/tag/edge rechecks; no live file reads or authorization bypass.",
+          "input": {
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "not": {
+                  "required": [
+                    "canonical_id"
+                  ]
+                },
+                "required": [
+                  "node_id"
+                ]
+              },
+              {
+                "not": {
+                  "required": [
+                    "node_id"
+                  ]
+                },
+                "required": [
+                  "canonical_id"
+                ]
+              }
+            ],
+            "properties": {
+              "canonical_id": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "expected_commit": {
+                "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
+                "type": "string"
+              },
+              "expected_snapshot_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "expected_source_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "max_annotations": {
+                "maximum": 128,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "node_id": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "timeout_ms": {
+                "maximum": 5000,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

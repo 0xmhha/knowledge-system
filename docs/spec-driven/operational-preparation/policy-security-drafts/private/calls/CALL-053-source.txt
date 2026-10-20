@@ -1,0 +1,13 @@
+func predictAddr(t *netutil.IPTracker) (net.IP, uint16) {
+	ep := t.PredictEndpoint()
+	if ep == "" {
+		return nil, 0
+	}
+	ipString, portString, _ := net.SplitHostPort(ep)
+	ip := net.ParseIP(ipString)
+	port, err := strconv.ParseUint(portString, 10, 16)
+	if err != nil {
+		return nil, 0
+	}
+	return ip, uint16(port)
+}

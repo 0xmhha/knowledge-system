@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "status": "ai_development_oracles_not_independent_gold",
+  "case_id": "SUB-EXIT-DRAFT-001",
+  "origin": "ai_source_reading_and_fixture_design",
+  "approved": false,
+  "reviewer": null,
+  "review_receipt": null,
+  "independently_derived_oracle": null,
+  "independent_acceptable_candidate_set": null,
+  "verified_project_defect": false,
+  "formal_runtime_executions": 0,
+  "local_fixture_executions": 0,
+  "tickets_promoted_to_protocol": 0,
+  "independent_family_count": 0,
+  "scenarios": [
+    {
+      "id": "normal_delivery_then_unsubscribe",
+      "purpose": "정상 알림을 받은 뒤 구독 해제"
+    },
+    {
+      "id": "blocked_delivery_then_consumer_exit",
+      "purpose": "알림 송신자가 수신자 없이 대기할 때 구독 해제"
+    },
+    {
+      "id": "late_delivery_before_confirmation",
+      "purpose": "해제 요청 수신 뒤 확인 전 알림 송신"
+    },
+    {
+      "id": "confirmation_delayed",
+      "purpose": "해제 요청 수신 뒤 확인을 명시적으로 지연"
+    },
+    {
+      "id": "concurrent_unsubscribe_once",
+      "purpose": "동일 구독에서 두 번 동시 해제, 요청 1개와 양쪽 반환 확인"
+    }
+  ],
+  "variants": [
+    {
+      "id": "ORIGINAL",
+      "artifact": "original.go.txt",
+      "role": "pinned_method_baseline"
+    },
+    {
+      "id": "CAND-A",
+      "artifact": "candidate-a.go.txt",
+      "role": "ai_fix_draft"
+    },
+    {
+      "id": "CAND-B",
+      "artifact": "candidate-b.go.txt",
+      "role": "ai_fix_draft"
+    },
+    {
+      "id": "MUT-REINTRO",
+      "artifact": "reintroduction.go.txt",
+      "role": "symptom_reintroduction"
+    },
+    {
+      "id": "MUT-EARLY",
+      "artifact": "early-return.go.txt",
+      "role": "overfit_early_return"
+    }
+  ],
+  "primary_oracle_draft": [
+    "모든 Unsubscribe 호출 반환",
+    "해제 요청 정확히 1개",
+    "loop가 해제 완료를 확인하고 구독을 제거",
+    "확인 전 반환하지 않음",
+    "모든 시험 소유 goroutine 종료"
+  ],
+  "secondary_oracle_draft": {
+    "kind": "same_ai_source_derived_wait_graph_not_independent",
+    "nodes": [
+      "eventLoop status send",
+      "Unsubscribe uninstall send"
+    ],
+    "edges": [
+      "eventLoop waits for sole consumer",
+      "Unsubscribe waits for eventLoop before it starts draining status"
+    ],
+    "scope": "controlled extracted-method schedule only"
+  },
+  "expected_draft_matrix": {
+    "ORIGINAL": {
+      "normal_delivery_then_unsubscribe": true,
+      "blocked_delivery_then_consumer_exit": false,
+      "late_delivery_before_confirmation": true,
+      "confirmation_delayed": true,
+      "concurrent_unsubscribe_once": true
+    },
+    "CAND-A": {
+      "normal_delivery_then_unsubscribe": true,
+      "blocked_delivery_then_consumer_exit": true,
+      "late_delivery_before_confirmation": true,
+      "confirmation_delayed": true,
+      "concurrent_unsubscribe_once": true
+    },
+    "CAND-B": {
+      "normal_delivery_then_unsubscribe": true,
+      "blocked_delivery_then_consumer_exit": true,
+      "late_delivery_before_confirmation": true,
+      "confirmation_delayed": true,
+      "concurrent_unsubscribe_once": true
+    },
+    "MUT-REINTRO": {
+      "normal_delivery_then_unsubscribe": true,
+      "blocked_delivery_then_consumer_exit": false,
+      "late_delivery_before_confirmation": true,
+      "confirmation_delayed": true,
+      "concurrent_unsubscribe_once": true
+    },
+    "MUT-EARLY": {
+      "normal_delivery_then_unsubscribe": false,
+      "blocked_delivery_then_consumer_exit": false,
+      "late_delivery_before_confirmation": false,
+      "confirmation_delayed": false,
+      "concurrent_unsubscribe_once": false
+    }
+  },
+  "limitations": [
+    "5 schedules share 1 source hypothesis; do not count as 5 independent WI-4 families",
+    "AI-generated candidate/oracle agreement is not independent validation",
+    "eventLoop and RPC notifier are controlled stubs; full project path is not executed",
+    "no chain node, external model, network or persistent target state is used",
+    "no DEV/FINAL allocation or quality score is authorized"
+  ]
+}

@@ -1,0 +1,556 @@
+--- FAIL: TestCapabilitiesCall_ProposalStatusRPC (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 33 [running]:
+testing.tRunner.func1.2({0x1018f0840, 0x2a39cb4e0600})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x1018f0840?, 0x2a39cb4e0600?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x1019f3be0, 0x2a39cb22c870})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/cmd/chainbench.TestCapabilitiesCall_ProposalStatusRPC(0x2a39cb411688)
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/capabilities_test.go:89 +0xc0
+testing.tRunner(0x2a39cb411688, 0x1019ecfa8)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench	0.583s
+--- FAIL: TestParity_AccountState (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 20 [running]:
+testing.tRunner.func1.2({0x103387040, 0x748c5f31b450})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x103387040?, 0x748c5f31b450?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x103475e60, 0x748c5f324450})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/cmd/chainbench/accountcmd_test.newNode(0x748c5f3fefc8, 0x748c5f4b4f90)
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/accountcmd/parity_test.go:36 +0x8c
+github.com/0xmhha/chainbench/cmd/chainbench/accountcmd_test.TestParity_AccountState(0x748c5f3fefc8)
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/accountcmd/parity_test.go:136 +0x11c
+testing.tRunner(0x748c5f3fefc8, 0x10346ff70)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench/accountcmd	1.060s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/catalogcmd	1.518s
+--- FAIL: TestChainUp_ComposesFromAChainPreset (0.07s)
+    up_preset_test.go:29: chain up: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+        new: stablenet: family wbft, chain id 8283, bootstrap static; keys /private/tmp/ks-op-chainbench-shutdown/presets/keys; target local /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/TestChainUp_ComposesFromAChainPreset481158341/001
+FAIL
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench/chaincmd	3.328s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/exitcode	2.193s
+?   	github.com/0xmhha/chainbench/cmd/chainbench/experimentcmd	[no test files]
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/filecmd	2.915s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/keyringcmd	34.547s
+--- FAIL: TestVerify_ReportsAgreementOnOneChain (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 41 [running]:
+testing.tRunner.func1.2({0x1036ae320, 0x4e15de04f400})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x1036ae320?, 0x4e15de04f400?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x103763e00, 0x4e15ddffb640})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/cmd/chainbench/lifecyclecmd_test.chainNode(0x4e15ddf5e6c8, 0x14, {0x10322d3a6, 0x4})
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/lifecyclecmd/verify_agreement_test.go:25 +0x88
+github.com/0xmhha/chainbench/cmd/chainbench/lifecyclecmd_test.TestVerify_ReportsAgreementOnOneChain(0x4e15ddf5e6c8)
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/lifecyclecmd/verify_agreement_test.go:66 +0x34
+testing.tRunner(0x4e15ddf5e6c8, 0x10375f018)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench/lifecyclecmd	3.517s
+?   	github.com/0xmhha/chainbench/cmd/chainbench/networkcmd	[no test files]
+--- FAIL: TestParity_NodeRPC (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 36 [running]:
+testing.tRunner.func1.2({0x102e96fa0, 0x70bc5f5a1450})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x102e96fa0?, 0x70bc5f5a1450?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x102f85340, 0x70bc5f5aa450})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/cmd/chainbench/nodecmd_test.newNode(0x70bc5f678fc8, 0x70bc5f73cf60)
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/nodecmd/nodecmd_test.go:30 +0x8c
+github.com/0xmhha/chainbench/cmd/chainbench/nodecmd_test.TestParity_NodeRPC(0x70bc5f678fc8)
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/nodecmd/nodecmd_test.go:101 +0x84
+testing.tRunner(0x70bc5f678fc8, 0x102f7f550)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench/nodecmd	3.870s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/reportcmd	4.386s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/resourcecmd	5.178s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/suitecmd	6.988s
+?   	github.com/0xmhha/chainbench/cmd/chainbench/surface	[no test files]
+?   	github.com/0xmhha/chainbench/cmd/chainbench/testcmd	[no test files]
+--- FAIL: TestParity_ContractCall (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 8 [running]:
+testing.tRunner.func1.2({0x1032c6f20, 0x71fbaa3f490})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x1032c6f20?, 0x71fbaa3f490?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x1033b5a20, 0x71fbaa12468})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/cmd/chainbench/txcmd_test.newNode(0x71fbabf6fc8, 0x71fbaca2f60)
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/txcmd/txcmd_test.go:34 +0x8c
+github.com/0xmhha/chainbench/cmd/chainbench/txcmd_test.TestParity_ContractCall(0x71fbabf6fc8)
+	/private/tmp/ks-op-chainbench-shutdown/cmd/chainbench/txcmd/txcmd_test.go:109 +0x84
+testing.tRunner(0x71fbabf6fc8, 0x1033afb28)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/cmd/chainbench/txcmd	5.405s
+ok  	github.com/0xmhha/chainbench/cmd/chainbench/upgradecmd	5.279s
+?   	github.com/0xmhha/chainbench/cmd/chainbench-dashboard	[no test files]
+ok  	github.com/0xmhha/chainbench/cmd/chainbench-mcp	6.151s
+--- FAIL: TestFaucet_RPCMock (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 49 [running]:
+testing.tRunner.func1.2({0x1049750e0, 0x5708e9aa840})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x1049750e0?, 0x5708e9aa840?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x104a028e0, 0x5708e9aa800})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/accounts_test.TestFaucet_RPCMock(0x5708eaa0b48)
+	/private/tmp/ks-op-chainbench-shutdown/internal/accounts/accounts_test.go:103 +0x88
+testing.tRunner(0x5708eaa0b48, 0x1049fe700)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/accounts	5.079s
+--- FAIL: TestTxWait_ReturnsTheReceiptOnceMined (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 238 [running]:
+testing.tRunner.func1.2({0x10313ede0, 0x43efc9b5c1d0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x10313ede0?, 0x43efc9b5c1d0?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x103237100, 0x43efc99b1cb0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/app.receiptServer(0x43efc9987448, 0x0, {0x102b2822a, 0x38})
+	/private/tmp/ks-op-chainbench-shutdown/internal/app/txwait_test.go:30 +0xb0
+github.com/0xmhha/chainbench/internal/app.TestTxWait_ReturnsTheReceiptOnceMined(0x43efc9987448)
+	/private/tmp/ks-op-chainbench-shutdown/internal/app/txwait_test.go:64 +0x38
+testing.tRunner(0x43efc9987448, 0x10322f5f0)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/app	11.913s
+--- FAIL: TestPackageTreeBodyIsMeasured (3.97s)
+    packagetree_body_test.go:131: ../../docs/dev/architecture/package-tree.md:227: cmd/chainbench-mcp holds 210 non-test lines, the tree says 56
+        Refresh every figure with: python3 scripts/refresh-package-tree.py
+    packagetree_body_test.go:146: 79 package figures measured
+--- FAIL: TestPackageTreeSectionsSumTheirOwnEntries (2.99s)
+    packagetree_body_test.go:183: ../../docs/dev/architecture/package-tree.md: "## 4. `cmd/`" lists 5984 lines, its heading says 5,830
+    packagetree_body_test.go:189: 6 section headings measured
+--- FAIL: TestPackageTreeTotalsAreMeasured (3.07s)
+    packagetree_test.go:178: ../../docs/dev/architecture/package-tree.md §0: cmd/ has 5984 non-test lines, the table says 5830
+    packagetree_test.go:178: ../../docs/dev/architecture/package-tree.md §0: 합계 (every package) has 91812 non-test lines, the table says 91658
+FAIL
+FAIL	github.com/0xmhha/chainbench/internal/arch	27.439s
+ok  	github.com/0xmhha/chainbench/internal/chains/all	4.855s
+?   	github.com/0xmhha/chainbench/internal/chains/common	[no test files]
+ok  	github.com/0xmhha/chainbench/internal/chains/external	5.199s
+ok  	github.com/0xmhha/chainbench/internal/chains/stablenet	4.758s
+ok  	github.com/0xmhha/chainbench/internal/chains/stablenet/govbind	4.242s
+ok  	github.com/0xmhha/chainbench/internal/chains/wbft	4.231s
+?   	github.com/0xmhha/chainbench/internal/chains/wemix	[no test files]
+--- FAIL: TestComposeComparing_RebuildAllComposesAgain (0.31s)
+    compare_gaps_test.go:39: rebuild-all failed: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestOperate_StopRestsInStopped (0.10s)
+    compare_gaps_test.go:102: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestCompose_WalksEveryStageInOrderAndEndsComposed (0.02s)
+    manager_test.go:159: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestCompose_StopsWhereTheRequestSaid (0.07s)
+    manager_test.go:178: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestCompose_AFailedStageStopsTheWalkAndKeepsTheReason (0.28s)
+    manager_test.go:232: reported [new], want [new place keys] — a stage after the failure ran
+--- FAIL: TestCompose_RecordsWhereItIsBeforeTheStageRuns (0.04s)
+    manager_test.go:279: the record says "CHAIN/CHAIN_BUILD_UP/CHAIN_BUILD_NODE_TABLE", want the stage that did not finish
+    manager_test.go:282: the record does not name genesis as the failed step: map[new:{Done:true Result:done Detail:stablenet: family wbft, chain id 8283, bootstrap static; keys /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/TestCompose_RecordsWhereItIsBeforeTheStageRuns2999481526/002; target local /var/folders/rm/hlzw3w710ml8tk5t0s79rhtc0000gn/T/TestCompose_RecordsWhereItIsBeforeTheStageRuns2999481526/001 Err: Failed: StartedAt:2026-10-14T23:45:32Z At:2026-10-14T23:45:32Z} place:{Done:false Result:failed Detail: Err:chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted Failed:ChainBuildNodeTableFailSetContended StartedAt:2026-10-14T23:45:32Z At:2026-10-14T23:45:32Z}]
+--- FAIL: TestOpeningWorkspace_RecordsTheChainAndTheRequestTogether (0.20s)
+    manager_test.go:298: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestBuildingNodeTable_PlacesTheNodesTheRequestAsksFor (0.41s)
+    manager_test.go:348: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestEnsuringKeys_SaysWhichWayTheKeysCameFrom (0.13s)
+    --- FAIL: TestEnsuringKeys_SaysWhichWayTheKeysCameFrom/generated_into_this_run's_own_ring (0.08s)
+        manager_test.go:440: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+    --- FAIL: TestEnsuringKeys_SaysWhichWayTheKeysCameFrom/taken_from_the_committed_preset (0.06s)
+        manager_test.go:440: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestBuildingGenesis_SaysWhereTheGenesisCameFrom (0.10s)
+    manager_test.go:465: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestDeployingInputs_SaysWhetherAnythingWasShipped (0.50s)
+    manager_test.go:500: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestResumeStep_AWorkspaceWithNoPositionFallsBackToTheStepMap (0.08s)
+    manager_test.go:552: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestComposeComparing_NothingComposedComposes (0.16s)
+    manager_test.go:607: chainsetup: chain up: place: chainsetup: allocate: the server set is being allocated by another run (pid 0 on  since : (command not recorded)): session: open guard for /Users/kevin/.chainbench/local.lock: open /Users/kevin/.chainbench/local.lock.guard: operation not permitted
+--- FAIL: TestVerifyValidators_MatchAndMismatch (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 227 [running]:
+testing.tRunner.func1.2({0x10333eaa0, 0x12c28553d3b0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x10333eaa0?, 0x12c28553d3b0?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x10342d500, 0x12c285543780})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/chainsetup.validatorRPCServer(0x102e8de66?, {0x0, 0x0, 0x0})
+	/private/tmp/ks-op-chainbench-shutdown/internal/chainsetup/verify_validators_test.go:23 +0x84
+github.com/0xmhha/chainbench/internal/chainsetup.TestVerifyValidators_MatchAndMismatch(0x12c285317688)
+	/private/tmp/ks-op-chainbench-shutdown/internal/chainsetup/verify_validators_test.go:68 +0x3c
+testing.tRunner(0x12c285317688, 0x103426610)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/chainsetup	12.207s
+ok  	github.com/0xmhha/chainbench/internal/chainsetup/verb	4.177s
+--- FAIL: TestRuntimeValidators_ReadsGovernanceMembers (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 35 [running]:
+testing.tRunner.func1.2({0x104c7dcc0, 0x37688504570})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x104c7dcc0?, 0x37688504570?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x104d15480, 0x376884ea340})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/consensus/poa.govRPCServer(0xf?, {0x1048a9d23, 0x2a}, {0x37688562810, 0x3, 0x3})
+	/private/tmp/ks-op-chainbench-shutdown/internal/consensus/poa/validators_test.go:23 +0xac
+github.com/0xmhha/chainbench/internal/consensus/poa.TestRuntimeValidators_ReadsGovernanceMembers(0x37688780488)
+	/private/tmp/ks-op-chainbench-shutdown/internal/consensus/poa/validators_test.go:72 +0x7c
+testing.tRunner(0x37688780488, 0x104d10f08)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/consensus/poa	5.134s
+ok  	github.com/0xmhha/chainbench/internal/consensus/wbft	4.382s
+ok  	github.com/0xmhha/chainbench/internal/core/blueprint	3.825s
+ok  	github.com/0xmhha/chainbench/internal/core/chainsurface	3.478s
+--- FAIL: TestDetect (0.00s)
+    --- FAIL: TestDetect/stablenet_via_istanbul_+_chain_id_8283 (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 9 [running]:
+testing.tRunner.func1.2({0x101009c80, 0x2dc78bbbcb00})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x101009c80?, 0x2dc78bbbcb00?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x1010a21e0, 0x2dc78bbbcac0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/core/collector.mockRPC(0xb9255bfa5e801?, 0x2dc78bdd92c0)
+	/private/tmp/ks-op-chainbench-shutdown/internal/core/collector/detect_test.go:38 +0x70
+github.com/0xmhha/chainbench/internal/core/collector.TestDetect.func9(0x2dc78bd5d8c8)
+	/private/tmp/ks-op-chainbench-shutdown/internal/core/collector/detect_test.go:123 +0x38
+testing.tRunner(0x2dc78bd5d8c8, 0x2dc78be16b60)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 8
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/core/collector	3.737s
+ok  	github.com/0xmhha/chainbench/internal/core/filestore	3.776s
+ok  	github.com/0xmhha/chainbench/internal/core/genesis	3.902s
+ok  	github.com/0xmhha/chainbench/internal/core/hardfork	2.957s
+ok  	github.com/0xmhha/chainbench/internal/core/health	2.426s
+ok  	github.com/0xmhha/chainbench/internal/core/home	2.689s
+--- FAIL: TestScan_LocalPortsAreTestedByBinding (0.00s)
+    ports_test.go:77: listen tcp 127.0.0.1:0: bind: operation not permitted
+FAIL
+FAIL	github.com/0xmhha/chainbench/internal/core/inspector	2.926s
+ok  	github.com/0xmhha/chainbench/internal/core/keyring	11.412s
+ok  	github.com/0xmhha/chainbench/internal/core/keyring/derive	2.367s
+ok  	github.com/0xmhha/chainbench/internal/core/keyring/operation	6.539s
+ok  	github.com/0xmhha/chainbench/internal/core/keyring/store	13.297s
+ok  	github.com/0xmhha/chainbench/internal/core/lifecycle	1.886s
+ok  	github.com/0xmhha/chainbench/internal/core/node	1.860s
+ok  	github.com/0xmhha/chainbench/internal/core/nodeconfig	1.346s
+ok  	github.com/0xmhha/chainbench/internal/core/origin	1.691s
+ok  	github.com/0xmhha/chainbench/internal/core/preflight	2.033s
+--- FAIL: TestLocalInspector_AnswersProcessQuestions (0.08s)
+    inspect_test.go:42: FindBinary: driver: pgrep sleep: exit status 3
+--- FAIL: TestLocalCmdline_ReadsArgvOfARunningProcess (0.02s)
+    inspect_test.go:70: Cmdline: driver: cmdline pid 46930: fork/exec /bin/ps: operation not permitted
+FAIL
+FAIL	github.com/0xmhha/chainbench/internal/core/process	23.285s
+ok  	github.com/0xmhha/chainbench/internal/core/registry	0.821s
+--- FAIL: TestAPIKeyTransport_InjectsHeader (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 20 [running]:
+testing.tRunner.func1.2({0x10525da00, 0x1d549d51a3d0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x10525da00?, 0x1d549d51a3d0?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x1052f8d00, 0x1d549d51a390})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/core/remote.TestAPIKeyTransport_InjectsHeader(0x1d549d560908)
+	/private/tmp/ks-op-chainbench-shutdown/internal/core/remote/auth_test.go:12 +0x84
+testing.tRunner(0x1d549d560908, 0x1052f47f8)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/core/remote	1.394s
+ok  	github.com/0xmhha/chainbench/internal/core/report	2.502s
+--- FAIL: TestClient_Quantities (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 23 [running]:
+testing.tRunner.func1.2({0x1032d8dc0, 0x1040c68203c0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x1032d8dc0?, 0x1040c68203c0?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x1033661a0, 0x1040c6820380})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/core/rpc.rpcServer(0x1032fcf60?, 0x1040c683d110)
+	/private/tmp/ks-op-chainbench-shutdown/internal/core/rpc/client_test.go:15 +0x70
+github.com/0xmhha/chainbench/internal/core/rpc.TestClient_Quantities(0x1040c687a488)
+	/private/tmp/ks-op-chainbench-shutdown/internal/core/rpc/client_test.go:33 +0x16c
+testing.tRunner(0x1040c687a488, 0x103362008)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/core/rpc	1.370s
+ok  	github.com/0xmhha/chainbench/internal/core/session	8.275s
+ok  	github.com/0xmhha/chainbench/internal/core/statemachine	1.864s
+ok  	github.com/0xmhha/chainbench/internal/core/wait	1.885s
+--- FAIL: TestWebSecurityClosesRevokedStream (0.07s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 30 [running]:
+testing.tRunner.func1.2({0x104a67140, 0x4a847a928e0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x104a67140?, 0x4a847a928e0?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x104b30360, 0x4a847d101e0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/dashboard.TestWebSecurityClosesRevokedStream(0x4a847b44008)
+	/private/tmp/ks-op-chainbench-shutdown/internal/dashboard/security_test.go:166 +0x1d4
+testing.tRunner(0x4a847b44008, 0x104b2a9f0)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/dashboard	12.093s
+ok  	github.com/0xmhha/chainbench/internal/dsl	2.489s
+ok  	github.com/0xmhha/chainbench/internal/dsl/assert	1.818s
+ok  	github.com/0xmhha/chainbench/internal/dsl/interp	4.391s
+--- FAIL: TestReadOnlyDSLActuallyWatchesUntilRecurrenceOrWindow (0.00s)
+    --- FAIL: TestReadOnlyDSLActuallyWatchesUntilRecurrenceOrWindow/recurrence (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 10 [running]:
+testing.tRunner.func1.2({0x104ea5260, 0x3bae656bc180})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x104ea5260?, 0x3bae656bc180?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x104f503a0, 0x3bae6571e150})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/experiment.TestReadOnlyDSLActuallyWatchesUntilRecurrenceOrWindow.func1(0x3bae6572e488)
+	/private/tmp/ks-op-chainbench-shutdown/internal/experiment/observation_test.go:36 +0xc4
+testing.tRunner(0x3bae6572e488, 0x3bae65690078)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 9
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/experiment	5.831s
+ok  	github.com/0xmhha/chainbench/internal/feature	1.343s
+--- FAIL: TestConsensusStatusTool (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 43 [running]:
+testing.tRunner.func1.2({0x104e308c0, 0x69ff98dc60f0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x104e308c0?, 0x69ff98dc60f0?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x104f19e20, 0x69ff98dc60b0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/mcp_test.rpcMock(...)
+	/private/tmp/ks-op-chainbench-shutdown/internal/mcp/mcp_test.go:133
+github.com/0xmhha/chainbench/internal/mcp_test.TestConsensusStatusTool(0x69ff98da3208)
+	/private/tmp/ks-op-chainbench-shutdown/internal/mcp/consensus_tools_test.go:9 +0x250
+testing.tRunner(0x69ff98da3208, 0x104f13b68)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/mcp	3.923s
+ok  	github.com/0xmhha/chainbench/internal/nodemonitor	0.429s
+?   	github.com/0xmhha/chainbench/internal/preset	[no test files]
+ok  	github.com/0xmhha/chainbench/internal/resource	3.148s
+--- FAIL: TestRPCProbe_ReadsNodeState (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 39 [running]:
+testing.tRunner.func1.2({0x105594880, 0x4ce3667994f0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x105594880?, 0x4ce3667994f0?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x105683b20, 0x4ce3667994b0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/testengine.mockRPCServer(0x4ce366976248, 0x4ce3669734a0)
+	/private/tmp/ks-op-chainbench-shutdown/internal/testengine/collect_internal_test.go:21 +0x74
+github.com/0xmhha/chainbench/internal/testengine.TestRPCProbe_ReadsNodeState(0x4ce366976248)
+	/private/tmp/ks-op-chainbench-shutdown/internal/testengine/collect_internal_test.go:105 +0x20c
+testing.tRunner(0x4ce366976248, 0x10567d0e0)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/testengine	1.136s
+--- FAIL: TestFaucetAction_FundsFromTheNodeCoinbaseByDefault (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 81 [running]:
+testing.tRunner.func1.2({0x102bac720, 0x53b7d7575300})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x102bac720?, 0x53b7d7575300?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x102c5d580, 0x53b7d75752c0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/testhelper.(*txRPC).server(0x53b7d735c540, 0x53b7d7828d88)
+	/private/tmp/ks-op-chainbench-shutdown/internal/testhelper/assets_test.go:30 +0x78
+github.com/0xmhha/chainbench/internal/testhelper.TestFaucetAction_FundsFromTheNodeCoinbaseByDefault(0x53b7d7828d88)
+	/private/tmp/ks-op-chainbench-shutdown/internal/testhelper/assets_test.go:68 +0xc8
+testing.tRunner(0x53b7d7828d88, 0x102c57050)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/testhelper	1.539s
+?   	github.com/0xmhha/chainbench/internal/testsupport	[no test files]
+ok  	github.com/0xmhha/chainbench/internal/validatorset	0.431s
+go: writing stat cache: open /Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/cache/download/github.com/0xmhha/chainbench/@v/v0.0.0-20261014062508-df464d4b97fd.info947997178.tmp: operation not permitted
+--- FAIL: TestRunStopsTheCommandWhenCancelled (0.00s)
+panic: httptest: failed to listen on a port: listen tcp6 [::1]:0: bind: operation not permitted [recovered, repanicked]
+
+goroutine 23 [running]:
+testing.tRunner.func1.2({0x100f78a20, 0x1324d9d845c0})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1974 +0x1a0
+testing.tRunner.func1()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:1977 +0x318
+panic({0x100f78a20?, 0x1324d9d845c0?})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/runtime/panic.go:860 +0x12c
+net/http/httptest.newLocalListener()
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:72 +0xd4
+net/http/httptest.NewUnstartedServer(...)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:120
+net/http/httptest.NewServer({0x10100d120, 0x1324d9d84580})
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/net/http/httptest/server.go:107 +0x28
+github.com/0xmhha/chainbench/internal/webcli_test.TestRunStopsTheCommandWhenCancelled(0x1324d9db46c8)
+	/private/tmp/ks-op-chainbench-shutdown/internal/webcli/runner_test.go:110 +0x8c
+testing.tRunner(0x1324d9db46c8, 0x101008f98)
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2036 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/Users/kevin/.gvm/pkgsets/go1.26.8/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.9.darwin-arm64/src/testing/testing.go:2101 +0x3a8
+FAIL	github.com/0xmhha/chainbench/internal/webcli	2.542s
+?   	github.com/0xmhha/chainbench/scripts/inventory/chain-flag-graph	[no test files]
+?   	github.com/0xmhha/chainbench/scripts/inventory/code-graph	[no test files]
+?   	github.com/0xmhha/chainbench/scripts/inventory/surface-graph	[no test files]
+?   	github.com/0xmhha/chainbench/tests/webui/fixtures/legacykeys	[no test files]
+FAIL

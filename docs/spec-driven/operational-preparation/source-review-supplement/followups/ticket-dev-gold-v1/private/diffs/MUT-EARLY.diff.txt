@@ -1,0 +1,24 @@
+--- original/eth/downloader/api.go
++++ MUT-EARLY/eth/downloader/api.go
+@@ -181,20 +181,7 @@
+ // The status channel that was passed to subscribeSyncStatus isn't used anymore
+ // after this method returns.
+ func (s *SyncStatusSubscription) Unsubscribe() {
+-	s.unsubOnce.Do(func() {
+-		req := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}
+-		s.api.uninstallSyncSubscription <- &req
+-
+-		for {
+-			select {
+-			case <-s.c:
+-				// drop new status events until uninstall confirmation
+-				continue
+-			case <-req.uninstalled:
+-				return
+-			}
+-		}
+-	})
++	s.unsubOnce.Do(func() {})
+ }
+ 
+ // SubscribeSyncStatus creates a subscription that will broadcast new synchronisation updates.

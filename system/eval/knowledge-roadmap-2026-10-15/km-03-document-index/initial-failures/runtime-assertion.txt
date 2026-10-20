@@ -1,0 +1,12 @@
+PASS: start from actual manager-generated reviewed filtered input
+PASS: actual registered profile pins source and reviewed knowledge inputs
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-document-index.py", line 180, in <module>
+    main()
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-document-index.py", line 116, in main
+    checked('actual public build holds candidate with every required gate passed',job['state']=='held_for_review'and job['activated']is False and all(value=='passed'for value in job['gates'].values()))
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-document-index.py", line 39, in checked
+    require(value,label)
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-document-index.py", line 22, in require
+    raise ValueError(message)
+ValueError: actual public build holds candidate with every required gate passed

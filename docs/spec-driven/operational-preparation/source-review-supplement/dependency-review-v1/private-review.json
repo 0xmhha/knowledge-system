@@ -1,0 +1,3176 @@
+{
+  "kind": "private_dependency_source_review_not_independent_gold",
+  "data_reviews": [
+    {
+      "id": "DR-01",
+      "candidate_id": "SRC-002",
+      "variable": "ok",
+      "use": {
+        "occurrence": {
+          "name": "ok",
+          "role": "read",
+          "site": {
+            "start_byte": 5926,
+            "end_byte_exclusive": 5928,
+            "start_line": 190,
+            "end_line": 190
+          },
+          "declaration": {
+            "start_byte": 5886,
+            "end_byte_exclusive": 5888,
+            "start_line": 189,
+            "end_line": 189
+          }
+        },
+        "lexical_binding": {
+          "id": "block@5878:ok@5886",
+          "name": "ok",
+          "kind": "var",
+          "origin": "short",
+          "scope": "block@5878",
+          "site": {
+            "start_byte": 5886,
+            "end_byte_exclusive": 5888,
+            "line": 189
+          }
+        },
+        "path": "consensus/wbft/backend/backend.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "ok",
+            "role": "definition",
+            "site": {
+              "start_byte": 5886,
+              "end_byte_exclusive": 5888,
+              "start_line": 189,
+              "end_line": 189
+            },
+            "declaration": {
+              "start_byte": 5886,
+              "end_byte_exclusive": 5888,
+              "start_line": 189,
+              "end_line": 189
+            }
+          },
+          "lexical_binding": {
+            "id": "block@5878:ok@5886",
+            "name": "ok",
+            "kind": "var",
+            "origin": "short",
+            "scope": "block@5878",
+            "site": {
+              "start_byte": 5886,
+              "end_byte_exclusive": 5888,
+              "line": 189
+            }
+          },
+          "path": "consensus/wbft/backend/backend.go"
+        }
+      ],
+      "rationale": "바깥 캐시 조회의 ok가 바깥 if 조건에 쓰인다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-02",
+      "candidate_id": "SRC-002",
+      "variable": "ok",
+      "use": {
+        "occurrence": {
+          "name": "ok",
+          "role": "read",
+          "site": {
+            "start_byte": 5960,
+            "end_byte_exclusive": 5962,
+            "start_line": 191,
+            "end_line": 191
+          },
+          "declaration": {
+            "start_byte": 5941,
+            "end_byte_exclusive": 5943,
+            "start_line": 191,
+            "end_line": 191
+          }
+        },
+        "lexical_binding": {
+          "id": "if@5935:ok@5941",
+          "name": "ok",
+          "kind": "var",
+          "origin": "short",
+          "scope": "if@5935",
+          "site": {
+            "start_byte": 5941,
+            "end_byte_exclusive": 5943,
+            "line": 191
+          }
+        },
+        "path": "consensus/wbft/backend/backend.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "ok",
+            "role": "definition",
+            "site": {
+              "start_byte": 5941,
+              "end_byte_exclusive": 5943,
+              "start_line": 191,
+              "end_line": 191
+            },
+            "declaration": {
+              "start_byte": 5941,
+              "end_byte_exclusive": 5943,
+              "start_line": 191,
+              "end_line": 191
+            }
+          },
+          "lexical_binding": {
+            "id": "if@5935:ok@5941",
+            "name": "ok",
+            "kind": "var",
+            "origin": "short",
+            "scope": "if@5935",
+            "site": {
+              "start_byte": 5941,
+              "end_byte_exclusive": 5943,
+              "line": 191
+            }
+          },
+          "path": "consensus/wbft/backend/backend.go"
+        }
+      ],
+      "rationale": "안쪽 m.Get의 새 ok가 같은 if 조건에 쓰인다. 189행 ok와 다른 바인딩이다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-03",
+      "candidate_id": "SRC-002",
+      "variable": "outboundCode",
+      "use": {
+        "occurrence": {
+          "name": "outboundCode",
+          "role": "read",
+          "site": {
+            "start_byte": 6308,
+            "end_byte_exclusive": 6320,
+            "start_line": 206,
+            "end_line": 206
+          },
+          "declaration": {
+            "start_byte": 6166,
+            "end_byte_exclusive": 6178,
+            "start_line": 202,
+            "end_line": 202
+          }
+        },
+        "lexical_binding": {
+          "id": "block@5878:outboundCode@6166",
+          "name": "outboundCode",
+          "kind": "var",
+          "origin": "var",
+          "scope": "block@5878",
+          "site": {
+            "start_byte": 6166,
+            "end_byte_exclusive": 6178,
+            "line": 202
+          }
+        },
+        "path": "consensus/wbft/backend/backend.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "outboundCode",
+            "role": "definition",
+            "site": {
+              "start_byte": 6166,
+              "end_byte_exclusive": 6178,
+              "start_line": 202,
+              "end_line": 202
+            },
+            "declaration": {
+              "start_byte": 6166,
+              "end_byte_exclusive": 6178,
+              "start_line": 202,
+              "end_line": 202
+            }
+          },
+          "lexical_binding": {
+            "id": "block@5878:outboundCode@6166",
+            "name": "outboundCode",
+            "kind": "var",
+            "origin": "var",
+            "scope": "block@5878",
+            "site": {
+              "start_byte": 6166,
+              "end_byte_exclusive": 6178,
+              "line": 202
+            }
+          },
+          "path": "consensus/wbft/backend/backend.go"
+        },
+        {
+          "occurrence": {
+            "name": "outboundCode",
+            "role": "write",
+            "site": {
+              "start_byte": 6257,
+              "end_byte_exclusive": 6269,
+              "start_line": 204,
+              "end_line": 204
+            },
+            "declaration": {
+              "start_byte": 6166,
+              "end_byte_exclusive": 6178,
+              "start_line": 202,
+              "end_line": 202
+            }
+          },
+          "lexical_binding": {
+            "id": "block@5878:outboundCode@6166",
+            "name": "outboundCode",
+            "kind": "var",
+            "origin": "var",
+            "scope": "block@5878",
+            "site": {
+              "start_byte": 6166,
+              "end_byte_exclusive": 6178,
+              "line": 202
+            }
+          },
+          "path": "consensus/wbft/backend/backend.go"
+        }
+      ],
+      "rationale": "조건부 덮어쓰기 뒤 Send 호출 인자는 기본값 또는 code 대입의 정의가 구조적으로 도달할 수 있다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-04",
+      "candidate_id": "SRC-002",
+      "variable": "m",
+      "use": {
+        "occurrence": {
+          "name": "m",
+          "role": "read",
+          "site": {
+            "start_byte": 6106,
+            "end_byte_exclusive": 6107,
+            "start_line": 199,
+            "end_line": 199
+          },
+          "declaration": {
+            "start_byte": 5883,
+            "end_byte_exclusive": 5884,
+            "start_line": 189,
+            "end_line": 189
+          }
+        },
+        "lexical_binding": {
+          "id": "block@5878:m@5883",
+          "name": "m",
+          "kind": "var",
+          "origin": "short",
+          "scope": "block@5878",
+          "site": {
+            "start_byte": 5883,
+            "end_byte_exclusive": 5884,
+            "line": 189
+          }
+        },
+        "path": "consensus/wbft/backend/backend.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "m",
+            "role": "definition",
+            "site": {
+              "start_byte": 5883,
+              "end_byte_exclusive": 5884,
+              "start_line": 189,
+              "end_line": 189
+            },
+            "declaration": {
+              "start_byte": 5883,
+              "end_byte_exclusive": 5884,
+              "start_line": 189,
+              "end_line": 189
+            }
+          },
+          "lexical_binding": {
+            "id": "block@5878:m@5883",
+            "name": "m",
+            "kind": "var",
+            "origin": "short",
+            "scope": "block@5878",
+            "site": {
+              "start_byte": 5883,
+              "end_byte_exclusive": 5884,
+              "line": 189
+            }
+          },
+          "path": "consensus/wbft/backend/backend.go"
+        },
+        {
+          "occurrence": {
+            "name": "m",
+            "role": "write",
+            "site": {
+              "start_byte": 6043,
+              "end_byte_exclusive": 6044,
+              "start_line": 196,
+              "end_line": 196
+            },
+            "declaration": {
+              "start_byte": 5883,
+              "end_byte_exclusive": 5884,
+              "start_line": 189,
+              "end_line": 189
+            }
+          },
+          "lexical_binding": {
+            "id": "block@5878:m@5883",
+            "name": "m",
+            "kind": "var",
+            "origin": "short",
+            "scope": "block@5878",
+            "site": {
+              "start_byte": 5883,
+              "end_byte_exclusive": 5884,
+              "line": 189
+            }
+          },
+          "path": "consensus/wbft/backend/backend.go"
+        }
+      ],
+      "rationale": "캐시 적중과 새 캐시 생성 경로의 로컬 참조 바인딩을 검토한다. 캐시 내부 데이터 의미는 별개다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-05",
+      "candidate_id": "SRC-006",
+      "variable": "count",
+      "use": {
+        "occurrence": {
+          "name": "count",
+          "role": "read",
+          "site": {
+            "start_byte": 10588,
+            "end_byte_exclusive": 10593,
+            "start_line": 321,
+            "end_line": 321
+          },
+          "declaration": {
+            "start_byte": 9890,
+            "end_byte_exclusive": 9895,
+            "start_line": 295,
+            "end_line": 295
+          }
+        },
+        "lexical_binding": {
+          "id": "function@9919:count@9890",
+          "name": "count",
+          "kind": "var",
+          "origin": "parameter",
+          "scope": "function@9919",
+          "site": {
+            "start_byte": 9890,
+            "end_byte_exclusive": 9895,
+            "line": 295
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "count",
+            "role": "definition",
+            "site": {
+              "start_byte": 9890,
+              "end_byte_exclusive": 9895,
+              "start_line": 295,
+              "end_line": 295
+            },
+            "declaration": {
+              "start_byte": 9890,
+              "end_byte_exclusive": 9895,
+              "start_line": 295,
+              "end_line": 295
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:count@9890",
+            "name": "count",
+            "kind": "var",
+            "origin": "parameter",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 9890,
+              "end_byte_exclusive": 9895,
+              "line": 295
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        },
+        {
+          "occurrence": {
+            "name": "count",
+            "role": "write",
+            "site": {
+              "start_byte": 10070,
+              "end_byte_exclusive": 10075,
+              "start_line": 303,
+              "end_line": 303
+            },
+            "declaration": {
+              "start_byte": 9890,
+              "end_byte_exclusive": 9895,
+              "start_line": 295,
+              "end_line": 295
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:count@9890",
+            "name": "count",
+            "kind": "var",
+            "origin": "parameter",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 9890,
+              "end_byte_exclusive": 9895,
+              "line": 295
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        },
+        {
+          "occurrence": {
+            "name": "count",
+            "role": "read_write",
+            "site": {
+              "start_byte": 10569,
+              "end_byte_exclusive": 10574,
+              "start_line": 318,
+              "end_line": 318
+            },
+            "declaration": {
+              "start_byte": 9890,
+              "end_byte_exclusive": 9895,
+              "start_line": 295,
+              "end_line": 295
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:count@9890",
+            "name": "count",
+            "kind": "var",
+            "origin": "parameter",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 9890,
+              "end_byte_exclusive": 9895,
+              "line": 295
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        }
+      ],
+      "rationale": "초기 인자·상한 보정·반복 감소가 loop 이후 조건에 합류할 수 있다. 값 기반 경로 가능성은 증명하지 않는다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-06",
+      "candidate_id": "SRC-006",
+      "variable": "i",
+      "use": {
+        "occurrence": {
+          "name": "i",
+          "role": "read",
+          "site": {
+            "start_byte": 10801,
+            "end_byte_exclusive": 10802,
+            "start_line": 326,
+            "end_line": 326
+          },
+          "declaration": {
+            "start_byte": 9993,
+            "end_byte_exclusive": 9994,
+            "start_line": 300,
+            "end_line": 300
+          }
+        },
+        "lexical_binding": {
+          "id": "function@9919:i@9993",
+          "name": "i",
+          "kind": "var",
+          "origin": "short",
+          "scope": "function@9919",
+          "site": {
+            "start_byte": 9993,
+            "end_byte_exclusive": 9994,
+            "line": 300
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "i",
+            "role": "definition",
+            "site": {
+              "start_byte": 9993,
+              "end_byte_exclusive": 9994,
+              "start_line": 300,
+              "end_line": 300
+            },
+            "declaration": {
+              "start_byte": 9993,
+              "end_byte_exclusive": 9994,
+              "start_line": 300,
+              "end_line": 300
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:i@9993",
+            "name": "i",
+            "kind": "var",
+            "origin": "short",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 9993,
+              "end_byte_exclusive": 9994,
+              "line": 300
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        },
+        {
+          "occurrence": {
+            "name": "i",
+            "role": "read_write",
+            "site": {
+              "start_byte": 10310,
+              "end_byte_exclusive": 10311,
+              "start_line": 310,
+              "end_line": 310
+            },
+            "declaration": {
+              "start_byte": 9993,
+              "end_byte_exclusive": 9994,
+              "start_line": 300,
+              "end_line": 300
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:i@9993",
+            "name": "i",
+            "kind": "var",
+            "origin": "short",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 9993,
+              "end_byte_exclusive": 9994,
+              "line": 300
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        }
+      ],
+      "rationale": "live loop 건너뜀과 반복 후 인덱스 바인딩을 구분한다. unsigned 산술의 실제 결과 안전성은 별도다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-07",
+      "candidate_id": "SRC-006",
+      "variable": "i",
+      "use": {
+        "occurrence": {
+          "name": "i",
+          "role": "read",
+          "site": {
+            "start_byte": 11218,
+            "end_byte_exclusive": 11219,
+            "start_line": 337,
+            "end_line": 337
+          },
+          "declaration": {
+            "start_byte": 11149,
+            "end_byte_exclusive": 11150,
+            "start_line": 336,
+            "end_line": 336
+          }
+        },
+        "lexical_binding": {
+          "id": "range@11145:i@11149",
+          "name": "i",
+          "kind": "var",
+          "origin": "range",
+          "scope": "range@11145",
+          "site": {
+            "start_byte": 11149,
+            "end_byte_exclusive": 11150,
+            "line": 336
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "i",
+            "role": "definition",
+            "site": {
+              "start_byte": 11149,
+              "end_byte_exclusive": 11150,
+              "start_line": 336,
+              "end_line": 336
+            },
+            "declaration": {
+              "start_byte": 11149,
+              "end_byte_exclusive": 11150,
+              "start_line": 336,
+              "end_line": 336
+            }
+          },
+          "lexical_binding": {
+            "id": "range@11145:i@11149",
+            "name": "i",
+            "kind": "var",
+            "origin": "range",
+            "scope": "range@11145",
+            "site": {
+              "start_byte": 11149,
+              "end_byte_exclusive": 11150,
+              "line": 336
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        }
+      ],
+      "rationale": "마지막 range의 안쪽 i만 사용한다. 현재 backend의 range binding 지원 제한도 별도 검토해야 한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "range_binding_unsupported",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-08",
+      "candidate_id": "SRC-006",
+      "variable": "data",
+      "use": {
+        "occurrence": {
+          "name": "data",
+          "role": "read",
+          "site": {
+            "start_byte": 11160,
+            "end_byte_exclusive": 11164,
+            "start_line": 336,
+            "end_line": 336
+          },
+          "declaration": {
+            "start_byte": 10747,
+            "end_byte_exclusive": 10751,
+            "start_line": 326,
+            "end_line": 326
+          }
+        },
+        "lexical_binding": {
+          "id": "function@9919:data@10747",
+          "name": "data",
+          "kind": "var",
+          "origin": "short",
+          "scope": "function@9919",
+          "site": {
+            "start_byte": 10747,
+            "end_byte_exclusive": 10751,
+            "line": 326
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "data",
+            "role": "definition",
+            "site": {
+              "start_byte": 10747,
+              "end_byte_exclusive": 10751,
+              "start_line": 326,
+              "end_line": 326
+            },
+            "declaration": {
+              "start_byte": 10747,
+              "end_byte_exclusive": 10751,
+              "start_line": 326,
+              "end_line": 326
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:data@10747",
+            "name": "data",
+            "kind": "var",
+            "origin": "short",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 10747,
+              "end_byte_exclusive": 10751,
+              "line": 326
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        }
+      ],
+      "rationale": "AncientRange가 반환한 바깥 data를 range 표현식에서 참조한다. live 조회의 안쪽 data와 구분한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-09",
+      "candidate_id": "SRC-006",
+      "variable": "rlpHeaders",
+      "use": {
+        "occurrence": {
+          "name": "rlpHeaders",
+          "role": "read",
+          "site": {
+            "start_byte": 11233,
+            "end_byte_exclusive": 11243,
+            "start_line": 339,
+            "end_line": 339
+          },
+          "declaration": {
+            "start_byte": 9926,
+            "end_byte_exclusive": 9936,
+            "start_line": 296,
+            "end_line": 296
+          }
+        },
+        "lexical_binding": {
+          "id": "function@9919:rlpHeaders@9926",
+          "name": "rlpHeaders",
+          "kind": "var",
+          "origin": "var",
+          "scope": "function@9919",
+          "site": {
+            "start_byte": 9926,
+            "end_byte_exclusive": 9936,
+            "line": 296
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "rlpHeaders",
+            "role": "definition",
+            "site": {
+              "start_byte": 9926,
+              "end_byte_exclusive": 9936,
+              "start_line": 296,
+              "end_line": 296
+            },
+            "declaration": {
+              "start_byte": 9926,
+              "end_byte_exclusive": 9936,
+              "start_line": 296,
+              "end_line": 296
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:rlpHeaders@9926",
+            "name": "rlpHeaders",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 9926,
+              "end_byte_exclusive": 9936,
+              "line": 296
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        },
+        {
+          "occurrence": {
+            "name": "rlpHeaders",
+            "role": "write",
+            "site": {
+              "start_byte": 10381,
+              "end_byte_exclusive": 10391,
+              "start_line": 312,
+              "end_line": 312
+            },
+            "declaration": {
+              "start_byte": 9926,
+              "end_byte_exclusive": 9936,
+              "start_line": 296,
+              "end_line": 296
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:rlpHeaders@9926",
+            "name": "rlpHeaders",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 9926,
+              "end_byte_exclusive": 9936,
+              "line": 296
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        },
+        {
+          "occurrence": {
+            "name": "rlpHeaders",
+            "role": "write",
+            "site": {
+              "start_byte": 11169,
+              "end_byte_exclusive": 11179,
+              "start_line": 337,
+              "end_line": 337
+            },
+            "declaration": {
+              "start_byte": 9926,
+              "end_byte_exclusive": 9936,
+              "start_line": 296,
+              "end_line": 296
+            }
+          },
+          "lexical_binding": {
+            "id": "function@9919:rlpHeaders@9926",
+            "name": "rlpHeaders",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@9919",
+            "site": {
+              "start_byte": 9926,
+              "end_byte_exclusive": 9936,
+              "line": 296
+            }
+          },
+          "path": "core/rawdb/accessors_chain.go"
+        }
+      ],
+      "rationale": "정상 마지막 return에서 참조 바인딩 합류를 검토한다. append 메모리/내용을 scalar 값 정답으로 보지 않는다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-10",
+      "candidate_id": "SRC-011",
+      "variable": "err",
+      "use": {
+        "occurrence": {
+          "name": "err",
+          "role": "read",
+          "site": {
+            "start_byte": 4464,
+            "end_byte_exclusive": 4467,
+            "start_line": 133,
+            "end_line": 133
+          },
+          "declaration": {
+            "start_byte": 4421,
+            "end_byte_exclusive": 4424,
+            "start_line": 132,
+            "end_line": 132
+          }
+        },
+        "lexical_binding": {
+          "id": "function@4114:err@4421",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "function@4114",
+          "site": {
+            "start_byte": 4421,
+            "end_byte_exclusive": 4424,
+            "line": 132
+          }
+        },
+        "path": "core/state/dump.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "err",
+            "role": "definition",
+            "site": {
+              "start_byte": 4421,
+              "end_byte_exclusive": 4424,
+              "start_line": 132,
+              "end_line": 132
+            },
+            "declaration": {
+              "start_byte": 4421,
+              "end_byte_exclusive": 4424,
+              "start_line": 132,
+              "end_line": 132
+            }
+          },
+          "lexical_binding": {
+            "id": "function@4114:err@4421",
+            "name": "err",
+            "kind": "var",
+            "origin": "short",
+            "scope": "function@4114",
+            "site": {
+              "start_byte": 4421,
+              "end_byte_exclusive": 4424,
+              "line": 132
+            }
+          },
+          "path": "core/state/dump.go"
+        }
+      ],
+      "rationale": "최초 NodeIterator의 오류 바인딩을 검사한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-11",
+      "candidate_id": "SRC-011",
+      "variable": "err",
+      "use": {
+        "occurrence": {
+          "name": "err",
+          "role": "read",
+          "site": {
+            "start_byte": 4686,
+            "end_byte_exclusive": 4689,
+            "start_line": 141,
+            "end_line": 141
+          },
+          "declaration": {
+            "start_byte": 4623,
+            "end_byte_exclusive": 4626,
+            "start_line": 140,
+            "end_line": 140
+          }
+        },
+        "lexical_binding": {
+          "id": "if@4620:err@4623",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "if@4620",
+          "site": {
+            "start_byte": 4623,
+            "end_byte_exclusive": 4626,
+            "line": 140
+          }
+        },
+        "path": "core/state/dump.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "err",
+            "role": "definition",
+            "site": {
+              "start_byte": 4623,
+              "end_byte_exclusive": 4626,
+              "start_line": 140,
+              "end_line": 140
+            },
+            "declaration": {
+              "start_byte": 4623,
+              "end_byte_exclusive": 4626,
+              "start_line": 140,
+              "end_line": 140
+            }
+          },
+          "lexical_binding": {
+            "id": "if@4620:err@4623",
+            "name": "err",
+            "kind": "var",
+            "origin": "short",
+            "scope": "if@4620",
+            "site": {
+              "start_byte": 4623,
+              "end_byte_exclusive": 4626,
+              "line": 140
+            }
+          },
+          "path": "core/state/dump.go"
+        }
+      ],
+      "rationale": "DecodeBytes if initializer의 새 err가 panic 인자이다. 실제 panic 도달성은 미판정이다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-12",
+      "candidate_id": "SRC-011",
+      "variable": "err",
+      "use": {
+        "occurrence": {
+          "name": "err",
+          "role": "read",
+          "site": {
+            "start_byte": 5551,
+            "end_byte_exclusive": 5554,
+            "start_line": 178,
+            "end_line": 178
+          },
+          "declaration": {
+            "start_byte": 5391,
+            "end_byte_exclusive": 5394,
+            "start_line": 172,
+            "end_line": 172
+          }
+        },
+        "lexical_binding": {
+          "id": "block@5332:err@5391",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "block@5332",
+          "site": {
+            "start_byte": 5391,
+            "end_byte_exclusive": 5394,
+            "line": 172
+          }
+        },
+        "path": "core/state/dump.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "err",
+            "role": "write",
+            "site": {
+              "start_byte": 5517,
+              "end_byte_exclusive": 5520,
+              "start_line": 177,
+              "end_line": 177
+            },
+            "declaration": {
+              "start_byte": 5391,
+              "end_byte_exclusive": 5394,
+              "start_line": 172,
+              "end_line": 172
+            }
+          },
+          "lexical_binding": {
+            "id": "block@5332:err@5391",
+            "name": "err",
+            "kind": "var",
+            "origin": "short",
+            "scope": "block@5332",
+            "site": {
+              "start_byte": 5391,
+              "end_byte_exclusive": 5394,
+              "line": 172
+            }
+          },
+          "path": "core/state/dump.go"
+        }
+      ],
+      "rationale": "172행에 선언한 err를 177행 같은 scope의 :=에서 재사용해 덮어쓴 뒤 검사한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-13",
+      "candidate_id": "SRC-011",
+      "variable": "nextKey",
+      "use": {
+        "occurrence": {
+          "name": "nextKey",
+          "role": "read",
+          "site": {
+            "start_byte": 6575,
+            "end_byte_exclusive": 6582,
+            "start_line": 212,
+            "end_line": 212
+          },
+          "declaration": {
+            "start_byte": 4098,
+            "end_byte_exclusive": 4105,
+            "start_line": 118,
+            "end_line": 118
+          }
+        },
+        "lexical_binding": {
+          "id": "function@4114:nextKey@4098",
+          "name": "nextKey",
+          "kind": "var",
+          "origin": "result",
+          "scope": "function@4114",
+          "site": {
+            "start_byte": 4098,
+            "end_byte_exclusive": 4105,
+            "line": 118
+          }
+        },
+        "path": "core/state/dump.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "nextKey",
+            "role": "definition",
+            "site": {
+              "start_byte": 4098,
+              "end_byte_exclusive": 4105,
+              "start_line": 118,
+              "end_line": 118
+            },
+            "declaration": {
+              "start_byte": 4098,
+              "end_byte_exclusive": 4105,
+              "start_line": 118,
+              "end_line": 118
+            }
+          },
+          "lexical_binding": {
+            "id": "function@4114:nextKey@4098",
+            "name": "nextKey",
+            "kind": "var",
+            "origin": "result",
+            "scope": "function@4114",
+            "site": {
+              "start_byte": 4098,
+              "end_byte_exclusive": 4105,
+              "line": 118
+            }
+          },
+          "path": "core/state/dump.go"
+        },
+        {
+          "occurrence": {
+            "name": "nextKey",
+            "role": "write",
+            "site": {
+              "start_byte": 6302,
+              "end_byte_exclusive": 6309,
+              "start_line": 201,
+              "end_line": 201
+            },
+            "declaration": {
+              "start_byte": 4098,
+              "end_byte_exclusive": 4105,
+              "start_line": 118,
+              "end_line": 118
+            }
+          },
+          "lexical_binding": {
+            "id": "function@4114:nextKey@4098",
+            "name": "nextKey",
+            "kind": "var",
+            "origin": "result",
+            "scope": "function@4114",
+            "site": {
+              "start_byte": 4098,
+              "end_byte_exclusive": 4105,
+              "line": 118
+            }
+          },
+          "path": "core/state/dump.go"
+        }
+      ],
+      "rationale": "이름 있는 결과의 entry zero와 다음 key 대입이 최종 return에서 합류할 수 있다. slice 내용은 알 수 없다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-14",
+      "candidate_id": "SRC-011",
+      "variable": "logged",
+      "use": {
+        "occurrence": {
+          "name": "logged",
+          "role": "read",
+          "site": {
+            "start_byte": 6050,
+            "end_byte_exclusive": 6056,
+            "start_line": 194,
+            "end_line": 194
+          },
+          "declaration": {
+            "start_byte": 4296,
+            "end_byte_exclusive": 4302,
+            "start_line": 127,
+            "end_line": 127
+          }
+        },
+        "lexical_binding": {
+          "id": "function@4114:logged@4296",
+          "name": "logged",
+          "kind": "var",
+          "origin": "var",
+          "scope": "function@4114",
+          "site": {
+            "start_byte": 4296,
+            "end_byte_exclusive": 4302,
+            "line": 127
+          }
+        },
+        "path": "core/state/dump.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "logged",
+            "role": "definition",
+            "site": {
+              "start_byte": 4296,
+              "end_byte_exclusive": 4302,
+              "start_line": 127,
+              "end_line": 127
+            },
+            "declaration": {
+              "start_byte": 4296,
+              "end_byte_exclusive": 4302,
+              "start_line": 127,
+              "end_line": 127
+            }
+          },
+          "lexical_binding": {
+            "id": "function@4114:logged@4296",
+            "name": "logged",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@4114",
+            "site": {
+              "start_byte": 4296,
+              "end_byte_exclusive": 4302,
+              "line": 127
+            }
+          },
+          "path": "core/state/dump.go"
+        },
+        {
+          "occurrence": {
+            "name": "logged",
+            "role": "write",
+            "site": {
+              "start_byte": 6212,
+              "end_byte_exclusive": 6218,
+              "start_line": 197,
+              "end_line": 197
+            },
+            "declaration": {
+              "start_byte": 4296,
+              "end_byte_exclusive": 4302,
+              "start_line": 127,
+              "end_line": 127
+            }
+          },
+          "lexical_binding": {
+            "id": "function@4114:logged@4296",
+            "name": "logged",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@4114",
+            "site": {
+              "start_byte": 4296,
+              "end_byte_exclusive": 4302,
+              "line": 127
+            }
+          },
+          "path": "core/state/dump.go"
+        }
+      ],
+      "rationale": "최초 timestamp와 이전 반복에서 갱신한 timestamp가 loop header 이후 검사에 도달할 수 있다. 시간 조건의 실제 성립은 미측정이다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-15",
+      "candidate_id": "SRC-036",
+      "variable": "err",
+      "use": {
+        "occurrence": {
+          "name": "err",
+          "role": "read",
+          "site": {
+            "start_byte": 6824,
+            "end_byte_exclusive": 6827,
+            "start_line": 195,
+            "end_line": 195
+          },
+          "declaration": {
+            "start_byte": 6795,
+            "end_byte_exclusive": 6798,
+            "start_line": 194,
+            "end_line": 194
+          }
+        },
+        "lexical_binding": {
+          "id": "function@6789:err@6795",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "function@6789",
+          "site": {
+            "start_byte": 6795,
+            "end_byte_exclusive": 6798,
+            "line": 194
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "err",
+            "role": "definition",
+            "site": {
+              "start_byte": 6795,
+              "end_byte_exclusive": 6798,
+              "start_line": 194,
+              "end_line": 194
+            },
+            "declaration": {
+              "start_byte": 6795,
+              "end_byte_exclusive": 6798,
+              "start_line": 194,
+              "end_line": 194
+            }
+          },
+          "lexical_binding": {
+            "id": "function@6789:err@6795",
+            "name": "err",
+            "kind": "var",
+            "origin": "short",
+            "scope": "function@6789",
+            "site": {
+              "start_byte": 6795,
+              "end_byte_exclusive": 6798,
+              "line": 194
+            }
+          },
+          "path": "rpc/client.go"
+        }
+      ],
+      "rationale": "URL parse의 바깥 err를 검사한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-16",
+      "candidate_id": "SRC-036",
+      "variable": "err",
+      "use": {
+        "occurrence": {
+          "name": "err",
+          "role": "read",
+          "site": {
+            "start_byte": 7163,
+            "end_byte_exclusive": 7166,
+            "start_line": 211,
+            "end_line": 211
+          },
+          "declaration": {
+            "start_byte": 7089,
+            "end_byte_exclusive": 7092,
+            "start_line": 209,
+            "end_line": 209
+          }
+        },
+        "lexical_binding": {
+          "id": "case@7065:err@7089",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "case@7065",
+          "site": {
+            "start_byte": 7089,
+            "end_byte_exclusive": 7092,
+            "line": 209
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "err",
+            "role": "definition",
+            "site": {
+              "start_byte": 7089,
+              "end_byte_exclusive": 7092,
+              "start_line": 209,
+              "end_line": 209
+            },
+            "declaration": {
+              "start_byte": 7089,
+              "end_byte_exclusive": 7092,
+              "start_line": 209,
+              "end_line": 209
+            }
+          },
+          "lexical_binding": {
+            "id": "case@7065:err@7089",
+            "name": "err",
+            "kind": "var",
+            "origin": "short",
+            "scope": "case@7065",
+            "site": {
+              "start_byte": 7089,
+              "end_byte_exclusive": 7092,
+              "line": 209
+            }
+          },
+          "path": "rpc/client.go"
+        }
+      ],
+      "rationale": "WS case 내부의 새 err를 return한다. 바깥 URL parse err와 구분한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-17",
+      "candidate_id": "SRC-036",
+      "variable": "reconnect",
+      "use": {
+        "occurrence": {
+          "name": "reconnect",
+          "role": "read",
+          "site": {
+            "start_byte": 7430,
+            "end_byte_exclusive": 7439,
+            "start_line": 222,
+            "end_line": 222
+          },
+          "declaration": {
+            "start_byte": 6948,
+            "end_byte_exclusive": 6957,
+            "start_line": 204,
+            "end_line": 204
+          }
+        },
+        "lexical_binding": {
+          "id": "function@6789:reconnect@6948",
+          "name": "reconnect",
+          "kind": "var",
+          "origin": "var",
+          "scope": "function@6789",
+          "site": {
+            "start_byte": 6948,
+            "end_byte_exclusive": 6957,
+            "line": 204
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "reconnect",
+            "role": "write",
+            "site": {
+              "start_byte": 7016,
+              "end_byte_exclusive": 7025,
+              "start_line": 207,
+              "end_line": 207
+            },
+            "declaration": {
+              "start_byte": 6948,
+              "end_byte_exclusive": 6957,
+              "start_line": 204,
+              "end_line": 204
+            }
+          },
+          "lexical_binding": {
+            "id": "function@6789:reconnect@6948",
+            "name": "reconnect",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@6789",
+            "site": {
+              "start_byte": 6948,
+              "end_byte_exclusive": 6957,
+              "line": 204
+            }
+          },
+          "path": "rpc/client.go"
+        },
+        {
+          "occurrence": {
+            "name": "reconnect",
+            "role": "write",
+            "site": {
+              "start_byte": 7173,
+              "end_byte_exclusive": 7182,
+              "start_line": 213,
+              "end_line": 213
+            },
+            "declaration": {
+              "start_byte": 6948,
+              "end_byte_exclusive": 6957,
+              "start_line": 204,
+              "end_line": 204
+            }
+          },
+          "lexical_binding": {
+            "id": "function@6789:reconnect@6948",
+            "name": "reconnect",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@6789",
+            "site": {
+              "start_byte": 6948,
+              "end_byte_exclusive": 6957,
+              "line": 204
+            }
+          },
+          "path": "rpc/client.go"
+        },
+        {
+          "occurrence": {
+            "name": "reconnect",
+            "role": "write",
+            "site": {
+              "start_byte": 7205,
+              "end_byte_exclusive": 7214,
+              "start_line": 215,
+              "end_line": 215
+            },
+            "declaration": {
+              "start_byte": 6948,
+              "end_byte_exclusive": 6957,
+              "start_line": 204,
+              "end_line": 204
+            }
+          },
+          "lexical_binding": {
+            "id": "function@6789:reconnect@6948",
+            "name": "reconnect",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@6789",
+            "site": {
+              "start_byte": 6948,
+              "end_byte_exclusive": 6957,
+              "line": 204
+            }
+          },
+          "path": "rpc/client.go"
+        },
+        {
+          "occurrence": {
+            "name": "reconnect",
+            "role": "write",
+            "site": {
+              "start_byte": 7271,
+              "end_byte_exclusive": 7280,
+              "start_line": 217,
+              "end_line": 217
+            },
+            "declaration": {
+              "start_byte": 6948,
+              "end_byte_exclusive": 6957,
+              "start_line": 204,
+              "end_line": 204
+            }
+          },
+          "lexical_binding": {
+            "id": "function@6789:reconnect@6948",
+            "name": "reconnect",
+            "kind": "var",
+            "origin": "var",
+            "scope": "function@6789",
+            "site": {
+              "start_byte": 6948,
+              "end_byte_exclusive": 6957,
+              "line": 204
+            }
+          },
+          "path": "rpc/client.go"
+        }
+      ],
+      "rationale": "정상 switch arm의 대입만 합류할 것으로 제안한다. default와 WS 오류는 return하므로 entry zero 정의 제외를 검토한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-18",
+      "candidate_id": "SRC-036",
+      "variable": "cfg",
+      "use": {
+        "occurrence": {
+          "name": "cfg",
+          "role": "read",
+          "site": {
+            "start_byte": 7425,
+            "end_byte_exclusive": 7428,
+            "start_line": 222,
+            "end_line": 222
+          },
+          "declaration": {
+            "start_byte": 6860,
+            "end_byte_exclusive": 6863,
+            "start_line": 199,
+            "end_line": 199
+          }
+        },
+        "lexical_binding": {
+          "id": "function@6789:cfg@6860",
+          "name": "cfg",
+          "kind": "var",
+          "origin": "short",
+          "scope": "function@6789",
+          "site": {
+            "start_byte": 6860,
+            "end_byte_exclusive": 6863,
+            "line": 199
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "cfg",
+            "role": "definition",
+            "site": {
+              "start_byte": 6860,
+              "end_byte_exclusive": 6863,
+              "start_line": 199,
+              "end_line": 199
+            },
+            "declaration": {
+              "start_byte": 6860,
+              "end_byte_exclusive": 6863,
+              "start_line": 199,
+              "end_line": 199
+            }
+          },
+          "lexical_binding": {
+            "id": "function@6789:cfg@6860",
+            "name": "cfg",
+            "kind": "var",
+            "origin": "short",
+            "scope": "function@6789",
+            "site": {
+              "start_byte": 6860,
+              "end_byte_exclusive": 6863,
+              "line": 199
+            }
+          },
+          "path": "rpc/client.go"
+        }
+      ],
+      "rationale": "로컬 cfg 포인터 바인딩을 인자로 전달한다. applyOption이나 constructor의 pointee 변경은 이 관계로 입증하지 않는다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    },
+    {
+      "id": "DR-19",
+      "candidate_id": "SRC-036",
+      "variable": "rc",
+      "use": {
+        "occurrence": {
+          "name": "rc",
+          "role": "read",
+          "site": {
+            "start_byte": 7185,
+            "end_byte_exclusive": 7187,
+            "start_line": 213,
+            "end_line": 213
+          },
+          "declaration": {
+            "start_byte": 7085,
+            "end_byte_exclusive": 7087,
+            "start_line": 209,
+            "end_line": 209
+          }
+        },
+        "lexical_binding": {
+          "id": "case@7065:rc@7085",
+          "name": "rc",
+          "kind": "var",
+          "origin": "short",
+          "scope": "case@7065",
+          "site": {
+            "start_byte": 7085,
+            "end_byte_exclusive": 7087,
+            "line": 209
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "definitions": [
+        {
+          "occurrence": {
+            "name": "rc",
+            "role": "definition",
+            "site": {
+              "start_byte": 7085,
+              "end_byte_exclusive": 7087,
+              "start_line": 209,
+              "end_line": 209
+            },
+            "declaration": {
+              "start_byte": 7085,
+              "end_byte_exclusive": 7087,
+              "start_line": 209,
+              "end_line": 209
+            }
+          },
+          "lexical_binding": {
+            "id": "case@7065:rc@7085",
+            "name": "rc",
+            "kind": "var",
+            "origin": "short",
+            "scope": "case@7065",
+            "site": {
+              "start_byte": 7085,
+              "end_byte_exclusive": 7087,
+              "line": 209
+            }
+          },
+          "path": "rpc/client.go"
+        }
+      ],
+      "rationale": "WS constructor 결과의 로컬 참조를 reconnect에 전달한다. 실제 연결 성공은 미판정이다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "complete_definition_set": false,
+      "value_domain": null,
+      "backend_mapping": "kind_and_exact_node_mapping_pending",
+      "reachability_interpretation": "structural_may_reach_proposal_not_path_feasibility"
+    }
+  ],
+  "exclusion_reviews": [
+    {
+      "id": "EX-01",
+      "candidate_id": "SRC-002",
+      "variable": "ok",
+      "definition": {
+        "occurrence": {
+          "name": "ok",
+          "role": "definition",
+          "site": {
+            "start_byte": 5886,
+            "end_byte_exclusive": 5888,
+            "start_line": 189,
+            "end_line": 189
+          },
+          "declaration": {
+            "start_byte": 5886,
+            "end_byte_exclusive": 5888,
+            "start_line": 189,
+            "end_line": 189
+          }
+        },
+        "lexical_binding": {
+          "id": "block@5878:ok@5886",
+          "name": "ok",
+          "kind": "var",
+          "origin": "short",
+          "scope": "block@5878",
+          "site": {
+            "start_byte": 5886,
+            "end_byte_exclusive": 5888,
+            "line": 189
+          }
+        },
+        "path": "consensus/wbft/backend/backend.go"
+      },
+      "use": {
+        "occurrence": {
+          "name": "ok",
+          "role": "read",
+          "site": {
+            "start_byte": 5960,
+            "end_byte_exclusive": 5962,
+            "start_line": 191,
+            "end_line": 191
+          },
+          "declaration": {
+            "start_byte": 5941,
+            "end_byte_exclusive": 5943,
+            "start_line": 191,
+            "end_line": 191
+          }
+        },
+        "lexical_binding": {
+          "id": "if@5935:ok@5941",
+          "name": "ok",
+          "kind": "var",
+          "origin": "short",
+          "scope": "if@5935",
+          "site": {
+            "start_byte": 5941,
+            "end_byte_exclusive": 5943,
+            "line": 191
+          }
+        },
+        "path": "consensus/wbft/backend/backend.go"
+      },
+      "exclusion_reason_proposal": "different_lexical_binding",
+      "rationale": "바깥 ok를 안쪽 조건의 ok에 연결하지 않는다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "same_lexical_binding": false
+    },
+    {
+      "id": "EX-02",
+      "candidate_id": "SRC-006",
+      "variable": "i",
+      "definition": {
+        "occurrence": {
+          "name": "i",
+          "role": "definition",
+          "site": {
+            "start_byte": 9993,
+            "end_byte_exclusive": 9994,
+            "start_line": 300,
+            "end_line": 300
+          },
+          "declaration": {
+            "start_byte": 9993,
+            "end_byte_exclusive": 9994,
+            "start_line": 300,
+            "end_line": 300
+          }
+        },
+        "lexical_binding": {
+          "id": "function@9919:i@9993",
+          "name": "i",
+          "kind": "var",
+          "origin": "short",
+          "scope": "function@9919",
+          "site": {
+            "start_byte": 9993,
+            "end_byte_exclusive": 9994,
+            "line": 300
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "use": {
+        "occurrence": {
+          "name": "i",
+          "role": "read",
+          "site": {
+            "start_byte": 11218,
+            "end_byte_exclusive": 11219,
+            "start_line": 337,
+            "end_line": 337
+          },
+          "declaration": {
+            "start_byte": 11149,
+            "end_byte_exclusive": 11150,
+            "start_line": 336,
+            "end_line": 336
+          }
+        },
+        "lexical_binding": {
+          "id": "range@11145:i@11149",
+          "name": "i",
+          "kind": "var",
+          "origin": "range",
+          "scope": "range@11145",
+          "site": {
+            "start_byte": 11149,
+            "end_byte_exclusive": 11150,
+            "line": 336
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "exclusion_reason_proposal": "different_lexical_binding",
+      "rationale": "outer i와 range i를 이름만으로 합치지 않는다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "same_lexical_binding": false
+    },
+    {
+      "id": "EX-03",
+      "candidate_id": "SRC-006",
+      "variable": "data",
+      "definition": {
+        "occurrence": {
+          "name": "data",
+          "role": "definition",
+          "site": {
+            "start_byte": 10322,
+            "end_byte_exclusive": 10326,
+            "start_line": 311,
+            "end_line": 311
+          },
+          "declaration": {
+            "start_byte": 10322,
+            "end_byte_exclusive": 10326,
+            "start_line": 311,
+            "end_line": 311
+          }
+        },
+        "lexical_binding": {
+          "id": "if@10319:data@10322",
+          "name": "data",
+          "kind": "var",
+          "origin": "short",
+          "scope": "if@10319",
+          "site": {
+            "start_byte": 10322,
+            "end_byte_exclusive": 10326,
+            "line": 311
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "use": {
+        "occurrence": {
+          "name": "data",
+          "role": "read",
+          "site": {
+            "start_byte": 11160,
+            "end_byte_exclusive": 11164,
+            "start_line": 336,
+            "end_line": 336
+          },
+          "declaration": {
+            "start_byte": 10747,
+            "end_byte_exclusive": 10751,
+            "start_line": 326,
+            "end_line": 326
+          }
+        },
+        "lexical_binding": {
+          "id": "function@9919:data@10747",
+          "name": "data",
+          "kind": "var",
+          "origin": "short",
+          "scope": "function@9919",
+          "site": {
+            "start_byte": 10747,
+            "end_byte_exclusive": 10751,
+            "line": 326
+          }
+        },
+        "path": "core/rawdb/accessors_chain.go"
+      },
+      "exclusion_reason_proposal": "different_lexical_binding",
+      "rationale": "live if의 data는 ancient data의 선언과 다르다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "same_lexical_binding": false
+    },
+    {
+      "id": "EX-04",
+      "candidate_id": "SRC-011",
+      "variable": "err",
+      "definition": {
+        "occurrence": {
+          "name": "err",
+          "role": "definition",
+          "site": {
+            "start_byte": 5391,
+            "end_byte_exclusive": 5394,
+            "start_line": 172,
+            "end_line": 172
+          },
+          "declaration": {
+            "start_byte": 5391,
+            "end_byte_exclusive": 5394,
+            "start_line": 172,
+            "end_line": 172
+          }
+        },
+        "lexical_binding": {
+          "id": "block@5332:err@5391",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "block@5332",
+          "site": {
+            "start_byte": 5391,
+            "end_byte_exclusive": 5394,
+            "line": 172
+          }
+        },
+        "path": "core/state/dump.go"
+      },
+      "use": {
+        "occurrence": {
+          "name": "err",
+          "role": "read",
+          "site": {
+            "start_byte": 5551,
+            "end_byte_exclusive": 5554,
+            "start_line": 178,
+            "end_line": 178
+          },
+          "declaration": {
+            "start_byte": 5391,
+            "end_byte_exclusive": 5394,
+            "start_line": 172,
+            "end_line": 172
+          }
+        },
+        "lexical_binding": {
+          "id": "block@5332:err@5391",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "block@5332",
+          "site": {
+            "start_byte": 5391,
+            "end_byte_exclusive": 5394,
+            "line": 172
+          }
+        },
+        "path": "core/state/dump.go"
+      },
+      "exclusion_reason_proposal": "intervening_write_proposal",
+      "rationale": "177행의 같은 scope 재대입이 172행 정의를 대체한다는 구조적 제외 초안이다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "same_lexical_binding": true
+    },
+    {
+      "id": "EX-05",
+      "candidate_id": "SRC-036",
+      "variable": "reconnect",
+      "definition": {
+        "occurrence": {
+          "name": "reconnect",
+          "role": "definition",
+          "site": {
+            "start_byte": 6948,
+            "end_byte_exclusive": 6957,
+            "start_line": 204,
+            "end_line": 204
+          },
+          "declaration": {
+            "start_byte": 6948,
+            "end_byte_exclusive": 6957,
+            "start_line": 204,
+            "end_line": 204
+          }
+        },
+        "lexical_binding": {
+          "id": "function@6789:reconnect@6948",
+          "name": "reconnect",
+          "kind": "var",
+          "origin": "var",
+          "scope": "function@6789",
+          "site": {
+            "start_byte": 6948,
+            "end_byte_exclusive": 6957,
+            "line": 204
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "use": {
+        "occurrence": {
+          "name": "reconnect",
+          "role": "read",
+          "site": {
+            "start_byte": 7430,
+            "end_byte_exclusive": 7439,
+            "start_line": 222,
+            "end_line": 222
+          },
+          "declaration": {
+            "start_byte": 6948,
+            "end_byte_exclusive": 6957,
+            "start_line": 204,
+            "end_line": 204
+          }
+        },
+        "lexical_binding": {
+          "id": "function@6789:reconnect@6948",
+          "name": "reconnect",
+          "kind": "var",
+          "origin": "var",
+          "scope": "function@6789",
+          "site": {
+            "start_byte": 6948,
+            "end_byte_exclusive": 6957,
+            "line": 204
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "exclusion_reason_proposal": "all_fallthrough_arms_write_proposal",
+      "rationale": "정상 arm 모두에서 대입하고 다른 arm은 반환하므로 zero 정의의 도달을 제외할지 검토한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "same_lexical_binding": true
+    },
+    {
+      "id": "EX-06",
+      "candidate_id": "SRC-036",
+      "variable": "err",
+      "definition": {
+        "occurrence": {
+          "name": "err",
+          "role": "definition",
+          "site": {
+            "start_byte": 6795,
+            "end_byte_exclusive": 6798,
+            "start_line": 194,
+            "end_line": 194
+          },
+          "declaration": {
+            "start_byte": 6795,
+            "end_byte_exclusive": 6798,
+            "start_line": 194,
+            "end_line": 194
+          }
+        },
+        "lexical_binding": {
+          "id": "function@6789:err@6795",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "function@6789",
+          "site": {
+            "start_byte": 6795,
+            "end_byte_exclusive": 6798,
+            "line": 194
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "use": {
+        "occurrence": {
+          "name": "err",
+          "role": "read",
+          "site": {
+            "start_byte": 7163,
+            "end_byte_exclusive": 7166,
+            "start_line": 211,
+            "end_line": 211
+          },
+          "declaration": {
+            "start_byte": 7089,
+            "end_byte_exclusive": 7092,
+            "start_line": 209,
+            "end_line": 209
+          }
+        },
+        "lexical_binding": {
+          "id": "case@7065:err@7089",
+          "name": "err",
+          "kind": "var",
+          "origin": "short",
+          "scope": "case@7065",
+          "site": {
+            "start_byte": 7089,
+            "end_byte_exclusive": 7092,
+            "line": 209
+          }
+        },
+        "path": "rpc/client.go"
+      },
+      "exclusion_reason_proposal": "different_lexical_binding",
+      "rationale": "WS case의 return err를 URL parse err와 합치지 않는다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "same_lexical_binding": false
+    },
+    {
+      "id": "EX-07",
+      "candidate_id": "SRC-011",
+      "variable": "nextKey",
+      "definition": {
+        "occurrence": {
+          "name": "nextKey",
+          "role": "write",
+          "site": {
+            "start_byte": 6302,
+            "end_byte_exclusive": 6309,
+            "start_line": 201,
+            "end_line": 201
+          },
+          "declaration": {
+            "start_byte": 4098,
+            "end_byte_exclusive": 4105,
+            "start_line": 118,
+            "end_line": 118
+          }
+        },
+        "lexical_binding": {
+          "id": "function@4114:nextKey@4098",
+          "name": "nextKey",
+          "kind": "var",
+          "origin": "result",
+          "scope": "function@4114",
+          "site": {
+            "start_byte": 4098,
+            "end_byte_exclusive": 4105,
+            "line": 118
+          }
+        },
+        "path": "core/state/dump.go"
+      },
+      "target_marker": {
+        "kind": "return",
+        "site": {
+          "start_byte": 4525,
+          "end_byte_exclusive": 4535,
+          "start_line": 135,
+          "end_line": 135
+        },
+        "target": {
+          "start_byte": 4028,
+          "end_byte_exclusive": 6584,
+          "start_line": 118,
+          "end_line": 213
+        },
+        "target_kind": "function",
+        "explicit_results": 1
+      },
+      "exclusion_reason_proposal": "earlier_explicit_nil_return_proposal",
+      "rationale": "135행 return nil은 nextKey의 명시적 읽기가 아니며 이 함수 호출의 201행 대입보다 먼저 종료한다.",
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null
+    }
+  ],
+  "boundaries": [
+    {
+      "id": "BD-01",
+      "candidate_id": "SRC-002",
+      "marker": {
+        "kind": "continue",
+        "site": {
+          "start_byte": 6012,
+          "end_byte_exclusive": 6020,
+          "start_line": 193,
+          "end_line": 193
+        },
+        "target": {
+          "start_byte": 5854,
+          "end_byte_exclusive": 6334,
+          "start_line": 188,
+          "end_line": 207
+        },
+        "target_kind": "*ast.RangeStmt",
+        "explicit_results": 0
+      },
+      "expected_target_start_line": 188,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-02",
+      "candidate_id": "SRC-006",
+      "marker": {
+        "kind": "break",
+        "site": {
+          "start_byte": 10524,
+          "end_byte_exclusive": 10529,
+          "start_line": 316,
+          "end_line": 316
+        },
+        "target": {
+          "start_byte": 10279,
+          "end_byte_exclusive": 10580,
+          "start_line": 310,
+          "end_line": 319
+        },
+        "target_kind": "*ast.ForStmt",
+        "explicit_results": 0
+      },
+      "expected_target_start_line": 310,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-03",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "continue",
+        "site": {
+          "start_byte": 5099,
+          "end_byte_exclusive": 5107,
+          "start_line": 159,
+          "end_line": 159
+        },
+        "target": {
+          "start_byte": 4572,
+          "end_byte_exclusive": 6339,
+          "start_line": 138,
+          "end_line": 205
+        },
+        "target_kind": "*ast.ForStmt",
+        "explicit_results": 0
+      },
+      "expected_target_start_line": 138,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-04",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "continue",
+        "site": {
+          "start_byte": 5492,
+          "end_byte_exclusive": 5500,
+          "start_line": 175,
+          "end_line": 175
+        },
+        "target": {
+          "start_byte": 4572,
+          "end_byte_exclusive": 6339,
+          "start_line": 138,
+          "end_line": 205
+        },
+        "target_kind": "*ast.ForStmt",
+        "explicit_results": 0
+      },
+      "expected_target_start_line": 138,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-05",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "continue",
+        "site": {
+          "start_byte": 5628,
+          "end_byte_exclusive": 5636,
+          "start_line": 180,
+          "end_line": 180
+        },
+        "target": {
+          "start_byte": 4572,
+          "end_byte_exclusive": 6339,
+          "start_line": 138,
+          "end_line": 205
+        },
+        "target_kind": "*ast.ForStmt",
+        "explicit_results": 0
+      },
+      "expected_target_start_line": 138,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-06",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "continue",
+        "site": {
+          "start_byte": 5867,
+          "end_byte_exclusive": 5875,
+          "start_line": 187,
+          "end_line": 187
+        },
+        "target": {
+          "start_byte": 5686,
+          "end_byte_exclusive": 5984,
+          "start_line": 183,
+          "end_line": 190
+        },
+        "target_kind": "*ast.ForStmt",
+        "explicit_results": 0
+      },
+      "expected_target_start_line": 183,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-07",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "break",
+        "site": {
+          "start_byte": 6327,
+          "end_byte_exclusive": 6332,
+          "start_line": 203,
+          "end_line": 203
+        },
+        "target": {
+          "start_byte": 4572,
+          "end_byte_exclusive": 6339,
+          "start_line": 138,
+          "end_line": 205
+        },
+        "target_kind": "*ast.ForStmt",
+        "explicit_results": 0
+      },
+      "expected_target_start_line": 138,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-08",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "return",
+        "site": {
+          "start_byte": 4525,
+          "end_byte_exclusive": 4535,
+          "start_line": 135,
+          "end_line": 135
+        },
+        "target": {
+          "start_byte": 4028,
+          "end_byte_exclusive": 6584,
+          "start_line": 118,
+          "end_line": 213
+        },
+        "target_kind": "function",
+        "explicit_results": 1
+      },
+      "expected_target_start_line": 118,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-09",
+      "candidate_id": "SRC-036",
+      "marker": {
+        "kind": "return",
+        "site": {
+          "start_byte": 6839,
+          "end_byte_exclusive": 6854,
+          "start_line": 196,
+          "end_line": 196
+        },
+        "target": {
+          "start_byte": 6694,
+          "end_byte_exclusive": 7442,
+          "start_line": 193,
+          "end_line": 223
+        },
+        "target_kind": "function",
+        "explicit_results": 2
+      },
+      "expected_target_start_line": 193,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-10",
+      "candidate_id": "SRC-036",
+      "marker": {
+        "kind": "return",
+        "site": {
+          "start_byte": 7151,
+          "end_byte_exclusive": 7166,
+          "start_line": 211,
+          "end_line": 211
+        },
+        "target": {
+          "start_byte": 6694,
+          "end_byte_exclusive": 7442,
+          "start_line": 193,
+          "end_line": 223
+        },
+        "target_kind": "function",
+        "explicit_results": 2
+      },
+      "expected_target_start_line": 193,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-11",
+      "candidate_id": "SRC-036",
+      "marker": {
+        "kind": "return",
+        "site": {
+          "start_byte": 7325,
+          "end_byte_exclusive": 7397,
+          "start_line": 219,
+          "end_line": 219
+        },
+        "target": {
+          "start_byte": 6694,
+          "end_byte_exclusive": 7442,
+          "start_line": 193,
+          "end_line": 223
+        },
+        "target_kind": "function",
+        "explicit_results": 2
+      },
+      "expected_target_start_line": 193,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-12",
+      "candidate_id": "SRC-036",
+      "marker": {
+        "kind": "return",
+        "site": {
+          "start_byte": 7403,
+          "end_byte_exclusive": 7440,
+          "start_line": 222,
+          "end_line": 222
+        },
+        "target": {
+          "start_byte": 6694,
+          "end_byte_exclusive": 7442,
+          "start_line": 193,
+          "end_line": 223
+        },
+        "target_kind": "function",
+        "explicit_results": 1
+      },
+      "expected_target_start_line": 193,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-13",
+      "candidate_id": "SRC-011",
+      "marker": {
+        "kind": "panic_call_syntax_only",
+        "site": {
+          "start_byte": 4680,
+          "end_byte_exclusive": 4690,
+          "start_line": 141,
+          "end_line": 141
+        },
+        "call_binding": "builtin_panic",
+        "explicit_results": 0
+      },
+      "expected_target_start_line": null,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    },
+    {
+      "id": "BD-14",
+      "candidate_id": "SRC-002",
+      "marker": {
+        "kind": "go",
+        "site": {
+          "start_byte": 6285,
+          "end_byte_exclusive": 6330,
+          "start_line": 206,
+          "end_line": 206
+        },
+        "explicit_results": 0
+      },
+      "expected_target_start_line": null,
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "meaning": "syntactic_exit_owner_only_not_computed_control_dependence"
+    }
+  ],
+  "contexts": [
+    {
+      "candidate_id": "SRC-002",
+      "anchors": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "start_line": 189,
+          "end_line": 206,
+          "start_byte": 5880,
+          "end_byte_exclusive": 6331,
+          "span_sha256": "ba8950dbf98235a5af7f972d9573d34f2f26157456165d578fb43095a3ac0927",
+          "source_interpretation_draft": "서로 다른 ok·m 재대입·continue와 비동기 송신을 구분한다."
+        },
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "start_line": 202,
+          "end_line": 209,
+          "start_byte": 6159,
+          "end_byte_exclusive": 6350,
+          "span_sha256": "0b3a6037a9a203d9c23db53f68e584df18cc66fa858b92fcfd1ab82a6481a61b",
+          "source_interpretation_draft": "outboundCode 조건부 대입과 return nil의 의미를 구분한다."
+        }
+      ],
+      "unknowns": [
+        "go 송신은 완료 대기나 성공 보장이 아니다.",
+        "cache 및 broadcaster의 alias/동시성/호출 효과는 별도다."
+      ],
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "source": {
+        "end_byte_exclusive": 6351,
+        "end_line": 210,
+        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+        "function_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51",
+        "git_blob": "a6de34bac3a897f03166c0399ee82fc84194ea89",
+        "name": "Gossip",
+        "package": "backend",
+        "path": "consensus/wbft/backend/backend.go",
+        "receiver": "*Backend",
+        "start_byte": 5451,
+        "start_line": 176,
+        "syntax_features": {
+          "assignment": true,
+          "branch": true,
+          "declaration": true,
+          "loop": true,
+          "repeated_short_declaration_name_hint": true,
+          "return": true,
+          "short_declaration": true
+        },
+        "candidate_id": "SRC-002",
+        "module": "consensus/wbft",
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "gold_status": "not_authored",
+        "independent_status": "not_reviewed",
+        "split": null
+      },
+      "exhaustive_data_gold": null,
+      "exhaustive_control_gold": null,
+      "final_eligibility": "not_established"
+    },
+    {
+      "candidate_id": "SRC-006",
+      "anchors": [
+        {
+          "path": "core/rawdb/accessors_chain.go",
+          "start_line": 295,
+          "end_line": 319,
+          "start_byte": 9837,
+          "end_byte_exclusive": 10581,
+          "span_sha256": "0e58364a1204d3444b370f35161ec3347d23b45f0c67f2fd276857c21f3cb7f0",
+          "source_interpretation_draft": "입력 보정·live loop·break가 count 감소와 post를 우회하는 경계를 검토한다."
+        },
+        {
+          "path": "core/rawdb/accessors_chain.go",
+          "start_line": 321,
+          "end_line": 339,
+          "start_byte": 10584,
+          "end_byte_exclusive": 11244,
+          "span_sha256": "6fb730c1253033559522bad68a4ecd1194bca535d630bd34f85f7ef697523974",
+          "source_interpretation_draft": "조기 return·ancient 조회·range shadow와 최종 return을 구분한다."
+        }
+      ],
+      "unknowns": [
+        "불완전 DB 읽기·count/i unsigned 산술의 실제 안전성은 미판정이다.",
+        "range iteration binding은 현재 valueflow에서 unsupported 진단 대상이다.",
+        "slice reference와 내용·메모리 alias를 scalar 결과로 합치지 않는다."
+      ],
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "source": {
+        "end_byte_exclusive": 11245,
+        "end_line": 340,
+        "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+        "function_sha256": "6ae623bfd7378b8fd99620849340544bd850af6645c65e83f870b9846d585c57",
+        "git_blob": "02f42753a3b76ad171163cd3a8f02b3989bfc364",
+        "name": "ReadHeaderRange",
+        "package": "rawdb",
+        "path": "core/rawdb/accessors_chain.go",
+        "receiver": "",
+        "start_byte": 9837,
+        "start_line": 295,
+        "syntax_features": {
+          "assignment": true,
+          "branch": true,
+          "declaration": true,
+          "loop": true,
+          "repeated_short_declaration_name_hint": true,
+          "return": true,
+          "short_declaration": true
+        },
+        "candidate_id": "SRC-006",
+        "module": "core/rawdb",
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "gold_status": "not_authored",
+        "independent_status": "not_reviewed",
+        "split": null
+      },
+      "exhaustive_data_gold": null,
+      "exhaustive_control_gold": null,
+      "final_eligibility": "not_established"
+    },
+    {
+      "candidate_id": "SRC-011",
+      "anchors": [
+        {
+          "path": "core/state/dump.go",
+          "start_line": 118,
+          "end_line": 142,
+          "start_byte": 4028,
+          "end_byte_exclusive": 4695,
+          "span_sha256": "3d4465339cf2bcf3fdf56f9df4d0754b0f33bbd84818d9dcedaaff7d560e30cc",
+          "source_interpretation_draft": "named result zero·conf 재대입·초기 오류 return과 DecodeBytes panic을 구분한다."
+        },
+        {
+          "path": "core/state/dump.go",
+          "start_line": 170,
+          "end_line": 203,
+          "start_byte": 5309,
+          "end_byte_exclusive": 6333,
+          "span_sha256": "db77d2e64c376b9e86cb3603917ff682208eee2142a985b2c911af42f52117c7",
+          "source_interpretation_draft": "서로 다른 err와 중첩 loop continue·outer break·nextKey 대입을 구분한다."
+        },
+        {
+          "path": "core/state/dump.go",
+          "start_line": 206,
+          "end_line": 212,
+          "start_byte": 6340,
+          "end_byte_exclusive": 6583,
+          "span_sha256": "209e0e037a41468133c7be7b5c45884fe59ec04ac5c3806eeb1b4db7d6a999c5",
+          "source_interpretation_draft": "loop 이후 로그와 최종 결과의 출처를 검토한다."
+        }
+      ],
+      "unknowns": [
+        "storage continue는 계정 loop가 아닌 가장 안쪽 storage loop로 간다.",
+        "panic은 정상 종료 postdominator와 같은 의미로 처리하지 않는다.",
+        "field·map·pointer·콜백 효과는 완전한 local scalar gold가 아니다."
+      ],
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "source": {
+        "end_byte_exclusive": 6584,
+        "end_line": 213,
+        "file_sha256": "db8982dfac16229485d5b6d3c886c5bb907fc0953160e2cadd70d81e69294c61",
+        "function_sha256": "36541cfe1c0275972d316095770ab13ea487ae205dc76e3b71a24b5d327a8796",
+        "git_blob": "91806cad47669e50045dbf175c1f0be2faca1d34",
+        "name": "DumpToCollector",
+        "package": "state",
+        "path": "core/state/dump.go",
+        "receiver": "*StateDB",
+        "start_byte": 4028,
+        "start_line": 118,
+        "syntax_features": {
+          "assignment": true,
+          "branch": true,
+          "declaration": true,
+          "loop": true,
+          "repeated_short_declaration_name_hint": true,
+          "return": true,
+          "short_declaration": true
+        },
+        "candidate_id": "SRC-011",
+        "module": "core/state",
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "gold_status": "not_authored",
+        "independent_status": "not_reviewed",
+        "split": null
+      },
+      "exhaustive_data_gold": null,
+      "exhaustive_control_gold": null,
+      "final_eligibility": "not_established"
+    },
+    {
+      "candidate_id": "SRC-036",
+      "anchors": [
+        {
+          "path": "rpc/client.go",
+          "start_line": 193,
+          "end_line": 223,
+          "start_byte": 6694,
+          "end_byte_exclusive": 7443,
+          "span_sha256": "5784a037919d52b5146131e06f61f99a8b55a09aaa80f252402ca2f40fcc062f",
+          "source_interpretation_draft": "오류 shadow·switch arm 합류·조기 종료·newClient 호출의 경계를 검토한다."
+        }
+      ],
+      "unknowns": [
+        "constructor/newClient 반환을 연결 성공이나 리소스 안전성으로 자동 판정하지 않는다.",
+        "cfg pointee mutation과 참조 alias는 별도다.",
+        "normal-exit postdominator 계산 전에는 nesting을 control edge로 채점하지 않는다."
+      ],
+      "origin": "ai_source_review_proposal",
+      "approved": false,
+      "reviewer": null,
+      "independence_verified": false,
+      "gold": false,
+      "split": null,
+      "quality_scoring_allowed": false,
+      "formal_edge_kind": null,
+      "source": {
+        "end_byte_exclusive": 7442,
+        "end_line": 223,
+        "file_sha256": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+        "function_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53",
+        "git_blob": "2b0016db8f4ec2e9d33cf937efe2dde42a3ffa6a",
+        "name": "DialOptions",
+        "package": "rpc",
+        "path": "rpc/client.go",
+        "receiver": "",
+        "start_byte": 6694,
+        "start_line": 193,
+        "syntax_features": {
+          "assignment": true,
+          "branch": true,
+          "declaration": true,
+          "loop": true,
+          "repeated_short_declaration_name_hint": true,
+          "return": true,
+          "short_declaration": true
+        },
+        "candidate_id": "SRC-036",
+        "module": "rpc",
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "gold_status": "not_authored",
+        "independent_status": "not_reviewed",
+        "split": null
+      },
+      "exhaustive_data_gold": null,
+      "exhaustive_control_gold": null,
+      "final_eligibility": "not_established"
+    }
+  ],
+  "approved_independent_functions": 0,
+  "independent_gold_records": 0,
+  "formal_runs": 0,
+  "dependency_backend_calls": 0,
+  "data_precision": null,
+  "data_recall": null,
+  "control_precision": null,
+  "control_recall": null,
+  "limitations": [
+    "four exposed source functions are not thirty independent acceptance functions",
+    "local binding corroboration does not prove reaching definitions or path feasibility",
+    "AI exclusions and exit owners are not computed postdominator/control edges",
+    "partial single-file typecheck diagnostics are preserved; full project typecheck was not run",
+    "reference/address/aggregate/unknown roles and unsupported ranges must stay separate from scalar edges",
+    "manual source anchors and proposed definitions are non-exhaustive and cannot support precision/recall"
+  ]
+}

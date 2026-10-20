@@ -1,0 +1,194 @@
+{
+  "collection_id": "22963a66dc3b6d7e98599cd721c858ab9ad3dfd2fa18cf2d5ca275018b72f0eb",
+  "evidence": {
+    "evidence": {
+      "collected_at": "2026-10-15T12:55:11.522577Z",
+      "collection_id": "22963a66dc3b6d7e98599cd721c858ab9ad3dfd2fa18cf2d5ca275018b72f0eb",
+      "content_role": "untrusted_source_data",
+      "content_sha256": "026211f35201c6832b8dc12b1041bda5313f404653512fdb3e7d988e33be28ad",
+      "end_line": 4,
+      "evidence_id": "9f7ff0d7cda0c8d650562b7cf1e014679e9d5805f0a4abaa80737679194867fd",
+      "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+      "origin_id": "repo",
+      "path": "value.go",
+      "project_id": "project-9152b9d3fd524a07bb648ac3cafb7e2d",
+      "reported_not_reexecuted": false,
+      "source_actor": null,
+      "source_kind": "code",
+      "source_recorded_at": null,
+      "start_line": 4
+    },
+    "text": "func HostValue() int { return 42 }\n",
+    "text_preview_sha256": "026211f35201c6832b8dc12b1041bda5313f404653512fdb3e7d988e33be28ad",
+    "text_truncated": false
+  },
+  "draft_id": "f2dc4cca59dd26bc989080896bd93a858901dd2d48363276eafd9cba2b690501",
+  "draft": {
+    "schema_version": 1,
+    "project_id": "project-9152b9d3fd524a07bb648ac3cafb7e2d",
+    "draft_id": "f2dc4cca59dd26bc989080896bd93a858901dd2d48363276eafd9cba2b690501",
+    "collection_id": "22963a66dc3b6d7e98599cd721c858ab9ad3dfd2fa18cf2d5ca275018b72f0eb",
+    "generated_at": "2026-10-15T12:55:11.972980Z",
+    "generated_by": {
+      "tool": "knowledge-manager-drafter",
+      "version": "0.2.0"
+    },
+    "claims": [
+      {
+        "claim_id": "53599b2d40d702a5afcd4415af5f7efc64cb5b0fd94a0e1e863e77eeff3ff591",
+        "kind": "observed_excerpt",
+        "statement": "Recorded source excerpt from go.mod; semantic interpretation remains unreviewed.",
+        "evidence": [
+          {
+            "project_id": "project-9152b9d3fd524a07bb648ac3cafb7e2d",
+            "collection_id": "22963a66dc3b6d7e98599cd721c858ab9ad3dfd2fa18cf2d5ca275018b72f0eb",
+            "origin_id": "repo",
+            "path": "go.mod",
+            "start_line": 1,
+            "end_line": 3,
+            "file_sha256": "2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d",
+            "content_sha256": "2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d",
+            "source_kind": "configuration",
+            "collected_at": "2026-10-15T12:55:11.522577Z",
+            "source_actor": null,
+            "source_recorded_at": null,
+            "content_role": "untrusted_source_data",
+            "reported_not_reexecuted": false,
+            "evidence_id": "b9367dc6641c2c25ca7f45ff1253980f9c02ead41a297ebe7c0d92bf0de46916"
+          }
+        ],
+        "status": "proposed",
+        "reviewed_by": null,
+        "review_reason": null,
+        "semantic_verification": "not_run",
+        "quotes": [
+          "module example.invalid/actual-host\n\ngo 1.26.9\n"
+        ],
+        "quotes_are_bounded_previews": true
+      },
+      {
+        "claim_id": "e20d7d88d9c749ae6bc5474eef8a8956e67b952936d39b5e41441da1bdd3a84d",
+        "kind": "observed_excerpt",
+        "statement": "Recorded source excerpt from value.go; semantic interpretation remains unreviewed.",
+        "evidence": [
+          {
+            "project_id": "project-9152b9d3fd524a07bb648ac3cafb7e2d",
+            "collection_id": "22963a66dc3b6d7e98599cd721c858ab9ad3dfd2fa18cf2d5ca275018b72f0eb",
+            "origin_id": "repo",
+            "path": "value.go",
+            "start_line": 1,
+            "end_line": 4,
+            "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+            "content_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+            "source_kind": "code",
+            "collected_at": "2026-10-15T12:55:11.522577Z",
+            "source_actor": null,
+            "source_recorded_at": null,
+            "content_role": "untrusted_source_data",
+            "reported_not_reexecuted": false,
+            "evidence_id": "4fc9adacc6a919e626677fdcbf00a2bc9c694c1f5728596e28a8d2e8d3e3695a"
+          }
+        ],
+        "status": "proposed",
+        "reviewed_by": null,
+        "review_reason": null,
+        "semantic_verification": "not_run",
+        "quotes": [
+          "package fixture\n\n// HostValue returns the owned fixture marker.\nfunc HostValue() int { return 42 }\n"
+        ],
+        "quotes_are_bounded_previews": true
+      }
+    ],
+    "human_approval": "not_recorded",
+    "db_adoption": "not_run",
+    "coverage": {
+      "collection_files": 2,
+      "referenced_files": 2,
+      "whole_project_semantics_verified": false
+    }
+  },
+  "review_revision": "cd89b582b7501e15903fab7f188aad80d62785fc57ad52184fa701571d61ee50",
+  "adoption": {
+    "adoption_id": "08c20877abfa061a195e55c36f480535ed756e27cf4ef7fb4c81704dc0b47d3d",
+    "input_project": "/private/tmp/ks-KM034C-host-final-20261015/kill-fixture/manager/adoptions/08c20877abfa061a195e55c36f480535ed756e27cf4ef7fb4c81704dc0b47d3d/project",
+    "review_revision": "cd89b582b7501e15903fab7f188aad80d62785fc57ad52184fa701571d61ee50",
+    "revision": "72a707f76edbedce095f975effae22b6e0c13e384e5c0d0075fad24cfd8bb4e6",
+    "schema_version": 1,
+    "scope": "reviewed_filtered_input_not_DB_publication",
+    "stage": "input_adopted_not_DB_published"
+  },
+  "profile": {
+    "allowed_activation": [
+      "hold_for_review"
+    ],
+    "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+    "existing_versions": [],
+    "input_digest": "57533e71ea6b145ebf026d5809dc079b343407ba4e02f79b92593193ecb78378",
+    "observed_base": {
+      "state": "absent"
+    },
+    "profile_digest": "6a5a4a3f929a3c80f677499ad87fb5e24aed6c50d424cf18d770fe336f44cef0",
+    "profile_id": "profile-7f83a5f57abaa8d6ff30f3cdff4d4d9a",
+    "project_id": "project-9152b9d3fd524a07bb648ac3cafb7e2d",
+    "required_gates": [
+      "source",
+      "identity",
+      "graph",
+      "vector",
+      "knowledge"
+    ],
+    "source_pin": {
+      "base_commit": "",
+      "mode": "snapshot-only",
+      "snapshot_id": "8590793c13e8e42acba16c30d3fd82dca31b0e28092fa644326af51ca8330710"
+    },
+    "timeout_max_seconds": 3600
+  },
+  "request": {
+    "schema_version": 1,
+    "project_id": "project-9152b9d3fd524a07bb648ac3cafb7e2d",
+    "profile_id": "profile-7f83a5f57abaa8d6ff30f3cdff4d4d9a",
+    "profile_digest": "6a5a4a3f929a3c80f677499ad87fb5e24aed6c50d424cf18d770fe336f44cef0",
+    "source_pin": {
+      "base_commit": "",
+      "mode": "snapshot-only",
+      "snapshot_id": "8590793c13e8e42acba16c30d3fd82dca31b0e28092fa644326af51ca8330710"
+    },
+    "input_digest": "57533e71ea6b145ebf026d5809dc079b343407ba4e02f79b92593193ecb78378",
+    "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+    "base": {
+      "state": "absent"
+    },
+    "new_version": "host-reviewed-v1",
+    "activation": "hold_for_review",
+    "idempotency_key": "owned-actual-host-v1",
+    "deadline_seconds": 120
+  },
+  "job": {
+    "activated": false,
+    "build_complete": false,
+    "candidate": null,
+    "error": null,
+    "gates": {
+      "graph": "not_run",
+      "identity": "not_run",
+      "knowledge": "not_run",
+      "semantic": "not_configured",
+      "source": "not_run",
+      "vector": "not_run"
+    },
+    "job_id": "343e9ea4a358afb9c7dca9816f2ea562",
+    "phase": "build_graph",
+    "profile_id": "profile-7f83a5f57abaa8d6ff30f3cdff4d4d9a",
+    "project_id": "project-9152b9d3fd524a07bb648ac3cafb7e2d",
+    "publication": null,
+    "request_digest": "45b159ec627a11b8f8e0a86c3396f40d55dce8fb951ef2a504e6be7c63f7724b",
+    "revision": 3,
+    "schema_version": 1,
+    "serving_adoption": "not_observed",
+    "state": "running",
+    "target_version": "host-reviewed-v1",
+    "terminal": false
+  },
+  "inflight_graph_observed": true
+}

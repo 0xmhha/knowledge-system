@@ -1,0 +1,20 @@
+{
+  "module_copy": "git archive pinned frontend commit; temporary helper added under cmd only in owned copy",
+  "build": [
+    "go",
+    "build",
+    "-o",
+    "/private/tmp/ks-policy-frontend-x6mr789a/probe",
+    "./cmd/policy-reference-probe"
+  ],
+  "build_exit": 0,
+  "probe_exit": 0,
+  "go_version": "go version go1.26.9 darwin/arm64",
+  "environment": {
+    "GOTOOLCHAIN": "go1.26.9",
+    "GOCACHE": "/private/tmp/ks-corpus-go-cache",
+    "GOPROXY": "off"
+  },
+  "probe_input": "882 pinned non-test Git blobs; original and proposed YAML file paths",
+  "target_package_build_or_execution": false
+}

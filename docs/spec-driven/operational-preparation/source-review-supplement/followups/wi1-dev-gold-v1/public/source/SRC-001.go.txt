@@ -1,0 +1,52 @@
+func (api *API) Status(startBlockNum *rpc.BlockNumber, endBlockNum *rpc.BlockNumber) (*Status, error) {
+	// Calculate block range
+	start, end, numBlocks, blockNumber, err := api.calculateBlockRange(startBlockNum, endBlockNum)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get validators
+	signers, err := api.GetValidators(&blockNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	// Initialize counters
+	authorCounts, preparedCounts, committedCounts, prevPreparedCounts, prevCommittedCounts, totalSealCounts := api.initializeCounters(signers)
+
+	// Analyze blocks and collect statistics
+	roundDistribution := make(map[uint64]uint64)
+	for n := start; n <= end; n++ {
+		round := api.analyzeBlock(n, authorCounts, preparedCounts, committedCounts, prevPreparedCounts, prevCommittedCounts, totalSealCounts)
+		roundDistribution[round]++
+	}
+
+	// Calculate total rounds (weighted sum) and remove rounds with zero count
+	var totalRounds uint64
+	for round, count := range roundDistribution {
+		if count == 0 {
+			delete(roundDistribution, round)
+		} else {
+			totalRounds += round * count
+		}
+	}
+	return &Status{
+		SealerActivity: SealerActivity{
+			Total:         totalSealCounts,
+			Prepared:      preparedCounts,
+			Committed:     committedCounts,
+			PrevPrepared:  prevPreparedCounts,
+			PrevCommitted: prevCommittedCounts,
+		},
+		AuthorCounts: authorCounts,
+		BlockRange: BlockRange{
+			StartBlock:  start,
+			EndBlock:    end,
+			TotalBlocks: numBlocks,
+		},
+		RoundStats: RoundStats{
+			RoundDistribution: roundDistribution,
+			TotalRounds:       totalRounds,
+		},
+	}, nil
+}

@@ -1,0 +1,4864 @@
+[
+  {
+    "candidate_id": "ORIGINAL",
+    "scenario_id": "normal_delivery_then_unsubscribe",
+    "preconditions": [
+      "fresh installed subscription",
+      "receiver accepts first notification",
+      "event loop removes and acknowledges uninstall"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "NORMAL-DELIVERY"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "ORIGINAL",
+    "scenario_id": "blocked_delivery_then_consumer_exit",
+    "preconditions": [
+      "same event loop blocked on unbuffered status",
+      "sole receiver exited",
+      "observe before rescue",
+      "loop stays live after send"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "source_conflict",
+        "rationale": "Verified conditional sole-receiver exit leaves two sends waiting before original drain loop is reachable.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "source_conflict",
+        "rationale": "Verified conditional sole-receiver exit leaves two sends waiting before original drain loop is reachable.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [
+        "METHOD-RETURN",
+        "BLOCKED-DELIVERY"
+      ],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN"
+      ]
+    },
+    "empty_set_rationales": {},
+    "bounded_method_expectation": "fails_AI_method_predicates",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "ORIGINAL",
+    "scenario_id": "late_delivery_before_confirmation",
+    "preconditions": [
+      "uninstall accepted",
+      "finite additional status offered",
+      "acknowledgement follows deletion",
+      "do not acknowledge early"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "LATE-DRAIN"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "ORIGINAL",
+    "scenario_id": "confirmation_delayed",
+    "preconditions": [
+      "uninstall accepted",
+      "ack held then released by owner",
+      "no previous Once completion"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "ORIGINAL",
+    "scenario_id": "concurrent_unsubscribe_once",
+    "preconditions": [
+      "two calls same exact subscription object",
+      "one request accepted",
+      "ack eventually released",
+      "join both calls"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-A",
+    "scenario_id": "normal_delivery_then_unsubscribe",
+    "preconditions": [
+      "fresh installed subscription",
+      "receiver accepts first notification",
+      "event loop removes and acknowledges uninstall"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "NORMAL-DELIVERY"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-A",
+    "scenario_id": "blocked_delivery_then_consumer_exit",
+    "preconditions": [
+      "same event loop blocked on unbuffered status",
+      "sole receiver exited",
+      "observe before rescue",
+      "loop stays live after send"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "BLOCKED-DELIVERY"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-A",
+    "scenario_id": "late_delivery_before_confirmation",
+    "preconditions": [
+      "uninstall accepted",
+      "finite additional status offered",
+      "acknowledgement follows deletion",
+      "do not acknowledge early"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "LATE-DRAIN"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-A",
+    "scenario_id": "confirmation_delayed",
+    "preconditions": [
+      "uninstall accepted",
+      "ack held then released by owner",
+      "no previous Once completion"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-A",
+    "scenario_id": "concurrent_unsubscribe_once",
+    "preconditions": [
+      "two calls same exact subscription object",
+      "one request accepted",
+      "ack eventually released",
+      "join both calls"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-B",
+    "scenario_id": "normal_delivery_then_unsubscribe",
+    "preconditions": [
+      "fresh installed subscription",
+      "receiver accepts first notification",
+      "event loop removes and acknowledges uninstall"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "NORMAL-DELIVERY"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-B",
+    "scenario_id": "blocked_delivery_then_consumer_exit",
+    "preconditions": [
+      "same event loop blocked on unbuffered status",
+      "sole receiver exited",
+      "observe before rescue",
+      "loop stays live after send"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "BLOCKED-DELIVERY"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-B",
+    "scenario_id": "late_delivery_before_confirmation",
+    "preconditions": [
+      "uninstall accepted",
+      "finite additional status offered",
+      "acknowledgement follows deletion",
+      "do not acknowledge early"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "LATE-DRAIN"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-B",
+    "scenario_id": "confirmation_delayed",
+    "preconditions": [
+      "uninstall accepted",
+      "ack held then released by owner",
+      "no previous Once completion"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "CAND-B",
+    "scenario_id": "concurrent_unsubscribe_once",
+    "preconditions": [
+      "two calls same exact subscription object",
+      "one request accepted",
+      "ack eventually released",
+      "join both calls"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-REINTRO",
+    "scenario_id": "normal_delivery_then_unsubscribe",
+    "preconditions": [
+      "fresh installed subscription",
+      "receiver accepts first notification",
+      "event loop removes and acknowledges uninstall"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "NORMAL-DELIVERY"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-REINTRO",
+    "scenario_id": "blocked_delivery_then_consumer_exit",
+    "preconditions": [
+      "same event loop blocked on unbuffered status",
+      "sole receiver exited",
+      "observe before rescue",
+      "loop stays live after send"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "source_conflict",
+        "rationale": "Verified conditional sole-receiver exit leaves two sends waiting before original drain loop is reachable.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "source_conflict",
+        "rationale": "Verified conditional sole-receiver exit leaves two sends waiting before original drain loop is reachable.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [
+        "METHOD-RETURN",
+        "BLOCKED-DELIVERY"
+      ],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN"
+      ]
+    },
+    "empty_set_rationales": {},
+    "bounded_method_expectation": "fails_AI_method_predicates",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-REINTRO",
+    "scenario_id": "late_delivery_before_confirmation",
+    "preconditions": [
+      "uninstall accepted",
+      "finite additional status offered",
+      "acknowledgement follows deletion",
+      "do not acknowledge early"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "LATE-DRAIN"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-REINTRO",
+    "scenario_id": "confirmation_delayed",
+    "preconditions": [
+      "uninstall accepted",
+      "ack held then released by owner",
+      "no previous Once completion"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-REINTRO",
+    "scenario_id": "concurrent_unsubscribe_once",
+    "preconditions": [
+      "two calls same exact subscription object",
+      "one request accepted",
+      "ack eventually released",
+      "join both calls"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "conditional_source_fit",
+        "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate. Required finite predicate: No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "source_conflict": [],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "source_conflict": "No source_conflict unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "conditional_AI_method_fit",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-EARLY",
+    "scenario_id": "normal_delivery_then_unsubscribe",
+    "preconditions": [
+      "fresh installed subscription",
+      "receiver accepts first notification",
+      "event loop removes and acknowledges uninstall"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "conditional_source_fit",
+        "rationale": "Empty Once body returns without request/removal/acknowledgement. Return speed alone cannot satisfy the handshake contract in any of the five schedules. Required finite predicate: Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [
+        "NORMAL-DELIVERY"
+      ],
+      "source_conflict": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {},
+    "bounded_method_expectation": "fails_AI_method_predicates",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-EARLY",
+    "scenario_id": "blocked_delivery_then_consumer_exit",
+    "preconditions": [
+      "same event loop blocked on unbuffered status",
+      "sole receiver exited",
+      "observe before rescue",
+      "loop stays live after send"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [],
+      "source_conflict": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "BLOCKED-DELIVERY"
+      ],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN"
+      ]
+    },
+    "empty_set_rationales": {
+      "conditional_source_fit": "No conditional_source_fit unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "fails_AI_method_predicates",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-EARLY",
+    "scenario_id": "late_delivery_before_confirmation",
+    "preconditions": [
+      "uninstall accepted",
+      "finite additional status offered",
+      "acknowledgement follows deletion",
+      "do not acknowledge early"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [],
+      "source_conflict": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK",
+        "LATE-DRAIN"
+      ],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "conditional_source_fit": "No conditional_source_fit unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "fails_AI_method_predicates",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-EARLY",
+    "scenario_id": "confirmation_delayed",
+    "preconditions": [
+      "uninstall accepted",
+      "ack held then released by owner",
+      "no previous Once completion"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [],
+      "source_conflict": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "conditional_source_fit": "No conditional_source_fit unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "fails_AI_method_predicates",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  },
+  {
+    "candidate_id": "MUT-EARLY",
+    "scenario_id": "concurrent_unsubscribe_once",
+    "preconditions": [
+      "two calls same exact subscription object",
+      "one request accepted",
+      "ack eventually released",
+      "join both calls"
+    ],
+    "unit_ids": [
+      "API-ENTRY",
+      "API-UNSUB",
+      "API-NEGATIVE",
+      "METHOD-RETURN",
+      "METHOD-ONCE",
+      "METHOD-REMOVE",
+      "METHOD-ACK",
+      "NORMAL-DELIVERY",
+      "LATE-DRAIN",
+      "BLOCKED-DELIVERY",
+      "OWNED-CLEANUP",
+      "SOURCE-BOUNDARY"
+    ],
+    "units": [
+      {
+        "id": "API-ENTRY",
+        "label": "runtime_unknown",
+        "rationale": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+        "source_anchor_ids": [
+          "API-01",
+          "API-02",
+          "API-03",
+          "API-04",
+          "API-05",
+          "API-08",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-UNSUB",
+        "label": "runtime_unknown",
+        "rationale": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+        "source_anchor_ids": [
+          "API-06",
+          "API-07",
+          "API-11"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "API-NEGATIVE",
+        "label": "runtime_unknown",
+        "rationale": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+        "source_anchor_ids": [
+          "API-05",
+          "API-06"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-RETURN",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ONCE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-REMOVE",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "METHOD-ACK",
+        "label": "source_conflict",
+        "rationale": "Empty Once body performs no uninstall/ack handshake. Fast return does not satisfy No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "NORMAL-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "LATE-DRAIN",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "BLOCKED-DELIVERY",
+        "label": "not_applicable",
+        "rationale": "Outside this explicit finite scenario requirement set; not an absence/safety claim.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "OWNED-CLEANUP",
+        "label": "runtime_unknown",
+        "rationale": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+        "source_anchor_ids": [
+          "API-10",
+          "API-11",
+          "API-12"
+        ],
+        "observed": false,
+        "independently_approved": false
+      },
+      {
+        "id": "SOURCE-BOUNDARY",
+        "label": "runtime_unknown",
+        "rationale": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+        "source_anchor_ids": [
+          "API-09",
+          "API-10",
+          "API-11",
+          "API-12",
+          "API-13"
+        ],
+        "observed": false,
+        "independently_approved": false
+      }
+    ],
+    "answer_sets": {
+      "conditional_source_fit": [],
+      "source_conflict": [
+        "METHOD-RETURN",
+        "METHOD-ONCE",
+        "METHOD-REMOVE",
+        "METHOD-ACK"
+      ],
+      "runtime_unknown": [
+        "API-ENTRY",
+        "API-UNSUB",
+        "API-NEGATIVE",
+        "OWNED-CLEANUP",
+        "SOURCE-BOUNDARY"
+      ],
+      "not_applicable": [
+        "NORMAL-DELIVERY",
+        "LATE-DRAIN",
+        "BLOCKED-DELIVERY"
+      ]
+    },
+    "empty_set_rationales": {
+      "conditional_source_fit": "No conditional_source_fit unit among these12 source/finite-scenario requirements; actual API/runtime/independent review remain unknown."
+    },
+    "bounded_method_expectation": "fails_AI_method_predicates",
+    "actual_API_result": null,
+    "formal_quality_score": null
+  }
+]

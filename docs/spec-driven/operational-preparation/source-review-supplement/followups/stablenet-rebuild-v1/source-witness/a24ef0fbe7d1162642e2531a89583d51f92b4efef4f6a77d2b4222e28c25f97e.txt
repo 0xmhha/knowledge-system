@@ -1,0 +1,24 @@
+# Genesis JSON authoring checklist for stablenet chains
+
+**Status:** verified · **Subsystem:** A8 (Genesis & Bootstrap) · **Type:** B6
+
+validateAnzeonGenesisConfig is the gate every stablenet genesis JSON
+passes through before initializeAnzeonGenesis materialises the
+block-zero state. The authoring checklist captures every section the
+validator requires: ChainConfig with the Anzeon hardfork block, WBFT
+consensus parameters, the Init section (validators plus matching BLS
+keys), the SystemContracts section selecting versions for each of
+the five governance contracts, and per-account Extra bits that must
+satisfy ValidateExtra. cmd/genesis_generator provides an interactive
+tool for filling these in.
+
+## Code anchors
+- `core/genesis.go` validateAnzeonGenesisConfig:231 — the gate; calls ChainConfig.Anzeon.CheckValidity on every required section
+- `core/genesis.go` initializeAnzeonGenesis:242 — after validate succeeds, sets up WBFT extra data and calls InjectContracts
+- `cmd/genesis_generator/genesis_generator.go` — interactive CLI that produces a valid genesis JSON skeleton
+
+## Aliases
+제네시스 작성, 제네시스 JSON 체크리스트, 체인 초기화, 초기 검증자 설정, genesis authoring, chain bootstrap config, validator initial set, genesis checklist, validateAnzeonGenesisConfig, initializeAnzeonGenesis, InjectContracts, CheckValidity, ValidateExtra, genesis_generator
+
+## Related
+A3.timing.wbft_config_defaults, A4.system_contracts.addresses, A4.system_contracts.gov_minter, A5.account_extra.bit_layout, A8.genesis.bootstrap_architecture, A8.genesis.inject_contracts_two_phase

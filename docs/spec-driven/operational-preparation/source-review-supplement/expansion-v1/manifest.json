@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "kind": "source_review_preparation_not_acceptance",
+  "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "candidate_pool": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-INPUT-CANDIDATES.json",
+  "candidate_pool_sha256": "029285c70ad60d104cdd59aa351ff07984905440c72465f3ecd094b16ed2a114",
+  "artifacts": {
+    "curation.json": "2cb0d3636909ee45f548e5db00a7964b4b215c579a516c8b3b201eb0cfac3af5",
+    "formal-state.json": "8c7b4546bc0b9493722720426c9328f091dabca4fecce49794f2a1e0db046457",
+    "generator.py.txt": "f48b6c3446d818db76ed2a40250dc13b8bad889adc2932aee8b945806f111113",
+    "private-ai-review.json": "1c2f82cbad84943252667f6407b6b8980d810b70afd11a6a31c40c6a76244d24",
+    "public-inputs.json": "54d6ddeac34b54756eea520991267cd66e16ec67a8c0a083e0cda5342a30aa2a",
+    "sources/consensus/wbft/backend/api.go.txt": "a1bc409a7e68126f611ee6c339d3814b90f7711e25740a2f1119f9af2f6c2a49",
+    "sources/consensus/wbft/backend/backend.go.txt": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+    "sources/consensus/wbft/core/roundchange.go.txt": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+    "sources/core/rawdb/accessors_chain.go.txt": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+    "sources/core/state/dump.go.txt": "db8982dfac16229485d5b6d3c886c5bb907fc0953160e2cadd70d81e69294c61",
+    "sources/core/state/pruner/pruner.go.txt": "bbddfc116b0151cccfbc169aed5ac6af76f5919bff17743d9a62aa29ea97f761",
+    "sources/core/txpool/blobpool/blobpool.go.txt": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+    "sources/core/txpool/blobpool/limbo.go.txt": "c04570603e9888bd3a3ac64c7c3dd36836faac32a13b42768dedbf5f5061cad9",
+    "sources/eth/downloader/api.go.txt": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "sources/eth/downloader/beaconsync.go.txt": "910cc34e1e8aa0a26856d8174c02bde840145f06767a68ad45ce41ee33f9ff37",
+    "sources/miner/stress/clique/main.go.txt": "ecf6f58758ec1944fb2d9a3a64a22cd915d2dd4f038caa381c0bb58425a01d49",
+    "sources/miner/worker.go.txt": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+    "sources/p2p/discover/v4_udp.go.txt": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+    "sources/rpc/client.go.txt": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716"
+  },
+  "generator_sha256": "f48b6c3446d818db76ed2a40250dc13b8bad889adc2932aee8b945806f111113",
+  "independent_gold_records": 0,
+  "cases_promoted_to_protocol": 0,
+  "formal_execution_allowed": false,
+  "counts": {
+    "public_inputs": 20,
+    "ai_reviews": 20,
+    "source_anchors": 40,
+    "production_candidates": 19,
+    "development_only_candidates": 1
+  },
+  "limitations": [
+    "intent relevance is an AI proposal, not independently reviewed",
+    "20 cards do not prove 20 independent families; semantic overlap is unreviewed",
+    "DEV/FINAL allocation, budgets, canonical matching and relevance labels remain unset",
+    "source anchors are non-exhaustive and cannot support precision/recall scores",
+    "stress main is source-only development material; do not start nodes"
+  ]
+}

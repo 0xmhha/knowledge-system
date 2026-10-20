@@ -1,0 +1,6 @@
+func GetRefundableBalance(govMinterAddress common.Address, state StateReader, addr common.Address) *big.Int {
+	refundableBalanceSlot := common.HexToHash(SLOT_GOV_MINTER_refundableBalance)
+	key := CalculateMappingSlot(refundableBalanceSlot, addr)
+	value := state.GetState(govMinterAddress, key)
+	return value.Big()
+}

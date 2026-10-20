@@ -1,0 +1,48 @@
+[
+  {
+    "name": "Bash",
+    "input": {
+      "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/consumer-role-adapter.py tamper --plugin /private/tmp/ks-adopted-consumer-20261017/plugin --workspace /private/tmp/ks-consumer-role-adopted-20261017-01/source/.coding-agent/tickets/KS-P06-REVIEW",
+      "description": "Owned integrated consumer verification"
+    }
+  },
+  {
+    "name": "Read",
+    "input": {
+      "file_path": "/private/tmp/ks-consumer-role-adopted-20261017-01/source/.coding-agent/tickets/KS-P06-REVIEW/state.json"
+    }
+  },
+  {
+    "state_operation": "complete"
+  },
+  {
+    "name": "Bash",
+    "input": {
+      "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/consumer-role-adapter.py restore --plugin /private/tmp/ks-adopted-consumer-20261017/plugin --workspace /private/tmp/ks-consumer-role-adopted-20261017-01/source/.coding-agent/tickets/KS-P06-REVIEW",
+      "description": "Owned integrated consumer verification"
+    }
+  },
+  {
+    "name": "Read",
+    "input": {
+      "file_path": "/private/tmp/ks-consumer-role-adopted-20261017-01/source/.coding-agent/tickets/KS-P06-REVIEW/state.json"
+    }
+  },
+  {
+    "name": "Bash",
+    "input": {
+      "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 /private/tmp/ks-adopted-consumer-20261017/plugin/scripts/deep_review.py verify --workspace /private/tmp/ks-consumer-role-adopted-20261017-01/source/.coding-agent/tickets/KS-P06-REVIEW",
+      "description": "Owned integrated consumer verification"
+    }
+  },
+  {
+    "state_operation": "complete"
+  },
+  {
+    "name": "Bash",
+    "input": {
+      "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 /private/tmp/ks-adopted-consumer-20261017/plugin/scripts/deep_review.py verify --workspace /private/tmp/ks-consumer-role-adopted-20261017-01/source/.coding-agent/tickets/KS-P06-REVIEW",
+      "description": "Owned integrated consumer verification"
+    }
+  }
+]

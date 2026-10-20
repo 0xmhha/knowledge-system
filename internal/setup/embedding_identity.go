@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 )
 
 // ResolveEmbeddingIdentity asks the same CKV binary used by BuildPlan for its
@@ -32,7 +31,7 @@ func ResolveEmbeddingIdentity(ctx context.Context, o Options) (json.RawMessage, 
 		args = append(args, "--query-prefix-policy", o.QueryPrefixPolicy)
 	}
 	args = append(args, "identity")
-	cmd := exec.CommandContext(ctx, bin, args...)
+	cmd := setupCommandContext(ctx, bin, args...)
 	cmd.Env = os.Environ()
 	if o.OllamaURL != "" {
 		cmd.Env = append(cmd.Env, "CKV_OLLAMA_ENDPOINT="+o.OllamaURL)

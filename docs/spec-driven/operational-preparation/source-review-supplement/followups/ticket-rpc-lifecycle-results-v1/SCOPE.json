@@ -1,0 +1,138 @@
+{
+  "phase": 68,
+  "kind": "WIV1_V2_instrumented_map_ack_native_followup_DEV_not_independent_acceptance",
+  "previous_revision": "f5d7da318e92f3dbbb024f396895b99033d1383d",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "candidate_roles": [
+    "ORIGINAL",
+    "CAND-A",
+    "CAND-B"
+  ],
+  "planned_slots": [
+    {
+      "slot_id": "ORIGINAL-general-rpc-lifecycle",
+      "candidate": "ORIGINAL",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "rpc-lifecycle"
+    },
+    {
+      "slot_id": "ORIGINAL-race-rpc-lifecycle",
+      "candidate": "ORIGINAL",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "rpc-lifecycle"
+    },
+    {
+      "slot_id": "CAND-A-general-rpc-lifecycle",
+      "candidate": "CAND-A",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "rpc-lifecycle"
+    },
+    {
+      "slot_id": "CAND-A-race-rpc-lifecycle",
+      "candidate": "CAND-A",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "rpc-lifecycle"
+    },
+    {
+      "slot_id": "CAND-B-general-rpc-lifecycle",
+      "candidate": "CAND-B",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "rpc-lifecycle"
+    },
+    {
+      "slot_id": "CAND-B-race-rpc-lifecycle",
+      "candidate": "CAND-B",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "rpc-lifecycle"
+    }
+  ],
+  "planned_attempts": 6,
+  "repetitions_per_role_profile": 1,
+  "independent_repeated_execution_criterion_satisfied": false,
+  "fixture_sha256": "e0d66339adb2ea4bb48c4a3daa78020875d4e420d288319def3c654db68633a9",
+  "main_fixture_sha256": "d4e23f2f1f0b1415875105ff71f120eaa2154d2dbc5d9ce39209304aa9cf194a",
+  "instrumented_api_sha256": {
+    "ORIGINAL": "a5e1c185e982f28cf242ad43ec8b9456cc5fcc1bb6011dcc769c5aa58904045d",
+    "CAND-A": "b322e8032f3d11cf1ece617ffd36b68dfc880a826e5ac6a0736f85c2e49ce077",
+    "CAND-B": "41e1fa3d7c417778e71269295500b67a3db81f8adbc876b98d1ba17ff4499626"
+  },
+  "source_anchors": {
+    "ORIGINAL": {
+      "broadcast": 127,
+      "original_uninstall": 199
+    },
+    "CAND-A": {
+      "broadcast": 127
+    },
+    "CAND-B": {
+      "broadcast": 127
+    }
+  },
+  "target_toolchain": {
+    "GOVERSION": "go1.23.12",
+    "GOOS": "darwin",
+    "GOARCH": "arm64",
+    "CGO_ENABLED": "1"
+  },
+  "build_timeout_seconds": 600,
+  "owned_process_timeout_seconds": 280,
+  "parallelism": 2,
+  "build_parallelism": 2,
+  "automatic_retries": 0,
+  "native_timer_seconds": 60,
+  "minimum_first_native_ns": 60000000000,
+  "minimum_second_native_ns": 120000000000,
+  "minimum_third_native_ns": 180000000000,
+  "observation_milliseconds": 300,
+  "flow": [
+    "same_actual_RPC_native_overlap_route_with_explicit_temporary_API_hooks",
+    "owner_only_actual_map_before_delete_after_delete_and_ack_close_begin_end",
+    "method_ack_receive_and_return_defer_hooks_are_post_operation_observations",
+    "hook_all3_API_send_sites_and_all_declared_method_receive_cases",
+    "freeze_cancellation_observation_before_any_cleanup",
+    "if_actual_RPC_method_returned_install_fresh_probe_wait_next_native60s_broadcast_and_unsubscribe_probe",
+    "final_before_rescue_fence_then_owned_cleanup"
+  ],
+  "program_additions": [
+    "eth/downloader/ks_owned_rpc_lifecycle.go",
+    "cmd/ks-owned-rpc-lifecycle/main.go"
+  ],
+  "custom_source_hooks": true,
+  "compiler_atomic_coverage": false,
+  "ordinary_write_deadline_behavior_proved": false,
+  "source_hook_semantics": {
+    "owner_map_membership": "actual owner-thread map read; observer never stores/live-reads map from another goroutine",
+    "ack_close": "begin hook before actual close; end after close; receiver hook may precede close-end log",
+    "method_io": "receive hook occurs after actual IO; log order is not exact operation linearization",
+    "channel_use": "proposed distinction target API channel IO vs observer identity/map references vs caller-owned cleanup; not independently approved reinterpretation",
+    "all_future_nonuse": "finite observed interval and source-site inventory only; no universal future proof"
+  },
+  "acceptance_limits": {
+    "independent_approved": 0,
+    "independent_tickets": 0,
+    "FINAL": 0,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "freeze": null,
+    "execution_allowed": false,
+    "independent_acceptable_candidate_set": null,
+    "canonical_selection": null,
+    "quality_score": null
+  },
+  "security": {
+    "external_network": false,
+    "operational_node": false,
+    "global_settings": false,
+    "system_clock_change": false,
+    "credential_environment_inheritance": false,
+    "publication": false,
+    "paid_or_external_LLM": false,
+    "owned_process_group_only": true
+  }
+}

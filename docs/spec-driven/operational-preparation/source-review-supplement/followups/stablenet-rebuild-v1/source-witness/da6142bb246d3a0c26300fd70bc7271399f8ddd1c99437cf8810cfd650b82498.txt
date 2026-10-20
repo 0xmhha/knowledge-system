@@ -1,0 +1,36 @@
+# StateAccount.Extra bit layout and immutability invariants
+
+**Status:** verified · **Subsystem:** A5 (Native Coin & Account Extra) · **Type:** B4
+
+StateAccount.Extra is a uint64 carrying per-account flags. Bit 63
+(MSB) marks Blacklisted; bit 62 marks Authorized; bits 0-61 are
+reserved. All mutation helpers (SetBlacklisted, ClearBlacklisted,
+SetAuthorized, ClearAuthorized) follow an immutable pattern — they
+take the existing uint64 and return a new uint64 with the requested
+bit toggled. The original value is never modified in place. New
+flags must claim a previously unused bit and may require hardfork
+gating if they affect consensus-reachable state.
+
+## Invariants
+- Bit 63 = Blacklisted, bit 62 = Authorized — these are consensus-reachable and must not be reused.
+- Mutation functions (Set*/Clear*) return a new uint64; they do not mutate the receiver. Reassign the result or the change is lost.
+- A bit outside AccountExtraValidMask in a stored StateAccount means corruption or an unrecognised flag from a different fork.
+- New flags must be guarded by a hardfork rule if they affect block validity, because nodes on the older fork will not honour the bit.
+
+## Pitfalls
+- Calling SetBlacklisted(extra) without reassigning the return value is a silent no-op.
+- Reusing bit 61 or below without checking AccountExtraValidMask membership leads to flags that other code paths ignore.
+- Forgetting to add the new flag to AccountExtraValidMask means subsequent validity checks reject accounts that carry it.
+
+## Code anchors
+- `core/types/state_account_extra.go` AccountExtraMaskBlacklisted:33 — bit 63 mask constant
+- `core/types/state_account_extra.go` AccountExtraMaskAuthorized:36 — bit 62 mask constant
+- `core/types/state_account_extra.go` AccountExtraValidMask:45 — OR of all currently-defined bits — used for validity check
+- `core/types/state_account_extra.go` IsBlacklisted:72
+- `core/types/state_account_extra.go` IsAuthorized:87
+
+## Aliases
+계정 확장 비트, 블랙리스트 비트, 권한 비트, Account Extra 비트마스크, account extra bitmask, blacklist bit, authorized bit, AccountExtraMaskBlacklisted, AccountExtraMaskAuthorized, AccountExtraValidMask, IsBlacklisted, SetBlacklisted, ClearBlacklisted, IsAuthorized, SetAuthorized, ClearAuthorized
+
+## Related
+A11.state_transition.blacklist_check_points, A4.system_contracts.addresses

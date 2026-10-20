@@ -1,0 +1,1 @@
+Two new root regression mutants changed the supplied in-memory protocol/ledger. The new WI1 current-index verifier had reread on-disk protocol/ledger, so it missed those input-snapshot mutations. It now accepts and validates the supplied snapshots; the CLI still reads actual files by default. Raw failed output preserved. No independent approval or runtime execution was performed.

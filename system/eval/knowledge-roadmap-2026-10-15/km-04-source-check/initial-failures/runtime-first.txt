@@ -1,0 +1,15 @@
+PASS: actual profile admits a pinned original-source verification command
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-source-check.py", line 111, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-source-check.py", line 77, in main
+    job1=wait(client,tool(client,'cks.dataset.build',request));write('v1-job.json',job1)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-source-check.py", line 37, in tool
+    require(not result.get('isError'),'native failure: '+str(result));return result['structuredContent']
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-source-check.py", line 18, in require
+    if not value:raise ValueError(message)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: native failure: {'content': [{'type': 'text', 'text': 'dataset request refused: source_stale'}], 'isError': True, 'structuredContent': {'code': 'source_stale', 'retryable': False, 'phase': 'accepted'}}

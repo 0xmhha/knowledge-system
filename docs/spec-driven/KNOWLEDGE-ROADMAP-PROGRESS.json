@@ -1,0 +1,661 @@
+{
+  "schema_version": 1,
+  "document_date": "2026-10-16",
+  "spec": "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+  "scope_status": "user_requested_local_implementation_and_bounded_effect_studies_complete_independent_acceptance_separate",
+  "source_observation_commit": "c4af3f2200b4497b49ca6b6b66061c2d09d3057c",
+  "implementation_completed": 7,
+  "total_work_items": 7,
+  "total_subtasks": 28,
+  "implementation_or_runtime_changed_by_this_documentation": false,
+  "legacy_wi5_mapping": [
+    "KM-03",
+    "KM-04"
+  ],
+  "ontology_followup_reclassified": "OE-01 mandatory priority evaluation; do not count in optional followups",
+  "local_development_requires_formal_acceptance_freeze": false,
+  "formal_independent_acceptance_ledger": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PROGRESS.json",
+  "items": [
+    {
+      "id": "KM-01",
+      "title": "프로젝트 격리와 collection 스키마",
+      "priority": "P0",
+      "scope": "project_isolation",
+      "scope_decision": "requested_by_user_2026-10-15",
+      "status": "complete",
+      "design_status": "implemented_and_locally_verified_isolation_independent_acceptance_separate",
+      "depends_on": [],
+      "evidence": [
+        "docs/spec-driven/PROJECT-COLLECTION-ISOLATION.md",
+        "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
+        "system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation/manifest.json"
+      ],
+      "verification": "owned_real_4DB_52_checks_46_tool_calls_18_writer_refusals_3_clean_EOF_source_bound_Go_reuse",
+      "independent_acceptance": "not_recorded",
+      "subtasks": [
+        {
+          "id": "KM-01.1",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/PROJECT-COLLECTION-ISOLATION.md",
+            "system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json"
+          ]
+        },
+        {
+          "id": "KM-01.2",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/PROJECT-COLLECTION-ISOLATION.md",
+            "system/eval/knowledge-roadmap-2026-10-15/km-01-foundation/manifest.json"
+          ]
+        },
+        {
+          "id": "KM-01.3",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/PROJECT-COLLECTION-ISOLATION.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-01.4",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/PROJECT-COLLECTION-ISOLATION.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        }
+      ],
+      "execution_stages": {
+        "scope_key_audit": "complete",
+        "catalog_contract": "complete",
+        "library_guarded_reads": "verified_in_owned_fixtures",
+        "public_CLI_MCP_adapters": "MCP_reads_connected_and_verified_in_owned_real_indexes",
+        "actual_backend_cross_project_reads_writes": "scoped_reads_verified_new_versioned_writes_not_added",
+        "final_actual_backend_isolation": "verified_52_cases_in_owned_4DB_protocol_fixtures",
+        "existing_public_write_surfaces": "18_requests_refused_no_mutation_or_jobs",
+        "new_versioned_writes": "KM-02_not_added"
+      },
+      "remaining": []
+    },
+    {
+      "id": "KM-02",
+      "title": "버전 DB 구축·갱신 도구 계약",
+      "priority": "P0",
+      "scope": "versioned_maintenance_tools",
+      "scope_decision": "requested_by_user_2026-10-15",
+      "status": "complete",
+      "design_status": "locally_verified_public_durable_build_recovery_retention_and_failure_matrix",
+      "depends_on": [
+        "KM-01"
+      ],
+      "evidence": [
+        "docs/spec-driven/VERSIONED-MAINTENANCE-CONTRACT.md",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-contract/manifest.json",
+        "docs/spec-driven/VERSIONED-MAINTENANCE-RUNTIME.md",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures/manifest.json"
+      ],
+      "verification": "actual_public_failures36_raw_MCP_partial_DB_current_reader_preservation_recovery_and_new_publication",
+      "independent_acceptance": "not_recorded",
+      "subtasks": [
+        {
+          "id": "KM-02.1",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-02.2",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-02.3",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-02.4",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        }
+      ],
+      "execution_stages": {
+        "capability_audit": "verified_current_MCP35_CLI_help_and_source",
+        "design_schema_and_lifecycle": "verified_101_cases",
+        "public_versioned_build_status_cancel": "verified_actual_public_28_checks_5_clean_EOF_sessions",
+        "durable_jobs_idempotency_crash_recovery": "verified_A_B_C_D1_D2_E1_E2_actual_public_host_replay_shutdown_readlease_rollback_GC",
+        "real_public_maintenance_evaluation": "actual_E1_host43_E2_retention21_KM02_4_failures36_mock_embedding_not_quality_or_independent_acceptance"
+      },
+      "remaining": []
+    },
+    {
+      "id": "KM-03",
+      "title": "Claude 지식 매니저 플러그인",
+      "priority": "P0",
+      "scope": "knowledge_manager_plugin",
+      "scope_decision": "requested_by_user_2026-10-15",
+      "status": "complete",
+      "design_status": "locally_verified_actual_Claude_host_transport_and_lifecycle_model_quality_separate",
+      "depends_on": [
+        "KM-02"
+      ],
+      "evidence": [
+        "docs/spec-driven/KNOWLEDGE-MANAGER-PLUGIN.md",
+        "plugins/knowledge-manager/README.md",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-collection/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-review/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-document-index/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-broker/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json"
+      ],
+      "verification": "actual_Claude_Code_8_runs_68_native_tool_results_manager103_native3_host_evidence16_fresh_Go3838_race812",
+      "independent_acceptance": "not_recorded",
+      "subtasks": [
+        {
+          "id": "KM-03.1",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-03.2",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-03.3",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-03.4",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        }
+      ],
+      "remaining": [],
+      "execution_stages": {
+        "A_reviewed_document_indexing": "verified_actual_public_14_checks_3_clean_EOF_current_Go3838_race812",
+        "B_adoption_bound_maintenance_and_reader": "verified_actual_proxy26_3_clean_EOF_broker29_collection23_registration14_native3",
+        "C_actual_Claude_host_end_to_end": "verified_actual_installed_CLI_8_runs_68_tools_local_scripted_API_no_paid_model_normal_exit0_kill_and_recovery"
+      }
+    },
+    {
+      "id": "KM-04",
+      "title": "매니저의 지속·주기 갱신",
+      "priority": "P0",
+      "scope": "continuous_updates",
+      "scope_decision": "requested_by_user_2026-10-15",
+      "status": "complete",
+      "design_status": "locally_verified_actual_two_project_periodic_change_delete_failure_retry_retained_reads",
+      "depends_on": [
+        "KM-03"
+      ],
+      "evidence": [
+        "docs/spec-driven/KNOWLEDGE-MANAGER-UPDATES.md",
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-contract/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-inputs/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-source-check/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-state/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-15/km-04-worker/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-04-worker-host/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-04-updates-MCP/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-04-periodic/manifest.json"
+      ],
+      "verification": "actual20_checks_221tools_2EOF0_A5jobs4publications_failure1_B1job_immutable_other_project",
+      "independent_acceptance": "not_recorded",
+      "subtasks": [
+        {
+          "id": "KM-04.1",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-04.2",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-04.3",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-04.4",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        }
+      ],
+      "remaining": [],
+      "execution_stages": {
+        "policy_trigger_success_contract": "verified_27_cases",
+        "automatic_observation_projection": "verified_32_cases_actual_manual_4DB_16_checks_11EOF0_82calls",
+        "durable_worker": "complete_A_B1_B2_C1_C2_actual_updates_MCP_Claude_parent_EOF_kill_exact_recovery",
+        "actual_periodic_execution": "verified_actual_20_checks_two_projects_periodic_change_delete_noop_failed_graph_linked_retry_retained_and_other_project_unchanged",
+        "native_original_source_publication_check": "actual14_3jobs_2publications_1stale_refusal_90calls_5EOF0_no_independent_acceptance",
+        "durable_state_foundation": "50_fault_contract_cases_with_one_actual_native_inspection_no_native_job_execution",
+        "foreground_worker": "actual14_native_RPC97_jobs6_publications4_failure1_canceled_exact_replay1_EOF16_0",
+        "actual_CLI_worker_lifecycle": "21checks_10CLI_TERM_KILL_budget_owned_quiescence_no_late_writes_3linked_recovery_publications",
+        "persistence_signal_reporting": "explicit_last_confirmed_memory_and_disk_reconciliation_required_verified_after_actual_admission_fsync_interrupt",
+        "updates_MCP_operation": "verified_six_tools_public20_RPC222_sessions3_Claude2_tools36_no_real_model_or_independent_acceptance"
+      }
+    },
+    {
+      "id": "KM-05",
+      "title": "공통 산업 개념과 프로젝트별 매핑",
+      "priority": "P1",
+      "scope": "industry_concept_mapping",
+      "scope_decision": "requested_by_user_2026-10-15",
+      "status": "complete",
+      "design_status": "locally_verified_optional_common_vocabulary_scoped_source_mapping_recorded_reviews_and_applicability",
+      "depends_on": [
+        "KM-01"
+      ],
+      "evidence": [
+        "docs/spec-driven/INDUSTRY-CONCEPT-COMPARISON.md",
+        "system/eval/knowledge-roadmap-2026-10-16/km-05-scheme/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-05-bindings/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-05-mapping-review/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-05-applicability/manifest.json"
+      ],
+      "verification": "comparison117_cases_scheme29_bindings30_review34_coverage24_role_industry_network_config_declared_absence_unknown_reader_capability_no_actual_MCP",
+      "independent_acceptance": "not_recorded",
+      "subtasks": [
+        {
+          "id": "KM-05.1",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-05.2",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-05.3",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-05.4",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "KM-06",
+      "title": "비교 근거 추출과 MCP 제공",
+      "priority": "P1",
+      "scope": "cross_project_comparison",
+      "scope_decision": "requested_by_user_2026-10-15",
+      "status": "complete",
+      "design_status": "locally_verified_explicit_readonly_real_project_comparison",
+      "depends_on": [
+        "KM-01",
+        "KM-05"
+      ],
+      "evidence": [
+        "docs/spec-driven/COMPARISON-MCP-CONTRACT.md",
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-contract/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-runtime/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-failures/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/km-06-real-projects/manifest.json"
+      ],
+      "verification": "request50_comparison192_actual_go_stablenet2224_go_wemix2019_source_files_6concepts40cells22checks19MCP_3EOF0_proposed_mappings_not_quality",
+      "independent_acceptance": "not_recorded",
+      "subtasks": [
+        {
+          "id": "KM-06.1",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-06.2",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-06.3",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "KM-06.4",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "OE-01",
+      "title": "온톨로지 효과 평가",
+      "priority": "P0",
+      "scope": "ontology_effect_evaluation",
+      "scope_decision": "requested_by_user_2026-10-15",
+      "status": "complete",
+      "design_status": "bounded_source_retrieval_and_explicit_mapping_effect_evaluated_quality_inconclusive",
+      "depends_on": [],
+      "evidence": [
+        "docs/spec-driven/operational-preparation/ontology-effect-dev/manifest.json",
+        "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json",
+        "docs/spec-driven/ONTOLOGY-EFFECT-DEV-OBSERVATION.md",
+        "system/eval/knowledge-roadmap-2026-10-16/oe-01-protocol/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/oe-02-capture/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/oe-03-score/manifest.json",
+        "system/eval/knowledge-roadmap-2026-10-16/oe-04-mapping-effect/manifest.json"
+      ],
+      "verification": "expanded512_function_tasks_plus_real2project_no_mapping_baseline_18checks_27tools_2EOF_source_recomputed_not_independent_quality",
+      "independent_acceptance": "not_recorded",
+      "subtasks": [
+        {
+          "id": "OE-01.1",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "OE-01.2",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "OE-01.3",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        },
+        {
+          "id": "OE-01.4",
+          "status": "complete",
+          "evidence": [
+            "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md",
+            "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md"
+          ]
+        }
+      ],
+      "execution_stages": {
+        "single_project": "complete_bounded_function_retrieval_effect_default_off_quality_inconclusive",
+        "multi_project": "complete_explicit_annotation_input_40cells_8source_3candidates_not_vocabulary_alone",
+        "multi_project_depends_on": [
+          "KM-05",
+          "KM-06"
+        ]
+      },
+      "remaining_preparation": [
+        "independent semantic/answer-quality gold and reviewer adoption remain a separate acceptance scope",
+        "reviewed implementation links and natural-language project intent remain unevaluated; no default activation"
+      ],
+      "local_observation": {
+        "planned_calls": 384,
+        "observed_calls": 384,
+        "failed_calls": 0,
+        "missing_calls": 0,
+        "citations_verified": 3616,
+        "bodies_verified": 3616,
+        "location_hit_at_10_all_arms": 0.625,
+        "location_RR_at_10_all_arms": 0.20729166666666665,
+        "active_arm_no_match_calls": 288,
+        "post_observation_exact_term_probe_calls": 8,
+        "post_observation_probe_final_boosts": 0,
+        "quality_verdict": "inconclusive",
+        "full_OE01_complete": true,
+        "manifest": "system/eval/operational-preparation-2026-10-15/ontology-effect-dev/manifest.json",
+        "full_OE01_complete_scope": "bounded local studies only; old384call observation not retroactively expanded"
+      }
+    }
+  ],
+  "documentation_validation": {
+    "kind": "requirements_recording_not_feature_completion",
+    "document_contract_tests_passed": 20,
+    "live_documents_checked": 120,
+    "subtask_ids_matched": 28,
+    "existing_implementation_and_formal_acceptance_ledgers_unchanged": true,
+    "feature_execution": "not_run"
+  },
+  "current_prerequisites": {
+    "policy_reference_local_overlay": {
+      "status": "complete",
+      "scope": "pinned local policy overlay graph storage/public CKS verification only",
+      "evidence": [
+        "system/eval/operational-preparation-2026-10-15/adopted-policy/manifest.json"
+      ],
+      "source_aware_regeneration": "implemented_and_verified_explicit_code_root_not_automatic_source_anchor_relocation_or_production_adoption",
+      "independent_acceptance": "not_recorded",
+      "manifest_sha256": "a3277936dfc84a865fedb8bfa5799a9f5c36022d6690f66209b005adeac4a37b"
+    }
+  },
+  "latest_preparation_validation": {
+    "adopted_policy_guard_tests_passed": 8,
+    "documentation_contract_tests_passed": 20,
+    "live_documents_checked": 131,
+    "ontology_effect_executed": true,
+    "feature_completion_count": 2,
+    "ontology_effect_scope": "local descriptive observation only; no independent quality verdict",
+    "ontology_effect_calls": 384,
+    "ontology_mechanism_probe_calls": 8,
+    "ontology_observation_false_completion_tests_passed": 10,
+    "knowledge_roadmap_guard_tests_passed": 7,
+    "collection_race_cases_passed": 40,
+    "collection_top_level_tests_passed": 17,
+    "module_test_cases": 3812,
+    "module_tests_passed": 3794,
+    "module_tests_skipped": 18,
+    "module_failed_tests": 0,
+    "build_fmt_lint_passed": true,
+    "refactoring_source_inventory_bindings_passed": 1697,
+    "refactoring_source_inventory_checker_exit": 0,
+    "source_binding_update_receipt": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap-source-binding-update/receipt.json",
+    "related_race_cases": 786,
+    "related_race_passed": 784,
+    "related_race_skipped": 2,
+    "public_collection_checks": 24,
+    "public_collection_tool_calls": 21,
+    "public_collection_request_reply_pairs": 26,
+    "public_collection_clean_EOF_sessions": 3,
+    "public_collection_packet": "system/eval/knowledge-roadmap-2026-10-15/km-01-public-read/manifest.json",
+    "public_collection_final_gates": "passed_build_module_race_full_lint_docs_evidence_guards_and_committed_source_inventory",
+    "original_source_binding_checks_historical_passed": 2069,
+    "public_collection_false_completion_tests_passed": 8,
+    "final_isolation_packet": "system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation/manifest.json",
+    "final_isolation_checks": 52,
+    "final_isolation_tool_calls": 46,
+    "final_isolation_wire_pairs": 52,
+    "final_isolation_evidence_packs": 20,
+    "final_isolation_writer_refusals": 18,
+    "final_isolation_clean_EOF_sessions": 3,
+    "go_validation_method": "fresh_Go_D1_supervision_compatibility_not_staging_cleanup_or_public_durable_E",
+    "final_isolation_metadata_gates": "passed_raw_protocol_HTTP_Git_citations_preservation_docs_and_current_ledger",
+    "final_isolation_false_completion_tests_passed": 9,
+    "current_roadmap_tests_passed": 7,
+    "maintenance_contract_cases_passed": 101,
+    "maintenance_contract_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-contract/manifest.json",
+    "maintenance_contract_scope": "design_only_not_runtime_success",
+    "current_Go_dependency_inputs_match": true,
+    "maintenance_contract_final_gates": "passed_design101_probe_history_roadmap7_document126_evidence_guard9_source_inventory",
+    "maintenance_contract_false_completion_tests_passed": 9,
+    "maintenance_runtime_checks": 28,
+    "maintenance_runtime_tool_calls": 90,
+    "maintenance_runtime_wire_pairs": 99,
+    "maintenance_runtime_EOF_sessions": 5,
+    "maintenance_runtime_false_completion_tests": 10,
+    "maintenance_runtime_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance/manifest.json",
+    "current_Go_validation_reused": true,
+    "journal_foundation_race_cases": 114,
+    "journal_foundation_scope": "private_store_and_status_validation_only_not_public_durability",
+    "journal_foundation_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-journal-foundation/manifest.json",
+    "journal_foundation_evidence_guard_tests_passed": 13,
+    "journal_foundation_public_compatibility_checks": 28,
+    "journal_foundation_public_compatibility_tool_calls": 112,
+    "journal_foundation_public_compatibility_wire_pairs": 121,
+    "durable_service_package_race_cases": 123,
+    "durable_service_scope": "private_admission_status_cancel_and_restart_only_public_C_D_E_pending",
+    "durable_service_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-service/manifest.json",
+    "durable_service_evidence_guard_tests_passed": 13,
+    "durable_service_public_compatibility_checks": 28,
+    "durable_service_public_compatibility_tool_calls": 81,
+    "durable_service_public_compatibility_wire_pairs": 90,
+    "publication_recovery_package_race_cases": 141,
+    "publication_real_pointer_and_kill_cases": 19,
+    "publication_recovery_evidence_guard_tests_passed": 14,
+    "publication_recovery_public_compatibility_checks": 28,
+    "publication_recovery_public_compatibility_tool_calls": 97,
+    "publication_recovery_public_compatibility_wire_pairs": 106,
+    "publication_recovery_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-publication-recovery/manifest.json",
+    "related_race_packages": 6,
+    "command_supervision_cases": 7,
+    "command_supervision_evidence_guard_tests_passed": 13,
+    "command_supervision_public_checks": 28,
+    "command_supervision_tool_calls": 90,
+    "command_supervision_wire_pairs": 99,
+    "command_supervision_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-command-supervision/manifest.json",
+    "owned_staging_checkpoint_cases": 144,
+    "owned_staging_evidence_guard_tests_passed": 13,
+    "public_durable_host_checks": 43,
+    "public_durable_host_EOF_sessions": 7,
+    "public_durable_host_expected_SIGKILLs": 2,
+    "public_durable_host_evidence_guard_tests_passed": 14,
+    "public_retention_checks": 21,
+    "public_retention_EOF_sessions": 5,
+    "public_retention_evidence_guard_tests_passed": 12,
+    "public_retention_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention/manifest.json",
+    "retention_binding_advance": "verified_committed_manifest_and_source_checker",
+    "current_Go_reference_scope": "unchanged_1253_Go_and_all_E2_bound_inputs_count1_proof",
+    "public_maintenance_failure_checks": 36,
+    "public_maintenance_failure_expected_SIGKILLs": 1,
+    "public_maintenance_failure_EOF_sessions": 4,
+    "public_maintenance_failure_guard_tests": 12,
+    "public_maintenance_failure_packet": "system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures/manifest.json",
+    "failure_binding_advance": "verified_committed_manifest_and_source_checker",
+    "manager_registration_tests": 14,
+    "manager_native_validations": 3,
+    "manager_bootstrap_checks": 9,
+    "manager_bootstrap_evidence_tests": 10,
+    "manager_bootstrap_packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap/manifest.json",
+    "manager_bootstrap_binding_advance": "verified_committed_manifest_and_source_checker"
+  },
+  "completed_subtasks": 28,
+  "test_matrix": "docs/spec-driven/KNOWLEDGE-ROADMAP-TEST-MATRIX.md",
+  "manager_host_validation": {
+    "packet": "system/eval/knowledge-roadmap-2026-10-15/km-03-host/manifest.json",
+    "actual_CLI_runs": 8,
+    "actual_tool_results": 68,
+    "manager_unit_tests": 103,
+    "evidence_tests": 16,
+    "real_model_calls": 0,
+    "independent_acceptance": false
+  },
+  "periodic_validation": {
+    "packet": "system/eval/knowledge-roadmap-2026-10-16/km-04-periodic/manifest.json",
+    "checks": 20,
+    "actual_tool_calls": 221,
+    "projects": 2,
+    "EOF_exit_codes": [
+      0,
+      0
+    ],
+    "real_model_calls": 0,
+    "independent_acceptance": false
+  },
+  "mapping_effect_validation": {
+    "packet": "system/eval/knowledge-roadmap-2026-10-16/oe-04-mapping-effect/manifest.json",
+    "checks": 18,
+    "tool_calls": 27,
+    "unique_cells_per_arm": 40,
+    "source_cells_without_mapping": 0,
+    "source_cells_with_mapping": 8,
+    "declared_mapping_cells": 7,
+    "unknown_cells": 18,
+    "not_collected_cells": 15,
+    "two_sided_candidates": 3,
+    "EOF_exit_codes": [
+      0,
+      0
+    ],
+    "independent_quality_acceptance": false
+  },
+  "policy_regeneration_validation": {
+    "packet": "system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json",
+    "policy_nodes": 42,
+    "policy_edges": 146,
+    "corrected_references": 7,
+    "MCP_tool_calls": 24,
+    "EOF_exit_codes": [
+      0
+    ],
+    "original_inputs_unchanged": true,
+    "independent_acceptance": false
+  }
+}

@@ -1,0 +1,66 @@
+diff --git a/bench/hooks/test_hooks.py b/bench/hooks/test_hooks.py
+index 12515e9..394ef5d 100644
+--- a/bench/hooks/test_hooks.py
++++ b/bench/hooks/test_hooks.py
+@@ -143,6 +143,14 @@ def test_on_stop():
+ 
+ # ---------------- session-context ----------------
+ def test_session_context():
++    with tempfile.TemporaryDirectory() as d:
++        _init_repo(d, "feature/evaluated")
++        _workspace(d, "T-EVAL", "EVALUATED")
++        out = run_hook(SESSION, {}, cwd=d)
++        context = out["hookSpecificOutput"]["additionalContext"]
++        check("EVALUATED marker requires receipt verification", "--check-exit" in context)
++        check("EVALUATED never asks to resume or publish", "Do not resume" in context and "resume with" not in context)
++        check("EVALUATED is not independent acceptance", "not delivery or independent acceptance" in context)
+     print("session-context")
+     with tempfile.TemporaryDirectory() as d:
+         _init_repo(d, "main")
+diff --git a/plugin/hooks/session-context.py b/plugin/hooks/session-context.py
+index 7443557..3fe1807 100755
+--- a/plugin/hooks/session-context.py
++++ b/plugin/hooks/session-context.py
+@@ -45,8 +45,9 @@ def main():
+     paths.sort(key=lambda p: _safe_mtime(p), reverse=True)
+ 
+     lines = []
++    evaluated = []
+     for p in paths:
+-        if len(lines) >= MAX_WS:
++        if len(lines) + len(evaluated) >= MAX_WS:
+             break
+         try:
+             st = json.load(open(p, encoding="utf-8"))
+@@ -56,6 +57,11 @@ def main():
+         if not cs or cs in TERMINAL:
+             continue
+         tid = st.get("ticket_id") or os.path.basename(os.path.dirname(p))
++        if cs == "EVALUATED":
++            evaluated.append(f"- {tid}: EVALUATED local evaluation boundary marker. Before reporting success, "
++                             "verify publication_policy.py --check-exit for its workspace. "
++                             "Do not resume the pipeline, push, create a PR or update Jira.")
++            continue
+         if cs == "BLOCKED":
+             lines.append(f"- {tid}: BLOCKED — needs attention (see its workspace).")
+         else:
+@@ -65,11 +71,16 @@ def main():
+             mode = ((cfg.get("autonomy") or {}).get("mode")) or "interactive"
+             lines.append(f"- {tid}: {cs} (eval cycle {cyc}/{maxc}, autonomy={mode})")
+ 
+-    if not lines:
++    if not lines and not evaluated:
+         return 0
+ 
+-    ctx = ("Active coding-agent pipeline workspace(s) — resume with /coding-agent:work "
+-           "or continue per state.json:\n" + "\n".join(lines))
++    sections = []
++    if evaluated:
++        sections.append("Local evaluation boundary markers (not delivery or independent acceptance):\n" + "\n".join(evaluated))
++    if lines:
++        sections.append("Active coding-agent pipeline workspace(s) — resume with /coding-agent:work "
++                        "or continue per state.json:\n" + "\n".join(lines))
++    ctx = "\n\n".join(sections)
+     print(json.dumps({
+         "hookSpecificOutput": {
+             "hookEventName": "SessionStart",

@@ -1,0 +1,29 @@
+func checkSystemContractVersions(systemContracts *params.SystemContracts) error {
+	if SystemContractCodes[CONTRACT_GOV_VALIDATOR][systemContracts.GovValidator.Version] == "" {
+		return fmt.Errorf("`systemContracts.govValidator`: unsupported version %s", systemContracts.GovValidator.Version)
+	}
+
+	if SystemContractCodes[CONTRACT_COIN_ADAPTER][systemContracts.NativeCoinAdapter.Version] == "" {
+		return fmt.Errorf("`systemContracts.nativeCoinAdapter`: unsupported version %s", systemContracts.NativeCoinAdapter.Version)
+	}
+
+	if systemContracts.GovMinter != nil {
+		if SystemContractCodes[CONTRACT_GOV_MINTER][systemContracts.GovMinter.Version] == "" {
+			return fmt.Errorf("`systemContracts.govMinter`: unsupported version %s", systemContracts.GovMinter.Version)
+		}
+	}
+
+	if systemContracts.GovMasterMinter != nil {
+		if SystemContractCodes[CONTRACT_GOV_MASTER_MINTER][systemContracts.GovMasterMinter.Version] == "" {
+			return fmt.Errorf("`systemContracts.govMasterMinter`: unsupported version %s", systemContracts.GovMasterMinter.Version)
+		}
+	}
+
+	if systemContracts.GovCouncil != nil {
+		if SystemContractCodes[CONTRACT_GOV_COUNCIL][systemContracts.GovCouncil.Version] == "" {
+			return fmt.Errorf("`systemContracts.govCouncil`: unsupported version %s", systemContracts.GovCouncil.Version)
+		}
+	}
+
+	return nil
+}

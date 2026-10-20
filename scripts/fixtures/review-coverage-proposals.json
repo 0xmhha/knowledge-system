@@ -1,0 +1,72 @@
+[
+  {
+    "candidate_id": "SRC-001",
+    "state_guard": [1, 2, 3, 4, 5],
+    "resources_cost": [3, 4],
+    "resource_scope": "블록 순회와 map 집계 위치만 확인했다. 상한·잠금·실제 조회 비용은 미판정이다.",
+    "priority_question": "RPC 허용 범위·최대 처리량·응답시간 요구와 analyzeBlock 계약을 확인한 뒤 범위/비용 항목의 필수 여부와 우선순위를 정할 수 있는가?"
+  },
+  {
+    "candidate_id": "SRC-002",
+    "state_guard": [1, 2, 3, 4, 5],
+    "resources_cost": [3, 4, 5],
+    "resource_scope": "cache 갱신과 비동기 전송 시작·즉시 반환 위치만 확인했다. 전송 완료·payload 소유권·동시성은 미판정이다.",
+    "priority_question": "재전송 보장·peer 수신 성공·payload 소유권·동시성 요구 중 필수 검토 항목은 무엇이며 실패 영향에 따라 어떤 우선순위를 부여해야 하는가?"
+  },
+  {
+    "candidate_id": "SRC-006",
+    "state_guard": [1, 2, 3, 4],
+    "resources_cost": [2, 3, 5],
+    "resource_scope": "live/ancient 조회와 count*8000 계산·주석 대비를 확인했다. 상위 요청 제한·산술 입력 범위·실제 할당량은 미판정이다.",
+    "priority_question": "count 상한과 부분 결과 계약·산술 허용 범위·메모리 예산을 확정하면 어떤 경계가 필수 항목이며 영향과 우선순위는 무엇인가?"
+  },
+  {
+    "candidate_id": "SRC-007",
+    "state_guard": [1, 2, 3],
+    "resources_cost": [3],
+    "resource_scope": "decode 결과를 순회하며 block slice를 구성하는 위치를 자원 검토 후보로 연결했다. 입력 크기 제한·호출 비용·메모리 상한 근거는 없다.",
+    "priority_question": "오류와 빈 목록의 구분 요구·badBlock 데이터 규모·할당 예산을 확인한 뒤 누락하면 안 되는 항목과 우선순위를 정할 수 있는가?"
+  },
+  {
+    "candidate_id": "SRC-011",
+    "state_guard": [1, 2, 3, 4, 5],
+    "resources_cost": [1, 3, 4],
+    "resource_scope": "iterator·storage 순회·skip·Max 중단 위치를 확인했다. collector/trie 계약·panic 영향·실제 메모리 비용은 미판정이다.",
+    "priority_question": "dump 완전성·panic 허용·collector 소유권·Max/skip 요구에서 필수 항목은 무엇이며 데이터 누락이나 중단의 영향을 어떻게 우선순위에 반영하는가?"
+  },
+  {
+    "candidate_id": "SRC-016",
+    "state_guard": [1, 2, 3, 4, 5],
+    "resources_cost": [1, 3, 4, 5],
+    "resource_scope": "directory/store/limbo 준비·오류 Close·Datacap drop 위치를 확인했다. 해제 보장·drop 진행성·잠금은 미판정이다.",
+    "priority_question": "초기화 실패 시 rollback/소유권·Datacap 초과 처리·진행 보장 계약을 확인한 뒤 어떤 자원/상태 항목을 필수로 하고 어떤 우선순위를 부여하는가?"
+  },
+  {
+    "candidate_id": "SRC-021",
+    "state_guard": [1, 2, 3, 4, 5],
+    "resources_cost": [1, 4, 5],
+    "resource_scope": "subscription/timer 생성·Stop·notification 전송 위치를 확인했다. 실제 소비자·buffer·종료 계약 없는 deadlock/누수 판정은 허용하지 않는다.",
+    "priority_question": "소비자 종료·송신 대기·subscription 해제 계약과 실제 도달성을 확인한 뒤 요구 위반 여부 및 영향/우선순위를 어떻게 판정하는가?"
+  },
+  {
+    "candidate_id": "SRC-027",
+    "state_guard": [1, 2, 3, 4, 5],
+    "resources_cost": [1, 2, 3, 4],
+    "resource_scope": "timer/WaitGroup 정리·channel/lock·recommit 조정 위치를 확인했다. happens-before·실제 timeout/race·비용은 미판정이다.",
+    "priority_question": "worker 종료·commit 요청·timer 재설정·recommit 비용의 요구 계약을 확인한 뒤 필수 guard/자원 항목과 영향별 우선순위를 정할 수 있는가?"
+  },
+  {
+    "candidate_id": "SRC-031",
+    "state_guard": [1, 2, 3],
+    "resources_cost": [1, 2, 3],
+    "resource_scope": "직접 요청·table 재시도·lookup 결과 순회 위치를 비용 검토 후보로 연결했다. deadline·요청 수 상한·최신성 보장은 미판정이다.",
+    "priority_question": "Resolve의 최신성/identity 요구·deadline·재시도 예산을 확인한 뒤 fallback 반환과 요청 비용 중 필수 검토 항목 및 우선순위는 무엇인가?"
+  },
+  {
+    "candidate_id": "SRC-036",
+    "state_guard": [1, 2, 3, 4],
+    "resources_cost": [2, 3, 4],
+    "resource_scope": "transport 선택·constructor 오류·ctx 전달 위치를 소유권 검토 후보로 연결했다. 연결 성공·자원 해제·TLS/취소 계약의 충분한 근거는 아니다.",
+    "priority_question": "transport별 연결/취소·재연결·소유권·TLS 요구를 확인한 뒤 어떤 항목이 필수이며 실패 영향별 우선순위는 무엇인가?"
+  }
+]

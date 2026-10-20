@@ -1,0 +1,203 @@
+package valueflow
+
+import (
+	"context"
+	"encoding/json"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"reflect"
+	"strings"
+	"testing"
+)
+
+type projectRuleArgument struct {
+	Text       string   `json:"text"`
+	Identifier bool     `json:"identifier"`
+	Location   Location `json:"location"`
+}
+
+type projectRuleCall struct {
+	Owner              string                `json:"owner"`
+	Callee             string                `json:"callee"`
+	Location           Location              `json:"location"`
+	ClosureDepth       int                   `json:"closure_depth"`
+	Arguments          []projectRuleArgument `json:"arguments"`
+	AssignmentLHS      []string              `json:"assignment_lhs"`
+	AssignmentLocation *Location             `json:"assignment_location,omitempty"`
+}
+
+type projectRuleVisitor struct {
+	fs          *token.FileSet
+	code        string
+	source      Source
+	depth       int
+	calls       *[]projectRuleCall
+	assignments map[*ast.CallExpr]*ast.AssignStmt
+}
+
+func (v projectRuleVisitor) location(n ast.Node) Location {
+	start, end := v.fs.Position(n.Pos()), v.fs.Position(n.End())
+	prefix := len("package project\n")
+	return Location{StartByte: v.source.StartByte + start.Offset - prefix,
+		EndByte:   v.source.StartByte + end.Offset - prefix,
+		StartLine: v.source.StartLine + start.Line - 2, EndLine: v.source.StartLine + end.Line - 2}
+}
+
+func (v projectRuleVisitor) text(n ast.Node) string {
+	loc := v.location(n)
+	return v.code[loc.StartByte-v.source.StartByte : loc.EndByte-v.source.StartByte]
+}
+
+func (v projectRuleVisitor) Visit(n ast.Node) ast.Visitor {
+	if n == nil {
+		return nil
+	}
+	if _, ok := n.(*ast.FuncLit); ok {
+		v.depth++
+	}
+	call, ok := n.(*ast.CallExpr)
+	if !ok {
+		return v
+	}
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return v
+	}
+	owner, ok := sel.X.(*ast.Ident)
+	if !ok || !(owner.Name == "exec" && (sel.Sel.Name == "Command" || sel.Sel.Name == "CommandContext") || owner.Name == "strconv" && (sel.Sel.Name == "Atoi" || sel.Sel.Name == "ParseInt" || sel.Sel.Name == "ParseUint")) {
+		return v
+	}
+	note := projectRuleCall{Owner: owner.Name, Callee: sel.Sel.Name, Location: v.location(call),
+		ClosureDepth: v.depth, Arguments: []projectRuleArgument{}, AssignmentLHS: []string{}}
+	for _, arg := range call.Args {
+		_, identifier := arg.(*ast.Ident)
+		note.Arguments = append(note.Arguments, projectRuleArgument{v.text(arg), identifier, v.location(arg)})
+	}
+	if assignment := v.assignments[call]; assignment != nil {
+		loc := v.location(assignment)
+		note.AssignmentLocation = &loc
+		for _, lhs := range assignment.Lhs {
+			note.AssignmentLHS = append(note.AssignmentLHS, v.text(lhs))
+		}
+	}
+	*v.calls = append(*v.calls, note)
+	return v
+}
+
+func projectRuleSyntax(t *testing.T, code string, source Source) []projectRuleCall {
+	t.Helper()
+	fs := token.NewFileSet()
+	file, err := parser.ParseFile(fs, source.File, "package project\n"+code, parser.SkipObjectResolution)
+	if err != nil || len(file.Decls) != 1 {
+		t.Fatal("syntax note parse failed", err)
+	}
+	fn, ok := file.Decls[0].(*ast.FuncDecl)
+	if !ok || fn.Body == nil || fn.Name.Name != source.FunctionName {
+		t.Fatal("source function identity differs")
+	}
+	assignments := map[*ast.CallExpr]*ast.AssignStmt{}
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		if stmt, ok := n.(*ast.AssignStmt); ok && len(stmt.Rhs) == 1 {
+			if call, ok := stmt.Rhs[0].(*ast.CallExpr); ok {
+				assignments[call] = stmt
+			}
+		}
+		return true
+	})
+	calls := []projectRuleCall{}
+	ast.Walk(projectRuleVisitor{fs: fs, source: source, code: code, calls: &calls, assignments: assignments}, fn.Body)
+	return calls
+}
+
+func TestProjectRulePreparation(t *testing.T) {
+	raw, err := os.ReadFile(os.Getenv("KS_PROJECT_RULE_INPUT_PATH"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var input struct {
+		Kind         string `json:"kind"`
+		SnapshotKind string `json:"snapshot_kind"`
+		SnapshotSHA  string `json:"snapshot_sha256"`
+		Cases        []struct {
+			ID     string `json:"id"`
+			Code   string `json:"code"`
+			Source Source `json:"source"`
+		} `json:"cases"`
+	}
+	decoder := json.NewDecoder(strings.NewReader(string(raw)))
+	decoder.DisallowUnknownFields()
+	if err = decoder.Decode(&input); err != nil || input.Kind != "project_function_source_preparation_no_gold" || input.SnapshotKind != "synthetic_source_bundle_not_retained_graph" || len(input.Cases) != 51 {
+		t.Fatal("unexpected public source envelope", err)
+	}
+	for _, row := range input.Cases {
+		t.Run(row.ID, func(t *testing.T) {
+			if row.Source.NodeID != row.ID || row.Source.SHA256 != hashBytes([]byte(row.Code)) || row.Source.SnapshotSHA256 != input.SnapshotSHA || row.Source.CanonicalID != "" {
+				t.Fatal("project source identity mismatch")
+			}
+			r, err := AnalyzeRules(context.Background(), row.Source, []byte(row.Code), Options{}, RulePackID, RuleOptions{})
+			if err != nil || r.Rules == nil || r.Source.SHA256 != row.Source.SHA256 {
+				t.Fatal("project analyzer failed", err)
+			}
+			again, err := AnalyzeRules(context.Background(), row.Source, []byte(row.Code), Options{}, RulePackID, RuleOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			r.ElapsedMicros, again.ElapsedMicros = 0, 0
+			if !reflect.DeepEqual(r, again) {
+				t.Fatal("nondeterministic project analysis other than elapsed")
+			}
+			calls := projectRuleSyntax(t, row.Code, row.Source)
+			encoded, err := json.Marshal(map[string]any{"case_id": row.ID, "analysis": r,
+				"repeat_equal_except_elapsed": true, "syntax_calls": calls})
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Log("PROJECT_RULE_OBSERVATION " + string(encoded))
+		})
+	}
+}
+
+func TestProjectRuleSyntaxControls(t *testing.T) {
+	cases := []struct {
+		name, code string
+		depths     []int
+	}{
+		{"closure_sibling", `func F(cmd string){f:=func(){exec.Command(cmd)};_=f;exec.Command(cmd)}`, []int{1, 0}},
+		{"nested_closure", `func F(cmd string){f:=func(){g:=func(){exec.Command(cmd)};_=g;exec.Command(cmd)};_=f}`, []int{2, 1}},
+		{"direct_assignment", `func F(s string){v,_:=strconv.Atoi(s);_=v;out:=wrap(strconv.Atoi(s));_=out}`, []int{0, 0}},
+		{"context_argument", `func F(cmd string){exec.CommandContext(nil,cmd);exec.Command("fixed",cmd)}`, []int{0, 0}},
+		{"shadowed_owner", `func F(cmd string,exec Fake){exec.Command(cmd)}`, []int{0}},
+	}
+	for _, row := range cases {
+		t.Run(row.name, func(t *testing.T) {
+			source := retained()
+			source.FunctionName = "F"
+			calls := projectRuleSyntax(t, row.code, source)
+			if len(calls) != len(row.depths) {
+				t.Fatal("syntax control call count", calls)
+			}
+			for i, note := range calls {
+				if note.ClosureDepth != row.depths[i] {
+					t.Fatal("closure ownership mismatch", calls)
+				}
+				loc := note.Location
+				if row.code[loc.StartByte-source.StartByte:loc.EndByte-source.StartByte] == "" {
+					t.Fatal("empty source span")
+				}
+			}
+			if row.name == "direct_assignment" && (!reflect.DeepEqual(calls[0].AssignmentLHS, []string{"v", "_"}) || calls[1].AssignmentLocation != nil) {
+				t.Fatal("wrapped call promoted to direct RHS", calls)
+			}
+			if row.name == "context_argument" && (!calls[0].Arguments[1].Identifier || calls[0].Arguments[1].Text != "cmd" || calls[1].Arguments[0].Identifier) {
+				t.Fatal("command argument index/shape lost", calls)
+			}
+			encoded, err := json.Marshal(map[string]any{"control_id": row.name, "syntax_calls": calls})
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Log("PROJECT_RULE_SYNTAX_CONTROL " + string(encoded))
+		})
+	}
+}

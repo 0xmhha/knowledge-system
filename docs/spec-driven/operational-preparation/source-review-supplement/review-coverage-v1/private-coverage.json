@@ -1,0 +1,1474 @@
+{
+  "status": "ai_draft_not_independent_gold",
+  "cases": [
+    {
+      "candidate_id": "SRC-001",
+      "case_id": "REVIEW-DRAFT-SRC-001",
+      "module": "consensus/wbft",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "consensus/wbft/backend/api.go",
+        "name": "Status",
+        "receiver": "*API",
+        "start_line": 169,
+        "end_line": 220,
+        "start_byte": 6085,
+        "end_byte_exclusive": 7648,
+        "git_blob": "da0f18ae519743f0924266f80fbcb195b4462e66",
+        "file_sha256": "a1bc409a7e68126f611ee6c339d3814b90f7711e25740a2f1119f9af2f6c2a49",
+        "function_sha256": "376fd0b342ecbce4a5e1b5b0d1c969940bc3bfd92913a32eeae619fe5a1bc393",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-001-source.txt",
+        "excerpt_sha256": "376fd0b342ecbce4a5e1b5b0d1c969940bc3bfd92913a32eeae619fe5a1bc393"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-001-R1",
+          "start_line": 171,
+          "end_line": 174,
+          "start_byte": 6215,
+          "end_byte_exclusive": 6349,
+          "span_sha256": "c42463dd3aacbb6546ff7c9fc1810e8e63f0935b4ce685e88094ed150634ca41",
+          "expected_source_fact_draft": "range 계산 오류를 먼저 반환한다; 이 지점에서 validator 조회는 아직 수행하지 않았다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-001-R2",
+          "start_line": 177,
+          "end_line": 180,
+          "start_byte": 6369,
+          "end_byte_exclusive": 6456,
+          "span_sha256": "0a4ee4ef031bcc16e3d1d9e3780ccfd1d579e337d8a7ec6c1f8edefdf288ecb0",
+          "expected_source_fact_draft": "validator 조회 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-001-R3",
+          "start_line": 183,
+          "end_line": 190,
+          "start_byte": 6481,
+          "end_byte_exclusive": 6911,
+          "span_sha256": "f1658f9a456524d3afdf68985a573e55b86e43c5a82c632c6ed86e61a66bbc8c",
+          "expected_source_fact_draft": "counter들을 초기화하고 start..end 블록을 analyzeBlock으로 순회하여 roundDistribution을 갱신한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-001-R4",
+          "start_line": 193,
+          "end_line": 200,
+          "start_byte": 6988,
+          "end_byte_exclusive": 7163,
+          "span_sha256": "b32860668be303b7b672db5e1e890458386c44380667e6bee13494d9b41cf79d",
+          "expected_source_fact_draft": "round count가0이면 삭제하고 아니면 round*count를 totalRounds에 누적한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-001-R5",
+          "start_line": 201,
+          "end_line": 219,
+          "start_byte": 7163,
+          "end_byte_exclusive": 7647,
+          "span_sha256": "975d8177389f9d159b952a0e2717ad536d9d0520295cfbc151d8f2945f184c2c",
+          "expected_source_fact_draft": "결과에 block 범위·counter·round 통계를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-001-R1",
+            "SRC-001-R2",
+            "SRC-001-R3",
+            "SRC-001-R4",
+            "SRC-001-R5"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-001-R3",
+            "SRC-001-R4"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "RPC 허용 범위·최대 처리량·응답시간 요구와 analyzeBlock 계약을 확인한 뒤 범위/비용 항목의 필수 여부와 우선순위를 정할 수 있는가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "블록 순회와 map 집계 위치만 확인했다. 상한·잠금·실제 조회 비용은 미판정이다.",
+      "existing_unknowns": [
+        "analyzeBlock의 map 갱신 효과·범위 제한·잠금은 이 함수 본문만으로 확정하지 않는다.",
+        "블록 수에 비례하는 조회 비용과 실제 실행시간은 미측정이다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": true,
+        "anchors": [
+          {
+            "path": "consensus/wbft/backend/api.go",
+            "start_line": 224,
+            "end_line": 230,
+            "source_fact_draft": "시작 또는 끝만 주어지면 짝이 없는 인자를 오류로 거부한다.",
+            "start_byte": 7871,
+            "end_byte_exclusive": 8100,
+            "span_sha256": "b4a88a30d701dc13793b0173c00665d3ce0c7ef5ca7813948c4bad17266b1e69"
+          },
+          {
+            "path": "consensus/wbft/backend/api.go",
+            "start_line": 235,
+            "end_line": 244,
+            "source_fact_draft": "둘 다 nil이면 현재 높이를 end로 사용한다. end>=63이면 start=end-63, 아니면 start=1이다.",
+            "start_byte": 8158,
+            "end_byte_exclusive": 8487,
+            "span_sha256": "c9089eb356b1f7983efa26a754fe2aa987d22e24d2fc82d8d41ebd42ec23ddfc"
+          },
+          {
+            "path": "consensus/wbft/backend/api.go",
+            "start_line": 246,
+            "end_line": 260,
+            "source_fact_draft": "명시 범위는 start>end 또는 end>현재 높이를 거부하고 numBlocks=end-start+1을 반환한다. 별도 최대 범위 길이 제한은 이 함수에 없다.",
+            "start_byte": 8497,
+            "end_byte_exclusive": 8960,
+            "span_sha256": "125a67da63b0655230bf6d25827339346d9045bbacaa5b8e8bb41a6f2c426645"
+          }
+        ],
+        "remaining_unknowns": [
+          "현재 높이 0·음수 RPC sentinel의 의도된 계약과 상위 RPC 허용 범위는 미검토",
+          "analyzeBlock 내부 비용·동시 변경과 실제 기본 범위 결과는 실행하지 않았다"
+        ],
+        "unsupported_conclusions": [
+          "모든 입력에서 정확히 최근 64개 블록을 읽는다",
+          "전체 RPC 경로에 범위 길이 제한이 전혀 없다"
+        ]
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-002",
+      "case_id": "REVIEW-DRAFT-SRC-002",
+      "module": "consensus/wbft",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "consensus/wbft/backend/backend.go",
+        "name": "Gossip",
+        "receiver": "*Backend",
+        "start_line": 176,
+        "end_line": 210,
+        "start_byte": 5451,
+        "end_byte_exclusive": 6351,
+        "git_blob": "a6de34bac3a897f03166c0399ee82fc84194ea89",
+        "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+        "function_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-002-source.txt",
+        "excerpt_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-002-R1",
+          "start_line": 177,
+          "end_line": 185,
+          "start_byte": 5540,
+          "end_byte_exclusive": 5762,
+          "span_sha256": "2beddbe9170927e0baceb330139016a045f8ab3af27ac5740fd04d2fb22004bd",
+          "expected_source_fact_draft": "payload hash를 knownMessages에 넣고 자기 주소를 제외한 validator 주소로 targets를 만든다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-002-R2",
+          "start_line": 186,
+          "end_line": 188,
+          "start_byte": 5762,
+          "end_byte_exclusive": 5880,
+          "span_sha256": "227505ead29e86a939e281c71a2d617466e30c11e42f1dfd6083c59ab9656f46",
+          "expected_source_fact_draft": "broadcaster가nil이 아니고 targets가 비어 있지 않을 때 peer들을 순회한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-002-R3",
+          "start_line": 189,
+          "end_line": 200,
+          "start_byte": 5880,
+          "end_byte_exclusive": 6158,
+          "span_sha256": "0ac6de1f3978b9cd5f2499855ba61f6ee8f5f79f24d9c420868ab2887de79458",
+          "expected_source_fact_draft": "peer가 hash를 이미 알면 건너뛰고, 신규 peer cache와 hash를 갱신한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-002-R4",
+          "start_line": 202,
+          "end_line": 206,
+          "start_byte": 6159,
+          "end_byte_exclusive": 6331,
+          "span_sha256": "f181c6f01a98d81e1a9421b7815c186ad7203893a80c1f8e41f9f9dbd249df87",
+          "expected_source_fact_draft": "기본 outboundCode는 istanbulMsg이고 등록된 message code이면 입력 code를 사용한다; 전송은 goroutine으로 시작한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-002-R5",
+          "start_line": 209,
+          "end_line": 209,
+          "start_byte": 6338,
+          "end_byte_exclusive": 6350,
+          "span_sha256": "ada1d7914809e3499d4573e8bfe5826ae082ea2e2a14db7cc14172577c6a735a",
+          "expected_source_fact_draft": "전송 goroutine의 성공/실패를 기다리지 않고 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-002-R1",
+            "SRC-002-R2",
+            "SRC-002-R3",
+            "SRC-002-R4",
+            "SRC-002-R5"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-002-R3",
+            "SRC-002-R4",
+            "SRC-002-R5"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "재전송 보장·peer 수신 성공·payload 소유권·동시성 요구 중 필수 검토 항목은 무엇이며 실패 영향에 따라 어떤 우선순위를 부여해야 하는가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "cache 갱신과 비동기 전송 시작·즉시 반환 위치만 확인했다. 전송 완료·payload 소유권·동시성은 미판정이다.",
+      "existing_unknowns": [
+        "고루틴의 전송 완료·에러·payload 소유권과 cache 동시성 안전성은 별도 확인해야 한다.",
+        "nil 반환을 peer 수신 성공으로 판정하지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": false,
+        "anchors": [],
+        "remaining_unknowns": [],
+        "unsupported_conclusions": []
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-006",
+      "case_id": "REVIEW-DRAFT-SRC-006",
+      "module": "core/rawdb",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/rawdb/accessors_chain.go",
+        "name": "ReadHeaderRange",
+        "receiver": "",
+        "start_line": 295,
+        "end_line": 340,
+        "start_byte": 9837,
+        "end_byte_exclusive": 11245,
+        "git_blob": "02f42753a3b76ad171163cd3a8f02b3989bfc364",
+        "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+        "function_sha256": "6ae623bfd7378b8fd99620849340544bd850af6645c65e83f870b9846d585c57",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-006-source.txt",
+        "excerpt_sha256": "6ae623bfd7378b8fd99620849340544bd850af6645c65e83f870b9846d585c57"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-006-R1",
+          "start_line": 297,
+          "end_line": 304,
+          "start_byte": 9952,
+          "end_byte_exclusive": 10092,
+          "span_sha256": "da8643f1bcfb2e7e9c8ab0ced06591bb63066c27e53a9765ed8783ba48970ff2",
+          "expected_source_fact_draft": "count==0이면 즉시 반환하며 count-1>number일 때 count를 number+1로 조정한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-006-R2",
+          "start_line": 305,
+          "end_line": 319,
+          "start_byte": 10092,
+          "end_byte_exclusive": 10581,
+          "span_sha256": "32ec9d24dfee0fd3ff7b27ecf4c58c4b64c15d84c3b6f9595d4a85fcbf53cb1c",
+          "expected_source_fact_draft": "Ancients 경계와 canonical hash를 이용해 live header를 역순 조회한다; 데이터가 없으면 loop를 중단한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-006-R3",
+          "start_line": 321,
+          "end_line": 330,
+          "start_byte": 10584,
+          "end_byte_exclusive": 10932,
+          "span_sha256": "e4b75069b761c4c96eaf209e66d5facdae75f792d0d89c4961cb6562ef8d1ca8",
+          "expected_source_fact_draft": "남은 count가0이면 반환; 아니면 maxBytes=count*8000으로 AncientRange를 호출하며 오류 시 이미 모은 결과를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-006-R4",
+          "start_line": 331,
+          "end_line": 338,
+          "start_byte": 10932,
+          "end_byte_exclusive": 11225,
+          "span_sha256": "6c1bfcd9e23489eb7aa3339ad30982ca4608a3001afcc632d80203863ca6afbb",
+          "expected_source_fact_draft": "ancient 결과 개수가 count와 다르면 부분 결과를 반환하며 일치하면 결과 순서를 역전하여 append한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-006-R5",
+          "start_line": 324,
+          "end_line": 326,
+          "start_byte": 10624,
+          "end_byte_exclusive": 10829,
+          "span_sha256": "fb7bb6f0afd34f30dbb19231ddcef3fb877c30aa7bc165aeb2f3e4a5eab9a087",
+          "expected_source_fact_draft": "주석에는 cap at 2M이 있지만 이 위치의 계산식에는 명시적인 2M 상수 clamp가 없다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-006-R1",
+            "SRC-006-R2",
+            "SRC-006-R3",
+            "SRC-006-R4"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-006-R2",
+            "SRC-006-R3",
+            "SRC-006-R5"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "count 상한과 부분 결과 계약·산술 허용 범위·메모리 예산을 확정하면 어떤 경계가 필수 항목이며 영향과 우선순위는 무엇인가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "live/ancient 조회와 count*8000 계산·주석 대비를 확인했다. 상위 요청 제한·산술 입력 범위·실제 할당량은 미판정이다.",
+      "existing_unknowns": [
+        "상위 호출의 요청 제한과 uint64 산술 입력 범위·overflow 가능성은 따로 확인해야 한다.",
+        "부분 반환을 완전한 요청 충족 또는 DB 안전성 입증으로 해석하지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": true,
+        "anchors": [
+          {
+            "path": "core/headerchain.go",
+            "start_line": 487,
+            "end_line": 501,
+            "source_fact_draft": "GetHeadersFrom은 미래 번호 요청에서 가용한 부분으로 요청을 조정하거나 nil을 반환하는 best-effort 경로를 가진다.",
+            "start_byte": 17107,
+            "end_byte_exclusive": 17741,
+            "span_sha256": "913f117e1a71fb4b6eccfbcec4bb2e735c1f3215f4b935241b981f20779cc7f6"
+          },
+          {
+            "path": "core/headerchain.go",
+            "start_line": 508,
+            "end_line": 523,
+            "source_fact_draft": "캐시에서 읽은 뒤 남은 count를 ReadHeaderRange에 넘기고 그 결과를 append하여 반환한다.",
+            "start_byte": 17950,
+            "end_byte_exclusive": 18305,
+            "span_sha256": "d3008133b3ef3f0feddbf5d3686f49225f95e2f16bc5581099332ffb01b8f66d"
+          },
+          {
+            "path": "core/blockchain_reader.go",
+            "start_line": 97,
+            "end_line": 99,
+            "source_fact_draft": "BlockChain.GetHeadersFrom은 HeaderChain.GetHeadersFrom으로 위임한다.",
+            "start_byte": 3656,
+            "end_byte_exclusive": 3778,
+            "span_sha256": "6b977cc1de5873eb4d74f698598036e8cbd0d9f1e889c91317356faa011be5e7"
+          },
+          {
+            "path": "eth/protocols/eth/handlers.go",
+            "start_line": 152,
+            "end_line": 171,
+            "source_fact_draft": "serviceContiguousBlockHeaderQuery는 count를 maxHeadersServe로 제한하고 번호 모드에서 GetHeadersFrom을 호출한다.",
+            "start_byte": 5053,
+            "end_byte_exclusive": 5737,
+            "span_sha256": "6610a2cd5c83ff762b5c9f7e42b19fa30c05cb9b622d31d5f4d5ebc5ecd479da"
+          }
+        ],
+        "remaining_unknowns": [
+          "전체 호출 경로 열거·maxHeadersServe 상수의 실제 값·직접 rawdb 호출자의 제한은 이 보완에서 검증하지 않았다",
+          "maxBytes=count*8000과 주석 2M의 일치는 여전히 별도 계약 검토 대상",
+          "프로토콜 단계의 count 제한을 모든 직접 호출에 일반화하지 않는다"
+        ],
+        "unsupported_conclusions": [
+          "부분 결과 자체가 결함이다",
+          "모든 호출자가 2M byte로 제한한다",
+          "어느 호출자에도 count 제한이 없다"
+        ]
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-007",
+      "case_id": "REVIEW-DRAFT-SRC-007",
+      "module": "core/rawdb",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/rawdb/accessors_chain.go",
+        "name": "ReadAllBadBlocks",
+        "receiver": "",
+        "start_line": 875,
+        "end_line": 889,
+        "start_byte": 29411,
+        "end_byte_exclusive": 29866,
+        "git_blob": "02f42753a3b76ad171163cd3a8f02b3989bfc364",
+        "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+        "function_sha256": "811283ee84cfd8c858ed6c0e4b457b75010b4e2e630b7c008c72537b68cf7be4",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-007-source.txt",
+        "excerpt_sha256": "811283ee84cfd8c858ed6c0e4b457b75010b4e2e630b7c008c72537b68cf7be4"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-007-R1",
+          "start_line": 876,
+          "end_line": 879,
+          "start_byte": 29467,
+          "end_byte_exclusive": 29534,
+          "span_sha256": "1e6cb9141768cf4bb63ebdffe693bc29a7d7b711cc0c757b10116e53b6305bc0",
+          "expected_source_fact_draft": "DB Get 오류가 있으면 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-007-R2",
+          "start_line": 880,
+          "end_line": 883,
+          "start_byte": 29534,
+          "end_byte_exclusive": 29636,
+          "span_sha256": "72a7e73d15885fb9d4a90202e08797a00d4816c433ef4ce7f10f8fb8d0d14609",
+          "expected_source_fact_draft": "RLP decode 오류가 있으면 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-007-R3",
+          "start_line": 884,
+          "end_line": 888,
+          "start_byte": 29636,
+          "end_byte_exclusive": 29865,
+          "span_sha256": "33f1303ff0cc9a0047c0ab86067739a132d5dacb4af469d1cf1c98461c940b43",
+          "expected_source_fact_draft": "디코딩된 badBlock 각각의 header/body/withdrawals를 이용해 Block을 구성하고 slice를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-007-R1",
+            "SRC-007-R2",
+            "SRC-007-R3"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-007-R3"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "오류와 빈 목록의 구분 요구·badBlock 데이터 규모·할당 예산을 확인한 뒤 누락하면 안 되는 항목과 우선순위를 정할 수 있는가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "decode 결과를 순회하며 block slice를 구성하는 위치를 자원 검토 후보로 연결했다. 입력 크기 제한·호출 비용·메모리 상한 근거는 없다.",
+      "existing_unknowns": [
+        "Get/decode 오류와 비어 있는 목록이 반환값만으로 구분되는지 호출자 요구를 검토한다.",
+        "decode의 pointer write·range binding은 scalar reaching-definition의 확정 근거로 쓰지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": false,
+        "anchors": [],
+        "remaining_unknowns": [],
+        "unsupported_conclusions": []
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-011",
+      "case_id": "REVIEW-DRAFT-SRC-011",
+      "module": "core/state",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/state/dump.go",
+        "name": "DumpToCollector",
+        "receiver": "*StateDB",
+        "start_line": 118,
+        "end_line": 213,
+        "start_byte": 4028,
+        "end_byte_exclusive": 6584,
+        "git_blob": "91806cad47669e50045dbf175c1f0be2faca1d34",
+        "file_sha256": "db8982dfac16229485d5b6d3c886c5bb907fc0953160e2cadd70d81e69294c61",
+        "function_sha256": "36541cfe1c0275972d316095770ab13ea487ae205dc76e3b71a24b5d327a8796",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-011-source.txt",
+        "excerpt_sha256": "36541cfe1c0275972d316095770ab13ea487ae205dc76e3b71a24b5d327a8796"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-011-R1",
+          "start_line": 120,
+          "end_line": 135,
+          "start_byte": 4160,
+          "end_byte_exclusive": 4536,
+          "span_sha256": "754d192cbee7cc276a39c185bba0d58b50eefb53b9b29bc1b1585ca671c424ec",
+          "expected_source_fact_draft": "nil config를 기본 config로 바꾸고 OnRoot를 호출한 뒤 iterator 생성 오류이면 로그 후 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-011-R2",
+          "start_line": 138,
+          "end_line": 142,
+          "start_byte": 4571,
+          "end_byte_exclusive": 4695,
+          "span_sha256": "02a602cf1bf668460f7d611f73ab552950c2ac1ba8753a18d7be810cc9dd999a",
+          "expected_source_fact_draft": "account RLP decode 오류는 panic으로 처리한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-011-R3",
+          "start_line": 154,
+          "end_line": 180,
+          "start_byte": 4977,
+          "end_byte_exclusive": 5637,
+          "span_sha256": "1dff94914f1f9acc0f82487ae3183cabdd96b12e4e96bddb1bfa84a2a27dce8a",
+          "expected_source_fact_draft": "주소 preimage 부족과 OnlyWithAddresses 조건에 따른 skip 및 SkipCode/SkipStorage 조건을 처리한다; storage trie 오류는 해당 account 처리를 건너뛴다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-011-R4",
+          "start_line": 183,
+          "end_line": 203,
+          "start_byte": 5683,
+          "end_byte_exclusive": 6333,
+          "span_sha256": "e183d0cd6994748118ee08cc0560d2ff1f19152b584fd24e3f53487f65dbb185",
+          "expected_source_fact_draft": "storage decode 오류는 storage loop에서 continue; OnAccount 후 count를 올리고 Max에 도달하면 다음 iterator key를 얻어 중단한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-011-R5",
+          "start_line": 206,
+          "end_line": 212,
+          "start_byte": 6340,
+          "end_byte_exclusive": 6583,
+          "span_sha256": "209e0e037a41468133c7be7b5c45884fe59ec04ac5c3806eeb1b4db7d6a999c5",
+          "expected_source_fact_draft": "missingPreimages 경고와 종료 로그를 남기고 nextKey를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-011-R1",
+            "SRC-011-R2",
+            "SRC-011-R3",
+            "SRC-011-R4",
+            "SRC-011-R5"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-011-R1",
+            "SRC-011-R3",
+            "SRC-011-R4"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "dump 완전성·panic 허용·collector 소유권·Max/skip 요구에서 필수 항목은 무엇이며 데이터 누락이나 중단의 영향을 어떻게 우선순위에 반영하는가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "iterator·storage 순회·skip·Max 중단 위치를 확인했다. collector/trie 계약·panic 영향·실제 메모리 비용은 미판정이다.",
+      "existing_unknowns": [
+        "collector/trie의 외부 상태·callback 동시성·실제 메모리 비용과 panic의 호출자 계약은 미확인이다.",
+        "이 함수가 dump의 완전성을 보장한다고 단정하지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": false,
+        "anchors": [],
+        "remaining_unknowns": [],
+        "unsupported_conclusions": []
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-016",
+      "case_id": "REVIEW-DRAFT-SRC-016",
+      "module": "core/txpool",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "core/txpool/blobpool/blobpool.go",
+        "name": "Init",
+        "receiver": "*BlobPool",
+        "start_line": 347,
+        "end_line": 436,
+        "start_byte": 18031,
+        "end_byte_exclusive": 20665,
+        "git_blob": "c1be572ea0aa4aeca20de3f98d38a638dfff89b5",
+        "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+        "function_sha256": "6aca37f8485bf0f57d0fa4eb63f4b5dbe7bf019491014ec36cb70397987fc98b",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-016-source.txt",
+        "excerpt_sha256": "6aca37f8485bf0f57d0fa4eb63f4b5dbe7bf019491014ec36cb70397987fc98b"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-016-R1",
+          "start_line": 348,
+          "end_line": 363,
+          "start_byte": 18124,
+          "end_byte_exclusive": 18510,
+          "span_sha256": "020744f525867371ba6f548c5a8c2ad89fc28abdacd4b2913e47ec7c18957ab1",
+          "expected_source_fact_draft": "reserver를 저장하고 Datadir가 있으면 queue/limbo directory를 만든다; 생성 오류는 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-016-R2",
+          "start_line": 367,
+          "end_line": 374,
+          "start_byte": 18670,
+          "end_byte_exclusive": 18848,
+          "span_sha256": "85606561c3277187b4612037af2546b29495665495c5d35d6e89d3d8d220d3b0",
+          "expected_source_fact_draft": "head state 조회 실패 시 empty-root state로 재시도하고 둘 다 실패하면 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-016-R3",
+          "start_line": 378,
+          "end_line": 398,
+          "start_byte": 18938,
+          "end_byte_exclusive": 19465,
+          "span_sha256": "e3b72f3194b12bd9d3685f3c2d48e34d3bb02b553899db249cd99a8e619d093c",
+          "expected_source_fact_draft": "index callback으로 parse 실패 ID를 모으고 store를 연다; invalid 항목 삭제가 실패하면 Close 후 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-016-R4",
+          "start_line": 402,
+          "end_line": 425,
+          "start_byte": 19593,
+          "end_byte_exclusive": 20366,
+          "span_sha256": "4c093e4b8bf991e42b6ea6e4aa0e88a15ebba5d841b424941efc53c62eeee1b5",
+          "expected_source_fact_draft": "index recheck·fee/heap 생성·limbo 연결·gasTip 설정을 수행한다; newLimbo 실패 시 Close 후 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-016-R5",
+          "start_line": 429,
+          "end_line": 435,
+          "start_byte": 20476,
+          "end_byte_exclusive": 20664,
+          "span_sha256": "301154c36d51265ed19a03bb0eb240fee9c633ca12dd48e3e6bbe6f113940685",
+          "expected_source_fact_draft": "stored가 Datacap을 초과하는 동안 drop하고 metrics를 갱신한 뒤 nil을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-016-R1",
+            "SRC-016-R2",
+            "SRC-016-R3",
+            "SRC-016-R4",
+            "SRC-016-R5"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-016-R1",
+            "SRC-016-R3",
+            "SRC-016-R4",
+            "SRC-016-R5"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "초기화 실패 시 rollback/소유권·Datacap 초과 처리·진행 보장 계약을 확인한 뒤 어떤 자원/상태 항목을 필수로 하고 어떤 우선순위를 부여하는가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "directory/store/limbo 준비·오류 Close·Datacap drop 위치를 확인했다. 해제 보장·drop 진행성·잠금은 미판정이다.",
+      "existing_unknowns": [
+        "Close/drop/parseTransaction의 실제 자원 해제·진행 보장·잠금은 별도 source와 실행으로 확인해야 한다.",
+        "callback 내부 mutation은 outer 함수의 scalar def-use gold로 자동 확정하지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": true,
+        "anchors": [
+          {
+            "path": "core/txpool/blobpool/blobpool.go",
+            "start_line": 347,
+            "end_line": 436,
+            "source_fact_draft": "Init은 store 획득 이후 실패한 invalid transaction 삭제와 newLimbo 생성 오류에서 p.Close를 호출하지만 그 반환 오류는 사용하지 않는다.",
+            "start_byte": 18031,
+            "end_byte_exclusive": 20666,
+            "span_sha256": "1698505a11491b9ce7bf00a2b718384e3035e9a48fccf93684f2d524cbe8273e"
+          },
+          {
+            "path": "core/txpool/blobpool/blobpool.go",
+            "start_line": 439,
+            "end_line": 457,
+            "source_fact_draft": "Close는 limbo가 있을 때만 limbo.Close를 호출하고 store.Close는 조건 없이 호출한다. 오류를 모아 반환한다.",
+            "start_byte": 20721,
+            "end_byte_exclusive": 21148,
+            "span_sha256": "b239fd6dc5c68cce1232ece090006bd29a5ad5c6bef3f32db91fcf46ac38e721"
+          },
+          {
+            "path": "core/txpool/blobpool/limbo.go",
+            "start_line": 81,
+            "end_line": 84,
+            "source_fact_draft": "limbo.Close는 내부 store.Close의 결과를 반환한다.",
+            "start_byte": 2821,
+            "end_byte_exclusive": 2933,
+            "span_sha256": "4a123d8aad22c9b624789352c3996d80d9b0b67947d8254ea415c8a081bdcf2f"
+          }
+        ],
+        "remaining_unknowns": [
+          "외부 저장소 Close의 성공·중복 호출 안전성·실제 파일 해제는 확인하지 않았다",
+          "Close 호출 시 모든 경로에서 store가 초기화되어 있는지는 전체 호출자 검토가 필요하다",
+          "원래 초기화 오류가 우선 반환되는 계약인지 검토 필요"
+        ],
+        "unsupported_conclusions": [
+          "Close를 호출하므로 정리에 반드시 성공한다",
+          "Close는 어떤 부분 초기화 상태에서도 안전하다",
+          "초기화 실패에서 발생한 모든 정리 오류가 사용자에게 반환된다"
+        ]
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-021",
+      "case_id": "REVIEW-DRAFT-SRC-021",
+      "module": "eth/downloader",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "eth/downloader/api.go",
+        "name": "eventLoop",
+        "receiver": "*DownloaderAPI",
+        "start_line": 67,
+        "end_line": 130,
+        "start_byte": 2605,
+        "end_byte_exclusive": 3994,
+        "git_blob": "6b8cb98e23bde46c9b8d7c3ec4b10d0d444425c0",
+        "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+        "function_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-021-source.txt",
+        "excerpt_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-021-R1",
+          "start_line": 69,
+          "end_line": 87,
+          "start_byte": 2652,
+          "end_byte_exclusive": 3193,
+          "span_sha256": "f2c37d61055b6f635b2eea55b1df1613b2a57904d683f36e5822fa9149bdfd03",
+          "expected_source_fact_draft": "StartEvent subscription·subscription map·60초 timer를 만들고 timer.Stop을 defer한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-021-R2",
+          "start_line": 91,
+          "end_line": 101,
+          "start_byte": 3212,
+          "end_byte_exclusive": 3490,
+          "span_sha256": "ad717323a5c77c494ffc0032033bafe24521857216400b5717d234cc54edb274",
+          "expected_source_fact_draft": "subscription 등록/해제 요청을 처리하며 event channel에서 nil이 오면 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-021-R3",
+          "start_line": 104,
+          "end_line": 111,
+          "start_byte": 3525,
+          "end_byte_exclusive": 3663,
+          "span_sha256": "63306c9e370b8c1137aac71089172805a23bf6a990cd356f8cc1cf4d070b7723",
+          "expected_source_fact_draft": "StartEvent를 받으면 started=true; 아직 시작하지 않은 timer tick에는 timer를 reset하고 continue한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-021-R4",
+          "start_line": 112,
+          "end_line": 127,
+          "start_byte": 3663,
+          "end_byte_exclusive": 3986,
+          "span_sha256": "5bf8bd57302229f942cef0b40324bee1cec2756a230dd29acd5947350079a430",
+          "expected_source_fact_draft": "진행 중에는 status notification을 보내고 timer를 reset; 완료면 subscriber에 false를 보내고 done=true로 둔다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-021-R5",
+          "start_line": 118,
+          "end_line": 125,
+          "start_byte": 3791,
+          "end_byte_exclusive": 3966,
+          "span_sha256": "121dba225ea9ab15a6505af61dc255fab4a682c6f60668184a6bb92ea449e397",
+          "expected_source_fact_draft": "notification 채널 전송에는 이 위치에서 별도 timeout/exit select가 없다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-021-R1",
+            "SRC-021-R2",
+            "SRC-021-R3",
+            "SRC-021-R4",
+            "SRC-021-R5"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-021-R1",
+            "SRC-021-R4",
+            "SRC-021-R5"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "소비자 종료·송신 대기·subscription 해제 계약과 실제 도달성을 확인한 뒤 요구 위반 여부 및 영향/우선순위를 어떻게 판정하는가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "subscription/timer 생성·Stop·notification 전송 위치를 확인했다. 실제 소비자·buffer·종료 계약 없는 deadlock/누수 판정은 허용하지 않는다.",
+      "existing_unknowns": [
+        "채널 buffer와 소비자·subscription 종료 계약 없이는 deadlock/누수를 확정하지 않는다.",
+        "eventLoop의 exit는 timer.Stop을 수행하나 이 본문에는 sub.Unsubscribe 호출이 보이지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": true,
+        "anchors": [
+          {
+            "path": "eth/downloader/api.go",
+            "start_line": 45,
+            "end_line": 54,
+            "source_fact_draft": "API 생성자는 install/uninstall 채널을 버퍼 없이 생성하고 eventLoop를 시작한다.",
+            "start_byte": 1802,
+            "end_byte_exclusive": 2190,
+            "span_sha256": "e8cdc13fcf7827f286290e4d4981013729173ff70f732ad425d4e33bcab304d7"
+          },
+          {
+            "path": "eth/downloader/api.go",
+            "start_line": 91,
+            "end_line": 99,
+            "source_fact_draft": "eventLoop는 install에서 done이면 i로 false를 송신하고 uninstall을 수신하면 목록에서 삭제한 후 확인 채널을 닫는다.",
+            "start_byte": 3212,
+            "end_byte_exclusive": 3458,
+            "span_sha256": "e646646f3812001aea3e88511ea55cba1f3d3f3b04a2d0c6c187b0cbc7833eec"
+          },
+          {
+            "path": "eth/downloader/api.go",
+            "start_line": 115,
+            "end_line": 130,
+            "source_fact_draft": "진행·완료 알림은 구독 채널로 직접 송신되며 이 송신 자체에 취소 select가 없다.",
+            "start_byte": 3745,
+            "end_byte_exclusive": 3995,
+            "span_sha256": "00c7249da3acfd229ce3af5bd6f4ee79844e5cc65bdb2a195aeee70555f27c3e"
+          },
+          {
+            "path": "eth/downloader/api.go",
+            "start_line": 141,
+            "end_line": 154,
+            "source_fact_draft": "Syncing의 goroutine은 버퍼 없는 statuses를 구독하고 RPC 종료 또는 notifier 종료 시 반환하며 defer로 Unsubscribe를 호출한다.",
+            "start_byte": 4377,
+            "end_byte_exclusive": 4666,
+            "span_sha256": "62a5cb9c478963cd0ce877053def5af96c019240b208d143f722bcbcfebad64e"
+          },
+          {
+            "path": "eth/downloader/api.go",
+            "start_line": 183,
+            "end_line": 198,
+            "source_fact_draft": "Unsubscribe는 uninstall 요청 송신을 먼저 완료한 뒤 status를 소비하거나 uninstall 확인을 기다린다.",
+            "start_byte": 5644,
+            "end_byte_exclusive": 5992,
+            "span_sha256": "e2ae5909f1e8adcb46cc05fb07d6f70c6b5bf45a6b9ce029669632eb23ce97e0"
+          }
+        ],
+        "remaining_unknowns": [
+          "실제 API에서 이 순서를 재현한 실행 증거는 없다",
+          "사용자 consumer가 별도 status 수신자를 유지하는지와 event mux 종료 순서는 추가 검토 필요"
+        ],
+        "unsupported_conclusions": [
+          "Unsubscribe는 모든 스케줄에서 종료한다",
+          "실제 운영 교착을 재현했다",
+          "독립적으로 확인된 결함 티켓이다"
+        ]
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-027",
+      "case_id": "REVIEW-DRAFT-SRC-027",
+      "module": "miner",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "miner/worker.go",
+        "name": "newWorkLoopOrigin",
+        "receiver": "*worker",
+        "start_line": 510,
+        "end_line": 605,
+        "start_byte": 16657,
+        "end_byte_exclusive": 19528,
+        "git_blob": "ee8d1fbbc97d366d94cf6640bef7b6a7be9ed23a",
+        "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+        "function_sha256": "bb7614131293e36941fe3d46d740be075c914a3745fa311f45ed081f6f2ce25d",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-027-source.txt",
+        "excerpt_sha256": "bb7614131293e36941fe3d46d740be075c914a3745fa311f45ed081f6f2ce25d"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-027-R1",
+          "start_line": 511,
+          "end_line": 520,
+          "start_byte": 16718,
+          "end_byte_exclusive": 17000,
+          "span_sha256": "66ef2589c58edf38fdd55478c2312d630fa4553f091fda9cfbdda99afa9e01ee",
+          "expected_source_fact_draft": "WaitGroup Done과 timer.Stop을 defer하고 초기 timer tick을 비운다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-027-R2",
+          "start_line": 523,
+          "end_line": 545,
+          "start_byte": 17094,
+          "end_byte_exclusive": 17637,
+          "span_sha256": "f18e03747b012a12dd8c9df8b8c8c3af4d4a6c20de9860db71f2464e39bd31b2",
+          "expected_source_fact_draft": "commit closure는 기존 interrupt를 갱신하고 새 request를 전송하거나 exitCh에 반응한다; clearPending closure는 pendingMu 아래 오래된 항목을 삭제한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-027-R3",
+          "start_line": 549,
+          "end_line": 568,
+          "start_byte": 17656,
+          "end_byte_exclusive": 18367,
+          "span_sha256": "09e0ca429a1150ffffeef98d304a339e21c30bf9c4f17c146fe53d657dfddff9",
+          "expected_source_fact_draft": "start/head event는 pending 정리·timestamp 갱신·commit을 요청하고 timer event는 실행/합의 조건 및 새 tx 여부를 확인한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-027-R4",
+          "start_line": 571,
+          "end_line": 599,
+          "start_byte": 18373,
+          "end_byte_exclusive": 19490,
+          "span_sha256": "164909af3c523e5c4002b1201ac4bee8e49ea4e57e668626d3028238b8539a55",
+          "expected_source_fact_draft": "수동 interval을 최소값으로 보정하며 feedback 분기에서 recalcRecommit을 적용하고 hook이 있으면 호출한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-027-R5",
+          "start_line": 601,
+          "end_line": 602,
+          "start_byte": 19491,
+          "end_byte_exclusive": 19520,
+          "span_sha256": "dc812fe8153abfa950b5856ed4cefcf28fd3d5438dc2f89bea820f7a289f0f23",
+          "expected_source_fact_draft": "outer select의 exitCh에서 return한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-027-R1",
+            "SRC-027-R2",
+            "SRC-027-R3",
+            "SRC-027-R4",
+            "SRC-027-R5"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-027-R1",
+            "SRC-027-R2",
+            "SRC-027-R3",
+            "SRC-027-R4"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "worker 종료·commit 요청·timer 재설정·recommit 비용의 요구 계약을 확인한 뒤 필수 guard/자원 항목과 영향별 우선순위를 정할 수 있는가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "timer/WaitGroup 정리·channel/lock·recommit 조정 위치를 확인했다. happens-before·실제 timeout/race·비용은 미판정이다.",
+      "existing_unknowns": [
+        "closure 내부·atomic/lock·channel happens-before는 지역 scalar 분석의 지원 범위와 구분한다.",
+        "실제 timeout·cancel·timer reset race와 비용은 미측정이며 mutex 사용만으로 전체 동시성 안전성을 입증하지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": false,
+        "anchors": [],
+        "remaining_unknowns": [],
+        "unsupported_conclusions": []
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-031",
+      "case_id": "REVIEW-DRAFT-SRC-031",
+      "module": "p2p",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "p2p/discover/v4_udp.go",
+        "name": "Resolve",
+        "receiver": "*UDPv4",
+        "start_line": 175,
+        "end_line": 201,
+        "start_byte": 5395,
+        "end_byte_exclusive": 6144,
+        "git_blob": "988f16b01df2c11af84d52f3c77784c37c65131a",
+        "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+        "function_sha256": "de50b31d7810ea501c009fb4833c3bafc8724dd8aa27a69c7d201f070714efea",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-031-source.txt",
+        "excerpt_sha256": "de50b31d7810ea501c009fb4833c3bafc8724dd8aa27a69c7d201f070714efea"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-031-R1",
+          "start_line": 177,
+          "end_line": 185,
+          "start_byte": 5541,
+          "end_byte_exclusive": 5825,
+          "span_sha256": "f7bf231ba75cca35acddc3fb02bb9ecc135ccff7711b3422071e5b711b802e44",
+          "expected_source_fact_draft": "직접 RequestENR 성공 시 반환; 실패하면 더 높은 sequence의 table node로 n을 바꾸고 다시 요청한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-031-R2",
+          "start_line": 188,
+          "end_line": 192,
+          "start_byte": 5868,
+          "end_byte_exclusive": 6005,
+          "span_sha256": "0c4082812d1ca5bd72afa997abd9cba0f66a95bef8697712ea1c1f922eb6684c",
+          "expected_source_fact_draft": "secp256k1 key를 load할 수 없으면 현재 n을 반환하고 가능하면 pubkey lookup을 수행한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-031-R3",
+          "start_line": 193,
+          "end_line": 200,
+          "start_byte": 6005,
+          "end_byte_exclusive": 6143,
+          "span_sha256": "3349bfaacc5190f1119f55fe1ef46b0b256716da46ef32433fb6fa5af8fdd6ed",
+          "expected_source_fact_draft": "lookup 결과의 ID가 현재 n과 같은 항목을 요청하여 성공하면 반환하며, 모두 실패하면 현재 n을 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-031-R1",
+            "SRC-031-R2",
+            "SRC-031-R3"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-031-R1",
+            "SRC-031-R2",
+            "SRC-031-R3"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "Resolve의 최신성/identity 요구·deadline·재시도 예산을 확인한 뒤 fallback 반환과 요청 비용 중 필수 검토 항목 및 우선순위는 무엇인가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "직접 요청·table 재시도·lookup 결과 순회 위치를 비용 검토 후보로 연결했다. deadline·요청 수 상한·최신성 보장은 미판정이다.",
+      "existing_unknowns": [
+        "lookup/request의 deadline·반환 identity 검증·외부 node의 mutation은 별도 확인 대상이다.",
+        "함수 반환을 네트워크상의 최신 node 확보 성공으로 항상 해석하지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": false,
+        "anchors": [],
+        "remaining_unknowns": [],
+        "unsupported_conclusions": []
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    },
+    {
+      "candidate_id": "SRC-036",
+      "case_id": "REVIEW-DRAFT-SRC-036",
+      "module": "rpc",
+      "source": {
+        "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+        "path": "rpc/client.go",
+        "name": "DialOptions",
+        "receiver": "",
+        "start_line": 193,
+        "end_line": 223,
+        "start_byte": 6694,
+        "end_byte_exclusive": 7442,
+        "git_blob": "2b0016db8f4ec2e9d33cf937efe2dde42a3ffa6a",
+        "file_sha256": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+        "function_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53",
+        "excerpt_path": "docs/spec-driven/operational-preparation/review-drafts/SRC-036-source.txt",
+        "excerpt_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53"
+      },
+      "existing_ai_anchors": [
+        {
+          "id": "SRC-036-R1",
+          "start_line": 194,
+          "end_line": 202,
+          "start_byte": 6791,
+          "end_byte_exclusive": 6942,
+          "span_sha256": "d7f47841174b5f1900a903aa57cbf75b3d92d2e8ae84f8b2064f822b17982bbc",
+          "expected_source_fact_draft": "URL parse 오류를 반환하고 options를 cfg에 적용한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-036-R2",
+          "start_line": 205,
+          "end_line": 219,
+          "start_byte": 6972,
+          "end_byte_exclusive": 7398,
+          "span_sha256": "76c683549dd4e395aead71d85979956e125991b8aa80ef68253b470694a92c29",
+          "expected_source_fact_draft": "http/https·ws/wss·stdio·빈 scheme에 대해 각각 transport constructor를 선택하고 알 수 없는 scheme이면 오류를 반환한다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-036-R3",
+          "start_line": 209,
+          "end_line": 213,
+          "start_byte": 7083,
+          "end_byte_exclusive": 7188,
+          "span_sha256": "b8fbcfab791a95291b36b99b52c61810a24051e173dd925103310691029a66ea",
+          "expected_source_fact_draft": "WS constructor 오류는 반환하고 성공한 rc를 reconnect에 넣는다.",
+          "review_status": "pending",
+          "reviewer": null
+        },
+        {
+          "id": "SRC-036-R4",
+          "start_line": 222,
+          "end_line": 222,
+          "start_byte": 7402,
+          "end_byte_exclusive": 7441,
+          "span_sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9",
+          "expected_source_fact_draft": "ctx·cfg·선택한 reconnect를 newClient에 전달한다.",
+          "review_status": "pending",
+          "reviewer": null
+        }
+      ],
+      "categories_proposal": {
+        "state_guard": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-036-R1",
+            "SRC-036-R2",
+            "SRC-036-R3",
+            "SRC-036-R4"
+          ],
+          "approved": false
+        },
+        "resources_cost": {
+          "status": "ai_source_material_mapping_not_required_item_gold",
+          "anchor_ids": [
+            "SRC-036-R2",
+            "SRC-036-R3",
+            "SRC-036-R4"
+          ],
+          "approved": false
+        },
+        "priority": {
+          "status": "needs_human_requirements_review",
+          "assigned_level": null,
+          "required_items": null,
+          "question": "transport별 연결/취소·재연결·소유권·TLS 요구를 확인한 뒤 어떤 항목이 필수이며 실패 영향별 우선순위는 무엇인가?",
+          "approved": false
+        }
+      },
+      "resource_scope_limit": "transport 선택·constructor 오류·ctx 전달 위치를 소유권 검토 후보로 연결했다. 연결 성공·자원 해제·TLS/취소 계약의 충분한 근거는 아니다.",
+      "existing_unknowns": [
+        "constructor/newClient의 재연결·TLS·context 취소·resource 소유권은 callee 원문 및 실행이 필요하다.",
+        "scheme 선택을 실제 연결 성공 또는 transport 안전성 판정으로 쓰지 않는다."
+      ],
+      "context_supplement": {
+        "same_case_not_new_review": true,
+        "available": true,
+        "anchors": [
+          {
+            "path": "rpc/client.go",
+            "start_line": 232,
+            "end_line": 240,
+            "source_fact_draft": "newClient는 connect(initctx)를 호출하고 그 오류를 반환한다. 성공하면 initClient 후 reconnectFunc를 저장한다.",
+            "start_byte": 7719,
+            "end_byte_exclusive": 7983,
+            "span_sha256": "386f588e10176dee8d5d73d038953e4dc562035155b023cdc2efc5ba4e28eda4"
+          },
+          {
+            "path": "rpc/http.go",
+            "start_line": 145,
+            "end_line": 169,
+            "source_fact_draft": "HTTP transport factory는 httpConn을 구성하며 반환 reconnect 함수는 그 객체와 nil을 반환한다. 이 함수 몸체에는 HTTP 요청이 없다.",
+            "start_byte": 4502,
+            "end_byte_exclusive": 5085,
+            "span_sha256": "770800a18f62e0fd6c2ebda628d8c71ca3ad53f737f373b533e76410941035de"
+          },
+          {
+            "path": "rpc/client.go",
+            "start_line": 267,
+            "end_line": 271,
+            "source_fact_draft": "initClient는 HTTP가 아닌 경우에만 dispatch goroutine을 시작한다.",
+            "start_byte": 8829,
+            "end_byte_exclusive": 8904,
+            "span_sha256": "85c2dd3a1e0af24226e9412e52b6af66f6f2cc0b723849490a606b0b0b430d71"
+          },
+          {
+            "path": "rpc/http.go",
+            "start_line": 171,
+            "end_line": 177,
+            "source_fact_draft": "sendHTTP가 hc.doRequest를 호출하고 오류 처리 및 응답 body Close를 수행한다.",
+            "start_byte": 5086,
+            "end_byte_exclusive": 5302,
+            "span_sha256": "f7f139a686c24426ddc3404da36ff21cae1a292dc5bafd75bfd0ae299d28a12b"
+          }
+        ],
+        "remaining_unknowns": [
+          "doRequest 내부의 네트워크·TLS·timeout 구현은 이 보완에서 검토하지 않았다",
+          "WS/IPC/stdio의 connect 부수효과와 재연결 동작은 transport별 추가 검토 필요"
+        ],
+        "unsupported_conclusions": [
+          "HTTP DialOptions 성공이 서버 접속 성공을 보장한다",
+          "모든 transport는 최초 RPC 요청까지 실제 연결을 지연한다"
+        ]
+      },
+      "exposure": "public_source_and_private_ai_drafts_already_exposed",
+      "independent_family": null,
+      "independence_status": "not_reviewed",
+      "split": null,
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "required_items_gold": null,
+      "gold_exhaustive": false,
+      "typed_report_artifact": null,
+      "diagram_artifact": null,
+      "state_handoff_receipt": null,
+      "host_execution_receipt": null,
+      "quality_scoring_allowed": false
+    }
+  ]
+}

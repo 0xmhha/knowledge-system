@@ -1,0 +1,60 @@
+// Source declaration coordinates only; no retrieval or candidate engine import.
+package main
+
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+)
+
+type Input struct{ Path, Source string }
+type Decl struct {
+	Name     string `json:"name"`
+	Start    int    `json:"start"`
+	End      int    `json:"end"`
+	DocStart int    `json:"doc_start"`
+	HasDoc   bool   `json:"has_doc"`
+	SHA256   string `json:"sha256"`
+}
+type Output struct {
+	Path      string `json:"path"`
+	SHA256    string `json:"sha256"`
+	Functions []Decl `json:"functions"`
+}
+
+func digest(raw []byte) string { sum := sha256.Sum256(raw); return hex.EncodeToString(sum[:]) }
+func main() {
+	var inputs []Input
+	if err := json.NewDecoder(os.Stdin).Decode(&inputs); err != nil {
+		panic(err)
+	}
+	outputs := []Output{}
+	for _, input := range inputs {
+		fs := token.NewFileSet()
+		file, err := parser.ParseFile(fs, input.Path, input.Source, parser.ParseComments|parser.SkipObjectResolution)
+		if err != nil {
+			panic(err)
+		}
+		o := Output{Path: input.Path, SHA256: digest([]byte(input.Source)), Functions: []Decl{}}
+		for _, node := range file.Decls {
+			fn, ok := node.(*ast.FuncDecl)
+			if !ok || fn.Body == nil {
+				continue
+			}
+			a, b := fs.Position(fn.Pos()).Offset, fs.Position(fn.End()).Offset
+			doc := a
+			if fn.Doc != nil {
+				doc = fs.Position(fn.Doc.Pos()).Offset
+			}
+			o.Functions = append(o.Functions, Decl{fn.Name.Name, a, b, doc, fn.Doc != nil, digest([]byte(input.Source[a:b]))})
+		}
+		outputs = append(outputs, o)
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(outputs); err != nil {
+		panic(err)
+	}
+}

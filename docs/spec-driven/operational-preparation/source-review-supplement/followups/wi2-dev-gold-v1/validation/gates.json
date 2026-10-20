@@ -1,0 +1,66 @@
+[
+  {
+    "name": "formal-gold-refusal",
+    "argv": [
+      "python3",
+      "scripts/check-wi2-dev-gold.py",
+      "--require-formal-gold"
+    ],
+    "exit_code": 1,
+    "expected_exit": 1
+  },
+  {
+    "name": "formal-freeze-refusal",
+    "argv": [
+      "python3",
+      "scripts/check-operational-acceptance.py",
+      "--require-frozen"
+    ],
+    "exit_code": 1,
+    "expected_exit": 1
+  },
+  {
+    "name": "aux-fmt",
+    "argv": [
+      "gofmt",
+      "-d",
+      "scripts/wi2_source_syntax.go.txt",
+      "scripts/wi1_dev_source.go.txt"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0
+  },
+  {
+    "name": "python-syntax",
+    "argv": [
+      "python3",
+      "-m",
+      "py_compile",
+      "scripts/wi2_dev_gold.py",
+      "scripts/prepare-wi2-dev-gold.py",
+      "scripts/check-wi2-dev-gold.py",
+      "scripts/test_wi2_dev_gold.py"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0
+  },
+  {
+    "name": "whitespace",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0
+  },
+  {
+    "name": "completion",
+    "argv": [
+      "python3",
+      "scripts/check-refactoring-progress.py"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0
+  }
+]

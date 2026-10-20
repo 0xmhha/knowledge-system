@@ -1,0 +1,43 @@
+# WBFT BLS seal scheme — 96-byte aggregate + SealerSet bitpack
+
+**Status:** verified · **Subsystem:** A12 (Cryptographic Primitives & Validator Seals) · **Type:** B2
+
+WBFT consensus seals are BLS aggregate signatures. The data structure
+is WBFTAggregatedSeal (core/types/istanbul.go:52) carrying a
+SealerSet bitpack (which validators signed, by ordered index) plus
+the aggregate 96-byte BLS signature. Two such seals live in
+WBFTExtra (core/types/istanbul.go:81): PrevPreparedSeal and
+PrevCommittedSeal, the latter being the previous block's commit
+attestation. BLS primitives are in crypto/bls/.
+
+The trap: an LLM editing seal encoding, hashing, or verification
+often assumes Ethereum's secp256k1 ECDSA signatures (65 bytes,
+recoverable v/r/s) and mis-sizes buffers, mis-computes hashes (using
+Keccak over the wrong payload), or attempts ecrecover on a BLS
+signature. The SealerSet bitpack also encodes WHO signed; dropping
+or reordering bits changes the attested validator set without
+changing the signature, which a naive verifier will accept. Any
+change to extra-data, seal serialization, or filtered-header hashing
+MUST preserve the WBFTAggregatedSeal byte layout exactly.
+
+## Invariants
+- WBFT seals are BLS aggregate (96 bytes), not ECDSA (65 bytes).
+- SealerSet bitpack identifies the validator subset whose votes are aggregated; the bit layout is part of consensus.
+- Filtered-header hash excludes seal fields, so seals can be added post-hash without changing the block hash.
+
+## Pitfalls
+- Calling ecrecover on a BLS signature — wrong primitive, returns garbage.
+- Hashing the seal payload with Keccak before BLS verify — primitives have their own hash-to-curve.
+- Reordering SealerSet bits — same signature now claims a different validator subset.
+- Embedding ECDSA-sized buffers ([65]byte) when serializing extra-data.
+
+## Code anchors
+- `core/types/istanbul.go` WBFTAggregatedSeal:52 — Aggregate seal struct — Sealers (bitpack) + Signature ([96]byte BLS)
+- `core/types/istanbul.go` types.WBFTExtra:81 — Block-header extradata — embeds PrevPreparedSeal + PrevCommittedSeal
+- `core/types/istanbul.go` WBFTExtra.PrevCommittedSeal:86 — Previous block's commit attestation — verified during block insert
+
+## Aliases
+BLS 서명, 집계 서명, 씰러셋, WBFT seal, BLS 96바이트, BLS aggregate seal, WBFT seal scheme, sealer set bitpack, 96-byte signature, WBFTAggregatedSeal, WBFTExtra, SealerSet, PrevPreparedSeal, PrevCommittedSeal, BLS
+
+## Related
+A12.seals.feepayer_sighash, A2.block_encoding.filtered_header_hash, A2.block_encoding.wbft_extra_struct

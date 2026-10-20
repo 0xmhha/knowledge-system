@@ -1,0 +1,797 @@
+[
+  {
+    "tool": "cks.manager.collect",
+    "actual_tool_use_id": "fixture_tool_0",
+    "is_error": false,
+    "value": {
+      "collection_dir": "/private/tmp/ks-KM034C-host-final-20261015/full-fixture/manager/collections/44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa",
+      "collection_id": "44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa",
+      "coverage": {
+        "excluded_counts": {
+          "excluded_file": 1
+        },
+        "file_count": 2,
+        "git_changes": {
+          "scope": "selected_existing_files_HEAD_to_worktree",
+          "state": "not_available_or_disabled",
+          "unexamined_files": 2
+        },
+        "selected_source_files_complete": true,
+        "whole_project_semantics_verified": false
+      },
+      "files": 2,
+      "paid_model_calls": 0,
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "schema_version": 1,
+      "stage": "collected_not_reviewed"
+    }
+  },
+  {
+    "tool": "cks.manager.evidence",
+    "actual_tool_use_id": "fixture_tool_1",
+    "is_error": false,
+    "value": {
+      "evidence": {
+        "collected_at": "2026-10-15T12:54:44.581668Z",
+        "collection_id": "44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa",
+        "content_role": "untrusted_source_data",
+        "content_sha256": "026211f35201c6832b8dc12b1041bda5313f404653512fdb3e7d988e33be28ad",
+        "end_line": 4,
+        "evidence_id": "cb02e39b6e2e2dbcddf72ddc914281a58b9527855530f9c68007b71d66a450d7",
+        "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+        "origin_id": "repo",
+        "path": "value.go",
+        "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+        "reported_not_reexecuted": false,
+        "source_actor": null,
+        "source_kind": "code",
+        "source_recorded_at": null,
+        "start_line": 4
+      },
+      "text": "func HostValue() int { return 42 }\n",
+      "text_preview_sha256": "026211f35201c6832b8dc12b1041bda5313f404653512fdb3e7d988e33be28ad",
+      "text_truncated": false
+    }
+  },
+  {
+    "tool": "cks.manager.draft",
+    "actual_tool_use_id": "fixture_tool_2",
+    "is_error": false,
+    "value": {
+      "claims": 2,
+      "collection_id": "44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa",
+      "draft_dir": "/private/tmp/ks-KM034C-host-final-20261015/full-fixture/manager/drafts/7042e453a31600ec577a0bad56d8b6688af77fb9bc4797cbd809834736b61268",
+      "draft_id": "7042e453a31600ec577a0bad56d8b6688af77fb9bc4797cbd809834736b61268",
+      "native_knowledge_validation": "passed_proposed_overlay_only",
+      "paid_model_calls": 0,
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "schema_version": 1,
+      "stage": "drafted_not_reviewed_or_adopted"
+    }
+  },
+  {
+    "tool": "cks.manager.review_plan",
+    "actual_tool_use_id": "fixture_tool_3",
+    "is_error": false,
+    "value": {
+      "as_of": "immutable_collection_not_current_source_verification",
+      "claims": [
+        {
+          "claim_id": "8e105d1c957fde33b8cb6d7d80ba7551118e9df3b034394a325e1c4dff5baf20",
+          "evidence": [
+            {
+              "collected_at": "2026-10-15T12:54:44.581668Z",
+              "collection_id": "44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa",
+              "content_role": "untrusted_source_data",
+              "content_sha256": "2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d",
+              "end_line": 3,
+              "evidence_id": "7dd71f60f13673714806d3637f3e94793c34735bf70bfd011ae80504163284c6",
+              "file_sha256": "2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d",
+              "origin_id": "repo",
+              "path": "go.mod",
+              "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+              "reported_not_reexecuted": false,
+              "source_actor": null,
+              "source_kind": "configuration",
+              "source_recorded_at": null,
+              "start_line": 1
+            }
+          ],
+          "kind": "observed_excerpt",
+          "statement": "Recorded source excerpt from go.mod; semantic interpretation remains unreviewed.",
+          "status": "proposed"
+        },
+        {
+          "claim_id": "9b37cd5c134f0cc269c4b256896129f79ca278d419b73d0853c3c2b2427e19b0",
+          "evidence": [
+            {
+              "collected_at": "2026-10-15T12:54:44.581668Z",
+              "collection_id": "44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa",
+              "content_role": "untrusted_source_data",
+              "content_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+              "end_line": 4,
+              "evidence_id": "0bf53486ad762c71a73ebdcb5b5b1bd0af027f828ba7f4033a763543cac47da2",
+              "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+              "origin_id": "repo",
+              "path": "value.go",
+              "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+              "reported_not_reexecuted": false,
+              "source_actor": null,
+              "source_kind": "code",
+              "source_recorded_at": null,
+              "start_line": 1
+            }
+          ],
+          "kind": "observed_excerpt",
+          "statement": "Recorded source excerpt from value.go; semantic interpretation remains unreviewed.",
+          "status": "proposed"
+        }
+      ],
+      "collection_id": "44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa",
+      "db_adoption": "not_run",
+      "draft_id": "7042e453a31600ec577a0bad56d8b6688af77fb9bc4797cbd809834736b61268",
+      "duplicate_claim_occurrences": 0,
+      "human_approval": "not_inferred",
+      "possible_duplicates": [],
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "questions": [
+        {
+          "answer_status": "not_provided",
+          "claim_id": "8e105d1c957fde33b8cb6d7d80ba7551118e9df3b034394a325e1c4dff5baf20",
+          "evidence_ids": [
+            "7dd71f60f13673714806d3637f3e94793c34735bf70bfd011ae80504163284c6"
+          ],
+          "kind": "observed_excerpt",
+          "question": "Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown."
+        },
+        {
+          "answer_status": "not_provided",
+          "claim_id": "9b37cd5c134f0cc269c4b256896129f79ca278d419b73d0853c3c2b2427e19b0",
+          "evidence_ids": [
+            "0bf53486ad762c71a73ebdcb5b5b1bd0af027f828ba7f4033a763543cac47da2"
+          ],
+          "kind": "observed_excerpt",
+          "question": "Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown."
+        }
+      ],
+      "review_authentication": "not_performed",
+      "revision": null,
+      "schema_version": 1,
+      "shared_evidence_interpretations": []
+    }
+  },
+  {
+    "tool": "cks.manager.review",
+    "actual_tool_use_id": "fixture_tool_4",
+    "is_error": false,
+    "value": {
+      "current_revision": "7b08c85828c7b0a712114d1693275f53dec8b74eb35ed91eabbe83e28c530d8f",
+      "db_adoption": "not_run",
+      "review_authentication": "not_performed",
+      "review_revision": "7b08c85828c7b0a712114d1693275f53dec8b74eb35ed91eabbe83e28c530d8f",
+      "schema_version": 1,
+      "stage": "review_recorded"
+    }
+  },
+  {
+    "tool": "cks.manager.adopt",
+    "actual_tool_use_id": "fixture_tool_5",
+    "is_error": false,
+    "value": {
+      "adoption_id": "141c58e35ef28519a1acea7ab7da58a74fa5c42dbf4462791eb2ade3e4d57850",
+      "input_project": "/private/tmp/ks-KM034C-host-final-20261015/full-fixture/manager/adoptions/141c58e35ef28519a1acea7ab7da58a74fa5c42dbf4462791eb2ade3e4d57850/project",
+      "review_revision": "7b08c85828c7b0a712114d1693275f53dec8b74eb35ed91eabbe83e28c530d8f",
+      "revision": "122aa2fbe65a47aec8167945ab17521e797426089a41ea66a09f425d7b9cc35a",
+      "schema_version": 1,
+      "scope": "reviewed_filtered_input_not_DB_publication",
+      "stage": "input_adopted_not_DB_published"
+    }
+  },
+  {
+    "tool": "cks.manager.select_input",
+    "actual_tool_use_id": "fixture_tool_6",
+    "is_error": false,
+    "value": {
+      "activation_policy": "hold_for_review_only",
+      "actual_Claude_host_workflow_verified": false,
+      "independent_acceptance": false,
+      "jobs": {},
+      "last_validated_read": null,
+      "pending_build": null,
+      "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "reader_selection": null,
+      "revision": 1,
+      "schema_version": 1,
+      "selected_input": "141c58e35ef28519a1acea7ab7da58a74fa5c42dbf4462791eb2ade3e4d57850",
+      "selection_rechecked_on_use": true
+    }
+  },
+  {
+    "tool": "cks.dataset.inspect_profile",
+    "actual_tool_use_id": "fixture_tool_7",
+    "is_error": true,
+    "value": {
+      "schema_version": 1,
+      "code": "project_or_profile_mismatch"
+    }
+  },
+  {
+    "tool": "cks.dataset.inspect_profile",
+    "actual_tool_use_id": "fixture_tool_8",
+    "is_error": false,
+    "value": {
+      "capabilities": {
+        "cancel": true,
+        "input_preparation": "existing_reviewed_or_rendered_inputs",
+        "job_persistence": "durable_journal",
+        "serving_adoption": "not_observed",
+        "versioned_build": true
+      },
+      "profile": {
+        "allowed_activation": [
+          "hold_for_review"
+        ],
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "existing_versions": [],
+        "input_digest": "2770e16038d3464b468f5696851a2d58a644c0b159af7704122e56bc42df5c4e",
+        "observed_base": {
+          "state": "absent"
+        },
+        "profile_digest": "0bcd8e3895dcb0a6a48b34b2fd3fa981813c2712d7cc4dc466d8f4a8c9650b5a",
+        "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+        "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+        "required_gates": [
+          "source",
+          "identity",
+          "graph",
+          "vector",
+          "knowledge"
+        ],
+        "source_pin": {
+          "base_commit": "",
+          "mode": "snapshot-only",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d"
+        },
+        "timeout_max_seconds": 3600
+      }
+    }
+  },
+  {
+    "tool": "cks.dataset.build",
+    "actual_tool_use_id": "fixture_tool_9",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": false,
+      "candidate": null,
+      "error": null,
+      "gates": {
+        "graph": "not_run",
+        "identity": "not_run",
+        "knowledge": "not_run",
+        "semantic": "not_configured",
+        "source": "not_run",
+        "vector": "not_run"
+      },
+      "job_id": "e283061bc4eb9ea4fa9ac2f6ee2aba6b",
+      "phase": "accepted",
+      "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "publication": null,
+      "request_digest": "e7194b36e09e189408846067ab17329399dc71b74e2a62073818c4a2cefb8ede",
+      "revision": 1,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "queued",
+      "target_version": "host-reviewed-v1",
+      "terminal": false
+    }
+  },
+  {
+    "tool": "cks.dataset.status",
+    "actual_tool_use_id": "fixture_tool_10",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": false,
+      "candidate": null,
+      "error": null,
+      "gates": {
+        "graph": "not_run",
+        "identity": "not_run",
+        "knowledge": "not_run",
+        "semantic": "not_configured",
+        "source": "not_run",
+        "vector": "not_run"
+      },
+      "job_id": "e283061bc4eb9ea4fa9ac2f6ee2aba6b",
+      "phase": "capture",
+      "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "publication": null,
+      "request_digest": "e7194b36e09e189408846067ab17329399dc71b74e2a62073818c4a2cefb8ede",
+      "revision": 2,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "running",
+      "target_version": "host-reviewed-v1",
+      "terminal": false
+    }
+  },
+  {
+    "tool": "cks.dataset.status",
+    "actual_tool_use_id": "fixture_tool_11",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": false,
+      "candidate": null,
+      "error": null,
+      "gates": {
+        "graph": "not_run",
+        "identity": "not_run",
+        "knowledge": "not_run",
+        "semantic": "not_configured",
+        "source": "not_run",
+        "vector": "not_run"
+      },
+      "job_id": "e283061bc4eb9ea4fa9ac2f6ee2aba6b",
+      "phase": "build_graph",
+      "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "publication": null,
+      "request_digest": "e7194b36e09e189408846067ab17329399dc71b74e2a62073818c4a2cefb8ede",
+      "revision": 3,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "running",
+      "target_version": "host-reviewed-v1",
+      "terminal": false
+    }
+  },
+  {
+    "tool": "cks.dataset.status",
+    "actual_tool_use_id": "fixture_tool_12",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": false,
+      "candidate": null,
+      "error": null,
+      "gates": {
+        "graph": "not_run",
+        "identity": "not_run",
+        "knowledge": "not_run",
+        "semantic": "not_configured",
+        "source": "not_run",
+        "vector": "not_run"
+      },
+      "job_id": "e283061bc4eb9ea4fa9ac2f6ee2aba6b",
+      "phase": "build_vector",
+      "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "publication": null,
+      "request_digest": "e7194b36e09e189408846067ab17329399dc71b74e2a62073818c4a2cefb8ede",
+      "revision": 4,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "running",
+      "target_version": "host-reviewed-v1",
+      "terminal": false
+    }
+  },
+  {
+    "tool": "cks.dataset.status",
+    "actual_tool_use_id": "fixture_tool_13",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": false,
+      "candidate": null,
+      "error": null,
+      "gates": {
+        "graph": "not_run",
+        "identity": "not_run",
+        "knowledge": "not_run",
+        "semantic": "not_configured",
+        "source": "not_run",
+        "vector": "not_run"
+      },
+      "job_id": "e283061bc4eb9ea4fa9ac2f6ee2aba6b",
+      "phase": "build_vector",
+      "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "publication": null,
+      "request_digest": "e7194b36e09e189408846067ab17329399dc71b74e2a62073818c4a2cefb8ede",
+      "revision": 4,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "running",
+      "target_version": "host-reviewed-v1",
+      "terminal": false
+    }
+  },
+  {
+    "tool": "cks.dataset.status",
+    "actual_tool_use_id": "fixture_tool_14",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": true,
+      "candidate": {
+        "coordinates": {
+          "base_commit": "",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only"
+        },
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "input_digest": "2770e16038d3464b468f5696851a2d58a644c0b159af7704122e56bc42df5c4e",
+        "version": "host-reviewed-v1"
+      },
+      "error": null,
+      "gates": {
+        "graph": "passed",
+        "identity": "passed",
+        "knowledge": "passed",
+        "semantic": "not_configured",
+        "source": "passed",
+        "vector": "passed"
+      },
+      "job_id": "e283061bc4eb9ea4fa9ac2f6ee2aba6b",
+      "phase": "finished",
+      "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "publication": null,
+      "request_digest": "e7194b36e09e189408846067ab17329399dc71b74e2a62073818c4a2cefb8ede",
+      "revision": 6,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "held_for_review",
+      "target_version": "host-reviewed-v1",
+      "terminal": true
+    }
+  },
+  {
+    "tool": "cks.manager.select_reader",
+    "actual_tool_use_id": "fixture_tool_15",
+    "is_error": false,
+    "value": {
+      "DB_publication_inferred": false,
+      "candidate_state": "held_for_review",
+      "coordinates": {
+        "base_commit": "",
+        "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+        "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+        "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+        "source_mode": "snapshot-only"
+      },
+      "schema_version": 1,
+      "serving_read_observed": false,
+      "stage": "reader_initialized_unqueried"
+    }
+  },
+  {
+    "tool": "cks.context.get_for_task_v2",
+    "actual_tool_use_id": "fixture_tool_16",
+    "is_error": false,
+    "value": {
+      "bodies": [
+        {
+          "citation": {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "026211f35201c6832b8dc12b1041bda5313f404653512fdb3e7d988e33be28ad",
+            "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+            "end_line": 4,
+            "file": "value.go",
+            "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+            "origin_id": "repo",
+            "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+            "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+            "source_mode": "snapshot-only",
+            "start_line": 4
+          },
+          "text": "func HostValue() int { return 42 }\n"
+        },
+        {
+          "citation": {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "36e934bedec0fd86bc010eea6b872722d08f553dfd05c4f61d5bb3b546a6e91b",
+            "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+            "end_line": 4,
+            "file": "value.go",
+            "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+            "origin_id": "repo",
+            "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+            "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+            "source_mode": "snapshot-only",
+            "start_line": 3
+          },
+          "text": "// HostValue returns the owned fixture marker.\nfunc HostValue() int { return 42 }\n"
+        },
+        {
+          "citation": {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+            "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+            "end_line": 4,
+            "file": "value.go",
+            "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+            "origin_id": "repo",
+            "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+            "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+            "source_mode": "snapshot-only",
+            "start_line": 1
+          },
+          "text": "package fixture\n\n// HostValue returns the owned fixture marker.\nfunc HostValue() int { return 42 }\n"
+        },
+        {
+          "citation": {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "6a90ca5e618bfa3cbcb3e8f52369385231d54a2afc71b01109d9199ed53f73ef",
+            "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+            "end_line": 39,
+            "file": "manager-reviewed.md",
+            "file_sha256": "d3f5c50e77d59876f4c67b08a18d6fb32a3422d253873f75fec16c676be6d0c9",
+            "origin_id": "docs:corpus.0",
+            "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+            "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+            "source_mode": "snapshot-only",
+            "start_line": 24
+          },
+          "text": "## 9b37cd5c134f0cc269c4b256896129f79ca278d419b73d0853c3c2b2427e19b0\n\nKind: observed_excerpt\n\nSupplied reviewer: controlled-host-fixture\n\n    Recorded source excerpt from value.go; semantic interpretation remains unreviewed.\n    Review reason: Accept the cited bytes as a controlled observation only; rationale remains unknown.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:54:44.581668Z\",\"collection_id\":\"44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09\",\"end_line\":4,\"evidence_id\":\"0bf53486ad762c71a73ebdcb5b5b1bd0af027f828ba7f4033a763543cac47da2\",\"file_sha256\":\"5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"project_id\":\"project-9093700b4fbf4621a5570e070d95536f\",\"reported_not_reexecuted\":false,\"source_actor\":null,\"source_kind\":\"code\",\"source_recorded_at\":null,\"start_line\":1}\n\n    package fixture\n    \n    // HostValue returns the owned fixture marker.\n    func HostValue() int { return 42 }\n\n"
+        },
+        {
+          "citation": {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "6a90ca5e618bfa3cbcb3e8f52369385231d54a2afc71b01109d9199ed53f73ef",
+            "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+            "end_line": 39,
+            "file": ".cks/knowledge/questions/manager-reviewed.md",
+            "file_sha256": "d3f5c50e77d59876f4c67b08a18d6fb32a3422d253873f75fec16c676be6d0c9",
+            "origin_id": "repo",
+            "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+            "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+            "source_mode": "snapshot-only",
+            "start_line": 24
+          },
+          "text": "## 9b37cd5c134f0cc269c4b256896129f79ca278d419b73d0853c3c2b2427e19b0\n\nKind: observed_excerpt\n\nSupplied reviewer: controlled-host-fixture\n\n    Recorded source excerpt from value.go; semantic interpretation remains unreviewed.\n    Review reason: Accept the cited bytes as a controlled observation only; rationale remains unknown.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:54:44.581668Z\",\"collection_id\":\"44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09\",\"end_line\":4,\"evidence_id\":\"0bf53486ad762c71a73ebdcb5b5b1bd0af027f828ba7f4033a763543cac47da2\",\"file_sha256\":\"5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09\",\"origin_id\":\"repo\",\"path\":\"value.go\",\"project_id\":\"project-9093700b4fbf4621a5570e070d95536f\",\"reported_not_reexecuted\":false,\"source_actor\":null,\"source_kind\":\"code\",\"source_recorded_at\":null,\"start_line\":1}\n\n    package fixture\n    \n    // HostValue returns the owned fixture marker.\n    func HostValue() int { return 42 }\n\n"
+        },
+        {
+          "citation": {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "5e2cb01c346b5a527f14739cf3c61fa853cd12b2a678f0db537bec113ab343df",
+            "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+            "end_line": 23,
+            "file": "manager-reviewed.md",
+            "file_sha256": "d3f5c50e77d59876f4c67b08a18d6fb32a3422d253873f75fec16c676be6d0c9",
+            "origin_id": "docs:corpus.0",
+            "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+            "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+            "source_mode": "snapshot-only",
+            "start_line": 9
+          },
+          "text": "## 8e105d1c957fde33b8cb6d7d80ba7551118e9df3b034394a325e1c4dff5baf20\n\nKind: observed_excerpt\n\nSupplied reviewer: controlled-host-fixture\n\n    Recorded source excerpt from go.mod; semantic interpretation remains unreviewed.\n    Review reason: Accept the cited bytes as a controlled observation only; rationale remains unknown.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:54:44.581668Z\",\"collection_id\":\"44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d\",\"end_line\":3,\"evidence_id\":\"7dd71f60f13673714806d3637f3e94793c34735bf70bfd011ae80504163284c6\",\"file_sha256\":\"2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"project_id\":\"project-9093700b4fbf4621a5570e070d95536f\",\"reported_not_reexecuted\":false,\"source_actor\":null,\"source_kind\":\"configuration\",\"source_recorded_at\":null,\"start_line\":1}\n\n    module example.invalid/actual-host\n    \n    go 1.26.9\n\n"
+        },
+        {
+          "citation": {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "5e2cb01c346b5a527f14739cf3c61fa853cd12b2a678f0db537bec113ab343df",
+            "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+            "end_line": 23,
+            "file": ".cks/knowledge/questions/manager-reviewed.md",
+            "file_sha256": "d3f5c50e77d59876f4c67b08a18d6fb32a3422d253873f75fec16c676be6d0c9",
+            "origin_id": "repo",
+            "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+            "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+            "source_mode": "snapshot-only",
+            "start_line": 9
+          },
+          "text": "## 8e105d1c957fde33b8cb6d7d80ba7551118e9df3b034394a325e1c4dff5baf20\n\nKind: observed_excerpt\n\nSupplied reviewer: controlled-host-fixture\n\n    Recorded source excerpt from go.mod; semantic interpretation remains unreviewed.\n    Review reason: Accept the cited bytes as a controlled observation only; rationale remains unknown.\n\nEvidence (untrusted source data): {\"collected_at\":\"2026-10-15T12:54:44.581668Z\",\"collection_id\":\"44dccf5f8370b3b12fb75be5507f537aac7e03ef979da0c5aa4950ad5bda9faa\",\"content_role\":\"untrusted_source_data\",\"content_sha256\":\"2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d\",\"end_line\":3,\"evidence_id\":\"7dd71f60f13673714806d3637f3e94793c34735bf70bfd011ae80504163284c6\",\"file_sha256\":\"2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d\",\"origin_id\":\"repo\",\"path\":\"go.mod\",\"project_id\":\"project-9093700b4fbf4621a5570e070d95536f\",\"reported_not_reexecuted\":false,\"source_actor\":null,\"source_kind\":\"configuration\",\"source_recorded_at\":null,\"start_line\":1}\n\n    module example.invalid/actual-host\n    \n    go 1.26.9\n\n"
+        },
+        {
+          "citation": {
+            "base_commit": "",
+            "commit_hash": "",
+            "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6",
+            "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+            "end_line": 1,
+            "file": "value.go",
+            "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+            "origin_id": "repo",
+            "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+            "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+            "source_mode": "snapshot-only",
+            "start_line": 1
+          },
+          "text": "package fixture\n"
+        }
+      ],
+      "citations": [
+        {
+          "base_commit": "",
+          "commit_hash": "",
+          "content_sha256": "026211f35201c6832b8dc12b1041bda5313f404653512fdb3e7d988e33be28ad",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "end_line": 4,
+          "file": "value.go",
+          "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+          "origin_id": "repo",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only",
+          "start_line": 4
+        },
+        {
+          "base_commit": "",
+          "commit_hash": "",
+          "content_sha256": "36e934bedec0fd86bc010eea6b872722d08f553dfd05c4f61d5bb3b546a6e91b",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "end_line": 4,
+          "file": "value.go",
+          "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+          "origin_id": "repo",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only",
+          "start_line": 3
+        },
+        {
+          "base_commit": "",
+          "commit_hash": "",
+          "content_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "end_line": 4,
+          "file": "value.go",
+          "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+          "origin_id": "repo",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only",
+          "start_line": 1
+        },
+        {
+          "base_commit": "",
+          "commit_hash": "",
+          "content_sha256": "6a90ca5e618bfa3cbcb3e8f52369385231d54a2afc71b01109d9199ed53f73ef",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "end_line": 39,
+          "file": "manager-reviewed.md",
+          "file_sha256": "d3f5c50e77d59876f4c67b08a18d6fb32a3422d253873f75fec16c676be6d0c9",
+          "origin_id": "docs:corpus.0",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only",
+          "start_line": 24
+        },
+        {
+          "base_commit": "",
+          "commit_hash": "",
+          "content_sha256": "6a90ca5e618bfa3cbcb3e8f52369385231d54a2afc71b01109d9199ed53f73ef",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "end_line": 39,
+          "file": ".cks/knowledge/questions/manager-reviewed.md",
+          "file_sha256": "d3f5c50e77d59876f4c67b08a18d6fb32a3422d253873f75fec16c676be6d0c9",
+          "origin_id": "repo",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only",
+          "start_line": 24
+        },
+        {
+          "base_commit": "",
+          "commit_hash": "",
+          "content_sha256": "5e2cb01c346b5a527f14739cf3c61fa853cd12b2a678f0db537bec113ab343df",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "end_line": 23,
+          "file": "manager-reviewed.md",
+          "file_sha256": "d3f5c50e77d59876f4c67b08a18d6fb32a3422d253873f75fec16c676be6d0c9",
+          "origin_id": "docs:corpus.0",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only",
+          "start_line": 9
+        },
+        {
+          "base_commit": "",
+          "commit_hash": "",
+          "content_sha256": "5e2cb01c346b5a527f14739cf3c61fa853cd12b2a678f0db537bec113ab343df",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "end_line": 23,
+          "file": ".cks/knowledge/questions/manager-reviewed.md",
+          "file_sha256": "d3f5c50e77d59876f4c67b08a18d6fb32a3422d253873f75fec16c676be6d0c9",
+          "origin_id": "repo",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only",
+          "start_line": 9
+        },
+        {
+          "base_commit": "",
+          "commit_hash": "",
+          "content_sha256": "c9f09e0a76fbbf83847013f7d79aa09c1566778489cc499e76e3e5d72b1c8db6",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "end_line": 1,
+          "file": "value.go",
+          "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+          "origin_id": "repo",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only",
+          "start_line": 1
+        }
+      ],
+      "coordinates": {
+        "base_commit": "",
+        "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+        "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+        "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+        "source_mode": "snapshot-only"
+      },
+      "evidence_state": "complete",
+      "format_version": 2,
+      "graph_neighbors": [],
+      "metadata": {
+        "integrity_hash": "5de2116349bc344c1b88ebeb803d231e752abee65c391c886c4293c6a2134296",
+        "integrity_hash_algo": "sha256-v2"
+      },
+      "query": "HostValue returns 42",
+      "semantic": null
+    }
+  },
+  {
+    "tool": "cks.manager.status",
+    "actual_tool_use_id": "fixture_tool_17",
+    "is_error": false,
+    "value": {
+      "activation_policy": "hold_for_review_only",
+      "actual_Claude_host_workflow_verified": false,
+      "independent_acceptance": false,
+      "jobs": {
+        "e283061bc4eb9ea4fa9ac2f6ee2aba6b": {
+          "state": "held_for_review",
+          "terminal": true
+        }
+      },
+      "last_validated_read": {
+        "at": "2026-10-15T12:54:50.686629Z",
+        "candidate_publication_inferred": false,
+        "coordinates": {
+          "base_commit": "",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only"
+        },
+        "job_id": "e283061bc4eb9ea4fa9ac2f6ee2aba6b"
+      },
+      "pending_build": null,
+      "profile_id": "profile-d83eb3136d61e4a916bd1ab3021312c0",
+      "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+      "reader_selection": {
+        "adoption_id": "141c58e35ef28519a1acea7ab7da58a74fa5c42dbf4462791eb2ade3e4d57850",
+        "expected_coordinates": {
+          "base_commit": "",
+          "dataset_id": "6583e0b4e4a3b74ae097eba7ec6e6daa8be9f8d45667f0d5213d513e2d5124f4",
+          "project_id": "project-9093700b4fbf4621a5570e070d95536f",
+          "snapshot_id": "46377f3b409bd145272277f45e851d965724bdc892cab79e49f1ff747029f77d",
+          "source_mode": "snapshot-only"
+        },
+        "job_id": "e283061bc4eb9ea4fa9ac2f6ee2aba6b"
+      },
+      "revision": 10,
+      "schema_version": 1,
+      "selected_input": "141c58e35ef28519a1acea7ab7da58a74fa5c42dbf4462791eb2ade3e4d57850",
+      "selection_rechecked_on_use": true
+    }
+  }
+]

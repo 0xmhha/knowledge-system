@@ -1,0 +1,251 @@
+{
+  "nodes": [
+    {
+      "reference": "n0.0",
+      "consumer": "b0/n0",
+      "candidates": [
+        "b0/n0"
+      ],
+      "span": {
+        "end": 47,
+        "start": 43
+      },
+      "synthetic": false
+    },
+    {
+      "reference": "n1.0",
+      "consumer": "b1/n0",
+      "candidates": [
+        "b1/n0"
+      ],
+      "span": {
+        "end": 62,
+        "start": 59
+      },
+      "synthetic": false
+    },
+    {
+      "reference": "n2.0",
+      "consumer": "b2/n0",
+      "candidates": [
+        "b2/n0"
+      ],
+      "span": {
+        "end": 74,
+        "start": 66
+      },
+      "synthetic": false
+    },
+    {
+      "reference": "n3.0",
+      "consumer": "b3/n0",
+      "candidates": [
+        "b3/n0"
+      ],
+      "span": {
+        "end": 56,
+        "start": 53
+      },
+      "synthetic": false
+    }
+  ],
+  "bindings": [
+    {
+      "reference": "v@30",
+      "consumer": "v30",
+      "candidates": [
+        "v30"
+      ]
+    },
+    {
+      "reference": "v@43",
+      "consumer": "v43",
+      "candidates": [
+        "v43"
+      ]
+    }
+  ],
+  "occurrences": [
+    {
+      "reference": "d:o@30",
+      "consumer": "entry/definition/v30/30",
+      "consumer_roles": [
+        "definition"
+      ],
+      "candidates": [
+        "entry/definition/v30/30"
+      ],
+      "reference_owner": "entry",
+      "phase": "definition",
+      "span": {
+        "end": 31,
+        "start": 30
+      }
+    },
+    {
+      "reference": "d:o@43",
+      "consumer": "b0/n0/definition/v43/43",
+      "consumer_roles": [
+        "definition"
+      ],
+      "candidates": [
+        "b0/n0/definition/v43/43"
+      ],
+      "reference_owner": "n0.0",
+      "phase": "definition",
+      "span": {
+        "end": 44,
+        "start": 43
+      }
+    },
+    {
+      "reference": "u:o@53",
+      "consumer": "b3/n0/use/v43/53",
+      "consumer_roles": [
+        "use"
+      ],
+      "candidates": [
+        "b3/n0/use/v43/53"
+      ],
+      "reference_owner": "n3.0",
+      "phase": "use",
+      "span": {
+        "end": 54,
+        "start": 53
+      }
+    },
+    {
+      "reference": "u:o@55",
+      "consumer": "b3/n0/use/v30/55",
+      "consumer_roles": [
+        "use"
+      ],
+      "candidates": [
+        "b3/n0/use/v30/55"
+      ],
+      "reference_owner": "n3.0",
+      "phase": "use",
+      "span": {
+        "end": 56,
+        "start": 55
+      }
+    },
+    {
+      "reference": "d:o@59",
+      "consumer": "b1/n0/definition/v43/59",
+      "consumer_roles": [
+        "definition"
+      ],
+      "candidates": [
+        "b1/n0/definition/v43/59"
+      ],
+      "reference_owner": "n1.0",
+      "phase": "definition",
+      "span": {
+        "end": 60,
+        "start": 59
+      }
+    },
+    {
+      "reference": "u:o@59",
+      "consumer": "b1/n0/use/v43/59",
+      "consumer_roles": [
+        "use"
+      ],
+      "candidates": [
+        "b1/n0/use/v43/59"
+      ],
+      "reference_owner": "n1.0",
+      "phase": "use",
+      "span": {
+        "end": 60,
+        "start": 59
+      }
+    },
+    {
+      "reference": "u:o@73",
+      "consumer": "b2/n0/use/v43/73",
+      "consumer_roles": [
+        "use"
+      ],
+      "candidates": [
+        "b2/n0/use/v43/73"
+      ],
+      "reference_owner": "n2.0",
+      "phase": "use",
+      "span": {
+        "end": 74,
+        "start": 73
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "reference": 0,
+      "candidates": [
+        0
+      ],
+      "consumer": 0
+    },
+    {
+      "reference": 1,
+      "candidates": [
+        1
+      ],
+      "consumer": 1
+    },
+    {
+      "reference": 2,
+      "candidates": [
+        2
+      ],
+      "consumer": 2
+    },
+    {
+      "reference": 3,
+      "candidates": [
+        3
+      ],
+      "consumer": 3
+    },
+    {
+      "reference": 4,
+      "candidates": [
+        4
+      ],
+      "consumer": 4
+    }
+  ],
+  "branches": [
+    {
+      "reference_block": 3,
+      "successor_ordinal": 0,
+      "reference_target": 1,
+      "consumer_edge": {
+        "from": "b3",
+        "to": "b1",
+        "kind": "cfg",
+        "condition": "true",
+        "certainty": "conservative"
+      },
+      "target_matches": true
+    },
+    {
+      "reference_block": 3,
+      "successor_ordinal": 1,
+      "reference_target": 2,
+      "consumer_edge": {
+        "from": "b3",
+        "to": "b2",
+        "kind": "cfg",
+        "condition": "false",
+        "certainty": "conservative"
+      },
+      "target_matches": true
+    }
+  ],
+  "unmatched_nodes": 0,
+  "unmatched_bindings": 0,
+  "unmatched_occurrence_phases": 0,
+  "unmatched_blocks": 0
+}

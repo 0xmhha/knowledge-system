@@ -1,0 +1,178 @@
+[
+  {
+    "label": "build",
+    "argv": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-wi3-resolver-20261019/native-source",
+    "pid": 85596,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 17.139963833615184,
+    "source_binding_sha256": "00d98d28c3b5eed74896ed948141115d38b27e1efbf00ff06a4227477605862c",
+    "source_head": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "test",
+    "argv": [
+      "go",
+      "test",
+      "-json",
+      "-count=1",
+      "-timeout=18m",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-wi3-resolver-20261019/native-source",
+    "pid": 86890,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 488.71421525022015,
+    "source_binding_sha256": "00d98d28c3b5eed74896ed948141115d38b27e1efbf00ff06a4227477605862c",
+    "source_head": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8",
+    "tests": {
+      "pass": 4123,
+      "fail": 0,
+      "skip": 18
+    },
+    "packages": {
+      "pass": 124,
+      "fail": 0,
+      "skip": 12
+    },
+    "stdout_sha256": "01fa8f0fac3dfdffe2cbd3fb896c828e58a506d211140b4f52d2054d6e533cb0",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "race",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-json",
+      "-count=1",
+      "-timeout=20m",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-wi3-resolver-20261019/native-source",
+    "pid": 25234,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 839.9125296249986,
+    "source_binding_sha256": "00d98d28c3b5eed74896ed948141115d38b27e1efbf00ff06a4227477605862c",
+    "source_head": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8",
+    "tests": {
+      "pass": 4123,
+      "fail": 0,
+      "skip": 18
+    },
+    "packages": {
+      "pass": 124,
+      "fail": 0,
+      "skip": 12
+    },
+    "stdout_sha256": "c4f59094a7ffcd1f0caf5d102813ce16d2f6d91f457b929598f498168eddd962",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "lint",
+    "argv": [
+      "make",
+      "lint",
+      "GOLANGCI_LINT=/Users/kevin/.gvm/pkgsets/go1.26.8/global/bin/golangci-lint"
+    ],
+    "cwd": "/private/tmp/ks-wi3-resolver-20261019/native-source",
+    "pid": 78354,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 40.36685341736302,
+    "source_binding_sha256": "00d98d28c3b5eed74896ed948141115d38b27e1efbf00ff06a4227477605862c",
+    "source_head": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8",
+    "stdout_sha256": "e4b31dd5ff7016393b49b1d4431f2f287975ff0c9d8ce18afdfe5485d35f1a37",
+    "stderr_sha256": "178798fe61ba1334ff08bf817ecfdd19fc0d58597ccd6c89fdb6ab98b9c28f6f"
+  },
+  {
+    "label": "build-bins",
+    "argv": [
+      "make",
+      "build-bins"
+    ],
+    "cwd": "/private/tmp/ks-wi3-resolver-20261019/native-source",
+    "pid": 81245,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 2.942920582834631,
+    "source_binding_sha256": "00d98d28c3b5eed74896ed948141115d38b27e1efbf00ff06a4227477605862c",
+    "source_head": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8",
+    "stdout_sha256": "be35acd6eb850c5ea10ebf4ef48416cd02f15d67a133d18e47182b6a9ec49af4",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build-runtime",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/ks-wi3-resolver-20261019/native/read-cks",
+      "./cmd/cks"
+    ],
+    "cwd": "/private/tmp/ks-wi3-resolver-20261019/native-source",
+    "pid": 81517,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 5.50985174998641,
+    "source_binding_sha256": "00d98d28c3b5eed74896ed948141115d38b27e1efbf00ff06a4227477605862c",
+    "source_head": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build-info",
+    "argv": [
+      "go",
+      "version",
+      "-m",
+      "/private/tmp/ks-wi3-resolver-20261019/native/read-cks"
+    ],
+    "cwd": "/private/tmp/ks-wi3-resolver-20261019/native-source",
+    "pid": 81809,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 0.022341541945934296,
+    "source_binding_sha256": "00d98d28c3b5eed74896ed948141115d38b27e1efbf00ff06a4227477605862c",
+    "source_head": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8",
+    "stdout_sha256": "f44f23463af0cb87bf3426a26af85482423f16db9bdda3b6ddb68f344aa08476",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

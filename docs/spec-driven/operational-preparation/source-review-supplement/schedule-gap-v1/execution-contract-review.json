@@ -1,0 +1,621 @@
+{
+  "status": "scoped_prior_evidence_and_source_inspection_only",
+  "contracts": [
+    {
+      "id": "T01",
+      "owner": "chainbench",
+      "path": "internal/experiment/plan.go",
+      "lines": [
+        100,
+        120
+      ],
+      "fact": "before/after source는 같은 driver/environment를 요구하며 repetitions는 1..1000, timeout 범위도 별도 검증한다.",
+      "gap": "일반 API 허용 범위는 WI-4 arm별 100회·승인된 binary/환경·10분 관찰 범위를 자동 강제하지 않는다.",
+      "anchor": {
+        "start_line": 100,
+        "end_line": 120,
+        "start_byte": 3357,
+        "end_byte_exclusive": 4486,
+        "span_sha256": "2ce7c69ae44cfb58c31a10b70148ef93dcff8eef8c66093bc4cf661a78d17bdf"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T02",
+      "owner": "chainbench",
+      "path": "internal/experiment/plan.go",
+      "lines": [
+        151,
+        171
+      ],
+      "fact": "schedule은 seed/trial의 지정 hash에서 파생하며 before/after가 같은 schedule을 쓴다.",
+      "gap": "같은 hash schedule이 독립 가족·공정한 arm 순서·관측되지 않은 교란 요인의 독립성을 입증하지 않는다.",
+      "anchor": {
+        "start_line": 151,
+        "end_line": 171,
+        "start_byte": 5989,
+        "end_byte_exclusive": 6649,
+        "span_sha256": "c1a50225a0b3228d7cdea2467cad32eed9f478f357b2cfb199b36bfb62608f69"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T03",
+      "owner": "chainbench",
+      "path": "internal/experiment/run.go",
+      "lines": [
+        356,
+        383
+      ],
+      "fact": "planned/attempted/completed·symptom/control/인프라 오류·missing을 분리하고 completed에서 관측 실패율을 계산한다.",
+      "gap": "승인된 유효 반복 분모·오류/취소/재시도·가족별 집계 및 선택 편향 처리 정책이 필요하다.",
+      "anchor": {
+        "start_line": 356,
+        "end_line": 383,
+        "start_byte": 11730,
+        "end_byte_exclusive": 12388,
+        "span_sha256": "39c29d30a68ce5a43a61c6758fc46c8995130fa523194b98f9b1bdf0b7923c53"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T04",
+      "owner": "chainbench",
+      "path": "internal/experiment/run.go",
+      "lines": [
+        383,
+        407
+      ],
+      "fact": "generic verdict는 최소 추론 표본과 MinCompleted를 검사하고 after의 UpperFailureRate95를 MaxFailureRate와 비교한다.",
+      "gap": "기존 최소 추론 표본 30과 수정 후 절대 상한 판정은 WI-4의 100회·baseline 대비 비율<=0.50·독립 가족 수용 판정과 다르다. 범위별 판정 연결이 미동결이다.",
+      "anchor": {
+        "start_line": 383,
+        "end_line": 407,
+        "start_byte": 12386,
+        "end_byte_exclusive": 13201,
+        "span_sha256": "65fdc79f16cc84f8fcb3708afb4c27437b8097e8194ec5b38a1c10c9f1c61065"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T05",
+      "owner": "chainbench",
+      "path": "internal/experiment/run.go",
+      "lines": [
+        410,
+        424
+      ],
+      "fact": "UpperBinomial95는 단측 95% Clopper-Pearson 관측 창 상한을 계산한다.",
+      "gap": "프로토콜의 paired family-cluster bootstrap 제안과 같은 구간이 아니다. 상대 비율·가족 불확실성/undefined 처리와 매칭을 별도로 확정해야 한다.",
+      "anchor": {
+        "start_line": 410,
+        "end_line": 424,
+        "start_byte": 13277,
+        "end_byte_exclusive": 13659,
+        "span_sha256": "1993eec3e8c6b30c2017d29a73e7cb0ff18df2e968aa39097728f7e10d91379c"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T06",
+      "owner": "chainbench",
+      "path": "internal/experiment/run.go",
+      "lines": [
+        205,
+        232
+      ],
+      "fact": "trial context와 분리한 cleanup context를 만들고 cleanup 오류를 ERROR로 보존한다.",
+      "gap": "실제 대상 노드의 소유권·환경 pin·취소/정리 영수증과 기존/외부 노드 비정지 경계를 확보해야 한다.",
+      "anchor": {
+        "start_line": 205,
+        "end_line": 232,
+        "start_byte": 7005,
+        "end_byte_exclusive": 8118,
+        "span_sha256": "05c205ee8a391ab3666fb3d4b6720f019f403582e2ca3aef75d1326e093aa5c8"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T07",
+      "owner": "chainbench",
+      "path": "internal/experiment/log_monitor.go",
+      "lines": [
+        145,
+        177
+      ],
+      "fact": "구조화 log 관찰은 AWAITING_OBSERVATION으로 시작하고 종료 시각까지 source/환경을 관찰한다.",
+      "gap": "짧은 대역 창의 무재발은 수정 성공이 아니다. 대상 600초 창·초기 log anchor·오류와 불충분 관측의 연결 규칙이 미동결이다.",
+      "anchor": {
+        "start_line": 145,
+        "end_line": 177,
+        "start_byte": 5138,
+        "end_byte_exclusive": 6343,
+        "span_sha256": "cd41aecacb4a4711aab795a97ebc98718c18b35fcee195a02e720d14474e2301"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T08",
+      "owner": "chainbench",
+      "path": "internal/experiment/log_monitor.go",
+      "lines": [
+        225,
+        239
+      ],
+      "fact": "지정 symptom log를 source identity로 재확인한 뒤 RECURRED와 resume_requested를 반환한다.",
+      "gap": "실제 target의 event 의미·재발/변조/취소/미재발 경로 및 분석 역할 재진입 영수증이 필요하다.",
+      "anchor": {
+        "start_line": 225,
+        "end_line": 239,
+        "start_byte": 7714,
+        "end_byte_exclusive": 8330,
+        "span_sha256": "06aa692d39254bbb207f6aaf5dfcd44b95cdebd5853b7432812f96c40627aa7b"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T09",
+      "owner": "chainbench",
+      "path": "internal/mcp/experiment_tool.go",
+      "lines": [
+        10,
+        31
+      ],
+      "fact": "MCP experiment 도구는 bounded input을 decode하고 application experiment를 호출한다.",
+      "gap": "도구 구현과 과거 host 연결만으로 현재 5가설의 실제 baseline/fix·설치된 역할 흐름을 검증했다고 볼 수 없다.",
+      "anchor": {
+        "start_line": 10,
+        "end_line": 31,
+        "start_byte": 105,
+        "end_byte_exclusive": 1349,
+        "span_sha256": "bae5143bf04b56d310d4cb96cf7a3da1f53ec3b374fcd155ccbc00363d33449b"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T10",
+      "owner": "chainbench",
+      "path": "internal/mcp/log_observation.go",
+      "lines": [
+        10,
+        29
+      ],
+      "fact": "구조화 log 관찰 도구는 노드 제어 없이 관찰하고 원인/수정 수용을 판정하지 않는다고 명시한다.",
+      "gap": "주입 comparison과 read-only mode9 관찰의 source/권한/영수증을 혼합하지 않고 단계별로 연결해야 한다.",
+      "anchor": {
+        "start_line": 10,
+        "end_line": 29,
+        "start_byte": 105,
+        "end_byte_exclusive": 1301,
+        "span_sha256": "b18e7c464f3730774439b0037d3bc918cf98313570801edaf4812eb4b4378fb8"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    },
+    {
+      "id": "T11",
+      "owner": "coding_agent",
+      "path": "plugin/scripts/timing_instrumentation.py",
+      "lines": [
+        103,
+        112
+      ],
+      "fact": "같은 normal/race suite·build/vet 통제 결과에서도 timing_neutrality=not_proven과 acceptance=not_recorded를 유지한다.",
+      "gap": "로깅의 스케줄 영향·오버헤드 효과와 불확실성 평가가 없다. 통제 테스트 통과를 timing neutrality로 승격하지 않는다.",
+      "anchor": {
+        "start_line": 103,
+        "end_line": 112,
+        "start_byte": 6641,
+        "end_byte_exclusive": 7747,
+        "span_sha256": "fdc16aa8d1ef471b1323d2401680aa84e14b7002753267e936b892e2138cf50b"
+      },
+      "observation_kind": "adopted_source_inspection_not_new_execution",
+      "approved": false
+    }
+  ],
+  "adopted_revisions": {
+    "chainbench": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+    "coding_agent": "b7e78689676769e8536626e76eed7165d870e1ba"
+  },
+  "subscription_extracted_matrix": [
+    {
+      "variant": "CAND-A",
+      "mode": "normal",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "CAND-A",
+      "mode": "race",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "CAND-B",
+      "mode": "normal",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "CAND-B",
+      "mode": "race",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "MUT-EARLY",
+      "mode": "normal",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "MUT-EARLY",
+      "mode": "race",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "MUT-REINTRO",
+      "mode": "normal",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "MUT-REINTRO",
+      "mode": "race",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "mode": "normal",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "mode": "race",
+      "observations": 5,
+      "scenarios": [
+        "blocked_delivery_then_consumer_exit",
+        "concurrent_unsubscribe_once",
+        "confirmation_delayed",
+        "late_delivery_before_confirmation",
+        "normal_delivery_then_unsubscribe"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    }
+  ],
+  "udp_synthetic_matrix": [
+    {
+      "variant": "CURSOR-DRAFT",
+      "mode": "normal",
+      "observations": 5,
+      "scenarios": [
+        "far_then_near",
+        "near_then_far",
+        "one_far",
+        "two_far",
+        "two_near"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "CURSOR-DRAFT",
+      "mode": "race",
+      "observations": 5,
+      "scenarios": [
+        "far_then_near",
+        "near_then_far",
+        "one_far",
+        "two_far",
+        "two_near"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "mode": "normal",
+      "observations": 5,
+      "scenarios": [
+        "far_then_near",
+        "near_then_far",
+        "one_far",
+        "two_far",
+        "two_near"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "mode": "race",
+      "observations": 5,
+      "scenarios": [
+        "far_then_near",
+        "near_then_far",
+        "one_far",
+        "two_far",
+        "two_near"
+      ],
+      "operational_trials": 0,
+      "independent_units": 0
+    }
+  ],
+  "udp_timer_scope": "Reset/Stop call recorder; real timer firing is not tested",
+  "target_toolchain_adoption": false,
+  "wall_clock_rollback_reproduced": false,
+  "historical_comparison": {
+    "owner_revisions": {
+      "coding-agent": "18aca435c4f8c9e17378ad40f60c76f09ee7bc7a",
+      "chainbench": "5f6483864a4a6a91f32ff02d532275039c72db80"
+    },
+    "scope": "actual owned Go RPC fixture with public composition and consumer; not blockchain consensus or full oracle acceptance",
+    "plan": {
+      "schema_version": 1,
+      "id": "owned-timing",
+      "mode": "comparison",
+      "symptom": "controlled concurrent read before commit; no consensus claim",
+      "assertion_id": "owned-timing/assert/0",
+      "seed": "owned-paired-v1",
+      "before": {
+        "commit": "276fccf334225ad12c02c526e4323aeef260d302",
+        "binary_sha256": "78863173ca87d3c85a964dd6c349f34b3bebd84b90737c48f30fc280dd74a456",
+        "driver_sha256": "70b4807ffcad24951c883908c24b21b1f75f4056401b366d357b2cd010074a83",
+        "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+      },
+      "after": {
+        "commit": "4cc8bdf8f310293fa87c46559597082781fca1d1",
+        "binary_sha256": "f1ad7b2b2e7340ec4b2d887aca00ddbd9117a9d999a2996092baa790ce9d1732",
+        "driver_sha256": "70b4807ffcad24951c883908c24b21b1f75f4056401b366d357b2cd010074a83",
+        "environment_sha256": "da04ac4a5c6fc4df5d29f623cef22b524e01923523015a87ba2f00a857ace3f5"
+      },
+      "repetitions": 60,
+      "min_completed": 60,
+      "min_symptom_failures": 3,
+      "max_failure_rate": 0.05,
+      "trial_timeout_seconds": 30,
+      "total_timeout_seconds": 600,
+      "owned_node_ids": [
+        "node1"
+      ],
+      "normal_assertion_ids": [
+        "owned-timing/assert/1"
+      ],
+      "injection": {
+        "kind": "delay",
+        "target": "node1",
+        "step": "owned-timing/step/1",
+        "min_delay_ms": 0,
+        "max_delay_ms": 3
+      },
+      "resume": null
+    },
+    "before": {
+      "planned": 60,
+      "attempted": 60,
+      "completed": 60,
+      "symptom_failures": 60,
+      "control_failures": 0,
+      "infrastructure_errors": 0,
+      "missing": 0,
+      "failure_rate": 1,
+      "upper_failure_rate_95": 1
+    },
+    "after": {
+      "planned": 60,
+      "attempted": 60,
+      "completed": 60,
+      "symptom_failures": 0,
+      "control_failures": 0,
+      "infrastructure_errors": 0,
+      "missing": 0,
+      "failure_rate": 0,
+      "upper_failure_rate_95": 0.048702913310097504
+    },
+    "verdict": "OBSERVED_RATE_BOUND_MET",
+    "acceptance": "not_recorded",
+    "current_five_families_covered": 0
+  },
+  "historical_mode9": {
+    "owner_revisions": {
+      "coding-agent": "72c262981dfb9ccfb9f3b49eb5a9af054bc4d52a",
+      "chainbench": "df464d4b97fde4ab308c5c422024dc80518e5956"
+    },
+    "summary": {
+      "schema_version": 1,
+      "base_commit": "02931c31e14a815c8e3d7018fac6eed730b0c2b7",
+      "probe_commit": "f9f24b8d2b7a7d186401233fdbce59c405f280e5",
+      "instrumentation_sha256": "3dc7c843c8b78fe6a97570f51317bf03ae7813dc88a982ce44a501b4e2d76153",
+      "normal_race_controls": "PASS",
+      "initial_reproduction": "INCONCLUSIVE",
+      "log_windows": [
+        "AWAITING_OBSERVATION",
+        "RECURRED"
+      ],
+      "resume_target": "ANALYSIS",
+      "mcp_prepare_observe": "PASS",
+      "planning": "DENIED",
+      "owned_cleanup": "PASS",
+      "scope": "owned Go RPC fixture, not blockchain consensus; no timing-neutrality or fix acceptance",
+      "acceptance": "not_recorded"
+    },
+    "windows": [
+      {
+        "planned_seconds": 2,
+        "verdict": "AWAITING_OBSERVATION",
+        "polls": 17,
+        "events": 0,
+        "resume_requested": false,
+        "acceptance": "not_recorded"
+      },
+      {
+        "planned_seconds": 2,
+        "verdict": "RECURRED",
+        "polls": 1,
+        "events": 1,
+        "resume_requested": true,
+        "acceptance": "not_recorded"
+      }
+    ],
+    "instrumentation_controls_status": "PASS",
+    "timing_neutrality": "not_proven",
+    "current_five_families_covered": 0
+  },
+  "metric_boundary": {
+    "generic_runtime": "after_one_sided_95_percent_absolute_binomial_upper_bound",
+    "generic_minimum_inference_samples": 30,
+    "work_item_proposal": "fix_to_baseline_rate_ratio_at_most_0.50_with_family_uncertainty",
+    "criteria_snapshot": {
+      "protocol_work_item": {
+        "id": "WI-4",
+        "status": "not_prepared",
+        "requirements_proposal": {
+          "independent_seed_schedule_families_min": 5,
+          "planned_runs_per_arm_min": 100,
+          "baseline_symptom_events_min": 10
+        },
+        "metrics_proposal": {
+          "fix_to_baseline_symptom_rate_ratio_max": 0.5,
+          "no_recurrence_verdict": "inconclusive"
+        },
+        "baseline_definition": null,
+        "canonical_matching_rules": null,
+        "sample_sufficiency_review": null,
+        "cases": [],
+        "input_manifest": null,
+        "input_manifest_sha256": null,
+        "gold_manifest": null,
+        "gold_manifest_sha256": null,
+        "review_receipt": null,
+        "final_minimum_independent_units": null,
+        "dev_sample_allocation": null
+      },
+      "progress_work_item": {
+        "id": "WI-4",
+        "owner": "coding-agent+ChainBench",
+        "target": "소유한 격리 노드의 baseline/fix 반복·fault/timing·모드9 관찰",
+        "input_proposal": "seed/schedule family5개 이상, 계획상 arm당100회 이상 및 유효 반복 분모. 주입 종류·증상 실패 조건·취소/cleanup·관찰 창10분을 사전 고정",
+        "completion_proposal": "baseline 증상10회 이상일 때 fix 실패율<=baseline의0.50 제안. family별 실패율·불확실성 구간과 인프라 오류를 분리. 취소/owned-node cleanup·변조/재발/미재발 분기 검증. 관찰 재발이 없으면 inconclusive이며 수정 성공으로 종료하지 않는다",
+        "limitations": "반복100회를100개 독립 결함으로 세지 않는다. logging의 timing neutrality는 별도 효과·불확실성 평가가 없으면 unknown. 기존/외부 노드는 정지하지 않는다",
+        "criterion_status": "proposed",
+        "operational_gate": "not_run",
+        "quality_gate": "not_run",
+        "independent_acceptance": "not_recorded",
+        "evidence": null,
+        "review_receipt": null,
+        "implementation_reference": {
+          "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/manifest.json",
+          "revision": "15876da91b67626e9f6a63f80695ce58992234f9"
+        }
+      },
+      "statistics_proposal": {
+        "status": "proposed_not_approved",
+        "method": "paired cluster bootstrap on independent fact/function/seed families",
+        "confidence_percent": 95,
+        "replicates": 10000,
+        "seed": 20261015,
+        "percentiles": [
+          2.5,
+          97.5
+        ],
+        "undefined_fraction_inconclusive_above": 0.05,
+        "scope": "descriptive scoped assessment; not population-wide production failure or success proof"
+      }
+    },
+    "equivalence_established": false,
+    "work_item_adapter_or_scoring_receipt": null,
+    "no_recurrence_scope_mapping": null,
+    "timing_neutrality_effect_estimate": null
+  },
+  "new_backend_calls": 0,
+  "new_model_calls": 0,
+  "new_nodes_started": 0,
+  "host_clock_changes": 0,
+  "target_state_writes": 0,
+  "formal_runs": 0
+}

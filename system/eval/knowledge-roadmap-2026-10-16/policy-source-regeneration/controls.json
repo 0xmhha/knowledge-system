@@ -1,0 +1,84 @@
+[
+  {
+    "kind": "expected_source_sha256",
+    "response": {
+      "schema_version": 1,
+      "status": "source_mismatch",
+      "reason": "expected retained blob differs",
+      "snapshot_sha256": "8705d8766c537e4dcdc6cdc7bde7ad22571472c406532a3a03bf52cb27d2b28c",
+      "symbol": null,
+      "annotations": [],
+      "more": false,
+      "max_annotations": 32,
+      "timeout_ms": 1000,
+      "safety_verdict": "unknown",
+      "automatic_rules": "separate_opt_in_rule_candidates_not_executed",
+      "limitations": [
+        "Manual tags are operator assertions, not verified vulnerabilities or policy compliance; empty tags do not prove safety",
+        "YAML bytes, real row, version, reviewer, review time and approval were not retained; identity/signature trust unsupported",
+        "SQL bounds row count; synchronous legacy node/blob reads and row bytes are not hard process memory or preemptive time bounds",
+        "Legacy merged descriptions cannot reliably separate remediation or severity",
+        "Final rechecks are not a database snapshot transaction and cannot detect changes reverted between reads"
+      ],
+      "elapsed_micros": 36244
+    }
+  },
+  {
+    "kind": "expected_snapshot_sha256",
+    "response": {
+      "schema_version": 1,
+      "status": "source_mismatch",
+      "reason": "expected retained snapshot differs",
+      "snapshot_sha256": "8705d8766c537e4dcdc6cdc7bde7ad22571472c406532a3a03bf52cb27d2b28c",
+      "symbol": null,
+      "annotations": [],
+      "more": false,
+      "max_annotations": 32,
+      "timeout_ms": 1000,
+      "safety_verdict": "unknown",
+      "automatic_rules": "separate_opt_in_rule_candidates_not_executed",
+      "limitations": [
+        "Manual tags are operator assertions, not verified vulnerabilities or policy compliance; empty tags do not prove safety",
+        "YAML bytes, real row, version, reviewer, review time and approval were not retained; identity/signature trust unsupported",
+        "SQL bounds row count; synchronous legacy node/blob reads and row bytes are not hard process memory or preemptive time bounds",
+        "Legacy merged descriptions cannot reliably separate remediation or severity",
+        "Final rechecks are not a database snapshot transaction and cannot detect changes reverted between reads"
+      ],
+      "elapsed_micros": 35468
+    }
+  },
+  {
+    "kind": "assembler_must_not_have_contract_policy",
+    "response": {
+      "schema_version": 1,
+      "status": "no_annotations",
+      "reason": "",
+      "snapshot_sha256": "8705d8766c537e4dcdc6cdc7bde7ad22571472c406532a3a03bf52cb27d2b28c",
+      "symbol": {
+        "node_id": "f425c476c7976d8c",
+        "canonical_id": "github.com/ethereum/go-ethereum/cmd/evm/internal/compiler.Compile",
+        "file": "cmd/evm/internal/compiler/compiler.go",
+        "indexed_commit": "",
+        "source_sha256": {
+          "status": "retained_blob",
+          "value": "e847e73c0852f8bb164a2ec482950d3f879074422322c5b027c1036d5c251905"
+        },
+        "metadata_sha256": "ceb35f8ffbc77e845c101f4add21f5e2dd9deed75d82959bfc6664fa19a1c560"
+      },
+      "annotations": [],
+      "more": false,
+      "max_annotations": 32,
+      "timeout_ms": 1000,
+      "safety_verdict": "unknown",
+      "automatic_rules": "separate_opt_in_rule_candidates_not_executed",
+      "limitations": [
+        "Manual tags are operator assertions, not verified vulnerabilities or policy compliance; empty tags do not prove safety",
+        "YAML bytes, real row, version, reviewer, review time and approval were not retained; identity/signature trust unsupported",
+        "SQL bounds row count; synchronous legacy node/blob reads and row bytes are not hard process memory or preemptive time bounds",
+        "Legacy merged descriptions cannot reliably separate remediation or severity",
+        "Final rechecks are not a database snapshot transaction and cannot detect changes reverted between reads"
+      ],
+      "elapsed_micros": 72395
+    }
+  }
+]

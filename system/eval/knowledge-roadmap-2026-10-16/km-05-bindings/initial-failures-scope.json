@@ -1,0 +1,6 @@
+{
+  "fixture_failure": "The owned retained blob was read-only. Change permission only in the intentional corruption test before altering it. No production archive mutation path added.",
+  "product_failure": "Validation incorrectly required working-tree citation.commit_hash to equal base_commit. Existing retained source only labels committed citations with commit_hash.",
+  "product_fix": "Preserve working-tree base_commit separately and require empty citation.commit_hash for uncommitted sources. Verify both modes with actual owned Git sources.",
+  "semantic_quality_acceptance": false
+}

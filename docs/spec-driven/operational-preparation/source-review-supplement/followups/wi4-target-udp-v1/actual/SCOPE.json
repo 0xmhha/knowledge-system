@@ -1,0 +1,193 @@
+{
+  "phase": 62,
+  "kind": "WI4_actual_UDP_DEV_paths_not_independent_acceptance",
+  "previous_revision": "e30579aeee3de5e7353e3f6c35216f4a9b55c7e1",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "target": "go-stablenet p2p/discover UDPv4.pending/handleReply/loop",
+  "target_toolchain": {
+    "GOVERSION": "go1.23.12",
+    "GOOS": "darwin",
+    "GOARCH": "arm64",
+    "CGO_ENABLED": "1"
+  },
+  "only_test_addition": "p2p/discover/wi4_owned_udp_test.go",
+  "production_patch": false,
+  "scope": {
+    "constructor": "minimal owned UDPv4 channels/context and actual loop; no ListenV4/table/node/socket or production host",
+    "near": "actual pending registrations and unmatched reply barrier; natural native timeout results; exact single resetTimeout call not exposed or claimed",
+    "far": "three actual pending matchers: completing gate callback safely sets two queued deadlines inside sole source loop, then gate removal exposes original two-element list; synthetic state injection, not production deadline reachability",
+    "response": "one actual handleReply event for two same-match pending requests; freeze counts and nil result before cleanup; timeout alternative not silently substituted",
+    "timing": "native respTimeout unchanged; 2000ms bounded step/negative observation; setup/overall timing explicit",
+    "security": "no external network, clock change, credentials, global settings, production node control, installed host, publishing or paid model calls"
+  },
+  "expected_observations_not_independent_oracle": {
+    "UDP-near": "two native errTimeout outcomes after actual pending; timer reset request count/list contents unknown",
+    "UDP-far-pair": "injected far head receives errClockWarp; second far tail remains pending during 2000ms before cleanup",
+    "UDP-far-near": "injected far head receives errClockWarp; near tail remains pending during 2000ms before cleanup",
+    "UDP-response-timeout": "response arm: one handleReply completes first matcher, second callback untouched and no second result at freeze; cleanup afterward"
+  },
+  "planned_slots": [
+    {
+      "slot_id": "general-r1-UDP-near",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "UDP-near"
+    },
+    {
+      "slot_id": "general-r1-UDP-far-pair",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "UDP-far-pair"
+    },
+    {
+      "slot_id": "general-r1-UDP-far-near",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "UDP-far-near"
+    },
+    {
+      "slot_id": "general-r1-UDP-response-timeout",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "UDP-response-timeout"
+    },
+    {
+      "slot_id": "general-r2-UDP-near",
+      "variant": "general",
+      "repetition": 2,
+      "case_id": "UDP-near"
+    },
+    {
+      "slot_id": "general-r2-UDP-far-pair",
+      "variant": "general",
+      "repetition": 2,
+      "case_id": "UDP-far-pair"
+    },
+    {
+      "slot_id": "general-r2-UDP-far-near",
+      "variant": "general",
+      "repetition": 2,
+      "case_id": "UDP-far-near"
+    },
+    {
+      "slot_id": "general-r2-UDP-response-timeout",
+      "variant": "general",
+      "repetition": 2,
+      "case_id": "UDP-response-timeout"
+    },
+    {
+      "slot_id": "general-r3-UDP-near",
+      "variant": "general",
+      "repetition": 3,
+      "case_id": "UDP-near"
+    },
+    {
+      "slot_id": "general-r3-UDP-far-pair",
+      "variant": "general",
+      "repetition": 3,
+      "case_id": "UDP-far-pair"
+    },
+    {
+      "slot_id": "general-r3-UDP-far-near",
+      "variant": "general",
+      "repetition": 3,
+      "case_id": "UDP-far-near"
+    },
+    {
+      "slot_id": "general-r3-UDP-response-timeout",
+      "variant": "general",
+      "repetition": 3,
+      "case_id": "UDP-response-timeout"
+    },
+    {
+      "slot_id": "race-r1-UDP-near",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "UDP-near"
+    },
+    {
+      "slot_id": "race-r1-UDP-far-pair",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "UDP-far-pair"
+    },
+    {
+      "slot_id": "race-r1-UDP-far-near",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "UDP-far-near"
+    },
+    {
+      "slot_id": "race-r1-UDP-response-timeout",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "UDP-response-timeout"
+    },
+    {
+      "slot_id": "race-r2-UDP-near",
+      "variant": "race",
+      "repetition": 2,
+      "case_id": "UDP-near"
+    },
+    {
+      "slot_id": "race-r2-UDP-far-pair",
+      "variant": "race",
+      "repetition": 2,
+      "case_id": "UDP-far-pair"
+    },
+    {
+      "slot_id": "race-r2-UDP-far-near",
+      "variant": "race",
+      "repetition": 2,
+      "case_id": "UDP-far-near"
+    },
+    {
+      "slot_id": "race-r2-UDP-response-timeout",
+      "variant": "race",
+      "repetition": 2,
+      "case_id": "UDP-response-timeout"
+    },
+    {
+      "slot_id": "race-r3-UDP-near",
+      "variant": "race",
+      "repetition": 3,
+      "case_id": "UDP-near"
+    },
+    {
+      "slot_id": "race-r3-UDP-far-pair",
+      "variant": "race",
+      "repetition": 3,
+      "case_id": "UDP-far-pair"
+    },
+    {
+      "slot_id": "race-r3-UDP-far-near",
+      "variant": "race",
+      "repetition": 3,
+      "case_id": "UDP-far-near"
+    },
+    {
+      "slot_id": "race-r3-UDP-response-timeout",
+      "variant": "race",
+      "repetition": 3,
+      "case_id": "UDP-response-timeout"
+    }
+  ],
+  "retries": 0,
+  "parallelism": 2,
+  "build_timeout_seconds": 600,
+  "test_timeout_seconds": 15,
+  "owned_process_timeout_seconds": 20,
+  "failure_policy": "retain every slot, actual failure/unknown/cleanup separately; no retry or pass relabel",
+  "acceptance_limits": {
+    "new_independent_families": 0,
+    "independent_approved": 0,
+    "FINAL": 0,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "full_original_driver_acceptance": 0,
+    "freeze": null,
+    "execution_allowed": false,
+    "quality_score": null
+  },
+  "remaining_after_this_probe_scope": "WI4 other12 schedules plus original timing/entry/independent semantics debts; other WI and ontology remain"
+}

@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "ticket_id": "KS-P06-REVIEW",
+  "rules": {
+    "tool": "cks.context.rule_candidates",
+    "arguments": {
+      "rule_pack": "go-local-review@1.0.0",
+      "function": {
+        "node_id": "55fac4690874d1be",
+        "expected_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+        "expected_source_sha256": "6915fd89e741e294691770ad920c8e4892d3c1fbe1d57ddf2b344dd38135525c",
+        "expected_snapshot_sha256": "7ccd9521f85d4dcbcce5d14ea333e488841e103b9bceeb842187370f624f58eb"
+      }
+    },
+    "result": {
+      "schema_version": 1,
+      "status": "partial",
+      "snapshot_sha256": "7ccd9521f85d4dcbcce5d14ea333e488841e103b9bceeb842187370f624f58eb",
+      "analysis": {
+        "schema_version": 1,
+        "source": {
+          "node_id": "55fac4690874d1be",
+          "canonical_id": "example.invalid/consumer-stdio-fixture.Field",
+          "file": "logic.go",
+          "commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+          "sha256": "6915fd89e741e294691770ad920c8e4892d3c1fbe1d57ddf2b344dd38135525c",
+          "language": "go",
+          "start_line": 21,
+          "start_byte": 402,
+          "bytes": 67,
+          "snapshot_sha256": "7ccd9521f85d4dcbcce5d14ea333e488841e103b9bceeb842187370f624f58eb",
+          "function_name": "Field"
+        },
+        "limits": {
+          "max_source_bytes": 262144,
+          "max_ast_nodes": 4096,
+          "max_blocks": 256,
+          "max_nodes": 1024,
+          "max_edges": 4096,
+          "max_iterations": 128,
+          "timeout_ms": 1000,
+          "max_facts": 65536
+        },
+        "status": "partial",
+        "capability": {
+          "cfg": "bounded_go",
+          "control_dependence": "normal_exit_postdominators",
+          "data_dependence": "local_scalar_may_reach",
+          "def_use": "lexical_may_reach",
+          "exceptions": "unsupported",
+          "local_binding": "isolated_go_types",
+          "memory_alias": "unsupported",
+          "package_types": "unavailable_function_blob",
+          "short_circuit": "unsupported"
+        },
+        "blocks": [
+          {
+            "id": 0,
+            "kind": "Body",
+            "reachable": true,
+            "nodes": [
+              "entry",
+              "b0/n0",
+              "b0/n1"
+            ]
+          },
+          {
+            "id": 1,
+            "kind": "Unreachable",
+            "reachable": false,
+            "nodes": []
+          }
+        ],
+        "nodes": [
+          {
+            "id": "b0/n0",
+            "block": 0,
+            "kind": "AssignStmt",
+            "location": {
+              "start_byte": 436,
+              "end_byte": 449,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "text": "box.Total = x",
+            "synthetic": false
+          },
+          {
+            "id": "b0/n1",
+            "block": 0,
+            "kind": "ReturnStmt",
+            "location": {
+              "start_byte": 451,
+              "end_byte": 467,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "text": "return box.Total",
+            "synthetic": false
+          },
+          {
+            "id": "entry",
+            "block": 0,
+            "kind": "entry",
+            "location": {
+              "start_byte": 402,
+              "end_byte": 433,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "text": "",
+            "synthetic": true
+          }
+        ],
+        "edges": [
+          {
+            "from": "entry",
+            "to": "b0/n0",
+            "kind": "data_dependence",
+            "certainty": "may_reach",
+            "variable": "v423"
+          },
+          {
+            "from": "entry",
+            "to": "b0/n0",
+            "kind": "address_dependence",
+            "certainty": "may_reach",
+            "variable": "v413"
+          },
+          {
+            "from": "entry",
+            "to": "b0/n1",
+            "kind": "address_dependence",
+            "certainty": "may_reach",
+            "variable": "v413"
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "isolated_type_info_partial",
+            "message": "Missing package types/imports or invalid source leave partial isolated Go type bindings; no package-wide proof"
+          },
+          {
+            "code": "memory_write_untracked",
+            "message": "Indirect writes do not kill or define scalar container variables",
+            "location": {
+              "start_byte": 436,
+              "end_byte": 445,
+              "start_line": 21,
+              "end_line": 21
+            }
+          },
+          {
+            "code": "field_read_untracked",
+            "message": "Field memory/type/alias relationships are not proven from a function blob",
+            "location": {
+              "start_byte": 436,
+              "end_byte": 445,
+              "start_line": 21,
+              "end_line": 21
+            }
+          },
+          {
+            "code": "field_read_untracked",
+            "message": "Field memory/type/alias relationships are not proven from a function blob",
+            "location": {
+              "start_byte": 458,
+              "end_byte": 467,
+              "start_line": 21,
+              "end_line": 21
+            }
+          }
+        ],
+        "truncated": false,
+        "elapsed_micros": 153,
+        "variables": [
+          {
+            "id": "v413",
+            "name": "box",
+            "kind": "parameter",
+            "declaration": {
+              "start_byte": 413,
+              "end_byte": 416,
+              "start_line": 21,
+              "end_line": 21
+            }
+          },
+          {
+            "id": "v423",
+            "name": "x",
+            "kind": "parameter",
+            "declaration": {
+              "start_byte": 423,
+              "end_byte": 424,
+              "start_line": 21,
+              "end_line": 21
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "id": "b0/n0/address/v413/436",
+            "node": "b0/n0",
+            "variable": "v413",
+            "role": "address",
+            "location": {
+              "start_byte": 436,
+              "end_byte": 439,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "reachable": true
+          },
+          {
+            "id": "b0/n0/use/v423/448",
+            "node": "b0/n0",
+            "variable": "v423",
+            "role": "use",
+            "location": {
+              "start_byte": 448,
+              "end_byte": 449,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "reachable": true
+          },
+          {
+            "id": "b0/n1/address/v413/458",
+            "node": "b0/n1",
+            "variable": "v413",
+            "role": "address",
+            "location": {
+              "start_byte": 458,
+              "end_byte": 461,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "reachable": true
+          },
+          {
+            "id": "entry/definition/v413/413",
+            "node": "entry",
+            "variable": "v413",
+            "role": "definition",
+            "location": {
+              "start_byte": 413,
+              "end_byte": 416,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "reachable": true
+          },
+          {
+            "id": "entry/definition/v423/423",
+            "node": "entry",
+            "variable": "v423",
+            "role": "definition",
+            "location": {
+              "start_byte": 423,
+              "end_byte": 424,
+              "start_line": 21,
+              "end_line": 21
+            },
+            "reachable": true
+          }
+        ],
+        "def_use": [
+          {
+            "definition": "entry/definition/v423/423",
+            "use": "b0/n0/use/v423/448",
+            "variable": "v423",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "entry/definition/v413/413",
+            "use": "b0/n0/address/v413/436",
+            "variable": "v413",
+            "certainty": "lexical_may_reach"
+          },
+          {
+            "definition": "entry/definition/v413/413",
+            "use": "b0/n1/address/v413/458",
+            "variable": "v413",
+            "certainty": "lexical_may_reach"
+          }
+        ],
+        "iterations": 6,
+        "facts_peak": 20,
+        "rules": {
+          "pack_id": "go-local-review",
+          "pack_version": "1.0.0",
+          "pack_sha256": "a1edcb4a8c8496c25e4e053784b93d528f17b765947961e37bb5f8d61304dd2d",
+          "engine_version": "2",
+          "origin": "automatic",
+          "status": "matched_bounded",
+          "limits": {
+            "max_candidates": 64,
+            "max_flow_steps": 4096
+          },
+          "flow_steps": 37,
+          "candidates": [],
+          "limitations": [
+            "empty_candidates_do_not_establish_safety",
+            "syntax_targets_unresolved",
+            "parameters_not_proven_attacker_controlled",
+            "lexical_may_reach_not_path_feasibility",
+            "sanitizers_and_opaque_call_effects_not_proven",
+            "aliases_closures_fields_and_indirect_sinks_unsupported"
+          ]
+        }
+      },
+      "elapsed_micros": 2895
+    }
+  },
+  "function_review": {
+    "tool": "cks.context.review_function",
+    "arguments": {
+      "symbol": "example.invalid/consumer-stdio-fixture.Field"
+    },
+    "result": {
+      "seed": {
+        "id": "55fac4690874d1be",
+        "qualified_name": "fixture.Field",
+        "type": "Function",
+        "file_path": "logic.go",
+        "start_line": 21,
+        "end_line": 21
+      },
+      "code": {
+        "signature": "func Field(box *Box, x int) int",
+        "uses_types": [
+          {
+            "id": "f1f0d01a74c47916",
+            "qualified_name": "fixture.Box",
+            "type": "Struct",
+            "file_path": "logic.go",
+            "start_line": 5,
+            "end_line": 5
+          }
+        ],
+        "instantiates": null,
+        "writes_fields": [
+          {
+            "id": "f0a7ca5f02f3a2e9",
+            "qualified_name": "fixture.Box.Total",
+            "type": "Field",
+            "file_path": "logic.go",
+            "start_line": 5,
+            "end_line": 5
+          }
+        ],
+        "return_statements": 1,
+        "control": {},
+        "call_sites": null,
+        "call_sites_total": 0,
+        "callees": null,
+        "interface_implementers": {},
+        "callers": null,
+        "via_interfaces": null,
+        "caller_paths": null,
+        "entry_points": 0,
+        "caller_walk_truncated": false,
+        "goroutines": null,
+        "sends_to": null,
+        "recvs_from": null,
+        "acquires_locks": null,
+        "releases_locks": null,
+        "timeout_paths": null,
+        "cancellation_paths": null
+      },
+      "history": {
+        "commits": [
+          {
+            "sha": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+            "time": 1792183357,
+            "subject": "test: own stdio contract fixture"
+          }
+        ],
+        "commits_total": 1,
+        "prs": []
+      },
+      "tests": {
+        "callers": [
+          {
+            "id": "ae9c86abeeb1b5d7",
+            "qualified_name": "fixture.TestFixture",
+            "type": "Function",
+            "file_path": "logic_test.go",
+            "start_line": 5,
+            "end_line": 12
+          }
+        ],
+        "callers_total": 1
+      },
+      "available": [
+        "history: 1 commits and 0 PRs changed this function; diffs and related past changes: cks.context.change_history",
+        "tests: 1 test functions call it; cks.context.find_callers lists them (it includes tests unless exclude_tests=true)"
+      ],
+      "limits": [
+        "calls through function values, callbacks, reflection and generated code have no graph edges and do not appear in callers or callees",
+        "a channel send or receive is listed, but the goroutine on the other end is not resolved",
+        "history covers the commits the index walked per file (a bounded recent window), not the whole repository history"
+      ]
+    }
+  }
+}

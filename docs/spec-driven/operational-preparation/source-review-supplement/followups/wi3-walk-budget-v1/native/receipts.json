@@ -1,0 +1,178 @@
+[
+  {
+    "label": "build",
+    "argv": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-wi3-walk-20261019/native-source-final-v2",
+    "pid": 37952,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 6.3620063327252865,
+    "source_binding_sha256": "c0513b1c297cc21b05776bd1a91c9521aa87bc9c5448cec88c363869da1c6ec3",
+    "source_head": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "test",
+    "argv": [
+      "go",
+      "test",
+      "-json",
+      "-count=1",
+      "-timeout=18m",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-wi3-walk-20261019/native-source-final-v2",
+    "pid": 38273,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 377.5421151248738,
+    "source_binding_sha256": "c0513b1c297cc21b05776bd1a91c9521aa87bc9c5448cec88c363869da1c6ec3",
+    "source_head": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0",
+    "tests": {
+      "pass": 4158,
+      "fail": 0,
+      "skip": 18
+    },
+    "packages": {
+      "pass": 124,
+      "fail": 0,
+      "skip": 12
+    },
+    "stdout_sha256": "51415bd20ea35b860fe726bf564834ad760c977e42100b1dc43b0007c016f06e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "race",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-json",
+      "-count=1",
+      "-timeout=20m",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-wi3-walk-20261019/native-source-final-v2",
+    "pid": 70780,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 704.0996712911874,
+    "source_binding_sha256": "c0513b1c297cc21b05776bd1a91c9521aa87bc9c5448cec88c363869da1c6ec3",
+    "source_head": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0",
+    "tests": {
+      "pass": 4158,
+      "fail": 0,
+      "skip": 18
+    },
+    "packages": {
+      "pass": 124,
+      "fail": 0,
+      "skip": 12
+    },
+    "stdout_sha256": "c751cb69d40d7109e91deefa298e4ef2e69ac6feef69d6631cffd21edd1501dc",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "lint",
+    "argv": [
+      "make",
+      "lint",
+      "GOLANGCI_LINT=/Users/kevin/.gvm/pkgsets/go1.26.8/global/bin/golangci-lint"
+    ],
+    "cwd": "/private/tmp/ks-wi3-walk-20261019/native-source-final-v2",
+    "pid": 19031,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 15.814948583953083,
+    "source_binding_sha256": "c0513b1c297cc21b05776bd1a91c9521aa87bc9c5448cec88c363869da1c6ec3",
+    "source_head": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0",
+    "stdout_sha256": "e4b31dd5ff7016393b49b1d4431f2f287975ff0c9d8ce18afdfe5485d35f1a37",
+    "stderr_sha256": "23f483b730e84579f40be060b745c4252b4b826b2c17b2105856879132e8b0a3"
+  },
+  {
+    "label": "build-bins",
+    "argv": [
+      "make",
+      "build-bins"
+    ],
+    "cwd": "/private/tmp/ks-wi3-walk-20261019/native-source-final-v2",
+    "pid": 19984,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 2.222707375418395,
+    "source_binding_sha256": "c0513b1c297cc21b05776bd1a91c9521aa87bc9c5448cec88c363869da1c6ec3",
+    "source_head": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0",
+    "stdout_sha256": "be35acd6eb850c5ea10ebf4ef48416cd02f15d67a133d18e47182b6a9ec49af4",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build-runtime",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/ks-wi3-walk-20261019/native-validated/read-cks",
+      "./cmd/cks"
+    ],
+    "cwd": "/private/tmp/ks-wi3-walk-20261019/native-source-final-v2",
+    "pid": 20167,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 4.50395941734314,
+    "source_binding_sha256": "c0513b1c297cc21b05776bd1a91c9521aa87bc9c5448cec88c363869da1c6ec3",
+    "source_head": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build-info",
+    "argv": [
+      "go",
+      "version",
+      "-m",
+      "/private/tmp/ks-wi3-walk-20261019/native-validated/read-cks"
+    ],
+    "cwd": "/private/tmp/ks-wi3-walk-20261019/native-source-final-v2",
+    "pid": 20410,
+    "owned_new_session": true,
+    "exit_code": 0,
+    "timeout": false,
+    "term_sent": false,
+    "kill_sent": false,
+    "reaped": true,
+    "elapsed_seconds": 0.021141875069588423,
+    "source_binding_sha256": "c0513b1c297cc21b05776bd1a91c9521aa87bc9c5448cec88c363869da1c6ec3",
+    "source_head": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0",
+    "stdout_sha256": "a6d3092313703c0b63c8f7ed716f691c818666d4fcc9d3714005eeec086ae855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "path": "core/txpool/legacypool/legacypool.go",
+  "file_sha256": "9aeac17494e1900db5454c3331153aa510954e9ba3130485e8e6efeec36442b3",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "function_sha256": "e4c7200a5531f4874840882bebd0bce31ce0def14e7772bd0be6cebd1b71d7d6",
+  "function_span": {
+    "start_byte": 49834,
+    "end_byte_exclusive": 52572
+  },
+  "witnesses": [
+    {
+      "start_byte": 51021,
+      "end_byte_exclusive": 51070,
+      "span_sha256": "e67869aabec4d5d663616978b5140e47a1f2285a5fd9417c449077a8560c6b3d",
+      "text": "promoted := pool.promoteExecutables(promoteAddrs)"
+    },
+    {
+      "start_byte": 52523,
+      "end_byte_exclusive": 52567,
+      "span_sha256": "6ec37bd22ad8fb367e325fe2f5c181e24243d5e23c8fe48cb12c7e5253d12dcf",
+      "text": "pool.txFeed.Send(core.NewTxsEvent{Txs: txs})"
+    }
+  ],
+  "explanation": "scheduleReorgLoop launches runReorg; runReorg promotes executable transactions and merges promoted/queued events before txFeed.Send. Static support, not runtime cause or scheduling fairness.",
+  "changes": [
+    {
+      "case_id": "RQ-007",
+      "location_id": "RQ-008",
+      "previous_label": "unknown",
+      "review_label": "relevant",
+      "relevance_kind": "supporting_static_call_context"
+    },
+    {
+      "case_id": "RQ-008",
+      "location_id": "RQ-007",
+      "previous_label": "unknown",
+      "review_label": "relevant",
+      "relevance_kind": "supporting_static_call_context"
+    }
+  ],
+  "root_cause_established": false,
+  "independent_review": null,
+  "caller_witness": {
+    "start_byte": 48435,
+    "end_byte_exclusive": 48497,
+    "span_sha256": "43f1591241f1accd601f2c9acf573d1346425c212a0b5a82f361512b4a9ce1dd",
+    "text": "go pool.runReorg(nextDone, reset, dirtyAccounts, queuedEvents)"
+  }
+}

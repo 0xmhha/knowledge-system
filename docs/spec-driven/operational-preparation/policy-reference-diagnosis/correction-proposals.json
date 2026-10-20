@@ -1,0 +1,148 @@
+{
+  "kind": "unapproved_unapplied_overlay_corrections",
+  "changes": [
+    {
+      "policy_id": "A10.codegen.contract_regen_procedure",
+      "old": "compiler.Compile",
+      "new": "compile.Compile",
+      "original_matches": [
+        {
+          "id": "f425c476c7976d8c",
+          "type": "Function",
+          "qualified_name": "compiler.Compile",
+          "path": "cmd/evm/internal/compiler/compiler.go",
+          "line": 26,
+          "start_byte": 816,
+          "end_byte": 1186
+        }
+      ],
+      "proposed_matches": [
+        {
+          "id": "ff9ffa92eee21ceb",
+          "type": "Function",
+          "qualified_name": "compile.Compile",
+          "path": "systemcontracts/compile/compiler/compiler.go",
+          "line": 40,
+          "start_byte": 1236,
+          "end_byte": 2814
+        }
+      ],
+      "approved": false,
+      "applied": false
+    },
+    {
+      "policy_id": "A10.codegen.contract_regen_procedure",
+      "old": "compiler.compiledTy.ExportContractCode",
+      "new": "compile.compiledTy.ExportContractCode",
+      "original_matches": [],
+      "proposed_matches": [
+        {
+          "id": "f95df2bb950c9283",
+          "type": "Method",
+          "qualified_name": "compile.compiledTy.ExportContractCode",
+          "path": "systemcontracts/compile/compiler/compiler.go",
+          "line": 123,
+          "start_byte": 3661,
+          "end_byte": 4022
+        }
+      ],
+      "approved": false,
+      "applied": false
+    },
+    {
+      "policy_id": "A10.codegen.contract_regen_procedure",
+      "old": "compiler.solcVersion",
+      "new": "compile.solcVersion",
+      "original_matches": [],
+      "proposed_matches": [
+        {
+          "id": "cc3808c2f06811d0",
+          "type": "Variable",
+          "qualified_name": "compile.solcVersion",
+          "path": "systemcontracts/compile/compiler/compiler.go",
+          "line": 37,
+          "start_byte": 1203,
+          "end_byte": 1232
+        }
+      ],
+      "approved": false,
+      "applied": false
+    },
+    {
+      "policy_id": "A11.txpool.type_taxonomy_admission",
+      "old": "types.ErrInvalidFeePayer",
+      "new": "txpool.ErrInvalidFeePayer",
+      "original_matches": [],
+      "proposed_matches": [
+        {
+          "id": "cbf7cc2bf5d087b5",
+          "type": "Variable",
+          "qualified_name": "txpool.ErrInvalidFeePayer",
+          "path": "core/txpool/errors.go",
+          "line": 69,
+          "start_byte": 3156,
+          "end_byte": 3223
+        }
+      ],
+      "approved": false,
+      "applied": false
+    },
+    {
+      "policy_id": "A13.sealing.reorg_serialization",
+      "old": "legacypool.queueTxEvent",
+      "new": "legacypool.LegacyPool.queueTxEvent",
+      "original_matches": [],
+      "proposed_matches": [
+        {
+          "id": "ddc421db691255f8",
+          "type": "Method",
+          "qualified_name": "legacypool.LegacyPool.queueTxEvent",
+          "path": "core/txpool/legacypool/legacypool.go",
+          "line": 1284,
+          "start_byte": 47619,
+          "end_byte": 47758
+        }
+      ],
+      "approved": false,
+      "applied": false
+    },
+    {
+      "policy_id": "A3.validator_set.epoch_transition",
+      "old": "engine.Engine.GetValidators",
+      "new": "wbftengine.Engine.GetValidators",
+      "original_matches": [],
+      "proposed_matches": [
+        {
+          "id": "1fe5cf7a84dc76c9",
+          "type": "Method",
+          "qualified_name": "wbftengine.Engine.GetValidators",
+          "path": "consensus/wbft/engine/engine.go",
+          "line": 1097,
+          "start_byte": 40471,
+          "end_byte": 41223
+        }
+      ],
+      "approved": false,
+      "applied": false
+    },
+    {
+      "policy_id": "A4.system_contracts.build_deploy_pipeline",
+      "old": "compiler.solcVersion",
+      "new": "compile.solcVersion",
+      "original_matches": [],
+      "proposed_matches": [
+        {
+          "id": "cc3808c2f06811d0",
+          "type": "Variable",
+          "qualified_name": "compile.solcVersion",
+          "path": "systemcontracts/compile/compiler/compiler.go",
+          "line": 37,
+          "start_byte": 1203,
+          "end_byte": 1232
+        }
+      ],
+      "approved": false,
+      "applied": false
+    }
+  ]
+}

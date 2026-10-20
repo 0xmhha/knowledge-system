@@ -1,0 +1,94 @@
+func generateAccounts(ctx *generatorContext, dl *diskLayer, accMarker []byte) error {
+	onAccount := func(key []byte, val []byte, write bool, delete bool) error {
+		// Make sure to clear all dangling storages before this account
+		account := common.BytesToHash(key)
+		ctx.removeStorageBefore(account)
+
+		start := time.Now()
+		if delete {
+			rawdb.DeleteAccountSnapshot(ctx.batch, account)
+			snapWipedAccountMeter.Mark(1)
+			snapAccountWriteCounter.Inc(time.Since(start).Nanoseconds())
+
+			ctx.removeStorageAt(account)
+			return nil
+		}
+		// Retrieve the current account and flatten it into the internal format
+		var acc types.StateAccount
+		if err := rlp.DecodeBytes(val, &acc); err != nil {
+			log.Crit("Invalid account encountered during snapshot creation", "err", err)
+		}
+		// If the account is not yet in-progress, write it out
+		if accMarker == nil || !bytes.Equal(account[:], accMarker) {
+			dataLen := len(val) // Approximate size, saves us a round of RLP-encoding
+			if !write {
+				if bytes.Equal(acc.CodeHash, types.EmptyCodeHash[:]) {
+					dataLen -= 32
+				}
+				if acc.Root == types.EmptyRootHash {
+					dataLen -= 32
+				}
+				snapRecoveredAccountMeter.Mark(1)
+			} else {
+				data := types.SlimAccountRLP(acc)
+				dataLen = len(data)
+				rawdb.WriteAccountSnapshot(ctx.batch, account, data)
+				snapGeneratedAccountMeter.Mark(1)
+			}
+			ctx.stats.storage += common.StorageSize(1 + common.HashLength + dataLen)
+			ctx.stats.accounts++
+		}
+		// If the snap generation goes here after interrupted, genMarker may go backward
+		// when last genMarker is consisted of accountHash and storageHash
+		marker := account[:]
+		if accMarker != nil && bytes.Equal(marker, accMarker) && len(dl.genMarker) > common.HashLength {
+			marker = dl.genMarker[:]
+		}
+		// If we've exceeded our batch allowance or termination was requested, flush to disk
+		if err := dl.checkAndFlush(ctx, marker); err != nil {
+			return err
+		}
+		snapAccountWriteCounter.Inc(time.Since(start).Nanoseconds()) // let's count flush time as well
+
+		// If the iterated account is the contract, create a further loop to
+		// verify or regenerate the contract storage.
+		if acc.Root == types.EmptyRootHash {
+			ctx.removeStorageAt(account)
+		} else {
+			var storeMarker []byte
+			if accMarker != nil && bytes.Equal(account[:], accMarker) && len(dl.genMarker) > common.HashLength {
+				storeMarker = dl.genMarker[common.HashLength:]
+			}
+			if err := generateStorages(ctx, dl, dl.root, account, acc.Root, storeMarker); err != nil {
+				return err
+			}
+		}
+		// Some account processed, unmark the marker
+		accMarker = nil
+		return nil
+	}
+	// Always reset the initial account range as 1 whenever recover from the
+	// interruption. TODO(rjl493456442) can we remove it?
+	var accountRange = accountCheckRange
+	if len(accMarker) > 0 {
+		accountRange = 1
+	}
+	origin := common.CopyBytes(accMarker)
+	for {
+		id := trie.StateTrieID(dl.root)
+		exhausted, last, err := dl.generateRange(ctx, id, rawdb.SnapshotAccountPrefix, snapAccount, origin, accountRange, onAccount, types.FullAccountRLP)
+		if err != nil {
+			return err // The procedure it aborted, either by external signal or internal error.
+		}
+		origin = increaseKey(last)
+
+		// Last step, cleanup the storages after the last account.
+		// All the left storages should be treated as dangling.
+		if origin == nil || exhausted {
+			ctx.removeStorageLeft()
+			break
+		}
+		accountRange = accountCheckRange
+	}
+	return nil
+}

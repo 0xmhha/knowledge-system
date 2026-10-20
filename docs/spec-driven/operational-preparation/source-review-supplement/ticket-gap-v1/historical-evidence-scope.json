@@ -1,0 +1,265 @@
+{
+  "kind": "scoped_historical_execution_not_current_ticket_acceptance",
+  "v1": {
+    "scope": "actual Go source/CLI/hook execution; no live Claude host/chain/human acceptance",
+    "tier": "simulation",
+    "symptom_id": "ledger-total",
+    "oracle_runs": 16,
+    "mechanical_verdict": "PASS",
+    "run_matrix": [
+      {
+        "oracle_id": "primary",
+        "variant": "base",
+        "case_id": "symptom",
+        "outcome": "RED"
+      },
+      {
+        "oracle_id": "independent",
+        "variant": "base",
+        "case_id": "symptom",
+        "outcome": "RED"
+      },
+      {
+        "oracle_id": "primary",
+        "variant": "base",
+        "case_id": "empty",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "independent",
+        "variant": "base",
+        "case_id": "empty",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "primary",
+        "variant": "base",
+        "case_id": "single",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "independent",
+        "variant": "base",
+        "case_id": "single",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "primary",
+        "variant": "head",
+        "case_id": "symptom",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "independent",
+        "variant": "head",
+        "case_id": "symptom",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "primary",
+        "variant": "head",
+        "case_id": "empty",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "independent",
+        "variant": "head",
+        "case_id": "empty",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "primary",
+        "variant": "head",
+        "case_id": "single",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "independent",
+        "variant": "head",
+        "case_id": "single",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "primary",
+        "variant": "mutant:lost-credit",
+        "case_id": "symptom",
+        "outcome": "RED"
+      },
+      {
+        "oracle_id": "independent",
+        "variant": "mutant:lost-credit",
+        "case_id": "symptom",
+        "outcome": "RED"
+      },
+      {
+        "oracle_id": "primary",
+        "variant": "mutant:literal-overfit",
+        "case_id": "symptom",
+        "outcome": "GREEN"
+      },
+      {
+        "oracle_id": "independent",
+        "variant": "mutant:literal-overfit",
+        "case_id": "symptom",
+        "outcome": "RED"
+      }
+    ],
+    "normal_controls": [
+      "empty",
+      "single"
+    ],
+    "mutants": [
+      {
+        "id": "lost-credit",
+        "kind": "reintroduce_symptom",
+        "patches": [
+          {
+            "path": "ledger.go",
+            "before": "total += credit",
+            "after": "total = credit"
+          }
+        ]
+      },
+      {
+        "id": "literal-overfit",
+        "kind": "overfit",
+        "patches": [
+          {
+            "path": "ledger.go",
+            "before": "return total",
+            "after": "return 42"
+          }
+        ]
+      }
+    ],
+    "completion_check": "{\"completion_gate\": \"PASS\"}",
+    "valid_completion_hook": "allowed",
+    "invalid_report_hook": {
+      "hookSpecificOutput": {
+        "hookEventName": "PreToolUse",
+        "permissionDecision": "deny",
+        "permissionDecisionReason": "Bugfix completion blocked: state does not bind the generated oracle report"
+      }
+    },
+    "independent_human_acceptance": "not_recorded"
+  },
+  "v2": {
+    "scope": "actual Go proposal materialization, oracle/metric/regression execution, selection/check/guards",
+    "panel_origin": "model",
+    "decision": {
+      "status": "SELECTED",
+      "selected_candidate": "loop",
+      "selected_commit": "9ce33557a22aa90c81ad90a5c0c0d76e785b8717",
+      "selected_tree": "3c7cfc8ff567f9c079b492f0bce42591e96b45c3",
+      "reason": "hard-eligible, unanimous preference and sole observed Pareto candidate",
+      "axes_used": [
+        "changed_lines",
+        "allocations"
+      ],
+      "rejections": {
+        "literal": "oracle/regression/execution hard condition failed"
+      }
+    },
+    "candidates": [
+      {
+        "id": "loop",
+        "hard_eligible": true,
+        "observation_complete": true,
+        "metrics": {
+          "changed_lines": {
+            "value": 7,
+            "unit": "lines",
+            "origin": "Git diff --numstat"
+          },
+          "allocations": {
+            "value": 0.0,
+            "unit": "allocations/call",
+            "origin": "executed frozen adapter",
+            "driver_source": "oracles/selection_driver.py",
+            "receipt_sha256": "cd388908390e01656f17f00006b3938a546079232147b1b6f17ed8f1da7e3ded"
+          }
+        },
+        "regression": "PASS"
+      },
+      {
+        "id": "copy",
+        "hard_eligible": true,
+        "observation_complete": true,
+        "metrics": {
+          "changed_lines": {
+            "value": 8,
+            "unit": "lines",
+            "origin": "Git diff --numstat"
+          },
+          "allocations": {
+            "value": 1.0,
+            "unit": "allocations/call",
+            "origin": "executed frozen adapter",
+            "driver_source": "oracles/selection_driver.py",
+            "receipt_sha256": "e91986b23ef370f24c9f3023d400ffe1fdbb85e44f87c46b3d929e255d01b45f"
+          }
+        },
+        "regression": "PASS"
+      },
+      {
+        "id": "literal",
+        "hard_eligible": false,
+        "observation_complete": true,
+        "metrics": {
+          "changed_lines": {
+            "value": 7,
+            "unit": "lines",
+            "origin": "Git diff --numstat"
+          },
+          "allocations": {
+            "value": 0.0,
+            "unit": "allocations/call",
+            "origin": "executed frozen adapter",
+            "driver_source": "oracles/selection_driver.py",
+            "receipt_sha256": "d6e85f015741a3a215f4ae277acc0e1b798e94636841fe6570ec1760025d215d"
+          }
+        },
+        "regression": "FAIL"
+      }
+    ],
+    "criteria": {
+      "selection_rule": "unanimous-panel-and-pareto",
+      "axes": [
+        {
+          "id": "changed_lines",
+          "unit": "lines",
+          "direction": "min",
+          "required": true
+        },
+        {
+          "id": "allocations",
+          "unit": "allocations/call",
+          "direction": "min",
+          "required": true
+        }
+      ],
+      "role_scope": "Each accept/reject concerns the minimum safety of that role; merely preferring a cheaper valid candidate is not a rejection. This is an isolated pure function with immutable inputs. No claim about production callsites or universal optimality."
+    },
+    "panel_roles": [
+      "correctness",
+      "maintainability",
+      "regression"
+    ],
+    "independent_human_acceptance": "not_recorded",
+    "fixture_panel_origin": "fixture",
+    "initial_attempt_scope": {
+      "status": "superseded implementation state; not final completion evidence",
+      "reason": "strengthened handling of candidates with incomplete execution after this measured run",
+      "selection_runner_sha256": "97b29240e8da36a4983e3a881da3f04e463eaa1eebbb7ad170e8858a1b405a2b",
+      "source_commit": "not committed at execution"
+    },
+    "selection_check": "PASS",
+    "applied_tree_check": "PASS",
+    "final_current_head_oracle": "PASS",
+    "both_completion_guards": "allowed"
+  },
+  "current_development_ticket_covered": false,
+  "approved_independent_tickets": 0,
+  "independent_acceptable_candidate_set": null,
+  "new_model_calls": 0
+}

@@ -1,0 +1,91 @@
+{
+  "kind": "actual_large_retained_graph_long_function_profile_DEV_not_capacity_acceptance",
+  "source_revision": "49662a5bc27dbae01e956c8c03a72a5b803a174e",
+  "binary_sha256": "069806973f5e4c7bf611b5281b028ba378a0d011c985438924d6f082bd16d623",
+  "binary_source_binding_sha256": "78e96a97895f05575148fe767567f1e56f607db382ffdcf755b7d4c6cbdac6b5",
+  "execution_gate": "all phase80 corrective native receipts pass and observed/runtime binary equality; no execution before gate",
+  "corpus_nodes": 244989,
+  "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+  "dataset_id": "7d5355a19e255a7733eddc7615c9eb4e419531babde63f184c09992c2e041ab6",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "snapshot_id": "5dee8b6b4582bb591ea41105c6e540b1a7eaa9ef2b302fd13677e87c20791ad4",
+  "long_functions": [
+    {
+      "node_id": "439f4e91a6d33eb7",
+      "kind": "Function",
+      "name": "newFrontierInstructionSet",
+      "canonical_id": "github.com/ethereum/go-ethereum/core/vm.newFrontierInstructionSet",
+      "path": "core/vm/jump_table.go",
+      "start_line": 283,
+      "end_line": 1095,
+      "start_byte": 10069,
+      "end_byte_exclusive": 29306,
+      "function_sha256": "2a7005dc50dd75cac42c26d4167fb45c909c11eb1e299cbd9215567f116410a5",
+      "file_sha256": "69a8c34fcfadf8a68e94a30bcc22d49766a8e6d3b2dd3d229ff270b361ccdc9f",
+      "bytes": 19237
+    },
+    {
+      "node_id": "810a28a764daf9d3",
+      "kind": "Method",
+      "name": "insertChain",
+      "canonical_id": "github.com/ethereum/go-ethereum/core.(*BlockChain).insertChain",
+      "path": "core/blockchain.go",
+      "start_line": 1561,
+      "end_line": 1911,
+      "start_byte": 63041,
+      "end_byte_exclusive": 77803,
+      "function_sha256": "ca6c73d3f1ab03e4bf33a6398f32a7010bb70c1944f22edd875f1d87fd247157",
+      "file_sha256": "8dabbec127ed903c0f1df31d3e2f6a22e3dcdf0ffcc3b939d9c0115e0f95352d",
+      "bytes": 14762
+    },
+    {
+      "node_id": "3c4c85eb15f45bc3",
+      "kind": "Method",
+      "name": "loop",
+      "canonical_id": "github.com/ethereum/go-ethereum/eth/fetcher.(*TxFetcher).loop",
+      "path": "eth/fetcher/tx_fetcher.go",
+      "start_line": 417,
+      "end_line": 803,
+      "start_byte": 17275,
+      "end_byte_exclusive": 31848,
+      "function_sha256": "f559b80be50158d471bf9b62b67c5a8f1e83d0b278cf684bf1b524337c9ab511",
+      "file_sha256": "a3017babce7b4f70f2e88a9c169846f10c43fbd259f2268b51698bfcb424114a",
+      "bytes": 14573
+    }
+  ],
+  "selection": "top3 non-test Function/Method by retained end_byte-start_byte descending, node_id tie-break; no semantic selection",
+  "tools": [
+    "cks.ops.health",
+    "cks.context.value_dependencies"
+  ],
+  "warmup_per_function": 1,
+  "measured_repetitions_per_function": 5,
+  "small_budget_control_per_function": 1,
+  "planned_value_queries": 21,
+  "ordinary_limits": {
+    "max_source_bytes": 262144,
+    "max_ast_nodes": 4096,
+    "max_blocks": 256,
+    "max_nodes": 1024,
+    "max_edges": 4096,
+    "max_iterations": 128,
+    "max_facts": 65536,
+    "timeout_ms": 1000
+  },
+  "small_budget_override": {
+    "max_ast_nodes": 1
+  },
+  "concurrency": 1,
+  "sampled_RSS_interval_ms": 250,
+  "RSS_claim": "maximum sampled resident size, not absolute high-water",
+  "resource_exclusive": false,
+  "native_validation_will_be_finished_before_measured_execution": true,
+  "automatic_retries": 0,
+  "uncontrolled_termination": false,
+  "original_data_write": false,
+  "actual_LLM_calls": 0,
+  "paid_external_calls": 0,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "capacity_SLA_accepted": false
+}

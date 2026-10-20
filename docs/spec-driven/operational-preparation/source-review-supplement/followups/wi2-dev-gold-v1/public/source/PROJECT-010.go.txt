@@ -1,0 +1,16 @@
+func parseFilterLimit(args []string) (int, error) {
+	limit := -1
+	for i, arg := range args {
+		if arg == "-limit" {
+			if i == len(args)-1 {
+				return -1, errors.New("-limit requires an argument")
+			}
+			n, err := strconv.Atoi(args[i+1])
+			if err != nil {
+				return -1, fmt.Errorf("invalid -limit %q", args[i+1])
+			}
+			limit = n
+		}
+	}
+	return limit, nil
+}

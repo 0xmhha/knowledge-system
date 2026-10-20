@@ -1,0 +1,956 @@
+{
+  "schema_version": 1,
+  "document_date": "2026-10-18",
+  "kind": "adoption_and_independent_acceptance_decision_draft",
+  "authority": "human_approved_recommended_scope_not_formal_gold_freeze_or_deployment_approval",
+  "base_commit": "4932767115f568fff7313e91c77f45b377203108",
+  "source_bindings": {
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/manifest.json": "6776de8233d694ece37ca4d04363fe7d15ec345a152e8d3ca2fb209970c47ece",
+    "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+    "docs/spec-driven/KNOWLEDGE-ROADMAP-PROGRESS.json": "4ff28d3be05945b7f5f37a08446c981b4f6939952ac44fcb6a77e272b074e85d",
+    "docs/spec-driven/KNOWLEDGE-MANAGER-AND-COMPARISON-SPEC.md": "a673d9a3124b017affa5994f698e5c94485807e28f27618d4785dd13087fec6f"
+  },
+  "current_state": {
+    "isolated_preparation_passed": 22,
+    "isolated_preparation_total": 22,
+    "P01_P08_complete": true,
+    "local_roadmap_implementation_completed": 7,
+    "local_roadmap_implementation_total": 7,
+    "local_roadmap_subtasks_completed": 28,
+    "local_roadmap_subtasks_total": 28,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "reviewer_assignment": "미정",
+    "freeze": null,
+    "formal_execution_allowed": false,
+    "candidate_adopted": true,
+    "production_activation": false,
+    "ontology_bounded_studies": "complete_with_quality_inconclusive_not_independent_acceptance",
+    "historical_unconfirmed_CKS_exit_receipts": 1,
+    "local_source_adoption_only": true,
+    "nonproduction_pilot": "SN-P01_SN-P04_scoped_technical_complete_not_formal_acceptance"
+  },
+  "candidate_pair": {
+    "CKS": {
+      "commit": "0c6cea1c74772e56438ec340b12e208811284b8a",
+      "delta_files_vs_base": 5,
+      "scope": "host-compatible selector metadata/descriptions, matching native schema golden and tests; existing decoders/query/ACL unchanged",
+      "base_reference": "5b39c413"
+    },
+    "coding_agent": {
+      "commit": "b32b7a5a01908c129732dd67b692b0c525dc04f2",
+      "base_reference": "b7e78689676769e8536626e76eed7165d870e1ba",
+      "delta_files_vs_base": 5,
+      "scope": "Analyzer/Planner explicit tool/structured delivery contracts, two schema mirrors and role tests"
+    },
+    "integration_requirement": "reconcile_with_current_destination_HEADs_and_rebuild_repin_after_integration; old binary hashes are prior evidence, not hashes of future artifacts",
+    "rollback": "previous source/plugin/config/binaries/dataset identities retained; adopted CKS source has signed commit fdb43ae2; consumer original/candidate checkouts unchanged and dedicated final commit d1ebafb8 bundled locally"
+  },
+  "decisions": [
+    {
+      "id": "D01",
+      "title": "소스 후보 채택",
+      "status": "recommended_scope_approved",
+      "recommended": "CKS와 coding-agent를 한 쌍으로 통합·검증한다. 현재 작업 브랜치의 최소 패치와 로컬 서명 커밋까지 진행하고 푸시/PR/머지는 별도 범위로 둔다.",
+      "alternatives": [
+        "한쪽만 채택하지 않고 보류",
+        "전체 기능 추가/런타임 재설계는 별도 명세"
+      ],
+      "formal_freeze_topics": [
+        "F-02"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": {
+        "origin": "direct_human_user_message",
+        "date": "2026-10-17",
+        "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+        "reviewer_assignment": "미정",
+        "formal_gold_review_or_acceptance_recorded": false,
+        "production_or_publication_approved": false,
+        "paid_model_approved": false
+      }
+    },
+    {
+      "id": "D02",
+      "title": "적용 대상과 활성화",
+      "status": "recommended_scope_approved",
+      "recommended": "첫 단계는 별도 소유 시험 환경에서 go-stablenet 한 프로젝트를 검증한다. 다음 비교 단계는 go-wemix를 명시적으로 추가한다. 운영 current·전역 플러그인 등록·기존 서비스·매니저 주기 갱신은 전환하지 않는다.",
+      "alternatives": [
+        "운영 전환까지 포함하려면 별도 대상·재시작·rollback·운영 승인 정의",
+        "다른 프로젝트를 시험 대상으로 지정"
+      ],
+      "formal_freeze_topics": [
+        "F-01",
+        "F-08"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": {
+        "origin": "direct_human_user_message",
+        "date": "2026-10-17",
+        "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+        "reviewer_assignment": "미정",
+        "formal_gold_review_or_acceptance_recorded": false,
+        "production_or_publication_approved": false,
+        "paid_model_approved": false
+      }
+    },
+    {
+      "id": "D03",
+      "title": "온톨로지 기본값과 범위",
+      "status": "recommended_scope_approved",
+      "recommended": "기본 off를 유지한다. 정합한 데이터의 기존 read-only semantic 도구는 사용할 수 있으며, 검색 on/off 효과는 같은 자료·모델·상한의 별도 시험 설정으로만 비교한다. 매핑·사람 검토·검색 활성화를 구분한다.",
+      "alternatives": [
+        "개별 시험 모드만 명시 opt-in",
+        "운영 기본 on은 독립 효과 판정 이후 별도 결정"
+      ],
+      "formal_freeze_topics": [
+        "F-01",
+        "F-02",
+        "F-07"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": {
+        "origin": "direct_human_user_message",
+        "date": "2026-10-17",
+        "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+        "reviewer_assignment": "미정",
+        "formal_gold_review_or_acceptance_recorded": false,
+        "production_or_publication_approved": false,
+        "paid_model_approved": false
+      }
+    },
+    {
+      "id": "D04",
+      "title": "정답 검토자와 최종 수용 담당자",
+      "status": "recommended_scope_approved_roles_unassigned",
+      "recommended": "AI는 초안·실행 보조를 담당하고, 별도 사람 검토자가 정답과 매칭 규칙을 검토하며 사용자가 최종 사용 범위를 수용한다. 정답 작성/검토와 후보 결과 노출을 기록하고 역할 겸임 시 독립성 제한을 명시한다. 이름·역할은 추정해서 기록하지 않는다.",
+      "alternatives": [
+        "담당자 미정 유지: 로컬 통합/시험 준비는 계속, 정식 독립 수용은 보류",
+        "한 사람이 겸임: 제한된 자체 검토로 기록하고 독립 수용으로 승격하지 않음"
+      ],
+      "formal_freeze_topics": [
+        "F-05"
+      ],
+      "additional_information_required": [
+        "사람 gold 검토자의 이름·역할",
+        "최종 수용 담당자의 이름·역할",
+        "정답 작성/검토·후보 출력 노출·역할 겸임 여부"
+      ],
+      "approval_receipt": {
+        "origin": "direct_human_user_message",
+        "date": "2026-10-17",
+        "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+        "reviewer_assignment": "미정",
+        "formal_gold_review_or_acceptance_recorded": false,
+        "production_or_publication_approved": false,
+        "paid_model_approved": false
+      }
+    },
+    {
+      "id": "D05",
+      "title": "독립 표본·기존 기준·통계",
+      "status": "recommended_scope_approved",
+      "recommended": "기존 9개 요구 표본/수치 기준은 유지 제안하고, 새 독립 FINAL 입력·완전한 정답·매칭·분모를 검토 후 고정한다. 기존 노출 자료와 AI 초안은 DEV/회귀로만 사용한다. 가족 단위 paired cluster bootstrap95%/10000회, 충분성 부족·undefined·미실행은 inconclusive/not_run으로 둔다.",
+      "alternatives": [
+        "표본·기준 조정은 실행 전 근거와 함께 별도 수정 승인",
+        "최소 표본 도달만으로 품질 합격을 선언하지 않음"
+      ],
+      "formal_freeze_topics": [
+        "F-03",
+        "F-04",
+        "F-07"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": {
+        "origin": "direct_human_user_message",
+        "date": "2026-10-17",
+        "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+        "reviewer_assignment": "미정",
+        "formal_gold_review_or_acceptance_recorded": false,
+        "production_or_publication_approved": false,
+        "paid_model_approved": false
+      }
+    },
+    {
+      "id": "D06",
+      "title": "온톨로지 독립 효과의 추가 판정안",
+      "status": "recommended_scope_approved",
+      "recommended": "독립 FINAL20가족 이상·4의도 이상을 별도로 검토한다. DEV에서 off/concept_text/relations/combined를 진단하고 FINAL primary 비교 모드는 사전 선택한다. 같은 자료의 off 대비 recall@10 +5%p 이상·95% paired CI 하한>0, precision 하락2%p 이내, warm p95비1.25 이하를 초안으로 제안한다. 타 프로젝트 혼입0·인용 원문 일치100%를 필수 조건으로 둔다. 개선 불충분이면 기본 off 유지 또는 inconclusive다.",
+      "alternatives": [
+        "임계치는 독립 검토 후 수정 가능; 실행 뒤 유리하게 바꾸지 않음",
+        "LLM 답변 품질 효과는 실제 모델을 사용할 때 별도 평가"
+      ],
+      "formal_freeze_topics": [
+        "F-03",
+        "F-04",
+        "F-07"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": {
+        "origin": "direct_human_user_message",
+        "date": "2026-10-17",
+        "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+        "reviewer_assignment": "미정",
+        "formal_gold_review_or_acceptance_recorded": false,
+        "production_or_publication_approved": false,
+        "paid_model_approved": false
+      }
+    },
+    {
+      "id": "D07",
+      "title": "모델·비용·시간·자원",
+      "status": "recommended_scope_approved",
+      "recommended": "첫 단계는 추가 유료 모델/API 호출0원으로 소스 통합·로컬 host/MCP와 검색 효과 준비를 진행한다. 기존 BGE-M3/native1024 선택을 유지하고 실측 전 정확한 runtime/digest/전처리 신원을 재확인한다. 로컬 자원·시간은 별도 측정한다. 실제 LLM 답변·자율 역할 평가는 모델/인증/총액 상한이 지정될 때만 시작한다.",
+      "alternatives": [
+        "유료 모델 평가는 계속 보류",
+        "실제 모델 평가를 원하면 provider/model·인증 방식·금액/통화·계량 출처를 별도 지정"
+      ],
+      "formal_freeze_topics": [
+        "F-06",
+        "F-08"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": {
+        "origin": "direct_human_user_message",
+        "date": "2026-10-17",
+        "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+        "reviewer_assignment": "미정",
+        "formal_gold_review_or_acceptance_recorded": false,
+        "production_or_publication_approved": false,
+        "paid_model_approved": false
+      }
+    },
+    {
+      "id": "D08",
+      "title": "종료·게시·운영 전환",
+      "status": "recommended_scope_approved",
+      "recommended": "평가 자료·검증·로컬 커밋에서 종료한다. 자동 push/PR/merge·외부 tracker·운영 설치·전역 설정 변경·기존 서비스 종료는 수행 범위에 넣지 않는다. 통합 완료 후 게시와 운영 적용을 별도 단계로 제안한다.",
+      "alternatives": [
+        "푸시/PR 등은 원하는 저장소·브랜치·범위를 명시해 별도 승인",
+        "운영 전환은 보존/백업·재시작·rollback 기준을 검증 후 별도 승인"
+      ],
+      "formal_freeze_topics": [
+        "F-01",
+        "F-08"
+      ],
+      "additional_information_required": [],
+      "approval_receipt": {
+        "origin": "direct_human_user_message",
+        "date": "2026-10-17",
+        "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+        "reviewer_assignment": "미정",
+        "formal_gold_review_or_acceptance_recorded": false,
+        "production_or_publication_approved": false,
+        "paid_model_approved": false
+      }
+    }
+  ],
+  "existing_nine_requirement_and_metric_proposals": [
+    {
+      "id": "WI-V1",
+      "requirements": {
+        "independent_defect_tickets_min": 2,
+        "normal_controls": true,
+        "symptom_reintroduction_mutants": true,
+        "overfit_mutants": true,
+        "oracles": [
+          "primary",
+          "independently_derived"
+        ]
+      },
+      "metrics": {
+        "declared_oracle_and_normal_control_pass_fraction": 1.0,
+        "expected_invalid_refusal_fraction": 1.0
+      }
+    },
+    {
+      "id": "WI-V2",
+      "requirements": {
+        "shared_ticket_group": "WI-V1",
+        "candidates_per_ticket_min": 2,
+        "independent_acceptable_candidate_set": true
+      },
+      "metrics": {
+        "selected_candidates_satisfy_hard_gates_and_gold": true,
+        "all_bad_selection": null,
+        "ties_and_insufficiency_explicit": true
+      }
+    },
+    {
+      "id": "WI-3",
+      "requirements": {
+        "independent_fact_families_min": 20,
+        "symptom_types_min": 4,
+        "top_k": 10
+      },
+      "metrics": {
+        "macro_case_recall_at_10_min": 0.8
+      }
+    },
+    {
+      "id": "WI-4",
+      "requirements": {
+        "independent_seed_schedule_families_min": 5,
+        "planned_runs_per_arm_min": 100,
+        "baseline_symptom_events_min": 10
+      },
+      "metrics": {
+        "fix_to_baseline_symptom_rate_ratio_max": 0.5,
+        "no_recurrence_verdict": "inconclusive"
+      }
+    },
+    {
+      "id": "WI-1",
+      "requirements": {
+        "independent_functions_min": 30,
+        "constructs": [
+          "declaration_redefinition",
+          "branch",
+          "loop",
+          "shadow",
+          "return"
+        ],
+        "functions_per_construct_min": 4,
+        "gold_semantics": "structural_lexical_may_reach_not_path_feasibility"
+      },
+      "metrics": {
+        "data_edge_precision_min": 0.95,
+        "data_edge_recall_min": 0.9,
+        "control_edge_precision_min": 0.95,
+        "control_edge_recall_min": 0.9
+      }
+    },
+    {
+      "id": "WI-2",
+      "requirements": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "metrics": {
+        "candidate_precision_min": 0.8,
+        "candidate_recall_min": 0.8,
+        "vulnerability_acceptance_separate": true
+      }
+    },
+    {
+      "id": "WI-C",
+      "requirements": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "metrics": {
+        "required_rubric_omissions_max": 0,
+        "source_artifact_state_binding_match_fraction": 1.0
+      }
+    },
+    {
+      "id": "WI-6",
+      "requirements": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "metrics": {
+        "macro_recall_delta_min": 0.1,
+        "macro_noise_fraction_delta_max": 0.1,
+        "warm_p95_latency_ratio_max": 2.0,
+        "delta_unit": "fraction_difference_0.10_equals_10_percentage_points",
+        "empty_return_noise_fraction": null
+      }
+    },
+    {
+      "id": "WI-SP",
+      "requirements": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "metrics": {
+        "annotation_match_fraction": 1.0,
+        "expected_permission_refusal_fraction": 1.0,
+        "unavailable_yaml_or_reviewer_provenance": "unknown"
+      }
+    }
+  ],
+  "ontology_new_gate_proposal": {
+    "status": "not_approved_not_frozen_not_a_change_to_WI6",
+    "FINAL_independent_families_min": 20,
+    "intent_types_min": 4,
+    "DEV_modes": [
+      "off",
+      "concept_text",
+      "relations",
+      "combined"
+    ],
+    "FINAL_primary": "off_vs_one_predeclared_mode_selected_before_holdout",
+    "same_corpus_source_snapshot_model_top_k_and_budget": true,
+    "recall_at_10_delta_min": 0.05,
+    "recall_delta_CI95_lower_strictly_positive": true,
+    "precision_delta_min": -0.02,
+    "warm_p95_ratio_max": 1.25,
+    "cross_project_contamination_max": 0,
+    "citation_source_match_fraction": 1.0,
+    "sample_sufficiency_required": true,
+    "multiple_arm_claims_require_multiplicity_plan": true,
+    "answer_quality_evaluated_by_retrieval_metrics": false,
+    "no_gain_or_insufficient_result": "keep_default_off; inconclusive_or_no_demonstrated_benefit",
+    "WI6_unchanged": {
+      "recall_delta_min": 0.1,
+      "noise_delta_max": 0.1,
+      "warm_p95_ratio_max": 2.0
+    }
+  },
+  "measurement_draft": {
+    "warmup_calls": 2,
+    "retrieval_repeats": 5,
+    "warm_repeats": 20,
+    "cold_repeats": 3,
+    "cold_definition": "fresh_CKS_process_model_cache_residency_recorded_separately",
+    "paired_order": "counterbalanced_record_each_arm_order",
+    "latency_percentile_method": null,
+    "owned_server_shutdown_modes": [
+      "EOF",
+      "idle_SIGTERM",
+      "active_SIGTERM"
+    ],
+    "shutdown_repeats_per_mode": 3,
+    "shutdown_seconds_max": 5,
+    "forced_kills_allowed": 0,
+    "unmeasured_cost": null,
+    "latency_percentile_method_proposal": "nearest_rank_ceiling_p_times_n; preserve raw times/sample_count;20 warm samples do not certify tail stability",
+    "statistics": {
+      "status": "proposed_not_approved",
+      "method": "paired cluster bootstrap on independent fact/function/seed families",
+      "confidence_percent": 95,
+      "replicates": 10000,
+      "seed": 20261015,
+      "percentiles": [
+        2.5,
+        97.5
+      ],
+      "undefined_fraction_inconclusive_above": 0.05,
+      "scope": "descriptive scoped assessment; not population-wide production failure or success proof"
+    },
+    "resource_limits": {
+      "status": "proposed_not_approved",
+      "parallel_measurement_sessions": 1,
+      "owned_nodes_max": 2,
+      "index_minutes_max": 90,
+      "host_case_minutes_max": 30,
+      "repeat_arm_minutes_max": 30,
+      "observation_minutes_max": 10,
+      "llm_provider": null,
+      "llm_model": null,
+      "llm_cost_limit": null
+    },
+    "budget_boundary": "no_paid_model_in_phaseA; actual_LLM_budget_still_unassigned"
+  },
+  "proposed_sequence": [
+    {
+      "id": "A",
+      "title": "후보 통합·비운영 적용 준비",
+      "entry": "D01/D02/D03/D07/D08 source/pilot scope approval; no reviewer/model assignment required for local technical work",
+      "exit": "minimal integrated diff, source/runtime contract comparison, full build/test/race/fmt/vet/lint/boundary checks as applicable, consumer regressions, fresh signed binary pins and isolated host smoke, local commits only"
+    },
+    {
+      "id": "B",
+      "title": "독립 입력·정답·평가 기준 확정",
+      "entry": "D04/D05/D06 assignments and methodology review",
+      "exit": "F01-F08 receipts for the chosen formal run; separate DEV/FINAL, full gold/matching, sample sufficiency and ontology protocol frozen before outcomes"
+    },
+    {
+      "id": "C",
+      "title": "정식 실행·사용 범위 수용",
+      "entry": "actual run requirements fulfilled; real LLM only after D07 model/auth/limit assignment",
+      "exit": "nine WI verdicts plus mandatory ontology independent effect verdict; raw attempts/errors/denominators/cost/cleanup; final human scoped acceptance"
+    },
+    {
+      "id": "D",
+      "title": "게시·운영 적용",
+      "entry": "separate explicit publication/deployment scope and validated rollback",
+      "exit": "approved targets only; fresh installed compatibility and restart/rollback receipts; no automatic global activation"
+    }
+  ],
+  "remaining_formal_ids": [
+    "WI-1",
+    "WI-2",
+    "WI-3",
+    "WI-4",
+    "WI-V1",
+    "WI-V2",
+    "WI-6",
+    "WI-SP",
+    "WI-C"
+  ],
+  "mandatory_ontology_remaining": [
+    "independent semantic/retrieval gold and reviewer acceptance",
+    "reviewed implementation/concept links and meaningful family coverage",
+    "real LLM answer-quality effect only when real model scope is assigned"
+  ],
+  "completed_roadmap_items_not_reopened": [
+    "KM-01",
+    "KM-02",
+    "KM-03",
+    "KM-04",
+    "KM-05",
+    "KM-06",
+    "OE-01 bounded studies"
+  ],
+  "optional_backlog": [
+    "조직 인증/권한",
+    "공개 CLI/HTTP·graph export",
+    "graph 점수/확장 조정",
+    "domain flow gold 평가",
+    "대규모 corpus/긴 함수",
+    "PR/as-of 지식",
+    "legacy 출처",
+    "CoreML",
+    "embedding cache 연결",
+    "운영 감사 연결",
+    "viewer 상호작용",
+    "배포/downstream 동기화"
+  ],
+  "execution_performed_by_this_proposal": {
+    "code_changes": 0,
+    "candidate_adoptions": 0,
+    "production_writes": 0,
+    "real_model_calls": 0,
+    "new_quality_measurements": 0,
+    "formal_approvals": 0,
+    "push_PR_merge_operations": 0
+  },
+  "response_instructions": "D01~D08별 승인/수정/보류를 답할 수 있다. 모두 권고안 승인이라고 답해도 D04의 실제 이름/역할은 별도 제공 전 미정이며, 유료 모델과 운영 전환은 자동 승인되지 않는다.",
+  "latest_authorization": {
+    "origin": "direct_human_user_message",
+    "date": "2026-10-17",
+    "text": "D01~D08 모두 권고안으로 승인. D04 담당자는 미정으로 유지하고, 우선 두 후보 통합과 로컬 검증부터 진행해. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+    "reviewer_assignment": "미정",
+    "formal_gold_review_or_acceptance_recorded": false,
+    "production_or_publication_approved": false,
+    "paid_model_approved": false
+  },
+  "execution_status": "SN-P04_real_project_comparison_complete_not_independent_quality",
+  "integration_result": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/integration-result.json",
+    "sha256": "e86fc14f7109b4c5ead10181ba1a94defb6d3b06d227af11be160982f08bcf55",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
+  },
+  "stablenet_pilot": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/manifest.json",
+    "sha256": "127c32a9508a927146deb06f1d24277f853333acc98c912da98610bb6bc24b25",
+    "status": "verification_complete_default_retrieval_not_ready",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/REPORT.txt",
+    "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json",
+    "historical": true,
+    "superseded_for_current_readiness_by": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json"
+  },
+  "stablenet_rebuild": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json",
+    "sha256": "3244926efe8853fb6aebda3fe927481be3f401d093708d2c828f443be69faa9b",
+    "status": "SN-P01_SN-P02_scoped_technical_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json",
+    "historical_source_validation": true
+  },
+  "current_execution_state": {
+    "stage": 87,
+    "state_scope": "source-bound deadline diagnosis checkpoint; active_remaining_worklist is live",
+    "technical_completed": [
+      "same-condition false-positive cause captured2/400 with marker already at return and inside group cancellation",
+      "one-line fixture control400/400 passed at unchanged200ms/1s schedule",
+      "new post-return gated writer passed general/race3 each; deliberate surviving writer rejected",
+      "whole default native validation; runtime source unchanged"
+    ],
+    "historical_original_failure_forensically_proven": false,
+    "production_runtime_changed": false,
+    "CoreML_excluded": true,
+    "next": "review remaining WI-V1 full12 contract and installed consumer oracle scope; preserve anonymous independent gold/freeze requirements",
+    "parent_completed": 0,
+    "parent_total": 13,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "independent_approved": 0,
+    "freeze": null,
+    "execution_allowed": false
+  },
+  "stablenet_rebuild_authorization": {
+    "origin": "direct_human_user_message",
+    "date": "2026-10-17",
+    "text": "다음 진행. 새 비운영 데이터 버전에서 외부 원문·출처 경로와 convention 처리 계약을 보완하고, 기존/새 버전의 검색을 재검증해줘. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+    "reviewer_assignment": "미정",
+    "scope": "owned retained external corpus rebuild and additive non-citable metadata contract, local validation and signed commits",
+    "formal_acceptance": false,
+    "production_activation": false,
+    "paid_LLM_calls": 0
+  },
+  "stablenet_error_recovery": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/manifest.json",
+    "sha256": "68667c650cc8df14fbcfbc5be9971520f8eab6a8e51d1bb8c95e300dac9c2ba6",
+    "status": "SN-P03_scoped_runtime_classification_recovery_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/WORKLIST.json",
+    "historical_source_validation": true
+  },
+  "stablenet_error_recovery_authorization": {
+    "origin": "direct_human_user_message",
+    "date": "2026-10-18",
+    "text": "다음 진행. SN-P03의 출처·무결성 오류와 모델 장애 분류·복구 계약을 보완하고, 실제 검색 경로에서 검증해줘. 검증·문서 갱신·커밋 후 현재 단계와 다음 작업, 남은 전체 작업을 보여줘.",
+    "reviewer_assignment": "미정",
+    "scope": "SN-P03 local implementation, actual nonproduction search faults, docs and signed local commits",
+    "formal_acceptance": false,
+    "production_activation": false,
+    "paid_LLM_calls": 0
+  },
+  "stablenet_comparison": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/manifest.json",
+    "sha256": "9c2264d3e5f0dc50e14c5b8ca037aa1936aae4bf35b3441c9d43beb18a3818f9",
+    "status": "SN-P04_scoped_real_project_comparison_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/WORKLIST.json"
+  },
+  "stablenet_comparison_authorization": "User requested SN-P04 actual source/data/model comparison, project confusion verification, docs and local commit; the observed versioned cross-root fallback is corrected within that boundary. No production activation or publication.",
+  "independent_freeze_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/manifest.json",
+    "sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b",
+    "status": "authoring_prepared_not_frozen_not_accepted",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json",
+    "historical_source_revision": "0f28a9a756f05cc29416ef953e4926ad24cc4ee8"
+  },
+  "historical_readiness_preparation": {
+    "kind": "preparation_only_not_formal_execution",
+    "manifest": "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json",
+    "manifest_sha256": "fffff1112ee82a82eb7e9a2c3bd16db57afea20af443cbb888724d06969804ea",
+    "source_revision": "9de07a8264bc4aea7054dcea8abb6559801d1cef",
+    "status": "historical_not_current_source_validation"
+  },
+  "current_readiness_preparation": {
+    "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/manifest.json",
+    "manifest_sha256": "c1213bce8e84df32b3597bbc57f46c6e955ce76246731fe6a623f0e2fbc7ed37"
+  },
+  "wi1_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/manifest.json",
+    "sha256": "115ff102128a1c72b8bacfb041e2e1f2e54638252eb2807a6f8e8f3e41ef7a10",
+    "status": "DEV30_bounded_AI_drafts_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "4529b6d1615d8d88159dfe07e22b0cdf38d929cf"
+  },
+  "wi1_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/manifest.json",
+    "sha256": "57a6c4b95daa4c76c85857ac361faf014ef64f9bf814dce06e6bad59d11ad96a",
+    "status": "AI_DEV_semantics_and_actual_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "5d84449eae68db4911a33d9a7b6bc09ca153406d"
+  },
+  "wi2_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/manifest.json",
+    "sha256": "bc2ab34ff96a3812878a9c8ae8745648b63a18ce51e9d8c5ed17308c99dae652",
+    "status": "WI2_DEV108_bounded_complete_AI_drafts_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "0993202df9799196540a078fd4020b661359c4fb"
+  },
+  "wi2_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/manifest.json",
+    "sha256": "00479af083b538b6b7784c5c6bac3e29eeec5a5be22157f7e5a6e70bfe15e503",
+    "status": "WI2_AI_DEV_source_context_and_observed_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "5b72156debceff5af54e7bf94a8399cb02681b33"
+  },
+  "wi3_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/manifest.json",
+    "sha256": "fc2df22aa9e52e2657f3df7a7af08a0376dabc1b9f4be3653b6b590d0361e53d",
+    "status": "WI3_DEV20_bounded_AI_gold_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "8553fe9707fd2dc289126872eb1138fe2f021098"
+  },
+  "wi3_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/manifest.json",
+    "sha256": "9870fa28b3fa6c4ffa5ff581e3207d8f2c045ce38676114512c864fe0e24e358",
+    "status": "WI3_AI_context_and_actual_partial_symptom_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "d95b3e91ac2ef0241f3386618c1f483e36cbf80e"
+  },
+  "wi4_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/manifest.json",
+    "sha256": "93a6e75122cfed77d7aa9ec611f6a4c943a2727b6c8acaf460d95dc4c3852dd4",
+    "status": "WI4_DEV21_conditional_outcomes_AI_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "20f470f2e1b8d9b0b9c6b6ed007b2a42b456befa"
+  },
+  "ticket_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/manifest.json",
+    "sha256": "34ec77e44271d3062d0288ac67a19448825492ccafb71281f74e38caab1cf418",
+    "status": "WIV1_V2_DEV1_bounded_AI_oracle_membership_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "875cfc29ae44fb99035dd884613e60946dd62a45"
+  },
+  "wi6_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/manifest.json",
+    "sha256": "8b80d30d9ea01e77d1bc4b66c25b1f512a1eb76d2495007aa401221ef6770825",
+    "status": "WI6_DEV20_bounded_AI_relevance_seed_excluded_unknown_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "fc4186b9997caa8aa432cc2dab6fb3fbe6ff703f"
+  },
+  "wisp_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/manifest.json",
+    "sha256": "97fc7ed639f7088a806e5220cb5806d4db8ef0e2d450ef9fe524f4b0f4866fc4",
+    "status": "WISP_DEV12_finite_AI_overlay_contract_not_independent_security_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "3bdf444fa5c6f591aa9bce93497668d2110dd188"
+  },
+  "reviewer_identity_policy": {
+    "real_name_required": false,
+    "personal_contact_required": false,
+    "preferred_receipt_field": "reviewer_id",
+    "legacy_field": "name_optional_identifier_compatibility",
+    "role_alias_examples": [
+      "gold-reviewer",
+      "acceptance-reviewer",
+      "execution-operator"
+    ],
+    "alias_assignment": "not_assigned_by_AI",
+    "approval": "alias_identifies_role_only_actual_review_decision_artifact_hash_and_independence_still_required",
+    "user_preference": "do_not_request_real_names_or_personal_contact_information"
+  },
+  "wic_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/manifest.json",
+    "sha256": "65e6527bd74b6f4121218c8c3fe8a9f40777832e76d48ea7096f58cc1e86e2e9",
+    "status": "WIC_DEV10_finite_AI_review_not_independent_required_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "b9e0db369211aba2c55f0db48d49f446c8023b88"
+  },
+  "wi123_debt_diagnostic": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/manifest.json",
+    "sha256": "4e62587f16738687f2cd8b97c565e9c3018e72211ef69070708457f45a056209",
+    "status": "WI123_readonly_diagnostic_not_semantic_resolution_or_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/WORKLIST.json",
+    "historical_source_revision": "3869a548b6d57dc7e3cdd1caf3c9f532399698f8"
+  },
+  "wi3_reason_fix": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/manifest.json",
+    "sha256": "842c8e749fc99e2eb122f75fd373b00d94ddad5ac7f483657cc10c3119cfd0c1",
+    "status": "WI3_typed_reason_fresh_native_MCP_regression_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/WORKLIST.json",
+    "historical_source_revision": "64c462347ad32c435c9d5970b22ca29dd9afb892"
+  },
+  "wi2_contract_audit": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/manifest.json",
+    "sha256": "7178cfd3b99f3eb46d6ddaa0a5e36c1c4b07a89d63b4a51243bb3d82abd2e8aa",
+    "status": "WI2_compiler_and_actual_contract_triage_not_independent_semantic_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/WORKLIST.json",
+    "historical_source_revision": "c874ca8e6a27aec396ac5f87d1b30f44b4503638"
+  },
+  "wi1_select_review": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/manifest.json",
+    "sha256": "7dcd5d8217c8c6a47069bc1599d32211237781fea5acb07322bc0837268f05b9",
+    "status": "AI_select_reference_supplement_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/WORKLIST.json",
+    "historical_source_revision": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8"
+  },
+  "wi3_resolver_fix": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/manifest.json",
+    "sha256": "c707e32fc561313bae2c55ae966a045125cfe553f6194678c8d3195c88e8f1cc",
+    "status": "WI3_optional_resolver_fresh_native_actual_stdio_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/WORKLIST.json",
+    "historical_source_revision": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0"
+  },
+  "wi3_walk_budget": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/manifest.json",
+    "sha256": "f80c072cbab89b6ef9bbf83995c2ce561ec373542f4ed371a2318b003a2477b1",
+    "status": "WI3_verified_walk_budget_measurement_fresh_native_stdio_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/WORKLIST.json",
+    "historical_source_revision": "bab348916fdb615c56fa31285ed72a70635a5afe"
+  },
+  "wi4_target_subscription": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/manifest.json",
+    "sha256": "c70d3a146fe3bccec001ca17a255f324ed4999db1c82417d53ae1a442c05e588",
+    "status": "WI4_actual_source_DEV_routes_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/WORKLIST.json",
+    "historical_source_revision": "e30579aeee3de5e7353e3f6c35216f4a9b55c7e1"
+  },
+  "wi4_target_udp": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/manifest.json",
+    "sha256": "3c37aca9c863ca63d872c4ded5eaa8fd5c6ad8a8e4e121449030544db9074677",
+    "status": "WI4_actual_UDP_DEV_paths_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/WORKLIST.json",
+    "historical_source_revision": "6094049ffc65e3ee77aec6469b74fc65c186a422"
+  },
+  "wi4_target_schedules": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/manifest.json",
+    "sha256": "1b4f683b9acb34c51c8fa15d9065bb1468cf35f40996608d64d09536da5fe221",
+    "status": "WI4_actual_WORK_GOSSIP_POOL_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/WORKLIST.json",
+    "historical_source_revision": "f91559fd59ad9b332fc22152f2540e29ccec9b1e"
+  },
+  "ticket_actual_rpc": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/manifest.json",
+    "sha256": "ebc2876bc70838e83b6240a9c5bea7e7542c2878cccd0336d05b3a2ada740f6c",
+    "status": "WIV1_V2_actual_inprocess_RPC_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/WORKLIST.json",
+    "historical_source_revision": "0b7dcf0ba65e04d1f39a14270fbaea76a42e3ca9"
+  },
+  "ticket_native_progress": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/manifest.json",
+    "sha256": "f0374d352661987455287595462cd9bb9f935ffba8ff781d60cbdbd6a6fcb33b",
+    "status": "WIV1_V2_native60_progress_RPC_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/WORKLIST.json",
+    "historical_source_revision": "5db56cfa43189aadc55a928052dc4a6418376fb5"
+  },
+  "ticket_method_schedules": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/manifest.json",
+    "sha256": "d00a25b04a509d9530b54acc8bcfa335d4593274491a1edecfa988c95e8715ab",
+    "status": "WIV1_V2_actual_method5_schedules_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/WORKLIST.json",
+    "historical_source_revision": "4b7b9decb76e234de8d2bae12575355f5f8415c1"
+  },
+  "ticket_rpc_overlap": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/manifest.json",
+    "sha256": "03f4d7a71288a3f461aa23f8ea2137b7210a106ae43162adbdb05d160186de36",
+    "status": "WIV1_V2_native_RPC_overlap_atomic_counter_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/WORKLIST.json"
+  },
+  "local_native_reliability": {
+    "kind": "local_native_reliability_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1/manifest.json",
+    "manifest_sha256": "a347d32880e42f9172718d5bf2055a861cee79ebf25483882862932b1cb50e7e"
+  },
+  "latest_scoped_followup": {
+    "kind": "real_factory_owner_schedules_DEV_not_independent",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1/manifest.json",
+    "manifest_sha256": "05462259713f3b7758dc99d89d029a2455292956137afb1bbb3dd626a73aa328",
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "full_original5_complete": false
+  },
+  "active_remaining_worklist": {
+    "path": "docs/spec-driven/REMAINING-13-EXECUTION.json",
+    "sha256": "a9a91e4ffac3fa2eb5c29f139849633e3cd5c7194c87a50e009f74da45511733"
+  },
+  "latest_consumer_role_followup": {
+    "kind": "four_actual_roles_current_CKS_transport_not_model_quality",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/four-role-current-v1/manifest.json",
+    "manifest_sha256": "d35d876033df50c17de1c242275df9b8009943dec91712c913db6be50d4d1e2d",
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "latest_intent_batch_followup": {
+    "kind": "WI3_source_bound_intent_batch_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/manifest.json",
+    "manifest_sha256": "a6996f321955d71adb56e7e18238adb516a951a7e435e98a52338350bf18c0be"
+  },
+  "latest_real_peer_followup": {
+    "kind": "actual_loopback_peer_sync_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/real-peer-sync-v1/manifest.json",
+    "manifest_sha256": "c42fc2d3c986e2100658954c68a5b9bc990810d51c1210c91f6e096ce4869a7b"
+  },
+  "latest_review_delivery_followup": {
+    "kind": "WIC_actual_installed_typed_delivery_and_render_DEV",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/review-delivery-current-v1/manifest.json",
+    "manifest_sha256": "d96a90f834e083e9763c6906d347532fe9d3a76edf7ae9b9b6c69b58fdd318ae"
+  },
+  "latest_viewer_followup": {
+    "kind": "viewer_owned_UI_lifecycle_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/viewer-lifecycle-v1/manifest.json",
+    "manifest_sha256": "d36a14abf5e57d0cd11c1e5bc0ce0c61b763ffd4bc9cd2c8daa0e02e9d8f70a2"
+  },
+  "latest_owner_scope_adoption": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json",
+    "sha256": "85310e913297a498665e4521b0d2a6dacaaa949a1e3659941076bf674dc80d1f",
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "latest_draft_history_reconciliation": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/draft-history-reconciliation-v1/manifest.json",
+    "sha256": "ff8ba28b17a18f2f19dba6a07aac5aea4fc252649cd014168006cf12a72702b1",
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "latest_local_model_inventory": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-local-model-inventory-v1/INVENTORY.json",
+    "sha256": "bbceaa83710ff0af3736c193a67b49181b00ea10b3fcf30b6c02d30f96add354",
+    "model_inference_calls": 0,
+    "CoreML_executed": false
+  },
+  "latest_user_security_deferral": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-deferred-security-scope-v1/SCOPE.json",
+    "sha256": "cbf9ab52dba5da47a2e1287939a74cd8c8eec4baf7f0999181faa3635aef639a",
+    "deferred_not_complete": true
+  },
+  "latest_scale_profile": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/scale-long-functions-v1/manifest.json",
+    "sha256": "901050e97ad3a0444d7277bef29e4c86eb86f9c5322deb71f6408e193d4887ae",
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "capacity_SLA_accepted": false
+  },
+  "latest_public_v2_followup": {
+    "kind": "public_v2_CLI_HTTP_graph_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/public-v2-surface-v1/manifest.json",
+    "manifest_sha256": "c0e27997085c7a401ae27e831e60f075fd2f28a70d57e4347d60befaf6adcd16"
+  },
+  "latest_coreml_followup": {
+    "kind": "CoreML_local_native_transport_CLI_default_regression_DEV_not_real_model_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/manifest.json",
+    "manifest_sha256": "dc79310029bb434dee6911227441e4b033bfc179c639191ada96179d59ea6a42"
+  },
+  "current_user_scope_exclusion": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json",
+    "sha256": "938605d7f35dc8b7c2783dbc334134b69d4c0e212e910ea2a9234bea0c36bcb9",
+    "excluded_not_complete": true
+  },
+  "latest_guardian_deadline_followup": {
+    "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/manifest.json",
+    "manifest_sha256": "c1213bce8e84df32b3597bbc57f46c6e955ce76246731fe6a623f0e2fbc7ed37"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "development_input_draft_not_independent_ticket",
+  "case_id": "SUB-EXIT-DRAFT-001",
+  "family_id_proposal": "downloader-sync-unsubscribe-handshake",
+  "work_items": [
+    "WI-V1",
+    "WI-V2"
+  ],
+  "source": {
+    "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "path": "eth/downloader/api.go",
+    "entry_points": [
+      "Syncing",
+      "eventLoop",
+      "SyncStatusSubscription.Unsubscribe"
+    ]
+  },
+  "prompt": "동기화 알림 전달 중 구독자가 종료하면 구독 해제가 반환하지 않는다는 제보를 조사하세요. 정상 종료를 보존하고, 종료 후 구독 채널을 더 이상 사용하지 않는 계약도 확인하세요. 원문 근거와 미확인 사항을 구분하여 수정 후보를 제안하세요.",
+  "symptom": "notification delivery overlaps subscriber termination; unsubscribe may not return",
+  "split": "DEV",
+  "approved": false,
+  "contains_gold": false,
+  "formal_split": null,
+  "exposure": "already_exposed_DEV_not_fresh_FINAL"
+}

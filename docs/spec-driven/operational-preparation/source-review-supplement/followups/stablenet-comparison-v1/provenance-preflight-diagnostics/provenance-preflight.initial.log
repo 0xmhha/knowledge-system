@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/private/tmp/ks-snp04-provenance-preflight.py", line 22, in <module>
+    if not hit.get('non_citable_metadata'):verify(f,hit['citation'],hit.get('text'))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-snp04-provenance-preflight.py", line 11, in verify
+    if text is not None:assert text.strip()==body.decode().strip(),(f['project'],path,c['start_line'],repr(text[:80]),repr(body[:80]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('go-stablenet', 'core/blockchain.go', 1585, "'합의 엔진이 헤더를 검증한다 — 미래시간·uncle·난이도·gas 한도·금지 포크·부모/타임스탬프/baseFee·signer 블랙리스트를 보고,'", "b'\\tabort, results := bc.engine.VerifyHeaders(bc, headers)\\n'")

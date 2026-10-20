@@ -1,0 +1,308 @@
+package experiment
+
+import (
+	"bytes"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"time"
+)
+
+const TracePrefix = "KS_TIMING_V1 "
+
+type TraceRecord struct {
+	SchemaVersion int            `json:"schema_version"`
+	ProbeID       string         `json:"probe_id"`
+	Event         string         `json:"event"`
+	Site          string         `json:"site"`
+	Symptom       bool           `json:"symptom"`
+	Values        map[string]any `json:"values"`
+}
+type LogAnchor struct {
+	Node    int    `json:"node"`
+	ID      uint64 `json:"id"`
+	Initial []byte `json:"initial"`
+}
+type LogWatchPlan struct {
+	SchemaVersion         int         `json:"schema_version"`
+	ID                    string      `json:"id"`
+	Source                Source      `json:"source"`
+	ProbeID               string      `json:"probe_id"`
+	InstrumentationSHA256 string      `json:"instrumentation_sha256"`
+	Event                 string      `json:"event"`
+	Sites                 []string    `json:"sites"`
+	WindowSeconds         int         `json:"window_seconds"`
+	PollMS                int         `json:"poll_ms"`
+	MaxBytes              int         `json:"max_bytes"`
+	MaxEvents             int         `json:"max_events"`
+	Anchors               []LogAnchor `json:"anchors"`
+}
+type LogReadFrame struct {
+	ID   uint64
+	Size int64
+	Data []byte
+}
+type LogWatchBackend interface {
+	Identity(context.Context) (Source, error)
+	Read(context.Context, int, int) (LogReadFrame, error)
+}
+type TraceObservation struct {
+	Node       int         `json:"node"`
+	Offset     int         `json:"offset"`
+	Raw        []byte      `json:"raw"`
+	SHA256     string      `json:"sha256"`
+	Record     TraceRecord `json:"record"`
+	ObservedAt time.Time   `json:"observed_at"`
+}
+type LogWatchReport struct {
+	SchemaVersion   int                `json:"schema_version"`
+	Plan            LogWatchPlan       `json:"plan"`
+	PlanSHA256      string             `json:"plan_sha256"`
+	Events          []TraceObservation `json:"events"`
+	Polls           int                `json:"polls"`
+	StartedAt       time.Time          `json:"started_at"`
+	FinishedAt      time.Time          `json:"finished_at"`
+	Verdict         string             `json:"verdict"`
+	Reason          string             `json:"reason"`
+	ResumeRequested bool               `json:"resume_requested"`
+	Acceptance      string             `json:"acceptance"`
+}
+
+func (p LogWatchPlan) Validate() error {
+	if p.SchemaVersion != 1 || p.ID == "" || len(p.ID) > 128 || p.ProbeID == "" || len(p.ProbeID) > 128 || p.Event == "" || len(p.Event) > 128 || !validHash(p.InstrumentationSHA256, 64) || p.WindowSeconds < 1 || p.WindowSeconds > 3600 || p.PollMS < 50 || p.PollMS > 5000 || p.MaxBytes < 4096 || p.MaxBytes > 65536 || p.MaxEvents < 1 || p.MaxEvents > 256 || len(p.Anchors) < 1 || len(p.Anchors) > 8 || len(p.Sites) < 1 || len(p.Sites) > 32 {
+		return fmt.Errorf("invalid bounded log watch plan")
+	}
+	if p.Source.DriverSHA256 != p.InstrumentationSHA256 {
+		return fmt.Errorf("instrumentation/source pin differs")
+	}
+	seenSites := map[string]bool{}
+	for _, site := range p.Sites {
+		if len(site) == 0 || len(site) > 256 || seenSites[site] {
+			return fmt.Errorf("site budget exceeded")
+		}
+		seenSites[site] = true
+	}
+	if e := p.Source.validate(); e != nil {
+		return e
+	}
+	seen := map[int]bool{}
+	for _, a := range p.Anchors {
+		if a.Node < 1 || a.Node > 32 || a.ID == 0 || seen[a.Node] || len(a.Initial) > p.MaxBytes || len(a.Initial) > 0 && a.Initial[len(a.Initial)-1] != '\n' {
+			return fmt.Errorf("invalid complete-line initial log anchor")
+		}
+		seen[a.Node] = true
+	}
+	return nil
+}
+func traceDigest(raw []byte) string { h := sha256.Sum256(raw); return hex.EncodeToString(h[:]) }
+func parseTrace(raw []byte) (TraceRecord, error) {
+	var out TraceRecord
+	i := bytes.Index(raw, []byte(TracePrefix))
+	if i < 0 {
+		return out, fmt.Errorf("trace prefix missing")
+	}
+	if len(raw) > 4096 {
+		return out, fmt.Errorf("trace line budget exceeded")
+	}
+	body := raw[i+len(TracePrefix):]
+	if e := strictTraceJSON(body); e != nil {
+		return out, e
+	}
+	var fields map[string]json.RawMessage
+	if e := json.Unmarshal(body, &fields); e != nil {
+		return out, e
+	}
+	for _, key := range []string{"schema_version", "probe_id", "event", "site", "symptom", "values"} {
+		if len(fields[key]) == 0 || bytes.Equal(fields[key], []byte("null")) {
+			return out, fmt.Errorf("explicit trace fields required")
+		}
+	}
+	decoder := json.NewDecoder(bytes.NewReader(raw[i+len(TracePrefix):]))
+	decoder.DisallowUnknownFields()
+	if e := decoder.Decode(&out); e != nil {
+		return out, e
+	}
+	if e := decoder.Decode(new(any)); e != io.EOF {
+		return out, fmt.Errorf("trailing trace document")
+	}
+	if out.SchemaVersion != 1 || out.ProbeID == "" || out.Event == "" || out.Site == "" || out.Values == nil || len(out.Values) > 16 {
+		return out, fmt.Errorf("invalid trace record")
+	}
+	return out, nil
+}
+func WatchLogs(ctx context.Context, p LogWatchPlan, b LogWatchBackend) (out LogWatchReport, err error) {
+	if e := p.Validate(); e != nil {
+		return out, e
+	}
+	if b == nil {
+		return out, fmt.Errorf("log backend missing")
+	}
+	raw, _ := json.Marshal(p)
+	_ = json.Unmarshal(raw, &p)
+	started := time.Now()
+	out = LogWatchReport{SchemaVersion: 1, Plan: p, PlanSHA256: traceDigest(raw), Events: []TraceObservation{}, StartedAt: started.UTC(), Verdict: "AWAITING_OBSERVATION", Acceptance: "not_recorded"}
+	defer func() { out.FinishedAt = time.Now().UTC() }()
+	fail := func(reason string) (LogWatchReport, error) {
+		out.Verdict = "ERROR"
+		out.Reason = reason
+		out.ResumeRequested = false
+		return out, nil
+	}
+	deadline := started.Add(time.Duration(p.WindowSeconds) * time.Second)
+	watched, cancel := context.WithDeadline(ctx, deadline)
+	defer cancel()
+	windowEnded := func(e error) bool {
+		return ctx.Err() == nil && watched.Err() == context.DeadlineExceeded && errors.Is(e, context.DeadlineExceeded)
+	}
+	prefixes := map[int][]byte{}
+	offsets := map[int]int{}
+	for _, a := range p.Anchors {
+		prefixes[a.Node] = append([]byte(nil), a.Initial...)
+		offsets[a.Node] = len(a.Initial)
+	}
+	for {
+		if ctx.Err() != nil {
+			return fail("observation_cancelled")
+		}
+		if time.Until(deadline) <= 0 {
+			out.Reason = "window_finished"
+			return out, nil
+		}
+		identity, e := b.Identity(watched)
+		if windowEnded(e) && out.Polls > 0 {
+			out.Reason = "window_finished"
+			return out, nil
+		}
+		if e != nil || identity != p.Source {
+			return fail("actual_source_environment_changed")
+		}
+		out.Polls++
+		for _, anchor := range p.Anchors {
+			frame, e := b.Read(watched, anchor.Node, p.MaxBytes+1)
+			if windowEnded(e) {
+				out.Reason = "window_finished"
+				return out, nil
+			}
+			if e != nil {
+				return fail("log_read_failed")
+			}
+			old := prefixes[anchor.Node]
+			if frame.ID != anchor.ID || frame.Size < int64(len(old)) || len(frame.Data) < len(old) || !bytes.Equal(frame.Data[:len(old)], old) {
+				return fail("log_rotation_truncation_or_mutation")
+			}
+			if len(frame.Data) > p.MaxBytes || frame.Size > int64(p.MaxBytes) {
+				return fail("log_byte_budget_exhausted")
+			}
+			cursor := offsets[anchor.Node]
+			for cursor < len(frame.Data) {
+				next := bytes.IndexByte(frame.Data[cursor:], '\n')
+				if next < 0 {
+					break
+				}
+				line := frame.Data[cursor : cursor+next]
+				start := cursor
+				cursor += next + 1
+				if !bytes.Contains(line, []byte(TracePrefix)) {
+					continue
+				}
+				record, e := parseTrace(line)
+				if e != nil {
+					return fail("malformed_trace_record")
+				}
+				if record.ProbeID != p.ProbeID {
+					continue
+				}
+				if !contains(p.Sites, record.Site) {
+					return fail("trace_site_not_frozen")
+				}
+				if len(out.Events) >= p.MaxEvents {
+					return fail("event_budget_exhausted")
+				}
+				out.Events = append(out.Events, TraceObservation{Node: anchor.Node, Offset: start, Raw: append([]byte(nil), line...), SHA256: traceDigest(line), Record: record, ObservedAt: time.Now().UTC()})
+				if record.Event == p.Event && record.Symptom {
+					if time.Until(deadline) <= 0 {
+						return fail("event_outside_window")
+					}
+					final, e := b.Identity(watched)
+					if e != nil || final != p.Source {
+						return fail("event_source_environment_changed")
+					}
+					out.Verdict = "RECURRED"
+					out.Reason = "structured_symptom_log_observed"
+					out.ResumeRequested = true
+					return out, nil
+				}
+			}
+			offsets[anchor.Node] = cursor
+			prefixes[anchor.Node] = append([]byte(nil), frame.Data...)
+		}
+		wait := time.Duration(p.PollMS) * time.Millisecond
+		if remaining := time.Until(deadline); remaining < wait {
+			wait = remaining
+		}
+		timer := time.NewTimer(wait)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return fail("observation_cancelled")
+		case <-timer.C:
+		}
+	}
+}
+
+func strictTraceJSON(raw []byte) error {
+	d := json.NewDecoder(bytes.NewReader(raw))
+	var consume func(int) error
+	consume = func(depth int) error {
+		if depth > 16 {
+			return fmt.Errorf("trace nesting budget exceeded")
+		}
+		value, e := d.Token()
+		if e != nil {
+			return e
+		}
+		delimiter, ok := value.(json.Delim)
+		if !ok {
+			return nil
+		}
+		switch delimiter {
+		case '{':
+			seen := map[string]bool{}
+			for d.More() {
+				key, e := d.Token()
+				if e != nil {
+					return e
+				}
+				name, ok := key.(string)
+				if !ok || seen[name] {
+					return fmt.Errorf("duplicate trace key")
+				}
+				seen[name] = true
+				if e = consume(depth + 1); e != nil {
+					return e
+				}
+			}
+		case '[':
+			for d.More() {
+				if e = consume(depth + 1); e != nil {
+					return e
+				}
+			}
+		default:
+			return fmt.Errorf("unexpected trace delimiter")
+		}
+		_, e = d.Token()
+		return e
+	}
+	if e := consume(0); e != nil {
+		return e
+	}
+	if _, e := d.Token(); e != io.EOF {
+		return fmt.Errorf("one trace document required")
+	}
+	return nil
+}

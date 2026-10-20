@@ -1,0 +1,1363 @@
+{
+  "schema_version": 1,
+  "document_date": "2026-10-18",
+  "status": "draft_for_review",
+  "plan": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-PLAN.md",
+  "source_inventory": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-SOURCE-INVENTORY.json",
+  "source_inventory_sha256": "ee3552ab48d2c81b12c26e22733898022e7c18e1036f308e5717d8352b0eba5e",
+  "scope_proposal": {
+    "environment": "isolated_local_go_pilot",
+    "bugfix_terminal": "actual_evaluation_gate_before_external_publication",
+    "code_review_terminal": "actual_typed_report_diagrams_hooks_local_delivery",
+    "external_pr_jira_messages_deployment": false,
+    "ontology_enabled": false,
+    "type_neighbors_enabled": false,
+    "knowledge_opt_in": true,
+    "original_developer_checkout_mutations": false
+  },
+  "freeze_requirements": [
+    {
+      "id": "F-01",
+      "topic": "scope_and_terminal_boundary",
+      "preparation_status": "ready_for_review",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-02",
+      "topic": "source_candidates",
+      "preparation_status": "pair_sources_locally_adopted_and_fresh_validation_complete_actual_formal_runtime_pin_pending",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-03",
+      "topic": "sampling_and_scoring",
+      "preparation_status": "all9_WI_AI_DEV_prepared_independent_semantics_and_actual_paths_pending",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-04",
+      "topic": "statistical_method_and_sufficiency",
+      "preparation_status": "family_and_exposure_inventory_prepared_FINAL_allocation_precision_review_pending",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-05",
+      "topic": "roles_and_independence",
+      "preparation_status": "awaiting_assignment_user_confirmed_unassigned",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-06",
+      "topic": "llm_and_resource_budget",
+      "preparation_status": "local_zero_paid_model_scope_approved_actual_LLM_unassigned",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-07",
+      "topic": "new_inputs_gold_and_holdout",
+      "preparation_status": "WI1_WI2_WI3_exposed_DEV_new_FINAL_and_independent_family_gold_pending",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-08",
+      "topic": "runtime_recipes_and_owned_resources",
+      "preparation_status": "SN_P01_P04_scoped_pilots_complete_exact_formal_API_runtime_recipes_pending",
+      "decision_status": "pending",
+      "receipt": null,
+      "remaining_source_risks": [
+        "real_agent_model_dispatch_and_publication_boundary_unverified",
+        "chainbench_real_node_active_cleanup_unverified",
+        "other_platform_stdio_shutdown_unmeasured"
+      ],
+      "local_scripted_host_evidence": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json"
+    }
+  ],
+  "roles": {
+    "gold_author": null,
+    "independent_content_reviewer": null,
+    "final_scope_acceptor": null,
+    "execution_operator": null,
+    "independence_declaration": null
+  },
+  "model": {
+    "embedding_candidate": "BGE-M3",
+    "embedding_dimensions_candidate": 1024,
+    "embedding_runtime_identity": null,
+    "llm_provider": null,
+    "llm_model": null,
+    "llm_version_or_digest": null,
+    "llm_cost_limit": null,
+    "currency": null,
+    "cost_accounting_source": null
+  },
+  "resources": {
+    "status": "zero_additional_paid_model_local_scope_approved_actual_run_allocation_pending",
+    "parallel_measurement_sessions": 1,
+    "owned_nodes_max": 2,
+    "index_minutes_max": 90,
+    "host_case_minutes_max": 30,
+    "repeat_arm_minutes_max": 30,
+    "observation_minutes_max": 10,
+    "llm_provider": null,
+    "llm_model": null,
+    "llm_cost_limit": null
+  },
+  "measurement_proposal": {
+    "warmup_calls": 2,
+    "retrieval_repeats": 5,
+    "warm_repeats": 20,
+    "cold_repeats": 3,
+    "cold_definition": "fresh_CKS_process_model_cache_residency_recorded_separately",
+    "paired_order": "counterbalanced_record_each_arm_order",
+    "latency_percentile_method": null,
+    "owned_server_shutdown_modes": [
+      "EOF",
+      "idle_SIGTERM",
+      "active_SIGTERM"
+    ],
+    "shutdown_repeats_per_mode": 3,
+    "shutdown_seconds_max": 5,
+    "forced_kills_allowed": 0,
+    "unmeasured_cost": null
+  },
+  "statistics_proposal": {
+    "status": "method_scope_approved_run_freeze_pending",
+    "method": "paired cluster bootstrap on independent fact/function/seed families",
+    "confidence_percent": 95,
+    "replicates": 10000,
+    "seed": 20261015,
+    "percentiles": [
+      2.5,
+      97.5
+    ],
+    "undefined_fraction_inconclusive_above": 0.05,
+    "scope": "descriptive scoped assessment; not population-wide production failure or success proof"
+  },
+  "input_groups": [
+    {
+      "id": "WI-V1",
+      "status": "DEV1_shared_ticket_AI_requirements_and_local_membership_actual_API_and_independence_pending",
+      "requirements_proposal": {
+        "independent_defect_tickets_min": 2,
+        "normal_controls": true,
+        "symptom_reintroduction_mutants": true,
+        "overfit_mutants": true,
+        "oracles": [
+          "primary",
+          "independently_derived"
+        ]
+      },
+      "metrics_proposal": {
+        "declared_oracle_and_normal_control_pass_fraction": 1.0,
+        "expected_invalid_refusal_fraction": 1.0
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/manifest.json",
+        "sha256": "34ec77e44271d3062d0288ac67a19448825492ccafb71281f74e38caab1cf418",
+        "status": "WIV1_V2_DEV1_bounded_AI_oracle_membership_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/WORKLIST.json"
+      }
+    },
+    {
+      "id": "WI-V2",
+      "status": "DEV1_shared_ticket_AI_requirements_and_local_membership_actual_API_and_independence_pending",
+      "requirements_proposal": {
+        "shared_ticket_group": "WI-V1",
+        "candidates_per_ticket_min": 2,
+        "independent_acceptable_candidate_set": true
+      },
+      "metrics_proposal": {
+        "selected_candidates_satisfy_hard_gates_and_gold": true,
+        "all_bad_selection": null,
+        "ties_and_insufficiency_explicit": true
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/manifest.json",
+        "sha256": "34ec77e44271d3062d0288ac67a19448825492ccafb71281f74e38caab1cf418",
+        "status": "WIV1_V2_DEV1_bounded_AI_oracle_membership_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/WORKLIST.json"
+      }
+    },
+    {
+      "id": "WI-3",
+      "status": "DEV20_AI_context_and_actual20_partial_symptom_responses_observed_independent_review_pending",
+      "requirements_proposal": {
+        "independent_fact_families_min": 20,
+        "symptom_types_min": 4,
+        "top_k": 10
+      },
+      "metrics_proposal": {
+        "macro_case_recall_at_10_min": 0.8
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/manifest.json",
+        "sha256": "fc2df22aa9e52e2657f3df7a7af08a0376dabc1b9f4be3653b6b590d0361e53d",
+        "status": "WI3_DEV20_bounded_AI_gold_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/WORKLIST.json",
+        "historical_source_revision": "8553fe9707fd2dc289126872eb1138fe2f021098"
+      },
+      "consumer_matching_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/manifest.json",
+        "sha256": "9870fa28b3fa6c4ffa5ff581e3207d8f2c045ce38676114512c864fe0e24e358",
+        "status": "WI3_AI_context_and_actual_partial_symptom_matching_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/WORKLIST.json"
+      }
+    },
+    {
+      "id": "WI-4",
+      "status": "DEV21_conditional_AI_outcome_drafts_actual_entry_and_independent_oracles_pending",
+      "requirements_proposal": {
+        "independent_seed_schedule_families_min": 5,
+        "planned_runs_per_arm_min": 100,
+        "baseline_symptom_events_min": 10
+      },
+      "metrics_proposal": {
+        "fix_to_baseline_symptom_rate_ratio_max": 0.5,
+        "no_recurrence_verdict": "inconclusive"
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/manifest.json",
+        "sha256": "93a6e75122cfed77d7aa9ec611f6a4c943a2727b6c8acaf460d95dc4c3852dd4",
+        "status": "WI4_DEV21_conditional_outcomes_AI_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/WORKLIST.json"
+      }
+    },
+    {
+      "id": "WI-1",
+      "status": "DEV30_AI_unknown_and_actual_consumer_matching_prepared_independent_review_pending",
+      "requirements_proposal": {
+        "independent_functions_min": 30,
+        "constructs": [
+          "declaration_redefinition",
+          "branch",
+          "loop",
+          "shadow",
+          "return"
+        ],
+        "functions_per_construct_min": 4,
+        "gold_semantics": "structural_lexical_may_reach_not_path_feasibility"
+      },
+      "metrics_proposal": {
+        "data_edge_precision_min": 0.95,
+        "data_edge_recall_min": 0.9,
+        "control_edge_precision_min": 0.95,
+        "control_edge_recall_min": 0.9
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/manifest.json",
+        "sha256": "115ff102128a1c72b8bacfb041e2e1f2e54638252eb2807a6f8e8f3e41ef7a10",
+        "status": "DEV30_bounded_AI_drafts_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/WORKLIST.json"
+      },
+      "draft_consumer_matching_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/manifest.json",
+        "sha256": "57a6c4b95daa4c76c85857ac361faf014ef64f9bf814dce06e6bad59d11ad96a",
+        "status": "AI_DEV_semantics_and_actual_matching_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/WORKLIST.json"
+      }
+    },
+    {
+      "id": "WI-2",
+      "status": "DEV108_AI_context_and_actual_matching_observed_independent_review_pending",
+      "requirements_proposal": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "metrics_proposal": {
+        "candidate_precision_min": 0.8,
+        "candidate_recall_min": 0.8,
+        "vulnerability_acceptance_separate": true
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "preparation_reference": {
+        "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+        "kind": "source_drafts_not_gold_or_runtime"
+      },
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/manifest.json",
+        "sha256": "bc2ab34ff96a3812878a9c8ae8745648b63a18ce51e9d8c5ed17308c99dae652",
+        "status": "WI2_DEV108_bounded_complete_AI_drafts_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/WORKLIST.json",
+        "historical_source_revision": "0993202df9799196540a078fd4020b661359c4fb"
+      },
+      "consumer_matching_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/manifest.json",
+        "sha256": "00479af083b538b6b7784c5c6bac3e29eeec5a5be22157f7e5a6e70bfe15e503",
+        "status": "WI2_AI_DEV_source_context_and_observed_matching_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/WORKLIST.json"
+      }
+    },
+    {
+      "id": "WI-C",
+      "status": "DEV10_AI64source20followups_current_consumer_contract_actual_paths_and_semantic_gold_pending",
+      "requirements_proposal": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "metrics_proposal": {
+        "required_rubric_omissions_max": 0,
+        "source_artifact_state_binding_match_fraction": 1.0
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/manifest.json",
+        "sha256": "65e6527bd74b6f4121218c8c3fe8a9f40777832e76d48ea7096f58cc1e86e2e9",
+        "status": "WIC_DEV10_finite_AI_review_not_independent_required_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/WORKLIST.json"
+      }
+    },
+    {
+      "id": "WI-6",
+      "status": "DEV20_selected20_AI_relevance_seed_excluded_actual_pairs_warm_and_independence_pending",
+      "requirements_proposal": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "metrics_proposal": {
+        "macro_recall_delta_min": 0.1,
+        "macro_noise_fraction_delta_max": 0.1,
+        "warm_p95_latency_ratio_max": 2.0,
+        "delta_unit": "fraction_difference_0.10_equals_10_percentage_points",
+        "empty_return_noise_fraction": null
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/manifest.json",
+        "sha256": "8b80d30d9ea01e77d1bc4b66c25b1f512a1eb76d2495007aa401221ef6770825",
+        "status": "WI6_DEV20_bounded_AI_relevance_seed_excluded_unknown_not_independent_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/WORKLIST.json"
+      }
+    },
+    {
+      "id": "WI-SP",
+      "status": "DEV12_literal_overlay_AI552_and16controls_actual_paths_and_independent_semantics_pending",
+      "requirements_proposal": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "metrics_proposal": {
+        "annotation_match_fraction": 1.0,
+        "expected_permission_refusal_fraction": 1.0,
+        "unavailable_yaml_or_reviewer_provenance": "unknown"
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "preparation_reference": {
+        "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+        "kind": "source_drafts_not_gold_or_runtime"
+      },
+      "draft_gold_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/manifest.json",
+        "sha256": "97fc7ed639f7088a806e5220cb5806d4db8ef0e2d450ef9fe524f4b0f4866fc4",
+        "status": "WISP_DEV12_finite_AI_overlay_contract_not_independent_security_gold",
+        "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/REPORT.txt",
+        "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/WORKLIST.json"
+      }
+    }
+  ],
+  "case_record_required_fields": [
+    "case_id",
+    "family_id",
+    "work_item_ids",
+    "split",
+    "origin",
+    "repository_commit",
+    "source_path",
+    "source_span",
+    "source_sha256",
+    "public_input_path",
+    "public_input_sha256",
+    "gold_path",
+    "gold_sha256",
+    "gold_author",
+    "gold_method",
+    "independent_reviewer",
+    "supported_scope",
+    "expected_unknowns",
+    "baseline",
+    "seed_schedule_or_pair_order",
+    "required_roles_tools_controls",
+    "rubric_or_matching_rule",
+    "review_receipt"
+  ],
+  "input_constraints": {
+    "split_values": [
+      "DEV",
+      "FINAL"
+    ],
+    "split_unit": "independent_fact_function_or_seed_family",
+    "old_fixtures_and_questions": "regression_only",
+    "gold_visible_to_host": false,
+    "final_seen_before_code_change": "retire_to_regression_and_create_new_holdout",
+    "controlled_project_results": "separate_denominators",
+    "rule_shortage_verdict": "inconclusive",
+    "all_planned_runs_preserved": true
+  },
+  "runtime_preflight_required_fields": [
+    "binary_path_sha256_buildinfo_source_commit",
+    "host_plugin_version_bytes_hook_dispatch",
+    "actual_tools_list_schemas_namespace_mapping",
+    "embedding_provider_server_version_digest_dimensions_preprocessing",
+    "dataset_manifest_snapshot_hashes",
+    "owned_pid_port_data_directory_lease",
+    "current_candidate_rollback_boundaries",
+    "exact_argv_cwd_env_input_timeout_for_each_recipe",
+    "resource_cost_limits_and_abort_conditions"
+  ],
+  "runtime_recipes": [
+    {
+      "id": "BUILD-CKS",
+      "status": "draft_unresolved",
+      "execution_status": "not_run",
+      "argv_template": [
+        "go",
+        "build",
+        "-o",
+        "{owned_binary_dir}/cks",
+        "./cmd/cks"
+      ],
+      "cwd_template": "{knowledge_execution_checkout}",
+      "env_names": [
+        "GOTOOLCHAIN",
+        "GOCACHE"
+      ],
+      "timeout_seconds": null,
+      "remaining": [
+        "checkout_tree_verification",
+        "toolchain_and_build_dependency_pins",
+        "build_timeout"
+      ]
+    },
+    {
+      "id": "BUILD-CHAINBENCH",
+      "status": "draft_unresolved",
+      "execution_status": "not_run",
+      "argv_template": [
+        "go",
+        "build",
+        "-o",
+        "{owned_binary_dir}/chainbench-mcp",
+        "./cmd/chainbench-mcp"
+      ],
+      "cwd_template": "{chainbench_execution_checkout}",
+      "env_names": [
+        "GOTOOLCHAIN",
+        "GOCACHE"
+      ],
+      "timeout_seconds": null,
+      "remaining": [
+        "checkout_tree_verification",
+        "toolchain_and_build_dependency_pins",
+        "build_timeout",
+        "signal_context_and_unmasked_exit_cleanup_verification"
+      ],
+      "candidate_source_override_proposal": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "adopted_local_source_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40"
+    },
+    {
+      "id": "SERVE-CKS",
+      "status": "draft_unresolved",
+      "execution_status": "not_run",
+      "argv_template": [
+        "{cks_binary}",
+        "mcp",
+        "--config",
+        "{owned_cks_yaml}",
+        "--http-addr",
+        "127.0.0.1:{reserved_cks_port}",
+        "--name",
+        "{run_id}"
+      ],
+      "cwd_template": "{owned_run_directory}",
+      "env_names": [],
+      "timeout_seconds": null,
+      "remaining": [
+        "real_dataset_graph_vector_model_pins",
+        "config_bytes_and_acl",
+        "port_ownership_and_pid_lease",
+        "graceful_cleanup_recipe"
+      ]
+    },
+    {
+      "id": "HOST-PILOT",
+      "status": "draft_unresolved",
+      "execution_status": "not_run",
+      "argv_template": [
+        "claude",
+        "--print",
+        "--model",
+        "{approved_llm_model}",
+        "--plugin-dir",
+        "{frozen_plugin_directory}",
+        "--max-budget-usd",
+        "{approved_usd_cap}",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{owned_mcp_json}",
+        "--setting-sources",
+        "",
+        "--settings",
+        "{owned_settings_json}",
+        "--permission-mode",
+        "manual",
+        "--include-hook-events",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "{public_prompt_without_gold}"
+      ],
+      "cwd_template": "{go_stablenet_execution_copy}",
+      "env_names": [
+        "CLAUDE_CONFIG_DIR",
+        "ANTHROPIC_API_KEY",
+        "CKS_MCP_URL",
+        "CHAINBENCH_DIR",
+        "CHAINBENCH_DATA_ROOT"
+      ],
+      "timeout_seconds": null,
+      "remaining": [
+        "provider_auth_without_personal_config",
+        "model_cost_review",
+        "explicit_mcp_plugin_configuration_compatibility",
+        "actual_hooks_dispatch_capture",
+        "visible_permission_or_approved_handler",
+        "prepublication_boundary_enforcement",
+        "public_input_gold_access_separation",
+        "timeout_owned_children_cleanup",
+        "installed_host_policy_lock_and_stop_hook_receipt_dispatch"
+      ],
+      "prohibited_flags": [
+        "--dangerously-skip-permissions",
+        "--allow-dangerously-skip-permissions",
+        "--bare",
+        "--safe-mode"
+      ],
+      "publication_boundary_status": "local_scripted_host_cases_verified_real_agent_pilot_not_run",
+      "scope_stop": "actual_evaluation_gate_before_push_pr_jira_or_deployment",
+      "forbidden_completion_substitutes": [
+        "fabricated_PR_URL",
+        "manual_completed_state",
+        "skipped_evaluator_or_hook",
+        "suppressed_error_as_success"
+      ],
+      "owned_state_root_status": "verified_for_local_host_metadata_sessions_real_nodes_not_run",
+      "local_scripted_connection_preflight": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json"
+    }
+  ],
+  "owned_resources": [],
+  "evidence_record_required_fields": [
+    "run_id",
+    "case_id",
+    "arm",
+    "source_input_protocol_hashes",
+    "runtime_inventory_hash",
+    "started_at",
+    "ended_at",
+    "command_argv_cwd_sanitized_env",
+    "raw_request_response_error_paths_hashes",
+    "exit_and_termination_reason",
+    "required_role_hook_dispatch",
+    "planned_valid_missing_cancelled_infrastructure_symptom_counts",
+    "latency_tokens_calls_measured_cost",
+    "cleanup_receipt",
+    "operational_verdict",
+    "quality_verdict",
+    "human_review_receipt"
+  ],
+  "freeze": null,
+  "execution_allowed": false,
+  "blocked_by": [
+    "F-01",
+    "F-02",
+    "F-03",
+    "F-04",
+    "F-05",
+    "F-06",
+    "F-07",
+    "F-08"
+  ],
+  "input_candidate_pool": {
+    "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-INPUT-CANDIDATES.json",
+    "sha256": "029285c70ad60d104cdd59aa351ff07984905440c72465f3ecd094b16ed2a114",
+    "kind": "preparation_only"
+  },
+  "host_preflight": {
+    "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-HOST-PREFLIGHT.json",
+    "sha256": "1b0716c59cd8b5704b9e45e5b6bee4cc7d19c6a15ee09e9673ad2a99756e12e8",
+    "kind": "preparation_only"
+  },
+  "review_draft_packet": {
+    "status": "ai_draft_not_independent_gold",
+    "public_path": "docs/spec-driven/operational-preparation/review-drafts/public-inputs.json",
+    "public_sha256": "b15efd704c9e80d8e2e10244e14ec772850a6c7e8080b6859feaa6afb9ef5fa6",
+    "gold_draft_path": "docs/spec-driven/operational-preparation/review-drafts/gold-drafts.json",
+    "gold_draft_sha256": "a01df54e0969a5416bbe13086a625ea525022efcab6de2b8a20a51685e1cc6eb",
+    "review_cases": 10,
+    "value_control_anchor_functions": 3,
+    "approved_gold_records": 0
+  },
+  "readiness_candidate_patches": [
+    {
+      "id": "OP-CB-01",
+      "component": "chainbench",
+      "status": "implemented_controlled_checks_passed",
+      "manifest": "system/eval/operational-preparation-2026-10-15/chainbench-stdio/manifest.json",
+      "manifest_sha256": "d6bef9e2cea8711e10acd36cf43038b218ba3394d359393a9aa39a715c628452",
+      "candidate_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "candidate_adoption": "adopted_for_owned_local_host",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "adopted_commit": "bdf5ad2758662310b23c508e61b13ee318e92b40",
+      "adoption_scope": "owned_local_session_only"
+    },
+    {
+      "id": "OP-CA-01",
+      "component": "coding-agent",
+      "status": "implemented_controlled_checks_passed",
+      "manifest": "system/eval/operational-preparation-2026-10-15/coding-agent-exit/manifest.json",
+      "manifest_sha256": "9a380dcc900db6098ae04822737d211c641728b25909114d8d4d5008bb392d92",
+      "candidate_commit": "b6e2abdc8892bb5e82044997f4f2285ece9c5b35",
+      "candidate_adoption": "adopted_for_owned_local_host",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "adopted_commit": "b7e78689676769e8536626e76eed7165d870e1ba",
+      "adoption_scope": "owned_local_session_only"
+    }
+  ],
+  "host_connection_verification": {
+    "scope": "owned_local_session_only",
+    "manifest": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json",
+    "manifest_sha256": "741fb22917ab562697cf7b0ecc973e13ed4e4f3533ac549868f4b3aeb11df42e"
+  },
+  "policy_security_input_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+    "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+    "kind": "source_drafts_not_gold_or_runtime"
+  },
+  "policy_reference_diagnosis": {
+    "manifest": "docs/spec-driven/operational-preparation/policy-reference-diagnosis/manifest.json",
+    "manifest_sha256": "480d412e3fdcc854866e04e5c0fb009f8b14049ae8a4132c3a72ce054d0d0f04",
+    "kind": "unapproved_unapplied_ast_probe_only"
+  },
+  "current_readiness_preparation": {
+    "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/manifest.json",
+    "manifest_sha256": "c1213bce8e84df32b3597bbc57f46c6e955ce76246731fe6a623f0e2fbc7ed37"
+  },
+  "reviewer_assignment_response": {
+    "path": "docs/spec-driven/operational-preparation/reviewer-assignment-2026-10-16.json",
+    "sha256": "49f14ba902e09a87a125aa4c97ada8a172d7b35fffbca7805d8b5ea409192853",
+    "status": "user_confirmed_unassigned"
+  },
+  "source_review_supplement": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/expansion-v1/manifest.json",
+    "sha256": "bcbff0e10edd1ecffde3bca1a3232fa4558fa4d01e9e4d1cdaa48e4b64d06580",
+    "status": "ai_preparation_only_not_gold_or_acceptance"
+  },
+  "review_context_supplement": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/context-v1/manifest.json",
+    "sha256": "0fc52eaebcece24f13d2579e0b6155e4de409d67da2d0654bdefafdbd3352caa",
+    "status": "private_ai_context_not_verified_defects_or_gold"
+  },
+  "subscription_ticket_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1/manifest.json",
+    "sha256": "188c20406cc81b9391484e8c0803e151c05b675065b0036abfa3fc314a4a009e",
+    "status": "development_draft_not_independent_ticket_or_gold"
+  },
+  "subscription_local_probe": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-probe-v1/manifest.json",
+    "sha256": "a2d62ce06dc06d66db1d3bb866a673a39356092744ac7bb12d8344c8aeb8d6e2",
+    "status": "extracted_method_fixture_only_not_independent_acceptance"
+  },
+  "schedule_candidate_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/schedule-candidates-v1/manifest.json",
+    "sha256": "2a94ff761ea7c20bf3f3dad39803f7f4698cb49f291be52dde05c5c7b41d164d",
+    "status": "source_schedule_proposals_not_independent_families"
+  },
+  "udp_cursor_local_probe": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/udp-cursor-probe-v1/manifest.json",
+    "sha256": "536f7cb90c255253d9806d48ea2d834714059623aa9ff892a84d62ec063c88b2",
+    "status": "synthetic_source_branch_only_not_operational_reachability"
+  },
+  "symptom_input_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/symptom-inputs-v1/manifest.json",
+    "sha256": "aa048d44743bfd578c1bfc6d964ed4be9a08eda2e86f68babc6e9c7a21900afc",
+    "status": "symptom_drafts_not_independent_gold_or_holdout"
+  },
+  "symptom_wire_preflight": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/symptom-wire-preflight-v1/manifest.json",
+    "sha256": "677c1d27314674caef0da900b0a6ab605e2196831ce9c88441aad080a8c11c49",
+    "status": "parser_preflight_not_retrieval_or_independent_acceptance"
+  },
+  "lexical_coverage_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/lexical-coverage-v1/manifest.json",
+    "sha256": "40f0dc0ecdb0fcd81a6d7df7bbeb3247e83f52f7e2c5c47893efc4eb221d8e54",
+    "status": "local_scope_census_not_independent_dependency_gold"
+  },
+  "dependency_source_review": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/dependency-review-v1/manifest.json",
+    "sha256": "fd6b58d8018eaadce038aa3ae18d8332b2696d71d7cb9cee7999477360fc1397",
+    "status": "private_source_proposals_not_independent_edge_gold"
+  },
+  "function_sample_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/function-sample-v1/manifest.json",
+    "sha256": "cfc108b33a4f6c135dcfad177caece393b1b3407bde5cb213ca4528759be22a0",
+    "status": "exposed_review_sample_not_independent_holdout_or_gold"
+  },
+  "selected_location_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/sample-locations-v1/manifest.json",
+    "sha256": "1344ff5840d5e3e7b1676b6c5daaaef7fc667003df41eabe9163eb8580e06d5e",
+    "status": "thirty_function_locations_not_semantic_gold_or_acceptance"
+  },
+  "rule_coverage_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-coverage-v1/manifest.json",
+    "sha256": "79142e1a247500ed4a30b22c846d994438e6438057bb079d43d7cb1d8a75a294",
+    "status": "rule_source_proposals_not_detection_gold_or_acceptance"
+  },
+  "controlled_rule_observations": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-observations-v1/manifest.json",
+    "sha256": "8e3e93ba9b208b9d6d482bcfe750ba0a91eb06384e95c1cf6144bf301320dffb",
+    "status": "controlled_analyzer_only_not_independent_quality_or_project_effect"
+  },
+  "project_rule_source_review": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/project-rule-review-v1/manifest.json",
+    "sha256": "bab1912a639ce00156fc690afdeb2337c5125a6b213319e8841328ffbb169901",
+    "status": "project_local_source_observations_not_independent_quality_or_runtime"
+  },
+  "rule_caller_context": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-caller-context-v1/manifest.json",
+    "sha256": "8eeabdff6f6721ae831944d340d9322f5f4599a9d52208b78cf4a7aa254596a6",
+    "status": "caller_syntax_and_ai_context_not_runtime_or_independent_gold"
+  },
+  "review_coverage_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/review-coverage-v1/manifest.json",
+    "sha256": "e7efea1c8d661c2240b6fdb81d1d488fe063b0c82b6cd9af4544d7bf02372c90",
+    "status": "review_material_mapping_not_independent_rubric_or_acceptance"
+  },
+  "semantic_gap_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/semantic-gap-v1/manifest.json",
+    "sha256": "bcd8b7d5fcf805be5a73e5529ac8130903cdc5fbf1f33ffbb6da93af8d851fee",
+    "status": "thirty_function_semantic_gaps_not_complete_gold_or_acceptance"
+  },
+  "symptom_gap_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/symptom-gap-v1/manifest.json",
+    "sha256": "016687973ddfa1083b20ab05ae3ba93c1c278b6622f030f6c340ebfc877eeca7",
+    "status": "symptom_family_exposure_gold_and_retrieval_gaps_not_acceptance"
+  },
+  "schedule_gap_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/schedule-gap-v1/manifest.json",
+    "sha256": "20b1dc0a526e1140c01e9be3fbf2db53cb84520eec5017c8e506ac2f3a7e95fa",
+    "status": "schedule_reachability_contract_family_and_sampling_gaps_not_acceptance"
+  },
+  "ticket_gap_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/ticket-gap-v1/manifest.json",
+    "sha256": "9538f6698bbb5f4bd971687bb3b1ef73b474ee46cc7bd33759529975d51fae2c",
+    "status": "api_ticket_oracle_and_acceptable_set_gaps_not_acceptance"
+  },
+  "rule_gap_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-gap-v1/manifest.json",
+    "sha256": "50247302a2d3b743a300a63a641b9eaf61a8aa5ddf243c041804c91504bb90bf",
+    "status": "rule_sample_gold_command_and_mcp_gaps_not_acceptance"
+  },
+  "expansion_gap_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/expansion-gap-v1/manifest.json",
+    "sha256": "cd8bd64a7876f4a3cffb3d5ea5039bb7957348678d4a0178f31d3072ef2b4a0b",
+    "status": "expansion_family_pair_gold_path_and_warm_gaps_not_acceptance"
+  },
+  "policy_security_gap_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1/manifest.json",
+    "sha256": "18a380ed5ac265f678cd3adfaf80a9aa1f4d448410ed63145d6f7381f96865d1",
+    "status": "policy_security_symbol_provenance_gold_boundary_and_consumer_gaps_not_acceptance"
+  },
+  "review_gap_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/review-gap-v1/manifest.json",
+    "sha256": "c3d677e0d31f88b4509a69116d6cfee018ff8a7063948849275e4fd527218942",
+    "status": "review_contract_rubric_artifact_handoff_and_role_gaps_not_acceptance"
+  },
+  "consumer_contract_plan": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
+    "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
+    "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+  },
+  "consumer_local_readiness": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+    "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+    "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
+  },
+  "consumer_stdio_readiness": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1/manifest.json",
+    "sha256": "5b0e491f8cfcd5c0fbf37e5f5dda37c2a7cb939e9b497042a36d463e88a7b1ad",
+    "status": "P05_owned_stdio_not_actual_role_or_formal_acceptance"
+  },
+  "consumer_role_readiness": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
+    "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
+    "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+  },
+  "host_schema_compatibility": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+    "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+    "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
+  },
+  "consumer_render_lifecycle": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-render-lifecycle-v1/manifest.json",
+    "sha256": "c96b20f550910bd42a785227ebebc3e5edfe7e59031c6b7fefe33a81d36c8452",
+    "status": "P07_render_lifecycle_pass_plan17_of22_not_adopted_or_accepted"
+  },
+  "consumer_opt_in": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1/manifest.json",
+    "sha256": "c221e36f9eff1dde30207b53b8188c52d9d386f8c895bfb2ac2a682134c4f3bc",
+    "status": "T04_isolated_workflow_pass_plan18_of22_not_adopted_or_accepted"
+  },
+  "consumer_foreign_pin": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+    "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+    "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
+  },
+  "consumer_partial": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-partial-v1/manifest.json",
+    "sha256": "84aafe156cd88be8251f48f8d6c6031e1b148f99ed4239d54c0ea9e614f45fd7",
+    "status": "T10_supported_partial_pass_plan20_of22_not_adopted_or_accepted"
+  },
+  "consumer_errors": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1/manifest.json",
+    "sha256": "5519439540cfa214646aea61473b1bb26fff9919f77d1838c2d0a9db70fd9e72",
+    "status": "T16_owned_errors_pass_plan21_of22_not_adopted_or_accepted"
+  },
+  "consumer_final": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/manifest.json",
+    "sha256": "6776de8233d694ece37ca4d04363fe7d15ec345a152e8d3ca2fb209970c47ece",
+    "status": "P08_T22_isolated_plan22_of22_not_adopted_or_accepted"
+  },
+  "adoption_acceptance_decision_proposal": {
+    "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
+    "sha256": "f6c2f2f9e11a9173cda510be7ad5c4d4349e199e6d1aee759fca8283ca03e1e2",
+    "status": "D04_review_pending_local_native_DEV_not_independent_acceptance"
+  },
+  "consumer_adoption": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
+    "sha256": "3a17b8326ab4a1cdf1e0d3d9b926cc41c722813b7c892c04179e5b7ec5e4b760",
+    "status": "approved_local_source_integration_fresh_validation_complete_not_formal_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
+  },
+  "methodology_approval": {
+    "origin": "direct_human_user_message",
+    "decision_ids": [
+      "D05",
+      "D06"
+    ],
+    "status": "recommended_method_and_threshold_scope_approved_formal_run_not_frozen",
+    "reviewer_assignment": "미정",
+    "actual_input_gold_runtime_freeze_receipts_recorded": false
+  },
+  "stablenet_pilot": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/manifest.json",
+    "sha256": "127c32a9508a927146deb06f1d24277f853333acc98c912da98610bb6bc24b25",
+    "status": "verification_complete_default_retrieval_not_ready",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/REPORT.txt",
+    "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json",
+    "historical": true,
+    "superseded_for_current_readiness_by": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json"
+  },
+  "stablenet_rebuild": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json",
+    "sha256": "3244926efe8853fb6aebda3fe927481be3f401d093708d2c828f443be69faa9b",
+    "status": "SN-P01_SN-P02_scoped_technical_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json",
+    "historical_source_validation": true
+  },
+  "current_execution_state": {
+    "stage": 87,
+    "state_scope": "source-bound deadline diagnosis checkpoint; active_remaining_worklist is live",
+    "technical_completed": [
+      "same-condition false-positive cause captured2/400 with marker already at return and inside group cancellation",
+      "one-line fixture control400/400 passed at unchanged200ms/1s schedule",
+      "new post-return gated writer passed general/race3 each; deliberate surviving writer rejected",
+      "whole default native validation; runtime source unchanged"
+    ],
+    "historical_original_failure_forensically_proven": false,
+    "production_runtime_changed": false,
+    "CoreML_excluded": true,
+    "next": "review remaining WI-V1 full12 contract and installed consumer oracle scope; preserve anonymous independent gold/freeze requirements",
+    "parent_completed": 0,
+    "parent_total": 13,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "independent_approved": 0,
+    "freeze": null,
+    "execution_allowed": false
+  },
+  "stablenet_error_recovery": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/manifest.json",
+    "sha256": "68667c650cc8df14fbcfbc5be9971520f8eab6a8e51d1bb8c95e300dac9c2ba6",
+    "status": "SN-P03_scoped_runtime_classification_recovery_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/WORKLIST.json",
+    "historical_source_validation": true
+  },
+  "stablenet_comparison": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/manifest.json",
+    "sha256": "9c2264d3e5f0dc50e14c5b8ca037aa1936aae4bf35b3441c9d43beb18a3818f9",
+    "status": "SN-P04_scoped_real_project_comparison_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/WORKLIST.json"
+  },
+  "independent_freeze_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/manifest.json",
+    "sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b",
+    "status": "authoring_prepared_not_frozen_not_accepted",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json",
+    "historical_source_revision": "0f28a9a756f05cc29416ef953e4926ad24cc4ee8"
+  },
+  "historical_readiness_preparation": {
+    "kind": "preparation_only_not_formal_execution",
+    "manifest": "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json",
+    "manifest_sha256": "fffff1112ee82a82eb7e9a2c3bd16db57afea20af443cbb888724d06969804ea",
+    "source_revision": "9de07a8264bc4aea7054dcea8abb6559801d1cef",
+    "status": "historical_not_current_source_validation"
+  },
+  "wi1_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/manifest.json",
+    "sha256": "115ff102128a1c72b8bacfb041e2e1f2e54638252eb2807a6f8e8f3e41ef7a10",
+    "status": "DEV30_bounded_AI_drafts_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "4529b6d1615d8d88159dfe07e22b0cdf38d929cf"
+  },
+  "wi1_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/manifest.json",
+    "sha256": "57a6c4b95daa4c76c85857ac361faf014ef64f9bf814dce06e6bad59d11ad96a",
+    "status": "AI_DEV_semantics_and_actual_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "5d84449eae68db4911a33d9a7b6bc09ca153406d"
+  },
+  "wi2_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/manifest.json",
+    "sha256": "bc2ab34ff96a3812878a9c8ae8745648b63a18ce51e9d8c5ed17308c99dae652",
+    "status": "WI2_DEV108_bounded_complete_AI_drafts_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "0993202df9799196540a078fd4020b661359c4fb"
+  },
+  "wi2_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/manifest.json",
+    "sha256": "00479af083b538b6b7784c5c6bac3e29eeec5a5be22157f7e5a6e70bfe15e503",
+    "status": "WI2_AI_DEV_source_context_and_observed_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "5b72156debceff5af54e7bf94a8399cb02681b33"
+  },
+  "wi3_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/manifest.json",
+    "sha256": "fc2df22aa9e52e2657f3df7a7af08a0376dabc1b9f4be3653b6b590d0361e53d",
+    "status": "WI3_DEV20_bounded_AI_gold_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "8553fe9707fd2dc289126872eb1138fe2f021098"
+  },
+  "wi3_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/manifest.json",
+    "sha256": "9870fa28b3fa6c4ffa5ff581e3207d8f2c045ce38676114512c864fe0e24e358",
+    "status": "WI3_AI_context_and_actual_partial_symptom_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "d95b3e91ac2ef0241f3386618c1f483e36cbf80e"
+  },
+  "wi4_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/manifest.json",
+    "sha256": "93a6e75122cfed77d7aa9ec611f6a4c943a2727b6c8acaf460d95dc4c3852dd4",
+    "status": "WI4_DEV21_conditional_outcomes_AI_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "20f470f2e1b8d9b0b9c6b6ed007b2a42b456befa"
+  },
+  "ticket_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/manifest.json",
+    "sha256": "34ec77e44271d3062d0288ac67a19448825492ccafb71281f74e38caab1cf418",
+    "status": "WIV1_V2_DEV1_bounded_AI_oracle_membership_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "875cfc29ae44fb99035dd884613e60946dd62a45"
+  },
+  "wi6_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/manifest.json",
+    "sha256": "8b80d30d9ea01e77d1bc4b66c25b1f512a1eb76d2495007aa401221ef6770825",
+    "status": "WI6_DEV20_bounded_AI_relevance_seed_excluded_unknown_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "fc4186b9997caa8aa432cc2dab6fb3fbe6ff703f"
+  },
+  "wisp_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/manifest.json",
+    "sha256": "97fc7ed639f7088a806e5220cb5806d4db8ef0e2d450ef9fe524f4b0f4866fc4",
+    "status": "WISP_DEV12_finite_AI_overlay_contract_not_independent_security_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "3bdf444fa5c6f591aa9bce93497668d2110dd188"
+  },
+  "reviewer_identity_policy": {
+    "real_name_required": false,
+    "personal_contact_required": false,
+    "preferred_receipt_field": "reviewer_id",
+    "legacy_field": "name_optional_identifier_compatibility",
+    "role_alias_examples": [
+      "gold-reviewer",
+      "acceptance-reviewer",
+      "execution-operator"
+    ],
+    "alias_assignment": "not_assigned_by_AI",
+    "approval": "alias_identifies_role_only_actual_review_decision_artifact_hash_and_independence_still_required",
+    "user_preference": "do_not_request_real_names_or_personal_contact_information"
+  },
+  "wic_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/manifest.json",
+    "sha256": "65e6527bd74b6f4121218c8c3fe8a9f40777832e76d48ea7096f58cc1e86e2e9",
+    "status": "WIC_DEV10_finite_AI_review_not_independent_required_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "b9e0db369211aba2c55f0db48d49f446c8023b88"
+  },
+  "wi123_debt_diagnostic": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/manifest.json",
+    "sha256": "4e62587f16738687f2cd8b97c565e9c3018e72211ef69070708457f45a056209",
+    "status": "WI123_readonly_diagnostic_not_semantic_resolution_or_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/WORKLIST.json",
+    "historical_source_revision": "3869a548b6d57dc7e3cdd1caf3c9f532399698f8"
+  },
+  "wi3_reason_fix": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/manifest.json",
+    "sha256": "842c8e749fc99e2eb122f75fd373b00d94ddad5ac7f483657cc10c3119cfd0c1",
+    "status": "WI3_typed_reason_fresh_native_MCP_regression_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/WORKLIST.json",
+    "historical_source_revision": "64c462347ad32c435c9d5970b22ca29dd9afb892"
+  },
+  "wi2_contract_audit": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/manifest.json",
+    "sha256": "7178cfd3b99f3eb46d6ddaa0a5e36c1c4b07a89d63b4a51243bb3d82abd2e8aa",
+    "status": "WI2_compiler_and_actual_contract_triage_not_independent_semantic_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/WORKLIST.json",
+    "historical_source_revision": "c874ca8e6a27aec396ac5f87d1b30f44b4503638"
+  },
+  "wi1_select_review": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/manifest.json",
+    "sha256": "7dcd5d8217c8c6a47069bc1599d32211237781fea5acb07322bc0837268f05b9",
+    "status": "AI_select_reference_supplement_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/WORKLIST.json",
+    "historical_source_revision": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8"
+  },
+  "wi3_resolver_fix": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/manifest.json",
+    "sha256": "c707e32fc561313bae2c55ae966a045125cfe553f6194678c8d3195c88e8f1cc",
+    "status": "WI3_optional_resolver_fresh_native_actual_stdio_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/WORKLIST.json",
+    "historical_source_revision": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0"
+  },
+  "wi3_walk_budget": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/manifest.json",
+    "sha256": "f80c072cbab89b6ef9bbf83995c2ce561ec373542f4ed371a2318b003a2477b1",
+    "status": "WI3_verified_walk_budget_measurement_fresh_native_stdio_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/WORKLIST.json",
+    "historical_source_revision": "bab348916fdb615c56fa31285ed72a70635a5afe"
+  },
+  "wi4_target_subscription": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/manifest.json",
+    "sha256": "c70d3a146fe3bccec001ca17a255f324ed4999db1c82417d53ae1a442c05e588",
+    "status": "WI4_actual_source_DEV_routes_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/WORKLIST.json",
+    "historical_source_revision": "e30579aeee3de5e7353e3f6c35216f4a9b55c7e1"
+  },
+  "wi4_target_udp": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/manifest.json",
+    "sha256": "3c37aca9c863ca63d872c4ded5eaa8fd5c6ad8a8e4e121449030544db9074677",
+    "status": "WI4_actual_UDP_DEV_paths_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/WORKLIST.json",
+    "historical_source_revision": "6094049ffc65e3ee77aec6469b74fc65c186a422"
+  },
+  "wi4_target_schedules": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/manifest.json",
+    "sha256": "1b4f683b9acb34c51c8fa15d9065bb1468cf35f40996608d64d09536da5fe221",
+    "status": "WI4_actual_WORK_GOSSIP_POOL_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/WORKLIST.json",
+    "historical_source_revision": "f91559fd59ad9b332fc22152f2540e29ccec9b1e"
+  },
+  "ticket_actual_rpc": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/manifest.json",
+    "sha256": "ebc2876bc70838e83b6240a9c5bea7e7542c2878cccd0336d05b3a2ada740f6c",
+    "status": "WIV1_V2_actual_inprocess_RPC_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/WORKLIST.json",
+    "historical_source_revision": "0b7dcf0ba65e04d1f39a14270fbaea76a42e3ca9"
+  },
+  "ticket_native_progress": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/manifest.json",
+    "sha256": "f0374d352661987455287595462cd9bb9f935ffba8ff781d60cbdbd6a6fcb33b",
+    "status": "WIV1_V2_native60_progress_RPC_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/WORKLIST.json",
+    "historical_source_revision": "5db56cfa43189aadc55a928052dc4a6418376fb5"
+  },
+  "ticket_method_schedules": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/manifest.json",
+    "sha256": "d00a25b04a509d9530b54acc8bcfa335d4593274491a1edecfa988c95e8715ab",
+    "status": "WIV1_V2_actual_method5_schedules_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/WORKLIST.json",
+    "historical_source_revision": "4b7b9decb76e234de8d2bae12575355f5f8415c1"
+  },
+  "ticket_rpc_overlap": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/manifest.json",
+    "sha256": "03f4d7a71288a3f461aa23f8ea2137b7210a106ae43162adbdb05d160186de36",
+    "status": "WIV1_V2_native_RPC_overlap_atomic_counter_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/WORKLIST.json"
+  },
+  "local_native_reliability": {
+    "kind": "local_native_reliability_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1/manifest.json",
+    "manifest_sha256": "a347d32880e42f9172718d5bf2055a861cee79ebf25483882862932b1cb50e7e"
+  },
+  "latest_scoped_followup": {
+    "kind": "real_factory_owner_schedules_DEV_not_independent",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1/manifest.json",
+    "manifest_sha256": "05462259713f3b7758dc99d89d029a2455292956137afb1bbb3dd626a73aa328",
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "full_original5_complete": false
+  },
+  "active_remaining_worklist": {
+    "path": "docs/spec-driven/REMAINING-13-EXECUTION.json",
+    "sha256": "a9a91e4ffac3fa2eb5c29f139849633e3cd5c7194c87a50e009f74da45511733"
+  },
+  "latest_consumer_role_followup": {
+    "kind": "four_actual_roles_current_CKS_transport_not_model_quality",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/four-role-current-v1/manifest.json",
+    "manifest_sha256": "d35d876033df50c17de1c242275df9b8009943dec91712c913db6be50d4d1e2d",
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "latest_intent_batch_followup": {
+    "kind": "WI3_source_bound_intent_batch_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/manifest.json",
+    "manifest_sha256": "a6996f321955d71adb56e7e18238adb516a951a7e435e98a52338350bf18c0be"
+  },
+  "latest_real_peer_followup": {
+    "kind": "actual_loopback_peer_sync_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/real-peer-sync-v1/manifest.json",
+    "manifest_sha256": "c42fc2d3c986e2100658954c68a5b9bc990810d51c1210c91f6e096ce4869a7b"
+  },
+  "latest_review_delivery_followup": {
+    "kind": "WIC_actual_installed_typed_delivery_and_render_DEV",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/review-delivery-current-v1/manifest.json",
+    "manifest_sha256": "d96a90f834e083e9763c6906d347532fe9d3a76edf7ae9b9b6c69b58fdd318ae"
+  },
+  "latest_viewer_followup": {
+    "kind": "viewer_owned_UI_lifecycle_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/viewer-lifecycle-v1/manifest.json",
+    "manifest_sha256": "d36a14abf5e57d0cd11c1e5bc0ce0c61b763ffd4bc9cd2c8daa0e02e9d8f70a2"
+  },
+  "latest_owner_scope_adoption": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json",
+    "sha256": "85310e913297a498665e4521b0d2a6dacaaa949a1e3659941076bf674dc80d1f",
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "latest_draft_history_reconciliation": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/draft-history-reconciliation-v1/manifest.json",
+    "sha256": "ff8ba28b17a18f2f19dba6a07aac5aea4fc252649cd014168006cf12a72702b1",
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "latest_local_model_inventory": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-local-model-inventory-v1/INVENTORY.json",
+    "sha256": "bbceaa83710ff0af3736c193a67b49181b00ea10b3fcf30b6c02d30f96add354",
+    "model_inference_calls": 0,
+    "CoreML_executed": false
+  },
+  "latest_user_security_deferral": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-deferred-security-scope-v1/SCOPE.json",
+    "sha256": "cbf9ab52dba5da47a2e1287939a74cd8c8eec4baf7f0999181faa3635aef639a",
+    "deferred_not_complete": true
+  },
+  "latest_scale_profile": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/scale-long-functions-v1/manifest.json",
+    "sha256": "901050e97ad3a0444d7277bef29e4c86eb86f9c5322deb71f6408e193d4887ae",
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "capacity_SLA_accepted": false
+  },
+  "latest_public_v2_followup": {
+    "kind": "public_v2_CLI_HTTP_graph_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/public-v2-surface-v1/manifest.json",
+    "manifest_sha256": "c0e27997085c7a401ae27e831e60f075fd2f28a70d57e4347d60befaf6adcd16"
+  },
+  "latest_coreml_followup": {
+    "kind": "CoreML_local_native_transport_CLI_default_regression_DEV_not_real_model_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/manifest.json",
+    "manifest_sha256": "dc79310029bb434dee6911227441e4b033bfc179c639191ada96179d59ea6a42"
+  },
+  "current_user_scope_exclusion": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json",
+    "sha256": "938605d7f35dc8b7c2783dbc334134b69d4c0e212e910ea2a9234bea0c36bcb9",
+    "excluded_not_complete": true
+  },
+  "latest_guardian_deadline_followup": {
+    "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/manifest.json",
+    "manifest_sha256": "c1213bce8e84df32b3597bbc57f46c6e955ce76246731fe6a623f0e2fbc7ed37"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "actual_observation": "SIGTERM during a state commit can poison persistence and leave the last-confirmed memory phase building. Child shutdown and intent preservation still completed, but the CLI lacked an explicit uncertainty report.",
+  "fix": "Report last_confirmed_in_process_state and disk_state_requires_reconciliation; never perform more writes in a poisoned process. Signal stop reports closed_requires_persistence_reconciliation.",
+  "deterministic_regression": "Interrupt Journal directory fsync after an actual admitted native job, verify uncertainty output and exact recovery from disk.",
+  "final_Python_cases": 248,
+  "independent_acceptance": false
+}

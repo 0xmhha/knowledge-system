@@ -1,0 +1,31 @@
+# Fee delegation signing model: setSignatureValues writes the FeePayer, not the Sender
+
+**Status:** verified · **Subsystem:** A6 (Fee Delegation & Anzeon Gas) · **Type:** B5
+
+FeeDelegateDynamicFeeTx (tx type 0x16) is a double-signed transaction:
+the Sender signs the inner DynamicFeeTx, then the FeePayer signs the
+whole envelope. The method names on the outer type are easy to
+misread. setSignatureValues writes the FeePayer's V/R/S
+(tx.FV/FR/FS); rawSignatureValues returns the Sender's signature by
+delegating to SenderTx.rawSignatureValues; rawFeePayerSignatureValues
+returns the FeePayer's signature. Confusing these breaks both
+signature verification paths and trips the blacklist guard for the
+FeePayer in TransitionDb.
+
+## Pitfalls
+- Adding logic to setSignatureValues thinking it covers the Sender signature — Sender's V/R/S lives on the embedded SenderTx and is set by the embedded DynamicFeeTx's setSignatureValues, not the wrapper.
+- Forgetting to verify both Sender and FeePayer signatures during transaction validation — verifying only Sender allows a forged FeePayer to be inserted.
+- Computing gas pricing from FeePayer's GasFeeCap/GasTipCap — there is no such field. The FeePayer only signs; gas price comes from SenderTx (the inner DynamicFeeTx).
+- Missing the FeePayer blacklist check in TransitionDb (verification ③ in stablenet-features.md §10) — a blacklisted FeePayer can otherwise still pay for a non-blacklisted Sender's transaction.
+
+## Code anchors
+- `core/types/tx_fee_delegation.go` FeeDelegateDynamicFeeTx.setSignatureValues:148 — writes V/R/S into tx.FV/FR/FS — FeePayer signature target
+- `core/types/tx_fee_delegation.go` FeeDelegateDynamicFeeTx.rawSignatureValues:144 — returns SenderTx.rawSignatureValues — Sender signature target
+- `core/types/tx_fee_delegation.go` FeeDelegateDynamicFeeTx.rawFeePayerSignatureValues:129 — returns FeePayer V/R/S directly
+- `core/state_transition.go` — FeePayer blacklist verification point (stablenet-features.md §10 verification ③)
+
+## Aliases
+수수료 위임, 수수료 위임 서명, 이중 서명 트랜잭션, Fee Delegation, fee delegation transaction, double signature, fee payer signature, FeeDelegateDynamicFeeTx, setSignatureValues, rawSignatureValues, rawFeePayerSignatureValues, FeeDelegateDynamicFeeTxType, FV, FR, FS, FeePayer
+
+## Related
+A11.state_transition.blacklist_check_points, A5.account_extra.bit_layout

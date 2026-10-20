@@ -1,0 +1,43 @@
+backends:
+  ckg:
+    binary_path: ''
+    path: /private/tmp/ks-KM034A-documents-final-20261015/prepared/dataset-a/reviewed-doc-v1/graph/graph.db
+    policy_file: ''
+    source_root: /private/tmp/ks-KM034A-documents-final-20261015/prepared/manager-a/adoptions/94afda9a5f0f92148c0cca27c7090f9bdd133c69131121c9d6923d05594b2c62/project
+    timeout_ms: 5000
+  ckv:
+    binary_path: ''
+    embed_model: mock-feature-hash-v1
+    ollama_url: http://localhost:11434
+    path: /private/tmp/ks-KM034A-documents-final-20261015/prepared/dataset-a/reviewed-doc-v1/vector
+    provider: mock
+    query_prefix_policy: registry
+    timeout_ms: 3000
+description: ''
+domain:
+  corpus_dir: ''
+  project_dir: ''
+listen:
+  allow_remote: false
+  allowed_cidrs: []
+  http_addr: 127.0.0.1:8080
+  mcp_stdio: true
+  transport: stdio
+logging:
+  audit_dir: ''
+  footprint_dir: ''
+  level: error
+  mode: prod
+name: cks
+sanitize:
+  default_action: drop
+  fail_closed_on_unknown_rule: true
+  rules_path: /private/tmp/ks-KM034A-documents-final-20261015/prepared/manager-a/sanitization_rules.yaml
+semantic:
+  ontology_budget_ms: 1000
+  store_path: ''
+service:
+  label_prefix: ''
+version: 1
+vocab:
+  glossary_path: ''

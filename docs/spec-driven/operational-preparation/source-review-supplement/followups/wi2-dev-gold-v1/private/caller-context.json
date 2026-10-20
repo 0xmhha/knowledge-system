@@ -1,0 +1,596 @@
+{
+  "kind": "existing14_source_only_caller_references_separate_population",
+  "references": [
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommandWithOutput",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 12269,
+        "end_byte_exclusive": 12339,
+        "start_line": 375,
+        "end_line": 375
+      },
+      "function_name": "doLint",
+      "function_site": {
+        "start_byte": 11888,
+        "end_byte_exclusive": 12387,
+        "start_line": 363,
+        "end_line": 377
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "identifier",
+        "text": "linter",
+        "site": {
+          "start_byte": 12300,
+          "end_byte_exclusive": 12306,
+          "start_line": 375,
+          "end_line": 375
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommandWithOutput(linter, append(lflags, packages...)...)",
+      "id": "CALLER-001",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 18793,
+        "end_byte_exclusive": 19006,
+        "start_line": 554,
+        "end_line": 554
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 18814,
+          "end_byte_exclusive": 18822,
+          "start_line": 554,
+          "end_line": 554
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"build\", \"--build-arg\", \"COMMIT=\"+env.Commit, \"--build-arg\", \"VERSION=\"+params.VersionWithMeta, \"--build-arg\", \"BUILDNUM=\"+env.Buildnum, \"--tag\", fmt.Sprintf(\"%s:TAG\", *upload), \".\")",
+      "id": "CALLER-002",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 19009,
+        "end_byte_exclusive": 19260,
+        "start_line": 555,
+        "end_line": 555
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 19030,
+          "end_byte_exclusive": 19038,
+          "start_line": 555,
+          "end_line": 555
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"build\", \"--build-arg\", \"COMMIT=\"+env.Commit, \"--build-arg\", \"VERSION=\"+params.VersionWithMeta, \"--build-arg\", \"BUILDNUM=\"+env.Buildnum, \"--tag\", fmt.Sprintf(\"%s:alltools-TAG\", *upload), \"-f\", \"Dockerfile.alltools\", \".\")",
+      "id": "CALLER-003",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 20833,
+        "end_byte_exclusive": 20922,
+        "start_line": 593,
+        "end_line": 593
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 20854,
+          "end_byte_exclusive": 20862,
+          "start_line": 593,
+          "end_line": 593
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"image\", \"tag\", fmt.Sprintf(\"%s:TAG\", *upload), gethImage)",
+      "id": "CALLER-004",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 20926,
+        "end_byte_exclusive": 21024,
+        "start_line": 594,
+        "end_line": 594
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 20947,
+          "end_byte_exclusive": 20955,
+          "start_line": 594,
+          "end_line": 594
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"image\", \"tag\", fmt.Sprintf(\"%s:alltools-TAG\", *upload), toolImage)",
+      "id": "CALLER-005",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 21028,
+        "end_byte_exclusive": 21077,
+        "start_line": 595,
+        "end_line": 595
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 21049,
+          "end_byte_exclusive": 21057,
+          "start_line": 595,
+          "end_line": 595
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"push\", gethImage)",
+      "id": "CALLER-006",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 21081,
+        "end_byte_exclusive": 21130,
+        "start_line": 596,
+        "end_line": 596
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 21102,
+          "end_byte_exclusive": 21110,
+          "start_line": 596,
+          "end_line": 596
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"push\", toolImage)",
+      "id": "CALLER-007",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 23261,
+        "end_byte_exclusive": 23363,
+        "start_line": 662,
+        "end_line": 662
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 23282,
+          "end_byte_exclusive": 23290,
+          "start_line": 662,
+          "end_line": 662
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", append([]string{\"manifest\", \"create\", gethImage}, gethSubImages...)...)",
+      "id": "CALLER-008",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 23367,
+        "end_byte_exclusive": 23428,
+        "start_line": 663,
+        "end_line": 663
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 23388,
+          "end_byte_exclusive": 23396,
+          "start_line": 663,
+          "end_line": 663
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"manifest\", \"push\", gethImage)",
+      "id": "CALLER-009",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 23730,
+        "end_byte_exclusive": 23832,
+        "start_line": 673,
+        "end_line": 673
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 23751,
+          "end_byte_exclusive": 23759,
+          "start_line": 673,
+          "end_line": 673
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", append([]string{\"manifest\", \"create\", toolImage}, toolSubImages...)...)",
+      "id": "CALLER-010",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 23836,
+        "end_byte_exclusive": 23897,
+        "start_line": 674,
+        "end_line": 674
+      },
+      "function_name": "doDocker",
+      "function_site": {
+        "start_byte": 16694,
+        "end_byte_exclusive": 23906,
+        "start_line": 514,
+        "end_line": 677
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"docker\"",
+        "literal": "docker",
+        "site": {
+          "start_byte": 23857,
+          "end_byte_exclusive": 23865,
+          "start_line": 674,
+          "end_line": 674
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"docker\", \"manifest\", \"push\", toolImage)",
+      "id": "CALLER-011",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 27380,
+        "end_byte_exclusive": 27420,
+        "start_line": 754,
+        "end_line": 754
+      },
+      "function_name": "doDebianSource",
+      "function_site": {
+        "start_byte": 23928,
+        "end_byte_exclusive": 27547,
+        "start_line": 680,
+        "end_line": 761
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"debsign\"",
+        "literal": "debsign",
+        "site": {
+          "start_byte": 27401,
+          "end_byte_exclusive": 27410,
+          "start_line": 754,
+          "end_line": 754
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"debsign\", changes)",
+      "id": "CALLER-012",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 33181,
+        "end_byte_exclusive": 33279,
+        "start_line": 966,
+        "end_line": 966
+      },
+      "function_name": "stageDebianSource",
+      "function_site": {
+        "start_byte": 32926,
+        "end_byte_exclusive": 34294,
+        "start_line": 959,
+        "end_line": 983
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"git\"",
+        "literal": "git",
+        "site": {
+          "start_byte": 33202,
+          "end_byte_exclusive": 33207,
+          "start_line": 966,
+          "end_line": 966
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"git\", \"checkout-index\", \"-a\", \"--prefix\", pkgdir+string(filepath.Separator))",
+      "id": "CALLER-013",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    },
+    {
+      "path": "build/ci.go",
+      "target": "MustRunCommand",
+      "kind": "direct_call_syntax",
+      "owner_spelling": "build",
+      "import_path_spelling": "github.com/ethereum/go-ethereum/internal/build",
+      "resolution": "syntax_only_unverified",
+      "site": {
+        "start_byte": 37027,
+        "end_byte_exclusive": 37249,
+        "start_line": 1047,
+        "end_line": 1054
+      },
+      "function_name": "doWindowsInstaller",
+      "function_site": {
+        "start_byte": 34317,
+        "end_byte_exclusive": 37381,
+        "start_line": 986,
+        "end_line": 1059
+      },
+      "closure_depth": 0,
+      "first_argument": {
+        "kind": "string_literal",
+        "text": "\"makensis.exe\"",
+        "literal": "makensis.exe",
+        "site": {
+          "start_byte": 37048,
+          "end_byte_exclusive": 37062,
+          "start_line": 1047,
+          "end_line": 1047
+        }
+      },
+      "matches_build_import_spelling": true,
+      "source_text": "build.MustRunCommand(\"makensis.exe\",\n\t\t\"/DOUTPUTFILE=\"+installer,\n\t\t\"/DMAJORVERSION=\"+version[0],\n\t\t\"/DMINORVERSION=\"+version[1],\n\t\t\"/DBUILDVERSION=\"+version[2],\n\t\t\"/DARCH=\"+*arch,\n\t\tfilepath.Join(*workdir, \"geth.nsi\"),\n\t)",
+      "id": "CALLER-014",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established",
+      "vulnerability_verdict": null,
+      "independent_label": null,
+      "approved": false,
+      "gold": false
+    }
+  ],
+  "runtime_reachability": "not_established",
+  "attacker_control": "not_established",
+  "not_added_to_108_DEV_inputs": true,
+  "independent_review_receipt": null
+}

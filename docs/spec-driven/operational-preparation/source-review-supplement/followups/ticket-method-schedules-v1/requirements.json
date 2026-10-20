@@ -1,0 +1,1782 @@
+[
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "ORIGINAL-general-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "ORIGINAL-race-method5",
+    "candidate": "ORIGINAL",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "CAND-A-general-method5",
+    "candidate": "CAND-A",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "CAND-A-race-method5",
+    "candidate": "CAND-A",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "CAND-B-general-method5",
+    "candidate": "CAND-B",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "CAND-B-race-method5",
+    "candidate": "CAND-B",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "MUT-REINTRO-general-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "MUT-REINTRO-race-method5",
+    "candidate": "MUT-REINTRO",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "MUT-EARLY-general-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "API-ENTRY",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "remaining": "No RPC in this method bundle. Phase64/65 actual RPC remains separate; full factory and installed finalHEAD pending."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "API-UNSUB",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "remaining": "Direct subscription method calls are not RPC registry cancellation. Actual callback exit overlap remains pending."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "API-NEGATIVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "remaining": "No transport/negative RPC tests in this bundle; earlier negative route evidence remains separate."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "METHOD-RETURN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Finite tested calls joined after controlled ack or real-loop handling; every schedule/host and independently accepted liveness still unproved."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "METHOD-ONCE",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three callers use exact same object, controlled owner observes one request and zero individual returns until ack except early mutant; one correlated repetition/profile, not independent sufficient population."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "METHOD-REMOVE",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Real loop deletion-before-close is a source fact only. Runtime map deletion is not instrumented; controlled receiver has no real map."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "METHOD-ACK",
+    "label": "not_exercised_or_uninstrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "remaining": "Controlled ack withheld/released and zero individual returns observed, but exact real-loop ack and absence of every post-ack channel use are uninstrumented."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "NORMAL-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "remaining": "Actual post-done installation delivers false before direct method call. Native broadcast primer is separate; exact removal/ack events and normal live RPC overlap not instrumented."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "LATE-DRAIN",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "remaining": "Three finite sends after controlled uninstall acceptance and before controlled ack drain. Not real map-owner deletion order or arbitrary finite schedule proof."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "BLOCKED-DELIVERY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Actual post-done install send overlaps sole direct consumer exit. Not native timer broadcast overlapping actual Syncing RPC callback exit; no scheduler/fairness proof."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "OWNED-CLEANUP",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "remaining": "Observed before owned rescue; all eight method calls and scoped loop/drains/memory chain joined per process. Not every retained package-init goroutine individually joined or external host lifecycle."
+  },
+  {
+    "slot_id": "MUT-EARLY-race-method5",
+    "candidate": "MUT-EARLY",
+    "requirement": "SOURCE-BOUNDARY",
+    "label": "bounded_observation_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "remaining": "Full2228 source map, exact API candidate/test Git trees/binaries bound. Installed4roles/finalHEAD and independent oracle remain pending."
+  }
+]

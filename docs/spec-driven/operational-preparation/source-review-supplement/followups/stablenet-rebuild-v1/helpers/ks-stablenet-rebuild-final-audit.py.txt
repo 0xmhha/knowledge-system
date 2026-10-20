@@ -1,0 +1,28 @@
+import json,pathlib,hashlib,subprocess,sys,importlib.util,urllib.request,os
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');V=O/'dataset/retained-origins-v2'
+def sha(p):
+ h=hashlib.sha256()
+ with p.open('rb')as f:
+  for b in iter(lambda:f.read(4<<20),b''):h.update(b)
+ return h.hexdigest()
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+before=json.load(open(O/'original-selected-before.json'));original=pathlib.Path(before['version']);after={'version':str(original),'current_target':os.readlink(original.parent/'current'),'files':{str(p.relative_to(original)):{'sha256':sha(p),'bytes':p.stat().st_size}for p in sorted(original.rglob('*'))if p.is_file()}};dump(O/'original-selected-after.json',after);assert before==after
+corpora=json.load(open(O/'corpus-inputs.json'));external=True
+for row in corpora['origins']:
+ for name,digest in row['file_sha256'].items():external&=sha(pathlib.Path(row['original'])/name)==digest and sha(pathlib.Path(row['copy'])/name)==digest
+assert external
+sys.path.insert(0,str(R/'scripts'));s=importlib.util.spec_from_file_location('scope',R/'scripts/run-consumer-final.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);plan=json.load(open(m.PLAN));scope={'global':m.global_state(plan),'operations':m.operations(plan),'source_repos':m.sources()['repos']};dump(O/'scope-after.json',scope);previous=json.load(open(O/'scope-before.json'));build=json.load(open(O/'build-start.json'));owned_ids={build['pid']}|{r['pid']for r in json.load(open(O/'owned-build-processes.json'))};owned_before_ids={r['pid']for r in previous['operations']['engines']if r['pid']==build['pid']or r['ppid']==build['pid']};original_engines=[r for r in previous['operations']['engines']if r['pid']not in owned_before_ids]
+known={}
+for row in json.load(open(O/'owned-build-processes.json')):known[row['pid']]={'kind':'owned_build','identity':row['identity']}
+for case in ['paired-old','paired-new','boundaries-new','foreign-project-new','foreign-snapshot-new','boundary-restored-new']:
+ life=json.load(open(O/case/'lifecycle.json'));known[life['pid']]={'kind':'owned_stdio','command':life['command']}
+probes=[]
+for pid,expected in sorted(known.items()):
+ r=subprocess.run(['ps','-p',str(pid),'-o','pid=,ppid=,lstart=,command='],capture_output=True,text=True);raw=r.stdout.strip()
+ if expected['kind']=='owned_build':gone=r.returncode==1 or raw!=expected['identity']
+ else:gone=r.returncode==1 or str(O/'read-bin/cks')not in raw
+ probes.append({'pid':pid,'kind':expected['kind'],'identity_gone':gone,'ps_exit_code':r.returncode,'current_identity_sha256':hashlib.sha256(raw.encode()).hexdigest(),'identity_comparison':'full recorded birth/command for build; unique owned read-binary command for stdio; PID reuse is not killed'});assert gone
+r=subprocess.run(['ps','-p',str(os.getpid()),'-o','pid='],capture_output=True,text=True);dump(O/'process-audit.json',{'probes':probes,'self':{'exit_code':r.returncode,'stdout':r.stdout},'unowned_signals':0})
+models=json.load(urllib.request.urlopen('http://127.0.0.1:11434/api/tags'));model=next(r for r in models['models']if r['name']=='bge-m3:latest');oldcopies=all(sha(O/'old-dataset/old-v1'/name)==record['sha256']for name,record in before['files'].items());assert oldcopies
+src=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet');head=subprocess.check_output(['git','-C',str(src),'rev-parse','HEAD'],text=True).strip();clean=not subprocess.check_output(['git','-C',str(src),'status','--porcelain'],text=True);ownedclean=not subprocess.check_output(['git','-C',str(O/'source'),'status','--porcelain'],text=True);assert clean and ownedclean and head=='0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8'
+result={'original_selected_unchanged':before==after,'original_selected_file_count':len(before['files']),'old_control_copy_unchanged':oldcopies,'original_source_commit':head,'original_source_clean':clean,'owned_source_clean':ownedclean,'original_external_inputs_unchanged':external,'global_configuration_equal':previous['global']==scope['global'],'global_entry_count':len(scope['global']),'operational_metadata_pointers_equal':previous['operations']['metadata']==scope['operations']['metadata'],'operational_metadata_entry_count':len(scope['operations']['metadata']),'prior_source_checkouts_equal':previous['source_repos']==scope['source_repos'],'original_unowned_engines_preserved':all(r in scope['operations']['engines']for r in original_engines),'original_unowned_engine_count':len(original_engines),'owned_build_engines_excluded_from_original_census':[r['pid']for r in previous['operations']['engines']if r['pid']in owned_before_ids],'no_current_created_in_owned_dataset':not(O/'dataset/current').exists(),'model_digest_after':model['digest'],'production_writes':0,'external_publication':0,'paid_LLM_calls':0,'scope':'complete selected original version file bytes plus scoped global/config/pointers/candidate identity snapshots; not every operational DB or continuous availability/ACL proof'};dump(O/'preservation.json',result);print(json.dumps(result),flush=True)

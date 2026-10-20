@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "state": "partial",
+  "profile_digest": "7e9408f7b2d2ce90be035672442817139340ab338e2794af02d70fec0307d584",
+  "catalog_digest": "51d1f9081989af8872309faa01ddfce0a3e87c254f12c1f3358347d8710c1883",
+  "collection_id": "real-chains",
+  "mode": "comparison",
+  "concept": {
+    "key": {
+      "pack_id": "industry.blockchain",
+      "version": "1.0.0",
+      "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+      "concept_id": "staking-policy"
+    },
+    "definition": "Explicitly documented or configured rules governing supported staking operations, distinct from inferred code intent.",
+    "view": {
+      "id": "staking-policy",
+      "aliases": [
+        "staking-policy",
+        "스테이킹 정책",
+        "staking policy",
+        "unstaking policy"
+      ],
+      "includes": [
+        "stated limits, unlock conditions, configuration and exceptions"
+      ],
+      "excludes": [
+        "code behavior alone is not an approved policy or rationale"
+      ],
+      "applicable_roles": [
+        "staking-network"
+      ],
+      "facets": [
+        {
+          "id": "withdrawal-conditions",
+          "question": "Which stated rules govern withdrawal and unbonding?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "limits",
+          "question": "Which network and configuration-specific limits apply?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        },
+        {
+          "id": "exceptions",
+          "question": "Which stated exceptions or policy conflicts remain unresolved?",
+          "conditions": [
+            "project version",
+            "network and configuration",
+            "component role",
+            "source observation time"
+          ]
+        }
+      ]
+    }
+  },
+  "facets": [
+    "withdrawal-conditions",
+    "limits",
+    "exceptions"
+  ],
+  "as_of": "2026-10-15T19:49:01Z",
+  "question": "고정 원문으로 staking-policy 근거와 모르는 부분을 프로젝트별로 비교한다.",
+  "groups": [
+    {
+      "participant": {
+        "scope_id": "99de6a6176deb82106aa664609b51440ab931711ad30dcd38d295182fee2d920",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-stablenet",
+            "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+            "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "wbft-source-excerpts-no-live-network",
+            "component_role": "staking-network",
+            "observed_at": "2026-10-15T19:48:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking-policy"
+          },
+          "facet": "withdrawal-conditions",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking-policy"
+          },
+          "facet": "limits",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-stablenet",
+              "dataset_id": "2cb3a623440127ebd84ec3c43bafe1758f65c738dc9f203b702e74e9b43161c3",
+              "snapshot_id": "51add2bd80175a8d53c97796804df99000a71f03502b55d2a9bdfe6ea7d8d9f6",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "wbft-source-excerpts-no-live-network",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking-policy"
+          },
+          "facet": "exceptions",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    },
+    {
+      "participant": {
+        "scope_id": "8e0e9994dc7e65212b0b7b5ae47ae3cd7991da6d4e785858bbfde4f1021ef18e",
+        "scope": {
+          "coordinates": {
+            "project_id": "comparison-go-wemix",
+            "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+            "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+            "source_mode": "working-tree",
+            "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+          },
+          "industry": "blockchain",
+          "conditions": {
+            "network": "not-selected-source-study",
+            "configuration": "clique-source-excerpts-no-live-network",
+            "component_role": "staking-network",
+            "observed_at": "2026-10-15T19:48:59+00:00"
+          }
+        }
+      },
+      "state": "partial",
+      "cells": [
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking-policy"
+          },
+          "facet": "withdrawal-conditions",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking-policy"
+          },
+          "facet": "limits",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        },
+        {
+          "scope": {
+            "coordinates": {
+              "project_id": "comparison-go-wemix",
+              "dataset_id": "979016b85e1baae0de6e7fde40eb1d2e168bdafd977c7d245ad642230a5d1cb4",
+              "snapshot_id": "dca6c171559e3b9229ea75d9519da635767122a66a5eeab61e207a0c2467a6c2",
+              "source_mode": "working-tree",
+              "base_commit": "1350376a680489298b3203a44d9ebddb7747f9cc"
+            },
+            "industry": "blockchain",
+            "conditions": {
+              "network": "not-selected-source-study",
+              "configuration": "clique-source-excerpts-no-live-network",
+              "component_role": "staking-network",
+              "observed_at": "2026-10-15T19:48:59+00:00"
+            }
+          },
+          "concept": {
+            "pack_id": "industry.blockchain",
+            "version": "1.0.0",
+            "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+            "concept_id": "staking-policy"
+          },
+          "facet": "exceptions",
+          "state": "not_collected",
+          "reasons": [
+            "no_mapping_collected_for_selected_project_version_and_conditions"
+          ],
+          "mappings": [],
+          "archive_verified": true,
+          "classification_basis": "declared_direct_mappings_and_retained_source",
+          "entity_identity": false,
+          "unreviewed_candidates_included": false
+        }
+      ]
+    }
+  ],
+  "candidates": [],
+  "used_body_bytes": 0,
+  "used_citations": 0,
+  "completeness_scope": "requested_project_facet_rows_only_not_all_project_evidence",
+  "final_assessment": "LLM_or_user_evaluates_tradeoffs_from_cited_evidence",
+  "omitted_candidates": 0,
+  "candidate_state": "complete"
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "label": "gen-reader-v3",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset/v3",
+      "--source-root",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/source",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/reader-v3.yaml"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "rollback-v1",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "rollback",
+      "v1",
+      "--config",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/setup.yaml"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "gc-active-reader",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "gc",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset",
+      "--keep-recent",
+      "2",
+      "--min-age",
+      "0s",
+      "--protect-version",
+      "v1",
+      "--plan-file",
+      "/private/tmp/ks-E2-retention-verified-20261015/gc-active-reader.json"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "gc-apply-active",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "gc",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset",
+      "--apply",
+      "--plan-file",
+      "/private/tmp/ks-E2-retention-verified-20261015/gc-active-reader.json"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "gc-released-reader",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "gc",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset",
+      "--keep-recent",
+      "2",
+      "--min-age",
+      "0s",
+      "--protect-version",
+      "v1",
+      "--plan-file",
+      "/private/tmp/ks-E2-retention-verified-20261015/gc-released-reader.json"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "gc-stale-reader-plan",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "gc",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset",
+      "--apply",
+      "--plan-file",
+      "/private/tmp/ks-E2-retention-verified-20261015/gc-released-reader.json"
+    ],
+    "exit_code": 1,
+    "expected_success": false
+  },
+  {
+    "label": "gc-collectible",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "gc",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset",
+      "--keep-recent",
+      "2",
+      "--min-age",
+      "0s",
+      "--protect-version",
+      "v1",
+      "--plan-file",
+      "/private/tmp/ks-E2-retention-verified-20261015/gc-collectible.json"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "gc-apply-released",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "gc",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset",
+      "--apply",
+      "--plan-file",
+      "/private/tmp/ks-E2-retention-verified-20261015/gc-collectible.json"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "gen-deleted-reader-v3",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset/v3",
+      "--source-root",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/source",
+      "--embed-model",
+      "mock",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/deleted-reader.yaml"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  },
+  {
+    "label": "refuse-reader-deleted-v3",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "--config",
+      "/private/tmp/ks-E2-retention-verified-20261015/deleted-reader.yaml"
+    ],
+    "exit_code": 1,
+    "expected_success": false
+  },
+  {
+    "label": "gen-reader-v5",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/dataset/v5",
+      "--source-root",
+      "/private/tmp/ks-E2-retention-verified-20261015/project-a/source",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-E2-retention-verified-20261015/reader-v5.yaml"
+    ],
+    "exit_code": 0,
+    "expected_success": true
+  }
+]

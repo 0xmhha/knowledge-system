@@ -1,0 +1,522 @@
+{
+  "freeze": null,
+  "execution_allowed": false,
+  "roles": {
+    "gold_author": null,
+    "independent_content_reviewer": null,
+    "final_scope_acceptor": null,
+    "execution_operator": null,
+    "independence_declaration": null
+  },
+  "model": {
+    "embedding_candidate": "BGE-M3",
+    "embedding_dimensions_candidate": 1024,
+    "embedding_runtime_identity": null,
+    "llm_provider": null,
+    "llm_model": null,
+    "llm_version_or_digest": null,
+    "llm_cost_limit": null,
+    "currency": null,
+    "cost_accounting_source": null
+  },
+  "freeze_requirements": [
+    {
+      "id": "F-01",
+      "topic": "scope_and_terminal_boundary",
+      "preparation_status": "ready_for_review",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-02",
+      "topic": "source_candidates",
+      "preparation_status": "current_candidate_committed_build_and_adopted_sources_verified_not_formal_source_adoption",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-03",
+      "topic": "sampling_and_scoring",
+      "preparation_status": "nine_scoring_proposals_ready_for_review_not_adopted",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-04",
+      "topic": "statistical_method_and_sufficiency",
+      "preparation_status": "ready_for_review",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-05",
+      "topic": "roles_and_independence",
+      "preparation_status": "awaiting_assignment_user_confirmed_unassigned",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-06",
+      "topic": "llm_and_resource_budget",
+      "preparation_status": "awaiting_assignment",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-07",
+      "topic": "new_inputs_gold_and_holdout",
+      "preparation_status": "source_review_annotation_and_rule_census_drafts_prepared_independent_gold_pending",
+      "decision_status": "pending",
+      "receipt": null
+    },
+    {
+      "id": "F-08",
+      "topic": "runtime_recipes_and_owned_resources",
+      "preparation_status": "current_2_1_301_scripted_host_and_native_metadata_verified_actual_runtime_recipe_pending",
+      "decision_status": "pending",
+      "receipt": null,
+      "remaining_source_risks": [
+        "real_agent_model_dispatch_and_publication_boundary_unverified",
+        "chainbench_real_node_active_cleanup_unverified",
+        "other_platform_stdio_shutdown_unmeasured"
+      ],
+      "local_scripted_host_evidence": "system/eval/operational-preparation-2026-10-15/isolated-host/manifest.json"
+    }
+  ],
+  "input_groups": [
+    {
+      "id": "WI-V1",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_defect_tickets_min": 2,
+        "normal_controls": true,
+        "symptom_reintroduction_mutants": true,
+        "overfit_mutants": true,
+        "oracles": [
+          "primary",
+          "independently_derived"
+        ]
+      },
+      "metrics_proposal": {
+        "declared_oracle_and_normal_control_pass_fraction": 1.0,
+        "expected_invalid_refusal_fraction": 1.0
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-V2",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "shared_ticket_group": "WI-V1",
+        "candidates_per_ticket_min": 2,
+        "independent_acceptable_candidate_set": true
+      },
+      "metrics_proposal": {
+        "selected_candidates_satisfy_hard_gates_and_gold": true,
+        "all_bad_selection": null,
+        "ties_and_insufficiency_explicit": true
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-3",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_fact_families_min": 20,
+        "symptom_types_min": 4,
+        "top_k": 10
+      },
+      "metrics_proposal": {
+        "macro_case_recall_at_10_min": 0.8
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-4",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_seed_schedule_families_min": 5,
+        "planned_runs_per_arm_min": 100,
+        "baseline_symptom_events_min": 10
+      },
+      "metrics_proposal": {
+        "fix_to_baseline_symptom_rate_ratio_max": 0.5,
+        "no_recurrence_verdict": "inconclusive"
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-1",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_functions_min": 30,
+        "constructs": [
+          "declaration_redefinition",
+          "branch",
+          "loop",
+          "shadow",
+          "return"
+        ],
+        "functions_per_construct_min": 4,
+        "gold_semantics": "structural_lexical_may_reach_not_path_feasibility"
+      },
+      "metrics_proposal": {
+        "data_edge_precision_min": 0.95,
+        "data_edge_recall_min": 0.9,
+        "control_edge_precision_min": 0.95,
+        "control_edge_recall_min": 0.9
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-2",
+      "status": "source_syntax_census_only_independent_cases_not_prepared",
+      "requirements_proposal": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "metrics_proposal": {
+        "candidate_precision_min": 0.8,
+        "candidate_recall_min": 0.8,
+        "vulnerability_acceptance_separate": true
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "preparation_reference": {
+        "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+        "kind": "source_drafts_not_gold_or_runtime"
+      }
+    },
+    {
+      "id": "WI-C",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "metrics_proposal": {
+        "required_rubric_omissions_max": 0,
+        "source_artifact_state_binding_match_fraction": 1.0
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-6",
+      "status": "not_prepared",
+      "requirements_proposal": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "metrics_proposal": {
+        "macro_recall_delta_min": 0.1,
+        "macro_noise_fraction_delta_max": 0.1,
+        "warm_p95_latency_ratio_max": 2.0,
+        "delta_unit": "fraction_difference_0.10_equals_10_percentage_points",
+        "empty_return_noise_fraction": null
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null
+    },
+    {
+      "id": "WI-SP",
+      "status": "source_queries_and_annotation_drafts_not_reviewed",
+      "requirements_proposal": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "metrics_proposal": {
+        "annotation_match_fraction": 1.0,
+        "expected_permission_refusal_fraction": 1.0,
+        "unavailable_yaml_or_reviewer_provenance": "unknown"
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "preparation_reference": {
+        "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+        "kind": "source_drafts_not_gold_or_runtime"
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "WI-V1",
+      "owner": "coding-agent",
+      "target": "선정한 실제 결함 티켓과 설치된 host의 Analyzer/Planner/Implementer/Evaluator 경로",
+      "input_proposal": "새 결함2건 이상. 독립 요구에서 도출한 primary/independent oracle, 정상 제어와 증상 재도입·과적합 mutation을 사전 고정",
+      "completion_proposal": "모든 선언 oracle의 base RED/head GREEN·정상 제어 GREEN. 무효 oracle·다른 assertion·빌드/timeout·raw 변조·stale source·필수 단계 누락은100% 차단. 독립 검토자가 oracle 의미·원인 수정·범위를 항목별 승인",
+      "limitations": "기존 fixture 통과나 CLI 단독 실행을 실제 host 완료로 대체하지 않는다.2건은 이 pilot 연결의 최소 사례이며 전체 false-done 발생률을 입증하지 않는다",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-v1/manifest.json",
+        "revision": "e040fc288a5fb438d35c77ab5281eb7aefce9a68"
+      }
+    },
+    {
+      "id": "WI-V2",
+      "owner": "coding-agent",
+      "target": "동일 증상에 대한 실제 후보 생성·패널·계획 선택",
+      "input_proposal": "WI-V1과 같은 신규 티켓2건 이상, 티켓당 후보2개 이상. 평가축·hard gate·사전 acceptable candidate set을 독립 검토자가 고정",
+      "completion_proposal": "선택된 후보는 모든 hard gate 통과 및 사전 acceptable set에 포함. 전부 부적격이면 선택 없음. 동률·근거 부족을 명시. source/모델·관점·비용·반대 의견과 사람의 선택 수용을 기록",
+      "limitations": "모델 패널 합의는 사람의 독립 수용이 아니다. 실제 측정되지 않은 성능·유지보수성 또는 전역 최적성은 unknown",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-v2/manifest.json",
+        "revision": "8ec6bb1f20dcd74cdcdf91fdd937ba0e8fbba388"
+      }
+    },
+    {
+      "id": "WI-3",
+      "owner": "coding-agent+CKS",
+      "target": "실제 텍스트 증상→MCP→설치된 bugfix 분석 역할→typed 후보 산출물",
+      "input_proposal": "독립 원인 위치가 있는 새 사실군20개 이상, 증상 유형4개 이상. top10·baseline·질문·정답/위치·source pin을 고정",
+      "completion_proposal": "case별 recall@10의 macro 평균>=0.80 제안. 같은 canonical 위치/commit으로 채점. provenance/unknown·반복 확장 상한·호스트 alias·실제 role 연결은 필수 조건. 독립 검토자의 root-cause 근거 확인",
+      "limitations": "후보가 원인을 확정하지 않는다. 없는 신호를0/안전으로 채우지 않는다. 미지원/기권은 원래 분모와 coverage에 별도 표시",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-3/manifest.json",
+        "revision": "fd56be6f637135fdf673cd28766701fee970c467"
+      }
+    },
+    {
+      "id": "WI-4",
+      "owner": "coding-agent+ChainBench",
+      "target": "소유한 격리 노드의 baseline/fix 반복·fault/timing·모드9 관찰",
+      "input_proposal": "seed/schedule family5개 이상, 계획상 arm당100회 이상 및 유효 반복 분모. 주입 종류·증상 실패 조건·취소/cleanup·관찰 창10분을 사전 고정",
+      "completion_proposal": "baseline 증상10회 이상일 때 fix 실패율<=baseline의0.50 제안. family별 실패율·불확실성 구간과 인프라 오류를 분리. 취소/owned-node cleanup·변조/재발/미재발 분기 검증. 관찰 재발이 없으면 inconclusive이며 수정 성공으로 종료하지 않는다",
+      "limitations": "반복100회를100개 독립 결함으로 세지 않는다. logging의 timing neutrality는 별도 효과·불확실성 평가가 없으면 unknown. 기존/외부 노드는 정지하지 않는다",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-4-mode9/manifest.json",
+        "revision": "15876da91b67626e9f6a63f80695ce58992234f9"
+      }
+    },
+    {
+      "id": "WI-1",
+      "owner": "CKG",
+      "target": "실제 Go 소스의 retained CFG·값/제어 의존",
+      "input_proposal": "새 Go 함수30개 이상, 선언/재정의·분기·루프·shadow·return 군별4개 이상. 수작업/별도 방법의 typed edge·원문 span 정답을 고정",
+      "completion_proposal": "지원 범위에서 data/control edge 각각 precision>=0.95, recall>=0.90 제안. 모든 반환 위치·source/snapshot pin 일치. stale·잘못된 입력·상한·unknown 처리는 필수 조건. 함수별 성능·coverage를 기록",
+      "limitations": "gold는 structural/lexical may-reach 기준이며 실제 실행 가능성을 요구하지 않는다. alias/메모리·미지원 언어/construct는 별도 coverage로 남기고 범위를 사후 축소하지 않는다",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-1/manifest.json",
+        "revision": "6332da9dd3258470f0c756c533be493b71b39e4c"
+      }
+    },
+    {
+      "id": "WI-2",
+      "owner": "CKG/CKS",
+      "target": "현재 opt-in Go rule pack의 독립 source→sink 후보",
+      "input_proposal": "지원 rule별 새 양성10개·음성10개 이상, sanitizer/branch/shadow/외부 target 사례 포함. 후보 탐지 정답과 실제 취약점 판단을 분리",
+      "completion_proposal": "지원 후보 탐지 precision>=0.80, recall>=0.80 제안, rule별·전체 혼동행렬 모두 공개. source 경로/조건·rule/version·manual/automatic 구분·unknown·상한·SDK/소비자 정합 필수. 독립 검토자의 판정 기록",
+      "limitations": "프로젝트에 양성 수가 부족하면 품질 inconclusive. 별도 독립 controlled 사례는 분리된 분모로 보고하며 프로젝트 효과를 채우는 데 사용하지 않는다. 취약점 확인은 별도 수용",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-2/manifest.json",
+        "revision": "3f0bb0397405fa27d8bb05cd053f70e511d6413e"
+      }
+    },
+    {
+      "id": "WI-C",
+      "owner": "coding-agent",
+      "target": "설치된 code_review 모드의 보고서·그림·상태/전달 gate",
+      "input_proposal": "새 함수/모듈 리뷰10건 이상, module5개 이상. state/guard·자원/비용·우선순위의 참조 rubric과 필수 결함/제약을 독립 고정",
+      "completion_proposal": "모든 문서/그림·source hash·typed artifact/state 연결 일치. 사전 필수 guard/state/자원 항목의 누락0. 독립 검토자가10건을 기준별 수용. 변조·placeholder-only·미핀 structural 자료의 확정 판단은 차단",
+      "limitations": "CFG 그림은 runtime sequence가 아니다. partial 지원·assumption·unknown과 추론 edge를 계산된 사실로 승격하지 않는다",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-c/manifest.json",
+        "revision": "c56d491c2080c1802b55df5e4257e1f56c3f2c4f"
+      }
+    },
+    {
+      "id": "WI-6",
+      "owner": "CKS",
+      "target": "실제 프로젝트에서 같은 seed의 지역 baseline과 bounded 함수 문맥 확장",
+      "input_proposal": "새 독립 intent/seed 사실군20개 이상, 독립 관련 함수 gold와 intent 유형4개 이상. baseline=context.value_dependencies, 확장=context.value_dependency_expansion. 동일 snapshot·고정 상한으로 paired 비교",
+      "completion_proposal": "macro recall 증가>=0.10, macro noise fraction 증가<=0.10, warm p95 latency ratio<=2.0 제안. 반환 함수/근거·분모·cycle/dedup·호출/값/curated 구분·부분/중단·source pin 필수. 독립 관련성 검토",
+      "limitations": "증가량은 percentage-point 단위다. noise fraction=비관련 반환/전체 반환. 빈 반환은 별도 실패/기권으로 기록. 비용 상승을 숨기거나 자동 argument transfer/dataset join을 주장하지 않는다",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-6/manifest.json",
+        "revision": "fcdea20fb818d59747f17fb7f6cc4a6125e39846"
+      }
+    },
+    {
+      "id": "WI-SP",
+      "owner": "CKS+CKG",
+      "target": "실제 소비자의 policy_security 질의와 운영 HTTP/CIDR 경계",
+      "input_proposal": "새 symbol12개 이상: 정책4·보안4·빈 태그4. manual/automatic·legacy/typed·입력/stale/권한 거부 제어를 별도 고정",
+      "completion_proposal": "사전 annotation 정답의 관련 symbol·설명/힌트/severity가100% 일치. 저장되지 않은 YAML row/hash/version/reviewer/approval은 unknown. 빈 태그와 not-found 구분. 직접 peer ACL·위조 헤더·private 경계는 기대 거부100%. 독립 검토자의 범위 수용",
+      "limitations": "manual 태그는 검증된 취약점/정책 적합 판정이 아니다. graph metadata SHA와 Go commit을 YAML/검토자 증명으로 사용하지 않는다. reviewer 인증은 현재 미지원",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-sp/manifest.json",
+        "revision": "e10f12b19a5219a37b2f9eaae417d76a875ff5c8"
+      }
+    }
+  ],
+  "reviewer_assignment": null,
+  "protocol_freeze": null
+}

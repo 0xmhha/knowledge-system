@@ -1,0 +1,259 @@
+{
+  "kind": "quality_checks_of_recorded_extracted_fixture_not_production",
+  "go_version": "go version go1.26.9 darwin/arm64",
+  "lint_version": "golangci-lint has version 2.14.0 built with go1.26.8 from (unknown, modified: ?, mod sum: \"h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=\") on (unknown)",
+  "compiled_inputs_sha256": {
+    "ORIGINAL": {
+      "go.mod": "9ddc8cbef293f0a36b32b59fddc3b3492b41064ee70b46120455aa23b349ba49",
+      "types.go": "3186ad37a8391201b997b049446baa784d408cd1bf4c8dab2e59f534d9c336f4",
+      "variant.go": "37fade61a59eb21391297fbdecca8896fe39f7b207d6c771196c57bf1ac9673d",
+      "subscription_test.go": "c4ed93c34a7f0d76a31b0671d9378879fabeda7569837a115a4b1c44d64110d5",
+      "expectations.json": "31d949f079cd9a405a5725e862fb07cdf9883fbbe5ad5a01c6a400b17e5a70e2"
+    },
+    "CAND-A": {
+      "go.mod": "9ddc8cbef293f0a36b32b59fddc3b3492b41064ee70b46120455aa23b349ba49",
+      "types.go": "3186ad37a8391201b997b049446baa784d408cd1bf4c8dab2e59f534d9c336f4",
+      "variant.go": "2d9febb6d476948b214f87acb2e393c56ad71f431cf9c77c68fce109a1c2e528",
+      "subscription_test.go": "c4ed93c34a7f0d76a31b0671d9378879fabeda7569837a115a4b1c44d64110d5",
+      "expectations.json": "31d949f079cd9a405a5725e862fb07cdf9883fbbe5ad5a01c6a400b17e5a70e2"
+    },
+    "CAND-B": {
+      "go.mod": "9ddc8cbef293f0a36b32b59fddc3b3492b41064ee70b46120455aa23b349ba49",
+      "types.go": "3186ad37a8391201b997b049446baa784d408cd1bf4c8dab2e59f534d9c336f4",
+      "variant.go": "210cd0a6ef1c5b3e7e427aea3e7715933af0cc324bb4c4b04a81dee02374b036",
+      "subscription_test.go": "c4ed93c34a7f0d76a31b0671d9378879fabeda7569837a115a4b1c44d64110d5",
+      "expectations.json": "31d949f079cd9a405a5725e862fb07cdf9883fbbe5ad5a01c6a400b17e5a70e2"
+    },
+    "MUT-REINTRO": {
+      "go.mod": "9ddc8cbef293f0a36b32b59fddc3b3492b41064ee70b46120455aa23b349ba49",
+      "types.go": "3186ad37a8391201b997b049446baa784d408cd1bf4c8dab2e59f534d9c336f4",
+      "variant.go": "37fade61a59eb21391297fbdecca8896fe39f7b207d6c771196c57bf1ac9673d",
+      "subscription_test.go": "c4ed93c34a7f0d76a31b0671d9378879fabeda7569837a115a4b1c44d64110d5",
+      "expectations.json": "31d949f079cd9a405a5725e862fb07cdf9883fbbe5ad5a01c6a400b17e5a70e2"
+    },
+    "MUT-EARLY": {
+      "go.mod": "9ddc8cbef293f0a36b32b59fddc3b3492b41064ee70b46120455aa23b349ba49",
+      "types.go": "3186ad37a8391201b997b049446baa784d408cd1bf4c8dab2e59f534d9c336f4",
+      "variant.go": "0f0d1e773a19e45f8c5813cd0880a57cd3d7d36041a4d1500d1556b4b13c8f8d",
+      "subscription_test.go": "c4ed93c34a7f0d76a31b0671d9378879fabeda7569837a115a4b1c44d64110d5",
+      "expectations.json": "31d949f079cd9a405a5725e862fb07cdf9883fbbe5ad5a01c6a400b17e5a70e2"
+    }
+  },
+  "checks": [
+    {
+      "variant": "ORIGINAL",
+      "check": "build",
+      "command": [
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-ORIGINAL-build"
+    },
+    {
+      "variant": "ORIGINAL",
+      "check": "fmt",
+      "command": [
+        "-l",
+        "types.go",
+        "variant.go",
+        "subscription_test.go"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-ORIGINAL-fmt"
+    },
+    {
+      "variant": "ORIGINAL",
+      "check": "vet",
+      "command": [
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-ORIGINAL-vet"
+    },
+    {
+      "variant": "ORIGINAL",
+      "check": "lint",
+      "command": [
+        "run",
+        "--no-config",
+        "--timeout=60s"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-ORIGINAL-lint"
+    },
+    {
+      "variant": "CAND-A",
+      "check": "build",
+      "command": [
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-CAND-A-build"
+    },
+    {
+      "variant": "CAND-A",
+      "check": "fmt",
+      "command": [
+        "-l",
+        "types.go",
+        "variant.go",
+        "subscription_test.go"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-CAND-A-fmt"
+    },
+    {
+      "variant": "CAND-A",
+      "check": "vet",
+      "command": [
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-CAND-A-vet"
+    },
+    {
+      "variant": "CAND-A",
+      "check": "lint",
+      "command": [
+        "run",
+        "--no-config",
+        "--timeout=60s"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-CAND-A-lint"
+    },
+    {
+      "variant": "CAND-B",
+      "check": "build",
+      "command": [
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-CAND-B-build"
+    },
+    {
+      "variant": "CAND-B",
+      "check": "fmt",
+      "command": [
+        "-l",
+        "types.go",
+        "variant.go",
+        "subscription_test.go"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-CAND-B-fmt"
+    },
+    {
+      "variant": "CAND-B",
+      "check": "vet",
+      "command": [
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-CAND-B-vet"
+    },
+    {
+      "variant": "CAND-B",
+      "check": "lint",
+      "command": [
+        "run",
+        "--no-config",
+        "--timeout=60s"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-CAND-B-lint"
+    },
+    {
+      "variant": "MUT-REINTRO",
+      "check": "build",
+      "command": [
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-MUT-REINTRO-build"
+    },
+    {
+      "variant": "MUT-REINTRO",
+      "check": "fmt",
+      "command": [
+        "-l",
+        "types.go",
+        "variant.go",
+        "subscription_test.go"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-MUT-REINTRO-fmt"
+    },
+    {
+      "variant": "MUT-REINTRO",
+      "check": "vet",
+      "command": [
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-MUT-REINTRO-vet"
+    },
+    {
+      "variant": "MUT-REINTRO",
+      "check": "lint",
+      "command": [
+        "run",
+        "--no-config",
+        "--timeout=60s"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-MUT-REINTRO-lint"
+    },
+    {
+      "variant": "MUT-EARLY",
+      "check": "build",
+      "command": [
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-MUT-EARLY-build"
+    },
+    {
+      "variant": "MUT-EARLY",
+      "check": "fmt",
+      "command": [
+        "-l",
+        "types.go",
+        "variant.go",
+        "subscription_test.go"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-MUT-EARLY-fmt"
+    },
+    {
+      "variant": "MUT-EARLY",
+      "check": "vet",
+      "command": [
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-MUT-EARLY-vet"
+    },
+    {
+      "variant": "MUT-EARLY",
+      "check": "lint",
+      "command": [
+        "run",
+        "--no-config",
+        "--timeout=60s"
+      ],
+      "exit_code": 0,
+      "log_stem": "quality-MUT-EARLY-lint"
+    }
+  ]
+}

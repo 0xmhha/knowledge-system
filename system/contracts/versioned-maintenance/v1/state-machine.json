@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "scope": "required future lifecycle; not existing setup.Jobs behavior",
+  "states": [
+    "queued",
+    "running",
+    "cancel_requested",
+    "recovering",
+    "held_for_review",
+    "succeeded",
+    "failed",
+    "canceled",
+    "interrupted"
+  ],
+  "phases": [
+    "accepted",
+    "capture",
+    "build_graph",
+    "build_vector",
+    "build_knowledge",
+    "build_semantic",
+    "gate",
+    "publish",
+    "reconcile",
+    "finished"
+  ],
+  "terminal_states": [
+    "held_for_review",
+    "succeeded",
+    "failed",
+    "canceled",
+    "interrupted"
+  ],
+  "transitions": {
+    "queued": [
+      "running",
+      "cancel_requested",
+      "interrupted",
+      "recovering"
+    ],
+    "running": [
+      "cancel_requested",
+      "held_for_review",
+      "succeeded",
+      "failed",
+      "interrupted",
+      "recovering"
+    ],
+    "cancel_requested": [
+      "canceled",
+      "failed",
+      "interrupted",
+      "recovering"
+    ],
+    "recovering": [
+      "held_for_review",
+      "succeeded",
+      "failed",
+      "canceled",
+      "interrupted"
+    ],
+    "held_for_review": [],
+    "succeeded": [],
+    "failed": [],
+    "canceled": [],
+    "interrupted": []
+  },
+  "poll_same_state_allowed": true,
+  "publication_boundary": "checked pointer swap plus durable reconciled activation receipt under dataset mutation lock",
+  "cancel_decisions": {
+    "queued": "accepted",
+    "running_before_publication": "accepted",
+    "cancel_requested": "already_requested",
+    "recovering": "reconcile_required",
+    "succeeded_or_publication_committed": "too_late",
+    "other_terminal": "already_terminal"
+  },
+  "error_codes": [
+    "invalid_request",
+    "profile_unknown",
+    "profile_stale",
+    "project_mismatch",
+    "source_stale",
+    "input_stale",
+    "embedding_stale",
+    "base_stale",
+    "version_exists",
+    "idempotency_conflict",
+    "writer_busy",
+    "unsupported_capability",
+    "job_unknown",
+    "cancel_too_late",
+    "reconcile_required",
+    "gate_failed",
+    "deadline_exceeded",
+    "canceled",
+    "interrupted",
+    "operation_failed"
+  ],
+  "gate_names": [
+    "source",
+    "identity",
+    "graph",
+    "vector",
+    "knowledge",
+    "semantic"
+  ]
+}

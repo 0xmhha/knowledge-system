@@ -1,0 +1,373 @@
+// Offline local-variable scope census. It does not derive dependency edges or gold.
+package main
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/format"
+	"go/parser"
+	"go/token"
+	"os"
+)
+
+type sourceInput struct {
+	Path   string
+	Source string
+	Starts []int
+}
+
+type site struct {
+	Start int `json:"start_byte"`
+	End   int `json:"end_byte_exclusive"`
+	Line  int `json:"line"`
+}
+
+type binding struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Kind   string `json:"kind"`
+	Origin string `json:"origin"`
+	Scope  string `json:"scope"`
+	Site   site   `json:"site"`
+}
+
+type event struct {
+	Kind    string   `json:"kind"`
+	Name    string   `json:"name"`
+	Site    site     `json:"site"`
+	Binding binding  `json:"binding"`
+	Outer   *binding `json:"outer,omitempty"`
+}
+
+type scope struct {
+	id     string
+	parent *scope
+	names  map[string]binding
+}
+
+func (s *scope) lookup(name string) (binding, bool) {
+	for ; s != nil; s = s.parent {
+		if b, ok := s.names[name]; ok {
+			return b, true
+		}
+	}
+	return binding{}, false
+}
+
+type functionCensus struct {
+	Path             string          `json:"path"`
+	Name             string          `json:"name"`
+	Receiver         string          `json:"receiver"`
+	Site             site            `json:"site"`
+	FunctionSHA256   string          `json:"function_sha256"`
+	Bindings         []binding       `json:"bindings"`
+	Events           []event         `json:"events"`
+	Features         map[string]bool `json:"features"`
+	ExcludedClosures []site          `json:"excluded_closures"`
+}
+
+type census struct {
+	fs    *token.FileSet
+	row   *functionCensus
+	stack *scope
+}
+
+func (c *census) location(n ast.Node) site {
+	p, q := c.fs.Position(n.Pos()), c.fs.Position(n.End())
+	return site{p.Offset, q.Offset, p.Line}
+}
+
+func (c *census) enter(n ast.Node, kind string, body func()) {
+	old := c.stack
+	c.stack = &scope{id: fmt.Sprintf("%s@%d", kind, c.location(n).Start), parent: old, names: map[string]binding{}}
+	body()
+	c.stack = old
+}
+
+func (c *census) declare(id *ast.Ident, kind, origin string) {
+	if id == nil || id.Name == "_" {
+		return
+	}
+	if _, exists := c.stack.names[id.Name]; exists {
+		panic("duplicate declaration in same scope: " + id.Name)
+	}
+	s := c.location(id)
+	b := binding{fmt.Sprintf("%s:%s@%d", c.stack.id, id.Name, s.Start), id.Name, kind, origin, c.stack.id, s}
+	c.row.Bindings = append(c.row.Bindings, b)
+	if kind == "var" {
+		if outer, ok := c.stack.parent.lookup(id.Name); ok && outer.Kind == "var" {
+			c.row.Events = append(c.row.Events, event{"local_variable_shadow", id.Name, s, b, &outer})
+			c.row.Features["local_variable_shadow"] = true
+		}
+		if origin != "parameter" && origin != "result" && origin != "receiver" {
+			c.row.Features["body_variable_declaration"] = true
+		}
+	}
+	c.stack.names[id.Name] = b
+}
+
+func (c *census) fields(list *ast.FieldList, kind, origin string) {
+	if list != nil {
+		for _, field := range list.List {
+			for _, id := range field.Names {
+				c.declare(id, kind, origin)
+			}
+		}
+	}
+}
+
+// Expressions are inspected only to record closure exclusions. Their bodies
+// belong to different functions and cannot inflate the enclosing sample.
+func (c *census) expr(expr ast.Expr) {
+	if expr != nil {
+		ast.Inspect(expr, func(n ast.Node) bool {
+			if lit, ok := n.(*ast.FuncLit); ok {
+				c.row.ExcludedClosures = append(c.row.ExcludedClosures, c.location(lit))
+				return false
+			}
+			return true
+		})
+	}
+}
+
+func (c *census) write(expr ast.Expr, kind string) {
+	if id, ok := ast.Unparen(expr).(*ast.Ident); ok && id.Name != "_" {
+		if b, found := c.stack.lookup(id.Name); found && b.Kind == "var" {
+			c.row.Events = append(c.row.Events, event{kind, id.Name, c.location(id), b, nil})
+			c.row.Features["local_variable_reassignment"] = true
+		}
+	}
+	c.expr(expr)
+}
+
+func (c *census) assign(lhs, rhs []ast.Expr, tok token.Token, origin string) {
+	for _, expr := range rhs {
+		c.expr(expr) // RHS sees bindings before a newly declared name becomes visible.
+	}
+	if tok != token.DEFINE {
+		kind := "assignment"
+		if tok != token.ASSIGN {
+			kind = "compound_assignment"
+		}
+		for _, expr := range lhs {
+			c.write(expr, kind)
+		}
+		return
+	}
+	newNames := 0
+	seen := map[string]bool{}
+	for _, expr := range lhs {
+		id, ok := expr.(*ast.Ident)
+		if !ok {
+			panic("non-identifier short declaration")
+		}
+		if id.Name == "_" {
+			continue
+		}
+		if seen[id.Name] {
+			panic("repeated nonblank name in short declaration")
+		}
+		seen[id.Name] = true
+		if b, reused := c.stack.names[id.Name]; reused {
+			if b.Kind != "var" {
+				panic("short declaration reuses non-variable")
+			}
+			c.row.Events = append(c.row.Events, event{"same_scope_short_reuse", id.Name, c.location(id), b, nil})
+			c.row.Features["same_scope_short_reuse"] = true
+			c.row.Features["local_variable_reassignment"] = true
+		} else {
+			newNames++
+			c.declare(id, "var", origin)
+		}
+	}
+	if newNames == 0 {
+		panic("short declaration without new nonblank variable")
+	}
+}
+
+func (c *census) list(stmts []ast.Stmt) {
+	for _, stmt := range stmts {
+		c.stmt(stmt)
+	}
+}
+
+func (c *census) stmt(stmt ast.Stmt) {
+	switch n := stmt.(type) {
+	case nil, *ast.EmptyStmt, *ast.BranchStmt:
+	case *ast.BlockStmt:
+		c.enter(n, "block", func() { c.list(n.List) })
+	case *ast.AssignStmt:
+		c.assign(n.Lhs, n.Rhs, n.Tok, "short")
+	case *ast.IncDecStmt:
+		c.write(n.X, "inc_dec")
+	case *ast.DeclStmt:
+		decl, ok := n.Decl.(*ast.GenDecl)
+		if !ok {
+			panic("unsupported declaration")
+		}
+		for _, spec := range decl.Specs {
+			switch s := spec.(type) {
+			case *ast.ValueSpec:
+				for _, expr := range s.Values {
+					c.expr(expr)
+				}
+				for _, id := range s.Names {
+					c.declare(id, decl.Tok.String(), decl.Tok.String())
+				}
+			case *ast.TypeSpec:
+				c.declare(s.Name, "type", "type")
+			default:
+				panic("unsupported declaration spec")
+			}
+		}
+	case *ast.IfStmt:
+		c.row.Features["branch"] = true
+		c.enter(n, "if", func() { c.stmt(n.Init); c.expr(n.Cond); c.stmt(n.Body); c.stmt(n.Else) })
+	case *ast.ForStmt:
+		c.row.Features["loop"] = true
+		c.enter(n, "for", func() { c.stmt(n.Init); c.expr(n.Cond); c.stmt(n.Body); c.stmt(n.Post) })
+	case *ast.RangeStmt:
+		c.row.Features["loop"] = true
+		c.enter(n, "range", func() {
+			lhs := []ast.Expr{}
+			if n.Key != nil {
+				lhs = append(lhs, n.Key)
+			}
+			if n.Value != nil {
+				lhs = append(lhs, n.Value)
+			}
+			if len(lhs) != 0 {
+				c.assign(lhs, []ast.Expr{n.X}, n.Tok, "range")
+			} else {
+				c.expr(n.X)
+			}
+			c.stmt(n.Body)
+		})
+	case *ast.SwitchStmt:
+		c.row.Features["branch"] = true
+		c.enter(n, "switch", func() {
+			c.stmt(n.Init)
+			c.expr(n.Tag)
+			for _, item := range n.Body.List {
+				clause := item.(*ast.CaseClause)
+				c.enter(clause, "case", func() {
+					for _, expr := range clause.List {
+						c.expr(expr)
+					}
+					c.list(clause.Body)
+				})
+			}
+		})
+	case *ast.TypeSwitchStmt:
+		c.row.Features["branch"] = true
+		c.enter(n, "type_switch", func() {
+			c.stmt(n.Init)
+			var guard *ast.Ident
+			if as, ok := n.Assign.(*ast.AssignStmt); ok {
+				if as.Tok != token.DEFINE || len(as.Lhs) != 1 {
+					panic("invalid type switch guard")
+				}
+				guard = as.Lhs[0].(*ast.Ident)
+				for _, expr := range as.Rhs {
+					c.expr(expr)
+				}
+			} else {
+				c.stmt(n.Assign)
+			}
+			for _, item := range n.Body.List {
+				clause := item.(*ast.CaseClause)
+				c.enter(clause, "type_case", func() {
+					c.declare(guard, "var", "type_switch_guard")
+					c.list(clause.Body)
+				})
+			}
+		})
+	case *ast.SelectStmt:
+		c.row.Features["branch"] = true
+		c.enter(n, "select", func() {
+			for _, item := range n.Body.List {
+				clause := item.(*ast.CommClause)
+				c.enter(clause, "comm_case", func() { c.stmt(clause.Comm); c.list(clause.Body) })
+			}
+		})
+	case *ast.LabeledStmt:
+		c.stmt(n.Stmt)
+	case *ast.ReturnStmt:
+		c.row.Features["return"] = true
+		for _, expr := range n.Results {
+			c.expr(expr)
+		}
+	case *ast.ExprStmt:
+		c.expr(n.X)
+	case *ast.SendStmt:
+		c.expr(n.Chan)
+		c.expr(n.Value)
+	case *ast.GoStmt:
+		c.expr(n.Call)
+	case *ast.DeferStmt:
+		c.expr(n.Call)
+	default:
+		panic(fmt.Sprintf("unsupported statement %T", stmt))
+	}
+}
+
+func analyze(in sourceInput) []functionCensus {
+	fs := token.NewFileSet()
+	f, err := parser.ParseFile(fs, in.Path, in.Source, parser.AllErrors|parser.DeclarationErrors|parser.SkipObjectResolution)
+	if err != nil {
+		panic(err)
+	}
+	rows := []functionCensus{}
+	for _, decl := range f.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+		if len(in.Starts) != 0 {
+			selected := false
+			for _, start := range in.Starts {
+				selected = selected || fs.Position(fn.Pos()).Offset == start
+			}
+			if !selected {
+				continue
+			}
+		}
+		row := functionCensus{Path: in.Path, Name: fn.Name.Name, Bindings: []binding{}, Events: []event{}, Features: map[string]bool{}, ExcludedClosures: []site{}}
+		c := census{fs: fs, row: &row}
+		row.Site = c.location(fn)
+		row.FunctionSHA256 = fmt.Sprintf("%x", sha256.Sum256([]byte(in.Source)[row.Site.Start:row.Site.End]))
+		if fn.Recv != nil {
+			var buf bytes.Buffer
+			if err := format.Node(&buf, fs, fn.Recv.List[0].Type); err != nil {
+				panic(err)
+			}
+			row.Receiver = buf.String()
+		}
+		c.enter(fn.Body, "function", func() {
+			c.fields(fn.Type.TypeParams, "type", "type_parameter")
+			c.fields(fn.Recv, "var", "receiver")
+			c.fields(fn.Type.Params, "var", "parameter")
+			c.fields(fn.Type.Results, "var", "result")
+			c.list(fn.Body.List) // parameters and the outer body share a scope.
+		})
+		rows = append(rows, row)
+	}
+	return rows
+}
+
+func main() {
+	var inputs []sourceInput
+	if err := json.NewDecoder(os.Stdin).Decode(&inputs); err != nil {
+		panic(err)
+	}
+	rows := []functionCensus{}
+	for _, in := range inputs {
+		rows = append(rows, analyze(in)...)
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(rows); err != nil {
+		panic(err)
+	}
+}

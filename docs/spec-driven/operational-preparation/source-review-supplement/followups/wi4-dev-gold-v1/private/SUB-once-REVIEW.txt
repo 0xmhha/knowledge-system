@@ -1,0 +1,234 @@
+SUB-once — WI-4 bounded conditional AI DEV, not independent oracle
+{
+  "case_id": "SUB-once",
+  "family_proposal": "SCHED-001",
+  "mechanism_proposal": "uninstall_status_handshake_cycle",
+  "work_item_id": "WI-4",
+  "split": "DEV",
+  "formal_split": null,
+  "independent_family": null,
+  "reviewer": null,
+  "independent_review_receipt": null,
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_mode": "committed",
+  "source_project": "go-stablenet",
+  "schedule": {
+    "id": "SUB-once",
+    "kind": "idempotence_control",
+    "start_conditions": [
+      "동일 구독"
+    ],
+    "steps": [
+      "두 해제 호출 동시 진입",
+      "확인"
+    ],
+    "observations": [
+      "요청 수",
+      "두 호출 종료"
+    ],
+    "primary_expectation_draft": "요청 1개와 두 호출 완료",
+    "step_deadline_ms": 2000,
+    "cleanup": [
+      "관측 결과를 먼저 복사한다",
+      "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+      "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+    ],
+    "outcome_status": "ai_draft_not_independent_oracle"
+  },
+  "strengthened_preconditions": [
+    "two calls share the same fresh subscription object",
+    "event loop can accept uninstall",
+    "acknowledgement eventually closes"
+  ],
+  "source_entry": {
+    "anchor": {
+      "path": "eth/downloader/api.go",
+      "start_line": 133,
+      "end_line": 155,
+      "start_byte": 4115,
+      "end_byte_exclusive": 4670,
+      "span_sha256": "cc63b7855c63398f0d3b7febd40167179ccd414784840f9cfb8202760a98d3e8"
+    },
+    "fact": "Syncing은 buffer 없는 statuses를 SubscribeSyncStatus에 넘기고 RPC 오류/연결 종료에서 goroutine을 반환하며 Unsubscribe를 defer한다.",
+    "reachability_question": "실제 notifier/RPC 종료와 eventLoop 송신이 겹치는 실행을 같은 source/snapshot에서 확보할 수 있는가? 추출 대역의 송신 대기와 실제 운영 도달성을 분리한다.",
+    "contract_question": "종료 시각·해제 확인·추가 알림의 허용 범위와 반환 상한을 독립 오라클로 확정해야 한다.",
+    "origin": "ai_source_inspection_not_runtime_or_gold",
+    "approved": false
+  },
+  "source_unknowns": [
+    "실제 RPC 종료 경로에서 제안한 순서에 도달 가능한지는 미검증",
+    "기존 추출 시험 50건은 실제 API 빈도나 독립 표본이 아니다"
+  ],
+  "product_contract_questions": [
+    "운영 API 종료 상한과 notifier 종료 순서의 계약은 무엇인가"
+  ],
+  "source_refs": [
+    {
+      "path": "eth/downloader/api.go",
+      "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+      "start_line": 175,
+      "end_line": 198,
+      "start_byte": 5220,
+      "end_byte_exclusive": 5992,
+      "span_sha256": "218be7c7d1c816a6299b70a4a37687b99c2790cd878575864861a5a0427cfe3f",
+      "text": "\tapi       *DownloaderAPI   // register subscription in event loop of this api instance\n\tc         chan interface{} // channel where events are broadcasted to\n\tunsubOnce sync.Once        // make sure unsubscribe logic is executed once\n}\n\n// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n"
+    }
+  ],
+  "universe": [
+    {
+      "id": "one_request_two_returns",
+      "label": "legal",
+      "rationale": "sync.Once executes one uninstall body; both calls complete after that body returns.",
+      "source_refs": [
+        {
+          "path": "eth/downloader/api.go",
+          "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+          "start_line": 175,
+          "end_line": 198,
+          "start_byte": 5220,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "218be7c7d1c816a6299b70a4a37687b99c2790cd878575864861a5a0427cfe3f",
+          "text": "\tapi       *DownloaderAPI   // register subscription in event loop of this api instance\n\tc         chan interface{} // channel where events are broadcasted to\n\tunsubOnce sync.Once        // make sure unsubscribe logic is executed once\n}\n\n// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "multiple_requests",
+      "label": "symptom_candidate",
+      "rationale": "More than one uninstall request attributable to this exact object contradicts the single Once body; two distinct subscriptions do not satisfy this condition.",
+      "source_refs": [
+        {
+          "path": "eth/downloader/api.go",
+          "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+          "start_line": 175,
+          "end_line": 198,
+          "start_byte": 5220,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "218be7c7d1c816a6299b70a4a37687b99c2790cd878575864861a5a0427cfe3f",
+          "text": "\tapi       *DownloaderAPI   // register subscription in event loop of this api instance\n\tc         chan interface{} // channel where events are broadcasted to\n\tunsubOnce sync.Once        // make sure unsubscribe logic is executed once\n}\n\n// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "unmodelled_trace",
+      "label": "unknown",
+      "rationale": "A call blocked behind the same unfinished Once is not a second independent failure family.",
+      "source_refs": [
+        {
+          "path": "eth/downloader/api.go",
+          "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+          "start_line": 175,
+          "end_line": 198,
+          "start_byte": 5220,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "218be7c7d1c816a6299b70a4a37687b99c2790cd878575864861a5a0427cfe3f",
+          "text": "\tapi       *DownloaderAPI   // register subscription in event loop of this api instance\n\tc         chan interface{} // channel where events are broadcasted to\n\tunsubOnce sync.Once        // make sure unsubscribe logic is executed once\n}\n\n// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "entry_unreached",
+      "label": "infra_or_unreached",
+      "rationale": "The specified source branch, object or trigger was not reached. No symptom success or valid trial.",
+      "source_refs": [
+        {
+          "path": "eth/downloader/api.go",
+          "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+          "start_line": 175,
+          "end_line": 198,
+          "start_byte": 5220,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "218be7c7d1c816a6299b70a4a37687b99c2790cd878575864861a5a0427cfe3f",
+          "text": "\tapi       *DownloaderAPI   // register subscription in event loop of this api instance\n\tc         chan interface{} // channel where events are broadcasted to\n\tunsubOnce sync.Once        // make sure unsubscribe logic is executed once\n}\n\n// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "precondition_unproved",
+      "label": "infra_or_unreached",
+      "rationale": "Readiness, identity, buffer or ordering precondition was not proved. Do not infer target behavior from timeout.",
+      "source_refs": [
+        {
+          "path": "eth/downloader/api.go",
+          "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+          "start_line": 175,
+          "end_line": 198,
+          "start_byte": 5220,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "218be7c7d1c816a6299b70a4a37687b99c2790cd878575864861a5a0427cfe3f",
+          "text": "\tapi       *DownloaderAPI   // register subscription in event loop of this api instance\n\tc         chan interface{} // channel where events are broadcasted to\n\tunsubOnce sync.Once        // make sure unsubscribe logic is executed once\n}\n\n// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "driver_error",
+      "label": "infra_or_unreached",
+      "rationale": "Driver, transport, instrumentation, resource or decode failure. Preserve planned slot and original error.",
+      "source_refs": [
+        {
+          "path": "eth/downloader/api.go",
+          "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+          "start_line": 175,
+          "end_line": 198,
+          "start_byte": 5220,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "218be7c7d1c816a6299b70a4a37687b99c2790cd878575864861a5a0427cfe3f",
+          "text": "\tapi       *DownloaderAPI   // register subscription in event loop of this api instance\n\tc         chan interface{} // channel where events are broadcasted to\n\tunsubOnce sync.Once        // make sure unsubscribe logic is executed once\n}\n\n// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "cancel_or_cleanup_error",
+      "label": "infra_or_unreached",
+      "rationale": "Cancellation or failure to join all owned resources. Preserve original observation and cleanup failure separately.",
+      "source_refs": [
+        {
+          "path": "eth/downloader/api.go",
+          "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+          "start_line": 175,
+          "end_line": 198,
+          "start_byte": 5220,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "218be7c7d1c816a6299b70a4a37687b99c2790cd878575864861a5a0427cfe3f",
+          "text": "\tapi       *DownloaderAPI   // register subscription in event loop of this api instance\n\tc         chan interface{} // channel where events are broadcasted to\n\tunsubOnce sync.Once        // make sure unsubscribe logic is executed once\n}\n\n// Unsubscribe uninstalls the subscription from the DownloadAPI event loop.\n// The status channel that was passed to subscribeSyncStatus isn't used anymore\n// after this method returns.\nfunc (s *SyncStatusSubscription) Unsubscribe() {\n\ts.unsubOnce.Do(func() {\n\t\treq := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}\n\t\ts.api.uninstallSyncSubscription <- &req\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-s.c:\n\t\t\t\t// drop new status events until uninstall confirmation\n\t\t\t\tcontinue\n\t\t\tcase <-req.uninstalled:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t})\n}\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    }
+  ],
+  "answer_sets": {
+    "legal": [
+      "one_request_two_returns"
+    ],
+    "symptom_candidate": [
+      "multiple_requests"
+    ],
+    "unknown": [
+      "unmodelled_trace"
+    ],
+    "infra_or_unreached": [
+      "entry_unreached",
+      "precondition_unproved",
+      "driver_error",
+      "cancel_or_cleanup_error"
+    ]
+  },
+  "empty_set_rationales": {},
+  "complete_within_declared_vocabulary": true,
+  "complete_trace_or_product_gold": false,
+  "observation_axis": "language_permitted_source_behavior_and_product_symptom_are_distinct",
+  "symptom_meaning": "conditional_AI_observation_candidate_not_independent_product_violation",
+  "unknown_policy": "unmodelled_or_product_contract_unresolved_never_negative_or_automatic_pass",
+  "formal_gold_schema_gap": "unknown_outcomes must remain explicit; old three-set authoring form cannot silently merge unknown with infra",
+  "current_scores": null,
+  "actual_target_trial_receipt": null,
+  "formal_scoring_allowed": false,
+  "exposure": "previously_exposed_DEV_no_fresh_FINAL",
+  "independent_approved": false
+}

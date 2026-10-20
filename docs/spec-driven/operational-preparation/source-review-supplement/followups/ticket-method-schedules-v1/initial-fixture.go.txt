@@ -1,0 +1,308 @@
+// Owned five-schedule DEV observations. No production instrumentation or RPC.
+package downloader
+
+import (
+	"encoding/json"
+	"os"
+	"runtime"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"testing"
+	"time"
+
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/eth/protocols/snap"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/params"
+)
+
+type methodLog struct {
+	f          *os.File
+	start      time.Time
+	seq        int
+	role, path string
+}
+
+func (r *methodLog) emit(name string, fields map[string]interface{}) {
+	if fields == nil {
+		fields = map[string]interface{}{}
+	}
+	r.seq++
+	fields["event"], fields["sequence"], fields["elapsed_ns"], fields["candidate"] = name, r.seq, time.Since(r.start).Nanoseconds(), r.role
+	if err := json.NewEncoder(r.f).Encode(fields); err != nil {
+		panic(err)
+	}
+}
+func methodStacks() string { b := make([]byte, 2<<20); return string(b[:runtime.Stack(b, true)]) }
+func methodFrame(s, name, site, state string) bool {
+	for _, g := range strings.Split(s, "\n\n") {
+		if strings.Contains(g, name) && strings.Contains(g, site) && strings.Contains(g, state) {
+			return true
+		}
+	}
+	return false
+}
+func methodUntil(t *testing.T, p func() bool) {
+	t.Helper()
+	end := time.Now().Add(2 * time.Second)
+	for time.Now().Before(end) {
+		if p() {
+			return
+		}
+		time.Sleep(time.Millisecond)
+	}
+	t.Fatal("owned schedule precondition/join failed")
+}
+func methodPending(done <-chan struct{}, delay time.Duration) bool {
+	select {
+	case <-done:
+		return false
+	case <-time.After(delay):
+		return true
+	}
+}
+func (r *methodLog) snapshot(t *testing.T, label string) string {
+	t.Helper()
+	s := methodStacks()
+	if err := os.WriteFile(r.path+"."+label+".stack", []byte(s), 0600); err != nil {
+		t.Fatal(err)
+	}
+	return s
+}
+
+func TestTicketMethodSchedules(t *testing.T) {
+	path, role := os.Getenv("TICKET_METHOD_TRACE"), os.Getenv("TICKET_METHOD_ROLE")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := &methodLog{f: f, start: time.Now(), role: role, path: path}
+	t.Cleanup(func() {
+		r.emit("trace_end", map[string]interface{}{"test_failed": t.Failed()})
+		if err := f.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	r.emit("trace_begin", map[string]interface{}{"base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8", "native_timer_seconds": 60, "RPC": false, "independent_oracle": false, "source_instrumentation": false})
+	methodRealSchedules(t, r)
+	for _, scenario := range []string{"late_delivery_before_confirmation", "confirmation_delayed", "concurrent_unsubscribe_once"} {
+		methodControlledSchedule(t, r, scenario)
+	}
+	r.emit("all_observations_frozen", map[string]interface{}{"schedules": 5, "full12_requirements": false, "independent_acceptable_candidate_set": nil})
+}
+
+func methodRealSchedules(t *testing.T, r *methodLog) {
+	db := rawdb.NewMemoryDatabase()
+	chain, err := core.NewBlockChain(db, nil, &core.Genesis{Config: params.AllEthashProtocolChanges}, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
+	if err != nil {
+		db.Close()
+		t.Fatal(err)
+	}
+	d := &Downloader{blockchain: chain, SnapSyncer: snap.NewSyncer(db, chain.TrieDB().Scheme())}
+	if !d.Progress().Done() {
+		t.Fatal("owned completion input differs")
+	}
+	mux := new(event.TypeMux)
+	api := NewDownloaderAPI(d, chain, mux)
+	// Every status channel and pending call belongs to this test. This rescue is
+	// installed before the native wait and runs only after observation/failure.
+	channels := []chan interface{}{}
+	calls := []<-chan struct{}{}
+	defer func() {
+		r.emit("real_cleanup_begin", nil)
+		stop := make(chan struct{})
+		var drains sync.WaitGroup
+		for _, c := range channels {
+			drains.Add(1)
+			go func(c chan interface{}) {
+				defer drains.Done()
+				for {
+					select {
+					case <-c:
+					case <-stop:
+						return
+					}
+				}
+			}(c)
+		}
+		for _, done := range calls {
+			methodUntil(t, func() bool {
+				select {
+				case <-done:
+					return true
+				default:
+					return false
+				}
+			})
+		}
+		mux.Stop()
+		methodUntil(t, func() bool { return !strings.Contains(methodStacks(), "(*DownloaderAPI).eventLoop") })
+		close(stop)
+		drains.Wait()
+		chain.Stop()
+		if err := db.Close(); err != nil {
+			t.Error(err)
+		}
+		r.emit("real_cleanup_end", map[string]interface{}{"calls_joined": len(calls), "drains_joined": len(channels), "event_loops": 0, "memory_chain_stopped": true})
+	}()
+	call := func(sub *SyncStatusSubscription) <-chan struct{} {
+		done := make(chan struct{})
+		calls = append(calls, done)
+		go func() { sub.Unsubscribe(); close(done) }()
+		return done
+	}
+	primer := make(chan interface{})
+	channels = append(channels, primer)
+	primeSub := api.SubscribeSyncStatus(primer)
+	if err := mux.Post(StartEvent{}); err != nil {
+		t.Fatal(err)
+	}
+	r.emit("native_completion_wait_begin", map[string]interface{}{"controlled_height": 0, "StartEvent_from_test_mux": true})
+	select {
+	case v := <-primer:
+		if v != false {
+			t.Fatal("native completion payload differs")
+		}
+	case <-time.After(75 * time.Second):
+		t.Fatal("native completion not observed")
+	}
+	r.emit("native_completion_received", map[string]interface{}{"payload": false})
+	primeDone := call(primeSub)
+	methodUntil(t, func() bool {
+		select {
+		case <-primeDone:
+			return true
+		default:
+			return false
+		}
+	})
+	// Fresh post-done installation uses the unchanged real eventLoop send.
+	c := make(chan interface{})
+	channels = append(channels, c)
+	sub := api.SubscribeSyncStatus(c)
+	select {
+	case v := <-c:
+		if v != false {
+			t.Fatal("normal payload differs")
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("normal delivery missing")
+	}
+	done := call(sub)
+	methodUntil(t, func() bool {
+		select {
+		case <-done:
+			return true
+		default:
+			return false
+		}
+	})
+	r.emit("normal_observation_frozen", map[string]interface{}{"scenario": "normal_delivery_then_unsubscribe", "route": "actual_eventLoop_post_done_install", "notification": false, "method_returned": true, "backend_removal_observed": false, "ack_observed": false})
+	// Subscribe returns after channel installation; this sole consumer then
+	// exits before accepting the synchronous post-done send. No RPC is implied.
+	c = make(chan interface{})
+	channels = append(channels, c)
+	sub = api.SubscribeSyncStatus(c)
+	methodUntil(t, func() bool {
+		return methodFrame(methodStacks(), "(*DownloaderAPI).eventLoop", "/eth/downloader/api.go:94", "[chan send]")
+	})
+	r.snapshot(t, "blocked-before-call")
+	r.emit("blocked_precondition", map[string]interface{}{"sole_consumer_exited": true, "unbuffered_channel": true, "send_site": 94, "route": "actual_eventLoop_post_done_install_not_RPC_callback"})
+	done = call(sub)
+	pending := methodPending(done, 300*time.Millisecond)
+	s := r.snapshot(t, "blocked-observed")
+	blocked := methodFrame(s, "(*DownloaderAPI).eventLoop", "/eth/downloader/api.go:94", "[chan send]")
+	r.emit("blocked_observation_frozen", map[string]interface{}{"scenario": "blocked_delivery_then_consumer_exit", "method_pending": pending, "eventLoop_send_pending": blocked, "backend_removal_observed": false, "ack_observed": false, "rescue_started": false})
+	// Actual loop liveness after a successful draining method, before rescue.
+	live := false
+	if !blocked {
+		probe := make(chan interface{})
+		channels = append(channels, probe)
+		api.SubscribeSyncStatus(probe)
+		select {
+		case v := <-probe:
+			live = v == false
+		case <-time.After(2 * time.Second):
+			t.Fatal("real loop did not service new install")
+		}
+	}
+	r.emit("post_observation_liveness", map[string]interface{}{"actual_loop_serviced_probe": live, "probe_before_rescue": true})
+}
+
+func methodControlledSchedule(t *testing.T, r *methodLog, scenario string) {
+	statuses := make(chan interface{})
+	api := &DownloaderAPI{uninstallSyncSubscription: make(chan *uninstallSyncSubscriptionRequest)}
+	sub := &SyncStatusSubscription{api: api, c: statuses}
+	count := 1
+	if scenario == "concurrent_unsubscribe_once" {
+		count = 3
+	}
+	start := make(chan struct{})
+	done := make(chan struct{})
+	var returned atomic.Int32
+	var ready, joined sync.WaitGroup
+	ready.Add(count)
+	joined.Add(count)
+	for i := 0; i < count; i++ {
+		go func() { defer joined.Done(); ready.Done(); <-start; sub.Unsubscribe(); returned.Add(1) }()
+	}
+	ready.Wait()
+	go func() { joined.Wait(); close(done) }()
+	close(start)
+	var req *uninstallSyncSubscriptionRequest
+	returnedBeforeRequest := false
+	select {
+	case req = <-api.uninstallSyncSubscription:
+	case <-done:
+		returnedBeforeRequest = true
+	case <-time.After(2 * time.Second):
+		t.Fatal("neither request nor method return")
+	}
+	if req != nil && req.c != statuses {
+		t.Fatal("request channel identity differs")
+	}
+	r.emit("controlled_request", map[string]interface{}{"scenario": scenario, "route": "controlled_receiver_actual_Unsubscribe", "same_object": true, "calls": count, "request_received": req != nil, "returned_before_request": returnedBeforeRequest, "backend_map_present": false})
+	late := 0
+	if req != nil && scenario == "late_delivery_before_confirmation" {
+		for i := 0; i < 3; i++ {
+			select {
+			case statuses <- i:
+				late++
+			case <-time.After(2 * time.Second):
+				t.Fatal("finite late send not drained")
+			}
+		}
+	}
+	pending := methodPending(done, 300*time.Millisecond)
+	duplicate := false
+	select {
+	case q := <-api.uninstallSyncSubscription:
+		duplicate = true
+		close(q.uninstalled)
+	default:
+	}
+	r.snapshot(t, scenario+"-before-ack")
+	r.emit("controlled_pre_ack_frozen", map[string]interface{}{"scenario": scenario, "method_pending": pending, "individual_returns": returned.Load(), "late_sends_completed": late, "duplicate_request": duplicate, "ack_released": false, "rescue_started": false})
+	if req != nil {
+		close(req.uninstalled)
+	}
+	methodUntil(t, func() bool {
+		select {
+		case <-done:
+			return true
+		default:
+			return false
+		}
+	})
+	select {
+	case q := <-api.uninstallSyncSubscription:
+		duplicate = true
+		close(q.uninstalled)
+	default:
+	}
+	r.emit("controlled_calls_joined", map[string]interface{}{"scenario": scenario, "calls": count, "request_received": req != nil, "ack_released": req != nil, "duplicate_request": duplicate, "all_calls_joined": true, "map_removal_proved": false, "post_ack_all_channel_use_proved": false})
+}

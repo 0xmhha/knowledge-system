@@ -1,0 +1,44 @@
+40단계 — 새 비운영 원문 보존 버전과 convention 계약 / SN-P01·SN-P02 완료
+검증기간: 2026-10-17~2026-10-18 (KST).
+
+요청: 외부 원문·출처 경로와 convention 처리 계약 보완, 기존/새 데이터 검색 재검증, 문서·로컬 서명 커밋. 정식 gold/온톨로지 품질 수용과 운영 전환은 포함하지 않는다.
+
+결과
+- 새 데이터 보관 위치: /private/tmp/ks-stablenet-rebuild-20261017-01/dataset/retained-origins-v2 (hold-for-review; 소유 current 없음). 임시 시험 자료이므로 이후 재사용/운영 전환 시 보관 위치·재검증·활성화 범위를 따로 정한다. 원본 current는 그대로다.
+- 기존 source commit0bf2f4d1의 repo2224파일 바이트는 동일하다. 기존 domain44·flow27파일을 변경 없이 복사하고 지원 setup --hold-for-review로 새 소유 버전을 구축했다. 원본 문서 생성 의미/정책을 재작성하거나 DB를 수동 수정하지 않았다.
+- 새 retained origin: {"repo": 2224, "docs:corpus.0": 44, "docs:corpus.1": 27}. 전체 chunk 21304개를 원문 좌표 또는 비인용 metadata로 분리했다: {"retained_source_range": 21100, "non_citable_metadata": 204}. metadata 전체를 source-backed로 합격 처리하지 않는다.
+- 외부 문서는 @cks/docs/<index>/<path> 이름공간과 docs:corpus.<index> origin으로 충돌 없이 보존된다. retained blob SHA·전체 인용 가능 chunk 경로/줄 범위를 점검했고 실제 검색의 외부 원문 witness 11hit를 확인했다.
+- convention 및 양수/정합 범위가 없는 검색 metadata는 optional non_citable_metadata=true를 반환한다. legacy file/text를 유지하되 Hit.IsValid는 이를 인용 가능하다고 인정하지 않고 v2 원문 인용으로 승격하지 않는다. false/필드 부재 자체가 원문 무결성 증명은 아니다.
+
+동일 노출 입력6개 비교 (성공/6; 독립 품질·recall 수용이 아닌 실행/출처 회귀)
+- 기존: {"keyword": 6, "vector-go": 6, "vector-all": 1, "pack-v2": 2}
+- 신규: {"keyword": 6, "vector-go": 6, "vector-all": 6, "pack-v2": 6}
+- 이전 실패·재시도·실제 요청 분모를 모두 보존했다. 기존 데이터의 누락을 새 reader가 마치 고친 것처럼 표시하지 않는다. 새 dataset/snapshot은 달라지며 source/project/BGE-M3 digest1024는 동일하다.
+- v2 성공 pack 10개 / 인용105건의 좌표·순서·본문·SHA·integrity를 재계산했다. 그 중 외부문서 v2 인용은 12건이다. raw 외부 원문 검증과 v2 실제 인용 건수를 혼동하지 않는다.
+- 잘못된 commit/source/snapshot pin은 source_mismatch·analysis=null, 타 프로젝트 fixture node는 not_found, retained 외부 blob변조는 snapshot_mismatch를 반환했다. live corpus만 바꾼 경우 retained 응답은 동일하고 bytes/mode 복구 후 정상 동작했다.
+- controlled project/snapshot manifest변조는 각각 startup exit1·회수, 정상4세션은 EOF exit0·회수. 총 도구 요청79회 / 소유 process identity15개 종료 확인. startup 공개 진단 operation_failed만으로 세부 원인 code를 증명했다고 주장하지 않는다.
+
+검증/식별
+- native source a3307ccbf0373b16caa86292c79f3ae5eeefe254: fresh build ./..., 일반4065pass/18skip, race4065pass/18skip, fail0, fmt/vet/golangci/boundaries/docs와 build-bins 통과. 추가 metadata 계약2검사 포함. 18skip은 실행 성공 검사에 합산하지 않는다.
+- builder는 복사해 둔 clean fdb43ae2412d071f02b6b0dc5df0e50d3966b59e 바이너리이며 reader는 clean a330이다. 기존 builder가 제공하는 원문 보존 경로를 사용했으며 새 reader source와 동일한 빌더라고 표시하지 않는다.
+- active binding commit 20a04b8fb221dda534590c621bb90725b268e6fb: 초기 binding 복사 시 남아있던 이전 단계의 delta 설명만 바로잡았다. 실제1732 source SHA는 검증한 a330과 동일하고 source 검증 후 Go 변경0이다.
+- 원본selected2175파일/current, 외부 원문·복사본, 전역32·운영metadata42·기존checkout5·비소유엔진11 보존. 소유 dataset/current 생성0, 원본/소유source clean. 유료 LLM0·외부게시0·운영변경0. 기존 BGE 로컬 임베딩 추론은 실제 실행했다.
+- 과거 frozen packet과 실패 기록은 그대로 보존했다. 이전 adoption guard는 해당 source의 역사 검증으로만 사용하며 현재 Go 전체 회귀는 위 새 실행 결과다.
+- 증거 재검산: scripts/check-stablenet-rebuild.py / 변조보호 scripts/test_stablenet_rebuild.py. 최종 증거보호12·이전pilot보호10·문서계약20·패키지고지3(총45), live문서134, 기존완료guard·새재검산·역사adoption guard·공백 검사 통과. validation-summary.json에 실행별 기록을 남겼다. 역사adoption guard 최초 필수인자누락 CLI exit2도 보존하고 경로를 명시해 재실행0을 확인했다. 원본완료guard 원문 로그는 private 보존한다.
+
+현재 단계
+- SN-P01 새 비운영 데이터 원문/경로·비인용 convention 계약: 완료.
+- SN-P02 기존/새 버전 검색·출처/혼입·복구 검증: 완료 (이 노출6개·정의한 경계 범위).
+- 로드맵 구현7/7·28/28 및 격리 준비22/22는 완료 유지. D04미정·정식0/9·freeze null/execution_allowed false 유지. 온톨로지 제한 연구는 완료/quality=inconclusive이며 이번 검색 수정은 독립 효과 증명이 아니다.
+
+다음 작업: SN-P03 — 출처/무결성 오류를 모델 장애로 오분류하지 않도록 실제 오류·health·복구 계약 검증.
+
+남은 전체 작업
+1. SN-P03: 실제 검색 출처/무결성 오류와 임베딩 모델 장애의 분류·health/복구 계약 보완
+2. SN-P04: go-wemix 실제 소스/데이터 식별 후 프로젝트 간 개념·검색·출처/혼입 비교
+3. FORMAL-PREP: D04 담당자·독립성 확인, 새 DEV/FINAL 입력·완전 gold·matching·충분성 및 F01~08 동결
+4. FORMAL-9: WI-1/WI-2/WI-3/WI-4/WI-V1/WI-V2/WI-6/WI-SP/WI-C 정식 실행·수용 (0/9)
+5. ONTOLOGY: 독립 의미/검색 gold, 검토된 구현-개념 연결/가족 coverage, 승인 DEV/FINAL 효과 gate; 실제 LLM 답변 효과는 모델/인증/상한 지정 후
+6. OPTIONAL-12: 조직 인증/권한; 공개 CLI/HTTP·graph export; graph 점수/확장; domain flow gold; 대규모 corpus/긴 함수; PR/as-of; legacy 출처; CoreML; embedding cache; 운영 감사; viewer; 배포/downstream
+
+게시/운영 적용은 별도 범위가 지정될 때 수행한다. 위 로컬 개발/검증의 공통 선행조건으로 유료 모델이나 담당자 지정을 요구하지 않는다.

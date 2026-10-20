@@ -1,0 +1,44 @@
+{
+  "inputs": [
+    {
+      "id": "C1",
+      "concept": "consensus",
+      "keyword": "verifySeal",
+      "prompt": "Explain consensus seal signer authorization and validator membership checks."
+    },
+    {
+      "id": "C2",
+      "concept": "consensus",
+      "keyword": "QuorumSize",
+      "prompt": "Explain validator quorum thresholds and commit message validation."
+    },
+    {
+      "id": "C3",
+      "concept": "mempool-admission",
+      "keyword": "nonce",
+      "prompt": "Explain transaction pool admission validation for nonce, gas and transaction fee."
+    },
+    {
+      "id": "C4",
+      "concept": "transaction-ordering",
+      "keyword": "Less",
+      "prompt": "Explain transaction ordering by price and time in block construction."
+    },
+    {
+      "id": "C5",
+      "concept": "staking-policy",
+      "keyword": "staking",
+      "prompt": "Where is validator staking eligibility or stake weighted voting policy defined?"
+    },
+    {
+      "id": "C6",
+      "concept": "finality",
+      "keyword": "commit",
+      "prompt": "What source evidence defines finality, commit conditions and rollback assumptions?"
+    }
+  ],
+  "exposed_diagnostic_inputs": true,
+  "independent_gold": false,
+  "k": 10,
+  "comparison_limit": "same embedding but different source/corpus/policy coverage; technical source isolation only"
+}

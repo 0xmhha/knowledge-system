@@ -1,0 +1,92 @@
+func (s *skeleton) initSync(head *types.Header) {
+	// Extract the head number, we'll need it all over
+	number := head.Number.Uint64()
+
+	// Retrieve the previously saved sync progress
+	if status := rawdb.ReadSkeletonSyncStatus(s.db); len(status) > 0 {
+		s.progress = new(skeletonProgress)
+		if err := json.Unmarshal(status, s.progress); err != nil {
+			log.Error("Failed to decode skeleton sync status", "err", err)
+		} else {
+			// Previous sync was available, print some continuation logs
+			for _, subchain := range s.progress.Subchains {
+				log.Debug("Restarting skeleton subchain", "head", subchain.Head, "tail", subchain.Tail)
+			}
+			// Create a new subchain for the head (unless the last can be extended),
+			// trimming anything it would overwrite
+			headchain := &subchain{
+				Head: number,
+				Tail: number,
+				Next: head.ParentHash,
+			}
+			for len(s.progress.Subchains) > 0 {
+				// If the last chain is above the new head, delete altogether
+				lastchain := s.progress.Subchains[0]
+				if lastchain.Tail >= headchain.Tail {
+					log.Debug("Dropping skeleton subchain", "head", lastchain.Head, "tail", lastchain.Tail)
+					s.progress.Subchains = s.progress.Subchains[1:]
+					continue
+				}
+				// Otherwise truncate the last chain if needed and abort trimming
+				if lastchain.Head >= headchain.Tail {
+					log.Debug("Trimming skeleton subchain", "oldhead", lastchain.Head, "newhead", headchain.Tail-1, "tail", lastchain.Tail)
+					lastchain.Head = headchain.Tail - 1
+				}
+				break
+			}
+			// If the last subchain can be extended, we're lucky. Otherwise, create
+			// a new subchain sync task.
+			var extended bool
+			if n := len(s.progress.Subchains); n > 0 {
+				lastchain := s.progress.Subchains[0]
+				if lastchain.Head == headchain.Tail-1 {
+					lasthead := rawdb.ReadSkeletonHeader(s.db, lastchain.Head)
+					if lasthead.Hash() == head.ParentHash {
+						log.Debug("Extended skeleton subchain with new head", "head", headchain.Tail, "tail", lastchain.Tail)
+						lastchain.Head = headchain.Tail
+						extended = true
+					}
+				}
+			}
+			if !extended {
+				log.Debug("Created new skeleton subchain", "head", number, "tail", number)
+				s.progress.Subchains = append([]*subchain{headchain}, s.progress.Subchains...)
+			}
+			// Update the database with the new sync stats and insert the new
+			// head header. We won't delete any trimmed skeleton headers since
+			// those will be outside the index space of the many subchains and
+			// the database space will be reclaimed eventually when processing
+			// blocks above the current head (TODO(karalabe): don't forget).
+			batch := s.db.NewBatch()
+
+			rawdb.WriteSkeletonHeader(batch, head)
+			s.saveSyncStatus(batch)
+
+			if err := batch.Write(); err != nil {
+				log.Crit("Failed to write skeleton sync status", "err", err)
+			}
+			return
+		}
+	}
+	// Either we've failed to decode the previous state, or there was none. Start
+	// a fresh sync with a single subchain represented by the currently sent
+	// chain head.
+	s.progress = &skeletonProgress{
+		Subchains: []*subchain{
+			{
+				Head: number,
+				Tail: number,
+				Next: head.ParentHash,
+			},
+		},
+	}
+	batch := s.db.NewBatch()
+
+	rawdb.WriteSkeletonHeader(batch, head)
+	s.saveSyncStatus(batch)
+
+	if err := batch.Write(); err != nil {
+		log.Crit("Failed to write initial skeleton sync status", "err", err)
+	}
+	log.Debug("Created initial skeleton subchain", "head", number, "tail", number)
+}

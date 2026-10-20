@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Apply exact retained candidates in owned trees; run preregistered RPC slots."""
+import argparse,concurrent.futures,hashlib,importlib.util,json,os,subprocess
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('owned',Path(__file__).with_name('run-wi4-target-subscription.py'));m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+PACKET=m.ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1'
+DRAFT=m.ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1'
+FIXTURE=m.ROOT/'scripts/fixtures/ticket-owned-rpc.go.fixture'
+API='eth/downloader/api.go';TEST='eth/downloader/ticket_owned_rpc_test.go'
+
+
+def flat_tree(src,tree):
+    rows=[]
+    for raw in m.git(src,'ls-tree','-rz',tree).split(b'\0'):
+        if not raw:continue
+        header,name=raw.split(b'\t',1);mode,kind,oid=header.decode().split();rows.append(dict(path=name.decode(),mode=mode,kind=kind,oid=oid))
+    return rows
+
+
+def tree_input(src,q,env,overlay,fixture):
+    e={**env,'GIT_INDEX_FILE':str(q/'owned-index')}
+    subprocess.run(['git','read-tree',m.COMMIT],cwd=src,env=e,check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    api_oid=subprocess.check_output(['git','hash-object','-w','--stdin'],input=overlay,cwd=src,env=e).decode().strip()
+    subprocess.run(['git','update-index','--add','--cacheinfo','100644,'+api_oid+','+API],cwd=src,env=e,check=True)
+    project=subprocess.check_output(['git','write-tree'],cwd=src,env=e).decode().strip()
+    test_oid=subprocess.check_output(['git','hash-object','-w','--stdin'],input=fixture,cwd=src,env=e).decode().strip()
+    subprocess.run(['git','update-index','--add','--cacheinfo','100644,'+test_oid+','+TEST],cwd=src,env=e,check=True)
+    build=subprocess.check_output(['git','write-tree'],cwd=src,env=e).decode().strip()
+    return dict(applied_project_commit=None,base_commit=m.COMMIT,applied_project_tree=project,build_input_tree=build,api_blob=api_oid,test_blob=test_oid,project_flat_tree=flat_tree(src,project),build_flat_tree=flat_tree(src,build),source_mode='owned_working_tree_with_real_Git_tree_objects_not_candidate_commit')
+
+
+def run(work):
+    work.mkdir();out=work/'rpc-trials-v1';out.mkdir();scope=json.loads((PACKET/'SCOPE.json').read_text());m.write(out/'SCOPE.json',scope)
+    parent=Path('/private/tmp/ks-wi4-target-20261019');dep=json.loads((parent/'dependency-plan.json').read_text());go=dep['argv'][0]
+    settings={**dep['task_environment'],'GOMODCACHE':'/Users/kevin/.gvm/pkgsets/go1.23.12/global/pkg/mod','GOCACHE':str(work/'go-cache')}
+    env={k:os.environ[k]for k in ('HOME','USER','TMPDIR','LANG','LC_ALL')if k in os.environ};env.update(settings);env['PATH']=str(Path(go).parent)+':/usr/bin:/bin:/usr/sbin:/sbin'
+    m.write(out/'environment.json',dict(credential_environment_inherited=False,allowed_inherited_keys=sorted(set(env)&{'HOME','USER','TMPDIR','LANG','LC_ALL'}),task_settings=settings,PATH=env['PATH'],scope='allowlisted_process_environment_not_independent_frozen_environment'))
+    candidates=json.loads((DRAFT/'private/candidates.json').read_text());base_source=json.loads((parent/'subscription-trials-v1/source-binding.json').read_text())['tracked'];built={}
+    for candidate in candidates:
+        role=candidate['id'];q=out/'candidates'/role;q.mkdir(parents=True);src=work/('source-'+role)
+        r=m.command(['git','-C',str(parent/'source'),'worktree','add','--detach',str(src),m.COMMIT],work,q/'restore',env,60)
+        if r['exit_code']or r['remaining_live_group_members']:raise ValueError('owned candidate restore failed')
+        baseline=m.source_inventory(src)
+        if baseline!=base_source or m.git(src,'status','--porcelain'):raise ValueError('candidate base identity differs')
+        overlay=(DRAFT/'private/overlays'/(role+'.go.txt')).read_bytes()
+        if m.sha(overlay)!=candidate['full_file_overlay_sha256']:raise ValueError('retained overlay differs')
+        (src/API).write_bytes(overlay);(src/TEST).write_bytes(FIXTURE.read_bytes());after=m.source_inventory(src);expected=dict(baseline);expected[API]=dict(mode=baseline[API]['mode'],sha256=m.sha(overlay))
+        if after!=expected:raise ValueError('unexpected tracked source change')
+        status=m.git(src,'status','--porcelain').decode();allowed={'?? '+TEST}|({' M '+API}if overlay!=m.git(src,'show',m.COMMIT+':'+API)else set())
+        if set(status.splitlines())!=allowed:raise ValueError('unexpected candidate changes')
+        binding=dict(candidate_id=role,base_commit=m.COMMIT,base_tracked=baseline,applied_tracked=after,api_sha256=m.sha(overlay),method_sha256=candidate['method_sha256'],fixture_sha256=m.sha(FIXTURE.read_bytes()),test_addition=TEST,production_patch=False)
+        m.write(q/'source-binding.json',binding);m.write(q/'tree-binding.json',tree_input(src,q,env,overlay,FIXTURE.read_bytes()))
+        # The temporary index is metadata for a real tree, not a build input.
+        (q/'owned-index').unlink()
+        # Reuse the retained commit-object proof rather than copying author
+        # metadata into another packet. The complete flat tree is newly read.
+        m.write(q/'base-flat-tree.json',flat_tree(src,m.COMMIT))
+        profile=json.loads(subprocess.check_output([go,'env','-json','GOVERSION','GOOS','GOARCH','CGO_ENABLED'],cwd=src,env=env,text=True));m.write(q/'profile.json',profile)
+        if profile!=scope['target_toolchain']:raise ValueError('actual toolchain differs')
+        binaries={}
+        for variant in ('general','race'):
+            binary=q/(variant+'.test');argv=[go,'test']+(['-race']if variant=='race'else[])+['-c','-o',str(binary),'./eth/downloader'];r=m.command(argv,src,q/('build-'+variant),env,scope['build_timeout_seconds'])
+            if r['exit_code']or r['remaining_live_group_members']:raise ValueError('target build failed '+role+' '+variant)
+            binaries[variant]=dict(path=str(binary),sha256=m.sha(binary.read_bytes()))
+        m.write(q/'binaries.json',binaries);built[role]=dict(src=src,binaries=binaries,binding=binding,status=status)
+    slots=scope['planned_slots'];m.write(out/'planned.json',slots)
+    def execute(slot):
+        q=out/'slots'/slot['slot_id'];q.mkdir(parents=True);tmp=q/'tmp';tmp.mkdir();trace=q/'events.jsonl';b=built[slot['candidate']];binary=b['binaries'][slot['variant']]
+        local={**env,'TMPDIR':str(tmp),'TICKET_ROLE':slot['candidate'],'TICKET_CASE':slot['case_id'],'TICKET_TRACE_PATH':str(trace)}
+        argv=[binary['path'],'-test.v=true','-test.run=^TestTicketOwnedRPC$','-test.count=1','-test.timeout=20s'];r=m.command(argv,b['src'],q/'process',local,scope['owned_process_timeout_seconds']);r.update(slot,binary_sha256=binary['sha256'],fixture_sha256=m.sha(FIXTURE.read_bytes()),tmp_children_after=sorted(p.name for p in tmp.iterdir()));m.write(q/'receipt.json',r)
+        print(json.dumps(dict(slot_id=slot['slot_id'],exit_code=r['exit_code'],timeout=r['timeout'],remaining_live_group_members=r['remaining_live_group_members'])),flush=True);return r
+    results=[]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=scope['parallelism'])as pool:
+        futures=[pool.submit(execute,s)for s in slots]
+        for future in futures:results.append(future.result());m.write(out/'attempts.json',results)
+    for role,b in built.items():
+        if m.source_inventory(b['src'])!=b['binding']['applied_tracked']or m.git(b['src'],'status','--porcelain').decode()!=b['status']or(b['src']/TEST).read_bytes()!=FIXTURE.read_bytes():raise ValueError('candidate inputs changed during trials')
+    post={role:{v:m.sha(Path(b['path']).read_bytes())for v,b in data['binaries'].items()}for role,data in built.items()}
+    if any(post[role][v]!=b['sha256']for role,d in built.items()for v,b in d['binaries'].items()):raise ValueError('postrun binary changed')
+    m.write(out/'binary-postrun-check.json',post)
+    m.write(out/'receipt.json',dict(planned=90,attempted=len(results),retries=0,tracked_changes_only_exact_candidate_api=True,test_addition_only=True,production_patch=False,source_commit=m.COMMIT,independent_approved=0,independent_tickets=0,FINAL=0,formal_completed=0,formal_total=9,quality_score=None,paid_or_external_LLM_calls=0,operational_nodes_started=0))
+
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser();p.add_argument('--workspace',type=Path,required=True);a=p.parse_args();run(a.workspace.resolve())

@@ -1,0 +1,371 @@
+{
+  "status": "source_contract_review_not_installed_role_execution",
+  "adopted_revision": "b7e78689676769e8536626e76eed7165d870e1ba",
+  "contracts": [
+    {
+      "id": "V-01",
+      "path": "plugin/scripts/oracle_gate.py",
+      "lines": [
+        80,
+        122
+      ],
+      "fact": "계획은 primary/independent 두 역할과 별도 derivation/소스 hash를 요구한다.",
+      "gap": "별도 파일과 서로 다른 hash만으로 의미적 독립성은 증명되지 않는다.",
+      "anchor": {
+        "start_line": 80,
+        "end_line": 122,
+        "start_byte": 2451,
+        "end_byte_exclusive": 5164,
+        "span_sha256": "bb02f67a9db2ba550a76329efc264542005531f12a1711cac07497aa7c69ffc3"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-02",
+      "path": "plugin/scripts/oracle_gate.py",
+      "lines": [
+        264,
+        328
+      ],
+      "fact": "분류기는 source·실행·assertion identity를 확인하며 ERROR를 RED로 세지 않고 정확한 실행 집합을 대조한다.",
+      "gap": "현재 티켓의 실제 driver/전체 API 기준 RED/GREEN 영수증이 없다.",
+      "anchor": {
+        "start_line": 264,
+        "end_line": 328,
+        "start_byte": 12888,
+        "end_byte_exclusive": 16438,
+        "span_sha256": "c9a3792ea050feb08ad5f640751c9d333b58d6b325467e204f2ad7bd518365f8"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-03",
+      "path": "plugin/scripts/oracle_gate.py",
+      "lines": [
+        398,
+        430
+      ],
+      "fact": "완료 검사는 상태·단계·보고서/계획 hash·현재 source를 묶고 e2e에서 chainbench PASS를 요구한다.",
+      "gap": "simulation은 일부 단계 WARN/SKIPPED를 허용한다. WI별 필수 hard gate를 독립 동결해야 한다.",
+      "anchor": {
+        "start_line": 398,
+        "end_line": 430,
+        "start_byte": 20674,
+        "end_byte_exclusive": 22936,
+        "span_sha256": "6f177c23404c01c5f33581c8ad6919aeebb2f17a28fcf7c681b3976e6c3af74a"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-04",
+      "path": "plugin/scripts/go_oracle_driver.py",
+      "lines": [
+        20,
+        43
+      ],
+      "fact": "Go adapter는 선택 test의 assertion marker와 실행 이벤트를 분리하여 build/다른 assertion/누락을 error로 처리한다.",
+      "gap": "이 transport는 기대값을 독립 도출하지 않는다.",
+      "anchor": {
+        "start_line": 20,
+        "end_line": 43,
+        "start_byte": 658,
+        "end_byte_exclusive": 2023,
+        "span_sha256": "e332170cc904bdf202aa984152b6c90ee4268a7f5352cf636d4e3d8e478214e9"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-05",
+      "path": "plugin/scripts/fix_selection.py",
+      "lines": [
+        240,
+        298
+      ],
+      "fact": "후보를 격리 source에 materialize하고 oracle/regression/metric 결과와 observation completeness를 기록한다.",
+      "gap": "현재 두 구독 후보에 대한 selector spec/RED carrier/실제 metric driver는 없다.",
+      "anchor": {
+        "start_line": 240,
+        "end_line": 298,
+        "start_byte": 12289,
+        "end_byte_exclusive": 16511,
+        "span_sha256": "df20545401f23ed7b544574bdcd0dfe919b5354b649b82b0ae996a1ec9809ecd"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-06",
+      "path": "plugin/scripts/fix_selection.py",
+      "lines": [
+        324,
+        359
+      ],
+      "fact": "불완전/의견 미일치/필수 측정 누락은 DEFERRED, 모두 부적격은 REJECTED, 복수 frontier는 TIED, 단독 일치만 SELECTED다.",
+      "gap": "이 판정은 독립 acceptable set membership 검사나 전역 최적성 증명이 아니다.",
+      "anchor": {
+        "start_line": 324,
+        "end_line": 359,
+        "start_byte": 17906,
+        "end_byte_exclusive": 21251,
+        "span_sha256": "8fc05d8fdf330e573af874c547735ea41216b05e041d38dfbefdb52fd4beb8c0"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-07",
+      "path": "plugin/scripts/fix_selection.py",
+      "lines": [
+        419,
+        440
+      ],
+      "fact": "재검사는 spec/report/runner/repo/source의 묶임과 RED carrier 변경 범위를 검사한다.",
+      "gap": "이번 티켓의 적용 tree/current HEAD 검증·후속 final V1 기록이 없다.",
+      "anchor": {
+        "start_line": 419,
+        "end_line": 440,
+        "start_byte": 25881,
+        "end_byte_exclusive": 27560,
+        "span_sha256": "35984b6bd2730a286dddad4c07cb7254cb6a8cb2b506223b3a42a403285d8354"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-08",
+      "path": "plugin/hooks/hooks.json",
+      "lines": [
+        39,
+        76
+      ],
+      "fact": "PreToolUse Write|Edit 경로에 완료/선택 guard가 등록되어 있다.",
+      "gap": "등록 원문은 실제 설치 host의 hook 호출·기권·재진입 영수증이 아니다.",
+      "anchor": {
+        "start_line": 39,
+        "end_line": 76,
+        "start_byte": 892,
+        "end_byte_exclusive": 2021,
+        "span_sha256": "10d4dfe67cd17de4d98de49ad7de6c9bf8cb41e37f3d32aeae667c482aeb983a"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-09",
+      "path": "plugin/hooks/fix-selection-guard.py",
+      "lines": [
+        20,
+        58
+      ],
+      "fact": "선택 guard는 state 진입 시 선택 증거와 적용 tree를 검사한다.",
+      "gap": "인식된 state/Write|Edit 경로 범위이며 실제 역할의 전 경로 불가능성 증명은 아니다.",
+      "anchor": {
+        "start_line": 20,
+        "end_line": 58,
+        "start_byte": 568,
+        "end_byte_exclusive": 3120,
+        "span_sha256": "f8ea96356437e47423806f349f12111c7f291440629d0ae2cbbcf8bfb8939b41"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-10",
+      "path": "plugin/agents/analyzer.md",
+      "lines": [
+        929,
+        938
+      ],
+      "fact": "Analyzer는 티켓 조건에서 독립 도출한 oracle 준비와 미실행 PASS 금지를 명시한다.",
+      "gap": "역할 문서 존재를 이번 티켓의 실제 Analyzer 실행으로 세지 않는다.",
+      "anchor": {
+        "start_line": 929,
+        "end_line": 938,
+        "start_byte": 61745,
+        "end_byte_exclusive": 62411,
+        "span_sha256": "8b5b60e73ac19f4b9fdb229e6bb65318627236887628aa3a429dfcdc54ef3814"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-11",
+      "path": "plugin/agents/planner.md",
+      "lines": [
+        73,
+        83
+      ],
+      "fact": "Planner는 둘 이상 대안·기준/adapter 동결·선택 실행을 요구한다.",
+      "gap": "같은 AI가 작성한 두 대안을 독립 티켓 또는 독립 gold로 세지 않는다.",
+      "anchor": {
+        "start_line": 73,
+        "end_line": 83,
+        "start_byte": 2994,
+        "end_byte_exclusive": 3686,
+        "span_sha256": "bcd8ccd223a8c5200d9db1264a7f44760897d2dcc64c3e7a8bc717761f99c155"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-12",
+      "path": "plugin/agents/implementer.md",
+      "lines": [
+        29,
+        37
+      ],
+      "fact": "Implementer는 선택 source와 RED carrier를 유지하며 적용 tree를 재검사한다.",
+      "gap": "기존 추출 fixture는 실제 프로젝트 적용 tree/설치 역할 증거가 아니다.",
+      "anchor": {
+        "start_line": 29,
+        "end_line": 37,
+        "start_byte": 651,
+        "end_byte_exclusive": 1158,
+        "span_sha256": "bf5512ca00da8c93f437035c8e7fdfdda479b1b2147e27e023c266953f5902de"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-13",
+      "path": "plugin/agents/evaluator.md",
+      "lines": [
+        58,
+        64
+      ],
+      "fact": "Evaluator는 선택 current HEAD 검증과 final V1 관측을 요구한다.",
+      "gap": "과거 trial oracle는 이번 티켓의 final V1/current HEAD 완료 증거가 아니다.",
+      "anchor": {
+        "start_line": 58,
+        "end_line": 64,
+        "start_byte": 2302,
+        "end_byte_exclusive": 2743,
+        "span_sha256": "8f608a6c8adeb2b7ec0ef4868990c215af3a417b2759b660eab45f3e45bc7879"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "V-14",
+      "path": "plugin/agents/evaluator.md",
+      "lines": [
+        887,
+        902
+      ],
+      "fact": "Evaluator는 oracle CLI 결과/실제 보고서 hash를 요구하며 사람의 독립 수용을 추론하지 않는다.",
+      "gap": "기계 PASS와 독립 의미 검토/최종 수용은 별도로 판정한다.",
+      "anchor": {
+        "start_line": 887,
+        "end_line": 902,
+        "start_byte": 44060,
+        "end_byte_exclusive": 44825,
+        "span_sha256": "b001786a1d57ab9b87a4c42a1d12e447883963fbf190637ace59920a0317be8e"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    }
+  ],
+  "criteria_snapshot": {
+    "WI-V1": {
+      "protocol": {
+        "id": "WI-V1",
+        "status": "not_prepared",
+        "requirements_proposal": {
+          "independent_defect_tickets_min": 2,
+          "normal_controls": true,
+          "symptom_reintroduction_mutants": true,
+          "overfit_mutants": true,
+          "oracles": [
+            "primary",
+            "independently_derived"
+          ]
+        },
+        "metrics_proposal": {
+          "declared_oracle_and_normal_control_pass_fraction": 1.0,
+          "expected_invalid_refusal_fraction": 1.0
+        },
+        "baseline_definition": null,
+        "canonical_matching_rules": null,
+        "sample_sufficiency_review": null,
+        "cases": [],
+        "input_manifest": null,
+        "input_manifest_sha256": null,
+        "gold_manifest": null,
+        "gold_manifest_sha256": null,
+        "review_receipt": null,
+        "final_minimum_independent_units": null,
+        "dev_sample_allocation": null
+      },
+      "progress": {
+        "id": "WI-V1",
+        "owner": "coding-agent",
+        "target": "선정한 실제 결함 티켓과 설치된 host의 Analyzer/Planner/Implementer/Evaluator 경로",
+        "input_proposal": "새 결함2건 이상. 독립 요구에서 도출한 primary/independent oracle, 정상 제어와 증상 재도입·과적합 mutation을 사전 고정",
+        "completion_proposal": "모든 선언 oracle의 base RED/head GREEN·정상 제어 GREEN. 무효 oracle·다른 assertion·빌드/timeout·raw 변조·stale source·필수 단계 누락은100% 차단. 독립 검토자가 oracle 의미·원인 수정·범위를 항목별 승인",
+        "limitations": "기존 fixture 통과나 CLI 단독 실행을 실제 host 완료로 대체하지 않는다.2건은 이 pilot 연결의 최소 사례이며 전체 false-done 발생률을 입증하지 않는다",
+        "criterion_status": "proposed",
+        "operational_gate": "not_run",
+        "quality_gate": "not_run",
+        "independent_acceptance": "not_recorded",
+        "evidence": null,
+        "review_receipt": null,
+        "implementation_reference": {
+          "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-v1/manifest.json",
+          "revision": "e040fc288a5fb438d35c77ab5281eb7aefce9a68"
+        }
+      }
+    },
+    "WI-V2": {
+      "protocol": {
+        "id": "WI-V2",
+        "status": "not_prepared",
+        "requirements_proposal": {
+          "shared_ticket_group": "WI-V1",
+          "candidates_per_ticket_min": 2,
+          "independent_acceptable_candidate_set": true
+        },
+        "metrics_proposal": {
+          "selected_candidates_satisfy_hard_gates_and_gold": true,
+          "all_bad_selection": null,
+          "ties_and_insufficiency_explicit": true
+        },
+        "baseline_definition": null,
+        "canonical_matching_rules": null,
+        "sample_sufficiency_review": null,
+        "cases": [],
+        "input_manifest": null,
+        "input_manifest_sha256": null,
+        "gold_manifest": null,
+        "gold_manifest_sha256": null,
+        "review_receipt": null,
+        "final_minimum_independent_units": null,
+        "dev_sample_allocation": null
+      },
+      "progress": {
+        "id": "WI-V2",
+        "owner": "coding-agent",
+        "target": "동일 증상에 대한 실제 후보 생성·패널·계획 선택",
+        "input_proposal": "WI-V1과 같은 신규 티켓2건 이상, 티켓당 후보2개 이상. 평가축·hard gate·사전 acceptable candidate set을 독립 검토자가 고정",
+        "completion_proposal": "선택된 후보는 모든 hard gate 통과 및 사전 acceptable set에 포함. 전부 부적격이면 선택 없음. 동률·근거 부족을 명시. source/모델·관점·비용·반대 의견과 사람의 선택 수용을 기록",
+        "limitations": "모델 패널 합의는 사람의 독립 수용이 아니다. 실제 측정되지 않은 성능·유지보수성 또는 전역 최적성은 unknown",
+        "criterion_status": "proposed",
+        "operational_gate": "not_run",
+        "quality_gate": "not_run",
+        "independent_acceptance": "not_recorded",
+        "evidence": null,
+        "review_receipt": null,
+        "implementation_reference": {
+          "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-v2/manifest.json",
+          "revision": "8ec6bb1f20dcd74cdcdf91fdd937ba0e8fbba388"
+        }
+      }
+    }
+  },
+  "independent_set_membership_adapter_or_receipt": null,
+  "new_host_calls": 0,
+  "formal_runs": 0
+}

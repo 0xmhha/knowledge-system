@@ -1,0 +1,153 @@
+WI-6 독립 가족·기본/확장 쌍·relevance/noise·실제 경로·warm 지연 공백 — 비공개 AI 자료
+20카드 = 운영 원문 19개 + 개발 stress 1개. 독립 가족/gold/실제 프로젝트 쌍/warm 영수증 0개.
+과거 6함수 fixture의 단일 seed 쌍은 현재 20독립 가족 또는 warm p95 증거가 아니다.
+
+EXPANSION-DRAFT-SRC-001 value_propagation production_source_candidate
+관련 target이 지역 값 전달·나가는 call 문맥·호출자의 소비 중 무엇인가? 호출 edge를 argument/return mapping으로 간주하지 않는 gold 범위를 정한다.
+analyzeBlock의 실패·부수효과와 범위 상한은 별도 호출 문맥 검토 필요
+
+EXPANSION-DRAFT-SRC-002 state_guard production_source_candidate
+상태 guard의 관련 근거는 이 함수/직접 callees에 있는가? incoming owner·interface·opaque 외부 조건을 미지원/unknown과 구분한다.
+비동기 송신 성공과 캐시의 동시성은 본문만으로 확정할 수 없다
+
+EXPANSION-DRAFT-SRC-003 state_guard production_source_candidate
+상태 guard의 관련 근거는 이 함수/직접 callees에 있는가? incoming owner·interface·opaque 외부 조건을 미지원/unknown과 구분한다.
+메시지 검증 상위 경로와 잠금 소유권은 미검토
+
+EXPANSION-DRAFT-SRC-006 error_handling production_source_candidate
+호출자에게 오류/부분 반환이 미치는 영향은 outgoing 확장만으로 회수되는가? caller 수요와 실제 지원 경로의 relevance/누락 기준을 독립 작성한다.
+호출자가 부분 결과를 허용하는지와 요청 크기 제한은 미검토
+
+EXPANSION-DRAFT-SRC-007 error_handling production_source_candidate
+호출자에게 오류/부분 반환이 미치는 영향은 outgoing 확장만으로 회수되는가? caller 수요와 실제 지원 경로의 relevance/누락 기준을 독립 작성한다.
+정상 빈 결과와 오류의 구별 필요성은 호출자 계약에 달려 있다
+
+EXPANSION-DRAFT-SRC-008 value_propagation production_source_candidate
+관련 target이 지역 값 전달·나가는 call 문맥·호출자의 소비 중 무엇인가? 호출 edge를 argument/return mapping으로 간주하지 않는 gold 범위를 정한다.
+log.Crit의 종료 의미와 DB 트랜잭션성은 본문 밖의 계약이다
+
+EXPANSION-DRAFT-SRC-011 error_handling production_source_candidate
+호출자에게 오류/부분 반환이 미치는 영향은 outgoing 확장만으로 회수되는가? caller 수요와 실제 지원 경로의 relevance/누락 기준을 독립 작성한다.
+collector 계약과 panic 복구 경계 및 계정 누락 허용 범위는 미검토
+
+EXPANSION-DRAFT-SRC-012 state_guard production_source_candidate
+상태 guard의 관련 근거는 이 함수/직접 callees에 있는가? incoming owner·interface·opaque 외부 조건을 미지원/unknown과 구분한다.
+prune 외부 구현의 원자성과 복구 가능성은 이 원문으로 확정하지 않는다
+
+EXPANSION-DRAFT-SRC-013 error_handling production_source_candidate
+호출자에게 오류/부분 반환이 미치는 영향은 outgoing 확장만으로 회수되는가? caller 수요와 실제 지원 경로의 relevance/누락 기준을 독립 작성한다.
+실제 중단 후 복구 성공과 데이터 보전은 실행하지 않았다
+
+EXPANSION-DRAFT-SRC-016 resource_lifecycle production_source_candidate
+자원 획득·소유권 인계·정리의 관련 함수와 비동기 closure/외부 효과가 무엇인가? source-only 질문을 실제 실행/누수 증명으로 세지 않는다.
+Close의 정리 대상과 미초기화 자원 처리 및 drop 진행 조건은 추가 확인 필요
+
+EXPANSION-DRAFT-SRC-017 state_guard production_source_candidate
+상태 guard의 관련 근거는 이 함수/직접 callees에 있는가? incoming owner·interface·opaque 외부 조건을 미지원/unknown과 구분한다.
+reorg·이벤트 송신의 블로킹과 잠금 순서는 별도 구현 검토 필요
+
+EXPANSION-DRAFT-SRC-018 resource_lifecycle production_source_candidate
+자원 획득·소유권 인계·정리의 관련 함수와 비동기 closure/외부 효과가 무엇인가? source-only 질문을 실제 실행/누수 증명으로 세지 않는다.
+billy.Open 콜백 시점과 Close의 전체 정리 보장은 별도 계약이다
+
+EXPANSION-DRAFT-SRC-021 resource_lifecycle production_source_candidate
+자원 획득·소유권 인계·정리의 관련 함수와 비동기 closure/외부 효과가 무엇인가? source-only 질문을 실제 실행/누수 증명으로 세지 않는다.
+채널 수신자·버퍼·mux 종료 계약 없이는 deadlock이나 누수로 단정하지 않는다
+
+EXPANSION-DRAFT-SRC-022 value_propagation production_source_candidate
+관련 target이 지역 값 전달·나가는 call 문맥·호출자의 소비 중 무엇인가? 호출 edge를 argument/return mapping으로 간주하지 않는 gold 범위를 정한다.
+동시 setHead와 skeleton 안정성 및 overflow 방지는 추가 확인 필요
+
+EXPANSION-DRAFT-SRC-026 resource_lifecycle development_stress_source_only
+자원 획득·소유권 인계·정리의 관련 함수와 비동기 closure/외부 효과가 무엇인가? source-only 질문을 실제 실행/누수 증명으로 세지 않는다.
+운영 함수가 아니며 운영 독립 가족 수에 포함하지 않는다
+프로그램·노드·채굴 실행은 이 자료 준비 범위 밖이다
+
+EXPANSION-DRAFT-SRC-027 resource_lifecycle production_source_candidate
+자원 획득·소유권 인계·정리의 관련 함수와 비동기 closure/외부 효과가 무엇인가? source-only 질문을 실제 실행/누수 증명으로 세지 않는다.
+commit closure의 반환과 바깥 루프 반환을 구별해야 한다
+실제 cancel·race·교착을 재현하지 않았다
+
+EXPANSION-DRAFT-SRC-031 error_handling production_source_candidate
+호출자에게 오류/부분 반환이 미치는 영향은 outgoing 확장만으로 회수되는가? caller 수요와 실제 지원 경로의 relevance/누락 기준을 독립 작성한다.
+실제 네트워크 최신성·요청 deadline·노드 신원 검증은 별도 문맥이다
+
+EXPANSION-DRAFT-SRC-032 resource_lifecycle production_source_candidate
+자원 획득·소유권 인계·정리의 관련 함수와 비동기 closure/외부 효과가 무엇인가? source-only 질문을 실제 실행/누수 증명으로 세지 않는다.
+errc 수신자 버퍼·callback 계약 없이는 무조건 종료 가능하다고 단정하지 않는다
+
+EXPANSION-DRAFT-SRC-036 state_guard production_source_candidate
+상태 guard의 관련 근거는 이 함수/직접 callees에 있는가? incoming owner·interface·opaque 외부 조건을 미지원/unknown과 구분한다.
+transport 선택만으로 TLS·실제 연결·취소 보장을 평가하지 않는다
+
+EXPANSION-DRAFT-SRC-037 value_propagation production_source_candidate
+관련 target이 지역 값 전달·나가는 call 문맥·호출자의 소비 중 무엇인가? 호출 edge를 argument/return mapping으로 간주하지 않는 gold 범위를 정한다.
+동일 ID·외부 transport 응답 계약과 동시 사용 안전성은 별도 검토이다
+
+EXP-01 pkg/graph/valueflow/expand.go:16
+입력은 정확한 함수 QueryInput과 확장 limits이며 intent/prompt 검색 필드가 없다.
+미충족: 카드의 의도는 gold·평가에 반영할 조건이며 엔진이 text query로 검색/순위를 바꾼다고 간주하지 않는다.
+
+EXP-02 pkg/graph/valueflow/expand.go:58
+확장 기본/최대 functions/hops/candidates/aggregate/time 상한과 strict raw input을 검증한다.
+미충족: 같은 local limits와 각 arm의 추가 aggregate cap·시간 예산 대응을 명시하고 동일 cap을 모호하게 쓰지 않는다.
+
+EXP-03 pkg/graph/valueflow/expand.go:145
+각 고유 함수의 지역 분석을 수행하고 seed snapshot·aggregate cap·partial 상태를 보존한다.
+미충족: 반환 wrapper 수와 유효 analysis 함수 수를 구분하고 partial/빈 분석/미지원 분모를 동결한다.
+
+EXP-04 pkg/graph/valueflow/expand.go:225
+나가는 calls/invokes만 조회하며 순환/중복을 줄이고 hop argument_mapping은 not_computed다.
+미충족: 호출자 탐색·argument/return 전달·타당한 실행 경로 또는 intent 관련성으로 승격하지 않는다.
+
+EXP-05 pkg/graph/valueflow/expand.go:291
+최종 manifest/node/blob/edge page와 more를 재확인하고 시간 초과/변경을 명시한다.
+미충족: 사례별 graph/retained source receipt·한계/중단/재시도·원래 분모를 실제 MCP 입력과 대조해야 한다.
+
+EXP-06 pkg/graph/valueflow/query.go:114
+기본 Query는 서버 측 elapsed를 측정하고 retained manifest와 선택적인 source/snapshot/commit pin을 대조한다.
+미충족: end-to-end 지연과 서버 내부 elapsed를 분리하고 정식 요청은 필요한 pin을 명시해야 한다.
+
+EXP-07 pkg/graph/valueflow/expand.go:110
+확장 elapsed는 Expand의 서버 측 소요 시간이다.
+미충족: CKS facade·직렬화·transport·소비자 해석을 포함하는 warm p95와 자동으로 같지 않다.
+
+MCP-01 internal/system/mcp/valueflow.go:15
+기본 arm은 CKS context.value_dependencies에서 public client와 공유 Query를 호출한다.
+미충족: baseline은 검색 top-k 문맥이 아니라 선택 함수 1개의 지역 분석이다. 평가 반환 단위를 동결한다.
+
+MCP-02 internal/system/mcp/value_expansion.go:15
+확장 arm은 optional backend를 통해 Expand하며 curated flow는 separate_not_joined/not_verified다.
+미충족: metadata·call hop을 계산된 값 전달·검증된 dataset join이나 ontology 효과로 판정하지 않는다.
+
+MCP-03 internal/system/ckgclient/valueflow.go:34
+public expansion client는 LLM-safe retained reader를 사용하고 legacy 불가 상태를 명시한다.
+미충족: 이번 프로젝트 retained graph/public client/MCP/설치된 역할의 실제 paired receipt가 없다.
+
+MCP-04 pkg/graph/mcphandlers/valueflow.go:15
+standalone 기본 도구도 같은 Query 엔진을 호출한다.
+미충족: standalone 성공을 CKS 소비자/역할의 쌍 실행 성공으로 세지 않는다.
+
+HOST-01 plugin/agents/analyzer.md:13
+Analyzer의 명시적 CKS tools 목록에 value_dependencies/value_dependency_expansion이 없다.
+미충족: 소비자 contract의 도구 존재와 직접 역할 노출은 다르다. 실제 유효 권한·의도→호출 정책·handoff를 검증해야 한다.
+
+정답/쌍/분모 질문:
+20입력 중 stress 1개는 운영 독립 가족에 포함하지 않는다. 운영 19개와 가족 최소20개/의도4종의 부족·독립성·노출·DEV/FINAL을 검토한다.
+정답 단위는 고유 함수인가 call/value/control 근거인가? seed 포함, 관련/비관련/unknown·reachable universe 및 complete relevance gold를 독립 동결한다.
+project/commit/snapshot/function canonical identity/blob hash와 source 위치를 매칭하고 node ID·이름만으로 다른 프로젝트/수정본을 합치지 않는다.
+같은 seed·source·snapshot·local limits를 양 arm에 적용하고 expansion aggregate cap·backend/version·순서·취소/retry·재색인 정책을 동결한다.
+기본 함수1개와 확장의 함수 목록/analysis null·실제 고유 함수·호출 hop·curated metadata 반환 단위를 분리하고 중복/순환·partial/budget/stale/기권 coverage를 보존한다.
+per-case recall/noise와 family macro 집계, 빈 gold/빈 반환·미지원·실패 분모를 동결한다. 미작성 relevance labels는 빈 정답이 아니다.
+noise=비관련 반환/전체 반환이며 증가0.10은 10 percentage points다. empty 반환을 임의 noise0으로 두지 않고 실패/기권의 처리와 protocol null을 유지한다.
+제안 recall delta>=0.10/noise delta<=0.10과 warm p95 ratio<=2.0은 모두 독립 정답·반복 측정으로 판정해야 한다. 과거 작은 fixture 지표로 이번 20가족 점수를 채우지 않는다.
+
+warm 지연 계약 질문:
+측정 대상은 client end-to-end, CKS facade, server Query/Expand 중 어느 범위인가? 두 arm에서 같은 범위·monotonic clock을 사용한다.
+warm의 정의·초기 제외 횟수·안정화 기준·session/process/connection 재사용·OS/DB/cache 상태와 고정 환경을 정한다.
+가족/arm별 반복 횟수·유효 표본 최소치와 p95의 quantile/interpolation 방법은 미정이다. 다른 평가의 warm20 조건을 자동 수입하지 않는다.
+arm 실행 순서·교차/무작위/동시성·timeout/오류/취소/retry·상한 도달의 포함/분모 정책을 사전 동결한다.
+ratio는 p95(expansion)/p95(baseline)인지 paired latency ratio의 p95인지 확정하고 family별/전체 집계·불확실성 정책을 정한다.
+baseline 0·누락·극소값과 부정확한 시간해상도에서는 비율을 임의 0/1로 채우지 않고 불충분 판정을 정한다.
+서버 내부 elapsed는 network/직렬화/소비자 비용을 포함하지 않는다. 함수수/노드/edge/fact/바이트 상한과 자원 사용을 함께 보고한다.
+현재 프로젝트의 warm 반복/순서/완료·중단 원자료와 source/snapshot/hardware/runtime pin receipt를 수집한 뒤 수용 점수를 계산한다.

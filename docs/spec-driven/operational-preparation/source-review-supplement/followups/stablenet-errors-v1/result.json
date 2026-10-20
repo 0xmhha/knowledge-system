@@ -1,0 +1,45 @@
+{
+  "status": "SN-P03_scoped_runtime_classification_recovery_pass",
+  "native_source_commit": "4cebf0c890b6708f3c6cd756749ccfdc55e096eb",
+  "native_test": {
+    "pass": 4086,
+    "skip": 18,
+    "fail": 0
+  },
+  "native_race": {
+    "pass": 4086,
+    "skip": 18,
+    "fail": 0
+  },
+  "baseline_source_poison_and_model_latch_reproduced": true,
+  "specific_source_integrity_errors_preserved": true,
+  "real_healthy_embedding_before_source_failure": true,
+  "controlled_embedding_faults": [
+    "503",
+    "empty_response"
+  ],
+  "health_only_TTL_recovery": true,
+  "successful_raw_query_immediate_recovery": true,
+  "caller_context_scope": "native tests; MCP cancellation notification not tested",
+  "final_stdio_sessions": 4,
+  "initial_diagnostic_stdio_sessions_preserved": 4,
+  "normal_EOF_exit0_reaped": 8,
+  "all_actual_tool_attempts": 57,
+  "final_tool_attempts": 37,
+  "proxy_HTTP_observations": 898,
+  "initial_proxy_HTTP_observations": 850,
+  "all_proxy_HTTP_observations": 1748,
+  "successful_v2_packs_verified": 5,
+  "v2_citations_verified": 54,
+  "owned_initial_native_interruption": 1,
+  "final_native_interruption": 0,
+  "shared_model_restarts_or_signals": 0,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "reviewer_assignment": "미정",
+  "independent_quality_evaluated": false,
+  "ontology_effect_evaluated": false,
+  "production_activation": false,
+  "paid_LLM_calls": 0,
+  "SN-P04_complete": false
+}

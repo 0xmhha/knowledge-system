@@ -1,0 +1,15 @@
+version: 1
+name: source-pinned-policy-evaluation
+backends:
+  ckg:
+    path: /private/tmp/ks-policy-regeneration-current-20261016/graph/graph.db
+  ckv:
+    provider: mock
+listen:
+  transport: stdio
+logging:
+  level: error
+sanitize:
+  rules_path: /private/tmp/ks-policy-regeneration-current-20261016/cks/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true

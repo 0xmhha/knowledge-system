@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
@@ -17,15 +16,21 @@ type EmbedService struct {
 
 // Run embeds the given text and returns the vector.
 func (s *EmbedService) Run(ctx context.Context, text string) ([]float32, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if s.emb == nil {
-		return nil, errors.New("embed: no embedder configured")
+		return nil, fmt.Errorf("%w: no embedder configured", ErrEmbeddingFailed)
 	}
 	vecs, err := embedQueryBatch(ctx, s.emb, []string{text})
+	if cancelErr := ctx.Err(); cancelErr != nil {
+		return nil, cancelErr
+	}
 	if err != nil {
-		return nil, fmt.Errorf("embed: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrEmbeddingFailed, err)
 	}
 	if len(vecs) == 0 || len(vecs[0]) == 0 {
-		return nil, errors.New("embed: embedder returned no vector")
+		return nil, fmt.Errorf("%w: embedder returned no vector", ErrEmbeddingFailed)
 	}
 	return vecs[0], nil
 }

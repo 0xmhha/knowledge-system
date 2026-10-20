@@ -1,0 +1,105 @@
+{
+  "kind": "verification_environment_correction_not_product_or_acceptance_change",
+  "source_checkpoint": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/manifest.json",
+    "sha256": "dc79310029bb434dee6911227441e4b033bfc179c639191ada96179d59ea6a42"
+  },
+  "initial_attempts": [
+    {
+      "attempt": "initial-sandbox",
+      "result": "test_process_completed_but_ps_denied_no_complete_ownership_receipt",
+      "verified_ownership_claimed": false
+    },
+    {
+      "attempt": "system-python",
+      "result": "Python3.9.6_does_not_support_existing_zip_strict_argument",
+      "operational_tests": 67,
+      "failed": 2,
+      "product_fix_claimed": false
+    }
+  ],
+  "selected_python": {
+    "executable": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+    "version": "3.11.4 (v3.11.4:d2340ef257, Jun  6 2023, 19:15:51) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "explicit_interpreter": true,
+    "reason": "PATH selected system Python3.9 in prior harness; existing diagnostic zip strict requires Python3.10 or later"
+  },
+  "verified_tests": {
+    "CoreML_evidence": 8,
+    "operational_acceptance_regressions": 67,
+    "remaining_ledger": 4
+  },
+  "final_commands": [
+    {
+      "label": "coreml",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "-m",
+        "unittest",
+        "test_coreml_readiness"
+      ],
+      "exit_code": 0,
+      "reaped": true,
+      "remaining_live_group_members": 0
+    },
+    {
+      "label": "operational",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "-m",
+        "unittest",
+        "test_operational_acceptance"
+      ],
+      "exit_code": 0,
+      "reaped": true,
+      "remaining_live_group_members": 0
+    },
+    {
+      "label": "remaining",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "-m",
+        "unittest",
+        "test_remaining_13"
+      ],
+      "exit_code": 0,
+      "reaped": true,
+      "remaining_live_group_members": 0
+    },
+    {
+      "label": "primary",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "scripts/check-operational-acceptance.py"
+      ],
+      "exit_code": 0,
+      "reaped": true,
+      "remaining_live_group_members": 0
+    },
+    {
+      "label": "remaining-primary",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+        "scripts/check-remaining-13.py"
+      ],
+      "exit_code": 0,
+      "reaped": true,
+      "remaining_live_group_members": 0
+    },
+    {
+      "label": "docs",
+      "argv": [
+        "make",
+        "docs-check"
+      ],
+      "exit_code": 0,
+      "reaped": true,
+      "remaining_live_group_members": 0
+    }
+  ],
+  "approval_conditions_changed": false,
+  "production_sources_changed": false,
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "parent_completed": 0
+}

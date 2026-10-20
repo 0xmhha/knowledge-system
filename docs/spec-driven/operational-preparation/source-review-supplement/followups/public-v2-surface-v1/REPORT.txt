@@ -1,0 +1,9 @@
+단계85: CKS CLI 선택형 v2·기존 HTTP·독립 원시 그래프 v2를 구현하고 검증했다.
+실제 CLI/HTTP는 각 인용11개·같은 좌표/질의/무결성 해시다. 기존 파일 재사용은 output_exists이며 소유 MCP는 먼저 exit0/reap했다.
+347378485바이트의 원시 그래프 출력244989노드/1964193관계를 SQLite와 전 행 대조했다. 종료 요청 중단은 request_canceled·exit1이고 임시/목적 파일·잔여 프로세스0이다. 이는 EvidencePack 원문 검증·정화·sha256-v2가 아니라 프로젝트 범위의 그래프 스냅샷이다.
+일반/race의 이전 통과/skip ID를 보존하며 새 전체 build/fmt/vet/고정lint/docs를 실행했다. 실제 runtime과 최종 native CKS/CKG bytes가 같다. 전체 검증 뒤 PUBLIC 문서의 낡은 미구현 문장1개만 바로잡고 docs-check를 다시 통과했다. Go/frontend 입력과 재빌드 bytes 불변을 별도 기록했다.
+초기 그래프 시험 상수명 오류, 하네스 PYTHONPATH 누락, sandbox lint cache 경고를 원자료로 보존했다. 초기 CLI/HTTP의 별도 후보·입력 바인딩·성공 결과도 보존하며 최종 후보 결과와 섞지 않는다.
+직접 CKV v2·정적 분할 v2는 구현하지 않았으며 세 소스 모드의 원시 그래프 DTO와 검색 EvidencePack을 구분한다. 완전 그래프 JSON 기본 선택은 응답 없는 선택 질문의 권고 기본값 적용이며 사람 승인으로 기록하지 않았다.
+새 독립 정답/FINAL·담당자·품질 수용·온톨로지 효과·운영 배포·CoreML 실물 검증은 이 단계의 성공으로 닫지 않는다. 정식0/9·부모0/13·독립승인0·실제LLM0·유료0·게시0.
+
+최초 새 원장 회귀67개 중27개가 실패했다. 새 current_indices가 전달된 protocol/ledger 대신 저장된 원장만 대조한 결함이었다. 전달된 두 객체를 이전 승인/정답과 직접 대조하도록 수정하고 직접 회귀2개를 추가했다. 최초 검사기·manifest·실패 로그를 attempts에 보존했다. 최종 재검증 결과는 별도 기록하며 미통과 상태를 완료로 세지 않았다.

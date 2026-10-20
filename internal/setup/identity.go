@@ -333,6 +333,16 @@ func ConfiguredInputDigest(o Options) (string, error) {
 		{"semantic-corpus", o.SemanticCorpus, true},
 		{"domain-knowledge", o.DomainKnowledge, true},
 	}
+	documents, err := ExtraDocumentRoots(o)
+	if err != nil {
+		return "", err
+	}
+	for index, root := range documents {
+		inputs = append(inputs, struct {
+			role, path string
+			folder     bool
+		}{fmt.Sprintf("document-corpus:%02d", index), root, true})
+	}
 	for _, knowledge := range o.KnowledgeInputs {
 		if knowledge.Role == "" || knowledge.Path == "" {
 			return "", fmt.Errorf("invalid registered knowledge input")

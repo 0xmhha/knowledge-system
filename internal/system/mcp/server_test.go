@@ -188,6 +188,21 @@ func TestHandleHealth_AllReachable_ReturnsOK(t *testing.T) {
 	}
 }
 
+func TestHealthReportsConfiguredEmbeddingCacheCapacity(t *testing.T) {
+	f := newFixture(t, nil)
+	f.deps.Embed.CacheEntries = 32
+	res, err := handleHealth(context.Background(), f.deps, mcpgo.CallToolRequest{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := unpackResult(t, res)
+	backends := got["backends"].(map[string]any)
+	vector := backends["vector"].(map[string]any)
+	if vector["embedding_cache_entries"] != float64(32) {
+		t.Fatal("cache setting absent from health", vector)
+	}
+}
+
 func TestHandleHealth_CKGDown_ReturnsDown(t *testing.T) {
 	t.Parallel()
 	// ckg unreachable -> fail closed. Health should reflect

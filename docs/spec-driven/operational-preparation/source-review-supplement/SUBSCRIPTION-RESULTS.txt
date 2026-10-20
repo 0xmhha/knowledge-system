@@ -1,0 +1,54 @@
+구독 종료 개발용 로컬 시험 결과 — 2026-10-16
+
+범위
+고정 go-stablenet 원문의 Unsubscribe 메서드·구조체를 추출했다.
+실행한 이벤트 루프는 단일 구독·단일 해제 요청을 처리하는 통제된 대역이다.
+실제 노드·RPC notifier·event mux·전체 downloader 경로는 실행하지 않았다.
+
+최종 시험: 5종 × 같은 가설의 스케줄 5개 × 일반/race 2모드 = 50건.
+아래 '기준 충족'은 AI가 작성한 개발용 기준이다. 독립 품질 점수가 아니다.
+원본            8/10 충족, 송신자 2개 대기 관측 2건
+수정 후보 A    10/10 충족
+수정 후보 B    10/10 충족
+재도입 변이     8/10 충족, 송신자 2개 대기 관측 2건
+즉시 반환 변이  0/10 충족, 요청·제거·확인 계약을 충족하지 못함
+모든 최종 50건에서 시험 소유 goroutine 종료를 확인했다.
+
+검증
+- Go 1.26.9로 모든 변형의 일반/race 시험 통과: 원자료 로그 10개.
+  변이를 기대대로 거부했다는 뜻이며 모든 변형이 올바르다는 뜻은 아니다.
+- 기록된 컴파일 입력과 실제 검사 입력의 SHA-256을 대조했다.
+- 5종 모두 build/fmt/vet/lint 통과: 검사 영수증 20개.
+- 원본·재도입 변이의 송신 대기 스택은 같은 순간의 스냅샷으로 보존했다.
+- 초기 관측기 2회는 race 빌드의 inline 함수명 변화로 대기 식별에 실패했다.
+  실패 로그·당시 시험 코드와 이유를 observer-diagnostics에 보존했다.
+- 추가 lint에서 발견한 대역의 미사용 요청 채널 필드를 보완했다.
+  요청 채널이 구독 채널과 일치할 때만 제거되도록 고친 뒤 50건을 재실행했다.
+  이전 50건은 진단 자료로 별도 보존하며 최종 표본에 합산하지 않았다.
+
+해석
+통제한 조건에서 원본의 해제 요청 송신과 알림 송신이 함께 대기함을 확인했다.
+실제 프로젝트에서 이 스케줄의 도달 가능성·발생 빈도를 검증한 결과는 아니다.
+후보 A/B는 프로젝트에 적용하지 않았다. 승인된 수정 후보 집합은 아직 없다.
+두 오라클 초안과 모든 후보는 같은 AI가 작성했다. 독립 오라클은 0개다.
+스케줄 5개는 같은 원문 가설에 속하므로 독립 가족 5개로 세지 않는다.
+정식 수용 0/9, 담당자 미정, F-01~F-08 pending을 유지한다.
+
+재검증
+python3 scripts/test_subscription_ticket.py
+python3 scripts/test_subscription_probe.py
+python3 scripts/check-subscription-probe.py docs/spec-driven/operational-preparation/source-review-supplement/subscription-probe-v1
+
+재실행
+scripts/run-subscription-probe.py에 --output 새 임시 경로와 --goroot Go 1.26.9 경로를 지정한다.
+scripts/validate-subscription-fixture.py는 --packet 결과 packet, --work-root 결과 work,
+--goroot 경로, --lint 실행 파일을 받아 동일 컴파일 입력의 품질 검사를 수행한다.
+최종 패킷은 초기 관측 실패 기록도 포함한다. 재실행 관측은 별도 새 증거로 보존한다.
+
+다음 작업
+WI-4의 다른 원문 가설·스케줄 후보를 조사하고 가족 중복·관측·정리 조건을 명시한다.
+이어 WI-3 증상 검색 입력과 비공개 근거를 분리해 준비한다.
+
+후속 기록 (2026-10-17): 준비 20단계에서 WI-4 도달성·계약·가족·반복/판정 연결 공백을 점검했다.
+SCHEDULE-GAP-REVIEW.txt 및 schedule-gap-v1 참조. 기존 관측과 generic 판정을 정식 가족·
+상대 비율 평가·운영/독립 수용으로 승격하지 않았다. 다음은 PROGRESS.txt의 준비 21단계 WI-V1/WI-V2다.

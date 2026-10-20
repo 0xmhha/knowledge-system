@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/run-ticket-rpc-startup-recovery.py", line 45, in <module>
+    p=argparse.ArgumentParser();p.add_argument('--workspace',type=Path,required=True);a=p.parse_args();run(a.workspace.resolve())
+                                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/run-ticket-rpc-startup-recovery.py", line 18, in run
+    if r['exit_code']!=-15 or not r['timeout']or r['remaining_live_group_members']or(q/'events.jsonl').exists()or(q/'process/stdout').read_bytes()or(q/'process/stderr').read_bytes():raise ValueError('initial failed-before-entry population differs; do not retry silently')
+                                                                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: initial failed-before-entry population differs; do not retry silently

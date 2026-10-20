@@ -1,0 +1,1070 @@
+[
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-general-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "ORIGINAL-race-rpc-overlap",
+    "candidate": "ORIGINAL",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-general-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-A-race-rpc-overlap",
+    "candidate": "CAND-A",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-general-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "API-ENTRY",
+    "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+    "source_anchor_ids": [
+      "API-01",
+      "API-02",
+      "API-03",
+      "API-04",
+      "API-05",
+      "API-08",
+      "API-11"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "API-UNSUB",
+    "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+    "source_anchor_ids": [
+      "API-06",
+      "API-07",
+      "API-11"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "API-NEGATIVE",
+    "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+    "source_anchor_ids": [
+      "API-05",
+      "API-06"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-RETURN",
+    "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-ONCE",
+    "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-REMOVE",
+    "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "METHOD-ACK",
+    "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "NORMAL-DELIVERY",
+    "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-13"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "LATE-DRAIN",
+    "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+    "source_anchor_ids": [
+      "API-12"
+    ],
+    "label": "not_exercised_or_not_directly_instrumented",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "BLOCKED-DELIVERY",
+    "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "OWNED-CLEANUP",
+    "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+    "source_anchor_ids": [
+      "API-10",
+      "API-11",
+      "API-12"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  },
+  {
+    "slot_id": "CAND-B-race-rpc-overlap",
+    "candidate": "CAND-B",
+    "requirement": "SOURCE-BOUNDARY",
+    "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+    "source_anchor_ids": [
+      "API-09",
+      "API-10",
+      "API-11",
+      "API-12",
+      "API-13"
+    ],
+    "label": "bounded_runtime_route_with_remaining_scope",
+    "full_requirement_satisfied": false,
+    "independent_approved": false,
+    "remaining": "Finite source-coupled instrumented DEV only; transport gate ignores ordinary deadline while held and compiler counters/owned additions perturb scheduling. Exact runtime map membership/delete-before-ack and all post-ack channel use, full original5/12requirements, full host/real sync/indexer, sufficient independent repeats/gold and installed roles/finalHEAD remain unproved. No same-object Once/late-owner matrix or independent candidate selection in this route."
+  }
+]

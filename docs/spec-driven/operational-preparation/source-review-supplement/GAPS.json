@@ -1,0 +1,996 @@
+{
+  "status": "preparation_gap_inventory_not_acceptance",
+  "formal_completed": 0,
+  "formal_total": 9,
+  "reviewer_assignment": "user_confirmed_unassigned",
+  "items": [
+    {
+      "id": "WI-V1",
+      "preparation_candidate_count": 1,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "개발 티켓 1개/독립 승인 0개. 고정 project 5파일·API 근거 13곳으로 eth 등록→eth_subscribe([syncing])→Syncing→구독 등록/알림→RPC 해제·연결 종료→defer Unsubscribe 경로를 대조했다. RPC 해제 응답은 내부 삭제 확인/해제 반환 증명이 아니다. 기존 추출 50관측은 eventLoop/notifier 대역이며 실제 API 전체 실행은 0건. 같은 AI wait graph는 독립 도출 oracle가 아니다. 과거 ledger 통제 Go/CLI/guard 16oracle 실행 PASS는 보존하지만 이번 티켓·설치된 네 역할·독립 수용으로 세지 않는다. 정상/변이·rescue 전 결과·동시 호출·loop 수명/다른 subscriber 계약을 독립 동결해야 한다.",
+      "requirements": {
+        "independent_defect_tickets_min": 2,
+        "normal_controls": true,
+        "symptom_reintroduction_mutants": true,
+        "overfit_mutants": true,
+        "oracles": [
+          "primary",
+          "independently_derived"
+        ]
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "api_ticket_oracle_and_acceptable_set_gap_inventory_prepared_independent_acceptance_not_evaluated",
+      "remaining": [
+        "독립 검토자·최종 수용 담당자를 지정하고 결함 티켓 2개 이상/노출·중복·가족 독립성·DEV/FINAL·표본 충분성을 검토; 현재 개발 티켓 1개를 임의 승인/분리하지 않음",
+        "실제 eth_subscribe transport·등록/notifier·Syncing/eventLoop/해제·RPC 오류/연결 종료·done 등록·mux 종료·다른 subscriber 정지의 계약/도달성을 source pin과 실행 receipt로 확정",
+        "주 oracle와 독립 재도출 derivation/driver·정상 대조군·증상 재도입/과적합 변이를 실제 tier에 사전 동결; source/assertion/timeout/infra/missing과 rescue 전후·owned cleanup을 구분",
+        "baseline RED carrier·head GREEN·정상 GREEN·변이 감지·잘못된 oracle/assertion/build/timeout/tamper/stale/단계 누락 거부의 사례별 판정/분모와 F-01~F-08 동결",
+        "승인 범위에서 설치된 Analyzer→Planner→Implementer→Evaluator의 typed state/plan/report hash·최종 HEAD·재진입/거부 receipt와 독립 의미 검토·운영/품질/최종 수용 기록"
+      ],
+      "ticket_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/ticket-gap-v1/manifest.json",
+        "sha256": "9538f6698bbb5f4bd971687bb3b1ef73b474ee46cc7bd33759529975d51fae2c",
+        "status": "api_ticket_oracle_and_acceptable_set_gaps_not_acceptance"
+      }
+    },
+    {
+      "id": "WI-V2",
+      "preparation_candidate_count": 2,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "같은 개발 티켓의 AI 후보 CAND-A/B 2개가 로컬 기준 각 10/10을 충족했다. 두 방법의 drain/한 번 요청/확인 대기 설계를 원문과 대조했으나 실제 API receipt·적용 project tree·비교 성능/공정성 측정과 독립 acceptable membership는 모두 null이다. 원본=재도입 변이의 byte identity를 유지한다. 채택 consumer 9파일·계약 14곳에서 candidate materialize/driver/hard gate/Pareto/panel/current HEAD/상태 guard를 확인했다. 과거 ledger 후보 loop/copy/literal의 실제 Go·fixture/model panel 실행과 선택 성공은 보존하고 이번 후보 집합 승인으로 세지 않는다. 순수 함수 22건은 all-bad REJECTED/tie TIED/incomplete DEFERRED/invalid ERROR를 검증했으나 실제 selector CLI나 설치 host 실행이 아니다.",
+      "requirements": {
+        "shared_ticket_group": "WI-V1",
+        "candidates_per_ticket_min": 2,
+        "independent_acceptable_candidate_set": true
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "api_ticket_oracle_and_acceptable_set_gap_inventory_prepared_independent_acceptance_not_evaluated",
+      "remaining": [
+        "WI-V1의 독립 승인된 티켓 2개 이상을 공유하고 티켓별 실제 source 후보 2개 이상·origin/source/tree/diff와 RED carrier/후보별 변이를 동결",
+        "독립 검토자가 후보별 acceptable membership와 포함/제외/unknown 근거·요구사항/정상/actual API/정리 hard gates를 사전 동결; 미확정 set은 null이며 빈 승인 집합 또는 AI 통과 후보 집합으로 대체하지 않음",
+        "실행 metric/regression adapter·비교 axes/단위/방향/허용차·필수 측정과 WARN/SKIPPED 허용 범위·선택 규칙/분모를 동결; 후보 부적격과 증거 부족을 구분",
+        "all-bad→없음(REJECTED), 동률→TIED, 실행/측정/의견 부족→DEFERRED, ERROR의 수용 mapping과 사람 선택 수용·panel 출처/비용/불일치를 기록",
+        "승인 범위의 실제 후보 생성/selector CLI/panel/선택→적용 tree→current HEAD 최종 V1→설치된 네 역할 handoff/상태 guard를 검증하고 hard gates+독립 set membership·운영/품질/독립 수용 판정"
+      ],
+      "ticket_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/ticket-gap-v1/manifest.json",
+        "sha256": "9538f6698bbb5f4bd971687bb3b1ef73b474ee46cc7bd33759529975d51fae2c",
+        "status": "api_ticket_oracle_and_acceptable_set_gaps_not_acceptance"
+      }
+    },
+    {
+      "id": "WI-3",
+      "preparation_candidate_count": 20,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "공개 증상 카드 20개/증상 label 7종/운영 원문 20함수·17파일·8모듈, 기존 근거 40곳. 가족 제안 15개 중 2카드 그룹 5개이며 독립 가족 승인 0개. 현 그룹을 유지하면 제안 수로도 5개 부족하나 임의 분리 승인이 아니다. 190쌍에서 같은 그룹 5쌍/파일 3쌍. 과거 질문 42개와 840건 대조: literal/exact match 0, 기존 AI topic 표시 29건/16카드; 표시 없는 4개도 독립성 미검토. 선정 함수 표본과 14카드, 기존 공개 리뷰와 같은 파일로 4카드가 겹친다. 실제 파서 관측 40건+대조군 12건은 검색이 아니다. 과거 작은 실제 graph→MCP→consumer 및 HTTP 별칭 연결은 symbol/expand 모드; 후속 격리 host의 1개 호출은 ChainBench 목록 조회다. 이번 20개 text-only 검색·설치된 전체 분석 역할·독립 gold·recall 영수증은 없다. 현재 검색 구현과 채택 consumer 원문을 12곳 연결하고 가족 판정 질문 15개·top-10/매칭/분모의 미동결 기준을 기록했다.",
+      "requirements": {
+        "independent_fact_families_min": 20,
+        "symptom_types_min": 4,
+        "top_k": 10
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "family_exposure_gold_and_retrieval_gap_inventory_prepared_independent_acceptance_not_evaluated",
+      "remaining": [
+        "독립 검토자·최종 수용 담당자 지정 및 20카드/15가족 제안의 노출·중복·가족 독립성 검토; 독립 사실 가족 20개/증상 4종 이상 표본 충분성·DEV/FINAL 확정",
+        "가정 증상·정상 오류/정책·실제 결함을 구분하고 원인/관련 위치·exhaustive relevance labels와 제외/unknown 근거를 독립 작성",
+        "top-10의 평가 단계/순서·다중 round 합산·canonical 위치/project/commit/source hash 매칭·dedup과 case/family macro 집계·실패/partial/기권/zero denominator 정책 동결",
+        "baseline·F-01~F-08·입력/정답/limits·실행 범위 동결 및 대상 retained dataset/graph/vector/검색 embedder identity·snapshot 준비",
+        "승인 범위에서 20개 symptom-only→실제 MCP/검색/graph→설치된 분석 역할→typed artifact/handoff의 pin·alias·unknown·반복 상한 영수증 수집",
+        "원래 분모/coverage를 보존하여 독립 정답으로 macro recall@10>=0.80 제안을 평가하고 운영·품질·독립 수용 판정"
+      ],
+      "symptom_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/symptom-gap-v1/manifest.json",
+        "sha256": "016687973ddfa1083b20ab05ae3ba93c1c278b6622f030f6c340ebfc877eeca7",
+        "status": "symptom_family_exposure_gold_and_retrieval_gaps_not_acceptance"
+      }
+    },
+    {
+      "id": "WI-4",
+      "preparation_candidate_count": 5,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "원문 가설 5개/상관된 스케줄 21개, 독립 가족 승인 0개. 기존 17근거에 진입 문맥 5곳을 추가 대조했다. SCHED-001 구독 추출 관측 50건과 SCHED-002 UDP 합성 deadline/타이머 요청 기록 20건은 운영 반복이 아니다. SCHED-003 Origin 선택은 실제 Anzeon 설정 확인이 필요하고 SCHED-004 cache 의미/재시도·SCHED-005 실제 subscriber lock 순서는 계약/도달성 미확정이다. 과거 Go RPC 대역 비교는 arm별 60회이며 현재 5가설을 검증하지 않았다. 모드9 과거 계획 창은 각 2초로 AWAITING_OBSERVATION/RECURRED 및 ANALYSIS 재진입을 검증한 범위다. 채택 ChainBench/consumer 원문 6파일을 Git/채택 SHA로 대조하고 실행 계약 11곳을 연결했다. 일반 엔진의 최소 추론 30회·수정 후 단측 절대 Clopper-Pearson 상한 판정과 WI-4의 100회·baseline 대비 0.50 비율·가족 bootstrap 제안은 별도이며 연결 미동결이다. 현재 5가족의 독립 오라클·600초 관찰·실제 운영 반복·timing neutrality는 미확보다.",
+      "requirements": {
+        "independent_seed_schedule_families_min": 5,
+        "planned_runs_per_arm_min": 100,
+        "baseline_symptom_events_min": 10
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "reachability_contract_family_and_sampling_gap_inventory_prepared_no_independent_acceptance",
+      "remaining": [
+        "독립 검토자·최종 수용 담당자 지정 및 가설 5개의 원인/스케줄 가족 독립성·표본 충분성·DEV/FINAL 동결",
+        "대상 chain config·RPC 종료·deadline 유입·peer 송신/캐시·reorg subscriber/buffer의 실제 도달성 및 정상/비정상 허용 계약을 입증",
+        "독립 primary/derived 오라클·증상/정상 assertion·before/fix revision/binary/driver/environment·주입 지점/시간·같은 schedule 및 arm 순서 동결",
+        "arm별 계획 100회 이상·유효 반복/오류/취소/미실행/재시도 분모·baseline 증상 10건 이상과 zero/insufficient baseline=inconclusive 정책 동결",
+        "600초 관찰과 trial/조사 전체 시간의 연결·무재발 적용 범위·재발/변조/오류/취소/cleanup/분석 재진입 영수증 확보",
+        "일반 엔진 절대 상한과 WI-4 상대 비율<=0.50·paired family bootstrap/undefined 처리를 연결할 별도 평가 기준·매칭·범위 확정",
+        "로깅 timing 효과/불확실성을 평가하고 owned-node 소유권·외부 노드 비정지·실제 설치 역할/host 경로를 승인 범위에서 검증한 뒤 운영·품질·독립 수용 판정"
+      ],
+      "schedule_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/schedule-gap-v1/manifest.json",
+        "sha256": "20b1dc0a526e1140c01e9be3fbf2db53cb84520eec5017c8e506ac2f3a7e95fa",
+        "status": "schedule_reachability_contract_family_and_sampling_gaps_not_acceptance"
+      }
+    },
+    {
+      "id": "WI-1",
+      "preparation_candidate_count": 40,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "기존 함수 후보 40개를 본문 로컬 범위로 재집계: 운영 39개/개발 스트레스 원문 전용 1개. 운영 후보의 실제 로컬 shadow 16개·선언과 재대입 35개·루프 37개·분기/return 각 39개. 독립 승인·완전한 edge gold·의존성 backend 평가는 미수행. 추가로 운영 함수 4개에 source occurrence 241개·syntax marker 62개를 관측하고 비완전 관계 19건·제외 7건·이동 경계 14건의 비공개 검토 초안을 작성. 타입 진단을 보존한 부분 검사이며 backend/CFG/postdominator 평가는 미수행. 운영 30개/8모듈의 검토 표본 제안과 예비 9개·개발전용 제외 1개를 분리. 선정 표본은 선언+재대입 27/분기 30/루프 29/shadow 14/return 30. 전체 741쌍(선정 435쌍)·기존 질문 비교 1638건(선정 1260건)을 메타데이터/기존 AI 표시로 작성했으나 의미적 독립성은 전부 미검토. 선정 30개/25개 파일의 관측을 완료: 기존 4개 원자료 불변, 추가 26개 수집. 원시 occurrence 1725개 중 본문 선언 대조 1721개·콜백 함수형 signature 영역 4개 격리, syntax marker 409개. 독립 정답·CFG·품질 점수·수용은 미작성/미실행. 선정 30개를 원문으로 의미 점검하여 비공개 질문 30개·구현/매칭 질문 14개를 작성했다. 대응한 로컬 occurrence 1721개/변수 선언 412개의 값 종류·완전한 정의 집합은 미확정이고 callback signature 4개는 격리 유지. 기존 dependency 관계 초안 4함수와 statement anchor 3함수는 1함수가 겹쳐 합집합 6함수이며, 24함수에는 기존 관계 자료가 없다. 모든 30함수의 완전한 data/control gold·정확한 매칭은 미작성/미동결. range 22함수·제외 closure 9함수·select 표기 6함수·panic 구문 2함수·결과 없는 return 표기 8함수의 경계는 런타임/후지배 증명이 아니다. bare return 주석의 선언 좌표 설명과 구현의 return 문 좌표 전달 불일치를 기록했고 코드 변경·정답 동결은 하지 않았다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다. 준비33/T09에서 별도 A/B 프로젝트의 canonical·지원 commit/source/snapshot pin 및 동결된 전달을 실제 host/MCP/CKS/CLI/hook으로 검증했다. 같은 파일/함수의 node ID 충돌은 정상 local-ID 대조군으로 분리하며 ID 단독 전역 프로젝트 식별·tenant ACL을 주장하지 않는다. 초기 빈 발견·node no-op 허용·ticket stale-read를 보존하고 최종 CLI8/Write hook9거부·복구/정상A완료를 확인. 준비19/22, 정식 의미/품질·온톨로지 효과 미평가.",
+      "requirements": {
+        "independent_functions_min": 30,
+        "constructs": [
+          "declaration_redefinition",
+          "branch",
+          "loop",
+          "shadow",
+          "return"
+        ],
+        "functions_per_construct_min": 4,
+        "gold_semantics": "structural_lexical_may_reach_not_path_feasibility"
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "thirty_source_semantic_gap_questions_prepared_complete_independent_gold_and_matching_not_frozen",
+      "remaining": [
+        "독립 검토자·최종 수용 담당자를 지정하고 노출된 함수 30개의 가족 독립성·표본 충분성·DEV/FINAL 및 구문별 최소 4개를 검토·동결",
+        "412개 로컬 선언/1721개 occurrence의 독립 value kind·role·scope 검토; callback signature 4개·range/closure/메모리·호출 영역의 제외/unknown 기준 확정",
+        "기존 4함수의 비완전 관계 19건과 legacy statement anchor 3함수를 재검토하며 30함수 모두 지원 범위 내 완전한 data 정의 집합·normal-exit control gold 작성",
+        "bare/named/synthetic return의 선언/occurrence/node 좌표를 독립 대조하고 주석/구현 불일치를 해소; 후속 소스 변경 시 원자료는 버전별 보존",
+        "canonical source/occurrence/node/edge key·kind/certainty·control condition·dedup/ambiguity와 unsupported/partial/truncated/비정상·비종료 분모 정책 동결",
+        "baseline·matching·limits·입력/정답·F-01~F-08 동결 후 실제 backend/MCP 경로와 data/control precision·recall 및 독립 수용 판정"
+      ],
+      "lexical_coverage_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/lexical-coverage-v1/manifest.json",
+        "production_candidates": 39,
+        "development_stress_source_only": 1,
+        "production_local_shadow_functions": 16,
+        "production_declaration_and_reassignment_functions": 35,
+        "approved_independent_functions": 0,
+        "source_replay_verified": true,
+        "go_types_development_controls": 22,
+        "normal_race_control_observations": 44
+      },
+      "dependency_source_review": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/dependency-review-v1/manifest.json",
+        "private_function_reviews": 4,
+        "data_proposals": 19,
+        "exclusion_proposals": 7,
+        "exit_owner_markers": 14,
+        "exhaustive_gold_records": 0,
+        "dependency_backend_runs": 0,
+        "project_typecheck_passed": false
+      },
+      "function_sample_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/function-sample-v1/manifest.json",
+        "selected_function_proposals": 30,
+        "reserve_function_proposals": 9,
+        "modules": 8,
+        "selected_source_files": 25,
+        "same_file_pairs_selected": 6,
+        "shared_ai_group_pairs_selected": 2,
+        "independent_functions_approved": 0,
+        "at_sample_creation_without_new_location_review": 26
+      },
+      "selected_location_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/sample-locations-v1/manifest.json",
+        "observed_selected_functions": 30,
+        "new_function_captures": 26,
+        "existing_four_functions_unchanged": true,
+        "corroborated_own_function_occurrences": 1721,
+        "quarantined_signature_occurrences": 4,
+        "syntax_markers": 409,
+        "functions_with_range_bindings": 22,
+        "excluded_closures": 14,
+        "independent_gold_records": 0,
+        "manual_relation_proposals_still_limited_to_functions": 4
+      },
+      "semantic_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/semantic-gap-v1/manifest.json",
+        "sha256": "bcd8b7d5fcf805be5a73e5529ac8130903cdc5fbf1f33ffbb6da93af8d851fee",
+        "status": "thirty_function_semantic_gaps_not_complete_gold_or_acceptance"
+      },
+      "consumer_contract_plan": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
+        "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
+        "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+      },
+      "consumer_local_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+        "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+        "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
+      },
+      "consumer_stdio_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1/manifest.json",
+        "sha256": "5b0e491f8cfcd5c0fbf37e5f5dda37c2a7cb939e9b497042a36d463e88a7b1ad",
+        "status": "P05_owned_stdio_not_actual_role_or_formal_acceptance"
+      },
+      "consumer_role_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
+        "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
+        "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
+      },
+      "consumer_foreign_pin": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+        "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+        "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
+      }
+    },
+    {
+      "id": "WI-2",
+      "preparation_candidate_count": 40,
+      "count_semantics": "exposed_controlled_source_drafts_not_project_or_independent_units",
+      "note": "통제 입력 40개/규칙별 AI 양성·음성 제안 각 10개와 로컬 80관측은 독립 gold가 아니다. 780쌍·기존 개발 fixture 23개와 920건 대조(정확 일치 0건)도 fresh/독립성 승인이 아니다. 프로젝트 68호출/51함수·34파일의 명령 후보 2개/빈 관측 65개/closure 제외 1개를 별도로 유지. 호출자 14개/5함수·AI 문맥 5개/11근거와 annotation query 12개를 양성/음성 분모에 합치지 않는다. 규칙별 독립 양성/음성 0개, 실제 command/PATH/archive/cachedir/인자 신뢰·공격자 제어·도달성 미확인. 현재 구현/채택 consumer 계약 14곳 대조: 공유 CKG/CKS engine·strict input/상한·optional expected pins·metadata parity 확인. ROLE-RULE-TOOL-01은 Analyzer 본문/schema에 rule_candidates가 있지만 explicit tools 목록에 없음을 기록; 실제 host 권한/거부는 미판정. 과거 실제 CKG 58/CKS 9요청·23compiled fixture·5함수 parity 성공을 보존하며 당시 review-condition TP10/TN7/FP2/FN4·recall10/14를 이번 독립 후보 품질 점수로 전용하지 않음. 이번 프로젝트 retained graph/MCP/설치 역할 실행·독립 gold/matching·분모·품질 수용은 미확보다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다. 준비32/T04에서 명시적 버전 pack/함수 선택, 일반 모드 자동 규칙 없음, 규칙 응답의 값/제어 분석 재사용과 검증/전달3회 추가CKS0·다섯 산출물 hash 유지를 실제 로컬 scripted host로 확인했다. 의도적 중복은 host/native에서 허용되며 시험 adapter가 기록 중복을 거부한 범위다. 준비18/22; 모델 자율 준수·서버 캐시/중복 차단·독립 의미 정답/품질/온톨로지 효과 수용은 미평가다. 준비33/T09에서 별도 A/B 프로젝트의 canonical·지원 commit/source/snapshot pin 및 동결된 전달을 실제 host/MCP/CKS/CLI/hook으로 검증했다. 같은 파일/함수의 node ID 충돌은 정상 local-ID 대조군으로 분리하며 ID 단독 전역 프로젝트 식별·tenant ACL을 주장하지 않는다. 초기 빈 발견·node no-op 허용·ticket stale-read를 보존하고 최종 CLI8/Write hook9거부·복구/정상A완료를 확인. 준비19/22, 정식 의미/품질·온톨로지 효과 미평가. 준비34/T10에서 실제 unsupported/잘린 분석/불완전 규칙/소유 requires_reindex 응답4종과 로컬 placeholder/unknown 변이6종을 분리해 CLI10/Write hook10거부·원본복구를 검증했다. 비잘림·matched rules를 가진 Seed/빈후보Field partial2건은 5unknown절·capability/diagnostics/한계를 유지해 실제 전달. 준비20/22이며 빈 후보/partial/unknown은 안전·누락0·독립 의미/품질·온톨로지 효과 수용이 아님. 준비35/T16에서 실제 소유 stdio의 missing/ambiguous/requires_reindex/provider 비서비스·hard transport timeout·startup EOF를 관측하고 평가7도구+진단1/전체8시나리오 분모를 보존했다. 지원partial2와 비사용6, timeout 뒤 late1/별도 recovery 및 CKS exit0/reap4·startup exit1/reap1을 구분. provider 연결 timeout과 manifest/alignment 복합 조건이 함께 존재한다. 준비21/22이며 actual host timeout·독립 품질/온톨로지 효과/정식 수용 증명이 아니다. 준비36/P08/T22에서 현재 전후 설정/운영metadata·원본/후보 서명clean5checkout·소스/바이너리/remote refs 유지와 새 소유fixture 복구·실제CKS1조회·exit0/reap/socket close를 확인. 이전35동결 패킷/로컬commit·현재PID161부재를 보존하며 초기 종료 영수증 미확인1건은 유지했다. 격리22/22/P01~P08 완료이나 후보 채택·운영 설치·과거 전역 기준선·독립 gold/품질/온톨로지 효과 수용은 별도 미완료다.",
+      "requirements": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "rule_sample_gold_command_and_mcp_gap_inventory_prepared_independent_acceptance_not_evaluated",
+      "remaining": [
+        "독립 검토자·최종 수용 담당자 지정. 규칙별 신규 독립 양성/음성 각 10개 이상·sanitizer/branch/shadow/external target·노출/가족/DEV-FINAL 및 프로젝트 양성 충분성 검토; controlled/project/caller/manual 분모 분리",
+        "지원 syntax candidate와 review condition/취약점 판정을 분리한 완전한 독립 gold 및 포함/제외/unknown 근거 작성. 빈 후보/partial/matched_bounded/미지원·closure 제외를 안전 음성으로 간주하지 않음",
+        "실제 명령 이름/호출자 binding·PATH/다운로드/archive/checksum/cachedir 신뢰·후속 인자·DryRunFlag/CI build/dispatch·외부 도달성/권한·실행/정리 계약 검토",
+        "pack/version/digest/engine·project/commit/file/function/source/snapshot pin·source/sink 좌표/규칙·witness/조건·dedup/case-family 집계·미지원/오류/상한/기권 분모 및 baseline 동결",
+        "ROLE-RULE-TOOL-01의 Analyzer 본문/explicit tools 목록 차이 해소와 실제 유효 권한/등록 alias 확인; consumer 변경 채택 및 설치 역할의 직접 MCP 호출/typed 결과/handoff 영수증 검증 필요",
+        "승인된 retained project dataset→CKG/CKS public client→실제 MCP/SDK/설치 역할 경로에서 pins·schema·manual/automatic 분리·stale/private/limit 거부를 검증하고 rule별/전체 혼동행렬·precision/recall>=0.80 제안 및 운영/품질/독립 수용 판정"
+      ],
+      "rule_coverage_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-coverage-v1/manifest.json",
+        "sha256": "79142e1a247500ed4a30b22c846d994438e6438057bb079d43d7cb1d8a75a294",
+        "status": "rule_source_proposals_not_detection_gold_or_acceptance"
+      },
+      "controlled_rule_observations": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-observations-v1/manifest.json",
+        "sha256": "8e3e93ba9b208b9d6d482bcfe750ba0a91eb06384e95c1cf6144bf301320dffb",
+        "status": "controlled_analyzer_only_not_independent_quality_or_project_effect"
+      },
+      "project_rule_source_review": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/project-rule-review-v1/manifest.json",
+        "sha256": "bab1912a639ce00156fc690afdeb2337c5125a6b213319e8841328ffbb169901",
+        "status": "project_local_source_observations_not_independent_quality_or_runtime"
+      },
+      "rule_caller_context": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-caller-context-v1/manifest.json",
+        "sha256": "8eeabdff6f6721ae831944d340d9322f5f4599a9d52208b78cf4a7aa254596a6",
+        "status": "caller_syntax_and_ai_context_not_runtime_or_independent_gold"
+      },
+      "rule_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/rule-gap-v1/manifest.json",
+        "sha256": "50247302a2d3b743a300a63a641b9eaf61a8aa5ddf243c041804c91504bb90bf",
+        "status": "rule_sample_gold_command_and_mcp_gaps_not_acceptance"
+      },
+      "consumer_contract_plan": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
+        "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
+        "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+      },
+      "consumer_local_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+        "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+        "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
+      },
+      "consumer_stdio_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1/manifest.json",
+        "sha256": "5b0e491f8cfcd5c0fbf37e5f5dda37c2a7cb939e9b497042a36d463e88a7b1ad",
+        "status": "P05_owned_stdio_not_actual_role_or_formal_acceptance"
+      },
+      "consumer_role_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
+        "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
+        "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
+      },
+      "consumer_opt_in": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1/manifest.json",
+        "sha256": "c221e36f9eff1dde30207b53b8188c52d9d386f8c895bfb2ac2a682134c4f3bc",
+        "status": "T04_isolated_workflow_pass_plan18_of22_not_adopted_or_accepted"
+      },
+      "consumer_foreign_pin": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+        "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+        "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
+      },
+      "consumer_partial": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-partial-v1/manifest.json",
+        "sha256": "84aafe156cd88be8251f48f8d6c6031e1b148f99ed4239d54c0ea9e614f45fd7",
+        "status": "T10_supported_partial_pass_plan20_of22_not_adopted_or_accepted"
+      },
+      "consumer_errors": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1/manifest.json",
+        "sha256": "5519439540cfa214646aea61473b1bb26fff9919f77d1838c2d0a9db70fd9e72",
+        "status": "T16_owned_errors_pass_plan21_of22_not_adopted_or_accepted"
+      },
+      "consumer_final": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/manifest.json",
+        "sha256": "6776de8233d694ece37ca4d04363fe7d15ec345a152e8d3ca2fb209970c47ece",
+        "status": "P08_T22_isolated_plan22_of22_not_adopted_or_accepted"
+      }
+    },
+    {
+      "id": "WI-C",
+      "preparation_candidate_count": 10,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "기존10후보/8모듈/9파일·45AI anchor·같은 사례5문맥19곳을 유지하고15계약 anchor·채택 consumer16파일을 Git/채택SHA와 대조했다. 45쌍 중 같은 모듈2쌍/같은 파일1쌍이며 독립성·노출/DEV-FINAL 미승인이다. 사례별 필수 항목 질문20개와 조건부 영향/우선순위 검토 초안은 gold가 아니다. 6절/criteria/priority enum의 형식 검증은 필수 항목 완전성·의미/우선순위 정답을 검증하지 않는다. structural review는 identity-only/unpinned이며 CFG는 runtime trace·모듈그림은 interprocedural graph가 아니다. Analyzer와 Planner의 review_function/rule_candidates explicit alias4항목이 없고 실제 유효권한/거부 미검증. Planner 옛 Markdown/severity4종/cap30·PLANNING완료 지시는 typed3종/cap32·보고서/그림 정확 재생성·report hash 계약과 충돌한다. 현재 native 일반/race 각7개·consumer 원래15테스트/추가12로컬 계약 점검 통과. 과거 실제CKS5요청/16checks·typed/diagram/hash/hook/CLI 성과는 유지하되 현재10프로젝트 리뷰/설치 역할/독립수용으로 세지 않는다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다. 준비31단계 P07에서 동일 typed 그림4개를 SVG/PNG8개로 실제 로컬 렌더링하고 잘못된 문법1개를 거부했다. 초기 SIGINT 관측기 재진입/CKS 종료 미확인을 보존하고 신호 안전 시험 관측기로 실제5종 host 종료 및6 CKS exit0/회수를 재검증했다. 준비17/22이며 독립10사례 품질·의미/온톨로지 효과 수용과 in-flight CKS 취소·직접 신호 처리는 미검증이다. 준비32/T04에서 명시적 버전 pack/함수 선택, 일반 모드 자동 규칙 없음, 규칙 응답의 값/제어 분석 재사용과 검증/전달3회 추가CKS0·다섯 산출물 hash 유지를 실제 로컬 scripted host로 확인했다. 의도적 중복은 host/native에서 허용되며 시험 adapter가 기록 중복을 거부한 범위다. 준비18/22; 모델 자율 준수·서버 캐시/중복 차단·독립 의미 정답/품질/온톨로지 효과 수용은 미평가다. 준비33/T09에서 별도 A/B 프로젝트의 canonical·지원 commit/source/snapshot pin 및 동결된 전달을 실제 host/MCP/CKS/CLI/hook으로 검증했다. 같은 파일/함수의 node ID 충돌은 정상 local-ID 대조군으로 분리하며 ID 단독 전역 프로젝트 식별·tenant ACL을 주장하지 않는다. 초기 빈 발견·node no-op 허용·ticket stale-read를 보존하고 최종 CLI8/Write hook9거부·복구/정상A완료를 확인. 준비19/22, 정식 의미/품질·온톨로지 효과 미평가. 준비34/T10에서 실제 unsupported/잘린 분석/불완전 규칙/소유 requires_reindex 응답4종과 로컬 placeholder/unknown 변이6종을 분리해 CLI10/Write hook10거부·원본복구를 검증했다. 비잘림·matched rules를 가진 Seed/빈후보Field partial2건은 5unknown절·capability/diagnostics/한계를 유지해 실제 전달. 준비20/22이며 빈 후보/partial/unknown은 안전·누락0·독립 의미/품질·온톨로지 효과 수용이 아님. 준비35/T16에서 실제 소유 stdio의 missing/ambiguous/requires_reindex/provider 비서비스·hard transport timeout·startup EOF를 관측하고 평가7도구+진단1/전체8시나리오 분모를 보존했다. 지원partial2와 비사용6, timeout 뒤 late1/별도 recovery 및 CKS exit0/reap4·startup exit1/reap1을 구분. provider 연결 timeout과 manifest/alignment 복합 조건이 함께 존재한다. 준비21/22이며 actual host timeout·독립 품질/온톨로지 효과/정식 수용 증명이 아니다. 준비36/P08/T22에서 현재 전후 설정/운영metadata·원본/후보 서명clean5checkout·소스/바이너리/remote refs 유지와 새 소유fixture 복구·실제CKS1조회·exit0/reap/socket close를 확인. 이전35동결 패킷/로컬commit·현재PID161부재를 보존하며 초기 종료 영수증 미확인1건은 유지했다. 격리22/22/P01~P08 완료이나 후보 채택·운영 설치·과거 전역 기준선·독립 gold/품질/온톨로지 효과 수용은 별도 미완료다.",
+      "requirements": {
+        "independent_review_cases_min": 10,
+        "modules_min": 5,
+        "rubric": [
+          "state_guard",
+          "resources_cost",
+          "priority"
+        ]
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "review_contract_rubric_artifact_handoff_and_role_gap_inventory_prepared_independent_acceptance_not_evaluated",
+      "remaining": [
+        "독립 검토자·최종 수용 담당자 지정, 신규10review/5module 이상·노출/같은문맥/가족/DEV-FINAL·표본 충분성 검토",
+        "각 source/caller/요구 계약과 상태/guard·복잡도/자원/I/O·priority/tradeoff 필수 항목 전체 ID·근거·unknown 허용·독립 gold 작성; 6절/AI anchor 수를 완전성으로 세지 않음",
+        "도달성·실패 영향·소유권·호환성·실측 비용과 조건부 제안을 대조해 priority gold/수용가능한 다른 판정·matching/omission 분모·기권/빈 gold/partial/오류 기준 동결",
+        "Planner 기존 report 절의 severity/cap/직접 Markdown/전달 hash 불일치를 structured-review 계약과 정렬하고 Analyzer/Planner 실제 도구 노출·권한과 hook/CLI 경로를 격리 검증",
+        "project/commit/canonical function·source span/blob/snapshot·두 MCP 응답/pack/version/limits·structural unpinned 한계를 고정하고 실제 retained graph→CKS→설치 역할 receipt 확보",
+        "독립10사례별 typed JSON/evidence/Markdown·CFG/모듈 그림의 계산/추론/unknown·rendering/표현 범위·ANALYSIS/PLANNING hash/handoff와 변조/우회 차단 영수증 검증",
+        "F-01~F-08·baseline/입력/gold/매칭/표본/실행 범위 동결 후 필수 항목 누락0·산출물/source/state100% 제안과 운영·품질·독립 수용을 별도 판정"
+      ],
+      "review_coverage_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/review-coverage-v1/manifest.json",
+        "sha256": "e7efea1c8d661c2240b6fdb81d1d488fe063b0c82b6cd9af4544d7bf02372c90",
+        "status": "review_material_mapping_not_independent_rubric_or_acceptance"
+      },
+      "review_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/review-gap-v1/manifest.json",
+        "sha256": "c3d677e0d31f88b4509a69116d6cfee018ff8a7063948849275e4fd527218942",
+        "status": "review_contract_rubric_artifact_handoff_and_role_gaps_not_acceptance"
+      },
+      "consumer_contract_plan": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
+        "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
+        "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+      },
+      "consumer_local_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+        "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+        "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
+      },
+      "consumer_stdio_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1/manifest.json",
+        "sha256": "5b0e491f8cfcd5c0fbf37e5f5dda37c2a7cb939e9b497042a36d463e88a7b1ad",
+        "status": "P05_owned_stdio_not_actual_role_or_formal_acceptance"
+      },
+      "consumer_role_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
+        "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
+        "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
+      },
+      "consumer_render_lifecycle": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-render-lifecycle-v1/manifest.json",
+        "sha256": "c96b20f550910bd42a785227ebebc3e5edfe7e59031c6b7fefe33a81d36c8452",
+        "status": "P07_render_lifecycle_pass_plan17_of22_not_adopted_or_accepted"
+      },
+      "consumer_opt_in": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1/manifest.json",
+        "sha256": "c221e36f9eff1dde30207b53b8188c52d9d386f8c895bfb2ac2a682134c4f3bc",
+        "status": "T04_isolated_workflow_pass_plan18_of22_not_adopted_or_accepted"
+      },
+      "consumer_foreign_pin": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+        "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+        "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
+      },
+      "consumer_partial": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-partial-v1/manifest.json",
+        "sha256": "84aafe156cd88be8251f48f8d6c6031e1b148f99ed4239d54c0ea9e614f45fd7",
+        "status": "T10_supported_partial_pass_plan20_of22_not_adopted_or_accepted"
+      },
+      "consumer_errors": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1/manifest.json",
+        "sha256": "5519439540cfa214646aea61473b1bb26fff9919f77d1838c2d0a9db70fd9e72",
+        "status": "T16_owned_errors_pass_plan21_of22_not_adopted_or_accepted"
+      },
+      "consumer_final": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/manifest.json",
+        "sha256": "6776de8233d694ece37ca4d04363fe7d15ec345a152e8d3ca2fb209970c47ece",
+        "status": "P08_T22_isolated_plan22_of22_not_adopted_or_accepted"
+      }
+    },
+    {
+      "id": "WI-6",
+      "preparation_candidate_count": 20,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "공개 입력 20개=운영 seed 제안 19개+개발 stress 1개·의도 label 4종, 고정 원문 14파일/기존 AI 근거 40곳. 운영 제안 수로도 최소20개에 1개 부족하며 독립 가족/관련성 gold/실제 프로젝트 paired receipt/warm 영수증은 0개. 190쌍 중 같은 파일7/의도41쌍, 기존 노출 WI-1 표본과 16seed 중복이며 다른 label도 독립으로 승인하지 않는다. 기본은 정확한 함수 지역 분석, 확장은 outgoing calls/invokes를 통한 함수 문맥이며 intent/prompt 검색 필드·caller 확장·computed argument/return transfer가 없다. 현재/채택 source 계약12곳·consumer2파일 Git/채택 SHA·두 도구 metadata input parity를 대조했다. Analyzer explicit tools에는 기본/확장 도구가 없으며 실제 유효 권한/거부·의도→쌍 호출 정책/handoff는 미검증. gold·매칭·seed 포함·같은 snapshot/local caps와 추가 aggregate budget·arm order·partial/unknown/empty/error 분모·warm/반복/p95/ratio 정의가 null이다. 과거 실제 6함수 fixture의 CKG7/CKS13요청·단일seed 쌍/기본1/4→확장4/4·noise1/5·상한/순환/불변 검증은 보존한다. 선언 fixture labels에 따른 recall delta .75/noise delta .20과 서버 단일1431/2875µs는 이번 독립 품질/warm p95 수용이 아니다. curated metadata는 separate_not_joined/not_verified다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다. 준비33/T09에서 별도 A/B 프로젝트의 canonical·지원 commit/source/snapshot pin 및 동결된 전달을 실제 host/MCP/CKS/CLI/hook으로 검증했다. 같은 파일/함수의 node ID 충돌은 정상 local-ID 대조군으로 분리하며 ID 단독 전역 프로젝트 식별·tenant ACL을 주장하지 않는다. 초기 빈 발견·node no-op 허용·ticket stale-read를 보존하고 최종 CLI8/Write hook9거부·복구/정상A완료를 확인. 준비19/22, 정식 의미/품질·온톨로지 효과 미평가.",
+      "requirements": {
+        "independent_intent_seed_families_min": 20,
+        "intent_types_min": 4,
+        "paired_arms": [
+          "context.value_dependencies",
+          "context.value_dependency_expansion"
+        ]
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "expansion_family_pair_gold_path_and_warm_gap_inventory_prepared_independent_acceptance_not_evaluated",
+      "remaining": [
+        "독립 검토자·최종 수용 담당자 지정, 운영 독립 intent/seed 가족20개 이상·의도4종 및 노출/중복·가족·표본 충분성·DEV/FINAL 검토; stress를 운영 분모에 넣지 않고 현재 운영 제안19개 부족 보완",
+        "의도별 완전한 관련/비관련/unknown 함수·근거 gold와 seed 포함/도달 가능한 universe 판정. outgoing call 문맥과 caller 요구·computed value transfer·curated/ontology dataset join의 지원 범위를 구분",
+        "project/commit/snapshot/function canonical identity·source/blob hash·source 위치 매칭, 고유 함수/analysis null/wrapper/hop/curated 단위·cycle/dedup/partial/중단·기권/실패/빈 gold·빈 반환의 분모 및 family macro 지표 동결",
+        "같은 retained seed/snapshot/local limits, 각 arm aggregate caps·전체 예산·버전/backend·실제 요청·순서/취소/retry/재색인 정책과 기본선 동결",
+        "소비자 기본/확장 도구의 explicit Analyzer 노출·실제 유효 권한·의도→호출 정책을 확정하고 retained project graph→CKS public client/MCP→설치 역할/typed handoff의 paired receipt 검증",
+        "warm 정의/초기 제외·반복 최소치·session/cache/환경·측정 clock/범위·arm order·p95 quantile/ratio와 family 집계·오류/상한/누락/0지연 분모 동결 후 반복 원자료 수집",
+        "F-01~F-08·입력/gold/매칭/표본/실행 범위를 동결하고 승인 범위에서 macro recall delta>=.10, noise delta<=.10, warm p95 ratio<=2.0 제안 및 운영/품질/독립 수용 판정"
+      ],
+      "expansion_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/expansion-gap-v1/manifest.json",
+        "sha256": "cd8bd64a7876f4a3cffb3d5ea5039bb7957348678d4a0178f31d3072ef2b4a0b",
+        "status": "expansion_family_pair_gold_path_and_warm_gaps_not_acceptance"
+      },
+      "consumer_contract_plan": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
+        "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
+        "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+      },
+      "consumer_local_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+        "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+        "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
+      },
+      "consumer_stdio_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1/manifest.json",
+        "sha256": "5b0e491f8cfcd5c0fbf37e5f5dda37c2a7cb939e9b497042a36d463e88a7b1ad",
+        "status": "P05_owned_stdio_not_actual_role_or_formal_acceptance"
+      },
+      "consumer_role_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
+        "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
+        "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
+      },
+      "consumer_foreign_pin": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+        "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+        "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
+      }
+    },
+    {
+      "id": "WI-SP",
+      "preparation_candidate_count": 12,
+      "count_semantics": "drafts_only_not_independent_units",
+      "note": "12개 source symbol 제안(정책4/보안AI초안4/직접policy참조없음4), 고정 Go5파일·66쌍 중 같은 파일11쌍, 독립 symbol/gold 승인0개. source 재생성 완료 자료의42policy/146edges 중 선정 정책4symbol의5관계를 대조했으나 이 projection은 policy-only이며 보안 태그 부재/전체12응답/독립정답 증명이 아니다. 보안4개는 미승인 수동AI overlay proposal이고 미태그4개는 선택 overlay 상대 범위다. 현재/채택 source 계약14곳·project5/consumer2파일 Git/채택SHA·consumer input metadata 정합 대조. Analyzer explicit tools에 policy_security alias가 없으며 실제 유효권한/거부·설치 역할/handoff는 미검증. YAML row/hash/version/reviewer/time/approval unknown과 graph metadata/Go commit을 구분하고 legacy hint/severity를 추측하지 않는다. 직접 peer RemoteAddr/CIDR ACL은 reviewer 인증·project/symbol 권한과 별개다. 현재 native 일반/race 각상위12+ACL세부12 통과; httptest/fake backend이지 deployed listener/현재12심볼 수용이 아니다. 과거 실제 stdio fixture18요청·typed/manual/automatic/empty/not-found/stale/상한/원문삭제 성과, 최신source-aware 재생성 수정완료·ontology미평가/production비활성 상태 보존. 정식gold/매칭/거부분모/HTTP·proxy/설치 소비자 receipt는 미확보다. P05 준비28단계에서 소유 fixture/index의 실제 CKS stdio5도구·pin/상한/오류 경로를 관측했다. 주4세션56요청+진단5세션57요청 보존. 실제 프로젝트 독립 gold/실제 역할·운영 설치·품질 수용으로 세지 않으며 P06~P08은 미완료. 준비29단계 실제 역할에서 요구7쌍 중5쌍 성공. host가 최상위 oneOf의 value_dependencies/policy_security를 제외하므로 P06 및 T05/T19/T20은 완료가 아니다. 두 세대 typed 전달·실제 hash/Write/Edit/shell 거부는 검증했으나 문안은 로컬 scripted adapter이며 독립 정답·품질/온톨로지 효과 수용은 미평가. 새 스키마 호환 후보와7쌍 재검증이 선행한다. 준비30단계에서 별도 CKS/소비자 호환 후보의 실제 역할7/7쌍·같은 snapshot 기본/규칙/확장·정책/미태그/상한/오류·전달/거부를 재검증했다. P06 격리 시험은 완료, 전체15/22 및 P07/남은 통합4사례/P08은 미완료다. 현재 코드/원본 소비자 채택과 실제 프로젝트 의미 gold·품질·온톨로지 효과 수용으로 세지 않는다. 준비33/T09에서 별도 A/B 프로젝트의 canonical·지원 commit/source/snapshot pin 및 동결된 전달을 실제 host/MCP/CKS/CLI/hook으로 검증했다. 같은 파일/함수의 node ID 충돌은 정상 local-ID 대조군으로 분리하며 ID 단독 전역 프로젝트 식별·tenant ACL을 주장하지 않는다. 초기 빈 발견·node no-op 허용·ticket stale-read를 보존하고 최종 CLI8/Write hook9거부·복구/정상A완료를 확인. 준비19/22, 정식 의미/품질·온톨로지 효과 미평가.",
+      "requirements": {
+        "independent_symbols_min": 12,
+        "policy_symbols_min": 4,
+        "security_symbols_min": 4,
+        "untagged_symbols_min": 4,
+        "controls": [
+          "manual_automatic",
+          "legacy_typed",
+          "invalid_input",
+          "stale",
+          "peer_acl",
+          "spoofed_header",
+          "private_boundary"
+        ]
+      },
+      "approved_independent_cases": 0,
+      "formal_status": "policy_security_symbol_provenance_gold_boundary_and_consumer_gap_inventory_prepared_independent_acceptance_not_evaluated",
+      "remaining": [
+        "독립 검토자·최종 수용 담당자 지정, 독립12symbol 이상/정책4·보안4·미태그4 및 같은 파일/정책·의미 가족·노출/DEV-FINAL·표본 충분성 검토",
+        "선택 source/overlay/graph snapshot별 exact annotation ID/kind·related symbol·설명/힌트/severity·known/unknown gold를 독립 작성. 보안AI초안4개는 의미 검토·승인/ingest·실제 결과 없이 existing tag로 세지 않음",
+        "project/commit/canonical function·path/span/blob/snapshot·정책/security relation과 version/hash 매칭을 동결. no_annotations/not_found/unavailable/unsupported/partial·legacy/typed와 manual/automatic/LLM 해석 분리",
+        "YAML원본/row/hash/version/reviewer/time/approval 미보존을 unknown으로 유지; graphmetadataSHA/Go commit·StartLine1·조작된YAML/header를 reviewer/원본 인증으로 승격하지 않음",
+        "invalid/stale/cap/timeout/변경snapshot·private symbol/annotation/edge·.claude/logs·잘못된 relation·legacy backend의 기대 거부/비노출 gold와 원래분모·coverage·기권 처리 동결",
+        "직접peer/loopback/remote/defaultLAN/explicit IPv4·IPv6 CIDR·public/invalid/nil·forwarded spoof/proxy topology/listen의 배포 계약과 실제 listener/허용·거부·backend 미호출 영수증 검증",
+        "Analyzer explicit policy_security 도구 노출·실제 유효 권한·retained graph→public client/MCP/SDK→설치 역할/typed handoff의 현재12symbol·경계 receipt 검증",
+        "F-01~F-08·baseline/입력/gold/매칭/표본/실행 범위 동결 후 annotation match100%/기대 permission refusal100% 제안과 운영·품질·독립 수용 판정"
+      ],
+      "policy_security_gap_preparation": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1/manifest.json",
+        "sha256": "18a380ed5ac265f678cd3adfaf80a9aa1f4d448410ed63145d6f7381f96865d1",
+        "status": "policy_security_symbol_provenance_gold_boundary_and_consumer_gaps_not_acceptance"
+      },
+      "consumer_contract_plan": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
+        "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
+        "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+      },
+      "consumer_local_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+        "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+        "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
+      },
+      "consumer_stdio_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1/manifest.json",
+        "sha256": "5b0e491f8cfcd5c0fbf37e5f5dda37c2a7cb939e9b497042a36d463e88a7b1ad",
+        "status": "P05_owned_stdio_not_actual_role_or_formal_acceptance"
+      },
+      "consumer_role_readiness": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
+        "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
+        "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+      },
+      "host_schema_compatibility": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+        "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+        "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
+      },
+      "consumer_foreign_pin": {
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+        "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+        "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
+      }
+    }
+  ],
+  "next_priority": [
+    "SN-P01~04 기술범위4/4 완료. 다음 독립 수용 DEV/FINAL·완전gold·matching·충분성·F01~08 및 필수 온톨로지 독립 효과 준비. D04미정·정식0/9 유지; 사람 검토/동결을 AI가 대신하지 않음.",
+    "WI-1 30함수의 독립 value kind·완전한 data/control gold·return 좌표/주석 정합·matching 및 baseline/실행 수용 미충족분 검토",
+    "WI-3 독립 사실 가족/정답·top-10/분모·baseline 동결 및 실제 symptom-only 검색/설치 역할 경로 미충족분 보완",
+    "WI-4 실제 도달성·독립 가족/오라클·100회/arm/600초·상대 비율/불확실성 연결 및 운영 수용 미충족분 보완",
+    "WI-V1/WI-V2 독립 티켓/실제 API 계약·도달성·주/독립 oracle·승인 후보 집합·selector/current HEAD/설치 역할 실행 및 독립 수용 미충족분 보완",
+    "WI-2 독립 표본/gold·명령/호출자 계약·명시적 Analyzer 도구 노출·retained project MCP/설치 역할과 품질 수용 미충족분 보완",
+    "WI-6 운영 독립 가족/관련성 gold·기본/확장 실제 쌍·명시적 소비자 도구 노출·warm 반복/p95 기준 및 품질 수용 미충족분 보완",
+    "WI-SP 독립 symbol/gold·수동/자동 provenance·도구 노출·실제12symbol/MCP/배포 ACL·private/spoof 경계 및 독립 수용 미충족분 보완",
+    "WI-C 독립 required-item/priority gold·실제10사례 typed report/diagram/handoff/설치 역할 및 운영·품질 수용 미충족분 보완"
+  ],
+  "optional_backlog_count": 12,
+  "consumer_contract_plan": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1/manifest.json",
+    "sha256": "989fe0c0d09ffa39efe53427bc63faca97954903bae158de6cf5ac096fc3baf2",
+    "status": "consumer_contract_spec_and_isolated_plan_not_implementation_or_acceptance"
+  },
+  "consumer_local_readiness": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1/manifest.json",
+    "sha256": "8a732443d9eac4b2d7490ff426b9a746e0e6d1287f0786f068c6614db0b834ad",
+    "status": "consumer_P01_P04_local_candidate_not_adopted_or_actual_role_accepted"
+  },
+  "consumer_stdio_readiness": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1/manifest.json",
+    "sha256": "5b0e491f8cfcd5c0fbf37e5f5dda37c2a7cb939e9b497042a36d463e88a7b1ad",
+    "status": "P05_owned_stdio_not_actual_role_or_formal_acceptance"
+  },
+  "consumer_role_readiness": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1/manifest.json",
+    "sha256": "17c4976fe3ca14a6efcc54db058477f2650bef0b5feeb1e84bdb12d6eef2faff",
+    "status": "P06_partial_5_of_7_pairs_two_host_schema_admission_failures"
+  },
+  "host_schema_compatibility": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1/manifest.json",
+    "sha256": "0947828372270ffd94851e93303c5de38e33d9789f8f2a1b2c07d04f17c10644",
+    "status": "isolated_P06_7_of_7_not_adopted_plan15_of22"
+  },
+  "consumer_render_lifecycle": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-render-lifecycle-v1/manifest.json",
+    "sha256": "c96b20f550910bd42a785227ebebc3e5edfe7e59031c6b7fefe33a81d36c8452",
+    "status": "P07_render_lifecycle_pass_plan17_of22_not_adopted_or_accepted"
+  },
+  "consumer_opt_in": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1/manifest.json",
+    "sha256": "c221e36f9eff1dde30207b53b8188c52d9d386f8c895bfb2ac2a682134c4f3bc",
+    "status": "T04_isolated_workflow_pass_plan18_of22_not_adopted_or_accepted"
+  },
+  "consumer_foreign_pin": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1/manifest.json",
+    "sha256": "70a83ab690cb13833678f840e0bd88799e274cbb8e6ab084c6353b487c9b4d17",
+    "status": "T09_two_project_pins_pass_plan19_of22_not_adopted_or_accepted"
+  },
+  "consumer_partial": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-partial-v1/manifest.json",
+    "sha256": "84aafe156cd88be8251f48f8d6c6031e1b148f99ed4239d54c0ea9e614f45fd7",
+    "status": "T10_supported_partial_pass_plan20_of22_not_adopted_or_accepted"
+  },
+  "consumer_errors": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1/manifest.json",
+    "sha256": "5519439540cfa214646aea61473b1bb26fff9919f77d1838c2d0a9db70fd9e72",
+    "status": "T16_owned_errors_pass_plan21_of22_not_adopted_or_accepted"
+  },
+  "consumer_final": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1/manifest.json",
+    "sha256": "6776de8233d694ece37ca4d04363fe7d15ec345a152e8d3ca2fb209970c47ece",
+    "status": "P08_T22_isolated_plan22_of22_not_adopted_or_accepted"
+  },
+  "adoption_acceptance_decision_proposal": {
+    "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
+    "sha256": "f6c2f2f9e11a9173cda510be7ad5c4d4349e199e6d1aee759fca8283ca03e1e2",
+    "status": "D04_review_pending_local_native_DEV_not_independent_acceptance"
+  },
+  "consumer_adoption": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/manifest.json",
+    "sha256": "3a17b8326ab4a1cdf1e0d3d9b926cc41c722813b7c892c04179e5b7ec5e4b760",
+    "status": "approved_local_source_integration_fresh_validation_complete_not_formal_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1/REPORT.txt"
+  },
+  "stablenet_pilot": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/manifest.json",
+    "sha256": "127c32a9508a927146deb06f1d24277f853333acc98c912da98610bb6bc24b25",
+    "status": "verification_complete_default_retrieval_not_ready",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/REPORT.txt",
+    "blockers": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-pilot-v1/BLOCKERS.json",
+    "historical": true,
+    "superseded_for_current_readiness_by": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json"
+  },
+  "document_date": "2026-10-18",
+  "stablenet_rebuild": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/manifest.json",
+    "sha256": "3244926efe8853fb6aebda3fe927481be3f401d093708d2c828f443be69faa9b",
+    "status": "SN-P01_SN-P02_scoped_technical_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1/WORKLIST.json",
+    "historical_source_validation": true
+  },
+  "current_execution_state": {
+    "stage": 87,
+    "state_scope": "source-bound deadline diagnosis checkpoint; active_remaining_worklist is live",
+    "technical_completed": [
+      "same-condition false-positive cause captured2/400 with marker already at return and inside group cancellation",
+      "one-line fixture control400/400 passed at unchanged200ms/1s schedule",
+      "new post-return gated writer passed general/race3 each; deliberate surviving writer rejected",
+      "whole default native validation; runtime source unchanged"
+    ],
+    "historical_original_failure_forensically_proven": false,
+    "production_runtime_changed": false,
+    "CoreML_excluded": true,
+    "next": "review remaining WI-V1 full12 contract and installed consumer oracle scope; preserve anonymous independent gold/freeze requirements",
+    "parent_completed": 0,
+    "parent_total": 13,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "independent_approved": 0,
+    "freeze": null,
+    "execution_allowed": false
+  },
+  "stablenet_error_recovery": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/manifest.json",
+    "sha256": "68667c650cc8df14fbcfbc5be9971520f8eab6a8e51d1bb8c95e300dac9c2ba6",
+    "status": "SN-P03_scoped_runtime_classification_recovery_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1/WORKLIST.json",
+    "historical_source_validation": true
+  },
+  "stablenet_comparison": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/manifest.json",
+    "sha256": "9c2264d3e5f0dc50e14c5b8ca037aa1936aae4bf35b3441c9d43beb18a3818f9",
+    "status": "SN-P04_scoped_real_project_comparison_pass",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1/WORKLIST.json"
+  },
+  "independent_freeze_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/manifest.json",
+    "sha256": "281651df16835a8188728e0da2deac12e74f2b0916d62772a41c3772e7a8204b",
+    "status": "authoring_prepared_not_frozen_not_accepted",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1/WORKLIST.json",
+    "historical_source_revision": "0f28a9a756f05cc29416ef953e4926ad24cc4ee8"
+  },
+  "historical_readiness_preparation": {
+    "kind": "preparation_only_not_formal_execution",
+    "manifest": "system/eval/operational-preparation-2026-10-16/readiness-refresh/manifest.json",
+    "manifest_sha256": "fffff1112ee82a82eb7e9a2c3bd16db57afea20af443cbb888724d06969804ea",
+    "source_revision": "9de07a8264bc4aea7054dcea8abb6559801d1cef",
+    "status": "historical_not_current_source_validation"
+  },
+  "current_readiness_preparation": {
+    "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/manifest.json",
+    "manifest_sha256": "c1213bce8e84df32b3597bbc57f46c6e955ce76246731fe6a623f0e2fbc7ed37"
+  },
+  "wi1_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/manifest.json",
+    "sha256": "115ff102128a1c72b8bacfb041e2e1f2e54638252eb2807a6f8e8f3e41ef7a10",
+    "status": "DEV30_bounded_AI_drafts_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "4529b6d1615d8d88159dfe07e22b0cdf38d929cf"
+  },
+  "wi1_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/manifest.json",
+    "sha256": "57a6c4b95daa4c76c85857ac361faf014ef64f9bf814dce06e6bad59d11ad96a",
+    "status": "AI_DEV_semantics_and_actual_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "5d84449eae68db4911a33d9a7b6bc09ca153406d"
+  },
+  "wi2_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/manifest.json",
+    "sha256": "bc2ab34ff96a3812878a9c8ae8745648b63a18ce51e9d8c5ed17308c99dae652",
+    "status": "WI2_DEV108_bounded_complete_AI_drafts_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "0993202df9799196540a078fd4020b661359c4fb"
+  },
+  "wi2_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/manifest.json",
+    "sha256": "00479af083b538b6b7784c5c6bac3e29eeec5a5be22157f7e5a6e70bfe15e503",
+    "status": "WI2_AI_DEV_source_context_and_observed_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "5b72156debceff5af54e7bf94a8399cb02681b33"
+  },
+  "wi3_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/manifest.json",
+    "sha256": "fc2df22aa9e52e2657f3df7a7af08a0376dabc1b9f4be3653b6b590d0361e53d",
+    "status": "WI3_DEV20_bounded_AI_gold_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "8553fe9707fd2dc289126872eb1138fe2f021098"
+  },
+  "wi3_consumer_matching_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/manifest.json",
+    "sha256": "9870fa28b3fa6c4ffa5ff581e3207d8f2c045ce38676114512c864fe0e24e358",
+    "status": "WI3_AI_context_and_actual_partial_symptom_matching_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1/WORKLIST.json",
+    "historical_source_revision": "d95b3e91ac2ef0241f3386618c1f483e36cbf80e"
+  },
+  "wi4_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/manifest.json",
+    "sha256": "93a6e75122cfed77d7aa9ec611f6a4c943a2727b6c8acaf460d95dc4c3852dd4",
+    "status": "WI4_DEV21_conditional_outcomes_AI_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "20f470f2e1b8d9b0b9c6b6ed007b2a42b456befa"
+  },
+  "ticket_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/manifest.json",
+    "sha256": "34ec77e44271d3062d0288ac67a19448825492ccafb71281f74e38caab1cf418",
+    "status": "WIV1_V2_DEV1_bounded_AI_oracle_membership_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "875cfc29ae44fb99035dd884613e60946dd62a45"
+  },
+  "wi6_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/manifest.json",
+    "sha256": "8b80d30d9ea01e77d1bc4b66c25b1f512a1eb76d2495007aa401221ef6770825",
+    "status": "WI6_DEV20_bounded_AI_relevance_seed_excluded_unknown_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "fc4186b9997caa8aa432cc2dab6fb3fbe6ff703f"
+  },
+  "wisp_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/manifest.json",
+    "sha256": "97fc7ed639f7088a806e5220cb5806d4db8ef0e2d450ef9fe524f4b0f4866fc4",
+    "status": "WISP_DEV12_finite_AI_overlay_contract_not_independent_security_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "3bdf444fa5c6f591aa9bce93497668d2110dd188"
+  },
+  "reviewer_identity_policy": {
+    "real_name_required": false,
+    "personal_contact_required": false,
+    "preferred_receipt_field": "reviewer_id",
+    "legacy_field": "name_optional_identifier_compatibility",
+    "role_alias_examples": [
+      "gold-reviewer",
+      "acceptance-reviewer",
+      "execution-operator"
+    ],
+    "alias_assignment": "not_assigned_by_AI",
+    "approval": "alias_identifies_role_only_actual_review_decision_artifact_hash_and_independence_still_required",
+    "user_preference": "do_not_request_real_names_or_personal_contact_information"
+  },
+  "wic_dev_gold_preparation": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/manifest.json",
+    "sha256": "65e6527bd74b6f4121218c8c3fe8a9f40777832e76d48ea7096f58cc1e86e2e9",
+    "status": "WIC_DEV10_finite_AI_review_not_independent_required_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1/WORKLIST.json",
+    "historical_source_revision": "b9e0db369211aba2c55f0db48d49f446c8023b88"
+  },
+  "wi123_debt_diagnostic": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/manifest.json",
+    "sha256": "4e62587f16738687f2cd8b97c565e9c3018e72211ef69070708457f45a056209",
+    "status": "WI123_readonly_diagnostic_not_semantic_resolution_or_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1/WORKLIST.json",
+    "historical_source_revision": "3869a548b6d57dc7e3cdd1caf3c9f532399698f8"
+  },
+  "wi3_reason_fix": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/manifest.json",
+    "sha256": "842c8e749fc99e2eb122f75fd373b00d94ddad5ac7f483657cc10c3119cfd0c1",
+    "status": "WI3_typed_reason_fresh_native_MCP_regression_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1/WORKLIST.json",
+    "historical_source_revision": "64c462347ad32c435c9d5970b22ca29dd9afb892"
+  },
+  "wi2_contract_audit": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/manifest.json",
+    "sha256": "7178cfd3b99f3eb46d6ddaa0a5e36c1c4b07a89d63b4a51243bb3d82abd2e8aa",
+    "status": "WI2_compiler_and_actual_contract_triage_not_independent_semantic_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1/WORKLIST.json",
+    "historical_source_revision": "c874ca8e6a27aec396ac5f87d1b30f44b4503638"
+  },
+  "wi1_select_review": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/manifest.json",
+    "sha256": "7dcd5d8217c8c6a47069bc1599d32211237781fea5acb07322bc0837268f05b9",
+    "status": "AI_select_reference_supplement_not_independent_gold",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/WORKLIST.json",
+    "historical_source_revision": "30e43a34a5af63f1b3b4cc15df0df5316c359fb8"
+  },
+  "wi3_resolver_fix": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/manifest.json",
+    "sha256": "c707e32fc561313bae2c55ae966a045125cfe553f6194678c8d3195c88e8f1cc",
+    "status": "WI3_optional_resolver_fresh_native_actual_stdio_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1/WORKLIST.json",
+    "historical_source_revision": "c18821b5f6b6319e5a7d97de79fd39f9270cacf0"
+  },
+  "wi3_walk_budget": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/manifest.json",
+    "sha256": "f80c072cbab89b6ef9bbf83995c2ce561ec373542f4ed371a2318b003a2477b1",
+    "status": "WI3_verified_walk_budget_measurement_fresh_native_stdio_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1/WORKLIST.json",
+    "historical_source_revision": "bab348916fdb615c56fa31285ed72a70635a5afe"
+  },
+  "wi4_target_subscription": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/manifest.json",
+    "sha256": "c70d3a146fe3bccec001ca17a255f324ed4999db1c82417d53ae1a442c05e588",
+    "status": "WI4_actual_source_DEV_routes_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1/WORKLIST.json",
+    "historical_source_revision": "e30579aeee3de5e7353e3f6c35216f4a9b55c7e1"
+  },
+  "wi4_target_udp": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/manifest.json",
+    "sha256": "3c37aca9c863ca63d872c4ded5eaa8fd5c6ad8a8e4e121449030544db9074677",
+    "status": "WI4_actual_UDP_DEV_paths_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1/WORKLIST.json",
+    "historical_source_revision": "6094049ffc65e3ee77aec6469b74fc65c186a422"
+  },
+  "wi4_target_schedules": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/manifest.json",
+    "sha256": "1b4f683b9acb34c51c8fa15d9065bb1468cf35f40996608d64d09536da5fe221",
+    "status": "WI4_actual_WORK_GOSSIP_POOL_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1/WORKLIST.json",
+    "historical_source_revision": "f91559fd59ad9b332fc22152f2540e29ccec9b1e"
+  },
+  "ticket_actual_rpc": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/manifest.json",
+    "sha256": "ebc2876bc70838e83b6240a9c5bea7e7542c2878cccd0336d05b3a2ada740f6c",
+    "status": "WIV1_V2_actual_inprocess_RPC_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1/WORKLIST.json",
+    "historical_source_revision": "0b7dcf0ba65e04d1f39a14270fbaea76a42e3ca9"
+  },
+  "ticket_native_progress": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/manifest.json",
+    "sha256": "f0374d352661987455287595462cd9bb9f935ffba8ff781d60cbdbd6a6fcb33b",
+    "status": "WIV1_V2_native60_progress_RPC_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-native-progress-v1/WORKLIST.json",
+    "historical_source_revision": "5db56cfa43189aadc55a928052dc4a6418376fb5"
+  },
+  "ticket_method_schedules": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/manifest.json",
+    "sha256": "d00a25b04a509d9530b54acc8bcfa335d4593274491a1edecfa988c95e8715ab",
+    "status": "WIV1_V2_actual_method5_schedules_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-method-schedules-v1/WORKLIST.json",
+    "historical_source_revision": "4b7b9decb76e234de8d2bae12575355f5f8415c1"
+  },
+  "ticket_rpc_overlap": {
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/manifest.json",
+    "sha256": "03f4d7a71288a3f461aa23f8ea2137b7210a106ae43162adbdb05d160186de36",
+    "status": "WIV1_V2_native_RPC_overlap_atomic_counter_DEV_not_independent_acceptance",
+    "report": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/REPORT.txt",
+    "worklist": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1/WORKLIST.json"
+  },
+  "local_native_reliability": {
+    "kind": "local_native_reliability_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1/manifest.json",
+    "manifest_sha256": "a347d32880e42f9172718d5bf2055a861cee79ebf25483882862932b1cb50e7e"
+  },
+  "latest_scoped_followup": {
+    "kind": "real_factory_owner_schedules_DEV_not_independent",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1/manifest.json",
+    "manifest_sha256": "05462259713f3b7758dc99d89d029a2455292956137afb1bbb3dd626a73aa328",
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "full_original5_complete": false
+  },
+  "active_remaining_worklist": {
+    "path": "docs/spec-driven/REMAINING-13-EXECUTION.json",
+    "sha256": "a9a91e4ffac3fa2eb5c29f139849633e3cd5c7194c87a50e009f74da45511733"
+  },
+  "latest_consumer_role_followup": {
+    "kind": "four_actual_roles_current_CKS_transport_not_model_quality",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/four-role-current-v1/manifest.json",
+    "manifest_sha256": "d35d876033df50c17de1c242275df9b8009943dec91712c913db6be50d4d1e2d",
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "latest_intent_batch_followup": {
+    "kind": "WI3_source_bound_intent_batch_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1/manifest.json",
+    "manifest_sha256": "a6996f321955d71adb56e7e18238adb516a951a7e435e98a52338350bf18c0be"
+  },
+  "latest_real_peer_followup": {
+    "kind": "actual_loopback_peer_sync_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/real-peer-sync-v1/manifest.json",
+    "manifest_sha256": "c42fc2d3c986e2100658954c68a5b9bc990810d51c1210c91f6e096ce4869a7b"
+  },
+  "latest_review_delivery_followup": {
+    "kind": "WIC_actual_installed_typed_delivery_and_render_DEV",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/review-delivery-current-v1/manifest.json",
+    "manifest_sha256": "d96a90f834e083e9763c6906d347532fe9d3a76edf7ae9b9b6c69b58fdd318ae"
+  },
+  "latest_viewer_followup": {
+    "kind": "viewer_owned_UI_lifecycle_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/viewer-lifecycle-v1/manifest.json",
+    "manifest_sha256": "d36a14abf5e57d0cd11c1e5bc0ce0c61b763ffd4bc9cd2c8daa0e02e9d8f70a2"
+  },
+  "latest_owner_scope_adoption": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json",
+    "sha256": "85310e913297a498665e4521b0d2a6dacaaa949a1e3659941076bf674dc80d1f",
+    "independent_approved": 0,
+    "formal_completed": 0
+  },
+  "latest_draft_history_reconciliation": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/draft-history-reconciliation-v1/manifest.json",
+    "sha256": "ff8ba28b17a18f2f19dba6a07aac5aea4fc252649cd014168006cf12a72702b1",
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "latest_local_model_inventory": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-local-model-inventory-v1/INVENTORY.json",
+    "sha256": "bbceaa83710ff0af3736c193a67b49181b00ea10b3fcf30b6c02d30f96add354",
+    "model_inference_calls": 0,
+    "CoreML_executed": false
+  },
+  "latest_user_security_deferral": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-deferred-security-scope-v1/SCOPE.json",
+    "sha256": "cbf9ab52dba5da47a2e1287939a74cd8c8eec4baf7f0999181faa3635aef639a",
+    "deferred_not_complete": true
+  },
+  "latest_scale_profile": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/scale-long-functions-v1/manifest.json",
+    "sha256": "901050e97ad3a0444d7277bef29e4c86eb86f9c5322deb71f6408e193d4887ae",
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "capacity_SLA_accepted": false
+  },
+  "latest_public_v2_followup": {
+    "kind": "public_v2_CLI_HTTP_graph_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/public-v2-surface-v1/manifest.json",
+    "manifest_sha256": "c0e27997085c7a401ae27e831e60f075fd2f28a70d57e4347d60befaf6adcd16"
+  },
+  "latest_coreml_followup": {
+    "kind": "CoreML_local_native_transport_CLI_default_regression_DEV_not_real_model_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1/manifest.json",
+    "manifest_sha256": "dc79310029bb434dee6911227441e4b033bfc179c639191ada96179d59ea6a42"
+  },
+  "current_user_scope_exclusion": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json",
+    "sha256": "938605d7f35dc8b7c2783dbc334134b69d4c0e212e910ea2a9234bea0c36bcb9",
+    "excluded_not_complete": true
+  },
+  "latest_guardian_deadline_followup": {
+    "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/manifest.json",
+    "manifest_sha256": "c1213bce8e84df32b3597bbc57f46c6e955ce76246731fe6a623f0e2fbc7ed37"
+  }
+}

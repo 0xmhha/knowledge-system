@@ -1,0 +1,61 @@
+{
+  "status": "declared_before_additional_original_input_trials",
+  "reason": "Original SUB-once specifies2 concurrent calls; first fixed plan explicitly used3. Keep all first30 attempts and classify its6 SUB-once rows as changed-input stress variants, not exact original matching.",
+  "original_case": "SUB-once",
+  "original_concurrent_calls": 2,
+  "first_plan_concurrent_calls": 3,
+  "additional_slots": [
+    {
+      "slot_id": "general-r1-SUB-once-two-callers",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "general-r2-SUB-once-two-callers",
+      "variant": "general",
+      "repetition": 2,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "general-r3-SUB-once-two-callers",
+      "variant": "general",
+      "repetition": 3,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "race-r1-SUB-once-two-callers",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "race-r2-SUB-once-two-callers",
+      "variant": "race",
+      "repetition": 2,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    },
+    {
+      "slot_id": "race-r3-SUB-once-two-callers",
+      "variant": "race",
+      "repetition": 3,
+      "case_id": "SUB-once",
+      "route": "controlled_receiver_actual_Unsubscribe",
+      "concurrent_calls": 2
+    }
+  ],
+  "total_planned_attempts_both_plans": 36,
+  "overwrite_original_plan": false,
+  "formal_completed": 0,
+  "quality_score": null
+}

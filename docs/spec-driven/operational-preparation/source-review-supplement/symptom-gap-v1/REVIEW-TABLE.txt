@@ -1,0 +1,74 @@
+WI-3 가족·노출·정답·검색 경로 공백 — 비공개 준비 자료
+20카드/7증상 label/15가족 제안; 독립 가족·gold 0개. 제안 5개 부족은 임의 분리 승인이 아니다.
+190쌍 및 과거 질문 840건 비교. literal/exact 불일치·topic flag 부재는 fresh holdout 증거가 아니다.
+
+G01 RQ-001
+증명 항목 decode 실패는 요구된 거부인가 결함인가? 독립 root-cause/관련 위치와 상위 검증 계약을 누가 확인할 것인가?
+
+G02 RQ-002
+집계 불일치가 요구 위반인지 먼저 정하고, 오류별 부분 집계 위치의 독립 관련성 정답을 어떻게 작성할 것인가?
+
+G03 RQ-003, RQ-004
+freezer 검사 제외와 인덱스 진행 정체는 다른 함수/증상이다. 같은 흐름으로 묶은 제안을 유지·분리할 독립 원인 근거가 있는가?
+
+G04 RQ-005, RQ-006
+같은 파일의 storage/account 생성과 재개 정리는 호출 흐름을 공유한다. 두 카드를 같은 가족으로 묶거나 나눌 독립 근거와 관련 위치 집합은 무엇인가?
+
+G05 RQ-007, RQ-008
+같은 파일의 reorg 예약과 거래 승격은 연관된다. 서로 다른 장애 사실인지 같은 txpool 흐름의 변형인지 호출 계약으로 어떻게 판단할 것인가?
+
+G06 RQ-009, RQ-011
+ancestor 탐색 거부와 skeleton 진행 재설정은 파일/증상이 다르다. 동기화라는 주제 외에 같은 가족으로 묶을 원인 근거가 있는가?
+
+G07 RQ-010
+부분 수락과 재큐잉이 정상 계약인지 결함인지 판단하고 callback·cache를 포함한 관련 위치의 완전한 정답을 누가 검토할 것인가?
+
+G08 RQ-012
+계정 제거와 우선순위 변화가 정책상 정상인지 먼저 판단하고 fee wrapping·heap/입력 map의 관련 위치를 어떻게 정답으로 확정할 것인가?
+
+G09 RQ-013, RQ-014
+같은 worker 파일의 WBFT 작업 예약과 대기 블록 갱신은 다른 조건을 다룬다. 하나/둘의 독립 가족이라는 판단을 어떤 실제 계약·근거로 검토할 것인가?
+
+G10 RQ-015
+오류와 누적 노드의 동시 반환은 정상일 수 있다. 실제 원인 증명 및 response count·정리·검증 위치의 관련성 기준은 무엇인가?
+
+G11 RQ-016
+중복/역순 레코드 거부가 정상 검증인 점과 가정된 오류 증상을 구분하고 독립 원인/관련 위치 정답을 어떻게 정의할 것인가?
+
+G12 RQ-017
+CIDR 오류 전 append가 호출자 임시 객체에 한정되는지 확인한 뒤 독립 원인과 rollback 관련 위치를 어떻게 확정할 것인가?
+
+G13 RQ-018
+연결 재설정과 lastOp 재등록의 실제 요청 보장을 검토하고 종료/부분 관측을 안전 또는 결함으로 단정하지 않으려면 어떤 독립 근거가 필요한가?
+
+G14 RQ-019
+API 등록/IPC 생성 실패가 정상 오류 반환인지 요구 위반인지 판단하고 독립 root-cause 및 자원 정리 위치를 어떻게 라벨링할 것인가?
+
+G15 RQ-020
+batch 제한에 따른 중단과 실제 handler 취소 협력의 차이를 검토하고 정상 제한·결함·unknown의 관련 위치 정답을 어떻게 구분할 것인가?
+
+실제 검색 경로:
+R01 공개 카드만으로 text-only 요청을 만들며 candidates10/seeds3/enriched3/calls32/depth2/1000ms를 넣는다.
+미충족: 공개 요청 포장은 OS 파일 접근 격리나 실제 검색 실행 영수증이 아니다.
+R02 handler가 요청을 파싱하고 backend alignment·retained identity·sanitizer 조건을 확인한다.
+미충족: 이번 20개 요청의 실제 handler→retained dataset 검증은 미실행이다.
+R03 text seed는 graph/vector health와 model reachability·snapshot 좌표를 확인한다.
+미충족: 실제 대상 index·embedding 모델/차원/일관된 snapshot·health 영수증이 필요하다. 여기의 모델은 검색용 embedder이며 분석 역할 모델과 다르다.
+R04 text-only 분기는 semantic 검색 후 keyword 검색을 하며 각각 MaxSeeds를 요청한다.
+미충족: 요청의 max_candidates10은 벡터 검색 K=10을 뜻하지 않는다. 각 검색·확장·최종 후보 단계 중 top-10 평가 대상을 동결해야 한다.
+R05 candidate는 citation key로 중복을 제거하며 처음 추가된 순서로 append하고 상한에서 더 받지 않는다.
+미충족: 이 순서를 원인 확률 순위로 해석하지 않는다. 여러 round의 top-10 선택·dedup·순서 정책과 baseline이 미동결이다.
+R06 시작점마다 calls/called-by 방향의 one-hop 탐색을 반복하며 depth와 candidate 상한을 적용한다.
+미충족: 제한된 탐색의 누락·partial·budget·abstention을 원래 분모와 coverage에서 어떻게 처리할지 미동결이다.
+R07 graph/vector identity를 마지막에 다시 확인하고 stop reasons·partial·실제 call count를 결과에 넣는다.
+미충족: 실제 20개 text-only 요청의 backend transcript·snapshot pin·stop reason 영수증은 없다.
+R08 Compose 결과의 candidate/signal 원문을 retained anchor로 검증하고 구조화 응답을 반환한다.
+미충족: factual 응답과 독립 root-cause 판정·정답 관련성 라벨은 별도이다. 실제 artifact와 source hash 매칭이 필요하다.
+R09 실제 vector adapter는 query/filter/K를 in-process engine SemanticSearch로 전달한다.
+미충족: real adapter 구현 존재는 이번 요청의 embedding·검색 실행 증거가 아니다. 과거 symbol/expand 시험으로 채울 수 없다.
+R10 채택한 analyzer 원문은 bugfix에서 suspect-labeling을 적용하고 factual 자료와 agent 가설을 구분하여 artifact를 저장하도록 한다.
+미충족: 채택 원문의 지시 존재와 실제 설치된 역할의 20개 입력 실행·handoff 영수증은 다르다.
+R11 채택한 지시는 실제 host alias·structured response·별도 가설을 기록하며 조사당 최대 3round/20citation/96call을 규정한다.
+미충족: 실제 host tools/list·alias·installed version/hash·role 실행·반복 종료 이유·source pin 증거가 필요하다. 이 파일은 감사 대상 원문이지 이번 실행에 호출한 skill이 아니다.
+R12 consumer는 round/candidate/call 상한과 별도 judgment를 검사하고 acceptance=not_recorded를 유지한다.
+미충족: 형식 검증 통과는 원인 승인·독립 gold·recall 통과를 뜻하지 않는다.

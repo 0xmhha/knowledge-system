@@ -1,0 +1,23 @@
+"""Review raw runtime evidence while native race/lint are still pending; no completion verdict."""
+import ast,pathlib,shutil,json,gzip,importlib.util
+O=pathlib.Path('/private/tmp/ks-stablenet-errors-20261018-01');P=O/'runtime-review';P.mkdir(exist_ok=False)
+def cp(a,b):b.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(a,b)
+for p in O.glob('*.json'):cp(p,P/p.name)
+cases=['baseline-source','baseline-model','fixed-source','fixed-recovery']
+for prefix in ['', 'diagnostics/initial-guard-run/']:
+ for case in cases:
+  for p in(O/prefix/case).iterdir():cp(p,P/prefix/case/p.name)
+ if prefix:
+  cp(O/prefix/'proxy-cleanup.json',P/prefix/'proxy-cleanup.json');cp(O/prefix/'native-initial/receipts.json',P/prefix/'native-initial/receipts.json')
+new=O/'new-dataset/retained-origins-v2';old=O/'old-dataset/old-v1';manifest=json.load(open(new/'sources/manifest.json'));inventory={(r['origin_id'],r['path']):r for r in manifest['files']};witness={}
+for arm,v in [('old',old),('new',new)]:cp(v/'dataset-identity.json',P/(arm+'-identity.json'))
+(P/'new-sources-manifest.json.gz').write_bytes(gzip.compress((new/'sources/manifest.json').read_bytes(),mtime=0))
+for case in cases:
+ for row in json.load(open(O/case/'messages.json')):
+  p=row['response'].get('result',{}).get('structuredContent',{})
+  if p.get('format_version')==2:
+   for c in p['citations']:witness[(c['origin_id'],c['file'])]=inventory[(c['origin_id'],c['file'])]
+selected=json.load(open(O/'external-selected.json'));key=(selected['origin_id'],selected['path']);witness[key]=inventory[key]
+for row in witness.values():cp(new/'sources/blobs'/row['sha256'],P/'source-witness'/(row['sha256']+'.txt'))
+(P/'witness-index.json').write_text(json.dumps([{'origin_id':a,'path':b,'sha256':r['sha256']}for(a,b),r in witness.items()]))
+s=importlib.util.spec_from_file_location('review','/private/tmp/check-stablenet-errors.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);tree=ast.parse(pathlib.Path('/private/tmp/check-stablenet-errors.py').read_text());derive=next(x for x in tree.body if isinstance(x,ast.FunctionDef)and x.name=='derive');start=next(i for i,x in enumerate(derive.body)if isinstance(x,ast.Assign)and any(isinstance(y,ast.Name)and y.id=='records'for y in x.targets));statements=derive.body[start:-1];body=ast.Module(body=statements,type_ignores=[]);ns={**m.__dict__,'packet':P,'e':{'initial_source_commit':'2fd6720504464b6623117e517e89b1ec33b553c4'}};exec(compile(ast.fix_missing_locations(body),'<runtime-only-evidence-review>','exec'),ns);print('runtime-only evidence review PASS; sessions',len(ns['sessions']),'packs',len(ns['packs']),'citations',ns['citations'],'full native race/lint remain pending')

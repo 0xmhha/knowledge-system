@@ -1,0 +1,218 @@
+package domaincli
+
+import (
+	"bytes"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/0xmhha/knowledge-system/internal/system/inventory"
+)
+
+type sourceDefinition struct {
+	name       string
+	start, end int
+}
+type policySourceFile struct {
+	path        string
+	data        []byte
+	definitions []sourceDefinition
+}
+
+// resolveSourcePolicies uses only declarations in the anchor's declared file.
+// A bare method is accepted only if unique; line proximity never breaks ties.
+// No changed policy is emitted until every referenced source has been checked.
+func resolveSourcePolicies(entries []inventory.Entry, output *ckgFile, codeRoot string) error {
+	root, err := filepath.Abs(codeRoot)
+	if err != nil {
+		return err
+	}
+	root, err = filepath.EvalSymlinks(root)
+	if err != nil {
+		return fmt.Errorf("source root: %w", err)
+	}
+	info, err := os.Stat(root)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("source root is not a directory")
+	}
+	files := map[string]*policySourceFile{}
+	for i, e := range entries {
+		var names []string
+		for _, a := range e.CodeAnchors {
+			// File/line-only anchors do not request a governs symbol.
+			if a.Symbol == "" {
+				continue
+			}
+			symbol := a.Symbol
+			if a.ResolvedKind() == inventory.AnchorKindLoc {
+				symbol = a.EnclosingSymbol
+			}
+			if symbol == "" {
+				if a.ResolvedKind() == inventory.AnchorKindLoc {
+					return fmt.Errorf("policy %s: loc anchor requires enclosing_symbol", e.ID)
+				}
+				continue
+			}
+			f := files[a.File]
+			if f == nil {
+				f, err = readPolicySource(root, a.File)
+				if err != nil {
+					return fmt.Errorf("policy %s anchor %s: %w", e.ID, a.File, err)
+				}
+				files[a.File] = f
+			}
+			var matches []sourceDefinition
+			for _, d := range f.definitions {
+				// Qualified names, receiver-qualified names, and unique bare names.
+				short := d.name[strings.IndexByte(d.name, '.')+1:]
+				leaf := short[strings.LastIndexByte(short, '.')+1:]
+				if symbol == d.name || symbol == short || symbol == leaf {
+					matches = append(matches, d)
+				}
+			}
+			if len(matches) != 1 {
+				return fmt.Errorf("policy %s anchor %s symbol %q: expected unique declaration in this file, found %d", e.ID, a.File, symbol, len(matches))
+			}
+			d := matches[0]
+			if a.ResolvedKind() == inventory.AnchorKindLoc && (a.Line < d.start || a.Line > d.end) {
+				return fmt.Errorf("policy %s: loc line %d outside %s [%d,%d]", e.ID, a.Line, d.name, d.start, d.end)
+			}
+			names = append(names, d.name)
+		}
+		output.Policies[i].Governs = sortedUnique(names)
+	}
+	// Reject drift between parsing and publication, rather than publishing a
+	// policy derived from an already changed source file.
+	for _, f := range files {
+		now, err := readPolicySource(root, f.path)
+		if err != nil {
+			return err
+		}
+		if !bytes.Equal(f.data, now.data) {
+			return fmt.Errorf("policy source changed during generation: %s", f.path)
+		}
+	}
+	return nil
+}
+
+func readPolicySource(root, relative string) (*policySourceFile, error) {
+	if relative == "" || filepath.IsAbs(relative) || filepath.ToSlash(filepath.Clean(relative)) != relative || strings.Contains(relative, "\\") || relative == ".." || strings.HasPrefix(relative, "../") || filepath.Ext(relative) != ".go" {
+		return nil, fmt.Errorf("anchor requires a clean relative Go source path")
+	}
+	// Reject symlink components, including aliases within the tree. Never read
+	// a declaration from another file by following an anchor alias.
+	current := root
+	for _, part := range strings.Split(relative, "/") {
+		current = filepath.Join(current, part)
+		info, err := os.Lstat(current)
+		if err != nil {
+			return nil, err
+		}
+		if current == filepath.Join(root, relative) && !info.Mode().IsRegular() {
+			return nil, fmt.Errorf("source anchor is not a regular file")
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			return nil, fmt.Errorf("symlink source anchor refused")
+		}
+	}
+	// OpenRoot confines file access even if a path component changes after lstat.
+	confined, err := os.OpenRoot(root)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = confined.Close() }()
+	file, err := confined.Open(relative)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = file.Close() }()
+	info, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if !info.Mode().IsRegular() {
+		return nil, fmt.Errorf("source anchor is not a regular file")
+	}
+	const limit = 16 << 20
+	data, err := io.ReadAll(io.LimitReader(file, limit+1))
+	if err != nil {
+		return nil, err
+	}
+	if len(data) > limit {
+		return nil, fmt.Errorf("source anchor exceeds 16MiB")
+	}
+	fset := token.NewFileSet()
+	tree, err := parser.ParseFile(fset, relative, data, parser.SkipObjectResolution)
+	if err != nil {
+		return nil, fmt.Errorf("parse Go source: %w", err)
+	}
+	result := &policySourceFile{path: relative, data: data}
+	add := func(name string, node ast.Node) {
+		result.definitions = append(result.definitions, sourceDefinition{name: tree.Name.Name + "." + name, start: fset.Position(node.Pos()).Line, end: fset.Position(node.End()).Line})
+	}
+	for _, decl := range tree.Decls {
+		switch d := decl.(type) {
+		case *ast.FuncDecl:
+			name := d.Name.Name
+			if d.Recv != nil && len(d.Recv.List) == 1 {
+				recv := receiverBase(d.Recv.List[0].Type)
+				if recv == "" {
+					return nil, fmt.Errorf("unsupported receiver in %s", relative)
+				}
+				name = recv + "." + name
+			}
+			add(name, d)
+		case *ast.GenDecl:
+			for _, spec := range d.Specs {
+				switch s := spec.(type) {
+				case *ast.TypeSpec:
+					add(s.Name.Name, s)
+					var fields *ast.FieldList
+					switch typ := s.Type.(type) {
+					case *ast.StructType:
+						fields = typ.Fields
+					case *ast.InterfaceType:
+						fields = typ.Methods
+					}
+					if fields != nil {
+						for _, field := range fields.List {
+							for _, name := range field.Names {
+								if name.Name != "_" {
+									add(s.Name.Name+"."+name.Name, field)
+								}
+							}
+						}
+					}
+				case *ast.ValueSpec:
+					for _, n := range s.Names {
+						if n.Name != "_" {
+							add(n.Name, s)
+						}
+					}
+				}
+			}
+		}
+	}
+	return result, nil
+}
+func receiverBase(expr ast.Expr) string {
+	switch e := expr.(type) {
+	case *ast.Ident:
+		return e.Name
+	case *ast.StarExpr:
+		return receiverBase(e.X)
+	case *ast.IndexExpr:
+		return receiverBase(e.X)
+	case *ast.IndexListExpr:
+		return receiverBase(e.X)
+	}
+	return ""
+}

@@ -1,0 +1,16 @@
+func gitAuthors(files []string) []string {
+	cmds := []string{"shortlog", "-s", "-n", "-e", "HEAD", "--"}
+	cmds = append(cmds, files...)
+	cmd := exec.Command("git", cmds...)
+	var authors []string
+	err := doLines(cmd, func(line string) {
+		m := authorRegexp.FindStringSubmatch(line)
+		if len(m) > 1 {
+			authors = append(authors, m[1])
+		}
+	})
+	if err != nil {
+		log.Fatalln("error getting authors:", err)
+	}
+	return authors
+}

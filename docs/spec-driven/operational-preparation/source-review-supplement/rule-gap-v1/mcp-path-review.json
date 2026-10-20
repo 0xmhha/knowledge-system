@@ -1,0 +1,347 @@
+{
+  "kind": "current_and_adopted_source_inspection_not_current_project_host_execution",
+  "contracts": [
+    {
+      "id": "RULE-01",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/rules.go",
+      "lines": [
+        15,
+        16
+      ],
+      "fact": "규칙 pack은 두 가지 고정 syntax target을 opt-in으로 제공한다.",
+      "gap": "규칙 탐지 정답과 취약점/공격 가능성 정답의 기준을 분리하여 사전 동결해야 한다.",
+      "anchor": {
+        "start_line": 15,
+        "end_line": 16,
+        "start_byte": 160,
+        "end_byte_exclusive": 708,
+        "span_sha256": "8c9c8c72ffab67e08308555fb75e2d34e0ec0a2fefb8f6cf30a5dd27d0efc2e5"
+      },
+      "approved": false
+    },
+    {
+      "id": "RULE-02",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/rules.go",
+      "lines": [
+        62,
+        118
+      ],
+      "fact": "pack과 양의 상한을 검증하고 후보 64/flow 4096까지 제한한다.",
+      "gap": "상한·incomplete·partial·오류·기권을 원래 분모에 어떻게 보고할지 미동결이다.",
+      "anchor": {
+        "start_line": 62,
+        "end_line": 118,
+        "start_byte": 2558,
+        "end_byte_exclusive": 4222,
+        "span_sha256": "a5a8453e42b1b3873ff81f65b508734bb8326e1d375c7f172712f0dcbab91aaf"
+      },
+      "approved": false
+    },
+    {
+      "id": "RULE-03",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/rules.go",
+      "lines": [
+        141,
+        164
+      ],
+      "fact": "base가 incomplete/unsupported이면 멈추고 deadline/flow 상한을 확인한다.",
+      "gap": "matched_bounded가 package type/모든 효과 분석 완료나 safe를 뜻하지 않는다.",
+      "anchor": {
+        "start_line": 141,
+        "end_line": 164,
+        "start_byte": 4860,
+        "end_byte_exclusive": 5529,
+        "span_sha256": "aafa8c665d6ef74fec89e978cf5f52a578ac6b8e3a9993cb3de97388c7d5372e"
+      },
+      "approved": false
+    },
+    {
+      "id": "RULE-04",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/rules.go",
+      "lines": [
+        202,
+        228
+      ],
+      "fact": "변환 출발점은 두 lhs 중 두 번째가 _인 직접 strconv 호출의 첫 결과 occurrence다.",
+      "gap": "오류 변수를 나중에 무시하거나 alias/return expression/closure를 쓰는 경우를 지원 규칙 음성과 미지원/의미상 위험으로 구분해야 한다.",
+      "anchor": {
+        "start_line": 202,
+        "end_line": 228,
+        "start_byte": 6365,
+        "end_byte_exclusive": 7113,
+        "span_sha256": "ab1c1f8bd681790b487197040b7418216b33bc308e9541e59a15a50ad2c35e60"
+      },
+      "approved": false
+    },
+    {
+      "id": "RULE-05",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/rules.go",
+      "lines": [
+        242,
+        285
+      ],
+      "fact": "후보 ID는 pack/node/snapshot/source/rule/정의/사용을 묶고 조건·한 witness를 기록한다.",
+      "gap": "snapshot별 ID만 정답 매칭으로 쓰지 말고 source/sink 좌표·규칙·원문 pin·중복·경로/조건 허용차를 독립 동결한다.",
+      "anchor": {
+        "start_line": 242,
+        "end_line": 285,
+        "start_byte": 7446,
+        "end_byte_exclusive": 9224,
+        "span_sha256": "a4c5be033be7bdd67d8e10b178a4d1d99c9dc7a85ebe37837d1e328d777d6a19"
+      },
+      "approved": false
+    },
+    {
+      "id": "RULE-06",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/rules.go",
+      "lines": [
+        337,
+        384
+      ],
+      "fact": "명령 이름의 직접 identifier와 explicit return identifier를 sink로 삼고 closure를 제외한다.",
+      "gap": "외부 함수 identity·sanitizer·alias·공격자 제어·실제 도달성은 미확인이다.",
+      "anchor": {
+        "start_line": 337,
+        "end_line": 384,
+        "start_byte": 10635,
+        "end_byte_exclusive": 12246,
+        "span_sha256": "91fc7dd8fc69bcfbd9ef2038f3def9eaf779052bb6090994a02ec6019ef6abdb"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-01",
+      "scope": "current_repository",
+      "path": "pkg/graph/mcphandlers/rules.go",
+      "lines": [
+        14,
+        45
+      ],
+      "fact": "CKG handler는 safeReader로 감싼 뒤 입력을 검증하고 QueryRules를 호출하며 공유 출력 schema를 제공한다.",
+      "gap": "이번 프로젝트 retained graph의 실제 도구 등록/입력/응답/거부 receipt와 SDK/소비자 handoff 검증이 없다.",
+      "anchor": {
+        "start_line": 14,
+        "end_line": 45,
+        "start_byte": 259,
+        "end_byte_exclusive": 2143,
+        "span_sha256": "e284b14d82ba4fa90e41195aadd9343c4f6b52a985f00b424f2d0fd1c1ffc09b"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-02",
+      "scope": "current_repository",
+      "path": "internal/system/mcp/valueflow.go",
+      "lines": [
+        15,
+        62
+      ],
+      "fact": "CKS facade는 같은 schema와 optional backend를 쓰고 불가하면 unavailable을 반환한다.",
+      "gap": "unavailable은 음성/안전/빈 gold가 아니며 설치 backend·namespace와 실제 역할 사용을 확인해야 한다.",
+      "anchor": {
+        "start_line": 15,
+        "end_line": 62,
+        "start_byte": 326,
+        "end_byte_exclusive": 1930,
+        "span_sha256": "50ef9c62ab70f0d014b89acdeadbbd8d3e0dbb214a0eda4df849253a16e25ba6"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-03",
+      "scope": "current_repository",
+      "path": "internal/system/ckgclient/valueflow.go",
+      "lines": [
+        10,
+        32
+      ],
+      "fact": "CKS public client가 retained reader와 LLM-safe wrapper를 통해 같은 QueryRules로 전달한다.",
+      "gap": "local AnalyzeRules 관측은 public client→MCP round trip 증거가 아니다.",
+      "anchor": {
+        "start_line": 10,
+        "end_line": 32,
+        "start_byte": 161,
+        "end_byte_exclusive": 1347,
+        "span_sha256": "795256a9af2b8def96a106473501eea649765bab756c1a57d36c5c11ef8dbdf9"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-04",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/query.go",
+      "lines": [
+        114,
+        207
+      ],
+      "fact": "Query는 retained manifest와 정확한 함수/blob를 확인하고, 선택적인 expected source/snapshot/commit pin이 주어졌을 때 대조한다.",
+      "gap": "expected pin은 API에서 선택적이다. 수용 실행은 project/commit/function·snapshot pin을 사전 동결하고 실제 요청에 명시해야 한다.",
+      "anchor": {
+        "start_line": 114,
+        "end_line": 207,
+        "start_byte": 3455,
+        "end_byte_exclusive": 7142,
+        "span_sha256": "f51dcf1b7941f8a0aa279b5176e2b116abbf6e2b9f283beaa20784571f6bf834"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-05",
+      "scope": "current_repository",
+      "path": "pkg/graph/valueflow/query.go",
+      "lines": [
+        210,
+        239
+      ],
+      "fact": "분석 후 manifest/node/blob를 다시 확인하고 변경/시간 초과 시 성공 분석을 내보내지 않는다.",
+      "gap": "stale/변조/비공개/상한 실패를 표본에서 누락하지 않는 평가 mapping이 필요하다.",
+      "anchor": {
+        "start_line": 210,
+        "end_line": 239,
+        "start_byte": 7161,
+        "end_byte_exclusive": 8303,
+        "span_sha256": "2d7b2a1215a24cbb536d1eccd7fec4df084623d563d1fa457c544a9f83bd612c"
+      },
+      "approved": false
+    },
+    {
+      "id": "MCP-06",
+      "scope": "current_repository",
+      "path": "pkg/graph/mcphandlers/namespace.go",
+      "lines": [
+        9,
+        30
+      ],
+      "fact": "standalone은 기본 bare 이름이며 root 설정 시 root.context.rule_candidates가 된다.",
+      "gap": "소비자 alias/실제 deploy namespace를 도구 목록과 요청 receipt로 확인해야 한다.",
+      "anchor": {
+        "start_line": 9,
+        "end_line": 30,
+        "start_byte": 124,
+        "end_byte_exclusive": 1173,
+        "span_sha256": "28f2ef8dc690e0f9355b2dc93d4cfbaa51200b15f01bd2c600d8a1b95a00b224"
+      },
+      "approved": false
+    },
+    {
+      "id": "HOST-01",
+      "scope": "adopted_consumer",
+      "path": "plugin/agents/analyzer.md",
+      "lines": [
+        13,
+        37
+      ],
+      "fact": "명시적 tools 목록의 CKS 항목에는 rule_candidates가 없다.",
+      "gap": "본문에서 요구하는 도구와 allowlist의 차이를 해소하거나 실제 유효 권한·지원 호출 경로를 검증해야 한다. Bash 존재만으로 직접 tool 노출을 추론하지 않는다.",
+      "anchor": {
+        "start_line": 13,
+        "end_line": 37,
+        "start_byte": 708,
+        "end_byte_exclusive": 1984,
+        "span_sha256": "a5241ee4ec9b20094ee3164c79721ebb88006e4cbbcdbb1bbe0e77d90cbf2699"
+      },
+      "approved": false
+    },
+    {
+      "id": "HOST-02",
+      "scope": "adopted_consumer",
+      "path": "plugin/agents/analyzer.md",
+      "lines": [
+        902,
+        910
+      ],
+      "fact": "code_review는 실제 rule_candidates와 review_function 응답 사용을 요구한다.",
+      "gap": "본문 요구와 explicit tools 목록 차이는 확인됐으나 실제 host에서 호출이 반드시 거부된다는 실행 증명은 없다.",
+      "anchor": {
+        "start_line": 902,
+        "end_line": 910,
+        "start_byte": 60117,
+        "end_byte_exclusive": 60788,
+        "span_sha256": "b95f0eac4cc7b2ab0990b86aa0c2d2de45adb65e9d32e2e409a8981cf374676a"
+      },
+      "approved": false
+    }
+  ],
+  "criteria_snapshot": {
+    "protocol": {
+      "id": "WI-2",
+      "status": "source_syntax_census_only_independent_cases_not_prepared",
+      "requirements_proposal": {
+        "new_positive_cases_per_supported_rule_min": 10,
+        "new_negative_cases_per_supported_rule_min": 10,
+        "must_cover": [
+          "sanitizer",
+          "branch",
+          "shadow",
+          "external_target"
+        ],
+        "controlled_and_project_denominators_separate": true
+      },
+      "metrics_proposal": {
+        "candidate_precision_min": 0.8,
+        "candidate_recall_min": 0.8,
+        "vulnerability_acceptance_separate": true
+      },
+      "baseline_definition": null,
+      "canonical_matching_rules": null,
+      "sample_sufficiency_review": null,
+      "cases": [],
+      "input_manifest": null,
+      "input_manifest_sha256": null,
+      "gold_manifest": null,
+      "gold_manifest_sha256": null,
+      "review_receipt": null,
+      "final_minimum_independent_units": null,
+      "dev_sample_allocation": null,
+      "preparation_reference": {
+        "manifest": "docs/spec-driven/operational-preparation/policy-security-drafts/manifest.json",
+        "manifest_sha256": "8252ca667db3fdb19b7aaa48c2c77d578f4642e5c75d766c34aed0b415eba0be",
+        "kind": "source_drafts_not_gold_or_runtime"
+      }
+    },
+    "progress": {
+      "id": "WI-2",
+      "owner": "CKG/CKS",
+      "target": "현재 opt-in Go rule pack의 독립 source→sink 후보",
+      "input_proposal": "지원 rule별 새 양성10개·음성10개 이상, sanitizer/branch/shadow/외부 target 사례 포함. 후보 탐지 정답과 실제 취약점 판단을 분리",
+      "completion_proposal": "지원 후보 탐지 precision>=0.80, recall>=0.80 제안, rule별·전체 혼동행렬 모두 공개. source 경로/조건·rule/version·manual/automatic 구분·unknown·상한·SDK/소비자 정합 필수. 독립 검토자의 판정 기록",
+      "limitations": "프로젝트에 양성 수가 부족하면 품질 inconclusive. 별도 독립 controlled 사례는 분리된 분모로 보고하며 프로젝트 효과를 채우는 데 사용하지 않는다. 취약점 확인은 별도 수용",
+      "criterion_status": "proposed",
+      "operational_gate": "not_run",
+      "quality_gate": "not_run",
+      "independent_acceptance": "not_recorded",
+      "evidence": null,
+      "review_receipt": null,
+      "implementation_reference": {
+        "manifest": "system/eval/upper-work-items-implementation-2026-10-14/wi-2/manifest.json",
+        "revision": "3f0bb0397405fa27d8bb05cd053f70e511d6413e"
+      }
+    }
+  },
+  "role_exposure_finding": {
+    "id": "ROLE-RULE-TOOL-01",
+    "required_by_body": true,
+    "consumer_contract_tool_present": true,
+    "consumer_wire_name": "cks.context.rule_candidates",
+    "consumer_input_metadata_parity": true,
+    "consumer_description_parity": true,
+    "expected_direct_tool_alias": "mcp__plugin_coding-agent_cks__cks_context_rule_candidates",
+    "explicit_analyzer_tool_present": false,
+    "explicit_tool_count": 49,
+    "effective_host_permissions": null,
+    "runtime_call_denial_proven": false,
+    "actual_installed_role_receipt": null,
+    "remaining": "resolve body/explicit allowlist difference and verify effective host exposure/call/handoff without assuming Bash grants a direct MCP tool"
+  },
+  "project_retained_dataset_receipt": null,
+  "project_mcp_roundtrip_receipt": null,
+  "independent_scoring_receipt": null,
+  "new_mcp_calls": 0,
+  "formal_runs": 0
+}

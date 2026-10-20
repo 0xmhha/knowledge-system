@@ -1,0 +1,196 @@
+# Content approved by the user; code/test links and criterion execution are separate.
+version: 1
+project_id: p-3fa6368dd3f6757c6b6a86121f0a9b7d
+domain: WBFT consensus constraints (proposed migration subset)
+competency_questions:
+- What quorum formula and boundary examples require review for this source version?
+- Which round-change quorum and prepared-block rules are claimed by the existing pack?
+- Which handler state and duplicate-message constraints still need substantive re-verification?
+- Which current-state accesses require the currentMutex rather than the priorState lock?
+- Which code/test links are still missing despite historical entry verification?
+concepts:
+- id: wbft-quorum
+  kind: rule
+  definition: 'WBFT requires QuorumSize = ceil(N - F) where N is the validator set
+
+    size and F = (N-1)/3 evaluated in float64. The quorum is the minimum
+
+    count of Prepare or Commit messages needed before the consensus core
+
+    advances state. State advancement in handlePrepareMsg uses the
+
+    expression WBFTPrepares.Size() >= valSet.QuorumSize().'
+  includes:
+  - WBFT quorum size calculation
+  excludes:
+  - Unreviewed implementation or test links
+  - Independent search quality or timing claims
+  terms:
+  - lang: ko
+    value: 쿼럼
+    preferred: true
+  - lang: ko
+    value: 쿼럼 크기
+    preferred: false
+  - lang: ko
+    value: 쿼럼 미달
+    preferred: false
+  - lang: ko
+    value: 최소 동의 수
+    preferred: false
+  - lang: en
+    value: consensus threshold
+    preferred: true
+  - lang: en
+    value: minimum agreement
+    preferred: false
+  - lang: en
+    value: voting quorum
+    preferred: false
+  status: verified
+  reviewed_by: current conversation user approval
+- id: wbft-round-change
+  kind: process
+  definition: 'WBFT recovers from a stuck round (PRE-PREPARE or COMMIT quorum not
+
+    reached within RequestTimeout) by broadcasting a ROUND-CHANGE message
+
+    for round+1. The message carries the highest prepared block and its
+
+    PREPARE justification from prior rounds; a node accepts the view
+
+    change once it has collected a quorum of ROUND-CHANGE messages for
+
+    the same target round.'
+  includes:
+  - 'WBFT round change: timeout-triggered round bump with prepared-block justification'
+  excludes:
+  - Unreviewed implementation or test links
+  - Independent search quality or timing claims
+  terms:
+  - lang: ko
+    value: 라운드 체인지
+    preferred: true
+  - lang: ko
+    value: 라운드 변경
+    preferred: false
+  - lang: ko
+    value: 뷰 체인지
+    preferred: false
+  - lang: ko
+    value: 타임아웃 처리
+    preferred: false
+  - lang: ko
+    value: 재라운드
+    preferred: false
+  - lang: en
+    value: view change
+    preferred: true
+  - lang: en
+    value: round bump
+    preferred: false
+  - lang: en
+    value: consensus timeout recovery
+    preferred: false
+  - lang: en
+    value: BFT round change
+    preferred: false
+  status: verified
+  reviewed_by: current conversation user approval
+- id: wbft-message-handlers
+  kind: process
+  definition: 'Three handlers drive the per-round state machine. handlePreprepareMsg
+
+    validates the proposer''s block and transitions to StatePreprepared;
+
+    handlePrepareMsg accumulates PREPARE votes and transitions to
+
+    StatePrepared at quorum; handleCommitMsg accumulates COMMIT votes and
+
+    finalises the block at quorum. Every handler verifies the message
+
+    signature, the sequence/round view, and the sender''s authorisation
+
+    before applying state changes.'
+  includes:
+  - 'WBFT consensus message handlers: preprepare, prepare, commit'
+  excludes:
+  - Unreviewed implementation or test links
+  - Independent search quality or timing claims
+  terms:
+  - lang: ko
+    value: 프리프리페어
+    preferred: true
+  - lang: ko
+    value: 프리페어
+    preferred: false
+  - lang: ko
+    value: 커밋 메시지
+    preferred: false
+  - lang: ko
+    value: 합의 메시지 처리
+    preferred: false
+  - lang: ko
+    value: BFT 메시지 핸들러
+    preferred: false
+  - lang: en
+    value: BFT message handlers
+    preferred: true
+  - lang: en
+    value: preprepare prepare commit
+    preferred: false
+  - lang: en
+    value: WBFT state transitions
+    preferred: false
+  - lang: en
+    value: consensus phase handlers
+    preferred: false
+  status: verified
+  reviewed_by: current conversation user approval
+- id: wbft-current-lock
+  kind: rule
+  definition: 'The WBFT Core''s `current` round-state pointer is guarded by
+
+    `currentMutex` (consensus/wbft/core/core.go:106 — a sync.RWMutex).
+
+    Every accessor that reads `c.current` MUST hold currentMutex.RLock
+
+    (read) or currentMutex.Lock (write). Examples in-repo: the
+
+    current-proposal accessor at core.go:155-157 acquires RLock around
+
+    the read; the round-state mutator at core.go:162-166 acquires
+
+    Lock for the entire write region.'
+  includes:
+  - WBFT Core lock discipline — never read Core.current off currentMutex
+  excludes:
+  - Unreviewed implementation or test links
+  - Independent search quality or timing claims
+  terms:
+  - lang: ko
+    value: 동시성
+    preferred: true
+  - lang: ko
+    value: 락 규율
+    preferred: false
+  - lang: ko
+    value: RWMutex
+    preferred: false
+  - lang: ko
+    value: current 읽기 락
+    preferred: false
+  - lang: en
+    value: lock discipline
+    preferred: true
+  - lang: en
+    value: current round state lock
+    preferred: false
+  - lang: en
+    value: RWMutex
+    preferred: false
+  - lang: en
+    value: data race
+    preferred: false
+  status: verified
+  reviewed_by: current conversation user approval

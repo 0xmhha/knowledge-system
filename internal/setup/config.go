@@ -1,7 +1,9 @@
 package setup
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -14,46 +16,67 @@ import (
 // against the config file's directory so a pack can reference its own data
 // portably.
 type fileConfig struct {
-	ProjectID            string `yaml:"project_id"`
-	SourceMode           string `yaml:"source_mode"`
-	Src                  string `yaml:"src"`
-	Out                  string `yaml:"out"`
-	GraphBin             string `yaml:"graph_bin"`
-	VectorBin            string `yaml:"vector_bin"`
-	PolicyFile           string `yaml:"policy_file"`
-	SecurityPatternFile  string `yaml:"security_pattern_file"`
-	Embedder             string `yaml:"embedder"`
-	ModelName            string `yaml:"model_name"`
-	EmbedDim             int    `yaml:"embed_dim"`
-	OllamaURL            string `yaml:"ollama_url"`
-	QueryPrefixPolicy    string `yaml:"query_prefix_policy"`
-	VectorBuildSources   string `yaml:"vector_build_sources"`
-	VectorPolicy         string `yaml:"vector_policy"`
-	SemanticCorpus       string `yaml:"semantic_corpus"`
-	SkipVector           bool   `yaml:"skip_vector"`
-	Filelist             string `yaml:"filelist"`
-	DomainKnowledge      string `yaml:"domain_knowledge"`
-	DerivedDir           string `yaml:"derived_dir"`
-	CodeRoot             string `yaml:"code_root"`
-	GlossaryFile         string `yaml:"glossary_file"`
-	FlowCorpus           string `yaml:"flow_corpus"`
-	CksBin               string `yaml:"cks_bin"`
-	MaxCaptureFiles      int    `yaml:"max_capture_files"`
-	MaxCaptureFileBytes  int64  `yaml:"max_capture_file_bytes"`
-	MaxCaptureTotalBytes int64  `yaml:"max_capture_total_bytes"`
-	BuildTimeout         string `yaml:"build_timeout"`
-	MinFreeBytes         int64  `yaml:"min_free_bytes"`
+	ProjectID            string   `yaml:"project_id"`
+	SourceMode           string   `yaml:"source_mode"`
+	Src                  string   `yaml:"src"`
+	Out                  string   `yaml:"out"`
+	GraphBin             string   `yaml:"graph_bin"`
+	VectorBin            string   `yaml:"vector_bin"`
+	PolicyFile           string   `yaml:"policy_file"`
+	SecurityPatternFile  string   `yaml:"security_pattern_file"`
+	Embedder             string   `yaml:"embedder"`
+	ModelName            string   `yaml:"model_name"`
+	EmbedDim             int      `yaml:"embed_dim"`
+	OllamaURL            string   `yaml:"ollama_url"`
+	QueryPrefixPolicy    string   `yaml:"query_prefix_policy"`
+	VectorBuildSources   string   `yaml:"vector_build_sources"`
+	VectorPolicy         string   `yaml:"vector_policy"`
+	SemanticCorpus       string   `yaml:"semantic_corpus"`
+	DocumentCorpora      []string `yaml:"document_corpora"`
+	SkipVector           bool     `yaml:"skip_vector"`
+	Filelist             string   `yaml:"filelist"`
+	DomainKnowledge      string   `yaml:"domain_knowledge"`
+	DerivedDir           string   `yaml:"derived_dir"`
+	CodeRoot             string   `yaml:"code_root"`
+	GlossaryFile         string   `yaml:"glossary_file"`
+	FlowCorpus           string   `yaml:"flow_corpus"`
+	CksBin               string   `yaml:"cks_bin"`
+	MaxCaptureFiles      int      `yaml:"max_capture_files"`
+	MaxCaptureFileBytes  int64    `yaml:"max_capture_file_bytes"`
+	MaxCaptureTotalBytes int64    `yaml:"max_capture_total_bytes"`
+	BuildTimeout         string   `yaml:"build_timeout"`
+	MinFreeBytes         int64    `yaml:"min_free_bytes"`
 }
 
 // LoadConfig reads a setup config file into Options. Path-valued fields that
 // are relative are resolved against the config file's directory.
 func LoadConfig(path string) (Options, error) {
+	return loadConfig(path, false)
+}
+
+// LoadConfigStrict is used for operator-registered maintenance profiles.
+// Legacy CLI config loading retains its existing compatibility behavior.
+func LoadConfigStrict(path string) (Options, error) {
+	return loadConfig(path, true)
+}
+
+func loadConfig(path string, strict bool) (Options, error) {
 	buf, err := os.ReadFile(path)
 	if err != nil {
 		return Options{}, err
 	}
 	var fc fileConfig
-	if err := yaml.Unmarshal(buf, &fc); err != nil {
+	if strict {
+		decoder := yaml.NewDecoder(bytes.NewReader(buf))
+		decoder.KnownFields(true)
+		if err := decoder.Decode(&fc); err != nil {
+			return Options{}, fmt.Errorf("%s: %w", path, err)
+		}
+		var extra any
+		if err := decoder.Decode(&extra); err != io.EOF {
+			return Options{}, fmt.Errorf("setup config has trailing document")
+		}
+	} else if err := yaml.Unmarshal(buf, &fc); err != nil {
 		return Options{}, fmt.Errorf("%s: %w", path, err)
 	}
 	base := filepath.Dir(path)
@@ -77,6 +100,13 @@ func LoadConfig(path string) (Options, error) {
 		}
 		return filepath.Join(base, p)
 	}
+	documents := make([]string, 0, len(fc.DocumentCorpora))
+	for _, root := range fc.DocumentCorpora {
+		if root == "" {
+			return Options{}, fmt.Errorf("invalid document corpus root")
+		}
+		documents = append(documents, rel(root))
+	}
 	return Options{
 		ProjectID:           fc.ProjectID,
 		SourceMode:          fc.SourceMode,
@@ -94,6 +124,7 @@ func LoadConfig(path string) (Options, error) {
 		VectorBuildSources:  rel(fc.VectorBuildSources),
 		VectorPolicy:        rel(fc.VectorPolicy),
 		SemanticCorpus:      rel(fc.SemanticCorpus),
+		DocumentCorpora:     documents,
 		SkipVector:          fc.SkipVector,
 		FilelistConfig:      rel(fc.Filelist),
 		DomainKnowledge:     rel(fc.DomainKnowledge),

@@ -1,0 +1,142 @@
+{
+  "kind": "P07_owned_render_and_lifecycle_not_quality_or_adoption",
+  "P07_complete": true,
+  "test_ids_passed": [
+    "T15",
+    "T18"
+  ],
+  "successful_renders": 8,
+  "syntax_refusals": 1,
+  "SVG_shapes": {
+    "P06-analyzer-handoff-sequence": {
+      "nodes": 6,
+      "edges": 7
+    },
+    "P06-analyzer-handoff-modules": {
+      "nodes": 3,
+      "edges": 2
+    },
+    "P06-analyzer-revision-sequence": {
+      "nodes": 6,
+      "edges": 7
+    },
+    "P06-analyzer-revision-modules": {
+      "nodes": 3,
+      "edges": 2
+    }
+  },
+  "actual_host_sessions": [
+    {
+      "case": "normal",
+      "raw_host_exit": 0,
+      "classification": "normal_completion",
+      "elapsed_seconds": 1.5740649169310927,
+      "CKS_exit": 0,
+      "rescue": false
+    },
+    {
+      "case": "sigterm",
+      "raw_host_exit": 143,
+      "classification": "requested_cancellation_not_normal_success",
+      "elapsed_seconds": 2.957950917072594,
+      "CKS_exit": 0,
+      "rescue": false
+    },
+    {
+      "case": "sigint",
+      "raw_host_exit": 0,
+      "classification": "requested_cancellation_not_normal_success",
+      "elapsed_seconds": 4.234337542206049,
+      "CKS_exit": 0,
+      "rescue": false
+    },
+    {
+      "case": "deadline",
+      "raw_host_exit": 143,
+      "classification": "deadline_stop_not_normal_success",
+      "elapsed_seconds": 4.3375119171105325,
+      "CKS_exit": 0,
+      "rescue": false
+    },
+    {
+      "case": "sigkill",
+      "raw_host_exit": -9,
+      "classification": "deliberate_forced_fault_not_normal_success",
+      "elapsed_seconds": 3.0063344999216497,
+      "CKS_exit": 0,
+      "rescue": false
+    }
+  ],
+  "normal_host_successes": 1,
+  "requested_cancellations": 2,
+  "deadline_stops": 1,
+  "deliberate_forced_faults": 1,
+  "actual_role_tool_calls": 5,
+  "native_budget": {
+    "initial_alias_error_forwarded": 1,
+    "initial_corrected_proxy_forwarded": 64,
+    "final_proxy_attempted": 65,
+    "final_proxy_forwarded": 64,
+    "final_65th_refused_before_CKS": true,
+    "native_tool_requests_forwarded_all_attempts": 129,
+    "all_new_CKS_tool_requests_including_hosts": 139,
+    "boundary_scope": "native_stdio_proxy_not_actual_role65_calls"
+  },
+  "initial_diagnostics": {
+    "host_sessions": 5,
+    "initial_host_controller_exit": 1,
+    "initial_controller_failure": "proxy_budget_alias_error",
+    "SIGINT_observer_SDK_forced_kill": 1,
+    "SIGINT_CKS_exit_status": "unknown_missing_exit_receipt",
+    "SIGINT_CKS_reaped": "unconfirmed",
+    "initial_PID_absence_not_accepted_as_reap_proof": true,
+    "preserved_as_failed_observation": true,
+    "correction": "append-only signal handler plus explicit CKS exit/reap requirement; rerun all5 hosts and budget"
+  },
+  "all_observed_owned_processes_absent_postrun": true,
+  "audited_pids": 87,
+  "loopback_responders_closed": 5,
+  "forced_cleanup_rescues": 0,
+  "final_CKS_children_reaped": 6,
+  "final_normal_CKS_exits": 6,
+  "all_attempts_CKS_processes": 13,
+  "all_attempts_confirmed_CKS_exit_receipts": 12,
+  "historical_unconfirmed_CKS_exit_receipts": 1,
+  "full_plan_cases_passed": [
+    "T01",
+    "T02",
+    "T03",
+    "T05",
+    "T06",
+    "T07",
+    "T08",
+    "T11",
+    "T12",
+    "T13",
+    "T14",
+    "T15",
+    "T17",
+    "T18",
+    "T19",
+    "T20",
+    "T21"
+  ],
+  "full_plan_cases_pending": [
+    "T04",
+    "T09",
+    "T10",
+    "T16",
+    "T22"
+  ],
+  "full_plan_cases_failed": [],
+  "formal_completed": 0,
+  "formal_total": 9,
+  "candidate_adopted": false,
+  "real_model_calls": 0,
+  "formal_runs": 0,
+  "ontology_effect_acceptance": "not_evaluated",
+  "render_semantic_quality": "not_evaluated",
+  "network_security_sandbox_proven": false,
+  "in_flight_CKS_query_cancellation": "not_measured_cancel_was_after_completed_tool_while_waiting_for_local_API",
+  "next": "T04/T09/T10/T16 integration gaps, then P08 T22 readiness/recovery/publication boundary"
+}

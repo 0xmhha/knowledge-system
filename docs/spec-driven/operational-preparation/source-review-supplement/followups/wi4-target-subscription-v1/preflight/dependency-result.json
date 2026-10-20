@@ -1,0 +1,62 @@
+{
+  "scope": "offline package dependency/build-profile preflight; no target execution or node startup",
+  "argv": [
+    "/Users/kevin/.gvm/gos/go1.23.12/bin/go",
+    "list",
+    "-e",
+    "-deps",
+    "-json",
+    "./eth/downloader",
+    "./p2p/discover",
+    "./miner",
+    "./consensus/wbft/backend",
+    "./core/txpool/blobpool"
+  ],
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "task_environment": {
+    "GOROOT": "/Users/kevin/.gvm/gos/go1.23.12",
+    "GOTOOLCHAIN": "local",
+    "GOCACHE": "/private/tmp/ks-wi4-target-20261019/go-cache",
+    "GOFLAGS": "-mod=readonly",
+    "GOWORK": "off",
+    "GOPROXY": "off",
+    "GOSUMDB": "off",
+    "GOPRIVATE": "",
+    "GONOPROXY": "",
+    "GONOSUMDB": "",
+    "GOVCS": "*:off"
+  },
+  "timeout_seconds": 180,
+  "formal_completed": 0,
+  "independent_samples": 0,
+  "exit_code": 0,
+  "elapsed_seconds": 1.7575438329949975,
+  "profile": {
+    "CGO_ENABLED": "1",
+    "GOARCH": "arm64",
+    "GOOS": "darwin",
+    "GOVERSION": "go1.23.12"
+  },
+  "packages_observed": 449,
+  "dependency_errors": {},
+  "target_packages": [
+    {
+      "ImportPath": "github.com/ethereum/go-ethereum/p2p/discover"
+    },
+    {
+      "ImportPath": "github.com/ethereum/go-ethereum/eth/downloader"
+    },
+    {
+      "ImportPath": "github.com/ethereum/go-ethereum/consensus/wbft/backend"
+    },
+    {
+      "ImportPath": "github.com/ethereum/go-ethereum/miner"
+    },
+    {
+      "ImportPath": "github.com/ethereum/go-ethereum/core/txpool/blobpool"
+    }
+  ],
+  "source_clean": true,
+  "stdout_sha256": "95b2a469c269692a8807988f40f3e1ec912d6fc6adef8d1b3f68da6584a73e5d",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

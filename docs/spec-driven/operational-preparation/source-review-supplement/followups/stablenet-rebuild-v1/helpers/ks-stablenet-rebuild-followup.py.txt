@@ -1,0 +1,18 @@
+import pathlib,time,json,subprocess,os,signal
+O=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');deadline=time.monotonic()+5700
+while not(O/'build-exit.json').exists():
+ if time.monotonic()>deadline:raise SystemExit('held build receipt missing before followup deadline')
+ time.sleep(2)
+assert json.load(open(O/'build-exit.json'))['exit_code']==0,'supported held build failed'
+receipts=[]
+for label,args,limit in [('source-data-audit',['python3','/private/tmp/ks-stablenet-rebuild-audit-data.py'],300),('paired-new',['python3','/private/tmp/ks-stablenet-rebuild-queries.py','new'],900),('boundaries-new',['python3','/private/tmp/ks-stablenet-rebuild-boundaries.py'],600)]:
+ start=time.monotonic();timeout=False;signals=[]
+ with(O/(label+'.collector.log')).open('wb')as f:
+  child=subprocess.Popen(args,stdout=f,stderr=subprocess.STDOUT,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'},start_new_session=True)
+  try:child.wait(timeout=limit)
+  except subprocess.TimeoutExpired:
+   timeout=True;signals.append('SIGTERM');os.killpg(child.pid,signal.SIGTERM)
+   try:child.wait(timeout=10)
+   except subprocess.TimeoutExpired:signals.append('SIGKILL');os.killpg(child.pid,signal.SIGKILL);child.wait()
+ receipts.append({'label':label,'argv':args,'pid':child.pid,'exit_code':child.returncode,'reaped':child.poll()is not None,'timeout':timeout,'owned_signals':signals,'elapsed_seconds':time.monotonic()-start});(O/'followup-receipts.json').write_text(json.dumps(receipts,indent=2)+'\n');print(label,child.returncode,flush=True)
+print('all post-build collectors attempted',flush=True);raise SystemExit(any(r['exit_code']!=0 for r in receipts))

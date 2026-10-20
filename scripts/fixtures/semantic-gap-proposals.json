@@ -1,0 +1,430 @@
+{
+  "functions": [
+    {
+      "candidate_id": "SRC-001",
+      "lines": [
+        183,
+        200
+      ],
+      "fact": "counter 초기화 뒤 블록/round map을 순회하고 totalRounds를 갱신한다.",
+      "question": "n·totalRounds의 루프 합류/재정의와 map 원소 쓰기·analyzeBlock 호출 효과를 어떻게 분리하고, 모든 사용의 정의 집합을 작성할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-002",
+      "lines": [
+        188,
+        206
+      ],
+      "fact": "바깥/안쪽 cache 조회가 각각 ok를 선언하고 outboundCode 분기 뒤 비동기 전송을 시작한다.",
+      "question": "동명 ok의 선언을 분리하고 outboundCode의 초기/조건부 정의를 매칭하되 cache·payload·goroutine 효과는 어떻게 unknown으로 남길 것인가?"
+    },
+    {
+      "candidate_id": "SRC-003",
+      "lines": [
+        154,
+        170
+      ],
+      "fact": "num·currentRoundMessages·logger를 재대입하고 num 조건의 분기에서 newRound를 계산하여 호출에 전달한다.",
+      "question": "앞선 Add 호출 효과와 별개로 num 재정의의 kill·분기 조건·짧은 회로·참조 값의 역할을 어떻게 정답과 매칭에 반영할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-004",
+      "lines": [
+        89,
+        108
+      ],
+      "fact": "Decode의 주소 인자와 range 내부 rc를 사용하고 receiver 필드들에 결과를 쓴다.",
+      "question": "message/rc의 aggregate·주소 역할과 range binding을 scalar 간선에서 분리하고 receiver 필드 쓰기를 독립 정답의 지원 범위에 어떻게 표시할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-006",
+      "lines": [
+        300,
+        325
+      ],
+      "fact": "i와 count가 초기화/조건부 재대입/루프 갱신을 거쳐 ancient 조회 크기 계산에 쓰인다.",
+      "question": "안쪽 range의 i와 바깥 i를 분리하고 break/루프 합류의 may-reach 정의 집합을 작성하되 산술 경로 가능성과 slice 내용 효과는 어떻게 구분할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-007",
+      "lines": [
+        880,
+        888
+      ],
+      "fact": "DecodeBytes에 badBlocks 주소를 넘긴 뒤 range에서 blocks를 append하여 반환한다.",
+      "question": "기존 statement anchor를 정확한 occurrence로 바꾸고 slice 재바인딩·decode의 메모리 쓰기·range 변수를 다른 값 종류로 어떻게 분리할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-009",
+      "lines": [
+        95,
+        109
+      ],
+      "fact": "freezer 분기에서 여러 err 선언을 검사하고 f.Close를 defer한 뒤 info를 infos에 append한다.",
+      "question": "switch case별 err/info 범위와 defer 호출의 즉시 인자 평가·나중 효과를 분리하고 정상 종료 제어 정답을 어떻게 작성할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-010",
+      "lines": [
+        53,
+        69
+      ],
+      "fact": "AncientRange 오류는 log.Crit에 전달하고 range 안에서 hash·batch·i를 갱신한다.",
+      "question": "log.Crit를 이 함수 원문만으로 no-return 처리하지 않고 구조적 제어 경로를 정하며 batch 메모리 효과와 i/hash 재정의를 어떻게 매칭할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-011",
+      "lines": [
+        132,
+        163
+      ],
+      "fact": "iterator 오류는 반환하고 decode 오류에는 panic 호출이 있으며 주소 preimage 분기에 따라 continue 또는 주소 대입을 수행한다.",
+      "question": "동명 err·named result nextKey·address/addr의 값 종류를 검토하고 panic/continue/주소 효과를 포함한 지원 범위의 완전한 정답을 어떻게 정할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-012",
+      "lines": [
+        284,
+        298
+      ],
+      "fact": "found/root를 루프 안에서 갱신하고 break 뒤 found 조건으로 오류를 반환한다.",
+      "question": "초기 found와 반복 갱신·root 참조/aggregate·break 소유권을 구분하여 모든 정의 집합과 정상 종료 제어 정답을 어떻게 작성할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-013",
+      "lines": [
+        383,
+        399
+      ],
+      "fact": "found/layers/middleRoots 초기화 뒤 range에서 found를 갱신하거나 map 원소를 쓰고 prune을 호출한다.",
+      "question": "found의 zero/조건부 정의와 map 원소 쓰기를 분리하고 외부 prune 효과를 정답의 로컬 scalar 범위 밖에 어떻게 표시할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-014",
+      "lines": [
+        547,
+        562
+      ],
+      "fact": "origin을 초기화한 뒤 generateRange 결과와 exhausted 또는 increaseKey(origin) 결과로 루프를 빠져나간다.",
+      "question": "origin의 재바인딩·loop-carried 정의를 검토하고 onStorage closure의 내부 상태/return을 외부 함수의 제어 간선으로 합치지 않으려면 어떤 경계가 필요한가?"
+    },
+    {
+      "candidate_id": "SRC-016",
+      "lines": [
+        367,
+        387
+      ],
+      "fact": "state/err의 fallback 재대입과 index closure를 통한 fails append가 store Open 주변에 있다.",
+      "question": "state/err의 정의 집합과 callback 호출로 인한 fails 변경을 분리하고 range·field·heap·drop 효과를 어떻게 unknown으로 유지할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-017",
+      "lines": [
+        794,
+        818
+      ],
+      "fact": "StateAt 오류는 return하고 p의 필드를 갱신한 뒤 reorg 결과를 range로 처리한다.",
+      "question": "statedb/err·reinject/inclusions의 범위와 adds slice 재바인딩을 검토하고 lock/defer/외부 field 변경을 순차 scalar gold로 오인하지 않으려면 무엇이 필요한가?"
+    },
+    {
+      "candidate_id": "SRC-018",
+      "lines": [
+        57,
+        75
+      ],
+      "fact": "index closure가 fails에 append하고 store Open 뒤 fails를 순회하여 Delete 오류에 Close 후 반환한다.",
+      "question": "closure capture와 외부 Open의 callback 효과를 outer reaching definition으로 만들지 않고 l/store/fails의 역할·실패 분기를 어떻게 매칭할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-019",
+      "lines": [
+        1305,
+        1328
+      ],
+      "fact": "조건부 goroutine 시작 뒤 curDone/nextDone·상태 flags·참조를 재대입하고 select에서 요청을 처리한다.",
+      "question": "순차 재바인딩과 채널 송수신/비동기 완료를 분리하며 select 및 무한 루프의 제어 정답을 어떤 unknown 범위로 제한할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-021",
+      "lines": [
+        107,
+        127
+      ],
+      "fact": "timer 분기에서 started/done을 확인·갱신하고 progress 결과에 따라 채널 전송과 continue를 수행한다.",
+      "question": "flag의 loop-carried 정의와 getProgress closure·channel/select 효과를 구분하고 정상 종료/비종료의 미확정 범위를 어떻게 정답에 표시할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-022",
+      "lines": [
+        238,
+        266
+      ],
+      "fact": "end가 내부 number 선언의 값으로 보정되고 binary-search 루프가 start/end를 재대입한다.",
+      "question": "바깥 number와 if-init number shadow 및 start/end의 loop 합류를 구분하고 field/call 결과가 scalar로 확인되지 않은 부분을 어떻게 매칭할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-023",
+      "lines": [
+        911,
+        939
+      ],
+      "fact": "range 검증의 내부 number와 바깥 number가 별도이며 후속 루프에서 number/hash를 조건부 대입 후 break한다.",
+      "question": "동명 number의 범위를 분리하고 known 분기·continue/break 뒤 return까지의 정의 집합을 완성하되 header/hash aggregate를 어떻게 분류할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-024",
+      "lines": [
+        891,
+        917
+      ],
+      "fact": "validate callback 오류는 failure 대입 후 break하고 reconstruct callback 및 taskPool 삭제 뒤 accepted를 증가시킨다.",
+      "question": "callback signature의 index/header/result 네 선언을 본문 로컬에서 제외하고 callback 메모리 효과·range·accepted/i 갱신을 어떻게 별도 매칭할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-027",
+      "lines": [
+        571,
+        594
+      ],
+      "fact": "interval을 최소값으로 보정하여 minRecommit/recommit에 대입하고 feedback 분기에서도 recommit을 갱신한다.",
+      "question": "이 scalar 갱신과 commit/clearPending closure의 capture·atomic·channel 효과를 분리하고 select/비종료 경계를 어떻게 정답에 유지할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-028",
+      "lines": [
+        155,
+        164
+      ],
+      "fact": "range에서 wrapped/err를 계산하고 오류면 map 삭제 후 continue하며 성공이면 heads와 txs 원소를 갱신한다.",
+      "question": "range 참조/alias와 slice·map 원소 쓰기를 scalar 재정의에서 분리하고 accTxs[0]의 오류 경로 가능성을 구조적 정상 종료 정답과 어떻게 구분할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-029",
+      "lines": [
+        644,
+        661
+      ],
+      "fact": "handler type assertion fallback 후 nil이면 panic 호출을 하고 NewChainHead 결과에 따라 commit을 호출한다.",
+      "question": "handler/err 바인딩과 type assertion의 미확정 효과·panic·closure·select를 분리하고 정상 종료 제어 간선을 어떻게 제한할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-030",
+      "lines": [
+        737,
+        760
+      ],
+      "fact": "tcount를 저장한 뒤 commitTransactions를 호출하고 receiver count 비교로 snapshot을 갱신하며 종료 채널에서 return한다.",
+      "question": "tcount 로컬과 receiver field/외부 호출 효과를 분리하고 여러 select 종료·defer closure가 있는 함수의 제어 정답을 어떻게 작성할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-031",
+      "lines": [
+        181,
+        195
+      ],
+      "fact": "n이 table node로 재대입될 수 있으며 key 주소 인자·lookup range·내부 rn 재선언이 있다.",
+      "question": "n 참조 재바인딩·key aggregate/주소·동명 rn을 분리하고 기존 statement anchor를 occurrence/node 수준의 매칭으로 어떻게 구체화할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-033",
+      "lines": [
+        401,
+        418
+      ],
+      "fact": "응답을 type assertion하고 range로 node들을 append한 뒤 total·received 조건 또는 error 채널에서 반환한다.",
+      "question": "total/received의 loop-carried 정의와 channel/type assertion·seen map 변경·비종료를 구분하여 어떤 영역을 unknown으로 유지할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-034",
+      "lines": [
+        243,
+        267
+      ],
+      "fact": "루프의 decode 오류마다 return/break하고 prevkey 비교 후 dec.pairs append와 prevkey 대입을 수행한다.",
+      "question": "named result dec/raw/err의 entry 정의와 내부 err shadow·prevkey 정의를 분리하고 decode의 field 메모리 쓰기를 scalar 간선으로 오인하지 않으려면 무엇이 필요한가?"
+    },
+    {
+      "candidate_id": "SRC-036",
+      "lines": [
+        204,
+        222
+      ],
+      "fact": "scheme 분기별로 reconnect를 대입하고 ws 경로의 rc/err를 검사한 뒤 newClient에 넘긴다.",
+      "question": "reconnect의 zero/각 분기 정의와 참조/함수 값을 검토하고 cfg 옵션 mutation·constructor 효과 및 기존 statement anchor를 어떻게 분리·매칭할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-039",
+      "lines": [
+        34,
+        51
+      ],
+      "fact": "API range 안에서 regMap/registered를 갱신하고 listener 오류 검사 뒤 goroutine을 시작한다.",
+      "question": "내부 err와 listener err의 범위·slice/map/참조 역할·비동기 효과를 분리하고 반환까지의 모든 로컬 정의와 제어 간선을 어떻게 정할 것인가?"
+    },
+    {
+      "candidate_id": "SRC-040",
+      "lines": [
+        187,
+        196
+      ],
+      "fact": "calls를 선언하고 handleResponses callback이 calls에 append하며 startCallProc에 또 다른 closure를 넘긴다.",
+      "question": "callback 이후 len(calls)의 정의를 호출 효과로 단정하지 않고 closure 내부 timer/cancel/return을 외부 함수의 occurrence·CFG에서 어떻게 격리할 것인가?"
+    }
+  ],
+  "engine_reviews": [
+    {
+      "id": "M01",
+      "path": "pkg/graph/valueflow/cfg.go",
+      "lines": [
+        18,
+        48
+      ],
+      "topic": "원문 identity·좌표",
+      "proposal": "project/repository 식별자는 별도 평가 envelope로 보존하고 commit/file/function SHA/start offset과 retained snapshot/node pin을 함께 매칭한다. byte offset은 UTF-8 원문 기준, end는 exclusive로 제안한다.",
+      "unresolved": "retained graph snapshot·node ID와 canonical identity의 실제 매핑/독립 동결 미확보"
+    },
+    {
+      "id": "M02",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        63,
+        109
+      ],
+      "topic": "선언·entry·range",
+      "proposal": "변수 이름 대신 선언 위치와 함수 identity를 사용한다. receiver/parameter/result entry와 로컬 정의를 구분하고 range_unknown을 지원되는 scalar 정답으로 자동 변환하지 않는다.",
+      "unresolved": "모든 entry/constant/range 변수에 대한 독립 값 종류·gold 미작성"
+    },
+    {
+      "id": "M03",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        281,
+        315
+      ],
+      "topic": "값 종류와 사용 역할",
+      "proposal": "helper의 read/write/read_write를 engine role로 직접 치환하지 않는다. 값의 scalar/reference/aggregate/unknown 분류와 address 문맥을 각각 검토한다.",
+      "unresolved": "부분 타입 정보에서 모든 occurrence의 값 종류와 role 매핑 미확정"
+    },
+    {
+      "id": "M04",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        441,
+        452
+      ],
+      "topic": "bare return 구현 좌표",
+      "proposal": "현재 구현의 implicit named-result use는 return 문 위치를 전달한다. 선언 identity와 occurrence 위치·CFG node 위치를 별도 필드로 유지한다.",
+      "unresolved": "sample의 explicit_results=0만으로 named-result implicit use 존재를 추정하지 않는다. 독립 좌표 대조 필요"
+    },
+    {
+      "id": "M05",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        471,
+        473
+      ],
+      "topic": "bare return 주석 불일치",
+      "proposal": "이 주석의 declaration coordinate 설명과 M04 구현의 return-site 전달을 별도 검토 항목으로 기록한다. 주석을 canonical matching 근거로 사용하지 않는다.",
+      "unresolved": "주석 정정과 명시적/named/synthetic return 계약 대조는 후속 코드 작업. 이번에는 유지보수 Go 불변"
+    },
+    {
+      "id": "M06",
+      "path": "pkg/graph/valueflow/cfg.go",
+      "lines": [
+        275,
+        310
+      ],
+      "topic": "CFG node·분기·synthetic 위치",
+      "proposal": "b/n ID의 숫자만으로 gold를 매칭하지 않는다. node kind/span/block 역할·synthetic 여부와 조건 라벨을 함께 사용하고 빈 block fallback을 별도로 정의한다.",
+      "unresolved": "statement anchor→실제 node/branch 매핑·synthetic exit·중복/모호성 처리 미동결"
+    },
+    {
+      "id": "M07",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        584,
+        597
+      ],
+      "topic": "사용 전 정의와 kill",
+      "proposal": "같은 node의 사용은 현재 state에 먼저 연결하고 이후 정의로 갱신하는 관측 계약을 검토한다. read_write·loop 합류·동명 shadow의 완전한 정의 집합을 별도 작성한다.",
+      "unresolved": "30개 함수의 exhaustive use→definition sets 및 비간선 사유 미작성"
+    },
+    {
+      "id": "M08",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        794,
+        808
+      ],
+      "topic": "관계 수준·kind·certainty",
+      "proposal": "occurrence-level DefUse와 node-level Edge를 다른 평가 단위로 둔다. 선언·두 endpoint·kind·certainty·control condition의 tuple을 제안하며 node-level 중복 병합 규칙은 따로 동결한다.",
+      "unresolved": "정확한 canonical key·dedup·ambiguity·FP/FN/unknown 분모·zero denominator 처리 미동결"
+    },
+    {
+      "id": "M09",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        614,
+        666
+      ],
+      "topic": "정상 종료·비종료",
+      "proposal": "control gold는 normal-exit structural postdominator 기준을 검토한다. 잠재 비종료 영역을 빈 control gold나 안전 판정으로 바꾸지 않는다.",
+      "unresolved": "실제 CFG/후지배 정답·비정상/비종료 제외와 unknown 분모 미작성"
+    },
+    {
+      "id": "M10",
+      "path": "pkg/graph/valueflow/cfg.go",
+      "lines": [
+        227,
+        252
+      ],
+      "topic": "no-return·부분 타입",
+      "proposal": "고립 함수는 log.Crit/os.Exit/panic 표기만으로 no-return을 증명하지 않는다. 타입 진단과 빌드/지원 상태를 별도로 유지한다.",
+      "unresolved": "프로젝트 타입/호출 효과·실제 예외/경로 가능성 증거 없음"
+    },
+    {
+      "id": "M11",
+      "path": "pkg/graph/valueflow/cfg.go",
+      "lines": [
+        320,
+        345
+      ],
+      "topic": "closure·select·짧은 회로·호출",
+      "proposal": "closure/async/defer/select/short-circuit/opaque call 진단을 보존하고 이들을 일반 순차 scalar/제어 정확도로 합산하지 않는다.",
+      "unresolved": "각 함수의 지원 영역/제외 영역·자원 cap·partial/truncated 평가 정책 미동결"
+    },
+    {
+      "id": "M12",
+      "path": "pkg/graph/valueflow/dependence.go",
+      "lines": [
+        339,
+        355
+      ],
+      "topic": "주소·메모리",
+      "proposal": "field/index/dereference와 주소 읽기는 local container binding flow와 메모리 내용의 별도 의미로 유지한다. unsupported는 unknown이며 자동 음성 정답이 아니다.",
+      "unresolved": "alias·field/element·channel·외부 mutation을 위한 독립 범위/정답 미확보"
+    },
+    {
+      "id": "M13",
+      "path": "pkg/graph/valueflow/query.go",
+      "lines": [
+        136,
+        153
+      ],
+      "topic": "snapshot/commit pin",
+      "proposal": "운영 query의 snapshot/commit pin과 원문 준비 패킷의 Git pin을 구분한다. 현재 함수 표본에는 실제 retained snapshot 영수증이 없다.",
+      "unresolved": "baseline·SDK/MCP·양 arm의 같은 snapshot/limits·실행 영수증 미확보"
+    },
+    {
+      "id": "M14",
+      "path": "pkg/graph/valueflow/query.go",
+      "lines": [
+        193,
+        235
+      ],
+      "topic": "blob 및 실행 후 pin",
+      "proposal": "function SHA와 좌표/길이 및 실행 후 manifest pin을 검토한다. source-only 점검을 실제 query 성공이나 수용으로 승격하지 않는다.",
+      "unresolved": "DEV/FINAL·baseline·matching·resource budget·독립 승인 동결 미완료"
+    }
+  ]
+}

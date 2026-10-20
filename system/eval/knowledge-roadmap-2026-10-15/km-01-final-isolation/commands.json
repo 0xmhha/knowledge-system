@@ -1,0 +1,432 @@
+[
+  {
+    "label": "git-init",
+    "command": [
+      "git",
+      "init",
+      "--initial-branch=main",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "3558a836242ae12103f674a0c3943d6fcb97d5373046bb8b8c41cb04ccda0f41",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "original-add",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "add",
+      "go.mod",
+      "consensus.go"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "original-commit",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "-c",
+      "user.name=Collection Fixture",
+      "-c",
+      "user.email=collection-fixture@example.invalid",
+      "commit",
+      "-m",
+      "original"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "c451a64894488b5c36b1bbe1430aca176f45d6b794949f9fb405ad1c5739b61f",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "original-rev",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "90df5480b28724e496291c2b7651e2503ab87cf1c3c7d8665d52f9818e19d66f",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "git-fork",
+    "command": [
+      "git",
+      "clone",
+      "--no-hardlinks",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/source"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "ee1f13683911c71d0f1a9702462a1716a1b763eb09e09ba5341a705e1e04de38"
+  },
+  {
+    "label": "fork-rev",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/source",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "90df5480b28724e496291c2b7651e2503ab87cf1c3c7d8665d52f9818e19d66f",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build-a1",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/dataset",
+      "--version",
+      "v1",
+      "--project-id",
+      "project-a",
+      "--source-mode",
+      "committed",
+      "--embedder",
+      "mock",
+      "--model-name",
+      "mock",
+      "--graph-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--ollama-url",
+      "http://127.0.0.1:59880",
+      "--build-timeout",
+      "3m",
+      "--progress",
+      "json"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "44895f412e33c489ac4507e63a9570d5dbf62ccaa11175346cca7382a43b4f7f",
+    "stderr_sha256": "7bee5b668077398ac7a69eee16f7b5c5ede32804cb8840a58f7d8db76cb2dcf4"
+  },
+  {
+    "label": "config-a1",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/dataset/v1",
+      "--source-root",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--graph-binary",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-binary",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--ollama-url",
+      "http://127.0.0.1:59880",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/a1.yaml"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "f77449cd99dd6bc459b6ba8fc9f190d139869b473537b76930bacb285b9851e9",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build-b1",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/source",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/dataset",
+      "--version",
+      "v1",
+      "--project-id",
+      "project-b",
+      "--source-mode",
+      "committed",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "collection-fixture-96:latest",
+      "--graph-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--ollama-url",
+      "http://127.0.0.1:59880",
+      "--build-timeout",
+      "3m",
+      "--progress",
+      "json"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "a97e0991ddd7d9fd5bc5da19d90b09823136431b636d440575962ab2b81af5c2",
+    "stderr_sha256": "ed76dd8ac3dd5eb354de663ce11fd0370111b3ed26329e16e0cc6a3908e34e71"
+  },
+  {
+    "label": "config-b1",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/dataset/v1",
+      "--source-root",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/source",
+      "--embed-model",
+      "collection-fixture-96:latest",
+      "--graph-binary",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-binary",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--ollama-url",
+      "http://127.0.0.1:59880",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/b1.yaml"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "7655f5d623a26a0982067f05c628443709c460d1cbcf180682f3ee1d660b78c5",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build-b2",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/source",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/dataset",
+      "--version",
+      "v2",
+      "--project-id",
+      "project-b",
+      "--source-mode",
+      "committed",
+      "--embedder",
+      "ollama",
+      "--model-name",
+      "collection-fixture-128:latest",
+      "--graph-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--ollama-url",
+      "http://127.0.0.1:59880",
+      "--build-timeout",
+      "3m",
+      "--progress",
+      "json"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "5159b0d38cf5345e6c2782724ae47267a2cb85b2cbc10ac1d42150e30bdd1af8",
+    "stderr_sha256": "4d6a0ce690c98684396a4609816a10e135772932e54f712dbd7469032514a9a8"
+  },
+  {
+    "label": "config-b2",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/dataset/v2",
+      "--source-root",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/source",
+      "--embed-model",
+      "collection-fixture-128:latest",
+      "--graph-binary",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-binary",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--ollama-url",
+      "http://127.0.0.1:59880",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/b2.yaml"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "eb07f8377e4e5e167994f94c6358b6487b67997018c68526d8185b22ae1aaf29",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "changed-a-add",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "add",
+      "go.mod",
+      "consensus.go"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "changed-a-commit",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "-c",
+      "user.name=Collection Fixture",
+      "-c",
+      "user.email=collection-fixture@example.invalid",
+      "commit",
+      "-m",
+      "changed-a"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "b7462932e27075ef71d0bdff2ba859667db9f5cde8b365d06283d32d78256cfb",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "changed-a-rev",
+    "command": [
+      "git",
+      "-C",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "1f4718bc1de1e30989a03110f23389eeb10a75e997cba21f53ada6a8d140ee43",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "build-a2",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "setup",
+      "--src",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/dataset",
+      "--version",
+      "v2",
+      "--project-id",
+      "project-a",
+      "--source-mode",
+      "committed",
+      "--embedder",
+      "mock",
+      "--model-name",
+      "mock",
+      "--graph-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--ollama-url",
+      "http://127.0.0.1:59880",
+      "--build-timeout",
+      "3m",
+      "--progress",
+      "json"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "f68a71726251c45e1c584a39391c5270106642fa540cc136bf22d18f108c85a2",
+    "stderr_sha256": "2ef34b210c416cac9fb991c0edc341e0ad69d2a4f2ae28145f79fc28a511d13d"
+  },
+  {
+    "label": "config-a2",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "mcp",
+      "gen-config",
+      "--dataset-dir",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/dataset/v2",
+      "--source-root",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/source",
+      "--embed-model",
+      "mock-feature-hash-v1",
+      "--graph-binary",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-binary",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--ollama-url",
+      "http://127.0.0.1:59880",
+      "--sanitize-rules",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/a2.yaml"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "883587fd3d2268e984fed621f88779a43d0c37e3098643ae882d64d81b07de17",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "gc-project-a",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "gc",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/dataset",
+      "--keep-recent",
+      "2",
+      "--min-age",
+      "0s"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "d476458031cb06536831d75783f6dfbf6b260145555cbee01c616fa0abdb3f58",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "gc-project-b",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "gc",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-b/dataset",
+      "--keep-recent",
+      "2",
+      "--min-age",
+      "0s"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "708a5969e782315ef31bafd86512559897adb0eaa6aa2e2eb693cd6b5af7fcb5",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "rollback-a-old",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "rollback",
+      "v1",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/dataset"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e2ed3496150f8699edd554f74e06b0ef11019bfe1542d3a30ba0f8dc6cb15b5b"
+  },
+  {
+    "label": "rollback-a-restore-new",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "rollback",
+      "v2",
+      "--out",
+      "/private/tmp/ks-collection-isolation-20261015-final/project-a/dataset"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "60aa228d49cbbbe929e37787ef9e7495f9e3fad36167630bf589a8add7cdf244"
+  }
+]

@@ -1,0 +1,93 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "mcp__plugin_coding-agent_cks__cks_context_change_history",
+      "mcp__plugin_coding-agent_cks__cks_context_concurrency_impact",
+      "mcp__plugin_coding-agent_cks__cks_context_expand_flow",
+      "mcp__plugin_coding-agent_cks__cks_context_find_branches",
+      "mcp__plugin_coding-agent_cks__cks_context_find_callees",
+      "mcp__plugin_coding-agent_cks__cks_context_find_callers",
+      "mcp__plugin_coding-agent_cks__cks_context_find_invariants",
+      "mcp__plugin_coding-agent_cks__cks_context_find_symbol",
+      "mcp__plugin_coding-agent_cks__cks_context_get_conventions",
+      "mcp__plugin_coding-agent_cks__cks_context_get_flow",
+      "mcp__plugin_coding-agent_cks__cks_context_get_for_task",
+      "mcp__plugin_coding-agent_cks__cks_context_get_for_task_v2",
+      "mcp__plugin_coding-agent_cks__cks_context_get_invariant_enforcement",
+      "mcp__plugin_coding-agent_cks__cks_context_get_subgraph",
+      "mcp__plugin_coding-agent_cks__cks_context_impact_analysis",
+      "mcp__plugin_coding-agent_cks__cks_context_label_suspects",
+      "mcp__plugin_coding-agent_cks__cks_context_review_function",
+      "mcp__plugin_coding-agent_cks__cks_context_rule_candidates",
+      "mcp__plugin_coding-agent_cks__cks_context_search_text",
+      "mcp__plugin_coding-agent_cks__cks_context_semantic_search",
+      "mcp__plugin_coding-agent_cks__cks_context_value_dependencies",
+      "mcp__plugin_coding-agent_cks__cks_context_value_dependency_expansion",
+      "mcp__plugin_coding-agent_cks__cks_ops_freshness",
+      "mcp__plugin_coding-agent_cks__cks_ops_health",
+      "mcp__plugin_coding-agent_cks__cks_ops_index",
+      "mcp__plugin_coding-agent_cks__cks_ops_reindex",
+      "mcp__plugin_coding-agent_cks__cks_ops_setup",
+      "mcp__plugin_coding-agent_cks__cks_ops_setup_status",
+      "mcp__plugin_coding-agent_cks__cks_semantic_get_concept",
+      "mcp__plugin_coding-agent_cks__cks_semantic_lookup_term",
+      "mcp__plugin_coding-agent_cks__cks_semantic_status",
+      "mcp__plugin_coding-agent_cks__cks_semantic_trace_requirement",
+      "mcp__plugin_coding-agent_cks__cks_context_policy_security"
+    ],
+    "deny": []
+  },
+  "disableClaudeAiConnectors": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/consumer-role-host.py --observe --log /private/tmp/ks-consumer-role-20261017/P06-analyzer-handoff/hook-inputs.jsonl",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/consumer-role-host.py --observe --log /private/tmp/ks-consumer-role-20261017/P06-analyzer-handoff/hook-inputs.jsonl",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/consumer-role-host.py --observe --log /private/tmp/ks-consumer-role-20261017/P06-analyzer-handoff/hook-inputs.jsonl",
+            "timeout": 5
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3 /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/consumer-role-host.py --observe --log /private/tmp/ks-consumer-role-20261017/P06-analyzer-handoff/hook-inputs.jsonl",
+            "timeout": 5
+          }
+        ],
+        "matcher": "*"
+      }
+    ]
+  }
+}

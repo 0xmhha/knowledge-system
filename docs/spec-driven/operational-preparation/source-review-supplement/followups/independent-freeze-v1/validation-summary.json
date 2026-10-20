@@ -1,0 +1,120 @@
+{
+  "status": "scoped_preparation_verified_not_formal_acceptance",
+  "current_scoped_tests": [
+    {
+      "name": "test_independent_acceptance.py",
+      "tests": 49,
+      "exit_code": 0,
+      "source": "current_working_tree"
+    },
+    {
+      "name": "test_operational_acceptance.py",
+      "tests": 39,
+      "exit_code": 0,
+      "source": "current_working_tree"
+    },
+    {
+      "name": "test_documentation_contract.py",
+      "tests": 20,
+      "exit_code": 0,
+      "source": "current_working_tree"
+    },
+    {
+      "name": "test_package_notice_recipe.py",
+      "tests": 3,
+      "exit_code": 0,
+      "source": "current_working_tree"
+    },
+    {
+      "name": "test_stablenet_comparison.py",
+      "tests": 22,
+      "exit_code": 0,
+      "source": "current_working_tree"
+    }
+  ],
+  "current_tests_total": 133,
+  "historical_tests": {
+    "tests": 36,
+    "source_revision": "9de07a8264bc4aea7054dcea8abb6559801d1cef",
+    "exit_code": 0,
+    "presented_as_current_source": false
+  },
+  "gates": [
+    {
+      "name": "independent",
+      "argv": [
+        "python3",
+        "scripts/check-independent-freeze.py"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0
+    },
+    {
+      "name": "expected-independent-refusal",
+      "argv": [
+        "python3",
+        "scripts/check-independent-freeze.py",
+        "--require-ready"
+      ],
+      "expected_exit": 1,
+      "actual_exit": 1
+    },
+    {
+      "name": "acceptance",
+      "argv": [
+        "python3",
+        "scripts/check-operational-acceptance.py"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0
+    },
+    {
+      "name": "expected-frozen-refusal",
+      "argv": [
+        "python3",
+        "scripts/check-operational-acceptance.py",
+        "--require-frozen"
+      ],
+      "expected_exit": 1,
+      "actual_exit": 1
+    },
+    {
+      "name": "docs",
+      "argv": [
+        "python3",
+        "scripts/check-docs.py"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0
+    },
+    {
+      "name": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "expected_exit": 0,
+      "actual_exit": 0
+    }
+  ],
+  "completion_guard_exit_code": 0,
+  "completion_guard_raw_log_public": false,
+  "live_documents": 134,
+  "deterministic_core_replay_files": 11,
+  "fresh_Go_full_tests_this_stage": false,
+  "native_reuse": "native-reuse.json",
+  "initial_failures_preserved": true,
+  "historical_reference_reclassified_not_rewritten": true,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "reviewer_assignment": "미정",
+  "freeze": null,
+  "execution_allowed": false,
+  "FINAL_inputs_created": 0,
+  "independent_gold_approved": 0,
+  "model_calls": 0,
+  "paid_model_calls": 0,
+  "production_activation": false,
+  "publication": false
+}

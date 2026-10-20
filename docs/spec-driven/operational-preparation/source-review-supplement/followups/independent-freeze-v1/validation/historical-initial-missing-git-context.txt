@@ -1,0 +1,866 @@
+.fatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+E...fatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+E.fatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+E..fatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+E.fatal: not a git repository (or any of the parent directories): .git
+E.fatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+Efatal: not a git repository (or any of the parent directories): .git
+E
+======================================================================
+ERROR: test_candidate_hash_tampering_is_rejected (__main__.PreparationGuardTests.test_candidate_hash_tampering_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 170, in test_candidate_hash_tampering_is_rejected
+    self.assertTrue(any("preparation reference" in e for e in self.errors()))
+                                                              ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_controlled_source_patch_is_not_operational_acceptance (__main__.PreparationGuardTests.test_controlled_source_patch_is_not_operational_acceptance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 229, in test_controlled_source_patch_is_not_operational_acceptance
+    self.assertTrue(any("readiness patch promoted" in e for e in self.errors()))
+                                                                 ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_current_documents_are_consistent (__main__.PreparationGuardTests.test_current_documents_are_consistent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 52, in test_current_documents_are_consistent
+    self.assertEqual(guard.check(guard.ROOT, self.actual_protocol, self.actual_ledger)[0], [])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_draft_cannot_start_execution (__main__.PreparationGuardTests.test_draft_cannot_start_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 59, in test_draft_cannot_start_execution
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_draft_does_not_satisfy_frozen_gate (__main__.PreparationGuardTests.test_draft_does_not_satisfy_frozen_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 62, in test_draft_does_not_satisfy_frozen_gate
+    self.assertTrue(self.errors(True))
+                    ^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_each_gate_cannot_advance_in_draft (__main__.PreparationGuardTests.test_each_gate_cannot_advance_in_draft) (field='operational_gate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 129, in test_each_gate_cannot_advance_in_draft
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_each_gate_cannot_advance_in_draft (__main__.PreparationGuardTests.test_each_gate_cannot_advance_in_draft) (field='quality_gate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 129, in test_each_gate_cannot_advance_in_draft
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_each_gate_cannot_advance_in_draft (__main__.PreparationGuardTests.test_each_gate_cannot_advance_in_draft) (field='independent_acceptance')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 129, in test_each_gate_cannot_advance_in_draft
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_execution_receipt_requires_freeze (__main__.PreparationGuardTests.test_execution_receipt_requires_freeze)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 120, in test_execution_receipt_requires_freeze
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_fake_freeze_is_rejected (__main__.PreparationGuardTests.test_fake_freeze_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 108, in test_fake_freeze_is_rejected
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_family_cannot_leak_across_work_items (__main__.PreparationGuardTests.test_family_cannot_leak_across_work_items)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 141, in test_family_cannot_leak_across_work_items
+    self.assertTrue(any("across work items" in e for e in self.errors()))
+                                                          ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_hash_tampering_is_rejected (__main__.PreparationGuardTests.test_hash_tampering_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 86, in test_hash_tampering_is_rejected
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_host_capture_hash_tampering_is_rejected (__main__.PreparationGuardTests.test_host_capture_hash_tampering_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 174, in test_host_capture_hash_tampering_is_rejected
+    self.assertTrue(any("preparation reference" in e for e in self.errors()))
+                                                              ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_host_recipe_cannot_skip_hooks_or_permissions (__main__.PreparationGuardTests.test_host_recipe_cannot_skip_hooks_or_permissions) (flag='--bare')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 182, in test_host_recipe_cannot_skip_hooks_or_permissions
+    self.assertTrue(any("bypasses" in e for e in self.errors()))
+                                                 ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_host_recipe_cannot_skip_hooks_or_permissions (__main__.PreparationGuardTests.test_host_recipe_cannot_skip_hooks_or_permissions) (flag='--safe-mode')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 182, in test_host_recipe_cannot_skip_hooks_or_permissions
+    self.assertTrue(any("bypasses" in e for e in self.errors()))
+                                                 ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_host_recipe_cannot_skip_hooks_or_permissions (__main__.PreparationGuardTests.test_host_recipe_cannot_skip_hooks_or_permissions) (flag='--dangerously-skip-permissions')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 182, in test_host_recipe_cannot_skip_hooks_or_permissions
+    self.assertTrue(any("bypasses" in e for e in self.errors()))
+                                                 ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_host_recipe_cannot_skip_hooks_or_permissions (__main__.PreparationGuardTests.test_host_recipe_cannot_skip_hooks_or_permissions) (flag='bypassPermissions')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 182, in test_host_recipe_cannot_skip_hooks_or_permissions
+    self.assertTrue(any("bypasses" in e for e in self.errors()))
+                                                 ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_local_host_adopted_source_cannot_change_without_evidence (__main__.PreparationGuardTests.test_local_host_adopted_source_cannot_change_without_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 76, in test_local_host_adopted_source_cannot_change_without_evidence
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_local_host_adoption_cannot_expand_to_production (__main__.PreparationGuardTests.test_local_host_adoption_cannot_expand_to_production)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 69, in test_local_host_adoption_cannot_expand_to_production
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_missing_requirement_cannot_disappear (__main__.PreparationGuardTests.test_missing_requirement_cannot_disappear)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 103, in test_missing_requirement_cannot_disappear
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_old_regression_cannot_become_gold (__main__.PreparationGuardTests.test_old_regression_cannot_become_gold)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 146, in test_old_regression_cannot_become_gold
+    self.assertTrue(any("regression input" in e for e in self.errors()))
+                                                         ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_phase_zero_cannot_be_marked_complete (__main__.PreparationGuardTests.test_phase_zero_cannot_be_marked_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 112, in test_phase_zero_cannot_be_marked_complete
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_policy_reference_diagnosis_cannot_claim_approved_scope (__main__.PreparationGuardTests.test_policy_reference_diagnosis_cannot_claim_approved_scope)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 93, in test_policy_reference_diagnosis_cannot_claim_approved_scope
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_policy_reference_diagnosis_reference_cannot_disappear (__main__.PreparationGuardTests.test_policy_reference_diagnosis_reference_cannot_disappear)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 99, in test_policy_reference_diagnosis_reference_cannot_disappear
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_policy_security_source_preparation_reference_cannot_disappear (__main__.PreparationGuardTests.test_policy_security_source_preparation_reference_cannot_disappear)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 82, in test_policy_security_source_preparation_reference_cannot_disappear
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_positive_verdict_requires_hash_bound_evidence (__main__.PreparationGuardTests.test_positive_verdict_requires_hash_bound_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 162, in test_positive_verdict_requires_hash_bound_evidence
+    self.assertTrue(any("hash-bound evidence" in e for e in self.errors()))
+                                                            ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_preparation_draft_is_consistent (__main__.PreparationGuardTests.test_preparation_draft_is_consistent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 55, in test_preparation_draft_is_consistent
+    self.assertEqual(self.errors(), [])
+                     ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_readiness_manifest_hash_tampering_is_rejected (__main__.PreparationGuardTests.test_readiness_manifest_hash_tampering_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 224, in test_readiness_manifest_hash_tampering_is_rejected
+    self.assertTrue(any("patch manifest" in e for e in self.errors()))
+                                                       ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_recipe_run_cannot_precede_freeze (__main__.PreparationGuardTests.test_recipe_run_cannot_precede_freeze)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 186, in test_recipe_run_cannot_precede_freeze
+    self.assertTrue(any("recipe execution" in e for e in self.errors()))
+                                                         ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_runtime_cannot_be_marked_complete (__main__.PreparationGuardTests.test_runtime_cannot_be_marked_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 116, in test_runtime_cannot_be_marked_complete
+    self.assertTrue(self.errors())
+                    ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_same_family_cannot_cross_holdout (__main__.PreparationGuardTests.test_same_family_cannot_cross_holdout)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 136, in test_same_family_cannot_cross_holdout
+    self.assertTrue(any("overlap" in e for e in self.errors()))
+                                                ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_unknown_verdict_cannot_bypass_guard (__main__.PreparationGuardTests.test_unknown_verdict_cannot_bypass_guard)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 166, in test_unknown_verdict_cannot_bypass_guard
+    self.assertTrue(any("unknown item verdict" in e for e in self.errors()))
+                                                             ^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/test_operational_acceptance.py", line 35, in errors
+    return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-operational-acceptance.py", line 155, in check
+    errors.extend(readiness.check((root / refreshed["manifest"]).parent, root))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/check-acceptance-readiness.py", line 15, in check
+    v=load(folder,'validation.json');unchanged_checkpoint_go(root,v,'17970c86');require(all(code==0 for code in v['gates'].values()),'failed validation gate')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/ks-independent-readiness-history-20261018/scripts/knowledge_evidence.py", line 140, in unchanged_checkpoint_go
+    require(sha(body)==ref['manifest_sha256']and body==subprocess.check_output(['git','show',ref['revision']+':'+path.as_posix()],cwd=root),'Go reference not immutable committed proof')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '17970c86:system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration/manifest.json']' returned non-zero exit status 128.
+
+----------------------------------------------------------------------
+Ran 36 tests in 11.760s
+
+FAILED (errors=32)

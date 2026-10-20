@@ -1,0 +1,111 @@
+{
+  "kind": "WI2_AI_DEV_context_and_observed_matching_not_independent_gold",
+  "source_inputs": 108,
+  "source_functions": 91,
+  "source_units": 538,
+  "review_labels": {
+    "positive": 20,
+    "negative": 505,
+    "unknown": 13
+  },
+  "source_label_changes": [
+    {
+      "case_id": "CALL-046",
+      "unit_id": "db65b25f4973d5dff71e5d18435348d2f1c747c05f10d841a03ef4291f23d81c",
+      "previous_review_label": "unknown",
+      "review_label": "positive",
+      "contract_label": "positive",
+      "rationale": "The exact selected source identity has a supported local RHS/CFG dependency witness to this sink; lexical may-reach, not runtime feasibility or attacker control.",
+      "flow": {
+        "origins": [
+          "parameter:v@1920"
+        ],
+        "unknown_reasons": [],
+        "definition_spans": [
+          {
+            "binding": "v@1920",
+            "span": {
+              "start": 1920,
+              "end": 1923
+            },
+            "owner": "entry"
+          }
+        ],
+        "conditions": []
+      },
+      "scope_unknown_reasons": [],
+      "callee_status": "declared_import_unshadowed_package_types_unresolved",
+      "safety_verdict": "unknown",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established"
+    },
+    {
+      "case_id": "CALL-046",
+      "unit_id": "e674a78e3dcec9e73d8c9cbf8eed392d195b235aeab7b39e2fd742b95f7d0a91",
+      "previous_review_label": "unknown",
+      "review_label": "negative",
+      "contract_label": "unknown",
+      "rationale": "No dependency from this exact selected source to this sink in the declared bounded local equations; other arguments/declarations/slots are distinct. Not a safety proof.",
+      "flow": {
+        "origins": [
+          "parameter:v@1920"
+        ],
+        "unknown_reasons": [],
+        "definition_spans": [
+          {
+            "binding": "v@1920",
+            "span": {
+              "start": 1920,
+              "end": 1923
+            },
+            "owner": "entry"
+          }
+        ],
+        "conditions": []
+      },
+      "scope_unknown_reasons": [
+        "parameter_value_domain_not_proven_scalar"
+      ],
+      "callee_status": "declared_import_unshadowed_package_types_unresolved",
+      "safety_verdict": "unknown",
+      "runtime_reachability": "not_established",
+      "attacker_control": "not_established"
+    }
+  ],
+  "consumer_function_statuses": {
+    "matched_bounded": 80,
+    "consumer_symbol_unavailable_unknown": 9,
+    "analysis_unavailable_unknown": 2
+  },
+  "consumer_unit_statuses": {
+    "not_returned_bounded_not_safety": 480,
+    "consumer_symbol_unavailable_unknown": 20,
+    "analysis_unavailable_unknown": 16,
+    "returned_candidate": 22
+  },
+  "observed_candidates": 22,
+  "returned_candidates_by_AI_source_label": {
+    "positive": 18,
+    "unknown": 2,
+    "negative": 2
+  },
+  "unmatched_candidates": 0,
+  "conditions": {
+    "source_node": 8
+  },
+  "condition_branches": {
+    "unique_structural_ordinal": 8
+  },
+  "caller_contexts": 14,
+  "independent_approved": 0,
+  "FINAL_cases": 0,
+  "D04": "미정",
+  "formal_completed": 0,
+  "formal_total": 9,
+  "freeze": null,
+  "execution_allowed": false,
+  "current_scores": null,
+  "semantic_gold_complete": false,
+  "formal_scoring_allowed": false,
+  "external_model_calls": 0
+}

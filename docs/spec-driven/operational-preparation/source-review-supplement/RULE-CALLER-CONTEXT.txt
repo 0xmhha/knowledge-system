@@ -1,0 +1,91 @@
+WI-2 후보 호출자·명령 선택 계약 문맥 — 준비 16단계
+
+결과와 완료 범위
+앞 단계 후보 CALL-045/046의 호출자 문맥을 고정 원문 두 파일에서 보완했다.
+관측한 문법상 직접 호출은 14개/5개 함수이며, 명령 이름 literal 13개와 identifier 1개다.
+wrapper·공통 실행 함수·린터 경로 반환·CI dispatch의 비공개 AI 문맥 초안 5개와
+원문 anchor 11곳을 작성했다. 원문 결합·문법 관측·범위 기록의 준비 작업이다.
+실제 callee resolution·명령 실행·운영 도달성·독립 정답 수용은 완료하지 않았다.
+
+출처와 검색 범위
+commit: 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+선정 파일: build/ci.go, internal/build/util.go
+두 파일은 앞서 고정 commit의 이름 검색에서 발견한 검토 범위다.
+프로젝트 전체의 완전한 resolved call graph나 다른 호출자 부재를 증명하지 않는다.
+project-rule-review-v1의 기존 commit→tree→blob 증명을 재검증하고 재사용했다.
+새 source-proof-reference.json은 그 manifest/Git proof SHA와 두 파일의 blob/SHA를 결합한다.
+원문/Git object를 다시 복제하거나 이전 패킷의 바이트를 변경하지 않았다.
+
+기계적으로 관측한 문법
+- MustRunCommand: 13개 직접 호출 표기. docker 10개, debsign/git/makensis.exe 각 1개.
+- MustRunCommandWithOutput: doLint에서 linter identifier로 1개 직접 호출 표기.
+- caller 함수: doLint 1, doDocker 10, doDebianSource 1, stageDebianSource 1,
+  doWindowsInstaller 1. 모두 이번에 선택한 CI 파일 안의 위치다.
+- helper 선언 2개, 검토 문맥 함수 6개, none build constraint 원문을 함께 보존했다.
+- import 경로 표기는 github.com/ethereum/go-ethereum/internal/build와 대응하지만
+  로컬 shadow/alias·타입·동적 호출을 해석한 것이 아니다. resolution은 syntax_only_unverified다.
+- 문자열 상수 명령 이름과 후속 인자 값은 별도다. 상수라고 실행 파일 신뢰성,
+  환경/PATH·파일 내용·외부 도구의 인자 정책이 안전하다고 결론 내리지 않는다.
+
+원문에 결합한 AI 계약 초안 — 모두 미승인
+1. 명령 이름과 후속 인자
+   literal 명령 이름을 넘기는 호출에서도 flag/env/이미지/경로 등 후속 인자가 있다.
+   현재 parameter-command-name 규칙은 명령 이름의 후보 흐름만 본다.
+2. 린터 경로
+   doLint는 cachedir flag를 downloadLinter에 넘기고 반환 linter를 명령 이름으로 전달한다.
+   downloadLinter에는 checksum 파일의 version, OS/arch, archive 다운로드·해제,
+   filepath.Join(cachedir,base,"golangci-lint") 반환 코드가 있다.
+   checksum/해제 구현·실제 파일 신뢰·cachedir 권한·공격자 제어는 별도 미확인이다.
+3. wrapper와 실행 gate
+   두 wrapper는 exec.Command(cmd,args...)를 MustRun에 전달한다.
+   MustRun은 명령을 표시하고 !DryRunFlag 분기에서 cmd.Run을 호출하며 오류는 log.Fatal로 넘긴다.
+   WithOutput에는 ticker/goroutine과 defer 코드가 있다. 실제 자원 수명/오류 종료는 시험하지 않았다.
+4. CI 진입점
+   CI 파일에는 none build constraint와 명시적 go run 사용 설명이 있다.
+   main은 os.Args[1]에 따라 lint/docker/debsrc/nsis 등의 함수로 분기한다.
+   이 소스 배치는 운영 서비스의 요청 처리 경로나 실제 CI 실행 조건을 증명하지 않는다.
+5. 후보 수와 독립성
+   두 후보는 같은 build util의 유사 wrapper다. 호출자 14개를 추가 독립 결함으로 세지 않는다.
+   gold·reviewer·approval·DEV/FINAL·실제 명령/호출자 계약 수용은 모두 미확정이다.
+
+검증과 실행 범위
+새 scanner는 표준 Go AST로 파일 문자열을 파싱한다. 프로젝트 코드를 컴파일/실행하지 않는다.
+Docker·git·debsign·makensis·린터 다운로드·자식 프로세스를 실제로 실행하지 않았다.
+관측기 자체는 Go 1.26.9에서 build/fmt/vet/lint 4건 통과.
+문법 대조군 9개를 일반/race 18건 검사: literal, import 별명, 주석/문자열 제외,
+function value, unqualified, shadowed owner, 중첩 closure, foreign import, CRLF/UTF-8 byte·행 위치.
+파일 source 관측을 두 번 실행해 동일한 결과를 확인했다. 지연/운영 성능 측정은 하지 않았다.
+checker는 신뢰하는 live helper를 새로 컴파일해 원문 관측을 다시 대조한다.
+패킷 안의 임의 코드를 실행하지 않으며 호환 Go·의존성 다운로드는 비활성화한다.
+전용 회귀 28개가 원문/위치 교체, 공개 입력의 정답 혼입, 실제 호출/도달성·안전·
+독립 정답 위조, 원래 프로젝트 분모 변경, 숨긴 native skip/lint 실패, 정식 실행 승격을 거부한다.
+이번 context scanner의 CKG kernel·MCP·모델·노드·정식 실행은 0이다.
+전체 연관 회귀에서 재검증하는 이전 분석기 증거는 해당 단계의 별도 기록으로 유지한다.
+
+원래 분모와 상태 유지
+프로젝트 원래 분모는 68개 호출, 관측 후보는 2개다. 호출자 14개를 합쳐 82개로 만들지 않는다.
+이전 통제 입력 40개·개발 fixture 23개·annotation query 12개도 별도 유지한다.
+독립 positive/negative gold는 0개이며 precision/recall은 null이다.
+정식 독립 수용 0/9, 담당자 미정, F-01~F-08 pending, freeze null, 실행 허용 false.
+최종 검증일 2026-10-17, 원문 관측일 2026-10-16.
+연관 Python 회귀 386개·현재 문서 134개·기존 구현 완료 상태 검사 통과.
+이전 동결 패킷 15개와 유지보수 Go 소스가 그대로임을 확인했다.
+WI-2의 추가 필요 사항: 규칙별 독립 양성/음성 각 10개 확보·검토, 실제 명령/호출자 계약과
+운영 도달성, retained graph→MCP/소비자 정합, 정답·매칭·DEV/FINAL 동결과 독립 수용.
+
+다음: 준비 17단계 — WI-C 공개 리뷰 입력의 기준 coverage
+기존 리뷰 입력 10개와 rubric·원문 anchor·외부 호출 문맥을 같은 ID로 연결한다.
+module·state/guard·resources/cost·priority의 제안 coverage와 누락/unknown을 점검한다.
+이전 문맥 보완 5개를 새 리뷰로 세지 않고 독립 검토·정답·실제 역할 연결 미완료를 유지한다.
+전체 9개 수용 작업과 별도 후속 12개는 PROGRESS.txt / GAPS.json에 기록했다.
+
+재검증
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_rule_caller_context.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-rule-caller-context.py docs/spec-driven/operational-preparation/source-review-supplement/rule-caller-context-v1
+새 기록은 scripts/prepare-rule-caller-context.py --output NEW_DIRECTORY
+--goroot EXPLICIT_GO_1_26_9_ROOT --lint EXISTING_GOLANGCI_LINT 로 수행한다.
+이전 패킷을 덮어쓰지 않는다.
+
+후속 기록 (2026-10-17): 준비 17단계 WI-C 자료 점검을 완료했다.
+REVIEW-COVERAGE.txt와 PROGRESS.txt의 준비 18단계 WI-1 공백 점검 참조.
+이 보고서의 호출자 관측·독립 gold/운영 도달성 미판정 상태는 그대로 유지한다.

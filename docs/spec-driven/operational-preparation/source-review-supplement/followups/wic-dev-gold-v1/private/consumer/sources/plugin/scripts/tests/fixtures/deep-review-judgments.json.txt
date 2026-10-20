@@ -1,0 +1,113 @@
+{
+  "sections": {
+    "data_state": {
+      "status": "unknown",
+      "claim": "This bounded function review has no verified data_state assessment",
+      "evidence_nodes": [],
+      "assumptions": [],
+      "unknowns": [
+        "No whole-program/measurement evidence supplied"
+      ],
+      "origin": "agent_reasoning"
+    },
+    "guards_exceptions": {
+      "status": "inferred",
+      "claim": "The local branch can select the parameter as a command name; evaluate an allowlist guard",
+      "evidence_nodes": [
+        "b2/n0"
+      ],
+      "assumptions": [
+        "The syntactic exec selector is the intended standard library call",
+        "The parameter may be influenced by the caller"
+      ],
+      "unknowns": [
+        "Actual target/import resolution and attacker influence are not proven",
+        "External call and exception behavior are unknown"
+      ],
+      "origin": "agent_reasoning"
+    },
+    "complexity": {
+      "status": "unknown",
+      "claim": "This bounded function review has no verified complexity assessment",
+      "evidence_nodes": [],
+      "assumptions": [],
+      "unknowns": [
+        "No whole-program/measurement evidence supplied"
+      ],
+      "origin": "agent_reasoning"
+    },
+    "resources": {
+      "status": "unknown",
+      "claim": "This bounded function review has no verified resources assessment",
+      "evidence_nodes": [],
+      "assumptions": [],
+      "unknowns": [
+        "No whole-program/measurement evidence supplied"
+      ],
+      "origin": "agent_reasoning"
+    },
+    "io": {
+      "status": "unknown",
+      "claim": "This bounded function review has no verified io assessment",
+      "evidence_nodes": [],
+      "assumptions": [],
+      "unknowns": [
+        "No whole-program/measurement evidence supplied"
+      ],
+      "origin": "agent_reasoning"
+    },
+    "priority_tradeoffs": {
+      "status": "inferred",
+      "claim": "Prefer a scoped guard review before optimizing the source selection; the tradeoff is stricter inputs versus compatibility",
+      "evidence_nodes": [
+        "b2/n0"
+      ],
+      "assumptions": [
+        "Input restrictions are an intended review concern"
+      ],
+      "unknowns": [
+        "Caller requirements and measured performance are unavailable"
+      ],
+      "origin": "agent_reasoning"
+    }
+  },
+  "findings": [
+    {
+      "id": "guard-review",
+      "category": "guard",
+      "claim": "Parameter-derived command-name candidate needs scoped guard review",
+      "suggestion": "Check intended caller permissions and allowed command names before changing behavior",
+      "priority": "high",
+      "evidence_nodes": [
+        "b2/n0"
+      ],
+      "rule_candidates": [
+        "4ae4ecf912f74ff40c685b1b7b20d1f28abac275e2d3366ffb6ba9f4915a9bde"
+      ],
+      "assumptions": [
+        "This selector is the intended command API"
+      ],
+      "unknowns": [
+        "No exploit or missing whole-program authorization is established"
+      ],
+      "origin": "agent_reasoning",
+      "state": "review_candidate"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "guard",
+      "requirement": "Review local command-name guards",
+      "section": "guards_exceptions",
+      "status": "covered",
+      "reason": "Source-bound local branch and rule candidate reviewed under explicit assumptions"
+    },
+    {
+      "id": "cost",
+      "requirement": "Assess resource and runtime cost",
+      "section": "resources",
+      "status": "unknown",
+      "reason": "No runtime measurement or whole-call-graph evidence supplied"
+    }
+  ]
+}

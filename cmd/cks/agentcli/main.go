@@ -43,21 +43,48 @@ import (
 // NewCmd builds the `cks agent` command: compose an LLM-ready markdown
 // prompt for a task by querying the fused MCP server.
 func NewCmd() *cobra.Command {
-	var prompt, mcpBinary, mcpConfig, output string
+	var prompt, mcpBinary, mcpConfig, output, format string
+	var v2 V2Options
 	cmd := &cobra.Command{
 		Use:   "agent",
-		Short: "Compose LLM-ready context for a task (prompt in, markdown out)",
+		Short: "Compose task context as markdown or verified v2 JSON",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+			ctx, cancel := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
 			defer cancel()
-			return run(ctx, prompt, mcpBinary, mcpConfig, output)
+			if format != "markdown" && format != "v2" {
+				return v2Error("invalid_request")
+			}
+			if format == "markdown" {
+				if !v2.empty() {
+					return v2Error("requires_v2")
+				}
+				return run(ctx, prompt, mcpBinary, mcpConfig, output)
+			}
+			if err := v2.validate(); err != nil {
+				return err
+			}
+			p, err := resolvePrompt(prompt, cmd.InOrStdin())
+			if err != nil {
+				return v2Error("invalid_request")
+			}
+			agent, err := NewAgent(ctx, AgentOpts{CKSMCPBinary: mcpBinary, CKSMCPConfig: mcpConfig})
+			if err != nil {
+				return publicV2CallError(err)
+			}
+			return deliverV2(ctx, agent, p, v2, output, cmd.OutOrStdout())
 		},
 	}
 	cmd.Flags().StringVar(&prompt, "prompt", "", "vibe prompt (when empty, reads from stdin)")
 	cmd.Flags().StringVar(&mcpBinary, "cks-mcp", "", "MCP server binary (empty = this cks binary's own mcp subcommand)")
 	cmd.Flags().StringVar(&mcpConfig, "config", "", "path to cks.yaml forwarded to the server")
-	cmd.Flags().StringVar(&output, "output", "", "write markdown to this file (empty = stdout)")
+	cmd.Flags().StringVar(&output, "output", "", "write selected output to this file (v2 requires a new path; empty = stdout)")
+	cmd.Flags().StringVar(&format, "format", "markdown", "output format: markdown (default) or v2 JSON")
+	cmd.Flags().StringVar(&v2.Intent, "intent", "", "explicit v2 task intent override")
+	cmd.Flags().BoolVar(&v2.ExplainOntology, "explain-ontology", false, "include bounded v2 ontology explanation without changing server mode")
+	cmd.Flags().BoolVar(&v2.IncludeKnowledge, "include-knowledge", false, "include explicitly scoped v2 knowledge context")
+	cmd.Flags().StringVar(&v2.KnowledgeAsOf, "knowledge-as-of", "", "v2 knowledge date (YYYY-MM-DD; requires --include-knowledge)")
+	cmd.Flags().StringVar(&v2.KnowledgeSubsystem, "knowledge-subsystem", "", "explicit v2 knowledge subsystem (requires --include-knowledge)")
 	return cmd
 }
 

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "scope": "observed baseline and designed target; no new runtime tools registered",
+  "baseline_revision": "cb373e94",
+  "observed": {
+    "legacy_MCP_dataset_mutators": [
+      "cks.ops.index",
+      "cks.ops.setup",
+      "cks.ops.reindex"
+    ],
+    "legacy_MCP_job_status": "cks.ops.setup_status",
+    "legacy_MCP_job_states": [
+      "running",
+      "done",
+      "failed"
+    ],
+    "versioned_cli_build": true,
+    "versioned_cli_review_hold": true,
+    "versioned_cli_rollback": true,
+    "internal_single_job_cancel": true,
+    "public_job_cancel": false,
+    "durable_MCP_job_registry": false,
+    "versioned_MCP_build": false,
+    "collection_reads": true
+  },
+  "designed_operations": [
+    "inspect_profile",
+    "build",
+    "status",
+    "cancel"
+  ],
+  "public_tool_names": "assigned with MCP registration in KM-02.2",
+  "runtime_exposed": false,
+  "next_runtime_work": [
+    "KM-02.2",
+    "KM-02.3",
+    "KM-02.4"
+  ],
+  "logical_profiles": "operator-registered project/source/output/config scope; request supplies IDs and exact digests, no paths or commands",
+  "reader_adoption": "separate catalog refresh/reconnect plus coordinate read probe; never inferred from job success"
+}

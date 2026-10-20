@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "test_id": "T09",
+  "base_commit": "f1608eeb6bda1f14ab1519083eaed9b7c55cb6bc",
+  "scope": "owned_two_project_stdio_and_actual_scripted_role_delivery_not_tenant_authorization",
+  "requirements": [
+    "Build a distinct owned project B with the same Seed name and logic.go path, distinct module/commit/source/snapshot; preserve project A and both source/graph proofs.",
+    "Actual Analyzer tests four pinned tools: value_dependencies, rule_candidates, value_dependency_expansion, policy_security. For each, accept exact node/canonical A, retain graph-local ID collision control, and refuse other-function, coherent foreign node+pins/canonical and B commit/source/snapshot pins against A.",
+    "Actual A/B rule+structural responses produce valid separate typed reviews; structural tool does not claim unsupported expected pin enforcement or atomic snapshot authentication.",
+    "Actual Planner verifier and Write hook refuse node/canonical/file/commit/source/snapshot/ticket mismatches and coherent foreign-project replacement under frozen A identity; refuse frozen identity rebind outside ANALYSIS.",
+    "Restore exact A bytes after every control; a final genuine A handoff completes and verifies. Preserve every attempted error/refusal, owned cleanup and previous32 packets."
+  ],
+  "host_cases": ["T09-matrix", "T09-build-A", "T09-build-B", "T09-delivery"],
+  "controls": ["node", "canonical", "file", "commit", "source", "snapshot", "ticket", "foreign"],
+  "matrix_calls": 36,
+  "host_tool_budget": 64,
+  "real_model_calls": 0,
+  "formal_runs": 0,
+  "limitations": ["Node IDs can collide across projects; use canonical+source/snapshot/commit pins and configured graph context. A's pins with that same local ID select A, not proof of B rejection.", "Pins/typed identity are not tenant ACL, reviewer identity or authenticated transport.", "The frozen T04 harness is reused unchanged; invocation labels retain its T04 prefix.", "Selections and reasoning use a local scripted responder, not real model inference.", "A supported fresh ANALYSIS can intentionally revise identity; the test guards accidental mixing and frozen PLANNING delivery."]
+}

@@ -1,0 +1,12 @@
+CALL-007 — AI DEV bounded draft, not independent gold
+build/ci.go {'start': 20344, 'end': 20374}
+discarded-conversion-error
+
+Source/excerpt identity: {"end": 23906, "file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa", "fragment_prefix_bytes": 0, "function_id": "PROJECT-003", "function_sha256": "32e0750df3c70108846c3e8d6ce8710a5320124ef4233ff6aec803789fff0bf0", "import_context": "original_committed_full_file_partial_type_context", "path": "build/ci.go", "project": "go-stablenet", "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8", "start": 16694}
+
+Complete declared source–sink units:
+{"attacker_control": "not_established", "blank_second_assignment": false, "call_span": {"end": 20374, "start": 20344}, "callee_status": "declared_import_unshadowed_package_types_unresolved", "contract_label": "negative", "empty_source_rationale": "no value returned from enclosing function", "flow": {"conditions": [], "definition_spans": [], "origins": [], "unknown_reasons": ["unsupported_value_expression:void_return"]}, "id": "489ee5dbc741bd4fa7214ffdd95a1599a31d3632129737beb84bfbcc80026c42", "rationale": "The direct two-result blank-second-target pattern is absent. This does not prove that the error was checked or correctly handled.", "review_label": "negative", "rule_id": "discarded-conversion-error", "runtime_reachability": "not_established", "safety_verdict": "unknown", "scope_unknown_reasons": ["sink_outside_explicit_direct_identifier_contract"], "sink_binding": "", "sink_kind": "void_return", "sink_span": {"end": 22969, "start": 22963}, "source_identity": "conversion:20344", "source_scope": {"file_sha256": "64a714ad534a97b9f3ed0b11d4029e5103253e9510603375baa3e99406afbbfa", "fragment_prefix_bytes": 0, "function_sha256": "32e0750df3c70108846c3e8d6ce8710a5320124ef4233ff6aec803789fff0bf0", "path": "build/ci.go", "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"}, "source_span": {"end": 20335, "start": 20329}}
+
+Answer sets: {"negative_locations": ["489ee5dbc741bd4fa7214ffdd95a1599a31d3632129737beb84bfbcc80026c42"], "rule_candidates": [], "unsupported_or_unknown_flows": []}
+Empty-set rationales: {"rule_candidates": "No units with this label in the complete declared source-call universe; AI rationale, independent review pending.", "unsupported_or_unknown_flows": "No units with this label in the complete declared source-call universe; AI rationale, independent review pending."}
+Human reviewer: unassigned; no scoring, no safety/attacker-control/runtime verdict; actual MCP mapping not frozen.

@@ -1,0 +1,65 @@
+func (api *API) analyzeBlock(blockNum uint64, authorCounts, preparedCounts, committedCounts, prevPreparedCounts, prevCommittedCounts, totalSealCounts map[common.Address]int) uint64 {
+	// Fetch header
+	header := api.chain.GetHeaderByNumber(blockNum)
+	if header == nil {
+		return 0
+	}
+
+	// Count block author (proposal creator)
+	author, err := api.backend.Author(header)
+	if err == nil {
+		if _, ok := authorCounts[author]; !ok {
+			authorCounts[author] = 0
+		}
+		authorCounts[author]++
+	}
+
+	// Count signers from prepared/committed and previous-round seals
+	extra, err := types.ExtractWBFTExtra(header)
+	if err != nil {
+		return 0
+	}
+
+	curValidators, prevValidators, err := api.backend.GetValidatorsForVerifying(api.chain, header, nil)
+	if err != nil {
+		return uint64(extra.Round)
+	}
+	curVals := curValidators.AddressList()
+	prevVals := prevValidators.AddressList()
+
+	// helper to add counts safely
+	addCounts := func(indices []uint32, vals []common.Address, target map[common.Address]int, addToTotal bool) {
+		for _, idx := range indices {
+			if int(idx) < len(vals) {
+				addr := vals[idx]
+				// ensure key exists on target
+				if _, ok := target[addr]; !ok {
+					target[addr] = 0
+				}
+				target[addr]++
+				// only add to total if requested (for actual seals, not null ones)
+				if addToTotal {
+					if _, ok := totalSealCounts[addr]; !ok {
+						totalSealCounts[addr] = 0
+					}
+					totalSealCounts[addr]++
+				}
+			}
+		}
+	}
+
+	if extra.PreparedSeal != nil {
+		addCounts(extra.PreparedSeal.Sealers.GetSealers(), curVals, preparedCounts, true)
+	}
+	if extra.CommittedSeal != nil {
+		addCounts(extra.CommittedSeal.Sealers.GetSealers(), curVals, committedCounts, true)
+	}
+	if extra.PrevPreparedSeal != nil {
+		addCounts(extra.PrevPreparedSeal.Sealers.GetSealers(), prevVals, prevPreparedCounts, true)
+	}
+	if extra.PrevCommittedSeal != nil {
+		addCounts(extra.PrevCommittedSeal.Sealers.GetSealers(), prevVals, prevCommittedCounts, true)
+	}
+
+	return uint64(extra.Round)
+}

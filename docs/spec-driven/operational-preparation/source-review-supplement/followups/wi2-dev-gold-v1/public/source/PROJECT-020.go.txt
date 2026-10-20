@@ -1,0 +1,23 @@
+func freezerInspect(ctx *cli.Context) error {
+	if ctx.NArg() < 4 {
+		return fmt.Errorf("required arguments: %v", ctx.Command.ArgsUsage)
+	}
+	var (
+		freezer = ctx.Args().Get(0)
+		table   = ctx.Args().Get(1)
+	)
+	start, err := strconv.ParseInt(ctx.Args().Get(2), 10, 64)
+	if err != nil {
+		log.Info("Could not read start-param", "err", err)
+		return err
+	}
+	end, err := strconv.ParseInt(ctx.Args().Get(3), 10, 64)
+	if err != nil {
+		log.Info("Could not read count param", "err", err)
+		return err
+	}
+	stack, _ := makeConfigNode(ctx)
+	ancient := stack.ResolveAncient("chaindata", ctx.String(utils.AncientFlag.Name))
+	stack.Close()
+	return rawdb.InspectFreezerTable(ancient, freezer, table, start, end)
+}

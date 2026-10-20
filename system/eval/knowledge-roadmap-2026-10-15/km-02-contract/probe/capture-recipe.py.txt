@@ -1,0 +1,19 @@
+import importlib.util,json,subprocess
+from pathlib import Path
+root=Path.cwd();out=Path('/private/tmp/ks-km02-contract-probe-20261015-final');out.mkdir();cfg=Path('/private/tmp/ks-collection-public-20261015-checked/collection.yaml');assert cfg.is_file()
+s=importlib.util.spec_from_file_location('client',root/'scripts/eval-value-dependencies.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+client=m.Client(None,None,out,command=[str(root/'bin/cks'),'mcp','--config',str(cfg)])
+try:
+ reply=client.request('initialize',{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'maintenance-contract-capability-audit','version':'1'}});assert 'error' not in reply
+ tools=client.request('tools/list')['result']['tools'];names={t['name'] for t in tools}
+ assert len(names)==35 and {'cks.ops.index','cks.ops.setup','cks.ops.setup_status','cks.ops.reindex'}<=names
+ assert not any(n.endswith('.cancel') or n.startswith('cks.dataset.') for n in names)
+ (out/'tools.json').write_text(json.dumps(tools,ensure_ascii=False,indent=2)+'\n')
+finally:client.close()
+rows=[]
+for name,args in [('setup-help',['setup','--help']),('rollback-help',['rollback','--help'])]:
+ r=subprocess.run([str(root/'bin/cks'),*args],capture_output=True,timeout=30);assert r.returncode==0
+ (out/(name+'.stdout.txt')).write_bytes(r.stdout);(out/(name+'.stderr.txt')).write_bytes(r.stderr);rows.append({'command':['bin/cks',*args],'exit_code':r.returncode})
+helptext=(out/'setup-help.stdout.txt').read_text()+(out/'setup-help.stderr.txt').read_text();assert all(flag in helptext for flag in ('--project-id','--source-mode','--version','--hold-for-review','--gate-test-bin'))
+(out/'receipt.json').write_text(json.dumps({'scope':'read_only_current_public_tool_and_CLI_help_probe','MCP_tool_count':len(names),'MCP_exit_code':client.proc.returncode,'MCP_calls':0,'requests':2,'versioned_build_tools_exposed':False,'public_cancel_exposed':False,'CLI_help':rows,'paid_model_calls':0},indent=2)+'\n')
+print('observed current MCP35 tools, no public versioned build/cancel; EOF0; CLI version/hold/rollback help confirmed')

@@ -1,0 +1,147 @@
+import pathlib,json,hashlib,importlib.util,sys,threading,time,http.server,urllib.request,urllib.error,socket,stat,shutil
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=pathlib.Path('/private/tmp/ks-stablenet-errors-20261018-01');sys.path.insert(0,str(R/'scripts'));s=importlib.util.spec_from_file_location('stdio',R/'scripts/prepare-consumer-stdio-readiness.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def sha(data):return hashlib.sha256(data).hexdigest()
+def payload(r):
+ a=r.get('result',{})
+ if 'structuredContent'in a:return a['structuredContent']
+ try:return json.loads(a['content'][0]['text'])
+ except (KeyError,ValueError):return {'text':str(a.get('content',r))}
+def failed(r):return 'error'in r or r.get('result',{}).get('isError')is True
+lock=threading.Lock();mode='healthy';step='startup';events=[];requests=[]
+def select(value,label):
+ global mode,step
+ with lock:mode=value;step=label;events.append({'mode':value,'step':label,'monotonic':time.monotonic()});dump(O/'proxy-events.json',events)
+class Handler(http.server.BaseHTTPRequestHandler):
+ def log_message(self,*args):pass
+ def do_GET(self):self.forward()
+ def do_POST(self):self.forward()
+ def forward(self):
+  with lock:current,label=mode,step
+  body=self.rfile.read(int(self.headers.get('Content-Length','0')))
+  row={'method':self.command,'path':self.path,'mode':current,'step':label,'started_monotonic':time.monotonic(),'request_sha256':sha(body)}
+  try:
+   if body:row['request']=json.loads(body)
+   if self.path not in ['/api/embed','/api/embeddings','/api/tags','/api/version','/api/show']:raise ValueError('unexpected endpoint')
+   if self.path in ['/api/embed','/api/embeddings']and current!='healthy':
+    status=503 if current=='503'else 200;data=json.dumps({'error':'controlled owned embedding outage'}if status==503 else {'model':'bge-m3:latest','embeddings':[]}).encode();row['injected']=True
+   else:
+    req=urllib.request.Request('http://127.0.0.1:11434'+self.path,data=body if self.command=='POST'else None,method=self.command,headers={'Content-Type':'application/json'})
+    try:
+     with urllib.request.urlopen(req,timeout=70)as response:status=response.status;data=response.read()
+    except urllib.error.HTTPError as e:status=e.code;data=e.read()
+    row['injected']=False
+   row.update(status=status,response_sha256=sha(data))
+   try:
+    obj=json.loads(data)
+    if 'embeddings'in obj:row.update(response_model=obj.get('model'),vector_count=len(obj['embeddings']),vector_dims=[len(v)for v in obj['embeddings']])
+    if 'models'in obj:row['selected_digest']=next(x['digest']for x in obj['models']if x['name']=='bge-m3:latest')
+   except (ValueError,KeyError,StopIteration):pass
+   self.send_response(status);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(data)));self.end_headers();self.wfile.write(data)
+  except Exception as e:
+   row['error']=type(e).__name__;self.send_error(502)
+  finally:
+   row['finished_monotonic']=time.monotonic()
+   with lock:requests.append(row);dump(O/'proxy-requests.json',requests)
+server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler);port=server.server_address[1];endpoint='http://127.0.0.1:'+str(port);thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start();dump(O/'proxy-listener.json',{'endpoint':endpoint,'scope':'only owned forwarding endpoint; shared Ollama never stopped or reconfigured','upstream':'http://127.0.0.1:11434','paid_LLM_calls':0})
+class Client(m.OwnedClient):
+ def __init__(self,name,arm,baseline=False):
+  self.attempts=[];self.case=name;self.arm=arm;super().__init__([str(O/'baseline-cks'if baseline else O/'bin/cks'),'mcp','--config',str(config(name,arm))],O/name)
+ def request(self,label,method,params=None):
+  with lock:
+   global step
+   step=self.case+':'+label;which=mode
+  row={'label':label,'method':method,'params':params,'mode':which,'outcome':'attempted','started_monotonic':time.monotonic()};self.attempts.append(row);dump(self.path/'attempts.json',self.attempts)
+  try:r=super().request(label,method,params);row.update(outcome='response',response=r);return r
+  except Exception as e:row['outcome']=type(e).__name__;raise
+  finally:row['finished_monotonic']=time.monotonic();dump(self.path/'attempts.json',self.attempts)
+ def call(self,label,name,args=None):return self.request(label,'tools/call',{'name':name,'arguments':args or{}})
+def config(name,arm):
+ v=O/(arm+'-dataset')/('old-v1'if arm=='old'else'retained-origins-v2');p=O/(name+'.yaml');p.write_text(f'''version: 1
+name: {name}
+backends:
+  ckg:
+    path: {v}/graph/graph.db
+    source_root: {O}/source
+  ckv:
+    path: {v}/vector
+    provider: ollama
+    embed_model: bge-m3:latest
+    embed_dim: 1024
+    ollama_url: {endpoint}
+listen:
+  transport: stdio
+logging:
+  level: error
+sanitize:
+  rules_path: {R}/system/policies/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true
+semantic:
+  ontology_mode: off
+retrieval:
+  recall_k: 10
+  type_neighbors: false
+''');return p
+Q='Explain WBFT validator quorum size in go-stablenet';GOOD='Explain transaction price and time ordering in the miner';search={'query':Q,'k':10,'exclude_tests':True};v2={'prompt':Q,'intent':'arch_explain','explain_ontology':True}
+def health(c,label,up):
+ p=payload(c.call(label,'cks.ops.health'));assert p['backends']['vector'].get('model_reachable',False)is up,(label,p);assert p['serviceable']is up,(label,p);return p
+def error(c,label,name,args,code):
+ r=c.call(label,name,args);assert failed(r)and payload(r)['code']==code,(label,r);assert code in json.dumps(r);return r
+def ok(c,label,name,args):
+ r=c.call(label,name,args);assert not failed(r),(label,r);return payload(r)
+def wait_ttl(label):
+ start=time.monotonic();time.sleep(5.35);events.append({'event':'TTL_wait','step':label,'start':start,'end':time.monotonic()});dump(O/'proxy-events.json',events)
+shutil.copyfile(pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01/read-bin/cks'),O/'baseline-cks');(O/'baseline-cks').chmod(0o755)
+summary=[]
+try:
+ # Historical executable regression witness, not a simulated classification.
+ c=Client('baseline-source','old',True)
+ try:
+  c.initialize();health(c,'health-before',True);r=c.call('source-missing','cks.context.semantic_search',search);assert failed(r)and'source_missing'in json.dumps(r);health(c,'health-poisoned',False)
+  ok(c,'good-go-recovery','cks.context.semantic_search',{**search,'language':'go'});health(c,'health-recovered',True)
+ finally:c.close()
+ summary.append({'case':'baseline-source','old_bug_observed':True})
+ c=Client('baseline-model','new',True)
+ try:
+  c.initialize();health(c,'health-before',True);select('503','baseline-model-outage');r=c.call('embedding-failed','cks.context.semantic_search',search);assert failed(r);health(c,'health-down',False)
+  select('healthy','baseline-model-restore');wait_ttl('baseline-health-only-recovery');health(c,'health-still-latched',False)
+  ok(c,'raw-recovery','cks.context.semantic_search',search);health(c,'health-recovered',True)
+ finally:select('healthy','baseline-model-close');c.close()
+ summary.append({'case':'baseline-model','old_latch_observed_after_TTL':True})
+ c=Client('fixed-source','old')
+ try:
+  c.initialize();health(c,'health-before',True);error(c,'source-missing','cks.context.semantic_search',search,'source_missing');health(c,'health-after-source',True)
+  ok(c,'known-good-v2','cks.context.get_for_task_v2',{'prompt':GOOD,'intent':'arch_explain','explain_ontology':True});health(c,'health-after-v2',True)
+ finally:c.close()
+ summary.append({'case':'fixed-source','source_missing_does_not_poison_model_or_v2_gate':True})
+ c=Client('fixed-recovery','new')
+ try:
+  c.initialize();health(c,'health-before',True);hits=ok(c,'baseline-search','cks.context.semantic_search',search)['hits'];ok(c,'baseline-v2','cks.context.get_for_task_v2',v2)
+  selected=next(h['citation']['file']for h in hits if h['citation']['file'].startswith('@cks/docs/'));index,path=selected[len('@cks/docs/'):].split('/',1);version=O/'new-dataset/retained-origins-v2';manifest=json.load(open(version/'sources/manifest.json'));record=next(x for x in manifest['files']if x['origin_id']=='docs:corpus.'+index and x['path']==path);blob=version/'sources/blobs'/record['sha256'];raw=blob.read_bytes();permissions=stat.S_IMODE(blob.stat().st_mode);dump(O/'external-selected.json',{'file':selected,'origin_id':record['origin_id'],'path':path,'sha256':record['sha256'],'mode':permissions})
+  blob.chmod(permissions|stat.S_IWUSR)
+  try:
+   blob.unlink();error(c,'retained-missing','cks.context.semantic_search',search,'source_missing');health(c,'health-after-missing',True)
+  finally:blob.write_bytes(raw);blob.chmod(permissions)
+  ok(c,'missing-restored','cks.context.semantic_search',search)
+  try:
+   blob.chmod(permissions|stat.S_IWUSR);blob.write_bytes(raw+b'\ncontrolled owned corruption\n');error(c,'retained-corrupt','cks.context.semantic_search',search,'snapshot_mismatch');health(c,'health-after-corrupt',True)
+  finally:blob.write_bytes(raw);blob.chmod(permissions)
+  ok(c,'corrupt-restored-v2','cks.context.get_for_task_v2',v2)
+  select('503','fixed-model-outage');error(c,'embedding-failed','cks.context.semantic_search',search,'embedding_failed');health(c,'health-down',False);error(c,'v2-blocked','cks.context.get_for_task_v2',v2,'service_unavailable')
+  select('healthy','fixed-model-restore');wait_ttl('fixed-health-only-recovery');health(c,'health-recovered-without-raw-query',True);ok(c,'v2-after-health-recovery','cks.context.get_for_task_v2',v2)
+  select('empty','fixed-empty-response');error(c,'empty-embedding','cks.context.semantic_search',search,'embedding_failed');health(c,'health-down-after-empty',False)
+  select('healthy','fixed-raw-recovery');ok(c,'raw-immediate-recovery','cks.context.semantic_search',search);health(c,'health-recovered-immediately',True)
+  # An expired healthy cache must also detect an outage first encountered by Health.
+  select('503','fixed-probe-outage');wait_ttl('fixed-probe-failure');health(c,'probe-detects-outage',False)
+  select('healthy','fixed-probe-restore');wait_ttl('fixed-probe-recovery');health(c,'probe-only-recovered',True);ok(c,'final-v2','cks.context.get_for_task_v2',v2)
+ finally:select('healthy','fixed-recovery-close');c.close()
+ summary.append({'case':'fixed-recovery','missing_corrupt_restored':True,'query_failure_detected':True,'health_only_recovery_without_restart':True,'raw_success_immediate_recovery':True,'empty_response_failure_detected':True,'probe_failure_and_recovery':True})
+ dump(O/'runtime-summary.json',{'cases':summary,'formal_completed':0,'formal_total':9,'reviewer_assignment':'미정','paid_LLM_calls':0,'production_writes':0,'external_publication':0,'proxy_isolation':True,'actual_shared_model_restarts':0,'context_cancellation_scope':'native engine/adapter/MCP tests, not actual MCP cancellation notification'})
+ print('actual baseline/fixed source, integrity, embedding outage and recovery checks PASS',flush=True)
+finally:
+ server.shutdown();server.server_close();thread.join(3)
+ try:
+  sock=socket.create_connection(('127.0.0.1',port),timeout=1);sock.close();closed=False
+ except OSError:closed=True
+ dump(O/'proxy-cleanup.json',{'endpoint':endpoint,'closed':closed,'server_thread_joined':not thread.is_alive(),'requests':len(requests),'mode_events':len(events),'shared_model_stop_or_signal':0});assert closed and not thread.is_alive()

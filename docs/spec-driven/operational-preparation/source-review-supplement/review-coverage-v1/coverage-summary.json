@@ -1,0 +1,51 @@
+{
+  "kind": "review_material_inventory_not_independent_rubric_or_acceptance",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "counts": {
+    "public_case_proposals": 10,
+    "module_labels": 8,
+    "source_files": 9,
+    "existing_ai_rubric_anchors": 45,
+    "same_case_context_supplements": 5,
+    "existing_context_anchors": 19,
+    "state_guard_material_mappings": 10,
+    "resources_cost_material_mappings": 10,
+    "priority_pending": 10,
+    "case_pairs": 45,
+    "same_module_pairs": 2,
+    "same_file_pairs": 1,
+    "approved_independent_reviews": 0,
+    "independent_gold_records": 0,
+    "formal_runs": 0,
+    "new_kernel_calls": 0,
+    "mcp_calls": 0,
+    "model_calls": 0
+  },
+  "module_distribution": {
+    "consensus/wbft": 2,
+    "core/rawdb": 2,
+    "core/state": 1,
+    "core/txpool": 1,
+    "eth/downloader": 1,
+    "miner": 1,
+    "p2p": 1,
+    "rpc": 1
+  },
+  "historical_replacement": {
+    "excluded": "SRC-026",
+    "reason": "miner/stress is a development stress program; production review scope pending",
+    "replacement": "SRC-027"
+  },
+  "material_scope": "10 public case proposals; five attached context supplements; not 15 independent reviews",
+  "categories_are_ai_proposals": true,
+  "required_item_completeness": "not_reviewed",
+  "formal_sample_sufficiency": "not_reviewed",
+  "quality_scores": null,
+  "remaining": [
+    "independently review case/family identity and exposure; freeze DEV/FINAL and sufficiency",
+    "review source contracts and all required state/guard and resource/cost items",
+    "resolve each priority question using requirements and impact; freeze rubric and gold",
+    "collect typed report, diagram, source hashes, state handoff and host execution receipts",
+    "adjudicate operational, quality and independent acceptance after protocol freeze"
+  ]
+}

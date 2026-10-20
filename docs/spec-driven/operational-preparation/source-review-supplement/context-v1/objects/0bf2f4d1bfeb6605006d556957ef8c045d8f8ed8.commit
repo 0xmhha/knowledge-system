@@ -1,0 +1,27 @@
+tree eefa4a0deead9c853f8b73cf4d4012d096274aa9
+parent e5a6e9e14c1e1d225c341b55798f31cd07b0bfcd
+author kimcy(WM) <44454459+colinkim@users.noreply.github.com> 1776840495 +0900
+committer GitHub <noreply@github.com> 1776840495 +0900
+gpgsig -----BEGIN PGP SIGNATURE-----
+ 
+ wsFcBAABCAAQBQJp6G8vCRC1aQ7uu5UhlAAAFdgQAJ38eEGlzc3IlsYZ/heGs1kI
+ 0re4ZyWfShBQzpwqC8H0PN7q6CZpHnQk6hjHX8Z6CfFwO6B9VPfHrJlq4PGlbKBE
+ OpBlBeOzvTkQZJiLsn3EObk3kx0p9Txoi9mbmr1Z/kd6nV5Q7kWeQmknOz0swSVL
+ 917CxSXfg68fkS3J9zq8yjijhlyyj9aWM1yG+ZKE/IR35olJu2i6GWewH4oTGbep
+ OKdxm7flmEiNhmQoKB9h+aPh5lqBSuqX8J9YmtR/xXZ8jqpBTDugtjPmrAdryzYs
+ XjkHr8BocsKSDHvLvA5DMcKBDZa2YXMx2lSlgz6wEWeZA5dAKftWHhLtfeEQTRXj
+ GZNtdu5Idfkv5GSX2po0oViDBm2eu8zeDi6cGOIzm5yDqDSLk08UFznIkcI//whG
+ COClzurHVEWr69HgmiekEsVDvJEtyoRfvolHUQ0+3buuX9p4vmkNrW1HgxaM9U+Y
+ p3sfei5xa+LaNLOUIL5BtC1Ku9l6M28/hawRGzLmAUmuInz6TpRK/9a4EoRJrRcc
+ bI6XQ68ZEXaraagRPN56G/57BM2pYYkMOF3tU56GwjzH43BH+dp77vQ4SoyFe4Pz
+ yUrLhT9ClRVs6ADx6+SGZFjVFXruNd93/wEdygKB8AJHrPQy/olPuRDWhJnKTFMy
+ CAGMRBgfhMKXlakLqVrM
+ =xo9S
+ -----END PGP SIGNATURE-----
+ 
+
+fix(wbft): prevent drop of valid next-sequence messages in future-view check (#75)
+
+* wbft: fix off-by-one in isTooFarFutureMessage validation
+
+* test(wbft): add boundary tests for future-message threshold check

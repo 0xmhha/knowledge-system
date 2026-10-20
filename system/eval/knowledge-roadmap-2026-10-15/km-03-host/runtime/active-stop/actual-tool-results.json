@@ -1,0 +1,353 @@
+[
+  {
+    "tool": "cks.manager.collect",
+    "actual_tool_use_id": "fixture_tool_0",
+    "is_error": false,
+    "value": {
+      "collection_dir": "/private/tmp/ks-KM034C-host-final-20261015/active-stop-fixture/manager/collections/14c79a355c976c12a8b400e1e77ac70a1410374b8a2670d3254528e206dc46c9",
+      "collection_id": "14c79a355c976c12a8b400e1e77ac70a1410374b8a2670d3254528e206dc46c9",
+      "coverage": {
+        "excluded_counts": {
+          "excluded_file": 1
+        },
+        "file_count": 2,
+        "git_changes": {
+          "scope": "selected_existing_files_HEAD_to_worktree",
+          "state": "not_available_or_disabled",
+          "unexamined_files": 2
+        },
+        "selected_source_files_complete": true,
+        "whole_project_semantics_verified": false
+      },
+      "files": 2,
+      "paid_model_calls": 0,
+      "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+      "schema_version": 1,
+      "stage": "collected_not_reviewed"
+    }
+  },
+  {
+    "tool": "cks.manager.evidence",
+    "actual_tool_use_id": "fixture_tool_1",
+    "is_error": false,
+    "value": {
+      "evidence": {
+        "collected_at": "2026-10-15T12:55:00.961379Z",
+        "collection_id": "14c79a355c976c12a8b400e1e77ac70a1410374b8a2670d3254528e206dc46c9",
+        "content_role": "untrusted_source_data",
+        "content_sha256": "026211f35201c6832b8dc12b1041bda5313f404653512fdb3e7d988e33be28ad",
+        "end_line": 4,
+        "evidence_id": "443c9e19723b9766b858b7d6a92de56505301983784f8874de426e79946b2e5f",
+        "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+        "origin_id": "repo",
+        "path": "value.go",
+        "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+        "reported_not_reexecuted": false,
+        "source_actor": null,
+        "source_kind": "code",
+        "source_recorded_at": null,
+        "start_line": 4
+      },
+      "text": "func HostValue() int { return 42 }\n",
+      "text_preview_sha256": "026211f35201c6832b8dc12b1041bda5313f404653512fdb3e7d988e33be28ad",
+      "text_truncated": false
+    }
+  },
+  {
+    "tool": "cks.manager.draft",
+    "actual_tool_use_id": "fixture_tool_2",
+    "is_error": false,
+    "value": {
+      "claims": 2,
+      "collection_id": "14c79a355c976c12a8b400e1e77ac70a1410374b8a2670d3254528e206dc46c9",
+      "draft_dir": "/private/tmp/ks-KM034C-host-final-20261015/active-stop-fixture/manager/drafts/28508f64213bb70fdd10bbb9297c4ec6dec083a7d28beaf5c80b36d34ea9d78f",
+      "draft_id": "28508f64213bb70fdd10bbb9297c4ec6dec083a7d28beaf5c80b36d34ea9d78f",
+      "native_knowledge_validation": "passed_proposed_overlay_only",
+      "paid_model_calls": 0,
+      "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+      "schema_version": 1,
+      "stage": "drafted_not_reviewed_or_adopted"
+    }
+  },
+  {
+    "tool": "cks.manager.review_plan",
+    "actual_tool_use_id": "fixture_tool_3",
+    "is_error": false,
+    "value": {
+      "as_of": "immutable_collection_not_current_source_verification",
+      "claims": [
+        {
+          "claim_id": "4ad66b479338948e6b211a174e912a769351a07baa533f0ae862cb9a692ab646",
+          "evidence": [
+            {
+              "collected_at": "2026-10-15T12:55:00.961379Z",
+              "collection_id": "14c79a355c976c12a8b400e1e77ac70a1410374b8a2670d3254528e206dc46c9",
+              "content_role": "untrusted_source_data",
+              "content_sha256": "2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d",
+              "end_line": 3,
+              "evidence_id": "e4fcb3bca98fcbfdd0a9373dc5d62fd354c1148582667a18f3808b006b9d0374",
+              "file_sha256": "2713b9bf1b10414bb3c75e3654969064e04c4e27f786d2078d272c99444cb31d",
+              "origin_id": "repo",
+              "path": "go.mod",
+              "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+              "reported_not_reexecuted": false,
+              "source_actor": null,
+              "source_kind": "configuration",
+              "source_recorded_at": null,
+              "start_line": 1
+            }
+          ],
+          "kind": "observed_excerpt",
+          "statement": "Recorded source excerpt from go.mod; semantic interpretation remains unreviewed.",
+          "status": "proposed"
+        },
+        {
+          "claim_id": "c316632166603c50a1280cb1c45a0280dd5a1725f282f978aaa2911306b21668",
+          "evidence": [
+            {
+              "collected_at": "2026-10-15T12:55:00.961379Z",
+              "collection_id": "14c79a355c976c12a8b400e1e77ac70a1410374b8a2670d3254528e206dc46c9",
+              "content_role": "untrusted_source_data",
+              "content_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+              "end_line": 4,
+              "evidence_id": "7b4799bac0b24054fa80caa7c5656a1a11ec4e1529a73becf3fad6978903fc15",
+              "file_sha256": "5ca1bd13fbc9f179ec31d153b69fccedb935200b6ee7c3b0d9653c3bac7c9f09",
+              "origin_id": "repo",
+              "path": "value.go",
+              "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+              "reported_not_reexecuted": false,
+              "source_actor": null,
+              "source_kind": "code",
+              "source_recorded_at": null,
+              "start_line": 1
+            }
+          ],
+          "kind": "observed_excerpt",
+          "statement": "Recorded source excerpt from value.go; semantic interpretation remains unreviewed.",
+          "status": "proposed"
+        }
+      ],
+      "collection_id": "14c79a355c976c12a8b400e1e77ac70a1410374b8a2670d3254528e206dc46c9",
+      "db_adoption": "not_run",
+      "draft_id": "28508f64213bb70fdd10bbb9297c4ec6dec083a7d28beaf5c80b36d34ea9d78f",
+      "duplicate_claim_occurrences": 0,
+      "human_approval": "not_inferred",
+      "possible_duplicates": [],
+      "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+      "questions": [
+        {
+          "answer_status": "not_provided",
+          "claim_id": "4ad66b479338948e6b211a174e912a769351a07baa533f0ae862cb9a692ab646",
+          "evidence_ids": [
+            "e4fcb3bca98fcbfdd0a9373dc5d62fd354c1148582667a18f3808b006b9d0374"
+          ],
+          "kind": "observed_excerpt",
+          "question": "Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown."
+        },
+        {
+          "answer_status": "not_provided",
+          "claim_id": "c316632166603c50a1280cb1c45a0280dd5a1725f282f978aaa2911306b21668",
+          "evidence_ids": [
+            "7b4799bac0b24054fa80caa7c5656a1a11ec4e1529a73becf3fad6978903fc15"
+          ],
+          "kind": "observed_excerpt",
+          "question": "Which constraints and alternatives explain this observation? Supply the actual decision source or leave the rationale unknown."
+        }
+      ],
+      "review_authentication": "not_performed",
+      "revision": null,
+      "schema_version": 1,
+      "shared_evidence_interpretations": []
+    }
+  },
+  {
+    "tool": "cks.manager.review",
+    "actual_tool_use_id": "fixture_tool_4",
+    "is_error": false,
+    "value": {
+      "current_revision": "ff7362f85846eb8edc830c2666d34d3aaa147b998185d52d74bc0586c500811a",
+      "db_adoption": "not_run",
+      "review_authentication": "not_performed",
+      "review_revision": "ff7362f85846eb8edc830c2666d34d3aaa147b998185d52d74bc0586c500811a",
+      "schema_version": 1,
+      "stage": "review_recorded"
+    }
+  },
+  {
+    "tool": "cks.manager.adopt",
+    "actual_tool_use_id": "fixture_tool_5",
+    "is_error": false,
+    "value": {
+      "adoption_id": "3dc9a81fd51c8ab2effc471b61994a195a98a222fce951871d8763b3386145a7",
+      "input_project": "/private/tmp/ks-KM034C-host-final-20261015/active-stop-fixture/manager/adoptions/3dc9a81fd51c8ab2effc471b61994a195a98a222fce951871d8763b3386145a7/project",
+      "review_revision": "ff7362f85846eb8edc830c2666d34d3aaa147b998185d52d74bc0586c500811a",
+      "revision": "b9a269f6557e9798ce5f26b56faa6bb9169643e2cbb987619fb41c7b40e7c2d2",
+      "schema_version": 1,
+      "scope": "reviewed_filtered_input_not_DB_publication",
+      "stage": "input_adopted_not_DB_published"
+    }
+  },
+  {
+    "tool": "cks.manager.select_input",
+    "actual_tool_use_id": "fixture_tool_6",
+    "is_error": false,
+    "value": {
+      "activation_policy": "hold_for_review_only",
+      "actual_Claude_host_workflow_verified": false,
+      "independent_acceptance": false,
+      "jobs": {},
+      "last_validated_read": null,
+      "pending_build": null,
+      "profile_id": "profile-6594ecfc13b0dd8d184326b8e5138261",
+      "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+      "reader_selection": null,
+      "revision": 1,
+      "schema_version": 1,
+      "selected_input": "3dc9a81fd51c8ab2effc471b61994a195a98a222fce951871d8763b3386145a7",
+      "selection_rechecked_on_use": true
+    }
+  },
+  {
+    "tool": "cks.dataset.inspect_profile",
+    "actual_tool_use_id": "fixture_tool_7",
+    "is_error": true,
+    "value": {
+      "schema_version": 1,
+      "code": "project_or_profile_mismatch"
+    }
+  },
+  {
+    "tool": "cks.dataset.inspect_profile",
+    "actual_tool_use_id": "fixture_tool_8",
+    "is_error": false,
+    "value": {
+      "capabilities": {
+        "cancel": true,
+        "input_preparation": "existing_reviewed_or_rendered_inputs",
+        "job_persistence": "durable_journal",
+        "serving_adoption": "not_observed",
+        "versioned_build": true
+      },
+      "profile": {
+        "allowed_activation": [
+          "hold_for_review"
+        ],
+        "embedding_digest": "c3f5e8bd71a457ab0b2cb77f6abf9b0172edb26a385725ed721e80371854a370",
+        "existing_versions": [],
+        "input_digest": "49db150c72abadbf137f1329432d8ffc03270aa7762291972c903f13dc054344",
+        "observed_base": {
+          "state": "absent"
+        },
+        "profile_digest": "e5e163db0e621910f9035ac12949fbc7bc7beff4b3c4a3869eb33ce66876aad6",
+        "profile_id": "profile-6594ecfc13b0dd8d184326b8e5138261",
+        "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+        "required_gates": [
+          "source",
+          "identity",
+          "graph",
+          "vector",
+          "knowledge"
+        ],
+        "source_pin": {
+          "base_commit": "",
+          "mode": "snapshot-only",
+          "snapshot_id": "8bdd36bd6e865a7fdc7c790ed7fa51ee58ee37ab9c991a08d5e4e287ab635b57"
+        },
+        "timeout_max_seconds": 3600
+      }
+    }
+  },
+  {
+    "tool": "cks.dataset.build",
+    "actual_tool_use_id": "fixture_tool_9",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": false,
+      "candidate": null,
+      "error": null,
+      "gates": {
+        "graph": "not_run",
+        "identity": "not_run",
+        "knowledge": "not_run",
+        "semantic": "not_configured",
+        "source": "not_run",
+        "vector": "not_run"
+      },
+      "job_id": "ef70efbad0bac405e34e1a249ca84def",
+      "phase": "accepted",
+      "profile_id": "profile-6594ecfc13b0dd8d184326b8e5138261",
+      "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+      "publication": null,
+      "request_digest": "274cf35cc2a21e2966e3363b5e45a74f9ab81807ea2239681eb9b05c56cf875b",
+      "revision": 1,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "queued",
+      "target_version": "host-reviewed-v1",
+      "terminal": false
+    }
+  },
+  {
+    "tool": "cks.dataset.status",
+    "actual_tool_use_id": "fixture_tool_10",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": false,
+      "candidate": null,
+      "error": null,
+      "gates": {
+        "graph": "not_run",
+        "identity": "not_run",
+        "knowledge": "not_run",
+        "semantic": "not_configured",
+        "source": "not_run",
+        "vector": "not_run"
+      },
+      "job_id": "ef70efbad0bac405e34e1a249ca84def",
+      "phase": "build_graph",
+      "profile_id": "profile-6594ecfc13b0dd8d184326b8e5138261",
+      "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+      "publication": null,
+      "request_digest": "274cf35cc2a21e2966e3363b5e45a74f9ab81807ea2239681eb9b05c56cf875b",
+      "revision": 3,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "running",
+      "target_version": "host-reviewed-v1",
+      "terminal": false
+    }
+  },
+  {
+    "tool": "cks.dataset.status",
+    "actual_tool_use_id": "fixture_tool_11",
+    "is_error": false,
+    "value": {
+      "activated": false,
+      "build_complete": false,
+      "candidate": null,
+      "error": null,
+      "gates": {
+        "graph": "not_run",
+        "identity": "not_run",
+        "knowledge": "not_run",
+        "semantic": "not_configured",
+        "source": "not_run",
+        "vector": "not_run"
+      },
+      "job_id": "ef70efbad0bac405e34e1a249ca84def",
+      "phase": "build_graph",
+      "profile_id": "profile-6594ecfc13b0dd8d184326b8e5138261",
+      "project_id": "project-37f7afb6b4a3484cb72a4124cb106012",
+      "publication": null,
+      "request_digest": "274cf35cc2a21e2966e3363b5e45a74f9ab81807ea2239681eb9b05c56cf875b",
+      "revision": 3,
+      "schema_version": 1,
+      "serving_adoption": "not_observed",
+      "state": "running",
+      "target_version": "host-reviewed-v1",
+      "terminal": false
+    }
+  }
+]

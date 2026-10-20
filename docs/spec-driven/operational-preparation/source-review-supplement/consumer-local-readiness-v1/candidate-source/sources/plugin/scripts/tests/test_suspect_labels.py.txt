@@ -1,0 +1,96 @@
+import copy
+import importlib.util
+import json
+from pathlib import Path
+import unittest
+
+ROOT=Path(__file__).resolve().parents[2]
+spec=importlib.util.spec_from_file_location('suspect_labels',ROOT/'scripts/suspect_labels.py');labels=importlib.util.module_from_spec(spec);spec.loader.exec_module(labels)
+
+
+def response():
+ c={'file':'a.go','start_line':1,'end_line':2,'commit_hash':'head'}
+ unknown={'value':None,'status':'unsupported','reason':'provider unavailable','provenance':[]}
+ signals={name:copy.deepcopy(unknown) for name in labels.SIGNALS}
+ signals['distance']={'value':0,'status':'observed','provenance':[{'tool':'seed','snapshot':'head','anchor':c,'retained_anchor':None}]}
+ return {'schema_version':1,'symptom':'hang','snapshot':'head','coordinates':None,'partial':False,'candidates':[{'citation':c,'retained_citation':None,'symbol':'Alpha','signals':signals}], 'budget':{'max_candidates':10,'max_seeds':3,'max_enriched':3,'max_calls':32,'depth':2,'time_budget_ms':1000,'calls':5,'elapsed_ms':3,'stop_reasons':[]}}
+
+class LabelsTests(unittest.TestCase):
+ def refused(self,r):
+  with self.assertRaises(labels.Invalid):labels.validate_response(r)
+ def test_real_shape_and_explicit_null(self):
+  r=response();self.assertIs(labels.validate_response(r),r)
+  r['candidates'][0]['signals']['security_tag']['value']=[];self.refused(r)
+ def test_false_zero_and_unknown_without_reason_refused(self):
+  for value in [False,0,[],{}]:
+   r=response();r['candidates'][0]['signals']['dataflow_on_path']['value']=value;self.refused(r)
+  r=response();r['candidates'][0]['signals']['dataflow_on_path'].pop('reason');self.refused(r)
+ def test_observation_needs_anchor_and_snapshot(self):
+  for field,value in [('provenance',[]),('value',None)]:
+   r=response();r['candidates'][0]['signals']['distance'][field]=value;self.refused(r)
+  r=response();r['candidates'][0]['signals']['distance']['provenance'][0]['snapshot']='other';self.refused(r)
+ def test_duplicate_and_foreign_candidates_refused(self):
+  r=response();r['candidates'].append(copy.deepcopy(r['candidates'][0]));self.refused(r)
+  r=response();r['candidates'][0]['citation']['commit_hash']='other';self.refused(r)
+ def test_backend_score_not_cause_score(self):
+  r=response();s=r['candidates'][0]['signals']['distance'];r['candidates'][0]['signals']['retrieval']={'status':'observed','value':[{'rank':1,'score':42,'source':'graph'},{'rank':1,'score':.3,'source':'vector'}],'provenance':s['provenance']};labels.validate_response(r)
+  r['candidates'][0]['signals']['retrieval']['value'][0]['score']=float('nan');self.refused(r)
+ def test_call_depth_partial_bounds(self):
+  for field,value in [('calls',33),('depth',4),('max_candidates',21),('elapsed_ms',True)]:
+   r=response();r['budget'][field]=value;self.refused(r)
+  r=response();r['budget']['stop_reasons']=['call_budget'];self.refused(r)
+ def test_personal_and_escape_paths_refused(self):
+  for path in ['.claude/a.go','logs/a.go','../a.go','/tmp/a.go','a/../b.go']:
+   r=response();r['candidates'][0]['citation']['file']=path;self.refused(r)
+ def test_round_cap_and_context_consistency(self):
+  state=None
+  for _ in range(3):state=labels.append_round(state,response())
+  self.assertEqual(state['stop_reason'],'budget_exhausted');self.assertEqual(state['candidate_count'],1)
+  with self.assertRaises(labels.Invalid):labels.append_round(state,response())
+  state=labels.append_round(None,response());r=response();r['symptom']='different'
+  with self.assertRaises(labels.Invalid):labels.append_round(state,r)
+ def test_prior_hash_change_refused(self):
+  state=labels.append_round(None,response());state['rounds'][0]['response']['symptom']='changed'
+  with self.assertRaises(labels.Invalid):labels.append_round(state,response())
+ def test_separate_judgment_cannot_accept_cause(self):
+  j={'origin':'agent_judgment','state':'candidate','rationale':'possible edge','citation':response()['candidates'][0]['citation'],'unknowns':['schedule']}
+  state=labels.append_round(None,response(),'awaiting_observation',[j]);self.assertEqual(state['acceptance'],'not_recorded');self.assertEqual(state['judgments'],[j])
+  j['state']='confirmed'
+  with self.assertRaises(labels.Invalid):labels.append_round(None,response(),judgments=[j])
+ def test_contract_schema_semantics_and_alias_collision(self):
+  contract=json.loads((ROOT/'contracts/cks-tools.schema.json').read_text())
+  tools=[{'name':v['wire_name'],'inputSchema':v['input']} for v in contract['providers']['cks']['tools'].values()]
+  self.assertEqual(labels.check_contract(tools),33)
+  wrong=copy.deepcopy(tools);wrong[0]['inputSchema']['properties']['symptom']={'type':'array'}
+  with self.assertRaises(labels.Invalid):labels.check_contract(wrong)
+  with self.assertRaises(labels.Invalid):labels.check_contract(tools[:-1])
+  full=json.loads((ROOT.parent/'contract/agent-mcp.schema.json').read_text());self.assertEqual(full['providers']['cks'],contract['providers']['cks'])
+
+ def test_finished_artifact_recomputed_and_tamper_refused(self):
+  state=labels.append_round(None,response(),'no_new_candidates');labels.verify_state(state)
+  state['candidate_count']=12
+  with self.assertRaises(labels.Invalid):labels.verify_state(state)
+  state=labels.append_round(None,response())
+  with self.assertRaises(labels.Invalid):labels.verify_state(state)
+ def test_failure_requires_actual_error_receipt(self):
+  state={'schema_version':1,'status':'unavailable','acceptance':'not_recorded','reason':'service down','failure':{'request':{'name':'cks.context.label_suspects','arguments':{'symptom':'hang'}},'response':{'isError':True,'content':[{'type':'text','text':'graph_unavailable'}]}}}
+  labels.verify_state(state);state['failure']['response']['isError']=False
+  with self.assertRaises(labels.Invalid):labels.verify_state(state)
+ def test_handoff_guard_accepts_bound_receipt_and_rejects_missing_or_changed(self):
+  import hashlib,subprocess,sys,tempfile
+  with tempfile.TemporaryDirectory() as tmp:
+   workspace=Path(tmp)/'.coding-agent/tickets/FIX';workspace.mkdir(parents=True);path=workspace/'state.json'
+   old={'ticket_id':'FIX','ticket_type':'bugfix','current_state':'ANALYSIS','states':{'ANALYSIS':{'status':'in_progress'}}};path.write_text(json.dumps(old))
+   artifact=workspace/'suspect-labels.json';candidate=copy.deepcopy(old);candidate['current_state']='PLANNING';candidate['states']['ANALYSIS']['status']='completed'
+   def invoke():
+    event={'tool_name':'Write','cwd':tmp,'tool_input':{'file_path':str(path),'content':json.dumps(candidate)}}
+    return subprocess.run([sys.executable,str(ROOT/'hooks/suspect-labeling-guard.py')],input=json.dumps(event),text=True,capture_output=True)
+   self.assertIn('deny',invoke().stdout)
+   artifact.write_text(json.dumps(labels.append_round(None,response(),'no_new_candidates')))
+   self.assertIn('deny',invoke().stdout)
+   candidate['states']['ANALYSIS']['suspect_labels_sha256']=hashlib.sha256(artifact.read_bytes()).hexdigest()
+   self.assertEqual(invoke().stdout,'')
+   artifact.write_text(artifact.read_text()+' ');self.assertIn('deny',invoke().stdout)
+   candidate['ticket_type']='fresh';self.assertIn('deny',invoke().stdout)
+
+if __name__=='__main__':unittest.main()

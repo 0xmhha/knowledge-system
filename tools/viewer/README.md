@@ -1,7 +1,7 @@
 # Knowledge System Dashboard (tools/viewer)
 
-Next.js 15 + TypeScript + `react-force-graph-{2d,3d}` 기반 코드 지식 그래프 viewer.
-`output: 'export'`로 만들어진 정적 자산이 `ckg` Go 바이너리에 `go:embed`로 박혀,
+Next.js 16 + TypeScript + `react-force-graph-{2d,3d}` 기반 코드 지식 그래프 viewer.
+`output: 'export'`로 만들어진 정적 자산이 `cks` Go 바이너리에 `go:embed`로 박혀,
 `cks viewer`가 `:8080`에서 대시보드를 serve하고 `/api/*`는 스폰된 `ckg api`로 proxy.
 
 > **첫 방문 시 이 문서부터 읽어라.** dev/prod 경로가 헷갈리기 쉽고,
@@ -13,10 +13,9 @@ Next.js 15 + TypeScript + `react-force-graph-{2d,3d}` 기반 코드 지식 그�
 ## 1. 정상 경로 (Prod) — 가장 흔한 사용
 
 `make -C graph viewer`는 이 앱을 정적 export해
-`internal/system/viewer/web_assets/`로 복사하고, 이어지는 `make build-bins`가
+`internal/system/viewer/web_assets/app/`로 복사하고, 이어지는 `make build-bins`가
 그 결과를 **cks 바이너리**에 embed한다 (대시보드는 합성 엔진 `cks viewer`가
-서빙; ckg는 API 전용). 자산 빌드 없이 `make build-bins`만 하면 embed된
-대시보드는 stub이다.
+서빙; ckg는 API 전용). 생성된 app이 없으면 대시보드는 미빌드 안내 페이지다. 추적된 stub을 빌드 결과의 index 위에 복원하지 않으며, HTTP와 정적 내보내기는 같은 app payload를 선택한다.
 
 ```bash
 # 0. 한 번만: 대시보드 자산 + 엔진 바이너리 빌드
@@ -52,7 +51,7 @@ viewer 변경분을 확인할 수 있다.
 
 ```bash
 # 한 번만
-cd tools/viewer && npm install
+cd tools/viewer && npm ci --no-audit --no-fund
 
 # 매 수정 사이클
 cd tools/viewer && npm run build       # 약 3~5s
@@ -173,3 +172,7 @@ BFS-ripple은 기존 문서의 선택적 UI 제안이며 필수 잔여로 승인
 - "viewer 수정했는데 안 보여요" → §1 또는 §2의 `CKS_DEV_VIEWER_DIR`. 절대 §3 먼저 시도하지 말 것.
 - "데이터가 안 보여요" → `ckg build`로 `graph.db`가 진짜 생겼는지 + `--graph` 경로가 맞는지부터.
 - "정적 export로 배포" → `ckg export-static --graph=X --out=Y` 후 Y를 정적 호스팅.
+
+The frontend workspace has its own `go.mod` boundary so root Go checks do not
+traverse Go samples inside npm dependencies. Run its build and checks with npm;
+the root module continues to test and lint all maintained Go packages.

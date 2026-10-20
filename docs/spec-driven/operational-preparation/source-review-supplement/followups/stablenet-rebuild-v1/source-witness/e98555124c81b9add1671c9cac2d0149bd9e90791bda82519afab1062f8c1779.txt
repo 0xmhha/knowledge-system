@@ -1,0 +1,27 @@
+# GovMinter (0x1003): native coin minting authority with v1/v2 versions
+
+**Status:** verified · **Subsystem:** A4 (System Contracts (Governance × 5)) · **Type:** B1
+
+GovMinter is the system contract at address 0x1003 that holds the
+mint authority for native coin. The MasterMinter (0x1002) approves
+mint proposals which GovMinter executes against NativeCoinAdapter
+(0x1000). Two versioned implementations exist: v1 (initial) and v2
+(current). ChainConfig.Anzeon.SystemContracts.GovMinter selects the
+version per chain. Storage tracks the fiat-token reference, mint
+proposals, per-account burn balances, refundable balances, and
+emergency-pause state.
+
+## Code anchors
+- `systemcontracts/gov_minter.go` initializeMinter:87 — Go initializer writes fiatToken from genesis param into contract storage at deploy time
+- `systemcontracts/gov_minter.go` GetMintProposalAmount:122 — reads the reserved mint amount for a given proposalId from contract storage
+- `systemcontracts/gov_minter.go` GetBurnBalance:130 — reads per-address burn balance from contract storage
+- `systemcontracts/contracts.go` GovMinterContractV1:44 — go:embed of compiled v1 bytecode at artifacts/v1/GovMinter
+- `systemcontracts/contracts.go` GovMinterContractV2:53 — go:embed of compiled v2 bytecode at artifacts/v2/GovMinter
+- `systemcontracts/solidity/v1/GovMinter.sol` — Solidity source for v1 (regenerate artifacts via systemcontracts/compile)
+- `systemcontracts/solidity/v2/GovMinter.sol` — Solidity source for v2
+
+## Aliases
+거브 민터, 민터 컨트랙트, 발행 권한, 민팅 시스템 컨트랙트, minter contract, minting authority, native coin minter, 0x1003 contract, GovMinter, initializeMinter, GovMinterContractV1, GovMinterContractV2, GetMintProposalAmount, GetBurnBalance, GetRefundableBalance, CONTRACT_GOV_MINTER
+
+## Related
+A10.codegen.contract_regen_procedure, A4.system_contracts.addresses, A5.native_coin.issuance_burn_flow, A8.genesis.inject_contracts_two_phase

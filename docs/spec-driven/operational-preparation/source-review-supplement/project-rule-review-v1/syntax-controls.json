@@ -1,0 +1,272 @@
+[
+  {
+    "control_id": "closure_sibling",
+    "syntax_calls": [
+      {
+        "owner": "exec",
+        "callee": "Command",
+        "location": {
+          "start_byte": 429,
+          "end_byte": 446,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 1,
+        "arguments": [
+          {
+            "text": "cmd",
+            "identifier": true,
+            "location": {
+              "start_byte": 442,
+              "end_byte": 445,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": []
+      },
+      {
+        "owner": "exec",
+        "callee": "Command",
+        "location": {
+          "start_byte": 452,
+          "end_byte": 469,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 0,
+        "arguments": [
+          {
+            "text": "cmd",
+            "identifier": true,
+            "location": {
+              "start_byte": 465,
+              "end_byte": 468,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": []
+      }
+    ]
+  },
+  {
+    "control_id": "nested_closure",
+    "syntax_calls": [
+      {
+        "owner": "exec",
+        "callee": "Command",
+        "location": {
+          "start_byte": 439,
+          "end_byte": 456,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 2,
+        "arguments": [
+          {
+            "text": "cmd",
+            "identifier": true,
+            "location": {
+              "start_byte": 452,
+              "end_byte": 455,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": []
+      },
+      {
+        "owner": "exec",
+        "callee": "Command",
+        "location": {
+          "start_byte": 462,
+          "end_byte": 479,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 1,
+        "arguments": [
+          {
+            "text": "cmd",
+            "identifier": true,
+            "location": {
+              "start_byte": 475,
+              "end_byte": 478,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": []
+      }
+    ]
+  },
+  {
+    "control_id": "direct_assignment",
+    "syntax_calls": [
+      {
+        "owner": "strconv",
+        "callee": "Atoi",
+        "location": {
+          "start_byte": 422,
+          "end_byte": 437,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 0,
+        "arguments": [
+          {
+            "text": "s",
+            "identifier": true,
+            "location": {
+              "start_byte": 435,
+              "end_byte": 436,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": [
+          "v",
+          "_"
+        ],
+        "assignment_location": {
+          "start_byte": 417,
+          "end_byte": 437,
+          "start_line": 20,
+          "end_line": 20
+        }
+      },
+      {
+        "owner": "strconv",
+        "callee": "Atoi",
+        "location": {
+          "start_byte": 452,
+          "end_byte": 467,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 0,
+        "arguments": [
+          {
+            "text": "s",
+            "identifier": true,
+            "location": {
+              "start_byte": 465,
+              "end_byte": 466,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": []
+      }
+    ]
+  },
+  {
+    "control_id": "context_argument",
+    "syntax_calls": [
+      {
+        "owner": "exec",
+        "callee": "CommandContext",
+        "location": {
+          "start_byte": 419,
+          "end_byte": 447,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 0,
+        "arguments": [
+          {
+            "text": "nil",
+            "identifier": true,
+            "location": {
+              "start_byte": 439,
+              "end_byte": 442,
+              "start_line": 20,
+              "end_line": 20
+            }
+          },
+          {
+            "text": "cmd",
+            "identifier": true,
+            "location": {
+              "start_byte": 443,
+              "end_byte": 446,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": []
+      },
+      {
+        "owner": "exec",
+        "callee": "Command",
+        "location": {
+          "start_byte": 448,
+          "end_byte": 473,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 0,
+        "arguments": [
+          {
+            "text": "\"fixed\"",
+            "identifier": false,
+            "location": {
+              "start_byte": 461,
+              "end_byte": 468,
+              "start_line": 20,
+              "end_line": 20
+            }
+          },
+          {
+            "text": "cmd",
+            "identifier": true,
+            "location": {
+              "start_byte": 469,
+              "end_byte": 472,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": []
+      }
+    ]
+  },
+  {
+    "control_id": "shadowed_owner",
+    "syntax_calls": [
+      {
+        "owner": "exec",
+        "callee": "Command",
+        "location": {
+          "start_byte": 429,
+          "end_byte": 446,
+          "start_line": 20,
+          "end_line": 20
+        },
+        "closure_depth": 0,
+        "arguments": [
+          {
+            "text": "cmd",
+            "identifier": true,
+            "location": {
+              "start_byte": 442,
+              "end_byte": 445,
+              "start_line": 20,
+              "end_line": 20
+            }
+          }
+        ],
+        "assignment_lhs": []
+      }
+    ]
+  }
+]

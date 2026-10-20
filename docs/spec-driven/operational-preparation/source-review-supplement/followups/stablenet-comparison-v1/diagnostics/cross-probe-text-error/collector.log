@@ -1,0 +1,18 @@
+health error False keys ['name', 'status', 'serviceable', 'builder_version', 'source_root', 'backends', 'alignment'] code None serviceable False hits 0
+v2 error True keys ['code', 'message'] code reindex_required serviceable None hits 0
+Traceback (most recent call last):
+  File "/private/tmp/ks-snp04-cross-probe.py", line 6, in <module>
+    r=c.call(label,name,args);p=payload(r);print(label,'error',failed(r),'keys',list(p),'code',p.get('code'),'serviceable',p.get('serviceable'),'hits',len(p.get('hits')or[]),flush=True)
+                                ^^^^^^^^^^
+  File "/private/tmp/ks_snp04_common.py", line 8, in payload
+    return a.get('structuredContent')or json.loads(a['content'][0]['text'])
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

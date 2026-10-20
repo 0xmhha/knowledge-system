@@ -103,7 +103,7 @@ func runTestGateWithLimits(ctx context.Context, candidateDir, sourceRoot string,
 		report.SourceMode, report.SnapshotID = pinned[0].SourceMode, pinned[0].SnapshotID
 	}
 	output := &gateOutputHash{hash: sha256.New()}
-	command := buildCommandContext(ctx, argv[0], argv[1:]...)
+	command := setupCommandContext(ctx, argv[0], argv[1:]...)
 	command.Dir, command.Stdout, command.Stderr = root, output, output
 	start := time.Now()
 	runErr := command.Run()
@@ -148,14 +148,14 @@ func testGateSourceClean(root, expectedCommit string) (bool, error) {
 }
 
 func testGateSourceCleanContext(ctx context.Context, root, expectedCommit string) (bool, error) {
-	head, err := exec.CommandContext(ctx, "git", "-C", root, "rev-parse", "HEAD").Output()
+	head, err := setupCommandContext(ctx, "git", "-C", root, "rev-parse", "HEAD").Output()
 	if err != nil {
 		return false, fmt.Errorf("inspect candidate HEAD: %w", err)
 	}
 	if string(bytes.TrimSpace(head)) != expectedCommit {
 		return false, nil
 	}
-	status, err := exec.CommandContext(ctx, "git", "-C", root, "status", "--porcelain").Output()
+	status, err := setupCommandContext(ctx, "git", "-C", root, "status", "--porcelain").Output()
 	if err != nil {
 		return false, fmt.Errorf("inspect candidate source: %w", err)
 	}

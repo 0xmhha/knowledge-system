@@ -1,0 +1,56 @@
+{
+  "kind": "caller_source_syntax_and_ai_context_not_runtime_or_independent_quality",
+  "counts": {
+    "source_files": 2,
+    "syntax_references": 14,
+    "direct_call_syntax": 14,
+    "other_unresolved_references": 0,
+    "target_declarations": 2,
+    "caller_functions": 5,
+    "literal_command_name_calls": 13,
+    "identifier_command_name_calls": 1,
+    "context_reviews": 5,
+    "source_anchors": 11,
+    "independent_gold_records": 0,
+    "approved_independent_cases": 0
+  },
+  "direct_calls_by_target": {
+    "MustRunCommandWithOutput": 1,
+    "MustRunCommand": 13
+  },
+  "literal_command_values": {
+    "docker": 10,
+    "debsign": 1,
+    "git": 1,
+    "makensis.exe": 1
+  },
+  "direct_calls_by_function": {
+    "doLint": 1,
+    "doDocker": 10,
+    "doDebianSource": 1,
+    "stageDebianSource": 1,
+    "doWindowsInstaller": 1
+  },
+  "original_project_call_denominator_unchanged": 68,
+  "original_project_candidates_unchanged": 2,
+  "new_independent_positive_labels": 0,
+  "new_independent_negative_labels": 0,
+  "analyzed_project_code_executed": false,
+  "context_scanner_kernel_calls": 0,
+  "model_calls": 0,
+  "mcp_calls": 0,
+  "nodes_started": 0,
+  "formal_runs": 0,
+  "precision": null,
+  "recall": null,
+  "runtime_reachability": "not_established",
+  "quality_status": "not_scored_independent_gold_and_positive_sufficiency_unestablished",
+  "limitations": [
+    "two source files selected by a pinned textual search, not an exhaustive resolved repository call graph",
+    "import spelling and literals do not establish binding, trusted PATH, executable content or safe arguments",
+    "function values, dot imports, shadowing, dynamic dispatch and external callers remain unverified",
+    "CI comments/build constraints and source dispatch are not observed production reachability",
+    "AI contract notes and caller multiplicity do not create independent defect cases or gold",
+    "existing 68 project calls / 2 candidates remain a separate denominator from caller references"
+  ]
+}

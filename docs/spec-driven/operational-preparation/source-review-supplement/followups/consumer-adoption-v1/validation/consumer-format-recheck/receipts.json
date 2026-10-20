@@ -1,0 +1,96 @@
+[
+  {
+    "label": "fmt",
+    "argv": [
+      "gofmt",
+      "-l",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/cmd/server/main.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/types/types.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/server/server.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/jira/client.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/jira/adf_test.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/jira/adf.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/filter/patterns.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/filter/engine_test.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/filter/redactor.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/filter/entropy_test.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/filter/engine.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/filter/redactor_test.go",
+      "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp/internal/filter/entropy.go",
+      "/private/tmp/ks-adopted-consumer-20261017/plugin/tools/timing-log-guard/main.go",
+      "/private/tmp/ks-adopted-consumer-20261017/plugin/tools/timing-log-guard/main_test.go"
+    ],
+    "cwd": "/private/tmp/ks-adopted-consumer-20261017",
+    "exit_code": 0,
+    "elapsed_seconds": 0.027653208933770657
+  },
+  {
+    "label": "jira-build",
+    "argv": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp",
+    "exit_code": 0,
+    "elapsed_seconds": 7.05586841609329
+  },
+  {
+    "label": "jira-test",
+    "argv": [
+      "go",
+      "test",
+      "-json",
+      "-count=1",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp",
+    "exit_code": 0,
+    "elapsed_seconds": 3.1685993326827884
+  },
+  {
+    "label": "jira-race",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-json",
+      "-count=1",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp",
+    "exit_code": 0,
+    "elapsed_seconds": 46.17727233329788
+  },
+  {
+    "label": "jira-vet",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "cwd": "/private/tmp/ks-adopted-consumer-20261017/tools/jira-gateway-mcp",
+    "exit_code": 0,
+    "elapsed_seconds": 6.930360542144626
+  },
+  {
+    "label": "deep-review-CI",
+    "argv": [
+      "python3",
+      "plugin/scripts/tests/test_deep_review.py"
+    ],
+    "cwd": "/private/tmp/ks-adopted-consumer-20261017",
+    "exit_code": 0,
+    "elapsed_seconds": 4.089422707911581
+  },
+  {
+    "label": "role-contract-CI",
+    "argv": [
+      "python3",
+      "plugin/scripts/tests/test_review_role_contract.py"
+    ],
+    "cwd": "/private/tmp/ks-adopted-consumer-20261017",
+    "exit_code": 0,
+    "elapsed_seconds": 8.425891458056867
+  }
+]

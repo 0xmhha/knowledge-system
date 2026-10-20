@@ -111,6 +111,21 @@ Mapping notes:
 - `include_history`: not part of `semantic_search`. Fetch with a follow-up `cks.context.change_history` call, or use `cks.context.get_for_task` which folds history into the composer's EvidencePack.
 - `rerank`: not exposed as a per-call flag. The composer (`get_for_task`) reranks by RRF over BM25 + symbol lists; `semantic_search` returns raw CKV hits.
 
+Raw CKS semantic hits may include `non_citable_metadata: true`. This marks
+convention summaries and hits without a positive, ordered source-line range.
+Keep their indexed text as contextual metadata; do not turn their file/line
+fields into a source citation or a v2 source body. The optional flag preserves
+existing hit fields, and its absence does not prove source integrity. Verify
+the dataset/source pins and retained bytes before citing a source-backed hit.
+
+External document hits use `@cks/docs/<index>/<path>` within the selected
+dataset, backed by retained origin `docs:corpus.<index>`. Resolve that origin
+through its source manifest rather than reading a same-named repository file
+or the current external input. In v2 citations, `origin_id` and the path within
+that origin identify the retained file. Rebuild a version with the external
+corpora included when old indexed hits have no retained original; changing
+the live directory alone cannot repair that version's source evidence.
+
 ### 3.2 phase3 (CKV): `ckv_index`
 
 ```ts
@@ -256,7 +271,32 @@ Before issuing retrieval calls in a long-lived session, the coding-agent should:
 { "name": "cks.ops.health", "arguments": {} }
 ```
 
-A `degraded` rollup (ckv unreachable but ckg ok) is still useful: the coding-agent can fall back to `search_text` / `find_symbol` / `find_callers` and skip `semantic_search`. A `down` rollup (ckg unreachable) means retrieval cannot proceed; the planner should surface the error rather than silently degrade.
+`serviceable` is true only when both backends, the vector model, and their
+alignment are usable. Evidence composition is gated when it is false. Individual
+graph tools can still help diagnose a degraded vector path; report that limited
+scope when using their results.
+
+`model_reachable` reflects cached model usability. A query embedding failure
+records a negative observation immediately; both positive and negative
+observations expire after five seconds. The next health call then probes again,
+and a successful raw semantic search refreshes a positive observation immediately.
+Source, integrity, store, budget, and unknown search errors leave this model
+observation unchanged. A healthy model still requires per-query source checks.
+Caller cancellation does not persist as a shared model outage.
+
+`semantic_search` errors carry a bounded `code`/`message` with `isError: true`.
+`source_missing` identifies a missing retained original; `snapshot_mismatch`
+identifies a source/identity mismatch. `embedding_failed` identifies query-vector
+production failure, including unusable provider responses, and does not establish
+a network outage. Caller cancellation/deadline uses `request_canceled` or
+`request_timeout`; other semantic failures use `retrieval_failed`. V2 preserves
+these specific composition errors, while its serviceability gate returns
+`service_unavailable`; inspect backend health to identify the unavailable part.
+The legacy source preflight also preserves bounded source-error codes.
+
+TTL recovery applies to a real adapter that connected successfully at startup.
+A client configured as a degraded dummy during startup requires client
+reconfiguration after its provider becomes available.
 
 `cks.ops.freshness` is a soft check — returns the CKV index's recorded last-built commit vs the working tree. The coding-agent should warn the user (not block) when freshness is stale.
 

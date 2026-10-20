@@ -1,0 +1,94 @@
+{
+  "kind": "local_native_reliability_DEV_not_independent_acceptance",
+  "native": {
+    "source_files": 1741,
+    "approved_inputs": 5,
+    "changes": 20,
+    "fresh_general": {
+      "pass": 4172,
+      "fail": 0,
+      "skip": 18
+    },
+    "fresh_race": {
+      "pass": 4172,
+      "fail": 0,
+      "skip": 18
+    },
+    "full_build_fmt_vet_pinned_lint": true,
+    "process_groups_remaining": 0,
+    "runtime_to_final_source_delta": [
+      "internal/system/maintenance/source_check_test.go"
+    ],
+    "final_binary_must_equal_observed_runtime": true,
+    "binary_sha256": "49e291fbcaab8c9742339889fdc11fb29f3d179aabdc94ee54f015028bbaf4b4"
+  },
+  "runtime": {
+    "actual_WI1_cases": 30,
+    "selected_receive_owner_corrections": 16,
+    "remaining_range_unknown_definitions": 37,
+    "ambiguous_unreachable_empty_blocks": 3,
+    "actual_semantic_searches": 8,
+    "cache_off_query_embedding_HTTP_calls": 2,
+    "cache_on_query_embedding_HTTP_calls": 1,
+    "repeat_on_embedding_HTTP_calls": 0,
+    "search_output_and_source_preserved": true,
+    "health_capacity_on": 32,
+    "actual_model_boundary_calls": 9,
+    "identity_failure_cached_query_rejected": true,
+    "model_down_after_cached_query_observed": true,
+    "post_cached_query_health_probe_HTTP_calls": 0,
+    "exact_health_TTL_state_at_cached_success": "native_regression_only_not_inferred_from_later_MCP_health",
+    "fresh_probe_recovery_verified": true,
+    "raw_tool_calls": 46,
+    "protocol_requests": 50,
+    "sessions": 2,
+    "owned_process_groups_remaining": 0,
+    "original_owned_payload_preserved": true,
+    "quality_score": null
+  },
+  "intentional_superseded_native_attempts": 2,
+  "superseded_native_test_exits": [
+    -15,
+    -15
+  ],
+  "earlier_runtime_attempts": [
+    {
+      "scope": "intermediate-query-aware-candidate",
+      "driver_exit": 0,
+      "tool_calls": 37,
+      "protocol_requests": 41,
+      "server_exits": [
+        0,
+        0
+      ]
+    },
+    {
+      "scope": "model-boundary-initial-attempt",
+      "driver_exit": 1,
+      "tool_calls": 46,
+      "protocol_requests": 50,
+      "server_exits": [
+        0,
+        0
+      ]
+    }
+  ],
+  "explicit_model_boundary_corrective_attempts": 1,
+  "all_runtime_tool_calls": 129,
+  "all_runtime_protocol_requests": 141,
+  "all_runtime_server_sessions": 6,
+  "earlier_full_race_assertion_failures": 1,
+  "original_deadline_failure_root_cause": "not_confirmed_after20_original_and100_traced_repetitions",
+  "deadline_test_now_requires_entered_descendant_and_post_return_release_gate": true,
+  "production_guardian_implementation_changed": false,
+  "previous_evidence_preserved": true,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "FINAL": 0,
+  "D04": "미정",
+  "freeze": null,
+  "execution_allowed": false,
+  "quality_score": null,
+  "personal_names_required": false
+}

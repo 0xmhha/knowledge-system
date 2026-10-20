@@ -1,0 +1,679 @@
+[
+  {
+    "label": "initialize",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {},
+        "clientInfo": {
+          "name": "owned-consumer-P05",
+          "version": "1"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        },
+        "serverInfo": {
+          "name": "fixed-source",
+          "version": "cks-mcp/0.0.1-dev"
+        }
+      }
+    }
+  },
+  {
+    "label": "health-before",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.ops.health",
+        "arguments": {}
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "fixed-source",
+          "status": "ok",
+          "serviceable": true,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-errors-20261018-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/old-dataset/old-v1/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "model_reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-13T14:54:37Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:55814",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/old-dataset/old-v1/vector"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+            "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-errors-20261018-01/source\" differs from indexed checkout \"/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "label": "source-missing",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.semantic_search",
+        "arguments": {
+          "query": "Explain WBFT validator quorum size in go-stablenet",
+          "k": 10,
+          "exclude_tests": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "code=source_missing: A pinned source file is missing."
+          }
+        ],
+        "isError": true,
+        "structuredContent": {
+          "code": "source_missing",
+          "message": "A pinned source file is missing."
+        }
+      }
+    }
+  },
+  {
+    "label": "health-after-source",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.ops.health",
+        "arguments": {}
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "fixed-source",
+          "status": "ok",
+          "serviceable": true,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-errors-20261018-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/old-dataset/old-v1/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "model_reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-13T14:54:37Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:55814",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/old-dataset/old-v1/vector"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+            "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-errors-20261018-01/source\" differs from indexed checkout \"/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "label": "known-good-v2",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.get_for_task_v2",
+        "arguments": {
+          "prompt": "Explain transaction price and time ordering in the miner",
+          "intent": "arch_explain",
+          "explain_ontology": true
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "v2 evidence pack"
+          }
+        ],
+        "structuredContent": {
+          "format_version": 2,
+          "coordinates": {
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+            "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+            "source_mode": "committed",
+            "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+          },
+          "query": "Explain transaction price and time ordering in the miner",
+          "citations": [
+            {
+              "file": "miner/ordering.go",
+              "start_line": 104,
+              "end_line": 106,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "c1d9be4e438c37f44a40fad577b0d1eb3c525c852d9a7c95be3dadb580df0730"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 177,
+              "end_line": 183,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "937952603c00eb36cc2ae906137c5d2525df795cf89038c66389cc268fdf6ed7"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 62,
+              "end_line": 66,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "16610faeb712f6868f1f9b75cff492bdf61609f34685ffd806c7a0c08b6e66e5"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 30,
+              "end_line": 35,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "97eafe8f731dc465fc1ee740c1149da7d307ebbd0c3c5080eecb69283368c090"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 102,
+              "end_line": 102,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "9dc1db4712f88f1503beac88ef042fb5d9c044a49b55e28b8e04c9732756794a"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 68,
+              "end_line": 68,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "e67ab381c61f8e8384b9a365ea4d3d55039926c06793cb6985a3b15392e9ffdb"
+            },
+            {
+              "file": "miner/ordering.go",
+              "start_line": 37,
+              "end_line": 60,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+              "content_sha256": "143aad2b4f794f5ea6cbb4b5dd205db27e4d42525556d482cfe821d86abd7470"
+            },
+            {
+              "file": "core/types/transaction.go",
+              "start_line": 554,
+              "end_line": 558,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "91b8e4b15f84c00ed947dbff08b15d87f3f95538f79009719ddefac05b82a310",
+              "content_sha256": "e3f98a3d25aff50262d844137696edd10b8ab7bc7180fa361536174bfd9a5a8c"
+            },
+            {
+              "file": "systemcontracts/coin_adapter.go",
+              "start_line": 55,
+              "end_line": 55,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "a072fc6c9b197b9f5eed6370be6aa96d70befd145df87a8a252e0b8bcf788e21",
+              "content_sha256": "2105950beedd014495e5178124419a1d7d1d23b6b4bc9da302047c5a2880c89d"
+            },
+            {
+              "file": "systemcontracts/coin_adapter.go",
+              "start_line": 60,
+              "end_line": 60,
+              "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+              "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+              "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+              "source_mode": "committed",
+              "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "origin_id": "repo",
+              "file_sha256": "a072fc6c9b197b9f5eed6370be6aa96d70befd145df87a8a252e0b8bcf788e21",
+              "content_sha256": "8c1af3d31f244e178dbeec663a5d6945a66107d0bf4c355c6b05f9edd3aa4a6c"
+            }
+          ],
+          "bodies": [
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 104,
+                "end_line": 106,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "c1d9be4e438c37f44a40fad577b0d1eb3c525c852d9a7c95be3dadb580df0730"
+              },
+              "text": "func (s *txByPriceAndTime) Push(x interface{}) {\n\ts.txs = append(s.txs, x.(*txWithMinerFee))\n}\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 177,
+                "end_line": 183,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "937952603c00eb36cc2ae906137c5d2525df795cf89038c66389cc268fdf6ed7"
+              },
+              "text": "// Peek returns the next transaction by price.\nfunc (t *transactionsByPriceAndNonce) Peek() (*txpool.LazyTransaction, *uint256.Int) {\n\tif len(t.heads.txs) == 0 {\n\t\treturn nil, nil\n\t}\n\treturn t.heads.txs[0].tx, t.heads.txs[0].fees\n}\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 62,
+                "end_line": 66,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "16610faeb712f6868f1f9b75cff492bdf61609f34685ffd806c7a0c08b6e66e5"
+              },
+              "text": "type txByPriceAndTime struct {\n\ttxs           []*txWithMinerFee\n\tanzeonEnabled bool                    // Cached value of chainConfig.AnzeonEnabled() to avoid repeated checks\n\tisAuthorized  map[common.Address]bool // Pre-computed authorized status for all accounts to avoid repeated checks in Less()\n}\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 30,
+                "end_line": 35,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "97eafe8f731dc465fc1ee740c1149da7d307ebbd0c3c5080eecb69283368c090"
+              },
+              "text": "// txWithMinerFee wraps a transaction with its gas price or effective miner gasTipCap\ntype txWithMinerFee struct {\n\ttx   *txpool.LazyTransaction\n\tfrom common.Address\n\tfees *uint256.Int\n}\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 102,
+                "end_line": 102,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "9dc1db4712f88f1503beac88ef042fb5d9c044a49b55e28b8e04c9732756794a"
+              },
+              "text": "func (s *txByPriceAndTime) Swap(i, j int) { s.txs[i], s.txs[j] = s.txs[j], s.txs[i] }\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 68,
+                "end_line": 68,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "e67ab381c61f8e8384b9a365ea4d3d55039926c06793cb6985a3b15392e9ffdb"
+              },
+              "text": "func (s *txByPriceAndTime) Len() int { return len(s.txs) }\n"
+            },
+            {
+              "citation": {
+                "file": "miner/ordering.go",
+                "start_line": 37,
+                "end_line": 60,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "60e73c5ab435d0cd1d238b86ace204a02e57ac80782ac2fc3b75884dc981e433",
+                "content_sha256": "143aad2b4f794f5ea6cbb4b5dd205db27e4d42525556d482cfe821d86abd7470"
+              },
+              "text": "// newTxWithMinerFee creates a wrapped transaction, calculating the effective\n// miner gasTipCap if a base fee is provided.\n// Returns error in case of a negative effective miner gasTipCap.\nfunc newTxWithMinerFee(tx *txpool.LazyTransaction, from common.Address, baseFee, headerTip *uint256.Int, isAuthorized bool) (*txWithMinerFee, error) {\n\ttip := new(uint256.Int).Set(tx.GasTipCap)\n\tif baseFee != nil {\n\t\tif tx.GasFeeCap.Cmp(baseFee) < 0 {\n\t\t\treturn nil, types.ErrGasFeeCapTooLow\n\t\t}\n\t\ttip = new(uint256.Int).Sub(tx.GasFeeCap, baseFee)\n\t\ttxTip := new(uint256.Int).Set(tx.GasTipCap)\n\t\tif !isAuthorized && headerTip != nil && txTip.Gt(headerTip) {\n\t\t\ttip = headerTip\n\t\t}\n\t\tif tip.Gt(txTip) {\n\t\t\ttip = txTip\n\t\t}\n\t}\n\treturn &txWithMinerFee{\n\t\ttx:   tx,\n\t\tfrom: from,\n\t\tfees: tip,\n\t}, nil\n}\n"
+            },
+            {
+              "citation": {
+                "file": "core/types/transaction.go",
+                "start_line": 554,
+                "end_line": 558,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "91b8e4b15f84c00ed947dbff08b15d87f3f95538f79009719ddefac05b82a310",
+                "content_sha256": "e3f98a3d25aff50262d844137696edd10b8ab7bc7180fa361536174bfd9a5a8c"
+              },
+              "text": "// Time returns the time when the transaction was first seen on the network. It\n// is a heuristic to prefer mining older txs vs new all other things equal.\nfunc (tx *Transaction) Time() time.Time {\n\treturn tx.time\n}\n"
+            },
+            {
+              "citation": {
+                "file": "systemcontracts/coin_adapter.go",
+                "start_line": 55,
+                "end_line": 55,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "a072fc6c9b197b9f5eed6370be6aa96d70befd145df87a8a252e0b8bcf788e21",
+                "content_sha256": "2105950beedd014495e5178124419a1d7d1d23b6b4bc9da302047c5a2880c89d"
+              },
+              "text": "\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: the number of minters and minterAllowedAmounts must be the same\")\n"
+            },
+            {
+              "citation": {
+                "file": "systemcontracts/coin_adapter.go",
+                "start_line": 60,
+                "end_line": 60,
+                "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+                "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+                "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+                "source_mode": "committed",
+                "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "origin_id": "repo",
+                "file_sha256": "a072fc6c9b197b9f5eed6370be6aa96d70befd145df87a8a252e0b8bcf788e21",
+                "content_sha256": "8c1af3d31f244e178dbeec663a5d6945a66107d0bf4c355c6b05f9edd3aa4a6c"
+              },
+              "text": "\t\t\t\t\treturn nil, fmt.Errorf(\"`systemContracts.nativeCoinAdapter.params`: invalid minterAllowed, must be decimal\")\n"
+            }
+          ],
+          "graph_neighbors": [],
+          "semantic": null,
+          "evidence_state": "complete",
+          "metadata": {
+            "ontology": {
+              "explanation": {
+                "state": "off",
+                "total_changed": 0,
+                "truncated": false,
+                "final_body_budget_partial": false,
+                "quality_evaluated": false
+              },
+              "mode": "off",
+              "state": "off",
+              "baseline_citations": 10,
+              "matched_concepts": 0,
+              "applied_relations": 0,
+              "boosted_citations": 0
+            },
+            "integrity_hash_algo": "sha256-v2",
+            "integrity_hash": "b1b277831406679377ade8b1f880e215f2c21731d7b02a4a235493994f487b24"
+          }
+        }
+      }
+    }
+  },
+  {
+    "label": "health-after-v2",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 6,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.ops.health",
+        "arguments": {}
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 6,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "health"
+          }
+        ],
+        "structuredContent": {
+          "name": "fixed-source",
+          "status": "ok",
+          "serviceable": true,
+          "builder_version": "cks-mcp/0.0.1-dev",
+          "source_root": "/private/tmp/ks-stablenet-errors-20261018-01/source",
+          "backends": {
+            "graph": {
+              "reachable": true,
+              "schema_version": "1.24",
+              "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/old-dataset/old-v1/graph/graph.db"
+            },
+            "vector": {
+              "reachable": true,
+              "model_reachable": true,
+              "indexed_head": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "stats_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+              "last_index_at": "2026-10-13T14:54:37Z",
+              "provider": "ollama",
+              "model": "bge-m3:latest",
+              "dim": 1024,
+              "endpoint": "http://127.0.0.1:55814",
+              "data_path": "/private/tmp/ks-stablenet-errors-20261018-01/old-dataset/old-v1/vector"
+            }
+          },
+          "alignment": {
+            "ok": true,
+            "project_id": "p-3fa6368dd3f6757c6b6a86121f0a9b7d",
+            "snapshot_id": "24620738ac397420d1a251b6ea480d4d51b1ee19b73b4285b4dc6f53543bcc2a",
+            "dataset_id": "f05818126ac51b473445a0a932556fb71b0bdfdd1b78a70cfed9a98f54061fd9",
+            "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "sources": {
+              "graph": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "schema_version": "1.24",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              },
+              "vector": {
+                "src_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+                "graph_digest": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494"
+              }
+            },
+            "src_commit_ckg": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "src_commit_ckv": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+            "schema_version_ckg": "1.24",
+            "graph_digest_actual": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "graph_digest_expected": "65d74ed74f57a9400615e573132f0e3e76279acfda2f14dc7c1f58890a239494",
+            "source_root_ok": false,
+            "warnings": [
+              "config source_root \"/private/tmp/ks-stablenet-errors-20261018-01/source\" differs from indexed checkout \"/Users/kevin/work/github/0xmhha/auto-coding/chain/go-stablenet\" — bodies match only while both are at the indexed commit"
+            ]
+          }
+        }
+      }
+    }
+  }
+]

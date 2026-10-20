@@ -112,7 +112,7 @@ func handleSemanticSearch(ctx context.Context, d Deps, req mcpgo.CallToolRequest
 
 	hits, err := d.CKV.SemanticSearch(ctx, maybeExpand(d, req, query), opts)
 	if err != nil {
-		return mcpgo.NewToolResultErrorf("%s: %v", ToolNameSemanticSearch, err), nil
+		return v2ToolErrorFor(err, "retrieval_failed"), nil
 	}
 	return mcpgo.NewToolResultStructured(searchResponse{
 		Query:        query,

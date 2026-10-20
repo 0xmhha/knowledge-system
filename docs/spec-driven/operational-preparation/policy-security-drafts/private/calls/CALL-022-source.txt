@@ -1,0 +1,45 @@
+func validateEnodeURL(enode string) bool {
+	if !strings.HasPrefix(enode, "enode://") {
+		log.Error("Invalid enode URL: must start with 'enode://'")
+		return false
+	}
+
+	u, err := url.Parse(enode)
+	if err != nil {
+		log.Error("Invalid enode URL format", "err", err)
+		return false
+	}
+
+	// Check if the hex part is valid (should be 128 characters after enode://)
+	if len(u.User.String()) != 128 {
+		log.Error("Invalid public key in enode URL: must be 128 hex characters")
+		return false
+	}
+
+	// Validate the host:port part
+	hostPort := u.Host
+	if hostPort == "" {
+		log.Error("Missing host:port in enode URL")
+		return false
+	}
+
+	host, port, err := net.SplitHostPort(hostPort)
+	if err != nil {
+		log.Error("Invalid host:port format in enode URL", "err", err)
+		return false
+	}
+
+	// Validate port
+	if _, err := strconv.Atoi(port); err != nil {
+		log.Error("Invalid port number in enode URL")
+		return false
+	}
+
+	// Validate IP address
+	if net.ParseIP(host) == nil {
+		log.Error("Invalid IP address in enode URL")
+		return false
+	}
+
+	return true
+}

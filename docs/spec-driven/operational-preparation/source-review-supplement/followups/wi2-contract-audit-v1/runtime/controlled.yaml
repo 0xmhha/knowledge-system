@@ -1,0 +1,17 @@
+version: 1
+name: wi2-owned-dev
+backends:
+  ckg:
+    path: /private/tmp/ks-wi2-matching-20261018-run4/controlled-graph/graph.db
+    source_root: /private/tmp/ks-wi2-matching-20261018-run4/controlled-source
+  ckv:
+    path: /private/tmp/ks-wi2-contract-20261019/runtime/mock-vector
+    provider: mock
+listen:
+  transport: stdio
+logging:
+  level: error
+sanitize:
+  rules_path: /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/system/policies/sanitization_rules.yaml
+  default_action: drop
+  fail_closed_on_unknown_rule: true

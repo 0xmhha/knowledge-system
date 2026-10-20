@@ -1,0 +1,580 @@
+{
+  "schema_version": 1,
+  "state": "configured",
+  "source_readiness": "not_checked",
+  "profile_digest": "dc5cc57a4dd4217f3f967a4f36ae3c358635ba9405b291109e49cdf96efcea8e",
+  "catalog_digest": "4606366a9c238bb45dfd46ef47bd650209af3bc4bf43726e476ec19cd4596732",
+  "collections": [
+    {
+      "id": "chains",
+      "members": [
+        {
+          "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+          "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+          "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        {
+          "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+          "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+          "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        }
+      ]
+    }
+  ],
+  "scopes": [
+    {
+      "scope_id": "1aefe4c61a85f8cc0ee5d6b0d3ac4a6bd07adc8ed63c6c2eb1d84efb42b48983",
+      "scope": {
+        "coordinates": {
+          "project_id": "project-57845f0a616a41ec89f8f6ce8bf50a0b",
+          "dataset_id": "ec96898f088c72e4ff32200fa41036420b0a442b21fa400df949327a60093a3f",
+          "snapshot_id": "1072af20b34e074e2fdaa7747238819f11dcdb7cd44e8f0b8c68f97af1695789",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        "industry": "blockchain",
+        "conditions": {
+          "network": "fixture-network",
+          "configuration": "fixture-config",
+          "component_role": "staking-network",
+          "observed_at": "2026-10-15T18:59:59+00:00"
+        }
+      }
+    },
+    {
+      "scope_id": "4822b70757a1d62a90d5fc7bac72630552b4c321ff641f316f14cf7c2c77099c",
+      "scope": {
+        "coordinates": {
+          "project_id": "project-ecfd3633b834440399b59c6ba539463e",
+          "dataset_id": "892a769151ea5311ca2373dcf5d37185d1d609673b895820b1e20117ddb37d1f",
+          "snapshot_id": "2fd552df3da1d4fb6dcbfecdd560d49606a6f1466d8777420a8e23369ce9d1a2",
+          "source_mode": "snapshot-only",
+          "base_commit": ""
+        },
+        "industry": "blockchain",
+        "conditions": {
+          "network": "fixture-network",
+          "configuration": "fixture-config",
+          "component_role": "staking-network",
+          "observed_at": "2026-10-15T19:00:04+00:00"
+        }
+      }
+    }
+  ],
+  "concepts": [
+    {
+      "key": {
+        "pack_id": "industry.blockchain",
+        "version": "1.0.0",
+        "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+        "concept_id": "consensus"
+      },
+      "definition": "The protocol by which participants agree on a shared ledger history under stated assumptions.",
+      "view": {
+        "id": "consensus",
+        "aliases": [
+          "consensus",
+          "합의",
+          "합의 알고리즘",
+          "검증"
+        ],
+        "includes": [
+          "agreement participants, quorum and fault assumptions"
+        ],
+        "excludes": [
+          "L2 sequencer ordering alone is not L1 consensus"
+        ],
+        "applicable_roles": [
+          "l1",
+          "rollup-consensus"
+        ],
+        "facets": [
+          {
+            "id": "participants",
+            "question": "Who participates and how are participants selected?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "quorum",
+            "question": "What quorum or voting condition decides a block?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "fault-assumptions",
+            "question": "Which fault and network assumptions are explicitly stated?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "pack_id": "industry.blockchain",
+        "version": "1.0.0",
+        "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+        "concept_id": "finality"
+      },
+      "definition": "The stated condition under which a ledger decision is treated as irreversible or subject to specified rollback assumptions.",
+      "view": {
+        "id": "finality",
+        "aliases": [
+          "finality",
+          "최종성",
+          "finalisation",
+          "finalization"
+        ],
+        "includes": [
+          "finality conditions and reorganization handling"
+        ],
+        "excludes": [
+          "block production or an unstated performance guarantee"
+        ],
+        "applicable_roles": [
+          "l1",
+          "l2"
+        ],
+        "facets": [
+          {
+            "id": "condition",
+            "question": "What event or threshold establishes finality?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "rollback",
+            "question": "Under what explicit conditions can a finalized or accepted history change?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "settlement",
+            "question": "For L2, which settlement conditions are separate from local acceptance?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "pack_id": "industry.blockchain",
+        "version": "1.0.0",
+        "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+        "concept_id": "mempool-admission"
+      },
+      "definition": "The local handling of pending transactions before inclusion, including acceptance, replacement and removal.",
+      "view": {
+        "id": "mempool-admission",
+        "aliases": [
+          "mempool-admission",
+          "mempool",
+          "txpool",
+          "메모리풀",
+          "트랜잭션 풀",
+          "검증"
+        ],
+        "includes": [
+          "admission, queueing, replacement, eviction and capacity"
+        ],
+        "excludes": [
+          "a pending pool is not evidence of consensus or staking"
+        ],
+        "applicable_roles": [
+          "l1",
+          "l2",
+          "sequencer"
+        ],
+        "facets": [
+          {
+            "id": "admission",
+            "question": "What checks determine pool admission?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "ordering",
+            "question": "How are pending transactions prioritized?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "replacement",
+            "question": "When can one transaction replace another?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "eviction",
+            "question": "Which capacity or timeout rules remove pending transactions?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "concurrency",
+            "question": "Which synchronization protects pending-pool state?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "pack_id": "industry.blockchain",
+        "version": "1.0.0",
+        "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+        "concept_id": "staking"
+      },
+      "definition": "The explicit commitment or delegation of stake, with project-defined entry, exit and penalty behavior when supported.",
+      "view": {
+        "id": "staking",
+        "aliases": [
+          "staking",
+          "스테이킹",
+          "stake",
+          "delegation"
+        ],
+        "includes": [
+          "stake commitment, delegation, withdrawal and penalties"
+        ],
+        "excludes": [
+          "not all validator systems require stake; same-named amounts are not sufficient"
+        ],
+        "applicable_roles": [
+          "staking-network"
+        ],
+        "facets": [
+          {
+            "id": "entry",
+            "question": "What conditions permit staking or delegation?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "exit",
+            "question": "What conditions and delay permit withdrawal?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "penalty",
+            "question": "What evidenced conditions cause penalties or slashing?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "pack_id": "industry.blockchain",
+        "version": "1.0.0",
+        "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+        "concept_id": "staking-policy"
+      },
+      "definition": "Explicitly documented or configured rules governing supported staking operations, distinct from inferred code intent.",
+      "view": {
+        "id": "staking-policy",
+        "aliases": [
+          "staking-policy",
+          "스테이킹 정책",
+          "staking policy",
+          "unstaking policy"
+        ],
+        "includes": [
+          "stated limits, unlock conditions, configuration and exceptions"
+        ],
+        "excludes": [
+          "code behavior alone is not an approved policy or rationale"
+        ],
+        "applicable_roles": [
+          "staking-network"
+        ],
+        "facets": [
+          {
+            "id": "withdrawal-conditions",
+            "question": "Which stated rules govern withdrawal and unbonding?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "limits",
+            "question": "Which network and configuration-specific limits apply?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "exceptions",
+            "question": "Which stated exceptions or policy conflicts remain unresolved?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "pack_id": "industry.blockchain",
+        "version": "1.0.0",
+        "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+        "concept_id": "transaction"
+      },
+      "definition": "A proposed state-changing message and its validation or execution lifecycle.",
+      "view": {
+        "id": "transaction",
+        "aliases": [
+          "transaction",
+          "거래",
+          "트랜잭션",
+          "tx"
+        ],
+        "includes": [
+          "transaction format, validation and execution"
+        ],
+        "excludes": [
+          "consensus decision or staking merely inferred from a transaction name"
+        ],
+        "applicable_roles": [
+          "l1",
+          "l2"
+        ],
+        "facets": [
+          {
+            "id": "validation",
+            "question": "Which checks admit or reject a transaction?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "execution",
+            "question": "How is transaction execution applied or reverted?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "fees",
+            "question": "How are transaction fees computed and configured?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "pack_id": "industry.blockchain",
+        "version": "1.0.0",
+        "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+        "concept_id": "transaction-ordering"
+      },
+      "definition": "The mechanism choosing and ordering transactions for proposed execution.",
+      "view": {
+        "id": "transaction-ordering",
+        "aliases": [
+          "transaction-ordering",
+          "거래 순서",
+          "sequencing",
+          "정렬"
+        ],
+        "includes": [
+          "proposer or sequencer selection and ordering rules"
+        ],
+        "excludes": [
+          "ordering does not itself establish consensus or finality"
+        ],
+        "applicable_roles": [
+          "l1",
+          "l2",
+          "sequencer"
+        ],
+        "facets": [
+          {
+            "id": "selection",
+            "question": "Who chooses transactions for a proposal?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "ordering",
+            "question": "Which ordering rule and tie breakers are implemented?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "fairness",
+            "question": "Which fairness or censorship properties are stated and evidenced?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "pack_id": "industry.blockchain",
+        "version": "1.0.0",
+        "digest": "aa4f17f17649e3eb626f9adc532786dcb5597842362d6e4fb43f0a4aba8ce993",
+        "concept_id": "validator-lifecycle"
+      },
+      "definition": "The project-defined admission, activation, duties, rotation and removal of validators.",
+      "view": {
+        "id": "validator-lifecycle",
+        "aliases": [
+          "validator-lifecycle",
+          "검증자 생명주기",
+          "validator",
+          "검증자"
+        ],
+        "includes": [
+          "validator admission, active set and removal"
+        ],
+        "excludes": [
+          "validator membership is not automatically staking"
+        ],
+        "applicable_roles": [
+          "validator-network"
+        ],
+        "facets": [
+          {
+            "id": "admission",
+            "question": "How does an entity become eligible and active as a validator?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "rotation",
+            "question": "How is the active validator set changed?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          },
+          {
+            "id": "removal",
+            "question": "What conditions remove or suspend a validator?",
+            "conditions": [
+              "project version",
+              "network and configuration",
+              "component role",
+              "source observation time"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "supported_capabilities": [
+    "retained-source"
+  ],
+  "maximum_budget": {
+    "max_body_bytes": 262144,
+    "max_citations": 128,
+    "timeout_ms": 30000
+  },
+  "write_enabled": false
+}

@@ -1,0 +1,269 @@
+SRC-012 — AI DEV draft, NOT independently approved
+core/state/pruner/pruner.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-012.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 8510, "start": 8509}, "flags": [], "id": "v@8509", "name": "p", "origin": "receiver", "value_kind": "reference_binding"}
+{"declaration": {"end": 8530, "start": 8526}, "flags": [], "id": "v@8526", "name": "root", "origin": "parameter", "value_kind": "unknown"}
+{"declaration": {"end": 8799, "start": 8785}, "flags": [], "id": "v@8785", "name": "stateBloomRoot", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 8804, "start": 8801}, "flags": [], "id": "v@8801", "name": "err", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 9216, "start": 9210}, "flags": [], "id": "v@9210", "name": "layers", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 10657, "start": 10652}, "flags": [], "id": "v@10652", "name": "found", "origin": "local", "value_kind": "scalar"}
+{"declaration": {"end": 10670, "start": 10669}, "flags": [], "id": "v@10669", "name": "i", "origin": "local", "value_kind": "scalar"}
+{"declaration": {"end": 11466, "start": 11455}, "flags": [], "id": "v@11455", "name": "middleRoots", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 11514, "start": 11509}, "flags": ["range_assignment_unknown"], "id": "v@11509", "name": "layer", "origin": "range", "value_kind": "unknown"}
+{"declaration": {"end": 11731, "start": 11726}, "flags": [], "id": "v@11726", "name": "start", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 11753, "start": 11750}, "flags": [], "id": "v@11750", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 11941, "start": 11938}, "flags": [], "id": "v@11938", "name": "err", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 12021, "start": 12011}, "flags": [], "id": "v@12011", "name": "filterName", "origin": "local", "value_kind": "scalar"}
+{"declaration": {"end": 12134, "start": 12131}, "flags": [], "id": "v@12131", "name": "err", "origin": "local", "value_kind": "unknown"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@10048: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@10054: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@10678: d:o@9210=positive(kill_free_nonempty_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@10691: d:o@10669=positive(kill_free_nonempty_CFG_path); d:o@10699=positive(kill_free_nonempty_CFG_path)
+u:o@10699: d:o@10669=positive(kill_free_nonempty_CFG_path); d:o@10699=positive(kill_free_nonempty_CFG_path)
+u:o@10735: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@10741: d:o@9210=positive(kill_free_nonempty_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@10748: d:o@10669=positive(kill_free_nonempty_CFG_path); d:o@10699=positive(kill_free_nonempty_CFG_path)
+u:o@10772: d:o@9210=positive(kill_free_nonempty_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@10779: d:o@10669=positive(kill_free_nonempty_CFG_path); d:o@10699=positive(kill_free_nonempty_CFG_path)
+u:o@10875: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@10890: d:o@10669=positive(kill_free_nonempty_CFG_path); d:o@10699=positive(kill_free_nonempty_CFG_path)
+u:o@10918: d:o@10652=positive(kill_free_nonempty_CFG_path); d:o@10793=positive(kill_free_nonempty_CFG_path)
+u:o@10936: d:o@9210=positive(kill_free_nonempty_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@11065: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@11094: d:o@9210=positive(kill_free_nonempty_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@11185: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@11201: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@11323: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@11524: d:o@9210=positive(kill_free_nonempty_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@11538: d:o@11509=unknown(range_assignment_unknown)
+u:o@11554: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@11576: d:o@11455=positive(kill_free_nonempty_CFG_path)
+u:o@11588: d:o@11509=unknown(range_assignment_unknown)
+u:o@11779: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@11791: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@11797: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@11803: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@11818: d:o@11750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@11840: d:o@11750=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@11960: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@11966: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@11981: d:o@11938=positive(kill_free_nonempty_CFG_path)
+u:o@12003: d:o@11938=positive(kill_free_nonempty_CFG_path)
+u:o@12041: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@12059: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@12115: d:o@12011=positive(kill_free_nonempty_CFG_path)
+u:o@12138: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@12158: d:o@12011=positive(kill_free_nonempty_CFG_path)
+u:o@12170: d:o@12011=positive(kill_free_nonempty_CFG_path)
+u:o@12208: d:o@12131=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@12230: d:o@12131=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@12287: d:o@12011=positive(kill_free_nonempty_CFG_path)
+u:o@12313: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@12325: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@12331: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@12337: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@12351: d:o@12011=positive(kill_free_nonempty_CFG_path)
+u:o@12363: d:o@11455=positive(kill_free_nonempty_CFG_path)
+u:o@12376: d:o@11726=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8824: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@8846: d:o@8801=positive(kill_free_nonempty_CFG_path)
+u:o@8868: d:o@8801=positive(kill_free_nonempty_CFG_path)
+u:o@8879: d:o@8785=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@8939: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@8957: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@9241: d:o@10765=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@8526=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@9843=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@9452: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@9473: d:o@8509=positive(kill_free_nonempty_CFG_path)
+u:o@9513: d:o@9210=negative(no_kill_free_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@9778: d:o@9210=negative(no_kill_free_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@9850: d:o@9210=negative(no_kill_free_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+u:o@9861: d:o@9210=negative(no_kill_free_CFG_path); d:o@9443=positive(kill_free_nonempty_CFG_path)
+
+Same-name shadow identity negatives:
+d:o@11938 -> u:o@11818 negative:different_lexical_declaration
+d:o@12131 -> u:o@11818 negative:different_lexical_declaration
+d:o@8801 -> u:o@11818 negative:different_lexical_declaration
+d:o@11938 -> u:o@11840 negative:different_lexical_declaration
+d:o@12131 -> u:o@11840 negative:different_lexical_declaration
+d:o@8801 -> u:o@11840 negative:different_lexical_declaration
+d:o@11750 -> u:o@11981 negative:different_lexical_declaration
+d:o@12131 -> u:o@11981 negative:different_lexical_declaration
+d:o@8801 -> u:o@11981 negative:different_lexical_declaration
+d:o@11750 -> u:o@12003 negative:different_lexical_declaration
+d:o@12131 -> u:o@12003 negative:different_lexical_declaration
+d:o@8801 -> u:o@12003 negative:different_lexical_declaration
+d:o@11750 -> u:o@12208 negative:different_lexical_declaration
+d:o@11938 -> u:o@12208 negative:different_lexical_declaration
+d:o@8801 -> u:o@12208 negative:different_lexical_declaration
+d:o@11750 -> u:o@12230 negative:different_lexical_declaration
+d:o@11938 -> u:o@12230 negative:different_lexical_declaration
+d:o@8801 -> u:o@12230 negative:different_lexical_declaration
+d:o@11750 -> u:o@8846 negative:different_lexical_declaration
+d:o@11938 -> u:o@8846 negative:different_lexical_declaration
+d:o@12131 -> u:o@8846 negative:different_lexical_declaration
+d:o@11750 -> u:o@8868 negative:different_lexical_declaration
+d:o@11938 -> u:o@8868 negative:different_lexical_declaration
+d:o@12131 -> u:o@8868 negative:different_lexical_declaration
+
+CFG block matching table (raw indices are only hints):
+136232d639751128374ec4d5cc2cd87f448a931d68a4b6ba55feb8c030d18827 {"anchor": {"end": 12384, "start": 8550}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0", "n0.1"], "successors": [1, 2]}
+9aa0a1e165e1d1cd50de0c03000910695b48c473971016a6aab43c8cf9acae9f {"anchor": {"end": 8874, "start": 8843}, "id": 1, "kind": "IfThen", "live": true, "nodes": ["n1.0"], "successors": []}
+e454444498dca7745d4ffbaa65aa03484477dd164787cc4034cc0e0ba57beab1 {"anchor": {"end": 8874, "start": 8843}, "id": 2, "kind": "IfDone", "live": true, "nodes": ["n2.0"], "successors": [4, 5]}
+25f63e0eeb5c26dedc0e875d920986e3c708175bef49549ab4a83f1bf66c530d {"anchor": {"end": 8871, "start": 8861}, "id": 3, "kind": "Unreachable", "live": false, "nodes": [], "successors": [2]}
+5e6ac62a2788116ae2a5ce1f8e36319696bda7259f6b6999b5b5b2fb0c519b99 {"anchor": {"end": 8965, "start": 8876}, "id": 4, "kind": "IfThen", "live": true, "nodes": ["n4.0"], "successors": []}
+8b072e6db071759a0d44dd30d4056ec60ab282f14ae9948bc7426def7031d34c {"anchor": {"end": 8965, "start": 8876}, "id": 5, "kind": "IfDone", "live": true, "nodes": ["n5.0", "n5.1"], "successors": [7, 8]}
+bc7ce3e44415d601dc50c5bc39007b5a5c5dbb367f0f329b12e2897d771f872c {"anchor": {"end": 8962, "start": 8917}, "id": 6, "kind": "Unreachable", "live": false, "nodes": [], "successors": [5]}
+2cca62ea21e834ef3775828a0476e926fe3c19763abf79528bb7c807a09ad4d8 {"anchor": {"end": 9881, "start": 9238}, "id": 7, "kind": "IfThen", "live": true, "nodes": ["n7.0", "n7.1"], "successors": [9, 10]}
+894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9 {"anchor": {"end": 9881, "start": 9238}, "id": 8, "kind": "IfDone", "live": true, "nodes": ["n8.0"], "successors": [12, 14]}
+b42d77d6d6583113a838054d3e3a34db34fc3369dd7fc9d46acfdf246c0505a0 {"anchor": {"end": 9790, "start": 9506}, "id": 9, "kind": "IfThen", "live": true, "nodes": ["n9.0"], "successors": []}
+418a6a312d16dd0b561f869bb26158fd7eb2a750ed11a2a5c9372be6cac77ff6 {"anchor": {"end": 9790, "start": 9506}, "id": 10, "kind": "IfDone", "live": true, "nodes": ["n10.0"], "successors": [8]}
+0048059dce2366092e86516d7b2196feb71e6c2b6c16c292afe6fcc2de45dac5 {"anchor": {"end": 9786, "start": 9700}, "id": 11, "kind": "Unreachable", "live": false, "nodes": [], "successors": [10]}
+df967a172202e541f1581e444caa81b7b4ef232a379b3bca7b02417e412ca7d2 {"anchor": {"end": 11335, "start": 10020}, "id": 12, "kind": "IfThen", "live": true, "nodes": ["n12.0", "n12.1"], "successors": [17]}
+be5bcecc0e38cba9f2d89baceae74d1724af747400ead875b85040d66354037f {"anchor": {"end": 11335, "start": 10020}, "id": 13, "kind": "IfDone", "live": true, "nodes": ["n13.0", "n13.1", "n13.2", "n13.3"], "successors": [31]}
+1dda0ae73a71756ccc1ccce50e21200403725a5f11d03b1e93b992e265b618c2 {"anchor": {"end": 11335, "start": 10020}, "id": 14, "kind": "IfElse", "live": true, "nodes": ["n14.0"], "successors": [28, 30]}
+1905116ebde19a966c42841ced64438f7ba3d4f4fb08f725c2f29d2b9699cb23 {"anchor": {"end": 10911, "start": 10665}, "id": 15, "kind": "ForBody", "live": true, "nodes": ["n15.0"], "successors": [19, 20]}
+981eefd08b2d38cbd76c4571c41cfdcc84a3b4c86546e2535840cb26edc6c1a2 {"anchor": {"end": 10911, "start": 10665}, "id": 16, "kind": "ForDone", "live": true, "nodes": ["n16.0"], "successors": [22, 23]}
+d8cd8cf8927ac36702576424ec71e31a1ebad9a13cf23885260721af64567031 {"anchor": {"end": 10911, "start": 10665}, "id": 17, "kind": "ForLoop", "live": true, "nodes": ["n17.0"], "successors": [15, 16]}
+0fc092f42fe758e62af348d064226909885853f80446443d3a1baea8c357fb69 {"anchor": {"end": 10911, "start": 10665}, "id": 18, "kind": "ForPost", "live": true, "nodes": ["n18.0"], "successors": [17]}
+8f1112ee21faeec430755c3e7870a51b0b544c541aebe59428e595405975eb8d {"anchor": {"end": 10907, "start": 10708}, "id": 19, "kind": "IfThen", "live": true, "nodes": ["n19.0", "n19.1", "n19.2"], "successors": [16]}
+afe9df766439b14d1746b6c1122a7fdcb9e10c199bf5e3a7ef6c3a38f4426e18 {"anchor": {"end": 10907, "start": 10708}, "id": 20, "kind": "IfDone", "live": true, "nodes": [], "successors": [18]}
+c07e779a8216cf34570de8142eb02103405c69bf89c1e342c22c7b7fe04895d6 {"anchor": {"end": 10902, "start": 10897}, "id": 21, "kind": "Unreachable", "live": false, "nodes": [], "successors": [20]}
+c2e2d3fc6eb7c9de2a99cd40bc7b67e267f73974971f4c1846e6c79066be266a {"anchor": {"end": 11074, "start": 10914}, "id": 22, "kind": "IfThen", "live": true, "nodes": ["n22.0"], "successors": [24, 25]}
+f0d36f6f9b26819e76bcb5d450a28758bae38013cd80ac6a63e93f106f3e8d18 {"anchor": {"end": 11074, "start": 10914}, "id": 23, "kind": "IfDone", "live": true, "nodes": [], "successors": [13]}
+cc2846b8ea9869615468c67ab4a501a37949ba1a87d9395228ab130ce8c461b4 {"anchor": {"end": 11004, "start": 10929}, "id": 24, "kind": "IfThen", "live": true, "nodes": ["n24.0"], "successors": []}
+2319ee19ead3562d14ba5c07972138de953df059a06929377ec45e4486c668ff {"anchor": {"end": 11004, "start": 10929}, "id": 25, "kind": "IfDone", "live": true, "nodes": ["n25.0"], "successors": []}
+6a8a6cad2b41584ffdae2541aa24360518f7301f9ecdb106c640a70fb523177e {"anchor": {"end": 10999, "start": 10954}, "id": 26, "kind": "Unreachable", "live": false, "nodes": [], "successors": [25]}
+d9737971654bfd3441585f31be3715282f170cd7a33c9a1a6c44f16a848385bb {"anchor": {"end": 11070, "start": 11008}, "id": 27, "kind": "Unreachable", "live": false, "nodes": [], "successors": [23]}
+b1bbc9c7f3dbd58985358ca3781b2d24652ce81fe44f9a5cef42cc9a598f2a02 {"anchor": {"end": 11332, "start": 11087}, "id": 28, "kind": "IfThen", "live": true, "nodes": ["n28.0"], "successors": [29]}
+7606d20868b5df9cb1ec0714177c044ef649ecce894725ea0be083579640f273 {"anchor": {"end": 11332, "start": 11087}, "id": 29, "kind": "IfDone", "live": true, "nodes": [], "successors": [13]}
+a9fc13da5169928eeee33796e5773f7d27c0c0e163158bb3ac90a53aef54914e {"anchor": {"end": 11332, "start": 11087}, "id": 30, "kind": "IfElse", "live": true, "nodes": ["n30.0"], "successors": [29]}
+f8c7c4f1e10956fc0959f542cbcbba7d964b2806b38f73a6c83c05323f5ce550 {"anchor": {"end": 11617, "start": 11502}, "id": 31, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [32, 33]}
+a68c387c94989d791052a47b0d09e17c17680c33f34a69c979868232b0bf9b7e {"anchor": {"end": 11617, "start": 11502}, "id": 32, "kind": "RangeBody", "live": true, "nodes": ["n32.0"], "successors": [34, 35]}
+f23bcf48da2a0d5c0343ae8617c445ae03fa0e07e76762cbb083688994305a3a {"anchor": {"end": 11617, "start": 11502}, "id": 33, "kind": "RangeDone", "live": true, "nodes": ["n33.0", "n33.1", "n33.2"], "successors": [37, 38]}
+1b8c1dbdbda769658d5e2e642882cc2a247e339639acfb2e3a3ddcc242a88823 {"anchor": {"end": 11573, "start": 11535}, "id": 34, "kind": "IfThen", "live": true, "nodes": [], "successors": [33]}
+1cb60a46e4660605506bc7e4c7987b6db754e1458d30a96ece0f63349be2ce89 {"anchor": {"end": 11573, "start": 11535}, "id": 35, "kind": "IfDone", "live": true, "nodes": ["n35.0"], "successors": [31]}
+80c2f981446cae59beb4eb8d444c0728811c01e992d86c5355d84b3ed75a325f {"anchor": {"end": 11569, "start": 11564}, "id": 36, "kind": "Unreachable", "live": false, "nodes": [], "successors": [35]}
+026460059d872461e1f65a627c0bda901ead38204eb62369ec1b4339877a0c3d {"anchor": {"end": 11846, "start": 11747}, "id": 37, "kind": "IfThen", "live": true, "nodes": ["n37.0"], "successors": []}
+875e5655b3ce4e562694566885a591e416a1f234840043fd5d58093b1573be98 {"anchor": {"end": 11846, "start": 11747}, "id": 38, "kind": "IfDone", "live": true, "nodes": ["n38.0", "n38.1"], "successors": [40, 41]}
+461190cc2d7127150ce3d8e88bbde972c19bf1923324dfe2959b68f443741e22 {"anchor": {"end": 11843, "start": 11833}, "id": 39, "kind": "Unreachable", "live": false, "nodes": [], "successors": [38]}
+4f3d9d008591f317607be243e87b207cf4a5db1a657dab5315474c6bea8c6964 {"anchor": {"end": 12009, "start": 11935}, "id": 40, "kind": "IfThen", "live": true, "nodes": ["n40.0"], "successors": []}
+42b782475a9b8e83b5891b87cf9f58714f216aee09f2ba3ed13c8b3c9254f307 {"anchor": {"end": 12009, "start": 11935}, "id": 41, "kind": "IfDone", "live": true, "nodes": ["n41.0", "n41.1", "n41.2", "n41.3"], "successors": [43, 44]}
+c7fb3c17f71425756f93962c471fc2dbedf340f80d3ab9628d40fa27d7505ac1 {"anchor": {"end": 12006, "start": 11996}, "id": 42, "kind": "Unreachable", "live": false, "nodes": [], "successors": [41]}
+c5ab07b97c8f9194aa34e83b123f759a9c382f940f18ac336f80204ef988df84 {"anchor": {"end": 12236, "start": 12128}, "id": 43, "kind": "IfThen", "live": true, "nodes": ["n43.0"], "successors": []}
+113506773514cddc8f1050e3379614f67cdbd461b01e85d5545e3555e68d7775 {"anchor": {"end": 12236, "start": 12128}, "id": 44, "kind": "IfDone", "live": true, "nodes": ["n44.0", "n44.1"], "successors": []}
+26a9f7b81078398688fb497ffb351025d0f39e4f8c05ab8440a4bedb39bd10ec {"anchor": {"end": 12233, "start": 12223}, "id": 45, "kind": "Unreachable", "live": false, "nodes": [], "successors": [44]}
+f0938d0fb8618578d68654046d0187cb6dcd05d233a90dde6d03ad448eb85474 {"anchor": {"end": 12382, "start": 12300}, "id": 46, "kind": "Unreachable", "live": false, "nodes": [], "successors": []}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "136232d639751128374ec4d5cc2cd87f448a931d68a4b6ba55feb8c030d18827", "target": "9aa0a1e165e1d1cd50de0c03000910695b48c473971016a6aab43c8cf9acae9f"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "136232d639751128374ec4d5cc2cd87f448a931d68a4b6ba55feb8c030d18827", "target": "e454444498dca7745d4ffbaa65aa03484477dd164787cc4034cc0e0ba57beab1"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e454444498dca7745d4ffbaa65aa03484477dd164787cc4034cc0e0ba57beab1", "target": "5e6ac62a2788116ae2a5ce1f8e36319696bda7259f6b6999b5b5b2fb0c519b99"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e454444498dca7745d4ffbaa65aa03484477dd164787cc4034cc0e0ba57beab1", "target": "8b072e6db071759a0d44dd30d4056ec60ab282f14ae9948bc7426def7031d34c"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "8b072e6db071759a0d44dd30d4056ec60ab282f14ae9948bc7426def7031d34c", "target": "2cca62ea21e834ef3775828a0476e926fe3c19763abf79528bb7c807a09ad4d8"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "8b072e6db071759a0d44dd30d4056ec60ab282f14ae9948bc7426def7031d34c", "target": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2cca62ea21e834ef3775828a0476e926fe3c19763abf79528bb7c807a09ad4d8", "target": "b42d77d6d6583113a838054d3e3a34db34fc3369dd7fc9d46acfdf246c0505a0"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2cca62ea21e834ef3775828a0476e926fe3c19763abf79528bb7c807a09ad4d8", "target": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "2cca62ea21e834ef3775828a0476e926fe3c19763abf79528bb7c807a09ad4d8", "target": "418a6a312d16dd0b561f869bb26158fd7eb2a750ed11a2a5c9372be6cac77ff6"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9", "target": "df967a172202e541f1581e444caa81b7b4ef232a379b3bca7b02417e412ca7d2"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9", "target": "981eefd08b2d38cbd76c4571c41cfdcc84a3b4c86546e2535840cb26edc6c1a2"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9", "target": "d8cd8cf8927ac36702576424ec71e31a1ebad9a13cf23885260721af64567031"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9", "target": "be5bcecc0e38cba9f2d89baceae74d1724af747400ead875b85040d66354037f"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9", "target": "1dda0ae73a71756ccc1ccce50e21200403725a5f11d03b1e93b992e265b618c2"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9", "target": "7606d20868b5df9cb1ec0714177c044ef649ecce894725ea0be083579640f273"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9", "target": "f8c7c4f1e10956fc0959f542cbcbba7d964b2806b38f73a6c83c05323f5ce550"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "894ee4a72f77bdd216dd0e86de7ddf564217f250b6143b0354950f2526cabdf9", "target": "f23bcf48da2a0d5c0343ae8617c445ae03fa0e07e76762cbb083688994305a3a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "1dda0ae73a71756ccc1ccce50e21200403725a5f11d03b1e93b992e265b618c2", "target": "b1bbc9c7f3dbd58985358ca3781b2d24652ce81fe44f9a5cef42cc9a598f2a02"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "1dda0ae73a71756ccc1ccce50e21200403725a5f11d03b1e93b992e265b618c2", "target": "a9fc13da5169928eeee33796e5773f7d27c0c0e163158bb3ac90a53aef54914e"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "1905116ebde19a966c42841ced64438f7ba3d4f4fb08f725c2f29d2b9699cb23", "target": "8f1112ee21faeec430755c3e7870a51b0b544c541aebe59428e595405975eb8d"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "1905116ebde19a966c42841ced64438f7ba3d4f4fb08f725c2f29d2b9699cb23", "target": "d8cd8cf8927ac36702576424ec71e31a1ebad9a13cf23885260721af64567031"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "1905116ebde19a966c42841ced64438f7ba3d4f4fb08f725c2f29d2b9699cb23", "target": "0fc092f42fe758e62af348d064226909885853f80446443d3a1baea8c357fb69"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "1905116ebde19a966c42841ced64438f7ba3d4f4fb08f725c2f29d2b9699cb23", "target": "afe9df766439b14d1746b6c1122a7fdcb9e10c199bf5e3a7ef6c3a38f4426e18"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "981eefd08b2d38cbd76c4571c41cfdcc84a3b4c86546e2535840cb26edc6c1a2", "target": "c2e2d3fc6eb7c9de2a99cd40bc7b67e267f73974971f4c1846e6c79066be266a"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "981eefd08b2d38cbd76c4571c41cfdcc84a3b4c86546e2535840cb26edc6c1a2", "target": "be5bcecc0e38cba9f2d89baceae74d1724af747400ead875b85040d66354037f"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "981eefd08b2d38cbd76c4571c41cfdcc84a3b4c86546e2535840cb26edc6c1a2", "target": "f0d36f6f9b26819e76bcb5d450a28758bae38013cd80ac6a63e93f106f3e8d18"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "981eefd08b2d38cbd76c4571c41cfdcc84a3b4c86546e2535840cb26edc6c1a2", "target": "f8c7c4f1e10956fc0959f542cbcbba7d964b2806b38f73a6c83c05323f5ce550"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "981eefd08b2d38cbd76c4571c41cfdcc84a3b4c86546e2535840cb26edc6c1a2", "target": "f23bcf48da2a0d5c0343ae8617c445ae03fa0e07e76762cbb083688994305a3a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d8cd8cf8927ac36702576424ec71e31a1ebad9a13cf23885260721af64567031", "target": "1905116ebde19a966c42841ced64438f7ba3d4f4fb08f725c2f29d2b9699cb23"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "c2e2d3fc6eb7c9de2a99cd40bc7b67e267f73974971f4c1846e6c79066be266a", "target": "cc2846b8ea9869615468c67ab4a501a37949ba1a87d9395228ab130ce8c461b4"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "c2e2d3fc6eb7c9de2a99cd40bc7b67e267f73974971f4c1846e6c79066be266a", "target": "2319ee19ead3562d14ba5c07972138de953df059a06929377ec45e4486c668ff"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "f8c7c4f1e10956fc0959f542cbcbba7d964b2806b38f73a6c83c05323f5ce550", "target": "a68c387c94989d791052a47b0d09e17c17680c33f34a69c979868232b0bf9b7e"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "a68c387c94989d791052a47b0d09e17c17680c33f34a69c979868232b0bf9b7e", "target": "1b8c1dbdbda769658d5e2e642882cc2a247e339639acfb2e3a3ddcc242a88823"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "a68c387c94989d791052a47b0d09e17c17680c33f34a69c979868232b0bf9b7e", "target": "f8c7c4f1e10956fc0959f542cbcbba7d964b2806b38f73a6c83c05323f5ce550"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "a68c387c94989d791052a47b0d09e17c17680c33f34a69c979868232b0bf9b7e", "target": "1cb60a46e4660605506bc7e4c7987b6db754e1458d30a96ece0f63349be2ce89"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "f23bcf48da2a0d5c0343ae8617c445ae03fa0e07e76762cbb083688994305a3a", "target": "026460059d872461e1f65a627c0bda901ead38204eb62369ec1b4339877a0c3d"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "f23bcf48da2a0d5c0343ae8617c445ae03fa0e07e76762cbb083688994305a3a", "target": "875e5655b3ce4e562694566885a591e416a1f234840043fd5d58093b1573be98"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "875e5655b3ce4e562694566885a591e416a1f234840043fd5d58093b1573be98", "target": "4f3d9d008591f317607be243e87b207cf4a5db1a657dab5315474c6bea8c6964"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "875e5655b3ce4e562694566885a591e416a1f234840043fd5d58093b1573be98", "target": "42b782475a9b8e83b5891b87cf9f58714f216aee09f2ba3ed13c8b3c9254f307"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "42b782475a9b8e83b5891b87cf9f58714f216aee09f2ba3ed13c8b3c9254f307", "target": "c5ab07b97c8f9194aa34e83b123f759a9c382f940f18ac336f80204ef988df84"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "42b782475a9b8e83b5891b87cf9f58714f216aee09f2ba3ed13c8b3c9254f307", "target": "113506773514cddc8f1050e3379614f67cdbd461b01e85d5545e3555e68d7775"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 8841, "start": 8808}}
+{"kind": "call_effect_not_inferred", "span": {"end": 8962, "start": 8924}}
+{"kind": "call_effect_not_inferred", "span": {"end": 9503, "start": 9452}}
+{"kind": "call_effect_not_inferred", "span": {"end": 9520, "start": 9509}}
+{"kind": "call_effect_not_inferred", "span": {"end": 9786, "start": 9707}}
+{"kind": "call_effect_not_inferred", "span": {"end": 9785, "start": 9774}}
+{"kind": "call_effect_not_inferred", "span": {"end": 9878, "start": 9850}}
+{"kind": "call_effect_not_inferred", "span": {"end": 9868, "start": 9857}}
+{"kind": "call_effect_not_inferred", "span": {"end": 10059, "start": 10024}}
+{"kind": "call_effect_not_inferred", "span": {"end": 10685, "start": 10674}}
+{"kind": "call_effect_not_inferred", "span": {"end": 10758, "start": 10711}}
+{"kind": "call_effect_not_inferred", "span": {"end": 10757, "start": 10741}}
+{"kind": "call_effect_not_inferred", "span": {"end": 10788, "start": 10772}}
+{"kind": "call_effect_not_inferred", "span": {"end": 10892, "start": 10810}}
+{"kind": "call_effect_not_inferred", "span": {"end": 10943, "start": 10932}}
+{"kind": "call_effect_not_inferred", "span": {"end": 10999, "start": 10961}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11070, "start": 11015}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11101, "start": 11090}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11235, "start": 11111}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11230, "start": 11201}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11328, "start": 11250}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11500, "start": 11470}}
+{"kind": "range_binding_unknown", "span": {"end": 11617, "start": 11502}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11550, "start": 11538}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11600, "start": 11588}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11745, "start": 11735}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11816, "start": 11757}}
+{"kind": "call_effect_not_inferred", "span": {"end": 11979, "start": 11945}}
+{"kind": "call_effect_not_inferred", "span": {"end": 12064, "start": 12025}}
+{"kind": "call_effect_not_inferred", "span": {"end": 12126, "start": 12067}}
+{"kind": "call_effect_not_inferred", "span": {"end": 12206, "start": 12138}}
+{"kind": "call_effect_not_inferred", "span": {"end": 12298, "start": 12238}}
+{"kind": "call_effect_not_inferred", "span": {"end": 12382, "start": 12307}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 8909, "start": 8905}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Snapshot", "span": {"end": 9236, "start": 9228}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 9261, "start": 9257}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Snapshots", "span": {"end": 9472, "start": 9463}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Root", "span": {"end": 9491, "start": 9487}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Errorf", "span": {"end": 9717, "start": 9711}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Root", "span": {"end": 9876, "start": 9872}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "HasLegacyTrieNode", "span": {"end": 10047, "start": 10030}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "HasLegacyTrieNode", "span": {"end": 10734, "start": 10717}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Root", "span": {"end": 10755, "start": 10751}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Root", "span": {"end": 10786, "start": 10782}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 10818, "start": 10814}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "New", "span": {"end": 10971, "start": 10968}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Errorf", "span": {"end": 11025, "start": 11019}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 11119, "start": 11115}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Number", "span": {"end": 11221, "start": 11215}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Uint64", "span": {"end": 11228, "start": 11222}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 11258, "start": 11254}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 11490, "start": 11486}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Root", "span": {"end": 11548, "start": 11544}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Root", "span": {"end": 11598, "start": 11594}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Now", "span": {"end": 11743, "start": 11740}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "GenerateTrie", "span": {"end": 11778, "start": 11766}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 12075, "start": 12071}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Commit", "span": {"end": 12157, "start": 12151}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Info", "span": {"end": 12246, "start": 12242}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

@@ -1,0 +1,64 @@
+{
+  "case": "deadline",
+  "host_pid": 36265,
+  "host_exit": 143,
+  "host_reaped": true,
+  "elapsed_seconds": 3.390856083948165,
+  "cancel_ready": true,
+  "signal": {
+    "signal": 15,
+    "target_pid": 36265,
+    "owned_Popen_child": true,
+    "after_real_tool_response": true,
+    "deadline_expired": true,
+    "deliberate_forced_fault": false,
+    "at_seconds": 2.8831353336572647
+  },
+  "overall_timeout": false,
+  "collector_error": null,
+  "collector_joined": true,
+  "hold_timed_out": false,
+  "owned_live_identities_before_cancel": [
+    {
+      "pid": 36265,
+      "ppid": 35472,
+      "pgid": 36265,
+      "stat": "Ss",
+      "birth": "Sat Oct 17 15:43:14 2026",
+      "command": "/Users/kevin/.local/share/claude/versions/2.1.300 --print --agent coding-agent:analyzer --model claude-sonnet-4-6 --max-budget-usd 0.10 --plugin-dir /private/tmp/ks-host-schema-consumer-20261017/plugin --strict-mcp-config --mcp-config /private/tmp/ks-consumer-lifecycle-20261017/deadline/mcp.json --setting-sources  --settings /private/tmp/ks-consumer-lifecycle-20261017/deadline/settings.json --permission-mode manual --permission-prompts none --include-hook-events --output-format stream-json --verbose --debug-file /private/tmp/ks-consumer-lifecycle-20261017/deadline/host.debug.txt --no-session-persistence --no-chrome --tools Bash,Read,Write,Edit -- KS_HOST_PROBE:P07-deadline. Owned lifecycle test, local scripted replies only; no publication or independent quality acceptance."
+    },
+    {
+      "pid": 36295,
+      "ppid": 36265,
+      "pgid": 36265,
+      "stat": "S",
+      "birth": "Sat Oct 17 15:43:15 2026",
+      "command": "/Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python /Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/run-consumer-lifecycle.py --proxy --owner a6385897b5134a4789143ec9bea8849b --binary /private/tmp/ks-host-schema-runtime-20261017/bin/cks --config /private/tmp/ks-consumer-lifecycle-20261017/cks.yaml --log /private/tmp/ks-consumer-lifecycle-20261017/deadline/mcp-frames.jsonl"
+    },
+    {
+      "pid": 36306,
+      "ppid": 36295,
+      "pgid": 36265,
+      "stat": "S",
+      "birth": "Sat Oct 17 15:43:15 2026",
+      "command": "/private/tmp/ks-host-schema-runtime-20261017/bin/cks mcp --config /private/tmp/ks-consumer-lifecycle-20261017/cks.yaml"
+    }
+  ],
+  "cleanup": {
+    "all_observed_identities_gone": true,
+    "observed_count": 3,
+    "remaining_pids": []
+  },
+  "rescue": [],
+  "gateway_cleanup": {
+    "handler_threads": 2,
+    "all_handler_threads_joined": true,
+    "errors": [],
+    "server_socket_closed": true,
+    "server_thread_joined": true
+  },
+  "workspace_unchanged": true,
+  "real_model_calls": 0,
+  "formal_runs": 0,
+  "classification": "deadline_stop_not_normal_success"
+}

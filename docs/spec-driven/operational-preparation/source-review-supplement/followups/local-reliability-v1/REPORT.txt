@@ -1,0 +1,19 @@
+단계73 — 로컬 정의 매칭·옵션 캐시와 모델 상태 계약
+
+원래30함수 실제 CKS 응답을 재검증했다. 선택 수신 정의16건은 선택된 CFG 분기에서만 정의되도록 수정했다. range37은 지원 밖이고 식별 불가능한 빈 블록3은 미확정이다. 독립 정답 승인이 아니다.
+
+캐시는 기본0이며 CKV 옵션/CKS 구성으로 활성화한다. 공개 cache 패키지가 query-specific 전처리와 식별 확인을 전달한다. 입력/출력 벡터를 복사하고 provider cardinality/dimension/finite 값, 취소, 같은 batch 중복과 용량을 검사한다. fresh health는 캐시를 우회하고 캐시 검색 성공은 이전 model-health 증거나 TTL을 지우거나 갱신하지 않는다.
+
+실제 최종 실행46도구/50요청·2세션: 반복 query embedding HTTP off2/on1, 결과와 출처 동일. 로컬 소유 중계기에만 오류를 주입한9회로 추론 장애, 캐시 응답 뒤 장애 표시, cached query의 식별 실패 거부, fresh probe 회복을 확인했다. provider HTTP 요청 수이지 모델 내부 추론 수로 추정하지 않는다. paid/external LLM0. 서버/driver exit0·잔존0·원본/사본2248파일 전후 동일.
+
+새 native 입력1741(Go1285)+승인5, 변경20파일. 일반4172통과/18skip, race4172통과/18skip, 실패0. build/fmt/vet/고정 lint2.14.0/문서134 검증 통과. 최종 바이너리49e291fbcaab8c9742339889fdc11fb29f3d179aabdc94ee54f015028bbaf4b4는 실제 시험 바이너리와 같다. runtime 이후 차이는 maintenance 시험 파일1개뿐이다. 소유 native 프로세스 그룹 잔존0.
+
+실패·중간 시도는 제외하지 않는다. 의도적 native 중단2회(SIGTERM, 소스 변경 전 중단), query-aware 중간 후보의 native/실제 실행, 최초 model boundary driver1, 명시 보정1을 보존했다. 최초 driver1은 보존 검사 변수 shadowing으로 발생했고 두 CKS 서버는 정상 종료했다. health TTL은 후속 관측 전에 만료될 수 있어 그 호출의 HTTP0 또는1을 허용한 범위를 보정 실행 전에 고정했다. 정확한 캐시 성공 직후 TTL 상태는 native 회귀로만 입증한다. 전체 실제 실행129도구·141요청·6서버 세션, 각 서버 정상 종료.
+
+별도의 이전 전체 race에서는 maintenance 종료 시험1건이 실패했다. 원인은 원래 시험20회·기록형100회에서 재현되지 않아 확정하지 못했다. descendant 진입을 확인하고 함수 반환 후에만 쓰기를 허용하는 게이트로 판정력을 강화했다. 강화 시험10/10, maintenance race171개, 이후 새 전체 race4172개 통과. production guardian 구현은 변경하지 않았다. 최초 실패를 서버 종료 결함의 확정이나 수정 완료로 바꾸지 않는다.
+
+자료 묶기 최초 시도는 과거 manifest 도구를 최신 기준 commit에서 읽어 digest 불일치로 중단했다. 원래 packet commit ad944ac6cc15a2c4e2ebd2100fb1807bef911f28에서 모든 도구 digest 일치를 확인해 검증했다. 이미 포착한 native 원자료를 덮어쓰거나 실제 시험을 재실행하지 않았다.
+
+현재 독립승인0·정식0/9·FINAL0·D04미정·freeze null·execution_allowed=false. 실명/연락처 불필요. 보안 전용 검증/조직 인증은 사용자 보류. WI-6의627쌍 중 본570은 모두 partial/budget·완전0이며 품질 수용이 아니다. 다음은 WI-V1 full host/factory/sync/indexer와 원래5일정/12계약이다.
+
+자료 검사 최초100개 중1개는 검사 도중 원자료 묶음에 로그를 추가하여 manifest와 달라진 것을 정확히 거부했다. 코드/런타임 실패가 아니며 최초 로그를 보존하고, 자료 수정을 멈춘 뒤 새로 seal하여 동일100개를 재검사한다.

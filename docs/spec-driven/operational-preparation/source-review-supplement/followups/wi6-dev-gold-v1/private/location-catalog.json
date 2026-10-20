@@ -1,0 +1,1002 @@
+[
+  {
+    "id": "SRC-001",
+    "key": "362415b920e034138770fa80139ebb198fa3ad2f97dea9877ae765a1b72ba3c8",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "consensus/wbft/backend/api.go",
+      "file_sha256": "a1bc409a7e68126f611ee6c339d3814b90f7711e25740a2f1119f9af2f6c2a49",
+      "function_sha256": "376fd0b342ecbce4a5e1b5b0d1c969940bc3bfd92913a32eeae619fe5a1bc393",
+      "start_byte": 6085,
+      "end_byte_exclusive": 7648
+    },
+    "name": "Status",
+    "receiver": "*API",
+    "scope": "production_source_candidate",
+    "behavior": "Status passes calculated block range into validator lookup, counter initialization and analyzeBlock iteration, accumulates round counts, and returns range/counter/round structures; errors from range and validators return early.",
+    "equivalence_spans": [
+      {
+        "start_byte": 6215,
+        "end_byte_exclusive": 6349,
+        "span_sha256": "c42463dd3aacbb6546ff7c9fc1810e8e63f0935b4ce685e88094ed150634ca41"
+      },
+      {
+        "start_byte": 7163,
+        "end_byte_exclusive": 7647,
+        "span_sha256": "975d8177389f9d159b952a0e2717ad536d9d0520295cfbc151d8f2945f184c2c"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 171,
+        "end_line": 174,
+        "start_byte": 6215,
+        "end_byte_exclusive": 6349,
+        "span_sha256": "c42463dd3aacbb6546ff7c9fc1810e8e63f0935b4ce685e88094ed150634ca41",
+        "expected_source_fact_draft": "range 계산 오류를 먼저 반환한다; 이 지점에서 validator 조회는 아직 수행하지 않았다.",
+        "text": "\tstart, end, numBlocks, blockNumber, err := api.calculateBlockRange(startBlockNum, endBlockNum)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n"
+      },
+      {
+        "start_line": 201,
+        "end_line": 219,
+        "start_byte": 7163,
+        "end_byte_exclusive": 7647,
+        "span_sha256": "975d8177389f9d159b952a0e2717ad536d9d0520295cfbc151d8f2945f184c2c",
+        "expected_source_fact_draft": "결과에 block 범위·counter·round 통계를 반환한다.",
+        "text": "\treturn &Status{\n\t\tSealerActivity: SealerActivity{\n\t\t\tTotal:         totalSealCounts,\n\t\t\tPrepared:      preparedCounts,\n\t\t\tCommitted:     committedCounts,\n\t\t\tPrevPrepared:  prevPreparedCounts,\n\t\t\tPrevCommitted: prevCommittedCounts,\n\t\t},\n\t\tAuthorCounts: authorCounts,\n\t\tBlockRange: BlockRange{\n\t\t\tStartBlock:  start,\n\t\t\tEndBlock:    end,\n\t\t\tTotalBlocks: numBlocks,\n\t\t},\n\t\tRoundStats: RoundStats{\n\t\t\tRoundDistribution: roundDistribution,\n\t\t\tTotalRounds:       totalRounds,\n\t\t},\n\t}, nil\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-002",
+    "key": "4cb9bbd930ae715bc76660745074c5e82ef632749d5a77d6e3eb76c428e35074",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "consensus/wbft/backend/backend.go",
+      "file_sha256": "1bb189b8d2ecd592b3f0f0c5942c4ce507fdf7b0d0cd7c568a42b00a1d50a213",
+      "function_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51",
+      "start_byte": 5451,
+      "end_byte_exclusive": 6351
+    },
+    "name": "Gossip",
+    "receiver": "*Backend",
+    "scope": "production_source_candidate",
+    "behavior": "Gossip excludes own validator address, requires broadcaster and targets, skips peer/hash cache hits, marks new hashes and asynchronously sends selected consensus code; nil return is not delivery.",
+    "equivalence_spans": [
+      {
+        "start_byte": 5762,
+        "end_byte_exclusive": 5880,
+        "span_sha256": "227505ead29e86a939e281c71a2d617466e30c11e42f1dfd6083c59ab9656f46"
+      },
+      {
+        "start_byte": 5880,
+        "end_byte_exclusive": 6158,
+        "span_sha256": "0ac6de1f3978b9cd5f2499855ba61f6ee8f5f79f24d9c420868ab2887de79458"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 186,
+        "end_line": 188,
+        "start_byte": 5762,
+        "end_byte_exclusive": 5880,
+        "span_sha256": "227505ead29e86a939e281c71a2d617466e30c11e42f1dfd6083c59ab9656f46",
+        "expected_source_fact_draft": "broadcaster가nil이 아니고 targets가 비어 있지 않을 때 peer들을 순회한다.",
+        "text": "\tif sb.broadcaster != nil && len(targets) > 0 {\n\t\tps := sb.broadcaster.FindPeers(targets)\n\t\tfor addr, p := range ps {\n"
+      },
+      {
+        "start_line": 189,
+        "end_line": 200,
+        "start_byte": 5880,
+        "end_byte_exclusive": 6158,
+        "span_sha256": "0ac6de1f3978b9cd5f2499855ba61f6ee8f5f79f24d9c420868ab2887de79458",
+        "expected_source_fact_draft": "peer가 hash를 이미 알면 건너뛰고, 신규 peer cache와 hash를 갱신한다.",
+        "text": "\t\t\tm, ok := sb.recentMessages.Get(addr)\n\t\t\tif ok {\n\t\t\t\tif _, ok := m.Get(hash); ok {\n\t\t\t\t\t// This peer had this event, skip it\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tm = lru.NewCache[common.Hash, bool](inmemoryMessages)\n\t\t\t}\n\n\t\t\tm.Add(hash, true)\n\t\t\tsb.recentMessages.Add(addr, m)\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-003",
+    "key": "5afbdefccd3c3581711242bb965c72783ba9d48f2a686ef9dd7503a05ee84b78",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "consensus/wbft/core/roundchange.go",
+      "file_sha256": "1631cecbac74c96239eb93f234d033abc6f06efe76d9111caf88f96c65efc54b",
+      "function_sha256": "b7df515804f894e33e01cd10bd7ccb27cbc1a77d73350c1fe7170025c55d8953",
+      "start_byte": 3851,
+      "end_byte_exclusive": 8473
+    },
+    "name": "handleRoundChangeMsg",
+    "receiver": "*Core",
+    "scope": "production_source_candidate",
+    "behavior": "handleRoundChangeMsg checks prepared sequence/digest, adds round messages, starts a higher round under F+1 conditions, or builds a justified proposal under quorum/proposer/unsent guards. Invalid justification logs and returns nil.",
+    "equivalence_spans": [
+      {
+        "start_byte": 4542,
+        "end_byte_exclusive": 5939,
+        "span_sha256": "c95884041d14782df9d175172d692bc97634affdc264ffde515748208a13a869"
+      },
+      {
+        "start_byte": 6367,
+        "end_byte_exclusive": 8392,
+        "span_sha256": "92061da2e02ae5b2318a6b976b0c4b48be1f93bb792bcadb02888d13b6e51272"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 118,
+        "end_line": 149,
+        "start_byte": 4542,
+        "end_byte_exclusive": 5939,
+        "span_sha256": "c95884041d14782df9d175172d692bc97634affdc264ffde515748208a13a869",
+        "expected_source_fact_draft": "현재 이상 라운드의 prepared 정보가 있으면 높이·해시를 검사하고 Add 오류를 반환한다.",
+        "text": "\tif view.Round.Cmp(currentRound) >= 0 {\n\t\tvar prepareMessages []*wbfmessage.Prepare = nil\n\t\tvar pr *big.Int = nil\n\t\tvar pb *types.Block = nil\n\t\tif roundChange.PreparedRound != nil && roundChange.PreparedBlock != nil && roundChange.Justification != nil && len(roundChange.Justification) > 0 {\n\t\t\t// We should check the prepared block hash and sequence number\n\t\t\tif roundChange.PreparedBlock.Number().Cmp(c.currentView().Sequence) != 0 {\n\t\t\t\terr := fmt.Errorf(\n\t\t\t\t\t\"prepared block number %v does not match current sequence %v\",\n\t\t\t\t\troundChange.PreparedBlock.Number().Uint64(),\n\t\t\t\t\tc.currentView().Sequence.Uint64(),\n\t\t\t\t)\n\t\t\t\tlogger.Warn(\"WBFT: round-change validation failed\", \"err\", err)\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tif roundChange.PreparedBlock.Hash() != roundChange.PreparedDigest {\n\t\t\t\terr := fmt.Errorf(\n\t\t\t\t\t\"prepared block hash %s does not match prepared digest %s in ROUND-CHANGE message\",\n\t\t\t\t\troundChange.PreparedBlock.Hash().Hex(),\n\t\t\t\t\troundChange.PreparedDigest.Hex(),\n\t\t\t\t)\n\t\t\t\tlogger.Warn(\"WBFT: round-change validation failed\", \"err\", err)\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tprepareMessages = roundChange.Justification\n\t\t\tpr = roundChange.PreparedRound\n\t\t\tpb = roundChange.PreparedBlock\n\t\t}\n\t\terr := c.roundChangeSet.Add(view.Round, roundChange, pr, pb, prepareMessages, c.valSet.QuorumSize())\n\t\tif err != nil {\n\t\t\tlogger.Warn(\"WBFT: failed to add ROUND-CHANGE message\", \"err\", err)\n\t\t\treturn err\n"
+      },
+      {
+        "start_line": 161,
+        "end_line": 207,
+        "start_byte": 6367,
+        "end_byte_exclusive": 8392,
+        "span_sha256": "92061da2e02ae5b2318a6b976b0c4b48be1f93bb792bcadb02888d13b6e51272",
+        "expected_source_fact_draft": "F+1 조건에서는 새 라운드와 broadcast를 실행하며 다른 조건에서는 제안·정당화 검사 후 sendPreprepareMsg를 호출한다.",
+        "text": "\tif float64(num) > c.valSet.F() && float64(num) <= c.valSet.F()+1 {\n\t\t// We received F+1 ROUND-CHANGE messages (this may happen before our timeout expired)\n\t\t// we start new round and broadcast ROUND-CHANGE message\n\t\tnewRound := c.roundChangeSet.getMinRoundChange(currentRound)\n\n\t\tlogger.Info(\"WBFT: received F+1 ROUND-CHANGE messages\", \"F\", c.valSet.F())\n\n\t\tc.startNewRound(newRound)\n\t\tc.broadcastRoundChange(newRound)\n\t} else if currentRoundMessages >= c.valSet.QuorumSize() && c.IsProposer() && c.current.preprepareSent.Cmp(currentRound) < 0 {\n\t\tlogger.Info(\"WBFT: received quorum of ROUND-CHANGE messages\")\n\n\t\t// We received quorum of ROUND-CHANGE for current round and we are proposer\n\n\t\t// If we have received a quorum of PREPARE message\n\t\t// then we propose the same block proposal again if not we\n\t\t// propose the block proposal that we generated\n\t\t_, proposal := c.highestPrepared(currentRound)\n\t\tif proposal == nil {\n\t\t\tif c.current != nil && c.current.pendingRequest != nil {\n\t\t\t\tproposal = c.current.pendingRequest.Proposal\n\t\t\t} else {\n\t\t\t\tlog.Warn(\"WBFT: round change returns an error: no proposal as pending request is nil\")\n\t\t\t\treturn errors.New(\"no proposal as pending request is nil\")\n\t\t\t}\n\t\t}\n\n\t\t// Prepare justification for ROUND-CHANGE messages\n\t\troundChangeMessages := c.roundChangeSet.roundChanges[currentRound.Uint64()]\n\t\trcSignedPayloads := make([]*wbfmessage.SignedRoundChangePayload, 0)\n\t\tfor _, m := range roundChangeMessages.Values() {\n\t\t\trcMsg := m.(*wbfmessage.RoundChange)\n\t\t\trcSignedPayloads = append(rcSignedPayloads, &rcMsg.SignedRoundChangePayload)\n\t\t}\n\n\t\tprepareMessages := c.roundChangeSet.prepareMessages[currentRound.Uint64()]\n\t\tif err := isJustified(proposal, rcSignedPayloads, prepareMessages, c.valSet.QuorumSize()); err != nil {\n\t\t\tlogger.Error(\"WBFT: invalid ROUND-CHANGE message justification\", \"err\", err)\n\t\t\treturn nil\n\t\t}\n\n\t\tr := &Request{\n\t\t\tProposal:        proposal,\n\t\t\tRCMessages:      roundChangeMessages,\n\t\t\tPrepareMessages: prepareMessages,\n\t\t}\n\t\tc.sendPreprepareMsg(r)\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-006",
+    "key": "88c9d2fc560a37383c9ae87f14854ac531604588fecd4d22d37e4b7ec4848159",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/rawdb/accessors_chain.go",
+      "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+      "function_sha256": "6ae623bfd7378b8fd99620849340544bd850af6645c65e83f870b9846d585c57",
+      "start_byte": 9837,
+      "end_byte_exclusive": 11245
+    },
+    "name": "ReadHeaderRange",
+    "receiver": "",
+    "scope": "production_source_candidate",
+    "behavior": "ReadHeaderRange caps requested count to available numbers, reads live headers backwards, then ancient headers with count*8000 bound, returns gathered partial results on error/incomplete ancient results and reverses complete ancient data.",
+    "equivalence_spans": [
+      {
+        "start_byte": 10584,
+        "end_byte_exclusive": 10932,
+        "span_sha256": "e4b75069b761c4c96eaf209e66d5facdae75f792d0d89c4961cb6562ef8d1ca8"
+      },
+      {
+        "start_byte": 10932,
+        "end_byte_exclusive": 11225,
+        "span_sha256": "6c1bfcd9e23489eb7aa3339ad30982ca4608a3001afcc632d80203863ca6afbb"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 321,
+        "end_line": 330,
+        "start_byte": 10584,
+        "end_byte_exclusive": 10932,
+        "span_sha256": "e4b75069b761c4c96eaf209e66d5facdae75f792d0d89c4961cb6562ef8d1ca8",
+        "expected_source_fact_draft": "남은 count가0이면 반환; 아니면 maxBytes=count*8000으로 AncientRange를 호출하며 오류 시 이미 모은 결과를 반환한다.",
+        "text": "\tif count == 0 {\n\t\treturn rlpHeaders\n\t}\n\t// read remaining from ancients, cap at 2M\n\tmaxBytes := count * 8000 // legacy WEMIX mainnet header size is 4K in normal\n\tdata, err := db.AncientRange(ChainFreezerHeaderTable, i+1-count, count, maxBytes)\n\tif err != nil {\n\t\tlog.Error(\"Failed to read headers from freezer\", \"err\", err)\n\t\treturn rlpHeaders\n\t}\n"
+      },
+      {
+        "start_line": 331,
+        "end_line": 338,
+        "start_byte": 10932,
+        "end_byte_exclusive": 11225,
+        "span_sha256": "6c1bfcd9e23489eb7aa3339ad30982ca4608a3001afcc632d80203863ca6afbb",
+        "expected_source_fact_draft": "ancient 결과 개수가 count와 다르면 부분 결과를 반환하며 일치하면 결과 순서를 역전하여 append한다.",
+        "text": "\tif uint64(len(data)) != count {\n\t\tlog.Warn(\"Incomplete read of headers from freezer\", \"wanted\", count, \"read\", len(data))\n\t\treturn rlpHeaders\n\t}\n\t// The data is on the order [h, h+1, .., n] -- reordering needed\n\tfor i := range data {\n\t\trlpHeaders = append(rlpHeaders, data[len(data)-1-i])\n\t}\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-007",
+    "key": "6d2aa521ebac2156b7061681e02f77034c9e51df458badd0be4e2de534f68245",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/rawdb/accessors_chain.go",
+      "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+      "function_sha256": "811283ee84cfd8c858ed6c0e4b457b75010b4e2e630b7c008c72537b68cf7be4",
+      "start_byte": 29411,
+      "end_byte_exclusive": 29866
+    },
+    "name": "ReadAllBadBlocks",
+    "receiver": "",
+    "scope": "production_source_candidate",
+    "behavior": "ReadAllBadBlocks returns nil on DB Get or RLP decode errors and builds blocks from badBlock headers/bodies/withdrawals on success; a caller cannot distinguish these nil causes from this signature alone.",
+    "equivalence_spans": [
+      {
+        "start_byte": 29467,
+        "end_byte_exclusive": 29534,
+        "span_sha256": "1e6cb9141768cf4bb63ebdffe693bc29a7d7b711cc0c757b10116e53b6305bc0"
+      },
+      {
+        "start_byte": 29636,
+        "end_byte_exclusive": 29865,
+        "span_sha256": "33f1303ff0cc9a0047c0ab86067739a132d5dacb4af469d1cf1c98461c940b43"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 876,
+        "end_line": 879,
+        "start_byte": 29467,
+        "end_byte_exclusive": 29534,
+        "span_sha256": "1e6cb9141768cf4bb63ebdffe693bc29a7d7b711cc0c757b10116e53b6305bc0",
+        "expected_source_fact_draft": "DB Get 오류가 있으면 nil을 반환한다.",
+        "text": "\tblob, err := db.Get(badBlockKey)\n\tif err != nil {\n\t\treturn nil\n\t}\n"
+      },
+      {
+        "start_line": 884,
+        "end_line": 888,
+        "start_byte": 29636,
+        "end_byte_exclusive": 29865,
+        "span_sha256": "33f1303ff0cc9a0047c0ab86067739a132d5dacb4af469d1cf1c98461c940b43",
+        "expected_source_fact_draft": "디코딩된 badBlock 각각의 header/body/withdrawals를 이용해 Block을 구성하고 slice를 반환한다.",
+        "text": "\tvar blocks []*types.Block\n\tfor _, bad := range badBlocks {\n\t\tblocks = append(blocks, types.NewBlockWithHeader(bad.Header).WithBody(bad.Body.Transactions, bad.Body.Uncles).WithWithdrawals(bad.Body.Withdrawals))\n\t}\n\treturn blocks\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-008",
+    "key": "974538b18329d18ce48224179159faca4593400e8f86b1f4b464c08eb59a44b9",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/rawdb/accessors_chain.go",
+      "file_sha256": "efaedd464a331f7d3be2da3feefbc7318dfde860cee4274b6e1f00189d0bd161",
+      "function_sha256": "98cb55738bddb213c4f847e4df78f4659fc5fb91887b3b7bcd80f7a3216e2e9b",
+      "start_byte": 30012,
+      "end_byte_exclusive": 31148
+    },
+    "name": "WriteBadBlock",
+    "receiver": "",
+    "scope": "production_source_candidate",
+    "behavior": "WriteBadBlock loads old badBlockKey data, logs read failure, decodes existing blocks, skips duplicate number/hash, appends/sorts/truncates, encodes and writes; log.Crit behavior is external.",
+    "equivalence_spans": [
+      {
+        "start_byte": 30364,
+        "end_byte_exclusive": 30923,
+        "span_sha256": "a8090402725f0f10aa9dd75a8c2d4e467945fd4ab947138fc07a008898005ee0"
+      },
+      {
+        "start_byte": 30923,
+        "end_byte_exclusive": 31147,
+        "span_sha256": "d852c5774414221eb249fcbebec95bd5d915bfb27f4fe7b8a1ec837fcf7e6de5"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 904,
+        "end_line": 920,
+        "start_byte": 30364,
+        "end_byte_exclusive": 30923,
+        "span_sha256": "a8090402725f0f10aa9dd75a8c2d4e467945fd4ab947138fc07a008898005ee0",
+        "expected_source_fact_draft": "번호·해시가 같은 항목이면 반환하고 그렇지 않으면 추가·번호 내림차순 정렬·상한 절단한다.",
+        "text": "\tfor _, b := range badBlocks {\n\t\tif b.Header.Number.Uint64() == block.NumberU64() && b.Header.Hash() == block.Hash() {\n\t\t\tlog.Info(\"Skip duplicated bad block\", \"number\", block.NumberU64(), \"hash\", block.Hash())\n\t\t\treturn\n\t\t}\n\t}\n\tbadBlocks = append(badBlocks, &badBlock{\n\t\tHeader: block.Header(),\n\t\tBody:   block.Body(),\n\t})\n\tslices.SortFunc(badBlocks, func(a, b *badBlock) int {\n\t\t// Note: sorting in descending number order.\n\t\treturn -a.Header.Number.Cmp(b.Header.Number)\n\t})\n\tif len(badBlocks) > badBlockToKeep {\n\t\tbadBlocks = badBlocks[:badBlockToKeep]\n\t}\n"
+      },
+      {
+        "start_line": 921,
+        "end_line": 927,
+        "start_byte": 30923,
+        "end_byte_exclusive": 31147,
+        "span_sha256": "d852c5774414221eb249fcbebec95bd5d915bfb27f4fe7b8a1ec837fcf7e6de5",
+        "expected_source_fact_draft": "정렬된 목록을 인코딩하여 badBlockKey에 저장하고 오류를 log.Crit으로 전달한다.",
+        "text": "\tdata, err := rlp.EncodeToBytes(badBlocks)\n\tif err != nil {\n\t\tlog.Crit(\"Failed to encode bad blocks\", \"err\", err)\n\t}\n\tif err := db.Put(badBlockKey, data); err != nil {\n\t\tlog.Crit(\"Failed to write bad blocks\", \"err\", err)\n\t}\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-011",
+    "key": "cc5eaee13d3f9c24a515769317889cd43cf306eb4911d0e232c7ac5c3a10a6a2",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/state/dump.go",
+      "file_sha256": "db8982dfac16229485d5b6d3c886c5bb907fc0953160e2cadd70d81e69294c61",
+      "function_sha256": "36541cfe1c0275972d316095770ab13ea487ae205dc76e3b71a24b5d327a8796",
+      "start_byte": 4028,
+      "end_byte_exclusive": 6584
+    },
+    "name": "DumpToCollector",
+    "receiver": "*StateDB",
+    "scope": "production_source_candidate",
+    "behavior": "DumpToCollector emits root, handles iterator failure with nil, panics on account decode error, conditionally skips missing preimages/code/storage or failed storage iteration, invokes collector OnAccount and returns next key at Max.",
+    "equivalence_spans": [
+      {
+        "start_byte": 4160,
+        "end_byte_exclusive": 4536,
+        "span_sha256": "754d192cbee7cc276a39c185bba0d58b50eefb53b9b29bc1b1585ca671c424ec"
+      },
+      {
+        "start_byte": 4977,
+        "end_byte_exclusive": 5637,
+        "span_sha256": "1dff94914f1f9acc0f82487ae3183cabdd96b12e4e96bddb1bfa84a2a27dce8a"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 120,
+        "end_line": 135,
+        "start_byte": 4160,
+        "end_byte_exclusive": 4536,
+        "span_sha256": "754d192cbee7cc276a39c185bba0d58b50eefb53b9b29bc1b1585ca671c424ec",
+        "expected_source_fact_draft": "nil config를 기본 config로 바꾸고 OnRoot를 호출한 뒤 iterator 생성 오류이면 로그 후 nil을 반환한다.",
+        "text": "\tif conf == nil {\n\t\tconf = new(DumpConfig)\n\t}\n\tvar (\n\t\tmissingPreimages int\n\t\taccounts         uint64\n\t\tstart            = time.Now()\n\t\tlogged           = time.Now()\n\t)\n\tlog.Info(\"Trie dumping started\", \"root\", s.trie.Hash())\n\tc.OnRoot(s.trie.Hash())\n\n\ttrieIt, err := s.trie.NodeIterator(conf.Start)\n\tif err != nil {\n\t\tlog.Error(\"Trie dumping error\", \"err\", err)\n\t\treturn nil\n"
+      },
+      {
+        "start_line": 154,
+        "end_line": 180,
+        "start_byte": 4977,
+        "end_byte_exclusive": 5637,
+        "span_sha256": "1dff94914f1f9acc0f82487ae3183cabdd96b12e4e96bddb1bfa84a2a27dce8a",
+        "expected_source_fact_draft": "주소 preimage 부족과 OnlyWithAddresses 조건에 따른 skip 및 SkipCode/SkipStorage 조건을 처리한다; storage trie 오류는 해당 account 처리를 건너뛴다.",
+        "text": "\t\t\taddrBytes = s.trie.GetKey(it.Key)\n\t\t)\n\t\tif addrBytes == nil {\n\t\t\tmissingPreimages++\n\t\t\tif conf.OnlyWithAddresses {\n\t\t\t\tcontinue\n\t\t\t}\n\t\t} else {\n\t\t\taddr = common.BytesToAddress(addrBytes)\n\t\t\taddress = &addr\n\t\t\taccount.Address = address\n\t\t}\n\t\tobj := newObject(s, addr, &data)\n\t\tif !conf.SkipCode {\n\t\t\taccount.Code = obj.Code()\n\t\t}\n\t\tif !conf.SkipStorage {\n\t\t\taccount.Storage = make(map[common.Hash]string)\n\t\t\ttr, err := obj.getTrie()\n\t\t\tif err != nil {\n\t\t\t\tlog.Error(\"Failed to load storage trie\", \"err\", err)\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\ttrieIt, err := tr.NodeIterator(nil)\n\t\t\tif err != nil {\n\t\t\t\tlog.Error(\"Failed to create trie iterator\", \"err\", err)\n\t\t\t\tcontinue\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-012",
+    "key": "016390826ac87ea5044c50487cd12c91d89b1305143209464d88ced111457594",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/state/pruner/pruner.go",
+      "file_sha256": "bbddfc116b0151cccfbc169aed5ac6af76f5919bff17743d9a62aa29ea97f761",
+      "function_sha256": "6229c1b79c44eede5675cf0a3d8b697c548148e7d6242772eb9a5c0875ceded6",
+      "start_byte": 8503,
+      "end_byte_exclusive": 12384
+    },
+    "name": "Prune",
+    "receiver": "*Pruner",
+    "scope": "production_source_candidate",
+    "behavior": "Prune checks prior bloom state and delegates recovery, selects explicit or sufficiently old snapshot root with trie presence checks/fallback, builds middleRoots and bloom then invokes prune; errors propagate at each preparation step.",
+    "equivalence_spans": [
+      {
+        "start_byte": 8781,
+        "end_byte_exclusive": 9879,
+        "span_sha256": "ab705f45b7d3512865a52701e7aa00a38dbe1add6dba983e9afd2170b4bede78"
+      },
+      {
+        "start_byte": 10019,
+        "end_byte_exclusive": 11071,
+        "span_sha256": "295bce9ca6a27c13b33464fc3f9a9c6c61b6b58cf3b5cbf37d07b8f11701fbd8"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 243,
+        "end_line": 267,
+        "start_byte": 8781,
+        "end_byte_exclusive": 9879,
+        "span_sha256": "ab705f45b7d3512865a52701e7aa00a38dbe1add6dba983e9afd2170b4bede78",
+        "expected_source_fact_draft": "bloom 루트가 있으면 RecoverPruning으로 위임하고 기본 루트 선택에는 snapshot 128개를 요구한다.",
+        "text": "\t_, stateBloomRoot, err := findBloomFilter(p.config.Datadir)\n\tif err != nil {\n\t\treturn err\n\t}\n\tif stateBloomRoot != (common.Hash{}) {\n\t\treturn RecoverPruning(p.config.Datadir, p.db)\n\t}\n\t// If the target state root is not specified, use the HEAD-127 as the\n\t// target. The reason for picking it is:\n\t// - in most of the normal cases, the related state is available\n\t// - the probability of this layer being reorg is very low\n\tvar layers []snapshot.Snapshot\n\tif root == (common.Hash{}) {\n\t\t// Retrieve all snapshot layers from the current HEAD.\n\t\t// In theory there are 128 difflayers + 1 disk layer present,\n\t\t// so 128 diff layers are expected to be returned.\n\t\tlayers = p.snaptree.Snapshots(p.chainHeader.Root, 128, true)\n\t\tif len(layers) != 128 {\n\t\t\t// Reject if the accumulated diff layers are less than 128. It\n\t\t\t// means in most of normal cases, there is no associated state\n\t\t\t// with bottom-most diff layer.\n\t\t\treturn fmt.Errorf(\"snapshot not old enough yet: need %d more blocks\", 128-len(layers))\n\t\t}\n\t\t// Use the bottom-most diff layer as the target\n\t\troot = layers[len(layers)-1].Root()\n"
+      },
+      {
+        "start_line": 272,
+        "end_line": 297,
+        "start_byte": 10019,
+        "end_byte_exclusive": 11071,
+        "span_sha256": "295bce9ca6a27c13b33464fc3f9a9c6c61b6b58cf3b5cbf37d07b8f11701fbd8",
+        "expected_source_fact_draft": "목표 trie가 없으면 중간 snapshot의 존재하는 루트를 찾고 없으면 오류를 반환한다.",
+        "text": "\tif !rawdb.HasLegacyTrieNode(p.db, root) {\n\t\t// The special case is for clique based networks(goerli\n\t\t// and some other private networks), it's possible that two\n\t\t// consecutive blocks will have same root. In this case snapshot\n\t\t// difflayer won't be created. So HEAD-127 may not paired with\n\t\t// head-127 layer. Instead the paired layer is higher than the\n\t\t// bottom-most diff layer. Try to find the bottom-most snapshot\n\t\t// layer with state available.\n\t\t//\n\t\t// Note HEAD and HEAD-1 is ignored. Usually there is the associated\n\t\t// state available, but we don't want to use the topmost state\n\t\t// as the pruning target.\n\t\tvar found bool\n\t\tfor i := len(layers) - 2; i >= 2; i-- {\n\t\t\tif rawdb.HasLegacyTrieNode(p.db, layers[i].Root()) {\n\t\t\t\troot = layers[i].Root()\n\t\t\t\tfound = true\n\t\t\t\tlog.Info(\"Selecting middle-layer as the pruning target\", \"root\", root, \"depth\", i)\n\t\t\t\tbreak\n\t\t\t}\n\t\t}\n\t\tif !found {\n\t\t\tif len(layers) > 0 {\n\t\t\t\treturn errors.New(\"no snapshot paired state\")\n\t\t\t}\n\t\t\treturn fmt.Errorf(\"associated state[%x] is not present\", root)\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-013",
+    "key": "35180bd183ae911f020b86b8007efdffff0dc82df5b855542c6390e1b68a998d",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/state/pruner/pruner.go",
+      "file_sha256": "bbddfc116b0151cccfbc169aed5ac6af76f5919bff17743d9a62aa29ea97f761",
+      "function_sha256": "1d0e4adf1c6c9a6e4a8e9c516c8d17a62d74b6f65ddb6089d74bc5c839c51d00",
+      "start_byte": 12876,
+      "end_byte_exclusive": 14940
+    },
+    "name": "RecoverPruning",
+    "receiver": "",
+    "scope": "production_source_candidate",
+    "behavior": "RecoverPruning returns discovery errors, succeeds for no bloom path, requires head/snapshot/bloom and target among layers, then invokes shared prune with persisted target and middle roots.",
+    "equivalence_spans": [
+      {
+        "start_byte": 12939,
+        "end_byte_exclusive": 13215,
+        "span_sha256": "9dccfd22be1c3da790a328c4d5a821ead0fc9eebd01259f82ee973c7c2a1713e"
+      },
+      {
+        "start_byte": 14582,
+        "end_byte_exclusive": 14939,
+        "span_sha256": "26d0ca38de65538fc3f6851ca0c6daedacfd1beba3882e6e7b19be382c1fb478"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 344,
+        "end_line": 354,
+        "start_byte": 12939,
+        "end_byte_exclusive": 13215,
+        "span_sha256": "9dccfd22be1c3da790a328c4d5a821ead0fc9eebd01259f82ee973c7c2a1713e",
+        "expected_source_fact_draft": "findBloomFilter 오류는 반환하고 경로가 없으면 성공 반환하며 head가 없으면 오류를 반환한다.",
+        "text": "\tstateBloomPath, stateBloomRoot, err := findBloomFilter(datadir)\n\tif err != nil {\n\t\treturn err\n\t}\n\tif stateBloomPath == \"\" {\n\t\treturn nil // nothing to recover\n\t}\n\theadBlock := rawdb.ReadHeadBlock(db)\n\tif headBlock == nil {\n\t\treturn errors.New(\"failed to load head block\")\n\t}\n"
+      },
+      {
+        "start_line": 388,
+        "end_line": 399,
+        "start_byte": 14582,
+        "end_byte_exclusive": 14939,
+        "span_sha256": "26d0ca38de65538fc3f6851ca0c6daedacfd1beba3882e6e7b19be382c1fb478",
+        "expected_source_fact_draft": "snapshot에서 목표 루트를 찾지 못하면 오류이며 찾은 경우 prune에 위임한다.",
+        "text": "\tfor _, layer := range layers {\n\t\tif layer.Root() == stateBloomRoot {\n\t\t\tfound = true\n\t\t\tbreak\n\t\t}\n\t\tmiddleRoots[layer.Root()] = struct{}{}\n\t}\n\tif !found {\n\t\tlog.Error(\"Pruning target state is not existent\")\n\t\treturn errors.New(\"non-existent target state\")\n\t}\n\treturn prune(snaptree, stateBloomRoot, db, stateBloom, stateBloomPath, middleRoots, time.Now())\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-016",
+    "key": "816c7858e2f29a156889bd198ee376726eb1502ed27d2bcf5fb138c998b5658a",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/txpool/blobpool/blobpool.go",
+      "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+      "function_sha256": "6aca37f8485bf0f57d0fa4eb63f4b5dbe7bf019491014ec36cb70397987fc98b",
+      "start_byte": 18031,
+      "end_byte_exclusive": 20665
+    },
+    "name": "Init",
+    "receiver": "*BlobPool",
+    "scope": "production_source_candidate",
+    "behavior": "BlobPool.Init creates dirs, loads head/fallback state, opens and indexes pending store, closes on invalid-item deletion failure, initializes price heap and newLimbo, closes on limbo failure, applies tip, evicts excess and updates metrics.",
+    "equivalence_spans": [
+      {
+        "start_byte": 18938,
+        "end_byte_exclusive": 19465,
+        "span_sha256": "e3b72f3194b12bd9d3685f3c2d48e34d3bb02b553899db249cd99a8e619d093c"
+      },
+      {
+        "start_byte": 20476,
+        "end_byte_exclusive": 20664,
+        "span_sha256": "301154c36d51265ed19a03bb0eb240fee9c633ca12dd48e3e6bbe6f113940685"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 378,
+        "end_line": 398,
+        "start_byte": 18938,
+        "end_byte_exclusive": 19465,
+        "span_sha256": "e3b72f3194b12bd9d3685f3c2d48e34d3bb02b553899db249cd99a8e619d093c",
+        "expected_source_fact_draft": "index callback으로 parse 실패 ID를 모으고 store를 연다; invalid 항목 삭제가 실패하면 Close 후 오류를 반환한다.",
+        "text": "\tindex := func(id uint64, size uint32, blob []byte) {\n\t\tif p.parseTransaction(id, size, blob) != nil {\n\t\t\tfails = append(fails, id)\n\t\t}\n\t}\n\tstore, err := billy.Open(billy.Options{Path: queuedir, Repair: true}, newSlotter(), index)\n\tif err != nil {\n\t\treturn err\n\t}\n\tp.store = store\n\n\tif len(fails) > 0 {\n\t\tlog.Warn(\"Dropping invalidated blob transactions\", \"ids\", fails)\n\t\tdropInvalidMeter.Mark(int64(len(fails)))\n\n\t\tfor _, id := range fails {\n\t\t\tif err := p.store.Delete(id); err != nil {\n\t\t\t\tp.Close()\n\t\t\t\treturn err\n\t\t\t}\n\t\t}\n"
+      },
+      {
+        "start_line": 429,
+        "end_line": 435,
+        "start_byte": 20476,
+        "end_byte_exclusive": 20664,
+        "span_sha256": "301154c36d51265ed19a03bb0eb240fee9c633ca12dd48e3e6bbe6f113940685",
+        "expected_source_fact_draft": "stored가 Datacap을 초과하는 동안 drop하고 metrics를 갱신한 뒤 nil을 반환한다.",
+        "text": "\tfor p.stored > p.config.Datacap {\n\t\tp.drop()\n\t}\n\t// Update the metrics and return the constructed pool\n\tdatacapGauge.Update(int64(p.config.Datacap))\n\tp.updateStorageMetrics()\n\treturn nil\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-017",
+    "key": "b6625688da53711b40132a376cabc5cff352f201255b0d3eef459a17a73eb668",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/txpool/blobpool/blobpool.go",
+      "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+      "function_sha256": "97c32bb8794b89b06b43b2d0fe59fe01ad91aee60d4b70fef9aafbf1324aff09",
+      "start_byte": 32400,
+      "end_byte_exclusive": 34250
+    },
+    "name": "Reset",
+    "receiver": "*BlobPool",
+    "scope": "production_source_candidate",
+    "behavior": "BlobPool.Reset holds the pool mutex, loads StateAt before replacing head/state, reinjects/rechecks reorg transactions and sends insertFeed, finalizes limbo under Cancun then resets fees/eviction metrics.",
+    "equivalence_spans": [
+      {
+        "start_byte": 32459,
+        "end_byte_exclusive": 32856,
+        "span_sha256": "add21cf8a2b99384eec5c5f39effc1c2cacb528ba73311173c406f04681cad1a"
+      },
+      {
+        "start_byte": 33001,
+        "end_byte_exclusive": 33744,
+        "span_sha256": "db552410b08c767f147726e67177c5ca8e389a28bc6d0375dacf599b3f9ff932"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 785,
+        "end_line": 800,
+        "start_byte": 32459,
+        "end_byte_exclusive": 32856,
+        "span_sha256": "add21cf8a2b99384eec5c5f39effc1c2cacb528ba73311173c406f04681cad1a",
+        "expected_source_fact_draft": "함수 진입 후 잠금을 획득하고 defer로 해제하며 StateAt 실패 시 갱신 전 반환한다.",
+        "text": "\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n"
+      },
+      {
+        "start_line": 804,
+        "end_line": 824,
+        "start_byte": 33001,
+        "end_byte_exclusive": 33744,
+        "span_sha256": "db552410b08c767f147726e67177c5ca8e389a28bc6d0375dacf599b3f9ff932",
+        "expected_source_fact_draft": "reorg 결과가 있으면 재삽입·recheck·이벤트 송신을 수행하고 Cancun 조건에서 limbo.finalize를 호출한다.",
+        "text": "\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n\t}\n\t// Flush out any blobs from limbo that are older than the latest finality\n\tif p.chain.Config().IsCancun(p.head.Number, p.head.Time) {\n\t\tp.limbo.finalize(p.chain.CurrentFinalBlock())\n\t}\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-018",
+    "key": "4a6016de1f3610d3a03e7eaa2872b17106bd7adc70546c3a3d336b55e0fc3899",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "core/txpool/blobpool/limbo.go",
+      "file_sha256": "c04570603e9888bd3a3ac64c7c3dd36836faac32a13b42768dedbf5f5061cad9",
+      "function_sha256": "8b3eefb1671b3358070d04a553c72333e8526ddde80966c1ff370a76f23b716f",
+      "start_byte": 2093,
+      "end_byte_exclusive": 2819
+    },
+    "name": "newLimbo",
+    "receiver": "",
+    "scope": "production_source_candidate",
+    "behavior": "newLimbo allocates maps, opens and indexes blob store, returns nil on open failure, closes on invalid-id deletion failure and returns the initialized limbo pointer on success.",
+    "equivalence_spans": [
+      {
+        "start_byte": 2339,
+        "end_byte_exclusive": 2597,
+        "span_sha256": "97739f7ed0a469cd6c7310d69b46aaf17031a8769ad351a184ffaeed03e31a64"
+      },
+      {
+        "start_byte": 2598,
+        "end_byte_exclusive": 2818,
+        "span_sha256": "15ccb65caa22194c67aee4e111e9881cafcd29310d4bd94d8a0ed898dd12dc4c"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 58,
+        "end_line": 67,
+        "start_byte": 2339,
+        "end_byte_exclusive": 2597,
+        "span_sha256": "97739f7ed0a469cd6c7310d69b46aaf17031a8769ad351a184ffaeed03e31a64",
+        "expected_source_fact_draft": "parseBlob 실패 id를 모으며 billy.Open 실패 시 nil,error를 반환하고 성공하면 l.store에 저장한다.",
+        "text": "\tindex := func(id uint64, size uint32, data []byte) {\n\t\tif l.parseBlob(id, data) != nil {\n\t\t\tfails = append(fails, id)\n\t\t}\n\t}\n\tstore, err := billy.Open(billy.Options{Path: datadir}, newSlotter(), index)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tl.store = store\n"
+      },
+      {
+        "start_line": 69,
+        "end_line": 78,
+        "start_byte": 2598,
+        "end_byte_exclusive": 2818,
+        "span_sha256": "15ccb65caa22194c67aee4e111e9881cafcd29310d4bd94d8a0ed898dd12dc4c",
+        "expected_source_fact_draft": "실패 id를 삭제하다 오류가 나면 l.Close 후 nil,error를 반환하고 성공하면 l,nil을 반환한다.",
+        "text": "\tif len(fails) > 0 {\n\t\tlog.Warn(\"Dropping invalidated limboed blobs\", \"ids\", fails)\n\t\tfor _, id := range fails {\n\t\t\tif err := l.store.Delete(id); err != nil {\n\t\t\t\tl.Close()\n\t\t\t\treturn nil, err\n\t\t\t}\n\t\t}\n\t}\n\treturn l, nil\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-021",
+    "key": "9fb6c800484d8fd3c9dec84c3016c54060eaeb7bec4f460f7d0e147cb2cb1bc2",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "eth/downloader/api.go",
+      "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+      "function_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8",
+      "start_byte": 2605,
+      "end_byte_exclusive": 3994
+    },
+    "name": "eventLoop",
+    "receiver": "*DownloaderAPI",
+    "scope": "production_source_candidate",
+    "behavior": "Downloader eventLoop subscribes StartEvent, creates subscription map and timer with deferred Stop, registers/removes/acks subscriptions, synchronously sends status, and returns on nil mux event; receiver contracts affect liveness.",
+    "equivalence_spans": [
+      {
+        "start_byte": 2652,
+        "end_byte_exclusive": 3193,
+        "span_sha256": "f2c37d61055b6f635b2eea55b1df1613b2a57904d683f36e5822fa9149bdfd03"
+      },
+      {
+        "start_byte": 3791,
+        "end_byte_exclusive": 3966,
+        "span_sha256": "121dba225ea9ab15a6505af61dc255fab4a682c6f60668184a6bb92ea449e397"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 69,
+        "end_line": 87,
+        "start_byte": 2652,
+        "end_byte_exclusive": 3193,
+        "span_sha256": "f2c37d61055b6f635b2eea55b1df1613b2a57904d683f36e5822fa9149bdfd03",
+        "expected_source_fact_draft": "StartEvent subscription·subscription map·60초 timer를 만들고 timer.Stop을 defer한다.",
+        "text": "\t\tsub               = api.mux.Subscribe(StartEvent{})\n\t\tsyncSubscriptions = make(map[chan interface{}]struct{})\n\t\tcheckInterval     = time.Second * 60\n\t\tcheckTimer        = time.NewTimer(checkInterval)\n\n\t\t// status flags\n\t\tstarted bool\n\t\tdone    bool\n\n\t\tgetProgress = func() ethereum.SyncProgress {\n\t\t\tprog := api.d.Progress()\n\t\t\tif txProg, err := api.chain.TxIndexProgress(); err == nil {\n\t\t\t\tprog.TxIndexFinishedBlocks = txProg.Indexed\n\t\t\t\tprog.TxIndexRemainingBlocks = txProg.Remaining\n\t\t\t}\n\t\t\treturn prog\n\t\t}\n\t)\n\tdefer checkTimer.Stop()\n"
+      },
+      {
+        "start_line": 118,
+        "end_line": 125,
+        "start_byte": 3791,
+        "end_byte_exclusive": 3966,
+        "span_sha256": "121dba225ea9ab15a6505af61dc255fab4a682c6f60668184a6bb92ea449e397",
+        "expected_source_fact_draft": "notification 채널 전송에는 이 위치에서 별도 timeout/exit select가 없다.",
+        "text": "\t\t\t\tfor c := range syncSubscriptions {\n\t\t\t\t\tc <- notification\n\t\t\t\t}\n\t\t\t\tcheckTimer.Reset(checkInterval)\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tfor c := range syncSubscriptions {\n\t\t\t\tc <- false\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-022",
+    "key": "be404add401e919c927c8c6d2a18ab57a2f4cfa0e70d491700b7b5e298d0cf9c",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "eth/downloader/beaconsync.go",
+      "file_sha256": "910cc34e1e8aa0a26856d8174c02bde840145f06767a68ad45ce41ee33f9ff37",
+      "function_sha256": "aa12217563d78b70e6dd6ef9699bc470fbe6dfbb1f849f0baa76513cdba92f04",
+      "start_byte": 7885,
+      "end_byte_exclusive": 10679
+    },
+    "name": "findBeaconAncestor",
+    "receiver": "*Downloader",
+    "scope": "production_source_candidate",
+    "behavior": "findBeaconAncestor selects mode-specific current head and linkage predicates, returns skeleton/link errors, caps search end by beacon head, updates binary-search start/end using known block/header tests and returns start.",
+    "equivalence_spans": [
+      {
+        "start_byte": 8022,
+        "end_byte_exclusive": 8708,
+        "span_sha256": "ed59fe4f762cd54d53e142b91c8929cd78d3108dc2147362e80e528f270a0e7e"
+      },
+      {
+        "start_byte": 9734,
+        "end_byte_exclusive": 10678,
+        "span_sha256": "f5ca1a2d8f71588312cae2878c2c98e41f1d4c89d6c037afb3f50eeda48471f5"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 199,
+        "end_line": 216,
+        "start_byte": 8022,
+        "end_byte_exclusive": 8708,
+        "span_sha256": "ed59fe4f762cd54d53e142b91c8929cd78d3108dc2147362e80e528f270a0e7e",
+        "expected_source_fact_draft": "동기화 모드별 head를 택하고 skeleton.Bounds 오류를 반환한다.",
+        "text": "\tswitch d.getMode() {\n\tcase FullSync:\n\t\tchainHead = d.blockchain.CurrentBlock()\n\tcase SnapSync:\n\t\tchainHead = d.blockchain.CurrentSnapBlock()\n\tdefault:\n\t\tchainHead = d.lightchain.CurrentHeader()\n\t}\n\tnumber := chainHead.Number.Uint64()\n\n\t// Retrieve the skeleton bounds and ensure they are linked to the local chain\n\tbeaconHead, beaconTail, _, err := d.skeleton.Bounds()\n\tif err != nil {\n\t\t// This is a programming error. The chain backfiller was called with an\n\t\t// invalid beacon sync state. Ideally we would panic here, but erroring\n\t\t// gives us at least a remote chance to recover. It's still a big fault!\n\t\tlog.Error(\"Failed to retrieve beacon bounds\", \"err\", err)\n\t\treturn 0, err\n"
+      },
+      {
+        "start_line": 237,
+        "end_line": 268,
+        "start_byte": 9734,
+        "end_byte_exclusive": 10678,
+        "span_sha256": "f5ca1a2d8f71588312cae2878c2c98e41f1d4c89d6c037afb3f50eeda48471f5",
+        "expected_source_fact_draft": "구간 상한을 beacon head로 제한하고 모드별 존재 검사에 따라 이분 탐색 경계를 바꾸어 start를 반환한다.",
+        "text": "\t// Binary search to find the ancestor\n\tstart, end := beaconTail.Number.Uint64()-1, number\n\tif number := beaconHead.Number.Uint64(); end > number {\n\t\t// This shouldn't really happen in a healthy network, but if the consensus\n\t\t// clients feeds us a shorter chain as the canonical, we should not attempt\n\t\t// to access non-existent skeleton items.\n\t\tlog.Warn(\"Beacon head lower than local chain\", \"beacon\", number, \"local\", end)\n\t\tend = number\n\t}\n\tfor start+1 < end {\n\t\t// Split our chain interval in two, and request the hash to cross check\n\t\tcheck := (start + end) / 2\n\n\t\th := d.skeleton.Header(check)\n\t\tn := h.Number.Uint64()\n\n\t\tvar known bool\n\t\tswitch d.getMode() {\n\t\tcase FullSync:\n\t\t\tknown = d.blockchain.HasBlock(h.Hash(), n)\n\t\tcase SnapSync:\n\t\t\tknown = d.blockchain.HasFastBlock(h.Hash(), n)\n\t\tdefault:\n\t\t\tknown = d.lightchain.HasHeader(h.Hash(), n)\n\t\t}\n\t\tif !known {\n\t\t\tend = check\n\t\t\tcontinue\n\t\t}\n\t\tstart = check\n\t}\n\treturn start, nil\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-026",
+    "key": "b6328330a7ddcf8adcb93c61630e428b83d6575fc7bf1a4cb3f147e58e5add64",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "miner/stress/clique/main.go",
+      "file_sha256": "ecf6f58758ec1944fb2d9a3a64a22cd915d2dd4f038caa381c0bb58425a01d49",
+      "function_sha256": "bd1a7fd2e6d3615d04ce680e2bbeda18cedd8e7676ac98b68bf1365e6003837e",
+      "start_byte": 1692,
+      "end_byte_exclusive": 4421
+    },
+    "name": "main",
+    "receiver": "",
+    "scope": "development_stress_source_only",
+    "behavior": "Development stress main creates accounts/keys and node stacks, defers closes, waits for listeners, starts mining, injects transactions and on interrupt explicitly closes stacks and returns. Read source only; never execute this program.",
+    "equivalence_spans": [
+      {
+        "start_byte": 2410,
+        "end_byte_exclusive": 2690,
+        "span_sha256": "9051539349e68321b0a677c5fb30071f47fd25e8f012309d797832e93f33fbd3"
+      },
+      {
+        "start_byte": 3612,
+        "end_byte_exclusive": 3760,
+        "span_sha256": "e150a9b82061fd85745ef399d4e3e1928906ea7ee48745935db34630c3368913"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 72,
+        "end_line": 82,
+        "start_byte": 2410,
+        "end_byte_exclusive": 2690,
+        "span_sha256": "9051539349e68321b0a677c5fb30071f47fd25e8f012309d797832e93f33fbd3",
+        "expected_source_fact_draft": "sealer를 생성하고 오류 시 panic하며 stack.Close를 defer한 후 listener 준비를 기다린다.",
+        "text": "\tfor _, sealer := range sealers {\n\t\t// Start the node and wait until it's up\n\t\tstack, ethBackend, err := makeSealer(genesis)\n\t\tif err != nil {\n\t\t\tpanic(err)\n\t\t}\n\t\tdefer stack.Close()\n\n\t\tfor stack.Server().NodeInfo().Ports.Listener == 0 {\n\t\t\ttime.Sleep(250 * time.Millisecond)\n\t\t}\n"
+      },
+      {
+        "start_line": 115,
+        "end_line": 124,
+        "start_byte": 3612,
+        "end_byte_exclusive": 3760,
+        "span_sha256": "e150a9b82061fd85745ef399d4e3e1928906ea7ee48745935db34630c3368913",
+        "expected_source_fact_draft": "interrupt를 수신하면 모든 stack에 Close를 호출하고 반환한다.",
+        "text": "\tfor {\n\t\t// Stop when interrupted.\n\t\tselect {\n\t\tcase <-interruptCh:\n\t\t\tfor _, node := range stacks {\n\t\t\t\tnode.Close()\n\t\t\t}\n\t\t\treturn\n\t\tdefault:\n\t\t}\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-027",
+    "key": "fe0d7c63a37d4c808110b04c1158c6130e7e6e59332f61798b9bca1a2c68ab88",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "miner/worker.go",
+      "file_sha256": "f11d1f008b8a4bafd00c8248face4564cea09dfd4b7bc813bff7b48e45d34ab4",
+      "function_sha256": "bb7614131293e36941fe3d46d740be075c914a3745fa311f45ed081f6f2ce25d",
+      "start_byte": 16657,
+      "end_byte_exclusive": 19528
+    },
+    "name": "newWorkLoopOrigin",
+    "receiver": "*worker",
+    "scope": "production_source_candidate",
+    "behavior": "Origin worker loop owns WaitGroup/timer cleanup, updates interrupt/request on events, uses send-or-exit select in commit closure, clears stale tasks under mutex, adjusts timer and returns from the outer exit branch.",
+    "equivalence_spans": [
+      {
+        "start_byte": 16718,
+        "end_byte_exclusive": 17000,
+        "span_sha256": "66ef2589c58edf38fdd55478c2312d630fa4553f091fda9cfbdda99afa9e01ee"
+      },
+      {
+        "start_byte": 17094,
+        "end_byte_exclusive": 17637,
+        "span_sha256": "f18e03747b012a12dd8c9df8b8c8c3af4d4a6c20de9860db71f2464e39bd31b2"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 511,
+        "end_line": 520,
+        "start_byte": 16718,
+        "end_byte_exclusive": 17000,
+        "span_sha256": "66ef2589c58edf38fdd55478c2312d630fa4553f091fda9cfbdda99afa9e01ee",
+        "expected_source_fact_draft": "WaitGroup Done과 timer.Stop을 defer하고 초기 timer tick을 비운다.",
+        "text": "\tdefer w.wg.Done()\n\tvar (\n\t\tinterrupt   *atomic.Int32\n\t\tminRecommit = recommit // minimal resubmit interval specified by user.\n\t\ttimestamp   int64      // timestamp for each round of sealing.\n\t)\n\n\ttimer := time.NewTimer(0)\n\tdefer timer.Stop()\n\t<-timer.C // discard the initial tick\n"
+      },
+      {
+        "start_line": 523,
+        "end_line": 545,
+        "start_byte": 17094,
+        "end_byte_exclusive": 17637,
+        "span_sha256": "f18e03747b012a12dd8c9df8b8c8c3af4d4a6c20de9860db71f2464e39bd31b2",
+        "expected_source_fact_draft": "commit closure는 기존 interrupt를 갱신하고 새 request를 전송하거나 exitCh에 반응한다; clearPending closure는 pendingMu 아래 오래된 항목을 삭제한다.",
+        "text": "\tcommit := func(s int32) {\n\t\tif interrupt != nil {\n\t\t\tinterrupt.Store(s)\n\t\t}\n\t\tinterrupt = new(atomic.Int32)\n\t\tselect {\n\t\tcase w.newWorkCh <- &newWorkReq{interrupt: interrupt, timestamp: timestamp}:\n\t\tcase <-w.exitCh:\n\t\t\treturn\n\t\t}\n\t\ttimer.Reset(recommit)\n\t\tw.newTxs.Store(0)\n\t}\n\t// clearPending cleans the stale pending tasks.\n\tclearPending := func(number uint64) {\n\t\tw.pendingMu.Lock()\n\t\tfor h, t := range w.pendingTasks {\n\t\t\tif t.block.NumberU64()+staleThreshold <= number {\n\t\t\t\tdelete(w.pendingTasks, h)\n\t\t\t}\n\t\t}\n\t\tw.pendingMu.Unlock()\n\t}\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-031",
+    "key": "d39a72425254fa29399a754609904e60805f53dc582a5ab24578e0e515b60f37",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "p2p/discover/v4_udp.go",
+      "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+      "function_sha256": "de50b31d7810ea501c009fb4833c3bafc8724dd8aa27a69c7d201f070714efea",
+      "start_byte": 5395,
+      "end_byte_exclusive": 6144
+    },
+    "name": "Resolve",
+    "receiver": "*UDPv4",
+    "scope": "production_source_candidate",
+    "behavior": "Resolve tries RequestENR, prefers a newer table entry, loads a public key, performs lookup and requests a matching id; if requests fail it returns the current node rather than an error.",
+    "equivalence_spans": [
+      {
+        "start_byte": 5541,
+        "end_byte_exclusive": 5825,
+        "span_sha256": "f7bf231ba75cca35acddc3fb02bb9ecc135ccff7711b3422071e5b711b802e44"
+      },
+      {
+        "start_byte": 6005,
+        "end_byte_exclusive": 6143,
+        "span_sha256": "3349bfaacc5190f1119f55fe1ef46b0b256716da46ef32433fb6fa5af8fdd6ed"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 177,
+        "end_line": 185,
+        "start_byte": 5541,
+        "end_byte_exclusive": 5825,
+        "span_sha256": "f7bf231ba75cca35acddc3fb02bb9ecc135ccff7711b3422071e5b711b802e44",
+        "expected_source_fact_draft": "직접 RequestENR 성공 시 반환; 실패하면 더 높은 sequence의 table node로 n을 바꾸고 다시 요청한다.",
+        "text": "\tif rn, err := t.RequestENR(n); err == nil {\n\t\treturn rn\n\t}\n\t// Check table for the ID, we might have a newer version there.\n\tif intable := t.tab.getNode(n.ID()); intable != nil && intable.Seq() > n.Seq() {\n\t\tn = intable\n\t\tif rn, err := t.RequestENR(n); err == nil {\n\t\t\treturn rn\n\t\t}\n"
+      },
+      {
+        "start_line": 193,
+        "end_line": 200,
+        "start_byte": 6005,
+        "end_byte_exclusive": 6143,
+        "span_sha256": "3349bfaacc5190f1119f55fe1ef46b0b256716da46ef32433fb6fa5af8fdd6ed",
+        "expected_source_fact_draft": "lookup 결과의 ID가 현재 n과 같은 항목을 요청하여 성공하면 반환하며, 모두 실패하면 현재 n을 반환한다.",
+        "text": "\tfor _, rn := range result {\n\t\tif rn.ID() == n.ID() {\n\t\t\tif rn, err := t.RequestENR(rn); err == nil {\n\t\t\t\treturn rn\n\t\t\t}\n\t\t}\n\t}\n\treturn n\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-032",
+    "key": "79f63543a7da87744f66447e30f4d8ef24aee602298c118bdf02ce33cf7f7788",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "p2p/discover/v4_udp.go",
+      "file_sha256": "13da05e1875f1c77230fe2634bc58443c29e64f14d0667b6e627e63070c73c8a",
+      "function_sha256": "d69ac12ec08bd2c4e8f51b4b6eaae2ab3ea33fb366e7482014948bc937462dce",
+      "start_byte": 12967,
+      "end_byte_exclusive": 15540
+    },
+    "name": "loop",
+    "receiver": "*UDPv4",
+    "scope": "production_source_candidate",
+    "behavior": "UDP loop owns WaitGroup/timer, registers Now.Add reply deadlines, resets timeout, closes pending requests on context cancellation, processes replies and timeout removals, and tracks timeout bursts for clock checks.",
+    "equivalence_spans": [
+      {
+        "start_byte": 12967,
+        "end_byte_exclusive": 13329,
+        "span_sha256": "35f2b749fc8dc1bd7cbfe53490926b090869b36ee1895c258a348e28101d7727"
+      },
+      {
+        "start_byte": 14029,
+        "end_byte_exclusive": 15243,
+        "span_sha256": "0060c911a997c02639862d97948af5645dc1a655f79e691f808e89de5c111a23"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 407,
+        "end_line": 418,
+        "start_byte": 12967,
+        "end_byte_exclusive": 13329,
+        "span_sha256": "35f2b749fc8dc1bd7cbfe53490926b090869b36ee1895c258a348e28101d7727",
+        "expected_source_fact_draft": "wg.Done과 timeout.Stop을 defer하고 초기 timer tick을 소비한다.",
+        "text": "func (t *UDPv4) loop() {\n\tdefer t.wg.Done()\n\n\tvar (\n\t\tplist        = list.New()\n\t\ttimeout      = time.NewTimer(0)\n\t\tnextTimeout  *replyMatcher // head of plist when timeout was last reset\n\t\tcontTimeouts = 0           // number of continuous timeouts to do NTP checks\n\t\tntpWarnTime  = time.Unix(0, 0)\n\t)\n\t<-timeout.C // ignore first timeout\n\tdefer timeout.Stop()\n"
+      },
+      {
+        "start_line": 445,
+        "end_line": 483,
+        "start_byte": 14029,
+        "end_byte_exclusive": 15243,
+        "span_sha256": "0060c911a997c02639862d97948af5645dc1a655f79e691f808e89de5c111a23",
+        "expected_source_fact_draft": "close context에서 pending errc에 종료 오류를 송신하고 반환하며 응답 또는 timeout에서 matcher를 제거한다.",
+        "text": "\t\tselect {\n\t\tcase <-t.closeCtx.Done():\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tel.Value.(*replyMatcher).errc <- errClosed\n\t\t\t}\n\t\t\treturn\n\n\t\tcase p := <-t.addReplyMatcher:\n\t\t\tp.deadline = time.Now().Add(respTimeout)\n\t\t\tplist.PushBack(p)\n\n\t\tcase r := <-t.gotreply:\n\t\t\tvar matched bool // whether any replyMatcher considered the reply acceptable.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {\n\t\t\t\t\tok, requestDone := p.callback(r.data)\n\t\t\t\t\tmatched = matched || ok\n\t\t\t\t\tp.reply = r.data\n\t\t\t\t\t// Remove the matcher if callback indicates that all replies have been received.\n\t\t\t\t\tif requestDone {\n\t\t\t\t\t\tp.errc <- nil\n\t\t\t\t\t\tplist.Remove(el)\n\t\t\t\t\t}\n\t\t\t\t\t// Reset the continuous timeout counter (time drift detection)\n\t\t\t\t\tcontTimeouts = 0\n\t\t\t\t}\n\t\t\t}\n\t\t\tr.matched <- matched\n\n\t\tcase now := <-timeout.C:\n\t\t\tnextTimeout = nil\n\n\t\t\t// Notify and remove callbacks whose deadline is in the past.\n\t\t\tfor el := plist.Front(); el != nil; el = el.Next() {\n\t\t\t\tp := el.Value.(*replyMatcher)\n\t\t\t\tif now.After(p.deadline) || now.Equal(p.deadline) {\n\t\t\t\t\tp.errc <- errTimeout\n\t\t\t\t\tplist.Remove(el)\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-036",
+    "key": "6e0247a4c03e2fcf00d6f9605c73ca8510b3e5a98f068f18195a9c9417b5678a",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "rpc/client.go",
+      "file_sha256": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+      "function_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53",
+      "start_byte": 6694,
+      "end_byte_exclusive": 7442
+    },
+    "name": "DialOptions",
+    "receiver": "",
+    "scope": "production_source_candidate",
+    "behavior": "DialOptions parses URL, applies client options, selects HTTP/WS/stdio/IPC reconnect transport or rejects unknown schemes, then passes ctx/config/reconnect to newClient; real connection/TLS/cancel success is not shown.",
+    "equivalence_spans": [
+      {
+        "start_byte": 6791,
+        "end_byte_exclusive": 6942,
+        "span_sha256": "d7f47841174b5f1900a903aa57cbf75b3d92d2e8ae84f8b2064f822b17982bbc"
+      },
+      {
+        "start_byte": 7402,
+        "end_byte_exclusive": 7441,
+        "span_sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 194,
+        "end_line": 202,
+        "start_byte": 6791,
+        "end_byte_exclusive": 6942,
+        "span_sha256": "d7f47841174b5f1900a903aa57cbf75b3d92d2e8ae84f8b2064f822b17982bbc",
+        "expected_source_fact_draft": "URL parse 오류를 반환하고 options를 cfg에 적용한다.",
+        "text": "\tu, err := url.Parse(rawurl)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\n\tcfg := new(clientConfig)\n\tfor _, opt := range options {\n\t\topt.applyOption(cfg)\n\t}\n"
+      },
+      {
+        "start_line": 222,
+        "end_line": 222,
+        "start_byte": 7402,
+        "end_byte_exclusive": 7441,
+        "span_sha256": "bbd1d32af5affc480e685c48c214c9eaaccc4766e97a05c1b5a0e111a96c8cc9",
+        "expected_source_fact_draft": "ctx·cfg·선택한 reconnect를 newClient에 전달한다.",
+        "text": "\treturn newClient(ctx, cfg, reconnect)\n"
+      }
+    ]
+  },
+  {
+    "id": "SRC-037",
+    "key": "de1a455e2979a6e7148affee1640f06248e95cc5927f64621139d2d64043a549",
+    "identity": {
+      "project": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "source_mode": "committed",
+      "path": "rpc/client.go",
+      "file_sha256": "81cb1840c663bb776762f7009d65b1a5df041080576afec2eb42abe3777b7716",
+      "function_sha256": "242a22d4c5c09ac09bf9bc32ece3a26e560a6267ec1fd3f87cc45b8b60c27ff2",
+      "start_byte": 13062,
+      "end_byte_exclusive": 14518
+    },
+    "name": "BatchCallContext",
+    "receiver": "*Client",
+    "scope": "production_source_candidate",
+    "behavior": "BatchCallContext builds messages and id-index map, chooses HTTP or generic send, waits for responses, ignores unknown/null ids, sets per-element errors/results and missing-response errors, while I/O/wait errors return at method level.",
+    "equivalence_spans": [
+      {
+        "start_byte": 13333,
+        "end_byte_exclusive": 13728,
+        "span_sha256": "a1995ce7c038a6282c88bbf8f036f5cc7868bdf2fc17551abf18cb3e7469cfab"
+      },
+      {
+        "start_byte": 13958,
+        "end_byte_exclusive": 14517,
+        "span_sha256": "cdbf32d8e0c4965fcba12d454dd45a5a0c02da84ddafd124ce53a1427d0b7683"
+      }
+    ],
+    "source_refs": [
+      {
+        "start_line": 408,
+        "end_line": 430,
+        "start_byte": 13333,
+        "end_byte_exclusive": 13728,
+        "span_sha256": "a1995ce7c038a6282c88bbf8f036f5cc7868bdf2fc17551abf18cb3e7469cfab",
+        "expected_source_fact_draft": "각 메시지 ID를 index에 매핑하고 HTTP 또는 다른 송신 후 wait 오류를 반환한다.",
+        "text": "\tfor i, elem := range b {\n\t\tmsg, err := c.newMessage(elem.Method, elem.Args...)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tmsgs[i] = msg\n\t\top.ids[i] = msg.ID\n\t\tbyID[string(msg.ID)] = i\n\t}\n\n\tvar err error\n\tif c.isHTTP {\n\t\terr = c.sendBatchHTTP(ctx, op, msgs)\n\t} else {\n\t\terr = c.send(ctx, op, msgs)\n\t}\n\tif err != nil {\n\t\treturn err\n\t}\n\n\tbatchresp, err := op.wait(ctx, c)\n\tif err != nil {\n\t\treturn err\n"
+      },
+      {
+        "start_line": 441,
+        "end_line": 466,
+        "start_byte": 13958,
+        "end_byte_exclusive": 14517,
+        "span_sha256": "cdbf32d8e0c4965fcba12d454dd45a5a0c02da84ddafd124ce53a1427d0b7683",
+        "expected_source_fact_draft": "일치 ID를 맵에서 제거하고 요소별 오류·결과를 기록하며 남은 ID에는 ErrMissingBatchResponse를 기록한다.",
+        "text": "\t\t// Find the element corresponding to this response.\n\t\tindex, ok := byID[string(resp.ID)]\n\t\tif !ok {\n\t\t\tcontinue\n\t\t}\n\t\tdelete(byID, string(resp.ID))\n\n\t\t// Assign result and error.\n\t\telem := &b[index]\n\t\tswitch {\n\t\tcase resp.Error != nil:\n\t\t\telem.Error = resp.Error\n\t\tcase resp.Result == nil:\n\t\t\telem.Error = ErrNoResult\n\t\tdefault:\n\t\t\telem.Error = json.Unmarshal(resp.Result, elem.Result)\n\t\t}\n\t}\n\n\t// Check that all expected responses have been received.\n\tfor _, index := range byID {\n\t\telem := &b[index]\n\t\telem.Error = ErrMissingBatchResponse\n\t}\n\n\treturn err\n"
+      }
+    ]
+  }
+]

@@ -1,0 +1,79 @@
+WI-2 규칙별 원문·사례 범위 검토 — 준비 13단계
+
+결과와 목적
+현재 opt-in go-local-review@1.0.0, engine 2의 두 규칙을 대상으로 검토 입력을
+준비했다. source→sink 후보 탐지 계약과 실제 취약성 판단은 서로 다른 작업이다.
+rule-coverage-v1/manifest.json이 원문·기존 fixture·생성기와 모든 산출물을 결합한다.
+이 단계에서 새 분석 기능이나 운영 소스를 수정하지 않았다.
+
+지원 규칙
+1. parameter-command-name
+   named scalar parameter의 entry definition에서 lexical may-reach로 전달된 값을
+   exec.Command의 0번 또는 exec.CommandContext의 1번 인자에서 찾는다.
+   sink는 직접 identifier만 지원한다. 문자열 expression·field·역참조·closure는
+   같은 방식으로 탐지하지 않는다. 병렬 RHS의 다른 값은 명령 이름으로 합치지 않는다.
+2. discarded-conversion-error
+   strconv.Atoi/ParseInt/ParseUint 호출의 첫 결과를 받고 두 번째 LHS가 _인
+   정확히 두 LHS/하나 RHS assignment에서 출발해 명시적 return의 직접 identifier를 찾는다.
+   err를 변수에 받은 뒤 _=err로 버리는 패턴·bare return·return expression은 이 source/sink와 다르다.
+
+의미 제한
+- 대상의 import/callee를 해석하지 않고 exec/strconv owner 표기를 본다.
+  process.Command처럼 이름을 바꾼 호출은 놓칠 수 있고, exec/strconv라는 로컬 객체는
+  표기가 같아 후보가 될 수 있다. target_resolution은 syntax_only_unverified이다.
+- sanitize/clamp 등 opaque 함수의 정제 효과는 증명하지 않는다. sanitizer는 not_proven.
+- parameter의 외부 공격자 제어·실행 경로 실현 가능성·실제 피해는 증명하지 않는다.
+- 빈 결과는 안전 판정이 아니다. candidate 경로도 확인된 취약점이 아니다.
+- structural range condition에 위치가 없을 수 있다. 위치를 임의로 만들어 채우지 않는다.
+- 수동 policy/security annotation과 자동 rule candidate의 출처·분모를 분리한다.
+
+이번 입력 목록
+public-inputs.json: 기대값 없는 공개 원문 40개, split null, scoring_allowed false.
+private-ai-review.json: 규칙·mechanism·coverage tag와 후보 수의 비공개 AI 제안.
+각 규칙의 양성 기대 10개/음성 기대 10개는 통제 개발 초안의 수다.
+실제 후보 수는 null, gold/approval false, reviewer null, safety unknown으로 보존한다.
+copy/kill/parallel RHS, 분기/loop, 실제 lexical shadow, opaque sanitizer,
+Context argument, 별명/위조 owner, expression/field/closure/bare return 경계를 다룬다.
+새 텍스트여도 기존 fixture와 의미가 겹칠 수 있다. 독립 가족·신규 holdout으로 세지 않는다.
+
+기존 증거와 별도 분모
+existing-fixtures.json: 기존 명령 fixture 16개·변환 fixture 7개, 합계 23개.
+원문과 기존 기대를 기록했으며 이번 단계에서 다시 실행한 결과로 표시하지 않는다.
+project-source-review.json: 고정 go-stablenet 원문의 기존 호출 68곳/51개 함수.
+- 명령 호출 20곳, 숫자 변환 호출 48곳. 원문 span·Git blob·function hash를 보존.
+- 명령 이름에 직접 parameter 표기가 있는 hint 2곳:
+  CALL-045 MustRunCommand, CALL-046 MustRunCommandWithOutput.
+  둘은 같은 internal/build/util.go에 있어 서로 독립이라고 승인하지 않는다.
+- CALL-044 goTool은 parameter가 1번 인자이며 명령 이름은 filepath.Join expression이다.
+  parameter가 등장한다는 이유로 0번 명령 sink 양성으로 합치지 않는다.
+- 변환의 blank second LHS 표기 hint는 0곳이다. 숨은 흐름·다른 source 모양·closure를
+  모두 분석한 것이 아니므로 프로젝트 양성 부재 또는 48개 확정 음성을 뜻하지 않는다.
+기존 정책/보안 source query 12개는 annotation 검토용이다.
+통제 초안 40개나 기존 fixture 23개로 프로젝트의 양성 분모를 채우지 않는다.
+
+검증과 한계
+40개를 각각 package wrapper 안에서 gofmt parser로 검사: 전부 문법 통과.
+이것은 전체 타입 검사·실행 가능성·분석기 탐지·후보 품질 검증이 아니다.
+원문 속 exec.Command, sanitize 등은 실행하지 않았다. rule backend/model/node 호출 0.
+전용 회귀 23개는 원문 교체, 공개 정답 주입, 가짜 안전/독립 승인/실제 관측,
+분모 합치기, sanitizer/target 증명 위조, 점수·FINAL·실행 승격을 거부한다.
+새 출력 위치의 10개 파일을 바이트 동일 재생성했다.
+연관 Python 회귀 295개·현재 문서 134개·기존 구현 완료 상태 검사 통과.
+이전 동결 패킷 12개와 유지보수 Go 파일은 변경하지 않았다.
+현재 정식 독립 수용 0/9, F-01~F-08 pending, 담당자 미정, freeze null, 실행 허용 false.
+
+다음 작업: 준비 14단계
+1. 공개 원문 40개만 실제 AnalyzeRules에 전달해 일반/race 관측을 보존한다.
+2. 후보 source/sink 위치·경로·조건·target/sanitizer unknown·상한·결정성을 검증한다.
+3. AI 기대와 관측 차이는 결함·unsupported·초안 오류를 구분해 남긴다.
+4. 이후 프로젝트 source/sink 도달성·신규성·독립성·양성 충분성과 별도 정답을 검토한다.
+독립 검토자 지정과 F-01~F-08 확정 전 정식 precision/recall·위험성·수용을 채점하지 않는다.
+전체 남은 9개 수용 작업 및 별도 후속 12개는 PROGRESS.txt와 GAPS.json에 기록한다.
+
+재검증
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_rule_coverage.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-rule-coverage.py docs/spec-driven/operational-preparation/source-review-supplement/rule-coverage-v1
+
+후속 갱신: 준비 14단계 통제 분석기 관측은 RULE-OBSERVATIONS.txt와
+rule-observations-v1에 기록했다. 이 문서와 rule-coverage-v1의 0회 실행은
+13단계 당시 입력 준비의 스냅샷이며, 독립 gold/프로젝트 효과 미확인 상태는 유지한다.

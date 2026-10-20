@@ -1,0 +1,3 @@
+func IncrementHash(baseSlot common.Hash, increment *big.Int) common.Hash {
+	return common.BigToHash(new(big.Int).Add(baseSlot.Big(), increment))
+}

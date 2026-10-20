@@ -1,0 +1,14 @@
+package main
+
+import (
+	"fmt"
+	"github.com/ethereum/go-ethereum/eth/downloader"
+	"os"
+)
+
+func main() {
+	if err := downloader.OwnedRPCLifecycle(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}

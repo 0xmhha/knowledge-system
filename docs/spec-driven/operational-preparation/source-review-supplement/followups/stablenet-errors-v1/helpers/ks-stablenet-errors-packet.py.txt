@@ -1,0 +1,41 @@
+import pathlib,json,hashlib,shutil,gzip,importlib.util
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=pathlib.Path('/private/tmp/ks-stablenet-errors-20261018-01');P=R/'docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def copy(a,b):b.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(a,b)
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+for p in O.glob('*.json'):copy(p,P/p.name)
+for p in O.glob('*.yaml'):copy(p,P/p.name)
+for name in ['cks-build-info.txt','baseline-build-info.txt']:copy(O/name,P/name)
+cases=['baseline-source','baseline-model','fixed-source','fixed-recovery']
+for prefix in ['','diagnostics/initial-guard-run/']:
+ for case in cases:
+  for p in(O/prefix/case).iterdir():
+   if p.is_file():copy(p,P/prefix/case/p.name)
+ if prefix:
+  for p in(O/prefix).iterdir():
+   if p.is_file():copy(p,P/prefix/p.name)
+  native=O/prefix/'native-initial';target=P/prefix/'native-initial';target.mkdir(exist_ok=True)
+  copy(native/'receipts.json',target/'receipts.json')
+  for p in native.iterdir():
+   if p.name!='receipts.json':(target/(p.name+'.gz')).write_bytes(gzip.compress(p.read_bytes(),mtime=0))
+folder=O/'validation/native-isolated';target=P/'validation/native';target.mkdir(parents=True,exist_ok=True);copy(folder/'receipts.json',target/'receipts.json')
+for r in json.load(open(folder/'receipts.json')):
+ for stream in ['stdout','stderr']:(target/(r['label']+'.'+stream+'.gz')).write_bytes(gzip.compress((folder/(r['label']+'.'+stream)).read_bytes(),mtime=0))
+new=O/'new-dataset/retained-origins-v2';old=O/'old-dataset/old-v1'
+for arm,v in [('old',old),('new',new)]:
+ copy(v/'dataset-identity.json',P/(arm+'-identity.json'))
+ for folder in ['sources','graph','vector']:(P/(arm+'-'+folder+'-manifest.json.gz')).write_bytes(gzip.compress((v/folder/'manifest.json').read_bytes(),mtime=0))
+source=json.load(open(new/'sources/manifest.json'));inventory={(r['origin_id'],r['path']):r for r in source['files']};witness={}
+for case in cases:
+ for row in json.load(open(O/case/'messages.json')):
+  response=row['response'].get('result',{});p=response.get('structuredContent',{})
+  if p.get('format_version')==2:
+   for c in p['citations']:witness[(c['origin_id'],c['file'])]=inventory[(c['origin_id'],c['file'])]
+selected=json.load(open(O/'external-selected.json'));key=(selected['origin_id'],selected['path']);witness[key]=inventory[key]
+for row in witness.values():copy(new/'sources/blobs'/row['sha256'],P/'source-witness'/(row['sha256']+'.txt'))
+dump(P/'witness-index.json',[{'origin_id':origin,'path':path,'sha256':r['sha256']}for(origin,path),r in sorted(witness.items())])
+for p in pathlib.Path('/private/tmp').glob('ks-stablenet-errors-*.py'):copy(p,P/'helpers'/(p.name+'.txt'))
+for name in ['ks-stablenet-errors-targeted-guard.log','ks-stablenet-errors-runtime-final.log','ks-stablenet-errors-prepare.log','ks-stablenet-errors-native-final.log','ks-stablenet-errors-final-audit.log']:copy(pathlib.Path('/private/tmp')/name,P/'collector-logs'/name)
+dump(P/'execution.json',{'document_date':'2026-10-18','native_source_commit':'4cebf0c890b6708f3c6cd756749ccfdc55e096eb','initial_source_commit':'2fd6720504464b6623117e517e89b1ec33b553c4','baseline_source_commit':'a3307ccbf0373b16caa86292c79f3ae5eeefe254','formal_completed':0,'formal_total':9,'reviewer_assignment':'미정','paid_LLM_calls':0,'production_writes':0,'external_publication':0,'initial_guard_gap_and_interrupted_suite_preserved':True,'startup_dummy_reconnection_and_MCP_cancel_notification_out_of_scope':True})
+(P/'.gitattributes').write_text('**/*.gz binary\nsource-witness/*.txt -whitespace\n*-build-info.txt whitespace=-blank-at-eol\n')
+copy(pathlib.Path('/private/tmp/check-stablenet-errors.py'),R/'scripts/check-stablenet-errors.py');s=importlib.util.spec_from_file_location('checkerrors',R/'scripts/check-stablenet-errors.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);result=m.derive(P);dump(P/'result.json',result);dump(P/'manifest.json',{'schema_version':1,'checker':'scripts/check-stablenet-errors.py','checker_sha256':sha(R/'scripts/check-stablenet-errors.py'),'artifacts':{str(p.relative_to(P)):sha(p)for p in sorted(P.rglob('*'))if p.is_file()and p.name!='manifest.json'}});print(json.dumps(result,ensure_ascii=False));print('packet files',sum(p.is_file()for p in P.rglob('*')))

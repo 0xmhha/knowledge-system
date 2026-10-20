@@ -1,0 +1,736 @@
+[
+  {
+    "case_id": "RQ-001",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "node/errors.go",
+        "start_line": 42,
+        "end_line": 47,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "rpc/errors.go",
+        "start_line": 141,
+        "end_line": 142,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      "github.com/ethereum/go-ethereum/consensus/wbft/backend.(*Backend).Verify",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-002",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "consensus/wbft/backend/api.go",
+        "start_line": 75,
+        "end_line": 81,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "consensus/wbft/backend/api.go",
+        "start_line": 168,
+        "end_line": 220,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "consensus/clique/api.go",
+        "start_line": 132,
+        "end_line": 180,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      null,
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-003",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [],
+    "fully_resolved_seed_set": true,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/cmd/gstable.checkDanglingStorage",
+      "github.com/ethereum/go-ethereum/trie.(*StateTrie).DeleteStorage",
+      "github.com/ethereum/go-ethereum/core/state/snapshot.CheckDanglingStorage"
+    ],
+    "shared_error_slots": 0,
+    "signal_states": {
+      "concurrency:observed": 3,
+      "impact_category:observed": 3
+    },
+    "generic_error_reasons": {},
+    "sufficient_source_failure_path": null,
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-004",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [],
+    "fully_resolved_seed_set": true,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/core.(*ChainIndexer).Sections",
+      "github.com/ethereum/go-ethereum/core.(*ChainIndexer).processSection",
+      "github.com/ethereum/go-ethereum/core.(*BlockChain).TxIndexProgress"
+    ],
+    "shared_error_slots": 0,
+    "signal_states": {
+      "concurrency:observed": 3,
+      "impact_category:observed": 3
+    },
+    "generic_error_reasons": {},
+    "sufficient_source_failure_path": null,
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-005",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "eth/protocols/snap/sync.go",
+        "start_line": 379,
+        "end_line": 398,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      "github.com/ethereum/go-ethereum/core/rawdb.WriteSnapshotSyncStatus",
+      "github.com/ethereum/go-ethereum/eth/protocols/snap.(*Syncer).saveSyncStatus"
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-006",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "core/state/snapshot/generate.go",
+        "start_line": 565,
+        "end_line": 661,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "eth/protocols/snap/sync.go",
+        "start_line": 379,
+        "end_line": 398,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/core/rawdb.WriteAccountSnapshot",
+      null,
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "edge_budget",
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-007",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "ethclient/ethclient.go",
+        "start_line": 519,
+        "end_line": 524,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/trie.(*Sync).ProcessNode",
+      "github.com/ethereum/go-ethereum/trie.(*Sync).ProcessCode",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-008",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "eth/api_debug.go",
+        "start_line": 135,
+        "end_line": 197,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      "github.com/ethereum/go-ethereum/core/state.(*accessList).Contains",
+      "github.com/ethereum/go-ethereum/accounts.(*Manager).Find"
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "edge_budget",
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-009",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "consensus/beacon/consensus.go",
+        "start_line": 295,
+        "end_line": 333,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "consensus/wbft/backend/engine.go",
+        "start_line": 83,
+        "end_line": 112,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      "github.com/ethereum/go-ethereum/eth/catalyst.(*ConsensusAPI).setInvalidAncestor",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-010",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "core/types/receipt.go",
+        "start_line": 50,
+        "end_line": 56,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/trie.(*Sync).Pending",
+      "github.com/ethereum/go-ethereum/graphql.(*Resolver).Syncing",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-011",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "eth/downloader/skeleton.go",
+        "start_line": 516,
+        "end_line": 610,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/eth/downloader.(*skeleton).processNewHead",
+      null,
+      "github.com/ethereum/go-ethereum/eth/downloader.(*skeleton).startup"
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "edge_budget",
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-012",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "core/txpool/blobpool/blobpool.go",
+        "start_line": 231,
+        "end_line": 319,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "core/txpool/blobpool/priority.go",
+        "start_line": 29,
+        "end_line": 43,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      "github.com/ethereum/go-ethereum/core/txpool/blobpool.newPriceHeap",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-013",
+    "partial": true,
+    "planned_candidate_slots": 10,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "miner/worker.go",
+        "start_line": 165,
+        "end_line": 171,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/eth/downloader.(*skeleton).processNewHead",
+      "github.com/ethereum/go-ethereum/eth/catalyst.(*ConsensusAPI).newPayload",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "concurrency:not_requested": 7,
+      "impact_category:error": 3,
+      "impact_category:not_requested": 7
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "call_budget",
+      "candidate_budget",
+      "edge_budget",
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-014",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "interfaces.go",
+        "start_line": 242,
+        "end_line": 253,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "eth/protocols/snap/sync.go",
+        "start_line": 400,
+        "end_line": 405,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      "github.com/ethereum/go-ethereum/core.(*BlockChain).insertChain",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable"
+    ]
+  },
+  {
+    "case_id": "RQ-015",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "node/errors.go",
+        "start_line": 42,
+        "end_line": 47,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "trie/errors.go",
+        "start_line": 31,
+        "end_line": 39,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      "github.com/ethereum/go-ethereum/trie.(*Sync).ProcessNode",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-016",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "trie/trie_reader.go",
+        "start_line": 27,
+        "end_line": 33,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/triedb/hashdb.(*Database).Reader",
+      "github.com/ethereum/go-ethereum/triedb.(*Database).Reader",
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-017",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "cmd/devp2p/internal/v5test/framework.go",
+        "start_line": 34,
+        "end_line": 38,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      },
+      {
+        "file": "triedb/pathdb/errors.go",
+        "start_line": 27,
+        "end_line": 52,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/triedb/pathdb.(*Database).modifyAllowed",
+      null,
+      null
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-018",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "eth/protocols/eth/dispatcher.go",
+        "start_line": 28,
+        "end_line": 40,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      null,
+      "github.com/ethereum/go-ethereum/eth/protocols/eth.(*Request).Close",
+      "github.com/ethereum/go-ethereum/eth/protocols/snap.(*Syncer).revertTrienodeHealRequest"
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-019",
+    "partial": true,
+    "planned_candidate_slots": 4,
+    "seed_count": 3,
+    "unresolved_seeds": [],
+    "fully_resolved_seed_set": true,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/node.(*Node).RegisterAPIs",
+      "github.com/ethereum/go-ethereum/node.(*Node).startInProc",
+      "github.com/ethereum/go-ethereum/node.(*ipcServer).start"
+    ],
+    "shared_error_slots": 0,
+    "signal_states": {
+      "concurrency:not_requested": 1,
+      "concurrency:observed": 3,
+      "impact_category:not_requested": 1,
+      "impact_category:observed": 3
+    },
+    "generic_error_reasons": {},
+    "sufficient_source_failure_path": null,
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "seed_budget",
+      "unanchored_edge"
+    ]
+  },
+  {
+    "case_id": "RQ-020",
+    "partial": true,
+    "planned_candidate_slots": 3,
+    "seed_count": 3,
+    "unresolved_seeds": [
+      {
+        "file": "rpc/client.go",
+        "start_line": 390,
+        "end_line": 467,
+        "commit_hash": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8"
+      }
+    ],
+    "fully_resolved_seed_set": false,
+    "seed_symbols": [
+      "github.com/ethereum/go-ethereum/eth/downloader.(*queue).Results",
+      null,
+      "github.com/ethereum/go-ethereum/rpc.(*Client).BatchCall"
+    ],
+    "shared_error_slots": 6,
+    "signal_states": {
+      "concurrency:error": 3,
+      "impact_category:error": 3
+    },
+    "generic_error_reasons": {
+      "backend_error": 6
+    },
+    "sufficient_source_failure_path": "missing_seed_marks_every_enriched_candidate_and_later_success_never_erases_error",
+    "actual_past_backend_error_trace": null,
+    "exclusive_historical_cause_proven": false,
+    "stop_reasons": [
+      "symbol_identity_unavailable",
+      "unanchored_edge"
+    ]
+  }
+]

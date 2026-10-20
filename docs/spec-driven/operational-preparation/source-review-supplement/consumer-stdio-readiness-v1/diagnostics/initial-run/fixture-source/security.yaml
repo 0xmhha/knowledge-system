@@ -1,0 +1,13 @@
+security_patterns:
+  - id:owned-command-boundary
+    name:Manual command boundary
+    category:review
+    severity:high
+    description:Manual hypothesis, not a confirmed vulnerability
+    remediation:Review input assumptions before editing
+    matches: [fixture.Seed]
+  - id:owned-secondary
+    name:Secondary manual hypothesis
+    severity:low
+    description:Manual metadata only
+    matches: [fixture.Seed]

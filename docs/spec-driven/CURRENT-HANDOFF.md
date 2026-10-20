@@ -1,30 +1,53 @@
-# 현재 인수인계
+# 현재 인수인계 — 실제 native broadcast·RPC callback 종료 연결 / 2026-10-20
 
-2026-10-14 통합 확인 기준은 main a214fbb18039f2e63ee93c0f073bfb1b61c3e716이다. [PR #102](https://github.com/0xmhha/knowledge-system/pull/102)는 head e77e59b8의 [CI5/5](https://github.com/0xmhha/knowledge-system/actions/runs/38565382940) 통과 후 스쿼시 머지됐다. 통합 시 로컬 main/원격 main·PR tree 동일성·clean worktree·기록된 source/evidence guard를 확인했다. 현재 checkout은 `git status --short --branch`로 확인하며 고정한 통합 commit을 미래의 실시간 HEAD로 해석하지 않는다.
+새 머신/새 세션에서는 [머신 간 인수인계](./MACHINE-HANDOFF.md)를 먼저 따라 증거 태그·실행 도구·외부 DB/모델·삭제된 임시 경로를 확인한다.
 
-## 현재 완료와 남은 범위
+단계90 요청 범위의 연결 검증을 완료했다. [명세](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SPEC.json) · [결과](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json) · [회귀·시도 이력](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/VALIDATION.json) · [자원 정리](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/CLEANUP.json).
 
-- 상위 WI-V1/V2/3/4/1/2/C/6/SP는 구현·명시 검증9/9 완료다.9개 운영·사람 독립 수용은 not_recorded이며 [전체 작업표](../REMAINING-WORK.md)에 별도 기록한다.
-- WI-5는 담당 저장소 미확보다. 다른9개 구현 완료 수와 구분한다. 일반 후속13개는 기능별 범위 결정이 필요하다.
-- go-stablenet 출처 매핑·42질문 재평가·SNK06 범위 검토3/3, 서버 종료 SD-01–04는4/4 완료다. 원래 SNK06 실패·과거 종료 오류는 보존한다. [비교/종료 작업표](./GO-STABLENET-DATASET-COMPARISON.md)를 따른다.
-- coding-agent·ChainBench의 원본 commit/patch/bundle은 구현 packet에 보존한다. knowledge-system 머지로 다른 저장소 게시·설치·운영 상태를 완료 처리하지 않는다.
+## 현재 단계 — 일반/race10슬롯·실제20노드 종료·회귀121종 통과
 
-현재 문서의 옛 WI 구현 잔여·중간 다음 작업 정리는 완료했다. 다음 권고는 운영·독립 수용 대상·완료 기준 확정과 외부 저장소/머신/설치된 소비자 상태 확인이다. 구현 상세는 [현재 명세](./UPPER-WORK-ITEMS-IMPLEMENTATION.md), evidence revision·SHA·owner commit은 [구현 원장](./UPPER-WORK-ITEMS-PROGRESS.json)에 있다.
+|역할|일반/race 관측|정리와 판정|
+|---|---|---|
+|원본·재도입 별칭|4건 모두 같은 구독의 native 상태 송신과 Unsubscribe 송신 쌍 대기; 삭제/ack/반환0|관측 고정 후 소유 status 수신으로 실제 owner를 진행; rescue를 후보 성공으로 세지 않음|
+|후보 A/B|4건 모두 실제 native 상태1개 drain→owner delete→ack→method/callback 반환|정리 개입0; gate 아래 finite 경로이며 독립 후보 승인 아님|
+|조기 반환 대조군|2건 모두 callback/method 반환은 있지만 owner 삭제/ack0, native 송신 pending|관측 후 소유 status 수신+실제 owner manual uninstall로 복구; 가짜 ack0|
 
-## 먼저 읽을 문서
+실제 node.New/eth.New/Start로 슬롯마다 두 노드를 만들고 loopback peer가3블록을 실제 동기화했다. 선택한 factory API의 downloader/blockchain/mux 포인터가 실제 receiver 객체와 같고, API/channel/RPC 구독 ID를 trace 전체에 결속했다. Start/Done 이벤트와 진행 높이를 주입하지 않았다. 활성 indexer와 동일 head를 확인했다. 원본60초 타이머는 유지했고 선택 receiver의 관측 나이는 60.0008~60.0018초였다.
 
-1. [남은 전체 작업](../REMAINING-WORK.md): N16 보류·태그/배포 보류와 별도 후속 범위.
-2. [목적과 범위](./PURPOSE-AND-SCOPE.md): 초기 요구사항과 외부 WI10개 책임.
-3. [현재 아키텍처](../ARCHITECTURE.md), [온톨로지 MCP](../../system/docs/ontology-mcp.md).
-4. [실행 명세](./REFACTORING-EXECUTION-SPEC.md), [진행 원장](./REFACTORING-PROGRESS.json).
-5. [평가 상태](./EVALUATION-STATUS.md), [출시 정책](./RELEASE-POLICY.md).
+송신 직전의 선언된 gate에서 같은 세션의 실제 eth_unsubscribe를 호출했다. true 응답을 받는 동안 owner 삭제/ack는0이고, 실제 Syncing의 rpcSub.Err 분기와 deferred Unsubscribe 진입을 확인한 뒤 gate를 열었다. 이후 원본의 대기와 A/B의 native drain·실제 map 삭제/ack를 같은 trace에서 구별했다. 원본·별칭의 frozen stack은 native send와 uninstall send를 같은 실제 callback 경로에서 보여준다. wire true를 내부 해제 완료로 바꾸지 않았다.
 
-기존17/18·온톨로지4/4 완료는 기록된 수용 범위다. 독립 온톨로지 품질은inconclusive, 성능수용false, 온톨로지off·knowledge opt-in·타입 선언off를 유지한다. WBFT trace의 missing_code와 acceptance_evaluated=false를 테스트/기준 통과로 설명하지 않는다.
+이 gate와 관측 hook은 실행 순서를 통제한다. 완료 상태 false broadcast와 RPC 해제 Err 분기에 한정된 검증이다. 진행 중 true 알림·transport close/Notify 중 종료·무계측 발생 확률/무한 생산자 fairness·모든 post-ack channel-use·독립 품질 수용을 주장하지 않는다. legacy PoW ethash 시험이며 운영 WBFT 검증이 아니다. 실제 owner4/별도 통제 late1 및 옛 구독·새 등록 전이라는 기존 승인 범위를 유지한다.
 
-## 변경과 검증 원칙
+소스0bf2f4d1bfeb의 고유 후보4개와 원본 별칭을 구분했다. 기존 파일 변경은 선언한 API 관측 hook/후보 method뿐이고 bridge/main2개를 추가했다. full source map·project/build Git tree·일반/race8바이너리·실행10개를 결속했다. 최초 보조 코드 빌드는 ack 채널 타입 오류로 실패했고 실제 노드 실행0이다. 해당 한 곳을 원본 chan interface 타입에 맞춘 corrective1에서 전체10슬롯을 실행했다. 최초 소스/실패 로그와 수정 범위를 모두 보존했다. 자동 재시도0이다.
 
-원장 각 task의 revision에서 근거를 읽는다. 문서 정리에서 삭제된 준비·완료 보고서는 [복구 방법](./EVIDENCE-RECOVERY.md)을 따른다. 기존 증거 branch/commit과 원래 승인 입력·capture·gold·protocol·원문·raw 결과를 보존하며 다시 작성하지 않는다. 사용자 .claude/와 logs 자료는 접근하지 않는다.
+지역 회귀54개와 준비 상태67개로 고유121종이 통과했다. 검증기 결속 강화 뒤 기존 manifest가 소스 변경을 탐지한 집중 검사1회 실패도 보존했고, 현재 해시로 재결속한 최종 집중9개는 통과했다. 원자료/실행 누락, 타이머 단축, RPC 분기 변경, owner ack 없는 완료, source drift와 독립 승인 승격을 거부한다. KS 운영 Go 코드는 그대로이며 이전 서명된 본체 전체 일반/race4273개씩의 같은 입력 근거를 유지한다. 이번에 본체 전체 suite를 새로 돌렸다고 주장하지 않는다.
 
-현재 문서 목록과 역할은 [catalog](../DOCUMENTATION-CATALOG.json), 삭제 경로와 SHA는 [정리 목록](../DOCUMENTATION-CLEANUP.json)에 있다. CLI/도구/링크는 `make docs-check`, 완료 조건은 `make refactoring-check`로 확인한다. 시험 통과, source alignment, 검토된 관계, 사람 수용과 품질 판정은 분리한다.
+관측 후 rescue status 수신6개·early 대상 실제 owner cleanup 요청2개를 별도 기록했고 가짜 ack0이다. 실제20노드가 닫혔고 소유 프로세스 잔여0·임시 데이터 잔여0·원본 checkout 보존을 확인했다. 증거 hash 확인 후 이번 캐시/초기·수정 시험 루트3개 약2.06GiB를 제거했다. 실제 LLM·유료 호출·운영 적용·게시0이다.
 
-다음 필수 작업은 N16 재개 여부 결정이다. 사용자가 보류를 유지하는 동안 키 생성·배포·선택 기능 기본 활성화를 수행하지 않는다. 새 후속 작업은 남은 목록의 별도 범위를 명시하고 승인·입력·완료 기준을 고정해 진행한다.
+## 다음 작업
+
+실제 owner ack 뒤 옛 구독의 모든 channel-use 관측과 명시적 새 등록의 세대 경계를 보완한다. 같은 channel의 새 구독은 허용되므로 영구 불사용으로 판정하지 않는다. 이후 독립 정답/충분성/동결과 승인 자료 기반 실제 역할 양성 oracle·최종 HEAD가 남는다.
+
+## 남은 전체13묶음 — 상위 완료0/13·정식0/9
+
+|묶음|남은 내용|
+|---|---|
+|WI-V1|옛 구독 ack 후 channel-use·새 등록 세대 경계·독립 티켓/oracle·승인 양성 역할/final HEAD|
+|WI-V2|독립 oracle·수용 후보 집합·선정 판단|
+|WI-6|독립 nonseed 관련성/잡음 정답·가족/표본 충분성|
+|WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 전용 평가는 사용자 보류|
+|WI-C|독립 필수 항목/우선순위·새 사례|
+|WI-1|값/종류/메모리 매칭·unknown 구분·독립 완전 정답|
+|WI-2|독립 비보안 표본·호출 대상/호출자·명령/build/MCP 소비자 매칭|
+|WI-3|가족/노출/중복·상한/partial/오류/범위 밖·독립 관련성|
+|WI-4|실제 host/receiver 일정·반복·독립 가족/oracle/충분성|
+|독립 수용 준비|익명 역할 미정·새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|
+|온톨로지|독립 의미/검색 정답·구현/개념 연결·동일 corpus off/on 효과|
+|정식9개 실행·수용|독립 승인·동결 후 WI-1/2/3/4/V1/V2/6/SP/C 실행|
+|활성 후속9개|캐시 로컬 완료; 공개 형식·graph tuning·flow gold·규모·as-of·legacy 출처·viewer·배포/downstream 남음|
+
+D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false다. 실명/연락처를 요구하지 않으며 익명 역할을 허용한다. CoreML은 사용자 제외로 완료 조건에서 뺐다. 보안 전용 평가는 사용자 보류다. 실제 LLM 답변 평가는 모델·인증·비용 상한 결정 후 진행한다.
+
+## 보존 근거
+
+[12계약·소비자12기준 검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-consumer-review-v1/REVIEW.json) · [기본 고정 소스·종료 시한 진단](./operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/SUMMARY.json) · [실제4/통제1 범위 승인](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json) · [전체 원장](./REMAINING-13-EXECUTION.json).

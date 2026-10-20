@@ -1,0 +1,205 @@
+SRC-017 — AI DEV draft, NOT independently approved
+core/txpool/blobpool/blobpool.go @ 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+own-function partial-go-types local Var/Const binding pairs and pinned x/tools structural normal-exit CFG; not memory effects, whole-program typing, exception/short-circuit feasibility or independent semantic truth
+Public source: ../public/source/SRC-017.go.txt
+
+Bindings (absolute UTF8 declaration spans, flags preserve unsupported meaning):
+{"declaration": {"end": 32407, "start": 32406}, "flags": [], "id": "v@32406", "name": "p", "origin": "receiver", "value_kind": "reference_binding"}
+{"declaration": {"end": 32432, "start": 32425}, "flags": [], "id": "v@32425", "name": "oldHead", "origin": "parameter", "value_kind": "unknown"}
+{"declaration": {"end": 32441, "start": 32434}, "flags": [], "id": "v@32434", "name": "newHead", "origin": "parameter", "value_kind": "unknown"}
+{"declaration": {"end": 32469, "start": 32460}, "flags": [], "id": "v@32460", "name": "waitStart", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 32693, "start": 32686}, "flags": [], "id": "v@32686", "name": "statedb", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 32698, "start": 32695}, "flags": [], "id": "v@32695", "name": "err", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 33013, "start": 33005}, "flags": [], "id": "v@33005", "name": "reinject", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 33025, "start": 33015}, "flags": [], "id": "v@33015", "name": "inclusions", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 33084, "start": 33080}, "flags": [], "id": "v@33080", "name": "adds", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 33116, "start": 33112}, "flags": ["range_assignment_unknown"], "id": "v@33112", "name": "addr", "origin": "range", "value_kind": "unknown"}
+{"declaration": {"end": 33121, "start": 33118}, "flags": ["range_assignment_unknown"], "id": "v@33118", "name": "txs", "origin": "range", "value_kind": "reference_binding"}
+{"declaration": {"end": 33218, "start": 33216}, "flags": ["range_assignment_unknown"], "id": "v@33216", "name": "tx", "origin": "range", "value_kind": "unknown"}
+{"declaration": {"end": 33244, "start": 33241}, "flags": [], "id": "v@33241", "name": "err", "origin": "local", "value_kind": "reference_binding"}
+{"declaration": {"end": 33826, "start": 33819}, "flags": [], "id": "v@33819", "name": "basefee", "origin": "local", "value_kind": "unknown"}
+{"declaration": {"end": 33906, "start": 33899}, "flags": [], "id": "v@33899", "name": "blobfee", "origin": "local", "value_kind": "unknown"}
+
+Complete definition/use pair labels, grouped by use. d/o identifiers encode source byte positions.
+u:o@32485: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@32532: d:o@32460=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@32565: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@32702: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@32718: d:o@32434=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@32736: d:o@32695=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@32802: d:o@32695=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@32820: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@32829: d:o@32434=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@32838: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@32848: d:o@32686=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@33029: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33037: d:o@32425=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@33046: d:o@32434=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@33056: d:o@33005=positive(kill_free_nonempty_CFG_path)
+u:o@33131: d:o@33005=positive(kill_free_nonempty_CFG_path)
+u:o@33228: d:o@33118=unknown(range_assignment_unknown)
+u:o@33248: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33259: d:o@33112=unknown(range_assignment_unknown)
+u:o@33265: d:o@33216=unknown(range_assignment_unknown)
+u:o@33277: d:o@33241=positive(kill_free_nonempty_CFG_path)
+u:o@33309: d:o@33080=positive(kill_free_nonempty_CFG_path); d:o@33295=positive(kill_free_nonempty_CFG_path)
+u:o@33315: d:o@33216=unknown(range_assignment_unknown)
+u:o@33448: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33458: d:o@33112=unknown(range_assignment_unknown)
+u:o@33464: d:o@33015=positive(kill_free_nonempty_CFG_path)
+u:o@33489: d:o@33080=positive(kill_free_nonempty_CFG_path); d:o@33295=positive(kill_free_nonempty_CFG_path)
+u:o@33504: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33544: d:o@33080=positive(kill_free_nonempty_CFG_path); d:o@33295=positive(kill_free_nonempty_CFG_path)
+u:o@33637: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33663: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33678: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33695: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33712: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33869: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@33887: d:o@32434=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@33978: d:o@32434=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@34062: d:o@32434=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@34090: d:o@32406=positive(kill_free_nonempty_CFG_path)
+u:o@34105: d:o@33819=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@34114: d:o@33899=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@34011=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@34158: d:o@33819=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@34204: d:o@33899=unknown(unresolved_value_domain_or_compile_time_mapping); d:o@34011=unknown(unresolved_value_domain_or_compile_time_mapping)
+u:o@34224: d:o@32406=positive(kill_free_nonempty_CFG_path)
+
+Same-name shadow identity negatives:
+d:o@33241 -> u:o@32736 negative:different_lexical_declaration
+d:o@33241 -> u:o@32802 negative:different_lexical_declaration
+d:o@32695 -> u:o@33277 negative:different_lexical_declaration
+
+CFG block matching table (raw indices are only hints):
+03edafa71cd244d12772cec725e1615d103bf4fd63c9dc49a077d2ec6789a2b1 {"anchor": {"end": 34250, "start": 32457}, "id": 0, "kind": "Body", "live": true, "nodes": ["n0.0", "n0.1", "n0.2", "n0.3", "n0.4", "n0.5", "n0.6"], "successors": [1, 2]}
+e3c6c418d19a79a04e43f118c3557abb1640a4a95da27cfa9e942bc4e6466af5 {"anchor": {"end": 32818, "start": 32733}, "id": 1, "kind": "IfThen", "live": true, "nodes": ["n1.0", "n1.1"], "successors": []}
+7e13fb89742fde30cfec61897f5f0bab8d7423652a0c6d23f63f3fe9f2a5c2ed {"anchor": {"end": 32818, "start": 32733}, "id": 2, "kind": "IfDone", "live": true, "nodes": ["n2.0", "n2.1", "n2.2", "n2.3"], "successors": [4, 5]}
+eb3025ad73a5d878d04d28914f49a9998900785f61848ad6f28703e0f3cde785 {"anchor": {"end": 32815, "start": 32809}, "id": 3, "kind": "Unreachable", "live": false, "nodes": [], "successors": [2]}
+1e17563f5b4b80dd4ad19a1d31a7fc1d1298642e9cc3ca0de3fd0ec2070f1307 {"anchor": {"end": 33557, "start": 33002}, "id": 4, "kind": "IfThen", "live": true, "nodes": ["n4.0", "n4.1", "n4.2", "n4.3"], "successors": [6]}
+e7fdd5f0ce79ebe759738e3d90f5ef9217c10a4a3d794df77261bd1225677e1c {"anchor": {"end": 33557, "start": 33002}, "id": 5, "kind": "IfDone", "live": true, "nodes": ["n5.0"], "successors": [16, 17]}
+6f3699e8444f5a8d1eb3d6968be635c3b1671432894105f7d62cab5d8e168345 {"anchor": {"end": 33479, "start": 33108}, "id": 6, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [7, 8]}
+e6e3e8ab4fbb792cf40fb00d10fe55ddd88879aced58008b7872a32bd9a83844 {"anchor": {"end": 33479, "start": 33108}, "id": 7, "kind": "RangeBody", "live": true, "nodes": ["n7.0", "n7.1", "n7.2"], "successors": [9]}
+d7e8c6ed863a4d5db3706e0dd3c2e9ba5342a782b370f7abce32826c68c6e0b5 {"anchor": {"end": 33479, "start": 33108}, "id": 8, "kind": "RangeDone", "live": true, "nodes": ["n8.0"], "successors": [14, 15]}
+4eb38a8ee0253eb9c6c3a213a6d3d096fd30a161b809e1d323d20ae10cbf6d1a {"anchor": {"end": 33352, "start": 33209}, "id": 9, "kind": "RangeLoop", "live": true, "nodes": [], "successors": [10, 11]}
+86507fa0724fdb0f0a4059a0be4ce1cbbd245546c87c297b30d6a98f1161c273 {"anchor": {"end": 33352, "start": 33209}, "id": 10, "kind": "RangeBody", "live": true, "nodes": ["n10.0", "n10.1"], "successors": [12, 13]}
+bcee88af918f9f0db210651b02c63a9e1f8520c65f4a2ca174576b1f99b6626a {"anchor": {"end": 33352, "start": 33209}, "id": 11, "kind": "RangeDone", "live": true, "nodes": ["n11.0"], "successors": [6]}
+f4cf1578dd43172de18b3aebf9fe6e1ebc08a6d30078b7de2619cc2684394fa0 {"anchor": {"end": 33347, "start": 33238}, "id": 12, "kind": "IfThen", "live": true, "nodes": ["n12.0"], "successors": [13]}
+f2982be2e41a72c7c8bbc694629020893f7ee9787092715ae1517dbb34e71d10 {"anchor": {"end": 33347, "start": 33238}, "id": 13, "kind": "IfDone", "live": true, "nodes": [], "successors": [9]}
+8561364e59532e9fc15d184ddcfb0cd64a7e3e4546ffcf74dec277f4addebd35 {"anchor": {"end": 33554, "start": 33482}, "id": 14, "kind": "IfThen", "live": true, "nodes": ["n14.0"], "successors": [15]}
+512138d95689579caf91bde46a15d97e5374021069f89326697ee5fdaeefa65b {"anchor": {"end": 33554, "start": 33482}, "id": 15, "kind": "IfDone", "live": true, "nodes": [], "successors": [5]}
+c14f75480977f60a82eb51565966e8a3d0de1b4559302be64df5e10fd0c28eb8 {"anchor": {"end": 33743, "start": 33634}, "id": 16, "kind": "IfThen", "live": true, "nodes": ["n16.0"], "successors": [17]}
+c7bb7058eccef065ee221ddf9c34f5f0243cd65c8f53451873ae4db5526a486a {"anchor": {"end": 33743, "start": 33634}, "id": 17, "kind": "IfDone", "live": true, "nodes": ["n17.0", "n17.1", "n17.2"], "successors": [18, 19]}
+72d5f15aa0a38163c2a25f262236066501cccfdfec37978daf3a2ad3eab609e7 {"anchor": {"end": 34088, "start": 33975}, "id": 18, "kind": "IfThen", "live": true, "nodes": ["n18.0"], "successors": [19]}
+823461d6d58093fae5fba58ce62ed7a2324193ad0c8262690cfdc818950a5d66 {"anchor": {"end": 34088, "start": 33975}, "id": 19, "kind": "IfDone", "live": true, "nodes": ["n19.0", "n19.1", "n19.2", "n19.3", "n19.4"], "successors": []}
+
+Control positive/unknown branch-block pairs:
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "03edafa71cd244d12772cec725e1615d103bf4fd63c9dc49a077d2ec6789a2b1", "target": "e3c6c418d19a79a04e43f118c3557abb1640a4a95da27cfa9e942bc4e6466af5"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "03edafa71cd244d12772cec725e1615d103bf4fd63c9dc49a077d2ec6789a2b1", "target": "7e13fb89742fde30cfec61897f5f0bab8d7423652a0c6d23f63f3fe9f2a5c2ed"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "03edafa71cd244d12772cec725e1615d103bf4fd63c9dc49a077d2ec6789a2b1", "target": "e7fdd5f0ce79ebe759738e3d90f5ef9217c10a4a3d794df77261bd1225677e1c"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "03edafa71cd244d12772cec725e1615d103bf4fd63c9dc49a077d2ec6789a2b1", "target": "c7bb7058eccef065ee221ddf9c34f5f0243cd65c8f53451873ae4db5526a486a"}
+{"branch": 1, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "03edafa71cd244d12772cec725e1615d103bf4fd63c9dc49a077d2ec6789a2b1", "target": "823461d6d58093fae5fba58ce62ed7a2324193ad0c8262690cfdc818950a5d66"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "7e13fb89742fde30cfec61897f5f0bab8d7423652a0c6d23f63f3fe9f2a5c2ed", "target": "1e17563f5b4b80dd4ad19a1d31a7fc1d1298642e9cc3ca0de3fd0ec2070f1307"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "7e13fb89742fde30cfec61897f5f0bab8d7423652a0c6d23f63f3fe9f2a5c2ed", "target": "6f3699e8444f5a8d1eb3d6968be635c3b1671432894105f7d62cab5d8e168345"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "7e13fb89742fde30cfec61897f5f0bab8d7423652a0c6d23f63f3fe9f2a5c2ed", "target": "d7e8c6ed863a4d5db3706e0dd3c2e9ba5342a782b370f7abce32826c68c6e0b5"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "7e13fb89742fde30cfec61897f5f0bab8d7423652a0c6d23f63f3fe9f2a5c2ed", "target": "512138d95689579caf91bde46a15d97e5374021069f89326697ee5fdaeefa65b"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "e7fdd5f0ce79ebe759738e3d90f5ef9217c10a4a3d794df77261bd1225677e1c", "target": "c14f75480977f60a82eb51565966e8a3d0de1b4559302be64df5e10fd0c28eb8"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "6f3699e8444f5a8d1eb3d6968be635c3b1671432894105f7d62cab5d8e168345", "target": "6f3699e8444f5a8d1eb3d6968be635c3b1671432894105f7d62cab5d8e168345"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "6f3699e8444f5a8d1eb3d6968be635c3b1671432894105f7d62cab5d8e168345", "target": "e6e3e8ab4fbb792cf40fb00d10fe55ddd88879aced58008b7872a32bd9a83844"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "6f3699e8444f5a8d1eb3d6968be635c3b1671432894105f7d62cab5d8e168345", "target": "4eb38a8ee0253eb9c6c3a213a6d3d096fd30a161b809e1d323d20ae10cbf6d1a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "6f3699e8444f5a8d1eb3d6968be635c3b1671432894105f7d62cab5d8e168345", "target": "bcee88af918f9f0db210651b02c63a9e1f8520c65f4a2ca174576b1f99b6626a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "d7e8c6ed863a4d5db3706e0dd3c2e9ba5342a782b370f7abce32826c68c6e0b5", "target": "8561364e59532e9fc15d184ddcfb0cd64a7e3e4546ffcf74dec277f4addebd35"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "4eb38a8ee0253eb9c6c3a213a6d3d096fd30a161b809e1d323d20ae10cbf6d1a", "target": "4eb38a8ee0253eb9c6c3a213a6d3d096fd30a161b809e1d323d20ae10cbf6d1a"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "4eb38a8ee0253eb9c6c3a213a6d3d096fd30a161b809e1d323d20ae10cbf6d1a", "target": "86507fa0724fdb0f0a4059a0be4ce1cbbd245546c87c297b30d6a98f1161c273"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "4eb38a8ee0253eb9c6c3a213a6d3d096fd30a161b809e1d323d20ae10cbf6d1a", "target": "f2982be2e41a72c7c8bbc694629020893f7ee9787092715ae1517dbb34e71d10"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "86507fa0724fdb0f0a4059a0be4ce1cbbd245546c87c297b30d6a98f1161c273", "target": "f4cf1578dd43172de18b3aebf9fe6e1ebc08a6d30078b7de2619cc2684394fa0"}
+{"branch": 0, "label": "positive", "reason": "normal_exit_structural_path_cut", "source": "c7bb7058eccef065ee221ddf9c34f5f0243cd65c8f53451873ae4db5526a486a", "target": "72d5f15aa0a38163c2a25f262236066501cccfdfec37978daf3a2ad3eab609e7"}
+All other rows of the declared live branch/target universe are negative; complete matrix is in the adjacent .json.gz.
+Non-exiting unknown block keys: []
+Quarantined function signatures: []
+
+Boundaries / unresolved identifiers, NEVER negative safety gold:
+{"kind": "call_effect_not_inferred", "span": {"end": 32483, "start": 32473}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32498, "start": 32485}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32557, "start": 32500}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32556, "start": 32521}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32542, "start": 32521}}
+{"kind": "defer_effect_not_executed", "span": {"end": 32580, "start": 32559}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32580, "start": 32565}}
+{"kind": "defer_effect_not_executed", "span": {"end": 32683, "start": 32583}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32683, "start": 32589}}
+{"kind": "closure_not_executed", "span": {"end": 32671, "start": 32589}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32682, "start": 32672}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32731, "start": 32702}}
+{"kind": "call_effect_not_inferred", "span": {"end": 32806, "start": 32751}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33054, "start": 33029}}
+{"kind": "range_binding_unknown", "span": {"end": 33479, "start": 33108}}
+{"kind": "range_binding_unknown", "span": {"end": 33352, "start": 33209}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33275, "start": 33248}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33274, "start": 33265}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33341, "start": 33302}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33340, "start": 33315}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33475, "start": 33448}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33494, "start": 33485}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33550, "start": 33504}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33690, "start": 33637}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33653, "start": 33637}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33740, "start": 33695}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33739, "start": 33712}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33896, "start": 33829}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33895, "start": 33849}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33885, "start": 33869}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33970, "start": 33909}}
+{"kind": "call_effect_not_inferred", "span": {"end": 33969, "start": 33929}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34085, "start": 34021}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34084, "start": 34041}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34129, "start": 34090}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34176, "start": 34132}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34175, "start": 34152}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34174, "start": 34158}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34222, "start": 34178}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34221, "start": 34198}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34220, "start": 34204}}
+{"kind": "call_effect_not_inferred", "span": {"end": 34248, "start": 34224}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Now", "span": {"end": 32481, "start": 32478}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Lock", "span": {"end": 32496, "start": 32492}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "resetwaitHist", "span": {"end": 32513, "start": 32500}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Update", "span": {"end": 32520, "start": 32514}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Since", "span": {"end": 32531, "start": 32526}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Nanoseconds", "span": {"end": 32554, "start": 32543}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Unlock", "span": {"end": 32578, "start": 32572}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Now", "span": {"end": 32680, "start": 32677}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "StateAt", "span": {"end": 32717, "start": 32710}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Root", "span": {"end": 32730, "start": 32726}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Error", "span": {"end": 32760, "start": 32755}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Transaction", "span": {"end": 33105, "start": 33094}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Hash", "span": {"end": 33272, "start": 33268}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "WithoutBlobTxSidecar", "span": {"end": 33338, "start": 33318}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Send", "span": {"end": 33521, "start": 33517}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "NewTxsEvent", "span": {"end": 33538, "start": 33527}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Txs", "span": {"end": 33542, "start": 33539}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Config", "span": {"end": 33651, "start": 33645}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "IsCancun", "span": {"end": 33662, "start": 33654}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Number", "span": {"end": 33676, "start": 33670}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Time", "span": {"end": 33689, "start": 33685}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "finalize", "span": {"end": 33711, "start": 33703}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "CurrentFinalBlock", "span": {"end": 33737, "start": 33720}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "MustFromBig", "span": {"end": 33848, "start": 33837}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "CalcBaseFee", "span": {"end": 33868, "start": 33857}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Config", "span": {"end": 33883, "start": 33877}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "MustFromBig", "span": {"end": 33928, "start": 33917}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "NewInt", "span": {"end": 33939, "start": 33933}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "BlobTxMinBlobGasprice", "span": {"end": 33968, "start": 33947}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "ExcessBlobGas", "span": {"end": 33999, "start": 33986}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "MustFromBig", "span": {"end": 34040, "start": 34029}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "CalcBlobFee", "span": {"end": 34060, "start": 34049}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "ExcessBlobGas", "span": {"end": 34083, "start": 34070}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "reinit", "span": {"end": 34104, "start": 34098}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "basefeeGauge", "span": {"end": 34144, "start": 34132}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Update", "span": {"end": 34151, "start": 34145}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Uint64", "span": {"end": 34172, "start": 34166}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "blobfeeGauge", "span": {"end": 34190, "start": 34178}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Update", "span": {"end": 34197, "start": 34191}}
+{"kind": "unresolved_identifier_not_negative_gold", "name": "Uint64", "span": {"end": 34218, "start": 34212}}
+
+Human reviewer: unassigned. Actual retained query and consumer-ID matching: not executed/frozen.

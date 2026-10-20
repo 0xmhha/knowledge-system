@@ -1,0 +1,22 @@
+{
+  "kind": "user_approved_owner_schedule_scope_v1",
+  "decision": "adopt_proposed_scope_split",
+  "approval_source": "direct_user_reply_2026-10-19",
+  "approval_quote": "제안한 범위 구분 채택 (권고)",
+  "proposal_sha256": "bdd40961f05477d0cae0a0197e5bcacc54b0887f710900189ecbe27ae53233f7",
+  "adopted_scope": {
+    "actual_owner_schedules": [
+      "normal_delivery_then_unsubscribe",
+      "blocked_delivery_then_consumer_exit",
+      "confirmation_delayed",
+      "concurrent_unsubscribe_once"
+    ],
+    "separate_controlled_owner_schedule": "late_delivery_before_confirmation",
+    "late_scope_note": "post-accept extra status cannot originate from this single owner before its immediate ack; external writers or an injected owner are separate scope",
+    "post_ack_scope": "old subscription until a later explicit new registration; no unconditional forever claim"
+  },
+  "independent_gold_approval": false,
+  "formal_completed": 0,
+  "freeze": null,
+  "execution_allowed": false
+}

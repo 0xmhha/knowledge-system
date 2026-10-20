@@ -1,0 +1,118 @@
+{
+  "declarations": [
+    {
+      "path": "internal/build/util.go",
+      "name": "MustRunCommand",
+      "site": {
+        "start_byte": 1594,
+        "end_byte_exclusive": 1682,
+        "start_line": 67,
+        "end_line": 69
+      },
+      "source_text": "func MustRunCommand(cmd string, args ...string) {\n\tMustRun(exec.Command(cmd, args...))\n}"
+    },
+    {
+      "path": "internal/build/util.go",
+      "name": "MustRunCommandWithOutput",
+      "site": {
+        "start_byte": 1890,
+        "end_byte_exclusive": 2244,
+        "start_line": 74,
+        "end_line": 90
+      },
+      "source_text": "func MustRunCommandWithOutput(cmd string, args ...string) {\n\tinterval := time.NewTicker(time.Minute)\n\tdone := make(chan struct{})\n\tdefer interval.Stop()\n\tdefer close(done)\n\tgo func() {\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-interval.C:\n\t\t\t\tfmt.Printf(\"Waiting for command %q\\n\", cmd)\n\t\t\tcase <-done:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\tMustRun(exec.Command(cmd, args...))\n}"
+    }
+  ],
+  "functions": [
+    {
+      "path": "build/ci.go",
+      "name": "main",
+      "site": {
+        "start_byte": 5214,
+        "end_byte_exclusive": 5911,
+        "start_line": 158,
+        "end_line": 189
+      },
+      "source_text": "func main() {\n\tlog.SetFlags(log.Lshortfile)\n\n\tif !common.FileExist(filepath.Join(\"build\", \"ci.go\")) {\n\t\tlog.Fatal(\"this script must be run from the root of the repository\")\n\t}\n\tif len(os.Args) < 2 {\n\t\tlog.Fatal(\"need subcommand as first argument\")\n\t}\n\tswitch os.Args[1] {\n\tcase \"install\":\n\t\tdoInstall(os.Args[2:])\n\tcase \"test\":\n\t\tdoTest(os.Args[2:])\n\tcase \"lint\":\n\t\tdoLint(os.Args[2:])\n\tcase \"archive\":\n\t\tdoArchive(os.Args[2:])\n\tcase \"docker\":\n\t\tdoDocker(os.Args[2:])\n\tcase \"debsrc\":\n\t\tdoDebianSource(os.Args[2:])\n\tcase \"nsis\":\n\t\tdoWindowsInstaller(os.Args[2:])\n\tcase \"purge\":\n\t\tdoPurge(os.Args[2:])\n\tcase \"sanitycheck\":\n\t\tdoSanityCheck()\n\tdefault:\n\t\tlog.Fatal(\"unknown command \", os.Args[1])\n\t}\n}"
+    },
+    {
+      "path": "build/ci.go",
+      "name": "doLint",
+      "site": {
+        "start_byte": 11888,
+        "end_byte_exclusive": 12387,
+        "start_line": 363,
+        "end_line": 377
+      },
+      "source_text": "func doLint(cmdline []string) {\n\tvar (\n\t\tcachedir = flag.String(\"cachedir\", \"./build/cache\", \"directory for caching golangci-lint binary.\")\n\t)\n\tflag.CommandLine.Parse(cmdline)\n\tpackages := []string{\"./...\"}\n\tif len(flag.CommandLine.Args()) > 0 {\n\t\tpackages = flag.CommandLine.Args()\n\t}\n\n\tlinter := downloadLinter(*cachedir)\n\tlflags := []string{\"run\", \"--config\", \".golangci.yml\"}\n\tbuild.MustRunCommandWithOutput(linter, append(lflags, packages...)...)\n\tfmt.Println(\"You have achieved perfection.\")\n}"
+    },
+    {
+      "path": "build/ci.go",
+      "name": "downloadLinter",
+      "site": {
+        "start_byte": 12444,
+        "end_byte_exclusive": 13247,
+        "start_line": 380,
+        "end_line": 405
+      },
+      "source_text": "func downloadLinter(cachedir string) string {\n\tcsdb := build.MustLoadChecksums(\"build/checksums.txt\")\n\tversion, err := build.Version(csdb, \"golangci\")\n\tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\tarch := runtime.GOARCH\n\text := \".tar.gz\"\n\n\tif runtime.GOOS == \"windows\" {\n\t\text = \".zip\"\n\t}\n\tif arch == \"arm\" {\n\t\tarch += \"v\" + os.Getenv(\"GOARM\")\n\t}\n\tbase := fmt.Sprintf(\"golangci-lint-%s-%s-%s\", version, runtime.GOOS, arch)\n\turl := fmt.Sprintf(\"https://github.com/golangci/golangci-lint/releases/download/v%s/%s%s\", version, base, ext)\n\tarchivePath := filepath.Join(cachedir, base+ext)\n\tif err := csdb.DownloadFile(url, archivePath); err != nil {\n\t\tlog.Fatal(err)\n\t}\n\tif err := build.ExtractArchive(archivePath, cachedir); err != nil {\n\t\tlog.Fatal(err)\n\t}\n\treturn filepath.Join(cachedir, base, \"golangci-lint\")\n}"
+    },
+    {
+      "path": "internal/build/util.go",
+      "name": "MustRun",
+      "site": {
+        "start_byte": 1138,
+        "end_byte_exclusive": 1340,
+        "start_line": 42,
+        "end_line": 51
+      },
+      "source_text": "func MustRun(cmd *exec.Cmd) {\n\tfmt.Println(\">>>\", printArgs(cmd.Args))\n\tif !*DryRunFlag {\n\t\tcmd.Stderr = os.Stderr\n\t\tcmd.Stdout = os.Stdout\n\t\tif err := cmd.Run(); err != nil {\n\t\t\tlog.Fatal(err)\n\t\t}\n\t}\n}"
+    },
+    {
+      "path": "internal/build/util.go",
+      "name": "MustRunCommand",
+      "site": {
+        "start_byte": 1594,
+        "end_byte_exclusive": 1682,
+        "start_line": 67,
+        "end_line": 69
+      },
+      "source_text": "func MustRunCommand(cmd string, args ...string) {\n\tMustRun(exec.Command(cmd, args...))\n}"
+    },
+    {
+      "path": "internal/build/util.go",
+      "name": "MustRunCommandWithOutput",
+      "site": {
+        "start_byte": 1890,
+        "end_byte_exclusive": 2244,
+        "start_line": 74,
+        "end_line": 90
+      },
+      "source_text": "func MustRunCommandWithOutput(cmd string, args ...string) {\n\tinterval := time.NewTicker(time.Minute)\n\tdone := make(chan struct{})\n\tdefer interval.Stop()\n\tdefer close(done)\n\tgo func() {\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-interval.C:\n\t\t\t\tfmt.Printf(\"Waiting for command %q\\n\", cmd)\n\t\t\tcase <-done:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\tMustRun(exec.Command(cmd, args...))\n}"
+    }
+  ],
+  "build_constraints": [
+    {
+      "path": "build/ci.go",
+      "name": "//go:build none",
+      "site": {
+        "start_byte": 793,
+        "end_byte_exclusive": 808,
+        "start_line": 17,
+        "end_line": 17
+      },
+      "source_text": "//go:build none"
+    },
+    {
+      "path": "build/ci.go",
+      "name": "// +build none",
+      "site": {
+        "start_byte": 809,
+        "end_byte_exclusive": 823,
+        "start_line": 18,
+        "end_line": 18
+      },
+      "source_text": "// +build none"
+    }
+  ]
+}

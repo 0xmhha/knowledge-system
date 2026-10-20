@@ -1,0 +1,42 @@
+{
+  "query": {
+    "node_id": "ea016a756cff1cc8",
+    "expected_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+    "expected_source_sha256": "98a061081afd57403a5988b03b6662a23b095e56ec9f204c214ac2334bc4c35b",
+    "expected_snapshot_sha256": "7ccd9521f85d4dcbcce5d14ea333e488841e103b9bceeb842187370f624f58eb"
+  },
+  "foreign": {
+    "node_id": "ea016a756cff1cc8",
+    "expected_commit": "5615bd40f641f146796af08997a47f843bf23ec5",
+    "expected_source_sha256": "adb3afd85b486e6abcc8da73a33dccbdc9e1a55930fc531ae04c7d5e57d49bc8",
+    "expected_snapshot_sha256": "2ef5d7865a8428cff32c6fbea69de27995c7a0b166f30682d13eacaa386fcc5e",
+    "canonical_id": "example.invalid/foreign-pin-fixture.Seed"
+  },
+  "foreign_selected": {
+    "canonical_id": "example.invalid/foreign-pin-fixture.Seed",
+    "confidence": "EXTRACTED",
+    "file": "logic.go",
+    "id": "ea016a756cff1cc8",
+    "line": 7,
+    "name": "Seed",
+    "qname": "fixture.Seed",
+    "signature": "func Seed(command string, values []int, strict bool) *exec.Cmd",
+    "source": "func Seed(command string, values []int, strict bool) *exec.Cmd {\n\ttotal := 0\n\tfor _, value := range values {\n\t\ttotal += value\n\t}\n\tif strict && total < 0 {\n\t\tcommand = \"foreign-fixed\"\n\t}\n\tHelper(total)\n\tEmpty(total)\n\treturn exec.Command(command)\n}",
+    "type": "Function",
+    "usage_score": 1
+  },
+  "other_node": "1d84eb1ddfd03c47",
+  "foreign_root": "/private/tmp/ks-consumer-role-t04-t09-B3-20261017",
+  "driver_sha256": "62525893a4413b23a6d734925bf0fb0707f00df7025e9e0cb236f6113c9ab197",
+  "plan_sha256": "2f5e61a7fcd7d809558d6032229cdb8d2aed2599d5d98489c0e91c9e13bcc963",
+  "host_helper_sha256": "fb3b8024ca3d0c8db815e4167852254c28a7ade0e8a4d4077b9eb2035af11390",
+  "host_cases": [
+    "T09-matrix",
+    "T09-build-A",
+    "T09-build-B",
+    "T09-delivery"
+  ],
+  "candidate_adopted": false,
+  "real_model_calls": 0,
+  "formal_runs": 0
+}

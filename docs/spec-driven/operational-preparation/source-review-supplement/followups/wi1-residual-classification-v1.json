@@ -1,0 +1,1271 @@
+{
+  "kind": "WI1_AI_DEV_residual_diagnostic_not_independent_gold",
+  "source_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
+  "input_sha256": {
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/observations.json.gz": "fe11cbd1920f0f0b19ea5a957332bf4bb579008859daecbd1dabe569dbd6f8f2",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1/comparisons.json.gz": "e86cbceb7091ded6ade731c585245392643cdda0a9017a1b57c0abf8eda87881",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1/runtime/project-results.json": "0454998eeb50a6a69dd8dca56e9ef0e1ec9efe27b0a32e694def72e2078ab829",
+    "pkg/graph/valueflow/dependence.go": "722f28c58905299be96cf151272a3db8c84b448d635b0ff9933646b493a2e4b5"
+  },
+  "occurrence_phases": 53,
+  "blocks": 3,
+  "classifications": {
+    "range_definition_explicitly_outside_scalar_assignment_support": 37,
+    "selected_receive_definition_attached_to_preselection_assignment": 16
+  },
+  "occurrences": [
+    {
+      "case_id": "SRC-001",
+      "source_sha256": "376fd0b342ecbce4a5e1b5b0d1c969940bc3bfd92913a32eeae619fe5a1bc393",
+      "path": "consensus/wbft/backend/api.go",
+      "reference": "d:o@7017",
+      "name": "round",
+      "span": {
+        "end": 7022,
+        "start": 7017
+      },
+      "reference_owner": "n8.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-001",
+      "source_sha256": "376fd0b342ecbce4a5e1b5b0d1c969940bc3bfd92913a32eeae619fe5a1bc393",
+      "path": "consensus/wbft/backend/api.go",
+      "reference": "d:o@7024",
+      "name": "count",
+      "span": {
+        "end": 7029,
+        "start": 7024
+      },
+      "reference_owner": "n8.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-002",
+      "source_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51",
+      "path": "consensus/wbft/backend/backend.go",
+      "reference": "d:o@5656",
+      "name": "val",
+      "span": {
+        "end": 5659,
+        "start": 5656
+      },
+      "reference_owner": "n0.5",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-002",
+      "source_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51",
+      "path": "consensus/wbft/backend/backend.go",
+      "reference": "d:o@5858",
+      "name": "addr",
+      "span": {
+        "end": 5862,
+        "start": 5858
+      },
+      "reference_owner": "n6.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-002",
+      "source_sha256": "f4400cd73bc64bc415f73b4e13cd8d587040fb2b4e906345043a8dc0b1700a51",
+      "path": "consensus/wbft/backend/backend.go",
+      "reference": "d:o@5864",
+      "name": "p",
+      "span": {
+        "end": 5865,
+        "start": 5864
+      },
+      "reference_owner": "n6.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-003",
+      "source_sha256": "b7df515804f894e33e01cd10bd7ccb27cbc1a77d73350c1fe7170025c55d8953",
+      "path": "consensus/wbft/core/roundchange.go",
+      "reference": "d:o@7789",
+      "name": "m",
+      "span": {
+        "end": 7790,
+        "start": 7789
+      },
+      "reference_owner": "n21.4",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-004",
+      "source_sha256": "26e696eaf751994c64013c9ab810133d5de1c1874a49cae68250cabdb2e24d57",
+      "path": "consensus/wbft/messages/preprepare.go",
+      "reference": "d:o@2524",
+      "name": "i",
+      "span": {
+        "end": 2525,
+        "start": 2524
+      },
+      "reference_owner": "n2.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-004",
+      "source_sha256": "26e696eaf751994c64013c9ab810133d5de1c1874a49cae68250cabdb2e24d57",
+      "path": "consensus/wbft/messages/preprepare.go",
+      "reference": "d:o@2527",
+      "name": "rawItem",
+      "span": {
+        "end": 2534,
+        "start": 2527
+      },
+      "reference_owner": "n2.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-006",
+      "source_sha256": "6ae623bfd7378b8fd99620849340544bd850af6645c65e83f870b9846d585c57",
+      "path": "core/rawdb/accessors_chain.go",
+      "reference": "d:o@11149",
+      "name": "i",
+      "span": {
+        "end": 11150,
+        "start": 11149
+      },
+      "reference_owner": "n23.1",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-007",
+      "source_sha256": "811283ee84cfd8c858ed6c0e4b457b75010b4e2e630b7c008c72537b68cf7be4",
+      "path": "core/rawdb/accessors_chain.go",
+      "reference": "d:o@29671",
+      "name": "bad",
+      "span": {
+        "end": 29674,
+        "start": 29671
+      },
+      "reference_owner": "n5.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-009",
+      "source_sha256": "4a7bedb933d6e250f9b67a5b3d6a0440002c0e77a5f00ddd91c674c3e57f9bf4",
+      "path": "core/rawdb/ancient_utils.go",
+      "reference": "d:o@2488",
+      "name": "freezer",
+      "span": {
+        "end": 2495,
+        "start": 2488
+      },
+      "reference_owner": "n0.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-010",
+      "source_sha256": "f9060f3d267f043985fdf6f6ac2fce51d858ae8f2b7c45125be804cb03534e5e",
+      "path": "core/rawdb/chain_iterator.go",
+      "reference": "d:o@2015",
+      "name": "j",
+      "span": {
+        "end": 2016,
+        "start": 2015
+      },
+      "reference_owner": "n10.1",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-010",
+      "source_sha256": "f9060f3d267f043985fdf6f6ac2fce51d858ae8f2b7c45125be804cb03534e5e",
+      "path": "core/rawdb/chain_iterator.go",
+      "reference": "d:o@2018",
+      "name": "h",
+      "span": {
+        "end": 2019,
+        "start": 2018
+      },
+      "reference_owner": "n10.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-012",
+      "source_sha256": "6229c1b79c44eede5675cf0a3d8b697c548148e7d6242772eb9a5c0875ceded6",
+      "path": "core/state/pruner/pruner.go",
+      "reference": "d:o@11509",
+      "name": "layer",
+      "span": {
+        "end": 11514,
+        "start": 11509
+      },
+      "reference_owner": "n13.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-013",
+      "source_sha256": "1d0e4adf1c6c9a6e4a8e9c516c8d17a62d74b6f65ddb6089d74bc5c839c51d00",
+      "path": "core/state/pruner/pruner.go",
+      "reference": "d:o@14590",
+      "name": "layer",
+      "span": {
+        "end": 14595,
+        "start": 14590
+      },
+      "reference_owner": "n14.6",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-016",
+      "source_sha256": "6aca37f8485bf0f57d0fa4eb63f4b5dbe7bf019491014ec36cb70397987fc98b",
+      "path": "core/txpool/blobpool/blobpool.go",
+      "reference": "d:o@19361",
+      "name": "id",
+      "span": {
+        "end": 19363,
+        "start": 19361
+      },
+      "reference_owner": "n17.4",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-016",
+      "source_sha256": "6aca37f8485bf0f57d0fa4eb63f4b5dbe7bf019491014ec36cb70397987fc98b",
+      "path": "core/txpool/blobpool/blobpool.go",
+      "reference": "d:o@19598",
+      "name": "addr",
+      "span": {
+        "end": 19602,
+        "start": 19598
+      },
+      "reference_owner": "n18.1",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-017",
+      "source_sha256": "97c32bb8794b89b06b43b2d0fe59fe01ad91aee60d4b70fef9aafbf1324aff09",
+      "path": "core/txpool/blobpool/blobpool.go",
+      "reference": "d:o@33112",
+      "name": "addr",
+      "span": {
+        "end": 33116,
+        "start": 33112
+      },
+      "reference_owner": "n4.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-017",
+      "source_sha256": "97c32bb8794b89b06b43b2d0fe59fe01ad91aee60d4b70fef9aafbf1324aff09",
+      "path": "core/txpool/blobpool/blobpool.go",
+      "reference": "d:o@33118",
+      "name": "txs",
+      "span": {
+        "end": 33121,
+        "start": 33118
+      },
+      "reference_owner": "n4.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-017",
+      "source_sha256": "97c32bb8794b89b06b43b2d0fe59fe01ad91aee60d4b70fef9aafbf1324aff09",
+      "path": "core/txpool/blobpool/blobpool.go",
+      "reference": "d:o@33216",
+      "name": "tx",
+      "span": {
+        "end": 33218,
+        "start": 33216
+      },
+      "reference_owner": "n7.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-018",
+      "source_sha256": "8b3eefb1671b3358070d04a553c72333e8526ddde80966c1ff370a76f23b716f",
+      "path": "core/txpool/blobpool/limbo.go",
+      "reference": "d:o@2691",
+      "name": "id",
+      "span": {
+        "end": 2693,
+        "start": 2691
+      },
+      "reference_owner": "n4.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-019",
+      "source_sha256": "6abce026e32428e525a14e4195bbe0fa97728d14f92f72bf964c30ba7422edc8",
+      "path": "core/txpool/legacypool/legacypool.go",
+      "reference": "d:o@48743",
+      "name": "req",
+      "span": {
+        "end": 48746,
+        "start": 48743
+      },
+      "reference_owner": "n6.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b4/n0/definition/v48743/48743",
+          "node": "b4/n0",
+          "variable": "v48743",
+          "role": "definition",
+          "location": {
+            "start_byte": 48743,
+            "end_byte": 48746,
+            "start_line": 1320,
+            "end_line": 1320
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-019",
+      "source_sha256": "6abce026e32428e525a14e4195bbe0fa97728d14f92f72bf964c30ba7422edc8",
+      "path": "core/txpool/legacypool/legacypool.go",
+      "reference": "d:o@48983",
+      "name": "req",
+      "span": {
+        "end": 48986,
+        "start": 48983
+      },
+      "reference_owner": "n11.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b4/n1/definition/v48983/48983",
+          "node": "b4/n1",
+          "variable": "v48983",
+          "role": "definition",
+          "location": {
+            "start_byte": 48983,
+            "end_byte": 48986,
+            "start_line": 1330,
+            "end_line": 1330
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-019",
+      "source_sha256": "6abce026e32428e525a14e4195bbe0fa97728d14f92f72bf964c30ba7422edc8",
+      "path": "core/txpool/legacypool/legacypool.go",
+      "reference": "d:o@49247",
+      "name": "tx",
+      "span": {
+        "end": 49249,
+        "start": 49247
+      },
+      "reference_owner": "n16.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b4/n2/definition/v49247/49247",
+          "node": "b4/n2",
+          "variable": "v49247",
+          "role": "definition",
+          "location": {
+            "start_byte": 49247,
+            "end_byte": 49249,
+            "start_line": 1340,
+            "end_line": 1340
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-021",
+      "source_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8",
+      "path": "eth/downloader/api.go",
+      "reference": "d:o@3219",
+      "name": "i",
+      "span": {
+        "end": 3220,
+        "start": 3219
+      },
+      "reference_owner": "n4.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n0/definition/v3219/3219",
+          "node": "b1/n0",
+          "variable": "v3219",
+          "role": "definition",
+          "location": {
+            "start_byte": 3219,
+            "end_byte": 3220,
+            "start_line": 91,
+            "end_line": 91
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-021",
+      "source_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8",
+      "path": "eth/downloader/api.go",
+      "reference": "d:o@3332",
+      "name": "u",
+      "span": {
+        "end": 3333,
+        "start": 3332
+      },
+      "reference_owner": "n8.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n1/definition/v3332/3332",
+          "node": "b1/n1",
+          "variable": "v3332",
+          "role": "definition",
+          "location": {
+            "start_byte": 3332,
+            "end_byte": 3333,
+            "start_line": 96,
+            "end_line": 96
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-021",
+      "source_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8",
+      "path": "eth/downloader/api.go",
+      "reference": "d:o@3435",
+      "name": "event",
+      "span": {
+        "end": 3440,
+        "start": 3435
+      },
+      "reference_owner": "n10.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n2/definition/v3435/3435",
+          "node": "b1/n2",
+          "variable": "v3435",
+          "role": "definition",
+          "location": {
+            "start_byte": 3435,
+            "end_byte": 3440,
+            "start_line": 99,
+            "end_line": 99
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-021",
+      "source_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8",
+      "path": "eth/downloader/api.go",
+      "reference": "d:o@3799",
+      "name": "c",
+      "span": {
+        "end": 3800,
+        "start": 3799
+      },
+      "reference_owner": "n23.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-021",
+      "source_sha256": "43bd3a8eac760a512695750da65773487b806b362c26e29fd9831a640d466fd8",
+      "path": "eth/downloader/api.go",
+      "reference": "d:o@3920",
+      "name": "c",
+      "span": {
+        "end": 3921,
+        "start": 3920
+      },
+      "reference_owner": "n24.1",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-023",
+      "source_sha256": "c9757e347c45d14dd1f31d00a2aaf5089f673ca4e30ecb013798b7313acc54a8",
+      "path": "eth/downloader/downloader.go",
+      "reference": "d:o@34702",
+      "name": "i",
+      "span": {
+        "end": 34703,
+        "start": 34702
+      },
+      "reference_owner": "n5.1",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-023",
+      "source_sha256": "c9757e347c45d14dd1f31d00a2aaf5089f673ca4e30ecb013798b7313acc54a8",
+      "path": "eth/downloader/downloader.go",
+      "reference": "d:o@34705",
+      "name": "header",
+      "span": {
+        "end": 34711,
+        "start": 34705
+      },
+      "reference_owner": "n5.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-024",
+      "source_sha256": "2369ff330f68049a297e775feca16bd1c68bab0b12ff1fccb00f1082bcdc8339",
+      "path": "eth/downloader/queue.go",
+      "reference": "d:o@31201",
+      "name": "header",
+      "span": {
+        "end": 31207,
+        "start": 31201
+      },
+      "reference_owner": "n4.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-024",
+      "source_sha256": "2369ff330f68049a297e775feca16bd1c68bab0b12ff1fccb00f1082bcdc8339",
+      "path": "eth/downloader/queue.go",
+      "reference": "d:o@31452",
+      "name": "header",
+      "span": {
+        "end": 31458,
+        "start": 31452
+      },
+      "reference_owner": "n5.6",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-024",
+      "source_sha256": "2369ff330f68049a297e775feca16bd1c68bab0b12ff1fccb00f1082bcdc8339",
+      "path": "eth/downloader/queue.go",
+      "reference": "d:o@31742",
+      "name": "header",
+      "span": {
+        "end": 31748,
+        "start": 31742
+      },
+      "reference_owner": "n11.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-024",
+      "source_sha256": "2369ff330f68049a297e775feca16bd1c68bab0b12ff1fccb00f1082bcdc8339",
+      "path": "eth/downloader/queue.go",
+      "reference": "d:o@32428",
+      "name": "header",
+      "span": {
+        "end": 32434,
+        "start": 32428
+      },
+      "reference_owner": "n20.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-027",
+      "source_sha256": "bb7614131293e36941fe3d46d740be075c914a3745fa311f45ed081f6f2ce25d",
+      "path": "miner/worker.go",
+      "reference": "d:o@17807",
+      "name": "head",
+      "span": {
+        "end": 17811,
+        "start": 17807
+      },
+      "reference_owner": "n6.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n1/definition/v17807/17807",
+          "node": "b1/n1",
+          "variable": "v17807",
+          "role": "definition",
+          "location": {
+            "start_byte": 17807,
+            "end_byte": 17811,
+            "start_line": 554,
+            "end_line": 554
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-027",
+      "source_sha256": "bb7614131293e36941fe3d46d740be075c914a3745fa311f45ed081f6f2ce25d",
+      "path": "miner/worker.go",
+      "reference": "d:o@18380",
+      "name": "interval",
+      "span": {
+        "end": 18388,
+        "start": 18380
+      },
+      "reference_owner": "n15.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n3/definition/v18380/18380",
+          "node": "b1/n3",
+          "variable": "v18380",
+          "role": "definition",
+          "location": {
+            "start_byte": 18380,
+            "end_byte": 18388,
+            "start_line": 571,
+            "end_line": 571
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-027",
+      "source_sha256": "bb7614131293e36941fe3d46d740be075c914a3745fa311f45ed081f6f2ce25d",
+      "path": "miner/worker.go",
+      "reference": "d:o@18866",
+      "name": "adjust",
+      "span": {
+        "end": 18872,
+        "start": 18866
+      },
+      "reference_owner": "n21.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n4/definition/v18866/18866",
+          "node": "b1/n4",
+          "variable": "v18866",
+          "role": "definition",
+          "location": {
+            "start_byte": 18866,
+            "end_byte": 18872,
+            "start_line": 584,
+            "end_line": 584
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-029",
+      "source_sha256": "923441fa5dd364a7099fa146e5b27f5b6b3cc0e429b33b39551550a7355435fe",
+      "path": "miner/worker.go",
+      "reference": "d:o@20450",
+      "name": "head",
+      "span": {
+        "end": 20454,
+        "start": 20450
+      },
+      "reference_owner": "n6.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n1/definition/v20450/20450",
+          "node": "b1/n1",
+          "variable": "v20450",
+          "role": "definition",
+          "location": {
+            "start_byte": 20450,
+            "end_byte": 20454,
+            "start_line": 644,
+            "end_line": 644
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-029",
+      "source_sha256": "923441fa5dd364a7099fa146e5b27f5b6b3cc0e429b33b39551550a7355435fe",
+      "path": "miner/worker.go",
+      "reference": "d:o@21058",
+      "name": "round",
+      "span": {
+        "end": 21063,
+        "start": 21058
+      },
+      "reference_owner": "n16.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n2/definition/v21058/21058",
+          "node": "b1/n2",
+          "variable": "v21058",
+          "role": "definition",
+          "location": {
+            "start_byte": 21058,
+            "end_byte": 21063,
+            "start_line": 664,
+            "end_line": 664
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-030",
+      "source_sha256": "60d54a90a23116640e1e3db39f04330a23cc36f8aad5235525c0d8a6fb652b33",
+      "path": "miner/worker.go",
+      "reference": "d:o@21862",
+      "name": "req",
+      "span": {
+        "end": 21865,
+        "start": 21862
+      },
+      "reference_owner": "n4.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n0/definition/v21862/21862",
+          "node": "b1/n0",
+          "variable": "v21862",
+          "role": "definition",
+          "location": {
+            "start_byte": 21862,
+            "end_byte": 21865,
+            "start_line": 698,
+            "end_line": 698
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-030",
+      "source_sha256": "60d54a90a23116640e1e3db39f04330a23cc36f8aad5235525c0d8a6fb652b33",
+      "path": "miner/worker.go",
+      "reference": "d:o@22026",
+      "name": "req",
+      "span": {
+        "end": 22029,
+        "start": 22026
+      },
+      "reference_owner": "n9.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n1/definition/v22026/22026",
+          "node": "b1/n1",
+          "variable": "v22026",
+          "role": "definition",
+          "location": {
+            "start_byte": 22026,
+            "end_byte": 22029,
+            "start_line": 705,
+            "end_line": 705
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-030",
+      "source_sha256": "60d54a90a23116640e1e3db39f04330a23cc36f8aad5235525c0d8a6fb652b33",
+      "path": "miner/worker.go",
+      "reference": "d:o@22100",
+      "name": "ev",
+      "span": {
+        "end": 22102,
+        "start": 22100
+      },
+      "reference_owner": "n11.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n2/definition/v22100/22100",
+          "node": "b1/n2",
+          "variable": "v22100",
+          "role": "definition",
+          "location": {
+            "start_byte": 22100,
+            "end_byte": 22102,
+            "start_line": 708,
+            "end_line": 708
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-030",
+      "source_sha256": "60d54a90a23116640e1e3db39f04330a23cc36f8aad5235525c0d8a6fb652b33",
+      "path": "miner/worker.go",
+      "reference": "d:o@22638",
+      "name": "tx",
+      "span": {
+        "end": 22640,
+        "start": 22638
+      },
+      "reference_owner": "n17.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-028",
+      "source_sha256": "e0e4f230dd044bf9ed1669a4306cb5b699a155f32e92eb86dc3cf79db66de154",
+      "path": "miner/ordering.go",
+      "reference": "d:o@5413",
+      "name": "from",
+      "span": {
+        "end": 5417,
+        "start": 5413
+      },
+      "reference_owner": "n3.1",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-028",
+      "source_sha256": "e0e4f230dd044bf9ed1669a4306cb5b699a155f32e92eb86dc3cf79db66de154",
+      "path": "miner/ordering.go",
+      "reference": "d:o@5681",
+      "name": "from",
+      "span": {
+        "end": 5685,
+        "start": 5681
+      },
+      "reference_owner": "n4.2",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-028",
+      "source_sha256": "e0e4f230dd044bf9ed1669a4306cb5b699a155f32e92eb86dc3cf79db66de154",
+      "path": "miner/ordering.go",
+      "reference": "d:o@5687",
+      "name": "accTxs",
+      "span": {
+        "end": 5693,
+        "start": 5687
+      },
+      "reference_owner": "n4.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-031",
+      "source_sha256": "de50b31d7810ea501c009fb4833c3bafc8724dd8aa27a69c7d201f070714efea",
+      "path": "p2p/discover/v4_udp.go",
+      "reference": "d:o@6013",
+      "name": "rn",
+      "span": {
+        "end": 6015,
+        "start": 6013
+      },
+      "reference_owner": "n10.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-033",
+      "source_sha256": "d46f0b5adcdb52fea8d0b3af0901bb739f887b70ef62041869ace426e45f49be",
+      "path": "p2p/discover/v5_udp.go",
+      "reference": "d:o@11934",
+      "name": "responseP",
+      "span": {
+        "end": 11943,
+        "start": 11934
+      },
+      "reference_owner": "n4.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n0/definition/v11934/11934",
+          "node": "b1/n0",
+          "variable": "v11934",
+          "role": "definition",
+          "location": {
+            "start_byte": 11934,
+            "end_byte": 11943,
+            "start_line": 401,
+            "end_line": 401
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-033",
+      "source_sha256": "d46f0b5adcdb52fea8d0b3af0901bb739f887b70ef62041869ace426e45f49be",
+      "path": "p2p/discover/v5_udp.go",
+      "reference": "d:o@12006",
+      "name": "record",
+      "span": {
+        "end": 12012,
+        "start": 12006
+      },
+      "reference_owner": "n4.4",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-033",
+      "source_sha256": "d46f0b5adcdb52fea8d0b3af0901bb739f887b70ef62041869ace426e45f49be",
+      "path": "p2p/discover/v5_udp.go",
+      "reference": "d:o@12431",
+      "name": "err",
+      "span": {
+        "end": 12434,
+        "start": 12431
+      },
+      "reference_owner": "n17.0",
+      "consumer_same_coordinate": [
+        {
+          "id": "b1/n1/definition/v12431/12431",
+          "node": "b1/n1",
+          "variable": "v12431",
+          "role": "definition",
+          "location": {
+            "start_byte": 12431,
+            "end_byte": 12434,
+            "start_line": 417,
+            "end_line": 417
+          },
+          "reachable": true
+        }
+      ],
+      "classification": "selected_receive_definition_attached_to_preselection_assignment",
+      "action": "consumer_fix_required; emit_definition_only_in_selected_case; do_not_relax_reference_owner_match",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-036",
+      "source_sha256": "81d04b7653c76bbb84647cb865872265e0dc2b82ef784491f500e81188e80b53",
+      "path": "rpc/client.go",
+      "reference": "d:o@6893",
+      "name": "opt",
+      "span": {
+        "end": 6896,
+        "start": 6893
+      },
+      "reference_owner": "n2.3",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-039",
+      "source_sha256": "9ca6d6bc88ca33d48f5f46339becfd9f1efc3691156e719ad2ebfb02d03f97f3",
+      "path": "rpc/endpoints.go",
+      "reference": "d:o@1166",
+      "name": "api",
+      "span": {
+        "end": 1169,
+        "start": 1166
+      },
+      "reference_owner": "n0.5",
+      "consumer_same_coordinate": [],
+      "classification": "range_definition_explicitly_outside_scalar_assignment_support",
+      "action": "retain_unknown_definition_and_range_binding_unsupported; no_missing_edge_as_negative",
+      "semantic_value": "unknown",
+      "independent_approval": null
+    }
+  ],
+  "ambiguous_blocks": [
+    {
+      "case_id": "SRC-030",
+      "reference": {
+        "anchor": {
+          "end": 24342,
+          "start": 24336
+        },
+        "id": 28,
+        "kind": "Unreachable",
+        "live": false,
+        "nodes": [],
+        "successors": [
+          3
+        ]
+      },
+      "candidates": [
+        {
+          "id": 28,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        },
+        {
+          "id": 31,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        },
+        {
+          "id": 34,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        }
+      ],
+      "classification": "unreachable_empty_blocks_have_no_distinguishing_public_anchor",
+      "action": "unmatched_unknown; do_not_map_by_numeric_id",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-030",
+      "reference": {
+        "anchor": {
+          "end": 24377,
+          "start": 24371
+        },
+        "id": 31,
+        "kind": "Unreachable",
+        "live": false,
+        "nodes": [],
+        "successors": [
+          3
+        ]
+      },
+      "candidates": [
+        {
+          "id": 28,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        },
+        {
+          "id": 31,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        },
+        {
+          "id": 34,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        }
+      ],
+      "classification": "unreachable_empty_blocks_have_no_distinguishing_public_anchor",
+      "action": "unmatched_unknown; do_not_map_by_numeric_id",
+      "independent_approval": null
+    },
+    {
+      "case_id": "SRC-030",
+      "reference": {
+        "anchor": {
+          "end": 24418,
+          "start": 24412
+        },
+        "id": 34,
+        "kind": "Unreachable",
+        "live": false,
+        "nodes": [],
+        "successors": [
+          3
+        ]
+      },
+      "candidates": [
+        {
+          "id": 28,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        },
+        {
+          "id": 31,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        },
+        {
+          "id": 34,
+          "kind": "Unreachable",
+          "reachable": false,
+          "nodes": []
+        }
+      ],
+      "classification": "unreachable_empty_blocks_have_no_distinguishing_public_anchor",
+      "action": "unmatched_unknown; do_not_map_by_numeric_id",
+      "independent_approval": null
+    }
+  ],
+  "residual_classification_complete": true,
+  "consumer_fix_completed": false,
+  "semantic_gold_complete": false,
+  "independent_approved": 0,
+  "formal_completed": 0,
+  "new_actual_consumer_calls": 0,
+  "existing_consumer_responses_reused": 30,
+  "quality_score": null,
+  "personal_names_required": false
+}

@@ -1,0 +1,34 @@
+# WBFT consensus flow — actors and message sequence per height
+
+**Status:** verified · **Subsystem:** A1 (WBFT Consensus Core) · **Type:** B1
+
+The WBFT consensus engine drives one block per height through four
+phases inside Core: handleRequest emits a Preprepare from the
+current proposer; every validator broadcasts a Prepare in response;
+once each validator has seen a Prepare quorum it broadcasts a Commit;
+once each validator has seen a Commit quorum the block is finalised
+and Core advances to the next height via startNewRound. RoundChange
+fires on RequestTimeout and selects a new proposer for the same
+height. Backend (consensus/wbft/backend) is the bridge between Core
+and the blockchain — it broadcasts/gossips messages, signs with BLS,
+fetches Validators, and commits sealed blocks back. Engine
+(consensus/wbft/engine) handles header validation, BaseFee
+distribution, and epoch construction. The Istanbul/100 P2P
+subprotocol (A9) carries the messages between nodes.
+
+## Code anchors
+- `consensus/wbft/core/core.go` Core.startNewRound:163 — entry point for each new round/sequence — orchestrates state transitions
+- `consensus/wbft/core/handler.go` — event loop, message routing into handle{Preprepare,Prepare,Commit,RoundChange}Msg
+- `consensus/wbft/core/preprepare.go` — Preprepare generation/validation
+- `consensus/wbft/core/prepare.go` — Prepare validation + quorum check that drives StatePrepared
+- `consensus/wbft/core/commit.go` — Commit validation + quorum check that drives StateCommitted
+- `consensus/wbft/core/roundchange.go` — RoundChange protocol on RequestTimeout
+- `consensus/wbft/backend/backend.go` — Backend interface implementation — blockchain ↔ Core bridge
+- `consensus/wbft/backend/engine.go` — epoch build, validator lookup, BLS signing
+- `consensus/wbft/engine/engine.go` — header verification, processFinalize where system-contract upgrades land
+
+## Aliases
+WBFT 합의 흐름, 합의 단계, 합의 메시지 흐름, 라운드 변경, WBFT consensus flow, consensus state machine, round-change protocol, Core, Backend, startNewRound, handleRequest, handlePreprepareMsg, handlePrepareMsg, handleCommitMsg, handleRoundChangeMsg, sendPreprepareMsg, broadcastPrepare, broadcastCommit, commitWBFT, StateAcceptRequest, StatePreprepared, StatePrepared, StateCommitted, RequestTimeout
+
+## Related
+A1.wbft_core.quorum_calc, A2.block_encoding.wbft_extra_struct, A3.validator_set.epoch_transition, A9.istanbul_p2p.protocol_architecture

@@ -1,0 +1,933 @@
+{
+  "schema_version": 1,
+  "status": "ai_schedule_drafts_not_independent_gold",
+  "accepted_independent_families": 0,
+  "formal_runs": 0,
+  "new_local_probe_runs": 0,
+  "reviewer": null,
+  "split": null,
+  "families": [
+    {
+      "case_id": "SCHED-001",
+      "source_candidate_id": "SRC-021",
+      "title": "구독 해제 등록과 알림 송신",
+      "mechanism": "uninstall_status_handshake_cycle",
+      "local_probe_eligibility": "existing_extracted_fixture_only",
+      "source_anchors": [
+        {
+          "path": "eth/downloader/api.go",
+          "start_line": 45,
+          "end_line": 54,
+          "source_fact_draft": "install/uninstall 채널은 버퍼가 없고 eventLoop를 goroutine으로 실행한다.",
+          "start_byte": 1802,
+          "end_byte_exclusive": 2190,
+          "span_sha256": "e8cdc13fcf7827f286290e4d4981013729173ff70f732ad425d4e33bcab304d7"
+        },
+        {
+          "path": "eth/downloader/api.go",
+          "start_line": 115,
+          "end_line": 130,
+          "source_fact_draft": "진행·완료 알림을 구독 채널에 직접 송신한다.",
+          "start_byte": 3745,
+          "end_byte_exclusive": 3995,
+          "span_sha256": "00c7249da3acfd229ce3af5bd6f4ee79844e5cc65bdb2a195aeee70555f27c3e"
+        },
+        {
+          "path": "eth/downloader/api.go",
+          "start_line": 183,
+          "end_line": 198,
+          "source_fact_draft": "해제 요청 송신을 먼저 완료한 뒤 상태 채널을 소비하거나 확인을 기다린다.",
+          "start_byte": 5644,
+          "end_byte_exclusive": 5992,
+          "span_sha256": "e2ae5909f1e8adcb46cc05fb07d6f70c6b5bf45a6b9ce029669632eb23ce97e0"
+        }
+      ],
+      "unverified_assumptions": [
+        "실제 RPC 종료 경로에서 제안한 순서에 도달 가능한지는 미검증",
+        "기존 추출 시험 50건은 실제 API 빈도나 독립 표본이 아니다"
+      ],
+      "contract_questions": [
+        "운영 API 종료 상한과 notifier 종료 순서의 계약은 무엇인가"
+      ],
+      "schedules": [
+        {
+          "id": "SUB-normal",
+          "kind": "normal_control",
+          "start_conditions": [
+            "알림 수신자 존재"
+          ],
+          "steps": [
+            "알림 수신",
+            "해제 요청",
+            "확인 후 반환"
+          ],
+          "observations": [
+            "반환·등록 제거·확인·소유 goroutine 종료"
+          ],
+          "primary_expectation_draft": "원문 정상 대조군에서 완료",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "SUB-blocked",
+          "kind": "symptom_candidate",
+          "start_conditions": [
+            "버퍼 없는 status",
+            "유일 수신자가 알림 전 종료"
+          ],
+          "steps": [
+            "알림 송신 대기",
+            "구독 해제 진입"
+          ],
+          "observations": [
+            "송신 대기 스택 두 개",
+            "구조 신호 전 반환 여부"
+          ],
+          "primary_expectation_draft": "통제된 원본 메서드에서 순환 대기 관측",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "SUB-late",
+          "kind": "boundary_control",
+          "start_conditions": [
+            "해제 요청을 수신함"
+          ],
+          "steps": [
+            "확인 전에 추가 알림",
+            "해제 확인"
+          ],
+          "observations": [
+            "알림 소비",
+            "확인 전 조기 반환 여부"
+          ],
+          "primary_expectation_draft": "확인 이전 알림을 소비하고 확인 후 반환",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "SUB-ack",
+          "kind": "boundary_control",
+          "start_conditions": [
+            "확인 신호를 시험이 소유"
+          ],
+          "steps": [
+            "해제 등록",
+            "확인 지연",
+            "확인 해제"
+          ],
+          "observations": [
+            "확인 대기",
+            "반환 순서"
+          ],
+          "primary_expectation_draft": "확인 전 반환 금지",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "SUB-once",
+          "kind": "idempotence_control",
+          "start_conditions": [
+            "동일 구독"
+          ],
+          "steps": [
+            "두 해제 호출 동시 진입",
+            "확인"
+          ],
+          "observations": [
+            "요청 수",
+            "두 호출 종료"
+          ],
+          "primary_expectation_draft": "요청 1개와 두 호출 완료",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        }
+      ],
+      "origin": "ai_manual_source_reading_and_schedule_design",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "independent_oracle": null,
+      "accepted_family": false,
+      "verified_project_defect": false,
+      "operational_reachability": "not_verified"
+    },
+    {
+      "case_id": "SCHED-002",
+      "source_candidate_id": "SRC-032",
+      "title": "목록 삭제 후 다음 원소 탐색",
+      "mechanism": "removed_list_cursor_loses_successor",
+      "local_probe_eligibility": "synthetic_deadline_source_branch_only",
+      "source_anchors": [
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "start_line": 380,
+          "end_line": 389,
+          "source_fact_draft": "pending은 오류 채널을 버퍼 1로 생성한다.",
+          "start_byte": 12121,
+          "end_byte_exclusive": 12454,
+          "span_sha256": "47d38f1df5a6468d70239c65cb0575b0af3a9728c609efee7c46dd20b345dc6c"
+        },
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "start_line": 420,
+          "end_line": 440,
+          "source_fact_draft": "resetTimeout은 먼 deadline 원소에 오류를 보내고 현재 원소를 제거한 뒤 el.Next로 순회하며 마지막에는 타이머를 중지한다.",
+          "start_byte": 13330,
+          "end_byte_exclusive": 14003,
+          "span_sha256": "234a5374dc387e46f6f9cab1a8988f9bd9d5b6d1c2158dd9e7831dfedcc8375b"
+        },
+        {
+          "path": "p2p/discover/v4_udp.go",
+          "start_line": 452,
+          "end_line": 486,
+          "source_fact_draft": "deadline은 Now.Add로 생성한다. 응답 완료와 timeout 처리에도 제거 후 el.Next 순회가 있다.",
+          "start_byte": 14187,
+          "end_byte_exclusive": 15274,
+          "span_sha256": "ce2dc844b7cf5ee50a1d57ef0fd635cdea735a30dc88de3a169e556415c43a17"
+        }
+      ],
+      "unverified_assumptions": [
+        "먼 미래 deadline은 합성 입력이다. 운영 pending 경로의 도달 가능성은 검증하지 않았다",
+        "Go 1.26.9의 Now.Add/Sub는 monotonic 값을 사용하므로 wall-clock rollback만으로 이 분기를 유발했다고 주장하지 않는다",
+        "응답·timeout·clockwarp 세 분기는 같은 삭제 순회 메커니즘으로 묶는다"
+      ],
+      "contract_questions": [
+        "한 번의 순회에서 처리할 pending 원소 범위는 무엇인가",
+        "먼 미래 deadline의 실제 유입 경로가 있는가"
+      ],
+      "schedules": [
+        {
+          "id": "UDP-near",
+          "kind": "normal_control",
+          "start_conditions": [
+            "가까운 deadline 2개"
+          ],
+          "steps": [
+            "resetTimeout 1회"
+          ],
+          "observations": [
+            "남은 목록",
+            "오류 수",
+            "타이머 활성"
+          ],
+          "primary_expectation_draft": "첫 요청에 timeout 설정",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "UDP-far-pair",
+          "kind": "synthetic_branch",
+          "start_conditions": [
+            "합성 먼 미래 deadline 2개",
+            "오류 채널 버퍼 1"
+          ],
+          "steps": [
+            "resetTimeout 1회"
+          ],
+          "observations": [
+            "두 번째 원소 잔존",
+            "오류 통지 수",
+            "타이머 중지"
+          ],
+          "primary_expectation_draft": "원본 삭제 순회가 다음 원소에 도달하는지 관측",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "UDP-far-near",
+          "kind": "synthetic_branch",
+          "start_conditions": [
+            "합성 먼 미래 head",
+            "가까운 deadline tail"
+          ],
+          "steps": [
+            "resetTimeout 1회"
+          ],
+          "observations": [
+            "tail 잔존과 타이머 활성",
+            "head 오류"
+          ],
+          "primary_expectation_draft": "미처리 원소와 중지 타이머의 동시 존재를 관측",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "UDP-response-timeout",
+          "kind": "related_branch_proposal",
+          "start_conditions": [
+            "같은 응답 조건 또는 만료 시각의 matcher 2개"
+          ],
+          "steps": [
+            "한 응답 또는 timeout 이벤트 처리"
+          ],
+          "observations": [
+            "처리된 matcher 수",
+            "남은 matcher",
+            "후속 깨움 필요"
+          ],
+          "primary_expectation_draft": "같은 제거 커서 문제의 다른 분기로 별도 가족에 합산하지 않음",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        }
+      ],
+      "origin": "ai_manual_source_reading_and_schedule_design",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "independent_oracle": null,
+      "accepted_family": false,
+      "verified_project_defect": false,
+      "operational_reachability": "not_verified"
+    },
+    {
+      "case_id": "SCHED-003",
+      "source_candidate_id": "SRC-027",
+      "title": "종료 신호와 작업 송신 선택",
+      "mechanism": "cancellation_and_ready_send_selection",
+      "local_probe_eligibility": "contract_question_only",
+      "source_anchors": [
+        {
+          "path": "miner/worker.go",
+          "start_line": 523,
+          "end_line": 535,
+          "source_fact_draft": "commit closure는 송신과 exit 수신을 select하며 exit 분기의 return은 closure에서 반환한다.",
+          "start_byte": 17094,
+          "end_byte_exclusive": 17373,
+          "span_sha256": "2f204ce423c26c8fe95d4341f51526c12e9e9cf5364053517301c1b58f19d237"
+        },
+        {
+          "path": "miner/worker.go",
+          "start_line": 547,
+          "end_line": 569,
+          "source_fact_draft": "바깥 루프는 start·head·timer 이벤트에서 commit을 호출한다.",
+          "start_byte": 17638,
+          "end_byte_exclusive": 18372,
+          "span_sha256": "c94bf22c9cc2d357c8c73a30e26b7b8eeee2a2e813684c917a9577a18a1441a1"
+        },
+        {
+          "path": "miner/worker.go",
+          "start_line": 601,
+          "end_line": 605,
+          "source_fact_draft": "바깥 select의 exit 분기는 전체 함수를 반환한다.",
+          "start_byte": 19491,
+          "end_byte_exclusive": 19529,
+          "span_sha256": "a59f681ace8a908fb31bfcb91b34962476136a19eed4aaa9a4d6951db1a8f953"
+        }
+      ],
+      "unverified_assumptions": [
+        "select 동시 준비에서 어느 분기를 택할지 하나의 고정 결과로 가정하지 않는다",
+        "종료 후 허용되는 이미 진행 중 작업의 범위는 미정이다",
+        "closure 반환만으로 전체 worker가 누수된다고 단정하지 않는다"
+      ],
+      "contract_questions": [
+        "종료 신호 관측과 작업 수락의 선형화 지점은 어디인가",
+        "이미 시작한 작업의 인계가 허용되는가"
+      ],
+      "schedules": [
+        {
+          "id": "WORK-normal",
+          "kind": "normal_control",
+          "start_conditions": [
+            "exit 미준비",
+            "작업 수신자 준비"
+          ],
+          "steps": [
+            "작업 이벤트",
+            "송신",
+            "종료"
+          ],
+          "observations": [
+            "작업 수",
+            "외부 루프 반환",
+            "타이머 정리"
+          ],
+          "primary_expectation_draft": "정상 작업 전달과 종료",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "WORK-exit",
+          "kind": "boundary_control",
+          "start_conditions": [
+            "작업 수신자 없음",
+            "exit 준비"
+          ],
+          "steps": [
+            "commit 진입",
+            "바깥 루프 재진입"
+          ],
+          "observations": [
+            "closure 반환",
+            "외부 함수 반환"
+          ],
+          "primary_expectation_draft": "두 반환 범위를 구별",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "WORK-both",
+          "kind": "contract_question",
+          "start_conditions": [
+            "송신과 exit가 동시에 준비"
+          ],
+          "steps": [
+            "select 선택 관측"
+          ],
+          "observations": [
+            "선택 분기",
+            "전달된 작업 수"
+          ],
+          "primary_expectation_draft": "선택 결과를 기록하며 계약 확정 전 실패로 채점하지 않음",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "WORK-backlog",
+          "kind": "contract_question",
+          "start_conditions": [
+            "start/head 이벤트 backlog",
+            "exit 준비"
+          ],
+          "steps": [
+            "반환까지 이벤트 소비 관측"
+          ],
+          "observations": [
+            "종료 전에 추가 처리한 이벤트",
+            "종료 시간 상한"
+          ],
+          "primary_expectation_draft": "원문만으로 특정 공정성·즉시 종료를 보장하지 않음",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        }
+      ],
+      "origin": "ai_manual_source_reading_and_schedule_design",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "independent_oracle": null,
+      "accepted_family": false,
+      "verified_project_defect": false,
+      "operational_reachability": "not_verified"
+    },
+    {
+      "case_id": "SCHED-004",
+      "source_candidate_id": "SRC-002",
+      "title": "송신 전 중복 캐시와 실패 재시도",
+      "mechanism": "cache_mark_precedes_async_delivery",
+      "local_probe_eligibility": "delivery_contract_question_only",
+      "source_anchors": [
+        {
+          "path": "consensus/wbft/backend/backend.go",
+          "start_line": 176,
+          "end_line": 210,
+          "source_fact_draft": "peer별 캐시에 hash를 기록한 뒤 비동기로 SendWBFTConsensus를 호출하며 송신 반환 오류를 여기서 수집하지 않는다.",
+          "start_byte": 5451,
+          "end_byte_exclusive": 6352,
+          "span_sha256": "1da358337a52d724b05ed867469355bdf40fb1e3c870d5b2d586b4864efc1bf4"
+        },
+        {
+          "path": "eth/protocols/eth/peer.go",
+          "start_line": 520,
+          "end_line": 525,
+          "source_fact_draft": "consensusRw가 없으면 nil을 반환하고 있으면 SendWithNoEncoding 결과를 반환한다.",
+          "start_byte": 17746,
+          "end_byte_exclusive": 17928,
+          "span_sha256": "3daa0d3ab6223917ca8829a28cfa375fb2bba217a1d5e150564ad6d25baee3b7"
+        }
+      ],
+      "unverified_assumptions": [
+        "Gossip의 best-effort·중복 억제 의도가 아직 검토되지 않았다",
+        "peer별 캐시 만료·제거와 다른 송신 경로는 미검토",
+        "실제 네트워크는 사용하지 않고 가짜 peer 응답으로만 설계한다"
+      ],
+      "contract_questions": [
+        "캐시는 송신 시도 또는 전달 성공 중 무엇을 나타내는가",
+        "동일 payload의 송신 실패 후 재시도를 보장하는가"
+      ],
+      "schedules": [
+        {
+          "id": "GOSSIP-normal",
+          "kind": "normal_control",
+          "start_conditions": [
+            "새 hash",
+            "가짜 peer 성공"
+          ],
+          "steps": [
+            "첫 호출",
+            "송신 완료 대기"
+          ],
+          "observations": [
+            "캐시 기록",
+            "송신 시도 1회"
+          ],
+          "primary_expectation_draft": "송신 시도와 완료를 분리 기록",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "GOSSIP-fail-repeat",
+          "kind": "contract_question",
+          "start_conditions": [
+            "첫 가짜 송신 오류",
+            "같은 peer/hash"
+          ],
+          "steps": [
+            "첫 호출 완료",
+            "두 번째 호출"
+          ],
+          "observations": [
+            "캐시 hit",
+            "송신 시도 수",
+            "반환 오류 수"
+          ],
+          "primary_expectation_draft": "재시도 억제 관측을 계약 확정 전 결함으로 채점하지 않음",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "GOSSIP-delay-repeat",
+          "kind": "boundary_control",
+          "start_conditions": [
+            "첫 가짜 송신 대기"
+          ],
+          "steps": [
+            "캐시 기록",
+            "두 번째 호출",
+            "첫 송신 해제"
+          ],
+          "observations": [
+            "완료 전 중복 억제",
+            "모든 가짜 peer 종료"
+          ],
+          "primary_expectation_draft": "중복 억제와 전달 보장 구분",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "GOSSIP-cache-control",
+          "kind": "normal_control",
+          "start_conditions": [
+            "새 peer 캐시 또는 다른 hash"
+          ],
+          "steps": [
+            "추가 호출"
+          ],
+          "observations": [
+            "새 송신 시도",
+            "캐시 범위"
+          ],
+          "primary_expectation_draft": "전역 영구 손실로 일반화하지 않음",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        }
+      ],
+      "origin": "ai_manual_source_reading_and_schedule_design",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "independent_oracle": null,
+      "accepted_family": false,
+      "verified_project_defect": false,
+      "operational_reachability": "not_verified"
+    },
+    {
+      "case_id": "SCHED-005",
+      "source_candidate_id": "SRC-017",
+      "title": "잠금을 유지한 동기 이벤트 전달",
+      "mechanism": "pool_lock_held_during_synchronous_fanout",
+      "local_probe_eligibility": "controlled_lock_model_only",
+      "source_anchors": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "start_line": 784,
+          "end_line": 788,
+          "source_fact_draft": "Reset은 pool 잠금을 획득하고 defer로 해제한다.",
+          "start_byte": 32400,
+          "end_byte_exclusive": 32581,
+          "span_sha256": "6cfa68dae2ee4f7c4d3a73f6a7f1bfecef3ea30fcc8b0f71be15e928d0f55cb6"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "start_line": 804,
+          "end_line": 819,
+          "source_fact_draft": "같은 함수 안에서 재삽입된 거래가 있으면 insertFeed.Send를 호출한다.",
+          "start_byte": 33001,
+          "end_byte_exclusive": 33555,
+          "span_sha256": "00e0ff55acdb07bbdf7bcc1451a10a10dc23ac99d685fa41a26693f164a6585e"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "start_line": 1630,
+          "end_line": 1638,
+          "source_fact_draft": "reorgs=true인 구독자는 insertFeed에 연결된다.",
+          "start_byte": 63311,
+          "end_byte_exclusive": 63666,
+          "span_sha256": "2483617d738eec3356b9dff124a1b5f24265fadca6636a8fbe15e6891655dc48"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "start_line": 1654,
+          "end_line": 1663,
+          "source_fact_draft": "Stats는 같은 pool 잠금을 획득한다.",
+          "start_byte": 64118,
+          "end_byte_exclusive": 64333,
+          "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c"
+        },
+        {
+          "path": "event/feed.go",
+          "start_line": 68,
+          "end_line": 92,
+          "source_fact_draft": "Subscribe는 충분한 버퍼를 권고하며 느린 구독자를 제거하지 않는다고 문서화한다.",
+          "start_byte": 2426,
+          "end_byte_exclusive": 3441,
+          "span_sha256": "1584705ba85c49a2d43b7827799c4cdc0a9eddcc4d75b7fee1e819ffe7503b39"
+        },
+        {
+          "path": "event/feed.go",
+          "start_line": 120,
+          "end_line": 179,
+          "source_fact_draft": "Feed.Send는 TrySend 후 미완료 수신자가 있으면 reflect.Select로 송신·구독 제거를 기다린다.",
+          "start_byte": 4154,
+          "end_byte_exclusive": 5962,
+          "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c"
+        }
+      ],
+      "unverified_assumptions": [
+        "실제 구독자가 수신 전 Stats를 호출하는 경로는 확인하지 않았다",
+        "충분한 버퍼가 권고되므로 backpressure 자체가 결함이라는 의미는 아니다",
+        "제안한 잠금 순서는 통제된 subscriber 대역에서만 구성한다"
+      ],
+      "contract_questions": [
+        "Reset이 구독자 수신을 기다리는 동안 조회가 대기하는 것은 허용되는가",
+        "호출자가 지켜야 하는 버퍼·수신 순서 계약은 무엇인가"
+      ],
+      "schedules": [
+        {
+          "id": "POOL-normal",
+          "kind": "normal_control",
+          "start_conditions": [
+            "수신자 준비",
+            "Stats는 수신 후 호출"
+          ],
+          "steps": [
+            "Reset 송신",
+            "수신",
+            "Stats"
+          ],
+          "observations": [
+            "잠금 해제",
+            "송신·조회 완료"
+          ],
+          "primary_expectation_draft": "정상 순서에서 완료",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "POOL-lock-cycle",
+          "kind": "controlled_assumption",
+          "start_conditions": [
+            "Reset이 잠금 소유",
+            "구독자는 수신 전 Stats 대기",
+            "채널 여유 없음"
+          ],
+          "steps": [
+            "이벤트 송신",
+            "subscriber 조회"
+          ],
+          "observations": [
+            "잠금 대기와 송신 대기",
+            "정리 전에 완료 여부"
+          ],
+          "primary_expectation_draft": "대역에서만 구성한 순환 대기이며 운영 도달성은 미검증",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "POOL-buffer",
+          "kind": "boundary_control",
+          "start_conditions": [
+            "이벤트 1개를 담을 빈 버퍼"
+          ],
+          "steps": [
+            "Reset 송신",
+            "잠금 해제",
+            "Stats 후 수신"
+          ],
+          "observations": [
+            "버퍼 사용",
+            "두 작업 완료"
+          ],
+          "primary_expectation_draft": "유한 빈 버퍼 대조군을 모든 부하 안전성으로 일반화하지 않음",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        },
+        {
+          "id": "POOL-unsubscribe",
+          "kind": "boundary_control",
+          "start_conditions": [
+            "느린 구독자",
+            "시험 소유 해제 경로"
+          ],
+          "steps": [
+            "송신 대기",
+            "구독 해제"
+          ],
+          "observations": [
+            "Send 해제",
+            "pool 잠금 해제",
+            "소유 goroutine 정리"
+          ],
+          "primary_expectation_draft": "Feed의 구독 제거 경로도 관측",
+          "step_deadline_ms": 2000,
+          "cleanup": [
+            "관측 결과를 먼저 복사한다",
+            "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+            "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+          ],
+          "outcome_status": "ai_draft_not_independent_oracle"
+        }
+      ],
+      "origin": "ai_manual_source_reading_and_schedule_design",
+      "approved": false,
+      "reviewer": null,
+      "review_receipt": null,
+      "independent_oracle": null,
+      "accepted_family": false,
+      "verified_project_defect": false,
+      "operational_reachability": "not_verified"
+    }
+  ],
+  "pairwise_overlap_review": [
+    {
+      "a": "SCHED-001",
+      "b": "SCHED-002",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-001",
+      "b": "SCHED-003",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-001",
+      "b": "SCHED-004",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-001",
+      "b": "SCHED-005",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-002",
+      "b": "SCHED-003",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-002",
+      "b": "SCHED-004",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-002",
+      "b": "SCHED-005",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-003",
+      "b": "SCHED-004",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-003",
+      "b": "SCHED-005",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    },
+    {
+      "a": "SCHED-004",
+      "b": "SCHED-005",
+      "same_mechanism_proposed": false,
+      "independence_status": "not_reviewed",
+      "shared_risks": [
+        "same_ai_author",
+        "shared_project_snapshot",
+        "source_overlap_and_semantic_dependence_require_review"
+      ]
+    }
+  ],
+  "sampling_proposal": {
+    "runs_per_arm": 100,
+    "minimum_baseline_symptom_events": 10,
+    "arms": [
+      "baseline",
+      "candidate_fix"
+    ],
+    "candidate_fix_revision": null,
+    "baseline_revision": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "sampling_approved": false,
+    "zero_or_insufficient_baseline": "inconclusive",
+    "statistical_independence": "not_reviewed"
+  },
+  "runtime_boundary": {
+    "external_model_calls": 0,
+    "nodes_started": 0,
+    "host_clock_changes": 0,
+    "target_state_writes": 0,
+    "operational_execution_allowed": false
+  }
+}

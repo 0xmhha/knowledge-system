@@ -1,0 +1,70 @@
+{
+  "go_version": "go version go1.26.8 darwin/arm64",
+  "helper_sha256": "177b5b6038693a2cf89afa49c5e339db67aed8536955b0dcf85d6f023e1a187b",
+  "executable_sha256": "3bcbbd934f78153f7e3aee40c93ab6bb584461ee818a884149aa6dd90f70023e",
+  "candidate_valueflow_imported": false,
+  "new_consumer_calls": 0,
+  "scope": "original30 partial single-file types; controls type-valid; shared pinned CFG, no independent semantic approval",
+  "calls": [
+    {
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/ks-wi1-select-20261019/repro/observer",
+        "/private/tmp/ks-wi1-select-20261019/repro/observer.go"
+      ],
+      "exit": 0,
+      "stdin_sha256": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/private/tmp/ks-wi1-select-20261019/repro/observer"
+      ],
+      "exit": 0,
+      "stdin_sha256": "cb0d2a9bdbd91e5763f356f81f175a3ab2334b6d7e8b22b17dbd910986c87383",
+      "stdout_sha256": "ef9b5e291c8097e1c6266fe91ea914ea3f0df4f2440de4698c88aacaab92ed42",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/private/tmp/ks-wi1-select-20261019/repro/observer"
+      ],
+      "exit": 0,
+      "stdin_sha256": "8178448605477c3f754118c03586a88f1d1dac914625861198b938e8d448f010",
+      "stdout_sha256": "94e34fd7187a8db5e8706d757ae91150e197a9139587667f9ccb4f749cf2a905",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "go",
+        "run",
+        "/private/tmp/ks-wi1-select-20261019/repro/runtime-witness.go"
+      ],
+      "exit": 0,
+      "stdin_sha256": null,
+      "stdout_sha256": "fa6989f63066601f601f0e4529fd42dc8ec2d7dd022c31dd92f7ba5a217ea601",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "go",
+        "version"
+      ],
+      "exit": 0,
+      "stdin_sha256": null,
+      "stdout_sha256": "2a108602dfb6c84352966f25ca6d598d3711bad8845923baf6308b1dd09d06a1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "files": {
+    "observations.json.gz": "fe11cbd1920f0f0b19ea5a957332bf4bb579008859daecbd1dabe569dbd6f8f2",
+    "controls-observations.json.gz": "e6b0822223bc9f6aca79067063cf7af61108dbdb7889bffd5db77610f5a43844",
+    "observer-inputs.json.gz": "994e33185133057023d79af6e96393fe7dd4b51ead08f65c8051546e8bc3f15c",
+    "controls-inputs.json": "8178448605477c3f754118c03586a88f1d1dac914625861198b938e8d448f010",
+    "runtime-witness.go.txt": "bb00342b9922476085d08067e811ff53186a5673941f8ff3ba67d883a2d036bb",
+    "runtime-witness-output.json": "fa6989f63066601f601f0e4529fd42dc8ec2d7dd022c31dd92f7ba5a217ea601"
+  }
+}

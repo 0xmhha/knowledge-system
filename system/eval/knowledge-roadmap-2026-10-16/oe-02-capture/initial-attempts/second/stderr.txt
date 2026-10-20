@@ -1,0 +1,15 @@
+four arms ready; signed inputs preserved; capture begins
+EX-01: four arms captured 32/512
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/run-ontology-effect-expanded.py", line 126, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/run-ontology-effect-expanded.py", line 113, in main
+    label=q['id']+'-'+arm;path=out/(label+'.json');run(label,[binary,'eval','capture','--config',configs[arm],'--requests',request,'--output',path,'--warmup','1','--retrieval-runs','2','--warm-runs','5','--cold-runs','0','--call-timeout','30s'],timeout=360);report=json.loads(path.read_text())
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/run-ontology-effect-expanded.py", line 82, in run
+    meter.set_label(label);before=time.monotonic();r=subprocess.run([str(v)for v in command],cwd=ROOT,capture_output=True,timeout=timeout);(out/(label+'.stdout.txt')).write_bytes(r.stdout);(out/(label+'.stderr.txt')).write_bytes(r.stderr);commands.append({'label':label,'command':[str(v)for v in command],'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-before});write(out/'commands.json',commands);r.check_returncode();return r
+                                                                                                                                                                                                                                                                                                                                                                                                                          ^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/subprocess.py", line 502, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '['/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks', 'eval', 'capture', '--config', '/private/tmp/ks-OE012-expanded-second-20261016/off.yaml', '--requests', '/private/tmp/ks-OE012-expanded-second-20261016/EX-02-request.json', '--output', '/private/tmp/ks-OE012-expanded-second-20261016/EX-02-off.json', '--warmup', '1', '--retrieval-runs', '2', '--warm-runs', '5', '--cold-runs', '0', '--call-timeout', '30s']' returned non-zero exit status 1.

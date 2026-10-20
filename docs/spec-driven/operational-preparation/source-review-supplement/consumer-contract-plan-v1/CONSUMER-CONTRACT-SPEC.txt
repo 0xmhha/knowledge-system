@@ -1,0 +1,74 @@
+소비자 도구 노출·Planner 구조화 전달 계약 보완 명세 — 준비26단계
+상태: 명세 작성/검증. 구현·새 격리 실행·독립 수용은 수행하지 않았다.
+채택 소비자의 누락된 명시 도구 노출과 Planner 전달 계약을 최소 보완하고, 비용 없는 격리 연결 검증으로 실제 역할 경로의 증거를 확보한다.
+기준선 consumer b7e78689676769e8536626e76eed7165d870e1ba / KS 53ce0a7e
+원본 채택 clone은 읽기 전용. 후속 구현은 별도 소유 checkout/fixture에서 수행한다.
+
+필수 변경 파일: plugin/agents/analyzer.md, plugin/agents/planner.md
+보존 runtime: plugin/scripts/deep_review.py, plugin/hooks/deep-review-guard.py, plugin/hooks/hooks.json, plugin/contracts/cks-tools.schema.json, plugin/agents/orchestrator.md, plugin/skills/state-machine/SKILL.md
+
+역할별 추가 도구 — 기존49/17개 보존, 계획54/19개:
+analyzer / mcp__plugin_coding-agent_cks__cks_context_value_dependencies → cks.context.value_dependencies / WI-1,WI-6
+analyzer / mcp__plugin_coding-agent_cks__cks_context_rule_candidates → cks.context.rule_candidates / WI-2,WI-C
+analyzer / mcp__plugin_coding-agent_cks__cks_context_value_dependency_expansion → cks.context.value_dependency_expansion / WI-6
+analyzer / mcp__plugin_coding-agent_cks__cks_context_policy_security → cks.context.policy_security / WI-SP
+analyzer / mcp__plugin_coding-agent_cks__cks_context_review_function → cks.context.review_function / WI-C
+planner / mcp__plugin_coding-agent_cks__cks_context_review_function → cks.context.review_function / WI-C
+planner / mcp__plugin_coding-agent_cks__cks_context_rule_candidates → cks.context.rule_candidates / WI-C
+
+요구사항과 검증 연결:
+
+CCP-01 역할별 도구 노출
+Analyzer에 value_dependencies/rule_candidates/value_dependency_expansion/policy_security/review_function 5개, Planner에 review_function/rule_candidates 2개를 정확한 alias로 추가한다. 기존 목록과 순서·도구의 기능은 유지하고 wildcard/전체 권한 부여를 사용하지 않는다.
+검증: T01, T02, T03, T05
+
+CCP-02 서버·소비자 계약 정합
+현재 CKS tools/list의 wire/input과 consumer schema·실제 alias를 대조한다. 출력은 각 도구의 typed 결과로 읽으며 오래된 tools cache/다른 namespace·누락 provider를 성공으로 세지 않는다.
+검증: T03, T05, T20, T21
+
+CCP-03 명시적 도구 선택
+code_review는 정확한 retained 함수와 go-local-review@1.0.0을 선택해 rule_candidates와 review_function의 실제 요청/응답을 bundle에 보존한다. 값 분석은 rule 결과를 재사용한다. 다른 도구는 목적에 맞게 명시적으로 선택하며 policy/security 수동 주석과 자동 후보를 섞지 않는다.
+검증: T04, T06, T19, T20
+
+CCP-04 Planner 구조화 전달
+Planner §7을 ANALYSIS→PLANNING→COMPLETION 계약에 맞춘다. deep-review-evidence.json/deep-review.json/review-report.md/sequence.mmd/modules.mmd를 검증하고 일반 Markdown으로 대체하거나 computed 부분을 직접 편집하지 않는다. Analyzer/Planner의 frontmatter 설명·mode dispatch·return에 남은 light-analysis→DONE 안내도 정렬한다. Planner는 PLANNING에서 검증/전달을 맡으며 이미 완료한 ANALYSIS를 중복 수행하지 않는다.
+검증: T06, T07, T08, T13
+
+CCP-05 정확한 해시와 재진입
+ANALYSIS.deep_review_sha256와 완료 PLANNING.review_report_sha256를 정확한 파일 bytes에 묶는다. 이미 검증된 산출물은 재진입 때 검증해 재사용한다. 추론 변경은 ANALYSIS로 돌아가 재생성·재검증하고 이전 Planner hash를 완료 근거로 쓰지 않는다.
+검증: T07, T08, T09, T13, T14
+
+CCP-06 필수 절·우선순위·정답 구분
+6개 추론 절과 assumptions/unknowns·원 노드 인용을 유지한다. finding priority는 high/medium/low, cap32로 통일한다. critical severity/cap30의 옛 절차를 제거하고 임의 변환하지 않는다. 형식 성공·빈 finding·criterion1개·priority 값 변경은 독립 정답/누락0/품질 수용이 아니다.
+검증: T10, T12, T17
+
+CCP-07 원문·snapshot·partial 한계
+exact canonical/node/file/span/commit/source/snapshot과 실제 요청을 기록한다. 실행용 pin은 선택 도구가 지원하는 범위에서 명시한다. structural 응답은 identity_only_unverified_snapshot이며 원자적 snapshot/transport 인증을 주장하지 않는다. 미지원/오래된 index/잘린 결과/부분 결과/unknown은 별도 상태로 남긴다.
+검증: T09, T10, T11, T16, T20
+
+CCP-08 보고서와 그림의 범위
+Markdown과 두 Mermaid 파일은 동일 typed 산출물에서 재생성한다. CFG는 runtime trace가 아니고 모듈 그림은 file membership이며 interprocedural 관계는 unknown이다. 별도 로컬 렌더링을 확인하되 렌더링 성공을 분석의 의미 정확성으로 세지 않는다.
+검증: T06, T08, T11, T15
+
+CCP-09 실제 hook·CLI 전달 검증
+등록 파일뿐 아니라 소유 host의 실제 hook 이벤트와 Write/Edit 거부·CLI 결과를 보존한다. 직접 shell/state 수정은 deep-review hook 밖임을 유지하고 전달 전 동일 verifier를 실행한다. 모든 Bash를 차단하는 새 보안 경계를 구현한 것으로 쓰지 않는다.
+검증: T07, T08, T14, T21
+
+CCP-10 실제 역할과 시험 응답기 구분
+새로 소유한 Claude Code 세션의 Analyzer·Planner 역할 신원/유효 도구 목록·요청/응답을 기록한다. 로컬 scripted API responder만 사용하고 실제 유료 모델을 연결하지 않는다. 기존 host probe가 이 7역할/도구 경로를 검증했다고 재사용하지 않는다.
+검증: T05, T06, T18, T21
+
+CCP-11 상태·수용·부작용 경계
+후속 격리 연결 검증을 독립 gold·LLM 품질·운영/독립 수용으로 승격하지 않는다. F-01~F-08 pending/담당자 미정/실행 허용 false/정식0/9를 유지한다. 원본 채택 clone·프로젝트·운영 포인터·global 설정·게시/외부 tracker를 변경하지 않는다.
+검증: T01, T17, T18, T22
+
+CCP-12 증거·종료·복구
+소유 fixture의 전후 source identity와 실제 argv/env 허용 목록·binary/plugin/contract hashes·원본 JSONL/stdout/stderr·exit와 종료 시그널을 보존한다. 시간/요청/프로세스 상한을 넘으면 성공으로 세지 않고 소유 자원만 정리한다. 종료/rollback 확인이 없으면 전체 준비 판정을 통과시키지 않는다.
+검증: T01, T18, T22
+
+완료 구분:
+이번 단계는 source/요구사항/테스트 연결·문서/장부 검증 완료만 의미한다.
+구현은 P01~P08 및22사례의 실제 증거·정리 확인 후 candidate readiness로만 판정한다.
+blocked/inconclusive·renderer 없음·수동 client 성공을 실제 역할 성공으로 대체하지 않는다.
+검토자/최종 수용 담당자 미정, F-01~F-08 pending, freeze null, 실행 허용 false, 정식0/9.
+독립 required-item/priority gold·LLM 품질·온톨로지 효과 평가는 별도 남은 작업이다.

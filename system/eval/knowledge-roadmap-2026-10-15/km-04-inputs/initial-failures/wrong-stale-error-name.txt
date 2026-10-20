@@ -1,0 +1,49 @@
+test_CLI_policy_template_and_preparation (__main__.UpdateInputTests.test_CLI_policy_template_and_preparation) ... ok
+test_actual_native_validate_lock_recheck_succeed (__main__.UpdateInputTests.test_actual_native_validate_lock_recheck_succeed) ... ok
+test_added_modified_and_deleted_sets (__main__.UpdateInputTests.test_added_modified_and_deleted_sets) ... ok
+test_ambiguous_same_bytes_moves_not_paired (__main__.UpdateInputTests.test_ambiguous_same_bytes_moves_not_paired) ... ok
+test_changed_source_during_multi_root_capture_refused (__main__.UpdateInputTests.test_changed_source_during_multi_root_capture_refused) ... ok
+test_changed_source_during_native_projection_refused (__main__.UpdateInputTests.test_changed_source_during_native_projection_refused) ... ok
+test_document_free_preparation_never_writes_source_review_or_DB (__main__.UpdateInputTests.test_document_free_preparation_never_writes_source_review_or_DB) ... ok
+test_empty_material_deletion_drops_latest_text (__main__.UpdateInputTests.test_empty_material_deletion_drops_latest_text) ... ok
+test_exact_input_replay_does_not_rerun_native_projection (__main__.UpdateInputTests.test_exact_input_replay_does_not_rerun_native_projection) ... ok
+test_exact_repeat_reuses_immutable_input_and_original_time (__main__.UpdateInputTests.test_exact_repeat_reuses_immutable_input_and_original_time) ... ok
+test_excluded_bytes_do_not_change_selected_input (__main__.UpdateInputTests.test_excluded_bytes_do_not_change_selected_input) ... ok
+test_excluded_private_and_sensitive_content_not_adopted (__main__.UpdateInputTests.test_excluded_private_and_sensitive_content_not_adopted) ... ok
+test_explicit_ontology_bytes_change_without_Git_change (__main__.UpdateInputTests.test_explicit_ontology_bytes_change_without_Git_change) ... ok
+test_failed_or_canceled_job_cannot_be_noop (__main__.UpdateInputTests.test_failed_or_canceled_job_cannot_be_noop) ... ok
+test_foreign_provided_record_refused (__main__.UpdateInputTests.test_foreign_provided_record_refused) ... ok
+test_foreign_registration_cannot_load_input (__main__.UpdateInputTests.test_foreign_registration_cannot_load_input) ... ok
+test_generated_knowledge_never_invents_review_or_decision (__main__.UpdateInputTests.test_generated_knowledge_never_invents_review_or_decision) ... ok
+test_hardlinked_input_refused (__main__.UpdateInputTests.test_hardlinked_input_refused) ... ok
+test_input_blob_corruption_refused (__main__.UpdateInputTests.test_input_blob_corruption_refused) ... ok
+test_input_extra_file_or_symlink_refused (__main__.UpdateInputTests.test_input_extra_file_or_symlink_refused) ... ok
+test_material_secret_and_non_UTF8_not_copied (__main__.UpdateInputTests.test_material_secret_and_non_UTF8_not_copied) ... ok
+test_mtime_alone_is_not_new_input (__main__.UpdateInputTests.test_mtime_alone_is_not_new_input) ... ok
+test_native_failure_never_becomes_prepared_input (__main__.UpdateInputTests.test_native_failure_never_becomes_prepared_input) ... ok
+test_new_observation_does_not_make_existing_review_fresh (__main__.UpdateInputTests.test_new_observation_does_not_make_existing_review_fresh) ... FAIL
+test_noop_model_source_input_and_wrong_reader_rejected (__main__.UpdateInputTests.test_noop_model_source_input_and_wrong_reader_rejected) ... ok
+test_noop_requires_input_job_pins_and_actual_read (__main__.UpdateInputTests.test_noop_requires_input_job_pins_and_actual_read) ... ok
+test_old_snapshot_remains_exact_after_live_change (__main__.UpdateInputTests.test_old_snapshot_remains_exact_after_live_change) ... ok
+test_policy_change_changes_identity (__main__.UpdateInputTests.test_policy_change_changes_identity) ... ok
+test_previously_selected_removed_material_root_is_explicit_deletion (__main__.UpdateInputTests.test_previously_selected_removed_material_root_is_explicit_deletion) ... ok
+test_same_bytes_move_is_only_candidate (__main__.UpdateInputTests.test_same_bytes_move_is_only_candidate) ... ok
+test_supplied_context_change_has_distinct_origin (__main__.UpdateInputTests.test_supplied_context_change_has_distinct_origin) ... ok
+test_total_budget_applies_across_all_roots (__main__.UpdateInputTests.test_total_budget_applies_across_all_roots) ... ok
+
+======================================================================
+FAIL: test_new_observation_does_not_make_existing_review_fresh (__main__.UpdateInputTests.test_new_observation_does_not_make_existing_review_fresh)
+----------------------------------------------------------------------
+manager.Failure: collection_stale
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/test_knowledge_manager_update_inputs.py", line 230, in test_new_observation_does_not_make_existing_review_fresh
+    with self.assertRaisesRegex(manager.Failure,'review_input_changed'):review.active_adoption(f.r,adoption['adoption_id'])
+AssertionError: "review_input_changed" does not match "collection_stale"
+
+----------------------------------------------------------------------
+Ran 32 tests in 16.814s
+
+FAILED (failures=1)

@@ -1,0 +1,100 @@
+{
+  "observed_at": "2026-10-17T13:52:27.225952+00:00",
+  "endpoint": "http://127.0.0.1:11434",
+  "version": "0.40.4",
+  "version_response_sha256": "d8bb76d3ef4fb71e40d101eb0574909b0431672355fe2d99ac161a83c3354fc2",
+  "tags_response_sha256": "aa5d5b33e8b7b63901e17f2ce6336609656d88f106d385318291d1b2b14da9e7",
+  "selected_model": {
+    "name": "bge-m3:latest",
+    "model": "bge-m3:latest",
+    "modified_at": "2026-06-07T16:31:51.998226332+09:00",
+    "size": 1157672605,
+    "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "bert",
+      "families": [
+        "bert"
+      ],
+      "parameter_size": "566.70M",
+      "quantization_level": "F16",
+      "context_length": 8192,
+      "embedding_length": 1024,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "embedding"
+    ]
+  },
+  "show": {
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "bert",
+      "families": [
+        "bert"
+      ],
+      "parameter_size": "566.70M",
+      "quantization_level": "F16"
+    },
+    "model_info": {
+      "bert.attention.causal": false,
+      "bert.attention.head_count": 16,
+      "bert.attention.layer_norm_epsilon": 1e-05,
+      "bert.block_count": 24,
+      "bert.context_length": 8192,
+      "bert.embedding_length": 1024,
+      "bert.feed_forward_length": 4096,
+      "bert.pooling_type": 2,
+      "general.architecture": "bert",
+      "general.file_type": 1,
+      "general.license": "mit",
+      "general.parameter_count": 566703104,
+      "general.quantization_version": 2,
+      "general.size_label": "567M",
+      "general.tags": [
+        "sentence-transformers",
+        "feature-extraction",
+        "sentence-similarity",
+        "sentence-similarity"
+      ],
+      "general.type": "model",
+      "tokenizer.ggml.add_bos_token": true,
+      "tokenizer.ggml.add_eos_token": true,
+      "tokenizer.ggml.add_space_prefix": true,
+      "tokenizer.ggml.bos_token_id": 0,
+      "tokenizer.ggml.cls_token_id": 0,
+      "tokenizer.ggml.eos_token_id": 2,
+      "tokenizer.ggml.mask_token_id": 250001,
+      "tokenizer.ggml.model": "t5",
+      "tokenizer.ggml.padding_token_id": 1,
+      "tokenizer.ggml.pre": "default",
+      "tokenizer.ggml.precompiled_charsmap": [],
+      "tokenizer.ggml.remove_extra_whitespaces": true,
+      "tokenizer.ggml.scores": [],
+      "tokenizer.ggml.seperator_token_id": 2,
+      "tokenizer.ggml.token_type": [],
+      "tokenizer.ggml.token_type_count": 1,
+      "tokenizer.ggml.tokens": [],
+      "tokenizer.ggml.unknown_token_id": 3
+    },
+    "capabilities": [
+      "embedding"
+    ]
+  },
+  "show_response_sha256": "3f510a3b3f30bee4f135be958c0e48db7adb0507f8bec0f2a6629944df994339",
+  "embedding_probe": {
+    "input": "go-stablenet non-production identity probe",
+    "response_sha256": "0cd96a7d76d318dd2731a63f6ec318a12b4ac1be25610f15ce05faafa677a35b",
+    "dimensions": 1024,
+    "finite": true,
+    "l2_norm": 1.0000000165777643,
+    "model": "bge-m3:latest",
+    "prompt_eval_count": 14,
+    "total_duration": 2379381875
+  },
+  "matches_dataset_identity": true,
+  "paid_model_calls": 0,
+  "model_downloads": 0
+}

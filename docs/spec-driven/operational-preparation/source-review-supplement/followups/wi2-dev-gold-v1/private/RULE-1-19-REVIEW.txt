@@ -1,0 +1,12 @@
+RULE-1-19 — AI DEV bounded draft, not independent gold
+controlled/RULE-1-19.go {'start': 236, 'end': 251}
+parameter-command-name
+
+Source/excerpt identity: {"end": 252, "file_sha256": "0cbe164f1a169474afaa2708c5684c646e52a88df575faf13a1d0e4d67c9202f", "fragment_prefix_bytes": 196, "function_id": "RULE-1-19", "function_sha256": "f084a916ba0935ba61fc08fe214e7edcd7ed5868ba28cf46adbad1653654ec8d", "import_context": "explicit_AI_DEV_fixture_assumption_not_original_evidence", "path": "controlled/RULE-1-19.go", "project": "controlled-dev-fixture", "source_commit": null, "start": 196}
+
+Complete declared source–sink units:
+{"attacker_control": "not_established", "call_span": {"end": 251, "start": 236}, "callee_status": "declared_import_unshadowed_package_types_unresolved", "contract_label": "negative", "empty_source_rationale": null, "flow": {"conditions": [], "definition_spans": [{"binding": "v@215", "owner": "n0.0", "span": {"end": 216, "start": 215}}], "origins": [], "unknown_reasons": []}, "id": "fcbf704f71a7c2a2360c6ae8fca3252a9a0a6c5c118007921c48b73af59112e4", "rationale": "No dependency from this exact selected source to this sink in the declared bounded local equations; other arguments/declarations/slots are distinct. Not a safety proof.", "review_label": "negative", "rule_id": "parameter-command-name", "runtime_reachability": "not_established", "safety_verdict": "unknown", "scope_unknown_reasons": [], "sink_binding": "v@215", "sink_kind": "command_name_argument", "sink_span": {"end": 250, "start": 249}, "source_identity": "v@203", "source_scope": {"file_sha256": "0cbe164f1a169474afaa2708c5684c646e52a88df575faf13a1d0e4d67c9202f", "fragment_prefix_bytes": 196, "function_sha256": "f084a916ba0935ba61fc08fe214e7edcd7ed5868ba28cf46adbad1653654ec8d", "path": "controlled/RULE-1-19.go", "source_commit": null}, "source_span": {"end": 206, "start": 203}, "source_value_kind": "scalar"}
+
+Answer sets: {"negative_locations": ["fcbf704f71a7c2a2360c6ae8fca3252a9a0a6c5c118007921c48b73af59112e4"], "rule_candidates": [], "unsupported_or_unknown_flows": []}
+Empty-set rationales: {"rule_candidates": "No units with this label in the complete declared source-call universe; AI rationale, independent review pending.", "unsupported_or_unknown_flows": "No units with this label in the complete declared source-call universe; AI rationale, independent review pending."}
+Human reviewer: unassigned; no scoring, no safety/attacker-control/runtime verdict; actual MCP mapping not frozen.

@@ -1,0 +1,559 @@
+#!/usr/bin/env python3
+"""Materialize, execute and compare bugfix proposals without editing checkout HEAD.
+
+Facts come from Git and frozen executable drivers. Panel judgments are separate
+inputs, never silently promoted into measurements or independent human approval.
+"""
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+import math
+import os
+from pathlib import Path
+import signal
+import subprocess
+import tempfile
+import time
+import uuid
+
+import oracle_gate as oracle
+
+ROLES = {"correctness", "regression", "maintainability"}
+LIMIT = 262144
+RUNNER_SHA = oracle.sha(Path(__file__).read_bytes())
+
+
+def git(repo, *args, data=None, env=None):
+    p = subprocess.run(["git", "-C", str(repo), *args], input=data,
+                       env=env, capture_output=True, timeout=30)
+    if p.returncode:
+        raise oracle.GateError(f"candidate Git operation failed: {args[0]}")
+    return p.stdout
+
+
+def artifact(workspace, path, limit=LIMIT):
+    result = workspace / oracle.relpath(path)
+    if not result.resolve().is_relative_to(workspace.resolve()):
+        raise oracle.GateError("selection artifact escapes the owned workspace")
+    if result.is_symlink() or not result.is_file() or result.stat().st_size > limit:
+        raise oracle.GateError("selection artifact missing, linked or too large")
+    return result
+
+
+def validate(spec):
+    try:
+        if type(spec["schema_version"]) is not int or spec["schema_version"] != 1:
+            raise oracle.GateError("unsupported selection schema")
+        oracle.relpath(spec["oracle_plan"])
+        candidates = spec["candidates"]
+        if not isinstance(candidates, list) or not 2 <= len(candidates) <= 8:
+            raise oracle.GateError("2..8 actual fix proposals are required")
+        if len({x["id"] for x in candidates}) != len(candidates):
+            raise oracle.GateError("duplicate candidate IDs")
+        for candidate in candidates:
+            oracle.text(candidate["id"], "candidate id")
+            if not candidate["id"].replace("-", "").replace("_", "").isalnum():
+                raise oracle.GateError("candidate id must be an alphanumeric slug")
+            oracle.text(candidate["rationale"], "root-cause rationale")
+            subject = candidate["commit_subject"]
+            if (not isinstance(subject, str) or not subject.startswith("fix: ")
+                    or not subject.isascii() or len(subject) > 200 or "\n" in subject):
+                raise oracle.GateError("candidate commit requires a short English fix: subject")
+            changes = candidate["changes"]
+            if not isinstance(changes, list) or not 1 <= len(changes) <= 12:
+                raise oracle.GateError("candidate requires 1..12 source replacements")
+            if len({x["path"] for x in changes}) != len(changes):
+                raise oracle.GateError("combine replacements per production file")
+            for change in changes:
+                oracle.relpath(change["path"])
+                if change["before"] is not None:oracle.text(change["before"], "candidate before")
+                if change["after"] is not None:oracle.text(change["after"], "candidate after")
+                if change["before"] == change["after"]:
+                    raise oracle.GateError("candidate must change production source")
+        axes = spec["criteria"]["axes"]
+        if not isinstance(axes, list) or not 1 <= len(axes) <= 8 or len({x["id"] for x in axes}) != len(axes):
+            raise oracle.GateError("1..8 distinct frozen comparison axes required")
+        for axis in axes:
+            oracle.text(axis["id"], "axis id")
+            oracle.text(axis["unit"], "axis unit")
+            if axis["direction"] not in ("min", "max") or type(axis["required"]) is not bool:
+                raise oracle.GateError("axis direction/required must be explicit")
+            tolerance = axis.get("tolerance", 0)
+            if type(tolerance) not in (int, float) or not math.isfinite(tolerance) or tolerance < 0:
+                raise oracle.GateError("comparison tolerance must be a finite nonnegative number")
+        if spec["criteria"]["selection_rule"] != "unanimous-panel-and-pareto":
+            raise oracle.GateError("only the frozen unanimous-panel-and-pareto rule is supported")
+        judges = spec["judges"]
+        if len(judges) != 3 or {x["role"] for x in judges} != ROLES or len({x["id"] for x in judges}) != 3:
+            raise oracle.GateError("three distinct correctness/regression/maintainability judges required")
+        for judge in judges:
+            if judge["kind"] not in ("model", "human", "fixture"):
+                raise oracle.GateError("judge origin must be explicit")
+            argv(judge["command"])
+            source=Path(judge["adapter_source"])
+            if not source.is_absolute() or not source.is_file() or source.is_symlink() or ".claude" in source.parts:
+                raise oracle.GateError("judge adapter must be an explicit local source file")
+            if oracle.sha(source.read_bytes())!=judge["adapter_sha256"]:
+                raise oracle.GateError("judge adapter changed since the selection spec was frozen")
+        drivers = spec["metric_drivers"]
+        if not isinstance(drivers, list) or len(drivers) > 8:
+            raise oracle.GateError("at most eight metric drivers are supported")
+        for driver in [spec["regression_driver"], *drivers]:
+            argv(driver["command"])
+            oracle.relpath(driver["source_file"])
+        timeout = spec.get("timeout_seconds", 120)
+        total = spec.get("max_total_seconds", 1800)
+        if type(timeout) not in (int, float) or not 0.05 <= timeout <= 300:
+            raise oracle.GateError("invalid driver timeout")
+        if type(total) not in (int, float) or not 1 <= total <= 7200:
+            raise oracle.GateError("invalid selection total budget")
+    except (TypeError, KeyError) as exc:
+        raise oracle.GateError(f"malformed candidate selection: {exc}") from exc
+    return spec
+
+
+def argv(command):
+    if not isinstance(command, list) or not 1 <= len(command) <= 32 or any(not isinstance(x, str) or not x for x in command):
+        raise oracle.GateError("command must be an argv array")
+
+
+def stage_tree(repo, base, updates, directory, subject):
+    env = dict(os.environ, GIT_INDEX_FILE=str(directory / (uuid.uuid4().hex + ".index")))
+    git(repo, "read-tree", base, env=env)
+    for path, raw in updates.items():
+        if raw is None:
+            git(repo,"update-index","--force-remove",path,env=env)
+            continue
+        blob = git(repo, "hash-object", "-w", "--stdin", data=raw).decode().strip()
+        entry = git(repo, "ls-tree", base, "--", path).decode().split()
+        mode = entry[0] if entry else "100644"
+        if mode not in ("100644", "100755"):
+            raise oracle.GateError("candidate cannot update links or nonregular source")
+        git(repo, "update-index", "--add", "--cacheinfo", mode, blob, path, env=env)
+    tree = git(repo, "write-tree", env=env).decode().strip()
+    if tree == git(repo, "rev-parse", base + "^{tree}").decode().strip():
+        return base, tree
+    revision = git(repo, "commit-tree", tree, "-p", base, "-m", subject).decode().strip()
+    ref = "refs/heads/codex/fix-trial-" + uuid.uuid4().hex
+    git(repo, "update-ref", ref, revision, "0" * 40)
+    return revision, tree
+
+
+def changed_lines(repo,base,head):
+    records=git(repo,"diff","--no-renames","--numstat","-z",base,head).decode().split("\0")
+    return sum(int(v) for record in records if record for v in record.split("\t",2)[:2])
+
+
+def changed_paths(repo,base,head):
+    return {p for p in git(repo,"diff","--no-renames","--name-only","-z",base,head).decode().split("\0") if p}
+
+
+def proposed_bytes(repo,base,change):
+    path=change["path"]
+    old=subprocess.run(["git","-C",str(repo),"show",f"{base}:{path}"],capture_output=True)
+    if change["before"] is None:
+        if old.returncode==0:raise oracle.GateError("new candidate file already exists")
+        return change["after"].encode()
+    if old.returncode:raise oracle.GateError("candidate source file is missing from baseline")
+    source=old.stdout.decode()
+    if change["after"] is None:
+        if source!=change["before"]:raise oracle.GateError("file deletion requires the exact full baseline content")
+        return None
+    if source.count(change["before"])!=1:raise oracle.GateError("candidate replacement must match exactly once in the unfixed source")
+    return source.replace(change["before"],change["after"],1).encode()
+
+
+def carrier(repo, workspace, spec, plan, temp):
+    base = oracle.commit(repo, spec["source_base_ref"])
+    if git(repo, "status", "--porcelain", "--untracked-files=no").strip():
+        raise oracle.GateError("candidate preparation requires committed production source")
+    updates = {}
+    provided = spec.get("oracle_sources", {})
+    if set(provided) - set(plan["frozen_files"]):
+        raise oracle.GateError("oracle carrier can only add declared frozen artifacts")
+    for path, digest in plan["frozen_files"].items():
+        old = subprocess.run(["git", "-C", str(repo), "show", f"{base}:{path}"], capture_output=True)
+        if old.returncode == 0:
+            if oracle.sha(old.stdout) != digest:
+                raise oracle.GateError("carrier cannot rewrite an existing baseline file")
+        else:
+            acceptable = (path.startswith(("oracles/", "tests/")) or path.endswith("_test.go")
+                          or path in (plan["requirement_file"], plan["independent_derivation_file"]))
+            if not acceptable or path not in provided:
+                raise oracle.GateError("new carrier input must be an oracle/test/requirement artifact")
+            raw = artifact(workspace, provided[path]).read_bytes()
+            if oracle.sha(raw) != digest:
+                raise oracle.GateError("oracle carrier source hash changed")
+            updates[path] = raw
+    for driver in [spec["regression_driver"], *spec["metric_drivers"]]:
+        if driver["source_file"] not in plan["frozen_files"]:
+            raise oracle.GateError("regression and metric adapters must be frozen")
+    revision, _ = stage_tree(repo, base, updates, temp, "test: freeze bugfix acceptance and oracle drivers")
+    plan["base_ref"] = revision
+    return revision
+
+
+def execute(command, directory, payload, timeout, env=None):
+    start = time.monotonic()
+    code, timed_out, error = None, False, None
+    with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
+        try:
+            proc = subprocess.Popen(command, cwd=directory, stdin=subprocess.PIPE,
+                                    stdout=out, stderr=err, env=env, start_new_session=True)
+            try:
+                proc.communicate(json.dumps(payload).encode(), timeout=timeout)
+                code = proc.returncode
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                os.killpg(proc.pid, signal.SIGKILL)
+                proc.communicate()
+                code = proc.returncode
+            finally:
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+        except OSError as exc:
+            error = str(exc)
+        out.seek(0)
+        err.seek(0)
+        stdout, stderr = out.read(LIMIT + 1), err.read(LIMIT + 1)
+    row = {"command":command,"exit_code":code,"timed_out":timed_out,"launch_error":error,
+           "stdout":stdout.decode(errors="replace"),"stderr":stderr.decode(errors="replace"),
+           "stdout_sha256":oracle.sha(stdout),"stderr_sha256":oracle.sha(stderr),
+           "duration_ms":round((time.monotonic()-start)*1000)}
+    return row
+
+
+def parse_execution(row):
+    if (row["exit_code"] != 0 or row["timed_out"] or row["launch_error"]
+            or len(row["stdout"].encode()) > LIMIT or len(row["stderr"].encode()) > LIMIT):
+        raise oracle.GateError("driver/model command failed, timed out or exceeded output cap")
+    value = json.loads(row["stdout"])
+    if not isinstance(value, dict) or type(value.get("schema_version")) is not int or value["schema_version"] != 1:
+        raise oracle.GateError("driver/model output must be a versioned JSON object")
+    return value
+
+
+def candidate_facts(repo, workspace, spec, original_plan, base, proposal, temp, deadline):
+    plan = copy.deepcopy(original_plan)
+    plan["base_ref"] = base
+    plan["mutants"] = proposal["mutants"]
+    oracle.validate_plan(plan)
+    updates = {}
+    for change in proposal["changes"]:
+        path = change["path"]
+        if path in plan["frozen_files"]:
+            raise oracle.GateError("fix proposal cannot change frozen oracle/requirements")
+        updates[path]=proposed_bytes(repo,base,change)
+    revision, tree = stage_tree(repo, base, updates, temp, proposal["commit_subject"])
+    plan_path = workspace / "oracle-validity-plan.json"
+    plan["max_total_seconds"] = min(plan.get("max_total_seconds", 600), max(0.1, deadline-time.monotonic()))
+    plan_path.write_text(json.dumps(plan, indent=2)+"\n")
+    report = oracle.run_plan(plan, workspace, repo, oracle.sha(plan_path.read_bytes()), revision)
+    patch = git(repo, "diff", "--no-ext-diff", "--no-textconv", base, revision).decode()
+    changed=changed_lines(repo,base,revision)
+    result = {"id":proposal["id"],"rationale":proposal["rationale"],"commit":revision,"tree":tree,
+              "diff":patch,"diff_sha256":oracle.sha(patch.encode()),"oracle_plan":plan,"oracle_report":report,
+              "oracle_plan_bytes":plan_path.read_text(),
+              "metrics":{"changed_lines":{"value":changed,"unit":"lines","origin":"Git diff --numstat"}},
+              "drivers":[],"regression":"ERROR"}
+    snapshot = temp / ("metrics-"+uuid.uuid4().hex)
+    oracle.extract_snapshot(repo, revision, snapshot)
+    inputs = oracle.source_hashes(snapshot)
+    for kind, driver in [("regression",spec["regression_driver"]), *[("metrics",x) for x in spec["metric_drivers"]]]:
+        remaining = deadline-time.monotonic()
+        if remaining <= 0:
+            raise oracle.GateError("candidate selection execution budget exhausted")
+        context={"schema_version":1,"candidate_id":proposal["id"],"subject_commit":revision,
+                 "symptom_id":plan["symptom_id"]}
+        env=dict(os.environ, ORACLE_SUBJECT_COMMIT=revision, ORACLE_SYMPTOM_ID=plan["symptom_id"], ORACLE_CASE_ID=plan["symptom_case"], PYTHONDONTWRITEBYTECODE="1")
+        row=execute(driver["command"],snapshot,context,min(spec.get("timeout_seconds",120),remaining),env)
+        row.update(kind=kind,source_file=driver["source_file"])
+        try:
+            value=parse_execution(row)
+            if value.get("subject_commit") != revision or value.get("candidate_id") != proposal["id"]:
+                raise oracle.GateError("metric/regression subject identity mismatch")
+            if kind=="regression":
+                if value.get("status") not in ("PASS","FAIL","ERROR"):
+                    raise oracle.GateError("invalid regression status")
+                result["regression"]=value["status"]
+            else:
+                for name,measurement in value["metrics"].items():
+                    number=measurement.get("value")
+                    if number is not None and (type(number) not in (int,float) or not math.isfinite(number)):
+                        raise oracle.GateError("metric must be finite or explicit null")
+                    if name in result["metrics"]:
+                        raise oracle.GateError("duplicate measurement producer")
+                    result["metrics"][name]={"value":number,"unit":measurement["unit"],"origin":"executed frozen adapter","driver_source":driver["source_file"],"receipt_sha256":row["stdout_sha256"]}
+        except (oracle.GateError,KeyError,ValueError,TypeError) as exc:
+            row["error"]=str(exc)
+        result["drivers"].append(row)
+    if any(not (snapshot/p).is_file() or (snapshot/p).is_symlink() or oracle.sha((snapshot/p).read_bytes())!=digest for p,digest in inputs.items()):
+        raise oracle.GateError("measurement adapter modified its source snapshot")
+    result["hard_eligible"] = report["mechanical_verdict"]=="PASS" and result["regression"]=="PASS" and not any("error" in x for x in result["drivers"])
+    result["observation_complete"] = report["mechanical_verdict"]!="ERROR" and result["regression"]!="ERROR" and not any("error" in x for x in result["drivers"])
+    return result
+
+
+def parse_panel(row, judge, candidates):
+    value=parse_execution(row)
+    if value.get("judge_id")!=judge["id"] or value.get("role")!=judge["role"]:
+        raise oracle.GateError("judge identity/role mismatch")
+    votes=value["votes"]
+    if len(votes)!=len(candidates) or {x["candidate_id"] for x in votes}!={x["id"] for x in candidates}:
+        raise oracle.GateError("every judge must assess each candidate exactly once")
+    for vote in votes:
+        if vote["verdict"] not in ("accept","reject","abstain"):
+            raise oracle.GateError("invalid judge verdict")
+        oracle.text(vote["reason"],"judge reason")
+        target=next(x for x in candidates if x["id"]==vote["candidate_id"])
+        refs=vote["evidence_sha256"]
+        if not isinstance(refs,list) or not refs or any(x not in target["evidence_sha256"] for x in refs):
+            raise oracle.GateError("judge cited evidence outside the candidate packet")
+        required=target["evidence_sha256"][{"maintainability":0,"correctness":1,"regression":2}[judge["role"]]]
+        if required not in refs:raise oracle.GateError("judge omitted its role-specific execution/source evidence")
+    preference=value.get("preferred_candidate")
+    if preference is not None and preference not in {x["id"] for x in candidates}:
+        raise oracle.GateError("judge preference names an unknown candidate")
+    return value
+
+
+def decide(criteria,candidates,panel):
+    if len(panel)!=3 or {x["role"] for x in panel}!=ROLES or any(x.get("error") for x in panel):
+        return {"status":"DEFERRED","reason":"missing/invalid panel execution","selected_candidate":None}
+    eligible=[];unresolved=[]
+    reasons={}
+    for c in candidates:
+        votes=[next(v for v in p["opinion"]["votes"] if v["candidate_id"]==c["id"])["verdict"] for p in panel]
+        if c.get("observation_complete") is False:
+            unresolved.append(c["id"]);reasons[c["id"]]="candidate execution incomplete; no inference of a bad alternative";continue
+        if not c["hard_eligible"]: reasons[c["id"]]="oracle/regression/execution hard condition failed";continue
+        if votes==["reject"]*3:reasons[c["id"]]="unanimous panel rejection";continue
+        if votes!=["accept"]*3:unresolved.append(c["id"]);reasons[c["id"]]="panel abstention or disagreement";continue
+        if any(a["required"] and (a["id"] not in c["metrics"] or c["metrics"][a["id"]]["value"] is None or c["metrics"][a["id"]]["unit"]!=a["unit"]) for a in criteria["axes"]):
+            unresolved.append(c["id"]);reasons[c["id"]]="required comparison measurement missing/unknown";continue
+        eligible.append(c)
+    if unresolved:
+        return {"status":"DEFERRED","reason":"potential candidates have unresolved judgment or required measurements","selected_candidate":None,"unresolved":unresolved,"rejections":reasons}
+    if not eligible:
+        return {"status":"REJECTED","reason":"no unanimously accepted candidate with all required evidence","selected_candidate":None,"rejections":reasons}
+    axes=[a for a in criteria["axes"] if all(a["id"] in c["metrics"] and c["metrics"][a["id"]]["value"] is not None and c["metrics"][a["id"]]["unit"]==a["unit"] for c in eligible)]
+    if not axes:
+        return {"status":"DEFERRED","reason":"no comparable observed axes","selected_candidate":None,"rejections":reasons}
+    def dominates(a,b):
+        differences=[(a["metrics"][x["id"]]["value"]-b["metrics"][x["id"]]["value"])*(1 if x["direction"]=="min" else -1) for x in axes]
+        tolerances=[x.get("tolerance",0) for x in axes]
+        return all(d<=t for d,t in zip(differences,tolerances)) and any(d < -t for d,t in zip(differences,tolerances))
+    frontier=[a for a in eligible if not any(dominates(b,a) for b in eligible if b is not a)]
+    if not frontier:
+        return {"status":"DEFERRED","reason":"no consistent dominance frontier under frozen tolerances","selected_candidate":None,"rejections":reasons}
+    if len(frontier)!=1:
+        return {"status":"TIED","reason":"multiple Pareto candidates; no arbitrary first-plausible choice","selected_candidate":None,"frontier":[c["id"] for c in frontier],"rejections":reasons}
+    winner=frontier[0]
+    preferred=[p["opinion"].get("preferred_candidate") for p in panel]
+    if any(x!=winner["id"] for x in preferred):
+        return {"status":"DEFERRED","reason":"panel preference is absent or disagrees with measured dominance","selected_candidate":None,"rejections":reasons}
+    return {"status":"SELECTED","selected_candidate":winner["id"],"selected_commit":winner["commit"],"selected_tree":winner["tree"],"reason":"hard-eligible, unanimous preference and sole observed Pareto candidate","axes_used":[x["id"] for x in axes],"rejections":reasons}
+
+
+def run_selection(workspace,repo):
+    spec_path=artifact(workspace,"fix-selection-spec.json")
+    spec=validate(oracle.read_json(spec_path))
+    spec_sha=oracle.sha(spec_path.read_bytes())
+    template_path=artifact(workspace,spec["oracle_plan"])
+    template_sha=oracle.sha(template_path.read_bytes())
+    plan=oracle.validate_plan(oracle.read_json(template_path))
+    if plan["base_ref"]!=spec["source_base_ref"]:
+        raise oracle.GateError("oracle template baseline differs from the source baseline")
+    original_head=git(repo,"rev-parse","HEAD").decode().strip()
+    source_base=oracle.commit(repo,spec["source_base_ref"])
+    oracle.git(repo,"merge-base","--is-ancestor",source_base,original_head)
+    deadline=time.monotonic()+spec.get("max_total_seconds",1800)
+    candidates=[];panel=[]
+    with tempfile.TemporaryDirectory(prefix="fix-selection-") as directory:
+        temp=Path(directory)
+        base=carrier(repo,workspace,spec,plan,temp)
+        for proposal in spec["candidates"]:
+            candidate_workspace=temp/("candidate-"+proposal["id"])
+            candidate_workspace.mkdir()
+            ticket=artifact(workspace,plan["ticket_file"])
+            target=candidate_workspace/oracle.relpath(plan["ticket_file"])
+            target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(ticket.read_bytes())
+            c=candidate_facts(repo,candidate_workspace,spec,plan,base,proposal,temp,deadline)
+            c["evidence_sha256"]=[c["diff_sha256"],oracle.sha(json.dumps(c["oracle_report"],sort_keys=True).encode()),* [oracle.sha(json.dumps(x,sort_keys=True).encode()) for x in c["drivers"]]]
+            candidates.append(c)
+        if len({c["tree"] for c in candidates})!=len(candidates):
+            raise oracle.GateError("duplicate source trees are not distinct fix candidates")
+        for judge in spec["judges"]:
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise oracle.GateError("selection total budget exhausted before panel")
+            views=[{"id":c["id"],"rationale":c["rationale"],"commit":c["commit"],"diff":c["diff"],
+                    "oracle_verdict":c["oracle_report"]["mechanical_verdict"],"oracle_checks":c["oracle_report"]["checks"],
+                    "regression":c["regression"],"metrics":c["metrics"],"hard_eligible":c["hard_eligible"],"observation_complete":c["observation_complete"],
+                    "evidence_sha256":c["evidence_sha256"],"driver_observations":[{"kind":d["kind"],"command":d["command"],"exit_code":d["exit_code"],"error":d.get("error"),"stdout":d["stdout"][:4096]} for d in c["drivers"]]} for c in candidates]
+            for view in views:
+                view["required_evidence_sha256"]=view["evidence_sha256"][{"maintainability":0,"correctness":1,"regression":2}[judge["role"]]]
+            payload={"schema_version":1,"judge_id":judge["id"],"role":judge["role"],"symptom_id":plan["symptom_id"],"criteria":spec["criteria"],"candidates":views}
+            row=execute(judge["command"],temp,payload,min(spec.get("timeout_seconds",120),remaining))
+            row.update(judge_id=judge["id"],role=judge["role"],kind=judge["kind"],adapter_sha256=judge["adapter_sha256"])
+            if oracle.sha(Path(judge["adapter_source"]).read_bytes())!=judge["adapter_sha256"]:
+                raise oracle.GateError("judge adapter changed during review")
+            try:row["opinion"]=parse_panel(row,judge,candidates)
+            except (oracle.GateError,ValueError,KeyError,TypeError) as exc:row["error"]=str(exc)
+            panel.append(row)
+    if (oracle.sha(spec_path.read_bytes())!=spec_sha or oracle.sha(Path(__file__).read_bytes())!=RUNNER_SHA
+            or oracle.sha(template_path.read_bytes())!=template_sha):
+        raise oracle.GateError("selection spec/runner changed during execution")
+    if git(repo,"rev-parse","HEAD").decode().strip()!=original_head or git(repo,"status","--porcelain","--untracked-files=no").strip():
+        raise oracle.GateError("original subject checkout changed during trials")
+    return {"schema_version":1,"runner_sha256":RUNNER_SHA,"oracle_runner_sha256":oracle.RUNNER_SHA256,
+            "repo_root":str(repo.resolve()),"spec_sha256":spec_sha,"oracle_template_sha256":template_sha,"source_base_commit":source_base,
+            "oracle_base_commit":base,"symptom_id":plan["symptom_id"],"candidates":candidates,"panel":panel,
+            "decision":decide(spec["criteria"],candidates,panel),"independent_human_acceptance":"not_recorded",
+            "scope":"observed proposals/axes plus role-separated opinions; not a proof of the globally best possible fix"}
+
+
+def verify_selection(workspace, repo, state, applied=False):
+    spec_path=artifact(workspace,"fix-selection-spec.json")
+    report_path=artifact(workspace,"fix-selection-report.json",64*1024*1024)
+    spec=validate(oracle.read_json(spec_path));report=oracle.read_json(report_path)
+    template_path=artifact(workspace,spec["oracle_plan"])
+    template=oracle.validate_plan(oracle.read_json(template_path))
+    design=state.get("states",{}).get("DESIGN",{})
+    if (design.get("fix_selection_spec_sha256")!=oracle.sha(spec_path.read_bytes())
+            or design.get("fix_selection_report_sha256")!=oracle.sha(report_path.read_bytes())
+            or report.get("spec_sha256")!=oracle.sha(spec_path.read_bytes())
+            or report.get("oracle_template_sha256")!=oracle.sha(template_path.read_bytes())
+            or report.get("runner_sha256")!=RUNNER_SHA
+            or report.get("oracle_runner_sha256")!=oracle.RUNNER_SHA256
+            or report.get("repo_root")!=str(repo.resolve())
+            or report.get("source_base_commit")!=spec["source_base_ref"]):
+        raise oracle.GateError("selection evidence missing, unbound, stale or for a different source")
+    candidates=report["candidates"]
+    carrier_changes=changed_paths(repo,spec["source_base_ref"],report["oracle_base_commit"])
+    if set(carrier_changes)-set(template["frozen_files"]):raise oracle.GateError("RED carrier changed baseline production source")
+    for path in carrier_changes:
+        old=subprocess.run(["git","-C",str(repo),"show",f"{spec['source_base_ref']}:{path}"],capture_output=True)
+        if old.returncode==0:raise oracle.GateError("RED carrier rewrote an existing baseline file")
+        if path not in spec.get("oracle_sources",{}):raise oracle.GateError("RED carrier added undeclared oracle source")
+        if oracle.sha(artifact(workspace,spec["oracle_sources"][path]).read_bytes())!=template["frozen_files"][path]:raise oracle.GateError("carrier input artifact changed")
+    if len(candidates)!=len(spec["candidates"]) or {c["id"] for c in candidates}!={p["id"] for p in spec["candidates"]}:
+        raise oracle.GateError("candidate execution coverage differs from proposals")
+    common=None
+    with tempfile.TemporaryDirectory(prefix="fix-selection-verify-") as directory:
+        for index,c in enumerate(candidates):
+            proposal=next(p for p in spec["candidates"] if p["id"]==c["id"])
+            if c["rationale"]!=proposal["rationale"]:
+                raise oracle.GateError("candidate rationale changed")
+            patch=git(repo,"diff","--no-ext-diff","--no-textconv",report["oracle_base_commit"],c["commit"]).decode()
+            modified=changed_paths(repo,report["oracle_base_commit"],c["commit"])
+            if modified!={p["path"] for p in proposal["changes"]}:raise oracle.GateError("candidate modified files outside its proposal")
+            if patch!=c["diff"] or oracle.sha(patch.encode())!=c["diff_sha256"] or git(repo,"rev-parse",c["commit"]+"^{tree}").decode().strip()!=c["tree"]:
+                raise oracle.GateError("candidate source/diff was changed")
+            for change in proposal["changes"]:
+                expected=proposed_bytes(repo,report["oracle_base_commit"],change)
+                actual=subprocess.run(["git","-C",str(repo),"show",c["commit"]+":"+change["path"]],capture_output=True)
+                if (expected is None and actual.returncode==0) or (expected is not None and (actual.returncode!=0 or actual.stdout!=expected)):
+                    raise oracle.GateError("executed candidate differs from its proposed fix")
+            oracle_workspace=Path(directory)/str(index);oracle_workspace.mkdir()
+            plan=oracle.validate_plan(c["oracle_plan"])
+            shared={k:v for k,v in plan.items() if k not in ("mutants","max_total_seconds")}
+            expected_template={k:v for k,v in template.items() if k not in ("mutants","max_total_seconds")}
+            expected_template["base_ref"]=report["oracle_base_commit"]
+            if shared!=expected_template:raise oracle.GateError("candidate acceptance contract differs from the frozen template")
+            if common is not None and shared!=common:
+                raise oracle.GateError("candidate oracles/conditions/baselines differ")
+            common=shared
+            if plan["base_ref"]!=report["oracle_base_commit"] or plan["mutants"]!=proposal["mutants"]:
+                raise oracle.GateError("candidate mutation/RED contract drift")
+            target=oracle_workspace/oracle.relpath(plan["ticket_file"])
+            target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(artifact(workspace,plan["ticket_file"]).read_bytes())
+            plan_path=oracle_workspace/"oracle-validity-plan.json";plan_path.write_text(c["oracle_plan_bytes"])
+            if oracle.read_json(plan_path)!=plan:
+                raise oracle.GateError("oracle plan serialization disagrees")
+            base,head=oracle.check_bindings(plan,oracle_workspace,repo,c["commit"])
+            receipt=c["oracle_report"]
+            if (receipt["plan_sha256"]!=oracle.sha(plan_path.read_bytes())
+                    or receipt["runner_sha256"]!=oracle.RUNNER_SHA256
+                    or receipt["base_commit"]!=base or receipt["head_commit"]!=head
+                    or receipt["repo_root"]!=str(repo.resolve()) or receipt["tier"]!=plan["tier"]
+                    or receipt["symptom_id"]!=plan["symptom_id"] or receipt["frozen_files"]!=plan["frozen_files"]
+                    or receipt["execution_scope"]!="candidate_trial"):
+                raise oracle.GateError("oracle trial receipt is stale/different")
+            checks=oracle.judge(plan,receipt["runs"],base,head)
+            verdict="PASS" if all(x["passed"] for x in checks) else "ERROR" if any(x["actual"]=="ERROR" for x in checks) else "FAIL"
+            if receipt["checks"]!=checks or receipt["mechanical_verdict"]!=verdict:
+                raise oracle.GateError("oracle verdict was fabricated")
+            metrics={"changed_lines":{"value":changed_lines(repo,base,head),"unit":"lines","origin":"Git diff --numstat"}}
+            regression="ERROR"
+            expected_drivers=[("regression",spec["regression_driver"]),*[("metrics",d) for d in spec["metric_drivers"]]]
+            if len(c["drivers"])!=len(expected_drivers):raise oracle.GateError("missing measurement/regression executions")
+            for row,(kind,driver) in zip(c["drivers"],expected_drivers):
+                if row["command"]!=driver["command"] or row["kind"]!=kind or row["source_file"]!=driver["source_file"]:
+                    raise oracle.GateError("measurement command changed")
+                for stream in ("stdout","stderr"):
+                    if oracle.sha(row[stream].encode())!=row[stream+"_sha256"]:raise oracle.GateError("measurement raw data changed")
+                if "error" in row:continue
+                value=parse_execution(row)
+                if value.get("subject_commit")!=head or value.get("candidate_id")!=c["id"]:raise oracle.GateError("measurement subject changed")
+                if kind=="regression":regression=value["status"]
+                else:
+                    for name,m in value["metrics"].items():
+                        number=m.get("value")
+                        if number is not None and (type(number) not in (int,float) or not math.isfinite(number)):raise oracle.GateError("invalid metric value")
+                        if name in metrics:raise oracle.GateError("duplicate metric")
+                        metrics[name]={"value":number,"unit":m["unit"],"origin":"executed frozen adapter","driver_source":driver["source_file"],"receipt_sha256":row["stdout_sha256"]}
+            if metrics!=c["metrics"] or regression!=c["regression"]:
+                raise oracle.GateError("measured axes were replaced by claims")
+            eligible=verdict=="PASS" and regression=="PASS" and not any("error" in x for x in c["drivers"])
+            if eligible!=c["hard_eligible"]:raise oracle.GateError("candidate eligibility was changed")
+            complete=verdict!="ERROR" and regression!="ERROR" and not any("error" in x for x in c["drivers"])
+            if complete!=c["observation_complete"]:raise oracle.GateError("incomplete observations were falsely treated as conclusive")
+            evidence=[c["diff_sha256"],oracle.sha(json.dumps(receipt,sort_keys=True).encode()),*[oracle.sha(json.dumps(x,sort_keys=True).encode()) for x in c["drivers"]]]
+            if evidence!=c["evidence_sha256"]:raise oracle.GateError("candidate evidence references changed")
+    if len(report["panel"])!=3:raise oracle.GateError("missing panel members")
+    for row,judge in zip(report["panel"],spec["judges"]):
+        if (row["command"]!=judge["command"] or row["kind"]!=judge["kind"] or row["role"]!=judge["role"]
+                or row["judge_id"]!=judge["id"] or row["adapter_sha256"]!=judge["adapter_sha256"]):
+            raise oracle.GateError("panel invocation provenance changed")
+        for stream in ("stdout","stderr"):
+            if oracle.sha(row[stream].encode())!=row[stream+"_sha256"]:raise oracle.GateError("panel raw receipt changed")
+        if "error" not in row and parse_panel(row,judge,candidates)!=row["opinion"]:
+            raise oracle.GateError("panel opinion does not match executed receipt")
+    decision=decide(spec["criteria"],candidates,report["panel"])
+    if decision!=report["decision"] or decision["status"]!="SELECTED":
+        raise oracle.GateError("selection is absent/deferred/rejected or disagrees with measured evidence")
+    if design.get("selected_candidate_commit")!=decision["selected_commit"]:
+        raise oracle.GateError("state selection identity changed")
+    if applied:
+        actual=git(repo,"rev-parse","HEAD^{tree}").decode().strip()
+        if actual!=decision["selected_tree"]:
+            raise oracle.GateError("implemented source differs from the selected candidate; re-evaluate")
+        oracle.git(repo,"merge-base","--is-ancestor",report["oracle_base_commit"],git(repo,"rev-parse","HEAD").decode().strip())
+    return report
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--workspace",type=Path,required=True);p.add_argument("--repo",type=Path,required=True)
+    p.add_argument("--check",action="store_true");p.add_argument("--applied",action="store_true")
+    a=p.parse_args();workspace=a.workspace.resolve();repo=a.repo.resolve()
+    if a.applied and not a.check:p.error("--applied is a read-only check; use --check --applied")
+    try:
+        if a.check:
+            verify_selection(workspace,repo,oracle.read_json(workspace/"state.json"),a.applied)
+            print(json.dumps({"selection_gate":"PASS","implemented_tree_checked":a.applied}));return 0
+        report=run_selection(workspace,repo)
+        if not a.check:(workspace/"fix-selection-report.json").write_text(json.dumps(report,indent=2)+"\n")
+        print(json.dumps(report["decision"]))
+        return 0 if report["decision"]["status"]=="SELECTED" else 1
+    except (oracle.GateError,OSError,ValueError,KeyError,TypeError,subprocess.SubprocessError) as exc:
+        report={"schema_version":1,"decision":{"status":"ERROR","reason":str(exc),"selected_candidate":None}}
+        if not a.check:(workspace/"fix-selection-report.json").write_text(json.dumps(report,indent=2)+"\n")
+        print(json.dumps(report["decision"]));return 2
+
+
+if __name__=="__main__":raise SystemExit(main())

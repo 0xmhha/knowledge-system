@@ -1,0 +1,5 @@
+func GetMinterCount(govMasterMinterAddress common.Address, state StateReader) uint64 {
+	minterListSlot := common.HexToHash(SLOT_GOV_MASTER_MINTER_minterList)
+	lengthValue := state.GetState(govMasterMinterAddress, minterListSlot)
+	return lengthValue.Big().Uint64()
+}

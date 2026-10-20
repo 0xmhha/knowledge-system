@@ -1,0 +1,9 @@
+단계84: 실제 large retained graph의 긴 함수21회
+
+대상:2248파일/1242250911bytes,244989nodes/1964193edges. 실제 비테스트 함수 최대3개19237/14762/14573bytes를 source SHA/commit/graph snapshot으로 고정했다. 각 warmup1+AST limit1제어1+측정5, 전체21 value요청과 health2, initialize/tools를 합해 실제 MCP25요청이다.
+
+응답 partial18/budget_exhausted3. 각 제어 다음 원래 제한의 응답에서 같은 원문을 확인했다. 완전한 값 분석·의미 정답·품질·용량수용은 아니다. measured15개 응답 처리량 약2.400/s, p50/p95는 jump_table377.17/386.86ms, blockchain408.95/465.42ms, tx_fetcher452.58/461.26ms. RSS 최대 표본162.45MiB는 CKS 프로세스의250ms표본이며 절대 peak/전체 Ollama·GPU 메모리가 아니다. 작은 표본/비독점 자원 측정이다.
+
+실제CKS exit0/EOF/reap/readerjoin, TERM/KILL0, 잔여group0. proxy/sampler 종료·activeHTTP0. 원본/소유 payload와 모델manifest는 보존됐다.
+
+로컬BGE HTTP4회와 input68개를 구분했다. 처음 validator는 startup-HTTP파일이 initialize직후라고 잘못 가정해 거부했다. 실제 캡처는 health_before 뒤이므로 prefix[1,65] 외 health probe1개가 포함됐으며, health_after probe1개도 포함해 총[1,65,1,1]이다. 원자료/실행/요청은 바꾸지 않고 phase label·집계 해석을 바로잡았다. 순수 startup 분리 측정으로 주장하지 않는다. 실제/유료LLM0·독립0·정식0/9이다.

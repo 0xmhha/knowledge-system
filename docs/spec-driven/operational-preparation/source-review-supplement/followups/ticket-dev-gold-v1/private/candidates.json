@@ -1,0 +1,151 @@
+[
+  {
+    "id": "ORIGINAL",
+    "artifact": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1/original.go.txt",
+    "method_sha256": "e2ae5909f1e8adcb46cc05fb07d6f70c6b5bf45a6b9ce029669632eb23ce97e0",
+    "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "base_file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "full_file_overlay_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "applied_project_commit": null,
+    "applied_project_tree": null,
+    "local_AI_membership": "unacceptable",
+    "rationale": "Unbuffered uninstall send precedes draining, so the proved two-sender wait cycle remains in the blocked-delivery conditional schedule; other four finite scenarios can satisfy the stated method predicates.",
+    "witnesses": [
+      {
+        "text": "s.api.uninstallSyncSubscription <- &req",
+        "start_byte": 147,
+        "end_byte_exclusive": 186,
+        "span_sha256": "b66b3709b5b4713daf7b39fd20fe3e2c94030cb7d6e4a201ec1bb1e13d0c0db3"
+      },
+      {
+        "text": "case <-s.c:",
+        "start_byte": 211,
+        "end_byte_exclusive": 222,
+        "span_sha256": "b17d3bffe17738e7b0f125b008c4209fe22189ea4659f3bf0a6686709bf6d913"
+      }
+    ],
+    "actual_API_membership": "unknown",
+    "independent_acceptable_membership": null,
+    "performance_or_fairness": null,
+    "original_bytes_alias": null
+  },
+  {
+    "id": "CAND-A",
+    "artifact": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1/candidate-a.go.txt",
+    "method_sha256": "1d0134d5eb45a4f15b8e167f2bf06497f885de35a5ad6fcfd14e576b9caf8475",
+    "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "base_file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "full_file_overlay_sha256": "9e39e2fbfc53c3683f244ea916c88bcb21ed9a1f324808787908ae18a93778be",
+    "diff_sha256": "4c2206318280f3f28eff81ef83e3d572af6134279a2412500a19884acaec5cc0",
+    "applied_project_commit": null,
+    "applied_project_tree": null,
+    "local_AI_membership": "acceptable",
+    "rationale": "Outer select offers uninstall while draining. Once it sends, the nested loop no longer offers another request, drains finite late statuses and returns on acknowledgement. Conditional method fit is not full API/fairness or independent acceptance.",
+    "witnesses": [
+      {
+        "text": "case s.api.uninstallSyncSubscription <- &req:",
+        "start_byte": 168,
+        "end_byte_exclusive": 213,
+        "span_sha256": "4872c5f84c33fbebcf6cee56c214522a6ae2d253c4914bbadec5a62e715b54ee"
+      },
+      {
+        "text": "case <-req.uninstalled:",
+        "start_byte": 260,
+        "end_byte_exclusive": 283,
+        "span_sha256": "0a5bd1dd8c30d03ba4cc22d5966f1cf0cbf75c5f4c008ac760964a4f8c073f58"
+      }
+    ],
+    "actual_API_membership": "unknown",
+    "independent_acceptable_membership": null,
+    "performance_or_fairness": null,
+    "original_bytes_alias": null
+  },
+  {
+    "id": "CAND-B",
+    "artifact": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1/candidate-b.go.txt",
+    "method_sha256": "9e6db67b42c3456e401c019557f3ee924428a9d003819cda39a7f4c1bc792ed3",
+    "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "base_file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "full_file_overlay_sha256": "2093ff16754b44ee6103a177bab1ed1d99adba038509c2787c1c2186c1a0b4e9",
+    "diff_sha256": "ac8b9eaa347f53363d5c36252b9472b930ea82030d22480003c04a010dade09d",
+    "applied_project_commit": null,
+    "applied_project_tree": null,
+    "local_AI_membership": "acceptable",
+    "rationale": "Single select offers request and status receive together, then disables the send channel with nil after its first successful send. It continues draining and waits for acknowledgement. The live-loop finite schedule assumptions remain explicit.",
+    "witnesses": [
+      {
+        "text": "send := s.api.uninstallSyncSubscription",
+        "start_byte": 147,
+        "end_byte_exclusive": 186,
+        "span_sha256": "6dc7f860aa227d1c9d80c630ad8082059dfd00a2b93bcaaf58a20bbfd2c361e4"
+      },
+      {
+        "text": "send = nil",
+        "start_byte": 233,
+        "end_byte_exclusive": 243,
+        "span_sha256": "6ef608eba6c2f22ca892f7240eba605059fa64a6c834f1cb1530a1bd6311ce35"
+      },
+      {
+        "text": "case <-req.uninstalled:",
+        "start_byte": 262,
+        "end_byte_exclusive": 285,
+        "span_sha256": "0a5bd1dd8c30d03ba4cc22d5966f1cf0cbf75c5f4c008ac760964a4f8c073f58"
+      }
+    ],
+    "actual_API_membership": "unknown",
+    "independent_acceptable_membership": null,
+    "performance_or_fairness": null,
+    "original_bytes_alias": null
+  },
+  {
+    "id": "MUT-REINTRO",
+    "artifact": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1/reintroduction.go.txt",
+    "method_sha256": "e2ae5909f1e8adcb46cc05fb07d6f70c6b5bf45a6b9ce029669632eb23ce97e0",
+    "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "base_file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "full_file_overlay_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "applied_project_commit": null,
+    "applied_project_tree": null,
+    "local_AI_membership": "unacceptable",
+    "rationale": "Identical bytes to ORIGINAL, same blocked-delivery failure mechanism. A mutation control alias, not a new source defect or independent candidate.",
+    "witnesses": [
+      {
+        "text": "s.api.uninstallSyncSubscription <- &req",
+        "start_byte": 147,
+        "end_byte_exclusive": 186,
+        "span_sha256": "b66b3709b5b4713daf7b39fd20fe3e2c94030cb7d6e4a201ec1bb1e13d0c0db3"
+      }
+    ],
+    "actual_API_membership": "unknown",
+    "independent_acceptable_membership": null,
+    "performance_or_fairness": null,
+    "original_bytes_alias": "ORIGINAL"
+  },
+  {
+    "id": "MUT-EARLY",
+    "artifact": "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1/early-return.go.txt",
+    "method_sha256": "bb61fc38b5f39b439ff2855d1b11ee549e592b4906f49a7483b9f64161b117c3",
+    "base_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "base_file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911",
+    "full_file_overlay_sha256": "dcfd718f5487c71966c82a60bed219aad96e954ba752d7fe9f2d12dffcf4de97",
+    "diff_sha256": "b3613b0ce7ead66bd6c0f65786b164cd54b731144433feff4a4810c5366cca6d",
+    "applied_project_commit": null,
+    "applied_project_tree": null,
+    "local_AI_membership": "unacceptable",
+    "rationale": "Empty Once body returns without request/removal/acknowledgement. Return speed alone cannot satisfy the handshake contract in any of the five schedules.",
+    "witnesses": [
+      {
+        "text": "s.unsubOnce.Do(func() {})",
+        "start_byte": 50,
+        "end_byte_exclusive": 75,
+        "span_sha256": "436c82ec5a063ba75017085b013df6fbc002ec448af74ecd95ff53b197b30e7c"
+      }
+    ],
+    "actual_API_membership": "unknown",
+    "independent_acceptable_membership": null,
+    "performance_or_fairness": null,
+    "original_bytes_alias": null
+  }
+]

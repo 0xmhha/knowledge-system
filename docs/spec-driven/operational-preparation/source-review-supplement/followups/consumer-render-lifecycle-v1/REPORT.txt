@@ -1,0 +1,12 @@
+준비31단계/P07 — 로컬 그림 렌더링 및 실제 host 취소·정리
+두 P06 검토 세대×CFG/파일 membership을 원본 typed 자료에서 재생성,4입력을 SVG/PNG8개로 렌더. 문법 오류1건은 거부.
+로컬 Mermaid CLI12.0.0/Mermaid12.1.0과 고정 Node/Chromium만 사용. 관측 browser/Node 종료·그림 legibility 확인은 의미 정답·실행 trace·온톨로지 효과 수용이 아니다.
+실제 Analyzer/CKS5세션: normal0, SIGTERM143, SIGINT0, deadline143, deliberate SIGKILL-9. 취소/강제 종료를 정상 host 성공으로 합산하지 않음.
+각1회 실제 도구 응답 후 API 대기 상태에서 취소. CKS 계산 중 취소와 CKS 직접 신호 처리는 미측정; 관측기가 EOF로 전달. 최종6CKS exit0/reap, 추가 rescue0.
+검증기 별칭 오류1건을 보존. 재시도 native proxy65시도 중64회 CKS 전달,65번째는 EOF 거부. 실제 역할65회 호출을 검증한 뜻이 아님.
+초기 역할5/native65+최종 역할5/native64=전체 CKS139요청, CKS13프로세스. 종료 영수증12개·초기SIGINT1개 unknown/reap미확인을 보존한다.
+초기SIGINT에서 반복신호 중 관측기 잠금→SDK강제종료·CKS종료영수증누락을 발견했다. 기존 PID부재만의 정리판정을 실패로 보존, 새 관측기/종료영수증 강제 후 전5시나리오 재시험.
+직접 PID 사후 점검 87개와 감사기 live positive control 보존. OS 전체 보안/네트워크 sandbox 증명 아님.
+계획22개 중17통과/실패0/미완료5(T04/T09/T10/T16/T22). 다음4통합 검증 후 P08.
+이전30패킷·현재 runtime/schema/문서·원본/후보 소스 보존. Go 전체검사는 변경 없는 기존 소스/바이너리의 결과를 재사용하며 새 실행으로 세지 않음.
+담당자미정/F01~08 pending/freeze null/executionfalse/정식0/9·실제 모델0·후보채택false 유지.

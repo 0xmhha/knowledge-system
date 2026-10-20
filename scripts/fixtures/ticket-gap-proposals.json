@@ -1,0 +1,294 @@
+{
+  "status": "ai_source_gap_proposals_not_gold",
+  "project_anchors": [
+    {
+      "id": "API-01",
+      "path": "eth/backend.go",
+      "lines": [
+        325,
+        344
+      ],
+      "fact": "Ethereum.APIs는 eth namespace에 DownloaderAPI를 등록한다.",
+      "gap": "대상 설치/transport 설정과 실제 eth_subscribe 요청 영수증은 없다."
+    },
+    {
+      "id": "API-02",
+      "path": "rpc/service.go",
+      "lines": [
+        60,
+        92
+      ],
+      "fact": "구독 callback은 일반 callback과 별도 registry에 등록한다.",
+      "gap": "등록된 실제 서비스 인스턴스와 세션 pin 확인 필요."
+    },
+    {
+      "id": "API-03",
+      "path": "rpc/service.go",
+      "lines": [
+        115,
+        130
+      ],
+      "fact": "exported method를 formatName으로 변환하여 callback 이름을 정한다.",
+      "gap": "Syncing의 subscription 분류와 lower-case 이름 연결을 검토한다."
+    },
+    {
+      "id": "API-04",
+      "path": "rpc/service.go",
+      "lines": [
+        230,
+        247
+      ],
+      "fact": "context와 Subscription/error 서명이 subscription이며 첫 문자를 소문자로 바꾼다.",
+      "gap": "소스 경로 확인이 실제 호출 도달성 증명은 아니다."
+    },
+    {
+      "id": "API-05",
+      "path": "rpc/handler.go",
+      "lines": [
+        530,
+        566
+      ],
+      "fact": "*_subscribe는 첫 인자를 구독 이름으로 사용하고 notifier를 context에 넣어 callback을 호출한다.",
+      "gap": "allowSubscribe/transport·등록·실제 callback 실행 영수증 필요."
+    },
+    {
+      "id": "API-06",
+      "path": "rpc/handler.go",
+      "lines": [
+        572,
+        584
+      ],
+      "fact": "*_unsubscribe는 server subscription의 err 채널을 닫고 map에서 지운 뒤 반환한다.",
+      "gap": "RPC 해제 응답은 downstream Unsubscribe 확인/반환과 동일하지 않다."
+    },
+    {
+      "id": "API-07",
+      "path": "rpc/handler.go",
+      "lines": [
+        367,
+        378
+      ],
+      "fact": "연결 정리는 server 구독 오류 채널에 오류를 보내고 닫는다.",
+      "gap": "연결 종료/구독 종료/알림 중첩 스케줄과 소유 정리를 검토한다."
+    },
+    {
+      "id": "API-08",
+      "path": "rpc/subscription.go",
+      "lines": [
+        94,
+        154
+      ],
+      "fact": "Notifier는 context 조회·subscription 생성·알림 송신·연결 Closed를 제공한다.",
+      "gap": "Notify 활성화/버퍼/writeJSON 지연과 무시되는 error의 영향을 확인한다."
+    },
+    {
+      "id": "API-09",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        45,
+        54
+      ],
+      "fact": "생성자는 buffer 없는 설치/해제 채널과 eventLoop goroutine을 만든다.",
+      "gap": "실제 mux/chain/progress 및 eventLoop 수명은 추출 대역 범위 밖이다."
+    },
+    {
+      "id": "API-10",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        67,
+        130
+      ],
+      "fact": "eventLoop는 map 등록/삭제와 삭제 확인 close, 동기 status 송신을 수행하며 mux 종료 시 반환한다.",
+      "gap": "다른 수신자의 정지·이미 done인 등록·mux 종료 뒤 확인 미발생의 계약이 미확정이다."
+    },
+    {
+      "id": "API-11",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        133,
+        158
+      ],
+      "fact": "Syncing은 unbuffered status를 구독하고 RPC err/Closed에서 반환하며 Unsubscribe를 defer한다.",
+      "gap": "RPC 종료와 실제 eventLoop 송신 중첩을 통제 대역 없이 재현해야 한다."
+    },
+    {
+      "id": "API-12",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        180,
+        198
+      ],
+      "fact": "Unsubscribe는 uninstall 요청 송신 뒤 status를 drain하며 확인을 기다린다. 반환 후 status 채널 미사용 계약을 주석에 명시한다.",
+      "gap": "반환 상한·eventLoop 생존 가정·sync.Once 동시 호출과 종료 이후 안전성을 독립 검토한다."
+    },
+    {
+      "id": "API-13",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        200,
+        205
+      ],
+      "fact": "SubscribeSyncStatus는 설치 요청 송신 후 구독 객체를 반환한다.",
+      "gap": "done 상태에서 초기 false 송신이 후속 해제와 겹칠 수 있는 실제 순서를 검토한다."
+    }
+  ],
+  "contracts": [
+    {
+      "id": "V-01",
+      "path": "plugin/scripts/oracle_gate.py",
+      "lines": [
+        80,
+        122
+      ],
+      "fact": "계획은 primary/independent 두 역할과 별도 derivation/소스 hash를 요구한다.",
+      "gap": "별도 파일과 서로 다른 hash만으로 의미적 독립성은 증명되지 않는다."
+    },
+    {
+      "id": "V-02",
+      "path": "plugin/scripts/oracle_gate.py",
+      "lines": [
+        264,
+        328
+      ],
+      "fact": "분류기는 source·실행·assertion identity를 확인하며 ERROR를 RED로 세지 않고 정확한 실행 집합을 대조한다.",
+      "gap": "현재 티켓의 실제 driver/전체 API 기준 RED/GREEN 영수증이 없다."
+    },
+    {
+      "id": "V-03",
+      "path": "plugin/scripts/oracle_gate.py",
+      "lines": [
+        398,
+        430
+      ],
+      "fact": "완료 검사는 상태·단계·보고서/계획 hash·현재 source를 묶고 e2e에서 chainbench PASS를 요구한다.",
+      "gap": "simulation은 일부 단계 WARN/SKIPPED를 허용한다. WI별 필수 hard gate를 독립 동결해야 한다."
+    },
+    {
+      "id": "V-04",
+      "path": "plugin/scripts/go_oracle_driver.py",
+      "lines": [
+        20,
+        43
+      ],
+      "fact": "Go adapter는 선택 test의 assertion marker와 실행 이벤트를 분리하여 build/다른 assertion/누락을 error로 처리한다.",
+      "gap": "이 transport는 기대값을 독립 도출하지 않는다."
+    },
+    {
+      "id": "V-05",
+      "path": "plugin/scripts/fix_selection.py",
+      "lines": [
+        240,
+        298
+      ],
+      "fact": "후보를 격리 source에 materialize하고 oracle/regression/metric 결과와 observation completeness를 기록한다.",
+      "gap": "현재 두 구독 후보에 대한 selector spec/RED carrier/실제 metric driver는 없다."
+    },
+    {
+      "id": "V-06",
+      "path": "plugin/scripts/fix_selection.py",
+      "lines": [
+        324,
+        359
+      ],
+      "fact": "불완전/의견 미일치/필수 측정 누락은 DEFERRED, 모두 부적격은 REJECTED, 복수 frontier는 TIED, 단독 일치만 SELECTED다.",
+      "gap": "이 판정은 독립 acceptable set membership 검사나 전역 최적성 증명이 아니다."
+    },
+    {
+      "id": "V-07",
+      "path": "plugin/scripts/fix_selection.py",
+      "lines": [
+        419,
+        440
+      ],
+      "fact": "재검사는 spec/report/runner/repo/source의 묶임과 RED carrier 변경 범위를 검사한다.",
+      "gap": "이번 티켓의 적용 tree/current HEAD 검증·후속 final V1 기록이 없다."
+    },
+    {
+      "id": "V-08",
+      "path": "plugin/hooks/hooks.json",
+      "lines": [
+        39,
+        76
+      ],
+      "fact": "PreToolUse Write|Edit 경로에 완료/선택 guard가 등록되어 있다.",
+      "gap": "등록 원문은 실제 설치 host의 hook 호출·기권·재진입 영수증이 아니다."
+    },
+    {
+      "id": "V-09",
+      "path": "plugin/hooks/fix-selection-guard.py",
+      "lines": [
+        20,
+        58
+      ],
+      "fact": "선택 guard는 state 진입 시 선택 증거와 적용 tree를 검사한다.",
+      "gap": "인식된 state/Write|Edit 경로 범위이며 실제 역할의 전 경로 불가능성 증명은 아니다."
+    },
+    {
+      "id": "V-10",
+      "path": "plugin/agents/analyzer.md",
+      "lines": [
+        929,
+        938
+      ],
+      "fact": "Analyzer는 티켓 조건에서 독립 도출한 oracle 준비와 미실행 PASS 금지를 명시한다.",
+      "gap": "역할 문서 존재를 이번 티켓의 실제 Analyzer 실행으로 세지 않는다."
+    },
+    {
+      "id": "V-11",
+      "path": "plugin/agents/planner.md",
+      "lines": [
+        73,
+        83
+      ],
+      "fact": "Planner는 둘 이상 대안·기준/adapter 동결·선택 실행을 요구한다.",
+      "gap": "같은 AI가 작성한 두 대안을 독립 티켓 또는 독립 gold로 세지 않는다."
+    },
+    {
+      "id": "V-12",
+      "path": "plugin/agents/implementer.md",
+      "lines": [
+        29,
+        37
+      ],
+      "fact": "Implementer는 선택 source와 RED carrier를 유지하며 적용 tree를 재검사한다.",
+      "gap": "기존 추출 fixture는 실제 프로젝트 적용 tree/설치 역할 증거가 아니다."
+    },
+    {
+      "id": "V-13",
+      "path": "plugin/agents/evaluator.md",
+      "lines": [
+        58,
+        64
+      ],
+      "fact": "Evaluator는 선택 current HEAD 검증과 final V1 관측을 요구한다.",
+      "gap": "과거 trial oracle는 이번 티켓의 final V1/current HEAD 완료 증거가 아니다."
+    },
+    {
+      "id": "V-14",
+      "path": "plugin/agents/evaluator.md",
+      "lines": [
+        887,
+        902
+      ],
+      "fact": "Evaluator는 oracle CLI 결과/실제 보고서 hash를 요구하며 사람의 독립 수용을 추론하지 않는다.",
+      "gap": "기계 PASS와 독립 의미 검토/최종 수용은 별도로 판정한다."
+    }
+  ],
+  "candidate_questions": {
+    "CAND-A": "중첩 select로 요청 전 drain/요청 후 확인 대기를 구분한다. 다른 구독자 정지·loop 종료·무한 status 공급에서 반환/안전 계약을 독립 검토한다.",
+    "CAND-B": "단일 select에서 요청 성공 뒤 send=nil로 중복 요청을 막는다. 확인 전 drain·nil case 비활성화와 종료/공정성 가정을 독립 검토한다."
+  },
+  "oracle_questions": [
+    "실제 API trace에서 증상/정상·허용 비결정 순서와 관측 상한을 정의하고 timeout·infra 오류·미도달을 결함 RED와 분리해야 한다.",
+    "secondary wait graph는 같은 AI/같은 가설이다. 독립 검토자가 주 oracle의 상수/helper를 복사하지 않고 별도 derivation·실행 driver·검토 receipt를 마련해야 한다.",
+    "삭제/확인/반환/반환 후 status 미사용을 구분하고 rescue 전 결과·소유 goroutine 정리·동시 호출을 유지해야 한다.",
+    "MUT-REINTRO는 원본과 같은 바이트이며 별도 결함/가족이 아니다. MUT-EARLY의 실패 이유·정상 대조군·진짜 오류 거부를 실제 tier에 묶어야 한다."
+  ],
+  "acceptable_set_questions": [
+    "티켓별 독립 검토자가 후보 ID뿐 아니라 source commit/tree/diff/요구사항 pin과 membership 근거를 사전 동결해야 한다.",
+    "hard gate는 correctness·normal regression·mutation sensitivity·actual API contract·source/driver pin·필수 단계·owned cleanup을 명시하고 WARN/SKIPPED 허용 범위를 독립 결정해야 한다.",
+    "같은 AI fixture 통과를 acceptable set으로 채우지 않는다. CAND-A/B membership는 null로 유지한다.",
+    "all-bad→선택 없음, tie→TIED, incomplete/unknown→DEFERRED의 수용 mapping과 오류/분모·허용 기권을 동결해야 한다.",
+    "성능·메모리·공정성·복잡도·유지보수성의 axes/단위/방향/허용차/측정 adapter·비용/불일치·사람 선택 수용을 정한다. 현재 구독 후보의 비교 측정은 없다."
+  ]
+}

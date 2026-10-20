@@ -1,0 +1,15 @@
+PASS: baseline actual CLI publishes a healthy retained DB
+PASS: sigterm: actual immutable candidate build starts with durable intent
+PASS: sigterm: actual worker exits according to requested lifecycle
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-worker-host.py", line 121, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-worker-host.py", line 81, in main
+    check(label+': normal stop reports pending reconciliation not canceled success',result['state']['phase']=='stopped' and result['state']['pending']==pending['id'] and result['stop_reason']==('budget' if label=='budget' else 'signal'))
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/verify-manager-worker-host.py", line 26, in check
+    manager.require(v,label);checks.append(label);write('checks.json',checks);print('PASS: '+label,flush=True)
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py", line 33, in require
+    raise Failure(code)
+manager.Failure: sigterm: normal stop reports pending reconciliation not canceled success

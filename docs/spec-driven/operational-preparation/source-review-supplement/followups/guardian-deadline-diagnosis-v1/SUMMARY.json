@@ -1,0 +1,86 @@
+{
+  "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
+  "original": {
+    "pass_count": 398,
+    "fail_count": 2,
+    "skip_count": 0,
+    "workers_started": 397,
+    "deadline_elapsed_before_start": 3,
+    "recorded_worker_groups": 397,
+    "remaining_live_worker_members": 0,
+    "failure_orderings": [
+      {
+        "group": 2,
+        "iteration": 1,
+        "kill_before": 1792450681872275000,
+        "marker_mtime": 1792450681873595021,
+        "kill_after": 1792450681873639000,
+        "guardian_return": 1792450681878017000,
+        "marker_already_at_return": true,
+        "stat_error": false
+      },
+      {
+        "group": 7,
+        "iteration": 11,
+        "kill_before": 1792450695042177000,
+        "marker_mtime": 1792450695044532520,
+        "kill_after": 1792450695044624000,
+        "guardian_return": 1792450695051484000,
+        "marker_already_at_return": true,
+        "stat_error": false
+      }
+    ]
+  },
+  "single_change_control": {
+    "pass_count": 400,
+    "fail_count": 0,
+    "skip_count": 0,
+    "workers_started": 394,
+    "deadline_elapsed_before_start": 6,
+    "recorded_worker_groups": 394,
+    "remaining_live_worker_members": 0,
+    "failure_orderings": []
+  },
+  "uninstrumented_runtime": {
+    "pass_count": 400,
+    "fail_count": 0,
+    "skip_count": 0,
+    "runtime_logging": false,
+    "conclusion": "no reproduction in this additional sample; not proof the original historical event is known"
+  },
+  "focused": {
+    "general": {
+      "pass": 27
+    },
+    "race": {
+      "pass": 27
+    }
+  },
+  "mutant_rejected": true,
+  "native": {
+    "test": {
+      "pass": 4273,
+      "fail": 0,
+      "skip": 18
+    },
+    "race": {
+      "pass": 4273,
+      "fail": 0,
+      "skip": 18
+    }
+  },
+  "native_source_inputs": 1815,
+  "Go_files": 1305,
+  "changed_Go_files": 1,
+  "production_runtime_changed": false,
+  "reproduced_cause": "pre-return shell write during group cancellation misclassified as late writer",
+  "exact_historical_event_forensically_proven": false,
+  "historical_failure_preserved": true,
+  "post_return_contract_verified": true,
+  "CoreML_excluded": true,
+  "actual_model_calls": 0,
+  "actual_LLM_calls": 0,
+  "paid_external_calls": 0,
+  "formal_completed": 0,
+  "independent_approved": 0
+}

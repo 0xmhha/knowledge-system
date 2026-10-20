@@ -1,0 +1,87 @@
+{
+  "original": {
+    "cks.yaml": {
+      "kind": "file",
+      "sha256": "8b7cf76836a622c63fec5f6eea81e0b60fc10acdb0cee2bbb280a64075fedc47",
+      "mode": 420,
+      "bytes": 396
+    },
+    "sanitize.yaml": {
+      "kind": "file",
+      "sha256": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96",
+      "mode": 420,
+      "bytes": 2675
+    },
+    "graph/graph.db": {
+      "kind": "file",
+      "sha256": "37aa6c3d00eb6f76f75048415960accb722b937b40ff09ac61ec9df8db7b8791",
+      "mode": 420,
+      "bytes": 196608
+    },
+    "graph/manifest.json": {
+      "kind": "file",
+      "sha256": "cfe546cdc669bb05f601c0830a98f04e372f5d26781fdbb108986159158a557d",
+      "mode": 420,
+      "bytes": 4551
+    },
+    "source/logic.go": {
+      "kind": "file",
+      "sha256": "6a075aced66b169ce706ecbe8d7a1e0fc6920a178bc49bcca9dfb097ddb505e4",
+      "mode": 420,
+      "bytes": 4574
+    },
+    "active": {
+      "kind": "symlink",
+      "target": "graph"
+    }
+  },
+  "mutated": {
+    "cks.yaml": {
+      "kind": "file",
+      "sha256": "f6546b163b46a2cc1f32c2d88135df42385e37d1d2a3e9a235c3677d2a48d7e3",
+      "mode": 420,
+      "bytes": 25
+    },
+    "sanitize.yaml": {
+      "kind": "file",
+      "sha256": "b00e1f5d220d09f2906bb79ceda3724e9e3a22f04d7aeaae116e1c4bf3cb6f96",
+      "mode": 420,
+      "bytes": 2675
+    },
+    "graph/graph.db": {
+      "kind": "file",
+      "sha256": "f888333a921441b1eaf52a1e3647cacf987675e9634f2d30a9c031c512be9cbd",
+      "mode": 420,
+      "bytes": 24
+    },
+    "graph/manifest.json": {
+      "kind": "file",
+      "sha256": "cfe546cdc669bb05f601c0830a98f04e372f5d26781fdbb108986159158a557d",
+      "mode": 420,
+      "bytes": 4551
+    },
+    "source/logic.go": {
+      "kind": "file",
+      "sha256": "57b83cf8a385bca943be0721a948e56f50f6989c1a4fdccc07e7b71a32b0c1eb",
+      "mode": 420,
+      "bytes": 4603
+    },
+    "active": {
+      "kind": "symlink",
+      "target": "fault-version"
+    }
+  },
+  "comparison_before_restore": "rejected_not_byte_identical",
+  "boundary_controls": [
+    {
+      "case": "foreign",
+      "refused_before_mutation": true,
+      "reason": "foreign path or symlink escape refused"
+    },
+    {
+      "case": "symlink-escape",
+      "refused_before_mutation": true,
+      "reason": "foreign path or symlink escape refused"
+    }
+  ]
+}

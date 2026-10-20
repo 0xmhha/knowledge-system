@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+"""Bind code-review handoff/delivery to validated partial review artifacts.
+
+Only guards identified Write/Edit pipeline state. Direct shell edits require
+running the same deep_review verify CLI; this hook cannot authenticate transport.
+"""
+import importlib.util
+import json
+import os
+from pathlib import Path
+import sys
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'scripts'))
+from deep_review import verify_workspace
+spec=importlib.util.spec_from_file_location('completion_guard',ROOT/'hooks/completion-guard.py');helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
+def main():
+ try:data=json.load(sys.stdin)
+ except (ValueError,TypeError):return 0
+ if not isinstance(data,dict)or data.get('tool_name')not in('Write','Edit'):return 0
+ inputs=data.get('tool_input');
+ if not isinstance(inputs,dict)or not isinstance(inputs.get('file_path'),str):return 0
+ path=Path(inputs['file_path']);path=path if path.is_absolute()else Path(data.get('cwd')or os.getcwd())/path
+ if path.name!='state.json':return 0
+ recognizable='.coding-agent'in path.parts and 'tickets'in path.parts
+ try:
+  old=path.read_text()if path.exists()else'{}';state=json.loads(old)
+  if not recognizable and not(isinstance(state,dict)and state.get('ticket_id')):return 0
+  proposed=json.loads(helper.proposed_content(data,old))
+  if not isinstance(state,dict)or not isinstance(proposed,dict):raise ValueError('pipeline state must stay an object')
+  if state.get('ticket_type')!='code_review'and proposed.get('ticket_type')!='code_review':return 0
+  if state.get('ticket_type')=='code_review'and proposed.get('ticket_type')!='code_review':raise ValueError('cannot bypass review delivery by changing ticket type')
+  old_hash=state.get('states',{}).get('ANALYSIS',{}).get('deep_review_sha256');new_hash=proposed.get('states',{}).get('ANALYSIS',{}).get('deep_review_sha256')
+  if old_hash and old_hash!=new_hash and proposed.get('current_state')!='ANALYSIS':raise ValueError('frozen review identity changed outside analysis')
+  completed=proposed.get('states',{}).get('ANALYSIS',{}).get('status')=='completed'
+  if completed or proposed.get('current_state')in('PLANNING','COMPLETION','COMPLETED'):verify_workspace(path.parent,proposed)
+ except Exception as error:helper.deny('Structured review delivery blocked: '+str(error))
+ return 0
+if __name__=='__main__':raise SystemExit(main())

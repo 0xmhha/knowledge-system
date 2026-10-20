@@ -1,0 +1,172 @@
+// Owned test-only Origin-loop scheduling probes. No miner/node is started.
+package miner
+
+import (
+	"encoding/json"
+	"math/big"
+	"os"
+	"runtime"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/params"
+)
+
+type wi4Recorder struct {
+	mu    sync.Mutex
+	f     *os.File
+	start time.Time
+	seq   int
+	id    string
+}
+
+func (r *wi4Recorder) emit(e string, d map[string]interface{}) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if d == nil {
+		d = map[string]interface{}{}
+	}
+	r.seq++
+	d["event"] = e
+	d["case_id"] = r.id
+	d["sequence"] = r.seq
+	d["elapsed_ns"] = time.Since(r.start).Nanoseconds()
+	if err := json.NewEncoder(r.f).Encode(d); err != nil {
+		panic(err)
+	}
+}
+func wi4Await(t *testing.T, ch <-chan struct{}) {
+	t.Helper()
+	select {
+	case <-ch:
+	case <-time.After(2 * time.Second):
+		t.Fatal("owned loop/helper did not join")
+	}
+}
+func wi4Stacks() string { b := make([]byte, 2<<20); n := runtime.Stack(b, true); return string(b[:n]) }
+func wi4Until(t *testing.T, fn func() bool) {
+	t.Helper()
+	end := time.Now().Add(2 * time.Second)
+	for time.Now().Before(end) {
+		if fn() {
+			return
+		}
+		time.Sleep(time.Millisecond)
+	}
+	t.Fatal("source barrier not proved")
+}
+
+func TestWI4OwnedSchedules(t *testing.T) {
+	id, path := os.Getenv("WI4_CASE"), os.Getenv("WI4_TRACE_PATH")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := &wi4Recorder{f: f, start: time.Now(), id: id}
+	t.Cleanup(func() {
+		r.emit("trace_end", map[string]interface{}{"test_failed": t.Failed()})
+		if err := f.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	r.emit("trace_begin", map[string]interface{}{"source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8", "step_watchdog_ms": 2000, "production_host": false})
+	wi4Work(t, r)
+}
+
+func wi4Work(t *testing.T, r *wi4Recorder) {
+	// All events and output capacity are test-owned. Head events avoid invoking
+	// an unrelated chain.CurrentBlock route; newWorkLoop dispatch remains real.
+	w := &worker{chainConfig: &params.ChainConfig{}, newWorkCh: make(chan *newWorkReq, 8), chainHeadCh: make(chan core.ChainHeadEvent, 4), exitCh: make(chan struct{})}
+	if r.id == "WORK-exit" {
+		w.newWorkCh = make(chan *newWorkReq)
+	}
+	var exitOnce sync.Once
+	stop := func() { exitOnce.Do(func() { close(w.exitCh) }) }
+	w.pendingMu.Lock()
+	locked := true
+	done := make(chan struct{})
+	w.wg.Add(1)
+	go func() { w.newWorkLoop(time.Hour); close(done) }()
+	t.Cleanup(func() {
+		r.emit("cleanup_begin", nil)
+		stop()
+		if locked {
+			w.pendingMu.Unlock()
+			locked = false
+		}
+		wi4Await(t, done)
+		w.wg.Wait()
+		r.emit("cleanup_end", map[string]interface{}{"joined": true})
+	})
+	r.emit("actual_dispatch_started", map[string]interface{}{"Anzeon_nil": w.chainConfig.Anzeon == nil, "route": "actual_newWorkLoop_Origin_controlled_head"})
+	head := core.ChainHeadEvent{Block: types.NewBlockWithHeader(&types.Header{Number: big.NewInt(1)})}
+	w.chainHeadCh <- head
+	wi4Until(t, func() bool {
+		for _, g := range strings.Split(wi4Stacks(), "\n\n") {
+			if strings.Contains(g, "(*worker).newWorkLoopOrigin") && strings.Contains(g, "sync.(*Mutex).lockSlow") {
+				return true
+			}
+		}
+		return false
+	})
+	stack := wi4Stacks()
+	if err := os.WriteFile(os.Getenv("WI4_TRACE_PATH")+".barrier.stack", []byte(stack), 0600); err != nil {
+		t.Fatal(err)
+	}
+	r.emit("actual_pending_lock_barrier", map[string]interface{}{"before_commit": true})
+	backlog := 0
+	switch r.id {
+	case "WORK-normal":
+		r.emit("selection_ready", map[string]interface{}{"send_ready": true, "exit_ready": false, "receiver_kind": "owned_buffer_capacity"})
+	case "WORK-exit":
+		stop()
+		r.emit("selection_ready", map[string]interface{}{"send_ready": false, "exit_ready": true})
+	case "WORK-both":
+		stop()
+		r.emit("selection_ready", map[string]interface{}{"send_ready": true, "exit_ready": true})
+	case "WORK-backlog":
+		for i := 0; i < 3; i++ {
+			w.chainHeadCh <- head
+		}
+		backlog = 3
+		stop()
+		r.emit("selection_ready", map[string]interface{}{"send_ready": true, "exit_ready": true, "queued_backlog": 3})
+	default:
+		t.Fatal("case outside plan")
+	}
+	w.pendingMu.Unlock()
+	locked = false
+	if r.id == "WORK-normal" {
+		select {
+		case req := <-w.newWorkCh:
+			if req == nil || req.interrupt == nil {
+				t.Fatal("actual work request missing")
+			}
+			r.emit("actual_work_received", nil)
+		case <-time.After(2 * time.Second):
+			t.Fatal("actual work not delivered")
+		}
+		stop()
+	}
+	wi4Await(t, done)
+	w.wg.Wait()
+	work := len(w.newWorkCh)
+	if r.id == "WORK-normal" {
+		work++
+	}
+	consumed := 1 + backlog - len(w.chainHeadCh)
+	if work < 0 || work > consumed || consumed < 1 || consumed > 1+backlog {
+		t.Fatal("unmodelled finite source result")
+	}
+	if r.id == "WORK-exit" && work != 0 {
+		t.Fatal("unready send delivered")
+	}
+	if r.id == "WORK-normal" && work != 1 {
+		t.Fatal("normal result differs")
+	}
+	r.emit("observation_frozen", map[string]interface{}{"delivered_work": work, "head_events_consumed": consumed, "remaining_backlog": len(w.chainHeadCh), "loop_returned": true, "finite_backlog": 1 + backlog, "fairness_or_SLA_proved": false, "unbuffered_receiver_precondition_proved": false})
+}

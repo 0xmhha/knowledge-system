@@ -1,0 +1,16 @@
+import pathlib,json,hashlib,shutil,sys,importlib.util,os,urllib.request
+R=pathlib.Path('/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system');O=pathlib.Path('/private/tmp/ks-stablenet-rebuild-20261017-01');old=pathlib.Path(json.load(open(O/'protocol.json'))['old_dataset'])
+def sha(p):
+ h=hashlib.sha256()
+ with p.open('rb')as f:
+  for b in iter(lambda:f.read(4<<20),b''):h.update(b)
+ return h.hexdigest()
+def dump(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+original={str(p.relative_to(old)):{'sha256':sha(p),'bytes':p.stat().st_size}for p in sorted(old.rglob('*'))if p.is_file()};dump(O/'original-selected-before.json',{'version':str(old),'current_target':os.readlink(old.parent/'current'),'files':original})
+shutil.copytree(old,O/'old-dataset/old-v1');(O/'old-dataset/.readers').mkdir();(O/'old-dataset/.readers/old-v1.lock').write_bytes(b'');(O/'old-dataset/.reindex.lock').write_bytes(b'');assert all(sha(O/'old-dataset/old-v1'/k)==v['sha256']for k,v in original.items())
+sys.path.insert(0,str(R/'scripts'));s=importlib.util.spec_from_file_location('scope',R/'scripts/run-consumer-final.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);plan=json.load(open(m.PLAN));dump(O/'scope-before.json',{'global':m.global_state(plan),'operations':m.operations(plan),'source_repos':m.sources()['repos']})
+with urllib.request.urlopen('http://127.0.0.1:11434/api/tags',timeout=10)as r:models=json.load(r)
+model=next(x for x in models['models']if x['name']=='bge-m3:latest');assert model['digest']==json.load(open(old/'dataset-identity.json'))['embedding_identity']['model_digest']
+with urllib.request.urlopen('http://127.0.0.1:11434/api/version',timeout=10)as r:version=json.load(r)
+dump(O/'model-before.json',{'version':version['version'],'model':model,'dimensions':1024,'endpoint':'http://127.0.0.1:11434','identity_probe_reference':'previous real1024 probe, plus current adapter/runtime verification during build and retrieval'})
+print('original bytes/control copy/scope/model pins ready',len(original),flush=True)

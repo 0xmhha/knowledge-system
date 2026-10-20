@@ -1,0 +1,87 @@
+{
+  "kind": "standalone_control_validation_not_project_typecheck",
+  "go_version": "go version go1.26.9 darwin/arm64",
+  "lint_version": "golangci-lint has version 2.14.0 built with go1.26.8 from (unknown, modified: ?, mod sum: \"h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=\") on (unknown)",
+  "quality_checks": [
+    {
+      "kind": "build",
+      "exit_code": 0
+    },
+    {
+      "kind": "fmt",
+      "exit_code": 0
+    },
+    {
+      "kind": "vet",
+      "exit_code": 0
+    },
+    {
+      "kind": "lint",
+      "exit_code": 0
+    }
+  ],
+  "runs": [
+    {
+      "mode": "normal",
+      "exit_code": 0,
+      "passed_controls": [
+        "TestLexicalCoverage/sibling_names",
+        "TestLexicalCoverage/nested_block",
+        "TestLexicalCoverage/mixed_short",
+        "TestLexicalCoverage/parameter_reuse",
+        "TestLexicalCoverage/named_result_reuse",
+        "TestLexicalCoverage/if_initializer",
+        "TestLexicalCoverage/for_initializer",
+        "TestLexicalCoverage/range_define",
+        "TestLexicalCoverage/range_assignment",
+        "TestLexicalCoverage/closure_excluded",
+        "TestLexicalCoverage/closure_initializer_outer_name",
+        "TestLexicalCoverage/switch_case_scopes",
+        "TestLexicalCoverage/type_switch_guards",
+        "TestLexicalCoverage/type_case_guard_reuse",
+        "TestLexicalCoverage/select_receive",
+        "TestLexicalCoverage/select_case_siblings",
+        "TestLexicalCoverage/blank_ignored",
+        "TestLexicalCoverage/type_blocks_outer_variable",
+        "TestLexicalCoverage/var_initializer",
+        "TestLexicalCoverage/package_variable_excluded",
+        "TestLexicalCoverage/receiver_reuse",
+        "TestLexicalCoverage/parenthesized_assignment"
+      ]
+    },
+    {
+      "mode": "race",
+      "exit_code": 0,
+      "passed_controls": [
+        "TestLexicalCoverage/sibling_names",
+        "TestLexicalCoverage/nested_block",
+        "TestLexicalCoverage/mixed_short",
+        "TestLexicalCoverage/parameter_reuse",
+        "TestLexicalCoverage/named_result_reuse",
+        "TestLexicalCoverage/if_initializer",
+        "TestLexicalCoverage/for_initializer",
+        "TestLexicalCoverage/range_define",
+        "TestLexicalCoverage/range_assignment",
+        "TestLexicalCoverage/closure_excluded",
+        "TestLexicalCoverage/closure_initializer_outer_name",
+        "TestLexicalCoverage/switch_case_scopes",
+        "TestLexicalCoverage/type_switch_guards",
+        "TestLexicalCoverage/type_case_guard_reuse",
+        "TestLexicalCoverage/select_receive",
+        "TestLexicalCoverage/select_case_siblings",
+        "TestLexicalCoverage/blank_ignored",
+        "TestLexicalCoverage/type_blocks_outer_variable",
+        "TestLexicalCoverage/var_initializer",
+        "TestLexicalCoverage/package_variable_excluded",
+        "TestLexicalCoverage/receiver_reuse",
+        "TestLexicalCoverage/parenthesized_assignment"
+      ]
+    }
+  ],
+  "source_census_runs": 1,
+  "project_packages_compiled": 0,
+  "knowledge_system_backend_calls": 0,
+  "nodes_started": 0,
+  "model_calls": 0,
+  "formal_runs": 0
+}

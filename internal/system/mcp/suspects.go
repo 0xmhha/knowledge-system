@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 
@@ -49,7 +50,9 @@ func expansionCitationSchema() map[string]any {
 	return map[string]any{"type": "object", "properties": properties, "required": []string{"file", "start_line", "end_line", "commit_hash"}, "additionalProperties": false}
 }
 
-func handleLabelSuspects(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*mcpgo.CallToolResult, error) {
+func handleLabelSuspects(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (result *mcpgo.CallToolResult, callErr error) {
+	ctx, finish := beginBackendMeasurement(ctx, d, req)
+	defer func() { finish(result, callErr) }()
 	r, rawExpand, err := parseSuspectRequest(req)
 	if err != nil {
 		return mcpgo.NewToolResultError("invalid_request: " + err.Error()), nil
@@ -65,7 +68,7 @@ func handleLabelSuspects(ctx context.Context, d Deps, req mcpgo.CallToolRequest)
 		}
 		ctx, verification, err = setup.BeginRequestVerification(ctx, d.EvidenceVersionDir)
 		if err != nil || verification == nil {
-			return mcpgo.NewToolResultError("snapshot_mismatch: retained identity unavailable"), nil
+			return mcpgo.NewToolResultError(suspectVerificationRefusal(ctx, err, "snapshot_mismatch: retained identity unavailable")), nil
 		}
 		defer verification.Close()
 		id := verification.Identity()
@@ -95,7 +98,7 @@ func handleLabelSuspects(ctx context.Context, d Deps, req mcpgo.CallToolRequest)
 		refs := append([]contract.Citation(nil), r.Expand...)
 		anchors, e := retainedSuspectAnchors(ctx, d, refs)
 		if e != nil {
-			return mcpgo.NewToolResultError("snapshot_mismatch: expansion source verification failed"), nil
+			return mcpgo.NewToolResultError(suspectVerificationRefusal(ctx, e, "snapshot_mismatch: expansion source verification failed")), nil
 		}
 		for i, c := range expected {
 			if *anchors[refs[i]] != c {
@@ -117,7 +120,7 @@ func handleLabelSuspects(ctx context.Context, d Deps, req mcpgo.CallToolRequest)
 		}
 		anchors, e := retainedSuspectAnchors(ctx, d, refs)
 		if e != nil {
-			return mcpgo.NewToolResultError("snapshot_mismatch: retained signal verification failed"), nil
+			return mcpgo.NewToolResultError(suspectVerificationRefusal(ctx, e, "snapshot_mismatch: retained signal verification failed")), nil
 		}
 		for i := range out.Candidates {
 			c := &out.Candidates[i]
@@ -125,10 +128,30 @@ func handleLabelSuspects(ctx context.Context, d Deps, req mcpgo.CallToolRequest)
 			attachSignalAnchors(&c.Signals, anchors)
 		}
 		if err = verification.Finish(ctx); err != nil {
-			return mcpgo.NewToolResultError("snapshot_mismatch: retained source changed"), nil
+			return mcpgo.NewToolResultError(suspectVerificationRefusal(ctx, err, "snapshot_mismatch: retained source changed")), nil
 		}
 	}
 	return mcpgo.NewToolResultStructured(out, "Factual candidate signals; symptom judgments remain with the agent."), nil
+}
+
+var (
+	errSuspectEvidenceBudget = errors.New("evidence_budget_exceeded")
+	errSuspectSourcePolicy   = errors.New("source_policy_denied")
+)
+
+func suspectVerificationRefusal(ctx context.Context, err error, fallback string) string {
+	switch {
+	case errors.Is(ctx.Err(), context.Canceled), errors.Is(err, context.Canceled):
+		return "request_cancelled: retained verification interrupted"
+	case errors.Is(ctx.Err(), context.DeadlineExceeded), errors.Is(err, context.DeadlineExceeded):
+		return "verification_budget_exhausted: retained verification interrupted"
+	case errors.Is(err, errSuspectEvidenceBudget):
+		return "evidence_budget_exceeded: retained evidence bounds exceeded"
+	case errors.Is(err, errSuspectSourcePolicy):
+		return "source_policy_denied: retained evidence rejected"
+	default:
+		return fallback
+	}
 }
 
 func decodeStrict(raw []byte, out any) error {
@@ -235,7 +258,7 @@ func retainedSuspectAnchors(ctx context.Context, d Deps, refs []contract.Citatio
 		spans = append(spans, setup.RetainedLineSpan{OriginID: "repo", Path: ref.File, First: ref.StartLine, Last: ref.EndLine})
 	}
 	if len(spans) > 128 {
-		return nil, fmt.Errorf("evidence_budget_exceeded")
+		return nil, errSuspectEvidenceBudget
 	}
 	total := 0
 	err := setup.VisitRetainedLineSpans(ctx, d.EvidenceVersionDir, spans, func(i int, e setup.RetainedEvidence) error {
@@ -245,14 +268,14 @@ func retainedSuspectAnchors(ctx context.Context, d Deps, refs []contract.Citatio
 		}
 		total += len(e.Text)
 		if len(e.Text) > 32_000 || total > 256_000 {
-			return fmt.Errorf("evidence_budget_exceeded")
+			return errSuspectEvidenceBudget
 		}
 		clean, err := d.EvidenceSanitizer.Sanitize(ctx, []sanitize.Sanitizable{{Citation: ref, Body: e.Text}})
 		if err != nil {
 			return err
 		}
 		if clean.FailClosed || len(clean.Items) != 1 || clean.Items[0].Dropped || clean.Items[0].Citation != ref {
-			return fmt.Errorf("source_policy_denied")
+			return errSuspectSourcePolicy
 		}
 		out[ref] = &contract.CitationV2{File: e.File, StartLine: e.StartLine, EndLine: e.EndLine, CommitHash: e.CommitHash, ProjectID: e.ProjectID, DatasetID: e.DatasetID, SnapshotID: e.SnapshotID, SourceMode: e.SourceMode, BaseCommit: e.BaseCommit, OriginID: e.OriginID, FileSHA256: e.FileSHA256, ContentSHA256: e.ContentSHA256}
 		return nil

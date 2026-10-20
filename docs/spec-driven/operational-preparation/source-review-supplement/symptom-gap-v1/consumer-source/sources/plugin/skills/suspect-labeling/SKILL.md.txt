@@ -1,0 +1,66 @@
+---
+name: suspect-labeling
+description: "Iterate over bounded code candidates using CKS factual labels, preserve each signal's evidence and unknowns, and keep symptom-specific judgments separate."
+type: skill
+---
+
+# Evidence before symptom judgment
+
+Use the agent's iterative v1 workflow. The CKS batch label tool is a factual
+step in that workflow; it never supplies a one-shot root-cause verdict or a
+candidate probability. The LLM owns symptom-specific hypotheses; reproduction
+and the oracle gates own acceptance.
+
+1. Read health and the source coordinates. Choose exactly one seed mode:
+   unique symbol, repository-relative file+line, previous expansion citations,
+   or symptom-only semantic/keyword discovery. A different source/index or
+   ambiguous symbol is not silently interchangeable with the target checkout.
+2. Call `mcp__plugin_coding-agent_cks__cks_context_label_suspects` using the
+   contract's real input schema. Default limits: candidates10, seeds3,
+   enriched3, backend calls32, depth2, cooperative1000ms. Maximum per-round
+   limits:20/8/8/64/depth3/5000ms. Keep cheap graph/retrieval observations
+   first; enrich only a few candidates. Missing fields, backend failures,
+   unsupported security/dataflow and exhausted budgets remain explicit nulls.
+3. Save the exact structured response as `suspect-round-1.json` in
+   `workspace_dir`; run the validator below into `suspect-labels.json`.
+   The installed plugin bundles all registered CKS input schemas. On server
+   version changes compare tools/list with `--check-contract tools.json`;
+   mismatched property types, requirements, nested shapes or tool sets require
+   coordinated updates, not guessed arguments. Wire names and host aliases
+   are explicit in the contract; the live host receipt records compatibility.
+4. Inspect distance/relation, seed-relative impact-category membership,
+   returned PR-reference recency, concurrency direction and backend-specific
+   retrieval rank/score/source. A shortest observed path can be incomplete.
+   Empty capped membership/history is scoped to that query, not proof of global
+   absence. Search scores from different backends are not comparable cause
+   scores. Never convert null into safe/false/zero or claim uncomputed tags.
+5. Record separate `agent_judgment` entries with candidate citation,
+   candidate/rejected/unknown state, rationale and explicit unknowns. They
+   cannot assert confirmed cause. Preserve all CKS signal provenance and
+   retained source hashes unchanged. Pinned working-tree/snapshot sources use
+   `retained_citation` as expansion seeds; unpinned committed sources use
+   `citation`. Legacy expansion must not strip retained dataset coordinates.
+6. Expand selected evidence anchors only when that will answer a concrete
+   remaining question. At most3 rounds,20 distinct candidate citations and96
+   total backend calls per investigation. Stop for sufficient evidence,
+   no new candidates, exhausted budget, awaiting observation or unavailable
+   backend. Record that reason; more rounds require a fresh explicitly scoped
+   investigation. An unresolved signal is a question for observation, not a
+   manufactured confidence score.
+7. Planner reads and validates the finished label artifact before design.
+   Symptoms that have not reproduced remain candidates/awaiting observation.
+   Independent primary/holdout oracle validity remains required separately;
+   factual labels do not authorize production changes or completion.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/suspect_labels.py" --round "{workspace_dir}/suspect-round-1.json" --state "{workspace_dir}/suspect-labels.json"
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/suspect_labels.py" --round "{workspace_dir}/suspect-round-2.json" --state "{workspace_dir}/suspect-labels.json" --judgments "{workspace_dir}/suspect-judgments.json" --stop awaiting_observation
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/suspect_labels.py" --check "{workspace_dir}/suspect-labels.json"
+```
+
+If the tool fails, preserve the actual request/error as
+`{schema_version:1,status:"unavailable",failure:{request:{name:"cks.context.label_suspects",arguments:{...}},response:{isError:true,...}},reason:"...",acceptance:"not_recorded"}`
+in `suspect-labels.json`. The validator accepts only an explicit failed tool
+receipt, not an empty candidate list relabeled as a successful investigation.
+Continue the existing reproduction requirements; this receipt grants no
+exception to their acceptance gates. Do not transmit private settings/history.

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "read_only",
+    "Path": "context/read_only.go",
+    "Source": "package contextaudit\nimport (\"os/exec\";\"strconv\")\nfunc F(cmd string) { go func(){ _ = cmd }(); exec.Command(cmd) }\n",
+    "Starts": [
+      50
+    ],
+    "expected_readonly_parameters": 1
+  },
+  {
+    "id": "closure_write",
+    "Path": "context/closure_write.go",
+    "Source": "package contextaudit\nimport (\"os/exec\";\"strconv\")\nfunc F(cmd string) { go func(){ cmd = \"fixed\" }(); exec.Command(cmd) }\n",
+    "Starts": [
+      50
+    ],
+    "expected_readonly_parameters": 0
+  },
+  {
+    "id": "address",
+    "Path": "context/address.go",
+    "Source": "package contextaudit\nimport (\"os/exec\";\"strconv\")\nfunc F(cmd string) { p := &cmd; go func(){ _ = cmd; _ = p }(); exec.Command(cmd) }\n",
+    "Starts": [
+      50
+    ],
+    "expected_readonly_parameters": 0
+  },
+  {
+    "id": "reference",
+    "Path": "context/reference.go",
+    "Source": "package contextaudit\nimport (\"os/exec\";\"strconv\")\nfunc F(cmd []string) { go func(){ _ = cmd }(); exec.Command(cmd[0]) }\n",
+    "Starts": [
+      50
+    ],
+    "expected_readonly_parameters": 0
+  },
+  {
+    "id": "shadow",
+    "Path": "context/shadow.go",
+    "Source": "package contextaudit\nimport (\"os/exec\";\"strconv\")\nfunc F(cmd string) { go func(){ cmd := \"fixed\"; _ = cmd }(); exec.Command(cmd) }\n",
+    "Starts": [
+      50
+    ],
+    "expected_readonly_parameters": 0
+  },
+  {
+    "id": "siblings",
+    "Path": "context/siblings.go",
+    "Source": "package contextaudit\nimport (\"os/exec\";\"strconv\")\nfunc F(s string) { a:=func()int { v,_:=strconv.Atoi(s); return v }; b:=func()int { return 7 }; _,_=a,b }\n",
+    "Starts": [
+      50
+    ],
+    "expected_readonly_parameters": 1
+  },
+  {
+    "id": "utf8",
+    "Path": "context/utf8.go",
+    "Source": "package contextaudit\nimport (\"os/exec\";\"strconv\")\nfunc F(명령 string) { go func(){ _ = 명령 }(); exec.Command(명령) }\n",
+    "Starts": [
+      50
+    ],
+    "expected_readonly_parameters": 1
+  }
+]

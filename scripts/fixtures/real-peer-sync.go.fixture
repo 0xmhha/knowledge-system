@@ -1,0 +1,84 @@
+package main
+
+import (
+ "context"
+ "encoding/json"
+ "fmt"
+ "math/big"
+ "os"
+ "time"
+
+ "github.com/ethereum/go-ethereum/consensus/ethash"
+ "github.com/ethereum/go-ethereum/core"
+ "github.com/ethereum/go-ethereum/eth"
+ "github.com/ethereum/go-ethereum/eth/downloader"
+ "github.com/ethereum/go-ethereum/eth/ethconfig"
+ "github.com/ethereum/go-ethereum/node"
+ "github.com/ethereum/go-ethereum/p2p"
+ "github.com/ethereum/go-ethereum/params"
+)
+var start=time.Now()
+func emit(event string,value interface{}) { _=json.NewEncoder(os.Stdout).Encode(map[string]interface{}{"event":event,"elapsed_ns":time.Since(start).Nanoseconds(),"value":value}) }
+func main(){if err:=run();err!=nil{emit("error",err.Error());os.Exit(1)};emit("complete",map[string]interface{}{"formal_completed":0,"independent_approved":0,"actual_source_sync":true})}
+func run()error{
+ dir,err:=os.MkdirTemp("","ks-real-peer-");if err!=nil{return err};defer os.RemoveAll(dir)
+ chain:=*params.AllEthashProtocolChanges
+ chain.TerminalTotalDifficulty=nil;chain.TerminalTotalDifficultyPassed=false
+ genesis:=&core.Genesis{Config:&chain,GasLimit:30000000,BaseFee:big.NewInt(params.InitialBaseFee),Difficulty:new(big.Int).Set(params.MinimumDifficulty)}
+ makeNode:=func(name string,maxPeers int)(*node.Node,*eth.Ethereum,error){
+  stack,e:=node.New(&node.Config{Name:"ks-owned-"+name,DataDir:dir+"/"+name,P2P:p2p.Config{ListenAddr:"127.0.0.1:0",NoDiscovery:true,NoDial:false,MaxPeers:maxPeers}})
+  if e!=nil{return nil,nil,e}
+  cfg:=ethconfig.Defaults;cfg.Genesis=genesis;cfg.NetworkId=71377;cfg.SyncMode=downloader.FullSync;cfg.TxLookupLimit=128;cfg.EthDiscoveryURLs=nil;cfg.SnapDiscoveryURLs=nil
+  service,e:=eth.New(stack,&cfg);if e!=nil{stack.Close();return nil,nil,e}
+  if e=stack.Start();e!=nil{stack.Close();return nil,nil,e}
+  if !stack.Server().Self().IP().IsLoopback(){stack.Close();return nil,nil,fmt.Errorf("non-loopback listener")}
+  emit("factory_started",map[string]interface{}{"name":name,"listen_addr":stack.Server().ListenAddr,"node_ip":stack.Server().Self().IP().String(),"discovery":!stack.Server().NoDiscovery,"network_id":cfg.NetworkId,"real_downloader":service.Downloader()!=nil})
+  return stack,service,nil
+ }
+ seed,seedService,err:=makeNode("seeder",2);if err!=nil{return fmt.Errorf("seeder factory: %w",err)};defer seed.Close()
+ receiver,receiverService,err:=makeNode("receiver",1);if err!=nil{return fmt.Errorf("receiver factory: %w",err)};defer receiver.Close()
+ engine:=ethash.NewFaker();defer engine.Close()
+ generated,blocks,_:=core.GenerateChainWithGenesis(genesis,engine,3,nil);defer generated.Close()
+ if _,err=seedService.BlockChain().InsertChain(blocks);err!=nil{return fmt.Errorf("seed block import: %w",err)}
+ emit("seeder_imported",map[string]interface{}{"blocks":len(blocks),"head":seedService.BlockChain().CurrentBlock().Hash().Hex()})
+ observer:=receiverService.EventMux().Subscribe(downloader.StartEvent{},downloader.DoneEvent{},downloader.FailedEvent{});defer observer.Unsubscribe()
+ client:=receiver.Attach();defer client.Close()
+ ctx,cancel:=context.WithTimeout(context.Background(),3*time.Second);defer cancel()
+ notifications:=make(chan json.RawMessage,4)
+ sub,err:=client.EthSubscribe(ctx,notifications,"syncing");if err!=nil{return fmt.Errorf("real RPC subscribe: %w",err)};defer sub.Unsubscribe()
+ emit("rpc_subscription_response",true)
+ // The original API timer is unchanged. Subscription installation is deliberately
+ // allowed to settle before connecting the only explicitly configured peer.
+ time.Sleep(time.Second)
+ receiver.Server().AddPeer(seed.Server().Self());emit("loopback_peer_added",seed.Server().Self().IP().String())
+ seenStart,seenDone:=false,false
+ deadline:=time.NewTimer(30*time.Second);defer deadline.Stop()
+ for !seenDone{
+  select{
+  case ev:=<-observer.Chan():
+   if ev==nil{return fmt.Errorf("source event mux closed")}
+   switch v:=ev.Data.(type){
+   case downloader.StartEvent:seenStart=true;emit("actual_sync_start",true)
+   case downloader.DoneEvent:seenDone=true;emit("actual_sync_done",v)
+   case downloader.FailedEvent:emit("actual_sync_failed",fmt.Sprint(v));return fmt.Errorf("actual sync failed: %v",v)
+   }
+  case <-deadline.C:return fmt.Errorf("actual sync did not complete within declared30s, peer counts%d/%d",receiver.Server().PeerCount(),seed.Server().PeerCount())
+  }
+ }
+ if !seenStart{return fmt.Errorf("done without source start")}
+ seedHead,head:=seedService.BlockChain().CurrentBlock(),receiverService.BlockChain().CurrentBlock()
+ if head.Number.Uint64()!=3||head.Hash()!=seedHead.Hash(){return fmt.Errorf("actual receiver head differs")}
+ emit("actual_receiver_head",map[string]interface{}{"number":head.Number.Uint64(),"hash":head.Hash().Hex(),"matches_seeder":true})
+ limit:=time.Now().Add(5*time.Second)
+ for {progress,e:=receiverService.BlockChain().TxIndexProgress();if e!=nil{return e};if progress.Done(){emit("actual_indexer_complete",progress);break};if time.Now().After(limit){return fmt.Errorf("indexer incomplete: %+v",progress)};time.Sleep(20*time.Millisecond)}
+ emit("actual_downloader_progress",receiverService.Downloader().Progress())
+ select{
+ case notification:=<-notifications:emit("native_timer_notification",notification);if string(notification)!="false"{return fmt.Errorf("expected completed notification: %s",notification)}
+ case e:=<-sub.Err():return fmt.Errorf("RPC subscription ended early: %v",e)
+ case <-time.After(68*time.Second):return fmt.Errorf("original60s notification missing")
+ }
+ sub.Unsubscribe();emit("rpc_unsubscribe_returned",true)
+ if err=receiver.Close();err!=nil{return fmt.Errorf("receiver close: %w",err)};emit("receiver_close_returned",true)
+ if err=seed.Close();err!=nil{return fmt.Errorf("seeder close: %w",err)};emit("seeder_close_returned",true)
+ return nil
+}

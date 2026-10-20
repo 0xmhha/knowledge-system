@@ -36,18 +36,20 @@ type effects struct {
 	defs []Occurrence
 }
 type flow struct {
-	a              *analysis
-	variables      map[types.Object]Variable
-	effects        map[string]effects
-	occurrences    map[string]Occurrence
-	diagnosticKeys map[string]bool
-	stopped        bool
-	constants      []string
-	liveStateFacts int
+	a                          *analysis
+	variables                  map[types.Object]Variable
+	effects                    map[string]effects
+	occurrences                map[string]Occurrence
+	diagnosticKeys             map[string]bool
+	stopped                    bool
+	constants                  []string
+	liveStateFacts             int
+	selectedReceiveAssignments map[*ast.AssignStmt]bool
+	selectedReceiveLHS         map[*ast.Ident]bool
 }
 
 func (a *analysis) compute() {
-	f := &flow{a: a, variables: map[types.Object]Variable{}, effects: map[string]effects{}, occurrences: map[string]Occurrence{}, diagnosticKeys: map[string]bool{}}
+	f := &flow{a: a, variables: map[types.Object]Variable{}, effects: map[string]effects{}, occurrences: map[string]Occurrence{}, diagnosticKeys: map[string]bool{}, selectedReceiveAssignments: map[*ast.AssignStmt]bool{}, selectedReceiveLHS: map[*ast.Ident]bool{}}
 	a.result.Status = "analyzed_bounded"
 	// Package typing remains unavailable. Certainty is lexical may-reach, never
 	// runtime path feasibility or memory alias proof.
@@ -69,6 +71,17 @@ func (a *analysis) compute() {
 			return false
 		}
 		switch v := node.(type) {
+		case *ast.CommClause:
+			if assignment, ok := v.Comm.(*ast.AssignStmt); ok && len(assignment.Rhs) == 1 {
+				if receive, ok := ast.Unparen(assignment.Rhs[0]).(*ast.UnaryExpr); ok && receive.Op == token.ARROW {
+					f.selectedReceiveAssignments[assignment] = true
+					for _, lhs := range assignment.Lhs {
+						if id, ok := lhs.(*ast.Ident); ok && id.Name != "_" {
+							f.selectedReceiveLHS[id] = true
+						}
+					}
+				}
+			}
 		case *ast.ValueSpec:
 			for _, id := range v.Names {
 				f.declare(id, "local")
@@ -154,6 +167,25 @@ func (a *analysis) compute() {
 				continue
 			}
 			f.effects[id] = f.extract(id, a.astNodes[id], block.Reachable)
+		}
+	}
+	modeledReceives := map[Location]bool{}
+	for _, occurrence := range f.occurrences {
+		if occurrence.Role == "definition" {
+			modeledReceives[occurrence.Location] = true
+		}
+	}
+	receiveIDs := make([]*ast.Ident, 0, len(f.selectedReceiveLHS))
+	for id := range f.selectedReceiveLHS {
+		receiveIDs = append(receiveIDs, id)
+	}
+	sort.Slice(receiveIDs, func(i, j int) bool { return receiveIDs[i].Pos() < receiveIDs[j].Pos() })
+	for _, id := range receiveIDs {
+		if !f.check() {
+			break
+		}
+		if !modeledReceives[a.loc(id)] {
+			f.warn("selected_receive_lhs_unmodeled", "The CFG has no selected-case owner for this receive target; no preselection definition is invented", id)
 		}
 	}
 	for _, v := range f.variables {
@@ -422,6 +454,12 @@ func (f *flow) extract(nodeID string, node ast.Node, live bool) effects {
 		for _, rhs := range v.Rhs {
 			read(rhs, "use")
 		}
+		// The CFG retains the whole receive assignment at select entry to
+		// evaluate channel operands. Its definitions belong only to the
+		// selected case's separate LHS nodes, never to every alternative.
+		if f.selectedReceiveAssignments[v] {
+			return out
+		}
 		for _, lhs := range v.Lhs {
 			if v.Tok != token.ASSIGN && v.Tok != token.DEFINE {
 				read(lhs, "use")
@@ -462,7 +500,11 @@ func (f *flow) extract(nodeID string, node ast.Node, live bool) effects {
 		read(v.Value, "use")
 		f.warn("channel_write_untracked", "Channel transfer is not a local scalar definition", v)
 	case ast.Expr:
-		read(v, "use")
+		if id, ok := v.(*ast.Ident); ok && f.selectedReceiveLHS[id] {
+			define(id)
+		} else {
+			read(v, "use")
+		}
 	default:
 		if node != nil {
 			f.warn("statement_unsupported", "Statement effects are outside the scalar subset", node)

@@ -1,0 +1,5 @@
+func GetMaxMinterAllowance(govMasterMinterAddress common.Address, state StateReader) *big.Int {
+	maxMinterAllowanceSlot := common.HexToHash(SLOT_GOV_MASTER_MINTER_maxMinterAllowance)
+	value := state.GetState(govMasterMinterAddress, maxMinterAllowanceSlot)
+	return value.Big()
+}

@@ -1,0 +1,78 @@
+{
+  "phase": "66_explicit_correction",
+  "kind": "WIV1_V2_actual_method5_schedules_DEV_not_independent_acceptance",
+  "previous_revision": "5db56cfa43189aadc55a928052dc4a6418376fb5",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "planned_slots": [
+    {
+      "slot_id": "ORIGINAL-general-method5",
+      "candidate": "ORIGINAL",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "method5"
+    }
+  ],
+  "candidate_roles": [
+    "ORIGINAL"
+  ],
+  "unique_method_variants": 4,
+  "planned_attempts": 1,
+  "correlated_schedules_per_attempt": 5,
+  "repetitions_per_role_profile": 1,
+  "independent_repeated_execution_criterion_satisfied": false,
+  "fixture_sha256": "30f13f406547286266c6a1788e2a798dab6ddaf2136014d03afe30b1623f9fc6",
+  "target_toolchain": {
+    "GOVERSION": "go1.23.12",
+    "GOOS": "darwin",
+    "GOARCH": "arm64",
+    "CGO_ENABLED": "1"
+  },
+  "build_timeout_seconds": 600,
+  "test_timeout_seconds": 100,
+  "owned_process_timeout_seconds": 180,
+  "parallelism": 2,
+  "automatic_retries": 0,
+  "native_timer_seconds": 60,
+  "observation_milliseconds": 300,
+  "finite_late_sends": 3,
+  "same_object_concurrent_calls": 3,
+  "actual_routes": [
+    "native60s_completion_primer",
+    "actual_eventLoop_post_done_install_normal",
+    "actual_eventLoop_post_done_install_blocked_sole_direct_consumer_exit",
+    "controlled_receiver_actual_method_late_ack_once"
+  ],
+  "scope": "one exposed DEV ticket;50 correlated schedule observations over10 processes; actual method and real eventLoop for normal/blocked; controlled receiver for late/ack/once; native timer unchanged; no actual RPC callback overlap; no map/ack instrumentation",
+  "full_original5_schedules": false,
+  "full12_requirements": false,
+  "security": {
+    "external_network": false,
+    "operational_node": false,
+    "global_settings": false,
+    "system_clock_change": false,
+    "credential_environment_inheritance": false,
+    "publication": false,
+    "paid_or_external_LLM": false,
+    "owned_process_group_only": true
+  },
+  "acceptance_limits": {
+    "independent_approved": 0,
+    "independent_tickets": 0,
+    "FINAL": 0,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "freeze": null,
+    "execution_allowed": false,
+    "independent_acceptable_candidate_set": null,
+    "canonical_selection": null,
+    "quality_score": null
+  },
+  "pretrial_cancellation_preserved": "pretrial-cancelled",
+  "corrective_run_reason": "stack site source inspection before any target schedule; all initial setup and cancelled build retained",
+  "reason": "elapsed-minute wait header caused original general probe to block; robust header and bounded/joined probe; all initial failures/partial traces retained",
+  "initial_scope_sha256": "b24b6c8fe1adfa2e08178f2ef6407422825b4fbed4fe4a2a3218db8dae8ae039",
+  "initial_failed_slots": [
+    "ORIGINAL-general-method5"
+  ],
+  "initial_attempts_manifest_sha256": "d7dd75f12321ac3a04a2560c99f8825b21076dff37f42a982fa69c975faf0c9a"
+}

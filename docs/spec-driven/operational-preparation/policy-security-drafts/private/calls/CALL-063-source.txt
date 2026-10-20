@@ -1,0 +1,80 @@
+func GetSolcBin(version string) (string, error) {
+	osName, ok := osMapping[runtime.GOOS]
+	if !ok {
+		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+	}
+	arch := runtime.GOARCH
+	// Handle ARM architecture
+	if runtime.GOARCH == "arm64" {
+		if osName == "macosx" {
+			// Mac ARM → check Rosetta 2
+			if err := exec.Command("pgrep", "oahd").Run(); err != nil {
+				return "", fmt.Errorf("rosetta 2 is required to run amd64 solc binary on Apple Silicon")
+			}
+			arch = "amd64"
+		} else {
+			// ARM on non-Mac OS → unsupported
+			return "", fmt.Errorf("unsupported architecture: ARM is not supported on %s", osName)
+		}
+	}
+
+	// Home directory based path for storing solc binaries
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	dir := filepath.Join(home, solcBinDirName)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", err
+	}
+
+	// Local binary file name
+	binName := fmt.Sprintf("solc-%s", version)
+	if osName == "windows" {
+		binName += ".exe"
+	}
+	binPath := filepath.Join(dir, binName)
+
+	// Return the path immediately if the binary already exists
+	if _, err := os.Stat(binPath); err == nil {
+		return binPath, nil
+	}
+
+	fmt.Printf("%s not found, downloading...\n", binName)
+
+	// Windows versions below 0.7.2 are unsupported
+	if osName == "windows" && versionCompare(version, "0.7.2") < 0 {
+		return "", fmt.Errorf("unsupported version on Windows: %s. Please use >=0.7.2", version)
+	}
+
+	// Fetch list.json to find the build info
+	listURL := fmt.Sprintf("%s/%s-%s/list.json", solcRepoURL, osName, arch)
+	build, err := getBuild(listURL, version)
+	if err != nil {
+		return "", err
+	}
+
+	// Construct download URL using the build path
+	downloadUrl := fmt.Sprintf("%s/%s-%s/%s", solcRepoURL, osName, arch, build.Path)
+	if err := downloadSolc(binPath, downloadUrl); err != nil {
+		return "", err
+	}
+
+	// Verify SHA256 checksum
+	if ok, err := verifyChecksum(binPath, build.Sha256); err != nil {
+		return "", err
+	} else if !ok {
+		os.Remove(binPath)
+		return "", fmt.Errorf("downloaded file checksum mismatch")
+	}
+
+	// Set executable permission on macOS/Linux
+	if osName != "windows" {
+		if err := os.Chmod(binPath, 0755); err != nil {
+			return "", err
+		}
+	}
+
+	fmt.Println("Download complete:", binPath)
+	return binPath, nil
+}

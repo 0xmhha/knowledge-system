@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -19,7 +18,7 @@ func CountIgnoredIndexable(root string) (int, error) {
 }
 
 func CountIgnoredIndexableContext(ctx context.Context, root string) (int, error) {
-	cmd := exec.CommandContext(ctx, "git", "-C", root, "ls-files", "--others", "--ignored", "--exclude-standard", "-z")
+	cmd := setupCommandContext(ctx, "git", "-C", root, "ls-files", "--others", "--ignored", "--exclude-standard", "-z")
 	out, err := cmd.Output()
 	if err != nil {
 		return 0, fmt.Errorf("inspect Git-ignored sources: %w", err)

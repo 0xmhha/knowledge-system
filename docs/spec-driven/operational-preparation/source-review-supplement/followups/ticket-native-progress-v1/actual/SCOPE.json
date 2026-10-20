@@ -1,0 +1,146 @@
+{
+  "phase": 65,
+  "kind": "WIV1_V2_native60_progress_RPC_DEV_not_independent_acceptance",
+  "previous_revision": "0b7dcf0ba65e04d1f39a14270fbaea76a42e3ca9",
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "planned_slots": [
+    {
+      "slot_id": "ORIGINAL-general-native60-progress",
+      "candidate": "ORIGINAL",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "ORIGINAL-race-native60-progress",
+      "candidate": "ORIGINAL",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "CAND-A-general-native60-progress",
+      "candidate": "CAND-A",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "CAND-A-race-native60-progress",
+      "candidate": "CAND-A",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "CAND-B-general-native60-progress",
+      "candidate": "CAND-B",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "CAND-B-race-native60-progress",
+      "candidate": "CAND-B",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "MUT-REINTRO-general-native60-progress",
+      "candidate": "MUT-REINTRO",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "MUT-REINTRO-race-native60-progress",
+      "candidate": "MUT-REINTRO",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "MUT-EARLY-general-native60-progress",
+      "candidate": "MUT-EARLY",
+      "variant": "general",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    },
+    {
+      "slot_id": "MUT-EARLY-race-native60-progress",
+      "candidate": "MUT-EARLY",
+      "variant": "race",
+      "repetition": 1,
+      "case_id": "native60-progress"
+    }
+  ],
+  "candidate_roles": [
+    "ORIGINAL",
+    "CAND-A",
+    "CAND-B",
+    "MUT-REINTRO",
+    "MUT-EARLY"
+  ],
+  "unique_method_variants": 4,
+  "planned_attempts": 10,
+  "repetitions_per_role_profile": 1,
+  "independent_repeated_execution_criterion_satisfied": false,
+  "fixture_sha256": "a1b770ca7ded3407fb509d1e41f681099ace4325090096a1912cfe781572a044",
+  "target_toolchain": {
+    "GOVERSION": "go1.23.12",
+    "GOOS": "darwin",
+    "GOARCH": "arm64",
+    "CGO_ENABLED": "1"
+  },
+  "flow": [
+    "actual_NewBlockChain_owned_memory_ethash_fake_no_tx_indexer",
+    "actual_snap_NewSyncer_and_Downloader_Progress_controlled_stats_not_Downloader_constructor_or_network_sync",
+    "actual_NewDownloaderAPI_native60second_timer_and_test_owned_StartEvent",
+    "raw_JSONRPC_Server_ServeCodec_NewCodec_netPipe_real_syncing_registration",
+    "native_in_progress_true_with_full_progress_payload_then_controlled_height_update_then_native_false",
+    "new_subscription_after_done_immediate_false_then_unsubscribe_both_and_repeated_id_error",
+    "freeze_before_owned_cleanup_API_callbacks_eventLoop_codec_memory_chain_process_group"
+  ],
+  "RPC_requests_per_completed_slot": 7,
+  "direct_non_RPC_notifier_controls": 1,
+  "notifications_per_completed_slot": 3,
+  "native_timer_fires_per_completed_slot": 2,
+  "minimum_constructor_to_first_notification_ns": 60000000000,
+  "minimum_notification_gap_ns": 59000000000,
+  "notification_read_timeout_seconds": 75,
+  "ordinary_RPC_watchdog_seconds": 2,
+  "build_timeout_seconds": 600,
+  "test_timeout_seconds": 155,
+  "owned_process_timeout_seconds": 240,
+  "parallelism": 2,
+  "automatic_retries": 0,
+  "normal_flow_only": true,
+  "full_original5_schedules": false,
+  "full12_requirements": false,
+  "full_Ethereum_factory": false,
+  "installed_roles": false,
+  "scope": "same exposed DEV ticket;5 roles4 method bytes; actual native progress notifier route with controlled height and memory chain; full5 schedules/12 requirements/acceptable membership remain unknown; no map instrumentation or shortened timer",
+  "security": {
+    "external_network": false,
+    "operational_node": false,
+    "global_settings": false,
+    "system_clock_change": false,
+    "credential_environment_inheritance": false,
+    "publication": false,
+    "paid_or_external_LLM": false,
+    "owned_process_group_only": true
+  },
+  "acceptance_limits": {
+    "independent_approved": 0,
+    "independent_tickets": 0,
+    "FINAL": 0,
+    "formal_completed": 0,
+    "formal_total": 9,
+    "freeze": null,
+    "execution_allowed": false,
+    "independent_acceptable_candidate_set": null,
+    "canonical_selection": null,
+    "quality_score": null
+  }
+}

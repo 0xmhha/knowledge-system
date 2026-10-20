@@ -1,0 +1,463 @@
+#!/usr/bin/env python3
+"""Execute frozen, independently derived bugfix oracles on isolated Git snapshots.
+
+This is a correctness gate, not a sandbox for hostile repository commands or a
+certificate of semantic/human independence. Drivers must emit assertion results;
+compiler/process failures cannot count as reproduction RED.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path, PurePosixPath
+import signal
+import subprocess
+import tarfile
+import tempfile
+import time
+
+VERSION = 1
+OUTPUT_LIMIT = 65536
+ARCHIVE_LIMIT = 512 * 1024 * 1024
+
+
+class GateError(ValueError):
+    """Invalid or stale gate inputs; never an assertion failure."""
+
+
+def sha(raw: bytes) -> str:
+    return hashlib.sha256(raw).hexdigest()
+
+
+RUNNER_SHA256 = sha(Path(__file__).read_bytes())
+
+
+def read_json(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text())
+    except (OSError, ValueError) as exc:
+        raise GateError(f"cannot read JSON {path.name}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise GateError(f"{path.name} must be an object")
+    return value
+
+
+def relpath(value) -> str:
+    if not isinstance(value, str) or not value or "\\" in value:
+        raise GateError("expected a nonempty relative POSIX path")
+    path = PurePosixPath(value)
+    if (path.is_absolute() or any(x in ("", ".", "..", ".git", ".claude") for x in value.split("/"))
+            or path.parts[0] == "logs"):
+        raise GateError(f"unsafe snapshot path: {value}")
+    return value
+
+
+def text(value, label) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise GateError(f"{label} must be a nonempty string")
+    return value
+
+
+def git(repo: Path, *args) -> bytes:
+    try:
+        return subprocess.run(["git", "-C", str(repo), *args], capture_output=True,
+                              check=True, timeout=30).stdout
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise GateError(f"git input unavailable: {args[0]}") from exc
+
+
+def commit(repo: Path, value: str) -> str:
+    if not isinstance(value, str) or len(value) != 40 or any(x not in "0123456789abcdef" for x in value):
+        raise GateError("base_ref must be a full immutable commit SHA")
+    resolved = git(repo, "rev-parse", "--verify", value + "^{commit}").decode().strip()
+    if resolved != value:
+        raise GateError("commit identity mismatch")
+    return resolved
+
+
+def validate_plan(plan: dict) -> dict:
+    try:
+        if type(plan["schema_version"]) is not int or plan["schema_version"] != VERSION:
+            raise GateError("unsupported plan version")
+        text(plan["symptom_id"], "symptom_id")
+        text(plan["symptom_case"], "symptom_case")
+        if plan["tier"] not in ("simulation", "e2e"):
+            raise GateError("tier must explicitly be simulation or e2e")
+        relpath(plan["ticket_file"])
+        sources = plan["frozen_files"]
+        if not isinstance(sources, dict) or not sources or len(sources) > 64:
+            raise GateError("frozen_files must contain 1..64 source hashes")
+        for name, digest in sources.items():
+            relpath(name)
+            if not isinstance(digest, str) or len(digest) != 64 or any(x not in "0123456789abcdef" for x in digest):
+                raise GateError("invalid source hash")
+        for name in (plan["requirement_file"], plan["independent_derivation_file"]):
+            if relpath(name) not in sources:
+                raise GateError("requirement and independent derivation must be frozen")
+        if plan["requirement_file"] == plan["independent_derivation_file"]:
+            raise GateError("independent derivation must be separate from requirements")
+        oracles = plan["oracles"]
+        if not isinstance(oracles, list) or len(oracles) != 2 or {x["role"] for x in oracles} != {"primary", "independent"}:
+            raise GateError("exactly primary and independent oracles are required")
+        if len({x["id"] for x in oracles}) != 2:
+            raise GateError("oracle IDs must differ")
+        sets = []
+        for oracle in oracles:
+            text(oracle["id"], "oracle id")
+            text(oracle["assertion_id"], "assertion id")
+            command = oracle["command"]
+            if not isinstance(command, list) or not command or len(command) > 32 or any(not isinstance(x, str) or not x for x in command):
+                raise GateError("oracle command must be a bounded argv list")
+            files = oracle["files"]
+            if not isinstance(files, list) or not files or any(relpath(x) not in sources for x in files):
+                raise GateError("every oracle source must be frozen")
+            sets.append(set(files))
+        if sets[0] & sets[1] or oracles[0]["command"] == oracles[1]["command"]:
+            raise GateError("oracles must use distinct commands and source files")
+        if {sources[x] for x in sets[0]} & {sources[x] for x in sets[1]}:
+            raise GateError("identical oracle source is not an independent derivation")
+        controls = plan["controls"]
+        if (not isinstance(controls, list) or not 1 <= len(controls) <= 10
+                or any(not isinstance(x, str) or not x for x in controls)
+                or len(set(controls)) != len(controls) or plan["symptom_case"] in controls):
+            raise GateError("1..10 distinct legitimate control cases are required")
+        mutants = plan["mutants"]
+        if not isinstance(mutants, list) or not 2 <= len(mutants) <= 10:
+            raise GateError("2..10 executable source mutants are required")
+        if not {"reintroduce_symptom", "overfit"} <= {x["kind"] for x in mutants}:
+            raise GateError("symptom reintroduction and overfit mutants are mandatory")
+        if len({x["id"] for x in mutants}) != len(mutants):
+            raise GateError("duplicate mutant IDs")
+        for mutant in mutants:
+            text(mutant["id"], "mutant id")
+            if mutant["kind"] not in ("reintroduce_symptom", "overfit"):
+                raise GateError("unsupported mutant kind")
+            patches = mutant["patches"]
+            if not isinstance(patches, list) or not 1 <= len(patches) <= 10:
+                raise GateError("mutants require 1..10 source replacements")
+            for patch in patches:
+                if relpath(patch["path"]) in sources:
+                    raise GateError("a mutant cannot change frozen oracle/requirement files")
+                text(patch["before"], "replacement before")
+                if not isinstance(patch["after"], str) or patch["after"] == patch["before"]:
+                    raise GateError("mutant must change production source")
+        timeout = plan.get("timeout_seconds", 60)
+        if type(timeout) not in (int, float) or not 0.05 <= timeout <= 300:
+            raise GateError("timeout_seconds must be in [0.05, 300]")
+        total = plan.get("max_total_seconds", 600)
+        if type(total) not in (int, float) or not 0.1 <= total <= 3600:
+            raise GateError("max_total_seconds must be in [0.1, 3600]")
+    except (KeyError, TypeError) as exc:
+        raise GateError(f"malformed oracle plan: {exc}") from exc
+    return plan
+
+
+def check_bindings(plan: dict, workspace: Path, repo: Path,
+                   head_ref: str | None = None) -> tuple[str, str]:
+    base = commit(repo, plan["base_ref"])
+    head = commit(repo, head_ref) if head_ref else git(repo, "rev-parse", "HEAD").decode().strip()
+    git(repo, "merge-base", "--is-ancestor", base, head)
+    if git(repo, "status", "--porcelain", "--untracked-files=no").strip():
+        raise GateError("tracked source changes must be committed before evaluation")
+    ticket = workspace / relpath(plan["ticket_file"])
+    if sha(ticket.read_bytes()) != plan["ticket_sha256"]:
+        raise GateError("ticket changed since the oracle plan was frozen")
+    for path, digest in plan["frozen_files"].items():
+        for revision in (base, head):
+            if sha(git(repo, "show", f"{revision}:{path}")) != digest:
+                raise GateError(f"frozen file changed or missing: {path}")
+    requirement = json.loads(git(repo, "show", f"{base}:{plan['requirement_file']}"))
+    if not isinstance(requirement, dict):
+        raise GateError("frozen requirement must be an object")
+    if (requirement.get("symptom_id") != plan["symptom_id"]
+            or requirement.get("symptom_case") != plan["symptom_case"]
+            or requirement.get("controls") != plan["controls"]):
+        raise GateError("plan does not match frozen acceptance cases")
+    if not git(repo, "show", f"{base}:{plan['independent_derivation_file']}").strip():
+        raise GateError("independent derivation is empty")
+    return base, head
+
+
+def extract_snapshot(repo: Path, revision: str, directory: Path) -> None:
+    paths = git(repo, "ls-tree", "-r", "-z", "--name-only", revision).decode().split("\0")
+    if any(p and PurePosixPath(p).parts[0] in (".claude", "logs") for p in paths):
+        raise GateError("snapshot contains protected root inputs; use a committed source-only subject")
+    directory.mkdir()
+    with tempfile.TemporaryFile() as archive:
+        proc = subprocess.run(["git", "-C", str(repo), "archive", revision],
+                              stdout=archive, stderr=subprocess.PIPE, timeout=60)
+        if proc.returncode != 0 or archive.tell() > ARCHIVE_LIMIT:
+            raise GateError("snapshot archive unavailable or too large")
+        archive.seek(0)
+        with tarfile.open(fileobj=archive, mode="r:") as source:
+            count = 0
+            for member in source:
+                count += 1
+                if count > 200000 or not (member.isfile() or member.isdir()):
+                    raise GateError("snapshot contains unsupported links/types or exceeds file cap")
+                path = directory / relpath(member.name.rstrip("/"))
+                if member.isdir():
+                    path.mkdir(parents=True, exist_ok=True)
+                else:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    with source.extractfile(member) as src, path.open("wb") as dst:
+                        while data := src.read(65536):
+                            dst.write(data)
+                    path.chmod(member.mode & 0o777)
+
+
+def source_hashes(directory: Path) -> dict[str, str]:
+    return {str(p.relative_to(directory)): sha(p.read_bytes())
+            for p in directory.rglob("*") if p.is_file()}
+
+
+def observe(oracle: dict, directory: Path, plan: dict, revision: str, case: str,
+            variant: str, inputs: dict[str, str], deadline: float) -> dict:
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise GateError("total oracle execution budget exhausted")
+    env = dict(os.environ, ORACLE_CASE_ID=case, ORACLE_SYMPTOM_ID=plan["symptom_id"],
+               ORACLE_SUBJECT_COMMIT=revision, PYTHONDONTWRITEBYTECODE="1")
+    started = time.monotonic()
+    timed_out = False
+    launch_error = None
+    with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
+        try:
+            proc = subprocess.Popen(oracle["command"], cwd=directory, env=env,
+                                    stdout=stdout, stderr=stderr, start_new_session=True)
+            try:
+                code = proc.wait(timeout=min(plan.get("timeout_seconds", 60), remaining))
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                code = proc.wait()
+            finally:
+                # Only the process group created for this driver is ours.
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+        except OSError as exc:
+            code, launch_error = None, str(exc)
+        stdout.seek(0)
+        stderr.seek(0)
+        out, err = stdout.read(OUTPUT_LIMIT + 1), stderr.read(OUTPUT_LIMIT + 1)
+    row = {"oracle_id": oracle["id"], "role": oracle["role"], "variant": variant,
+           "subject_commit": revision, "case_id": case, "command": oracle["command"],
+           "exit_code": code, "timed_out": timed_out, "launch_error": launch_error,
+           "duration_ms": round((time.monotonic() - started) * 1000),
+           "stdout": out.decode(errors="replace"), "stderr": err.decode(errors="replace"),
+           "stdout_sha256": sha(out), "stderr_sha256": sha(err)}
+    row["source_unchanged"] = all((directory / path).is_file()
+        and not (directory / path).is_symlink()
+        and sha((directory / path).read_bytes()) == digest for path, digest in inputs.items())
+    outcome, reason = classify(row, oracle, plan)
+    row.update(outcome=outcome, reason=reason)
+    return row
+
+
+def classify(row: dict, oracle: dict, plan: dict) -> tuple[str, str]:
+    if row.get("source_unchanged") is not True:
+        return "ERROR", "driver modified its source snapshot"
+    if (row.get("timed_out") or row.get("launch_error")
+            or type(row.get("exit_code")) is not int or row["exit_code"] not in (0, 1)):
+        return "ERROR", "driver failed to execute within its budget"
+    if len(row["stdout"].encode()) > OUTPUT_LIMIT or len(row["stderr"].encode()) > OUTPUT_LIMIT:
+        return "ERROR", "driver output exceeds cap"
+    try:
+        value = json.loads(row["stdout"])
+    except ValueError:
+        return "ERROR", "driver did not emit a single JSON assertion result"
+    if not isinstance(value, dict) or (type(value.get("schema_version")) is not int
+            or value.get("schema_version") != VERSION
+            or value.get("symptom_id") != plan["symptom_id"]
+            or value.get("assertion_id") != oracle["assertion_id"]
+            or value.get("subject_commit") != row["subject_commit"]
+            or value.get("case_id") != row["case_id"]):
+        return "ERROR", "driver assertion identity does not match the frozen case"
+    outcome = value.get("outcome")
+    if outcome == "pass" and row["exit_code"] == 0:
+        return "GREEN", "bound assertion passed"
+    if outcome == "symptom_fail" and row["exit_code"] == 1:
+        return "RED", "bound symptom assertion failed"
+    return "ERROR", "driver outcome/exit status is not an assertion verdict"
+
+
+def expected_runs(plan: dict) -> list[tuple[str, str, str, str]]:
+    expected = []
+    for variant in ("base", "head"):
+        for case in [plan["symptom_case"], *plan["controls"]]:
+            for oracle in plan["oracles"]:
+                want = "RED" if variant == "base" and case == plan["symptom_case"] else "GREEN"
+                expected.append((variant, case, oracle["id"], want))
+    for mutant in plan["mutants"]:
+        for oracle in plan["oracles"]:
+            want = "RED" if mutant["kind"] == "reintroduce_symptom" or oracle["role"] == "independent" else "ASSERTION"
+            expected.append(("mutant:" + mutant["id"], plan["symptom_case"], oracle["id"], want))
+    return expected
+
+
+def judge(plan: dict, rows: list[dict], base: str, head: str) -> list[dict]:
+    oracles = {x["id"]: x for x in plan["oracles"]}
+    indexed = {}
+    for row in rows:
+        key = (row["variant"], row["case_id"], row["oracle_id"])
+        if key in indexed:
+            raise GateError("duplicate execution evidence")
+        indexed[key] = row
+    expected = expected_runs(plan)
+    if set(indexed) != {x[:3] for x in expected}:
+        raise GateError("missing or extra execution evidence")
+    checks = []
+    for variant, case, oracle_id, want in expected:
+        row = indexed[(variant, case, oracle_id)]
+        if row["subject_commit"] != (base if variant == "base" else head) or row["command"] != oracles[oracle_id]["command"]:
+            raise GateError("execution source/command binding changed")
+        for stream in ("stdout", "stderr"):
+            if sha(row[stream].encode()) != row[stream + "_sha256"]:
+                raise GateError("raw execution evidence was modified")
+        outcome, reason = classify(row, oracles[oracle_id], plan)
+        checks.append({"variant": variant, "case_id": case, "oracle_id": oracle_id,
+                       "expected": want, "actual": outcome, "reason": reason,
+                       "passed": outcome in ("GREEN", "RED") if want == "ASSERTION" else outcome == want})
+    return checks
+
+
+def run_plan(plan: dict, workspace: Path, repo: Path, plan_sha: str,
+             head_ref: str | None = None) -> dict:
+    validate_plan(plan)
+    base, head = check_bindings(plan, workspace, repo, head_ref)
+    rows = []
+    deadline = time.monotonic() + plan.get("max_total_seconds", 600)
+    with tempfile.TemporaryDirectory(prefix="coding-agent-oracle-") as temp:
+        root = Path(temp)
+        for variant, revision in (("base", base), ("head", head)):
+            directory = root / variant
+            extract_snapshot(repo, revision, directory)
+            inputs = source_hashes(directory)
+            for case in [plan["symptom_case"], *plan["controls"]]:
+                for oracle in plan["oracles"]:
+                    rows.append(observe(oracle, directory, plan, revision, case, variant, inputs, deadline))
+        for index, mutant in enumerate(plan["mutants"]):
+            directory = root / f"mutant-{index}"
+            extract_snapshot(repo, head, directory)
+            for patch in mutant["patches"]:
+                path = directory / relpath(patch["path"])
+                if not path.is_file():
+                    raise GateError("mutant target is not a tracked regular file")
+                source = path.read_text()
+                if source.count(patch["before"]) != 1:
+                    raise GateError("mutant replacement must match exactly once")
+                path.write_text(source.replace(patch["before"], patch["after"], 1))
+            inputs = source_hashes(directory)
+            for oracle in plan["oracles"]:
+                rows.append(observe(oracle, directory, plan, head, plan["symptom_case"], "mutant:" + mutant["id"], inputs, deadline))
+    checks = judge(plan, rows, base, head)
+    if sha(Path(__file__).read_bytes()) != RUNNER_SHA256:
+        raise GateError("oracle runner changed during execution")
+    if sha((workspace / "oracle-validity-plan.json").read_bytes()) != plan_sha:
+        raise GateError("oracle plan changed during execution")
+    if check_bindings(plan, workspace, repo, head_ref) != (base, head):
+        raise GateError("subject revision changed during execution")
+    verdict = "PASS" if all(x["passed"] for x in checks) else "ERROR" if any(x["actual"] == "ERROR" for x in checks) else "FAIL"
+    return {"schema_version": VERSION, "mechanical_verdict": verdict,
+            "repo_root": str(repo.resolve()), "base_commit": base, "head_commit": head,
+            "plan_sha256": plan_sha, "runner_sha256": RUNNER_SHA256,
+            "symptom_id": plan["symptom_id"], "frozen_files": plan["frozen_files"],
+            "tier": plan["tier"],
+            "execution_scope": "candidate_trial" if head_ref else "current_head",
+            "runs": rows, "checks": checks, "independent_human_acceptance": "not_recorded",
+            "limits": ["Separate drivers and derivation do not prove semantic independence without review.",
+                       "Finite controls/mutants do not prove correctness for every input."]}
+
+
+def verify_report(report: dict, plan_path: Path, workspace: Path, repo: Path,
+                  head_ref: str | None = None) -> None:
+    plan = validate_plan(read_json(plan_path))
+    base, head = check_bindings(plan, workspace, repo, head_ref)
+    if (report.get("schema_version") != VERSION or report.get("mechanical_verdict") != "PASS"
+            or report.get("plan_sha256") != sha(plan_path.read_bytes())
+            or report.get("runner_sha256") != sha(Path(__file__).read_bytes())
+            or report.get("repo_root") != str(repo.resolve())
+            or report.get("base_commit") != base or report.get("head_commit") != head
+            or report.get("symptom_id") != plan["symptom_id"]
+            or report.get("tier") != plan["tier"]
+            or report.get("execution_scope") != ("candidate_trial" if head_ref else "current_head")
+            or report.get("frozen_files") != plan["frozen_files"]):
+        raise GateError("oracle report is absent, failed, stale or bound to different inputs")
+    checks = judge(plan, report.get("runs", []), base, head)
+    if not all(x["passed"] for x in checks) or checks != report.get("checks"):
+        raise GateError("report verdict disagrees with its execution evidence")
+
+
+def completion_check(workspace: Path, state: dict, repo: Path | None = None) -> None:
+    if state.get("ticket_type") != "bugfix":
+        return
+    report_path = workspace / "oracle-validity-report.json"
+    plan_path = workspace / "oracle-validity-plan.json"
+    report = read_json(report_path)
+    evaluation = state.get("states", {}).get("EVALUATION", {})
+    analysis = state.get("states", {}).get("ANALYSIS", {})
+    implementation = state.get("states", {}).get("IMPLEMENTATION", {})
+    results = evaluation.get("results", {})
+    if not isinstance(results, dict) or any(results.get(k) != "PASS" for k in
+            ("oracle_validity", "reproduction_verdict", "fix_validity_verdict")):
+        raise GateError("oracle, reproduction and fix-validity verdicts must all be PASS")
+    for key in ("unit_test", "lint", "security", "chainbench", "full_regression"):
+        value = results.get(key)
+        status = value.get("status") if isinstance(value, dict) else value
+        permitted = {"PASS", "WARN", "SKIPPED"} if key in ("chainbench", "full_regression") else {"PASS", "WARN"}
+        if status not in permitted:
+            raise GateError(f"verification stage missing or failed: {key}")
+    if report.get("tier") == "e2e":
+        chain = results["chainbench"]
+        if (chain.get("status") if isinstance(chain, dict) else chain) != "PASS":
+            raise GateError("required e2e oracle cannot complete with skipped/degraded chain verification")
+    if evaluation.get("oracle_validity_report_sha256") != sha(report_path.read_bytes()):
+        raise GateError("state does not bind the generated oracle report")
+    if analysis.get("oracle_validity_plan_sha256") != sha(plan_path.read_bytes()):
+        raise GateError("state does not bind the frozen oracle plan")
+    if implementation.get("reproduction_commit") != report.get("base_commit"):
+        raise GateError("reproduction commit and oracle RED source disagree")
+    verify_report(report, plan_path, workspace, repo or Path(report["repo_root"]))
+    if analysis.get("investigation_kind") in ("timing","observation") or (workspace/"timing").exists():
+        from timing_investigation import completion_check as timing_completion_check
+        timing_completion_check(workspace,state)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--workspace", type=Path, required=True)
+    parser.add_argument("--repo", type=Path, required=True)
+    parser.add_argument("--check-completion", action="store_true")
+    parser.add_argument("--head-ref", help="explicit candidate commit; never a final completion receipt")
+    args = parser.parse_args()
+    workspace, repo = args.workspace.resolve(), args.repo.resolve()
+    if args.check_completion and args.head_ref:
+        parser.error("completion always verifies actual HEAD; --head-ref is trial-only")
+    try:
+        if args.check_completion:
+            completion_check(workspace, read_json(workspace / "state.json"), repo)
+            print(json.dumps({"completion_gate": "PASS"}))
+            return 0
+        plan_path = workspace / "oracle-validity-plan.json"
+        report = run_plan(read_json(plan_path), workspace, repo, sha(plan_path.read_bytes()), args.head_ref)
+        (workspace / "oracle-validity-report.json").write_text(json.dumps(report, indent=2) + "\n")
+        print(json.dumps({"mechanical_verdict": report["mechanical_verdict"], "checks": len(report["checks"])}))
+        return 0 if report["mechanical_verdict"] == "PASS" else 1
+    except (GateError, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
+        # A stale previous PASS must not survive a failed rerun.
+        if not args.check_completion:
+            (workspace / "oracle-validity-report.json").write_text(json.dumps({"schema_version": VERSION,
+                "mechanical_verdict": "ERROR", "reason": str(exc)}) + "\n")
+        print(json.dumps({"mechanical_verdict": "ERROR", "reason": str(exc)}))
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

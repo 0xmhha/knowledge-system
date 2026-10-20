@@ -1,0 +1,16 @@
+PINNED: go-stablenet 0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8
+BUILT: go-stablenet 2224 retained files
+PINNED: go-wemix 1350376a680489298b3203a44d9ebddb7747f9cc
+Traceback (most recent call last):
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-real-comparison.py", line 52, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-real-comparison.py", line 39, in main
+    profile=tool('cks.dataset.inspect_profile',scope)['profile'];write(label+'-profile.json',profile)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/scripts/prepare-real-comparison.py", line 36, in tool
+    response=native.tool(name,args);calls.append({'tool':name,'arguments':copy.deepcopy(args),'response':copy.deepcopy(response)});write(label+'-build-calls.json',calls);return value(response)
+                                                                                                                                                                                 ^^^^^^^^^^^^^^^
+  File "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/update_native.py", line 16, in value
+    raise Refusal(payload)
+update_native.Refusal: source_stale

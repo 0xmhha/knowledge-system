@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -39,7 +40,25 @@ type Runner interface {
 // resolved from this machine rather than inherited — see toolchainEnv. Without
 // it, a server launchd started has no `go` to hand the graph build, and the
 // failure surfaces deep inside go/packages instead of here.
-type SubprocessRunner struct{}
+type SubprocessRunner struct{ GuardianBinary string }
+
+// RunGuardedCommand runs an operator-configured check with the same owner
+// socket/deadline/process-group supervision as build steps. It accepts no shell
+// text, keeps no output and does not resolve a build toolchain first. Callers
+// must bind argv/executable bytes and provide a bounded context.
+func RunGuardedCommand(ctx context.Context, guardian string, argv, env []string) error {
+	if guardian == "" || len(argv) == 0 || argv[0] == "" {
+		return fmt.Errorf("guarded check requires guardian and argv")
+	}
+	ctx = context.WithValue(ctx, commandGuardianKey{}, guardian)
+	cmd := setupCommandContext(ctx, argv[0], argv[1:]...)
+	cmd.Env = append(cmd.Environ(), env...)
+	cmd.Stdout, cmd.Stderr = io.Discard, io.Discard
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return ctx.Err()
+}
 
 // toolchainTools are what a build subprocess shells out to: go/packages runs
 // `go list`, and indexing records each chunk's commit.
@@ -104,15 +123,21 @@ var reportToolchain = func() func(emit func(Event)) {
 	}
 }()
 
-func (SubprocessRunner) Run(ctx context.Context, s Step, emit func(Event)) error {
+func (runner SubprocessRunner) Run(ctx context.Context, s Step, emit func(Event)) error {
 	if s.Cmd == nil {
+		if s.VerifyContext != nil {
+			return s.VerifyContext(ctx, emit)
+		}
 		if s.Verify == nil {
 			return fmt.Errorf("step %s: neither command nor verify", s.ID)
 		}
 		return s.Verify(emit)
 	}
 	reportToolchain(emit)
-	cmd := buildCommandContext(ctx, s.Cmd[0], s.Cmd[1:]...)
+	if runner.GuardianBinary != "" {
+		ctx = context.WithValue(ctx, commandGuardianKey{}, runner.GuardianBinary)
+	}
+	cmd := setupCommandContext(ctx, s.Cmd[0], s.Cmd[1:]...)
 	// Toolchain first, then the step's own env: a step that names a variable
 	// outranks the machine-wide resolution (exec keeps the last duplicate).
 	cmd.Env = append(cmd.Environ(), toolchainEnv().env...)

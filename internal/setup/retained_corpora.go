@@ -3,7 +3,6 @@ package setup
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 )
@@ -15,7 +14,6 @@ func PrepareRetainedCorpora(ctx context.Context, o *Options, runner Runner, emit
 	if o.SkipVector || o.RetainedCorporaPrepared {
 		return nil
 	}
-	var roots []string
 	if o.DomainKnowledge != "" {
 		binary := o.CksBin
 		if binary == "" {
@@ -28,22 +26,10 @@ func PrepareRetainedCorpora(ctx context.Context, o *Options, runner Runner, emit
 		if err := Execute(ctx, Plan{Steps: []Step{{ID: "domain-export", Title: "Render domain text before retaining source identity", Cmd: argv}}}, runner, emit); err != nil {
 			return err
 		}
-		roots = append(roots, o.DomainCorpusDir())
 	}
-	if o.SemanticCorpus != "" {
-		roots = append(roots, o.SemanticCorpus)
-	}
-	if o.FlowCorpus != "" {
-		root := filepath.Dir(o.FlowCorpus)
-		duplicate := false
-		for _, existing := range roots {
-			if filepath.Clean(existing) == filepath.Clean(root) {
-				duplicate = true
-			}
-		}
-		if !duplicate {
-			roots = append(roots, root)
-		}
+	roots, err := RetainedDocumentRoots(*o)
+	if err != nil {
+		return err
 	}
 	for index, root := range roots {
 		id := sourcepath.Origin(index)

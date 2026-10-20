@@ -1,0 +1,37 @@
+{
+  "kind": "optional_VIEWER_owned_interaction_and_backend_lifecycle_preparation",
+  "source_revision": "49662a5bc27dbae01e956c8c03a72a5b803a174e",
+  "source_sha256": {
+    "cmd/cks/viewercli/viewer.go": "c99de83e9d9c76cefdb89ad92fe9bfd0230fc3126fe7c93e269fe451614d46e8",
+    "internal/system/viewer/server.go": "a4034cd94ad13cfafce10099efa5688eb34a8a3043e1756e9cee0e3005f84e8b",
+    "internal/system/viewer/web_assets/index.html": "92700445eeb0f3f1a35f2c642acbd3f487ee3c3c82c618854366f66e6b5ef9ea"
+  },
+  "observed_code_gap": "runViewer starts sibling graph API but deferred cleanup calls Kill without Wait; no child reap; cancellation uses exec default kill",
+  "proposed_behavior": [
+    "own a derived cancellation context per viewer call",
+    "request SIGTERM for owned graph API with bounded fallback",
+    "always Wait exactly once to reap started backend on successful serve, readiness failure, bind failure and cancellation",
+    "keep loopback listener and unchanged public viewer flags",
+    "validate existing UI navigation/search/redraw and keyboard-labelled controls; report actual unsupported gaps",
+    "readiness probes respect parent and absolute timeout, stop on early backend exit",
+    "reap the platform browser launcher inside its existing asynchronous call without owning the user browser",
+    "unexpected owned backend exit after readiness shuts the dashboard and reports failure; an explicitly supplied external API is never terminated",
+    "a killed/nonzero owned backend shutdown is reported as failure even if dashboard cancellation was requested; no healthy-exit claim from forced fallback"
+  ],
+  "verification": [
+    "owned fake backend lifecycle unit paths",
+    "actual viewer+owned graph API on pinned corpus and normal cancellation",
+    "record all PID/group/wait exits and preserved source/data maps",
+    "real browser interaction and screenshots without real model",
+    "full native checks after any production change",
+    "controlled after-ready crash preserves nonzero failure rather than healthy dashboard",
+    "external API remains serviceable after dashboard cancellation",
+    "ready but SIGTERM-ignoring owned backend is killed/reaped and the dashboard caller receives shutdown failure"
+  ],
+  "security_only_audit": "deferred by user; do not introduce audit policy wiring",
+  "actual_LLM_calls": 0,
+  "paid_external_calls": 0,
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "additional_observation": "waitReady uses http.Get without request deadline and sleeps without cancellation; platform browser launcher Start has no reaper"
+}

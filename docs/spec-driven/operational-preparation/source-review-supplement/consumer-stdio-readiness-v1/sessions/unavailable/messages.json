@@ -1,0 +1,219 @@
+[
+  {
+    "label": "initialize",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {},
+        "clientInfo": {
+          "name": "owned-consumer-P05",
+          "version": "1"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        },
+        "serverInfo": {
+          "name": "owned-P05",
+          "version": "cks-mcp/0.0.1-dev"
+        }
+      }
+    }
+  },
+  {
+    "label": "value_dependencies",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.value_dependencies",
+        "arguments": {
+          "node_id": "ea016a756cff1cc8",
+          "expected_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+          "expected_source_sha256": "98a061081afd57403a5988b03b6662a23b095e56ec9f204c214ac2334bc4c35b"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"schema_version\":1,\"status\":\"unavailable\",\"reason\":\"backend does not support retained value/rule analysis\",\"analysis\":null,\"elapsed_micros\":0}"
+          }
+        ],
+        "structuredContent": {
+          "schema_version": 1,
+          "status": "unavailable",
+          "reason": "backend does not support retained value/rule analysis",
+          "analysis": null,
+          "elapsed_micros": 0
+        }
+      }
+    }
+  },
+  {
+    "label": "rule_candidates",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.rule_candidates",
+        "arguments": {
+          "rule_pack": "go-local-review@1.0.0",
+          "function": {
+            "node_id": "ea016a756cff1cc8",
+            "expected_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+            "expected_source_sha256": "98a061081afd57403a5988b03b6662a23b095e56ec9f204c214ac2334bc4c35b"
+          }
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"schema_version\":1,\"status\":\"unavailable\",\"reason\":\"backend does not support retained value/rule analysis\",\"analysis\":null,\"elapsed_micros\":0}"
+          }
+        ],
+        "structuredContent": {
+          "schema_version": 1,
+          "status": "unavailable",
+          "reason": "backend does not support retained value/rule analysis",
+          "analysis": null,
+          "elapsed_micros": 0
+        }
+      }
+    }
+  },
+  {
+    "label": "value_dependency_expansion",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.value_dependency_expansion",
+        "arguments": {
+          "function": {
+            "node_id": "ea016a756cff1cc8",
+            "expected_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+            "expected_source_sha256": "98a061081afd57403a5988b03b6662a23b095e56ec9f204c214ac2334bc4c35b"
+          }
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"schema_version\":1,\"graph\":{\"schema_version\":1,\"status\":\"unavailable\",\"limits\":{\"max_functions\":0,\"max_hops\":0,\"max_candidates\":0,\"max_total_nodes\":0,\"max_total_edges\":0,\"max_total_facts\":0,\"timeout_ms\":0},\"functions\":[],\"hops\":[],\"candidates\":0,\"deduplicated\":0,\"total_nodes\":0,\"total_edges\":0,\"total_facts\":0,\"stop_reasons\":[\"bounded_value_backend_unavailable\"],\"limitations\":[\"no safe bounded expansion backend\"],\"elapsed_micros\":0},\"curated_flow\":{\"origin\":\"operator_curated_metadata\",\"status\":\"separate_not_joined\",\"query_tool\":\"cks.context.get_flow\",\"source_association\":\"not_verified\",\"reason\":\"Curated call order/reads/writes are separate records; they are not local computed def-use/control or a verified cross-dataset join\"}}"
+          }
+        ],
+        "structuredContent": {
+          "schema_version": 1,
+          "graph": {
+            "schema_version": 1,
+            "status": "unavailable",
+            "limits": {
+              "max_functions": 0,
+              "max_hops": 0,
+              "max_candidates": 0,
+              "max_total_nodes": 0,
+              "max_total_edges": 0,
+              "max_total_facts": 0,
+              "timeout_ms": 0
+            },
+            "functions": [],
+            "hops": [],
+            "candidates": 0,
+            "deduplicated": 0,
+            "total_nodes": 0,
+            "total_edges": 0,
+            "total_facts": 0,
+            "stop_reasons": [
+              "bounded_value_backend_unavailable"
+            ],
+            "limitations": [
+              "no safe bounded expansion backend"
+            ],
+            "elapsed_micros": 0
+          },
+          "curated_flow": {
+            "origin": "operator_curated_metadata",
+            "status": "separate_not_joined",
+            "query_tool": "cks.context.get_flow",
+            "source_association": "not_verified",
+            "reason": "Curated call order/reads/writes are separate records; they are not local computed def-use/control or a verified cross-dataset join"
+          }
+        }
+      }
+    }
+  },
+  {
+    "label": "policy_security",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "method": "tools/call",
+      "params": {
+        "name": "cks.context.policy_security",
+        "arguments": {
+          "node_id": "ea016a756cff1cc8",
+          "expected_commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+          "expected_source_sha256": "98a061081afd57403a5988b03b6662a23b095e56ec9f204c214ac2334bc4c35b"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"schema_version\":1,\"status\":\"unavailable\",\"reason\":\"\",\"snapshot_sha256\":\"\",\"symbol\":null,\"annotations\":[],\"more\":false,\"max_annotations\":0,\"timeout_ms\":0,\"safety_verdict\":\"unknown\",\"automatic_rules\":\"separate_opt_in_rule_candidates_not_executed\",\"limitations\":[\"retained annotation backend unsupported\"],\"elapsed_micros\":0}"
+          }
+        ],
+        "structuredContent": {
+          "schema_version": 1,
+          "status": "unavailable",
+          "reason": "",
+          "snapshot_sha256": "",
+          "symbol": null,
+          "annotations": [],
+          "more": false,
+          "max_annotations": 0,
+          "timeout_ms": 0,
+          "safety_verdict": "unknown",
+          "automatic_rules": "separate_opt_in_rule_candidates_not_executed",
+          "limitations": [
+            "retained annotation backend unsupported"
+          ],
+          "elapsed_micros": 0
+        }
+      }
+    }
+  }
+]

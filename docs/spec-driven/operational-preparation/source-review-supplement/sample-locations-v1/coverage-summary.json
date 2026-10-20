@@ -1,0 +1,38 @@
+{
+  "kind": "thirty_function_source_observations_not_edge_gold",
+  "counts": {
+    "functions": 30,
+    "new_function_captures": 26,
+    "unchanged_existing_function_captures": 4,
+    "source_files": 25,
+    "raw_occurrences": 1725,
+    "corroborated_own_function_variable": 1721,
+    "quarantined_non_body_signature_scope": 4,
+    "ambiguous_lexical_scope_not_collapsed": 0,
+    "unmatched_scope_not_assumed_local": 0,
+    "syntax_markers": 409,
+    "unobserved_prior_variable_bindings": 0,
+    "excluded_closures": 14,
+    "functions_with_range_bindings": 22,
+    "approved_independent_functions": 0,
+    "independent_gold_records": 0
+  },
+  "partial_file_type_error_total": 1000,
+  "source_observation_coverage": "30_of_30_selected_not_semantic_or_gold_coverage",
+  "data_edges": null,
+  "control_edges": null,
+  "quality_scores": null,
+  "formal_runs": 0,
+  "dependency_backend_calls": 0,
+  "model_calls": 0,
+  "nodes_started": 0,
+  "full_project_typecheck_passed": false,
+  "limitations": [
+    "partial file type diagnostics are retained; imported types and full project build are outside scope",
+    "callback/function-type signature variables cannot be promoted to own function body variables",
+    "matching local declaration locations does not compute reaching definitions, data/control edges or value kinds",
+    "ambiguous/unmatched/unobserved bindings remain explicit; no first-match or fabricated occurrence",
+    "range/closure/memory/call/concurrency and postdominator limitations remain separate",
+    "all thirty functions are exposed proposals without independent review, gold or DEV/FINAL freeze"
+  ]
+}

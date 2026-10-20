@@ -1,0 +1,304 @@
+[
+  {
+    "case_id": "RQ-001",
+    "primary": "RQ-001",
+    "source_behavior_draft": "중첩 제안 증명의 decode 오류를 감싸 반환하고 모든 항목 성공 후 필드를 갱신한다.",
+    "question_contract_draft": "preprepare 증명 항목 decode/오류 반환",
+    "primary_witness_text": "return fmt.Errorf(\"failed to decode SignedRoundChange[%d]: %w\", i, err)",
+    "supporting_relevant": [],
+    "unknown": [],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-002",
+    "primary": "RQ-002",
+    "source_behavior_draft": "작성자 집계 후 extra/validator 조회의 조기 반환과 seal별 가산 조건을 구분한다.",
+    "question_contract_draft": "블록 활동 작성자/서명 집계 및 조회 실패",
+    "primary_witness_text": "extra, err := types.ExtractWBFTExtra(header)",
+    "supporting_relevant": [],
+    "unknown": [],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-003",
+    "primary": "RQ-003",
+    "source_behavior_draft": "상태 freezer는 PathScheme일 때만 열고 검사 목록에 추가한다.",
+    "question_contract_draft": "저장 방식에 따른 상태 이력 점검 제외",
+    "primary_witness_text": "if ReadStateScheme(db) != PathScheme {",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-004",
+        "rationale": "freezer 복원과 검사 제외는 같은 저장 흐름이나 함수 내 계약은 다르다. 요구된 증상의 전이/공통 원인은 미확정이다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-004",
+    "primary": "RQ-004",
+    "source_behavior_draft": "freezer hash 묶음 길이만큼 인덱스를 전진한다. 빈 묶음 시 진행 불변은 조건부 관찰이며 backend가 빈 묶음을 반환한다는 주장은 아니다.",
+    "question_contract_draft": "과거 블록 인덱스 복원 반복/진행",
+    "primary_witness_text": "i += uint64(len(data))",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-003",
+        "rationale": "freezer 검사 정책이 인덱스 복원 반복에 영향을 주는지 이20함수만으로 확인하지 않았다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-005",
+    "primary": "RQ-005",
+    "source_behavior_draft": "storage marker 복사 후 범위 생성·exhausted·증가키 고갈·flush 오류에 따라 재개/완료/중단한다.",
+    "question_contract_draft": "계약 storage 스냅샷 범위 재개/완료/중단",
+    "primary_witness_text": "if origin = increaseKey(last); origin == nil {",
+    "supporting_relevant": [
+      {
+        "location_case_id": "RQ-006",
+        "rationale": "account 생성기는 동일 계정의 재개 storage marker를 구성하고 storage 생성을 직접 호출한다.",
+        "witness_text": "if err := generateStorages(ctx, dl, dl.root, account, acc.Root, storeMarker); err != nil {"
+      }
+    ],
+    "unknown": [],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-006",
+    "primary": "RQ-006",
+    "source_behavior_draft": "account 재개 표식과 storage 접미 표식을 구분하고 dangling storage를 정리한다.",
+    "question_contract_draft": "계정 스냅샷 재개 표식/잔재",
+    "primary_witness_text": "if accMarker != nil && bytes.Equal(marker, accMarker) && len(dl.genMarker) > common.HashLength {",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-005",
+        "rationale": "storage 범위 생성이 계정 재개 잔재의 원인인지 및 caller 외부 계약은 미확정이다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-007",
+    "primary": "RQ-007",
+    "source_behavior_draft": "실행 중인 reorg가 없을 때 예약을 실행하고 reset/promote 요청을 병합한다. queue event 수신 자체는 reorg를 예약하지 않는다.",
+    "question_contract_draft": "거래 알림 지연/요청 병합",
+    "primary_witness_text": "case tx := <-pool.queueTxEventCh:",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-008",
+        "rationale": "runReorg 예약과 실제 승격은 관련되지만 이 함수 사이의 완전한 호출/알림 계약은 미확정이다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-008",
+    "primary": "RQ-008",
+    "source_behavior_draft": "낮은 nonce·잔액/가스·계정 cap에 따라 queue 거래를 제거하고 ready 거래를 승격한다.",
+    "question_contract_draft": "실행 가능 거래 승격/제거",
+    "primary_witness_text": "readies := list.Ready(pool.pendingNonces.get(addr))",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-007",
+        "rationale": "예약/병합이 제거 판정에 영향을 주는지 전이 계약을 검토하지 않았다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-009",
+    "primary": "RQ-009",
+    "source_behavior_draft": "응답 헤더의 순서·검색 범위·로컬 known 여부와 floor를 점검해 ancestor를 반환하거나 거부한다.",
+    "question_contract_draft": "헤더 응답 후 조상 탐색 거부",
+    "primary_witness_text": "if int64(number) <= floor {",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-011",
+        "rationale": "skeleton 재개와 ancestor 검색은 동기화 문맥을 공유하지만 공통 원인이나 직접 관련성은 미확정이다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-010",
+    "primary": "RQ-010",
+    "source_behavior_draft": "요청과 validation 상태에 따라 부분 수락하고 나머지를 재큐잉한다. stale delivery도 별도 오류로 처리한다.",
+    "question_contract_draft": "동기화 응답 부분 수락/재큐잉",
+    "primary_witness_text": "taskQueue.Push(header, -int64(header.Number.Uint64()))",
+    "supporting_relevant": [],
+    "unknown": [],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-011",
+    "primary": "RQ-011",
+    "source_behavior_draft": "이전 skeleton 진행을 decode하고 새 head에 따라 subchain을 삭제·절단·연장하거나 새로 만든다.",
+    "question_contract_draft": "동기화 재시작 subchain 조정",
+    "primary_witness_text": "if lastchain.Tail >= headchain.Tail {",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-009",
+        "rationale": "헤더 조상 검사가 재시작 subchain 조정의 관련 위치인지 추가 계약이 필요하다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-012",
+    "primary": "RQ-012",
+    "source_behavior_draft": "계정별 첫 거래의 fee wrapper 실패 시 계정을 제거하고 나머지를 heap으로 초기화한다. 전체 비교 우선순위는 이 함수 밖 comparator 검토가 필요하다.",
+    "question_contract_draft": "계정별 선택 목록/가격 heap 초기화",
+    "primary_witness_text": "wrapped, err := newTxWithMinerFee(",
+    "supporting_relevant": [
+      {
+        "location_case_id": "RQ-014",
+        "rationale": "pending 거래 경로가 계정별 가격/nonce 선택기를 만드는 실제 소비자 문맥이다. comparator 자체의 증명은 아니다.",
+        "witness_text": "plainTxs := newTransactionsByPriceAndNonce"
+      }
+    ],
+    "unknown": [],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-013",
+    "primary": "RQ-013",
+    "source_behavior_draft": "새 head의 engine handler와 stopped 오류 및 ready round에 따라 newWorkCh로 commit 요청을 보낸다.",
+    "question_contract_draft": "새 head 후 작업 예약 조건",
+    "primary_witness_text": "if errors.Is(err, wbft.ErrStoppedEngine) {",
+    "supporting_relevant": [
+      {
+        "location_case_id": "RQ-014",
+        "rationale": "newWorkCh 요청을 받아 commitWork로 넘기는 작업 시작의 소비자 문맥이다. head 분기 원인은 primary 함수에서 따로 확인한다.",
+        "witness_text": "case req := <-w.newWorkCh:"
+      }
+    ],
+    "unknown": [],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-014",
+    "primary": "RQ-014",
+    "source_behavior_draft": "새 거래 수신 시 실행 상태·가스·현재 block 조건과 tcount 증가에 따라 pending snapshot을 갱신한다.",
+    "question_contract_draft": "새 거래 후 pending 화면 갱신 조건",
+    "primary_witness_text": "if tcount != w.current.tcount {",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-013",
+        "rationale": "WBFT head 작업 예약이 새 거래 pending 화면 갱신의 직접 관련 위치인지는 engine/실행 상태 계약 검토가 필요하다."
+      },
+      {
+        "location_case_id": "RQ-012",
+        "rationale": "선택기 초기화가 실제 tcount 증가에 미치는 효과는 comparator/commitTransactions 등 범위 밖 구현이 필요하다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-015",
+    "primary": "RQ-015",
+    "source_behavior_draft": "유효한 응답 노드만 누적하고 응답 묶음 수를 세며 오류 시 누적 노드와 오류를 함께 반환한다.",
+    "question_contract_draft": "탐색 응답의 부분 노드 반환",
+    "primary_witness_text": "case err := <-c.err:",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-016",
+        "rationale": "탐색 record 검증에서 이 RLP decode 함수까지의 실제 경로/형식 계약은 범위 밖이다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-016",
+    "primary": "RQ-016",
+    "source_behavior_draft": "RLP record 크기/완전성·중복 key·key 정렬을 검사한다.",
+    "question_contract_draft": "노드 record 중복/정렬 거부",
+    "primary_witness_text": "return dec, raw, errDuplicateKey",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-015",
+        "rationale": "탐색 응답 검증과 ENR decode 오류의 연결은 직접 body 증거만으로 확정하지 않는다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-017",
+    "primary": "RQ-017",
+    "source_behavior_draft": "CIDR 목록을 순서대로 append하므로 나중 항목 파싱 실패 전의 값은 이미 반영된다. 전체 원자성 요구 여부는 미확정이다.",
+    "question_contract_draft": "네트워크 목록 파싱 실패 후 앞선 값 잔존",
+    "primary_witness_text": "*l = append(*l, *n)",
+    "supporting_relevant": [],
+    "unknown": [],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-018",
+    "primary": "RQ-018",
+    "source_behavior_draft": "재연결 때 이전 handler를 닫고 read를 비운 뒤 lastOp를 새 연결에 다시 등록한다.",
+    "question_contract_draft": "원격 호출 재연결/진행 요청 정리",
+    "primary_witness_text": "conn.close(errClientReconnected, lastOp)",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-020",
+        "rationale": "dispatch가 batch 처리를 호출하지만 재연결 정리와 batch의 시간/응답 계약이 어떤 요청을 공유하는지는 미확정이다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-019",
+    "primary": "RQ-019",
+    "source_behavior_draft": "API 등록 실패를 listener 생성 전에 반환하고 listen 성공 후에만 ServeListener를 시작한다.",
+    "question_contract_draft": "로컬 호출 소켓 등록/생성 실패",
+    "primary_witness_text": "handler.RegisterName(api.Namespace, api.Service)",
+    "supporting_relevant": [],
+    "unknown": [],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  },
+  {
+    "case_id": "RQ-020",
+    "primary": "RQ-020",
+    "source_behavior_draft": "batch 요청 수·시간·누적 결과 크기 상한을 검사하고 남은 응답/구독을 처리한다. 응답 크기 합계는 Result 길이로 계산한다.",
+    "question_contract_draft": "batch 시간/응답 크기 제한",
+    "primary_witness_text": "responseBytes += len(resp.Result)",
+    "supporting_relevant": [],
+    "unknown": [
+      {
+        "location_case_id": "RQ-018",
+        "rationale": "client 재연결과 server batch 상한의 end-to-end 영향은 미검증이다."
+      }
+    ],
+    "negative_review": "The remaining selected function bodies were read against this question contract; their documented local behavior does not directly implement or explicitly support this symptom. Bounded function-body judgment only; no transitive/runtime/safety verdict.",
+    "author": "AI_source_review_not_independent_reviewer"
+  }
+]

@@ -1,0 +1,16 @@
+func (s *SyncStatusSubscription) Unsubscribe() {
+	s.unsubOnce.Do(func() {
+		req := uninstallSyncSubscriptionRequest{s.c, make(chan interface{})}
+		s.api.uninstallSyncSubscription <- &req
+
+		for {
+			select {
+			case <-s.c:
+				// drop new status events until uninstall confirmation
+				continue
+			case <-req.uninstalled:
+				return
+			}
+		}
+	})
+}

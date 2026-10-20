@@ -1,0 +1,490 @@
+{
+  "status": "ai_gap_review_not_independent_defect_gold_or_acceptance",
+  "case_id": "SUB-EXIT-DRAFT-001",
+  "family_proposal": "downloader-sync-unsubscribe-handshake",
+  "source": {
+    "repository_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+    "path": "eth/downloader/api.go",
+    "entry_points": [
+      "Syncing",
+      "eventLoop",
+      "SyncStatusSubscription.Unsubscribe"
+    ]
+  },
+  "api_route_draft": {
+    "subscribe_method": "eth_subscribe",
+    "subscribe_params": [
+      "syncing"
+    ],
+    "unsubscribe_method": "eth_unsubscribe",
+    "unsubscribe_params": [
+      "<subscription-id>"
+    ],
+    "requires_subscription_capable_transport": true,
+    "runtime_receipt": null
+  },
+  "source_anchors": [
+    {
+      "id": "API-01",
+      "path": "eth/backend.go",
+      "lines": [
+        325,
+        344
+      ],
+      "fact": "Ethereum.APIs는 eth namespace에 DownloaderAPI를 등록한다.",
+      "gap": "대상 설치/transport 설정과 실제 eth_subscribe 요청 영수증은 없다.",
+      "anchor": {
+        "start_line": 325,
+        "end_line": 344,
+        "start_byte": 11731,
+        "end_byte_exclusive": 12344,
+        "span_sha256": "6744776f7ed81fb657fd9cd53ac6e12beeb533503b5e19def30cb7f452bff0fe"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-02",
+      "path": "rpc/service.go",
+      "lines": [
+        60,
+        92
+      ],
+      "fact": "구독 callback은 일반 callback과 별도 registry에 등록한다.",
+      "gap": "등록된 실제 서비스 인스턴스와 세션 pin 확인 필요.",
+      "anchor": {
+        "start_line": 60,
+        "end_line": 92,
+        "start_byte": 2013,
+        "end_byte_exclusive": 2844,
+        "span_sha256": "b00ad7b69b91c6d0d6b78d952e3bf1d61422391c8d4c6b199b9fbf9388b90891"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-03",
+      "path": "rpc/service.go",
+      "lines": [
+        115,
+        130
+      ],
+      "fact": "exported method를 formatName으로 변환하여 callback 이름을 정한다.",
+      "gap": "Syncing의 subscription 분류와 lower-case 이름 연결을 검토한다.",
+      "anchor": {
+        "start_line": 115,
+        "end_line": 130,
+        "start_byte": 3660,
+        "end_byte_exclusive": 4102,
+        "span_sha256": "02bdeb1f9570ce7266c5ae57825971534765e5d56b791e411f6732807a2b6ff9"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-04",
+      "path": "rpc/service.go",
+      "lines": [
+        230,
+        247
+      ],
+      "fact": "context와 Subscription/error 서명이 subscription이며 첫 문자를 소문자로 바꾼다.",
+      "gap": "소스 경로 확인이 실제 호출 도달성 증명은 아니다.",
+      "anchor": {
+        "start_line": 230,
+        "end_line": 247,
+        "start_byte": 6872,
+        "end_byte_exclusive": 7462,
+        "span_sha256": "9f321c01517ebf2ab4917d811c00fa82deea197d83cfcbfd30b6454a75891d8b"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-05",
+      "path": "rpc/handler.go",
+      "lines": [
+        530,
+        566
+      ],
+      "fact": "*_subscribe는 첫 인자를 구독 이름으로 사용하고 notifier를 context에 넣어 callback을 호출한다.",
+      "gap": "allowSubscribe/transport·등록·실제 callback 실행 영수증 필요.",
+      "anchor": {
+        "start_line": 530,
+        "end_line": 566,
+        "start_byte": 15018,
+        "end_byte_exclusive": 16402,
+        "span_sha256": "750e271bbb76c2092ec29bc0952865121f077c534034641b1913a0670cd3c1c1"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-06",
+      "path": "rpc/handler.go",
+      "lines": [
+        572,
+        584
+      ],
+      "fact": "*_unsubscribe는 server subscription의 err 채널을 닫고 map에서 지운 뒤 반환한다.",
+      "gap": "RPC 해제 응답은 downstream Unsubscribe 확인/반환과 동일하지 않다.",
+      "anchor": {
+        "start_line": 572,
+        "end_line": 584,
+        "start_byte": 16469,
+        "end_byte_exclusive": 16798,
+        "span_sha256": "2b8b9b8dfa043299c6e0c926cdaf940b87f5a47fcaf12cf90a8fd0f0221912d1"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-07",
+      "path": "rpc/handler.go",
+      "lines": [
+        367,
+        378
+      ],
+      "fact": "연결 정리는 server 구독 오류 채널에 오류를 보내고 닫는다.",
+      "gap": "연결 종료/구독 종료/알림 중첩 스케줄과 소유 정리를 검토한다.",
+      "anchor": {
+        "start_line": 367,
+        "end_line": 378,
+        "start_byte": 10692,
+        "end_byte_exclusive": 10980,
+        "span_sha256": "b80eb52370b2799afdd4bbc949d011995449eab5435c02c5b0cd3b582a94817f"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-08",
+      "path": "rpc/subscription.go",
+      "lines": [
+        94,
+        154
+      ],
+      "fact": "Notifier는 context 조회·subscription 생성·알림 송신·연결 Closed를 제공한다.",
+      "gap": "Notify 활성화/버퍼/writeJSON 지연과 무시되는 error의 영향을 확인한다.",
+      "anchor": {
+        "start_line": 94,
+        "end_line": 154,
+        "start_byte": 2523,
+        "end_byte_exclusive": 4472,
+        "span_sha256": "5d650d0b36bef3aeefe2a3ffb0ae8f984e778d7cb9e4dc7b8938cc0d5a504680"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-09",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        45,
+        54
+      ],
+      "fact": "생성자는 buffer 없는 설치/해제 채널과 eventLoop goroutine을 만든다.",
+      "gap": "실제 mux/chain/progress 및 eventLoop 수명은 추출 대역 범위 밖이다.",
+      "anchor": {
+        "start_line": 45,
+        "end_line": 54,
+        "start_byte": 1802,
+        "end_byte_exclusive": 2190,
+        "span_sha256": "e8cdc13fcf7827f286290e4d4981013729173ff70f732ad425d4e33bcab304d7"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-10",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        67,
+        130
+      ],
+      "fact": "eventLoop는 map 등록/삭제와 삭제 확인 close, 동기 status 송신을 수행하며 mux 종료 시 반환한다.",
+      "gap": "다른 수신자의 정지·이미 done인 등록·mux 종료 뒤 확인 미발생의 계약이 미확정이다.",
+      "anchor": {
+        "start_line": 67,
+        "end_line": 130,
+        "start_byte": 2605,
+        "end_byte_exclusive": 3995,
+        "span_sha256": "521fa7ba4492c041fccb992e556e2dd6bcaf59e5b6e3bf566affedd2f189f6d3"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-11",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        133,
+        158
+      ],
+      "fact": "Syncing은 unbuffered status를 구독하고 RPC err/Closed에서 반환하며 Unsubscribe를 defer한다.",
+      "gap": "RPC 종료와 실제 eventLoop 송신 중첩을 통제 대역 없이 재현해야 한다.",
+      "anchor": {
+        "start_line": 133,
+        "end_line": 158,
+        "start_byte": 4115,
+        "end_byte_exclusive": 4696,
+        "span_sha256": "8d1b16677e9091e943071f84d70021d5e810a615b79b74d884897e839e6a7a36"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-12",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        180,
+        198
+      ],
+      "fact": "Unsubscribe는 uninstall 요청 송신 뒤 status를 drain하며 확인을 기다린다. 반환 후 status 채널 미사용 계약을 주석에 명시한다.",
+      "gap": "반환 상한·eventLoop 생존 가정·sync.Once 동시 호출과 종료 이후 안전성을 독립 검토한다.",
+      "anchor": {
+        "start_line": 180,
+        "end_line": 198,
+        "start_byte": 5458,
+        "end_byte_exclusive": 5992,
+        "span_sha256": "1b5398ed46172689f685f36418ea37b4a06c206e6f776bbb4421afc016c73d49"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    },
+    {
+      "id": "API-13",
+      "path": "eth/downloader/api.go",
+      "lines": [
+        200,
+        205
+      ],
+      "fact": "SubscribeSyncStatus는 설치 요청 송신 후 구독 객체를 반환한다.",
+      "gap": "done 상태에서 초기 false 송신이 후속 해제와 겹칠 수 있는 실제 순서를 검토한다.",
+      "anchor": {
+        "start_line": 200,
+        "end_line": 205,
+        "start_byte": 5993,
+        "end_byte_exclusive": 6354,
+        "span_sha256": "def589cfa7e2f74acdef53a6af2edef4a728391e1e6e76fa90f14f9d458dfebb"
+      },
+      "kind": "ai_source_inspection_not_runtime_or_gold",
+      "approved": false
+    }
+  ],
+  "same_scenarios": [
+    "normal_delivery_then_unsubscribe",
+    "blocked_delivery_then_consumer_exit",
+    "late_delivery_before_confirmation",
+    "confirmation_delayed",
+    "concurrent_unsubscribe_once"
+  ],
+  "primary_oracle_ai_draft": [
+    "모든 Unsubscribe 호출 반환",
+    "해제 요청 정확히 1개",
+    "loop가 해제 완료를 확인하고 구독을 제거",
+    "확인 전 반환하지 않음",
+    "모든 시험 소유 goroutine 종료"
+  ],
+  "secondary_oracle_ai_draft": {
+    "kind": "same_ai_source_derived_wait_graph_not_independent",
+    "nodes": [
+      "eventLoop status send",
+      "Unsubscribe uninstall send"
+    ],
+    "edges": [
+      "eventLoop waits for sole consumer",
+      "Unsubscribe waits for eventLoop before it starts draining status"
+    ],
+    "scope": "controlled extracted-method schedule only"
+  },
+  "candidates": [
+    {
+      "id": "CAND-A",
+      "artifact": "candidate-a.go.txt",
+      "sha256": "1d0134d5eb45a4f15b8e167f2bf06497f885de35a5ad6fcfd14e576b9caf8475",
+      "source_question_draft": "중첩 select로 요청 전 drain/요청 후 확인 대기를 구분한다. 다른 구독자 정지·loop 종료·무한 status 공급에서 반환/안전 계약을 독립 검토한다.",
+      "local_observations": 10,
+      "ai_fixture_criteria_met": 10,
+      "independent_acceptable_membership": null,
+      "actual_api_receipt": null,
+      "applied_project_tree": null,
+      "performance_or_fairness_measurements": null
+    },
+    {
+      "id": "CAND-B",
+      "artifact": "candidate-b.go.txt",
+      "sha256": "9e6db67b42c3456e401c019557f3ee924428a9d003819cda39a7f4c1bc792ed3",
+      "source_question_draft": "단일 select에서 요청 성공 뒤 send=nil로 중복 요청을 막는다. 확인 전 drain·nil case 비활성화와 종료/공정성 가정을 독립 검토한다.",
+      "local_observations": 10,
+      "ai_fixture_criteria_met": 10,
+      "independent_acceptable_membership": null,
+      "actual_api_receipt": null,
+      "applied_project_tree": null,
+      "performance_or_fairness_measurements": null
+    }
+  ],
+  "mutants": [
+    {
+      "id": "MUT-REINTRO",
+      "artifact": "reintroduction.go.txt",
+      "role": "symptom_reintroduction"
+    },
+    {
+      "id": "MUT-EARLY",
+      "artifact": "early-return.go.txt",
+      "role": "overfit_early_return"
+    }
+  ],
+  "reintroduction_bytes_equal_original": true,
+  "local_matrix": [
+    {
+      "variant": "CAND-A",
+      "mode": "normal",
+      "observations": 5,
+      "ai_fixture_criteria_met": 5,
+      "completed_before_rescue": 5,
+      "two_sender_wait_witnesses": 0,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "CAND-A",
+      "mode": "race",
+      "observations": 5,
+      "ai_fixture_criteria_met": 5,
+      "completed_before_rescue": 5,
+      "two_sender_wait_witnesses": 0,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "CAND-B",
+      "mode": "normal",
+      "observations": 5,
+      "ai_fixture_criteria_met": 5,
+      "completed_before_rescue": 5,
+      "two_sender_wait_witnesses": 0,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "CAND-B",
+      "mode": "race",
+      "observations": 5,
+      "ai_fixture_criteria_met": 5,
+      "completed_before_rescue": 5,
+      "two_sender_wait_witnesses": 0,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "MUT-EARLY",
+      "mode": "normal",
+      "observations": 5,
+      "ai_fixture_criteria_met": 0,
+      "completed_before_rescue": 5,
+      "two_sender_wait_witnesses": 0,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "MUT-EARLY",
+      "mode": "race",
+      "observations": 5,
+      "ai_fixture_criteria_met": 0,
+      "completed_before_rescue": 5,
+      "two_sender_wait_witnesses": 0,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "MUT-REINTRO",
+      "mode": "normal",
+      "observations": 5,
+      "ai_fixture_criteria_met": 4,
+      "completed_before_rescue": 4,
+      "two_sender_wait_witnesses": 1,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "MUT-REINTRO",
+      "mode": "race",
+      "observations": 5,
+      "ai_fixture_criteria_met": 4,
+      "completed_before_rescue": 4,
+      "two_sender_wait_witnesses": 1,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "mode": "normal",
+      "observations": 5,
+      "ai_fixture_criteria_met": 4,
+      "completed_before_rescue": 4,
+      "two_sender_wait_witnesses": 1,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    },
+    {
+      "variant": "ORIGINAL",
+      "mode": "race",
+      "observations": 5,
+      "ai_fixture_criteria_met": 4,
+      "completed_before_rescue": 4,
+      "two_sender_wait_witnesses": 1,
+      "all_owned_goroutines_stopped": true,
+      "independent_units": 0,
+      "actual_api_runs": 0
+    }
+  ],
+  "oracle_questions": [
+    "실제 API trace에서 증상/정상·허용 비결정 순서와 관측 상한을 정의하고 timeout·infra 오류·미도달을 결함 RED와 분리해야 한다.",
+    "secondary wait graph는 같은 AI/같은 가설이다. 독립 검토자가 주 oracle의 상수/helper를 복사하지 않고 별도 derivation·실행 driver·검토 receipt를 마련해야 한다.",
+    "삭제/확인/반환/반환 후 status 미사용을 구분하고 rescue 전 결과·소유 goroutine 정리·동시 호출을 유지해야 한다.",
+    "MUT-REINTRO는 원본과 같은 바이트이며 별도 결함/가족이 아니다. MUT-EARLY의 실패 이유·정상 대조군·진짜 오류 거부를 실제 tier에 묶어야 한다."
+  ],
+  "acceptable_set_questions": [
+    "티켓별 독립 검토자가 후보 ID뿐 아니라 source commit/tree/diff/요구사항 pin과 membership 근거를 사전 동결해야 한다.",
+    "hard gate는 correctness·normal regression·mutation sensitivity·actual API contract·source/driver pin·필수 단계·owned cleanup을 명시하고 WARN/SKIPPED 허용 범위를 독립 결정해야 한다.",
+    "같은 AI fixture 통과를 acceptable set으로 채우지 않는다. CAND-A/B membership는 null로 유지한다.",
+    "all-bad→선택 없음, tie→TIED, incomplete/unknown→DEFERRED의 수용 mapping과 오류/분모·허용 기권을 동결해야 한다.",
+    "성능·메모리·공정성·복잡도·유지보수성의 axes/단위/방향/허용차/측정 adapter·비용/불일치·사람 선택 수용을 정한다. 현재 구독 후보의 비교 측정은 없다."
+  ],
+  "obligations": {
+    "independent_ticket_and_family": "not_satisfied",
+    "source_and_transport_reachability": "not_satisfied",
+    "defect_and_normal_contract": "not_satisfied",
+    "primary_executable_oracle": "not_satisfied",
+    "independently_derived_executable_oracle": "not_satisfied",
+    "reintroduction_and_overfit_mutants": "not_satisfied",
+    "frozen_red_carrier_and_candidate_trees": "not_satisfied",
+    "independent_acceptable_candidate_set": "not_satisfied",
+    "comparison_axes_drivers_and_hard_gates": "not_satisfied",
+    "all_bad_tie_incomplete_mapping": "not_satisfied",
+    "installed_four_role_handoff_and_final_head": "not_satisfied",
+    "sample_sufficiency_exposure_dev_final": "not_satisfied",
+    "human_review_and_final_acceptance": "not_satisfied"
+  },
+  "independent_ticket": null,
+  "independently_derived_oracle": null,
+  "independent_acceptable_candidate_set": null,
+  "reviewer": null,
+  "review_receipt": null,
+  "split": null,
+  "verified_project_defect": false,
+  "operational_gate": "not_run",
+  "quality_gate": "not_run",
+  "independent_acceptance": "not_recorded"
+}

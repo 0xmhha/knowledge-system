@@ -1,0 +1,172 @@
+# Structured function review
+
+Status: structured partial review; independent acceptance: not recorded.
+
+Source pins:
+```json
+{
+  "bytes": 67,
+  "canonical_id": "example.invalid/consumer-stdio-fixture.Field",
+  "commit": "7c8dae874c40306549f0f43fffee2113ff58c9d8",
+  "file": "logic.go",
+  "function_name": "Field",
+  "language": "go",
+  "node_id": "55fac4690874d1be",
+  "sha256": "6915fd89e741e294691770ad920c8e4892d3c1fbe1d57ddf2b344dd38135525c",
+  "snapshot_sha256": "7ccd9521f85d4dcbcce5d14ea333e488841e103b9bceeb842187370f624f58eb",
+  "start_byte": 402,
+  "start_line": 21
+}
+```
+
+Computed CFG sequence (not an execution trace):
+```json
+{
+  "edges": [],
+  "kind": "bounded_cfg_not_execution_trace"
+}
+```
+
+Module membership:
+```json
+{
+  "file": "logic.go",
+  "interprocedural_edges": "unknown",
+  "kind": "retained_file_membership",
+  "symbol": "55fac4690874d1be"
+}
+```
+
+## data_state
+
+```json
+{
+  "assumptions": [
+    "The pinned owned fixture is the review target."
+  ],
+  "claim": "The owned fixture has a retained local computation to inspect.",
+  "evidence_nodes": [
+    "b0/n0"
+  ],
+  "origin": "agent_reasoning",
+  "status": "inferred",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## guards_exceptions
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established guards_exceptions.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## complexity
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established complexity.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## resources
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established resources.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## io
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established io.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## priority_tradeoffs
+
+```json
+{
+  "assumptions": [],
+  "claim": "This scripted adapter has not established priority_tradeoffs.",
+  "evidence_nodes": [],
+  "origin": "agent_reasoning",
+  "status": "unknown",
+  "unknowns": [
+    "Scripted transport test: no independent semantic review."
+  ]
+}
+```
+
+## Findings and review criteria
+
+```json
+{
+  "criteria": [
+    {
+      "id": "owned-local-shape",
+      "reason": "Scripted transport fixture only; not independent completeness or quality.",
+      "requirement": "Preserve the source-bound local computation with explicit uncertainty.",
+      "section": "data_state",
+      "status": "covered"
+    }
+  ],
+  "findings": []
+}
+```
+
+## Limitations
+
+- graph rule/value computation is bounded, not whole-program safety
+- structural review lacks its own immutable snapshot/blob pin; no atomic cross-call proof
+- source/CFG order is not a runtime call trace
+- agent findings, complexity/resources/I/O and priorities are reasoning, not measured facts
+- local receipt hashes do not authenticate MCP transport or grant reviewer acceptance
+
+## Diagrams (computed local structure; no runtime trace)
+
+```mermaid
+flowchart TD
+%% Computed bounded CFG; runtime feasibility, calls and exceptions remain unknown.
+  empty["No CFG successors; no safety conclusion"]
+```
+
+```mermaid
+flowchart LR
+%% Computed retained-file membership; interprocedural edges are unknown.
+  file["logic.go"] -->|computed membership| symbol["Selected retained function"]
+  symbol -.->|unknown, not computed| external["Interprocedural relationships unavailable"]
+```

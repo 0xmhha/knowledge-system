@@ -1,0 +1,400 @@
+POOL-normal — WI-4 bounded conditional AI DEV, not independent oracle
+{
+  "case_id": "POOL-normal",
+  "family_proposal": "SCHED-005",
+  "mechanism_proposal": "pool_lock_held_during_synchronous_fanout",
+  "work_item_id": "WI-4",
+  "split": "DEV",
+  "formal_split": null,
+  "independent_family": null,
+  "reviewer": null,
+  "independent_review_receipt": null,
+  "source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_mode": "committed",
+  "source_project": "go-stablenet",
+  "schedule": {
+    "id": "POOL-normal",
+    "kind": "normal_control",
+    "start_conditions": [
+      "수신자 준비",
+      "Stats는 수신 후 호출"
+    ],
+    "steps": [
+      "Reset 송신",
+      "수신",
+      "Stats"
+    ],
+    "observations": [
+      "잠금 해제",
+      "송신·조회 완료"
+    ],
+    "primary_expectation_draft": "정상 순서에서 완료",
+    "step_deadline_ms": 2000,
+    "cleanup": [
+      "관측 결과를 먼저 복사한다",
+      "시험 소유 취소 신호·타이머·가짜 peer를 종료한다",
+      "등록·잠금·모든 시험 소유 goroutine의 종료를 확인한다"
+    ],
+    "outcome_status": "ai_draft_not_independent_oracle"
+  },
+  "strengthened_preconditions": [
+    "StateAt succeeds and reorg produces nonempty successfully reinjected adds",
+    "reorg subscriber is ready to receive insertFeed",
+    "Stats called only after receipt",
+    "remaining Reset operations succeed"
+  ],
+  "source_entry": {
+    "anchor": {
+      "path": "core/txpool/blobpool/blobpool.go",
+      "start_line": 1630,
+      "end_line": 1638,
+      "start_byte": 63311,
+      "end_byte_exclusive": 63666,
+      "span_sha256": "2483617d738eec3356b9dff124a1b5f24265fadca6636a8fbe15e6891655dc48"
+    },
+    "fact": "SubscribeTransactions는 reorgs=true에서 insertFeed, 아니면 discoverFeed에 구독한다.",
+    "reachability_question": "실제 reorgs 구독자가 수신 전 Stats/같은 lock을 기다리는 경로와 buffer 포화 조건을 입증해야 한다. 통제 subscriber 순환 대기를 운영 도달성으로 승격하지 않는다.",
+    "contract_question": "구독자 버퍼·수신 순서·허용 backpressure·해제 시 자원 정리와 정상 대조군을 독립 오라클로 확정해야 한다.",
+    "origin": "ai_source_inspection_not_runtime_or_gold",
+    "approved": false
+  },
+  "source_unknowns": [
+    "실제 구독자가 수신 전 Stats를 호출하는 경로는 확인하지 않았다",
+    "충분한 버퍼가 권고되므로 backpressure 자체가 결함이라는 의미는 아니다",
+    "제안한 잠금 순서는 통제된 subscriber 대역에서만 구성한다"
+  ],
+  "product_contract_questions": [
+    "Reset이 구독자 수신을 기다리는 동안 조회가 대기하는 것은 허용되는가",
+    "호출자가 지켜야 하는 버퍼·수신 순서 계약은 무엇인가"
+  ],
+  "source_refs": [
+    {
+      "path": "core/txpool/blobpool/blobpool.go",
+      "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+      "start_line": 784,
+      "end_line": 819,
+      "start_byte": 32400,
+      "end_byte_exclusive": 33555,
+      "span_sha256": "2d8274c01c64486704d29981278c7c6fc4af02e3077c69227a269e7514eb6b81",
+      "text": "func (p *BlobPool) Reset(oldHead, newHead *types.Header) {\n\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n\n\t// Run the reorg between the old and new head and figure out which accounts\n\t// need to be rechecked and which transactions need to be readded\n\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n"
+    },
+    {
+      "path": "core/txpool/blobpool/blobpool.go",
+      "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+      "start_line": 1654,
+      "end_line": 1663,
+      "start_byte": 64118,
+      "end_byte_exclusive": 64333,
+      "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c",
+      "text": "func (p *BlobPool) Stats() (int, int) {\n\tp.lock.Lock()\n\tdefer p.lock.Unlock()\n\n\tvar pending int\n\tfor _, txs := range p.index {\n\t\tpending += len(txs)\n\t}\n\treturn pending, 0 // No non-executable txs in the blob pool\n}\n"
+    },
+    {
+      "path": "event/feed.go",
+      "file_sha256": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879",
+      "start_line": 120,
+      "end_line": 179,
+      "start_byte": 4154,
+      "end_byte_exclusive": 5962,
+      "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c",
+      "text": "func (f *Feed) Send(value interface{}) (nsent int) {\n\trvalue := reflect.ValueOf(value)\n\n\tf.once.Do(func() { f.init(rvalue.Type()) })\n\tif f.etype != rvalue.Type() {\n\t\tpanic(feedTypeError{op: \"Send\", got: rvalue.Type(), want: f.etype})\n\t}\n\n\t<-f.sendLock\n\n\t// Add new cases from the inbox after taking the send lock.\n\tf.mu.Lock()\n\tf.sendCases = append(f.sendCases, f.inbox...)\n\tf.inbox = nil\n\tf.mu.Unlock()\n\n\t// Set the sent value on all channels.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = rvalue\n\t}\n\n\t// Send until all channels except removeSub have been chosen. 'cases' tracks a prefix\n\t// of sendCases. When a send succeeds, the corresponding case moves to the end of\n\t// 'cases' and it shrinks by one element.\n\tcases := f.sendCases\n\tfor {\n\t\t// Fast path: try sending without blocking before adding to the select set.\n\t\t// This should usually succeed if subscribers are fast enough and have free\n\t\t// buffer space.\n\t\tfor i := firstSubSendCase; i < len(cases); i++ {\n\t\t\tif cases[i].Chan.TrySend(rvalue) {\n\t\t\t\tnsent++\n\t\t\t\tcases = cases.deactivate(i)\n\t\t\t\ti--\n\t\t\t}\n\t\t}\n\t\tif len(cases) == firstSubSendCase {\n\t\t\tbreak\n\t\t}\n\t\t// Select on all the receivers, waiting for them to unblock.\n\t\tchosen, recv, _ := reflect.Select(cases)\n\t\tif chosen == 0 /* <-f.removeSub */ {\n\t\t\tindex := f.sendCases.find(recv.Interface())\n\t\t\tf.sendCases = f.sendCases.delete(index)\n\t\t\tif index >= 0 && index < len(cases) {\n\t\t\t\t// Shrink 'cases' too because the removed case was still active.\n\t\t\t\tcases = f.sendCases[:len(cases)-1]\n\t\t\t}\n\t\t} else {\n\t\t\tcases = cases.deactivate(chosen)\n\t\t\tnsent++\n\t\t}\n\t}\n\n\t// Forget about the sent value and hand off the send lock.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = reflect.Value{}\n\t}\n\tf.sendLock <- struct{}{}\n\treturn nsent\n"
+    }
+  ],
+  "universe": [
+    {
+      "id": "feed_then_unlock_stats",
+      "label": "legal",
+      "rationale": "Send can finish, Reset eventually leaves and releases lock; Stats can then acquire it.",
+      "source_refs": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 784,
+          "end_line": 819,
+          "start_byte": 32400,
+          "end_byte_exclusive": 33555,
+          "span_sha256": "2d8274c01c64486704d29981278c7c6fc4af02e3077c69227a269e7514eb6b81",
+          "text": "func (p *BlobPool) Reset(oldHead, newHead *types.Header) {\n\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n\n\t// Run the reorg between the old and new head and figure out which accounts\n\t// need to be rechecked and which transactions need to be readded\n\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 1654,
+          "end_line": 1663,
+          "start_byte": 64118,
+          "end_byte_exclusive": 64333,
+          "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c",
+          "text": "func (p *BlobPool) Stats() (int, int) {\n\tp.lock.Lock()\n\tdefer p.lock.Unlock()\n\n\tvar pending int\n\tfor _, txs := range p.index {\n\t\tpending += len(txs)\n\t}\n\treturn pending, 0 // No non-executable txs in the blob pool\n}\n"
+        },
+        {
+          "path": "event/feed.go",
+          "file_sha256": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879",
+          "start_line": 120,
+          "end_line": 179,
+          "start_byte": 4154,
+          "end_byte_exclusive": 5962,
+          "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c",
+          "text": "func (f *Feed) Send(value interface{}) (nsent int) {\n\trvalue := reflect.ValueOf(value)\n\n\tf.once.Do(func() { f.init(rvalue.Type()) })\n\tif f.etype != rvalue.Type() {\n\t\tpanic(feedTypeError{op: \"Send\", got: rvalue.Type(), want: f.etype})\n\t}\n\n\t<-f.sendLock\n\n\t// Add new cases from the inbox after taking the send lock.\n\tf.mu.Lock()\n\tf.sendCases = append(f.sendCases, f.inbox...)\n\tf.inbox = nil\n\tf.mu.Unlock()\n\n\t// Set the sent value on all channels.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = rvalue\n\t}\n\n\t// Send until all channels except removeSub have been chosen. 'cases' tracks a prefix\n\t// of sendCases. When a send succeeds, the corresponding case moves to the end of\n\t// 'cases' and it shrinks by one element.\n\tcases := f.sendCases\n\tfor {\n\t\t// Fast path: try sending without blocking before adding to the select set.\n\t\t// This should usually succeed if subscribers are fast enough and have free\n\t\t// buffer space.\n\t\tfor i := firstSubSendCase; i < len(cases); i++ {\n\t\t\tif cases[i].Chan.TrySend(rvalue) {\n\t\t\t\tnsent++\n\t\t\t\tcases = cases.deactivate(i)\n\t\t\t\ti--\n\t\t\t}\n\t\t}\n\t\tif len(cases) == firstSubSendCase {\n\t\t\tbreak\n\t\t}\n\t\t// Select on all the receivers, waiting for them to unblock.\n\t\tchosen, recv, _ := reflect.Select(cases)\n\t\tif chosen == 0 /* <-f.removeSub */ {\n\t\t\tindex := f.sendCases.find(recv.Interface())\n\t\t\tf.sendCases = f.sendCases.delete(index)\n\t\t\tif index >= 0 && index < len(cases) {\n\t\t\t\t// Shrink 'cases' too because the removed case was still active.\n\t\t\t\tcases = f.sendCases[:len(cases)-1]\n\t\t\t}\n\t\t} else {\n\t\t\tcases = cases.deactivate(chosen)\n\t\t\tnsent++\n\t\t}\n\t}\n\n\t// Forget about the sent value and hand off the send lock.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = reflect.Value{}\n\t}\n\tf.sendLock <- struct{}{}\n\treturn nsent\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "stats_wait_while_reset_lock",
+      "label": "legal",
+      "rationale": "Stats waiting before Reset actually returns is compatible with the same mutex and is not itself a deadlock.",
+      "source_refs": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 784,
+          "end_line": 819,
+          "start_byte": 32400,
+          "end_byte_exclusive": 33555,
+          "span_sha256": "2d8274c01c64486704d29981278c7c6fc4af02e3077c69227a269e7514eb6b81",
+          "text": "func (p *BlobPool) Reset(oldHead, newHead *types.Header) {\n\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n\n\t// Run the reorg between the old and new head and figure out which accounts\n\t// need to be rechecked and which transactions need to be readded\n\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 1654,
+          "end_line": 1663,
+          "start_byte": 64118,
+          "end_byte_exclusive": 64333,
+          "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c",
+          "text": "func (p *BlobPool) Stats() (int, int) {\n\tp.lock.Lock()\n\tdefer p.lock.Unlock()\n\n\tvar pending int\n\tfor _, txs := range p.index {\n\t\tpending += len(txs)\n\t}\n\treturn pending, 0 // No non-executable txs in the blob pool\n}\n"
+        },
+        {
+          "path": "event/feed.go",
+          "file_sha256": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879",
+          "start_line": 120,
+          "end_line": 179,
+          "start_byte": 4154,
+          "end_byte_exclusive": 5962,
+          "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c",
+          "text": "func (f *Feed) Send(value interface{}) (nsent int) {\n\trvalue := reflect.ValueOf(value)\n\n\tf.once.Do(func() { f.init(rvalue.Type()) })\n\tif f.etype != rvalue.Type() {\n\t\tpanic(feedTypeError{op: \"Send\", got: rvalue.Type(), want: f.etype})\n\t}\n\n\t<-f.sendLock\n\n\t// Add new cases from the inbox after taking the send lock.\n\tf.mu.Lock()\n\tf.sendCases = append(f.sendCases, f.inbox...)\n\tf.inbox = nil\n\tf.mu.Unlock()\n\n\t// Set the sent value on all channels.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = rvalue\n\t}\n\n\t// Send until all channels except removeSub have been chosen. 'cases' tracks a prefix\n\t// of sendCases. When a send succeeds, the corresponding case moves to the end of\n\t// 'cases' and it shrinks by one element.\n\tcases := f.sendCases\n\tfor {\n\t\t// Fast path: try sending without blocking before adding to the select set.\n\t\t// This should usually succeed if subscribers are fast enough and have free\n\t\t// buffer space.\n\t\tfor i := firstSubSendCase; i < len(cases); i++ {\n\t\t\tif cases[i].Chan.TrySend(rvalue) {\n\t\t\t\tnsent++\n\t\t\t\tcases = cases.deactivate(i)\n\t\t\t\ti--\n\t\t\t}\n\t\t}\n\t\tif len(cases) == firstSubSendCase {\n\t\t\tbreak\n\t\t}\n\t\t// Select on all the receivers, waiting for them to unblock.\n\t\tchosen, recv, _ := reflect.Select(cases)\n\t\tif chosen == 0 /* <-f.removeSub */ {\n\t\t\tindex := f.sendCases.find(recv.Interface())\n\t\t\tf.sendCases = f.sendCases.delete(index)\n\t\t\tif index >= 0 && index < len(cases) {\n\t\t\t\t// Shrink 'cases' too because the removed case was still active.\n\t\t\t\tcases = f.sendCases[:len(cases)-1]\n\t\t\t}\n\t\t} else {\n\t\t\tcases = cases.deactivate(chosen)\n\t\t\tnsent++\n\t\t}\n\t}\n\n\t// Forget about the sent value and hand off the send lock.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = reflect.Value{}\n\t}\n\tf.sendLock <- struct{}{}\n\treturn nsent\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "unmodelled_trace",
+      "label": "unknown",
+      "rationale": "If reorg has no adds or StateAt fails, the stipulated send was not reached; do not count an easy return as a valid normal trial.",
+      "source_refs": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 784,
+          "end_line": 819,
+          "start_byte": 32400,
+          "end_byte_exclusive": 33555,
+          "span_sha256": "2d8274c01c64486704d29981278c7c6fc4af02e3077c69227a269e7514eb6b81",
+          "text": "func (p *BlobPool) Reset(oldHead, newHead *types.Header) {\n\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n\n\t// Run the reorg between the old and new head and figure out which accounts\n\t// need to be rechecked and which transactions need to be readded\n\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 1654,
+          "end_line": 1663,
+          "start_byte": 64118,
+          "end_byte_exclusive": 64333,
+          "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c",
+          "text": "func (p *BlobPool) Stats() (int, int) {\n\tp.lock.Lock()\n\tdefer p.lock.Unlock()\n\n\tvar pending int\n\tfor _, txs := range p.index {\n\t\tpending += len(txs)\n\t}\n\treturn pending, 0 // No non-executable txs in the blob pool\n}\n"
+        },
+        {
+          "path": "event/feed.go",
+          "file_sha256": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879",
+          "start_line": 120,
+          "end_line": 179,
+          "start_byte": 4154,
+          "end_byte_exclusive": 5962,
+          "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c",
+          "text": "func (f *Feed) Send(value interface{}) (nsent int) {\n\trvalue := reflect.ValueOf(value)\n\n\tf.once.Do(func() { f.init(rvalue.Type()) })\n\tif f.etype != rvalue.Type() {\n\t\tpanic(feedTypeError{op: \"Send\", got: rvalue.Type(), want: f.etype})\n\t}\n\n\t<-f.sendLock\n\n\t// Add new cases from the inbox after taking the send lock.\n\tf.mu.Lock()\n\tf.sendCases = append(f.sendCases, f.inbox...)\n\tf.inbox = nil\n\tf.mu.Unlock()\n\n\t// Set the sent value on all channels.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = rvalue\n\t}\n\n\t// Send until all channels except removeSub have been chosen. 'cases' tracks a prefix\n\t// of sendCases. When a send succeeds, the corresponding case moves to the end of\n\t// 'cases' and it shrinks by one element.\n\tcases := f.sendCases\n\tfor {\n\t\t// Fast path: try sending without blocking before adding to the select set.\n\t\t// This should usually succeed if subscribers are fast enough and have free\n\t\t// buffer space.\n\t\tfor i := firstSubSendCase; i < len(cases); i++ {\n\t\t\tif cases[i].Chan.TrySend(rvalue) {\n\t\t\t\tnsent++\n\t\t\t\tcases = cases.deactivate(i)\n\t\t\t\ti--\n\t\t\t}\n\t\t}\n\t\tif len(cases) == firstSubSendCase {\n\t\t\tbreak\n\t\t}\n\t\t// Select on all the receivers, waiting for them to unblock.\n\t\tchosen, recv, _ := reflect.Select(cases)\n\t\tif chosen == 0 /* <-f.removeSub */ {\n\t\t\tindex := f.sendCases.find(recv.Interface())\n\t\t\tf.sendCases = f.sendCases.delete(index)\n\t\t\tif index >= 0 && index < len(cases) {\n\t\t\t\t// Shrink 'cases' too because the removed case was still active.\n\t\t\t\tcases = f.sendCases[:len(cases)-1]\n\t\t\t}\n\t\t} else {\n\t\t\tcases = cases.deactivate(chosen)\n\t\t\tnsent++\n\t\t}\n\t}\n\n\t// Forget about the sent value and hand off the send lock.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = reflect.Value{}\n\t}\n\tf.sendLock <- struct{}{}\n\treturn nsent\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "entry_unreached",
+      "label": "infra_or_unreached",
+      "rationale": "The specified source branch, object or trigger was not reached. No symptom success or valid trial.",
+      "source_refs": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 784,
+          "end_line": 819,
+          "start_byte": 32400,
+          "end_byte_exclusive": 33555,
+          "span_sha256": "2d8274c01c64486704d29981278c7c6fc4af02e3077c69227a269e7514eb6b81",
+          "text": "func (p *BlobPool) Reset(oldHead, newHead *types.Header) {\n\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n\n\t// Run the reorg between the old and new head and figure out which accounts\n\t// need to be rechecked and which transactions need to be readded\n\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 1654,
+          "end_line": 1663,
+          "start_byte": 64118,
+          "end_byte_exclusive": 64333,
+          "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c",
+          "text": "func (p *BlobPool) Stats() (int, int) {\n\tp.lock.Lock()\n\tdefer p.lock.Unlock()\n\n\tvar pending int\n\tfor _, txs := range p.index {\n\t\tpending += len(txs)\n\t}\n\treturn pending, 0 // No non-executable txs in the blob pool\n}\n"
+        },
+        {
+          "path": "event/feed.go",
+          "file_sha256": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879",
+          "start_line": 120,
+          "end_line": 179,
+          "start_byte": 4154,
+          "end_byte_exclusive": 5962,
+          "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c",
+          "text": "func (f *Feed) Send(value interface{}) (nsent int) {\n\trvalue := reflect.ValueOf(value)\n\n\tf.once.Do(func() { f.init(rvalue.Type()) })\n\tif f.etype != rvalue.Type() {\n\t\tpanic(feedTypeError{op: \"Send\", got: rvalue.Type(), want: f.etype})\n\t}\n\n\t<-f.sendLock\n\n\t// Add new cases from the inbox after taking the send lock.\n\tf.mu.Lock()\n\tf.sendCases = append(f.sendCases, f.inbox...)\n\tf.inbox = nil\n\tf.mu.Unlock()\n\n\t// Set the sent value on all channels.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = rvalue\n\t}\n\n\t// Send until all channels except removeSub have been chosen. 'cases' tracks a prefix\n\t// of sendCases. When a send succeeds, the corresponding case moves to the end of\n\t// 'cases' and it shrinks by one element.\n\tcases := f.sendCases\n\tfor {\n\t\t// Fast path: try sending without blocking before adding to the select set.\n\t\t// This should usually succeed if subscribers are fast enough and have free\n\t\t// buffer space.\n\t\tfor i := firstSubSendCase; i < len(cases); i++ {\n\t\t\tif cases[i].Chan.TrySend(rvalue) {\n\t\t\t\tnsent++\n\t\t\t\tcases = cases.deactivate(i)\n\t\t\t\ti--\n\t\t\t}\n\t\t}\n\t\tif len(cases) == firstSubSendCase {\n\t\t\tbreak\n\t\t}\n\t\t// Select on all the receivers, waiting for them to unblock.\n\t\tchosen, recv, _ := reflect.Select(cases)\n\t\tif chosen == 0 /* <-f.removeSub */ {\n\t\t\tindex := f.sendCases.find(recv.Interface())\n\t\t\tf.sendCases = f.sendCases.delete(index)\n\t\t\tif index >= 0 && index < len(cases) {\n\t\t\t\t// Shrink 'cases' too because the removed case was still active.\n\t\t\t\tcases = f.sendCases[:len(cases)-1]\n\t\t\t}\n\t\t} else {\n\t\t\tcases = cases.deactivate(chosen)\n\t\t\tnsent++\n\t\t}\n\t}\n\n\t// Forget about the sent value and hand off the send lock.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = reflect.Value{}\n\t}\n\tf.sendLock <- struct{}{}\n\treturn nsent\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "precondition_unproved",
+      "label": "infra_or_unreached",
+      "rationale": "Readiness, identity, buffer or ordering precondition was not proved. Do not infer target behavior from timeout.",
+      "source_refs": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 784,
+          "end_line": 819,
+          "start_byte": 32400,
+          "end_byte_exclusive": 33555,
+          "span_sha256": "2d8274c01c64486704d29981278c7c6fc4af02e3077c69227a269e7514eb6b81",
+          "text": "func (p *BlobPool) Reset(oldHead, newHead *types.Header) {\n\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n\n\t// Run the reorg between the old and new head and figure out which accounts\n\t// need to be rechecked and which transactions need to be readded\n\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 1654,
+          "end_line": 1663,
+          "start_byte": 64118,
+          "end_byte_exclusive": 64333,
+          "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c",
+          "text": "func (p *BlobPool) Stats() (int, int) {\n\tp.lock.Lock()\n\tdefer p.lock.Unlock()\n\n\tvar pending int\n\tfor _, txs := range p.index {\n\t\tpending += len(txs)\n\t}\n\treturn pending, 0 // No non-executable txs in the blob pool\n}\n"
+        },
+        {
+          "path": "event/feed.go",
+          "file_sha256": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879",
+          "start_line": 120,
+          "end_line": 179,
+          "start_byte": 4154,
+          "end_byte_exclusive": 5962,
+          "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c",
+          "text": "func (f *Feed) Send(value interface{}) (nsent int) {\n\trvalue := reflect.ValueOf(value)\n\n\tf.once.Do(func() { f.init(rvalue.Type()) })\n\tif f.etype != rvalue.Type() {\n\t\tpanic(feedTypeError{op: \"Send\", got: rvalue.Type(), want: f.etype})\n\t}\n\n\t<-f.sendLock\n\n\t// Add new cases from the inbox after taking the send lock.\n\tf.mu.Lock()\n\tf.sendCases = append(f.sendCases, f.inbox...)\n\tf.inbox = nil\n\tf.mu.Unlock()\n\n\t// Set the sent value on all channels.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = rvalue\n\t}\n\n\t// Send until all channels except removeSub have been chosen. 'cases' tracks a prefix\n\t// of sendCases. When a send succeeds, the corresponding case moves to the end of\n\t// 'cases' and it shrinks by one element.\n\tcases := f.sendCases\n\tfor {\n\t\t// Fast path: try sending without blocking before adding to the select set.\n\t\t// This should usually succeed if subscribers are fast enough and have free\n\t\t// buffer space.\n\t\tfor i := firstSubSendCase; i < len(cases); i++ {\n\t\t\tif cases[i].Chan.TrySend(rvalue) {\n\t\t\t\tnsent++\n\t\t\t\tcases = cases.deactivate(i)\n\t\t\t\ti--\n\t\t\t}\n\t\t}\n\t\tif len(cases) == firstSubSendCase {\n\t\t\tbreak\n\t\t}\n\t\t// Select on all the receivers, waiting for them to unblock.\n\t\tchosen, recv, _ := reflect.Select(cases)\n\t\tif chosen == 0 /* <-f.removeSub */ {\n\t\t\tindex := f.sendCases.find(recv.Interface())\n\t\t\tf.sendCases = f.sendCases.delete(index)\n\t\t\tif index >= 0 && index < len(cases) {\n\t\t\t\t// Shrink 'cases' too because the removed case was still active.\n\t\t\t\tcases = f.sendCases[:len(cases)-1]\n\t\t\t}\n\t\t} else {\n\t\t\tcases = cases.deactivate(chosen)\n\t\t\tnsent++\n\t\t}\n\t}\n\n\t// Forget about the sent value and hand off the send lock.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = reflect.Value{}\n\t}\n\tf.sendLock <- struct{}{}\n\treturn nsent\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "driver_error",
+      "label": "infra_or_unreached",
+      "rationale": "Driver, transport, instrumentation, resource or decode failure. Preserve planned slot and original error.",
+      "source_refs": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 784,
+          "end_line": 819,
+          "start_byte": 32400,
+          "end_byte_exclusive": 33555,
+          "span_sha256": "2d8274c01c64486704d29981278c7c6fc4af02e3077c69227a269e7514eb6b81",
+          "text": "func (p *BlobPool) Reset(oldHead, newHead *types.Header) {\n\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n\n\t// Run the reorg between the old and new head and figure out which accounts\n\t// need to be rechecked and which transactions need to be readded\n\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 1654,
+          "end_line": 1663,
+          "start_byte": 64118,
+          "end_byte_exclusive": 64333,
+          "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c",
+          "text": "func (p *BlobPool) Stats() (int, int) {\n\tp.lock.Lock()\n\tdefer p.lock.Unlock()\n\n\tvar pending int\n\tfor _, txs := range p.index {\n\t\tpending += len(txs)\n\t}\n\treturn pending, 0 // No non-executable txs in the blob pool\n}\n"
+        },
+        {
+          "path": "event/feed.go",
+          "file_sha256": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879",
+          "start_line": 120,
+          "end_line": 179,
+          "start_byte": 4154,
+          "end_byte_exclusive": 5962,
+          "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c",
+          "text": "func (f *Feed) Send(value interface{}) (nsent int) {\n\trvalue := reflect.ValueOf(value)\n\n\tf.once.Do(func() { f.init(rvalue.Type()) })\n\tif f.etype != rvalue.Type() {\n\t\tpanic(feedTypeError{op: \"Send\", got: rvalue.Type(), want: f.etype})\n\t}\n\n\t<-f.sendLock\n\n\t// Add new cases from the inbox after taking the send lock.\n\tf.mu.Lock()\n\tf.sendCases = append(f.sendCases, f.inbox...)\n\tf.inbox = nil\n\tf.mu.Unlock()\n\n\t// Set the sent value on all channels.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = rvalue\n\t}\n\n\t// Send until all channels except removeSub have been chosen. 'cases' tracks a prefix\n\t// of sendCases. When a send succeeds, the corresponding case moves to the end of\n\t// 'cases' and it shrinks by one element.\n\tcases := f.sendCases\n\tfor {\n\t\t// Fast path: try sending without blocking before adding to the select set.\n\t\t// This should usually succeed if subscribers are fast enough and have free\n\t\t// buffer space.\n\t\tfor i := firstSubSendCase; i < len(cases); i++ {\n\t\t\tif cases[i].Chan.TrySend(rvalue) {\n\t\t\t\tnsent++\n\t\t\t\tcases = cases.deactivate(i)\n\t\t\t\ti--\n\t\t\t}\n\t\t}\n\t\tif len(cases) == firstSubSendCase {\n\t\t\tbreak\n\t\t}\n\t\t// Select on all the receivers, waiting for them to unblock.\n\t\tchosen, recv, _ := reflect.Select(cases)\n\t\tif chosen == 0 /* <-f.removeSub */ {\n\t\t\tindex := f.sendCases.find(recv.Interface())\n\t\t\tf.sendCases = f.sendCases.delete(index)\n\t\t\tif index >= 0 && index < len(cases) {\n\t\t\t\t// Shrink 'cases' too because the removed case was still active.\n\t\t\t\tcases = f.sendCases[:len(cases)-1]\n\t\t\t}\n\t\t} else {\n\t\t\tcases = cases.deactivate(chosen)\n\t\t\tnsent++\n\t\t}\n\t}\n\n\t// Forget about the sent value and hand off the send lock.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = reflect.Value{}\n\t}\n\tf.sendLock <- struct{}{}\n\treturn nsent\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    },
+    {
+      "id": "cancel_or_cleanup_error",
+      "label": "infra_or_unreached",
+      "rationale": "Cancellation or failure to join all owned resources. Preserve original observation and cleanup failure separately.",
+      "source_refs": [
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 784,
+          "end_line": 819,
+          "start_byte": 32400,
+          "end_byte_exclusive": 33555,
+          "span_sha256": "2d8274c01c64486704d29981278c7c6fc4af02e3077c69227a269e7514eb6b81",
+          "text": "func (p *BlobPool) Reset(oldHead, newHead *types.Header) {\n\twaitStart := time.Now()\n\tp.lock.Lock()\n\tresetwaitHist.Update(time.Since(waitStart).Nanoseconds())\n\tdefer p.lock.Unlock()\n\n\tdefer func(start time.Time) {\n\t\tresettimeHist.Update(time.Since(start).Nanoseconds())\n\t}(time.Now())\n\n\tstatedb, err := p.chain.StateAt(newHead.Root)\n\tif err != nil {\n\t\tlog.Error(\"Failed to reset blobpool state\", \"err\", err)\n\t\treturn\n\t}\n\tp.head = newHead\n\tp.state = statedb\n\n\t// Run the reorg between the old and new head and figure out which accounts\n\t// need to be rechecked and which transactions need to be readded\n\tif reinject, inclusions := p.reorg(oldHead, newHead); reinject != nil {\n\t\tvar adds []*types.Transaction\n\t\tfor addr, txs := range reinject {\n\t\t\t// Blindly push all the lost transactions back into the pool\n\t\t\tfor _, tx := range txs {\n\t\t\t\tif err := p.reinject(addr, tx.Hash()); err == nil {\n\t\t\t\t\tadds = append(adds, tx.WithoutBlobTxSidecar())\n\t\t\t\t}\n\t\t\t}\n\t\t\t// Recheck the account's pooled transactions to drop included and\n\t\t\t// invalidated ones\n\t\t\tp.recheck(addr, inclusions)\n\t\t}\n\t\tif len(adds) > 0 {\n\t\t\tp.insertFeed.Send(core.NewTxsEvent{Txs: adds})\n\t\t}\n"
+        },
+        {
+          "path": "core/txpool/blobpool/blobpool.go",
+          "file_sha256": "f9009c4f0a901cf0f4eb7d5ed90268e3cda5e9c1a1eb5dd15d9d46fc2144c1e8",
+          "start_line": 1654,
+          "end_line": 1663,
+          "start_byte": 64118,
+          "end_byte_exclusive": 64333,
+          "span_sha256": "2f58a23099ee8fcca31c5b1aa7f65120a50e331b0e8dda8e4f6cb77fdc5f529c",
+          "text": "func (p *BlobPool) Stats() (int, int) {\n\tp.lock.Lock()\n\tdefer p.lock.Unlock()\n\n\tvar pending int\n\tfor _, txs := range p.index {\n\t\tpending += len(txs)\n\t}\n\treturn pending, 0 // No non-executable txs in the blob pool\n}\n"
+        },
+        {
+          "path": "event/feed.go",
+          "file_sha256": "152c86a90fb59236fed58e4a9d25e7797e2b222601e163a4f07072bcd2c25879",
+          "start_line": 120,
+          "end_line": 179,
+          "start_byte": 4154,
+          "end_byte_exclusive": 5962,
+          "span_sha256": "099ebf83136310515a737df6902529227944d98be9759bba504b2a93b0449a1c",
+          "text": "func (f *Feed) Send(value interface{}) (nsent int) {\n\trvalue := reflect.ValueOf(value)\n\n\tf.once.Do(func() { f.init(rvalue.Type()) })\n\tif f.etype != rvalue.Type() {\n\t\tpanic(feedTypeError{op: \"Send\", got: rvalue.Type(), want: f.etype})\n\t}\n\n\t<-f.sendLock\n\n\t// Add new cases from the inbox after taking the send lock.\n\tf.mu.Lock()\n\tf.sendCases = append(f.sendCases, f.inbox...)\n\tf.inbox = nil\n\tf.mu.Unlock()\n\n\t// Set the sent value on all channels.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = rvalue\n\t}\n\n\t// Send until all channels except removeSub have been chosen. 'cases' tracks a prefix\n\t// of sendCases. When a send succeeds, the corresponding case moves to the end of\n\t// 'cases' and it shrinks by one element.\n\tcases := f.sendCases\n\tfor {\n\t\t// Fast path: try sending without blocking before adding to the select set.\n\t\t// This should usually succeed if subscribers are fast enough and have free\n\t\t// buffer space.\n\t\tfor i := firstSubSendCase; i < len(cases); i++ {\n\t\t\tif cases[i].Chan.TrySend(rvalue) {\n\t\t\t\tnsent++\n\t\t\t\tcases = cases.deactivate(i)\n\t\t\t\ti--\n\t\t\t}\n\t\t}\n\t\tif len(cases) == firstSubSendCase {\n\t\t\tbreak\n\t\t}\n\t\t// Select on all the receivers, waiting for them to unblock.\n\t\tchosen, recv, _ := reflect.Select(cases)\n\t\tif chosen == 0 /* <-f.removeSub */ {\n\t\t\tindex := f.sendCases.find(recv.Interface())\n\t\t\tf.sendCases = f.sendCases.delete(index)\n\t\t\tif index >= 0 && index < len(cases) {\n\t\t\t\t// Shrink 'cases' too because the removed case was still active.\n\t\t\t\tcases = f.sendCases[:len(cases)-1]\n\t\t\t}\n\t\t} else {\n\t\t\tcases = cases.deactivate(chosen)\n\t\t\tnsent++\n\t\t}\n\t}\n\n\t// Forget about the sent value and hand off the send lock.\n\tfor i := firstSubSendCase; i < len(f.sendCases); i++ {\n\t\tf.sendCases[i].Send = reflect.Value{}\n\t}\n\tf.sendLock <- struct{}{}\n\treturn nsent\n"
+        }
+      ],
+      "source_expected_not_observed": true
+    }
+  ],
+  "answer_sets": {
+    "legal": [
+      "feed_then_unlock_stats",
+      "stats_wait_while_reset_lock"
+    ],
+    "symptom_candidate": [],
+    "unknown": [
+      "unmodelled_trace"
+    ],
+    "infra_or_unreached": [
+      "entry_unreached",
+      "precondition_unproved",
+      "driver_error",
+      "cancel_or_cleanup_error"
+    ]
+  },
+  "empty_set_rationales": {
+    "symptom_candidate": "No authored symptom_candidate outcome in this finite conditional vocabulary; unmodelled traces stay unknown."
+  },
+  "complete_within_declared_vocabulary": true,
+  "complete_trace_or_product_gold": false,
+  "observation_axis": "language_permitted_source_behavior_and_product_symptom_are_distinct",
+  "symptom_meaning": "conditional_AI_observation_candidate_not_independent_product_violation",
+  "unknown_policy": "unmodelled_or_product_contract_unresolved_never_negative_or_automatic_pass",
+  "formal_gold_schema_gap": "unknown_outcomes must remain explicit; old three-set authoring form cannot silently merge unknown with infra",
+  "current_scores": null,
+  "actual_target_trial_receipt": null,
+  "formal_scoring_allowed": false,
+  "exposure": "previously_exposed_DEV_no_fresh_FINAL",
+  "independent_approved": false
+}

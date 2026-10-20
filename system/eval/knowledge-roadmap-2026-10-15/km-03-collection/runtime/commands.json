@@ -1,0 +1,327 @@
+[
+  {
+    "label": "register-a",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "register",
+      "--source",
+      "/private/tmp/ks-KM032-collection-packet-20261015/source-a",
+      "--dataset",
+      "/private/tmp/ks-KM032-collection-packet-20261015/dataset-a",
+      "--state-dir",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a",
+      "--cks-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "--graph-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--embedder",
+      "mock",
+      "--model-name",
+      "mock"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "register-b",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "register",
+      "--source",
+      "/private/tmp/ks-KM032-collection-packet-20261015/source-b",
+      "--dataset",
+      "/private/tmp/ks-KM032-collection-packet-20261015/dataset-b",
+      "--state-dir",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-b",
+      "--cks-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "--graph-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckg",
+      "--vector-bin",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/ckv",
+      "--embedder",
+      "mock",
+      "--model-name",
+      "mock"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "collect-a",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "collect",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--exclude",
+      "private/**",
+      "--context-file",
+      "/private/tmp/ks-KM032-collection-packet-20261015/provided-context.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "collect-b",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "collect",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-b/registration.json",
+      "--exclude",
+      "private/**"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "collect-a-replay",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "collect",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--exclude",
+      "private/**",
+      "--context-file",
+      "/private/tmp/ks-KM032-collection-packet-20261015/provided-context.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "evidence-a",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "evidence",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--collection-id",
+      "7b18f4617bf73b0860ecae15ec7af861e68be49a02b1bfddee2aa6ecadd26b1a",
+      "--path",
+      "consensus.go",
+      "--start-line",
+      "4",
+      "--end-line",
+      "4"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "evidence-b",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "evidence",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-b/registration.json",
+      "--collection-id",
+      "50aa974ea6d917b38336ce025f316b242f58eaa1d44023a95bdff6a7995cfb71",
+      "--path",
+      "consensus.go",
+      "--start-line",
+      "4",
+      "--end-line",
+      "4"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "draft-default",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "draft",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--collection-id",
+      "7b18f4617bf73b0860ecae15ec7af861e68be49a02b1bfddee2aa6ecadd26b1a"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "draft-claims",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "draft",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--collection-id",
+      "7b18f4617bf73b0860ecae15ec7af861e68be49a02b1bfddee2aa6ecadd26b1a",
+      "--claims-file",
+      "/private/tmp/ks-KM032-collection-packet-20261015/claims-input.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "native-validate-default",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "--project-root",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/drafts/10328885433354c3065fd077726b823f428ffc5dd4ce4753939b886ab813b326/project",
+      "validate"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "native-validate-custom",
+    "command": [
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/bin/cks",
+      "knowledge",
+      "--project-root",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/drafts/d8b750b1b50be46fa92b41bc46d47e2e7335c918fbb447c279bee0b70c1d304f/project",
+      "validate"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "draft-claims-replay",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "draft",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--collection-id",
+      "7b18f4617bf73b0860ecae15ec7af861e68be49a02b1bfddee2aa6ecadd26b1a",
+      "--claims-file",
+      "/private/tmp/ks-KM032-collection-packet-20261015/claims-input.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "refuse-foreign-claims",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "draft",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--collection-id",
+      "7b18f4617bf73b0860ecae15ec7af861e68be49a02b1bfddee2aa6ecadd26b1a",
+      "--claims-file",
+      "/private/tmp/ks-KM032-collection-packet-20261015/foreign-claims.json"
+    ],
+    "exit_code": 2,
+    "expected_error": "project_mismatch"
+  },
+  {
+    "label": "refuse-invented-reason",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "draft",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--collection-id",
+      "7b18f4617bf73b0860ecae15ec7af861e68be49a02b1bfddee2aa6ecadd26b1a",
+      "--claims-file",
+      "/private/tmp/ks-KM032-collection-packet-20261015/invented-decision.json"
+    ],
+    "exit_code": 2,
+    "expected_error": "decision_requires_reported_source"
+  },
+  {
+    "label": "collect-a-changed",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "collect",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--exclude",
+      "private/**",
+      "--context-file",
+      "/private/tmp/ks-KM032-collection-packet-20261015/provided-context.json"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "evidence-old-after-change",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "evidence",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--collection-id",
+      "7b18f4617bf73b0860ecae15ec7af861e68be49a02b1bfddee2aa6ecadd26b1a",
+      "--path",
+      "consensus.go",
+      "--start-line",
+      "4",
+      "--end-line",
+      "4"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "evidence-change",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "evidence",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--collection-id",
+      "cb2cb9e2f2a1717e31f50d64c7e48e543efa81958c64b25dbc92ce9f17107907",
+      "--origin-id",
+      "change",
+      "--path",
+      "consensus.go",
+      "--start-line",
+      "1",
+      "--end-line",
+      "11"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "draft-status",
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager/scripts/manager.py",
+      "draft-status",
+      "--registration",
+      "/private/tmp/ks-KM032-collection-packet-20261015/manager-a/registration.json",
+      "--draft-id",
+      "d8b750b1b50be46fa92b41bc46d47e2e7335c918fbb447c279bee0b70c1d304f"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  },
+  {
+    "label": "native-plugin-validation",
+    "command": [
+      "claude",
+      "plugin",
+      "validate",
+      "--strict",
+      "--json",
+      "/Users/kevin/work/github/0xmhha/auto-coding/knowledge/knowledge-system/plugins/knowledge-manager"
+    ],
+    "exit_code": 0,
+    "expected_error": null
+  }
+]

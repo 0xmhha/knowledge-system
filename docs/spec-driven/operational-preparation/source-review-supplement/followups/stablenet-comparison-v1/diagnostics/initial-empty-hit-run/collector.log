@@ -1,0 +1,9 @@
+go-stablenet C1 {'keyword': {'ok': True, 'count': 5, 'error': None}, 'vector-go': {'ok': True, 'count': 10, 'error': None}, 'vector-all': {'ok': True, 'count': 10, 'error': None}, 'v2': {'ok': True, 'count': 10, 'error': None}}
+go-stablenet C2 {'keyword': {'ok': True, 'count': 7, 'error': None}, 'vector-go': {'ok': True, 'count': 10, 'error': None}, 'vector-all': {'ok': True, 'count': 10, 'error': None}, 'v2': {'ok': True, 'count': 10, 'error': None}}
+go-stablenet C3 {'keyword': {'ok': True, 'count': 10, 'error': None}, 'vector-go': {'ok': True, 'count': 10, 'error': None}, 'vector-all': {'ok': True, 'count': 10, 'error': None}, 'v2': {'ok': True, 'count': 10, 'error': None}}
+go-stablenet C4 {'keyword': {'ok': True, 'count': 10, 'error': None}, 'vector-go': {'ok': True, 'count': 10, 'error': None}, 'vector-all': {'ok': True, 'count': 10, 'error': None}, 'v2': {'ok': True, 'count': 10, 'error': None}}
+Traceback (most recent call last):
+  File "/private/tmp/ks-snp04-runtime.py", line 32, in <module>
+    r=c.call(q['id']+'-'+kind,'cks.context.'+name,args);outcomes[kind]={'ok':not failed(r),'count':len(payload(r).get('citations'if kind=='v2'else'hits',[])),'error':payload(r)if failed(r)else None}
+                                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: object of type 'NoneType' has no len()

@@ -1,0 +1,12 @@
+RULE-2-11 — AI DEV bounded draft, not independent gold
+controlled/RULE-2-11.go {'start': 223, 'end': 238}
+discarded-conversion-error
+
+Source/excerpt identity: {"end": 254, "file_sha256": "13962b4339aa7a771a6f1de9ec687d488bcd76da31e33e6dc09508e4e4858b89", "fragment_prefix_bytes": 196, "function_id": "RULE-2-11", "function_sha256": "44b7135a7aaa59b60bf8010ed3044589790ff022b4d9699ccd95cf2a30965419", "import_context": "explicit_AI_DEV_fixture_assumption_not_original_evidence", "path": "controlled/RULE-2-11.go", "project": "controlled-dev-fixture", "source_commit": null, "start": 196}
+
+Complete declared source–sink units:
+{"attacker_control": "not_established", "blank_second_assignment": false, "call_span": {"end": 238, "start": 223}, "callee_status": "declared_import_unshadowed_package_types_unresolved", "contract_label": "negative", "empty_source_rationale": null, "flow": {"conditions": [], "definition_spans": [{"binding": "v@216", "owner": "n0.0", "span": {"end": 217, "start": 216}}], "origins": ["conversion:223"], "unknown_reasons": []}, "id": "ded244d4817d09e3fed1973c95f99f17a0432800a3faf33e84e9af7e1b397007", "rationale": "The direct two-result blank-second-target pattern is absent. This does not prove that the error was checked or correctly handled.", "review_label": "negative", "rule_id": "discarded-conversion-error", "runtime_reachability": "not_established", "safety_verdict": "unknown", "scope_unknown_reasons": [], "sink_binding": "v@216", "sink_kind": "explicit_return_value", "sink_span": {"end": 253, "start": 252}, "source_identity": "conversion:223", "source_scope": {"file_sha256": "13962b4339aa7a771a6f1de9ec687d488bcd76da31e33e6dc09508e4e4858b89", "fragment_prefix_bytes": 196, "function_sha256": "44b7135a7aaa59b60bf8010ed3044589790ff022b4d9699ccd95cf2a30965419", "path": "controlled/RULE-2-11.go", "source_commit": null}, "source_span": {"end": 217, "start": 216}}
+
+Answer sets: {"negative_locations": ["ded244d4817d09e3fed1973c95f99f17a0432800a3faf33e84e9af7e1b397007"], "rule_candidates": [], "unsupported_or_unknown_flows": []}
+Empty-set rationales: {"rule_candidates": "No units with this label in the complete declared source-call universe; AI rationale, independent review pending.", "unsupported_or_unknown_flows": "No units with this label in the complete declared source-call universe; AI rationale, independent review pending."}
+Human reviewer: unassigned; no scoring, no safety/attacker-control/runtime verdict; actual MCP mapping not frozen.

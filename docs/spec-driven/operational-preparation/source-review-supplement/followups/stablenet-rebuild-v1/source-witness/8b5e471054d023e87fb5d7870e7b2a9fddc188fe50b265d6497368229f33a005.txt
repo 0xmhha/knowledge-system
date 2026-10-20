@@ -1,0 +1,28 @@
+# WBFT custom RPC API (istanbul namespace) — method reference
+
+**Status:** verified · **Subsystem:** A9 (P2P, Istanbul Protocol & Custom RPC) · **Type:** B7
+
+The WBFT consensus engine exposes a JSON-RPC API under the istanbul
+namespace via consensus/wbft/backend/api.go. The methods cover
+node identity (NodeAddress, IsValidator), block-attestation lookup
+(GetCommitSignersFromBlock / ByHash), validator-set introspection
+(GetValidators / AtHash), aggregate activity stats over a range
+(Status), and raw WBFTExtra inspection (GetWbftExtraInfo). These
+are the operational entry points for monitoring tools and any
+external client that needs to confirm who signed which block.
+
+## Code anchors
+- `consensus/wbft/backend/api.go` API.NodeAddress:80
+- `consensus/wbft/backend/api.go` API.GetCommitSignersFromBlock:86
+- `consensus/wbft/backend/api.go` API.GetCommitSignersFromBlockByHash:103
+- `consensus/wbft/backend/api.go` API.GetValidators:132
+- `consensus/wbft/backend/api.go` API.GetValidatorsAtHash:152
+- `consensus/wbft/backend/api.go` API.Status:165 — validator activity statistics over a range
+- `consensus/wbft/backend/api.go` BlockSigners — return type for GetCommitSignersFromBlock
+- `consensus/wbft/backend/api.go` backend.Status:72 — return type for Status method
+
+## Aliases
+WBFT RPC API, istanbul 네임스페이스, 검증자 RPC, 블록 서명자 조회, WBFT JSON-RPC, istanbul namespace API, validator activity stats, istanbul, NodeAddress, GetCommitSignersFromBlock, GetCommitSignersFromBlockByHash, GetValidators, GetValidatorsAtHash, IsValidator, GetWbftExtraInfo, Status, BlockSigners, SealerActivity, AuthorCounts, RoundStats
+
+## Related
+A2.block_encoding.wbft_extra_struct, A3.validator_set.epoch_transition

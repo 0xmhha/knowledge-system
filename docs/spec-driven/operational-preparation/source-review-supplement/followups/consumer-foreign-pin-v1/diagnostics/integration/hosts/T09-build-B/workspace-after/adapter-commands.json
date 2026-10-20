@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/private/tmp/ks-host-schema-consumer-20261017/plugin/scripts/deep_review.py",
+      "build",
+      "--workspace",
+      "/private/tmp/ks-consumer-role-t04-t09-B2-20261017/source/.coding-agent/tickets/KS-P06-REVIEW",
+      "--bundle",
+      "/private/tmp/ks-consumer-role-t04-t09-B2-20261017/source/.coding-agent/tickets/KS-P06-REVIEW/input-bundle.json",
+      "--judgments",
+      "/private/tmp/ks-consumer-role-t04-t09-B2-20261017/source/.coding-agent/tickets/KS-P06-REVIEW/scripted-judgments.json"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"status\": \"structured_partial_review\", \"independent_acceptance\": \"not_recorded\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+      "/private/tmp/ks-host-schema-consumer-20261017/plugin/scripts/deep_review.py",
+      "verify",
+      "--workspace",
+      "/private/tmp/ks-consumer-role-t04-t09-B2-20261017/source/.coding-agent/tickets/KS-P06-REVIEW"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"status\": \"validated_delivery\", \"ticket_id\": \"KS-P06-REVIEW\", \"deep_review_sha256\": \"7051dc2e174ebb1771eeb1b03369c4868eb36e54f937c934b8c579a9c1831b33\", \"review_report_sha256\": \"c9a37b3a5aa6291f1cf372e9908dbb9cfced55dd67020dfbca338c7eb59ab98c\", \"independent_acceptance\": \"not_recorded\"}\n",
+    "stderr": ""
+  }
+]
