@@ -8,15 +8,15 @@
 
 ## 현재 검증과 다음 작업
 
-최신 고정 소스의 기본 일반/race는 각각4273통과·18skip, build/fmt/vet/고정lint/docs 통과다. 기존 BGE 반복/새 버전의 검색10개는 출처·본문·순서·점수까지 일치했다. 같은 조건400회에서2회의 오탐을 재현해 반환 전 파일 생성으로 확인했다. 대기 성공 조건을 사용한 한 줄 대조400회는 통과했으며, 반환 후 쓰기 gate·실제 후손 잔존 대조군도 검증했다. 과거 최초1회의 정확한 내부 순서는 상세 로그가 없어 사후 확정하지 않는다.
+최신 clean HEAD CKS를 새로 빌드해 실제4역할의 partial MCP2회·출처 context2개·Read3회·미승인 선택 거부2회·완료 거부4회를 확인했다. 실제 factory RPC 오류12종×후보5역할×일반/race=120건과 최신 MCP 오류/미확정35건·이후 정상 partial2건이 통과했다. 고유 후보 source는4개이며 원본 별칭을 독립 표본으로 세지 않는다. 회귀112개 통과, 소유 프로세스 잔여0, 새 캐시/임시 루트4개 약3.49GiB를 정리했다. [최신 검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/latest-four-role-api-v1/SUMMARY.json).
 
-WI-V1의 전체12계약·소비자 판정12개 검토와 회귀56개를 완료했다. 기존932개 원자료 hash·owner40·과거 실제4역할을 재대조했으며, 최신 CKS 실제4역할 실행과 실제 승인 oracle 성공 경로는 미완이다. [검토 정본](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-contract-consumer-review-v1/REVIEW.json). 다음은 최신 CKS 실제4역할 미승인/partial 전달·API 음성 경로 matrix, native RPC callback overlap·전 channel-use 관측 순서다. 작업용 캐시/중간 빌드 약19.3GiB를 제거했고 소스·지식 DB·커밋된 원자료는 보존했다. 실제 peer 동기화·리뷰5산출물 전달·viewer 소유 backend/UI·공개 CLI/HTTP 및 원시 그래프 v2의 앞선 로컬 검증은 보존한다. 독립 정답·품질 수용은 별도다.
+운영 Go 코드는 바꾸지 않았고 이전 서명된 전체 native 일반/race4273개씩의 소스 입력과 같은지 확인했다. 이번 전체 suite 재실행이나 독립 수용을 주장하지 않는다. 다음은 native broadcast와 실제 Syncing RPC callback 종료 overlap, 옛 구독·새 등록 전 channel-use 관측이다. 승인된 독립 oracle 기반 실제 역할 성공 경로와 final HEAD 판정은 남아 있다.
 
 ## 전체13묶음 — 완료0/13
 
 |묶음|현재 남은 내용|
 |---|---|
-|WI-V1|12계약/소비자12기준 검토 완료; 최신 CKS 실제4역할·native RPC overlap·channel-use·승인 양성 oracle/final HEAD·독립 티켓|
+|WI-V1|최신 CKS 실제4역할·선언한 API 오류 점검 완료; native RPC overlap·channel-use·승인 양성 oracle/final HEAD·독립 티켓|
 |WI-V2|유한 후보 구별 완료; 독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|warm 쌍627회 보존; 독립 nonseed 관련성/잡음 정답·표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 부분은 사용자 보류|
