@@ -1,34 +1,36 @@
-# 현재 인수인계 — 최신 CKS 실제4역할·API 오류 경로 / 2026-10-20
+# 현재 인수인계 — 실제 native broadcast·RPC callback 종료 연결 / 2026-10-20
 
-단계89 요청 범위의 로컬 실행·검증을 완료했다. [명세](./operational-preparation/source-review-supplement/followups/latest-four-role-api-v1/SPEC.json) · [결과](./operational-preparation/source-review-supplement/followups/latest-four-role-api-v1/SUMMARY.json) · [검증](./operational-preparation/source-review-supplement/followups/latest-four-role-api-v1/VALIDATION.json) · [임시 자원 정리](./operational-preparation/source-review-supplement/followups/latest-four-role-api-v1/CLEANUP.json).
+단계90 요청 범위의 연결 검증을 완료했다. [명세](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SPEC.json) · [결과](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json) · [회귀·시도 이력](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/VALIDATION.json) · [자원 정리](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/CLEANUP.json).
 
-## 현재 단계 — 실행3/3·증거 회귀112통과
+## 현재 단계 — 일반/race10슬롯·실제20노드 종료·회귀121종 통과
 
-|실행|검증 결과|한계|
+|역할|일반/race 관측|정리와 판정|
 |---|---|---|
-|최신 CKS 실제4역할|Analyzer/Planner의 실제 partial MCP2회·context write2개·downstream Read3회, 미승인 선택 거부2회·완료 거부4회; host/CKS 정상 종료|로컬 scripted 모델 응답이며 역할 의미 품질·승인 oracle 양성 경로가 아님|
-|실제 factory RPC|오류12종×후보5역할×일반/race=120건 예상 오류; 정상 registry 구독/해제·오류 후 health·node close10회 통과|고유 source4개, 재도입은 원본 별칭. native60초 알림/callback overlap·전체12계약 수용은 아님|
-|최신 CKS stdio MCP|실제 사용2도구의 잘못된 selector/타입/필드/한도/rule pack·없는 도구, source_mismatch/not_found 등35건과 이후 partial2회 통과|35개 선언 범위이며 모든 MCP 도구나 모든 입력의 보편 검증이 아님|
+|원본·재도입 별칭|4건 모두 같은 구독의 native 상태 송신과 Unsubscribe 송신 쌍 대기; 삭제/ack/반환0|관측 고정 후 소유 status 수신으로 실제 owner를 진행; rescue를 후보 성공으로 세지 않음|
+|후보 A/B|4건 모두 실제 native 상태1개 drain→owner delete→ack→method/callback 반환|정리 개입0; gate 아래 finite 경로이며 독립 후보 승인 아님|
+|조기 반환 대조군|2건 모두 callback/method 반환은 있지만 owner 삭제/ack0, native 송신 pending|관측 후 소유 status 수신+실제 owner manual uninstall로 복구; 가짜 ack0|
 
-CKS는 clean HEAD `b8e3488e302e`를 Go1.26.8 기본 프로필로 새로 빌드했고 build-info의 같은 revision·modified=false와 바이너리/입력 hash를 확인했다. 소비자는 `d1ebafb8ddf4`, 실제 Claude Code host는 고정2.1.300이다. 이전 드라이버의 P76/corrective1 문자열은 RUNPLAN에 재사용한 명칭임을 기록했고, 모든 실행은 이번 새 소유 자원에서 수행했다. 과거 CKS49197f의 역할 실행을 최신 실행으로 바꿔 표기하지 않았다.
+실제 node.New/eth.New/Start로 슬롯마다 두 노드를 만들고 loopback peer가3블록을 실제 동기화했다. 선택한 factory API의 downloader/blockchain/mux 포인터가 실제 receiver 객체와 같고, API/channel/RPC 구독 ID를 trace 전체에 결속했다. Start/Done 이벤트와 진행 높이를 주입하지 않았다. 활성 indexer와 동일 head를 확인했다. 원본60초 타이머는 유지했고 선택 receiver의 관측 나이는 60.0008~60.0018초였다.
 
-RPC 원본은 `0bf2f4d1bfeb`이며 실제 node.New/eth.New/Start·활성 indexer 설정·등록된 factory API를 사용했다. 기존 파일에는 선언한 후보의 API overlay만 적용했고 probe main1개를 추가했다. 관찰 hook은 넣지 않았다. full source map·project/build Git tree·일반/race8개 바이너리·실행10개를 결속했다. HTTP 미지원은 실제 ServeHTTP를 소켓 없이 호출했고 나머지는 실제 in-process RPC다. 선언한12종은 HTTP 구독 미지원, 구독명 누락/숫자/null/알 수 없는 이름/namespace/초과 인수, 해제 ID 미존재/누락/숫자/초과 인수/이미 해제된 ID다. 실제 오류 코드와 메시지를 보존했으며 API 오류를 symptom RED로 세지 않는다. RPC true로 내부 deferred Unsubscribe 완료를 추론하지 않는다.
+송신 직전의 선언된 gate에서 같은 세션의 실제 eth_unsubscribe를 호출했다. true 응답을 받는 동안 owner 삭제/ack는0이고, 실제 Syncing의 rpcSub.Err 분기와 deferred Unsubscribe 진입을 확인한 뒤 gate를 열었다. 이후 원본의 대기와 A/B의 native drain·실제 map 삭제/ack를 같은 trace에서 구별했다. 원본·별칭의 frozen stack은 native send와 uninstall send를 같은 실제 callback 경로에서 보여준다. wire true를 내부 해제 완료로 바꾸지 않았다.
 
-MCP의 source_mismatch/not_found는 구조화된 미확정 상태로, 잘못된 인수/도구는 오류로 구분했다. 오류 뒤에도 같은 세션에서 출처 hash가 일치하는 partial2개를 받고 EOF로 정상 종료했다. 원본 데이터·소스·소비자 및 소유 데이터 전후 inventory가 같고, 소유 프로세스/세션 잔여0이다. BGE-M3 임베딩은 로컬 Ollama를 사용했다. 실제 LLM·유료/외부 LLM 호출0이며 전역 플러그인 등록·운영 적용·게시를 하지 않았다.
+이 gate와 관측 hook은 실행 순서를 통제한다. 완료 상태 false broadcast와 RPC 해제 Err 분기에 한정된 검증이다. 진행 중 true 알림·transport close/Notify 중 종료·무계측 발생 확률/무한 생산자 fairness·모든 post-ack channel-use·독립 품질 수용을 주장하지 않는다. legacy PoW ethash 시험이며 운영 WBFT 검증이 아니다. 실제 owner4/별도 통제 late1 및 옛 구독·새 등록 전이라는 기존 승인 범위를 유지한다.
 
-새 증거 회귀6개를 포함한 지역 회귀45개와 준비 상태 회귀67개, 합112개 통과·실패0·skip0이다. 이전 CKS 전체 일반/race4273개씩의 서명된 검증은 입력 hash가 같은 근거로 보존하며, 이번에 전체 suite를 새로 실행했다고 주장하지 않는다. 운영 Go 코드 변경은 없다.
+소스0bf2f4d1bfeb의 고유 후보4개와 원본 별칭을 구분했다. 기존 파일 변경은 선언한 API 관측 hook/후보 method뿐이고 bridge/main2개를 추가했다. full source map·project/build Git tree·일반/race8바이너리·실행10개를 결속했다. 최초 보조 코드 빌드는 ack 채널 타입 오류로 실패했고 실제 노드 실행0이다. 해당 한 곳을 원본 chan interface 타입에 맞춘 corrective1에서 전체10슬롯을 실행했다. 최초 소스/실패 로그와 수정 범위를 모두 보존했다. 자동 재시도0이다.
 
-이번에 새로 만든 빌드 캐시2개·소유 시험 루트2개(바이너리/데이터/소스 복사본/CLI profile 포함)를 제거했다. 삭제 전 압축 원자료 manifest를 검증했고 약3.49GiB의 임시 할당을 반환했다. 이전42경로 정리 기록도 보존하며 전역 모듈 저장소·원본 DB·원본 checkout은 삭제하지 않았다.
+지역 회귀54개와 준비 상태67개로 고유121종이 통과했다. 검증기 결속 강화 뒤 기존 manifest가 소스 변경을 탐지한 집중 검사1회 실패도 보존했고, 현재 해시로 재결속한 최종 집중9개는 통과했다. 원자료/실행 누락, 타이머 단축, RPC 분기 변경, owner ack 없는 완료, source drift와 독립 승인 승격을 거부한다. KS 운영 Go 코드는 그대로이며 이전 서명된 본체 전체 일반/race4273개씩의 같은 입력 근거를 유지한다. 이번에 본체 전체 suite를 새로 돌렸다고 주장하지 않는다.
+
+관측 후 rescue status 수신6개·early 대상 실제 owner cleanup 요청2개를 별도 기록했고 가짜 ack0이다. 실제20노드가 닫혔고 소유 프로세스 잔여0·임시 데이터 잔여0·원본 checkout 보존을 확인했다. 증거 hash 확인 후 이번 캐시/초기·수정 시험 루트3개 약2.06GiB를 제거했다. 실제 LLM·유료 호출·운영 적용·게시0이다.
 
 ## 다음 작업
 
-WI-V1의 native broadcast와 실제 Syncing RPC callback 종료 overlap을 같은 출처·구독/객체·관측 시각으로 연결한다. 이후 옛 구독·새 등록 전의 전체 channel-use 경계 관측을 보완한다. 실제 owner4/별도 통제 late-drain1이라는 승인 범위를 유지한다. 독립 정답·충분성·동결과 승인 oracle 기반 실제 양성 역할/final HEAD는 별도로 남는다.
+실제 owner ack 뒤 옛 구독의 모든 channel-use 관측과 명시적 새 등록의 세대 경계를 보완한다. 같은 channel의 새 구독은 허용되므로 영구 불사용으로 판정하지 않는다. 이후 독립 정답/충분성/동결과 승인 자료 기반 실제 역할 양성 oracle·최종 HEAD가 남는다.
 
 ## 남은 전체13묶음 — 상위 완료0/13·정식0/9
 
 |묶음|남은 내용|
 |---|---|
-|WI-V1|native broadcast/실제 RPC callback 종료 overlap·channel-use 경계·독립 티켓/oracle·승인 양성 역할/final HEAD|
+|WI-V1|옛 구독 ack 후 channel-use·새 등록 세대 경계·독립 티켓/oracle·승인 양성 역할/final HEAD|
 |WI-V2|독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|독립 nonseed 관련성/잡음 정답·가족/표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 전용 평가는 사용자 보류|
