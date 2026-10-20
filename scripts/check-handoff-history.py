@@ -13,6 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 def check(root=ROOT, restore_generated=False):
     manifest = json.loads((root / 'docs/spec-driven/HANDOFF-HISTORY.json').read_text())
     errors = []
+    for name, row in manifest.get('consumer_bundles', {}).items():
+        p = root / row['path']
+        if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != row['sha256']:
+            errors.append('missing or changed consumer source bundle: ' + name)
     pending = []
     for name, row in manifest.get('generated_inputs', {}).items():
         p = root / name

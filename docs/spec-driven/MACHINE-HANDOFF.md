@@ -1,6 +1,6 @@
 # 새 머신 개발 인수인계
 
-2026-10-20 기준. 이 문서는 설치·재개 절차이고, 현재 진행 상황과 남은 전체 13묶음은 [현재 인수인계](./CURRENT-HANDOFF.md)와 [실행 원장](./REMAINING-13-EXECUTION.json)이 기준이다. 코드를 읽지 않고 완료 표시부터 옮기지 않는다. 후속 담당자는 아래 검증을 거친 뒤 다음 세부 작업을 진행한다.
+2026-10-20 기준. [별도 checkout·외부 소스 복원 검증 기록](./HANDOFF-VALIDATION.json)을 보존했다. 이 문서는 설치·재개 절차이고, 현재 진행 상황과 남은 전체 13묶음은 [현재 인수인계](./CURRENT-HANDOFF.md)와 [실행 원장](./REMAINING-13-EXECUTION.json)이 기준이다. 코드를 읽지 않고 완료 표시부터 옮기지 않는다. 후속 담당자는 아래 검증을 거친 뒤 다음 세부 작업을 진행한다.
 
 ## 1. 저장소와 증거 이력 복원
 
@@ -50,11 +50,31 @@ python3 -m unittest discover -s scripts -p 'test_factory_native_overlap.py'
 |go-stablenet|`https://github.com/stable-net/go-stablenet.git`, commit `0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8`. 원본은 변경하지 않고 후보별 소유 clone을 만든다.|
 |go-wemix|`https://github.com/wemixarchive/go-wemix.git`, commit `1350376a680489298b3203a44d9ebddb7747f9cc`. 이전 비교의 source_mode는 working-tree이고 upstream의 cmd/gwemix 삭제가 있었으므로 commit만 같다고 같은 입력으로 판정하지 않는다.|
 |coding-agent|`https://github.com/0xmhha/coding-agent.git`, 실제 역할 검증 commit `d1ebafb8ddf4eb487b8f1d6285135e174c40834b`. 설치 호스트는 Claude Code 2.1.300, 실제 hook/MCP와 로컬 시험 응답기를 사용했다. 실제 LLM 답변 품질 검증은 아니다.|
-|ChainBench|고정 commit `bdf5ad2758662310b23c508e61b13ee318e92b40`와 채택 소스/객체는 아래 schedule-gap 증거가 기준이다. 새 checkout은 객체·파일 해시로 확인하며 저장소 URL을 추측하지 않는다.|
+|ChainBench|고정 commit `bdf5ad2758662310b23c508e61b13ee318e92b40`와 채택 소스/객체는 아래 schedule-gap 증거가 기준이다. 원격은 https://github.com/0xmhha/chainbench.git 이며 아래 bundle 절차로 실제 채택 커밋을 복원한다.|
 
 데이터 구축·복구는 [설치 절차](../INSTALLATION.md), [setup](../../system/docs/SETUP.md), [매니저 플러그인](./KNOWLEDGE-MANAGER-PLUGIN.md), [지속 갱신 계약](./KNOWLEDGE-MANAGER-UPDATES.md)을 따른다. baseline은 `bge-m3:latest`, digest `7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab`, 1024차원이다. 모델명만 같은 것으로 승인하지 않는다. 원래 dataset/project ID·pin·설정과 별도 재구축 ID를 구분하고 go-stablenet/go-wemix 검색 결과의 project/source provenance를 검사한다.
 
 기존 자료의 `/Users/kevin/...`와 `/private/tmp/ks-*`는 당시 실행의 출처 기록이다. 특히 최근 단계89/90의 시험 루트·캐시·바이너리는 검증 후 삭제했다. 그 경로를 live 경로로 사용할 수 없다. retained-origins-v2 DB는 별도 로컬 자원이며 원격 clone으로 복구되지 않는다.
+
+### 외부 소비자 소스 복원
+
+coding-agent d1eb와 ChainBench bdf5는 원격에 게시되지 않은 로컬 채택 커밋이다. 원격 SHA fetch만으로 복구되지 않음을 확인했다. 위 고정 이력 목록에는 각 bundle의 commit/tree/SHA-256을 기록했다. coding-agent는 완전한 history bundle, ChainBench는 원격에서 확인한 기반662fff 위의 차이 bundle이다. 원본 저장소는 수정하지 않았고, ChainBench의 기존5개 보존 bundle을 순서대로 복구해 완전한 Git tree도 확인했다. 다음은 새 소유 디렉터리에서 복원하는 예다.
+
+```sh
+KS_ROOT="$(pwd)"
+KS_RESTORE="$(mktemp -d)"
+git init "$KS_RESTORE/coding-agent"
+git -C "$KS_RESTORE/coding-agent" fetch "$KS_ROOT/docs/spec-driven/handoff-inputs/coding-agent.bundle" HEAD
+git -C "$KS_RESTORE/coding-agent" switch --detach d1ebafb8ddf4eb487b8f1d6285135e174c40834b
+git -C "$KS_RESTORE/coding-agent" remote add origin https://github.com/0xmhha/coding-agent.git
+git clone https://github.com/0xmhha/chainbench.git "$KS_RESTORE/chainbench"
+git -C "$KS_RESTORE/chainbench" fetch origin 662fff77382eb031df687d371a8bc8f63cad581f
+git -C "$KS_RESTORE/chainbench" bundle verify "$KS_ROOT/docs/spec-driven/handoff-inputs/chainbench.bundle"
+git -C "$KS_RESTORE/chainbench" fetch "$KS_ROOT/docs/spec-driven/handoff-inputs/chainbench.bundle" refs/heads/handoff
+git -C "$KS_RESTORE/chainbench" switch --detach bdf5ad2758662310b23c508e61b13ee318e92b40
+```
+
+새 경로를 다음 시험의 source_root에 명시하고 `git status`, commit/tree와 보존된 source-files 목록을 대조한다. bundle은 소스와 기존 라이선스/이력을 보존하며 의존성·설치된 CLI·런타임 바이너리·인증·DB를 포함하지 않는다. 소비자 의존성/빌드는 각 복원 checkout의 manifest와 문서를 따른다. 기존 KS 보존 packet 안의 절대 경로를 바꾸지 말고 새 실행 adapter에 매핑을 기록한다.
 
 ## 4. 최근 증거의 재검토와 실제 재실행 구분
 
