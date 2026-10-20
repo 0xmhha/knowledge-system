@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 import coreml_readiness as p
 import viewer_readiness as v
+import evidence_revision
 
 class CoreMLEvidence(unittest.TestCase):
     def base(self):return dict(actual_CoreML_model_inference_calls=0,actual_LLM_calls=0,paid_external_calls=0,formal_completed=0,independent_approved=0,real_CoreML_model_accepted=False,Qwen_CoreML_supported=False,managed_CKS_CoreML_runtime_implemented=False)
@@ -40,5 +41,10 @@ class CoreMLEvidence(unittest.TestCase):
         protocol=v.read(p.ROOT/v.PATHS[0]);ledger=v.read(p.ROOT/v.PATHS[1]);ledger['wi2_dev_gold_preparation']['status']='independent_approved'
         self.assertIn('prior decision/gold changed',p.current_indices(p.ROOT,protocol,ledger))
     def test_current_sealed_packet(self):self.assertEqual(p.validate(),[])
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

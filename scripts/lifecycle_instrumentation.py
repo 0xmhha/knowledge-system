@@ -1,9 +1,10 @@
 """Declared observation-only API edits in owned checkouts; never a production patch."""
 import subprocess
+import recorded_locations
 API='eth/downloader/api.go'
 BRIDGE='eth/downloader/ks_owned_rpc_lifecycle.go'
 MAIN='cmd/ks-owned-rpc-lifecycle/main.go'
-GOFMT='/Users/kevin/.gvm/gos/go1.23.12/bin/gofmt'
+GOFMT=recorded_locations.gofmt()
 
 
 def instrument(data):

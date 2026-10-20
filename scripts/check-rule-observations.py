@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import subprocess
 
+from recorded_locations import in_run_checkout
 from source_packet import safe, sha
 import importlib.util
 
@@ -40,7 +41,8 @@ def check(packet, check_references=True):
                 and (packet / 'overlay-base.go.txt').read_bytes() == (ROOT / runner.VIRTUAL).read_bytes()
                 and (packet / 'overlay-backing.go.txt').read_bytes() == runner.overlay_source(), 'overlay changes trusted template or existing tests')
         overlay = json.loads((packet / 'overlay.json.txt').read_text())
-        require(set(overlay) == {'Replace'} and set(overlay['Replace']) == {str(ROOT / runner.VIRTUAL)}, 'overlay scope')
+        require(set(overlay) == {'Replace'} and len(overlay['Replace']) == 1
+                and in_run_checkout(next(iter(overlay['Replace'])), runner.VIRTUAL), 'overlay scope')
         require({p.relative_to(packet / 'public-bundle').as_posix() for p in (packet / 'public-bundle').rglob('*') if p.is_file()} == {'public-inputs.json'}, 'private data in public bundle')
         public = (ROOT / runner.INPUT / 'public-inputs.json').read_bytes()
         require((packet / 'public-bundle/public-inputs.json').read_bytes() == public, 'public-only input payload')
@@ -66,7 +68,7 @@ def check(packet, check_references=True):
         require(not subprocess.check_output(['git', '-C', str(ROOT), 'diff', validation['go_source_reference_commit'], '--', '*.go']), 'maintained Go differs from tested reference')
         checks = validation['quality_checks']
         require(len(checks) == 4 and [q['kind'] for q in checks] == ['build', 'fmt', 'vet', 'lint'] and all(q['exit_code'] == 0 for q in checks), 'native quality checks')
-        backing = Path(overlay['Replace'][str(ROOT / runner.VIRTUAL)])
+        backing = Path(next(iter(overlay['Replace'].values())))
         ov = backing.parent / 'overlay.json'
         expected_commands = {'build': ['test', '-overlay=' + str(ov), '-c', '-o', str(backing.parent / 'rules.test'), './pkg/graph/valueflow'],
                              'fmt': ['-l', str(backing)], 'vet': ['vet', '-overlay=' + str(ov), './pkg/graph/valueflow'],

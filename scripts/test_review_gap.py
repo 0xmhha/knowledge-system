@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/review-gap-v1'
@@ -123,6 +124,10 @@ class ReviewGapTests(unittest.TestCase):
         self.assertEqual((c['review_proposals'],c['module_labels'],c['project_source_files'],c['existing_ai_anchors']),(10,8,9,45))
         self.assertEqual((c['pairwise_reviews'],c['same_module_pairs'],c['same_file_pairs']),(45,2,1))
         self.assertEqual(c['missing_explicit_role_tool_entries'],4);self.assertIsNone(a['gap-summary.json']['required_omissions'])
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 import native_reliability as n
+import evidence_revision
 
 
 class Contract(unittest.TestCase):
@@ -48,6 +49,10 @@ class Captured(unittest.TestCase):
 
     def test_resealed_runtime_pin_change_rejected(self):
         self.mutant('RUNTIME-SCOPE.json',lambda d:d['pins'].update(commit='0'*40))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

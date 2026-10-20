@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('t22_check', ROOT / 'scripts/check-consumer-final.py')
@@ -181,6 +182,10 @@ for name, key, value in [
     ('self_commit_circular_proof', 'self_commit_needs_post_creation_verification', False),
 ]:
     setattr(Final, 'test_' + name, boundary_test(key, value))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

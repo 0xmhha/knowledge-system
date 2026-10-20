@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 def module(name,file):
  s=importlib.util.spec_from_file_location(name,Path(__file__).with_name(file));m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
@@ -30,4 +31,10 @@ class AcceptanceReadinessTests(unittest.TestCase):
  def test_incomplete_not_green(self):self.rejects('host/incomplete/exit.json',lambda v:v.update(receipt_check_exit=0))
  def test_formal_state_preserved(self):self.rejects('formal-state-after.json',lambda v:v.update(execution_allowed=True))
  def test_Go_not_fresh(self):self.rejects('validation.json',lambda v:v.update(current_Go_validation_reused=False))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__=='__main__':unittest.main()

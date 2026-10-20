@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('t16_check', ROOT / 'scripts/check-consumer-errors.py')
@@ -164,6 +165,10 @@ for name, key, value in [
     ('provider_confound_hidden', 'provider_alignment_confounded', False),
 ]:
     setattr(Errors, 'test_' + name, accounting_test(key, value))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

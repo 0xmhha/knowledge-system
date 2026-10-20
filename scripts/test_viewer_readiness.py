@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 import viewer_readiness as v
+import evidence_revision
 
 
 class ViewerEvidence(unittest.TestCase):
@@ -71,6 +72,10 @@ class ViewerEvidence(unittest.TestCase):
     def test_current_complete_packet(self):
         if not(v.ROOT/v.PACKET/'manifest.json').exists():self.skipTest('packet is not sealed yet')
         self.assertEqual(v.validate(),[])
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

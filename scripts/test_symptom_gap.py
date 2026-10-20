@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/symptom-gap-v1'
@@ -165,6 +166,10 @@ class SymptomGapTests(unittest.TestCase):
         self.assertEqual((c['prior_question_comparisons'], c['prior_ai_topic_flags'], c['cards_with_prior_ai_topic_flags']), (840, 29, 16))
         self.assertEqual(out['public-bundle/wire-requests.json'], self.inputs['wire'])
         self.assertTrue(all(all(v is None for v in r['current_case_receipts'].values()) for r in out['private-case-gaps.json']['cases']))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

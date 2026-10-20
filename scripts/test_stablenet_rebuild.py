@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('rebuild', Path(__file__).with_name('check-stablenet-rebuild.py'))
 rebuild = importlib.util.module_from_spec(spec)
@@ -119,6 +120,10 @@ class RebuildEvidenceTests(unittest.TestCase):
     def test_live_owned_identity_cannot_count_as_cleaned_up(self):
         self.change('process-audit.json', lambda d: d['probes'][0].update(identity_gone=False))
         self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

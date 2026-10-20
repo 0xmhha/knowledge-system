@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import unittest
 import wi2_dev_gold as g
+import evidence_revision
 f=g.flow
 
 class SourceExpectations(unittest.TestCase):
@@ -91,5 +92,10 @@ class ResealedMutations(unittest.TestCase):
     def test_source_observer_receipt_cannot_change(self):self.mutant('syntax-receipt.json',lambda v:v.update(candidate_engine_imported_or_invoked=True))
     def test_caller_population_not_promoted(self):self.mutant('private/caller-context.json',lambda v:v.update(not_added_to_108_DEV_inputs=False))
     def test_heuristic_cannot_be_safety(self):self.mutant('private/RULE-1-01.json.gz',lambda v:v['universe'][0].update(safety_verdict='safe'),True)
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

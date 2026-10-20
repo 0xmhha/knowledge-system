@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/rule-caller-context-v1'
@@ -158,6 +159,10 @@ class CallerContextTests(unittest.TestCase):
         observations[0]['references'][0]['first_argument']['text'] = 'forged'
         with self.assertRaisesRegex(ValueError, 'caller argument source mismatch'):
             guard.prepare.derive(observations)
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

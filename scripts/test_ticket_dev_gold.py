@@ -2,6 +2,7 @@
 import copy,json,shutil,tempfile,unittest
 from pathlib import Path
 import ticket_dev_gold as g
+import evidence_revision
 
 
 class SourceAndOracle(unittest.TestCase):
@@ -118,6 +119,10 @@ class ResealedMutations(unittest.TestCase):
     def test_review_debt_erased(self):self.mutant('REVIEW-LEDGER.json',lambda v:v.update(missing=[]))
     def test_no_abstention_contract(self):self.mutant('matching-contract.json',lambda v:v.update(candidate_decision='always pick A'))
     def test_reviewer_and_formal_completion(self):self.mutant('WORKLIST.json',lambda v:v.update(reviewer_assignment='AI',formal_completed=2))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

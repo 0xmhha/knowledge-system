@@ -2,6 +2,7 @@
 import copy,gzip,json,shutil,tempfile,unittest
 from pathlib import Path
 import wi3_reason_fix as g
+import evidence_revision
 
 
 class ActualRegressionTests(unittest.TestCase):
@@ -61,6 +62,10 @@ class ResealedMutations(unittest.TestCase):
     def test_embedding_calls_fabricated_zero(self):self.mutant('runtime/receipt.json',lambda v:v.update(embedding_inference_call_count=0))
     def test_primary_retry_hidden(self):self.mutant('runtime/receipt.json',lambda v:v.update(primary_retries=1))
     def test_frozen_gold_fabricated(self):self.mutant('WORKLIST.json',lambda v:v.update(formal_completed=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

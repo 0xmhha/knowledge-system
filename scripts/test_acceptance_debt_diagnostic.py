@@ -2,6 +2,7 @@
 import copy,gzip,json,shutil,tempfile,unittest
 from pathlib import Path
 import acceptance_debt_diagnostic as g
+import evidence_revision
 
 
 class DiagnosticTests(unittest.TestCase):
@@ -62,6 +63,10 @@ class ResealedMutations(unittest.TestCase):
     def test_cleanup_not_zero(self):self.mutant('runtime/all-symbols/session.json',lambda v:v.update(exit=1))
     def test_semantic_score_fabricated(self):self.mutant('SUMMARY.json',lambda v:v.update(quality_scores={'precision':1}))
     def test_formal_completed_fabricated(self):self.mutant('WORKLIST.json',lambda v:v.update(formal_completed=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

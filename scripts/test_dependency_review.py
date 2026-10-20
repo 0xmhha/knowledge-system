@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/dependency-review-v1'
@@ -153,6 +154,10 @@ class DependencyReviewTests(unittest.TestCase):
     def test_formal_acceptance_promoted(self):
         self.change('formal-state.json', lambda d: d.update(execution_allowed=True))
         self.rejected('formal state promotion')
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

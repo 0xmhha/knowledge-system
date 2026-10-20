@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def module(name,file):
@@ -36,6 +37,10 @@ class UpdateStateEvidenceTests(unittest.TestCase):
     def test_referenced_go_not_fresh(self):self.rejects('validation.json',lambda v:v.update(current_Go_validation_reused=False))
     def test_python_denominator_not_reduced(self):self.rejects('validation.json',lambda v:v.update(manager_python_tests=174))
     def test_history_proof_cannot_be_new_head(self):self.rejects('historical-design.json',lambda v:v.update(revision='uncommitted'))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

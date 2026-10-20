@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/rule-observations-v1'
@@ -186,6 +187,10 @@ class RuleObservationTests(unittest.TestCase):
         records[0]['analysis']['rules']['candidates'][0]['id'] = 'd' * 64
         with self.assertRaisesRegex(ValueError, 'candidate pin hash mismatch'):
             guard.runner.derive(records)
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

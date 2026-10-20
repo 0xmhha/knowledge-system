@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import unittest
 import wi3_consumer_matching as g
+import evidence_revision
 
 
 class SourceAndAdapter(unittest.TestCase):
@@ -99,6 +100,10 @@ class ResealedMutants(unittest.TestCase):
     def test_matching_promoted(self):self.mutant('matching-contract.json',lambda v:v.update(formal_scoring_allowed=True))
     def test_independent_acceptance_invented(self):self.mutant('runtime/receipt.json',lambda v:v.update(independent_approved=20))
     def test_role_run_invented(self):self.mutant('runtime/receipt.json',lambda v:v.update(installed_agent_role_runs=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

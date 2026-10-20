@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import subprocess
 
+from recorded_locations import in_run_checkout
 from source_packet import safe, sha
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,7 +48,8 @@ def check(packet, check_references=True):
             require((ROOT / source).read_bytes() == (packet / artifact).read_bytes(), 'project trusted source snapshot: ' + artifact)
         require((packet / 'overlay-backing.go.txt').read_bytes() == runner.overlay_source(), 'project overlay changes existing tests')
         overlay = json.loads((packet / 'overlay.json.txt').read_text())
-        require(set(overlay) == {'Replace'} and set(overlay['Replace']) == {str(ROOT / runner.VIRTUAL)}, 'project overlay scope')
+        require(set(overlay) == {'Replace'} and len(overlay['Replace']) == 1
+                and in_run_checkout(next(iter(overlay['Replace'])), runner.VIRTUAL), 'project overlay scope')
         require({p.relative_to(packet / 'public-bundle').as_posix() for p in (packet / 'public-bundle').rglob('*') if p.is_file()} == {'public-inputs.json'}, 'private data in project public bundle')
         require(json.loads((packet / 'public-bundle/public-inputs.json').read_text()) == payload, 'project public source payload')
         require(json.loads((packet / 'source-bundle.json').read_text()) == descriptor, 'project synthetic bundle descriptor')
@@ -68,7 +70,7 @@ def check(packet, check_references=True):
         require(validation['source_analysis_invocations_per_mode'] == 102, 'project repeat call accounting')
         require(validation['public_input_scope'] == 'source_packaging_separation_not_os_filesystem_isolation', 'project input isolation overclaim')
         require(not subprocess.check_output(['git', '-C', str(ROOT), 'diff', validation['go_source_reference_commit'], '--', '*.go']), 'project observer Go source drift')
-        backing = Path(overlay['Replace'][str(ROOT / runner.VIRTUAL)])
+        backing = Path(next(iter(overlay['Replace'].values())))
         ov = backing.parent / 'overlay.json'
         expected_commands = {'build': ['test', '-overlay=' + str(ov), '-c', '-o', str(backing.parent / 'project.test'), './pkg/graph/valueflow'],
                              'fmt': ['-l', str(backing)], 'vet': ['vet', '-overlay=' + str(ov), './pkg/graph/valueflow'],

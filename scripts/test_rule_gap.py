@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/rule-gap-v1'
@@ -164,6 +165,10 @@ class RuleGapTests(unittest.TestCase):
         r=d['mcp-path-review.json']['role_exposure_finding']
         self.assertTrue(r['required_by_body']);self.assertTrue(r['consumer_input_metadata_parity'])
         self.assertFalse(r['explicit_analyzer_tool_present']);self.assertIsNone(r['effective_host_permissions'])
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

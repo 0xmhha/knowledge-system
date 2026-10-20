@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def module(name,file):
@@ -75,6 +76,10 @@ class CollectionEvidenceTests(unittest.TestCase):
         data['full_KM03_complete']=True
         path.write_text(json.dumps(data))
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':

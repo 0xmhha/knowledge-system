@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 ROOT=Path(__file__).resolve().parents[1]
 s=importlib.util.spec_from_file_location('p07_check',ROOT/'scripts/check-consumer-render-lifecycle.py');c=importlib.util.module_from_spec(s);s.loader.exec_module(c)
 PACKET=ROOT/c.p.PACKET
@@ -67,4 +68,10 @@ class P07(unittest.TestCase):
     def test_prior_inventory_omitted(self):self.edit('preservation.json',lambda d:d['files'].pop(next(iter(d['files']))));self.rejected()
     def test_extra_profile_file(self):
         p=self.p/'hosts/normal/claude-config';p.mkdir();(p/'settings.json').write_text('{}');self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__=='__main__':unittest.main()

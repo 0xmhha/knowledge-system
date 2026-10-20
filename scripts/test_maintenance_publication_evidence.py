@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import tarfile
 import unittest
+import evidence_revision
 
 
 def load(name, file):
@@ -69,6 +70,10 @@ class PublicationEvidenceTests(base.MaintenanceRuntimeEvidenceTests):
         path.write_bytes(gzip.compress(stream.getvalue(), mtime=0))
         self.rehash('fixture.tar.gz')
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@
 import copy,gzip,json,shutil,tempfile,unittest
 from pathlib import Path
 import wisp_dev_gold as g
+import evidence_revision
 
 
 class SourceAndMetadata(unittest.TestCase):
@@ -101,6 +102,10 @@ class ResealedMutations(unittest.TestCase):
     def test_independent_symbols_invented(self):self.mutant('SUMMARY.json',lambda v:v.update(independent_families=12))
     def test_formal_acceptance_invented(self):self.mutant('WORKLIST.json',lambda v:v.update(formal_completed=1))
     def test_real_name_requirement_cannot_return(self):self.mutant('reviewer-identity-policy.json',lambda v:v.update(real_name_required=True))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

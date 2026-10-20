@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def module(name,file):
@@ -32,6 +33,10 @@ class WorkerHostEvidenceTests(unittest.TestCase):
     def test_snapshot_origin_not_relabelled_current_disk(self):self.rejects('runtime/sigterm-stopped.json',lambda v:v.update(state_snapshot_origin='latest_disk_state'))
     def test_plugin_errors_not_hidden(self):self.rejects('plugin-validate.json',lambda v:v.update(success=False))
     def test_new_Python_not_claimed_reused(self):self.rejects('validation.json',lambda v:v.update(current_manager_Python_rerun=False))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

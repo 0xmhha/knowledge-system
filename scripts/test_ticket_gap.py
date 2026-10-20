@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/ticket-gap-v1'
@@ -156,6 +157,10 @@ class TicketGapTests(unittest.TestCase):
         self.assertEqual((c['project_source_anchors'],c['consumer_contract_anchors'],c['local_pure_function_checks']),(13,14,22))
         self.assertIsNone(out['private-ticket-gaps.json']['independent_acceptable_candidate_set'])
         self.assertTrue(all(v=='not_satisfied' for v in out['private-ticket-gaps.json']['obligations'].values()))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

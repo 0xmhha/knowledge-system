@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 ROOT=Path(__file__).resolve().parents[1]
 s=importlib.util.spec_from_file_location('compat_check',ROOT/'scripts/check-host-schema-compatibility.py');c=importlib.util.module_from_spec(s);s.loader.exec_module(c)
 PACKET=ROOT/c.prepare.BASE/'host-schema-compatibility-v1'
@@ -58,6 +59,10 @@ class Compatibility(unittest.TestCase):
         proof=json.loads((self.p/'cks-source/git-proof.json').read_text());p=self.p/'cks-source'/proof['files']['pkg/graph/valueflow/query.go']['artifact'];p.write_bytes(p.read_bytes()+b'\n// altered\n');self.rejected()
     def test_consumer_mirror_source_tampered(self):
         proof=json.loads((self.p/'consumer-source/git-proof.json').read_text());p=self.p/'consumer-source'/proof['files']['plugin/contracts/cks-tools.schema.json']['artifact'];p.write_bytes(p.read_bytes()+b'\n ');self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

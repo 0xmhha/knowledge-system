@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('source_regeneration_guard', ROOT / 'scripts/check-source-policy-regeneration.py')
@@ -101,6 +102,11 @@ class SourceRegenerationTests(unittest.TestCase):
         row.update(sha256=hashlib.sha256(p.read_bytes()).hexdigest(),bytes=p.stat().st_size)
         mpath.write_text(json.dumps(m))
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__ == '__main__':
     unittest.main()

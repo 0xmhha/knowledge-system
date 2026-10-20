@@ -8,6 +8,7 @@ import sqlite3
 from contextlib import closing
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1'
@@ -98,6 +99,10 @@ class StdioReadinessTests(unittest.TestCase):
         self.change('execution.json',lambda d:d['index_sha256'].update(index=guard.sha(path.read_bytes())));self.rejected()
     def test_plan_progress_has_22_cases_and_15_pending(self):
         r=guard.prepare.derive(PACKET)['stdio-readiness.json'];self.assertEqual(len(r['planned_case_progress']),22);self.assertEqual(r['full_cases_pending'],15);self.assertEqual(r['all_new_tool_requests'],113)
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

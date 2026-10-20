@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 def module(name,file):
     s=importlib.util.spec_from_file_location(name,Path(__file__).with_name(file));m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
@@ -37,4 +38,10 @@ class RealComparisonEvidenceTests(unittest.TestCase):
     def test_actual_DB_failure(self):self.rejects('build/go-wemix-job.json',lambda v:v.update(state='failed'))
     def test_alias_scope_hidden(self):self.rejects('build/go-wemix-source-scope.json',lambda v:v.update(excluded_non_regular=[]))
     def test_referenced_Go_is_not_fresh(self):self.rejects('validation.json',lambda v:v.update(current_Go_validation_reused=False))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__=='__main__':unittest.main()

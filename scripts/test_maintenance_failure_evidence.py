@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def load(name, file):
@@ -78,6 +79,10 @@ class FailureEvidenceTests(unittest.TestCase):
         data['independent_acceptance'] = True
         p.write_text(json.dumps(data))
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

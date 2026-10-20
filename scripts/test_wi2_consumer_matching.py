@@ -7,6 +7,7 @@ import shutil
 import tempfile
 import unittest
 import wi2_consumer_matching as g
+import evidence_revision
 f = g.f
 
 
@@ -211,6 +212,10 @@ class ResealedMutants(unittest.TestCase):
 
     def test_actual_conditions_cannot_be_erased(self):
         self.mutant('runtime/controlled-results.json', lambda v: next(r for r in v if r['function_id']=='RULE-1-08')['response']['analysis']['rules']['candidates'][0]['conditions'].clear())
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

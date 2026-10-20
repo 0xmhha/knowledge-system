@@ -2,6 +2,7 @@
 import importlib.util
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def module(name, file):
@@ -79,6 +80,10 @@ class HostEvidenceTests(unittest.TestCase):
 
     def test_actual_native_validator_required(self):
         self.rejects('native/agents.stdout.json', lambda r:r.update(success=False))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('roadmap_guard', Path(__file__).with_name('check-knowledge-roadmap.py'))
 guard = importlib.util.module_from_spec(spec)
@@ -81,6 +82,10 @@ class RoadmapTests(unittest.TestCase):
         p = self.root / 'internal/system/collection/session.go'
         p.write_text(p.read_text() + '\n// changed after verification\n')
         self.assertTrue(guard.check(self.folder, self.root))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

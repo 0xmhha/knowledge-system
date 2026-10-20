@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1'
 s=importlib.util.spec_from_file_location('guard',ROOT/'scripts/check-consumer-role-readiness.py');guard=importlib.util.module_from_spec(s);s.loader.exec_module(guard)
@@ -96,6 +97,10 @@ class RoleReadinessTests(unittest.TestCase):
         (self.packet/'unrecorded.txt').write_text('extra');self.rehash();self.rejected()
     def test_scope_cannot_claim_compatibility_implementation(self):
         p=self.packet/'COMPATIBILITY-FOLLOWUP.txt';p.write_text(p.read_text().replace('미구현','완료'));self.rehash();self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

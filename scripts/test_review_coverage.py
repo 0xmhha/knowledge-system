@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/review-coverage-v1'
@@ -150,6 +151,10 @@ class ReviewCoverageTests(unittest.TestCase):
         self.assertEqual(result['public-inputs.json'], self.inputs['public'])
         self.assertTrue(all(r['categories_proposal']['priority']['assigned_level'] is None for r in result['private-coverage.json']['cases']))
         self.assertNotIn('SRC-026', [r['candidate_id'] for r in result['private-coverage.json']['cases']])
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

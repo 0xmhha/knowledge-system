@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('t10_check', ROOT / 'scripts/check-consumer-partial.py')
@@ -207,6 +208,10 @@ class Partial(unittest.TestCase):
     def test_report_hides_unknown_scope(self):
         (self.p / 'REPORT.txt').write_text('T10 pass')
         self.rejected('report omitted partial/unknown scope')
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

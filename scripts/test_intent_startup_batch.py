@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 import intent_startup_batch as r
+import evidence_revision
 
 class Numeric(unittest.TestCase):
     def test_exact_text_matching_is_order_independent(self):
@@ -53,5 +54,10 @@ class SourceBound(unittest.TestCase):
                     f=p/x.relative_to(r.ROOT/r.PACKET);f.parent.mkdir(parents=True,exist_ok=True);f.symlink_to(x)
             f=p/'SUMMARY.json';d=r.read(f);d.update(formal_completed=9,independent_approved=1);f.unlink();r.write(f,d);r.seal(p)
             self.assertTrue(r.validate(packet=p))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

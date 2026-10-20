@@ -7,6 +7,7 @@ import shutil
 import tempfile
 import unittest
 from unittest.mock import patch
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('t04_check', ROOT / 'scripts/check-consumer-opt-in.py')
@@ -215,6 +216,10 @@ class OptIn(unittest.TestCase):
     def test_failure_limit_removed_from_report(self):
         (self.p / 'REPORT.txt').write_text('T04 passed')
         self.rejected('report omits limits/failure')
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

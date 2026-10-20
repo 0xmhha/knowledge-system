@@ -1,0 +1,982 @@
+{
+ "schema_version": 1,
+ "purpose": "Historical stage tests run at the evidence-history commit where their packet was verified; packet paths must be unmodified in the current checkout.",
+ "history_tag": "evidence/2026-10-20/publication",
+ "selection": "last first-parent commit that changed the test module; the module passed there unchanged",
+ "modules": {
+  "test_acceptance_debt_diagnostic": {
+   "commit": "3869a548b6d57dc7e3cdd1caf3c9f532399698f8",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1"
+   ]
+  },
+  "test_acceptance_readiness": {
+   "commit": "9de07a8264bc4aea7054dcea8abb6559801d1cef",
+   "packets": [
+    "system/eval/operational-preparation-2026-10-16/readiness-refresh"
+   ]
+  },
+  "test_collection_isolation": {
+   "commit": "cb373e9451f44b0ca36bbbeaf719ac5294de1aa5",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-01-final-isolation"
+   ]
+  },
+  "test_collection_public": {
+   "commit": "16a75b8da4aaec9de8a4fa7412bad1a136197e6f",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-01-public-read"
+   ]
+  },
+  "test_comparison_contract_evidence": {
+   "commit": "c7de05e1ae88f17856658acb3490cdf622a25777",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-06-contract"
+   ]
+  },
+  "test_comparison_failure_evidence": {
+   "commit": "dd554e79a086c246e02bea52397f937aed406a04",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-06-failures"
+   ]
+  },
+  "test_comparison_runtime_evidence": {
+   "commit": "5f7216748f71cad7e123de33a0fb9272aa90334c",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-06-runtime"
+   ]
+  },
+  "test_consumer_adoption": {
+   "commit": "a2e235fd7b30b8cd6e86ccd8a34e80361e38810e",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-adoption-v1"
+   ]
+  },
+  "test_consumer_contract_plan": {
+   "commit": "88b2234b455b51e25b3465a5bfe52ffcd22c878e",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/consumer-contract-plan-v1"
+   ]
+  },
+  "test_consumer_errors": {
+   "commit": "39f4554034ae8fb9ad7a87b8b22b9a21cbebf368",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-partial-v1"
+   ]
+  },
+  "test_consumer_final": {
+   "commit": "4932767115f568fff7313e91c77f45b377203108",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-errors-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-final-v1"
+   ]
+  },
+  "test_consumer_foreign_pin": {
+   "commit": "0821b6c1d3d42b16245e3fed43161c16bab68010",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1"
+   ]
+  },
+  "test_consumer_local_readiness": {
+   "commit": "cbd5aa341b6357bc92e2f8ff0c28bdd935645d80",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1"
+   ]
+  },
+  "test_consumer_opt_in": {
+   "commit": "f1608eeb6bda1f14ab1519083eaed9b7c55cb6bc",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-opt-in-v1"
+   ]
+  },
+  "test_consumer_partial": {
+   "commit": "a7c9d929965e6d649b18446d7902d0c4b4475a25",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-foreign-pin-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-partial-v1"
+   ]
+  },
+  "test_consumer_render_lifecycle": {
+   "commit": "9ede28200343434d250f4a53798ef5409b07552a",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/consumer-render-lifecycle-v1"
+   ]
+  },
+  "test_consumer_role_readiness": {
+   "commit": "5b39c413c4b7e6cf0a8fe51ce4c1567ae8a1ee7b",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/consumer-role-readiness-v1"
+   ]
+  },
+  "test_consumer_stdio_readiness": {
+   "commit": "00e8e4cb652f73018d961ebcfa3e63b8f66ee87c",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/consumer-stdio-readiness-v1"
+   ]
+  },
+  "test_coreml_readiness": {
+   "commit": "d5efe8f10b7953b50dc14d3492c71596496dbec4",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1"
+   ],
+   "overlay": {
+    "commit": "137a718e60db2eb3ffafbe4e0ee5ca1620120d72",
+    "paths": [
+     "docs/spec-driven/operational-preparation/source-review-supplement/followups/coreml-transport-v1"
+    ]
+   }
+  },
+  "test_dependency_review": {
+   "commit": "460c48be6373b2b58bae33ffeaeecee0ed2bda48",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/dependency-review-v1"
+   ]
+  },
+  "test_expansion_gap": {
+   "commit": "bff338f5356932bb63157f918f16c4935e623729",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/expansion-gap-v1"
+   ]
+  },
+  "test_four_role_readiness": {
+   "commit": "7d5a5537c24a73a2a191d2f94b6243fb98c0d059",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/four-role-current-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-factory-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1"
+   ]
+  },
+  "test_full_host_factory": {
+   "commit": "0bbc94c410db1f2a0cf220e6c1731f4e06135149",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-factory-v1"
+   ]
+  },
+  "test_full_host_owner": {
+   "commit": "49197f0f3d5967913355278ba5d45d4a32ae614a",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-factory-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1"
+   ]
+  },
+  "test_function_sample": {
+   "commit": "02c1d13676791e410fe533e4c8975c393a350207",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/function-sample-v1"
+   ]
+  },
+  "test_host_schema_compatibility": {
+   "commit": "a6a1de98bb9fca8e8b5adaf11b53895a8189b533",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/host-schema-compatibility-v1"
+   ]
+  },
+  "test_independent_acceptance": {
+   "runs": [
+    {
+     "commit": "0f28a9a756f05cc29416ef953e4926ad24cc4ee8",
+     "packets": [
+      "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1"
+     ],
+     "only": [
+      "PacketMutationTests",
+      "MetricTests.test_current_indices_are_bound"
+     ]
+    },
+    {
+     "commit": "3bdf444fa5c6f591aa9bce93497668d2110dd188",
+     "packets": [],
+     "exclude": [
+      "PacketMutationTests",
+      "MetricTests.test_current_indices_are_bound"
+     ]
+    }
+   ]
+  },
+  "test_industry_scheme_evidence": {
+   "commit": "f597c04a83463d7030a3d5d541700d31cd8146e2",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-05-scheme"
+   ]
+  },
+  "test_intent_startup_batch": {
+   "commit": "84969638e4cfc77311825148158b7cdf97e5c44e",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1"
+   ]
+  },
+  "test_knowledge_manager_bootstrap_evidence": {
+   "commit": "2c2b7ed18496709958b2d0817820a220dede1a52",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-03-bootstrap"
+   ]
+  },
+  "test_knowledge_manager_broker_evidence": {
+   "commit": "c51f7423b32f5b07a2194339814b1219b79e7557",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-03-broker"
+   ]
+  },
+  "test_knowledge_manager_collection_evidence": {
+   "commit": "322daf390b769ee5c9bc868fb707cc791b710fa6",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-03-collection"
+   ]
+  },
+  "test_knowledge_manager_host_evidence": {
+   "commit": "cea1c9438364702b937a273e68db49a99b196ec3",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-03-host"
+   ]
+  },
+  "test_knowledge_manager_review_evidence": {
+   "commit": "3d39801cbb447b1affdd23e4ecbdc344efbe6898",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-03-review"
+   ]
+  },
+  "test_knowledge_manager_update_contract_evidence": {
+   "commit": "7268ac7f0e8d3d8d6f0e1e345d773429630ec551",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-04-contract"
+   ]
+  },
+  "test_knowledge_roadmap": {
+   "commit": "a90d4775b6c8a155c0240b9861c0b4a7c7b95213",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-01-foundation"
+   ]
+  },
+  "test_knowledge_roadmap_current": {
+   "commit": "56c59c8821f86a581e378478971de6b401481336",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-01-foundation"
+   ]
+  },
+  "test_lexical_coverage": {
+   "commit": "feea6cc5b5aaed540589cd04ed1fc78e484a0029",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/lexical-coverage-v1"
+   ]
+  },
+  "test_lifecycle_preparation": {
+   "commit": "9158875e8c996b9914ec3fa963eed36065560384",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-v1"
+   ],
+   "portable": [
+    "lifecycle_instrumentation.py"
+   ]
+  },
+  "test_maintenance_design_evidence": {
+   "commit": "7034ce85a0a5cd9c3401e1599732c86334260a57",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-contract"
+   ]
+  },
+  "test_maintenance_durable_host_evidence": {
+   "commit": "0fa42cefe85b2e30b126f22d3a6ba765ee9b460a",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-host"
+   ]
+  },
+  "test_maintenance_durable_service_evidence": {
+   "commit": "29169b2b4fc13817d8022afd3749fde4dea41ed4",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-service"
+   ]
+  },
+  "test_maintenance_failure_evidence": {
+   "commit": "6705ed5772915e2130acb0f93f15a2163b2f32a1",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-public-failures"
+   ]
+  },
+  "test_maintenance_journal_foundation": {
+   "commit": "fff83134fa751eaf034ae0d4d135ed033274293d",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-journal-foundation"
+   ]
+  },
+  "test_maintenance_publication_evidence": {
+   "commit": "17633b226e699fe13099d13da090018acbc4314a",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-publication-recovery"
+   ]
+  },
+  "test_maintenance_retention_evidence": {
+   "commit": "ae3f987d6fbe77a3b5ceb5709787db5017c2d4a2",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-durable-retention"
+   ]
+  },
+  "test_maintenance_runtime_evidence": {
+   "commit": "31c1f30de41f7c053ecc4081c0ee5bc278f25d28",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-public-maintenance"
+   ]
+  },
+  "test_maintenance_staging_evidence": {
+   "commit": "ed74cd7f0846f408a5959a97d3bdd148c16e3afe",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-owned-staging"
+   ]
+  },
+  "test_maintenance_supervision_evidence": {
+   "commit": "1283a22c9df1cb34dc0941e66740cd5894db8ca8",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-02-command-supervision"
+   ]
+  },
+  "test_manager_document_index_evidence": {
+   "commit": "bb71aae36e66d53e43b3e3e94dffa19f7d2322ad",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-03-document-index"
+   ]
+  },
+  "test_manager_periodic_evidence": {
+   "commit": "2f9ddb52e3f578237efe4732ad5897926a72dc06",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-04-periodic"
+   ]
+  },
+  "test_manager_source_check_evidence": {
+   "commit": "8bfe40e8a722168b33b191048dedbf7d40ee1bb5",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-04-source-check"
+   ]
+  },
+  "test_manager_update_inputs_evidence": {
+   "commit": "2c03322f6ea0684788d7971f6072b1c3819ee5ce",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-04-inputs"
+   ]
+  },
+  "test_manager_update_state_evidence": {
+   "commit": "d00224a54a5b5dd27dad7cf661761b9ae008f983",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-04-state"
+   ]
+  },
+  "test_manager_update_worker_evidence": {
+   "commit": "a801f551fe8701f6afcfc612fdb1e7dc89dfb134",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-15/km-04-worker"
+   ]
+  },
+  "test_manager_updates_MCP_evidence": {
+   "commit": "4a2ca4cd2799c730548968187573de2568ca0d5a",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-04-updates-MCP"
+   ]
+  },
+  "test_manager_worker_host_evidence": {
+   "commit": "ebec085873ad256ac5d630354a1cd7388dfb2c5d",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-04-worker-host"
+   ]
+  },
+  "test_mapping_review_evidence": {
+   "commit": "f2eef29dc3e602fca4e5b517fb84c328e2eec1f5",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-05-mapping-review"
+   ]
+  },
+  "test_multiproject_mapping_effect": {
+   "commit": "56c59c8821f86a581e378478971de6b401481336",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/oe-04-mapping-effect"
+   ]
+  },
+  "test_native_reliability": {
+   "commit": "38b4c5e279b5bb09153a0c80838f36f4ccf3b0be",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1"
+   ]
+  },
+  "test_ontology_expanded_capture": {
+   "commit": "e44c58f066b96f48d41bf0329f89678b182ff978",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/oe-02-capture"
+   ]
+  },
+  "test_ontology_expanded_protocol": {
+   "commit": "f73b9e3604f1a7c225a94c8643a013b56158ca3c",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/oe-01-protocol"
+   ]
+  },
+  "test_ontology_expanded_score": {
+   "commit": "c0c77897f6681a72caf0358e5d945ce7a28a35e7",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/oe-03-score"
+   ]
+  },
+  "test_policy_security_gap": {
+   "commit": "4a3d13399ba768c555012cf6d16bc77ec22566c2",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1"
+   ]
+  },
+  "test_project_applicability_evidence": {
+   "commit": "ba807f5ec8879eea3e1518607e73eec3834b9506",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-05-applicability"
+   ]
+  },
+  "test_project_bindings_evidence": {
+   "commit": "3e3c1022176341955021a3441e65f2469d86ab2a",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-05-bindings"
+   ]
+  },
+  "test_project_rule_review": {
+   "commit": "fd34e4954723165324636b799b202d6e4f328f1c",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/project-rule-review-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/rule-observations-v1"
+   ],
+   "portable": [
+    "check-project-rule-review.py",
+    "check-rule-observations.py"
+   ]
+  },
+  "test_public_v2_readiness": {
+   "commit": "83a77c7245cb567bcd4cede1756b23dfbb5b6f88",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/public-v2-surface-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/viewer-lifecycle-v1"
+   ]
+  },
+  "test_real_comparison_evidence": {
+   "commit": "efd439951e50158477f6c15d65c0dec8090e7978",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/km-06-real-projects"
+   ]
+  },
+  "test_real_peer_readiness": {
+   "commit": "dccf6d024d80db1ce71bb7471093335ba60ab64c",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/real-peer-sync-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1"
+   ]
+  },
+  "test_review_context": {
+   "commit": "3b0b32ff732444dcf1ac96c918cd4e2bfa3c806a",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/context-v1"
+   ]
+  },
+  "test_review_coverage": {
+   "commit": "121e615dcd47aabbd10b7f88c13ae0938e43b3c4",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/review-coverage-v1"
+   ]
+  },
+  "test_review_delivery_readiness": {
+   "commit": "49662a5bc27dbae01e956c8c03a72a5b803a174e",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/four-role-current-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-factory-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/full-host-owner-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/intent-startup-batch-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/local-reliability-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/review-delivery-current-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-actual-rpc-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-select-review-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-resolver-fix-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-walk-budget-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-schedules-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-subscription-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-target-udp-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-paired-runtime-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1"
+   ]
+  },
+  "test_review_gap": {
+   "commit": "53ce0a7ef499645b86a1d24ff43bfb609bd3f34b",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/review-gap-v1"
+   ]
+  },
+  "test_rule_caller_context": {
+   "commit": "ee9b8f320393429293969deddbda996211d1ec59",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/rule-caller-context-v1"
+   ]
+  },
+  "test_rule_coverage": {
+   "commit": "335892887053e1d126eab1c3717cb4e284cf536d",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/rule-coverage-v1"
+   ]
+  },
+  "test_rule_gap": {
+   "commit": "19be26fd332e287e73b7aa03ed3925a967de05a2",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/rule-gap-v1"
+   ]
+  },
+  "test_rule_observations": {
+   "commit": "6c72898ad38f84fc3a8f11c6d0c534b493930106",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/rule-observations-v1"
+   ],
+   "portable": [
+    "check-rule-observations.py"
+   ]
+  },
+  "test_sample_locations": {
+   "commit": "a564f1263bc4fa778fb8a485c07a658b33043724",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/sample-locations-v1"
+   ]
+  },
+  "test_schedule_candidates": {
+   "commit": "fcd91ee3d49e4f40f6dab8633f5561cbf4a403cc",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/schedule-candidates-v1"
+   ]
+  },
+  "test_schedule_gap": {
+   "commit": "310e8cd3041f8f75517433c82379a87249bcb399",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/schedule-gap-v1"
+   ]
+  },
+  "test_semantic_gap": {
+   "commit": "7fc7f744ef18bde555e950d25f73e0a9e8f6ab19",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/semantic-gap-v1"
+   ]
+  },
+  "test_source_policy_regeneration": {
+   "commit": "17970c869be85f4242bd61eea0db7c5f01d2a4d8",
+   "packets": [
+    "system/eval/knowledge-roadmap-2026-10-16/policy-source-regeneration"
+   ]
+  },
+  "test_source_review_supplement": {
+   "commit": "efc05162c62f101079b5ad668c8b922e70ae7d56",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/expansion-v1"
+   ]
+  },
+  "test_stablenet_comparison": {
+   "commit": "64e8c1be0935adb791b4bd731e4a00fa22cff023",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-comparison-v1"
+   ],
+   "portable": [
+    "test_stablenet_comparison.py"
+   ]
+  },
+  "test_stablenet_errors": {
+   "commit": "64e8c1be0935adb791b4bd731e4a00fa22cff023",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-errors-v1"
+   ],
+   "overlay": {
+    "commit": "4cebf0c890b6708f3c6cd756749ccfdc55e096eb",
+    "paths": [
+     "cmd/cks/mcpcli/serve.go"
+    ]
+   }
+  },
+  "test_stablenet_rebuild": {
+   "commit": "137a718e60db2eb3ffafbe4e0ee5ca1620120d72",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/stablenet-rebuild-v1"
+   ],
+   "overlay": {
+    "commit": "a3307ccbf0373b16caa86292c79f3ae5eeefe254",
+    "paths": [
+     "cmd/cks/agentcli/main.go",
+     "cmd/cks/main.go",
+     "cmd/cks/mcpcli/serve.go",
+     "cmd/cks/viewercli/viewer.go",
+     "cmd/graph/export_json.go",
+     "cmd/graph/export_static.go",
+     "cmd/graph/main.go",
+     "cmd/vector/embedder.go",
+     "cmd/vector/embedder_test.go",
+     "cmd/vector/root.go",
+     "docs/INSTALLATION.md",
+     "docs/spec-driven/PUBLIC-CONTRACT-V2.md",
+     "internal/graph/persist/manifest.go",
+     "internal/graph/persist/sqlite_helpers.go",
+     "internal/setup/command_guard_test.go",
+     "internal/system/backendmeasure/clients.go",
+     "internal/system/backendmeasure/recorder.go",
+     "internal/system/backendmeasure/recorder_test.go",
+     "internal/system/ckvclient/real.go",
+     "internal/system/composer/intent/classifier.go",
+     "internal/system/composer/intent/embedder.go",
+     "internal/system/config/config.go",
+     "internal/system/config/config_test.go",
+     "internal/system/embedder/embedder.go",
+     "internal/system/embedder/embedder_test.go",
+     "internal/system/maintenance/source_check_test.go",
+     "internal/system/mcp/backend_measurement_test.go",
+     "internal/system/mcp/get_for_task_v2.go",
+     "internal/system/mcp/health.go",
+     "internal/system/mcp/search.go",
+     "internal/system/mcp/server_test.go",
+     "internal/system/mcp/source_guard.go",
+     "internal/system/mcp/suspects.go",
+     "internal/system/suspects/compose.go",
+     "internal/system/suspects/compose_test.go",
+     "internal/system/viewer/assets.go",
+     "internal/system/viewer/assets_test.go",
+     "internal/system/viewer/server.go",
+     "internal/system/viewer/web_assets/index.html",
+     "internal/vector/embed/cache/lru.go",
+     "internal/vector/embed/cache/lru_test.go",
+     "internal/vector/embed/coreml/adapter.go",
+     "internal/vector/embed/coreml/bridge.h",
+     "internal/vector/embed/coreml/bridge_darwin.m",
+     "internal/vector/embed/coreml/coreml_darwin.go",
+     "internal/vector/embed/coreml/coreml_other.go",
+     "internal/vector/embed/coreml/coreml_test.go",
+     "internal/vector/embed/coreml/tokenizer_darwin.go",
+     "internal/vector/query/errors.go",
+     "internal/vector/query/service_embed.go",
+     "pkg/graph/valueflow/dependence.go",
+     "pkg/vector/ckv/ckv.go",
+     "pkg/vector/types/embed.go"
+    ]
+   }
+  },
+  "test_subscription_probe": {
+   "commit": "e6978b95e168cffbdc7412689a2fe30b5f25d538",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/subscription-probe-v1"
+   ]
+  },
+  "test_subscription_ticket": {
+   "commit": "d4134bd88c6f41da40bb13cffdf81ba51ef92f68",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1"
+   ]
+  },
+  "test_symptom_gap": {
+   "commit": "9c3af33815d302433c09fd621c309ba8bb7960a7",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/symptom-gap-v1"
+   ]
+  },
+  "test_symptom_inputs": {
+   "commit": "36379c3a6d2e9816b149e787456b55f2e74ba8e2",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/symptom-inputs-v1"
+   ]
+  },
+  "test_symptom_wire_preflight": {
+   "commit": "481bc4151d9e3c33e038ec2254cc494d9d5b0dc5",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/symptom-wire-preflight-v1"
+   ],
+   "portable": [
+    "check-symptom-wire-preflight.py"
+   ]
+  },
+  "test_ticket_dev_gold": {
+   "commit": "3caf64d6bf7cf765b124cdb80c8c6925ef69ab6c",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1"
+   ]
+  },
+  "test_ticket_gap": {
+   "commit": "1e46e311154b3f07aec3daebaf0f01f04c1f63fa",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/ticket-gap-v1"
+   ]
+  },
+  "test_ticket_rpc_lifecycle_results": {
+   "commit": "9158875e8c996b9914ec3fa963eed36065560384",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-results-v1"
+   ],
+   "portable": [
+    "lifecycle_instrumentation.py"
+   ]
+  },
+  "test_ticket_rpc_overlap": {
+   "commit": "f5d7da318e92f3dbbb024f396895b99033d1383d",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-overlap-v1"
+   ],
+   "portable": [
+    "ticket_rpc_overlap.py"
+   ]
+  },
+  "test_udp_cursor_probe": {
+   "commit": "c2697237ccc29e7d3c1470e47a38414e6ee8ceb7",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/udp-cursor-probe-v1"
+   ]
+  },
+  "test_viewer_readiness": {
+   "commit": "3cebd6f0524a29a1ecec5fef707475070d1db7ed",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/viewer-lifecycle-v1"
+   ]
+  },
+  "test_wi1_consumer_matching": {
+   "commit": "5d84449eae68db4911a33d9a7b6bc09ca153406d",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1"
+   ]
+  },
+  "test_wi1_dev_gold": {
+   "commit": "4529b6d1615d8d88159dfe07e22b0cdf38d929cf",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1"
+   ]
+  },
+  "test_wi2_consumer_matching": {
+   "commit": "5b72156debceff5af54e7bf94a8399cb02681b33",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1"
+   ]
+  },
+  "test_wi2_contract_audit": {
+   "commit": "c874ca8e6a27aec396ac5f87d1b30f44b4503638",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-contract-audit-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1"
+   ]
+  },
+  "test_wi2_dev_gold": {
+   "commit": "0993202df9799196540a078fd4020b661359c4fb",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1"
+   ]
+  },
+  "test_wi3_consumer_matching": {
+   "commit": "d95b3e91ac2ef0241f3386618c1f483e36cbf80e",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1"
+   ]
+  },
+  "test_wi3_dev_gold": {
+   "commit": "8553fe9707fd2dc289126872eb1138fe2f021098",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1"
+   ]
+  },
+  "test_wi3_reason_fix": {
+   "commit": "738c4a513bf2ae3de53035b0388a7ac207bab6cb",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi123-debt-diagnostic-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-reason-fix-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1"
+   ]
+  },
+  "test_wi4_dev_gold": {
+   "commit": "20f470f2e1b8d9b0b9c6b6ed007b2a42b456befa",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1"
+   ]
+  },
+  "test_wi6_dev_gold": {
+   "commit": "fc4186b9997caa8aa432cc2dab6fb3fbe6ff703f",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1"
+   ]
+  },
+  "test_wic_dev_gold": {
+   "commit": "b9e0db369211aba2c55f0db48d49f446c8023b88",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/independent-freeze-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi1-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi2-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-consumer-matching-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi3-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi4-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wi6-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wic-dev-gold-v1",
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1"
+   ]
+  },
+  "test_wisp_dev_gold": {
+   "commit": "3bdf444fa5c6f591aa9bce93497668d2110dd188",
+   "packets": [
+    "docs/spec-driven/operational-preparation/source-review-supplement/followups/wisp-dev-gold-v1"
+   ]
+  }
+ }
+}

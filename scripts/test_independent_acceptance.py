@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 import independent_acceptance as guard
+import evidence_revision
 
 
 def example_gold():
@@ -276,6 +277,10 @@ class PacketMutationTests(unittest.TestCase):
 
     def test_native_reuse_not_presented_as_fresh(self):
         self.assertTrue(self.mutate('native-reuse.json', lambda d: d.update(fresh_Go_full_tests_this_stage=True)))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

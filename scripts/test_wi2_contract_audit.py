@@ -2,6 +2,7 @@
 import copy,gzip,json,shutil,tempfile,unittest
 from pathlib import Path
 import wi2_contract_audit as g
+import evidence_revision
 
 
 class ScopeTests(unittest.TestCase):
@@ -52,6 +53,10 @@ class ResealedMutations(unittest.TestCase):
     def test_runtime_binary_mismatch(self):self.mutant('runtime/receipt.json',lambda v:v.update(binary_sha256='0'*64))
     def test_semantic_score_fabricated(self):self.mutant('SUMMARY.json',lambda v:v.update(current_semantic_quality_scores={'precision':1}))
     def test_formal_acceptance_fabricated(self):self.mutant('WORKLIST.json',lambda v:v.update(formal_completed=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

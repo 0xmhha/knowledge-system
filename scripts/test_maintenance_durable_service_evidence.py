@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def load(name, file):
@@ -39,6 +40,10 @@ class DurableServiceEvidenceTests(base.MaintenanceRuntimeEvidenceTests):
         value['uncertain_write_returns_status'] = True
         path.write_text(json.dumps(value))
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

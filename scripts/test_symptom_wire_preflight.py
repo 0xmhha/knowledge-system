@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement'
@@ -105,6 +106,10 @@ class WirePreflightTests(unittest.TestCase):
         public['cases'][0]['source_anchors'] = ['synthetic control']
         with self.assertRaises(ValueError):
             guard.load('export-symptom-wire.py').render(public)
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

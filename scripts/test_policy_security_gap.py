@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/policy-security-gap-v1'
@@ -166,6 +167,10 @@ class PolicySecurityGapTests(unittest.TestCase):
         self.assertEqual((c['native_top_level_tests_per_mode'],c['native_pass_records_including_subtests_per_mode'],c['native_modes']),(12,24,2))
         self.assertEqual(c['historical_fixture_cks_requests'],18);self.assertIsNone(d['gap-summary.json']['annotation_match_fraction'])
         self.assertTrue(all(v=='not_satisfied' for v in d['private-symbol-gaps.json']['obligations'].values()))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

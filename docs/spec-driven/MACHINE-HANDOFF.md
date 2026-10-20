@@ -40,6 +40,28 @@ python3 scripts/wiv1_generation_boundary.py
 python3 -m unittest discover -s scripts -p 'test_wiv1_generation_boundary.py'
 ```
 
+### scripts 시험 전체
+
+`scripts/` 아래 시험 전체는 CI가 돌리지 않는다. 새 머신에서는 아래처럼 준비한 뒤 실행한다.
+
+```sh
+KS_VENV="$HOME/.venvs/knowledge-system"
+python3 -m venv "$KS_VENV"
+"$KS_VENV/bin/pip" install 'Cython==0.29.37' 'setuptools==80.9.0' 'wheel==0.45.1'
+"$KS_VENV/bin/pip" install --no-build-isolation 'PyYAML==6.0'
+"$KS_VENV/bin/pip" install -r scripts/requirements.txt
+make build
+"$KS_VENV/bin/python" -m unittest discover -s scripts -p 'test_*.py'
+```
+
+venv는 저장소 밖에 만든다. `.gitignore`는 현재 검증기 여러 개가 바인딩한 입력이라 venv 때문에 바꾸지 않는다.
+
+- 외부 모듈은 [고정 목록](../../scripts/requirements.txt)의 jsonschema와 PyYAML뿐이다. 보존 패킷이 PyYAML 6.0을 parser 버전으로 기록했으므로 같은 버전을 쓴다. Python 3.12용 wheel이 없어 소스에서 빌드한다.
+- `check-lexical-coverage.py`는 PATH의 `go`를 `GOTOOLCHAIN=local`로 실행한다. PATH의 `go`가 go.mod의 Go 1.25.13 이상이어야 한다. 1.25.12를 두면 87건이 버전 오류로 실패한다.
+- Go 1.23.12 native 증거를 다시 계산하는 시험은 `KS_GO1_23_ROOT`(기본 `~/.gvm/gos/go1.23.12`)의 SDK를 쓴다. 기록된 이전 머신 경로는 [위치 대응](../../scripts/recorded_locations.py)이 도구 이름으로 바꾸고, 바이너리 해시는 기록과 비교한다.
+- 과거 단계 시험 110개 모듈은 끝의 `load_tests` hook으로 [기록된 커밋](../../scripts/evidence-revisions.json)의 임시 worktree에서 돌린다. 이후 단계가 바인딩된 소스·도구·정식 상태를 바꿨기 때문이다. 그 커밋 이후 패킷 파일이 수정되거나 지워졌으면 실패한다. evidence 태그가 없어도 실패한다. 동작 방식은 [실행 모듈](../../scripts/evidence_revision.py)에 적었다.
+- `test_stablenet_comparison`의 소유 index 재조회 1건은 건너뛴다. 원래 실행이 임시 루트에 만든 DB가 지워져 재현할 수 없다. 나머지 오프라인 검사와 변조 시험은 그대로 돈다.
+
 의존 라이브러리가 없는 새 머신은 처음에 모듈 다운로드와 고정 lint 설치가 필요하다. 이전 머신의 GVM 경로나 오프라인 환경변수를 복사하지 않는다. lint 설치/선택은 Makefile의 고정 버전을 따른다. 검사 출력은 소유한 작업 디렉터리에 보존한다. 실행 종료와 자식 프로세스 종료를 확인한 뒤 이번 작업에서 만든 GOCACHE/GOLANGCI_LINT_CACHE, 임시 데이터와 생성 bin만 제거한다. 공용 모듈 캐시·기존 프로젝트·기존 DB를 지우지 않는다. `make`로 재생성 가능한 viewer 의존성도 필요할 때만 설치한다. 현재 검증에 결속된 정적 viewer 입력은 저장소에서 복원되며, 재빌드로 덮어쓰면 별도 source drift로 기록해야 한다.
 
 ## 3. clone에 있는 것과 다시 준비할 것

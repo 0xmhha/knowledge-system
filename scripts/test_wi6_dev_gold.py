@@ -2,6 +2,7 @@
 import copy,gzip,json,shutil,tempfile,unittest
 from pathlib import Path
 import wi6_dev_gold as g
+import evidence_revision
 
 
 class DraftAndProjection(unittest.TestCase):
@@ -99,6 +100,10 @@ class ResealedMutations(unittest.TestCase):
     def test_warm_raw_samples_invented(self):self.mutant('REVIEW-LEDGER.json',lambda v:v.update(warm_raw_samples=[1]))
     def test_review_debt_erased(self):self.mutant('REVIEW-LEDGER.json',lambda v:v.update(missing=[]))
     def test_formal_acceptance_invented(self):self.mutant('WORKLIST.json',lambda v:v.update(formal_completed=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

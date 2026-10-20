@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 import full_host_factory as f
+import evidence_revision
 
 
 @unittest.skipUnless((f.ROOT/f.PACKET/'manifest.json').is_file(),'actual capture not prepared')
@@ -40,6 +41,10 @@ class Captured(unittest.TestCase):
   self.trace_mutant(lambda rows:next(r for r in rows if r['event']=='node_close_returned')['value'].update(error='close failed'))
  def test_resealed_existing_source_modification_rejected(self):
   self.mutant({'actual/source-binding.json.gz':lambda d:d.update(modified_existing_project_files=['eth/downloader/api.go'])})
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()
