@@ -1,44 +1,44 @@
-# 현재 인수인계 — owner ack 이후 status channel 사용과 구독 세대 경계 / 2026-10-20
+# 현재 인수인계 — transport close와 같은 channel timer broadcast의 구독 세대 경계 / 2026-10-20
 
 새 머신/새 세션에서는 [머신 간 인수인계](./MACHINE-HANDOFF.md)를 먼저 따라 증거 태그·실행 도구·외부 DB/모델·삭제된 임시 경로를 확인한다.
 
-단계91 요청 범위의 관측을 마쳤다. [명세](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SPEC.json) · [결과](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json) · [검증·시도 이력](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/VALIDATION.json) · [자원 정리](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/CLEANUP.json). 단계90 근거는 [그대로 보존한다](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json).
+단계92 요청 범위의 관측을 마쳤다. [명세](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SPEC.json) · [결과](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json) · [검증·시도 이력](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/VALIDATION.json) · [자원 정리](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/CLEANUP.json). 단계91 근거는 [그대로 보존한다](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json).
 
-## 새 머신 복원과 실행 adapter
+## scripts 시험 전체 복구
 
-evidence 태그를 받은 뒤 이력 복원 검사, 진행 원장, 운영 수용 구조 검사, 단계90 검증기가 모두 통과했다. 이전 머신 경로는 쓰지 않았다. 단계90 드라이버에 박힌 경로 7종을 이름 붙인 자리표시자로 바꾸는 adapter를 만들었다. 실제 로컬 경로는 커밋하지 않는다. [사전 점검](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/adapter/PREFLIGHT.json)에서 확인한 내용은 다음과 같다.
+`scripts/` 시험 전체(CI 밖)를 처음 돌렸을 때 2825개 중 581개가 실패했다. 원인은 셋이었다.
 
-- 고정 커밋으로 새로 clone한 go-stablenet은 보존된 2228개 파일 목록과 해시가 같다.
-- Go 1.23.12 local과 공용 모듈 캐시만으로 오프라인 의존성 해석이 된다.
-- 단계90 계측 규칙을 gofmt 경로만 바꿔 다시 돌리면, 네 역할의 계측 API와 Git build tree가 기록된 해시와 같다.
+- 과거 단계 검증기가 그 단계의 소스·도구·정식 상태를 지금 트리와 비교했다. 이후 단계가 그 입력을 일부러 바꿨으므로 증거 결함이 아니라 drift다.
+- jsonschema와 PyYAML이 설치되지 않았다. 패킷은 PyYAML 6.0을 parser 버전으로 기록했다.
+- 이전 머신의 Go SDK 경로와 저장소 절대 경로를 그대로 비교하거나 실행했다.
 
-본체 검증은 처음에 Go 1.26.8로 돌렸다. 이때 race 시험의 buildpipe가 기본 10분 제한을 넘겼고, manager broker 시험 11개가 실패했다. broker fixture가 `go 1.26.9`를 요구하는데 1.26.8을 local로 고정했기 때문이다. 같은 오류를 재현해 확인했다. CI와 같은 공식 Go 1.26.9로 다시 돌리자 build, lint, race 126패키지, manager 268개가 모두 통과했다. 두 실행 기록을 모두 보존했다.
+과거 단계 시험 110개 모듈은 이제 [기록된 커밋](../../scripts/evidence-revisions.json)의 임시 worktree에서 돈다. 그 커밋 이후 패킷 파일이 수정되거나 지워졌으면 실패한다. 소스 커밋과 패킷 커밋이 달랐던 경우는 바인딩된 파일만 기록된 소스 커밋에서 되살려 검증 당시 트리를 다시 만든다. 이전 머신 경로는 도구 이름과 저장소 상대 경로로 바꾸고 기록된 해시는 그대로 비교한다. 원래 실행의 임시 DB를 다시 읽는 확인 1건만 건너뛴다. DB가 지워져 재현할 수 없기 때문이다. 준비 절차는 [머신 인수인계 2절](./MACHINE-HANDOFF.md)에 있다.
 
-## 현재 단계 — 16슬롯·실제32노드, 대조군 아닌 슬롯의 ack 후 같은 세대 사용 0
+## 현재 단계 — 16슬롯·실제32노드, ack 후 같은 세대 사용 0
 
-trace는 (factory API, status channel) 키마다 세대를 센다. 실제 owner의 install이 일어날 때마다 세대가 하나 오른다. api.go에 있는 모든 status channel 연산 지점(역할별 6~10곳)에 계측을 걸었다. 송신, 수신, 등록, 해제 요청, ack가 모두 포함된다. 같은 세대가 이미 ack된 뒤에 그 세대로 송신이나 수신이 일어나면 위반으로 센다. 세대가 오른 뒤의 사용은 명시적 새 등록이므로 허용한다.
+trace 규칙은 단계91과 같다. (factory API, status channel) 키마다 세대를 세고, 실제 owner install이 세대를 올린다. 이번에는 규칙 하나를 더했다. owner가 install 직전의 map membership을 기록한다. 같은 channel을 재등록하면 stale 항목과 재등록이 한 키로 합쳐지기 때문이다.
 
 |일정|역할|관측|
 |---|---|---|
-|overlap(단계90 gate)|CAND-A/B|drain→실제 owner 삭제·ack 뒤 같은 channel 세대2 전달1·새 RPC 전달1, 위반0, 정리 개입0|
-|overlap|ORIGINAL|쌍 대기 후 소유 status 수신1로 복구; 재생성은 복구 뒤로 표시; 위반0|
-|overlap|MUT-EARLY|조기 반환, 세대마다 실제 owner manual uninstall 3회; 위반0|
-|timer(gate 없음)|ORIGINAL·CAND-A/B|60초 타이머 전 옛 세대 ack; 자연 done broadcast는 새 세대만 대상, 위반0|
-|timer|MUT-STALE-ACK|delete 없이 ack한 옛 세대에 done 송신 1회(위반 검출); 소유 수신1로 복구|
+|transport(단계90 gate)|CAND-A/B|연결 종료 뒤 drain·실제 owner 삭제·ack, 같은 channel 세대2(install 송신)와 새 연결의 새 RPC 등록 전달, 위반0|
+|transport|ORIGINAL|쌍 대기 후 소유 status 수신1로 복구, 이후 재생성, 위반0|
+|transport|MUT-EARLY|조기 반환, 세대마다 실제 owner manual uninstall 3회, 위반0|
+|timer-same-channel|ORIGINAL·CAND-A/B|타이머 전 옛 세대 ack, 세대2와 새 등록을 둔 채 자연 done broadcast가 둘 다 한 번씩 송신, 위반0|
+|timer-same-channel|MUT-STALE-ACK|delete 없이 ack한 항목에 세대2가 합쳐져 broadcast는 세대2로 집계, 위반0; install 직전 membership true로만 드러남|
 
-일반/race 각 1회씩이다. RPC `true` 응답과 owner ack는 따로 기록했고, `true`를 ack로 바꾸어 세지 않았다. 소유 status 수신은 6회, manual uninstall은 6회이며 가짜 ack는 0이다. 진행 중 true 알림, transport close, Notify 도중 종료는 다루지 않았다. 같은 channel 재등록도 install 송신 경로만 시험했다. timer broadcast 경로에서는 stale 항목과 재등록이 map 키 하나로 합쳐지므로 channel 사용만으로는 구별할 수 없다. 이 경우는 membership으로만 드러난다. legacy PoW 시험이며 운영 WBFT 검증이 아니다. 실제 owner4/별도 통제 late1 범위는 바꾸지 않았고 독립 표본으로 합치지 않는다.
+transport close는 8슬롯 모두 callback을 `rpcSub.Err()` 분기로 끝냈다. 이 커밋의 RPC 서버는 연결이 닫히면 구독 오류 채널을 먼저 닫고 그다음 연결 종료 채널을 닫는다. 그래서 `notifier.Closed()` 분기는 0회다. 분기를 억지로 고르지 않았고, 이 분기는 두 채널이 동시에 준비될 때만 탈 수 있다. timer 경로의 stale-ack 대조군은 channel 사용 집계로는 검출되지 않는다. membership으로만 드러나며 2슬롯 모두 드러났다. 소유 status 수신은 4회, manual uninstall은 6회이며 가짜 ack는 0이다. legacy PoW 시험이며 운영 WBFT 검증이 아니다. 실제 owner4/별도 통제 late1 범위는 바꾸지 않았고 독립 표본으로 합치지 않는다.
 
-시도 실패도 보존했다. 첫 컴파일 점검에서 bridge 함수 이름이 downloader 패키지와 충돌했고, 첫 smoke에서는 하네스가 상대 경로를 넘겼다. 둘 다 노드 실행 0회에서 멈췄다. 첫 보관본에서는 로컬 계정명과 임시 경로가 섞인 것을 커밋 전에 찾아 다시 보관했다. 매트릭스 자체는 자동 재시도 0회로 16슬롯이 모두 성공했다. 원본 checkout은 보존됐다. 캐시·clone·바이너리 약 6.85GiB는 지웠고 남은 소유 프로세스는 0이다. KS 운영 Go 변경, 실제 LLM, 유료 호출, 운영 적용, 게시는 모두 0이다.
+시도 실패도 보존했다. 첫 보관본은 race 빌드 로그의 macOS 링커 경고에 Go 임시 링크 폴더가 남아 검증기가 거부했다. 보관 규칙에 자리표시자 변환을 넣어 같은 실행 증거로 다시 보관했다. 컴파일 점검, smoke 2슬롯, 매트릭스 16슬롯은 첫 시도에 통과했고 자동 재시도는 0회다. 원본 checkout은 보존됐다. clone·캐시·바이너리 약 2.87GiB는 지웠고 남은 소유 프로세스는 0이다. KS 운영 Go 변경, 실제 LLM, 유료 호출, 운영 적용, 게시는 모두 0이다.
 
 ## 다음 작업
 
-WI-V1에서는 독립 ticket/oracle, 승인된 실제 역할 양성 경로와 최종 HEAD가 남았다. transport close와 같은 channel timer broadcast 경로의 세대 경계도 남아 있다. 이후 독립 정답·충분성·동결이 필요하다.
+WI-V1에서는 남은 세대 경로가 셋이다. 진행 중 true 알림(Syncing=true), Notify 도중 종료, gate 없는 transport close다. 독립 ticket/oracle 준비, 승인된 실제 역할 양성 경로와 최종 HEAD도 남았다. 이후 독립 정답·충분성·동결이 필요하다.
 
 ## 남은 전체13묶음 — 상위 완료0/13·정식0/9
 
 |묶음|남은 내용|
 |---|---|
-|WI-V1|독립 티켓/oracle·승인 양성 역할/final HEAD·transport close와 같은 channel timer broadcast 세대 경로|
+|WI-V1|진행 중 true 알림·Notify 도중 종료·gate 없는 transport close 세대 경로·독립 티켓/oracle·승인 양성 역할/final HEAD|
 |WI-V2|독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|독립 nonseed 관련성/잡음 정답·가족/표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 전용 평가는 사용자 보류|
@@ -56,4 +56,4 @@ D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false다. 실�
 
 ## 보존 근거
 
-[단계90 native/RPC 겹침](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json) · [12계약·소비자12기준 검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-consumer-review-v1/REVIEW.json) · [기본 고정 소스·종료 시한 진단](./operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/SUMMARY.json) · [실제4/통제1 범위 승인](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json) · [전체 원장](./REMAINING-13-EXECUTION.json).
+[단계91 owner ack 후 세대 경계](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json) · [단계90 native/RPC 겹침](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json) · [12계약·소비자12기준 검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-consumer-review-v1/REVIEW.json) · [실제4/통제1 범위 승인](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json) · [전체 원장](./REMAINING-13-EXECUTION.json).

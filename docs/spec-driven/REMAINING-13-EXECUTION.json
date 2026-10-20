@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "91_actual_factory_post_ack_channel_use_and_generation_boundary",
+  "current_activity": "92_actual_factory_transport_close_and_same_channel_timer_generation_boundary",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -11,7 +11,7 @@
       "id": "WI-V1",
       "priority": 1,
       "status": "pending",
-      "task": "Actual factory/real peer native60 overlap linked (10slots/20nodes). Post-ack status-channel use and generation boundary observed in16slots/32nodes: non-control post-ack same-generation uses0, stale-ack control detected2, same-channel generation2 delivered8, new RPC registration delivered16. Independent gold/tickets/sufficiency, approved positive oracle/finalHEAD, transport-close and same-channel timer-broadcast routes remain",
+      "task": "Actual factory/real peer native60 overlap linked (10slots/20nodes). Post-ack status-channel use and generation boundary observed in16slots/32nodes. Transport close and same-channel timer broadcast observed in16slots/32nodes: post-ack same-generation uses0, transport close ended the callback through rpcSub.Err8/8 (notifier.Closed0), same-channel generation2 delivered16 incl. natural broadcast8, stale-ack entry visible only as membership2. Independent gold/tickets/sufficiency, approved positive oracle/finalHEAD, progress-true/Notify-in-flight/ungated transport routes remain",
       "completion_status": "not_complete",
       "implementation_status": "exists_in_bounded_scope",
       "done_when": [
@@ -28,7 +28,8 @@
         "all12_canonical_contracts_and12_installed_consumer_criteria_reviewed_56_nonsecurity_regressions_passed_no_full12_acceptance",
         "fresh_clean_HEAD_CKS_actual4_roles_partial_and_unapproved_denials_actual_factory_RPC12x10_and_MCP35_plus2_partial_controls_verified",
         "actual_factory_peer_native60_done_broadcast_same_RPC_Err_callback_Unsubscribe_owner_delete_ack_linked_10slots20nodes_declared_gate_no_fake_ack",
-        "actual_factory_post_ack_status_channel_use_generation_boundary_16slots32nodes_stale_ack_control_detected_no_fake_ack"
+        "actual_factory_post_ack_status_channel_use_generation_boundary_16slots32nodes_stale_ack_control_detected_no_fake_ack",
+        "actual_factory_transport_close_and_same_channel_timer_broadcast_generation_boundary_16slots32nodes_stale_entry_visible_only_by_membership_no_fake_ack"
       ],
       "actual_peer_technical_progress": {
         "actual_nodes": 4,
@@ -78,7 +79,7 @@
         "API_NEGATIVE": "declared12 error cases across5roles/general+race observed120; 4unique source variants; independent approval not implied",
         "installed_consumer": "latest clean CKS actual4 roles2partial tool calls2writes3Reads2selection denials4completion denials",
         "remaining": [
-          "independent_acceptance_of_post_ack_generation_boundary_plus_transport_close_and_same_channel_timer_broadcast_routes",
+          "independent_acceptance_of_post_ack_generation_boundaries_plus_progress_true_notify_in_flight_and_ungated_transport_routes",
           "approved_independent_oracle_and_positive_actual_roles_final_HEAD",
           "independent_tickets_matching_and_repetition_sufficiency"
         ],
@@ -116,6 +117,35 @@
         "fake_acknowledgements": 0,
         "transport_close_callback_route_tested": false,
         "same_channel_reuse_on_timer_broadcast_tested": false,
+        "universal_post_ack_claim": false,
+        "full12_acceptance": false,
+        "formal_completed": 0,
+        "independent_approved": 0
+      },
+      "wiv1_transport_generation": {
+        "kind": "actual_factory_transport_close_and_same_channel_timer_generation_boundary_DEV_not_independent",
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/manifest.json",
+        "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+        "validator": "scripts/wiv1_transport_generation.py",
+        "actual_slots": 16,
+        "actual_owned_nodes": 32,
+        "post_ack_same_generation_uses": 0,
+        "transport_callback_exit_routes": {
+          "callback_exit_rpc_error": 8,
+          "callback_exit_transport_closed": 0
+        },
+        "notifier_closed_branch_reached": false,
+        "same_channel_generation2_deliveries": 16,
+        "timer_broadcasts_to_generation2": 8,
+        "stale_membership_at_reregistration": {
+          "ORIGINAL": 0,
+          "CAND-A": 0,
+          "CAND-B": 0,
+          "MUT-STALE-ACK": 2
+        },
+        "stale_control_detected_by_channel_use": 0,
+        "regenerations_after_rescue": 4,
+        "fake_acknowledgements": 0,
         "universal_post_ack_claim": false,
         "full12_acceptance": false,
         "formal_completed": 0,
@@ -534,7 +564,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "WI-V1 independent ticket/oracle and approved positive actual roles/final HEAD; transport-close and same-channel timer-broadcast generation routes; independent gold/sufficiency and all13 groups remain under adopted actual4/controlled1 scope",
+  "next": "WI-V1 remaining generation routes (progress-true notification, Notify in flight at shutdown, ungated transport close) and independent ticket/oracle preparation; approved positive actual roles/final HEAD, independent gold/sufficiency and all13 groups remain under adopted actual4/controlled1 scope",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -779,6 +809,35 @@
     "fake_acknowledgements": 0,
     "transport_close_callback_route_tested": false,
     "same_channel_reuse_on_timer_broadcast_tested": false,
+    "universal_post_ack_claim": false,
+    "full12_acceptance": false,
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "current_wiv1_transport_generation": {
+    "kind": "actual_factory_transport_close_and_same_channel_timer_generation_boundary_DEV_not_independent",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/manifest.json",
+    "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+    "validator": "scripts/wiv1_transport_generation.py",
+    "actual_slots": 16,
+    "actual_owned_nodes": 32,
+    "post_ack_same_generation_uses": 0,
+    "transport_callback_exit_routes": {
+      "callback_exit_rpc_error": 8,
+      "callback_exit_transport_closed": 0
+    },
+    "notifier_closed_branch_reached": false,
+    "same_channel_generation2_deliveries": 16,
+    "timer_broadcasts_to_generation2": 8,
+    "stale_membership_at_reregistration": {
+      "ORIGINAL": 0,
+      "CAND-A": 0,
+      "CAND-B": 0,
+      "MUT-STALE-ACK": 2
+    },
+    "stale_control_detected_by_channel_use": 0,
+    "regenerations_after_rescue": 4,
+    "fake_acknowledgements": 0,
     "universal_post_ack_claim": false,
     "full12_acceptance": false,
     "formal_completed": 0,
