@@ -6,7 +6,7 @@ The original evidence commits are retained by the immutable tags listed in [HAND
 
 ```sh
 git fetch origin '+refs/tags/evidence/2026-10-20/*:refs/tags/evidence/2026-10-20/*'
-python3 scripts/check-handoff-history.py
+python3 scripts/check-handoff-history.py --restore-generated-inputs
 python3 scripts/check-refactoring-progress.py
 ```
 

@@ -12,11 +12,11 @@ cd knowledge-system
 git switch main
 git pull --ff-only origin main
 git fetch origin '+refs/tags/evidence/2026-10-20/*:refs/tags/evidence/2026-10-20/*'
-python3 scripts/check-handoff-history.py
+python3 scripts/check-handoff-history.py --restore-generated-inputs
 git switch -c codex/wiv1-subscription-generation
 ```
 
-스쿼시된 main의 파일만으로는 과거 `git show REVISION:PATH` 검증이 불가능하다. [고정 이력 목록](./HANDOFF-HISTORY.json)에 기록한 원본 커밋들을 원격 evidence 태그로 보존한다. 태그는 완료된 개발 브랜치와 별개인 읽기 전용 증거 기준점이다. 브랜치가 제거되어도 위 fetch로 복원한다. 최초 별도 clone 시험에서 기존 run/·log ignore 규칙으로 빠진 manifest 증거38개를 발견했고 원래 해시 그대로 추가했다. 복원 검사는 이 파일들의 존재와 해시도 확인한다. 최초 점검이 실패하면 과거 보고서를 현재 내용으로 대체하지 말고 누락 객체/태그를 먼저 복구한다. shallow clone도 태그 fetch 이후 검사로 확인한다. [증거 복원 설명](./EVIDENCE-RECOVERY.md)을 함께 따른다.
+스쿼시된 main의 파일만으로는 과거 `git show REVISION:PATH` 검증이 불가능하다. [고정 이력 목록](./HANDOFF-HISTORY.json)에 기록한 원본 커밋들을 원격 evidence 태그로 보존한다. 태그는 완료된 개발 브랜치와 별개인 읽기 전용 증거 기준점이다. 브랜치가 제거되어도 위 fetch로 복원한다. 최초 별도 clone 시험에서 기존 run/·log ignore 규칙으로 빠진 manifest 증거38개를 발견했고 원래 해시 그대로 추가했다. 추가로 현재 native source binding에 포함된 viewer 정적 입력46개(약2.5MiB)도 보존했다. 복원 검사는 증거38개와 압축 보존된 viewer 입력46개의 해시를 확인하며, 명시 복원 옵션으로 누락된 viewer 입력만 생성한다. 이미 있는 파일이 다르면 덮어쓰지 않는다. 최초 점검이 실패하면 과거 보고서를 현재 내용으로 대체하지 말고 누락 객체/태그를 먼저 복구한다. shallow clone도 태그 fetch 이후 검사로 확인한다. [증거 복원 설명](./EVIDENCE-RECOVERY.md)을 함께 따른다.
 
 ## 2. 실행 도구와 캐시 위치
 
@@ -38,7 +38,7 @@ python3 scripts/factory_native_overlap.py
 python3 -m unittest discover -s scripts -p 'test_factory_native_overlap.py'
 ```
 
-의존 라이브러리가 없는 새 머신은 처음에 모듈 다운로드와 고정 lint 설치가 필요하다. 이전 머신의 GVM 경로나 오프라인 환경변수를 복사하지 않는다. lint 설치/선택은 Makefile의 고정 버전을 따른다. 검사 출력은 소유한 작업 디렉터리에 보존한다. 실행 종료와 자식 프로세스 종료를 확인한 뒤 이번 작업에서 만든 GOCACHE/GOLANGCI_LINT_CACHE, 임시 데이터와 생성 bin만 제거한다. 공용 모듈 캐시·기존 프로젝트·기존 DB를 지우지 않는다. `make`로 재생성 가능한 viewer 의존성도 필요할 때만 설치한다.
+의존 라이브러리가 없는 새 머신은 처음에 모듈 다운로드와 고정 lint 설치가 필요하다. 이전 머신의 GVM 경로나 오프라인 환경변수를 복사하지 않는다. lint 설치/선택은 Makefile의 고정 버전을 따른다. 검사 출력은 소유한 작업 디렉터리에 보존한다. 실행 종료와 자식 프로세스 종료를 확인한 뒤 이번 작업에서 만든 GOCACHE/GOLANGCI_LINT_CACHE, 임시 데이터와 생성 bin만 제거한다. 공용 모듈 캐시·기존 프로젝트·기존 DB를 지우지 않는다. `make`로 재생성 가능한 viewer 의존성도 필요할 때만 설치한다. 현재 검증에 결속된 정적 viewer 입력은 저장소에서 복원되며, 재빌드로 덮어쓰면 별도 source drift로 기록해야 한다.
 
 ## 3. clone에 있는 것과 다시 준비할 것
 
