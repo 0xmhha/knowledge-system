@@ -1,7 +1,11 @@
 package buildpipe
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
+	"io"
+	"os"
 	"os/exec"
 	"regexp"
 	"runtime"
@@ -48,6 +52,11 @@ import (
 //     the "왜" history that CKV's semantic search ingests. Both fall
 //     back to "".
 //
+// In a shallow clone the commits at which history was cut have no parent, so
+// git shows each as adding its whole tree. Such a boundary commit is skipped:
+// its patch is not the change its PR made, and in a large repository reading
+// it would hold the entire tree in memory. A genuine root commit is kept.
+//
 // Cost is dominated by step 4 — one `git show` per PR-tagged commit.
 // On ckg's own repo (4 PRs) this is millisecond-scale; on stable-net
 // (~80 PRs across the 50k-commit history that survive the cap) the
@@ -59,7 +68,8 @@ func ScanPRHistory(srcRoot string, nodes []types.Node) (map[string][]types.PRRef
 	}
 
 	repo := scanGitRemoteRepo(srcRoot)
-	commits, err := listPRCommits(srcRoot)
+	boundaries := shallowBoundaries(srcRoot)
+	commits, err := listPRCommits(srcRoot, boundaries)
 	if err != nil {
 		// Non-git source tree, or git not on PATH — treat as "no PR
 		// history" rather than a build failure. The breadcrumb is
@@ -120,7 +130,7 @@ func ScanPRHistory(srcRoot string, nodes []types.Node) (map[string][]types.PRRef
 	// follows the line range backwards through history, so attribution is
 	// position-independent. File and statement nodes keep the Pass-1 result
 	// (a File node spans the whole file, so overlap is already exact for it).
-	overrideDefinitionHistory(srcRoot, repo, nodes, out)
+	overrideDefinitionHistory(srcRoot, repo, boundaries, nodes, out)
 
 	dedupePRRefsByNode(out)
 	return out, nil
@@ -155,7 +165,7 @@ const lineHistoryMaxCommits = 40
 // `git log` subprocesses. On a git failure for a node it leaves the Pass-1
 // entry untouched; on success it sets the git-`-L` result (possibly empty,
 // meaning the symbol's lines were never touched by a PR-tagged commit).
-func overrideDefinitionHistory(srcRoot, repo string, nodes []types.Node, out map[string][]types.PRRef) {
+func overrideDefinitionHistory(srcRoot, repo string, boundaries map[string]bool, nodes []types.Node, out map[string][]types.PRRef) {
 	defs := make([]types.Node, 0, len(nodes))
 	for _, n := range nodes {
 		if defHistoryNodeTypes[n.Type] && n.FilePath != "" && n.StartLine >= 1 && n.EndLine >= n.StartLine {
@@ -178,7 +188,7 @@ func overrideDefinitionHistory(srcRoot, repo string, nodes []types.Node, out map
 		go func(n types.Node) {
 			defer wg.Done()
 			defer func() { <-sem }()
-			refs, ok := lineHistoryRefs(srcRoot, repo, n)
+			refs, ok := lineHistoryRefs(srcRoot, repo, boundaries, n)
 			if !ok {
 				return // git failed for this node — keep the Pass-1 baseline
 			}
@@ -195,10 +205,11 @@ func overrideDefinitionHistory(srcRoot, repo string, nodes []types.Node, out map
 }
 
 // lineHistoryRefs returns the PR refs whose commits modified node n's source
-// line range, following the range across history with `git log -L`. The bool
-// is false only when git itself errored (so the caller can preserve the
-// Pass-1 baseline rather than wipe it).
-func lineHistoryRefs(srcRoot, repo string, n types.Node) ([]types.PRRef, bool) {
+// line range, following the range across history with `git log -L`. Shallow
+// boundary commits are skipped: git attributes every line they hold to them.
+// The bool is false only when git itself errored (so the caller can preserve
+// the Pass-1 baseline rather than wipe it).
+func lineHistoryRefs(srcRoot, repo string, boundaries map[string]bool, n types.Node) ([]types.PRRef, bool) {
 	const fieldSep = "\x00"
 	const recordSep = "\x01"
 	format := strings.Join([]string{"%H", "%P", "%cI", "%s", "%b"}, "%x00") + "%x01"
@@ -219,6 +230,9 @@ func lineHistoryRefs(srcRoot, repo string, n types.Node) ([]types.PRRef, bool) {
 		}
 		fields := strings.SplitN(rec, fieldSep, 5)
 		if len(fields) < 5 {
+			continue
+		}
+		if boundaries[fields[0]] {
 			continue
 		}
 		m := prNumberRE.FindStringSubmatch(fields[3])
@@ -268,14 +282,15 @@ type prCommit struct {
 var prNumberRE = regexp.MustCompile(`\(#(\d+)\)`)
 
 // listPRCommits runs git log over srcRoot, parses each commit, and
-// returns the subset whose subject carries a (#NNN) suffix. We pull
+// returns the subset whose subject carries a (#NNN) suffix, leaving out
+// shallow boundary commits. We pull
 // both --merges and --no-merges so GitHub's "Merge pull request"
 // flavour and the squash-merge "Title (#NNN)" flavour both survive.
 //
 // The pretty-format uses NUL terminators (%x00) between the per-record
 // fields and a custom record terminator (`<<<COMMIT_END>>>`) so commit
 // bodies that include newlines or pipes don't trip the parser.
-func listPRCommits(srcRoot string) ([]prCommit, error) {
+func listPRCommits(srcRoot string, boundaries map[string]bool) ([]prCommit, error) {
 	// git's pretty=format cannot transport a literal NUL byte from the
 	// host process arg into its formatter — the byte stops the format
 	// string mid-parse and only the leading %H is emitted. The %x00
@@ -302,6 +317,9 @@ func listPRCommits(srcRoot string) ([]prCommit, error) {
 		}
 		fields := strings.SplitN(rec, fieldSep, 5)
 		if len(fields) < 5 {
+			continue
+		}
+		if boundaries[fields[0]] {
 			continue
 		}
 		subj := fields[3]
@@ -439,38 +457,79 @@ type hunkRange struct {
 
 var hunkHeaderRE = regexp.MustCompile(`^@@ [^@]+\+(\d+)(?:,(\d+))? @@`)
 
+// patchReadBufferBytes sizes the patch reader. Only "+++ " and "@@ " lines are
+// parsed, so a longer line is read in pieces and its remainder discarded.
+const patchReadBufferBytes = 64 << 10
+
 // patchLineRanges runs `git show <SHA> --unified=0 --pretty=` to read
 // the raw patch and parses the new-file (`+A,B`) ranges out of each
 // @@-header. Keyed by file path (relative to the repo root). Returns
 // nil + error only when git itself failed; an empty map is the normal
-// "this commit has no patch" outcome (e.g. a pure rename).
+// "this commit has no patch" outcome (e.g. a pure rename). The patch is
+// streamed, so memory does not grow with its size.
 func patchLineRanges(srcRoot, sha string) (map[string][]hunkRange, error) {
-	out := map[string][]hunkRange{}
 	cmd := exec.Command("git", "-C", srcRoot, "show", sha,
 		"--unified=0", "--pretty=", "--no-color")
-	stdout, err := cmd.Output()
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("git show %s: %w", sha, err)
 	}
+	if err := cmd.Start(); err != nil {
+		return nil, fmt.Errorf("git show %s: %w", sha, err)
+	}
+	out, parseErr := parsePatchLineRanges(stdout)
+	if parseErr != nil {
+		// Stop git before Wait so it cannot block on a full pipe.
+		_ = cmd.Process.Kill()
+	}
+	waitErr := cmd.Wait()
+	if parseErr != nil {
+		return nil, fmt.Errorf("git show %s: read patch: %w", sha, parseErr)
+	}
+	if waitErr != nil {
+		return nil, fmt.Errorf("git show %s: %w", sha, waitErr)
+	}
+	return out, nil
+}
+
+// parsePatchLineRanges reads a unified=0 patch and returns the new-file line
+// ranges of its hunks, keyed by file path.
+func parsePatchLineRanges(r io.Reader) (map[string][]hunkRange, error) {
+	out := map[string][]hunkRange{}
+	br := bufio.NewReaderSize(r, patchReadBufferBytes)
 	var currentFile string
-	for line := range strings.SplitSeq(string(stdout), "\n") {
+	continued := false
+	for {
+		chunk, isPrefix, err := br.ReadLine()
+		if err == io.EOF {
+			return out, nil
+		}
+		if err != nil {
+			return nil, err
+		}
+		// Only the first piece of a line can start a header.
+		first := !continued
+		continued = isPrefix
+		if !first {
+			continue
+		}
 		switch {
-		case strings.HasPrefix(line, "+++ b/"):
-			currentFile = strings.TrimPrefix(line, "+++ b/")
-		case strings.HasPrefix(line, "+++ /dev/null"):
+		case bytes.HasPrefix(chunk, []byte("+++ b/")):
+			currentFile = string(chunk[len("+++ b/"):])
+		case bytes.HasPrefix(chunk, []byte("+++ /dev/null")):
 			currentFile = ""
-		case strings.HasPrefix(line, "@@ "):
+		case bytes.HasPrefix(chunk, []byte("@@ ")):
 			if currentFile == "" {
 				continue
 			}
-			m := hunkHeaderRE.FindStringSubmatch(line)
+			m := hunkHeaderRE.FindSubmatch(chunk)
 			if len(m) < 2 {
 				continue
 			}
-			start, _ := strconv.Atoi(m[1])
+			start, _ := strconv.Atoi(string(m[1]))
 			length := 1
-			if m[2] != "" {
-				length, _ = strconv.Atoi(m[2])
+			if len(m[2]) > 0 {
+				length, _ = strconv.Atoi(string(m[2]))
 			}
 			if length == 0 {
 				// A 0-length new-side hunk is a pure-delete chunk;
@@ -484,7 +543,26 @@ func patchLineRanges(srcRoot, sha string) (map[string][]hunkRange, error) {
 			})
 		}
 	}
-	return out, nil
+}
+
+// shallowBoundaries returns the commits at which a shallow clone's history
+// was cut, or nil when srcRoot is not a shallow clone.
+func shallowBoundaries(srcRoot string) map[string]bool {
+	cmd := exec.Command("git", "-C", srcRoot, "rev-parse",
+		"--path-format=absolute", "--git-path", "shallow")
+	stdout, err := cmd.Output()
+	if err != nil {
+		return nil
+	}
+	data, err := os.ReadFile(strings.TrimSpace(string(stdout)))
+	if err != nil {
+		return nil // no shallow file: full history
+	}
+	out := map[string]bool{}
+	for _, sha := range strings.Fields(string(data)) {
+		out[sha] = true
+	}
+	return out
 }
 
 // scanGitRemoteRepo runs `git config --get remote.origin.url` and
