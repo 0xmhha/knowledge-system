@@ -4,12 +4,12 @@ This engine is part of the consolidated knowledge-system module. Start from [pur
 
 ## Verify against the source
 
-Run commands below from the repository root. go.mod declares Go1.25.13; the pinned whole-module linter requires Go1.26, and tool-driven CI uses Go1.26.9. Native/vector CI still verifies the declared minimum version.
+Run commands below from the repository root. go.mod declares Go1.25.13; the pinned whole-module linter requires Go1.26, and tool-driven CI uses Go1.26.10. CI runs the tests without the race detector, so run `make test-race` locally before opening a pull request. Native/vector CI still verifies the declared minimum version.
 
 ```sh
-GOTOOLCHAIN=go1.26.9 make build
-GOTOOLCHAIN=go1.26.9 make lint
-GOTOOLCHAIN=go1.26.9 make test-race
+GOTOOLCHAIN=go1.26.10 make build
+GOTOOLCHAIN=go1.26.10 make lint
+GOTOOLCHAIN=go1.26.10 make test-race
 make -C graph eval
 make docs-check
 make refactoring-check

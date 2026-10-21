@@ -20,7 +20,7 @@ git switch -c feat/wiv1-progress-true-generation
 
 ## 2. 실행 도구와 캐시 위치
 
-Python 3.10 이상, Git, C/C++ 빌드 도구, Go를 준비한다. 저장소의 기본 Go 최소 버전은 go.mod가 기준이고, 현재 CI 본체는 Go 1.26.10과 golangci-lint 2.14.0을 사용한다. 1.26.9에서 crypto/x509 공지(GO-2026-6809)가 나와 2026-10-21에 올렸다. 이전 macOS 본체 증거는 Go 1.26.8이었다. manager broker 시험 fixture가 `go 1.26.9`를 요구하므로 `GOTOOLCHAIN=local`로 1.26.8을 고정하면 11개가 실패한다. 본체 검증은 CI와 같은 Go 버전으로 실행한다(2026-10-20 새 머신 기록: [검증 이력](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/VALIDATION.json)). upstream go-stablenet native 시험은 별도 Go 1.23.12였으므로 본체 도구와 섞지 않는다. macOS와 Linux의 실제 실행 결과는 별도 기록한다.
+Python 3.10 이상, Git, C/C++ 빌드 도구, Go를 준비한다. 저장소의 기본 Go 최소 버전은 go.mod가 기준이고, 현재 CI 본체는 Go 1.26.10과 golangci-lint 2.14.0을 사용한다. 1.26.9에서 crypto/x509 공지(GO-2026-6809)가 나와 2026-10-21에 올렸다. 이전 macOS 본체 증거는 Go 1.26.8이었다. manager broker 시험 fixture가 `go 1.26.9`를 요구하므로 `GOTOOLCHAIN=local`로 1.26.8을 고정하면 11개가 실패한다. CI는 race 검출기 없이 `make test`만 실행한다. race 시험(`make test-race`)은 PR을 올리기 전에 로컬에서 통과시킨다(2026-10-21 결정). 본체 검증은 CI와 같은 Go 버전으로 실행한다(2026-10-20 새 머신 기록: [검증 이력](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/VALIDATION.json)). upstream go-stablenet native 시험은 별도 Go 1.23.12였으므로 본체 도구와 섞지 않는다. macOS와 Linux의 실제 실행 결과는 별도 기록한다.
 
 ```sh
 python3 --version

@@ -19,8 +19,11 @@ jobs:
         run: make build
       - name: Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)
         run: make lint
-      - name: Test (race)
-        run: make test-race
+      # The race detector multiplies the memory of the heavy graph test
+      # binaries and is run locally before a pull request is opened
+      # (make test-race); CI runs the same tests without it.
+      - name: Test
+        run: make test
       - name: Knowledge manager (actual stdio, mock lifecycle, no Claude/model dependency)
         run: make manager-test
       - name: Retained Go dependence through real stdio MCP
