@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def load(name, file):
@@ -36,6 +37,10 @@ class SupervisionEvidenceTests(base.MaintenanceRuntimeEvidenceTests):
     def test_actual_parent_kill_case_cannot_be_removed(self):
         self.edit('race-tests.json', lambda rows: rows.remove(next(r for r in rows if r['test'] == 'TestGuardianActualOwnerKillStopsWriterAndReleasesLease')))
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

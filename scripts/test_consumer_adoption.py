@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('adoption', Path(__file__).with_name('check-consumer-adoption.py'))
 adoption = importlib.util.module_from_spec(spec)
@@ -85,6 +86,10 @@ class AdoptionTests(unittest.TestCase):
     def test_missing_artifact_is_rejected(self):
         (self.packet / 'binary-pins.json').unlink()
         self.rejected('packet inventory')
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

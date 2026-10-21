@@ -13,16 +13,11 @@ import (
 // internal/parse/golang/testdata/resolve). Asserts that nodes were persisted
 // and that a staleness fingerprint (git commit OR mtime) was recorded.
 func TestPipelineRunsOnGoFixture(t *testing.T) {
-	out := t.TempDir()
-	_, err := buildpipe.Run(buildpipe.Options{
+	out, _ := buildpipe.SharedColdBuild(t, buildpipe.Options{
 		SrcRoot:    "../parse/golang/testdata/resolve",
-		OutDir:     out,
 		Languages:  []string{"auto"},
 		CKGVersion: "test",
 	})
-	if err != nil {
-		t.Fatalf("Run: %v", err)
-	}
 
 	store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
 	if err != nil {

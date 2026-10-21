@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/consumer-local-readiness-v1'
@@ -73,6 +74,10 @@ class LocalReadinessTests(unittest.TestCase):
         self.assertEqual([r['id'] for r in d['planned_case_progress']if r['full_case_status']=='pass'],guard.prepare.FULL_LOCAL)
         self.assertEqual(d['full_cases_pending'],16)
         self.assertEqual([r['after'] for r in d['role_tool_exposure']],[54,19])
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

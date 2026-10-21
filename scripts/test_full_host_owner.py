@@ -2,6 +2,7 @@
 import gzip,json,tempfile,unittest
 from pathlib import Path
 import full_host_owner as o
+import evidence_revision
 
 @unittest.skipUnless((o.ROOT/o.PACKET/'manifest.json').is_file(),'actual capture not prepared')
 class Captured(unittest.TestCase):
@@ -32,5 +33,10 @@ class Captured(unittest.TestCase):
   self.mutant('actual/slots/CAND-A-general/process/stdout.gz',lambda rows:next(r for r in rows if r['event']=='native_timer_notification').update(elapsed_ns=2_000_000_000),True)
  def test_resealed_old_commit_cannot_relabel_candidate_worktree(self):
   self.mutant('actual/candidates/CAND-A/tree-binding.json.gz',lambda d:d.update(applied_project_commit=o.factory.COMMIT))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

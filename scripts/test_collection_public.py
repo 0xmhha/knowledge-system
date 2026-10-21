@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('collection_guard', Path(__file__).with_name('check-collection-public.py'))
 guard = importlib.util.module_from_spec(spec)
@@ -89,6 +90,10 @@ class PublicCollectionTests(unittest.TestCase):
             next(r for r in rows if r.get('Test') and r.get('Action') == 'pass')['Action'] = 'fail'
         self.edit('adapter-race.jsonl.gz', mutate)
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

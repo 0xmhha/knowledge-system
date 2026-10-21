@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/sample-locations-v1'
@@ -164,6 +165,10 @@ class SampleLocationTests(unittest.TestCase):
         (self.packet / 'public-inputs.json').write_text('{"gold":true}\n')
         self.rehash()
         self.rejected('unexpected source observation artifact')
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

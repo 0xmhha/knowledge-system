@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('t09_check', ROOT / 'scripts/check-consumer-foreign-pin.py')
@@ -210,6 +211,10 @@ class ForeignPin(unittest.TestCase):
     def test_report_hides_collision(self):
         (self.p / 'REPORT.txt').write_text('T09 pass')
         self.rejected('report hides collision/failures/scope')
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

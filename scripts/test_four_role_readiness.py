@@ -2,6 +2,7 @@
 import gzip,json,tempfile,unittest
 from pathlib import Path
 import four_role_readiness as r
+import evidence_revision
 
 @unittest.skipUnless((r.ROOT/r.PACKET/'manifest.json').is_file(),'current role capture not sealed')
 class Captured(unittest.TestCase):
@@ -24,5 +25,10 @@ class Captured(unittest.TestCase):
  def test_resealed_external_model_flag_rejected(self):self.mutant('actual/evidence/SCOPE.json.gz',lambda d:d.update(actual_LLM_inference=True))
  def test_resealed_missing_source_handoff_cannot_hide_under_host_exit0(self):
   self.mutant('actual/P76-planner/workspace-after/planner-context.json.gz',lambda d:d.update(actual_tool_response={}))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

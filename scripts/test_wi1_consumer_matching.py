@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import unittest
 import wi1_consumer_matching as g
+import evidence_revision
 old=g.old
 
 class MatchingControls(unittest.TestCase):
@@ -75,5 +76,10 @@ class EvidenceMutations(unittest.TestCase):
     def test_review_debt_cannot_disappear(self):self.mutant('REVIEW-LEDGER.json',lambda v:v['items'].clear())
     def test_matching_contract_cannot_be_formal(self):self.mutant('matching-contract.json',lambda v:v.update(scoring_allowed=True))
     def test_prior_failure_not_erased(self):self.mutant('runtime/receipt.json',lambda v:v.update(initial_budget_exhausted_calls=0))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

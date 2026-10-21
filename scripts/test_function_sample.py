@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/function-sample-v1'
@@ -137,6 +138,10 @@ class FunctionSampleTests(unittest.TestCase):
         self.assertEqual(sum(quotas.values()), 30)
         self.assertTrue(all(c >= 4 for c in counts.values()))
         self.assertEqual([r['slot'] for r in trace], list(range(1, 31)))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

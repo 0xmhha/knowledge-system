@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 import public_v2_readiness as p
 import viewer_readiness as v
+import evidence_revision
 
 class PublicV2Evidence(unittest.TestCase):
     def test_native_prior_ids_must_be_preserved(self):
@@ -47,5 +48,10 @@ class PublicV2Evidence(unittest.TestCase):
 
     def test_current_sealed_packet(self):
         self.assertEqual(p.validate(),[])
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

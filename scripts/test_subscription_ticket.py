@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/subscription-ticket-v1'
@@ -86,6 +87,10 @@ class TicketTests(unittest.TestCase):
     def test_formal_state_tampering(self):
         self.change('formal-state.json', lambda d: d.update(execution_allowed=True))
         self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

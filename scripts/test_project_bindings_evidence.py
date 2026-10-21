@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 def module(name,file):
     s=importlib.util.spec_from_file_location(name,Path(__file__).with_name(file));m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
@@ -26,4 +27,10 @@ class BindingsEvidenceTests(unittest.TestCase):
     def test_failed_lint(self):self.rejects('validation.json',lambda v:v['gates'].update(lint=1))
     def test_skip_not_pass(self):self.rejects('validation.json',lambda v:v['module'].update(skipped_tests=0))
     def test_old_scheme_proof_required(self):self.rejects('historical-design.json',lambda v:v.update(verification_exit_code=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__=='__main__':unittest.main()

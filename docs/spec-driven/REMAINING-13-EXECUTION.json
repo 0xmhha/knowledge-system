@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "90_actual_factory_peer_native60_broadcast_RPC_callback_overlap",
+  "current_activity": "93_actual_factory_notify_in_flight_and_ungated_transport_generation_boundary",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -11,7 +11,7 @@
       "id": "WI-V1",
       "priority": 1,
       "status": "pending",
-      "task": "Actual factory/real peer native60 done-broadcast and same-session RPC Err callback linked in10slots/20nodes under declared before-send gate; A/B drain+real owner ack4, original/alias paired sends4, early return2. Complete old-subscription channel-use/generation boundary, independent gold/tickets/sufficiency and approved positive oracle/finalHEAD remain",
+      "task": "Actual factory/real peer native60 overlap linked (10slots/20nodes); post-ack generation boundary (16slots), transport close and same-channel timer broadcast (16slots) and Notify-in-flight plus ungated transport close (16slots/32nodes) observed: post-ack same-generation uses0 on every route, held Notify ended through rpcSub.Err4/notifier.Closed4, ungated close through rpcSub.Err8, stale-ack entry visible only as membership. Independent gold/tickets/sufficiency, approved positive oracle/finalHEAD and the progress-true route remain",
       "completion_status": "not_complete",
       "implementation_status": "exists_in_bounded_scope",
       "done_when": [
@@ -27,7 +27,10 @@
         "user_approved_real4_controlledlate1_scope_and_old_subscription_lifetime_applied_without_gold_approval",
         "all12_canonical_contracts_and12_installed_consumer_criteria_reviewed_56_nonsecurity_regressions_passed_no_full12_acceptance",
         "fresh_clean_HEAD_CKS_actual4_roles_partial_and_unapproved_denials_actual_factory_RPC12x10_and_MCP35_plus2_partial_controls_verified",
-        "actual_factory_peer_native60_done_broadcast_same_RPC_Err_callback_Unsubscribe_owner_delete_ack_linked_10slots20nodes_declared_gate_no_fake_ack"
+        "actual_factory_peer_native60_done_broadcast_same_RPC_Err_callback_Unsubscribe_owner_delete_ack_linked_10slots20nodes_declared_gate_no_fake_ack",
+        "actual_factory_post_ack_status_channel_use_generation_boundary_16slots32nodes_stale_ack_control_detected_no_fake_ack",
+        "actual_factory_transport_close_and_same_channel_timer_broadcast_generation_boundary_16slots32nodes_stale_entry_visible_only_by_membership_no_fake_ack",
+        "actual_factory_notify_in_flight_and_ungated_transport_close_generation_boundary_16slots32nodes_both_callback_exit_branches_observed_no_fake_ack"
       ],
       "actual_peer_technical_progress": {
         "actual_nodes": 4,
@@ -77,7 +80,7 @@
         "API_NEGATIVE": "declared12 error cases across5roles/general+race observed120; 4unique source variants; independent approval not implied",
         "installed_consumer": "latest clean CKS actual4 roles2partial tool calls2writes3Reads2selection denials4completion denials",
         "remaining": [
-          "complete_old_subscription_until_new_registration_channel_use_observation",
+          "independent_acceptance_of_post_ack_generation_boundaries_plus_progress_true_route",
           "approved_independent_oracle_and_positive_actual_roles_final_HEAD",
           "independent_tickets_matching_and_repetition_sufficiency"
         ],
@@ -96,6 +99,89 @@
         "early_return_observations": 2,
         "gate_controls_schedule": true,
         "all_post_ack_channel_use_proved": false,
+        "full12_acceptance": false,
+        "formal_completed": 0,
+        "independent_approved": 0
+      },
+      "wiv1_generation_boundary": {
+        "kind": "actual_factory_post_ack_channel_use_and_generation_boundary_DEV_not_independent",
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/manifest.json",
+        "manifest_sha256": "9843807d91fe569ce89d6e2d581d2a1466159de283d6a07791ea5fa5d1814efb",
+        "validator": "scripts/wiv1_generation_boundary.py",
+        "actual_slots": 16,
+        "actual_owned_nodes": 32,
+        "post_ack_same_generation_uses_non_control": 0,
+        "violation_control_detections": 2,
+        "same_channel_generation2_deliveries": 8,
+        "new_rpc_registration_deliveries": 16,
+        "regenerations_after_rescue": 4,
+        "fake_acknowledgements": 0,
+        "transport_close_callback_route_tested": false,
+        "same_channel_reuse_on_timer_broadcast_tested": false,
+        "universal_post_ack_claim": false,
+        "full12_acceptance": false,
+        "formal_completed": 0,
+        "independent_approved": 0
+      },
+      "wiv1_transport_generation": {
+        "kind": "actual_factory_transport_close_and_same_channel_timer_generation_boundary_DEV_not_independent",
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/manifest.json",
+        "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+        "validator": "scripts/wiv1_transport_generation.py",
+        "actual_slots": 16,
+        "actual_owned_nodes": 32,
+        "post_ack_same_generation_uses": 0,
+        "transport_callback_exit_routes": {
+          "callback_exit_rpc_error": 8,
+          "callback_exit_transport_closed": 0
+        },
+        "notifier_closed_branch_reached": false,
+        "same_channel_generation2_deliveries": 16,
+        "timer_broadcasts_to_generation2": 8,
+        "stale_membership_at_reregistration": {
+          "ORIGINAL": 0,
+          "CAND-A": 0,
+          "CAND-B": 0,
+          "MUT-STALE-ACK": 2
+        },
+        "stale_control_detected_by_channel_use": 0,
+        "regenerations_after_rescue": 4,
+        "fake_acknowledgements": 0,
+        "universal_post_ack_claim": false,
+        "full12_acceptance": false,
+        "formal_completed": 0,
+        "independent_approved": 0
+      },
+      "wiv1_notify_transport_generation": {
+        "kind": "actual_factory_notify_in_flight_and_ungated_transport_generation_boundary_DEV_not_independent",
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/manifest.json",
+        "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+        "validator": "scripts/wiv1_notify_transport_generation.py",
+        "actual_slots": 16,
+        "actual_owned_nodes": 32,
+        "post_ack_same_generation_uses": 0,
+        "callback_exit_routes": {
+          "notify-in-flight": {
+            "callback_exit_rpc_error": 4,
+            "callback_exit_transport_closed": 4
+          },
+          "transport-ungated": {
+            "callback_exit_rpc_error": 8,
+            "callback_exit_transport_closed": 0
+          }
+        },
+        "notifier_closed_branch_reached": true,
+        "same_channel_generation2_deliveries": 16,
+        "stale_membership_at_reregistration": {
+          "ORIGINAL": 0,
+          "CAND-A": 0,
+          "CAND-B": 0,
+          "MUT-STALE-ACK": 2
+        },
+        "owned_manual_uninstalls": 6,
+        "fake_acknowledgements": 0,
+        "progress_true_notification_tested": false,
+        "universal_post_ack_claim": false,
         "full12_acceptance": false,
         "formal_completed": 0,
         "independent_approved": 0
@@ -513,7 +599,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "WI-V1 complete old-subscription channel-use after real owner acknowledgement and explicit new-registration generation boundary under adopted actual4/controlled1 scope; independent gold/sufficiency/positive oracle/finalHEAD and all13 groups remain",
+  "next": "WI-V1 progress-true notification route (fixture with a longer chain and a peer lost mid-sync) and independent ticket/oracle preparation; approved positive actual roles/final HEAD, independent gold/sufficiency and all13 groups remain under adopted actual4/controlled1 scope",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -739,6 +825,89 @@
     "early_return_observations": 2,
     "gate_controls_schedule": true,
     "all_post_ack_channel_use_proved": false,
+    "full12_acceptance": false,
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "current_wiv1_generation_boundary": {
+    "kind": "actual_factory_post_ack_channel_use_and_generation_boundary_DEV_not_independent",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/manifest.json",
+    "manifest_sha256": "9843807d91fe569ce89d6e2d581d2a1466159de283d6a07791ea5fa5d1814efb",
+    "validator": "scripts/wiv1_generation_boundary.py",
+    "actual_slots": 16,
+    "actual_owned_nodes": 32,
+    "post_ack_same_generation_uses_non_control": 0,
+    "violation_control_detections": 2,
+    "same_channel_generation2_deliveries": 8,
+    "new_rpc_registration_deliveries": 16,
+    "regenerations_after_rescue": 4,
+    "fake_acknowledgements": 0,
+    "transport_close_callback_route_tested": false,
+    "same_channel_reuse_on_timer_broadcast_tested": false,
+    "universal_post_ack_claim": false,
+    "full12_acceptance": false,
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "current_wiv1_transport_generation": {
+    "kind": "actual_factory_transport_close_and_same_channel_timer_generation_boundary_DEV_not_independent",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/manifest.json",
+    "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+    "validator": "scripts/wiv1_transport_generation.py",
+    "actual_slots": 16,
+    "actual_owned_nodes": 32,
+    "post_ack_same_generation_uses": 0,
+    "transport_callback_exit_routes": {
+      "callback_exit_rpc_error": 8,
+      "callback_exit_transport_closed": 0
+    },
+    "notifier_closed_branch_reached": false,
+    "same_channel_generation2_deliveries": 16,
+    "timer_broadcasts_to_generation2": 8,
+    "stale_membership_at_reregistration": {
+      "ORIGINAL": 0,
+      "CAND-A": 0,
+      "CAND-B": 0,
+      "MUT-STALE-ACK": 2
+    },
+    "stale_control_detected_by_channel_use": 0,
+    "regenerations_after_rescue": 4,
+    "fake_acknowledgements": 0,
+    "universal_post_ack_claim": false,
+    "full12_acceptance": false,
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "current_wiv1_notify_transport_generation": {
+    "kind": "actual_factory_notify_in_flight_and_ungated_transport_generation_boundary_DEV_not_independent",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/manifest.json",
+    "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+    "validator": "scripts/wiv1_notify_transport_generation.py",
+    "actual_slots": 16,
+    "actual_owned_nodes": 32,
+    "post_ack_same_generation_uses": 0,
+    "callback_exit_routes": {
+      "notify-in-flight": {
+        "callback_exit_rpc_error": 4,
+        "callback_exit_transport_closed": 4
+      },
+      "transport-ungated": {
+        "callback_exit_rpc_error": 8,
+        "callback_exit_transport_closed": 0
+      }
+    },
+    "notifier_closed_branch_reached": true,
+    "same_channel_generation2_deliveries": 16,
+    "stale_membership_at_reregistration": {
+      "ORIGINAL": 0,
+      "CAND-A": 0,
+      "CAND-B": 0,
+      "MUT-STALE-ACK": 2
+    },
+    "owned_manual_uninstalls": 6,
+    "fake_acknowledgements": 0,
+    "progress_true_notification_tested": false,
+    "universal_post_ack_claim": false,
     "full12_acceptance": false,
     "formal_completed": 0,
     "independent_approved": 0

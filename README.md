@@ -29,12 +29,12 @@ the source checkout is whatever tree the pack you build indexes.
 
 `go.mod` declares Go1.25.13 as the minimum. Go uses an already-installed newer compatible toolchain; `GOTOOLCHAIN=auto` can fetch a required newer version when the installed one is too old. A pinned `GOTOOLCHAIN=local` requires the toolchain to be installed explicitly.
 
-The pinned linter requires Go1.26. Whole-module build/lint/race CI uses Go1.26.9, while vector and native installation jobs retain minimum-version coverage:
+The pinned linter requires Go1.26. Whole-module build/lint/race CI uses Go1.26.10, while vector and native installation jobs retain minimum-version coverage:
 
 ```sh
 go version
-GOTOOLCHAIN=go1.26.9 make build
-GOTOOLCHAIN=go1.26.9 make lint
+GOTOOLCHAIN=go1.26.10 make build
+GOTOOLCHAIN=go1.26.10 make lint
 ```
 
 ### C toolchain

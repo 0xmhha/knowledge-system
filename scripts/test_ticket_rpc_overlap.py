@@ -2,6 +2,7 @@
 import gzip,json,shutil,tempfile,unittest
 from pathlib import Path
 import ticket_rpc_overlap as g
+import evidence_revision
 
 class RPCOverlap(unittest.TestCase):
     slot='ORIGINAL-general-rpc-overlap'
@@ -75,5 +76,10 @@ class RPCOverlap(unittest.TestCase):
         self.edit('WORKLIST.json',lambda d:d['security_scope_adjustment'].update(deferred_is_completed=True));g.seal(self.packet);self.assertTrue(any('worklist differs'in e for e in g.validate(packet=self.packet)))
     def test_requirements_cannot_be_accepted_by_reseal(self):
         self.edit('requirements.json',lambda d:d[0].update(full_requirement_satisfied=True));g.seal(self.packet);self.assertTrue(any('derived native result differs'in e for e in g.validate(packet=self.packet)))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

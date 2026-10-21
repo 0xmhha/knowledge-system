@@ -10,6 +10,7 @@ import tempfile
 import unittest
 
 import wi1_dev_gold as guard
+import evidence_revision
 
 FIXTURES = Path('scripts/fixtures/wi1-dev-controls.json')
 
@@ -168,6 +169,10 @@ class PacketControls(unittest.TestCase):
     def test_missing_raw_artifact(self):
         (self.packet / 'observations.json.gz').unlink()
         self.assertTrue(guard.validate_packet(guard.ROOT, self.packet))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

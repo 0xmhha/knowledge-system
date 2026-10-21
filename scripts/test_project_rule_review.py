@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/project-rule-review-v1'
@@ -197,6 +198,10 @@ class ProjectRuleReviewTests(unittest.TestCase):
         observations[0]['syntax_calls'][0]['location']['start_byte'] += 1
         with self.assertRaisesRegex(ValueError, 'AST call span is absent/ambiguous'):
             guard.runner.derive(PACKET, observations)
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

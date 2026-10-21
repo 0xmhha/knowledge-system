@@ -1,0 +1,70 @@
+{
+  "purpose": "단계91에서 시험하지 않은 두 경로의 세대 경계를 실제 owner ack 기준으로 관측한다: RPC 연결 종료(transport close)로 끝난 옛 세대, 그리고 같은 channel을 재등록한 상태에서 맞는 자연 60초 done broadcast",
+  "requirement_source": "docs/spec-driven/MACHINE-HANDOFF.md 5절, CURRENT-HANDOFF.md 다음 작업, REMAINING-13-EXECUTION.json next (stage 91)",
+  "upstream_source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "execution_adapter": {
+    "reused": "followups/wiv1-generation-boundary-v1/adapter (PREFLIGHT.json PASS); ks_adapter.py bytes unchanged",
+    "fresh_upstream_clone": "https://github.com/stable-net/go-stablenet.git at the pinned commit; the run driver re-checks the retained 2228-file inventory before applying overlays",
+    "live_paths_committed": false
+  },
+  "trace_model": {
+    "inherited_from": "followups/wiv1-generation-boundary-v1/SPEC.json trace_model (key, generation, channel-use events, violation definition)",
+    "added_rule": "before_install: the owner records map membership immediately before syncSubscriptions[i] = struct{}{}; not a channel use",
+    "why": "in the same-channel timer route a stale entry and the re-registration are one map key, so channel use alone cannot tell them apart; membership before the install can"
+  },
+  "schedules": {
+    "transport": {
+      "roles": [
+        "ORIGINAL",
+        "CAND-A",
+        "CAND-B",
+        "MUT-EARLY"
+      ],
+      "old_generation": "phase-90 declared pre-send gate on the selected done broadcast; the RPC client connection is closed instead of eth_unsubscribe; release; rescues only when the source cannot reach the real owner ack by itself",
+      "callback_exit_route": "recorded, not forced: at this commit the server cancels its subscriptions (rpcSub.Err) before closing the codec (notifier.Closed), so either branch may end the callback",
+      "regeneration": "same-channel generation 2 through the factory API (served by the install send because done is already true), then a new RPC connection and a new eth_subscribe"
+    },
+    "timer-same-channel": {
+      "roles": [
+        "ORIGINAL",
+        "CAND-A",
+        "CAND-B",
+        "MUT-STALE-ACK"
+      ],
+      "old_generation": "pre-timer eth_unsubscribe and real owner ack, no gate",
+      "regeneration": "same-channel generation 2 and a new RPC registration are both installed before the native timer and stay installed across the natural 60s done broadcast",
+      "control": "MUT-STALE-ACK acknowledges without deleting; expected to stay invisible to channel-use counting and visible only as stale membership at the generation 2 install"
+    }
+  },
+  "profiles": [
+    "general",
+    "race"
+  ],
+  "repetitions": 1,
+  "automatic_retries": 0,
+  "owned_nodes_per_slot": 2,
+  "native_timer_seconds": 60,
+  "expected": {
+    "post_ack_same_generation_uses": 0,
+    "stale_membership_at_reregistration": {
+      "MUT-STALE-ACK": "true in both profiles",
+      "others": "false"
+    },
+    "stale_control_detected_by_channel_use": 0
+  },
+  "out_of_scope": [
+    "Notify in progress at shutdown",
+    "progress (Syncing=true) notifications",
+    "transport close without the phase-90 gate",
+    "operational WBFT; this is legacy PoW ethash fixture",
+    "independent oracle, approved positive role, final HEAD"
+  ],
+  "acceptance_boundary": {
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "FINAL": 0,
+    "freeze": null,
+    "execution_allowed": false,
+    "D04": "미정"
+  }
+}

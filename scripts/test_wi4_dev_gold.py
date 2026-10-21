@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 import wi4_dev_gold as g
+import evidence_revision
 
 
 class SourceAndSchedule(unittest.TestCase):
@@ -166,6 +167,10 @@ class ResealedMutations(unittest.TestCase):
     def test_no_recurrence_promoted_to_success(self): self.mutant('matching-contract.json',lambda v:v.update(observation='no recurrence = accepted fix'))
     def test_reviewer_invented(self): self.mutant('WORKLIST.json',lambda v:v.update(reviewer_assignment='AI'))
     def test_formal_completed(self): self.mutant('WORKLIST.json',lambda v:v.update(formal_completed=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__': unittest.main()

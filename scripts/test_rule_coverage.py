@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/rule-coverage-v1'
@@ -136,6 +137,10 @@ class RuleCoverageTests(unittest.TestCase):
         guard.prepare.prepare(output)
         self.assertEqual({p.relative_to(PACKET): p.read_bytes() for p in PACKET.rglob('*') if p.is_file()},
                          {p.relative_to(output): p.read_bytes() for p in output.rglob('*') if p.is_file()})
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

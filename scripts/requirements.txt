@@ -1,0 +1,11 @@
+# Third-party modules imported by the evidence validators and their tests.
+# Install into a virtual environment outside the checkout; .gitignore is a
+# bound input of current validators and is not changed for it:
+#   python3 -m venv "$HOME/.venvs/knowledge-system"
+# Retained packets record PyYAML 6.0 as their parser identity. It has no wheel
+# for Python 3.12+; build it once without isolation, then install this file:
+#   "$HOME/.venvs/knowledge-system/bin/pip" install 'Cython==0.29.37' 'setuptools==80.9.0' 'wheel==0.45.1'
+#   "$HOME/.venvs/knowledge-system/bin/pip" install --no-build-isolation 'PyYAML==6.0'
+#   "$HOME/.venvs/knowledge-system/bin/pip" install -r scripts/requirements.txt
+jsonschema==4.25.1
+PyYAML==6.0

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from lifecycle_instrumentation import instrument
 from lifecycle_trace_contract import validate_prefix
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-rpc-lifecycle-v1'
@@ -111,6 +112,10 @@ class LifecyclePreparation(unittest.TestCase):
     def test_unmatched_send_completion_refused(self):
         with self.assertRaises(ValueError):
             validate_prefix(trace(['install', 'send_end_progress']), 'ORIGINAL')
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

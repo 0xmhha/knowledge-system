@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 def module(name,file):
     s=importlib.util.spec_from_file_location(name,Path(__file__).with_name(file));m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
@@ -34,4 +35,10 @@ class ComparisonFailureEvidenceTests(unittest.TestCase):
     def test_missing_candidate_budget_state(self):self.rejects('runtime/candidate-budget.json',lambda v:v.update(omitted_candidates=0))
     def test_affected_project_leaks_body(self):self.rejects('runtime/missing-B.json',lambda v:v['groups'][1]['cells'][0].update(state='similar'))
     def test_changed_DB_after_restoration(self):self.rejects('runtime/after.json',lambda v:v.update({next(iter(v)):'0'*64}))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__=='__main__':unittest.main()

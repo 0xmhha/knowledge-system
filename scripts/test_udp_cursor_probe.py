@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/udp-cursor-probe-v1'
@@ -96,6 +97,10 @@ class CursorProbeTests(unittest.TestCase):
     def test_network_reproduction_claim(self):
         self.change(lambda d: d.update(network_calls=1))
         self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

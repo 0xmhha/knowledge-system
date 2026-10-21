@@ -8,6 +8,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('foundation_roadmap_tests', Path(__file__).with_name('test_knowledge_roadmap.py'))
 foundation = importlib.util.module_from_spec(spec)
@@ -79,6 +80,10 @@ class CurrentRoadmapTests(foundation.RoadmapTests):
         self.assertEqual(changed, 1)
         path.write_text('\n'.join(lines) + '\n')
         self.assertTrue(foundation.guard.check(self.folder, self.root))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

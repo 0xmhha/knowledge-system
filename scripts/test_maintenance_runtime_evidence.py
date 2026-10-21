@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('maintenance_runtime_guard', Path(__file__).with_name('check-maintenance-runtime-evidence.py'))
 guard = importlib.util.module_from_spec(spec)
@@ -89,6 +90,10 @@ class MaintenanceRuntimeEvidenceTests(unittest.TestCase):
     def test_failed_lint_cannot_be_promoted(self):
         self.edit('validation.json', lambda value: value['gates'].update(lint=1))
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

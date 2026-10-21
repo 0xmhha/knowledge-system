@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/symptom-inputs-v1'
@@ -118,6 +119,10 @@ class SymptomInputTests(unittest.TestCase):
     def test_duplicate_card(self):
         self.change('public-inputs.json', lambda d: d['cases'].append(d['cases'][0]))
         self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

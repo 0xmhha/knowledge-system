@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('maintenance_evidence', Path(__file__).with_name('check-maintenance-design-evidence.py'))
 guard = importlib.util.module_from_spec(spec)
@@ -84,6 +85,10 @@ class MaintenanceDesignEvidenceTests(unittest.TestCase):
     def test_capability_source_audit_cannot_be_changed(self):
         self.edit('source-audit.json', lambda rows: rows[0].update(span_sha256='0'*64))
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

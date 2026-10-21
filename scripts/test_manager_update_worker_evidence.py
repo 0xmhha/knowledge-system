@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def module(name,file):
@@ -39,6 +40,10 @@ class UpdateWorkerEvidenceTests(unittest.TestCase):
     def test_Python_inventory_not_reduced(self):self.rejects('validation.json',lambda v:v.update(manager_python_tests=224))
     def test_skips_not_counted_as_pass(self):self.rejects('validation.json',lambda v:v['module'].update(skipped_tests=0))
     def test_failed_lint_not_accepted(self):self.rejects('validation.json',lambda v:v['gates'].update(lint=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

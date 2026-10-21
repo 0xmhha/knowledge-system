@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/context-v1'
@@ -99,6 +100,10 @@ class ContextGuardTests(unittest.TestCase):
     def test_public_proposal_includes_private_fact(self):
         self.change(lambda d: d['reviews'][0]['followup_candidate'].update(public_input_proposal=d['reviews'][0]['anchors'][0]['source_fact_draft']))
         self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,42 @@
+{
+  "knowledge_checkout": {
+    "head": "0c830661 (stage 91) plus uncommitted scripts test-suite changes that do not touch the overlays, baselines or drivers read by this run",
+    "verified_inputs": "retained overlays and wi4 subscription baseline read from the checkout; run driver compared the fresh clone with the retained binding"
+  },
+  "development_attempts": [
+    {
+      "name": "compile probe out1",
+      "result": "go vet exit 0 for all 5 roles on the first attempt; channel sites 9/10/9/6/10",
+      "nodes_started": 0,
+      "log": "checks/compile-probe/out1.json.gz"
+    },
+    {
+      "name": "smoke1",
+      "result": "transport ORIGINAL and timer-same-channel MUT-STALE-ACK exit 0 in about 62s each; transport close ended the old callback through callback_exit_rpc_error; MUT-STALE-ACK showed member true before the generation 2 install",
+      "log": "checks/smoke/"
+    },
+    {
+      "name": "first archive",
+      "result": "validator refused the packet: race build stderr carried the Go linker scratch directory /private/tmp/go-link-<n> from a macOS ld warning, because the run had no TMPDIR set",
+      "resolution": "archive.py gained a scrub rule mapping it to ${TMPDIR}/go-link; the packet directory was recreated from the same run evidence; actual-REDACTION.json lists every changed file with raw and archived digests"
+    }
+  ],
+  "matrix": {
+    "run": "run-tt1",
+    "planned": 16,
+    "attempted": 16,
+    "failed": 0,
+    "automatic_retries": 0,
+    "source_preserved": true,
+    "slot_seconds": "60 to 150 enforced by the validator"
+  },
+  "validator": {
+    "script": "scripts/wiv1_transport_generation.py",
+    "test": "scripts/test_wiv1_transport_generation.py",
+    "recomputes": "generation and post-ack flags from install/ack events, exit route, stale membership, broadcast addressing, rescue counts, build trees and binaries"
+  },
+  "not_run": [
+    "host make build/lint/test-race/manager-test (no KS Go change in this stage)",
+    "independent review"
+  ]
+}

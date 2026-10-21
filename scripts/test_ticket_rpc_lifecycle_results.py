@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 import ticket_rpc_lifecycle_results as g
+import evidence_revision
 
 
 def sample(returned=True, role='CAND-A', drain=True):
@@ -205,6 +206,10 @@ class ActualCapturedResults(unittest.TestCase):
 
     def test_resealed_requirement_completion_rejected(self):
         self.mutant('requirements.json', lambda v: v[0].update(full_requirement_satisfied=True))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

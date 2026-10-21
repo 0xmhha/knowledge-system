@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('final_isolation_guard', Path(__file__).with_name('check-collection-isolation.py'))
 guard = importlib.util.module_from_spec(spec)
@@ -93,6 +94,10 @@ class FinalIsolationTests(unittest.TestCase):
             b1.update(http_start=b2['http_start'], http_end=b2['http_end'])
         self.edit('results.json', mutate)
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

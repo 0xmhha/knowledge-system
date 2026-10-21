@@ -1,6 +1,7 @@
 import json,tempfile,unittest
 from pathlib import Path
 import real_peer_readiness as r
+import evidence_revision
 
 @unittest.skipUnless((r.ROOT/r.PACKET/'manifest.json').exists(),'real peer evidence not sealed')
 class Actual(unittest.TestCase):
@@ -22,4 +23,10 @@ class Actual(unittest.TestCase):
     if x.is_file()and x.name!='manifest.json':
      f=p/x.relative_to(r.ROOT/r.PACKET);f.parent.mkdir(parents=True,exist_ok=True);f.symlink_to(x)
    f=p/'SUMMARY.json';d=r.read(f);d['independent_families']=2;f.unlink();r.write(f,d);r.seal(p);self.assertTrue(r.check(packet=p))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__=='__main__':unittest.main()

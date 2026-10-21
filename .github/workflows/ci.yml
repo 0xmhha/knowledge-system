@@ -14,7 +14,7 @@ jobs:
         with:
           # Pinned golangci-lint requires Go 1.26; retain go.mod compatibility
           # coverage in the vector and native installation jobs below.
-          go-version: '1.26.9'
+          go-version: '1.26.10'
       - name: Build
         run: make build
       - name: Lint (gofmt drift, vet, golangci-lint, engine boundaries, docs)
@@ -66,7 +66,7 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           # Self-indexing also loads retained source modules captured with Go 1.26.
-          go-version: '1.26.9'
+          go-version: '1.26.10'
       - name: make eval (self-index + 4 probes)
         run: make -C graph eval
       - name: eval-gate (compare against committed baseline)
@@ -87,9 +87,9 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v7
         with:
-          # Go 1.26.9 fixes the standard-library findings reported on 1.26.8.
+          # Go 1.26.10 fixes the crypto/x509 finding (GO-2026-6809) reported on 1.26.9.
           # The scanner also requires Go 1.26; native checks keep go.mod.
-          go-version: '1.26.9'
+          go-version: '1.26.10'
       - name: govulncheck
         run: make vuln
 

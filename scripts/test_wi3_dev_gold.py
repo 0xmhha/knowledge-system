@@ -6,6 +6,7 @@ import shutil
 import tempfile
 import unittest
 import wi3_dev_gold as g
+import evidence_revision
 
 
 class DraftAndMatching(unittest.TestCase):
@@ -82,6 +83,10 @@ class Mutations(unittest.TestCase):
     def test_dedup_before_cut_without_approval(self):self.mutant('matching-contract.json',lambda v:v.update(top10='dedup and refill from full corpus'))
     def test_reviewer_invention(self):self.mutant('WORKLIST.json',lambda v:v.update(reviewer_assignment='AI'))
     def test_formal_completion_fabrication(self):self.mutant('WORKLIST.json',lambda v:v.update(formal_completed=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

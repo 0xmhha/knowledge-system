@@ -5,10 +5,15 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 spec = importlib.util.spec_from_file_location('comparisoncheck', Path(__file__).with_name('check-stablenet-comparison.py'))
 check = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(check)
+# The run's owned selected indexes lived under a temporary root that was removed
+# after the run; a fresh checkout cannot re-read them.
+OWNED_INDEXES = [Path(f['version']) / 'vector/vector.db' for f in check.read(check.ROOT / check.REL / 'fixtures.json')]
+LIVE_INDEXES = all(p.is_file() for p in OWNED_INDEXES)
 
 
 class ComparisonEvidenceTests(unittest.TestCase):
@@ -52,7 +57,7 @@ class ComparisonEvidenceTests(unittest.TestCase):
         self.seal()
 
     def rejected(self):
-        self.assertTrue(check.check(self.packet))
+        self.assertTrue(check.check(self.packet, LIVE_INDEXES))
 
     def matrix(self, name, fn):
         p = self.packet / 'comparison' / (name + '.json')
@@ -70,6 +75,15 @@ class ComparisonEvidenceTests(unittest.TestCase):
         self.seal()
 
     def test_actual_evidence_valid(self):
+        self.assertEqual([], check.check(self.packet, live=False))
+
+    def test_bound_sources_match_checkout(self):
+        binding = check.read(self.packet / 'source-binding.json')
+        for name, digest in {**binding['source_sha256'], **binding['approved_input_sha256']}.items():
+            self.assertEqual(check.sha((check.ROOT / name).read_bytes()), digest, name)
+
+    @unittest.skipUnless(LIVE_INDEXES, 'owned selected indexes were not retained after the run')
+    def test_actual_evidence_valid_against_owned_indexes(self):
         self.assertEqual([], check.check(self.packet))
 
     def test_formal_promotion_refused(self):
@@ -160,6 +174,10 @@ class ComparisonEvidenceTests(unittest.TestCase):
         self.change('comparison/bootstrap-session/attempts.json', lambda rows: rows[1]['params'].update(arguments={'unknown': 'forged'}))
         self.change('comparison/calls.json', lambda rows: rows[0].update(arguments={'unknown': 'forged'}))
         self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

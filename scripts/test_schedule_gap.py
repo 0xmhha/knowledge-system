@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/schedule-gap-v1'
@@ -151,6 +152,10 @@ class ScheduleGapTests(unittest.TestCase):
         for f in out['private-family-gaps.json']['families']:
             self.assertIsNone(f['baseline_valid_trials']);self.assertIsNone(f['baseline_symptom_events'])
             self.assertTrue(all(v=='not_satisfied' for v in f['obligations'].values()))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':

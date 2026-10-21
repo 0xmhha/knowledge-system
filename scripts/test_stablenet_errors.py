@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 spec = importlib.util.spec_from_file_location('errorscheck', Path(__file__).with_name('check-stablenet-errors.py'))
 check = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(check)
@@ -107,5 +108,11 @@ class ErrorEvidenceTests(unittest.TestCase):
     def test_owned_process_identity_must_be_gone(self):
         self.change('process-audit.json', lambda d: d['probes'][0].update(identity_gone=False))
         self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__ == '__main__':
     unittest.main()

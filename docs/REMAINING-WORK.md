@@ -8,17 +8,19 @@
 
 ## 현재 검증과 다음 작업
 
-실제 factory·실제 loopback peer 동기화·원래60초 done broadcast와 같은 RPC 구독의 callback Err 종료를 연결했다. 선언한 송신 직전 gate 아래 일반/race10슬롯·20노드를 실행해 원본/재도입 쌍 대기4건, A/B native drain·실제 owner ack 후 반환4건, 조기 반환2건을 구분했다. 고유 source4개이며 별칭을 독립 표본으로 세지 않는다. 모든 노드·소유 프로세스를 정리했고 cache/시험 루트3개 약2.06GiB를 제거했다. [검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json).
+단계91에서 실제 owner ack 이후 옛 구독 세대의 status channel 사용과 명시적 새 등록 세대 경계를 일반/race 16슬롯, 실제32노드로 관측했다([검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json)). 단계92에서는 남은 두 경로를 같은 규모로 관측했다. RPC 연결을 닫아 옛 세대를 끝낸 경로와, 같은 channel을 세대2로 다시 등록한 채 자연 60초 done broadcast를 맞는 경로다. 두 경로 모두 ack 후 같은 세대 사용은 0이다. 연결 종료는 8슬롯 모두 callback을 `rpcSub.Err()` 분기로 끝냈고 `notifier.Closed()` 분기는 0회다. delete 없이 ack한 대조군은 channel 사용 집계로는 드러나지 않고, install 직전 membership으로만 2슬롯 모두 드러났다. 가짜 ack는 0이다. [검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json)
 
-회귀121종과 최종 결속 집중9개가 통과했다. 최초 보조 fixture 채널 타입 컴파일 오류와 검증기 변경 후 manifest guard 실패는 보존하고, 각각 별도 수정·재결속 뒤 검증했다. KS 운영 Go 변경0이며 이전 본체 전체 일반/race4273개씩의 같은 입력 검증을 재사용한다. gate 없는 보편 동작·모든 post-ack channel-use·독립 수용으로 승격하지 않는다.
+단계93에서는 Notify 직전에 잡힌 callback의 연결 종료와 타이머 전 gate 없는 연결 종료를 같은 규모로 관측했다. ack 후 같은 세대 사용은 0이다. Notify 도중 종료는 callback 종료가 `rpcSub.Err()` 4회, `notifier.Closed()` 4회로 나뉘어 두 분기를 모두 관측했다. gate 없는 종료는 8회 모두 `rpcSub.Err()`다. [검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json)
 
-다음은 실제 owner ack 후 옛 구독의 channel-use와 명시적 새 등록 세대 경계다. 승인된 독립 oracle 기반 실제 역할 성공 경로와 최종 HEAD 판정도 남아 있다. 앞선 최신 CKS 실제4역할·RPC 오류120건·MCP 오류/미확정35건 근거는 보존한다.
+`scripts/` 시험 전체도 복구했다. 과거 단계 시험 110개 모듈은 기록된 증거 커밋의 임시 worktree에서 돌고, 그 뒤 패킷이 바뀌었으면 실패한다. 이전 머신 경로는 도구 이름과 저장소 상대 경로로 비교한다. KS 운영 Go 변경은 0이다. gate 없는 보편 동작과 독립 수용으로 승격하지 않는다.
+
+다음은 WI-V1의 진행 중 true 알림 세대 경로와 독립 oracle 준비다. true 알림은 긴 체인과 동기화 도중 peer를 잃는 fixture가 먼저 필요하다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
 
 ## 전체13묶음 — 완료0/13
 
 |묶음|현재 남은 내용|
 |---|---|
-|WI-V1|최신 CKS 4역할·API 오류·native done/RPC Err overlap 확인; channel-use/새 세대·승인 oracle/final HEAD·독립 티켓|
+|WI-V1|최신 CKS 4역할·API 오류·native done/RPC Err overlap·ack 후 세대 경계·transport close/같은 channel timer/Notify 도중 종료/gate 없는 종료 경로 확인; 진행 중 true 알림·승인 oracle/final HEAD·독립 티켓|
 |WI-V2|유한 후보 구별 완료; 독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|warm 쌍627회 보존; 독립 nonseed 관련성/잡음 정답·표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 부분은 사용자 보류|

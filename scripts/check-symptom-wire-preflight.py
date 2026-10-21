@@ -6,10 +6,12 @@ import json
 from pathlib import Path
 import subprocess
 
+from recorded_locations import in_run_checkout
 from source_packet import safe, sha
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = Path('docs/spec-driven/operational-preparation/source-review-supplement')
+VIRTUAL_TEST = 'internal/system/mcp/suspects_fixture_test.go'
 CONTROLS = {'minimal_defaults': ('parser_defaults', True), 'unknown_gold_field': ('parser_defaults', False),
             'fractional_candidates': ('parser_defaults', False), 'insufficient_call_budget': ('parser_defaults', False),
             'site_without_line': ('parser_defaults', False), 'public_seed_hint': ('public_input_policy', False)}
@@ -70,8 +72,8 @@ def check(packet, check_references=True):
         require((packet / 'template.go.txt').read_bytes() == template and (packet / 'overlay-base.go.txt').read_bytes() == base
                 and (packet / 'overlay-backing.go.txt').read_bytes() == backing, 'overlay changes existing tests or preparation code')
         overlay = json.loads((packet / 'overlay.json.txt').read_text())
-        require(len(overlay['Replace']) == 1 and set(overlay['Replace']) == {str(ROOT / 'internal/system/mcp/suspects_fixture_test.go')}
-                and summary['virtual_test_file'] == str(ROOT / 'internal/system/mcp/suspects_fixture_test.go'), 'overlay scope')
+        require(len(overlay['Replace']) == 1 and set(overlay['Replace']) == {summary['virtual_test_file']}
+                and in_run_checkout(summary['virtual_test_file'], VIRTUAL_TEST), 'overlay scope')
         require(manifest['counts'] == {'public_requests': 20, 'modes': 2, 'request_observations': 40, 'controls': 12, 'quality_checks': 4}, 'count inflation')
         quality = summary['quality_checks']
         require(len(quality) == 4 and {q['kind'] for q in quality} == {'build', 'fmt', 'vet', 'lint'}, 'quality inventory')

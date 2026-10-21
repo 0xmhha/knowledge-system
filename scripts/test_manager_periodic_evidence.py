@@ -2,6 +2,7 @@
 import importlib.util
 from pathlib import Path
 import unittest
+import evidence_revision
 
 def module(name,file):
     spec=importlib.util.spec_from_file_location(name,Path(__file__).with_name(file));m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
@@ -23,5 +24,10 @@ class PeriodicEvidenceTests(unittest.TestCase):
     def test_quality_claim(self):self.rejects('runtime/summary.json',lambda v:v.update(mock_embedding_not_quality=False))
     def test_omitted_query_failure(self):self.rejects('initial-identifier-read.json',lambda v:v['pack'].update(bodies=[{'invented':'evidence'}]))
     def test_inferred_human_review(self):self.rejects('runtime/a3-capture.json',lambda v:v.update(human_approval='approved'))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
 
 if __name__=='__main__':unittest.main()

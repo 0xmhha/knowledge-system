@@ -2,6 +2,7 @@
 import copy,gzip,json,shutil,tempfile,types,unittest
 from pathlib import Path
 import wic_dev_gold as g
+import evidence_revision
 
 
 class DraftTests(unittest.TestCase):
@@ -105,6 +106,10 @@ class ResealedMutations(unittest.TestCase):
     def test_debt_erased(self):self.mutant('REVIEW-LEDGER.json',lambda v:v.update(missing=[]))
     def test_public_gold_leak(self):self.mutant('public/DEV-inputs.json',lambda v:v[0].update(required_gold=[]))
     def test_formal_acceptance_fabricated(self):self.mutant('WORKLIST.json',lambda v:v.update(formal_completed=1))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

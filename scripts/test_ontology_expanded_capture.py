@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 def module(name,file):
  s=importlib.util.spec_from_file_location(name,Path(__file__).with_name(file));m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
@@ -29,4 +30,10 @@ class ExpandedCaptureEvidenceTests(unittest.TestCase):
  def test_false_verification_summary(self):self.rejects('runtime/verification.json',lambda v:v.update(actual_capture_calls=511))
  def test_source_not_preserved(self):self.rejects('runtime/preservation.json',lambda v:v.update(dataset_files_unchanged=False))
  def test_reused_Go_not_fresh(self):self.rejects('validation.json',lambda v:v.update(current_Go_validation_reused=False))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__=='__main__':unittest.main()

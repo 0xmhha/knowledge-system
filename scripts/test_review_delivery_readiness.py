@@ -1,6 +1,7 @@
 import json,tempfile,unittest
 from pathlib import Path
 import review_delivery_readiness as r
+import evidence_revision
 
 @unittest.skipUnless((r.ROOT/r.PACKET/'manifest.json').exists(),'review packet not sealed')
 class Actual(unittest.TestCase):
@@ -22,4 +23,10 @@ class Actual(unittest.TestCase):
  def test_lingering_host_not_ignored(self):self.mutant('process-cleanup.json',lambda d:d[0].update(remaining_recorded_PIDs=1))
  def test_unsupported_policy_attempt_not_relabelled_success(self):self.mutant('unsupported-policy/evidence/receipt.json.gz',lambda d:d.update(artifact_files=0))
  def test_semantic_quality_not_inferred_from_render(self):self.mutant('render/VISUAL-REVIEW.json',lambda d:d.update(semantic_quality_approved=True))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
+
+
 if __name__=='__main__':unittest.main()

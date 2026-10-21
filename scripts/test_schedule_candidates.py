@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/schedule-candidates-v1'
@@ -110,6 +111,10 @@ class ScheduleCandidateTests(unittest.TestCase):
     def test_contract_question_erased(self):
         self.change('private-schedules.json', lambda d: d['families'][0].update(contract_questions=[]))
         self.rejected()
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

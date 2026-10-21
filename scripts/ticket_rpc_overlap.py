@@ -4,6 +4,7 @@ from pathlib import Path
 import ticket_actual_rpc as prior
 import ticket_method_schedules as previous
 from source_packet import oid,verify
+import recorded_locations
 ROOT,BASE=prior.ROOT,prior.BASE
 PACKET=BASE/'followups/ticket-rpc-overlap-v1'
 REVISION='4b7b9decb76e234de8d2bae12575355f5f8415c1'
@@ -112,10 +113,12 @@ def counter_profile(root,p,q,label,env):
     files=list(source.iterdir())
     if sum(x.name.startswith('covmeta.')for x in files)!=1 or sum(x.name.startswith('covcounters.')for x in files)!=1 or len(files)!=2:raise ValueError('pre-rescue snapshots merged/contaminated or missing')
     tool=read(p/'coverage-tool.json')
-    if tool!={str(n):sha(n.read_bytes())for n in [Path(GO),Path(GO).parent.parent/'pkg/tool/darwin_arm64/covdata']}:raise ValueError('local coverage SDK changed')
+    # Recorded keys name the previous machine's SDK; digests are read from this machine's copy.
+    if tool!={str(n):sha(recorded_locations.local(n).read_bytes())for n in [Path(GO),Path(GO).parent.parent/'pkg/tool/darwin_arm64/covdata']}:raise ValueError('local coverage SDK changed')
     e={k:os.environ[k]for k in ('HOME','USER','TMPDIR','LANG','LC_ALL')if k in os.environ};e.update(env['task_settings']);e['PATH']=env['PATH']
     with tempfile.TemporaryDirectory(dir='/private/tmp')as tmp:
-        output=Path(tmp)/'profile.txt';r=subprocess.run([GO,'tool','covdata','textfmt','-i='+str(source.resolve()),'-o='+str(output)],cwd='/private/tmp',env=e,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=30)
+        e=recorded_locations.local_env(e);e['GOCACHE']=str(Path(tmp)/'go-cache')
+        output=Path(tmp)/'profile.txt';r=subprocess.run([str(recorded_locations.local(GO)),'tool','covdata','textfmt','-i='+str(source.resolve()),'-o='+str(output)],cwd='/private/tmp',env=e,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=30)
         if r.returncode or output.read_bytes()!=converted.read_bytes():raise ValueError('retained text differs from independent re-conversion of raw atomic counters')
     lines=converted.read_text().splitlines()
     if not lines or lines[0]!='mode: atomic':raise ValueError('counter mode differs')

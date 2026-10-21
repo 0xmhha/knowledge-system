@@ -1,0 +1,63 @@
+{
+  "purpose": "실제 owner ack 이후 옛 구독 세대의 모든 status channel 사용을 관측하고, 같은 session의 새 RPC 등록과 같은 channel의 명시적 재등록을 세대 단위로 구별한다",
+  "requirement_source": "docs/spec-driven/MACHINE-HANDOFF.md 5절, CURRENT-HANDOFF.md 다음 작업, REMAINING-13-EXECUTION.json next",
+  "upstream_source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "execution_adapter": {
+    "packet_path": "adapter/",
+    "purpose": "이전 머신의 고정 경로와 Go SDK를 이름 붙인 자리표시자로 바꾸고, 실제 경로는 커밋하지 않는다",
+    "preflight_must_pass_before_run": [
+      "Go 1.23.12 local toolchain",
+      "owned upstream clone at the pinned commit equals the retained 2228-file inventory",
+      "offline read-only module resolution with go.sum as the integrity authority",
+      "retained phase-90 instrumentation reproduces recorded instrumented API and Git build trees for all four built roles"
+    ]
+  },
+  "trace_model": {
+    "key": "(factory API, status channel)",
+    "generation": "real owner install count for the key at the moment of each event",
+    "channel_use_events": ["install_send_begin", "native_send_begin_progress", "native_send_begin_done", "method_status_received", "callback_status_received", "probe_status_received"],
+    "violation": "a channel use whose generation equals the generation the real owner already acknowledged for that key",
+    "allowed_after_ack": "a use after an explicit new install of the same key (generation increased) or on a distinct channel",
+    "owned_rescue_receives_are_not_source_uses": true,
+    "rpc_wire_true_and_owner_ack_recorded_as_separate_events": true,
+    "static_site_inventory": "every status-channel operation site in eth/downloader/api.go must map to one instrumentation rule"
+  },
+  "schedules": {
+    "overlap": {
+      "roles": ["ORIGINAL", "CAND-A", "CAND-B", "MUT-EARLY"],
+      "old_generation": "phase-90 declared pre-send gate on the selected done broadcast, same-session eth_unsubscribe, release; rescues counted",
+      "regeneration": ["same channel re-registered through the selected factory API (generation 2) and consumed by an owned probe, then unsubscribed", "new RPC eth_subscribe syncing on the same session (distinct channel), wire notification received, then unsubscribed"]
+    },
+    "timer": {
+      "roles": ["ORIGINAL", "CAND-A", "CAND-B", "MUT-STALE-ACK"],
+      "old_generation": "same-session eth_unsubscribe before the unchanged 60s timer fires; no gate",
+      "regeneration": ["new RPC eth_subscribe syncing installed before the natural done broadcast; broadcast targets recorded per generation"],
+      "violation_control": "MUT-STALE-ACK is CAND-A whose owner acknowledges without deleting; its stale old generation must be addressed after ack"
+    }
+  },
+  "profiles": ["general", "race"],
+  "planned_slots": 16,
+  "owned_nodes_per_slot": 2,
+  "expected": {
+    "CAND-A/CAND-B overlap": "drain and real owner ack before rescue as in phase 90; zero post-ack same-generation uses; generation-2 delivery and new RPC delivery each exactly once; all generations acknowledged",
+    "ORIGINAL overlap": "paired native/uninstall sends before rescue; one owned status receive; regeneration labelled post-rescue; zero post-ack same-generation uses",
+    "MUT-EARLY overlap": "early return without owner delete/ack; owned status receive plus manual real-owner uninstall for every generation; zero post-ack same-generation uses",
+    "ORIGINAL/CAND-A/CAND-B timer": "real owner ack of the old generation before the timer; done broadcast addresses only the new generation; zero post-ack same-generation uses; no rescue",
+    "MUT-STALE-ACK timer": "ack without delete leaves the old generation a member; the natural done broadcast addresses it after ack (violation observed); one owned status receive"
+  },
+  "limits": [
+    "overlap gate and observation hooks perturb scheduling; no ungated probability or fairness claim",
+    "same-channel re-registration is exercised only on the install-send path; a stale entry and a re-registration share one map key, so a missing delete is visible there only through membership, not channel use",
+    "only status-channel sites in eth/downloader/api.go and the owned probe are covered; transport close and Notify-time exit are not exercised",
+    "legacy PoW ethash two-node fixture, not production WBFT",
+    "single exposed DEV family; no independent gold, repeats, sufficiency or acceptance; actual owner4/controlled late1 scope unchanged and not merged into independent samples"
+  ],
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "FINAL": 0,
+  "freeze": null,
+  "execution_allowed": false,
+  "D04": "unassigned",
+  "actual_LLM_calls": 0,
+  "paid_calls": 0
+}

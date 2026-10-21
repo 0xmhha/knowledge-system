@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import evidence_revision
 
 
 def module(name,file):
@@ -67,6 +68,10 @@ class BootstrapEvidenceTests(unittest.TestCase):
     def test_failed_lint_is_not_accepted(self):
         self.edit('validation.json',lambda row:row['gates'].update(lint=1))
         self.assertTrue(guard.check(self.folder))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':

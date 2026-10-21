@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT=Path(__file__).resolve().parents[1]
 PACKET=ROOT/'docs/spec-driven/operational-preparation/source-review-supplement/expansion-gap-v1'
@@ -154,6 +155,10 @@ class ExpansionGapTests(unittest.TestCase):
         self.assertAlmostEqual(a['recall_delta'],.75);self.assertAlmostEqual(a['noise_fraction_delta'],.2)
         self.assertAlmostEqual(a['single_server_elapsed_ratio'],2875/1431);self.assertIsNone(a['warm_p95_latency_ratio'])
         self.assertTrue(all(v=='not_satisfied' for v in d['private-family-pair-gaps.json']['obligations'].values()))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__=='__main__':unittest.main()

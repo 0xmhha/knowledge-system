@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import evidence_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/source-review-supplement/semantic-gap-v1'
@@ -176,6 +177,10 @@ class SemanticGapTests(unittest.TestCase):
             self.assertIsNone(r['control_gold'])
             self.assertEqual(set(r['requirements']), set(guard.prepare.REQUIREMENTS))
             self.assertTrue(all(v == 'not_satisfied' for v in r['requirements'].values()))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':
