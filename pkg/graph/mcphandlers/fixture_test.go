@@ -13,6 +13,7 @@ package mcphandlers
 // internal/mcp during T-14b) keeps working without churn.
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
@@ -20,6 +21,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/internal/testgit"
 	"github.com/0xmhha/knowledge-system/pkg/graph/impact"
 )
 
@@ -31,6 +33,10 @@ var (
 
 // TestMain removes the shared fixture graph after the package's tests.
 func TestMain(m *testing.M) {
+	if err := testgit.IsolateFixtures(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 	code := m.Run()
 	if fixtureDir != "" {
 		_ = os.RemoveAll(fixtureDir)

@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/0xmhha/knowledge-system/internal/testgit"
 )
 
 func TestResolveOutDir_Empty(t *testing.T) {
@@ -28,6 +30,7 @@ func TestResolveOutDir_LiteralTag(t *testing.T) {
 }
 
 func TestResolveOutDir_AutoCommitHash(t *testing.T) {
+	testgit.UseRepository(t)
 	got, err := resolveOutDir("/tmp/out", "auto-commit-hash", ".")
 	if err != nil {
 		t.Fatal(err)
@@ -87,6 +90,7 @@ func TestCheckoutWorktree_NonGitDir(t *testing.T) {
 }
 
 func TestCheckoutWorktree_Success(t *testing.T) {
+	testgit.UseRepository(t)
 	wt, cleanup, err := checkoutWorktree(".", "HEAD")
 	if err != nil {
 		t.Fatalf("checkoutWorktree: %v", err)

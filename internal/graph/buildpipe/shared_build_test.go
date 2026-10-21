@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+	"github.com/0xmhha/knowledge-system/internal/testgit"
 )
 
 // A cold Run type-loads the fixture's whole dependency graph through
@@ -27,6 +28,10 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	if err := testgit.IsolateFixtures(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 	code := m.Run()
 	if sharedBuildsRoot != "" {
 		_ = os.RemoveAll(sharedBuildsRoot)
