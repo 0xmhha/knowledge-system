@@ -60,7 +60,7 @@ make build
 
 venv는 저장소 밖에 만든다. `.gitignore`는 현재 검증기 여러 개가 바인딩한 입력이라 venv 때문에 바꾸지 않는다.
 
-운영 수용 문서의 현재 준비 근거(guardian 패킷)는 Go 파일 전체와 CI workflow의 해시를 묶는다. 그래서 코드가 바뀌면 살아 있는 트리와 맞지 않는다. 두 문서의 `current_readiness_source_revision`에 패킷이 마지막으로 통과한 main 커밋을 적었다. 검사기는 그 커밋이 HEAD의 조상이고 패킷이 그 뒤로 바뀌지 않았는지 확인한 뒤, 그 커밋의 worktree에서 그때 코드로 패킷을 검증한다(2026-10-21, CI 수정 뒤).
+운영 수용 문서의 현재 준비 근거(guardian 패킷)는 Go 파일 전체와 CI workflow의 해시를 묶는다. 그래서 코드가 바뀌면 살아 있는 트리와 맞지 않는다. 두 문서의 `current_readiness_source_revision`에 패킷이 마지막으로 통과한 main 커밋을 적었다. 검사기는 그 커밋이 HEAD의 조상이고 패킷이 그 뒤로 바뀌지 않았는지 확인한 뒤, 그 커밋의 worktree에서 그때 코드로 패킷을 검증한다(2026-10-21, CI 수정 뒤). 같은 결속을 쓰는 리팩토링 진행 검사도 `REFACTORING-PROGRESS.json`의 `active_source_binding.source_revision`에 같은 커밋을 적고, 그 커밋이 HEAD의 조상인지 확인한 뒤 그 커밋 시점의 파일 해시와 Go 파일 목록을 비교한다(2026-10-21). 그 뒤 바뀐 코드는 이 두 검사가 잡지 않으므로 새 결속을 만들 때까지 race 시험과 CI로 확인한다.
 
 - 외부 모듈은 [고정 목록](../../scripts/requirements.txt)의 jsonschema와 PyYAML뿐이다. 보존 패킷이 PyYAML 6.0을 parser 버전으로 기록했으므로 같은 버전을 쓴다. Python 3.12용 wheel이 없어 소스에서 빌드한다.
 - `check-lexical-coverage.py`는 PATH의 `go`를 `GOTOOLCHAIN=local`로 실행한다. PATH의 `go`가 go.mod의 Go 1.25.13 이상이어야 한다. 1.25.12를 두면 87건이 버전 오류로 실패한다.
