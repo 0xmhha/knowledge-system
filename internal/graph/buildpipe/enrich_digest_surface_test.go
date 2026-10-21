@@ -18,6 +18,7 @@ import (
 // buildManifestSkeleton sees nothing and returns "". The cold path must fill
 // EnrichDigest from the injected rows instead.
 func TestColdBuild_EnrichDigestSurfaced(t *testing.T) {
+	t.Parallel()
 	const fixture = "../parse/golang/testdata/resolve"
 
 	// Build A: no enrichment — EnrichDigest must be empty, GraphDigest is the

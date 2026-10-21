@@ -13,6 +13,7 @@ import (
 // internal/parse/golang/testdata/resolve). Asserts that nodes were persisted
 // and that a staleness fingerprint (git commit OR mtime) was recorded.
 func TestPipelineRunsOnGoFixture(t *testing.T) {
+	t.Parallel()
 	out := t.TempDir()
 	_, err := buildpipe.Run(buildpipe.Options{
 		SrcRoot:    "../parse/golang/testdata/resolve",
@@ -48,6 +49,7 @@ func TestPipelineRunsOnGoFixture(t *testing.T) {
 // at least one binds_to edge was emitted by the cross-language linker
 // and persisted to SQLite.
 func TestPipelineXLangBinding(t *testing.T) {
+	t.Parallel()
 	out := t.TempDir()
 	_, err := buildpipe.Run(buildpipe.Options{
 		SrcRoot:    "testdata/synthetic",
