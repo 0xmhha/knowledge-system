@@ -92,7 +92,7 @@
 ## 6. PR-ready 체크리스트 (요약)
 
 ```
-[ ] go test ./... → all packages ok (match CI: `go test -race ./...`)
+[ ] make test-race → all packages ok (CI runs `go test ./...` without -race; run this locally before opening the PR)
 [ ] 추가/수정한 surface 4축 (Options/HTTP/MCP/CLI) 모두 cover
 [ ] 새 axis 가 기존 N axis와 만들 수 있는 N개 조합 중 의미 있는 것 단위 테스트
 [ ] negative path: 필수-input-누락, allow-list-violation, 존재하지-않는-리소스
