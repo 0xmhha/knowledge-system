@@ -182,18 +182,13 @@ func TestLockPropagation_NoLockNoEdge(t *testing.T) {
 
 func buildAndQueryFull(t *testing.T, src string, lockProp bool) ([]types.Edge, []types.Node) {
 	t.Helper()
-	out := t.TempDir()
-	_, err := buildpipe.Run(buildpipe.Options{
+	out, _ := buildpipe.SharedColdBuild(t, buildpipe.Options{
 		SrcRoot:         src,
-		OutDir:          out,
 		Languages:       []string{"go"},
 		CKGVersion:      "test",
 		NoCache:         true,
 		LockPropagation: lockProp,
 	})
-	if err != nil {
-		t.Fatalf("Run: %v", err)
-	}
 	store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
 	if err != nil {
 		t.Fatalf("OpenReadOnly: %v", err)

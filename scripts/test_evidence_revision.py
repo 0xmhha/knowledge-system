@@ -58,6 +58,15 @@ class Guards(unittest.TestCase):
             with er.checkout('0' * 40):
                 pass
 
+    def test_recorded_validation_needs_an_ancestor(self):
+        self.assertIn('not an ancestor', er.recorded_errors('0' * 40, 'guardian_deadline', 'scripts')[0])
+
+    def test_recorded_validation_refuses_changed_packet(self):
+        protocol = json.loads((er.ROOT / 'docs/spec-driven/OPERATIONAL-ACCEPTANCE-PROTOCOL.json').read_text())
+        # The guardian test gained its evidence-revision hook after that revision.
+        commit = protocol['current_readiness_source_revision']
+        self.assertIn('differs', er.recorded_errors(commit, 'guardian_deadline', 'scripts/test_guardian_deadline.py')[0])
+
     def test_selection_keeps_order_and_names(self):
         class Sample(unittest.TestCase):
             def test_a(self):
