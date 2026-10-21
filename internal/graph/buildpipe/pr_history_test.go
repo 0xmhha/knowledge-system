@@ -193,6 +193,87 @@ func TestScanPRHistory_EmptyInputs(t *testing.T) {
 	}
 }
 
+// TestScanPRHistory_ShallowBoundarySkipped covers a depth-2 clone of the
+// fixture: c1 (#42) becomes the shallow boundary, which git shows as adding
+// the whole file. It must not be attributed, while c2 (#43), whose parent is
+// present, still is.
+func TestScanPRHistory_ShallowBoundarySkipped(t *testing.T) {
+	origin := initPRRepo(t)
+	clone := filepath.Join(t.TempDir(), "clone")
+	if out, err := exec.Command("git", "clone", "-q", "--depth", "1", "file://"+origin, clone).CombinedOutput(); err != nil {
+		t.Fatalf("shallow clone: %v\n%s", err, out)
+	}
+	if out, err := exec.Command("git", "-C", clone, "fetch", "-q", "--deepen", "1").CombinedOutput(); err != nil {
+		t.Fatalf("deepen: %v\n%s", err, out)
+	}
+
+	nodes := []types.Node{
+		{ID: "n1", FilePath: "foo.go", StartLine: 3, EndLine: 4,
+			Type: types.NodeFunction, Name: "Foo", QualifiedName: "foo.Foo",
+			Language: "go"},
+		{ID: "n2", FilePath: "foo.go", StartLine: 8, EndLine: 9,
+			Type: types.NodeFunction, Name: "Bar", QualifiedName: "foo.Bar",
+			Language: "go"},
+		{ID: "n3", FilePath: "foo.go", StartLine: 1, EndLine: 11,
+			Type: types.NodeFile, Name: "foo.go", QualifiedName: "file:foo.go",
+			Language: "go"},
+	}
+	got, err := ScanPRHistory(clone, nodes)
+	if err != nil {
+		t.Fatalf("ScanPRHistory: %v", err)
+	}
+	if len(got["n1"]) != 0 {
+		t.Errorf("n1: boundary commit #42 must not be attributed, got %+v", got["n1"])
+	}
+	if len(got["n2"]) != 1 || got["n2"][0].Number != 43 {
+		t.Errorf("n2: want [#43], got %+v", got["n2"])
+	}
+	if len(got["n3"]) != 1 || got["n3"][0].Number != 43 {
+		t.Errorf("n3: want [#43], got %+v", got["n3"])
+	}
+}
+
+// TestParsePatchLineRanges reads past a line longer than the reader buffer
+// and still records the hunks before and after it.
+func TestParsePatchLineRanges(t *testing.T) {
+	long := "+" + strings.Repeat("x", 3*patchReadBufferBytes)
+	patch := strings.Join([]string{
+		"diff --git a/a.json b/a.json",
+		"--- /dev/null",
+		"+++ b/a.json",
+		"@@ -0,0 +1,2 @@",
+		long,
+		"+@@ -9,9 +9,9 @@ not a header",
+		"diff --git a/b.go b/b.go",
+		"--- a/b.go",
+		"+++ b/b.go",
+		"@@ -3,0 +4,3 @@ func B() {",
+		"@@ -9 +11,0 @@",
+		"diff --git a/c.go b/c.go",
+		"--- a/c.go",
+		"+++ /dev/null",
+		"@@ -1,2 +0,0 @@",
+		"",
+	}, "\n")
+
+	got, err := parsePatchLineRanges(strings.NewReader(patch))
+	if err != nil {
+		t.Fatalf("parsePatchLineRanges: %v", err)
+	}
+	want := map[string][]hunkRange{
+		"a.json": {{Start: 1, End: 2}},
+		"b.go":   {{Start: 4, End: 6}},
+	}
+	if len(got) != len(want) {
+		t.Fatalf("files: got %+v, want %+v", got, want)
+	}
+	for file, ranges := range want {
+		if len(got[file]) != len(ranges) || got[file][0] != ranges[0] {
+			t.Errorf("%s: got %+v, want %+v", file, got[file], ranges)
+		}
+	}
+}
+
 // TestRangesOverlap is a smoke around the inclusive-both-ends overlap
 // helper that drives the hunk × node match.
 func TestRangesOverlap(t *testing.T) {
