@@ -1,6 +1,7 @@
 """Protect the causal distinction and the existing approval boundaries."""
 import tempfile
 import unittest
+import evidence_revision
 from pathlib import Path
 import guardian_deadline as p
 import viewer_readiness as v
@@ -44,6 +45,10 @@ class GuardianDiagnosis(unittest.TestCase):
 
     def test_current_sealed_packet(self):
         self.assertEqual(p.validate(), [])
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

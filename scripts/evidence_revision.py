@@ -32,6 +32,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / 'scripts'
 REVISIONS = SCRIPTS / 'evidence-revisions.json'
+# Untracked build outputs a historical worktree borrows from this checkout.
+BUILD_OUTPUTS = ('bin', 'internal/system/viewer/web_assets/app')
 
 
 class RevisionUnavailable(RuntimeError):
@@ -66,9 +68,10 @@ def checkout(commit: str) -> Iterator[Path]:
         result = _git('worktree', 'add', '--detach', '--quiet', str(tree), commit)
         if result.returncode:
             raise RevisionUnavailable('cannot check out ' + commit + ': ' + result.stderr.strip())
-        # Built binaries are untracked; tests that run them use the current build.
-        if (ROOT / 'bin').is_dir():
-            (tree / 'bin').symlink_to(ROOT / 'bin')
+        # Build outputs are untracked; tests that run or hash them use the current build.
+        for output in BUILD_OUTPUTS:
+            if (ROOT / output).is_dir() and (tree / output).parent.is_dir():
+                (tree / output).symlink_to(ROOT / output)
         yield tree.resolve()
     finally:
         _git('worktree', 'remove', '--force', str(tree))
