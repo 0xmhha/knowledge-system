@@ -22,7 +22,6 @@ import (
 //     in schema 1.11. This was originally a documented gap; once
 //     the column landed this test gained the marker assertions.
 func TestPipelineMultilangV6Markers(t *testing.T) {
-	t.Parallel()
 	out := t.TempDir()
 	_, err := buildpipe.Run(buildpipe.Options{
 		SrcRoot:    "testdata/multilang_v6_markers",

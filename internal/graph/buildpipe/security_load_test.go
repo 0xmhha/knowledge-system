@@ -40,7 +40,6 @@ func TestLoadSecurityPatterns_MissingFile(t *testing.T) {
 // resolve fixture + a small security YAML, then inspects the SQLite
 // store to confirm rows landed under the new schema 1.15 slots.
 func TestSecurityIntegration_EndToEnd(t *testing.T) {
-	t.Parallel()
 	outDir := t.TempDir()
 
 	// One pattern matching the fixture's a.Greet, one that intentionally

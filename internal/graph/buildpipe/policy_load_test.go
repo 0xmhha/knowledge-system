@@ -49,7 +49,6 @@ func TestLoadPolicy_MissingFile(t *testing.T) {
 // public surface so the test can assert on row counts without round-
 // tripping through the MCP layer.
 func TestPolicyIntegration_EndToEnd(t *testing.T) {
-	t.Parallel()
 	outDir := t.TempDir()
 
 	// Drop a policy YAML alongside the build output. The governs[]

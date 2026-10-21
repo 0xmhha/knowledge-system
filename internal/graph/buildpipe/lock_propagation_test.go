@@ -16,7 +16,6 @@ import (
 // as the existing intra-function pass. Catches accidental
 // "default-on" drift before it reaches CI.
 func TestLockPropagation_DefaultOff_NoEmit(t *testing.T) {
-	t.Parallel()
 	off := buildAndQueryUnderLock(t, "testdata/lock_propagation", false)
 	on := buildAndQueryUnderLock(t, "testdata/lock_propagation", true)
 	if len(on) <= len(off) {
@@ -39,7 +38,6 @@ func TestLockPropagation_DefaultOff_NoEmit(t *testing.T) {
 // --lock-propagation the field's accessed_under_lock edge appears, and the
 // confidence is INFERRED (design §5.0 Q2 — all cross-fn emits are INFERRED).
 func TestLockPropagation_SingleHop(t *testing.T) {
-	t.Parallel()
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "SingleHop.value")
 	muID := findNodeIDBySuffix(nodes, "SingleHop.mu#mutex")
@@ -70,7 +68,6 @@ func TestLockPropagation_SingleHop(t *testing.T) {
 // label that signals "could not have been derived from a single function
 // body" doesn't degrade further as the chain lengthens.
 func TestLockPropagation_DeepChain(t *testing.T) {
-	t.Parallel()
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "DeepChain.value")
 	muID := findNodeIDBySuffix(nodes, "DeepChain.mu#mutex")
@@ -96,7 +93,6 @@ func TestLockPropagation_DeepChain(t *testing.T) {
 // could silently downgrade the cycle path's edge to AMBIGUOUS / EXTRACTED
 // while still passing the existence check.
 func TestLockPropagation_Cycle(t *testing.T) {
-	t.Parallel()
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "Cycle.value")
 	muID := findNodeIDBySuffix(nodes, "Cycle.mu#mutex")
@@ -118,7 +114,6 @@ func TestLockPropagation_Cycle(t *testing.T) {
 // can verify that the edge count for StdlibSkip-related accessed_under_lock
 // edges is exactly the intra-fn count (1, for the mu field itself).
 func TestLockPropagation_StdlibSkip(t *testing.T) {
-	t.Parallel()
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	muID := findNodeIDBySuffix(nodes, "StdlibSkip.mu#mutex")
 	if muID == "" {
@@ -152,7 +147,6 @@ func TestLockPropagation_StdlibSkip(t *testing.T) {
 // fn INFERRED label — confidence stays consistent with the other
 // propagation paths.
 func TestLockPropagation_NamedGoroutine(t *testing.T) {
-	t.Parallel()
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "GoroutineHolder.value")
 	muID := findNodeIDBySuffix(nodes, "GoroutineHolder.mu#mutex")
@@ -172,7 +166,6 @@ func TestLockPropagation_NamedGoroutine(t *testing.T) {
 // caller doesn't acquire any lock, the callee's field accesses produce
 // zero accessed_under_lock edges even via propagation.
 func TestLockPropagation_NoLockNoEdge(t *testing.T) {
-	t.Parallel()
 	edges, nodes := buildAndQueryFull(t, "testdata/lock_propagation", true)
 	valueID := findNodeIDBySuffix(nodes, "NoLockNoEdge.value")
 	if valueID == "" {
@@ -189,18 +182,13 @@ func TestLockPropagation_NoLockNoEdge(t *testing.T) {
 
 func buildAndQueryFull(t *testing.T, src string, lockProp bool) ([]types.Edge, []types.Node) {
 	t.Helper()
-	out := t.TempDir()
-	_, err := buildpipe.Run(buildpipe.Options{
+	out, _ := buildpipe.SharedColdBuild(t, buildpipe.Options{
 		SrcRoot:         src,
-		OutDir:          out,
 		Languages:       []string{"go"},
 		CKGVersion:      "test",
 		NoCache:         true,
 		LockPropagation: lockProp,
 	})
-	if err != nil {
-		t.Fatalf("Run: %v", err)
-	}
 	store, err := persist.OpenReadOnly(filepath.Join(out, "graph.db"))
 	if err != nil {
 		t.Fatalf("OpenReadOnly: %v", err)

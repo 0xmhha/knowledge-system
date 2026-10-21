@@ -50,11 +50,7 @@ func TestReviewTestFiles(t *testing.T) {
 
 // A cold build stores the review index.
 func TestColdBuildWritesReviewIndex(t *testing.T) {
-	t.Parallel()
-	out := t.TempDir()
-	if _, err := Run(Options{SrcRoot: "../parse/golang/testdata/resolve", OutDir: out, Languages: []string{"auto"}, CKGVersion: "test"}); err != nil {
-		t.Fatal(err)
-	}
+	out, _ := SharedColdBuild(t, Options{SrcRoot: "../parse/golang/testdata/resolve", Languages: []string{"auto"}, CKGVersion: "test"})
 	db, err := sql.Open("sqlite", "file:"+filepath.Join(out, "graph.db")+"?mode=ro")
 	if err != nil {
 		t.Fatal(err)

@@ -18,21 +18,15 @@ import (
 // buildManifestSkeleton sees nothing and returns "". The cold path must fill
 // EnrichDigest from the injected rows instead.
 func TestColdBuild_EnrichDigestSurfaced(t *testing.T) {
-	t.Parallel()
 	const fixture = "../parse/golang/testdata/resolve"
 
 	// Build A: no enrichment — EnrichDigest must be empty, GraphDigest is the
 	// baseline coordinate pin.
-	outA := t.TempDir()
-	mA, err := Run(Options{
+	_, mA := SharedColdBuild(t, Options{
 		SrcRoot:    fixture,
-		OutDir:     outA,
 		Languages:  []string{"auto"},
 		CKGVersion: "test",
 	})
-	if err != nil {
-		t.Fatalf("build without policy: %v", err)
-	}
 	if mA.EnrichDigest != "" {
 		t.Errorf("no-enrichment build EnrichDigest = %q, want empty", mA.EnrichDigest)
 	}
