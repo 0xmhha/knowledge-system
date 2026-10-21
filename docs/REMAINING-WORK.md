@@ -10,15 +10,17 @@
 
 단계91에서 실제 owner ack 이후 옛 구독 세대의 status channel 사용과 명시적 새 등록 세대 경계를 일반/race 16슬롯, 실제32노드로 관측했다([검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json)). 단계92에서는 남은 두 경로를 같은 규모로 관측했다. RPC 연결을 닫아 옛 세대를 끝낸 경로와, 같은 channel을 세대2로 다시 등록한 채 자연 60초 done broadcast를 맞는 경로다. 두 경로 모두 ack 후 같은 세대 사용은 0이다. 연결 종료는 8슬롯 모두 callback을 `rpcSub.Err()` 분기로 끝냈고 `notifier.Closed()` 분기는 0회다. delete 없이 ack한 대조군은 channel 사용 집계로는 드러나지 않고, install 직전 membership으로만 2슬롯 모두 드러났다. 가짜 ack는 0이다. [검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json)
 
+단계93에서는 Notify 직전에 잡힌 callback의 연결 종료와 타이머 전 gate 없는 연결 종료를 같은 규모로 관측했다. ack 후 같은 세대 사용은 0이다. Notify 도중 종료는 callback 종료가 `rpcSub.Err()` 4회, `notifier.Closed()` 4회로 나뉘어 두 분기를 모두 관측했다. gate 없는 종료는 8회 모두 `rpcSub.Err()`다. [검증 정본](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json)
+
 `scripts/` 시험 전체도 복구했다. 과거 단계 시험 110개 모듈은 기록된 증거 커밋의 임시 worktree에서 돌고, 그 뒤 패킷이 바뀌었으면 실패한다. 이전 머신 경로는 도구 이름과 저장소 상대 경로로 비교한다. KS 운영 Go 변경은 0이다. gate 없는 보편 동작과 독립 수용으로 승격하지 않는다.
 
-다음은 WI-V1의 진행 중 true 알림, Notify 도중 종료, gate 없는 transport close 세대 경로와 독립 oracle 준비다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
+다음은 WI-V1의 진행 중 true 알림 세대 경로와 독립 oracle 준비다. true 알림은 긴 체인과 동기화 도중 peer를 잃는 fixture가 먼저 필요하다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
 
 ## 전체13묶음 — 완료0/13
 
 |묶음|현재 남은 내용|
 |---|---|
-|WI-V1|최신 CKS 4역할·API 오류·native done/RPC Err overlap·ack 후 세대 경계·transport close/같은 channel timer 경로 확인; 진행 중 true 알림/Notify 도중 종료/gate 없는 transport close·승인 oracle/final HEAD·독립 티켓|
+|WI-V1|최신 CKS 4역할·API 오류·native done/RPC Err overlap·ack 후 세대 경계·transport close/같은 channel timer/Notify 도중 종료/gate 없는 종료 경로 확인; 진행 중 true 알림·승인 oracle/final HEAD·독립 티켓|
 |WI-V2|유한 후보 구별 완료; 독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|warm 쌍627회 보존; 독립 nonseed 관련성/잡음 정답·표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 부분은 사용자 보류|

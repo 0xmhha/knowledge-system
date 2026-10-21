@@ -1,0 +1,71 @@
+{
+  "purpose": "단계92 이후 남은 WI-V1 세대 경로 가운데 두 가지를 실제 owner ack 기준으로 관측한다: RPC callback이 done 상태를 client에 전달하는 Notify 직전에 연결이 닫힌 경우, 그리고 native timer 전에 gate 없이 연결이 닫힌 경우",
+  "requirement_source": "docs/spec-driven/MACHINE-HANDOFF.md 5절, CURRENT-HANDOFF.md 다음 작업, REMAINING-13-EXECUTION.json next (stage 92)",
+  "upstream_source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "execution_adapter": {
+    "reused": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/adapter (PREFLIGHT.json PASS); ks_adapter.py bytes unchanged",
+    "instrumentation": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/drivers/transport_instrument.py.gz, byte-identical",
+    "fresh_upstream_clone": "https://github.com/stable-net/go-stablenet.git at the pinned commit; the run driver re-checks the retained inventory",
+    "live_paths_committed": false
+  },
+  "trace_model": {
+    "inherited_from": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SPEC.json trace_model",
+    "added_events": [
+      "actual_transport_close_begin: emitted before rpc.Client.Close, because Close returns only after the server teardown",
+      "callback_notify_gate_observed / transport_teardown_settled / native_gate_release around the held Notify"
+    ]
+  },
+  "schedules": {
+    "notify-in-flight": {
+      "roles": [
+        "ORIGINAL",
+        "CAND-A",
+        "CAND-B",
+        "MUT-EARLY"
+      ],
+      "old_generation": "the native done broadcast is delivered; the selected RPC callback is held just before notifier.Notify; the connection is closed; a declared 500 ms settle lets the server teardown finish; the callback is released and returns to its select with both exit channels ready",
+      "callback_exit_route": "recorded, not forced; Go select chooses between ready cases at random",
+      "regeneration": "new RPC connection, same-channel generation 2 served by the install send, and a new eth_subscribe"
+    },
+    "transport-ungated": {
+      "roles": [
+        "ORIGINAL",
+        "CAND-A",
+        "CAND-B",
+        "MUT-STALE-ACK"
+      ],
+      "old_generation": "connection closed before the native timer with no gate; real owner ack",
+      "regeneration": "new RPC connection; same-channel generation 2 and a new RPC registration installed before the timer and kept across the natural 60s done broadcast"
+    }
+  },
+  "profiles": [
+    "general",
+    "race"
+  ],
+  "repetitions": 1,
+  "automatic_retries": 0,
+  "owned_nodes_per_slot": 2,
+  "native_timer_seconds": 60,
+  "expected": {
+    "post_ack_same_generation_uses": 0,
+    "notify_in_flight_exit": "either branch; notifier.Closed reachable",
+    "ungated_exit": "rpcSub.Err, since the server cancels subscriptions before closing the codec",
+    "stale_membership_at_reregistration": {
+      "MUT-STALE-ACK": "true",
+      "others": "false"
+    }
+  },
+  "out_of_scope": [
+    "progress (Syncing=true) notifications: at this commit the receiver must still have CurrentBlock < HighestBlock at the 60s timer, which needs a longer chain and a peer lost mid-sync",
+    "operational WBFT; legacy PoW ethash fixture",
+    "independent oracle, approved positive role, final HEAD"
+  ],
+  "acceptance_boundary": {
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "FINAL": 0,
+    "freeze": null,
+    "execution_allowed": false,
+    "D04": "미정"
+  }
+}

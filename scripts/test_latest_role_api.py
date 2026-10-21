@@ -3,6 +3,7 @@ import gzip
 import json
 import tempfile
 import unittest
+import evidence_revision
 from pathlib import Path
 import latest_role_api as x
 
@@ -45,6 +46,10 @@ class Evidence(unittest.TestCase):
 
     def test_formal_approval_not_inferred_from_errors(self):
         self.mutate('SUMMARY.json', lambda d: d.update(independent_approved=1, formal_completed=1, full12_requirement_acceptance=True))
+
+
+# Later stages changed inputs this packet binds; run at its recorded revision.
+load_tests = evidence_revision.tests(__file__)
 
 
 if __name__ == '__main__':

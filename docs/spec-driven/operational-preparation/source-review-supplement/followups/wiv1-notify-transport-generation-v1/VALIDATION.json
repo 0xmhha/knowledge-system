@@ -1,0 +1,41 @@
+{
+  "knowledge_checkout": {
+    "head": "13c08307 (stage 92) on branch feat/wiv1-notify-inflight-generation",
+    "verified_inputs": "retained overlays and wi4 subscription baseline read from the checkout"
+  },
+  "development_attempts": [
+    {
+      "name": "compile probe out1",
+      "result": "go vet exit 0 for all 5 roles on the first attempt",
+      "nodes_started": 0,
+      "log": "checks/compile-probe/out1.json.gz"
+    },
+    {
+      "name": "smoke1",
+      "result": "both slots exit 0; held Notify ended through callback_exit_transport_closed. Trace review found that on the ungated route actual_transport_closed was recorded after the callback exit and owner ack, because rpc.Client.Close returns after the server teardown",
+      "resolution": "the bridge emits actual_transport_close_begin before Close; the validator orders the close by that event",
+      "log": "checks/smoke/smoke1/"
+    },
+    {
+      "name": "smoke2",
+      "result": "both slots exit 0 with the close begin ordered before the callback exit",
+      "log": "checks/smoke/smoke2/"
+    }
+  ],
+  "matrix": {
+    "run": "run-nt1",
+    "planned": 16,
+    "attempted": 16,
+    "failed": 0,
+    "automatic_retries": 0,
+    "source_preserved": true
+  },
+  "validator": {
+    "script": "scripts/wiv1_notify_transport_generation.py",
+    "test": "scripts/test_wiv1_notify_transport_generation.py"
+  },
+  "not_run": [
+    "host make build/lint/test-race/manager-test (no KS Go change in this stage)",
+    "independent review"
+  ]
+}
