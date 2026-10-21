@@ -150,7 +150,17 @@ def check(root, protocol, ledger, require_frozen=False):
                 raise ValueError("current readiness scope or hash differs")
             if refreshed.get("kind") == "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance":
                 import guardian_deadline
-                errors.extend(guardian_deadline.validate(root, (root / refreshed["manifest"]).parent))
+                # The packet binds every source file, so later code changes
+                # move it; it is validated at the recorded source revision.
+                revision = protocol.get("current_readiness_source_revision")
+                if revision != ledger.get("current_readiness_source_revision"):
+                    errors.append("protocol/ledger current readiness source revisions differ")
+                elif revision is None:
+                    errors.extend(guardian_deadline.validate(root, (root / refreshed["manifest"]).parent))
+                else:
+                    import evidence_revision
+                    packet = str(Path(refreshed["manifest"]).parent)
+                    errors.extend(evidence_revision.recorded_errors(revision, "guardian_deadline", packet))
                 errors.extend(guardian_deadline.current_indices(root, protocol, ledger))
             elif refreshed.get("kind") == "CoreML_local_native_transport_CLI_default_regression_DEV_not_real_model_acceptance":
                 import coreml_readiness

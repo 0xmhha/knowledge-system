@@ -34,6 +34,15 @@ class PreparationGuardTests(unittest.TestCase):
     def errors(self, frozen=False):
         return guard.check(guard.ROOT, self.protocol, self.ledger, frozen)[0]
 
+    def test_current_readiness_source_revisions_must_agree(self):
+        self.ledger['current_readiness_source_revision'] = '0' * 40
+        self.assertIn('protocol/ledger current readiness source revisions differ', self.errors())
+
+    def test_current_readiness_source_revision_must_be_ancestor(self):
+        for value in (self.protocol, self.ledger):
+            value['current_readiness_source_revision'] = '0' * 40
+        self.assertTrue(any('not an ancestor' in e for e in self.errors()))
+
     def test_current_readiness_cannot_be_promoted(self):
         for value in (self.protocol,self.ledger):
             value['current_readiness_preparation']['kind']='operational_acceptance'

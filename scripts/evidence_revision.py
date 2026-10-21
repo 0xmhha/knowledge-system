@@ -16,6 +16,7 @@ commit, and a difference fails the module instead of being skipped. The commits 
 machine handoff restores first.
 """
 import contextlib
+import functools
 import importlib.abc
 import importlib.machinery
 import importlib.util
@@ -32,7 +33,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / 'scripts'
 REVISIONS = SCRIPTS / 'evidence-revisions.json'
-# Untracked build outputs a historical worktree borrows from this checkout.
+# Build outputs an older worktree lacks; it borrows them from this checkout.
 BUILD_OUTPUTS = ('bin', 'internal/system/viewer/web_assets/app')
 
 
@@ -68,10 +69,12 @@ def checkout(commit: str) -> Iterator[Path]:
         result = _git('worktree', 'add', '--detach', '--quiet', str(tree), commit)
         if result.returncode:
             raise RevisionUnavailable('cannot check out ' + commit + ': ' + result.stderr.strip())
-        # Build outputs are untracked; tests that run or hash them use the current build.
+        # Tests that run or hash build outputs use the current build when the
+        # recorded commit did not track them.
         for output in BUILD_OUTPUTS:
-            if (ROOT / output).is_dir() and (tree / output).parent.is_dir():
-                (tree / output).symlink_to(ROOT / output)
+            target = tree / output
+            if (ROOT / output).is_dir() and target.parent.is_dir() and not target.exists():
+                target.symlink_to(ROOT / output)
         yield tree.resolve()
     finally:
         _git('worktree', 'remove', '--force', str(tree))
@@ -90,6 +93,27 @@ def unchanged(commit: str, paths: list[str]) -> None:
             raise RevisionUnavailable(path + ' is absent at ' + commit)
         if _git('diff', '--quiet', '--diff-filter=MDT', commit, '--', path).returncode:
             raise RevisionUnavailable(path + ' differs from the evidence verified at ' + commit)
+
+
+@functools.cache
+def recorded_errors(commit: str, module: str, packet: str) -> tuple[str, ...]:
+    """Return module.validate() errors as run by its own code at commit.
+
+    A validator that binds the live tree is checked where it last passed: the
+    commit must be an ancestor of HEAD and the packet unmodified since then.
+    """
+    if _git('merge-base', '--is-ancestor', commit, 'HEAD').returncode:
+        return (commit + ' is not an ancestor of the checkout',)
+    try:
+        unchanged(commit, [packet])
+        with checkout(commit) as tree:
+            code = 'import json, ' + module + ' as m; print(json.dumps(m.validate()))'
+            result = subprocess.run([sys.executable, '-c', code], cwd=tree / 'scripts', capture_output=True, text=True, timeout=1800)
+    except RevisionUnavailable as e:
+        return (str(e),)
+    if result.returncode:
+        return (module + ' failed at ' + commit + ': ' + result.stderr.strip()[-500:],)
+    return tuple(json.loads(result.stdout.splitlines()[-1]))
 
 
 def _restore(tree: Path, commit: str, paths: list[str]) -> None:

@@ -60,6 +60,8 @@ make build
 
 venv는 저장소 밖에 만든다. `.gitignore`는 현재 검증기 여러 개가 바인딩한 입력이라 venv 때문에 바꾸지 않는다.
 
+운영 수용 문서의 현재 준비 근거(guardian 패킷)는 Go 파일 전체와 CI workflow의 해시를 묶는다. 그래서 코드가 바뀌면 살아 있는 트리와 맞지 않는다. 두 문서의 `current_readiness_source_revision`에 패킷이 마지막으로 통과한 main 커밋을 적었다. 검사기는 그 커밋이 HEAD의 조상이고 패킷이 그 뒤로 바뀌지 않았는지 확인한 뒤, 그 커밋의 worktree에서 그때 코드로 패킷을 검증한다(2026-10-21, CI 수정 뒤).
+
 - 외부 모듈은 [고정 목록](../../scripts/requirements.txt)의 jsonschema와 PyYAML뿐이다. 보존 패킷이 PyYAML 6.0을 parser 버전으로 기록했으므로 같은 버전을 쓴다. Python 3.12용 wheel이 없어 소스에서 빌드한다.
 - `check-lexical-coverage.py`는 PATH의 `go`를 `GOTOOLCHAIN=local`로 실행한다. PATH의 `go`가 go.mod의 Go 1.25.13 이상이어야 한다. 1.25.12를 두면 87건이 버전 오류로 실패한다.
 - Go 1.23.12 native 증거를 다시 계산하는 시험은 `KS_GO1_23_ROOT`(기본 `~/.gvm/gos/go1.23.12`)의 SDK를 쓴다. 기록된 이전 머신 경로는 [위치 대응](../../scripts/recorded_locations.py)이 도구 이름으로 바꾸고, 바이너리 해시는 기록과 비교한다.
