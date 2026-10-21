@@ -139,6 +139,43 @@ def verify_ontology_progress(ledger, worklist, live_spec, allowed, original_rema
     return partial
 
 
+def verify_source_binding(active):
+    """Check the active source binding and return its bound source digests.
+
+    Without "source_revision" the binding must match the live tree. With it,
+    the binding is checked at that commit, which must be an ancestor of HEAD:
+    the binding then records what was verified there, and later code changes
+    do not invalidate it.
+    """
+    manifest = json.loads(recorded(active["revision"], active["manifest"]))
+    sources = manifest["source_sha256"]
+    revision = active.get("source_revision")
+    if revision is None:
+        def content(path):
+            return (ROOT / path).read_bytes() if (ROOT / path).is_file() else None
+        inventory = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "*.go"],
+                                            cwd=ROOT, text=True)
+        place = "current"
+    else:
+        require(subprocess.run(["git", "merge-base", "--is-ancestor", revision, "HEAD"], cwd=ROOT,
+                               capture_output=True).returncode == 0,
+                f"source binding revision {revision} is not an ancestor of HEAD")
+
+        def content(path):
+            try:
+                return recorded(revision, path)
+            except subprocess.CalledProcessError:
+                return None
+        inventory = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", revision], cwd=ROOT, text=True)
+        place = revision
+    for path, digest in {**sources, **manifest["approved_input_sha256"]}.items():
+        data = content(path)
+        require(data is not None and sha(data) == digest, f"unverified {place} source/input change: {path}")
+    bound = {p for p in inventory.splitlines() if p.startswith(("cmd/", "internal/", "pkg/")) and p.endswith(".go")}
+    require(bound == {p for p in sources if p.endswith(".go")}, "source inventory changed without new binding")
+    return sources
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ledger", type=Path, default=ROOT / "docs/spec-driven/REFACTORING-PROGRESS.json")
@@ -160,15 +197,7 @@ def main():
             verify_manifest(task)
         else:
             partial += verify_partial_checks(task, live_spec)
-    active = ledger["active_source_binding"]
-    manifest = json.loads(recorded(active["revision"], active["manifest"]))
-    sources = manifest["source_sha256"]
-    for path, digest in {**sources, **manifest["approved_input_sha256"]}.items():
-        require((ROOT / path).is_file() and sha((ROOT / path).read_bytes()) == digest,
-                f"unverified current source/input change: {path}")
-    inventory = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "*.go"], cwd=ROOT, text=True)
-    live = {p for p in inventory.splitlines() if p.startswith(("cmd/", "internal/", "pkg/"))}
-    require(live == {p for p in sources if p.endswith(".go")}, "source inventory changed without new binding")
+    sources = verify_source_binding(ledger["active_source_binding"])
     remaining = [t["id"] for t in tasks if t["state"] != "complete"]
     require(ledger["next_task"] in remaining, "next task is already marked complete")
     require(f"{len(done)}/18" in worklist and f"{len(remaining)}개" in worklist, "progress counts drifted")

@@ -92,6 +92,27 @@ class PartialCompletionTests(unittest.TestCase):
                     progress.verify_partial_checks(task, self.live)
 
 
+# Changes ci.yml and buildpipe tests that the active binding hashes.
+BINDING_DRIFT_REVISION = "d3bf35b5745ff74a3bae2d00b4c5b0f334575c2b"
+
+
+class SourceBindingTests(unittest.TestCase):
+    def binding(self, **change):
+        ledger = json.loads((ROOT / "docs/spec-driven/REFACTORING-PROGRESS.json").read_text())
+        return {**ledger["active_source_binding"], **change}
+
+    def test_binding_is_checked_at_its_source_revision(self):
+        self.assertEqual(len(progress.verify_source_binding(self.binding())), 1823)
+
+    def test_source_revision_must_be_an_ancestor(self):
+        with self.assertRaisesRegex(ValueError, "not an ancestor"):
+            progress.verify_source_binding(self.binding(source_revision="0" * 40))
+
+    def test_source_revision_must_match_the_binding(self):
+        with self.assertRaisesRegex(ValueError, "unverified " + BINDING_DRIFT_REVISION + " source/input change"):
+            progress.verify_source_binding(self.binding(source_revision=BINDING_DRIFT_REVISION))
+
+
 class OntologyProgressTests(unittest.TestCase):
  def fixture(self):
   tasks=[{"id":f"O-{i:02d}","state":"pending"}for i in range(1,5)]
