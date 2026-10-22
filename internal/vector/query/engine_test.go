@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/0xmhha/knowledge-system/internal/testgit"
 	"github.com/0xmhha/knowledge-system/internal/vector/build"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
 	"github.com/0xmhha/knowledge-system/internal/vector/footprint"
@@ -28,6 +29,9 @@ func buildSample(t *testing.T) (out, src string) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// A committed copy gives the build a HEAD to record that does not come
+	// from this repository's history.
+	srcAbs = testgit.CommittedCopy(t, srcAbs)
 	outDir := t.TempDir()
 	_, err = build.Run(context.Background(), build.Options{
 		SrcRoot:  srcAbs,

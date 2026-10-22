@@ -45,3 +45,27 @@ func TestUseRepositoryLiftsTheCeiling(t *testing.T) {
 		t.Fatalf("enclosing repository not found after UseRepository: %v", err)
 	}
 }
+
+func TestCommittedCopyHasItsOwnHead(t *testing.T) {
+	src := t.TempDir()
+	if err := os.WriteFile(filepath.Join(src, "a.txt"), []byte("a\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	first, second := CommittedCopy(t, src), CommittedCopy(t, src)
+	head := func(dir string) string {
+		out, err := exec.Command("git", "-C", dir, "rev-parse", "HEAD").Output()
+		if err != nil {
+			t.Fatalf("rev-parse HEAD in %s: %v", dir, err)
+		}
+		return string(out)
+	}
+	if head(first) != head(second) {
+		t.Errorf("copies of the same fixture have different HEADs")
+	}
+	if _, err := os.Stat(filepath.Join(first, "a.txt")); err != nil {
+		t.Errorf("fixture file not copied: %v", err)
+	}
+	if err := exec.Command("git", "-C", first, "diff", "--quiet", "HEAD").Run(); err != nil {
+		t.Errorf("copy has uncommitted changes: %v", err)
+	}
+}
