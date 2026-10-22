@@ -21,7 +21,7 @@
 
 ## 다음 작업
 
-WI-V1의 세대 경로 관측은 이번 단계로 요청 범위를 마쳤다. 남은 것은 독립 ticket/oracle 준비, 승인된 실제 역할 양성 경로와 최종 HEAD다.
+WI-V1의 세대 경로 관측은 단계94로 요청 범위를 마쳤다. 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 인용 36개는 모두 봉인된 패킷 manifest와 요약값에 결속되고, 새 근거가 있는 계약은 11개, 없는 계약은 LATE-DRAIN 1개다. 충족·독립 승인으로 올린 계약은 0개다. 남은 독립 ticket/oracle·완전 정답·매칭·반복 충분성과 승인된 실제 역할 양성 경로·최종 HEAD는 D04 익명 검토 역할이 정해져야 진행할 수 있다.
 
 ## 남은 전체13묶음 — 상위 완료0/13·정식0/9
 

@@ -1,0 +1,533 @@
+{
+  "schema_version": 1,
+  "kind": "WI_V1_full12_evidence_rebinding_AI_review_not_independent_acceptance",
+  "review_date": "2026-10-22",
+  "purpose": "단계90~94의 실제 경로 관측을 12계약별로 다시 묶어, 독립 검토자가 계약마다 어떤 근거가 있고 무엇이 남았는지 한 곳에서 보게 한다. AI 검토이며 독립 승인이 아니다.",
+  "requirements_source": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/ticket-dev-gold-v1/private/requirements.json",
+    "sha256": "b2ec9a949aa7349dbbdfd4684d34f04c08d5a5aff61f4d3186e4eb7b3f7609bf"
+  },
+  "previous_review": {
+    "path": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-contract-consumer-review-v1/REVIEW.json",
+    "sha256": "cbda4b02df444008a4b8cedfcb61e8d831cf1cf2145c451fdf97030ab9daa9b5"
+  },
+  "source_revision": "4080dd135f1392a46e0f366fff4fffafd50ef5ac",
+  "requirements": [
+    {
+      "id": "API-ENTRY",
+      "tier": "actual_API",
+      "assertion": "On a subscription-capable transport, eth_subscribe with syncing reaches the registered DownloaderAPI.Syncing callback for the bound source and returns the same session's subscription id.",
+      "unknown": "Registry inspection or an extracted method cannot establish transport setup, actual callback execution or source identity at runtime.",
+      "previous_remaining": "모든 후보·실제 RPC callback·blocked 일정이 하나의 trace와 최종 HEAD로 연결된 것은 아니다.",
+      "evidence": [
+        {
+          "packet": "factory-native-overlap-v1",
+          "manifest_sha256": "5ce44923cd02fdd534ef2b9c7efb2ce852fabe502faaea166bb500095f463d0e",
+          "summary_fields": {
+            "actual_slots": 10,
+            "actual_peer_syncs": 10
+          },
+          "relevance": "원래 60초 done broadcast와 같은 RPC callback을 실제 peer 동기화 10슬롯에서 연결"
+        },
+        {
+          "packet": "wiv1-generation-boundary-v1",
+          "manifest_sha256": "9843807d91fe569ce89d6e2d581d2a1466159de283d6a07791ea5fa5d1814efb",
+          "summary_fields": {
+            "actual_slots": 16,
+            "unique_build_roles": 5
+          },
+          "relevance": "eth_subscribe 응답 id로 factory 구독을 고르고 callback 실행 관측"
+        },
+        {
+          "packet": "wiv1-transport-timer-generation-v1",
+          "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+          "summary_fields": {
+            "actual_slots": 16,
+            "unique_build_roles": 5
+          },
+          "relevance": "같은 선택 방식"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "actual_slots": 16,
+            "unique_build_roles": 5
+          },
+          "relevance": "같은 선택 방식"
+        },
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "actual_slots": 16,
+            "unique_build_roles": 5
+          },
+          "relevance": "같은 선택 방식"
+        },
+        {
+          "packet": "latest-four-role-api-v1",
+          "manifest_sha256": "03dd0cbfd77b85f8fc44ce7a82a177d29351e30be7568de90e22c2c9aa1412df",
+          "summary_fields": {
+            "actual_roles": 4,
+            "rpc_nodes": 10
+          },
+          "relevance": "최신 CKS 실제4역할과 RPC 노드"
+        }
+      ],
+      "covered_now": "실제 eth_subscribe 응답 id로 같은 downloader·blockchain·mux를 감싼 factory API의 구독을 골랐고, 그 Syncing callback 실행을 74슬롯(단계90 10, 단계91~94 각 16)에서 관측했다. 단계90은 blocked 일정과 callback을 한 trace에 연결했다.",
+      "remaining": "최종 agent HEAD와 승인 oracle의 실제 성공 경로 연결, 독립 반복 충분성이 남았다. legacy PoW fixture이며 운영 WBFT 검증이 아니다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "API-UNSUB",
+      "tier": "actual_API",
+      "assertion": "eth_unsubscribe for a known id closes that server subscription error channel and removes its registry entry; true response is distinct from downstream deferred Unsubscribe completion.",
+      "unknown": "Do not require downstream completion before the RPC true response; source handler does not wait for it.",
+      "previous_remaining": "RPC true/registry 삭제와 내부 deferred Unsubscribe 반환의 시각·객체를 같은 trace로 연결해야 한다. peer 시험은 client error channel close를 명시 관측하지 않았다.",
+      "evidence": [
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "old_generation_end": {
+              "RPC_unsubscribe": 16
+            },
+            "progress_sends_to_old_generation": 16
+          },
+          "relevance": "같은 객체·channel에서 eth_unsubscribe 시작→callback rpcSub.Err→지연 Unsubscribe→owner 삭제·ack→반환을 한 trace에 기록"
+        },
+        {
+          "packet": "wiv1-generation-boundary-v1",
+          "manifest_sha256": "9843807d91fe569ce89d6e2d581d2a1466159de283d6a07791ea5fa5d1814efb",
+          "summary_fields": {
+            "rpc_true_before_old_ack": 16
+          },
+          "relevance": "RPC true가 옛 세대 owner ack보다 먼저 옴"
+        }
+      ],
+      "covered_now": "단계94는 16슬롯마다 같은 구독 객체와 channel에서 eth_unsubscribe 시작, callback의 rpcSub.Err 종료, 지연 Unsubscribe 진입, owner 삭제와 ack, 반환 순서를 한 trace에 남겼다. 단계91은 RPC true가 옛 세대 owner ack보다 먼저 오는 것을 16슬롯에서 확인했다. true 응답이 내부 완료를 기다리지 않는다는 원문 조건과 맞는다.",
+      "remaining": "client 쪽 error channel close는 따로 관측하지 않았다. 서버 registry 삭제는 rpcSub.Err 신호로만 간접 확인했다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "API-NEGATIVE",
+      "tier": "actual_API",
+      "assertion": "Unsupported subscription transport, malformed or unknown subscription names and unknown unsubscribe ids preserve their actual errors and do not count as symptom RED.",
+      "unknown": "Error shape/version and concrete transport receipt must be pinned; missing API execution is unknown.",
+      "previous_remaining": "unsupported transport·malformed/unknown name·unknown id 전체 오류 형태를 실제 factory/후보/고정 버전에서 연결 검증해야 한다. 오류는 symptom RED가 아니다.",
+      "evidence": [
+        {
+          "packet": "latest-four-role-api-v1",
+          "manifest_sha256": "03dd0cbfd77b85f8fc44ce7a82a177d29351e30be7568de90e22c2c9aa1412df",
+          "summary_fields": {
+            "rpc_negative_cases": 120,
+            "rpc_unique_source_variants": 4,
+            "mcp_negative_or_uncertain_cases": 35
+          },
+          "relevance": "선언 오류12종×5역할×일반/race와 MCP 음성·불확실 사례"
+        }
+      ],
+      "covered_now": "최신 CKS 실제4역할 시험에서 선언한 오류 12종을 5역할·일반/race로 120건 관측했고 MCP 35건을 따로 보존했다. 오류는 symptom RED로 세지 않았다.",
+      "remaining": "선언한 12종 밖의 transport·이름·버전은 범위 밖이다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "METHOD-RETURN",
+      "tier": "bounded_method",
+      "assertion": "In the stated finite live-event-loop schedules, every started call returns after verified downstream acknowledgement; no successful completion may be inferred from rescue.",
+      "unknown": "No unconditional timeout guarantee, event-loop shutdown behavior or infinite status-producer fairness contract is established.",
+      "previous_remaining": "finite live-loop 조건이며 임의 스케줄·종료 중 event loop·무한 producer fairness·독립 반복 충분성은 증명하지 않았다.",
+      "evidence": [
+        {
+          "packet": "factory-native-overlap-v1",
+          "manifest_sha256": "5ce44923cd02fdd534ef2b9c7efb2ce852fabe502faaea166bb500095f463d0e",
+          "summary_fields": {
+            "drain_real_owner_ack_observations": 4,
+            "early_return_observations": 2
+          },
+          "relevance": "blocked 일정의 drain 뒤 실제 delete/ack 다음 반환과 early 반환"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "owned_manual_uninstalls": 6
+          },
+          "relevance": "MUT-EARLY 세대별 manual 정리"
+        },
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "owned_manual_uninstalls": 6
+          },
+          "relevance": "MUT-EARLY 세대별 manual 정리"
+        }
+      ],
+      "covered_now": "단계90 blocked 일정에서 A/B가 drain한 뒤 실제 delete/ack 다음에 반환했다. 단계91~94의 비차단 경로에서는 ORIGINAL·A·B가 모두 실제 ack 뒤 반환했다. MUT-EARLY는 요청 없이 반환해 세대마다 소유 manual uninstall로 정리했고 성공으로 세지 않았다.",
+      "remaining": "유한 live-loop 일정에 한정한다. 임의 스케줄·종료 중 event loop·무한 producer fairness·독립 반복 충분성은 증명하지 않았다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "METHOD-ONCE",
+      "tier": "bounded_method",
+      "assertion": "All concurrent calls on this exact subscription object share one uninstall request and do not return before its Once body completes.",
+      "unknown": "Different subscription objects are distinct request populations; shared channel or equal names alone do not prove object identity.",
+      "previous_remaining": "객체/채널/등록 세대 구분과 개별 호출 전원 join을 새 표본에서도 확인해야 한다. 0개 요청인 early mutant는 성공이 아니다.",
+      "evidence": [
+        {
+          "packet": "wiv1-generation-boundary-v1",
+          "manifest_sha256": "9843807d91fe569ce89d6e2d581d2a1466159de283d6a07791ea5fa5d1814efb",
+          "summary_fields": {
+            "same_channel_generation2_deliveries": 8,
+            "new_rpc_registration_deliveries": 16
+          },
+          "relevance": "같은 channel 세대2와 다른 channel 새 등록을 세대 번호로 구분"
+        },
+        {
+          "packet": "wiv1-transport-timer-generation-v1",
+          "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+          "summary_fields": {
+            "same_channel_generation2_deliveries": 16,
+            "new_rpc_registration_deliveries": 16
+          },
+          "relevance": "같은 channel 세대2와 다른 channel 새 등록을 세대 번호로 구분"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "same_channel_generation2_deliveries": 16,
+            "new_rpc_registration_deliveries": 16
+          },
+          "relevance": "같은 channel 세대2와 다른 channel 새 등록을 세대 번호로 구분"
+        },
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "new_rpc_registration_deliveries": 16
+          },
+          "relevance": "같은 channel 세대2와 다른 channel 새 등록을 세대 번호로 구분"
+        }
+      ],
+      "covered_now": "같은 channel 재등록(세대2)과 다른 channel의 새 RPC 등록을 세대 번호로 구분했고, 각 등록이 따로 실제 ack를 받았다.",
+      "remaining": "같은 구독 객체에 대한 동시 Unsubscribe 호출이 요청 하나를 공유하는지는 시험하지 않았다. 요청이 0개인 early mutant는 성공이 아니다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "METHOD-REMOVE",
+      "tier": "bounded_method",
+      "assertion": "The event loop removes the subscribed status channel before closing this request's acknowledgement.",
+      "unknown": "A closed acknowledgement generated by an arbitrary fake does not prove real map removal.",
+      "previous_remaining": "관찰 hook/gate가 타이밍에 영향을 준다. 실제 RPC overlap과 모든 후보의 무계측 보편 보장은 별도다.",
+      "evidence": [
+        {
+          "packet": "wiv1-transport-timer-generation-v1",
+          "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+          "summary_fields": {
+            "stale_membership_at_reregistration": {
+              "ORIGINAL": 0,
+              "CAND-A": 0,
+              "CAND-B": 0,
+              "MUT-STALE-ACK": 2
+            }
+          },
+          "relevance": "삭제 없이 ack하는 대조군이 재등록 직전 membership으로 드러남"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "stale_membership_at_reregistration": {
+              "ORIGINAL": 0,
+              "CAND-A": 0,
+              "CAND-B": 0,
+              "MUT-STALE-ACK": 2
+            }
+          },
+          "relevance": "삭제 없이 ack하는 대조군이 재등록 직전 membership으로 드러남"
+        },
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "stale_membership_at_reregistration": {
+              "ORIGINAL": 0,
+              "CAND-A": 0,
+              "CAND-B": 0,
+              "MUT-STALE-ACK": 2
+            }
+          },
+          "relevance": "삭제 없이 ack하는 대조군이 재등록 직전 membership으로 드러남"
+        }
+      ],
+      "covered_now": "대조군이 아닌 역할은 모든 슬롯에서 owner가 channel을 지운 뒤 ack를 닫았다. 삭제 없이 ack하는 MUT-STALE-ACK 대조군은 재등록 직전 membership true로 매번 드러났다(단계92~94 각 2/2).",
+      "remaining": "계측 hook가 타이밍에 영향을 준다. 무계측 보편 보장은 주장하지 않는다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "METHOD-ACK",
+      "tier": "bounded_method",
+      "assertion": "No Unsubscribe call returns before this object's acknowledgement; after acknowledged deletion no later status-channel use is permitted by the method comment.",
+      "unknown": "Observe channel use, not just delivered messages; zero observed messages with incomplete instrumentation is unknown.",
+      "previous_remaining": "옛 구독·새 등록 전의 모든 channel-use 부재를 완전 계측으로 관측한 것은 아니다. 새 등록을 영구 금지하는 기준으로 바꾸지 않는다.",
+      "evidence": [
+        {
+          "packet": "wiv1-generation-boundary-v1",
+          "manifest_sha256": "9843807d91fe569ce89d6e2d581d2a1466159de283d6a07791ea5fa5d1814efb",
+          "summary_fields": {
+            "post_ack_same_generation_uses_non_control": 0,
+            "all_post_ack_channel_use_in_api_sites": true
+          },
+          "relevance": "overlap·timer 일정"
+        },
+        {
+          "packet": "wiv1-transport-timer-generation-v1",
+          "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+          "summary_fields": {
+            "post_ack_same_generation_uses": 0
+          },
+          "relevance": "transport close·같은 channel timer"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "post_ack_same_generation_uses": 0
+          },
+          "relevance": "Notify 도중 종료·gate 없는 종료"
+        },
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "post_ack_same_generation_uses": 0
+          },
+          "relevance": "진행 중 progress 유지·progress 뒤 done"
+        }
+      ],
+      "covered_now": "api.go의 모든 status channel 사용 지점을 계측한 상태에서 일정 8가지(단계91 overlap·timer, 단계92 transport close·같은 channel timer, 단계93 Notify 도중 종료·gate 없는 종료, 단계94 progress 유지·progress 뒤 done)의 64슬롯 모두 ack 후 같은 세대 사용이 0이었다.",
+      "remaining": "stale 항목이 같은 키로 합쳐지면 channel 사용만으로는 위반을 볼 수 없어 membership 관측이 필요하다. 보편 주장이 아니며 새 등록을 금지하는 기준으로 바꾸지 않는다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "NORMAL-DELIVERY",
+      "tier": "bounded_method",
+      "assertion": "Normal live subscription notification remains observable before cancellation and normal unsubscribe preserves removal/ack/return order.",
+      "unknown": "The extracted producer is not a real syncing-progress source or RPC notifier.",
+      "previous_remaining": "post-done 직접 호출과 native broadcast 중 실제 RPC callback 종료 overlap은 같은 증거가 아니다. source/notification/id 연결이 필요하다.",
+      "evidence": [
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "progress_broadcasts_to_generation2": 8,
+            "done_after_progress_to_generation2": 8,
+            "stalled_current_block_range": [
+              384,
+              1022
+            ]
+          },
+          "relevance": "실제 진행 중 progress와 그 뒤 done 전달"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "callback_exit_routes": {
+              "notify-in-flight": {
+                "callback_exit_rpc_error": 4,
+                "callback_exit_transport_closed": 4
+              },
+              "transport-ungated": {
+                "callback_exit_rpc_error": 8,
+                "callback_exit_transport_closed": 0
+              }
+            },
+            "notifier_closed_branch_reached": true
+          },
+          "relevance": "done 전달 중 Notify 직전 callback 종료"
+        }
+      ],
+      "covered_now": "단계94에서 실제 downloader의 진행 중 progress가 원래 60초 타이머로 옛 세대와 새 등록에 전달됐고 client가 syncing:true를 받았다. 이전 미지 조건(추출한 producer는 실제 syncing source가 아니다)을 실제 source 관측으로 대신한다. 단계93은 done 전달 중 Notify 직전에 callback이 끝나는 겹침을 관측했다.",
+      "remaining": "트랜잭션 색인이 덜 끝나서 생기는 true와 snap sync는 시험하지 않았다. legacy PoW만 관측했다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "LATE-DRAIN",
+      "tier": "bounded_method",
+      "assertion": "A finite status offered after uninstall registration but before acknowledgement can be drained without premature return.",
+      "unknown": "An infinite competing stream cannot justify deterministic fairness or immediate registration/ack selection.",
+      "previous_remaining": "승인된 실제4/별도통제1로 판정한다. 실제 owner에서 도달 불가능한 중간 송신을 인위적으로 넣거나 통제 증거를 실제 owner 증거로 승격하지 않는다.",
+      "evidence": [],
+      "covered_now": "단계90~94는 이 계약의 새 근거가 아니다.",
+      "remaining": "승인된 실제4/별도통제1로 판정한다. 실제 owner에서 도달 불가능한 중간 송신을 인위적으로 넣거나 통제 증거를 실제 owner 증거로 승격하지 않는다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "BLOCKED-DELIVERY",
+      "tier": "bounded_method",
+      "assertion": "When the same event loop is blocked on this exact sole receiver's unbuffered status, a candidate can drain while offering uninstall and then await acknowledgement.",
+      "unknown": "Only an actual callback/close trace can establish the production overlap; the conditional wait graph alone does not.",
+      "previous_remaining": "native timer broadcast·실제 Syncing RPC callback 종료·동일 객체의 overlap은 미완이다. peer sync 성공만으로 이 조건을 충족했다고 볼 수 없다.",
+      "evidence": [
+        {
+          "packet": "factory-native-overlap-v1",
+          "manifest_sha256": "5ce44923cd02fdd534ef2b9c7efb2ce852fabe502faaea166bb500095f463d0e",
+          "summary_fields": {
+            "paired_send_observations": 4,
+            "gate_controls_schedule": true
+          },
+          "relevance": "선언 gate 아래 done broadcast와 callback 종료 연결"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "notify_in_flight_tested": true
+          },
+          "relevance": "Notify 도중 종료"
+        }
+      ],
+      "covered_now": "단계90에서 원래 60초 done broadcast, 같은 RPC callback의 Err 종료, 지연 Unsubscribe와 owner delete/ack를 선언한 gate 아래 10슬롯으로 연결했다.",
+      "remaining": "gate 없는 확률·공정성은 주장하지 않는다. peer 동기화 성공만으로 이 조건을 충족했다고 보지 않는다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "OWNED-CLEANUP",
+      "tier": "all_tiers",
+      "assertion": "Observe before rescue, then release only owned gates and join all owned goroutines, timers, transports and processes; cleanup error is retained separately.",
+      "unknown": "No permission to stop pre-existing or external nodes; fixture cancellation is not production loop shutdown support.",
+      "previous_remaining": "rescue는 후보 성공이 아니다. 이전 실패와 package-init goroutine 개별 join 제한을 보존하며 새 실행도 종료/복구 증거를 남겨야 한다.",
+      "evidence": [
+        {
+          "packet": "factory-native-overlap-v1",
+          "manifest_sha256": "5ce44923cd02fdd534ef2b9c7efb2ce852fabe502faaea166bb500095f463d0e",
+          "summary_fields": {
+            "owned_status_drain_rescues": 6,
+            "fake_acknowledgements": 0
+          },
+          "relevance": "rescue와 가짜 ack 분리"
+        },
+        {
+          "packet": "wiv1-generation-boundary-v1",
+          "manifest_sha256": "9843807d91fe569ce89d6e2d581d2a1466159de283d6a07791ea5fa5d1814efb",
+          "summary_fields": {
+            "owned_manual_uninstalls": 6,
+            "fake_acknowledgements": 0
+          },
+          "relevance": "manual 정리 횟수와 가짜 ack"
+        },
+        {
+          "packet": "wiv1-transport-timer-generation-v1",
+          "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+          "summary_fields": {
+            "owned_manual_uninstalls": 6,
+            "fake_acknowledgements": 0
+          },
+          "relevance": "manual 정리 횟수와 가짜 ack"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "owned_manual_uninstalls": 6,
+            "fake_acknowledgements": 0
+          },
+          "relevance": "manual 정리 횟수와 가짜 ack"
+        },
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "owned_manual_uninstalls": 6,
+            "fake_acknowledgements": 0
+          },
+          "relevance": "manual 정리 횟수와 가짜 ack"
+        }
+      ],
+      "covered_now": "모든 단계가 관측을 고정한 뒤에만 소유 gate를 풀고 rescue를 따로 셌다. 가짜 ack는 0이고, 단계마다 남은 소유 프로세스 0을 CLEANUP.json에 남겼다.",
+      "remaining": "rescue는 후보 성공이 아니다. package-init goroutine 개별 join 제한은 그대로다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    },
+    {
+      "id": "SOURCE-BOUNDARY",
+      "tier": "all_tiers",
+      "assertion": "Bind original commit/full file, candidate full-file overlay and exact method diff, driver, requirements and public prompt hashes; prove actual tier and normal/mutant results for those bytes.",
+      "unknown": "A method SHA or candidate name is not an applied commit/tree, actual binary or final agent HEAD receipt.",
+      "previous_remaining": "기존 실제 4역할의 CKS는 49197f0f이며 최신 고정 소스 87fed3d9가 아니다. 최종 agent HEAD와 승인 oracle의 실제 성공 경로 연결이 남았다.",
+      "evidence": [
+        {
+          "packet": "wiv1-generation-boundary-v1",
+          "manifest_sha256": "9843807d91fe569ce89d6e2d581d2a1466159de283d6a07791ea5fa5d1814efb",
+          "summary_fields": {
+            "unique_build_roles": 5
+          },
+          "relevance": "원본 커밋·전체 파일·overlay·Git tree·바이너리·driver 해시 결속"
+        },
+        {
+          "packet": "wiv1-transport-timer-generation-v1",
+          "manifest_sha256": "fe39688a0c3bfbe504fd6d211cf1117324d4d530d01c9c7c675e4e3e42b829a3",
+          "summary_fields": {
+            "unique_build_roles": 5
+          },
+          "relevance": "원본 커밋·전체 파일·overlay·Git tree·바이너리·driver 해시 결속"
+        },
+        {
+          "packet": "wiv1-notify-transport-generation-v1",
+          "manifest_sha256": "92b543c22ab8e8b5570016925691f04fdeb4127ab125c9bfa4c32035d61622ca",
+          "summary_fields": {
+            "unique_build_roles": 5
+          },
+          "relevance": "원본 커밋·전체 파일·overlay·Git tree·바이너리·driver 해시 결속"
+        },
+        {
+          "packet": "wiv1-progress-true-generation-v1",
+          "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+          "summary_fields": {
+            "unique_build_roles": 5
+          },
+          "relevance": "원본 커밋·전체 파일·overlay·Git tree·바이너리·driver 해시 결속"
+        }
+      ],
+      "covered_now": "단계91~94는 원본 커밋·전체 파일·후보 overlay·Git tree·바이너리·driver 해시를 패킷마다 결속했다. 단계94는 원본 clone 목록이 보존 고정 트리와 같은지도 확인한다.",
+      "remaining": "최종 agent HEAD와 승인 oracle의 실제 성공 경로 연결이 남았다. 실제 4역할 CKS 근거는 b8e3488e 기준이다.",
+      "full_requirement_satisfied": false,
+      "independent_approved": false
+    }
+  ],
+  "reviewed_contracts": 12,
+  "full_requirement_satisfied": 0,
+  "full12_acceptance": false,
+  "installed_positive_WIV1_oracle": false,
+  "formal_completed": 0,
+  "independent_approved": 0,
+  "FINAL": 0,
+  "freeze": null,
+  "execution_allowed": false,
+  "anonymous_reviewer_role_status": "미정",
+  "personal_names_required": false,
+  "blocked_next": [
+    {
+      "task": "새 독립 티켓·완전 정답·primary/derived 의미 검토·매칭·반복 충분성·F01~08 동결",
+      "requires": "D04 익명 검토 역할 승인 기록; 사용자 범위 승인을 gold 승인으로 대체하지 않음"
+    },
+    {
+      "task": "승인 자료 기반 실제 소비자 양성 oracle·final HEAD 검증 후 정식 WI-V1 판정",
+      "requires": "정식 실행 허용과 다른 필수 완료 gate"
+    }
+  ]
+}

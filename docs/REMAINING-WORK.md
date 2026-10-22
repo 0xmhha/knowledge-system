@@ -14,7 +14,7 @@
 
 `scripts/` 시험 전체도 복구했다. 과거 단계 시험 110개 모듈은 기록된 증거 커밋의 임시 worktree에서 돌고, 그 뒤 패킷이 바뀌었으면 실패한다. 이전 머신 경로는 도구 이름과 저장소 상대 경로로 비교한다. KS 운영 Go 변경은 0이다. gate 없는 보편 동작과 독립 수용으로 승격하지 않는다.
 
-단계94에서 진행 중 true 알림(Syncing=true)의 세대 경계를 관측했다([결과](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 다음은 WI-V1의 독립 ticket/oracle 준비다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
+단계94에서 진행 중 true 알림(Syncing=true)의 세대 경계를 관측했다([결과](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 다음 WI-V1 작업인 독립 ticket/oracle은 D04 익명 검토 역할이 정해져야 진행할 수 있다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
 
 ## 전체13묶음 — 완료0/13
 

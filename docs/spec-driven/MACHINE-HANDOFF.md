@@ -44,6 +44,8 @@ python3 scripts/wiv1_notify_transport_generation.py
 python3 -m unittest discover -s scripts -p 'test_wiv1_notify_transport_generation.py'
 python3 scripts/wiv1_progress_generation.py
 python3 -m unittest discover -s scripts -p 'test_wiv1_progress_generation.py'
+python3 scripts/wiv1_contract_evidence.py
+python3 -m unittest discover -s scripts -p 'test_wiv1_contract_evidence.py'
 ```
 
 ### scripts 시험 전체
@@ -128,7 +130,7 @@ git -C "$KS_RESTORE/chainbench" switch --detach bdf5ad2758662310b23c508e61b13ee3
 
 ## 5. 다음 작업과 완료 기준
 
-단계91에서 owner ack 이후 옛 구독 세대의 status channel 사용과 명시적 새 등록 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json)). 단계92에서 transport close와 같은 channel timer broadcast 경로를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json)). 단계93에서 Notify 도중 종료와 gate 없는 transport close를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json)). 단계94에서 동기화 도중 peer를 잃은 상태의 진행 중 true 알림(Syncing=true) 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 다음 WI-V1 작업은 독립 ticket/oracle 준비, 승인된 실제 역할 양성 경로와 최종 HEAD다. 같은 channel 재등록에서는 stale 항목이 한 키로 합쳐지므로 membership 관측을 함께 둔다. ack 시점과 RPC wire true를 혼동하지 않는다. 실제 owner4개 일정과 별도 통제 late-drain1개를 합쳐 독립 표본으로 세지 않는다. 요구사항·실제 소스·검증 기준의 누락을 먼저 대조하고 이후 구현한다.
+단계91에서 owner ack 이후 옛 구독 세대의 status channel 사용과 명시적 새 등록 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json)). 단계92에서 transport close와 같은 channel timer broadcast 경로를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json)). 단계93에서 Notify 도중 종료와 gate 없는 transport close를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json)). 단계94에서 동기화 도중 peer를 잃은 상태의 진행 중 true 알림(Syncing=true) 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 단계95에서 이 관측을 12계약별로 다시 묶었다([검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 다음 WI-V1 작업인 독립 ticket/oracle, 승인된 실제 역할 양성 경로와 최종 HEAD는 D04 익명 검토 역할이 정해져야 진행할 수 있다. 같은 channel 재등록에서는 stale 항목이 한 키로 합쳐지므로 membership 관측을 함께 둔다. ack 시점과 RPC wire true를 혼동하지 않는다. 실제 owner4개 일정과 별도 통제 late-drain1개를 합쳐 독립 표본으로 세지 않는다. 요구사항·실제 소스·검증 기준의 누락을 먼저 대조하고 이후 구현한다.
 
 각 세부 작업마다 목적/범위 명세 → 구현/실제 경로·대조군 검증 → receipt/hash/시도 실패 보존 → 문서·원장 업데이트 → 서명 가능 환경에서 커밋한다. 완료되지 않은 상위 작업에 완료 체크를 하지 않는다. 새 소스 변경으로 기존 source binding이 달라지면 새 검증을 남기며 기존 캡처의 source hash를 바꾸지 않는다. 매 단계 화면에 검증 결과·현재 단계·다음 작업·남은 전체 목록을 보여준다.
 
