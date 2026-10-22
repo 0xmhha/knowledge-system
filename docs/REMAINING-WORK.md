@@ -14,7 +14,7 @@
 
 `scripts/` 시험 전체도 복구했다. 과거 단계 시험 110개 모듈은 기록된 증거 커밋의 임시 worktree에서 돌고, 그 뒤 패킷이 바뀌었으면 실패한다. 이전 머신 경로는 도구 이름과 저장소 상대 경로로 비교한다. KS 운영 Go 변경은 0이다. gate 없는 보편 동작과 독립 수용으로 승격하지 않는다.
 
-단계94에서 진행 중 true 알림(Syncing=true)의 세대 경계를 관측했다([결과](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 단계96에서 사용자가 D04를 A안으로 정했다([기록](./spec-driven/operational-preparation/reviewer-assignment-2026-10-22.json)). 다음은 gold-reviewer의 독립성 선언과 단계95 AI 초안을 바탕으로 한 WI-V1 정답·매칭 규칙 확정이다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
+단계94에서 진행 중 true 알림(Syncing=true)의 세대 경계를 관측했다([결과](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 단계96에서 사용자가 D04를 A안으로 정했다([기록](./spec-driven/operational-preparation/reviewer-assignment-2026-10-22.json)). 단계97에서 gold-reviewer에게 넘길 검토 묶음을 만들었다([안내](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-reviewer-packet-v1/REVIEW-GUIDE.md)). 계약 12개, 매칭 규칙 11개, FINAL 입력 기준의 검토자 칸과 독립성 선언은 비어 있고 AI는 채우지 않는다. 다음은 gold-reviewer가 선언과 결정을 채워 돌려주는 것이다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
 
 ## 전체13묶음 — 완료0/13
 

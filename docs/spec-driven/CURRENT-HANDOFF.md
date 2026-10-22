@@ -21,7 +21,7 @@
 
 ## 다음 작업
 
-WI-V1의 세대 경로 관측은 단계94로 요청 범위를 마쳤다. 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 인용 36개는 모두 봉인된 패킷 manifest와 요약값에 결속되고, 새 근거가 있는 계약은 11개, 없는 계약은 LATE-DRAIN 1개다. 충족·독립 승인으로 올린 계약은 0개다. 단계96에서 사용자가 D04를 A안으로 정했다([기록](./operational-preparation/reviewer-assignment-2026-10-22.json)). 다음은 gold-reviewer의 독립성 선언과 단계95 AI 초안을 바탕으로 한 WI-V1 정답·매칭 규칙 확정이다. 승인된 실제 역할 양성 경로와 최종 HEAD도 남았다.
+WI-V1의 세대 경로 관측은 단계94로 요청 범위를 마쳤다. 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 인용 36개는 모두 봉인된 패킷 manifest와 요약값에 결속되고, 새 근거가 있는 계약은 11개, 없는 계약은 LATE-DRAIN 1개다. 충족·독립 승인으로 올린 계약은 0개다. 단계96에서 사용자가 D04를 A안으로 정했다([기록](./operational-preparation/reviewer-assignment-2026-10-22.json)). 단계97에서 gold-reviewer에게 넘길 검토 묶음을 만들었다([안내](./operational-preparation/source-review-supplement/followups/wiv1-reviewer-packet-v1/REVIEW-GUIDE.md)). 계약 12개, 매칭 규칙 11개, FINAL 입력 기준의 검토자 칸과 독립성 선언은 비어 있고 AI는 채우지 않는다. 다음은 gold-reviewer가 선언과 결정을 채워 돌려주는 것이다. 승인된 실제 역할 양성 경로와 최종 HEAD도 남았다.
 
 ## 남은 전체13묶음 — 상위 완료0/13·정식0/9
 

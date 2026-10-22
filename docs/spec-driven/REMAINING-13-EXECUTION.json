@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "96_D04_role_assignment_record_WIV1_pilot",
+  "current_activity": "97_WIV1_gold_reviewer_packet_prepared_unfilled",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -32,7 +32,8 @@
         "actual_factory_transport_close_and_same_channel_timer_broadcast_generation_boundary_16slots32nodes_stale_entry_visible_only_by_membership_no_fake_ack",
         "actual_factory_notify_in_flight_and_ungated_transport_close_generation_boundary_16slots32nodes_both_callback_exit_branches_observed_no_fake_ack",
         "actual_factory_progress_true_notification_generation_boundary_16slots32nodes_stalled_sync_then_progress_or_done_no_fake_ack",
-        "WIV1_full12_contract_evidence_rebinding_stage90_94_36citations_11contracts_new_evidence_0satisfied_AI_review_not_independent"
+        "WIV1_full12_contract_evidence_rebinding_stage90_94_36citations_11contracts_new_evidence_0satisfied_AI_review_not_independent",
+        "WIV1_gold_reviewer_packet_12contracts_11matching_rules_FINAL_inputs_unfilled_declaration_template_AI_did_not_decide"
       ],
       "actual_peer_technical_progress": {
         "actual_nodes": 4,
@@ -233,6 +234,19 @@
         ],
         "full_requirement_satisfied": 0,
         "full12_acceptance": false,
+        "formal_completed": 0,
+        "independent_approved": 0
+      },
+      "wiv1_reviewer_packet": {
+        "kind": "WIV1_gold_reviewer_packet_unfilled_not_review",
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-reviewer-packet-v1/manifest.json",
+        "manifest_sha256": "2e2bf17aa2e77fd86a5fe69698e8883e5191678a562ca739e2f73e4e2366a866",
+        "validator": "scripts/wiv1_reviewer_packet.py",
+        "reviewer_id": "gold-reviewer",
+        "contracts": 12,
+        "matching_rules": 11,
+        "reviewer_decisions_filled": 0,
+        "independence_declaration": null,
         "formal_completed": 0,
         "independent_approved": 0
       }
@@ -649,7 +663,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "WI-V1 pilot: gold-reviewer independence declaration, then gold-reviewer finalizes WI-V1 gold and matching rules from the stage 95 AI draft; approved positive actual roles/final HEAD, independent gold/sufficiency and all13 groups remain under adopted actual4/controlled1 scope",
+  "next": "WI-V1 pilot: gold-reviewer fills the independence declaration and the 12-contract, 11-matching-rule and FINAL-input decisions in the reviewer packet; then AI binds the returned decisions and requests F-05 approval and WI-V1 input freeze from owner-acceptor; approved positive actual roles/final HEAD, independent gold/sufficiency and all13 groups remain under adopted actual4/controlled1 scope",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -1022,5 +1036,18 @@
     "independent_approved": 0,
     "freeze": null,
     "execution_allowed": false
+  },
+  "current_wiv1_reviewer_packet": {
+    "kind": "WIV1_gold_reviewer_packet_unfilled_not_review",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-reviewer-packet-v1/manifest.json",
+    "manifest_sha256": "2e2bf17aa2e77fd86a5fe69698e8883e5191678a562ca739e2f73e4e2366a866",
+    "validator": "scripts/wiv1_reviewer_packet.py",
+    "reviewer_id": "gold-reviewer",
+    "contracts": 12,
+    "matching_rules": 11,
+    "reviewer_decisions_filled": 0,
+    "independence_declaration": null,
+    "formal_completed": 0,
+    "independent_approved": 0
   }
 }

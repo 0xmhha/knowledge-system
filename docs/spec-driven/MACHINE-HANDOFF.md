@@ -48,6 +48,8 @@ python3 scripts/wiv1_contract_evidence.py
 python3 -m unittest discover -s scripts -p 'test_wiv1_contract_evidence.py'
 python3 scripts/d04_role_assignment.py
 python3 -m unittest discover -s scripts -p 'test_d04_role_assignment.py'
+python3 scripts/wiv1_reviewer_packet.py
+python3 -m unittest discover -s scripts -p 'test_wiv1_reviewer_packet.py'
 ```
 
 ### scripts 시험 전체
@@ -142,4 +144,4 @@ D04는 A안(역할 분리)으로 정했다([기록](./operational-preparation/re
 
 ## 새 세션에 전달할 프롬프트
 
-> docs/spec-driven/MACHINE-HANDOFF.md와 CURRENT-HANDOFF.md, REMAINING-13-EXECUTION.json을 읽고 HANDOFF-HISTORY.json의 이력을 복원·검증해 주세요. 기존 증거와 독립 수용을 구분하고 현재 코드/실제 경로를 대조한 뒤 WI-V1 시범의 gold-reviewer 독립성 선언과 정답·매칭 확정부터 진행하세요. 기존 원본/DB/전역 설정은 보존하고 시험 자원은 소유 디렉터리에 만드세요. 매 단계 명세·검증·실패 시도·문서·커밋을 남기고 현재 단계/다음 작업/남은 전체13묶음을 보여주세요. D04 미정, 익명 역할 허용, 정식0/9, freeze=null, 실제 LLM 비용 호출 보류, 사용자 제외/보류 범위를 유지하세요. 삭제된 이전 머신 임시 경로가 존재한다고 가정하지 마세요.
+> docs/spec-driven/MACHINE-HANDOFF.md와 CURRENT-HANDOFF.md, REMAINING-13-EXECUTION.json을 읽고 HANDOFF-HISTORY.json의 이력을 복원·검증해 주세요. 기존 증거와 독립 수용을 구분하고 현재 코드/실제 경로를 대조한 뒤 WI-V1 시범은 gold-reviewer가 검토 묶음(followups/wiv1-reviewer-packet-v1)을 채워 돌려주면 그 결정을 결속하는 것부터 진행하세요. 기존 원본/DB/전역 설정은 보존하고 시험 자원은 소유 디렉터리에 만드세요. 매 단계 명세·검증·실패 시도·문서·커밋을 남기고 현재 단계/다음 작업/남은 전체13묶음을 보여주세요. D04 미정, 익명 역할 허용, 정식0/9, freeze=null, 실제 LLM 비용 호출 보류, 사용자 제외/보류 범위를 유지하세요. 삭제된 이전 머신 임시 경로가 존재한다고 가정하지 마세요.
