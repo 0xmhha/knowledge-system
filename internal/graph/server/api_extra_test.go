@@ -69,6 +69,7 @@ func buildFixture(t *testing.T) persist.Store {
 func TestHandlersExtended(t *testing.T) {
 	store := buildFixture(t)
 	srv := server.New(store, nil)
+	t.Cleanup(srv.Close)
 	ts := httptest.NewServer(srv)
 	t.Cleanup(ts.Close)
 
@@ -315,6 +316,7 @@ func TestHandlersExtended(t *testing.T) {
 func TestHandleTopNodes(t *testing.T) {
 	store := buildFixture(t)
 	srv := server.New(store, nil)
+	t.Cleanup(srv.Close)
 	ts := httptest.NewServer(srv)
 	t.Cleanup(ts.Close)
 

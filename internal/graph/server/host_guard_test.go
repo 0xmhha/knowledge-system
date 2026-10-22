@@ -22,7 +22,9 @@ func TestServerRejectsNonLoopbackHost(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = store.Close() })
-	ts := httptest.NewServer(server.New(store, nil))
+	srv := server.New(store, nil)
+	t.Cleanup(srv.Close)
+	ts := httptest.NewServer(srv)
 	t.Cleanup(ts.Close)
 	for host, want := range map[string]int{
 		"attacker.example:8080": http.StatusForbidden,
@@ -56,7 +58,9 @@ func TestPostBodiesAreBounded(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = store.Close() })
-	ts := httptest.NewServer(server.New(store, nil))
+	srv := server.New(store, nil)
+	t.Cleanup(srv.Close)
+	ts := httptest.NewServer(srv)
 	t.Cleanup(ts.Close)
 	huge := `{"ids":["` + strings.Repeat("a", 5<<20) + `"]}`
 	for _, path := range []string{"/api/edges", "/api/nodes-by-ids"} {

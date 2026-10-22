@@ -143,6 +143,7 @@ port allocation or cleanup race; safe to invoke from CI.`,
 			probes := defaultProbes(seed)
 
 			srv := server.New(store, nil)
+			defer srv.Close()
 			ts := httptest.NewServer(srv)
 			defer func() { ts.Close() }()
 
