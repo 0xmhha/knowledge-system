@@ -1,6 +1,6 @@
 # 새 머신 개발 인수인계
 
-2026-10-20 기준. [별도 checkout·외부 소스 복원 검증 기록](./HANDOFF-VALIDATION.json)을 보존했다. 이 문서는 설치·재개 절차이고, 현재 진행 상황과 남은 전체 13묶음은 [현재 인수인계](./CURRENT-HANDOFF.md)와 [실행 원장](./REMAINING-13-EXECUTION.json)이 기준이다. 코드를 읽지 않고 완료 표시부터 옮기지 않는다. 후속 담당자는 아래 검증을 거친 뒤 다음 세부 작업을 진행한다.
+2026-10-20 기준. [별도 checkout·외부 소스 복원 검증 기록](./HANDOFF-VALIDATION.json)을 보존했다. 이 문서는 설치·재개 절차이고, 남은 작업과 그 순서는 [남은 작업](../REMAINING-WORK.md), 현재 단계는 [현재 인수인계](./CURRENT-HANDOFF.md), 정본은 [실행 원장](./REMAINING-13-EXECUTION.json)이다. 코드를 읽지 않고 완료 표시부터 옮기지 않는다. 후속 담당자는 아래 검증을 거친 뒤 다음 세부 작업을 진행한다.
 
 ## 1. 저장소와 증거 이력 복원
 
@@ -13,7 +13,7 @@ git switch main
 git pull --ff-only origin main
 git fetch origin '+refs/tags/evidence/2026-10-20/*:refs/tags/evidence/2026-10-20/*'
 python3 scripts/check-handoff-history.py --restore-generated-inputs
-git switch -c feat/wiv1-independent-oracle
+git switch -c <작업-브랜치>
 ```
 
 스쿼시된 main의 파일만으로는 과거 `git show REVISION:PATH` 검증이 불가능하다. [고정 이력 목록](./HANDOFF-HISTORY.json)에 기록한 원본 커밋들을 원격 evidence 태그로 보존한다. 태그는 완료된 개발 브랜치와 별개인 읽기 전용 증거 기준점이다. 브랜치가 제거되어도 위 fetch로 복원한다. 최초 별도 clone 시험에서 기존 run/·log ignore 규칙으로 빠진 manifest 증거38개를 발견했고 원래 해시 그대로 추가했다. 추가로 현재 native source binding에 포함된 viewer 정적 입력46개(약2.5MiB)도 보존했다. 복원 검사는 증거38개와 압축 보존된 viewer 입력46개의 해시를 확인하며, 동일 입력46개는 기본 build와 문서 경로 검사에도 필요하므로 원본 바이트로 추적하며, 생성 번들의 Git 줄 끝 변환을 막는다. 명시 복원 옵션은 누락된 viewer 입력만 생성한다. 이미 있는 파일이 다르면 덮어쓰지 않는다. 최초 점검이 실패하면 과거 보고서를 현재 내용으로 대체하지 말고 누락 객체/태그를 먼저 복구한다. shallow clone도 태그 fetch 이후 검사로 확인한다. [증거 복원 설명](./EVIDENCE-RECOVERY.md)을 함께 따른다.
@@ -62,7 +62,7 @@ python3 -m venv "$KS_VENV"
 "$KS_VENV/bin/pip" install 'Cython==0.29.37' 'setuptools==80.9.0' 'wheel==0.45.1'
 "$KS_VENV/bin/pip" install --no-build-isolation 'PyYAML==6.0'
 "$KS_VENV/bin/pip" install -r scripts/requirements.txt
-make build
+make build-bins   # bin/ckg, bin/ckv, bin/cks; `make build` makes no binaries
 "$KS_VENV/bin/python" -m unittest discover -s scripts -p 'test_*.py'
 ```
 
@@ -134,14 +134,10 @@ git -C "$KS_RESTORE/chainbench" switch --detach bdf5ad2758662310b23c508e61b13ee3
 
 ## 5. 다음 작업과 완료 기준
 
-단계91에서 owner ack 이후 옛 구독 세대의 status channel 사용과 명시적 새 등록 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json)). 단계92에서 transport close와 같은 channel timer broadcast 경로를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json)). 단계93에서 Notify 도중 종료와 gate 없는 transport close를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json)). 단계94에서 동기화 도중 peer를 잃은 상태의 진행 중 true 알림(Syncing=true) 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 단계95에서 이 관측을 12계약별로 다시 묶었다([검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 다음 WI-V1 작업인 독립 ticket/oracle, 승인된 실제 역할 양성 경로와 최종 HEAD는 D04 익명 검토 역할이 정해져야 진행할 수 있다. 같은 channel 재등록에서는 stale 항목이 한 키로 합쳐지므로 membership 관측을 함께 둔다. ack 시점과 RPC wire true를 혼동하지 않는다. 실제 owner4개 일정과 별도 통제 late-drain1개를 합쳐 독립 표본으로 세지 않는다. 요구사항·실제 소스·검증 기준의 누락을 먼저 대조하고 이후 구현한다.
+지금 할 일과 그 순서, 하지 않을 일은 [남은 작업](../REMAINING-WORK.md)이 정한다. 현재 단계는 [현재 인수인계](./CURRENT-HANDOFF.md)에 있다. 이 문서에는 진행 상황을 적지 않는다.
 
 각 세부 작업마다 목적/범위 명세 → 구현/실제 경로·대조군 검증 → receipt/hash/시도 실패 보존 → 문서·원장 업데이트 → 서명 가능 환경에서 커밋한다. 완료되지 않은 상위 작업에 완료 체크를 하지 않는다. 새 소스 변경으로 기존 source binding이 달라지면 새 검증을 남기며 기존 캡처의 source hash를 바꾸지 않는다. 매 단계 화면에 검증 결과·현재 단계·다음 작업·남은 전체 목록을 보여준다.
 
-남은 전체는 [현재 인수인계의 13묶음](./CURRENT-HANDOFF.md)과 원장의 항목을 그대로 이어간다. 정식 수용은 WI-1/2/3/4/V1/V2/6/SP/C **0/9**, 상위 **0/13**이다. 개별 연결 시험 성공이 독립 품질 승인·운영 적용·전체 완료를 뜻하지 않는다.
-
-D04는 A안(역할 분리)으로 정했다([기록](./operational-preparation/reviewer-assignment-2026-10-22.json)). 독립 내용 검토자는 gold-reviewer, 최종 범위 승인자는 owner-acceptor, 실행은 AI가 맡고 승인자가 확인한다. 정식 수용은 WI-V1 한 묶음 시범부터 한다. 검토자의 독립성 선언 전이므로 F-05는 미승인이다. 익명 역할을 허용한다. 실명·연락처를 요구하지 않는다. 새 DEV/FINAL 표본·독립 완전 정답/매칭/충분성·F01~08 승인/동결 전 `execution_allowed=false`, FINAL0, freeze=null을 유지한다. 온톨로지 평가는 동일 corpus/모델에서 off/on 검색·개념/구현 연결과 독립 정답이 필요하다. 실제 LLM 평가는 모델·인증·총 비용 상한 결정 뒤 진행한다. CoreML은 사용자 제외, 보안 전용 평가는 사용자 보류로 유지한다.
-
 ## 새 세션에 전달할 프롬프트
 
-> docs/spec-driven/MACHINE-HANDOFF.md와 CURRENT-HANDOFF.md, REMAINING-13-EXECUTION.json을 읽고 HANDOFF-HISTORY.json의 이력을 복원·검증해 주세요. 기존 증거와 독립 수용을 구분하고 현재 코드/실제 경로를 대조한 뒤 WI-V1 시범은 gold-reviewer가 검토 묶음(followups/wiv1-reviewer-packet-v1)을 채워 돌려주면 그 결정을 결속하는 것부터 진행하세요. 기존 원본/DB/전역 설정은 보존하고 시험 자원은 소유 디렉터리에 만드세요. 매 단계 명세·검증·실패 시도·문서·커밋을 남기고 현재 단계/다음 작업/남은 전체13묶음을 보여주세요. D04 미정, 익명 역할 허용, 정식0/9, freeze=null, 실제 LLM 비용 호출 보류, 사용자 제외/보류 범위를 유지하세요. 삭제된 이전 머신 임시 경로가 존재한다고 가정하지 마세요.
+> docs/REMAINING-WORK.md, docs/spec-driven/CURRENT-HANDOFF.md, docs/spec-driven/MACHINE-HANDOFF.md를 읽고 MACHINE-HANDOFF의 절차로 환경과 증거 이력(HANDOFF-HISTORY.json)을 복원·검증해 주세요. 그다음 REMAINING-WORK.md 3장의 순서대로 진행하고, 4장의 하지 않을 일을 지키세요. 3장에 없는 방향은 먼저 물어 주세요. AI 초안과 AI 실행 결과를 독립 정답이나 승인으로 세지 않고, 검토자 칸과 독립성 선언을 채우지 않습니다. 기존 원본/DB/전역 설정은 보존하고 시험 자원은 소유 디렉터리에 만드세요. 매 단계 명세·검증·실패 시도·문서·커밋을 남기고, 단계를 마치면 REMAINING-WORK.md, CURRENT-HANDOFF.md, REMAINING-13-EXECUTION.json을 같은 커밋에서 갱신한 뒤 현재 단계/다음 작업/남은 전체 목록을 보여주세요.
