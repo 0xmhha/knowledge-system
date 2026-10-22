@@ -22,8 +22,6 @@
 package temporal
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -65,45 +63,30 @@ func LoadUnreachableHunks(repoRoot string, maxCommits int) ([]CommitInfo, []Hunk
 	return commits, hunks, nil
 }
 
-// loadCommitWithHunks runs `git show <sha>` and parses the result via
-// parseHunkStream — same parser the HEAD-walk uses, so binary-files /
-// rename / mode-only / multi-hunk handling is identical between the
-// EXTRACTED and AMBIGUOUS paths.
+// loadCommitWithHunks streams `git show <sha>` through parseHunkStream —
+// the same parser the HEAD-walk uses, so binary-files / rename /
+// mode-only / multi-hunk handling is identical between the EXTRACTED and
+// AMBIGUOUS paths. The commit header comes from a separate header-only
+// `git show -s`, because the stream parser does not expose it.
 func loadCommitWithHunks(repoRoot, sha string) (CommitInfo, []HunkInfo, error) {
-	cmd := exec.Command("git", "-C", repoRoot,
+	header, err := exec.Command("git", "-C", repoRoot,
+		"show", "-s", "--no-color", "--pretty=format:"+commitHeaderFormat, sha).Output()
+	if err != nil {
+		return CommitInfo{}, nil, fmt.Errorf("git show -s %s: %w", sha, err)
+	}
+	hunks, err := streamHunks(exec.Command("git", "-C", repoRoot,
 		"show", "--no-color", "--no-renames",
-		"--pretty=format:COMMIT %H %at %s",
-		"--unified=3", sha)
-	out, err := cmd.Output()
+		"--pretty=format:"+commitHeaderFormat,
+		"--unified=3", sha), "git show "+sha)
 	if err != nil {
-		return CommitInfo{}, nil, fmt.Errorf("git show %s: %w", sha, err)
+		return CommitInfo{}, nil, err
 	}
-	hunks, err := parseHunkStream(bytes.NewReader(out))
-	if err != nil {
-		return CommitInfo{}, nil, fmt.Errorf("parse %s: %w", sha, err)
-	}
-	// Extract the COMMIT header line for the timestamp + subject. The
-	// stream parser uses parseCommitHeader internally for the same job —
-	// we re-scan here because the parser doesn't expose the parsed info
-	// at the per-stream-segment level (it's stateful inside the hunk
-	// loop).
-	var info CommitInfo
-	scanner := bufio.NewScanner(bytes.NewReader(out))
-	scanner.Buffer(make([]byte, 0, 4096), 1024*1024)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, "COMMIT ") {
-			if ci, ok := parseCommitHeader(line); ok {
-				info = ci
-			}
-			break
-		}
-	}
-	if info.SHA == "" {
+	info, ok := parseCommitHeader(strings.TrimSpace(string(header)))
+	if !ok {
 		// Fallback: at least populate the SHA so downstream Commit-node
 		// emission works. Timestamp/Subject stay zero — viewers can
 		// still display a "(unreachable)" placeholder.
-		info.SHA = sha
+		info = CommitInfo{SHA: sha}
 	}
 	return info, hunks, nil
 }

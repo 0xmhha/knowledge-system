@@ -62,7 +62,7 @@ func LoadHistory(repoRoot string, maxPerFile int) (FileHistory, error) {
 	}
 	cmd := exec.Command("git", "-C", repoRoot,
 		"log", "--raw", "--no-renames", "--no-color",
-		"--pretty=format:COMMIT %H %at %s",
+		"--pretty=format:"+commitHeaderFormat,
 		"HEAD", "--", ".")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -156,6 +156,10 @@ func parseGitLog(r io.Reader, maxPerFile int) (FileHistory, error) {
 	}
 	return hist, nil
 }
+
+// commitHeaderFormat is the --pretty format every git walk in this package
+// uses; parseCommitHeader reads the line it produces.
+const commitHeaderFormat = "COMMIT %H %at %s"
 
 // parseCommitHeader parses one `COMMIT <sha> <ts> <subject>` line.
 // Returns (info, true) on success, (zero, false) on any malformed input.

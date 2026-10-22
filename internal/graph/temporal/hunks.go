@@ -92,25 +92,32 @@ func LoadHunks(repoRoot string, maxCommits int) ([]HunkInfo, error) {
 	}
 	cmd := exec.Command("git", "-C", repoRoot,
 		"log", "--no-renames", "--no-color", "--no-merges",
-		"--pretty=format:COMMIT %H %at %s",
+		"--pretty=format:"+commitHeaderFormat,
 		"-p", "--unified=3",
 		fmt.Sprintf("-n%d", maxCommits),
 		"HEAD", "--", ".")
+	return streamHunks(cmd, "git log -p")
+}
+
+// streamHunks runs cmd and parses its stdout with parseHunkStream as it
+// arrives, so a large patch is never held as one buffer next to the hunks
+// parsed from it. label prefixes the returned errors.
+func streamHunks(cmd *exec.Cmd, label string) ([]HunkInfo, error) {
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, fmt.Errorf("git log -p stdout pipe: %w", err)
+		return nil, fmt.Errorf("%s stdout pipe: %w", label, err)
 	}
 	var stderrBuf bytes.Buffer
 	cmd.Stderr = &stderrBuf
 	if err := cmd.Start(); err != nil {
-		return nil, fmt.Errorf("git log -p start: %w", err)
+		return nil, fmt.Errorf("%s start: %w", label, err)
 	}
 	hunks, parseErr := parseHunkStream(stdout)
 	// Drain pipe + wait so the subprocess exits cleanly even on parse errors.
 	_, _ = io.Copy(io.Discard, stdout)
 	if waitErr := cmd.Wait(); waitErr != nil && parseErr == nil {
-		return nil, fmt.Errorf("git log -p wait: %w (stderr: %s)",
-			waitErr, strings.TrimSpace(stderrBuf.String()))
+		return nil, fmt.Errorf("%s wait: %w (stderr: %s)",
+			label, waitErr, strings.TrimSpace(stderrBuf.String()))
 	}
 	return hunks, parseErr
 }

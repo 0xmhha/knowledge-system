@@ -104,6 +104,49 @@ func TestLoadUnreachableHunks_CapHonoured(t *testing.T) {
 	}
 }
 
+// TestLoadCommitWithHunks covers the streamed patch and the separate
+// header read: the subject keeps its spaces, every hunk belongs to the
+// commit, and a SHA git cannot show is an error rather than empty output.
+func TestLoadCommitWithHunks(t *testing.T) {
+	repo := initUnreachFixtureRepo(t)
+	commitFile(t, repo, "a.go", "package a\n", "first")
+	commitFile(t, repo, "a.go", "package a\nvar X = 1\n", "add X to a")
+	sha := headSHA(t, repo)
+
+	tests := []struct {
+		name      string
+		sha       string
+		wantErr   bool
+		wantHunks int
+	}{
+		{name: "existing commit", sha: sha, wantHunks: 1},
+		{name: "missing commit", sha: strings.Repeat("0", 40), wantErr: true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			info, hunks, err := loadCommitWithHunks(repo, tc.sha)
+			if tc.wantErr {
+				if err == nil {
+					t.Fatalf("loadCommitWithHunks(%s): err = nil, want error", tc.sha[:8])
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("loadCommitWithHunks: %v", err)
+			}
+			if info.SHA != tc.sha || info.Subject != "add X to a" || info.Timestamp == 0 {
+				t.Errorf("header = %+v, want sha %s, subject %q and a timestamp", info, tc.sha[:8], "add X to a")
+			}
+			if len(hunks) != tc.wantHunks {
+				t.Fatalf("hunks = %d, want %d", len(hunks), tc.wantHunks)
+			}
+			if h := hunks[0]; h.SHA != tc.sha || h.FilePath != "a.go" || h.Added != 1 {
+				t.Errorf("hunk = %+v, want a.go with 1 added line", h)
+			}
+		})
+	}
+}
+
 // --- helpers ---
 
 func initUnreachFixtureRepo(t *testing.T) string {
