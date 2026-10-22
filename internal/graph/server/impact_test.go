@@ -20,6 +20,7 @@ import (
 func TestHandleImpact_FunctionCallers(t *testing.T) {
 	store := buildFixture(t)
 	srv := server.New(store, nil)
+	t.Cleanup(srv.Close)
 	ts := httptest.NewServer(srv)
 	t.Cleanup(ts.Close)
 
@@ -74,6 +75,7 @@ func TestHandleImpact_FunctionCallers(t *testing.T) {
 func TestHandleImpact_BadRequest(t *testing.T) {
 	store := buildFixture(t)
 	srv := server.New(store, nil)
+	t.Cleanup(srv.Close)
 	ts := httptest.NewServer(srv)
 	t.Cleanup(ts.Close)
 
@@ -93,6 +95,7 @@ func TestHandleImpact_BadRequest(t *testing.T) {
 func TestHandleImpact_SeedTooLong(t *testing.T) {
 	store := buildFixture(t)
 	srv := server.New(store, nil)
+	t.Cleanup(srv.Close)
 	ts := httptest.NewServer(srv)
 	t.Cleanup(ts.Close)
 
@@ -131,6 +134,7 @@ func TestHandleImpact_SeedTooLong(t *testing.T) {
 func TestHandleImpact_NotFound(t *testing.T) {
 	store := buildFixture(t)
 	srv := server.New(store, nil)
+	t.Cleanup(srv.Close)
 	ts := httptest.NewServer(srv)
 	t.Cleanup(ts.Close)
 

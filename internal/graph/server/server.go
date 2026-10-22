@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
@@ -35,6 +36,9 @@ type Server struct {
 	// stale indicator linger, long enough to absorb viewer poll
 	// bursts without re-spawning git.
 	stalenessCache *stalenessCache
+	// prewarm tracks the boot-time cache warm-up goroutines so Close can
+	// wait for them before the caller closes the store they read.
+	prewarm sync.WaitGroup
 }
 
 // Options tunes the Server. The dashboard UI is not served here: it moved
@@ -80,9 +84,17 @@ func NewWithOptions(store persist.StoreReader, log *slog.Logger, opts Options) *
 		stalenessCache: newStalenessCache(stalenessCacheTTL),
 	}
 	s.routes(opts)
-	go s.prewarmTicketIndex()
-	go s.prewarmEdgeCounts()
+	s.prewarm.Go(s.prewarmTicketIndex)
+	s.prewarm.Go(s.prewarmEdgeCounts)
 	return s
+}
+
+// Close waits for the background cache warm-up started by New to finish.
+// It does not close the store: call it before closing the store, so no
+// warm-up query is still running against a closed database. Close is safe
+// to call more than once and from several goroutines.
+func (s *Server) Close() {
+	s.prewarm.Wait()
 }
 
 // prewarmTicketIndex kicks the BM25 corpus build off the user's first

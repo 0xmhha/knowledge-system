@@ -85,6 +85,8 @@ func runAPI(o apiOpts) error {
 	defer func() { _ = store.Close() }()
 
 	srv := server.New(store, o.Log)
+	// Runs before the store close deferred above.
+	defer srv.Close()
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		os.Interrupt, syscall.SIGTERM)

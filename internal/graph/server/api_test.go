@@ -33,6 +33,7 @@ func TestHandlersBasic(t *testing.T) {
 	defer func() { _ = store.Close() }()
 
 	srv := server.New(store, nil)
+	defer srv.Close()
 	ts := httptest.NewServer(srv)
 	defer func() { ts.Close() }()
 
