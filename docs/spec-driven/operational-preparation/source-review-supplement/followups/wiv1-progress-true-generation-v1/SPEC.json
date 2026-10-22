@@ -1,0 +1,81 @@
+{
+  "purpose": "단계93까지 시험하지 못한 진행 중 true 알림(Syncing=true)의 구독 세대 경계를 실제 owner ack 기준으로 관측한다. 긴 체인을 동기화하는 도중 receiver의 유일한 peer를 끊어 원래 60초 타이머가 CurrentBlock < HighestBlock 상태에서 progress를 보내게 한다",
+  "requirement_source": "docs/spec-driven/MACHINE-HANDOFF.md 5절, CURRENT-HANDOFF.md 다음 작업, REMAINING-13-EXECUTION.json next (stage 93)",
+  "upstream_source_commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+  "source_condition": "eth/downloader/api.go eventLoop: the 60s timer sends SyncingResult{Syncing: true} when a StartEvent was seen and SyncProgress.Done() is false (CurrentBlock < HighestBlock or TxIndexRemainingBlocks > 0); Downloader.Progress keeps HighestBlock at the height known when sync started",
+  "feasibility_probe": "an uninstrumented throwaway program in the session scratch clone received a real Syncing=true at the 60s timer after the peer was removed (2000 and 1024 blocks, general and race); not archived as evidence",
+  "execution_adapter": {
+    "reused": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/adapter (PREFLIGHT.json PASS); ks_adapter.py bytes unchanged",
+    "instrumentation": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/drivers/transport_instrument.py.gz, byte-identical; the existing c <- notification rule already traces progress sends",
+    "fresh_upstream_clone": "https://github.com/stable-net/go-stablenet.git at the pinned commit; the run driver re-checks the retained inventory",
+    "live_paths_committed": false
+  },
+  "fixture": {
+    "chain": "legacy PoW ethash faker, 1024 blocks generated before either node exists so the API timer is not consumed by generation",
+    "peer_loss": "receiver.Server().RemovePeer(seeder) once the receiver head reaches 1; the sync fails with no peers and stays below the seeder head",
+    "restore": "progress-to-done only: AddPeer again, wait for DoneEvent, head equal to the seeder and the transaction indexer complete"
+  },
+  "trace_model": {
+    "inherited_from": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SPEC.json trace_model",
+    "added_events": [
+      "native_send_begin_progress carries the downloader progress read at the send (observation only)",
+      "actual_RPC_unsubscribe_begin: emitted before eth_unsubscribe, because the call returns after the server has ended the subscription",
+      "old_progress_forwarded / progress_observation_frozen / peer_restore_begin / peer_restore_sync_completed"
+    ]
+  },
+  "schedules": {
+    "progress-retained": {
+      "roles": [
+        "ORIGINAL",
+        "CAND-A",
+        "CAND-B",
+        "MUT-STALE-ACK"
+      ],
+      "old_generation": "the first eligible 60s timer sends progress to the selected RPC callback, which forwards it; a real client eth_unsubscribe ends it; real owner ack",
+      "regeneration": "same-channel generation 2 and a new eth_subscribe on the same connection; the sync stays stalled, so the next timer broadcasts progress to both"
+    },
+    "progress-to-done": {
+      "roles": [
+        "ORIGINAL",
+        "CAND-A",
+        "CAND-B",
+        "MUT-EARLY"
+      ],
+      "old_generation": "as progress-retained",
+      "regeneration": "same-channel generation 2 and a new eth_subscribe; the peer is restored and the real sync completes; the next timer broadcasts done to both"
+    }
+  },
+  "profiles": [
+    "general",
+    "race"
+  ],
+  "repetitions": 1,
+  "automatic_retries": 0,
+  "owned_nodes_per_slot": 2,
+  "native_timer_seconds": 60,
+  "program_timeout_seconds": 330,
+  "expected": {
+    "post_ack_same_generation_uses": 0,
+    "old_generation_exit": "rpcSub.Err after eth_unsubscribe",
+    "install_send": "none, since the sync is not done when the registrations are installed",
+    "stale_membership_at_reregistration": {
+      "MUT-STALE-ACK": "true",
+      "others": "false"
+    },
+    "MUT-EARLY": "Unsubscribe returns without an uninstall request; each generation is cleaned by an owned manual uninstall that is counted"
+  },
+  "out_of_scope": [
+    "progress caused by TxIndexRemainingBlocks > 0 with the block sync complete",
+    "snap sync",
+    "operational WBFT; legacy PoW ethash fixture",
+    "independent oracle, approved positive role, final HEAD"
+  ],
+  "acceptance_boundary": {
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "FINAL": 0,
+    "freeze": null,
+    "execution_allowed": false,
+    "D04": "미정"
+  }
+}

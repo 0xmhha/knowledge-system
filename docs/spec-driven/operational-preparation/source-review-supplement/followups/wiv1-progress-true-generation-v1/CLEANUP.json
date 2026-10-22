@@ -1,0 +1,37 @@
+{
+  "removed": [
+    {
+      "path": "${WORK_ROOT}/run-pt2",
+      "existed": true,
+      "bytes": 740212736,
+      "removed": true
+    },
+    {
+      "path": "${WORK_ROOT}/go-build-cache",
+      "existed": true,
+      "bytes": 1723183104,
+      "removed": true
+    },
+    {
+      "path": "${WORK_ROOT}/probe",
+      "existed": false
+    },
+    {
+      "path": "${UPSTREAM_SOURCE}",
+      "existed": true,
+      "bytes": 261013504,
+      "removed": true
+    }
+  ],
+  "removed_bytes": 2724409344,
+  "removed_GiB": 2.54,
+  "removed_before_rerun": "run-pt1, its build cache and probe, the first upstream clone and the feasibility probe clone were removed before run-pt2",
+  "owned_processes_remaining": 0,
+  "preserved": {
+    "shared_module_caches": "untouched (read-only offline use)",
+    "existing_local_go_stablenet_checkout_head": "5e75950ba66f92eed9f40c276d62cf4e239b38da",
+    "existing_local_checkout_dirty_files": 7,
+    "datasets_or_models_modified": 0
+  },
+  "kept_for_reproduction": "driver sources and logs remain in the session scratch directory only; archived copies are in this packet"
+}

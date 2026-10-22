@@ -14,13 +14,13 @@
 
 `scripts/` 시험 전체도 복구했다. 과거 단계 시험 110개 모듈은 기록된 증거 커밋의 임시 worktree에서 돌고, 그 뒤 패킷이 바뀌었으면 실패한다. 이전 머신 경로는 도구 이름과 저장소 상대 경로로 비교한다. KS 운영 Go 변경은 0이다. gate 없는 보편 동작과 독립 수용으로 승격하지 않는다.
 
-다음은 WI-V1의 진행 중 true 알림 세대 경로와 독립 oracle 준비다. true 알림은 긴 체인과 동기화 도중 peer를 잃는 fixture가 먼저 필요하다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
+단계94에서 진행 중 true 알림(Syncing=true)의 세대 경계를 관측했다([결과](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 다음은 WI-V1의 독립 ticket/oracle 준비다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
 
 ## 전체13묶음 — 완료0/13
 
 |묶음|현재 남은 내용|
 |---|---|
-|WI-V1|최신 CKS 4역할·API 오류·native done/RPC Err overlap·ack 후 세대 경계·transport close/같은 channel timer/Notify 도중 종료/gate 없는 종료 경로 확인; 진행 중 true 알림·승인 oracle/final HEAD·독립 티켓|
+|WI-V1|최신 CKS 4역할·API 오류·native done/RPC Err overlap·ack 후 세대 경계·transport close/같은 channel timer/Notify 도중 종료/gate 없는 종료/진행 중 true 알림 경로 확인; 승인 oracle/final HEAD·독립 티켓|
 |WI-V2|유한 후보 구별 완료; 독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|warm 쌍627회 보존; 독립 nonseed 관련성/잡음 정답·표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 부분은 사용자 보류|

@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "93_actual_factory_notify_in_flight_and_ungated_transport_generation_boundary",
+  "current_activity": "94_actual_factory_progress_true_generation_boundary",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -11,7 +11,7 @@
       "id": "WI-V1",
       "priority": 1,
       "status": "pending",
-      "task": "Actual factory/real peer native60 overlap linked (10slots/20nodes); post-ack generation boundary (16slots), transport close and same-channel timer broadcast (16slots) and Notify-in-flight plus ungated transport close (16slots/32nodes) observed: post-ack same-generation uses0 on every route, held Notify ended through rpcSub.Err4/notifier.Closed4, ungated close through rpcSub.Err8, stale-ack entry visible only as membership. Independent gold/tickets/sufficiency, approved positive oracle/finalHEAD and the progress-true route remain",
+      "task": "Actual factory/real peer native60 overlap linked (10slots/20nodes); post-ack generation boundary (16slots), transport close and same-channel timer broadcast (16slots) and Notify-in-flight plus ungated transport close (16slots/32nodes) observed: post-ack same-generation uses0 on every route, held Notify ended through rpcSub.Err4/notifier.Closed4, ungated close through rpcSub.Err8, stale-ack entry visible only as membership. The progress-true route (Syncing=true at the native timer after the only peer was lost mid-sync) was observed in16slots/32nodes: post-ack same-generation uses0, progress to the old generation16, then progress8 or done8 to generation2 and a new registration. Independent gold/tickets/sufficiency and approved positive oracle/finalHEAD remain",
       "completion_status": "not_complete",
       "implementation_status": "exists_in_bounded_scope",
       "done_when": [
@@ -30,7 +30,8 @@
         "actual_factory_peer_native60_done_broadcast_same_RPC_Err_callback_Unsubscribe_owner_delete_ack_linked_10slots20nodes_declared_gate_no_fake_ack",
         "actual_factory_post_ack_status_channel_use_generation_boundary_16slots32nodes_stale_ack_control_detected_no_fake_ack",
         "actual_factory_transport_close_and_same_channel_timer_broadcast_generation_boundary_16slots32nodes_stale_entry_visible_only_by_membership_no_fake_ack",
-        "actual_factory_notify_in_flight_and_ungated_transport_close_generation_boundary_16slots32nodes_both_callback_exit_branches_observed_no_fake_ack"
+        "actual_factory_notify_in_flight_and_ungated_transport_close_generation_boundary_16slots32nodes_both_callback_exit_branches_observed_no_fake_ack",
+        "actual_factory_progress_true_notification_generation_boundary_16slots32nodes_stalled_sync_then_progress_or_done_no_fake_ack"
       ],
       "actual_peer_technical_progress": {
         "actual_nodes": 4,
@@ -80,7 +81,7 @@
         "API_NEGATIVE": "declared12 error cases across5roles/general+race observed120; 4unique source variants; independent approval not implied",
         "installed_consumer": "latest clean CKS actual4 roles2partial tool calls2writes3Reads2selection denials4completion denials",
         "remaining": [
-          "independent_acceptance_of_post_ack_generation_boundaries_plus_progress_true_route",
+          "independent_acceptance_of_post_ack_generation_boundaries",
           "approved_independent_oracle_and_positive_actual_roles_final_HEAD",
           "independent_tickets_matching_and_repetition_sufficiency"
         ],
@@ -181,6 +182,39 @@
         "owned_manual_uninstalls": 6,
         "fake_acknowledgements": 0,
         "progress_true_notification_tested": false,
+        "universal_post_ack_claim": false,
+        "full12_acceptance": false,
+        "formal_completed": 0,
+        "independent_approved": 0
+      },
+      "wiv1_progress_generation": {
+        "kind": "actual_factory_progress_true_generation_boundary_DEV_not_independent",
+        "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/manifest.json",
+        "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+        "validator": "scripts/wiv1_progress_generation.py",
+        "actual_slots": 16,
+        "actual_owned_nodes": 32,
+        "fixture_blocks": 1024,
+        "progress_sends_to_old_generation": 16,
+        "old_generation_end": {
+          "RPC_unsubscribe": 16
+        },
+        "stalled_current_block_range": [
+          384,
+          1022
+        ],
+        "progress_broadcasts_to_generation2": 8,
+        "done_after_progress_to_generation2": 8,
+        "post_ack_same_generation_uses": 0,
+        "stale_membership_at_reregistration": {
+          "ORIGINAL": 0,
+          "CAND-A": 0,
+          "CAND-B": 0,
+          "MUT-STALE-ACK": 2
+        },
+        "owned_manual_uninstalls": 6,
+        "fake_acknowledgements": 0,
+        "progress_true_notification_tested": true,
         "universal_post_ack_claim": false,
         "full12_acceptance": false,
         "formal_completed": 0,
@@ -599,7 +633,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "WI-V1 progress-true notification route (fixture with a longer chain and a peer lost mid-sync) and independent ticket/oracle preparation; approved positive actual roles/final HEAD, independent gold/sufficiency and all13 groups remain under adopted actual4/controlled1 scope",
+  "next": "WI-V1 independent ticket/oracle preparation; approved positive actual roles/final HEAD, independent gold/sufficiency and all13 groups remain under adopted actual4/controlled1 scope",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -907,6 +941,39 @@
     "owned_manual_uninstalls": 6,
     "fake_acknowledgements": 0,
     "progress_true_notification_tested": false,
+    "universal_post_ack_claim": false,
+    "full12_acceptance": false,
+    "formal_completed": 0,
+    "independent_approved": 0
+  },
+  "current_wiv1_progress_generation": {
+    "kind": "actual_factory_progress_true_generation_boundary_DEV_not_independent",
+    "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/manifest.json",
+    "manifest_sha256": "e72c68ea37c78c2ff3e99eca6071ba6ae03a4c805a5003c361e33831b1cbb367",
+    "validator": "scripts/wiv1_progress_generation.py",
+    "actual_slots": 16,
+    "actual_owned_nodes": 32,
+    "fixture_blocks": 1024,
+    "progress_sends_to_old_generation": 16,
+    "old_generation_end": {
+      "RPC_unsubscribe": 16
+    },
+    "stalled_current_block_range": [
+      384,
+      1022
+    ],
+    "progress_broadcasts_to_generation2": 8,
+    "done_after_progress_to_generation2": 8,
+    "post_ack_same_generation_uses": 0,
+    "stale_membership_at_reregistration": {
+      "ORIGINAL": 0,
+      "CAND-A": 0,
+      "CAND-B": 0,
+      "MUT-STALE-ACK": 2
+    },
+    "owned_manual_uninstalls": 6,
+    "fake_acknowledgements": 0,
+    "progress_true_notification_tested": true,
     "universal_post_ack_claim": false,
     "full12_acceptance": false,
     "formal_completed": 0,

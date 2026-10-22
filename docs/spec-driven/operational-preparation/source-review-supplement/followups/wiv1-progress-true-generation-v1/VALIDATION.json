@@ -1,0 +1,61 @@
+{
+  "knowledge_checkout": {
+    "head": "a3d55897 (main after #111) on branch feat/wiv1-progress-true-generation",
+    "verified_inputs": "retained overlays and wi4 subscription baseline read from the checkout"
+  },
+  "development_attempts": [
+    {
+      "name": "compile probe out1",
+      "result": "go vet exit 0 for all 5 roles on the first attempt",
+      "nodes_started": 0,
+      "log": "checks/compile-probe/out1.json.gz"
+    },
+    {
+      "name": "smoke1",
+      "result": "both slots exit 0; progress reached the old generation and both schedules ended as declared. Trace review found actual_RPC_unsubscribe_true recorded after the callback exit, because eth_unsubscribe returns after the server ended the subscription",
+      "resolution": "the bridge emits actual_RPC_unsubscribe_begin before the call; the validator orders the unsubscribe by that event",
+      "log": "checks/smoke/smoke1/"
+    },
+    {
+      "name": "compile probe out2",
+      "result": "go vet exit 0 for all 5 roles after the bridge change",
+      "nodes_started": 0,
+      "log": "checks/compile-probe/out2.json.gz"
+    },
+    {
+      "name": "smoke2",
+      "result": "both slots exit 0 with the unsubscribe begin ordered before the callback exit",
+      "log": "checks/smoke/smoke2/"
+    }
+  ],
+  "matrix": {
+    "run": "run-pt2",
+    "planned": 16,
+    "attempted": 16,
+    "failed": 0,
+    "automatic_retries": 0,
+    "source_preserved": true
+  },
+  "validator": {
+    "script": "scripts/wiv1_progress_generation.py",
+    "test": "scripts/test_wiv1_progress_generation.py"
+  },
+  "not_run": [
+    "host make test-race (no KS Go change in this stage)",
+    "independent review"
+  ],
+  "discarded_runs": [
+    {
+      "run": "run-pt1",
+      "planned": 16,
+      "attempted": 16,
+      "failed": 0,
+      "automatic_retries": 0,
+      "reason": "the owned upstream clone was left without a checkout, so original-before/after inventories were empty and the source-preservation comparison proved nothing; per-role sources were checked out at the pin and matched the retained binding",
+      "found_by": "the mutation test that removes an entry from original-after could not find one",
+      "resolution": "re-cloned and checked out the pin as stage 93 did; the validator now requires the original inventory to equal the retained pinned tree",
+      "archived": false,
+      "deleted": true
+    }
+  ]
+}

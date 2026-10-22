@@ -1,33 +1,33 @@
-# 현재 인수인계 — Notify 도중 종료와 gate 없는 transport close의 구독 세대 경계 / 2026-10-20
+# 현재 인수인계 — 진행 중 true 알림(Syncing=true)의 구독 세대 경계 / 2026-10-21
 
 새 머신/새 세션에서는 [머신 간 인수인계](./MACHINE-HANDOFF.md)를 먼저 따라 증거 태그·실행 도구·외부 DB/모델·삭제된 임시 경로를 확인한다.
 
-단계93 요청 범위의 관측을 마쳤다. [명세](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SPEC.json) · [결과](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json) · [검증·시도 이력](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/VALIDATION.json) · [자원 정리](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/CLEANUP.json). 단계91·92 근거는 그대로 보존한다([단계91](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json), [단계92](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json)).
+단계94 요청 범위의 관측을 마쳤다. [명세](./operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SPEC.json) · [결과](./operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json) · [검증·시도 이력](./operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/VALIDATION.json) · [자원 정리](./operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/CLEANUP.json). 단계91·92·93 근거는 그대로 보존한다([단계91](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json), [단계92](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json), [단계93](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json)).
 
 ## 현재 단계 — 16슬롯·실제32노드, ack 후 같은 세대 사용 0
 
-단계91·92의 adapter와 계측 규칙을 바이트 그대로 다시 썼다. 두 일정 모두 옛 연결을 닫고 새 연결로 새 등록을 한다.
+원래 60초 타이머는 동기화가 시작됐고 `SyncProgress.Done()`이 거짓일 때 진행 중 true를 보낸다. seeder에 1024블록 체인을 주고, receiver가 첫 블록을 넣으면 유일한 peer를 끊었다. receiver는 이미 받은 블록을 넣고 멈췄다(일반 1022, race 384~576). `HighestBlock`은 1024로 남아 타이머가 실제 progress를 보냈다. 단계91 adapter와 단계92 계측 규칙은 바이트 그대로 다시 썼다.
 
 |일정|역할|관측|
 |---|---|---|
-|notify-in-flight|ORIGINAL·CAND-A/B|done 전달 직후 callback을 Notify 직전에 잡고 연결을 닫음; 놓아준 뒤 callback 종료·실제 owner ack, 같은 channel 세대2와 새 RPC 등록 전달, 위반0|
-|notify-in-flight|MUT-EARLY|조기 반환, 세대마다 실제 owner manual uninstall 3회, 위반0|
-|transport-ungated|ORIGINAL·CAND-A/B|타이머 전 gate 없이 연결 종료와 실제 owner ack; 세대2와 새 등록이 자연 done broadcast를 한 번씩 받음, 위반0|
-|transport-ungated|MUT-STALE-ACK|stale 항목에 세대2가 합쳐져 channel 사용으로는 위반0; install 직전 membership true로만 드러남|
+|progress-retained|ORIGINAL·CAND-A/B|옛 세대가 progress를 받은 뒤 실제 eth_unsubscribe와 owner ack; 세대2와 새 RPC 등록이 다음 progress를 한 번씩 받음, 위반0|
+|progress-retained|MUT-STALE-ACK|stale 항목에 세대2가 합쳐져 channel 사용으로는 위반0; install 직전 membership true로만 드러남|
+|progress-to-done|ORIGINAL·CAND-A/B|옛 세대 progress 수신과 종료 뒤 peer를 다시 붙여 동기화를 끝냄; 세대2와 새 등록이 done을 한 번씩 받음, 위반0|
+|progress-to-done|MUT-EARLY|조기 반환, 세대마다 owner manual uninstall 3회, 위반0|
 
-Notify 도중 종료에서는 callback이 다시 select로 돌아올 때 두 종료 채널이 모두 준비돼 있다. 그래서 `rpcSub.Err()` 4회, `notifier.Closed()` 4회로 나뉘었다. 단계92에서 한 번도 타지 않던 `notifier.Closed()` 분기를 실제로 관측했다. gate 없는 종료는 8슬롯 모두 `rpcSub.Err()`로 끝났다. 가짜 ack는 0이고, manual uninstall 6회는 모두 MUT-EARLY 대조군이다. legacy PoW 시험이며 운영 WBFT 검증이 아니다.
+16슬롯 모두 옛 세대가 진행 중 true를 받았고 `rpcSub.Err()`로 끝났다. 등록할 때 동기화가 끝나지 않았으므로 install send는 0이다. 가짜 ack는 0이고, manual uninstall 6회는 모두 MUT-EARLY 대조군이다. legacy PoW 시험이며 운영 WBFT 검증이 아니다. 트랜잭션 색인이 덜 끝나서 생기는 true와 snap sync는 시험하지 않았다.
 
-시도 실패도 보존했다. smoke1의 trace를 검토하다 gate 없는 경로에서 연결 종료 기록이 callback 종료보다 뒤에 찍힌 것을 찾았다. `rpc.Client.Close`가 서버 정리가 끝난 뒤에 반환되기 때문이다. 호출 직전에 시작 기록을 추가하고 smoke2로 확인했다. 컴파일 점검과 매트릭스 16슬롯은 첫 시도에 통과했고 자동 재시도는 0회다. clone·캐시·바이너리 약 2.98GiB를 지웠고 남은 소유 프로세스는 0이다.
+시도 실패도 보존했다. smoke1의 trace에서 eth_unsubscribe 기록이 callback 종료보다 뒤에 찍힌 것을 찾았다. 호출이 서버가 구독을 끝낸 뒤에 반환되기 때문이다. 호출 직전에 시작 기록을 추가하고 smoke2로 확인했다. 첫 매트릭스 run-pt1(16슬롯 통과)은 버렸다. 원본 upstream clone을 checkout하지 않아 원본 보존 비교가 빈 목록끼리의 비교였기 때문이다. checkout한 clone으로 run-pt2를 다시 돌렸고, 검증기는 이제 원본 목록이 보존된 고정 트리와 같아야 통과시킨다. 자동 재시도는 0회다. clone·캐시·바이너리 약 2.54GiB를 지웠고 남은 소유 프로세스는 0이다.
 
 ## 다음 작업
 
-WI-V1에서 남은 세대 경로는 진행 중 true 알림(Syncing=true)이다. 이 커밋은 60초 타이머 시점에 `CurrentBlock < HighestBlock`일 때만 true를 보낸다. 지금 fixture는 3블록을 몇 초 안에 끝내므로, 긴 체인과 동기화 도중 peer를 잃는 새 fixture가 먼저 필요하다. 독립 ticket/oracle 준비, 승인된 실제 역할 양성 경로와 최종 HEAD도 남았다.
+WI-V1의 세대 경로 관측은 이번 단계로 요청 범위를 마쳤다. 남은 것은 독립 ticket/oracle 준비, 승인된 실제 역할 양성 경로와 최종 HEAD다.
 
 ## 남은 전체13묶음 — 상위 완료0/13·정식0/9
 
 |묶음|남은 내용|
 |---|---|
-|WI-V1|진행 중 true 알림 세대 경로·독립 티켓/oracle·승인 양성 역할/final HEAD|
+|WI-V1|독립 티켓/oracle·승인 양성 역할/final HEAD|
 |WI-V2|독립 oracle·수용 후보 집합·선정 판단|
 |WI-6|독립 nonseed 관련성/잡음 정답·가족/표본 충분성|
 |WI-SP|비보안 수동/자동 출처·policy/미태그 소비자와 독립 의미 검토; 보안 전용 평가는 사용자 보류|
