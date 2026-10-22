@@ -13,7 +13,7 @@ git switch main
 git pull --ff-only origin main
 git fetch origin '+refs/tags/evidence/2026-10-20/*:refs/tags/evidence/2026-10-20/*'
 python3 scripts/check-handoff-history.py --restore-generated-inputs
-git switch -c feat/wiv1-progress-true-generation
+git switch -c feat/wiv1-independent-oracle
 ```
 
 스쿼시된 main의 파일만으로는 과거 `git show REVISION:PATH` 검증이 불가능하다. [고정 이력 목록](./HANDOFF-HISTORY.json)에 기록한 원본 커밋들을 원격 evidence 태그로 보존한다. 태그는 완료된 개발 브랜치와 별개인 읽기 전용 증거 기준점이다. 브랜치가 제거되어도 위 fetch로 복원한다. 최초 별도 clone 시험에서 기존 run/·log ignore 규칙으로 빠진 manifest 증거38개를 발견했고 원래 해시 그대로 추가했다. 추가로 현재 native source binding에 포함된 viewer 정적 입력46개(약2.5MiB)도 보존했다. 복원 검사는 증거38개와 압축 보존된 viewer 입력46개의 해시를 확인하며, 동일 입력46개는 기본 build와 문서 경로 검사에도 필요하므로 원본 바이트로 추적하며, 생성 번들의 Git 줄 끝 변환을 막는다. 명시 복원 옵션은 누락된 viewer 입력만 생성한다. 이미 있는 파일이 다르면 덮어쓰지 않는다. 최초 점검이 실패하면 과거 보고서를 현재 내용으로 대체하지 말고 누락 객체/태그를 먼저 복구한다. shallow clone도 태그 fetch 이후 검사로 확인한다. [증거 복원 설명](./EVIDENCE-RECOVERY.md)을 함께 따른다.
@@ -42,6 +42,8 @@ python3 scripts/wiv1_transport_generation.py
 python3 -m unittest discover -s scripts -p 'test_wiv1_transport_generation.py'
 python3 scripts/wiv1_notify_transport_generation.py
 python3 -m unittest discover -s scripts -p 'test_wiv1_notify_transport_generation.py'
+python3 scripts/wiv1_progress_generation.py
+python3 -m unittest discover -s scripts -p 'test_wiv1_progress_generation.py'
 ```
 
 ### scripts 시험 전체
@@ -119,13 +121,14 @@ git -C "$KS_RESTORE/chainbench" switch --detach bdf5ad2758662310b23c508e61b13ee3
 |followups/wiv1-generation-boundary-v1|새 머신 adapter 사전 점검(단계90 입력 4역할 재현)과 owner ack 이후 status channel 사용·세대 경계. 일반/race 16슬롯, 실제32노드. 대조군 아닌 슬롯의 ack 후 같은 세대 사용0, stale-ack 대조군 검출2, 같은 channel 세대2 전달8, 새 RPC 전달16.|transport close·같은 channel timer broadcast 경로 미시험. 독립 수용 아님.|
 |followups/wiv1-transport-timer-generation-v1|단계91 adapter 재사용. 연결 종료(transport close)로 끝난 옛 세대와, 같은 channel 세대2를 둔 채 맞는 자연 done broadcast. 일반/race 16슬롯, 실제32노드. ack 후 같은 세대 사용0, 연결 종료 callback은 rpcSub.Err 8/8(notifier.Closed 0), 같은 channel 세대2 전달16(자연 broadcast 8), stale-ack 항목은 install 직전 membership으로만 드러남2.|진행 중 true 알림·Notify 도중 종료·gate 없는 transport close 미시험. channel 사용 집계는 같은 키에 합쳐진 stale 항목을 검출하지 못함. 독립 수용 아님.|
 |followups/wiv1-notify-transport-generation-v1|단계91·92 adapter와 계측 재사용. Notify 직전에 잡힌 callback의 연결 종료와, 타이머 전 gate 없는 연결 종료. 일반/race 16슬롯, 실제32노드. ack 후 같은 세대 사용0, Notify 도중 종료 callback은 rpcSub.Err4·notifier.Closed4, gate 없는 종료는 rpcSub.Err8, stale-ack 항목은 membership으로만 드러남2.|진행 중 true 알림 미시험. 독립 수용 아님.|
+|followups/wiv1-progress-true-generation-v1|단계91 adapter·단계92 계측 재사용. 1024블록 체인 동기화 도중 유일한 peer를 끊어 원래 60초 타이머가 진행 중 true를 보냄. 일반/race 16슬롯, 실제32노드. 옛 세대 progress 수신16 후 실제 eth_unsubscribe로 종료, 세대2와 새 등록은 다음 progress8 또는 peer 복구 뒤 done8, ack 후 같은 세대 사용0, stale-ack 항목은 membership으로만 드러남2.|TxIndexRemainingBlocks로 생기는 true와 snap sync 미시험. 독립 수용 아님.|
 |schedule-gap-v1/adopted-source/chainbench|채택 source·Git 객체·hash 보존.|소스 존재만으로 새 머신 설치·운영 수용을 주장하지 않음.|
 
 원자료 checksum/의미 검증은 Python 검사로 다시 할 수 있다. native 재실행은 별도 작업이다. 최근 패킷 drivers의 gzip 소스와 초기 실패/명시 corrective1을 먼저 읽고 소유 작업 디렉터리에 추출한다. 고정 절대 경로·Go SDK·원본 checkout·출력 경로를 새 머신 경로로 바꾸는 별도 실행 adapter를 작성하고 그 diff를 기록한다. 기준 구현은 wiv1-generation-boundary-v1의 `drivers/ks_adapter.py.gz`와 `adapter/`이며, 로컬 경로는 커밋하지 않는 설정 파일로만 넘긴다. 원본 packet/manifest/summary를 재봉인하거나 덮어쓰지 않는다. 기존 candidate overlay는 followups/ticket-dev-gold-v1/private/overlays, 실제 owner 범위 승인은 followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json이 기준이다. timer 단축·가짜 mux event·가짜 ack로 같은 검증이라고 주장하지 않는다. 새 실행은 새 패킷에 출처·입력 해시·schedule·receipt·정리 결과를 남긴다.
 
 ## 5. 다음 작업과 완료 기준
 
-단계91에서 owner ack 이후 옛 구독 세대의 status channel 사용과 명시적 새 등록 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json)). 단계92에서 transport close와 같은 channel timer broadcast 경로를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json)). 단계93에서 Notify 도중 종료와 gate 없는 transport close를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json)). 다음 WI-V1 작업은 진행 중 true 알림(Syncing=true)의 세대 경계와 독립 ticket/oracle 준비다. true 알림은 60초 시점에 동기화가 끝나지 않아야 하므로 긴 체인과 동기화 도중 peer를 잃는 fixture를 먼저 만든다. 승인된 실제 역할 양성 경로와 최종 HEAD도 남았다. 같은 channel 재등록에서는 stale 항목이 한 키로 합쳐지므로 membership 관측을 함께 둔다. ack 시점과 RPC wire true를 혼동하지 않는다. 실제 owner4개 일정과 별도 통제 late-drain1개를 합쳐 독립 표본으로 세지 않는다. 요구사항·실제 소스·검증 기준의 누락을 먼저 대조하고 이후 구현한다.
+단계91에서 owner ack 이후 옛 구독 세대의 status channel 사용과 명시적 새 등록 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-generation-boundary-v1/SUMMARY.json)). 단계92에서 transport close와 같은 channel timer broadcast 경로를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-transport-timer-generation-v1/SUMMARY.json)). 단계93에서 Notify 도중 종료와 gate 없는 transport close를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-notify-transport-generation-v1/SUMMARY.json)). 단계94에서 동기화 도중 peer를 잃은 상태의 진행 중 true 알림(Syncing=true) 세대 경계를 관측했다([결과](./operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 다음 WI-V1 작업은 독립 ticket/oracle 준비, 승인된 실제 역할 양성 경로와 최종 HEAD다. 같은 channel 재등록에서는 stale 항목이 한 키로 합쳐지므로 membership 관측을 함께 둔다. ack 시점과 RPC wire true를 혼동하지 않는다. 실제 owner4개 일정과 별도 통제 late-drain1개를 합쳐 독립 표본으로 세지 않는다. 요구사항·실제 소스·검증 기준의 누락을 먼저 대조하고 이후 구현한다.
 
 각 세부 작업마다 목적/범위 명세 → 구현/실제 경로·대조군 검증 → receipt/hash/시도 실패 보존 → 문서·원장 업데이트 → 서명 가능 환경에서 커밋한다. 완료되지 않은 상위 작업에 완료 체크를 하지 않는다. 새 소스 변경으로 기존 source binding이 달라지면 새 검증을 남기며 기존 캡처의 source hash를 바꾸지 않는다. 매 단계 화면에 검증 결과·현재 단계·다음 작업·남은 전체 목록을 보여준다.
 
@@ -135,4 +138,4 @@ D04는 미정이고 익명 역할을 허용한다. 실명·연락처를 요구�
 
 ## 새 세션에 전달할 프롬프트
 
-> docs/spec-driven/MACHINE-HANDOFF.md와 CURRENT-HANDOFF.md, REMAINING-13-EXECUTION.json을 읽고 HANDOFF-HISTORY.json의 이력을 복원·검증해 주세요. 기존 증거와 독립 수용을 구분하고 현재 코드/실제 경로를 대조한 뒤 WI-V1의 남은 진행 중 true 알림 세대 경로와 독립 oracle 준비부터 진행하세요. 기존 원본/DB/전역 설정은 보존하고 시험 자원은 소유 디렉터리에 만드세요. 매 단계 명세·검증·실패 시도·문서·커밋을 남기고 현재 단계/다음 작업/남은 전체13묶음을 보여주세요. D04 미정, 익명 역할 허용, 정식0/9, freeze=null, 실제 LLM 비용 호출 보류, 사용자 제외/보류 범위를 유지하세요. 삭제된 이전 머신 임시 경로가 존재한다고 가정하지 마세요.
+> docs/spec-driven/MACHINE-HANDOFF.md와 CURRENT-HANDOFF.md, REMAINING-13-EXECUTION.json을 읽고 HANDOFF-HISTORY.json의 이력을 복원·검증해 주세요. 기존 증거와 독립 수용을 구분하고 현재 코드/실제 경로를 대조한 뒤 WI-V1의 독립 ticket/oracle 준비부터 진행하세요. 기존 원본/DB/전역 설정은 보존하고 시험 자원은 소유 디렉터리에 만드세요. 매 단계 명세·검증·실패 시도·문서·커밋을 남기고 현재 단계/다음 작업/남은 전체13묶음을 보여주세요. D04 미정, 익명 역할 허용, 정식0/9, freeze=null, 실제 LLM 비용 호출 보류, 사용자 제외/보류 범위를 유지하세요. 삭제된 이전 머신 임시 경로가 존재한다고 가정하지 마세요.
