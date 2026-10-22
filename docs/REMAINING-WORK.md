@@ -4,7 +4,7 @@
 
 사용자 지시 “coreml은 안해도되”에 따라 CoreML을 개발·평가·배포 및 완료 조건에서 제외했다. 모델·토크나이저·배포 대상은 더 이상 요청하지 않는다. 제외는 완료가 아니며 기존 코드와 서명된 검증 기록은 보존한다. 기본 Ollama + BGE-M3를 유지한다. [범위 제외 기록](./spec-driven/operational-preparation/source-review-supplement/followups/user-excluded-coreml-scope-v1/SCOPE.json).
 
-로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처를 요구하지 않으며 익명 역할로 검토할 수 있다.
+로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04는 A안(역할 분리)으로 정했다. 검토자 gold-reviewer의 독립성 선언 전이므로 F-05는 미승인이고 독립승인0·FINAL0·freeze null·execution_allowed=false다. 실명/연락처를 요구하지 않으며 익명 역할로 검토할 수 있다.
 
 ## 현재 검증과 다음 작업
 
@@ -14,7 +14,7 @@
 
 `scripts/` 시험 전체도 복구했다. 과거 단계 시험 110개 모듈은 기록된 증거 커밋의 임시 worktree에서 돌고, 그 뒤 패킷이 바뀌었으면 실패한다. 이전 머신 경로는 도구 이름과 저장소 상대 경로로 비교한다. KS 운영 Go 변경은 0이다. gate 없는 보편 동작과 독립 수용으로 승격하지 않는다.
 
-단계94에서 진행 중 true 알림(Syncing=true)의 세대 경계를 관측했다([결과](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 다음 WI-V1 작업인 독립 ticket/oracle은 D04 익명 검토 역할이 정해져야 진행할 수 있다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
+단계94에서 진행 중 true 알림(Syncing=true)의 세대 경계를 관측했다([결과](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-progress-true-generation-v1/SUMMARY.json)). 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./spec-driven/operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 단계96에서 사용자가 D04를 A안으로 정했다([기록](./spec-driven/operational-preparation/reviewer-assignment-2026-10-22.json)). 다음은 gold-reviewer의 독립성 선언과 단계95 AI 초안을 바탕으로 한 WI-V1 정답·매칭 규칙 확정이다. 승인된 실제 역할 성공 경로와 최종 HEAD 판정도 남았다. [단계90 근거](./spec-driven/operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)는 보존한다.
 
 ## 전체13묶음 — 완료0/13
 

@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 from pathlib import Path
+import d04_role_assignment
 import viewer_readiness as v
 import coreml_readiness as prior
 
@@ -228,7 +229,11 @@ def current_indices(root, protocol, ledger):
         excluded = next(r for r in active['optional_followups'] if r['id'] == 'COREML')
         v.require(active['optional_active_followups'] == 9 and active['optional_user_excluded_followups'] == 1 and excluded['active'] is False and excluded['status'] == 'user_excluded_not_complete', 'CoreML user exclusion changed')
         allowed = {'current_readiness_preparation', 'current_execution_state', 'active_remaining_worklist', 'adoption_acceptance_decision_proposal'}
+        # The user's D04 role assignment is the one later decision change; it is
+        # accepted only while its own record check passes, and nothing else may move.
+        d04_role_assignment.inspect(v.read(root/d04_role_assignment.RECORD), docs[0], docs[2], active)
         for n, d in zip(v.PATHS, docs):
+            d = d04_role_assignment.unassigned(d)
             old = json.loads(subprocess.check_output(['git', 'show', BASE+':'+str(n)], cwd=root))
             v.require(all(d.get(k) == value for k, value in old.items() if k not in allowed), 'prior decision/gold changed')
             v.require(d['current_readiness_preparation'] == d['latest_guardian_deadline_followup'] == ref and d['current_execution_state'] == v.read(root/PACKET/'WORKLIST.json') and d['active_remaining_worklist'] == link, 'guardian current references differ')

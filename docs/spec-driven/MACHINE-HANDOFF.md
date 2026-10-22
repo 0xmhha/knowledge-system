@@ -46,6 +46,8 @@ python3 scripts/wiv1_progress_generation.py
 python3 -m unittest discover -s scripts -p 'test_wiv1_progress_generation.py'
 python3 scripts/wiv1_contract_evidence.py
 python3 -m unittest discover -s scripts -p 'test_wiv1_contract_evidence.py'
+python3 scripts/d04_role_assignment.py
+python3 -m unittest discover -s scripts -p 'test_d04_role_assignment.py'
 ```
 
 ### scripts 시험 전체
@@ -136,8 +138,8 @@ git -C "$KS_RESTORE/chainbench" switch --detach bdf5ad2758662310b23c508e61b13ee3
 
 남은 전체는 [현재 인수인계의 13묶음](./CURRENT-HANDOFF.md)과 원장의 항목을 그대로 이어간다. 정식 수용은 WI-1/2/3/4/V1/V2/6/SP/C **0/9**, 상위 **0/13**이다. 개별 연결 시험 성공이 독립 품질 승인·운영 적용·전체 완료를 뜻하지 않는다.
 
-D04는 미정이고 익명 역할을 허용한다. 실명·연락처를 요구하지 않는다. 새 DEV/FINAL 표본·독립 완전 정답/매칭/충분성·F01~08 승인/동결 전 `execution_allowed=false`, FINAL0, freeze=null을 유지한다. 온톨로지 평가는 동일 corpus/모델에서 off/on 검색·개념/구현 연결과 독립 정답이 필요하다. 실제 LLM 평가는 모델·인증·총 비용 상한 결정 뒤 진행한다. CoreML은 사용자 제외, 보안 전용 평가는 사용자 보류로 유지한다.
+D04는 A안(역할 분리)으로 정했다([기록](./operational-preparation/reviewer-assignment-2026-10-22.json)). 독립 내용 검토자는 gold-reviewer, 최종 범위 승인자는 owner-acceptor, 실행은 AI가 맡고 승인자가 확인한다. 정식 수용은 WI-V1 한 묶음 시범부터 한다. 검토자의 독립성 선언 전이므로 F-05는 미승인이다. 익명 역할을 허용한다. 실명·연락처를 요구하지 않는다. 새 DEV/FINAL 표본·독립 완전 정답/매칭/충분성·F01~08 승인/동결 전 `execution_allowed=false`, FINAL0, freeze=null을 유지한다. 온톨로지 평가는 동일 corpus/모델에서 off/on 검색·개념/구현 연결과 독립 정답이 필요하다. 실제 LLM 평가는 모델·인증·총 비용 상한 결정 뒤 진행한다. CoreML은 사용자 제외, 보안 전용 평가는 사용자 보류로 유지한다.
 
 ## 새 세션에 전달할 프롬프트
 
-> docs/spec-driven/MACHINE-HANDOFF.md와 CURRENT-HANDOFF.md, REMAINING-13-EXECUTION.json을 읽고 HANDOFF-HISTORY.json의 이력을 복원·검증해 주세요. 기존 증거와 독립 수용을 구분하고 현재 코드/실제 경로를 대조한 뒤 WI-V1의 독립 ticket/oracle 준비부터 진행하세요. 기존 원본/DB/전역 설정은 보존하고 시험 자원은 소유 디렉터리에 만드세요. 매 단계 명세·검증·실패 시도·문서·커밋을 남기고 현재 단계/다음 작업/남은 전체13묶음을 보여주세요. D04 미정, 익명 역할 허용, 정식0/9, freeze=null, 실제 LLM 비용 호출 보류, 사용자 제외/보류 범위를 유지하세요. 삭제된 이전 머신 임시 경로가 존재한다고 가정하지 마세요.
+> docs/spec-driven/MACHINE-HANDOFF.md와 CURRENT-HANDOFF.md, REMAINING-13-EXECUTION.json을 읽고 HANDOFF-HISTORY.json의 이력을 복원·검증해 주세요. 기존 증거와 독립 수용을 구분하고 현재 코드/실제 경로를 대조한 뒤 WI-V1 시범의 gold-reviewer 독립성 선언과 정답·매칭 확정부터 진행하세요. 기존 원본/DB/전역 설정은 보존하고 시험 자원은 소유 디렉터리에 만드세요. 매 단계 명세·검증·실패 시도·문서·커밋을 남기고 현재 단계/다음 작업/남은 전체13묶음을 보여주세요. D04 미정, 익명 역할 허용, 정식0/9, freeze=null, 실제 LLM 비용 호출 보류, 사용자 제외/보류 범위를 유지하세요. 삭제된 이전 머신 임시 경로가 존재한다고 가정하지 마세요.

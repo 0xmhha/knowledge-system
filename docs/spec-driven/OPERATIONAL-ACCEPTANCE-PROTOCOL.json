@@ -47,7 +47,7 @@
     {
       "id": "F-05",
       "topic": "roles_and_independence",
-      "preparation_status": "awaiting_assignment_user_confirmed_unassigned",
+      "preparation_status": "roles_assigned_by_user_gold_reviewer_independence_declaration_pending",
       "decision_status": "pending",
       "receipt": null
     },
@@ -80,10 +80,17 @@
     }
   ],
   "roles": {
-    "gold_author": null,
-    "independent_content_reviewer": null,
-    "final_scope_acceptor": null,
-    "execution_operator": null,
+    "gold_author": {
+      "final_authority": "gold-reviewer",
+      "draft_assistance": "AI",
+      "basis": "D04 recommended text approved 2026-10-17: AI drafts, a separate human reviewer reviews gold and matching rules; AI drafts stay DEV until the reviewer finalizes them"
+    },
+    "independent_content_reviewer": "gold-reviewer",
+    "final_scope_acceptor": "owner-acceptor",
+    "execution_operator": {
+      "operator": "AI",
+      "confirmed_by": "owner-acceptor"
+    },
     "independence_declaration": null
   },
   "model": {
@@ -975,7 +982,7 @@
   },
   "adoption_acceptance_decision_proposal": {
     "path": "docs/spec-driven/OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json",
-    "sha256": "bebf56b56d9cc21e185be4fa50a75ebb1edb1c094c1a7a1864863d0b9253e7eb",
+    "sha256": "8a31ff1fecf7375d3ad5955779fe787a586ad6841fd3d09ded38003853f66094",
     "status": "D04_review_pending_local_native_DEV_not_independent_acceptance"
   },
   "consumer_adoption": {
@@ -1282,7 +1289,7 @@
   },
   "active_remaining_worklist": {
     "path": "docs/spec-driven/REMAINING-13-EXECUTION.json",
-    "sha256": "5e578429915487f93d7d91f7b76ff62c481d51ce3561e827991033bbd35d2b95"
+    "sha256": "557177a14ccd2f1eb598e60fea81c9fc18819b5aa68c2c41769c75363e8289cd"
   },
   "latest_consumer_role_followup": {
     "kind": "four_actual_roles_current_CKS_transport_not_model_quality",
@@ -1360,5 +1367,10 @@
     "kind": "guardian_deadline_fixture_causality_native_DEV_not_independent_acceptance",
     "manifest": "docs/spec-driven/operational-preparation/source-review-supplement/followups/guardian-deadline-diagnosis-v1/manifest.json",
     "manifest_sha256": "c1213bce8e84df32b3597bbc57f46c6e955ce76246731fe6a623f0e2fbc7ed37"
+  },
+  "reviewer_assignment_update": {
+    "path": "docs/spec-driven/operational-preparation/reviewer-assignment-2026-10-22.json",
+    "sha256": "a4017515712e78779ee8f4391af79cac994af9594daae724930df7c70ba7eec0",
+    "status": "roles_assigned_independence_declaration_pending"
   }
 }
