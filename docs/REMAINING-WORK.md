@@ -29,7 +29,7 @@
 |WI-2|독립 비보안 표본·호출 대상/호출자·명령/build/MCP 소비자 매칭|
 |WI-3|시작 배치·계측 기능 보존 검증 완료; 가족/노출/중복·기본 상한/partial/오류/범위 밖·독립 관련성|
 |WI-4|실제 host·receiver 일정·반복 기준·독립 가족/oracle/충분성; 실제 peer 일반/race 근거 확인|
-|독립 수용 준비|익명 검토 역할 미정; 새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|
+|독립 수용 준비|D04 A안 결정(gold-reviewer·owner-acceptor, WI-V1 시범); 검토자 독립성 선언·새 DEV/FINAL·완전 정답/매칭/충분성·F01~08 동결|
 |온톨로지|독립 의미/검색 정답·구현/개념 연결·동일 corpus off/on 효과 판단|
 |정식9개 실행·수용|독립 승인·동결 후 WI-1/2/3/4/V1/V2/6/SP/C 실행; 현재0/9|
 |활성 선택 기능9개|캐시 로컬 완료. 공개 형식·graph tuning·flow gold·규모·as-of·legacy 출처·viewer·배포 남음. CoreML 사용자 제외, 보안 감사 사용자 보류|

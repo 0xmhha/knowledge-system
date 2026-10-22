@@ -2,7 +2,7 @@
 
 [코드·검증 결과](./operational-preparation/source-review-supplement/followups/local-reliability-v1/SUMMARY.json) · [실제 경로](./operational-preparation/source-review-supplement/followups/local-reliability-v1/runtime-summary.json) · [13개 실행 원장](./REMAINING-13-EXECUTION.json) · [남은 전체 작업](../REMAINING-WORK.md)
 
-로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
+로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04는 A안(역할 분리)으로 정했고 검토자 독립성 선언 전이다. 독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
 
 기존 로컬 구현의 전체 완료는7/7(세부28/28)이다. 7개/28개는 기존 로컬 구현·도구 시험의 완료 기록이다. 아래 모든 완료는 당시 명시한 입력/host/프로젝트 범위에 한정되며 독립 정답 승인이나 일반 품질 향상을 뜻하지 않는다. 이전 중간 집계와 순차 실행 로그는 Git 판본 및 불변 manifest에 남긴다. 현재 상태에는 과거의 6/28·미구현 문구를 다시 적용하지 않는다.
 
@@ -83,7 +83,7 @@ KM-03 host 기록은 실제 설치 host와 로컬 통제 응답의 연결 시험
 |종료 판정|반환 후 게이트10회·유지보수171개·새 전체 검사|최초1건 원인 미확정·이전 실패 원자료 보존|
 |WI-6 반복|627쌍·본570 partial/budget·완전0|독립 품질/완전 응답 지연 판정유보|
 |실제 node/eth factory|일반/race·활성 indexer·원래60초 RPC·unsubscribe/node.Close·exit0|전체8노드 중 최종2회 성공; 실제 피어 sync/5일정12계약/독립 수용은 남음|
-|정식 수용|0/9|D04/새 DEV·FINAL/gold/F01~08 미정·미동결|
+|정식 수용|0/9|D04 독립성 선언/새 DEV·FINAL/gold/F01~08 미정·미동결|
 
 현재13묶음의 완료 기준과 다음 작업은 [전체 실행 원장](./REMAINING-13-EXECUTION.json)을 따른다. 데이터 원본·프로세스 정리·호출/실패 분모·실제 서명 저장을 검증하며, 노출된 DEV·반복 호출·AI 초안을 독립 표본으로 세지 않는다.
 

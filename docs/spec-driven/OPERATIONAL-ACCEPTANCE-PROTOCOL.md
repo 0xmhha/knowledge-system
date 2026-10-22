@@ -2,7 +2,7 @@
 
 정본은 [프로토콜 JSON](./OPERATIONAL-ACCEPTANCE-PROTOCOL.json), [수용 원장](./OPERATIONAL-ACCEPTANCE-PROGRESS.json), [결정 제안](./OPERATIONAL-ACCEPTANCE-DECISION-PROPOSAL.json)이다. 이 문서는 현재 계약을 요약하며 승인·역할·정답·동결을 대신 생성하지 않는다.
 
-로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
+로컬 구현9/9·지식 매니저 로드맵7/7(28/28)과 정식 독립 수용0/9를 구분한다. D04는 A안(역할 분리)으로 정했고 검토자 독립성 선언 전이다. 독립승인0·FINAL0·freeze null·execution_allowed=false를 유지한다. 실명/연락처는 요구하지 않으며 익명 역할로 검토할 수 있다.
 
 ## 수용 대상과 완료의 의미
 
@@ -18,7 +18,7 @@
 |F-02|실제 source·candidate·binary·runtime pin|pending|
 |F-03|sampling·완전 정답·matching·scoring|pending|
 |F-04|독립 가족·분모·통계 방법·표본 충분성|pending|
-|F-05|익명 역할·독립성·검토/수용 기록|미정|
+|F-05|익명 역할·독립성·검토/수용 기록|역할 지정(gold-reviewer·owner-acceptor)·독립성 선언 대기|
 |F-06|실제 LLM 선택 시 모델·인증 방식·비용/자원 상한|로컬 무유료 범위 승인·실제 LLM 미정|
 |F-07|새 DEV/FINAL·gold·holdout·노출/중복 관리|pending|
 |F-08|정확한 실제 실행 경로·소유 자원·종료/복구|pending|
