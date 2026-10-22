@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/0xmhha/knowledge-system/internal/testgit"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/mock"
 	"github.com/0xmhha/knowledge-system/internal/vector/manifest"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
@@ -153,7 +154,7 @@ func TestReindex_ForceFilesProcessesListedPaths(t *testing.T) {
 // prev_head equals new_head touches no files but still refreshes the
 // manifest BuiltAt for freshness reporting.
 func TestReindex_NoChangesIsNoop(t *testing.T) {
-	src := resolveTestdataSample(t)
+	src := testgit.CommittedCopy(t, resolveTestdataSample(t))
 	out := t.TempDir()
 
 	// Build (records IndexedHead = current HEAD of testdata).
@@ -174,14 +175,7 @@ func TestReindex_NoChangesIsNoop(t *testing.T) {
 		Embedder: mock.Default(),
 		Now:      func() time.Time { return time.Unix(200, 0).UTC() },
 	})
-	// detectCommit may legitimately return empty when the testdata
-	// path isn't a git repo (rare in CI but possible). In that case
-	// resolveChangeSet returns an error and we skip the assertion
-	// rather than fail spuriously.
 	if err != nil {
-		if strings.Contains(err.Error(), "no git HEAD") {
-			t.Skip("testdata/sample is not in a git repo; skip no-op test")
-		}
 		t.Fatalf("Reindex: %v", err)
 	}
 	if res.FilesProcessed != 0 {
