@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-22",
+  "timezone": "Asia/Seoul",
+  "kind": "user_role_assignment_not_independent_review_approval",
+  "decision_id": "D04",
+  "supersedes_assignment_status_of": "docs/spec-driven/operational-preparation/reviewer-assignment-2026-10-16.json",
+  "origin": "direct_human_user_message",
+  "user_message": "1. 스쿼시 머지하고, main 에 동기화해. 2. 권고안으로 진행.",
+  "selected_option": "A_role_separation",
+  "selected_option_text": "검토자 1명을 따로 두고 정답과 매칭을 검토하게 합니다. 사용자는 최종 범위만 승인합니다",
+  "user_answers": [
+    {
+      "question": "정답과 매칭 규칙을 검토할 사람(독립 내용 검토자)이 정해졌습니까? 정해졌다면 원장에 쓸 역할 ID를 골라 주세요.",
+      "answer": "정해짐, ID gold-reviewer (Recommended)"
+    },
+    {
+      "question": "최종 사용 범위를 승인하는 사람(최종 범위 승인자)은 사용자 본인으로 기록할까요?",
+      "answer": "본인, ID owner-acceptor (Recommended)"
+    },
+    {
+      "question": "동결된 입력으로 정식 실행을 맡을 실행 담당자는 누구로 할까요?",
+      "answer": "AI 실행, 승인자 확인 (Recommended)"
+    },
+    {
+      "question": "정식 수용을 어디부터 시작할까요?",
+      "answer": "WI-V1 한 묶음 시범 (Recommended)"
+    }
+  ],
+  "assignment_status": "roles_assigned_independence_declaration_pending",
+  "roles": {
+    "gold_author": {
+      "final_authority": "gold-reviewer",
+      "draft_assistance": "AI",
+      "basis": "D04 recommended text approved 2026-10-17: AI drafts, a separate human reviewer reviews gold and matching rules; AI drafts stay DEV until the reviewer finalizes them"
+    },
+    "independent_content_reviewer": "gold-reviewer",
+    "final_scope_acceptor": "owner-acceptor",
+    "execution_operator": {
+      "operator": "AI",
+      "confirmed_by": "owner-acceptor"
+    },
+    "independence_declaration": null
+  },
+  "role_overlaps": [
+    {
+      "roles": [
+        "gold_author.draft_assistance",
+        "execution_operator"
+      ],
+      "holder": "AI",
+      "limit": "AI drafts are never scored as gold; only gold finalized by gold-reviewer may score AI-run outputs"
+    },
+    {
+      "roles": [
+        "gold_author.final_authority",
+        "independent_content_reviewer"
+      ],
+      "holder": "gold-reviewer",
+      "limit": "the reviewer finalizes gold from AI drafts and is independent of the AI that produced candidate outputs; it is not a second independent review of its own gold"
+    }
+  ],
+  "independence_declaration_required_fields": [
+    "reviewer_id",
+    "not_author_of_candidate_outputs",
+    "candidate_output_exposure_before_gold_finalization",
+    "ai_draft_exposure",
+    "conflicts",
+    "declared_date"
+  ],
+  "independence_declaration_source": "must_be_provided_by_gold-reviewer_not_AI",
+  "pilot_scope": [
+    "WI-V1"
+  ],
+  "pilot_expansion": "decided_by_owner-acceptor_after_WI-V1_pilot",
+  "real_name_recorded": false,
+  "personal_contact_recorded": false,
+  "protocol_requirement": "F-05",
+  "freeze_approval": false,
+  "independent_acceptance": false,
+  "formal_completed": 0,
+  "formal_total": 9,
+  "freeze": null,
+  "execution_allowed": false,
+  "next_preparation": "gold-reviewer가 독립성 선언을 제출한다. 그 다음 단계95 AI 초안을 바탕으로 WI-V1 정답과 매칭 규칙을 확정한다. 선언 전에는 F-05를 승인하지 않고 정식 수용을 완료 처리하지 않는다."
+}

@@ -21,7 +21,7 @@
 
 ## 다음 작업
 
-WI-V1의 세대 경로 관측은 단계94로 요청 범위를 마쳤다. 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 인용 36개는 모두 봉인된 패킷 manifest와 요약값에 결속되고, 새 근거가 있는 계약은 11개, 없는 계약은 LATE-DRAIN 1개다. 충족·독립 승인으로 올린 계약은 0개다. 남은 독립 ticket/oracle·완전 정답·매칭·반복 충분성과 승인된 실제 역할 양성 경로·최종 HEAD는 D04 익명 검토 역할이 정해져야 진행할 수 있다.
+WI-V1의 세대 경로 관측은 단계94로 요청 범위를 마쳤다. 단계95에서 단계90~94 관측을 12계약별로 다시 묶었다([검토](./operational-preparation/source-review-supplement/followups/wiv1-contract-evidence-v1/REVIEW.json)). 인용 36개는 모두 봉인된 패킷 manifest와 요약값에 결속되고, 새 근거가 있는 계약은 11개, 없는 계약은 LATE-DRAIN 1개다. 충족·독립 승인으로 올린 계약은 0개다. 단계96에서 사용자가 D04를 A안으로 정했다([기록](./operational-preparation/reviewer-assignment-2026-10-22.json)). 다음은 gold-reviewer의 독립성 선언과 단계95 AI 초안을 바탕으로 한 WI-V1 정답·매칭 규칙 확정이다. 승인된 실제 역할 양성 경로와 최종 HEAD도 남았다.
 
 ## 남은 전체13묶음 — 상위 완료0/13·정식0/9
 
@@ -41,7 +41,7 @@ WI-V1의 세대 경로 관측은 단계94로 요청 범위를 마쳤다. 단계9
 |정식9개 실행·수용|독립 승인·동결 후 WI-1/2/3/4/V1/V2/6/SP/C 실행|
 |활성 후속9개|캐시 로컬 완료; 공개 형식·graph tuning·flow gold·규모·as-of·legacy 출처·viewer·배포/downstream 남음|
 
-D04미정·독립승인0·FINAL0·freeze null·execution_allowed=false다. 실명/연락처를 요구하지 않으며 익명 역할을 허용한다. CoreML은 사용자 제외로 완료 조건에서 뺐다. 보안 전용 평가는 사용자 보류다. 실제 LLM 답변 평가는 모델·인증·비용 상한 결정 후 진행한다.
+D04는 A안(역할 분리)으로 정했다. 검토자 gold-reviewer의 독립성 선언 전이므로 F-05는 미승인이고 독립승인0·FINAL0·freeze null·execution_allowed=false다. 실명/연락처를 요구하지 않으며 익명 역할을 허용한다. CoreML은 사용자 제외로 완료 조건에서 뺐다. 보안 전용 평가는 사용자 보류다. 실제 LLM 답변 평가는 모델·인증·비용 상한 결정 후 진행한다.
 
 ## 보존 근거
 
