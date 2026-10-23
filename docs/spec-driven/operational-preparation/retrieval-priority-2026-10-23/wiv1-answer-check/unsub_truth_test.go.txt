@@ -1,0 +1,73 @@
+package downloader
+
+import (
+	"testing"
+	"time"
+
+	"github.com/ethereum/go-ethereum/event"
+)
+
+// tick is the eventLoop's fixed 60s check interval plus scheduling margin.
+const tick = 62 * time.Second
+
+// alive reports whether the eventLoop still accepts a new subscription.
+func alive(api *DownloaderAPI) bool {
+	ok := make(chan struct{})
+	go func() {
+		api.SubscribeSyncStatus(make(chan interface{}, 16))
+		close(ok)
+	}()
+	select {
+	case <-ok:
+		return true
+	case <-time.After(5 * time.Second):
+		return false
+	}
+}
+
+// TestUnsubscribeDuringBroadcast: the subscriber has stopped reading (the
+// Syncing handler left its loop), the eventLoop is blocked broadcasting to it,
+// and the deferred Unsubscribe runs. Correct behaviour: Unsubscribe returns,
+// and the eventLoop keeps serving on this and the next tick.
+func TestUnsubscribeDuringBroadcast(t *testing.T) {
+	tester := newTester(t)
+	defer tester.terminate()
+	mux := new(event.TypeMux)
+	defer mux.Stop()
+	api := NewDownloaderAPI(tester.downloader, tester.chain, mux)
+
+	statuses := make(chan interface{}) // unbuffered, as in Syncing; never read
+	sub := api.SubscribeSyncStatus(statuses)
+	mux.Post(StartEvent{})
+	time.Sleep(tick) // first broadcast is now blocked on statuses
+
+	returned := make(chan struct{})
+	go func() { sub.Unsubscribe(); close(returned) }()
+	select {
+	case <-returned:
+		t.Log("RESULT unsubscribe_returned=true")
+	case <-time.After(5 * time.Second):
+		t.Log("RESULT unsubscribe_returned=false")
+	}
+	t.Logf("RESULT alive_after_tick1=%v", alive(api))
+	time.Sleep(tick) // second broadcast: a stale entry would block it again
+	t.Logf("RESULT alive_after_tick2=%v", alive(api))
+}
+
+// TestUnsubscribeNoOverlap is the normal control: no broadcast in flight.
+func TestUnsubscribeNoOverlap(t *testing.T) {
+	tester := newTester(t)
+	defer tester.terminate()
+	mux := new(event.TypeMux)
+	defer mux.Stop()
+	api := NewDownloaderAPI(tester.downloader, tester.chain, mux)
+	sub := api.SubscribeSyncStatus(make(chan interface{}))
+	returned := make(chan struct{})
+	go func() { sub.Unsubscribe(); close(returned) }()
+	select {
+	case <-returned:
+		t.Log("RESULT control_returned=true")
+	case <-time.After(5 * time.Second):
+		t.Log("RESULT control_returned=false")
+	}
+}
