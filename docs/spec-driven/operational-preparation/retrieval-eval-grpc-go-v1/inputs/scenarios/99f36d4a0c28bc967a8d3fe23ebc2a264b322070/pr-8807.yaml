@@ -1,0 +1,39 @@
+version: 1
+name: pr-8807
+description: "xds/internal/client: Add async gauge metrics for Connected and Resources (A78)"
+prompt: "xDS 클라이언트가 리소스 수와 ADS 스트림 연결 여부를 비동기 게이지 지표로 보고하게 하고 싶어"
+expected_intent: feature_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: internal/xds/clients/config.go
+    start_line: 104
+    end_line: 112
+    anchor: "type MetricsReporter interface {"
+  - file: internal/xds/clients/xdsclient/ads_stream.go
+    start_line: 88
+    end_line: 116
+    anchor: "type adsStreamImpl struct {"
+  - file: internal/xds/clients/xdsclient/ads_stream.go
+    start_line: 230
+    end_line: 271
+    anchor: "func (s *adsStreamImpl) runner(ctx context.Context) {"
+  - file: internal/xds/clients/xdsclient/ads_stream.go
+    start_line: 370
+    end_line: 414
+    anchor: "func (s *adsStreamImpl) sendMessageLocked(stream clients.Stream, names []string, url, version, nonce string, nackErr error) error {"
+  - file: internal/xds/clients/xdsclient/ads_stream.go
+    start_line: 416
+    end_line: 473
+    anchor: "func (s *adsStreamImpl) recv(stream clients.Stream) bool {"
+  - file: internal/xds/clients/xdsclient/xdsclient.go
+    start_line: 68
+    end_line: 98
+    anchor: "type XDSClient struct {"
+  - file: internal/xds/clients/xdsclient/xdsclient.go
+    start_line: 100
+    end_line: 118
+    anchor: "func New(config Config) (*XDSClient, error) {"
+  - file: internal/xds/clients/xdsclient/xdsclient.go
+    start_line: 169
+    end_line: 201
+    anchor: "func (c *XDSClient) Close() {"

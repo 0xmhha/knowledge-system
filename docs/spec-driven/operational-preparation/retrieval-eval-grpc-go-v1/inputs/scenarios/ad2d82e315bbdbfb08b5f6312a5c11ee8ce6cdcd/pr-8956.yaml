@@ -1,0 +1,111 @@
+version: 1
+name: pr-8956
+description: "xds: leaf clusters provide the handshake info instead of top level cluster"
+prompt: "집계 클러스터에서 핸드셰이크가 최상위 클러스터의 보안 설정을 써. 실제 말단 클러스터의 보안 설정을 쓰게 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd
+expected_citations:
+  - file: credentials/xds/xds.go
+    start_line: 86
+    end_line: 168
+    anchor: "func (c *credsImpl) ClientHandshake(ctx context.Context, authority string, rawConn net.Conn) (net.Conn, credentials.AuthInfo, error) {"
+  - file: internal/credentials/xds/handshake_info.go
+    start_line: 39
+    end_line: 41
+    anchor: "func init() {"
+  - file: internal/credentials/xds/handshake_info.go
+    start_line: 69
+    end_line: 74
+    anchor: "func SetHandshakeInfo(addr resolver.Address, hiPtr *unsafe.Pointer) resolver.Address {"
+  - file: internal/credentials/xds/handshake_info.go
+    start_line: 76
+    end_line: 81
+    anchor: "func GetHandshakeInfo(attr *attributes.Attributes) *unsafe.Pointer {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 62
+    end_line: 62
+    anchor: "buildProvider = buildProviderFunc"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 64
+    end_line: 66
+    anchor: "x509SystemCertPoolFunc = x509.SystemCertPool"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 78
+    end_line: 123
+    anchor: "func (bb) Build(cc balancer.ClientConn, opts balancer.BuildOptions) balancer.Balancer {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 148
+    end_line: 190
+    anchor: "type cdsBalancer struct {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 192
+    end_line: 253
+    anchor: "func (b *cdsBalancer) handleSecurityConfig(config *xdsresource.SecurityConfig) error {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 255
+    end_line: 276
+    anchor: "func buildProviderFunc(configs map[string]*certprovider.BuildableConfig, instanceName, certName string, wantIdentity, wantRoot bool) (certprovider.Provider, error) {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 324
+    end_line: 360
+    anchor: "func (b *cdsBalancer) handleXDSConfigUpdate() error {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 397
+    end_line: 445
+    anchor: "func (b *cdsBalancer) updateChildConfig() error {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 525
+    end_line: 537
+    anchor: "func (b *cdsBalancer) closeChildPolicyAndReportTF(err error) {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 539
+    end_line: 556
+    anchor: "func (b *cdsBalancer) Close() {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 613
+    end_line: 624
+    anchor: "type ccWrapper struct {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 626
+    end_line: 638
+    anchor: "func (ccw *ccWrapper) NewSubConn(addrs []resolver.Address, opts balancer.NewSubConnOptions) (balancer.SubConn, error) {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 640
+    end_line: 642
+    anchor: "func (ccw *ccWrapper) UpdateAddresses(sc balancer.SubConn, _ []resolver.Address) {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 644
+    end_line: 646
+    anchor: "type systemRootCertsProvider struct{}"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 648
+    end_line: 648
+    anchor: "func (systemRootCertsProvider) Close() {}"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 650
+    end_line: 658
+    anchor: "func (systemRootCertsProvider) KeyMaterial(context.Context) (*certprovider.KeyMaterial, error) {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 71
+    end_line: 81
+    anchor: "func (bb) Build(cc balancer.ClientConn, bOpts balancer.BuildOptions) balancer.Balancer {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 91
+    end_line: 123
+    anchor: "type clusterImplBalancer struct {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 262
+    end_line: 344
+    anchor: "func (b *clusterImplBalancer) UpdateClientConnState(s balancer.ClientConnState) error {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 371
+    end_line: 382
+    anchor: "func (b *clusterImplBalancer) Close() {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 444
+    end_line: 466
+    anchor: "func (b *clusterImplBalancer) NewSubConn(addrs []resolver.Address, opts balancer.NewSubConnOptions) (balancer.SubConn, error) {"
+  - file: internal/xds/balancer/priority/balancer_child.go
+    start_line: 111
+    end_line: 122
+    anchor: "func (cb *childBalancer) sendUpdate() {"

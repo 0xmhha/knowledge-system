@@ -1,0 +1,47 @@
+version: 1
+name: pr-8877
+description: "experimental/stats: Expose Telemetry Label Callback"
+prompt: "OpenTelemetry를 안 쓰는 클라이언트도 통계 핸들러에 레이블을 넘길 수 있게, 텔레메트리 레이블 콜백을 등록하는 실험 API를 만들고 싶어"
+expected_intent: feature_add
+expected_commit: fd8a1060a84d7021a9db7b4120b49df651beb762
+expected_citations:
+  - file: internal/stats/labels.go
+    start_line: 24
+    end_line: 28
+    anchor: "type Labels struct {"
+  - file: internal/stats/labels.go
+    start_line: 30
+    end_line: 30
+    anchor: "type labelsKey struct{}"
+  - file: internal/stats/labels.go
+    start_line: 32
+    end_line: 36
+    anchor: "func GetLabels(ctx context.Context) *Labels {"
+  - file: internal/stats/labels.go
+    start_line: 38
+    end_line: 42
+    anchor: "func SetLabels(ctx context.Context, labels *Labels) context.Context {"
+  - file: internal/testutils/balancer.go
+    start_line: 221
+    end_line: 234
+    anchor: "func (tcc *BalancerClientConn) WaitForErrPicker(ctx context.Context) error {"
+  - file: internal/testutils/balancer.go
+    start_line: 236
+    end_line: 252
+    anchor: "func (tcc *BalancerClientConn) WaitForPickerWithErr(ctx context.Context, want error) error {"
+  - file: internal/testutils/balancer.go
+    start_line: 272
+    end_line: 312
+    anchor: "func (tcc *BalancerClientConn) WaitForRoundRobinPicker(ctx context.Context, want ...balancer.SubConn) error {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 98
+    end_line: 107
+    anchor: "func telemetryLabels(ctx context.Context) map[string]string {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 109
+    end_line: 229
+    anchor: "func (d *picker) Pick(info balancer.PickInfo) (balancer.PickResult, error) {"
+  - file: stats/opentelemetry/client_metrics.go
+    start_line: 160
+    end_line: 186
+    anchor: "func (h *clientMetricsHandler) TagRPC(ctx context.Context, info *stats.RPCTagInfo) context.Context {"

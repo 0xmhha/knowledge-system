@@ -1,0 +1,11 @@
+version: 1
+name: pr-8854
+description: "test: use testpb alias in stream_test.go for proto messages."
+prompt: "스트림 시험 파일에서 proto 메시지에 testpb 별칭을 쓰도록 바꾸고 싶어"
+expected_intent: test_add
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: stream_test.go
+    start_line: 72
+    end_line: 146
+    anchor: "func (s) TestUnaryClient_ServerStreamingMismatch(t *testing.T) {"

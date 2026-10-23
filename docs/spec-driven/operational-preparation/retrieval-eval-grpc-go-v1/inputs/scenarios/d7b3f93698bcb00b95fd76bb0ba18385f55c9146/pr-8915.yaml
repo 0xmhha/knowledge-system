@@ -1,0 +1,11 @@
+version: 1
+name: pr-8915
+description: "xds: fix copy-paste bug in WeightExpirationPeriod config"
+prompt: "xDS 클라이언트 쪽 가중 라운드로빈 설정 변환에서 가중치 만료 기간 자리에 다른 값을 복사해 넣는 실수가 있어. 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/xdsclient/xdslbregistry/converter/converter.go
+    start_line: 144
+    end_line: 176
+    anchor: "func convertWeightedRoundRobinProtoToServiceConfig(rawProto []byte, _ int) (json.RawMessage, error) {"

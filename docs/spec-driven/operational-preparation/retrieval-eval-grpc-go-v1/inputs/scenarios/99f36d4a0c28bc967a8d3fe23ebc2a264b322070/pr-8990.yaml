@@ -1,0 +1,15 @@
+version: 1
+name: pr-8990
+description: "xds/rbac: add additional handling for addresses with ports"
+prompt: "xDS RBAC의 IP 매칭이 포트가 붙은 주소 문자열을 제대로 처리하지 못해. 포트를 떼고 비교하게 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: internal/xds/rbac/matchers.go
+    start_line: 346
+    end_line: 349
+    anchor: "func (sim *remoteIPMatcher) match(data *rpcData) bool {"
+  - file: internal/xds/rbac/matchers.go
+    start_line: 364
+    end_line: 367
+    anchor: "func (dim *localIPMatcher) match(data *rpcData) bool {"

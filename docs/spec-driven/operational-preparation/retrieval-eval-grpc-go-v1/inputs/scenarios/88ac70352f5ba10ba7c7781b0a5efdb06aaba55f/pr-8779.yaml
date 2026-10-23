@@ -1,0 +1,59 @@
+version: 1
+name: pr-8779
+description: "xds: implement :authority header rewriting in xds_cluster_impl LB policy (gRFC A81)"
+prompt: "xDS 클러스터 구현 정책에서 :authority 헤더를 백엔드 호스트 이름으로 자동으로 바꿔 쓰는 기능을 넣고 싶어. 피커가 어디서 이걸 결정해야 해?"
+expected_intent: feature_add
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: internal/testutils/xds/e2e/bootstrap.go
+    start_line: 106
+    end_line: 146
+    anchor: "func DefaultBootstrapContents(t *testing.T, nodeID, serverURI string) []byte {"
+  - file: internal/testutils/xds/e2e/clientresources.go
+    start_line: 642
+    end_line: 656
+    anchor: "type BackendOptions struct {"
+  - file: internal/testutils/xds/e2e/clientresources.go
+    start_line: 692
+    end_line: 781
+    anchor: "func EndpointResourceWithOptions(opts EndpointOptions) *v3endpointpb.ClusterLoadAssignment {"
+  - file: internal/transport/transport.go
+    start_line: 544
+    end_line: 581
+    anchor: "type CallHdr struct {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 406
+    end_line: 423
+    anchor: "type scWrapper struct {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 437
+    end_line: 472
+    anchor: "func (b *clusterImplBalancer) NewSubConn(addrs []resolver.Address, opts balancer.NewSubConnOptions) (balancer.SubConn, error) {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 105
+    end_line: 196
+    anchor: "func (d *picker) Pick(info balancer.PickInfo) (balancer.PickResult, error) {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 202
+    end_line: 206
+    anchor: "func autoHostRewrite(ctx context.Context) bool {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 208
+    end_line: 212
+    anchor: "func AutoHostRewriteForTesting(ctx context.Context) bool {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 214
+    end_line: 218
+    anchor: "func SetAutoHostRewrite(ctx context.Context, autohostRewrite bool) context.Context {"
+  - file: internal/xds/resolver/serviceconfig.go
+    start_line: 172
+    end_line: 229
+    anchor: "func (cs *configSelector) SelectConfig(rpcInfo iresolver.RPCInfo) (*iresolver.RPCConfig, error) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_eds.go
+    start_line: 54
+    end_line: 59
+    anchor: "func HostnameFromEndpoint(endpoint resolver.Endpoint) string {"
+  - file: stream.go
+    start_line: 520
+    end_line: 561
+    anchor: "func (a *csAttempt) newStream() error {"

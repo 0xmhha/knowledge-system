@@ -1,0 +1,11 @@
+version: 1
+name: pr-8863
+description: "client/picker: log loop to V(2)"
+prompt: "피커가 고른 전송이 준비가 안 됐을 때 도는 반복의 로그가 너무 비싸. 상세 수준 2일 때만 찍게 하고 싶어"
+expected_intent: refactor
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: picker_wrapper.go
+    start_line: 98
+    end_line: 201
+    anchor: "func (pw *pickerWrapper) pick(ctx context.Context, failfast bool, info balancer.PickInfo) (pick, error) {"

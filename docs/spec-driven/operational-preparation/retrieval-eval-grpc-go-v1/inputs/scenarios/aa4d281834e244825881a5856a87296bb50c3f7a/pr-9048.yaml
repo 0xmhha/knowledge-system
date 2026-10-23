@@ -1,0 +1,15 @@
+version: 1
+name: pr-9048
+description: "transport: fixes non-linux environment failures"
+prompt: "리눅스가 아닌 환경에서 원시 연결 코드가 빌드나 시험에 실패해. 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: internal/transport/readyreader/raw_conn_nonlinux.go
+    start_line: 27
+    end_line: 30
+    anchor: "func sysRead(fd uintptr, p []byte) (int, error) {"
+  - file: internal/transport/readyreader/raw_conn_nonlinux.go
+    start_line: 32
+    end_line: 35
+    anchor: "func wouldBlock(err error) bool {"

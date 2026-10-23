@@ -1,0 +1,23 @@
+version: 1
+name: pr-9096
+description: "grpc: Document interactions between static flow control window options"
+prompt: "스트림과 연결의 고정 흐름 제어 창 옵션을 하나만 설정하면 BDP 추정이 꺼지고 다른 쪽은 기본값이 돼. 이 상호작용을 문서에 적고 싶어"
+expected_intent: docs_update
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: dialoptions.go
+    start_line: 230
+    end_line: 237
+    anchor: "func WithStaticStreamWindowSize(s int32) DialOption {"
+  - file: dialoptions.go
+    start_line: 239
+    end_line: 247
+    anchor: "func WithStaticConnWindowSize(s int32) DialOption {"
+  - file: server.go
+    start_line: 301
+    end_line: 310
+    anchor: "func StaticStreamWindowSize(s int32) ServerOption {"
+  - file: server.go
+    start_line: 312
+    end_line: 321
+    anchor: "func StaticConnWindowSize(s int32) ServerOption {"

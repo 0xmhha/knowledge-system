@@ -1,0 +1,23 @@
+version: 1
+name: pr-8827
+description: "transport: fix potential race in `TestKeepaliveClientClosesWithActiveStreams`."
+prompt: "활성 스트림이 있을 때 클라이언트가 keepalive로 연결을 닫는지 보는 시험이 가끔 경쟁 상태로 실패해. 핑 응답을 조절할 수 있는 서버로 고치고 싶어"
+expected_intent: test_add
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: internal/transport/keepalive_test.go
+    start_line: 283
+    end_line: 312
+    anchor: "func (s) TestKeepaliveClientClosesUnresponsiveServer(t *testing.T) {"
+  - file: internal/transport/keepalive_test.go
+    start_line: 314
+    end_line: 345
+    anchor: "func (s) TestKeepaliveClientOpenWithUnresponsiveServer(t *testing.T) {"
+  - file: internal/transport/keepalive_test.go
+    start_line: 347
+    end_line: 382
+    anchor: "func (s) TestKeepaliveClientClosesWithActiveStreams(t *testing.T) {"
+  - file: internal/transport/transport_test.go
+    start_line: 541
+    end_line: 577
+    anchor: "func setUpWithNoPingServer(t *testing.T, copts ConnectOptions, connCh chan net.Conn) (*http2Client, func()) {"

@@ -1,0 +1,51 @@
+version: 1
+name: pr-8808
+description: "rls: update rls cache metrics to use async gauge framework"
+prompt: "RLS 캐시 항목 수와 캐시 크기 지표를 매번 직접 기록하지 말고 비동기 게이지 방식으로 보고하게 바꾸고 싶어"
+expected_intent: feature_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: balancer/rls/balancer.go
+    start_line: 82
+    end_line: 88
+    anchor: "cacheEntriesMetric = estats.RegisterInt64Gauge(estats.MetricDescriptor{"
+  - file: balancer/rls/balancer.go
+    start_line: 89
+    end_line: 95
+    anchor: "cacheSizeMetric = estats.RegisterInt64Gauge(estats.MetricDescriptor{"
+  - file: balancer/rls/balancer.go
+    start_line: 129
+    end_line: 153
+    anchor: "func (rlsBB) Build(cc balancer.ClientConn, opts balancer.BuildOptions) balancer.Balancer {"
+  - file: balancer/rls/balancer.go
+    start_line: 155
+    end_line: 200
+    anchor: "type rlsBalancer struct {"
+  - file: balancer/rls/balancer.go
+    start_line: 484
+    end_line: 501
+    anchor: "func (b *rlsBalancer) Close() {"
+  - file: balancer/rls/cache.go
+    start_line: 159
+    end_line: 180
+    anchor: "type dataCache struct {"
+  - file: balancer/rls/cache.go
+    start_line: 182
+    end_line: 193
+    anchor: "func newDataCache(size int64, logger *internalgrpclog.PrefixLogger, metricsRecorder estats.MetricsRecorder, grpcTarget string) *dataCache {"
+  - file: balancer/rls/cache.go
+    start_line: 304
+    end_line: 333
+    anchor: "func (dc *dataCache) addEntry(key cacheKey, entry *cacheEntry) (backoffCancelled bool, ok bool) {"
+  - file: balancer/rls/cache.go
+    start_line: 335
+    end_line: 342
+    anchor: "func (dc *dataCache) updateEntrySize(entry *cacheEntry, newSize int64) {"
+  - file: balancer/rls/cache.go
+    start_line: 365
+    end_line: 376
+    anchor: "func (dc *dataCache) deleteAndCleanup(key cacheKey, entry *cacheEntry) {"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 298
+    end_line: 302
+    anchor: "type NoopMetricsRecorder struct {"

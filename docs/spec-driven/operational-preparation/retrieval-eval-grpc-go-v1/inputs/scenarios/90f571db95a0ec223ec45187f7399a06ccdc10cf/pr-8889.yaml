@@ -1,0 +1,11 @@
+version: 1
+name: pr-8889
+description: "cdsbalancer: Increase timeout for test"
+prompt: "CDS 밸런서의 여러 지역 EDS 시험이 느린 기계에서 시간 초과로 실패해. 제한 시간을 늘리고 싶어"
+expected_intent: test_add
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go
+    start_line: 212
+    end_line: 344
+    anchor: "func (s) TestEDS_MultipleLocalities(t *testing.T) {"

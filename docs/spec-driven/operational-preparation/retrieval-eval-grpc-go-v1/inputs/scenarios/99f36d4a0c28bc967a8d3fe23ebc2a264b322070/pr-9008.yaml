@@ -1,0 +1,39 @@
+version: 1
+name: pr-9008
+description: "grpc/stats: Add support for custom labels in per call metrics (A108)"
+prompt: "호출마다 지표에 애플리케이션이 정한 사용자 정의 레이블을 하나 붙일 수 있게 하고 싶어"
+expected_intent: feature_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: balancer/rls/balancer.go
+    start_line: 96
+    end_line: 102
+    anchor: "defaultTargetPicksMetric = estats.RegisterInt64Count(estats.MetricDescriptor{"
+  - file: balancer/rls/balancer.go
+    start_line: 103
+    end_line: 109
+    anchor: "targetPicksMetric = estats.RegisterInt64Count(estats.MetricDescriptor{"
+  - file: balancer/rls/balancer.go
+    start_line: 110
+    end_line: 116
+    anchor: "failedPicksMetric = estats.RegisterInt64Count(estats.MetricDescriptor{"
+  - file: balancer/rls/picker.go
+    start_line: 182
+    end_line: 224
+    anchor: "func (p *rlsPicker) delegateToChildPoliciesLocked(dcEntry *cacheEntry, info balancer.PickInfo) (balancer.PickResult, func(), error) {"
+  - file: balancer/rls/picker.go
+    start_line: 226
+    end_line: 246
+    anchor: "func (p *rlsPicker) useDefaultPickIfPossible(info balancer.PickInfo, errOnNoDefault error) (balancer.PickResult, func(), error) {"
+  - file: stats/opentelemetry/client_metrics.go
+    start_line: 134
+    end_line: 143
+    anchor: "func (h *clientMetricsHandler) perCallMetrics(ctx context.Context, err error, startTime time.Time, ci *callInfo) {"
+  - file: stats/opentelemetry/client_metrics.go
+    start_line: 201
+    end_line: 227
+    anchor: "func (h *clientMetricsHandler) processRPCEvent(ctx context.Context, s stats.RPCStats, ai *attemptInfo) {"
+  - file: stats/opentelemetry/client_metrics.go
+    start_line: 239
+    end_line: 275
+    anchor: "func (h *clientMetricsHandler) processRPCEnd(ctx context.Context, ai *attemptInfo, e *stats.End) {"

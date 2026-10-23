@@ -1,0 +1,15 @@
+version: 1
+name: pr-9091
+description: "credentials/alts: fix the leaked context and close handshaker properly"
+prompt: "ALTS 핸드셰이크에서 문맥이 새고 핸드셰이커가 제대로 안 닫혀. 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: credentials/alts/alts.go
+    start_line: 171
+    end_line: 225
+    anchor: "func (g *altsTC) ClientHandshake(ctx context.Context, addr string, rawConn net.Conn) (_ net.Conn, _ credentials.AuthInfo, err error) {"
+  - file: credentials/alts/alts.go
+    start_line: 227
+    end_line: 268
+    anchor: "func (g *altsTC) ServerHandshake(rawConn net.Conn) (_ net.Conn, _ credentials.AuthInfo, err error) {"

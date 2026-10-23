@@ -1,0 +1,11 @@
+version: 1
+name: pr-8959
+description: "cds: increase defaultTestTimeout to 10s for e2e tests"
+prompt: "CDS e2e 시험이 RPC를 많이 보내다가 기본 시험 시간 제한에 걸려 실패해. 제한을 10초로 늘리고 싶어"
+expected_intent: test_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go
+    start_line: 72
+    end_line: 72
+    anchor: "defaultTestTimeout            = 5 * time.Second"

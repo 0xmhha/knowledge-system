@@ -1,0 +1,31 @@
+version: 1
+name: pr-8970
+description: "xdsclient: fix panic on empty resource in ADS response"
+prompt: "ADS 응답에 이름이 빈 리소스가 있으면 xDS 클라이언트가 가끔 panic이 나. 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: internal/xds/clients/xdsclient/channel.go
+    start_line: 197
+    end_line: 230
+    anchor: "func (xc *xdsChannel) onResponse(resp response, onDone func()) ([]string, error) {"
+  - file: internal/xds/clients/xdsclient/channel.go
+    start_line: 232
+    end_line: 301
+    anchor: "func decodeResponse(opts *DecodeOptions, rType *ResourceType, resp response) (map[string]dataAndErrTuple, xdsresource.UpdateMetadata, error) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_cds.go
+    start_line: 57
+    end_line: 78
+    anchor: "func unmarshalClusterResource(r *anypb.Any, serverCfg *bootstrap.ServerConfig) (string, ClusterUpdate, error) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_eds.go
+    start_line: 62
+    end_line: 83
+    anchor: "func unmarshalEndpointsResource(r *anypb.Any) (string, EndpointsUpdate, error) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_lds.go
+    start_line: 40
+    end_line: 60
+    anchor: "func unmarshalListenerResource(r *anypb.Any, opts *xdsclient.DecodeOptions) (string, ListenerUpdate, error) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_rds.go
+    start_line: 39
+    end_line: 59
+    anchor: "func unmarshalRouteConfigResource(r *anypb.Any, opts *xdsclient.DecodeOptions) (string, RouteConfigUpdate, error) {"

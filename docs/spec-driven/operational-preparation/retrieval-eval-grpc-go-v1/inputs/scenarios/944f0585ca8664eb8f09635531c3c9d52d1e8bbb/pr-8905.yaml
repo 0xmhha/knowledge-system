@@ -1,0 +1,11 @@
+version: 1
+name: pr-8905
+description: "correctly check nil stream"
+prompt: "keepalive 시험에서 스트림이 정상인지 확인하는 도우미가 nil 스트림을 제대로 검사하지 않아. 고치고 싶어"
+expected_intent: test_add
+expected_commit: 944f0585ca8664eb8f09635531c3c9d52d1e8bbb
+expected_citations:
+  - file: internal/transport/keepalive_test.go
+    start_line: 813
+    end_line: 821
+    anchor: "func checkForHealthyStream(client *http2Client) error {"

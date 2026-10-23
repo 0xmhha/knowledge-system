@@ -1,0 +1,15 @@
+version: 1
+name: pr-8875
+description: "xds: decouple A76 and A86 EDS metadata parsing"
+prompt: "EDS 메타데이터를 해석할 때 링 해시 엔드포인트 키 기능과 HTTP CONNECT 기능이 서로 묶여 있어. 각각 따로 켜지게 분리하고 싶어"
+expected_intent: bug_fix
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/xdsclient/xdsresource/metadata.go
+    start_line: 28
+    end_line: 30
+    anchor: "func init() {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_eds.go
+    start_line: 259
+    end_line: 288
+    anchor: "func validateAndConstructMetadata(metadataProto *v3corepb.Metadata) (map[string]any, error) {"

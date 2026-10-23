@@ -1,0 +1,15 @@
+version: 1
+name: pr-9069
+description: "grpc: add link to CVE in log messages"
+prompt: "엄격한 경로 검사를 끈 경우에 찍는 경고 로그에 관련 CVE 링크를 넣고 싶어"
+expected_intent: docs_update
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: internal/envconfig/envconfig.go
+    start_line: 107
+    end_line: 121
+    anchor: "DisableStrictPathChecking = boolFromEnv(\"GRPC_GO_EXPERIMENTAL_DISABLE_STRICT_PATH_CHECKING\", false)"
+  - file: server.go
+    start_line: 1787
+    end_line: 1889
+    anchor: "func (s *Server) handleStream(t transport.ServerTransport, stream *transport.ServerStream) {"

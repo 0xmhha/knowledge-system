@@ -1,0 +1,11 @@
+version: 1
+name: pr-9100
+description: "xds/resolver: support HTTP filters for routes using cluster specifier plugins"
+prompt: "xDS 리졸버가 클러스터 지정 플러그인을 쓰는 라우트에는 HTTP 필터 체인을 만들지 않아. 그 라우트에도 필터가 적용되게 하고 싶어"
+expected_intent: bug_fix
+expected_commit: 39f16539d2463c05d52b4c44137831fd5f73f7d9
+expected_citations:
+  - file: internal/xds/resolver/xds_resolver.go
+    start_line: 382
+    end_line: 488
+    anchor: "func (r *xdsResolver) newConfigSelector() (_ *configSelector, err error) {"

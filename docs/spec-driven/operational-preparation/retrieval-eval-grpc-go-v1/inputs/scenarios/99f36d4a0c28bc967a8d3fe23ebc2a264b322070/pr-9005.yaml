@@ -1,0 +1,43 @@
+version: 1
+name: pr-9005
+description: "xds: LRS custom metrics changes (a85)"
+prompt: "xDS 부하 보고(LRS)에 사용자 정의 지표를 보내는 방식을 새 제안대로 바꾸고 싶어"
+expected_intent: feature_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 111
+    end_line: 150
+    anchor: "type clusterImplBalancer struct {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 152
+    end_line: 195
+    anchor: "func (b *clusterImplBalancer) handleDropAndRequestCountLocked(clusterConfig xdsresource.ClusterConfig) bool {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 197
+    end_line: 207
+    anchor: "func (b *clusterImplBalancer) newPickerLocked() *picker {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 366
+    end_line: 455
+    anchor: "func (b *clusterImplBalancer) UpdateClientConnState(s balancer.ClientConnState) error {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 84
+    end_line: 93
+    anchor: "type picker struct {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 106
+    end_line: 205
+    anchor: "func (d *picker) Pick(info balancer.PickInfo) (balancer.PickResult, error) {"
+  - file: internal/xds/clients/lrsclient/lrs_stream.go
+    start_line: 234
+    end_line: 295
+    anchor: "func (lrs *streamImpl) sendLoadStatsRequest(stream clients.Stream, loads []*loadData) error {"
+  - file: internal/xds/xdsclient/xdsresource/type_cds.go
+    start_line: 44
+    end_line: 82
+    anchor: "type ClusterUpdate struct {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_cds.go
+    start_line: 88
+    end_line: 235
+    anchor: "func validateClusterAndConstructClusterUpdate(cluster *v3clusterpb.Cluster, serverCfg *bootstrap.ServerConfig) (ClusterUpdate, error) {"

@@ -1,0 +1,15 @@
+version: 1
+name: pr-9109
+description: "transport: set current timestamp in channelz socket metrics"
+prompt: "채널z 소켓 지표의 마지막 메시지 보낸 시각과 받은 시각이 실제 시각이 아니야. 현재 시각이 기록되게 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: internal/transport/http2_server.go
+    start_line: 1441
+    end_line: 1446
+    anchor: "func (t *http2Server) incrMsgSent() {"
+  - file: internal/transport/http2_server.go
+    start_line: 1448
+    end_line: 1453
+    anchor: "func (t *http2Server) incrMsgRecv() {"

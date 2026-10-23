@@ -1,0 +1,11 @@
+version: 1
+name: pr-8832
+description: "transport: make the client send a RST_STREAM when it receives an END_STREAM from the server"
+prompt: "서버가 스트림 끝(END_STREAM)을 보냈는데 클라이언트 쪽 스트림이 아직 열려 있으면, 클라이언트가 RST_STREAM을 보내야 해. 지금은 안 보내는데 어디를 고쳐야 해?"
+expected_intent: bug_fix
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: internal/transport/http2_client.go
+    start_line: 1181
+    end_line: 1241
+    anchor: "func (t *http2Client) handleData(f *parsedDataFrame) {"

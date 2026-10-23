@@ -1,0 +1,15 @@
+version: 1
+name: pr-8793
+description: "xds: Add `IsDynamic` field to cdsbalancer LB and make it true for RLS"
+prompt: "CDS 밸런서 설정에 동적 클러스터인지 표시하는 값을 추가하고, 라우트 조회 서비스의 클러스터 지정 플러그인에서는 그걸 켜고 싶어"
+expected_intent: refactor
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 135
+    end_line: 140
+    anchor: "type lbConfig struct {"
+  - file: internal/xds/clusterspecifier/rls/rls.go
+    start_line: 54
+    end_line: 95
+    anchor: "func (rls) ParseClusterSpecifierConfig(cfg proto.Message) (clusterspecifier.BalancerConfig, error) {"

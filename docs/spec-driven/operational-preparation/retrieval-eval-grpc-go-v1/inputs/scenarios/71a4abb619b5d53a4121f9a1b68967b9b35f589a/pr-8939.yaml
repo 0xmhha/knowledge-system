@@ -1,0 +1,59 @@
+version: 1
+name: pr-8939
+description: "xds/clusterresolver: improve configbuilder tests by removing globals"
+prompt: "xDS 클러스터 리졸버 설정 생성 시험이 패키지 전역 변수와 패키지 초기화 함수에 기대고 있어. 도우미 함수로 바꾸고 싶어"
+expected_intent: test_add
+expected_commit: 71a4abb619b5d53a4121f9a1b68967b9b35f589a
+expected_citations:
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 60
+    end_line: 60
+    anchor: "localityCount       = 5"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 61
+    end_line: 61
+    anchor: "endpointPerLocality = 2"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 65
+    end_line: 65
+    anchor: "testLocalityIDs       []clients.Locality"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 66
+    end_line: 66
+    anchor: "testResolverEndpoints [][]resolver.Endpoint"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 67
+    end_line: 67
+    anchor: "testEndpoints         [][]xdsresource.Endpoint"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 69
+    end_line: 69
+    anchor: "testLocalitiesP0, testLocalitiesP1 []xdsresource.Locality"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 69
+    end_line: 69
+    anchor: "testLocalitiesP0, testLocalitiesP1 []xdsresource.Locality"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 90
+    end_line: 144
+    anchor: "func init() {"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 146
+    end_line: 212
+    anchor: "func (s) TestBuildPriorityConfigJSON(t *testing.T) {"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 214
+    end_line: 321
+    anchor: "func (s) TestBuildPriorityConfig(t *testing.T) {"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 406
+    end_line: 495
+    anchor: "func (s) TestBuildClusterImplConfigForEDS_PickFirstWeightedShuffling_Disabled(t *testing.T) {"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 497
+    end_line: 603
+    anchor: "func (s) TestBuildClusterImplConfigForEDS_PickFirstWeightedShuffling_Enabled(t *testing.T) {"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder_test.go
+    start_line: 604
+    end_line: 664
+    anchor: "func (s) TestGroupLocalitiesByPriority(t *testing.T) {"

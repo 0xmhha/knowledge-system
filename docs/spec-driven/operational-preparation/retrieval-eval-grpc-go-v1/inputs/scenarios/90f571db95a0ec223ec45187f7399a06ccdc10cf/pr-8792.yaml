@@ -1,0 +1,35 @@
+version: 1
+name: pr-8792
+description: "xdsdepmgr: add functionality for cluster subscription"
+prompt: "xDS 의존성 관리에서 클러스터를 구독하면 참조 수를 올리고 해지하면 내리는 기능을 만들고 싶어. 동적 클러스터 감시에 쓸 거야"
+expected_intent: refactor
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: internal/xds/resolver/xds_resolver.go
+    start_line: 109
+    end_line: 155
+    anchor: "func (b *xdsResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (_ resolver.Resolver, retErr error) {"
+  - file: internal/xds/resolver/xds_resolver.go
+    start_line: 294
+    end_line: 339
+    anchor: "func (r *xdsResolver) sendNewServiceConfig(cs stoppableConfigSelector) bool {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager.go
+    start_line: 102
+    end_line: 132
+    anchor: "type DependencyManager struct {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager.go
+    start_line: 134
+    end_line: 176
+    anchor: "func New(listenerName, dataplaneAuthority string, xdsClient xdsclient.XDSClient, watcher ConfigWatcher) *DependencyManager {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager.go
+    start_line: 217
+    end_line: 275
+    anchor: "func (m *DependencyManager) maybeSendUpdateLocked() {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager.go
+    start_line: 440
+    end_line: 475
+    anchor: "func (m *DependencyManager) applyRouteConfigUpdateLocked(update *xdsresource.RouteConfigUpdate) {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager.go
+    start_line: 829
+    end_line: 854
+    anchor: "func (m *DependencyManager) newDNSResolver(target string) *xdsResourceState[xdsresource.DNSUpdate, dnsExtras] {"

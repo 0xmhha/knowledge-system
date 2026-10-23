@@ -1,0 +1,19 @@
+version: 1
+name: pr-8844
+description: "xds: remove `HashKey` field from `xdsresource.Endpoint` struct"
+prompt: "xDS 엔드포인트 구조체에 있는 해시 키 필드를 빼고, EDS를 해석할 때 속성으로 넣게 바꾸고 싶어"
+expected_intent: refactor
+expected_commit: bb2073d1e5551b900763979e08e1c11a47a8f150
+expected_citations:
+  - file: internal/xds/balancer/clusterresolver/configbuilder.go
+    start_line: 250
+    end_line: 302
+    anchor: "func priorityLocalitiesToClusterImpl(localities []xdsresource.Locality, priorityName string, mechanism DiscoveryMechanism, drops []clusterimpl.DropConfig, xdsLBPolicy *internalserviceconfig.BalancerConfig) (*clusterimpl.LBConfig, []resolver.Endpoint, error) {"
+  - file: internal/xds/xdsclient/xdsresource/type_eds.go
+    start_line: 51
+    end_line: 59
+    anchor: "type Endpoint struct {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_eds.go
+    start_line: 109
+    end_line: 166
+    anchor: "func parseEndpoints(lbEndpoints []*v3endpointpb.LbEndpoint, uniqueEndpointAddrs map[string]bool) ([]Endpoint, error) {"

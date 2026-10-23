@@ -1,0 +1,19 @@
+version: 1
+name: pr-8929
+description: "transport: surface subsequent data when receiving non-gRPC header"
+prompt: "응답 content-type이 gRPC가 아니면, 뒤따르는 데이터 일부(최대 1KB)를 읽어서 오류 메시지에 붙여 주고 싶어"
+expected_intent: feature_add
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: internal/transport/client_stream.go
+    start_line: 31
+    end_line: 55
+    anchor: "type ClientStream struct {"
+  - file: internal/transport/http2_client.go
+    start_line: 1183
+    end_line: 1246
+    anchor: "func (t *http2Client) handleData(f *parsedDataFrame) {"
+  - file: internal/transport/http2_client.go
+    start_line: 1446
+    end_line: 1628
+    anchor: "func (t *http2Client) operateHeaders(frame *http2.MetaHeadersFrame) {"

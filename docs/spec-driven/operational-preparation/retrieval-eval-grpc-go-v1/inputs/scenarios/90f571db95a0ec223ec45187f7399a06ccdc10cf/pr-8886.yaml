@@ -1,0 +1,11 @@
+version: 1
+name: pr-8886
+description: "mem: ensure `Reader` buffers are reused on early return"
+prompt: "메시지 읽기에서 압축 해제 중 오류로 일찍 반환하면 버퍼가 풀에 안 돌아가. 오류가 나도 버퍼를 돌려주게 하고 싶어"
+expected_intent: refactor
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: rpc_util.go
+    start_line: 964
+    end_line: 1004
+    anchor: "func decompress(compressor encoding.Compressor, d mem.BufferSlice, dc Decompressor, maxReceiveMessageSize int, pool mem.BufferPool) (mem.BufferSlice, error) {"

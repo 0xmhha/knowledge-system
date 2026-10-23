@@ -1,0 +1,15 @@
+version: 1
+name: pr-8830
+description: "encoding: remove unused `DecompressedSize` API"
+prompt: "gzip 압축기에 있는 압축 해제 후 크기를 알려주는 API를 아무도 안 써. 지우고 싶어"
+expected_intent: refactor
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: encoding/encoding.go
+    start_line: 59
+    end_line: 78
+    anchor: "type Compressor interface {"
+  - file: encoding/gzip/gzip.go
+    start_line: 114
+    end_line: 123
+    anchor: "func (c *compressor) DecompressedSize(buf []byte) int {"

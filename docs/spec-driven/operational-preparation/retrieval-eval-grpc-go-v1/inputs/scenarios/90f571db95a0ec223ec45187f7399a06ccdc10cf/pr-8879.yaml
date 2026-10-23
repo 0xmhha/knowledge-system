@@ -1,0 +1,11 @@
+version: 1
+name: pr-8879
+description: "cmd/protoc-gen-go-grpc: bump -version to 1.6.1 for release"
+prompt: "코드 생성 플러그인 protoc-gen-go-grpc의 버전 표시를 다음 릴리스 번호로 올리고 싶어"
+expected_intent: bug_fix
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: cmd/protoc-gen-go-grpc/main.go
+    start_line: 45
+    end_line: 45
+    anchor: "const version = \"1.6.0\""

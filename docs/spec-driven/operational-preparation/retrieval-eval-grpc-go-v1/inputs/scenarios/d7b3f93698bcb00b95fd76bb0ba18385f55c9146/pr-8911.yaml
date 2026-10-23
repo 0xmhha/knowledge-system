@@ -1,0 +1,11 @@
+version: 1
+name: pr-8911
+description: "orca: fix goroutine leak in fakeORCAService.StreamCoreMetrics"
+prompt: "가짜 ORCA 서비스가 요청을 채널로 보내다가 시험 문맥이 끝나면 고루틴이 영원히 막혀서 새. 고치고 싶어"
+expected_intent: test_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: orca/producer_test.go
+    start_line: 238
+    end_line: 264
+    anchor: "func (f *fakeORCAService) StreamCoreMetrics(req *v3orcaservicepb.OrcaLoadReportRequest, stream v3orcaservicegrpc.OpenRcaService_StreamCoreMetricsServer) error {"

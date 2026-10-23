@@ -1,0 +1,51 @@
+version: 1
+name: pr-8869
+description: "xds/googlec2p: Revert PR 8829 that removed `SetFallbackBootstrapConfig`"
+prompt: "구글 C2P 쪽 전역 대체 부트스트랩 설정 API를 지웠는데 내부에서 아직 쓰고 있어. 지운 변경을 되돌리고 싶어"
+expected_intent: bug_fix
+expected_commit: 61d569d3e4007c48b1ca6b6800f13e5b5bba668c
+expected_citations:
+  - file: internal/xds/bootstrap/bootstrap.go
+    start_line: 650
+    end_line: 685
+    anchor: "func GetConfiguration() (*Config, error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 43
+    end_line: 53
+    anchor: "type Pool struct {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 80
+    end_line: 96
+    anchor: "func NewPool(config *bootstrap.Config) *Pool {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 98
+    end_line: 107
+    anchor: "func (p *Pool) getBootstrapConfiguration() (*bootstrap.Config, error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 109
+    end_line: 116
+    anchor: "func (p *Pool) getConfig(config *bootstrap.Config) (*bootstrap.Config, error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 118
+    end_line: 134
+    anchor: "func (p *Pool) NewClientWithConfig(name string, metricsRecorder estats.MetricsRecorder, config *bootstrap.Config) (XDSClient, func(), error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 136
+    end_line: 149
+    anchor: "func (p *Pool) NewClient(name string, metricsRecorder estats.MetricsRecorder) (XDSClient, func(), error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 151
+    end_line: 189
+    anchor: "func (p *Pool) NewClientForTesting(opts OptionsForTesting) (XDSClient, func(), error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 236
+    end_line: 245
+    anchor: "func (p *Pool) BootstrapConfigForTesting() *bootstrap.Config {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 247
+    end_line: 255
+    anchor: "func (p *Pool) UnsetBootstrapConfigForTesting() {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 293
+    end_line: 319
+    anchor: "func (p *Pool) newRefCounted(name string, metricsRecorder estats.MetricsRecorder, watchExpiryTimeout time.Duration, config *bootstrap.Config) (*clientImpl, func(), error) {"

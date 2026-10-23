@@ -1,0 +1,239 @@
+version: 1
+name: pr-8878
+description: "xds: refactor server-side HTTP filter processing"
+prompt: "서버 쪽 xDS HTTP 필터 처리 구조를 필터 상태를 유지하기 쉽게 다시 짜고 싶어"
+expected_intent: refactor
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/resolver/xds_resolver.go
+    start_line: 308
+    end_line: 355
+    anchor: "func (r *xdsResolver) sendNewServiceConfig(cs stoppableConfigSelector) bool {"
+  - file: internal/xds/resolver/xds_resolver.go
+    start_line: 357
+    end_line: 426
+    anchor: "func (r *xdsResolver) newConfigSelector() (*configSelector, error) {"
+  - file: internal/xds/server/conn_wrapper.go
+    start_line: 34
+    end_line: 71
+    anchor: "type connWrapper struct {"
+  - file: internal/xds/server/conn_wrapper.go
+    start_line: 73
+    end_line: 77
+    anchor: "func (c *connWrapper) UsableRouteConfiguration() xdsresource.UsableRouteConfiguration {"
+  - file: internal/xds/server/conn_wrapper.go
+    start_line: 98
+    end_line: 130
+    anchor: "func (c *connWrapper) XDSHandshakeInfo() (*xdsinternal.HandshakeInfo, error) {"
+  - file: internal/xds/server/listener_wrapper.go
+    start_line: 112
+    end_line: 161
+    anchor: "type listenerWrapper struct {"
+  - file: internal/xds/server/listener_wrapper.go
+    start_line: 194
+    end_line: 218
+    anchor: "func (l *listenerWrapper) handleRDSUpdate(routeName string, rcu rdsWatcherUpdate) {"
+  - file: internal/xds/server/listener_wrapper.go
+    start_line: 220
+    end_line: 243
+    anchor: "func (l *listenerWrapper) instantiateFilterChainRoutingConfigurationsLocked() {"
+  - file: internal/xds/server/listener_wrapper.go
+    start_line: 245
+    end_line: 328
+    anchor: "func (l *listenerWrapper) Accept() (net.Conn, error) {"
+  - file: internal/xds/server/listener_wrapper.go
+    start_line: 390
+    end_line: 429
+    anchor: "func (lw *ldsWatcher) ResourceChanged(update *xdsresource.ListenerUpdate, onDone func()) {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 39
+    end_line: 41
+    anchor: "unspecifiedPrefixMapKey = \"unspecified\""
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 43
+    end_line: 52
+    anchor: "noPrefixMatch          = -2"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 53
+    end_line: 53
+    anchor: "unspecifiedPrefixMatch = -1"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 56
+    end_line: 75
+    anchor: "type FilterChain struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 77
+    end_line: 86
+    anchor: "type VirtualHostWithInterceptors struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 88
+    end_line: 99
+    anchor: "type RouteWithInterceptors struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 101
+    end_line: 107
+    anchor: "type UsableRouteConfiguration struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 109
+    end_line: 113
+    anchor: "func (rc *UsableRouteConfiguration) StatusErrWithNodeID(c codes.Code, msg string, args ...any) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 115
+    end_line: 129
+    anchor: "func (fc *FilterChain) ConstructUsableRouteConfiguration(config RouteConfigUpdate) *UsableRouteConfiguration {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 131
+    end_line: 159
+    anchor: "func (fc *FilterChain) convertVirtualHost(virtualHost *VirtualHost) (VirtualHostWithInterceptors, error) {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 161
+    end_line: 162
+    anchor: "type SourceType int"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 165
+    end_line: 166
+    anchor: "SourceTypeAny SourceType = iota"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 167
+    end_line: 168
+    anchor: "SourceTypeSameOrLoopback"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 169
+    end_line: 170
+    anchor: "SourceTypeExternal"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 173
+    end_line: 222
+    anchor: "type FilterChainManager struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 224
+    end_line: 240
+    anchor: "type destPrefixEntry struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 242
+    end_line: 243
+    anchor: "type sourceTypesArray [3]*sourcePrefixes"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 245
+    end_line: 252
+    anchor: "type sourcePrefixes struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 254
+    end_line: 262
+    anchor: "type sourcePrefixEntry struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 264
+    end_line: 318
+    anchor: "func NewFilterChainManager(lis *v3listenerpb.Listener) (*FilterChainManager, error) {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 320
+    end_line: 339
+    anchor: "func (fcm *FilterChainManager) addFilterChains(fcs []*v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 341
+    end_line: 371
+    anchor: "func (fcm *FilterChainManager) addFilterChainsForDestPrefixes(fc *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 373
+    end_line: 382
+    anchor: "func (fcm *FilterChainManager) addFilterChainsForServerNames(dstEntry *destPrefixEntry, fc *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 384
+    end_line: 406
+    anchor: "func (fcm *FilterChainManager) addFilterChainsForTransportProtocols(dstEntry *destPrefixEntry, fc *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 408
+    end_line: 414
+    anchor: "func (fcm *FilterChainManager) addFilterChainsForApplicationProtocols(dstEntry *destPrefixEntry, fc *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 416
+    end_line: 437
+    anchor: "func (fcm *FilterChainManager) addFilterChainsForSourceType(dstEntry *destPrefixEntry, fc *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 439
+    end_line: 477
+    anchor: "func (fcm *FilterChainManager) addFilterChainsForSourcePrefixes(srcPrefixMap map[string]*sourcePrefixEntry, fc *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 479
+    end_line: 512
+    anchor: "func (fcm *FilterChainManager) addFilterChainsForSourcePorts(srcEntry *sourcePrefixEntry, fcProto *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 514
+    end_line: 517
+    anchor: "func (fcm *FilterChainManager) FilterChains() []*FilterChain {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 519
+    end_line: 581
+    anchor: "func (fcm *FilterChainManager) filterChainFromProto(fc *v3listenerpb.FilterChain) (*FilterChain, error) {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 583
+    end_line: 600
+    anchor: "func (fcm *FilterChainManager) Validate(f func(fc *FilterChain) error) error {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 602
+    end_line: 702
+    anchor: "func processNetworkFilters(filters []*v3listenerpb.Filter) (*FilterChain, error) {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 704
+    end_line: 717
+    anchor: "type FilterChainLookupParams struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 719
+    end_line: 756
+    anchor: "func (fcm *FilterChainManager) Lookup(params FilterChainLookupParams) (*FilterChain, error) {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 758
+    end_line: 794
+    anchor: "func filterByDestinationPrefixes(dstPrefixes []*destPrefixEntry, isUnspecified bool, dstAddr net.IP) []*destPrefixEntry {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 796
+    end_line: 834
+    anchor: "func filterBySourceType(dstPrefixes []*destPrefixEntry, srcType SourceType) []*sourcePrefixes {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 836
+    end_line: 880
+    anchor: "func filterBySourcePrefixes(srcPrefixes []*sourcePrefixes, srcAddr net.IP) (*sourcePrefixEntry, error) {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 882
+    end_line: 900
+    anchor: "func filterBySourcePorts(spe *sourcePrefixEntry, srcPort int) *FilterChain {"
+  - file: internal/xds/xdsclient/xdsresource/listener_resource_type.go
+    start_line: 83
+    end_line: 93
+    anchor: "func listenerValidator(bc *bootstrap.Config, lis ListenerUpdate) error {"
+  - file: internal/xds/xdsclient/xdsresource/matcher.go
+    start_line: 257
+    end_line: 283
+    anchor: "func FindBestMatchingVirtualHostServer(authority string, vHosts []VirtualHostWithInterceptors) *VirtualHostWithInterceptors {"
+  - file: internal/xds/xdsclient/xdsresource/type_lds.go
+    start_line: 27
+    end_line: 53
+    anchor: "type ListenerUpdate struct {"
+  - file: internal/xds/xdsclient/xdsresource/type_lds.go
+    start_line: 68
+    end_line: 79
+    anchor: "type InboundListenerConfig struct {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_lds.go
+    start_line: 65
+    end_line: 120
+    anchor: "func processClientSideListener(lis *v3listenerpb.Listener, opts *xdsclient.DecodeOptions) (*ListenerUpdate, error) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_lds.go
+    start_line: 250
+    end_line: 278
+    anchor: "func processServerSideListener(lis *v3listenerpb.Listener) (*ListenerUpdate, error) {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager.go
+    start_line: 516
+    end_line: 577
+    anchor: "func (m *DependencyManager) onListenerResourceUpdate(update *xdsresource.ListenerUpdate, onDone func()) {"
+  - file: xds/server.go
+    start_line: 239
+    end_line: 305
+    anchor: "func routeAndProcess(ctx context.Context) error {"
+  - file: xds/server.go
+    start_line: 307
+    end_line: 314
+    anchor: "func xdsUnaryInterceptor(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {"
+  - file: xds/server.go
+    start_line: 316
+    end_line: 323
+    anchor: "func xdsStreamInterceptor(srv any, ss grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) error {"

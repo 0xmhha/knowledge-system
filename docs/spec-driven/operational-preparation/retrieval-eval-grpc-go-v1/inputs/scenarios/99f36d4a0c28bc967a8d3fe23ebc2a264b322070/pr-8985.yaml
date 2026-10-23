@@ -1,0 +1,15 @@
+version: 1
+name: pr-8985
+description: "grpc: enforce strict path checking for incoming requests on the server"
+prompt: "서버가 맨 앞 슬래시가 없는 잘못된 :path 헤더를 받아들여서 경로 기반 거부 규칙을 우회할 수 있어. 정규 형식이 아닌 경로는 바로 거부하고 싶어"
+expected_intent: security
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: server.go
+    start_line: 125
+    end_line: 152
+    anchor: "type Server struct {"
+  - file: server.go
+    start_line: 1766
+    end_line: 1864
+    anchor: "func (s *Server) handleStream(t transport.ServerTransport, stream *transport.ServerStream) {"

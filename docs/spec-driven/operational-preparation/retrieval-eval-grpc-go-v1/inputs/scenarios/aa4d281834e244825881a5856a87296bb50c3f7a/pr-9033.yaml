@@ -1,0 +1,119 @@
+version: 1
+name: pr-9033
+description: "tests: avoid relying on socket reads/writes for synchronization"
+prompt: "시험들이 소켓 읽기와 쓰기를 동기화 수단으로 써서 race 탐지기가 실패해. 다른 동기화 방법으로 바꾸고 싶어"
+expected_intent: test_add
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: encoding/encoding_test.go
+    start_line: 112
+    end_line: 148
+    anchor: "func (s) TestEncodeDoesntPanicOnServer(t *testing.T) {"
+  - file: encoding/encoding_test.go
+    start_line: 150
+    end_line: 185
+    anchor: "func (s) TestDecodeDoesntPanicOnServer(t *testing.T) {"
+  - file: internal/xds/balancer/clusterimpl/tests/balancer_test.go
+    start_line: 1351
+    end_line: 1434
+    anchor: "func (s) TestAuthorityOverriding(t *testing.T) {"
+  - file: internal/xds/clients/lrsclient/loadreport_test.go
+    start_line: 630
+    end_line: 724
+    anchor: "func (s) TestReportLoad_LoadReportInterval(t *testing.T) {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager_test.go
+    start_line: 1469
+    end_line: 1535
+    anchor: "func (s) TestEndpointAmbientError(t *testing.T) {"
+  - file: orca/producer_test.go
+    start_line: 270
+    end_line: 396
+    anchor: "func (s) TestProducerBackoff(t *testing.T) {"
+  - file: test/end2end_test.go
+    start_line: 2079
+    end_line: 2081
+    anchor: "type myTap struct {"
+  - file: test/end2end_test.go
+    start_line: 2083
+    end_line: 2099
+    anchor: "func (t *myTap) handle(ctx context.Context, info *tap.Info) (context.Context, error) {"
+  - file: test/end2end_test.go
+    start_line: 2101
+    end_line: 2155
+    anchor: "func testTap(t *testing.T, e env) {"
+  - file: test/end2end_test.go
+    start_line: 5169
+    end_line: 5194
+    anchor: "func (s) TestGRPCMethod(t *testing.T) {"
+  - file: test/end2end_test.go
+    start_line: 5613
+    end_line: 5632
+    anchor: "func (s) TestMethodFromServerStream(t *testing.T) {"
+  - file: test/end2end_test.go
+    start_line: 6215
+    end_line: 6249
+    anchor: "func testLargeTimeout(t *testing.T, e env) {"
+  - file: test/end2end_test.go
+    start_line: 6962
+    end_line: 6964
+    anchor: "type mockMethodLogger struct {"
+  - file: test/end2end_test.go
+    start_line: 6966
+    end_line: 6968
+    anchor: "func (mml *mockMethodLogger) Log(context.Context, binarylog.LogEntryConfig) {"
+  - file: test/end2end_test.go
+    start_line: 6970
+    end_line: 7035
+    anchor: "func (s) TestGlobalBinaryLoggingOptions(t *testing.T) {"
+  - file: test/retry_test.go
+    start_line: 48
+    end_line: 104
+    anchor: "func (s) TestRetryUnary(t *testing.T) {"
+  - file: test/retry_test.go
+    start_line: 106
+    end_line: 168
+    anchor: "func (s) TestRetryThrottling(t *testing.T) {"
+  - file: test/retry_test.go
+    start_line: 170
+    end_line: 479
+    anchor: "func (s) TestRetryStreaming(t *testing.T) {"
+  - file: test/retry_test.go
+    start_line: 481
+    end_line: 573
+    anchor: "func (s) TestMaxCallAttempts(t *testing.T) {"
+  - file: test/server_test.go
+    start_line: 232
+    end_line: 328
+    anchor: "func (s) TestChainStreamServerInterceptor(t *testing.T) {"
+  - file: test/xds/xds_client_retry_test.go
+    start_line: 41
+    end_line: 181
+    anchor: "func (s) TestClientSideRetry(t *testing.T) {"
+  - file: test/xds/xds_server_rbac_test.go
+    start_line: 415
+    end_line: 765
+    anchor: "func (s) TestRBACHTTPFilter(t *testing.T) {"
+  - file: test/xds/xds_server_rbac_test.go
+    start_line: 958
+    end_line: 961
+    anchor: "type statAuditLogger struct {"
+  - file: test/xds/xds_server_rbac_test.go
+    start_line: 963
+    end_line: 966
+    anchor: "func (s *statAuditLogger) Log(event *audit.Event) {"
+  - file: test/xds/xds_server_rbac_test.go
+    start_line: 968
+    end_line: 971
+    anchor: "type loggerBuilder struct {"
+  - file: test/xds/xds_server_rbac_test.go
+    start_line: 973
+    end_line: 975
+    anchor: "func (loggerBuilder) Name() string {"
+  - file: test/xds/xds_server_rbac_test.go
+    start_line: 977
+    end_line: 982
+    anchor: "func (lb *loggerBuilder) Build(audit.LoggerConfig) audit.Logger {"
+  - file: xds/server_test.go
+    start_line: 349
+    end_line: 472
+    anchor: "func (s) TestServeSuccess(t *testing.T) {"

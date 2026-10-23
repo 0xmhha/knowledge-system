@@ -1,0 +1,11 @@
+version: 1
+name: pr-8960
+description: "cds: use a grpcsync.Event instead of a channel to communicate resource names being requested"
+prompt: "CDS 클러스터 리소스 갱신 시험이 요청된 리소스 이름을 채널로 주고받다가 가끔 실패해. 이벤트 방식으로 바꾸고 싶어"
+expected_intent: test_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go
+    start_line: 619
+    end_line: 769
+    anchor: "func (s) TestEDS_ClusterResourceUpdates(t *testing.T) {"

@@ -1,0 +1,19 @@
+version: 1
+name: pr-8815
+description: "wrr: use new-style atomic APIs"
+prompt: "가중 라운드로빈 스케줄러의 원자 연산을 새 스타일 atomic 타입으로 바꾸고 싶어"
+expected_intent: refactor
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: balancer/weightedroundrobin/balancer.go
+    start_line: 249
+    end_line: 304
+    anchor: "func (b *wrrBalancer) UpdateState(state balancer.State) {"
+  - file: balancer/weightedroundrobin/balancer.go
+    start_line: 414
+    end_line: 429
+    anchor: "type picker struct {"
+  - file: balancer/weightedroundrobin/balancer.go
+    start_line: 466
+    end_line: 468
+    anchor: "func (p *picker) inc() uint32 {"

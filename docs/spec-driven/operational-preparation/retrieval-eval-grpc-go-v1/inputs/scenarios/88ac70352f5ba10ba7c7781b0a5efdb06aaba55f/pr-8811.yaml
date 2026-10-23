@@ -1,0 +1,19 @@
+version: 1
+name: pr-8811
+description: "cdsbalancer: Remove UpdateAddresses handling"
+prompt: "CDS 밸런서가 감싼 클라이언트 연결에서 서브커넥션 주소 갱신 처리를 없애고 싶어"
+expected_intent: refactor
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 82
+    end_line: 128
+    anchor: "func (bb) Build(cc balancer.ClientConn, opts balancer.BuildOptions) balancer.Balancer {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 673
+    end_line: 683
+    anchor: "type ccWrapper struct {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer.go
+    start_line: 699
+    end_line: 705
+    anchor: "func (ccw *ccWrapper) UpdateAddresses(sc balancer.SubConn, addrs []resolver.Address) {"

@@ -1,0 +1,11 @@
+version: 1
+name: pr-8894
+description: "grpc: introduce ErrRetriesExhausted to wrap retry failures"
+prompt: "재시도 횟수를 다 썼을 때 실패를 감싸는 전용 오류 값을 만들어서 호출자가 구별할 수 있게 하고 싶어"
+expected_intent: feature_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: stream.go
+    start_line: 682
+    end_line: 779
+    anchor: "func (a *csAttempt) shouldRetry(err error) (bool, error) {"

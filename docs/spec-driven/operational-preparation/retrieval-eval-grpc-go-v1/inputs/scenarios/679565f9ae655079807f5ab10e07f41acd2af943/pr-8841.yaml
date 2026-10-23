@@ -1,0 +1,51 @@
+version: 1
+name: pr-8841
+description: "xds: remove references to ResolverState.Addresses"
+prompt: "xDS 코드에서 리졸버 상태의 주소 목록을 쓰는 곳을 모두 없애고 엔드포인트만 쓰게 하고 싶어"
+expected_intent: refactor
+expected_commit: 679565f9ae655079807f5ab10e07f41acd2af943
+expected_citations:
+  - file: balancer/weightedtarget/weightedtarget.go
+    start_line: 97
+    end_line: 181
+    anchor: "func (b *weightedTargetBalancer) UpdateClientConnState(s balancer.ClientConnState) error {"
+  - file: internal/hierarchy/hierarchy.go
+    start_line: 63
+    end_line: 71
+    anchor: "func Get(addr resolver.Address) []string {"
+  - file: internal/hierarchy/hierarchy.go
+    start_line: 73
+    end_line: 77
+    anchor: "func Set(addr resolver.Address, path []string) resolver.Address {"
+  - file: internal/hierarchy/hierarchy.go
+    start_line: 79
+    end_line: 124
+    anchor: "func Group(addrs []resolver.Address) map[string][]resolver.Address {"
+  - file: internal/hierarchy/hierarchy.go
+    start_line: 126
+    end_line: 171
+    anchor: "func GroupEndpoints(endpoints []resolver.Endpoint) map[string][]resolver.Endpoint {"
+  - file: internal/xds/balancer/clustermanager/clustermanager.go
+    start_line: 85
+    end_line: 168
+    anchor: "func (b *bal) updateChildren(s balancer.ClientConnState, newConfig *lbConfig) error {"
+  - file: internal/xds/balancer/clusterresolver/clusterresolver.go
+    start_line: 226
+    end_line: 285
+    anchor: "func (b *clusterResolverBalancer) updateChildConfig() {"
+  - file: internal/xds/balancer/clusterresolver/resource_resolver_dns.go
+    start_line: 130
+    end_line: 150
+    anchor: "func (dr *dnsDiscoveryMechanism) UpdateState(state resolver.State) error {"
+  - file: internal/xds/balancer/clusterresolver/resource_resolver_dns.go
+    start_line: 174
+    end_line: 176
+    anchor: "func (dr *dnsDiscoveryMechanism) NewAddress(addresses []resolver.Address) {"
+  - file: internal/xds/balancer/priority/balancer.go
+    start_line: 116
+    end_line: 210
+    anchor: "func (b *priorityBalancer) UpdateClientConnState(s balancer.ClientConnState) error {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager.go
+    start_line: 748
+    end_line: 772
+    anchor: "func (m *DependencyManager) onDNSUpdate(resourceName string, update *resolver.State) {"

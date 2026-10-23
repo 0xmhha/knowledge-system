@@ -1,0 +1,39 @@
+version: 1
+name: pr-8965
+description: "xds: Add SNI related field in handshake info"
+prompt: "xDS 핸드셰이크 정보에 SNI 값과 SAN 자동 검증 여부를 넣고, TLS 설정을 만들 때 그 SNI를 쓰게 하고 싶어"
+expected_intent: feature_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: internal/credentials/xds/handshake_info.go
+    start_line: 47
+    end_line: 67
+    anchor: "func (hi *HandshakeInfo) Equal(other *HandshakeInfo) bool {"
+  - file: internal/credentials/xds/handshake_info.go
+    start_line: 83
+    end_line: 93
+    anchor: "type HandshakeInfo struct {"
+  - file: internal/credentials/xds/handshake_info.go
+    start_line: 95
+    end_line: 104
+    anchor: "func NewHandshakeInfo(rootProvider certprovider.Provider, identityProvider certprovider.Provider, sanMatchers []matcher.StringMatcher, requireClientCert bool) *HandshakeInfo {"
+  - file: internal/credentials/xds/handshake_info.go
+    start_line: 121
+    end_line: 158
+    anchor: "func (hi *HandshakeInfo) ClientSideTLSConfig(ctx context.Context) (*tls.Config, error) {"
+  - file: internal/credentials/xds/handshake_info.go
+    start_line: 160
+    end_line: 212
+    anchor: "func (hi *HandshakeInfo) buildVerifyFunc(km *certprovider.KeyMaterial, isClient bool) func(rawCerts [][]byte, _ [][]*x509.Certificate) error {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 78
+    end_line: 101
+    anchor: "func (bb) Build(cc balancer.ClientConn, bOpts balancer.BuildOptions) balancer.Balancer {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 306
+    end_line: 364
+    anchor: "func (b *clusterImplBalancer) handleSecurityConfig(config *xdsresource.SecurityConfig) error {"
+  - file: internal/xds/server/conn_wrapper.go
+    start_line: 91
+    end_line: 123
+    anchor: "func (c *connWrapper) XDSHandshakeInfo() (*xdsinternal.HandshakeInfo, error) {"

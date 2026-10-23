@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "99_retrieval_eval_spec_approved_cks_eval_intent_and_rank_metrics",
+  "current_activity": "100_retrieval_eval_grpc_go_inputs_frozen_tools_ready",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -663,7 +663,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "build the grpc-go PR-to-scenario converter and the baseline runner (spec section 6), with mutation tests; then run the evaluation, fix weak spots, and repeat on go-stablenet; coding-agent items follow after retrieval quality; WI-V1 pilot paused",
+  "next": "build the 24 grpc-go snapshot indexes (full build, then ckv reindex chain), check the reindexed index against a full build of the same commit, run CKS and the four baselines, get the human answer/prompt sample check, then fix weak spots and repeat on go-stablenet; WI-V1 pilot paused",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -1076,12 +1076,19 @@
     "approval": "direct_human_user_message 2026-10-23: \"1. 명세대로 진행. 2. 한국어로\"",
     "prompt_language": "ko",
     "implemented": [
-      "cks eval expected_intent, first_hit_rank, used_tokens, rank_summary, intent_accuracy"
+      "cks eval expected_intent, first_hit_rank, used_tokens, rank_summary, intent_accuracy",
+      "grpc-go inputs frozen: 100 PRs, 575 answer ranges, 100 Korean prompts, 24 snapshots; converter, baselines and snapshot chain tools"
     ],
     "pending": [
-      "PR-to-scenario converter",
-      "baseline runner",
-      "evaluation run"
+      "snapshot indexes",
+      "reindex equivalence check",
+      "evaluation run",
+      "human sample check"
     ]
+  },
+  "retrieval_eval_grpc_go_inputs": {
+    "manifest": "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/manifest.json",
+    "manifest_sha256": "97b2b75ed566122c05e5dfee08bbb3f88cd3554c2d1ae334b3de1e3efbabbae3",
+    "results": null
   }
 }

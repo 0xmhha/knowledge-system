@@ -1,0 +1,23 @@
+version: 1
+name: pr-8864
+description: "*: Implementation of weighted random shuffling (A113)"
+prompt: "지역(locality)을 우선순위별로 묶는 부분을 단순하게 하고, 가중치 기반 무작위 섞기 제안을 구현하고 싶어"
+expected_intent: feature_add
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: balancer/pickfirst/pickfirst.go
+    start_line: 233
+    end_line: 325
+    anchor: "func (b *pickfirstBalancer) UpdateClientConnState(state balancer.ClientConnState) error {"
+  - file: internal/xds/balancer/clusterresolver/configbuilder.go
+    start_line: 205
+    end_line: 230
+    anchor: "func groupLocalitiesByPriority(localities []xdsresource.Locality) [][]xdsresource.Locality {"
+  - file: internal/xds/balancer/clusterresolver/configbuilder.go
+    start_line: 232
+    end_line: 247
+    anchor: "func dedupSortedIntSlice(a []int) []int {"
+  - file: internal/xds/balancer/clusterresolver/configbuilder.go
+    start_line: 249
+    end_line: 300
+    anchor: "func priorityLocalitiesToClusterImpl(localities []xdsresource.Locality, priorityName string, mechanism DiscoveryMechanism, drops []clusterimpl.DropConfig, xdsLBPolicy *internalserviceconfig.BalancerConfig) (*clusterimpl.LBConfig, []resolver.Endpoint, error) {"

@@ -1,0 +1,11 @@
+version: 1
+name: pr-8895
+description: "xds: add panic recovery in xdsclient resource unmarshalling."
+prompt: "xDS 리소스를 해석하다가 잘못된 응답 때문에 panic이 나면 앱 전체가 죽어. 해석 부분에서 panic을 잡아 오류로 바꾸고 싶어"
+expected_intent: feature_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/clients/xdsclient/channel.go
+    start_line: 231
+    end_line: 291
+    anchor: "func decodeResponse(opts *DecodeOptions, rType *ResourceType, resp response) (map[string]dataAndErrTuple, xdsresource.UpdateMetadata, error) {"

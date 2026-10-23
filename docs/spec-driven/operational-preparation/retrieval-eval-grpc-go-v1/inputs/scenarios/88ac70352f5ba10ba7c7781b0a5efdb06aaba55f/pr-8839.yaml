@@ -1,0 +1,11 @@
+version: 1
+name: pr-8839
+description: "Fix flaky `TestServer_RedundantUpdateSuppression`."
+prompt: "서버의 중복 갱신 억제 시험이 가끔 실패해. 연결이 Ready로 안정되기 전에 상태 변화를 보기 시작해서 그런 것 같아. 고치고 싶어"
+expected_intent: test_add
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: xds/server_resource_ext_test.go
+    start_line: 163
+    end_line: 270
+    anchor: "func (s) TestServer_RedundantUpdateSuppression(t *testing.T) {"

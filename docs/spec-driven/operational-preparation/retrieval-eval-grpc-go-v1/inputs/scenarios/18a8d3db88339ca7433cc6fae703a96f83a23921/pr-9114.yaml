@@ -1,0 +1,15 @@
+version: 1
+name: pr-9114
+description: "grpc: limit decompression size in legacy gzip Decompressor to prevent OOM"
+prompt: "예전 방식 gzip 압축 해제기가 크기 제한 없이 끝까지 읽어서 메모리가 터질 수 있어. 해제 크기를 제한하고 싶어"
+expected_intent: security
+expected_commit: 18a8d3db88339ca7433cc6fae703a96f83a23921
+expected_citations:
+  - file: rpc_util.go
+    start_line: 130
+    end_line: 152
+    anchor: "func (d *gzipDecompressor) Do(r io.Reader) ([]byte, error) {"
+  - file: rpc_util.go
+    start_line: 964
+    end_line: 1017
+    anchor: "func decompress(compressor encoding.Compressor, d mem.BufferSlice, dc Decompressor, maxReceiveMessageSize int, pool mem.BufferPool) (mem.BufferSlice, error) {"

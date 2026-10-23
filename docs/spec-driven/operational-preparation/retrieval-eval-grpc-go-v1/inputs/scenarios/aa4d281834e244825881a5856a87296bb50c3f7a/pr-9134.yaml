@@ -1,0 +1,27 @@
+version: 1
+name: pr-9134
+description: "internal/grpcutil: remove FullMatchWithRegex to prevent data race"
+prompt: "정규식 전체 일치 검사에서 매번 가장 긴 일치 모드로 바꾸는 바람에 같은 정규식을 동시에 쓰면 data race가 나. 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: internal/xds/matcher/matcher_header.go
+    start_line: 90
+    end_line: 98
+    anchor: "func (hrm *HeaderRegexMatcher) Match(md metadata.MD) bool {"
+  - file: internal/xds/matcher/string_matcher.go
+    start_line: 49
+    end_line: 76
+    anchor: "func (sm StringMatcher) Match(input string) bool {"
+  - file: internal/xds/matcher/string_matcher.go
+    start_line: 94
+    end_line: 133
+    anchor: "func StringMatcherFromProto(matcherProto *v3matcherpb.StringMatcher) (StringMatcher, error) {"
+  - file: internal/xds/xdsclient/xdsresource/matcher_path.go
+    start_line: 96
+    end_line: 98
+    anchor: "func (prm *pathRegexMatcher) match(path string) bool {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_rds.go
+    start_line: 216
+    end_line: 415
+    anchor: "func routesProtoToSlice(routes []*v3routepb.Route, csps map[string]clusterspecifier.BalancerConfig, opts *xdsclient.DecodeOptions) ([]*Route, map[string]bool, error) {"

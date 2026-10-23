@@ -1,0 +1,15 @@
+version: 1
+name: pr-8733
+description: "xds/clusterresolver: implement gRFC A61 changes for LOGICAL_DNS clusters"
+prompt: "xDS에서 논리 DNS 클러스터는 로드밸런싱 정책이 고정돼 있는데, 이중 스택(IPv4/IPv6) 백엔드 제안대로 바꾸고 싶어. 어디서 그 클러스터 설정을 만드는지 알려줘"
+expected_intent: feature_add
+expected_commit: 830c9098e4d034e0c7641e1fbc6001c2570bbc0f
+expected_citations:
+  - file: internal/xds/balancer/clusterresolver/configbuilder.go
+    start_line: 88
+    end_line: 126
+    anchor: "func buildPriorityConfig(priorities []priorityConfig, xdsLBPolicy *internalserviceconfig.BalancerConfig) (*priority.LBConfig, []resolver.Endpoint, error) {"
+  - file: internal/xds/balancer/clusterresolver/configbuilder.go
+    start_line: 142
+    end_line: 163
+    anchor: "func buildClusterImplConfigForDNS(g *nameGenerator, endpoints []resolver.Endpoint, mechanism DiscoveryMechanism) (string, *clusterimpl.LBConfig, []resolver.Endpoint) {"

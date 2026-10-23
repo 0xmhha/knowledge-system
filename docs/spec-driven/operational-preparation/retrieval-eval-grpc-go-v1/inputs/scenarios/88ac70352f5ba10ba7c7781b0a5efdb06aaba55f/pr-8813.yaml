@@ -1,0 +1,15 @@
+version: 1
+name: pr-8813
+description: "priority: prevent init timer restarting when a child transitions from CONNECTING to CONNECTING"
+prompt: "priority 정책에서 자식이 연결 중에서 다시 연결 중으로 바뀌면 초기화 타이머가 다시 시작돼서 장애 전환이 늦어져. 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: internal/xds/balancer/priority/balancer_child.go
+    start_line: 143
+    end_line: 163
+    anchor: "func (cb *childBalancer) startInitTimer() {"
+  - file: internal/xds/balancer/priority/balancer_priority.go
+    start_line: 175
+    end_line: 210
+    anchor: "func (b *priorityBalancer) handleChildStateUpdate(childName string, s balancer.State) {"

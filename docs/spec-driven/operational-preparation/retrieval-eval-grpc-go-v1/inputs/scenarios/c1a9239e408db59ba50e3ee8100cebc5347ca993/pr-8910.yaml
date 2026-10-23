@@ -1,0 +1,115 @@
+version: 1
+name: pr-8910
+description: "mem: Move buffer pool implementations to internal"
+prompt: "계층형 버퍼 풀 구현을 공개 패키지에서 내부 패키지로 옮기고 싶어. 기본 풀은 반환 전에 버퍼를 지우는데 그 비용도 고려하고 싶어"
+expected_intent: refactor
+expected_commit: c1a9239e408db59ba50e3ee8100cebc5347ca993
+expected_citations:
+  - file: mem/buffer_pool.go
+    start_line: 45
+    end_line: 45
+    anchor: "goPageSizeExponent = 12"
+  - file: mem/buffer_pool.go
+    start_line: 46
+    end_line: 46
+    anchor: "goPageSize         = 1 << goPageSizeExponent // 4KiB. N.B. this must be a power of 2."
+  - file: mem/buffer_pool.go
+    start_line: 50
+    end_line: 56
+    anchor: "defaultBufferPoolSizeExponents = []uint8{"
+  - file: mem/buffer_pool.go
+    start_line: 58
+    end_line: 58
+    anchor: "uintSize          = bits.UintSize // use a variable for mocking during tests."
+  - file: mem/buffer_pool.go
+    start_line: 84
+    end_line: 95
+    anchor: "func NewTieredBufferPool(poolSizes ...int) BufferPool {"
+  - file: mem/buffer_pool.go
+    start_line: 97
+    end_line: 102
+    anchor: "type tieredBufferPool struct {"
+  - file: mem/buffer_pool.go
+    start_line: 104
+    end_line: 106
+    anchor: "func (p *tieredBufferPool) Get(size int) *[]byte {"
+  - file: mem/buffer_pool.go
+    start_line: 108
+    end_line: 110
+    anchor: "func (p *tieredBufferPool) Put(buf *[]byte) {"
+  - file: mem/buffer_pool.go
+    start_line: 112
+    end_line: 122
+    anchor: "func (p *tieredBufferPool) getPool(size int) BufferPool {"
+  - file: mem/buffer_pool.go
+    start_line: 124
+    end_line: 137
+    anchor: "type binaryTieredBufferPool struct {"
+  - file: mem/buffer_pool.go
+    start_line: 139
+    end_line: 195
+    anchor: "func NewBinaryTieredBufferPool(powerOfTwoExponents ...uint8) (BufferPool, error) {"
+  - file: mem/buffer_pool.go
+    start_line: 197
+    end_line: 199
+    anchor: "func (b *binaryTieredBufferPool) Get(size int) *[]byte {"
+  - file: mem/buffer_pool.go
+    start_line: 201
+    end_line: 216
+    anchor: "func (b *binaryTieredBufferPool) poolForGet(size int) BufferPool {"
+  - file: mem/buffer_pool.go
+    start_line: 218
+    end_line: 223
+    anchor: "func (b *binaryTieredBufferPool) Put(buf *[]byte) {"
+  - file: mem/buffer_pool.go
+    start_line: 225
+    end_line: 251
+    anchor: "func (b *binaryTieredBufferPool) poolForPut(bCap int) BufferPool {"
+  - file: mem/buffer_pool.go
+    start_line: 253
+    end_line: 264
+    anchor: "type sizedBufferPool struct {"
+  - file: mem/buffer_pool.go
+    start_line: 266
+    end_line: 276
+    anchor: "func (p *sizedBufferPool) Get(size int) *[]byte {"
+  - file: mem/buffer_pool.go
+    start_line: 278
+    end_line: 286
+    anchor: "func (p *sizedBufferPool) Put(buf *[]byte) {"
+  - file: mem/buffer_pool.go
+    start_line: 288
+    end_line: 292
+    anchor: "func newSizedBufferPool(size int) *sizedBufferPool {"
+  - file: mem/buffer_pool.go
+    start_line: 294
+    end_line: 294
+    anchor: "var _ BufferPool = (*simpleBufferPool)(nil)"
+  - file: mem/buffer_pool.go
+    start_line: 296
+    end_line: 302
+    anchor: "type simpleBufferPool struct {"
+  - file: mem/buffer_pool.go
+    start_line: 304
+    end_line: 327
+    anchor: "func (p *simpleBufferPool) Get(size int) *[]byte {"
+  - file: mem/buffer_pool.go
+    start_line: 329
+    end_line: 331
+    anchor: "func (p *simpleBufferPool) Put(buf *[]byte) {"
+  - file: mem/buffer_pool.go
+    start_line: 333
+    end_line: 333
+    anchor: "var _ BufferPool = NopBufferPool{}"
+  - file: mem/buffer_pool.go
+    start_line: 335
+    end_line: 336
+    anchor: "type NopBufferPool struct{}"
+  - file: mem/buffer_pool.go
+    start_line: 338
+    end_line: 342
+    anchor: "func (NopBufferPool) Get(length int) *[]byte {"
+  - file: mem/buffer_pool.go
+    start_line: 344
+    end_line: 346
+    anchor: "func (NopBufferPool) Put(*[]byte) {"
