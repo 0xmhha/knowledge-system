@@ -1,0 +1,11 @@
+version: 1
+name: pr-9031
+description: "transport: Fix handling of closed connections in ReadyReader"
+prompt: "비차단 읽기를 쓰는 준비 완료 읽기 경로에서 상대가 연결을 닫았을 때 처리가 틀려. 닫힌 연결을 제대로 다루게 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: c33aa45e147aa1e08070a0764c285ea30a82688a
+expected_citations:
+  - file: internal/transport/ready_reader.go
+    start_line: 50
+    end_line: 77
+    anchor: "func (c *nonBlockingReader) ReadOnReady(bufSize int, pool mem.BufferPool) (buf *[]byte, n int, err error) {"

@@ -1,0 +1,35 @@
+version: 1
+name: pr-8810
+description: "outlierdetection: Remove UpdateAddresses handling"
+prompt: "이상치 탐지 밸런서에서 서브커넥션 주소 갱신을 처리하는 코드가 이제 안 쓰여. 지우고 싶어"
+expected_intent: refactor
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 453
+    end_line: 483
+    anchor: "func incrementCounter(sc balancer.SubConn, info balancer.DoneInfo) {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 489
+    end_line: 518
+    anchor: "func (b *outlierDetectionBalancer) NewSubConn(addrs []resolver.Address, opts balancer.NewSubConnOptions) (balancer.SubConn, error) {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 524
+    end_line: 538
+    anchor: "func (b *outlierDetectionBalancer) appendIfPresent(addr string, scw *subConnWrapper) *endpointInfo {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 540
+    end_line: 555
+    anchor: "func (b *outlierDetectionBalancer) removeSubConnFromEndpointMapEntry(scw *subConnWrapper) {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 557
+    end_line: 604
+    anchor: "func (b *outlierDetectionBalancer) UpdateAddresses(sc balancer.SubConn, addrs []resolver.Address) {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 606
+    end_line: 612
+    anchor: "func (b *outlierDetectionBalancer) handleSubConnUpdate(u *scUpdate) {"
+  - file: internal/xds/balancer/outlierdetection/subconn_wrapper.go
+    start_line: 31
+    end_line: 71
+    anchor: "type subConnWrapper struct {"

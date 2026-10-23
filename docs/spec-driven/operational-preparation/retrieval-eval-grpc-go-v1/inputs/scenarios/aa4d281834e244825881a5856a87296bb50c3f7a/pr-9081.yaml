@@ -1,0 +1,63 @@
+version: 1
+name: pr-9081
+description: "otel: Segregate client and server RPCInfo used for metrics and traces"
+prompt: "앱이 서버로 요청을 받다가 다시 클라이언트로 gRPC를 부르면 OpenTelemetry 지표와 추적 정보가 섞여서 덮어써져. 클라이언트와 서버 정보를 분리하고 싶어"
+expected_intent: bug_fix
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: stats/opentelemetry/client_metrics.go
+    start_line: 70
+    end_line: 82
+    anchor: "func getOrCreateCallInfo(ctx context.Context, cc *grpc.ClientConn, method string, opts ...grpc.CallOption) (context.Context, *callInfo) {"
+  - file: stats/opentelemetry/client_metrics.go
+    start_line: 160
+    end_line: 169
+    anchor: "func getOrCreateRPCAttemptInfo(ctx context.Context) (context.Context, *attemptInfo) {"
+  - file: stats/opentelemetry/client_metrics.go
+    start_line: 171
+    end_line: 196
+    anchor: "func (h *clientMetricsHandler) TagRPC(ctx context.Context, info *stats.RPCTagInfo) context.Context {"
+  - file: stats/opentelemetry/client_metrics.go
+    start_line: 198
+    end_line: 206
+    anchor: "func (h *clientMetricsHandler) HandleRPC(ctx context.Context, rs stats.RPCStats) {"
+  - file: stats/opentelemetry/client_tracing.go
+    start_line: 121
+    end_line: 126
+    anchor: "func (h *clientTracingHandler) TagRPC(ctx context.Context, info *stats.RPCTagInfo) context.Context {"
+  - file: stats/opentelemetry/client_tracing.go
+    start_line: 128
+    end_line: 136
+    anchor: "func (h *clientTracingHandler) HandleRPC(ctx context.Context, rs stats.RPCStats) {"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 186
+    end_line: 188
+    anchor: "func setCallInfo(ctx context.Context, ci *callInfo) context.Context {"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 203
+    end_line: 203
+    anchor: "type rpcInfoKey struct{}"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 205
+    end_line: 207
+    anchor: "func setRPCInfo(ctx context.Context, ri *rpcInfo) context.Context {"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 209
+    end_line: 214
+    anchor: "func getRPCInfo(ctx context.Context) *rpcInfo {"
+  - file: stats/opentelemetry/server_metrics.go
+    start_line: 181
+    end_line: 204
+    anchor: "func (h *serverMetricsHandler) TagRPC(ctx context.Context, info *stats.RPCTagInfo) context.Context {"
+  - file: stats/opentelemetry/server_metrics.go
+    start_line: 206
+    end_line: 214
+    anchor: "func (h *serverMetricsHandler) HandleRPC(ctx context.Context, rs stats.RPCStats) {"
+  - file: stats/opentelemetry/server_tracing.go
+    start_line: 41
+    end_line: 46
+    anchor: "func (h *serverTracingHandler) TagRPC(ctx context.Context, _ *stats.RPCTagInfo) context.Context {"
+  - file: stats/opentelemetry/server_tracing.go
+    start_line: 68
+    end_line: 76
+    anchor: "func (h *serverTracingHandler) HandleRPC(ctx context.Context, rs stats.RPCStats) {"

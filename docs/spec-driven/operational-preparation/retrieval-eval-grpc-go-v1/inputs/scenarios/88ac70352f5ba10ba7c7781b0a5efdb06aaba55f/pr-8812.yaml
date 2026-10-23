@@ -1,0 +1,19 @@
+version: 1
+name: pr-8812
+description: "dns: set Endpoints in resolver updates"
+prompt: "DNS 리졸버가 갱신을 보낼 때 주소만 채우고 엔드포인트는 안 채워. 리졸버가 직접 엔드포인트를 채우게 하고 싶어"
+expected_intent: refactor
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: internal/resolver/dns/dns_resolver.go
+    start_line: 117
+    end_line: 152
+    anchor: "func (b *dnsBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {"
+  - file: internal/resolver/dns/dns_resolver.go
+    start_line: 336
+    end_line: 353
+    anchor: "func (d *dnsResolver) lookup() (*resolver.State, error) {"
+  - file: internal/xds/xdsdepmgr/xds_dependency_manager.go
+    start_line: 748
+    end_line: 772
+    anchor: "func (m *DependencyManager) onDNSUpdate(resourceName string, update *resolver.State) {"

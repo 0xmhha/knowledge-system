@@ -1,0 +1,11 @@
+version: 1
+name: pr-8786
+description: "clientconn: close canceled transport synchronously"
+prompt: "연결 시도를 취소했을 때 이미 만들어진 전송 계층을 별도 고루틴으로 닫아서 추적 안 되는 고루틴이 남아. 그 자리에서 바로 닫게 바꾸고 싶어"
+expected_intent: refactor
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: clientconn.go
+    start_line: 1480
+    end_line: 1561
+    anchor: "func (ac *addrConn) createTransport(ctx context.Context, addr resolver.Address, copts transport.ConnectOptions, connectDeadline time.Time) error {"

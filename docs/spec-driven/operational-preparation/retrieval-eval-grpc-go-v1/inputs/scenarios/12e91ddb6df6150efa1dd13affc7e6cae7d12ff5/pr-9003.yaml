@@ -1,0 +1,15 @@
+version: 1
+name: pr-9003
+description: "test/xds: wait for server to enter SERVING mode before sending the first RPC"
+prompt: "xDS 서버 시험이 서버가 정상 서비스 상태에 들어가기 전에 첫 RPC를 보내서 가끔 실패해. 서비스 상태가 될 때까지 기다리게 하고 싶어"
+expected_intent: test_add
+expected_commit: 12e91ddb6df6150efa1dd13affc7e6cae7d12ff5
+expected_citations:
+  - file: test/xds/xds_server_filter_state_retention_test.go
+    start_line: 156
+    end_line: 368
+    anchor: "func (s) TestServerSideXDS_FilterStateRetention_AcrossUpdates_FilterConfigChange(t *testing.T) {"
+  - file: test/xds/xds_server_filter_state_retention_test.go
+    start_line: 370
+    end_line: 585
+    anchor: "func (s) TestServerSideXDS_FilterStateRetention_AcrossUpdates_FilterChainsChange(t *testing.T) {"

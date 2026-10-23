@@ -1,0 +1,35 @@
+version: 1
+name: pr-8945
+description: "xds/clusterimpl: use xdsConfig for updates and remove redundant fields from LB config "
+prompt: "xDS 클러스터 구현 밸런서가 xDS 전체 설정에서 바로 갱신을 받게 하고, 그 때문에 필요 없어진 LB 설정 필드를 지우고 싶어"
+expected_intent: feature_add
+expected_commit: 1d4fa8a7b772553e82137b059ad4a8f632a1c522
+expected_citations:
+  - file: internal/xds/balancer/cdsbalancer/configbuilder.go
+    start_line: 161
+    end_line: 193
+    anchor: "func buildClusterImplConfigForDNS(g *nameGenerator, config *xdsresource.ClusterConfig, xdsLBPolicy *internalserviceconfig.BalancerConfig) (string, *clusterimpl.LBConfig, []resolver.Endpoint) {"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder.go
+    start_line: 195
+    end_line: 238
+    anchor: "func buildClusterImplConfigForEDS(g *nameGenerator, config *xdsresource.ClusterConfig, xdsLBPolicy *internalserviceconfig.BalancerConfig) ([]string, map[string]*clusterimpl.LBConfig, []resolver.Endpoint, error) {"
+  - file: internal/xds/balancer/cdsbalancer/configbuilder.go
+    start_line: 264
+    end_line: 338
+    anchor: "func priorityLocalitiesToClusterImpl(localities []xdsresource.Locality, priorityName string, clusterUpdate xdsresource.ClusterUpdate, drops []clusterimpl.DropConfig, xdsLBPolicy *internalserviceconfig.BalancerConfig) (*clusterimpl.LBConfig, []resolver.Endpoint, error) {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 125
+    end_line: 155
+    anchor: "func (b *clusterImplBalancer) handleDropAndRequestCountLocked(newConfig *LBConfig) bool {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 169
+    end_line: 247
+    anchor: "func (b *clusterImplBalancer) updateLoadStore(newConfig *LBConfig) error {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 249
+    end_line: 323
+    anchor: "func (b *clusterImplBalancer) UpdateClientConnState(s balancer.ClientConnState) error {"
+  - file: internal/xds/balancer/clusterimpl/config.go
+    start_line: 35
+    end_line: 49
+    anchor: "type LBConfig struct {"

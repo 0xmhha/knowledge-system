@@ -1,0 +1,71 @@
+version: 1
+name: pr-8802
+description: "xds: Revert workaround to get SubConn locality"
+prompt: "서브채널의 지역(locality) 정보를 전달하려고 넣었던 내부 우회 API가 이제 필요 없어. 그걸 걷어내고 싶어"
+expected_intent: refactor
+expected_commit: a887d0b51765dc9a99e5660ecb2b6e69c31bff90
+expected_citations:
+  - file: balancer/balancer.go
+    start_line: 76
+    end_line: 80
+    anchor: "func init() {"
+  - file: balancer/subconn.go
+    start_line: 107
+    end_line: 117
+    anchor: "type SubConnState struct {"
+  - file: balancer/subconn.go
+    start_line: 119
+    end_line: 123
+    anchor: "func connectedAddress(scs SubConnState) resolver.Address {"
+  - file: balancer/subconn.go
+    start_line: 125
+    end_line: 128
+    anchor: "func setConnectedAddress(scs *SubConnState, addr resolver.Address) {"
+  - file: balancer_wrapper.go
+    start_line: 39
+    end_line: 39
+    anchor: "setConnectedAddress = internal.SetConnectedAddress.(func(*balancer.SubConnState, resolver.Address))"
+  - file: balancer_wrapper.go
+    start_line: 306
+    end_line: 343
+    anchor: "func (acbw *acBalancerWrapper) updateState(s connectivity.State, curAddr resolver.Address, err error) {"
+  - file: clientconn.go
+    start_line: 1276
+    end_line: 1301
+    anchor: "func (ac *addrConn) updateConnectivityState(s connectivity.State, lastErr error) {"
+  - file: internal/internal.go
+    start_line: 214
+    end_line: 216
+    anchor: "ConnectedAddress any // func (scs SubConnState) resolver.Address"
+  - file: internal/internal.go
+    start_line: 218
+    end_line: 219
+    anchor: "SetConnectedAddress any // func(scs *SubConnState, addr resolver.Address)"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 61
+    end_line: 61
+    anchor: "connectedAddress = internal.ConnectedAddress.(func(balancer.SubConnState) resolver.Address)"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 407
+    end_line: 425
+    anchor: "type scWrapper struct {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 427
+    end_line: 429
+    anchor: "func (scw *scWrapper) updateLocalityID(lID clients.Locality) {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 431
+    end_line: 437
+    anchor: "func (scw *scWrapper) localityID() clients.Locality {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 439
+    end_line: 477
+    anchor: "func (b *clusterImplBalancer) NewSubConn(addrs []resolver.Address, opts balancer.NewSubConnOptions) (balancer.SubConn, error) {"
+  - file: internal/xds/balancer/clusterimpl/clusterimpl.go
+    start_line: 483
+    end_line: 498
+    anchor: "func (b *clusterImplBalancer) UpdateAddresses(sc balancer.SubConn, addrs []resolver.Address) {"
+  - file: internal/xds/balancer/clusterimpl/picker.go
+    start_line: 106
+    end_line: 205
+    anchor: "func (d *picker) Pick(info balancer.PickInfo) (balancer.PickResult, error) {"

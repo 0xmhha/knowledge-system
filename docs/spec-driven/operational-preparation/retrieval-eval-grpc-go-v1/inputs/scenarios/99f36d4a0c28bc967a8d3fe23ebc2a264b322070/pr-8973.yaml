@@ -1,0 +1,47 @@
+version: 1
+name: pr-8973
+description: "transport: Add values to the grpc.disconnect_error label for grpc.subchannel.disconnections metric (A94)"
+prompt: "서브채널 연결 끊김 지표의 끊김 이유 레이블에 실제 이유 값을 채우고 싶어"
+expected_intent: feature_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: clientconn.go
+    start_line: 1239
+    end_line: 1273
+    anchor: "type addrConn struct {"
+  - file: clientconn.go
+    start_line: 1275
+    end_line: 1300
+    anchor: "func (ac *addrConn) updateConnectivityState(s connectivity.State, lastErr error) {"
+  - file: clientconn.go
+    start_line: 1479
+    end_line: 1561
+    anchor: "func (ac *addrConn) createTransport(ctx context.Context, addr resolver.Address, copts transport.ConnectOptions, connectDeadline time.Time) error {"
+  - file: clientconn.go
+    start_line: 1654
+    end_line: 1708
+    anchor: "func (ac *addrConn) tearDown(err error) {"
+  - file: internal/transport/http2_client.go
+    start_line: 69
+    end_line: 156
+    anchor: "type http2Client struct {"
+  - file: internal/transport/http2_client.go
+    start_line: 204
+    end_line: 479
+    anchor: "func NewHTTP2Client(connectCtx, ctx context.Context, addr resolver.Address, opts ConnectOptions, onClose func(GoAwayReason)) (_ ClientTransport, err error) {"
+  - file: internal/transport/http2_client.go
+    start_line: 998
+    end_line: 1072
+    anchor: "func (t *http2Client) Close(err error) {"
+  - file: internal/transport/http2_client.go
+    start_line: 1074
+    end_line: 1098
+    anchor: "func (t *http2Client) GracefulClose() {"
+  - file: internal/transport/http2_client.go
+    start_line: 1332
+    end_line: 1407
+    anchor: "func (t *http2Client) handleGoAway(f *http2.GoAwayFrame) error {"
+  - file: internal/transport/http2_client.go
+    start_line: 1409
+    end_line: 1425
+    anchor: "func (t *http2Client) setGoAwayReason(f *http2.GoAwayFrame) {"

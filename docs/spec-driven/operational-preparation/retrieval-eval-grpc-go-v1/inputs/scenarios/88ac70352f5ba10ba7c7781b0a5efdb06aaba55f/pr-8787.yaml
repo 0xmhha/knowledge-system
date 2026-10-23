@@ -1,0 +1,11 @@
+version: 1
+name: pr-8787
+description: "transport: Remove unused return value from connect()"
+prompt: "전송 연결을 시작하는 함수가 아무도 안 쓰는 값을 돌려주고 있어. 그 반환값을 없애고 싶어"
+expected_intent: refactor
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: clientconn.go
+    start_line: 977
+    end_line: 999
+    anchor: "func (ac *addrConn) connect() error {"

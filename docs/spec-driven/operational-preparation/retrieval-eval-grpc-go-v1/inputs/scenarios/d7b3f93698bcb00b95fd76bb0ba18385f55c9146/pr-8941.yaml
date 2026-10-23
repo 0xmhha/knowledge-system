@@ -1,0 +1,23 @@
+version: 1
+name: pr-8941
+description: "xdsresource: add SNI related fields in security config of CDS update for A101"
+prompt: "CDS 갱신의 보안 설정에 SNI 관련 값을 추가하고 싶어. SNI 설정과 SAN 검증 제안의 첫 단계야"
+expected_intent: feature_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/xdsclient/xdsresource/type_cds.go
+    start_line: 84
+    end_line: 123
+    anchor: "type SecurityConfig struct {"
+  - file: internal/xds/xdsclient/xdsresource/type_cds.go
+    start_line: 125
+    end_line: 157
+    anchor: "func (sc *SecurityConfig) Equal(other *SecurityConfig) bool {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_cds.go
+    start_line: 50
+    end_line: 52
+    anchor: "const transportSocketName = \"envoy.transport_sockets.tls\""
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_cds.go
+    start_line: 273
+    end_line: 306
+    anchor: "func securityConfigFromCluster(cluster *v3clusterpb.Cluster) (*SecurityConfig, error) {"

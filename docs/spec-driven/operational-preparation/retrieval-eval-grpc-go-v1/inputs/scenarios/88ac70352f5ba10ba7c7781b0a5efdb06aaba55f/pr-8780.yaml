@@ -1,0 +1,79 @@
+version: 1
+name: pr-8780
+description: "stats/otel: a79 scaffolding to register an async gauge metric and api to record it- part 3"
+prompt: "OpenTelemetry 관찰형 게이지처럼 비동기로 값을 보고하는 지표를 등록하고 기록하는 API를 지표 기록기 쪽에 추가하고 싶어"
+expected_intent: feature_add
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: experimental/stats/metrics.go
+    start_line: 24
+    end_line: 49
+    anchor: "type MetricsRecorder interface {"
+  - file: internal/grpctest/grpctest.go
+    start_line: 54
+    end_line: 63
+    anchor: "func (Tester) Setup(t *testing.T) {"
+  - file: internal/grpctest/grpctest.go
+    start_line: 65
+    end_line: 79
+    anchor: "func (Tester) Teardown(t *testing.T) {"
+  - file: internal/stats/metrics_recorder_list.go
+    start_line: 26
+    end_line: 33
+    anchor: "type MetricsRecorderList struct {"
+  - file: internal/stats/metrics_recorder_list.go
+    start_line: 117
+    end_line: 146
+    anchor: "func (l *MetricsRecorderList) RegisterAsyncReporter(reporter estats.AsyncMetricReporter, metrics ...estats.AsyncMetric) func() {"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 33
+    end_line: 49
+    anchor: "type TestMetricsRecorder struct {"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 279
+    end_line: 283
+    anchor: "func (r *TestMetricsRecorder) RegisterAsyncReporter(estats.AsyncMetricReporter, ...estats.AsyncMetric) func() {"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 303
+    end_line: 305
+    anchor: "type NoopMetricsRecorder struct{}"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 307
+    end_line: 308
+    anchor: "func (r *NoopMetricsRecorder) RecordInt64Count(*estats.Int64CountHandle, int64, ...string) {}"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 310
+    end_line: 311
+    anchor: "func (r *NoopMetricsRecorder) RecordFloat64Count(*estats.Float64CountHandle, float64, ...string) {}"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 313
+    end_line: 314
+    anchor: "func (r *NoopMetricsRecorder) RecordInt64Histo(*estats.Int64HistoHandle, int64, ...string) {}"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 316
+    end_line: 317
+    anchor: "func (r *NoopMetricsRecorder) RecordFloat64Histo(*estats.Float64HistoHandle, float64, ...string) {}"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 319
+    end_line: 320
+    anchor: "func (r *NoopMetricsRecorder) RecordInt64Gauge(*estats.Int64GaugeHandle, int64, ...string) {}"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 322
+    end_line: 324
+    anchor: "func (r *NoopMetricsRecorder) RecordInt64UpDownCount(*estats.Int64UpDownCountHandle, int64, ...string) {"
+  - file: internal/testutils/stats/test_metrics_recorder.go
+    start_line: 326
+    end_line: 329
+    anchor: "func (r *NoopMetricsRecorder) RegisterAsyncReporter(estats.AsyncMetricReporter, ...estats.AsyncMetric) func() {"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 362
+    end_line: 373
+    anchor: "type registryMetrics struct {"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 375
+    end_line: 406
+    anchor: "func (rm *registryMetrics) registerMetrics(metrics *stats.MetricSet, meter otelmetric.Meter) {"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 456
+    end_line: 467
+    anchor: "func (rm *registryMetrics) RegisterAsyncReporter(_ estats.AsyncMetricReporter, _ ...estats.AsyncMetric) func() {"

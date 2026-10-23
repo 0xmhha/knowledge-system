@@ -1,0 +1,15 @@
+version: 1
+name: pr-8845
+description: "transport: warn when header list size exceeds 8KB"
+prompt: "보내는 헤더 목록이 8KB를 넘으면 경고 로그를 남기고 싶어. 나중에 기본 제한을 8KB로 줄이기 전 단계야"
+expected_intent: feature_add
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: internal/transport/http2_client.go
+    start_line: 745
+    end_line: 930
+    anchor: "func (t *http2Client) NewStream(ctx context.Context, callHdr *CallHdr) (*ClientStream, error) {"
+  - file: internal/transport/http2_server.go
+    start_line: 937
+    end_line: 951
+    anchor: "func (t *http2Server) checkForHeaderListSize(hf []hpack.HeaderField) bool {"

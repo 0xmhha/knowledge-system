@@ -1,0 +1,31 @@
+version: 1
+name: pr-8923
+description: "stats/opentelemetry: restore the changes from #8342 and fix the flaky test."
+prompt: "OpenTelemetry 추적에서 예전에 되돌렸던 변경을 다시 넣고, 그때 실패하던 시험의 경쟁 상태도 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: 679ae4c7df728622eb8d58e7ea8dcffc043169b7
+expected_citations:
+  - file: stats/opentelemetry/client_tracing.go
+    start_line: 81
+    end_line: 102
+    anchor: "func (h *clientTracingHandler) traceTagRPC(ctx context.Context, ai *attemptInfo, nameResolutionDelayed bool) (context.Context, *attemptInfo) {"
+  - file: stats/opentelemetry/client_tracing.go
+    start_line: 121
+    end_line: 126
+    anchor: "func (h *clientTracingHandler) TagRPC(ctx context.Context, info *stats.RPCTagInfo) context.Context {"
+  - file: stats/opentelemetry/client_tracing.go
+    start_line: 128
+    end_line: 136
+    anchor: "func (h *clientTracingHandler) HandleRPC(ctx context.Context, rs stats.RPCStats) {"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 173
+    end_line: 182
+    anchor: "type callInfo struct {"
+  - file: stats/opentelemetry/opentelemetry.go
+    start_line: 238
+    end_line: 263
+    anchor: "type attemptInfo struct {"
+  - file: stats/opentelemetry/trace.go
+    start_line: 29
+    end_line: 88
+    anchor: "func populateSpan(rs stats.RPCStats, ai *attemptInfo) {"

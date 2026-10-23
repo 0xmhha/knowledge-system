@@ -1,0 +1,11 @@
+version: 1
+name: pr-9004
+description: "test: Fix flaky test `TestServerStreaming_ClientCallSendMsgTwice` in `end2end_test.go`."
+prompt: "서버 스트리밍에서 클라이언트가 메시지를 두 번 보내는 경우를 보는 시험이 가끔 실패해. 고치고 싶어"
+expected_intent: test_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: test/end2end_test.go
+    start_line: 3944
+    end_line: 4003
+    anchor: "func (s) TestServerStreaming_ClientCallSendMsgTwice(t *testing.T) {"

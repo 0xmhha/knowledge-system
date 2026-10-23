@@ -1,0 +1,11 @@
+version: 1
+name: pr-8765
+description: "grpc: initialize decompressor for health check streams"
+prompt: "예전 방식 압축 해제 옵션을 켜면 헬스체크가 실패해. 헬스체크용 스트림을 만들 때 압축 해제기가 안 붙는 것 같은데 어디를 고쳐야 해?"
+expected_intent: bug_fix
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: stream.go
+    start_line: 1262
+    end_line: 1376
+    anchor: "func newNonRetryClientStream(ctx context.Context, desc *StreamDesc, method string, t transport.ClientTransport, ac *addrConn, opts ...CallOption) (_ ClientStream, err error) {"

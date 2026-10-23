@@ -1,0 +1,11 @@
+version: 1
+name: pr-8833
+description: "outlierdetection: move ParseConfig test to a test-only package"
+prompt: "이상치 탐지 설정 파싱 시험을 외부 시험 전용 패키지로 옮기고, 하위 시험 이름도 스타일 가이드에 맞추고 싶어"
+expected_intent: test_add
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: internal/xds/balancer/outlierdetection/balancer_test.go
+    start_line: 74
+    end_line: 546
+    anchor: "func (s) TestParseConfig(t *testing.T) {"

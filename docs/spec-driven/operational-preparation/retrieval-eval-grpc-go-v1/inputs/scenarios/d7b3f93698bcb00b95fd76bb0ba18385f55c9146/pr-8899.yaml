@@ -1,0 +1,11 @@
+version: 1
+name: pr-8899
+description: "xds/xdsclient: add EDS sum of endpoint weights does not exceed MaxUint32"
+prompt: "EDS에서 한 지역 안 엔드포인트 가중치를 다 더하면 uint32 최댓값을 넘을 수 있어. 넘으면 거부하게 검증을 넣고 싶어"
+expected_intent: bug_fix
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_eds.go
+    start_line: 110
+    end_line: 167
+    anchor: "func parseEndpoints(lbEndpoints []*v3endpointpb.LbEndpoint, uniqueEndpointAddrs map[string]bool) ([]Endpoint, error) {"

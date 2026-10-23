@@ -1,0 +1,71 @@
+version: 1
+name: pr-8909
+description: "xds: replace net with netip in `xds/xdsclient` and `xds/server`"
+prompt: "xDS 클라이언트와 xDS 서버 쪽에서 IP 주소와 대역을 옛 net 타입 대신 netip 타입으로 바꾸고 싶어"
+expected_intent: refactor
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: internal/xds/server/filter_chain_manager.go
+    start_line: 62
+    end_line: 106
+    anchor: "func newFilterChainManager(filterChainConfigs *xdsresource.NetworkFilterChainMap, defFilterChainConfig *xdsresource.NetworkFilterChainConfig) *filterChainManager {"
+  - file: internal/xds/server/filter_chain_manager.go
+    start_line: 120
+    end_line: 125
+    anchor: "type destPrefixEntry struct {"
+  - file: internal/xds/server/filter_chain_manager.go
+    start_line: 144
+    end_line: 149
+    anchor: "type sourcePrefixEntry struct {"
+  - file: internal/xds/server/filter_chain_manager.go
+    start_line: 185
+    end_line: 190
+    anchor: "type lookupParams struct {"
+  - file: internal/xds/server/filter_chain_manager.go
+    start_line: 192
+    end_line: 226
+    anchor: "func (fcm *filterChainManager) lookup(params lookupParams) (*filterChain, error) {"
+  - file: internal/xds/server/filter_chain_manager.go
+    start_line: 228
+    end_line: 264
+    anchor: "func filterByDestinationPrefixes(dstPrefixes []*destPrefixEntry, isUnspecified bool, dstAddr net.IP) []*destPrefixEntry {"
+  - file: internal/xds/server/filter_chain_manager.go
+    start_line: 266
+    end_line: 296
+    anchor: "func filterBySourceType(dstPrefixes []*destPrefixEntry, srcType sourceType) []*sourcePrefixes {"
+  - file: internal/xds/server/filter_chain_manager.go
+    start_line: 298
+    end_line: 342
+    anchor: "func filterBySourcePrefixes(srcPrefixes []*sourcePrefixes, srcAddr net.IP) (*sourcePrefixEntry, error) {"
+  - file: internal/xds/server/listener_wrapper.go
+    start_line: 245
+    end_line: 328
+    anchor: "func (l *listenerWrapper) Accept() (net.Conn, error) {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 39
+    end_line: 50
+    anchor: "type DestinationPrefixEntry struct {"
+  - file: internal/xds/xdsclient/xdsresource/filter_chain.go
+    start_line: 58
+    end_line: 65
+    anchor: "type SourcePrefixEntry struct {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_lds.go
+    start_line: 397
+    end_line: 426
+    anchor: "func addFilterChainsForDestPrefixes(dstPrefixEntries []*dstPrefixEntry, fc *v3listenerpb.FilterChain) ([]*dstPrefixEntry, error) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_lds.go
+    start_line: 428
+    end_line: 441
+    anchor: "func getOrCreateDestPrefixEntry(dstPrefixEntries []*dstPrefixEntry, prefix *net.IPNet) ([]*dstPrefixEntry, *dstPrefixEntry) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_lds.go
+    start_line: 514
+    end_line: 535
+    anchor: "func addFilterChainsForSourcePrefixes(srcPrefixes *SourcePrefixes, fc *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_lds.go
+    start_line: 537
+    end_line: 557
+    anchor: "func getOrCreateSourcePrefixEntry(srcPrefixes *SourcePrefixes, prefix *net.IPNet, fc *v3listenerpb.FilterChain) error {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_lds.go
+    start_line: 590
+    end_line: 598
+    anchor: "func ipNetEqual(a, b *net.IPNet) bool {"

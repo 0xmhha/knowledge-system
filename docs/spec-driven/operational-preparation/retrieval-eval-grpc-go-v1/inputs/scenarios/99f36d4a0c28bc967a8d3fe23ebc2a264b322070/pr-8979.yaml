@@ -1,0 +1,23 @@
+version: 1
+name: pr-8979
+description: "grpclb: replace testServer with StubServer in grpclb_test.go"
+prompt: "grpclb 시험에서 직접 만든 시험 서버 대신 공용 스텁 서버를 쓰게 바꾸고 싶어"
+expected_intent: test_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: balancer/grpclb/grpclb_test.go
+    start_line: 301
+    end_line: 306
+    anchor: "type testServer struct {"
+  - file: balancer/grpclb/grpclb_test.go
+    start_line: 310
+    end_line: 320
+    anchor: "func (s *testServer) EmptyCall(ctx context.Context, _ *testpb.Empty) (*testpb.Empty, error) {"
+  - file: balancer/grpclb/grpclb_test.go
+    start_line: 322
+    end_line: 324
+    anchor: "func (s *testServer) FullDuplexCall(testgrpc.TestService_FullDuplexCallServer) error {"
+  - file: balancer/grpclb/grpclb_test.go
+    start_line: 326
+    end_line: 340
+    anchor: "func startBackends(t *testing.T, sn string, fallback bool, lis ...net.Listener) (servers []*grpc.Server) {"

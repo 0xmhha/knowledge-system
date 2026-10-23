@@ -1,0 +1,19 @@
+version: 1
+name: pr-8822
+description: "xds: Support `:authority` header rewriting for LOGICAL_DNS clusters"
+prompt: "논리 DNS 클러스터에서는 :authority 헤더 자동 재작성이 안 돼. DNS 호스트 이름을 엔드포인트 속성에 넣어 주고 싶어"
+expected_intent: bug_fix
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: internal/xds/balancer/clusterresolver/configbuilder.go
+    start_line: 141
+    end_line: 159
+    anchor: "func buildClusterImplConfigForDNS(g *nameGenerator, endpoints []resolver.Endpoint, mechanism DiscoveryMechanism) (string, *clusterimpl.LBConfig, []resolver.Endpoint) {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_eds.go
+    start_line: 43
+    end_line: 53
+    anchor: "func setHostname(endpoint resolver.Endpoint, hostname string) resolver.Endpoint {"
+  - file: internal/xds/xdsclient/xdsresource/unmarshal_eds.go
+    start_line: 110
+    end_line: 167
+    anchor: "func parseEndpoints(lbEndpoints []*v3endpointpb.LbEndpoint, uniqueEndpointAddrs map[string]bool) ([]Endpoint, error) {"

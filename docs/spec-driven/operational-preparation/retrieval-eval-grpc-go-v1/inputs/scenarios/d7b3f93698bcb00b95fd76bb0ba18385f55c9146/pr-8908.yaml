@@ -1,0 +1,31 @@
+version: 1
+name: pr-8908
+description: "xds/rbac: replace legacy net to netip"
+prompt: "xDS RBAC의 IP 대역 매칭이 옛 net 패키지 타입을 써. netip로 바꾸고 싶어"
+expected_intent: refactor
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/xds/rbac/matchers.go
+    start_line: 324
+    end_line: 334
+    anchor: "type remoteIPMatcher struct {"
+  - file: internal/xds/rbac/matchers.go
+    start_line: 336
+    end_line: 345
+    anchor: "func newRemoteIPMatcher(cidrRange *v3corepb.CidrRange) (*remoteIPMatcher, error) {"
+  - file: internal/xds/rbac/matchers.go
+    start_line: 347
+    end_line: 350
+    anchor: "func (sim *remoteIPMatcher) match(data *rpcData) bool {"
+  - file: internal/xds/rbac/matchers.go
+    start_line: 352
+    end_line: 354
+    anchor: "type localIPMatcher struct {"
+  - file: internal/xds/rbac/matchers.go
+    start_line: 356
+    end_line: 363
+    anchor: "func newLocalIPMatcher(cidrRange *v3corepb.CidrRange) (*localIPMatcher, error) {"
+  - file: internal/xds/rbac/matchers.go
+    start_line: 365
+    end_line: 368
+    anchor: "func (dim *localIPMatcher) match(data *rpcData) bool {"

@@ -1,0 +1,15 @@
+version: 1
+name: pr-8823
+description: "grpc: improve the docstring for StreamServerInterceptor"
+prompt: "스트림 서버 인터셉터 문서 설명이 헷갈려. 설명을 더 정확하게 고치고 싶어"
+expected_intent: docs_update
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: interceptor.go
+    start_line: 100
+    end_line: 104
+    anchor: "type StreamServerInterceptor func(srv any, ss ServerStream, info *StreamServerInfo, handler StreamHandler) error"
+  - file: stream.go
+    start_line: 54
+    end_line: 61
+    anchor: "type StreamHandler func(srv any, stream ServerStream) error"

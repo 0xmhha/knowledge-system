@@ -1,0 +1,63 @@
+version: 1
+name: pr-8978
+description: "binarylog: replace testServer with StubServer in binarylog_end2end_test.go"
+prompt: "바이너리 로그 e2e 시험에서 직접 만든 시험 서버 대신 공용 스텁 서버를 쓰게 바꾸고 싶어"
+expected_intent: test_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 133
+    end_line: 136
+    anchor: "type testServer struct {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 138
+    end_line: 154
+    anchor: "func (s *testServer) UnaryCall(ctx context.Context, in *testpb.SimpleRequest) (*testpb.SimpleResponse, error) {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 156
+    end_line: 182
+    anchor: "func (s *testServer) FullDuplexCall(stream testgrpc.TestService_FullDuplexCallServer) error {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 184
+    end_line: 206
+    anchor: "func (s *testServer) StreamingInputCall(stream testgrpc.TestService_StreamingInputCallServer) error {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 208
+    end_line: 227
+    anchor: "func (s *testServer) StreamingOutputCall(in *testpb.StreamingOutputCallRequest, stream testgrpc.TestService_StreamingOutputCallServer) error {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 229
+    end_line: 248
+    anchor: "type test struct {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 250
+    end_line: 256
+    anchor: "func (te *test) tearDown() {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 285
+    end_line: 310
+    anchor: "func (te *test) startServer(ts testgrpc.TestServiceServer) {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 312
+    end_line: 324
+    anchor: "func (te *test) clientConn() *grpc.ClientConn {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 342
+    end_line: 360
+    anchor: "func (te *test) doUnaryCall(c *rpcConfig) (*testpb.SimpleRequest, *testpb.SimpleResponse, error) {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 362
+    end_line: 409
+    anchor: "func (te *test) doFullDuplexCallRoundtrip(c *rpcConfig) ([]proto.Message, []proto.Message, error) {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 411
+    end_line: 441
+    anchor: "func (te *test) doClientStreamCall(c *rpcConfig) ([]proto.Message, proto.Message, error) {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 443
+    end_line: 474
+    anchor: "func (te *test) doServerStreamCall(c *rpcConfig) (proto.Message, []proto.Message, error) {"
+  - file: binarylog/binarylog_end2end_test.go
+    start_line: 797
+    end_line: 837
+    anchor: "func runRPCs(t *testing.T, cc *rpcConfig) *expectedData {"

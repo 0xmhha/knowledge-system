@@ -1,0 +1,47 @@
+version: 1
+name: pr-8829
+description: "xds/googlec2p: remove legacy `SetFallbackBootstrapConfig` and fix tests."
+prompt: "구글 C2P 쪽의 전역 대체 부트스트랩 설정 API는 이제 쓸모가 없어. 그 API와 관련 필드를 지우고 싶어"
+expected_intent: refactor
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: internal/xds/bootstrap/bootstrap.go
+    start_line: 650
+    end_line: 685
+    anchor: "func GetConfiguration() (*Config, error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 44
+    end_line: 56
+    anchor: "type Pool struct {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 83
+    end_line: 97
+    anchor: "func NewPool(config *bootstrap.Config) *Pool {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 99
+    end_line: 108
+    anchor: "func (p *Pool) NewClientWithConfig(name string, metricsRecorder estats.MetricsRecorder, config *bootstrap.Config) (XDSClient, func(), error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 110
+    end_line: 119
+    anchor: "func (p *Pool) NewClient(name string, metricsRecorder estats.MetricsRecorder) (XDSClient, func(), error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 121
+    end_line: 150
+    anchor: "func (p *Pool) NewClientForTesting(opts OptionsForTesting) (XDSClient, func(), error) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 175
+    end_line: 183
+    anchor: "func (p *Pool) SetFallbackBootstrapConfig(config *bootstrap.Config) {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 207
+    end_line: 219
+    anchor: "func (p *Pool) BootstrapConfigForTesting() *bootstrap.Config {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 221
+    end_line: 230
+    anchor: "func (p *Pool) UnsetBootstrapConfigForTesting() {"
+  - file: internal/xds/xdsclient/pool.go
+    start_line: 268
+    end_line: 311
+    anchor: "func (p *Pool) newRefCounted(name string, metricsRecorder estats.MetricsRecorder, watchExpiryTimeout time.Duration, bConfig *bootstrap.Config) (*clientImpl, func(), error) {"

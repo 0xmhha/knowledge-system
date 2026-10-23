@@ -1,0 +1,23 @@
+version: 1
+name: pr-9014
+description: "xds: Exported `buildXDSClientConfig` to use in external packages and update `xds_fake_transport.go`."
+prompt: "xDS 클라이언트 설정을 만드는 함수를 외부 패키지에서도 쓸 수 있게 공개하고, 가짜 전송에서 생길 수 있는 교착도 고치고 싶어. 퍼저에서 쓸 거야"
+expected_intent: test_add
+expected_commit: 6477252c28b2222e6f0e6d2b7c01fa0b7b7eb3e5
+expected_citations:
+  - file: internal/xds/clients/internal/testutils/faketransport/xds_fake_transport.go
+    start_line: 182
+    end_line: 191
+    anchor: "func (s *stream) Send(data []byte) error {"
+  - file: internal/xds/xdsclient/clientimpl.go
+    start_line: 123
+    end_line: 149
+    anchor: "func newClientImpl(config *bootstrap.Config, metricsRecorder estats.MetricsRecorder, target string, watchExpiryTimeout time.Duration) (*clientImpl, error) {"
+  - file: internal/xds/xdsclient/clientimpl.go
+    start_line: 191
+    end_line: 241
+    anchor: "func buildXDSClientConfig(config *bootstrap.Config, metricsRecorder estats.MetricsRecorder, target string, watchExpiryTimeout time.Duration) (xdsclient.Config, error) {"
+  - file: internal/xds/xdsclient/clientimpl_test.go
+    start_line: 61
+    end_line: 334
+    anchor: "func (s) TestBuildXDSClientConfig_Success(t *testing.T) {"

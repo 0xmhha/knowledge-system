@@ -1,0 +1,11 @@
+version: 1
+name: pr-9391
+description: "transport: fix server Recv hang on initial HEADERS with EndStream"
+prompt: "클라이언트가 스트림을 열면서 첫 헤더에 스트림 끝 표시를 같이 보내면 서버 쪽 수신이 멈춰. 고치고 싶어"
+expected_intent: security
+expected_commit: a9cbf17a2ad108cdaded0d1f37d35098733ee462
+expected_citations:
+  - file: internal/transport/http2_server.go
+    start_line: 375
+    end_line: 640
+    anchor: "func (t *http2Server) operateHeaders(ctx context.Context, frame *http2.MetaHeadersFrame, handle func(*ServerStream)) error {"

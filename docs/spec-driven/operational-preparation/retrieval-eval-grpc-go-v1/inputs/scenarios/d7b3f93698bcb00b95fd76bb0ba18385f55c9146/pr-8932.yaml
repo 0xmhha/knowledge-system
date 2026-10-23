@@ -1,0 +1,11 @@
+version: 1
+name: pr-8932
+description: "security/advancedtls: fix macOS compatibility in CRL script"
+prompt: "advancedtls의 인증서 폐기 목록 생성 스크립트가 macOS sed에서 안 돌아. 운영체제 상관없이 돌게 고치고 싶어"
+expected_intent: test_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: security/advancedtls/crl_provider_test.go
+    start_line: 138
+    end_line: 205
+    anchor: "func (s) TestFileWatcherCRLProvider(t *testing.T) {"

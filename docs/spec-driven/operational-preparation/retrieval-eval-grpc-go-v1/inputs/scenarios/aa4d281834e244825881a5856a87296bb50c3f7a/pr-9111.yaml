@@ -1,0 +1,11 @@
+version: 1
+name: pr-9111
+description: "xds/rbac: enforce strict presence-based short-circuit in authenticatedMatcher"
+prompt: "xDS RBAC의 인증 주체 매칭이 URI나 DNS SAN이 있어도 주체 DN까지 내려가서 비교해. 처음 비어 있지 않은 신원만 보게 고치고 싶어"
+expected_intent: security
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: internal/xds/rbac/matchers.go
+    start_line: 422
+    end_line: 451
+    anchor: "func (am *authenticatedMatcher) match(data *rpcData) bool {"

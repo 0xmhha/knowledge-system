@@ -1,0 +1,11 @@
+version: 1
+name: pr-8871
+description: "examples: Poll for expected server logs in test"
+prompt: "예제 시험 스크립트가 클라이언트가 끝나자마자 서버 로그를 확인해서 가끔 실패해. 기대한 로그가 나올 때까지 기다리게 하고 싶어"
+expected_intent: test_add
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: examples/features/gracefulstop/server/main.go
+    start_line: 76
+    end_line: 105
+    anchor: "func main() {"

@@ -1,0 +1,11 @@
+version: 1
+name: pr-8831
+description: "credentials/tls: verify overwritten authority against only leaf certificate"
+prompt: "인증서 기반 보안 연결에서 RPC마다 덮어쓴 authority를 검증할 때 인증서 체인 전체가 아니라 말단 인증서만 봐야 해. 그렇게 고치고 싶어"
+expected_intent: bug_fix
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: credentials/tls.go
+    start_line: 54
+    end_line: 71
+    anchor: "func (t TLSInfo) ValidateAuthority(authority string) error {"

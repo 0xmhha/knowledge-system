@@ -1,0 +1,35 @@
+version: 1
+name: pr-8874
+description: "client: process RPC stats/tracing only when a handler is configured"
+prompt: "헬스체크나 ORCA용 스트림처럼 통계 핸들러가 없는 스트림에서도 통계 처리를 해서 오류 로그가 계속 찍혀. 핸들러가 있을 때만 처리하게 하고 싶어"
+expected_intent: bug_fix
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/transport/client_stream.go
+    start_line: 30
+    end_line: 53
+    anchor: "type ClientStream struct {"
+  - file: internal/transport/http2_client.go
+    start_line: 481
+    end_line: 511
+    anchor: "func (t *http2Client) newStream(ctx context.Context, callHdr *CallHdr) *ClientStream {"
+  - file: internal/transport/http2_client.go
+    start_line: 745
+    end_line: 934
+    anchor: "func (t *http2Client) NewStream(ctx context.Context, callHdr *CallHdr) (*ClientStream, error) {"
+  - file: internal/transport/http2_client.go
+    start_line: 1439
+    end_line: 1621
+    anchor: "func (t *http2Client) operateHeaders(frame *http2.MetaHeadersFrame) {"
+  - file: internal/transport/transport.go
+    start_line: 604
+    end_line: 641
+    anchor: "type ClientTransport interface {"
+  - file: stream.go
+    start_line: 521
+    end_line: 570
+    anchor: "func (a *csAttempt) newStream() error {"
+  - file: stream.go
+    start_line: 1271
+    end_line: 1386
+    anchor: "func newNonRetryClientStream(ctx context.Context, desc *StreamDesc, method string, t transport.ClientTransport, ac *addrConn, opts ...CallOption) (_ ClientStream, err error) {"

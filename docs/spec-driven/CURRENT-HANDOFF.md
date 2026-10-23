@@ -13,8 +13,8 @@
 
 ## 바로 다음 행동
 
-1. [남은 작업](../REMAINING-WORK.md) 3.1의 2단계: PR 변환 스크립트와 비교 대상 실행 스크립트를 만든다. [명세](./RETRIEVAL-EVAL-SPEC.md)는 승인됐고, `cks eval`의 의도·순위 지표는 들어갔다.
-2. 그다음 3~5단계를 차례로 한다.
+1. [남은 작업](../REMAINING-WORK.md) 3.1의 3단계: 스냅샷 색인 24개를 만들고 CKS와 비교 대상을 돌린다. 입력은 고정됐다([입력](./operational-preparation/retrieval-eval-grpc-go-v1/README.md)).
+2. 그다음 4~5단계를 차례로 한다.
 3. 단계를 마치면 이 문서, [남은 작업](../REMAINING-WORK.md), 원장을 같은 커밋에서 갱신한다.
 
 ## WI-V1 근거 (보류 중, 봉인된 패킷은 고치지 않는다)

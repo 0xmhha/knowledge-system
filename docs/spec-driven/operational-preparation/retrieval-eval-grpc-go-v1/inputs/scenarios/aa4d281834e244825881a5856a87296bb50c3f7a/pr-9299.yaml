@@ -1,0 +1,11 @@
+version: 1
+name: pr-9299
+description: "credentials/sts: do not follow redirects during token exchange"
+prompt: "STS 토큰 교환 요청이 리다이렉트를 따라가서 토큰이 다른 곳으로 갈 수 있어. 리다이렉트를 따라가지 않게 하고 싶어"
+expected_intent: security
+expected_commit: aa4d281834e244825881a5856a87296bb50c3f7a
+expected_citations:
+  - file: credentials/sts/sts.go
+    start_line: 196
+    end_line: 205
+    anchor: "func makeHTTPClient(roots *x509.CertPool) httpDoer {"

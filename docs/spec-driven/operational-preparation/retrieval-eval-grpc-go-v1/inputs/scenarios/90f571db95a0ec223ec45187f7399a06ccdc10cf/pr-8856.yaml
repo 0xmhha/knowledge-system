@@ -1,0 +1,11 @@
+version: 1
+name: pr-8856
+description: "rls: Fix flaky test TestPickerUpdateOnDataCacheSizeDecrease"
+prompt: "RLS 데이터 캐시 크기를 줄였을 때 피커가 갱신되는지 보는 시험이 가끔 실패해. 고치고 싶어"
+expected_intent: test_add
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: balancer/rls/balancer_test.go
+    start_line: 658
+    end_line: 828
+    anchor: "func (s) TestPickerUpdateOnDataCacheSizeDecrease(t *testing.T) {"

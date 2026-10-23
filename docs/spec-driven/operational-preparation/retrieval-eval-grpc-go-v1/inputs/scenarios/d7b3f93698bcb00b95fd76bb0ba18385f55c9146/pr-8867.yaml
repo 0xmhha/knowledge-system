@@ -1,0 +1,119 @@
+version: 1
+name: pr-8867
+description: "resolver: Add resolver.EndpointMap.All() to iterate over keys and values"
+prompt: "엔드포인트 맵을 돌 때 키를 뽑고 값을 다시 찾지 않고, 키와 값을 한꺼번에 도는 반복자를 추가하고 싶어"
+expected_intent: feature_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: balancer/base/balancer.go
+    start_line: 95
+    end_line: 146
+    anchor: "func (b *baseBalancer) UpdateClientConnState(s balancer.ClientConnState) error {"
+  - file: balancer/base/balancer.go
+    start_line: 162
+    end_line: 181
+    anchor: "func (b *baseBalancer) regeneratePicker() {"
+  - file: balancer/endpointsharding/endpointsharding.go
+    start_line: 132
+    end_line: 201
+    anchor: "func (es *endpointSharding) UpdateClientConnState(state balancer.ClientConnState) error {"
+  - file: balancer/endpointsharding/endpointsharding.go
+    start_line: 203
+    end_line: 218
+    anchor: "func (es *endpointSharding) ResolverError(err error) {"
+  - file: balancer/endpointsharding/endpointsharding.go
+    start_line: 224
+    end_line: 231
+    anchor: "func (es *endpointSharding) Close() {"
+  - file: balancer/endpointsharding/endpointsharding.go
+    start_line: 233
+    end_line: 241
+    anchor: "func (es *endpointSharding) ExitIdle() {"
+  - file: balancer/endpointsharding/endpointsharding.go
+    start_line: 243
+    end_line: 305
+    anchor: "func (es *endpointSharding) updateState() {"
+  - file: balancer/leastrequest/leastrequest.go
+    start_line: 153
+    end_line: 211
+    anchor: "func (lrb *leastRequestBalancer) UpdateState(state balancer.State) {"
+  - file: balancer/pickfirst/pickfirst.go
+    start_line: 398
+    end_line: 406
+    anchor: "func (b *pickfirstBalancer) startFirstPassLocked() {"
+  - file: balancer/pickfirst/pickfirst.go
+    start_line: 408
+    end_line: 413
+    anchor: "func (b *pickfirstBalancer) closeSubConnsLocked() {"
+  - file: balancer/pickfirst/pickfirst.go
+    start_line: 494
+    end_line: 517
+    anchor: "func (b *pickfirstBalancer) reconcileSubConnsLocked(newAddrs []resolver.Address) {"
+  - file: balancer/pickfirst/pickfirst.go
+    start_line: 519
+    end_line: 530
+    anchor: "func (b *pickfirstBalancer) shutdownRemainingLocked(selected *scData) {"
+  - file: balancer/pickfirst/pickfirst.go
+    start_line: 765
+    end_line: 790
+    anchor: "func (b *pickfirstBalancer) endFirstPassIfPossibleLocked(lastErr error) {"
+  - file: balancer/ringhash/ringhash.go
+    start_line: 121
+    end_line: 179
+    anchor: "func (b *ringhashBalancer) UpdateState(state balancer.State) {"
+  - file: balancer/ringhash/ringhash.go
+    start_line: 239
+    end_line: 307
+    anchor: "func (b *ringhashBalancer) updatePickerLocked() {"
+  - file: balancer/ringhash/ringhash.go
+    start_line: 319
+    end_line: 340
+    anchor: "func (b *ringhashBalancer) newPickerLocked() *picker {"
+  - file: balancer/ringhash/ringhash.go
+    start_line: 342
+    end_line: 379
+    anchor: "func (b *ringhashBalancer) aggregatedStateLocked() connectivity.State {"
+  - file: balancer/weightedroundrobin/balancer.go
+    start_line: 155
+    end_line: 202
+    anchor: "func (b *wrrBalancer) updateEndpointsLocked(endpoints []resolver.Endpoint) {"
+  - file: balancer/weightedroundrobin/balancer.go
+    start_line: 404
+    end_line: 424
+    anchor: "func (b *wrrBalancer) Close() {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 244
+    end_line: 265
+    anchor: "func (b *outlierDetectionBalancer) onIntervalConfig() {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 267
+    end_line: 285
+    anchor: "func (b *outlierDetectionBalancer) onNoopConfig() {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 287
+    end_line: 372
+    anchor: "func (b *outlierDetectionBalancer) UpdateClientConnState(s balancer.ClientConnState) error {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 652
+    end_line: 696
+    anchor: "func (b *outlierDetectionBalancer) intervalTimerAlgorithm() {"
+  - file: internal/xds/balancer/outlierdetection/balancer.go
+    start_line: 698
+    end_line: 712
+    anchor: "func (b *outlierDetectionBalancer) endpointsWithAtLeastRequestVolume(requestVolume uint32) []*endpointInfo {"
+  - file: resolver/map.go
+    start_line: 137
+    end_line: 146
+    anchor: "func (a *AddressMapV2[T]) Keys() []Address {"
+  - file: resolver/map.go
+    start_line: 148
+    end_line: 157
+    anchor: "func (a *AddressMapV2[T]) Values() []T {"
+  - file: resolver/map.go
+    start_line: 221
+    end_line: 232
+    anchor: "func (em *EndpointMap[T]) Keys() []Endpoint {"
+  - file: resolver/map.go
+    start_line: 234
+    end_line: 241
+    anchor: "func (em *EndpointMap[T]) Values() []T {"

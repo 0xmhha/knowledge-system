@@ -1,0 +1,15 @@
+version: 1
+name: pr-8922
+description: "ringhash: enable behaviors of A76 by default"
+prompt: "링 해시에서 EDS 해시 키 메타데이터와 요청 해시 헤더 설정을 쓰는 동작을 이제 기본으로 켜고 싶어"
+expected_intent: feature_add
+expected_commit: d7b3f93698bcb00b95fd76bb0ba18385f55c9146
+expected_citations:
+  - file: internal/envconfig/envconfig.go
+    start_line: 55
+    end_line: 61
+    anchor: "XDSEndpointHashKeyBackwardCompat = boolFromEnv(\"GRPC_XDS_ENDPOINT_HASH_KEY_BACKWARD_COMPAT\", true)"
+  - file: internal/envconfig/envconfig.go
+    start_line: 63
+    end_line: 67
+    anchor: "RingHashSetRequestHashKey = boolFromEnv(\"GRPC_EXPERIMENTAL_RING_HASH_SET_REQUEST_HASH_KEY\", false)"

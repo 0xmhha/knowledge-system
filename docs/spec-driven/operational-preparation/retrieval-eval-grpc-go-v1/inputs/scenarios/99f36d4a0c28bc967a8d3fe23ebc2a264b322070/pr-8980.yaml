@@ -1,0 +1,51 @@
+version: 1
+name: pr-8980
+description: "stats: replace testServer with StubServer in stats_test.go"
+prompt: "stats 시험에서 직접 만든 시험 서버 대신 공용 스텁 서버를 쓰게 바꾸고 싶어"
+expected_intent: test_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: stats/stats_test.go
+    start_line: 119
+    end_line: 121
+    anchor: "type testServer struct {"
+  - file: stats/stats_test.go
+    start_line: 123
+    end_line: 136
+    anchor: "func (s *testServer) UnaryCall(ctx context.Context, in *testpb.SimpleRequest) (*testpb.SimpleResponse, error) {"
+  - file: stats/stats_test.go
+    start_line: 138
+    end_line: 161
+    anchor: "func (s *testServer) FullDuplexCall(stream testgrpc.TestService_FullDuplexCallServer) error {"
+  - file: stats/stats_test.go
+    start_line: 163
+    end_line: 182
+    anchor: "func (s *testServer) StreamingInputCall(stream testgrpc.TestService_StreamingInputCallServer) error {"
+  - file: stats/stats_test.go
+    start_line: 184
+    end_line: 200
+    anchor: "func (s *testServer) StreamingOutputCall(in *testpb.StreamingOutputCallRequest, stream testgrpc.TestService_StreamingOutputCallServer) error {"
+  - file: stats/stats_test.go
+    start_line: 202
+    end_line: 217
+    anchor: "type test struct {"
+  - file: stats/stats_test.go
+    start_line: 244
+    end_line: 270
+    anchor: "func (te *test) startServer(ts testgrpc.TestServiceServer) {"
+  - file: stats/stats_test.go
+    start_line: 842
+    end_line: 928
+    anchor: "func testServerStats(t *testing.T, tc *testConfig, cc *rpcConfig, checkFuncs []func(t *testing.T, d *gotData, e *expectedData)) {"
+  - file: stats/stats_test.go
+    start_line: 1142
+    end_line: 1232
+    anchor: "func testClientStats(t *testing.T, tc *testConfig, cc *rpcConfig, checkFuncs map[int]*checkFuncWithCount) {"
+  - file: stats/stats_test.go
+    start_line: 1374
+    end_line: 1418
+    anchor: "func (s) TestMultipleClientStatsHandler(t *testing.T) {"
+  - file: stats/stats_test.go
+    start_line: 1420
+    end_line: 1464
+    anchor: "func (s) TestMultipleServerStatsHandler(t *testing.T) {"

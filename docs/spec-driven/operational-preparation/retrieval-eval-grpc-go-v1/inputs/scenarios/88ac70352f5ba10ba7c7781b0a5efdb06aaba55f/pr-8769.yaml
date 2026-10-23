@@ -1,0 +1,35 @@
+version: 1
+name: pr-8769
+description: "transport: http2 server must validates header list size when early aborting stream"
+prompt: "HTTP/2 서버가 스트림을 일찍 끊을 때 헤더 목록 크기 제한을 검사하지 않아. 제한을 넘으면 RST_STREAM을 보내게 하고 싶어"
+expected_intent: bug_fix
+expected_commit: 88ac70352f5ba10ba7c7781b0a5efdb06aaba55f
+expected_citations:
+  - file: internal/transport/controlbuf.go
+    start_line: 152
+    end_line: 158
+    anchor: "type earlyAbortStream struct {"
+  - file: internal/transport/controlbuf.go
+    start_line: 845
+    end_line: 878
+    anchor: "func (l *loopyWriter) earlyAbortStreamHandler(eas *earlyAbortStream) error {"
+  - file: internal/transport/http2_server.go
+    start_line: 367
+    end_line: 661
+    anchor: "func (t *http2Server) operateHeaders(ctx context.Context, frame *http2.MetaHeadersFrame, handle func(*ServerStream)) error {"
+  - file: internal/transport/http2_server.go
+    start_line: 972
+    end_line: 987
+    anchor: "func (t *http2Server) checkForHeaderListSize(it any) bool {"
+  - file: internal/transport/http2_server.go
+    start_line: 1028
+    end_line: 1061
+    anchor: "func (t *http2Server) writeHeaderLocked(s *ServerStream) error {"
+  - file: internal/transport/http2_server.go
+    start_line: 1063
+    end_line: 1134
+    anchor: "func (t *http2Server) writeStatus(s *ServerStream, st *status.Status) error {"
+  - file: test/servertester.go
+    start_line: 91
+    end_line: 117
+    anchor: "func (st *serverTester) greet() {"

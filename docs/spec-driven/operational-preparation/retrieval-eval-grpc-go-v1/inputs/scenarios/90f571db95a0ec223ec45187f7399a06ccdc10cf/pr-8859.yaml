@@ -1,0 +1,15 @@
+version: 1
+name: pr-8859
+description: "balancer,fakegrpclb: Use log *f functions with format args"
+prompt: "밸런서와 가짜 grpclb 서버 쪽에서 형식 인자를 쓰면서 형식 없는 로그 함수를 부르고 있어. 형식 있는 함수로 바꾸고 정수에는 %d를 쓰고 싶어"
+expected_intent: refactor
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: balancer/rls/config.go
+    start_line: 186
+    end_line: 280
+    anchor: "func parseRLSProto(rlsProto *rlspb.RouteLookupConfig) (*lbConfig, error) {"
+  - file: internal/testutils/fakegrpclb/server.go
+    start_line: 161
+    end_line: 250
+    anchor: "func (s *Server) BalanceLoad(stream lbgrpc.LoadBalancer_BalanceLoadServer) error {"

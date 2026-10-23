@@ -1,0 +1,11 @@
+version: 1
+name: pr-8843
+description: "xds: fix typo in log message"
+prompt: "xDS 클라이언트 로그 메시지에 같은 낱말이 두 번 들어간 오타가 있어. 고치고 싶어"
+expected_intent: docs_update
+expected_commit: 90f571db95a0ec223ec45187f7399a06ccdc10cf
+expected_citations:
+  - file: internal/xds/clients/xdsclient/authority.go
+    start_line: 738
+    end_line: 794
+    anchor: "func (a *authority) unwatchResource(rType ResourceType, resourceName string, watcher ResourceWatcher) func() {"

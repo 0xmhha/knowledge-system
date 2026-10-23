@@ -1,0 +1,23 @@
+version: 1
+name: pr-9009
+description: "Fix flaky test `TestAggregatedClusterSuccess_SwitchBetweenLeafAndAggregate` in aggregate_cluster_test.go."
+prompt: "집계 클러스터에서 말단과 집계를 오가는 시험이 실제 DNS 조회 때문에 가끔 실패해. 결정적으로 돌게 고치고 싶어"
+expected_intent: test_add
+expected_commit: 99f36d4a0c28bc967a8d3fe23ebc2a264b322070
+expected_citations:
+  - file: internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go
+    start_line: 160
+    end_line: 252
+    anchor: "func (s) TestAggregateClusterSuccess_ThenUpdateChildClusters(t *testing.T) {"
+  - file: internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go
+    start_line: 254
+    end_line: 326
+    anchor: "func (s) TestAggregateClusterSuccess_ThenChangeRootToEDS(t *testing.T) {"
+  - file: internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go
+    start_line: 328
+    end_line: 415
+    anchor: "func (s) TestAggregatedClusterSuccess_SwitchBetweenLeafAndAggregate(t *testing.T) {"
+  - file: internal/xds/balancer/cdsbalancer/cdsbalancer_test.go
+    start_line: 84
+    end_line: 84
+    anchor: "defaultTestTimeout      = 5 * time.Second"
