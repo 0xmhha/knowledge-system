@@ -663,7 +663,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "finish the grpc-go snapshot indexes for qwen3-embedding:4b (2560d, main) and bge-m3 (baseline) with graph-aligned reindex, run CKS and the four baselines per model, get the human answer/prompt sample check, then fix weak spots and repeat on go-stablenet; WI-V1 pilot paused",
+  "next": "get the human answer/prompt sample check while indexes build; finish the grpc-go snapshot indexes for qwen3-embedding:4b (2560d, main) and bge-m3 (baseline) with graph-aligned reindex; point the baselines script at vec/<model>/<snapshot>; run CKS and the four baselines per model and report; then fix weak spots and repeat on go-stablenet; WI-V1 pilot paused",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -1080,10 +1080,11 @@
       "grpc-go inputs frozen: 100 PRs, 575 answer ranges, 100 Korean prompts, 24 snapshots; converter, baselines and snapshot chain tools"
     ],
     "pending": [
-      "snapshot indexes",
-      "reindex equivalence check",
-      "evaluation run",
-      "human sample check"
+      "human answer/prompt sample check",
+      "qwen3-embedding:4b snapshot indexes (first full build running)",
+      "bge-m3 snapshot indexes",
+      "baselines script reads vec/<model>/<snapshot>",
+      "evaluation run per model"
     ],
     "embedding_models": {
       "main": "qwen3-embedding:4b (2560d)",
@@ -1094,6 +1095,14 @@
       "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
       "canonical_id_mismatch_without_graph_repoint": 629,
       "remaining_difference_with_graph_repoint": "12 package convention summary chunks of 15860; code chunks identical"
+    },
+    "indexing_progress": {
+      "as_of": "2026-10-23T19:52+09:00",
+      "qwen3-embedding:4b": "first snapshot 88ac7035 full build at 851/1082 files after 2h; 23 reindex steps left",
+      "bge-m3": "not started with graph-aligned reindex; earlier chain discarded",
+      "graphs_reused_from_before_pr_124": 8,
+      "truncated_chunks": "qwen3-embedding:4b 16 by 851 files (13 large test files, 2 *.pb.go, 1 example server), bge-m3 2 at the same snapshot",
+      "known_gap": "scripts/retrieval_baselines.py still reads chain-<snapshot>/vector"
     }
   },
   "retrieval_eval_grpc_go_inputs": {

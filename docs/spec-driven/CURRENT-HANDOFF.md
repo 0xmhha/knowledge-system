@@ -1,23 +1,116 @@
 # 현재 인수인계
 
-기준: 2026-10-23, main `b62430bd`에 검색 평가 우선 결정을 반영. 이 문서는 지금 단계와 바로 다음 행동만 적는다. 남은 전체 목록, 맥락, 하지 않을 일은 [남은 작업](../REMAINING-WORK.md)에 있고, 정본은 [실행 원장](./REMAINING-13-EXECUTION.json)이다. 새 머신이나 새 세션은 [머신 간 인수인계](./MACHINE-HANDOFF.md)로 환경부터 준비한다.
+기준: 2026-10-23, main `0a70f502`(PR #124까지 머지). 이 문서는 지금 단계, 진행 중인 작업, 바로 다음 행동만 적는다. 남은 전체 목록, 맥락, 하지 않을 일은 [남은 작업](../REMAINING-WORK.md)에 있고, 정본은 [실행 원장](./REMAINING-13-EXECUTION.json)이다. 새 머신이나 새 세션은 [머신 간 인수인계](./MACHINE-HANDOFF.md)로 환경부터 준비한다.
 
-## 현재 단계
+## 1. 흔들리면 안 되는 기준
 
-정답이 있는 검색 평가를 시작한다(원장 `current_activity`: `98_retrieval_eval_first_answer_known_cases_WIV1_pilot_paused`).
+이 시스템은 어떤 프로젝트든 지식 DB로 만들고, 느슨하게 묻는 질문(vibe query)에 찾는 코드를 거의 한 번에 압축해 돌려줘야 한다. 사용자가 2026-10-23에 우선순위를 정했다([결정 기록](./operational-preparation/retrieval-priority-2026-10-23/DECISION.json)).
 
-- 사용자가 2026-10-23에 이 시스템의 핵심 가치를 정했다. vibe query의 의도를 정확히 파악하는 것이 1번, 그 의도의 코드와 연결된 코드를 거의 한 번에 찾아 주는 것이 2번이다. 테스트는 정답이 확인된 사례로만 한다([결정 기록](./operational-preparation/retrieval-priority-2026-10-23/DECISION.json)).
-- 첫 대상은 grpc-go, 그다음 go-stablenet이다. WI-V1 정식 수용 시범은 보류했다. 코딩 에이전트 묶음은 검색 품질을 올린 뒤에 한다.
-- WI-V1 사례는 정답 없이 골랐던 것으로 확인됐다. 정답 시험을 실제 코드로 돌려 후보 판정이 맞았음을 확인했고, 그 시험을 나중에 WI-V1을 다시 열 때 판정 기준으로 쓴다.
-- 13묶음 완료 0/13, 정식 수용 0/9, 독립 승인 0, FINAL 0, freeze 없음, `execution_allowed=false`다.
+1. 질문의 의도를 정확히 파악한다.
+2. 그 의도의 코드와, 그 코드와 연결된 코드를 한 번에 찾아 준다.
 
-## 바로 다음 행동
+테스트는 정답이 이미 확인된 사례로만 한다. 지금 하는 grpc-go 평가는 머지된 PR을 정답으로 쓴다. 지금 단계의 일은 이 두 가지를 숫자로 재는 것이다. 숫자가 나오기 전에는 검색 로직을 고치지 않는다. 결과를 본 뒤 표본, 정답, 질문을 바꾸지 않는다.
 
-1. [남은 작업](../REMAINING-WORK.md) 3.1의 3단계: `qwen3-embedding:4b`(2560차원, 본 평가)와 `bge-m3`(기준선)로 스냅샷 색인 24개씩을 만들고 CKS와 비교 대상을 돌린다. 입력은 고정됐다([입력](./operational-preparation/retrieval-eval-grpc-go-v1/README.md)).
-2. 그다음 4~5단계를 차례로 한다.
-3. 단계를 마치면 이 문서, [남은 작업](../REMAINING-WORK.md), 원장을 같은 커밋에서 갱신한다.
+## 2. 현재 단계
 
-## WI-V1 근거 (보류 중, 봉인된 패킷은 고치지 않는다)
+원장 `current_activity`: `101_retrieval_eval_grpc_go_indexing_qwen3_embedding_4b_and_bge_m3`. [남은 작업](../REMAINING-WORK.md) 3.1의 3단계(명세대로 실행)를 하는 중이다.
+
+### 끝난 것
+
+|PR|내용|
+|---|---|
+|#121|검색 평가를 1순위로 정한 결정과 WI-V1 정답 확인 기록|
+|#122|`cks eval`에 `expected_intent`, `first_hit_rank`, `used_tokens`, `rank_summary`, `intent_accuracy`를 더함([계약](./EVAL-CONTRACT.md))|
+|#123|grpc-go 입력 고정(PR 100건, 정답 범위 575개, 한국어 질문 100개, 스냅샷 24개)과 변환·비교 대상·연쇄 색인 스크립트|
+|#124|복사한 벡터 색인이 이번 스냅샷의 그래프를 가리키게 고침. 모델 결정을 명세 3장에 기록|
+
+[평가 명세](./RETRIEVAL-EVAL-SPEC.md)는 사용자가 승인했다. 입력은 [grpc-go 입력](./operational-preparation/retrieval-eval-grpc-go-v1/README.md)에 고정돼 있고 `manifest.json`이 해시를 묶는다.
+
+### 임베딩 모델 (사용자 결정)
+
+- 본 평가: `qwen3-embedding:4b`, 2560차원. 모델 기본 출력이 2560차원이라 `--embed-dim`을 주지 않는다.
+- 기준선: `bge-m3`, 1024차원.
+- 다른 모델은 받지 않는다. 사용자가 "그냥 다른 모델 받지 말고"라고 정했다. 제외한 모델과 이유는 [명세](./RETRIEVAL-EVAL-SPEC.md) 3장에 있다.
+- Ollama에서 임베딩을 지원하는 모델은 이 둘뿐이다. `qwen3.5:9b`, `gemma4:12b` 등은 대화형 LLM이라 임베딩에 쓰지 않는다.
+
+### 진행 중: `qwen3-embedding:4b` 스냅샷 색인
+
+`scripts/retrieval_snapshot_chain.py`로 24개 스냅샷의 색인을 시간 순서로 만든다. 2026-10-23 19:52 기준으로 첫 스냅샷 `88ac7035`의 벡터 전체 빌드가 1082개 파일 중 851개까지 갔다. 2시간이 걸렸다. 나머지 23개는 `reindex`로 바뀐 파일만 다시 임베딩한다.
+
+이 작업은 세션 임시 디렉터리에서 돌고 있다. 세션이나 머신이 바뀌면 결과가 남지 않을 수 있다. 그때는 아래 3장 명령으로 다시 만든다. 스크립트는 `chain-<모델>.json`에 끝난 스냅샷을 기록하므로 같은 작업 디렉터리에서 다시 돌리면 끝난 스냅샷은 건너뛴다. 단, 끊긴 스냅샷의 벡터는 처음부터 다시 만든다.
+
+## 3. 색인을 만들고 이어 가는 법
+
+### 준비
+
+- 저장소 루트에서 `make build-bins`로 `bin/ckg`, `bin/ckv`, `bin/cks`를 만든다.
+- grpc-go 전체 이력 clone을 저장소 밖에 둔다(`git clone https://github.com/grpc/grpc-go`).
+- `ollama list`에 `qwen3-embedding:4b`와 `bge-m3`가 있어야 한다.
+- 작업 디렉터리 `$WORK`는 저장소 밖에 둔다. 색인 하나가 수 GB라 커밋하지 않는다.
+
+### 스냅샷 목록
+
+`inputs/sample.json`의 `snapshots`는 해시 순이다. 연쇄 색인은 시간 순서가 필요하므로 커밋 시각으로 정렬해 `$WORK/snapshots.json`을 만든다.
+
+```sh
+D=docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1
+python3 -c "import json;print('\n'.join(json.load(open('$D/inputs/sample.json'))['snapshots']))" \
+  | xargs git -C <grpc-go clone> show -s --format='%ct %H' | sort -n | cut -d' ' -f2 \
+  | python3 -c "import json,sys;print(json.dumps(sys.stdin.read().split()))" > $WORK/snapshots.json
+```
+
+첫 항목은 `88ac7035`, 마지막은 `a9cbf17a`, 모두 24개다.
+
+### 실행
+
+```sh
+python3 scripts/retrieval_snapshot_chain.py --repo <grpc-go clone> --snapshots $WORK/snapshots.json \
+  --work $WORK --bin bin --model qwen3-embedding:4b
+python3 scripts/retrieval_snapshot_chain.py --repo <grpc-go clone> --snapshots $WORK/snapshots.json \
+  --work $WORK --bin bin --model bge-m3
+```
+
+두 모델을 동시에 돌리지 않는다. 같은 `src-chain` worktree를 checkout하기 때문이다. 그래프는 모델과 무관하다. 그래서 첫 모델이 만든 `chain-<스냅샷>/graph`를 둘째 모델이 다시 쓴다.
+
+### 만들어지는 것
+
+|경로|내용|
+|---|---|
+|`$WORK/src-chain`|grpc-go worktree. 스냅샷마다 checkout한다|
+|`$WORK/chain-<스냅샷>/graph`|그래프 DB. 스냅샷마다 한 번 만든다|
+|`$WORK/vec/<모델>/<스냅샷>`|모델별 벡터 색인. 모델 이름의 `:`와 `/`는 `-`로 바꾼다|
+|`$WORK/chain-<모델>.json`|스냅샷마다 모드(full, reindex)와 걸린 시간|
+|`$WORK/chain-<모델>-<스냅샷>.log`|빌드 로그|
+
+### 걸리는 시간 (이 머신에서 잰 값)
+
+- 그래프: 스냅샷 하나에 약 220초.
+- `bge-m3` 첫 스냅샷 전체 빌드: 약 40분(임베딩 36분, 청크 15,860개).
+- `qwen3-embedding:4b` 첫 스냅샷 전체 빌드: `bge-m3`보다 약 4배 느리다. 851/1082 파일에 2시간이 걸렸으므로 전체는 2시간 30분 안팎으로 본다. 끝나면 `chain-qwen3-embedding-4b.json`의 실제 값으로 이 줄을 바꾼다.
+- `reindex`: 바뀐 파일 수에 따라 10초에서 2분 남짓(`bge-m3` 기준).
+
+## 4. 바로 다음 행동 (이 순서를 따른다)
+
+1. **색인이 도는 동안 사람의 표본 확인을 받는다.** 명세 7장대로 무작위 정답 10건과 질문 10건을 사용자에게 보인다. 결과를 보기 전에 받아야 결과가 확인에 영향을 주지 않는다. 확인 결과는 사용자 메시지 그대로 기록하고, AI가 대신 확인하지 않는다. 확인 전의 결과는 DEV 근거다.
+2. **두 모델의 색인 48개를 끝낸다.** 끝나면 모델마다 `chain-<모델>.json`에 24행이 있는지, 첫 행이 `full`이고 나머지가 `reindex`인지 본다. `vec/<모델>/<스냅샷>/manifest.json`의 차원이 `qwen3-embedding:4b`는 2560, `bge-m3`는 1024인지 확인한다.
+3. **비교 대상 스크립트를 새 색인 위치에 맞춘다.** `scripts/retrieval_baselines.py`는 아직 옛 위치 `chain-<스냅샷>/vector`를 읽는다. 벡터는 `vec/<모델>/<스냅샷>`, 그래프는 `chain-<스냅샷>/graph`에서 읽도록 `--model` 인자를 더하고 시험을 고친다. 이 변경은 입력 고정 뒤의 도구 변경이다. 표본, 정답, 질문은 바꾸지 않는다.
+4. **CKS를 돌린다.** 스냅샷마다 `cks.yaml`을 만든다. `backends.ckg.path`는 `chain-<스냅샷>/graph/graph.db`, `source_root`는 그 스냅샷으로 checkout한 소스, `backends.ckv.path`는 `vec/<모델>/<스냅샷>`, `provider: ollama`, `embed_model`은 모델 이름이다. `sanitize.rules_path`는 저장소의 `system/policies/sanitization_rules.yaml`이다. 그다음 `bin/cks eval --config <cks.yaml> --scenarios <입력>/inputs/scenarios/<스냅샷> --verify-anchors <소스> --output <결과>`를 돌린다. 앵커 검사가 실패하면 실행하지 말고 원인을 먼저 찾는다.
+5. **비교 대상 네 가지를 돌린다.** 벡터만, 벡터와 BM25 재정렬, `ckg query`, `git grep`이다. 같은 스냅샷과 질문으로 모델마다 돌린다. `ckg query`와 `git grep`은 모델과 무관하므로 한 번만 돌려도 된다.
+6. **결과를 모아 보고한다.** 모델 두 개와 방식 다섯 개(CKS와 비교 대상 네 가지)를 놓고 hit@1, hit@3, MRR, 의도 정확도, 정답 하나를 찾는 데 쓴 토큰 수를 표로 만든다. 오류와 측정하지 못한 값도 분모에 남긴다. 결과 기록은 `retrieval-eval-grpc-go-v1/` 아래 새 하위 디렉터리에 두고 입력 파일은 건드리지 않는다.
+7. 그다음 [남은 작업](../REMAINING-WORK.md) 3.1의 4단계(약한 곳 고치기)와 5단계(go-stablenet)로 간다.
+
+단계를 하나 마칠 때마다 이 문서, [남은 작업](../REMAINING-WORK.md), 원장을 같은 커밋에서 갱신한다.
+
+## 5. 이미 확인한 사실과 주의할 점
+
+- **`reindex` 전에 그래프를 바꿔 가리켜야 한다.** 복사한 벡터 색인의 manifest는 앞 스냅샷의 그래프를 가리킨다. 그대로 `reindex`하면 같은 커밋을 전체 빌드한 것과 canonical ID가 629개 달랐다. 스크립트가 `sources.ckg.path`를 이번 스냅샷의 그래프로 바꾼 뒤 `reindex`한다. 그러면 code 청크는 전체 빌드와 같고, 패키지 convention 요약 청크 15,860개 중 12개만 다르다. 이 12개는 `ckv reindex`의 버그로 보고 나중에 따로 고친다. 평가 결과에는 이 차이를 함께 적는다.
+- **8개 스냅샷의 그래프는 PR #124 전에 만든 것이다.** 그래프 빌드는 그 PR에서 바뀌지 않았다. 스크립트는 manifest에 그 커밋이 적혀 있으면 그래프를 다시 쓴다. 9번째 `d7b3f936`은 빌드 도중 멈춰 그래프가 없으므로 새로 만든다. 같은 작업 디렉터리의 옛 `chain.json`과 `chain-<스냅샷>/vector`는 그래프를 잘못 가리키던 `bge-m3` 색인이다. 평가에 쓰지 않는다.
+- **긴 청크는 잘려서 임베딩된다.** Ollama가 긴 입력을 거부하면 `ckv`가 입력을 12,000바이트나 4,000바이트로 줄여 다시 보낸다. `qwen3-embedding:4b`는 851개 파일까지 16개 청크가 잘렸다. `bge-m3`는 같은 스냅샷에서 2개였다. 16개 중 13개가 큰 시험 파일, 2개가 생성 파일(`*.pb.go`), 1개가 예제 서버다. 시험 파일이 정답인 PR은 이 잘림의 영향을 받을 수 있다. 로그에서 `truncated`를 세어 결과와 함께 적는다.
+- **`ckg query`는 한국어 질문에 자주 오류를 낸다.** 질문에서 쓸 수 있는 낱말을 못 찾으면 "no usable tokens"를 낸다. 명세대로 오류도 실패로 센다. 고치는 일은 4단계에서 한다.
+- **부분 측정값은 참고만 한다.** `90f571db` 스냅샷의 18개 시나리오를 옛 `bge-m3` 색인으로 돌렸을 때 hit@1이 벡터 0.33, BM25 재정렬 0.17, `ckg query` 0, `git grep` 0이었다. CKS 시나리오 하나(pr-8792)는 정답 의도 refactor를 feature_add로 분류했고, 정답을 2위에 냈고, 3,030토큰을 썼다. 색인을 다시 만들기 전의 값이라 결과 보고에 쓰지 않는다.
+- **`pplx-embed-v1-4b`는 쓰지 않는다.** 이 네트워크에서 Hugging Face에 닿지 않고, 양방향 구조라 Ollama에서 돌기 어렵다.
+
+## 6. WI-V1 근거 (보류 중, 봉인된 패킷은 고치지 않는다)
 
 |패킷|담은 것|
 |---|---|
@@ -30,4 +123,4 @@
 |[factory-native-overlap-v1](./operational-preparation/source-review-supplement/followups/factory-native-overlap-v1/SUMMARY.json)|원래 60초 timer와 RPC callback 겹침|
 |[owner-schedule-contract-v1](./operational-preparation/source-review-supplement/followups/owner-schedule-contract-v1/ADOPTION-MANIFEST.json)|사용자가 승인한 실제 4·통제 1 범위|
 
-모든 근거는 AI가 만든 DEV 근거다. 어느 것도 독립 정답이나 독립 승인이 아니다.
+모든 근거는 AI가 만든 DEV 근거다. 어느 것도 독립 정답이나 독립 승인이 아니다. 13묶음 완료 0/13, 정식 수용 0/9, 독립 승인 0, FINAL 0, freeze 없음, `execution_allowed=false`다.
