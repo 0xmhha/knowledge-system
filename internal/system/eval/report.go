@@ -26,6 +26,10 @@ type Report struct {
 	FinishedAt     time.Time        `json:"finished_at,omitempty"`
 	Results        []ScenarioResult `json:"results"`
 	IntentSummary  []IntentSummary  `json:"intent_summary,omitempty"`
+	// RankSummary and IntentAccuracy aggregate the per-scenario first-hit
+	// rank and expected_intent checks; absent when no scenario supplies them.
+	RankSummary    *RankSummary    `json:"rank_summary,omitempty"`
+	IntentAccuracy *IntentAccuracy `json:"intent_accuracy,omitempty"`
 }
 
 // IntentSummary is the per-intent rollup across all scenarios that
@@ -99,6 +103,99 @@ func SummarizeByIntent(results []ScenarioResult) []IntentSummary {
 		})
 	}
 	return out
+}
+
+// RankSummary is hit@k and per-query MRR over scenarios that declare
+// expected citations. A scenario that errored counts as a miss, so a
+// failing backend cannot raise the rates by dropping out of the denominator.
+type RankSummary struct {
+	Scenarios int     `json:"scenarios"`
+	HitAt1    float64 `json:"hit_at_1"`
+	HitAt3    float64 `json:"hit_at_3"`
+	MRR       float64 `json:"mrr"`
+}
+
+// IntentAccuracy compares the classified intent with expected_intent.
+// Confusion is keyed expected → classified; an errored scenario is
+// recorded under classifiedError and counts as wrong.
+type IntentAccuracy struct {
+	Scenarios int                       `json:"scenarios"`
+	Correct   int                       `json:"correct"`
+	Accuracy  float64                   `json:"accuracy"`
+	Confusion map[string]map[string]int `json:"confusion"`
+}
+
+// classifiedError and classifiedUnknown label confusion cells that have
+// no classified intent value.
+const (
+	classifiedError   = "(error)"
+	classifiedUnknown = "(unknown)"
+)
+
+// rankHitLimits are the k values RankSummary reports.
+const (
+	hitTop1 = 1
+	hitTop3 = 3
+)
+
+// SummarizeRanks returns nil when no scenario declares expected citations.
+func SummarizeRanks(results []ScenarioResult) *RankSummary {
+	var out RankSummary
+	var hit1, hit3 int
+	var rr float64
+	for _, r := range results {
+		if r.RetrievalState == "not_evaluated" {
+			continue
+		}
+		out.Scenarios++
+		rank := r.Metrics.FirstHitRank
+		if r.Error != "" || rank == 0 {
+			continue
+		}
+		if rank <= hitTop1 {
+			hit1++
+		}
+		if rank <= hitTop3 {
+			hit3++
+		}
+		rr += 1 / float64(rank)
+	}
+	if out.Scenarios == 0 {
+		return nil
+	}
+	n := float64(out.Scenarios)
+	out.HitAt1, out.HitAt3, out.MRR = float64(hit1)/n, float64(hit3)/n, rr/n
+	return &out
+}
+
+// SummarizeIntents returns nil when no scenario declares expected_intent.
+func SummarizeIntents(results []ScenarioResult) *IntentAccuracy {
+	out := IntentAccuracy{Confusion: map[string]map[string]int{}}
+	for _, r := range results {
+		if r.ExpectedIntent == "" {
+			continue
+		}
+		out.Scenarios++
+		got := classifiedError
+		if r.IntentMatch != nil && *r.IntentMatch {
+			out.Correct++
+		}
+		if len(r.ClassifiedIntents) > 0 {
+			got = r.ClassifiedIntents[0]
+			if got == "" {
+				got = classifiedUnknown
+			}
+		}
+		if out.Confusion[r.ExpectedIntent] == nil {
+			out.Confusion[r.ExpectedIntent] = map[string]int{}
+		}
+		out.Confusion[r.ExpectedIntent][got]++
+	}
+	if out.Scenarios == 0 {
+		return nil
+	}
+	out.Accuracy = float64(out.Correct) / float64(out.Scenarios)
+	return &out
 }
 
 // NewReport returns a Report with the schema version pre-set.

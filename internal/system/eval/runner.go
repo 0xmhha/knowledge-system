@@ -57,28 +57,39 @@ type Metrics struct {
 	// FileMRR is the mean reciprocal rank of the expected citations in the
 	// pack's citation order — the rank-sensitive counterpart to P/R/F1
 	// (order-blind), added so demotion/boost tuning is measurable.
-	FileMRR          float64 `json:"file_mrr"`
+	FileMRR float64 `json:"file_mrr"`
+	// FirstHitRank is the rank of the first citation matching any expected
+	// citation; 0 means no hit. hit@k and per-query MRR derive from it.
+	FirstHitRank     int     `json:"first_hit_rank"`
 	TokenUtilization float64 `json:"token_utilization"`
-	CitationCount    int     `json:"citation_count"`
-	BodyCount        int     `json:"body_count"`
-	RedactionCount   int     `json:"redaction_count"`
-	LatencyMS        int64   `json:"latency_ms"` // median (legacy)
-	LatencyMSP50     int64   `json:"latency_ms_p50"`
-	LatencyMSP95     int64   `json:"latency_ms_p95"`
-	LatencyMSMax     int64   `json:"latency_ms_max"`
+	// UsedTokens is the pack's token cost as reported by the composer.
+	UsedTokens     int   `json:"used_tokens"`
+	CitationCount  int   `json:"citation_count"`
+	BodyCount      int   `json:"body_count"`
+	RedactionCount int   `json:"redaction_count"`
+	LatencyMS      int64 `json:"latency_ms"` // median (legacy)
+	LatencyMSP50   int64 `json:"latency_ms_p50"`
+	LatencyMSP95   int64 `json:"latency_ms_p95"`
+	LatencyMSMax   int64 `json:"latency_ms_max"`
 }
 
 // ScenarioResult is the per-scenario row in the final report.
 type ScenarioResult struct {
 	// RawCalls is opt-in so legacy reports retain their shape. It includes
 	// failed calls and freshness checks, not just successful scored packs.
-	RawCalls  []RawToolCall `json:"raw_calls,omitempty"`
-	Name      string        `json:"name"`
-	Prompt    string        `json:"prompt"`
-	Intent    string        `json:"intent,omitempty"`
-	Runs      int           `json:"runs"`
-	MatchMode string        `json:"match_mode"`
-	Metrics   Metrics       `json:"metrics"`
+	RawCalls []RawToolCall `json:"raw_calls,omitempty"`
+	Name     string        `json:"name"`
+	Prompt   string        `json:"prompt"`
+	Intent   string        `json:"intent,omitempty"`
+	// ExpectedIntent, ClassifiedIntents and IntentMatch are present only for
+	// scenarios that declare expected_intent. ClassifiedIntents keeps one
+	// entry per successful run; IntentMatch requires every run to agree.
+	ExpectedIntent    string   `json:"expected_intent,omitempty"`
+	ClassifiedIntents []string `json:"classified_intents,omitempty"`
+	IntentMatch       *bool    `json:"intent_match,omitempty"`
+	Runs              int      `json:"runs"`
+	MatchMode         string   `json:"match_mode"`
+	Metrics           Metrics  `json:"metrics"`
 	// Error, when non-empty, indicates the tool produced an error on
 	// at least one run. Per-run errors are aggregated into a single
 	// summary string; metric fields are best-effort over the
@@ -309,12 +320,15 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 		}
 	}
 
+	var classified []string
 	for i := 0; i < s.Runs; i++ {
-		m, missing, citationConflict, runErr := r.executeOnce(ctx, s)
+		run, runErr := r.executeOnce(ctx, s)
 		if runErr != nil {
 			errMsgs = append(errMsgs, fmt.Sprintf("run %d: %v", i+1, runErr))
 			continue
 		}
+		m, missing, citationConflict := run.metrics, run.missingKnowledge, run.citationConflict
+		classified = append(classified, string(run.intent))
 		for _, scope := range missing {
 			if !missingSeen[scope] {
 				missingSeen[scope] = true
@@ -346,6 +360,15 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 		RetrievalState:   "not_evaluated",
 		EvidenceState:    "not_evaluated",
 		AbstentionState:  "not_applicable",
+	}
+	if s.ExpectedIntent != "" {
+		out.ExpectedIntent = string(s.ExpectedIntent)
+		out.ClassifiedIntents = classified
+		match := len(perRun) == s.Runs
+		for _, got := range classified {
+			match = match && got == string(s.ExpectedIntent)
+		}
+		out.IntentMatch = &match
 	}
 	if len(perRun) != s.Runs {
 		out.RetrievalState = "error"
@@ -417,7 +440,7 @@ func (r *Runner) IndexedHead(ctx context.Context) (string, error) {
 }
 
 // executeOnce performs one tool call + metric computation.
-func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []string, bool, error) {
+func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (runOutcome, error) {
 	req := mcpgo.CallToolRequest{}
 	req.Params.Name = toolGetForTask
 	// Pass the scenario's declared intent so the run scores the
@@ -437,15 +460,15 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []strin
 		elapsed = time.Duration(r.rawCalls[len(r.rawCalls)-1].ElapsedNS)
 	}
 	if err != nil {
-		return Metrics{}, nil, false, fmt.Errorf("CallTool: %w", err)
+		return runOutcome{}, fmt.Errorf("CallTool: %w", err)
 	}
 	if res != nil && res.IsError {
-		return Metrics{}, nil, false, fmt.Errorf("%s", concatText(res))
+		return runOutcome{}, fmt.Errorf("%s", concatText(res))
 	}
 
 	pack, err := decodePack(res)
 	if err != nil {
-		return Metrics{}, nil, false, fmt.Errorf("decode: %w", err)
+		return runOutcome{}, fmt.Errorf("decode: %w", err)
 	}
 
 	missingKnowledge := missingKnowledgeScopes(s.ExpectedKnowledge, pack.Knowledge)
@@ -462,17 +485,32 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (Metrics, []strin
 		}
 	}
 	p, rec, f := precisionRecall(s.ExpectedCitations, metricCitations, s.MatchMode)
-	return Metrics{
-		FilePrecision:    p,
-		FileRecall:       rec,
-		FileF1:           f,
-		FileMRR:          mrr(s.ExpectedCitations, metricCitations, s.MatchMode),
-		TokenUtilization: pack.Metadata.UtilizationRatio,
-		CitationCount:    len(pack.Citations),
-		BodyCount:        len(pack.Bodies),
-		RedactionCount:   len(pack.SanitizeReport),
-		LatencyMS:        elapsed.Milliseconds(),
-	}, missingKnowledge, citationConflict, nil
+	return runOutcome{
+		metrics: Metrics{
+			FilePrecision:    p,
+			FileRecall:       rec,
+			FileF1:           f,
+			FileMRR:          mrr(s.ExpectedCitations, metricCitations, s.MatchMode),
+			FirstHitRank:     firstHitRank(s.ExpectedCitations, metricCitations, s.MatchMode),
+			TokenUtilization: pack.Metadata.UtilizationRatio,
+			UsedTokens:       pack.Metadata.UsedTokens,
+			CitationCount:    len(pack.Citations),
+			BodyCount:        len(pack.Bodies),
+			RedactionCount:   len(pack.SanitizeReport),
+			LatencyMS:        elapsed.Milliseconds(),
+		},
+		intent:           pack.Intent,
+		missingKnowledge: missingKnowledge,
+		citationConflict: citationConflict,
+	}, nil
+}
+
+// runOutcome is one successful tool call's scored result.
+type runOutcome struct {
+	metrics          Metrics
+	intent           contract.Intent
+	missingKnowledge []string
+	citationConflict bool
 }
 
 // medianMetrics folds per-run Metrics into one. Scalar fields and
@@ -497,7 +535,11 @@ func medianMetrics(ms []Metrics) Metrics {
 	bod := make([]float64, len(ms))
 	red := make([]float64, len(ms))
 	lat := make([]float64, len(ms))
+	ranks := make([]int, len(ms))
+	used := make([]float64, len(ms))
 	for i, m := range ms {
+		ranks[i] = m.FirstHitRank
+		used[i] = float64(m.UsedTokens)
 		prec[i] = m.FilePrecision
 		mrrs[i] = m.FileMRR
 		rec[i] = m.FileRecall
@@ -514,7 +556,9 @@ func medianMetrics(ms []Metrics) Metrics {
 		FileMRR:          median(mrrs),
 		FileRecall:       median(rec),
 		FileF1:           median(f1),
+		FirstHitRank:     medianRank(ranks),
 		TokenUtilization: median(tok),
+		UsedTokens:       int(median(used)),
 		CitationCount:    int(median(cit)),
 		BodyCount:        int(median(bod)),
 		RedactionCount:   int(median(red)),

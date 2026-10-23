@@ -34,11 +34,15 @@ const scenarioVersion = 1
 //	match_mode: overlap              # default "overlap"; or "strict"
 //	runs: 1                          # default 1; >1 takes median
 type Scenario struct {
-	Version           int
-	Name              string
-	Description       string
-	Prompt            string
-	Intent            contract.Intent
+	Version     int
+	Name        string
+	Description string
+	Prompt      string
+	Intent      contract.Intent
+	// ExpectedIntent is the intent the server's classifier should assign.
+	// Unlike Intent it is never sent with the request, so the run measures
+	// classification instead of bypassing it.
+	ExpectedIntent    contract.Intent
 	ExpectedCitations []contract.Citation
 	// ExpectedCommit pins both the indexed head and returned citations. Without
 	// it, file/line metrics cannot establish that the evidence is current.
@@ -77,6 +81,7 @@ type scenarioWire struct {
 	Description       string                 `yaml:"description,omitempty"`
 	Prompt            string                 `yaml:"prompt"`
 	Intent            string                 `yaml:"intent,omitempty"`
+	ExpectedIntent    string                 `yaml:"expected_intent,omitempty"`
 	ExpectedCitations []scenarioCitationWire `yaml:"expected_citations,omitempty"`
 	ExpectedCommit    string                 `yaml:"expected_commit,omitempty"`
 	ExpectNoCitations bool                   `yaml:"expect_no_citations,omitempty"`
@@ -111,6 +116,7 @@ func ParseScenario(data []byte) (*Scenario, error) {
 		Description:       w.Description,
 		Prompt:            w.Prompt,
 		Intent:            contract.Intent(w.Intent),
+		ExpectedIntent:    contract.Intent(w.ExpectedIntent),
 		MatchMode:         w.MatchMode,
 		Runs:              w.Runs,
 		ExpectNoCitations: w.ExpectNoCitations,
@@ -180,6 +186,13 @@ func (s *Scenario) Validate() error {
 	// the runner; it only matters for per-intent breakdown grouping.
 	if s.Intent != "" && !s.Intent.IsValid() {
 		return fmt.Errorf("scenario: intent=%q invalid", s.Intent)
+	}
+	if s.ExpectedIntent != "" && !s.ExpectedIntent.IsValid() {
+		return fmt.Errorf("scenario: expected_intent=%q invalid", s.ExpectedIntent)
+	}
+	// A declared intent overrides classification, so it cannot be scored.
+	if s.Intent != "" && s.ExpectedIntent != "" {
+		return errors.New("scenario: intent and expected_intent are mutually exclusive")
 	}
 	if s.Runs < 1 {
 		return fmt.Errorf("scenario: runs=%d invalid (must be >= 1)", s.Runs)
