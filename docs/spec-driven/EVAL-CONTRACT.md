@@ -36,6 +36,31 @@ runs: 1
 
 이 계약의 실제 CKS 스모크는 `scripts/wbs-smoke.sh`에 있다. 고정된 Git fixture, mock 임베더, 답을 찾는 시나리오, 인용을 삼가야 하는 시나리오 및 의도적인 커밋 충돌을 실행한다. 이는 상태 분류와 스냅샷 보호의 구조 검증이다. 검색 품질 게이트에는 실제 임베딩 모델, 고정 질문 세트, 지연·회수율 기준과 별도의 답변 검토가 필요하다.
 
+### 의도 분류와 순위 지표
+
+시나리오의 `intent`는 요청에 그대로 넘어가 서버의 의도 분류를 건너뛴다. 그래서 의도 파악을 재려면 `intent` 대신 `expected_intent`를 쓴다. `expected_intent`는 요청에 넣지 않고, 응답 묶음의 `intent`와 비교만 한다. 둘을 함께 쓰면 입력 오류다.
+
+```yaml
+version: 1
+name: reconnect-stale-config
+prompt: 연결이 끊겼다가 다시 붙을 때 예전 설정이 잠깐 쓰이는 문제를 고치고 싶어
+expected_intent: bug_fix
+expected_citations:
+  - file: clientconn.go
+    start_line: 120
+    end_line: 180
+```
+
+|필드|위치|의미|
+|---|---|---|
+|`expected_intent`, `classified_intents`, `intent_match`|시나리오 결과|기대 의도, 실행마다 분류된 의도, 모든 실행이 기대와 같았는지. 오류 실행이 있으면 `intent_match`는 거짓이다|
+|`metrics.first_hit_rank`|시나리오 결과|정답과 겹치는 첫 인용의 순위(중복 인용은 접은 뒤). 0은 못 찾음. 여러 실행이면 못 찾은 실행을 가장 뒤로 놓은 중앙값|
+|`metrics.used_tokens`|시나리오 결과|응답 묶음이 쓴 토큰 수|
+|`rank_summary`|보고서|정답 인용을 선언한 시나리오의 hit@1, hit@3, 첫 정답 순위의 역수 평균(MRR). 오류 시나리오도 분모에 남아 못 찾은 것으로 센다|
+|`intent_accuracy`|보고서|`expected_intent`를 선언한 시나리오의 정확도와 혼동표(기대 → 분류). 분류값이 없으면 `(unknown)`, 오류면 `(error)`|
+
+기존 `file_mrr`는 정답 인용마다의 순위를 평균한 값이라 그대로 둔다. "첫 정답을 몇 번째에서 찾았는가"는 `first_hit_rank`와 `rank_summary.mrr`로 본다.
+
 ## 현재 수집 경로와 범위
 
 cks eval capture는 실제 v1/v2 원응답·warmup/retrieval/warm/cold 분모와 실패를 수집한다. cks eval matrix는 명시 입력·실행 환경·모델/소스/질문/설정을 결합한다. cks semantic compare-responses는 저장 팩을 검증하고 차이를 보고하며 품질·지연 합격을 판정하지 않는다. 승인 입력과 사전 protocol을 먼저 고정한다. 과거 FINAL/DEV를 새 독립 holdout으로 재사용하지 않고, 반복·언어 변형·동일 사실군을 독립 표본으로 부풀리지 않는다. 현재 관측과 미입증 범위는 [평가 상태](./EVALUATION-STATUS.md)를 따른다.

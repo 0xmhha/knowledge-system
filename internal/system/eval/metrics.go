@@ -14,6 +14,7 @@
 package eval
 
 import (
+	"math"
 	"sort"
 
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
@@ -103,18 +104,7 @@ func citationEvalKey(c contract.Citation) string {
 // actual, mark it "correct" iff it matches at least one expected.
 // Counts are then folded into the standard P/R/F1 formulas.
 func precisionRecall(expected, actual []contract.Citation, mode MatchMode) (precision, recall, f1 float64) {
-	// Dedup actual by location and commit; preserve first-seen order so
-	// downstream debug output stays predictable.
-	seen := make(map[string]struct{}, len(actual))
-	dedup := make([]contract.Citation, 0, len(actual))
-	for _, c := range actual {
-		k := citationEvalKey(c)
-		if _, ok := seen[k]; ok {
-			continue
-		}
-		seen[k] = struct{}{}
-		dedup = append(dedup, c)
-	}
+	dedup := dedupCitations(actual)
 
 	if len(dedup) == 0 {
 		// Empty retrieval: every expected is missed.
@@ -174,16 +164,7 @@ func precisionRecall(expected, actual []contract.Citation, mode MatchMode) (prec
 // Citation.Key() before ranks are assigned so a backend repeating one
 // location cannot shift later ranks.
 func mrr(expected, actual []contract.Citation, mode MatchMode) float64 {
-	seen := make(map[string]struct{}, len(actual))
-	dedup := make([]contract.Citation, 0, len(actual))
-	for _, c := range actual {
-		k := citationEvalKey(c)
-		if _, ok := seen[k]; ok {
-			continue
-		}
-		seen[k] = struct{}{}
-		dedup = append(dedup, c)
-	}
+	dedup := dedupCitations(actual)
 	if len(dedup) == 0 {
 		return 0
 	}
@@ -202,6 +183,63 @@ func mrr(expected, actual []contract.Citation, mode MatchMode) float64 {
 		}
 	}
 	return sum / float64(len(expected))
+}
+
+// dedupCitations collapses actual citations by location and commit,
+// keeping first-seen order, so a backend repeating one location cannot
+// inflate counts or shift later ranks.
+func dedupCitations(actual []contract.Citation) []contract.Citation {
+	seen := make(map[string]struct{}, len(actual))
+	dedup := make([]contract.Citation, 0, len(actual))
+	for _, c := range actual {
+		k := citationEvalKey(c)
+		if _, ok := seen[k]; ok {
+			continue
+		}
+		seen[k] = struct{}{}
+		dedup = append(dedup, c)
+	}
+	return dedup
+}
+
+// firstHitRank returns the 1-based rank (after dedup) of the first actual
+// citation that matches any expected citation, or 0 when none matches or
+// nothing is expected. It answers "how far down did the user have to read"
+// — the quantity hit@k and per-query MRR are built from — which FileMRR,
+// averaged over every expected citation, does not.
+func firstHitRank(expected, actual []contract.Citation, mode MatchMode) int {
+	if len(expected) == 0 {
+		return 0
+	}
+	m := matcher(mode)
+	for i, a := range dedupCitations(actual) {
+		for _, e := range expected {
+			if m(e, a) {
+				return i + 1
+			}
+		}
+	}
+	return 0
+}
+
+// medianRank is the median of first-hit ranks where 0 (no hit) sorts
+// after every real rank; it returns 0 when the median run had no hit.
+func medianRank(ranks []int) int {
+	if len(ranks) == 0 {
+		return 0
+	}
+	sorted := make([]int, len(ranks))
+	for i, r := range ranks {
+		if r == 0 {
+			r = math.MaxInt
+		}
+		sorted[i] = r
+	}
+	sort.Ints(sorted)
+	if r := sorted[(len(sorted)-1)/2]; r != math.MaxInt {
+		return r
+	}
+	return 0
 }
 
 // median returns the median of xs without mutating the input.
