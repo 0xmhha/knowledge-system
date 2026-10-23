@@ -33,11 +33,11 @@
 - 다른 모델은 받지 않는다. 사용자가 "그냥 다른 모델 받지 말고"라고 정했다. 제외한 모델과 이유는 [명세](./RETRIEVAL-EVAL-SPEC.md) 3장에 있다.
 - Ollama에서 임베딩을 지원하는 모델은 이 둘뿐이다. `qwen3.5:9b`, `gemma4:12b` 등은 대화형 LLM이라 임베딩에 쓰지 않는다.
 
-### 진행 중: `qwen3-embedding:4b` 스냅샷 색인
+### 진행 중: 두 모델의 스냅샷 색인 (2026-10-24 다시 시작)
 
-`scripts/retrieval_snapshot_chain.py`로 24개 스냅샷의 색인을 시간 순서로 만든다. 2026-10-23 19:52 기준으로 첫 스냅샷 `88ac7035`의 벡터 전체 빌드가 1082개 파일 중 851개까지 갔다. 2시간이 걸렸다. 나머지 23개는 `reindex`로 바뀐 파일만 다시 임베딩한다.
+2026-10-23에 세션 임시 디렉터리에서 돌던 색인은 세션과 함께 사라졌다. 2026-10-24에 저장소 밖 `knowledge-data/grpc-go-retrieval-eval`에서 처음부터 다시 시작했다. `qwen3-embedding:4b` 24개를 먼저 만들고 이어서 `bge-m3` 24개를 만든다. 쓰는 바이너리의 SHA-256은 그 디렉터리의 `bin-sha256.txt`, 저장소 커밋은 `source-commit.txt`에 있다.
 
-이 작업은 세션 임시 디렉터리에서 돌고 있다. 세션이나 머신이 바뀌면 결과가 남지 않을 수 있다. 그때는 아래 3장 명령으로 다시 만든다. 스크립트는 `chain-<모델>.json`에 끝난 스냅샷을 기록하므로 같은 작업 디렉터리에서 다시 돌리면 끝난 스냅샷은 건너뛴다. 단, 끊긴 스냅샷의 벡터는 처음부터 다시 만든다.
+스크립트는 `chain-<모델>.json`에 끝난 스냅샷을 기록하므로 같은 작업 디렉터리에서 다시 돌리면 끝난 스냅샷은 건너뛴다. 단, 끊긴 스냅샷의 벡터는 처음부터 다시 만든다.
 
 ## 3. 색인을 만들고 이어 가는 법
 
@@ -91,10 +91,10 @@ python3 scripts/retrieval_snapshot_chain.py --repo <grpc-go clone> --snapshots $
 
 ## 4. 바로 다음 행동 (이 순서를 따른다)
 
-1. **색인이 도는 동안 사람의 표본 확인을 받는다.** 명세 7장대로 무작위 정답 10건과 질문 10건을 사용자에게 보인다. 결과를 보기 전에 받아야 결과가 확인에 영향을 주지 않는다. 확인 결과는 사용자 메시지 그대로 기록하고, AI가 대신 확인하지 않는다. 확인 전의 결과는 DEV 근거다.
+1. **색인이 도는 동안 사람의 표본 확인을 받는다.** 확인 자료는 [표본 확인](./operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md)에 있다(seed 20261024). 명세 7장대로 무작위 정답 10건과 질문 10건을 사용자에게 보인다. 결과를 보기 전에 받아야 결과가 확인에 영향을 주지 않는다. 확인 결과는 사용자 메시지 그대로 기록하고, AI가 대신 확인하지 않는다. 확인 전의 결과는 DEV 근거다.
 2. **두 모델의 색인 48개를 끝낸다.** 끝나면 모델마다 `chain-<모델>.json`에 24행이 있는지, 첫 행이 `full`이고 나머지가 `reindex`인지 본다. `vec/<모델>/<스냅샷>/manifest.json`의 차원이 `qwen3-embedding:4b`는 2560, `bge-m3`는 1024인지 확인한다.
-3. **비교 대상 스크립트를 새 색인 위치에 맞춘다.** `scripts/retrieval_baselines.py`는 아직 옛 위치 `chain-<스냅샷>/vector`를 읽는다. 벡터는 `vec/<모델>/<스냅샷>`, 그래프는 `chain-<스냅샷>/graph`에서 읽도록 `--model` 인자를 더하고 시험을 고친다. 이 변경은 입력 고정 뒤의 도구 변경이다. 표본, 정답, 질문은 바꾸지 않는다.
-4. **CKS를 돌린다.** 스냅샷마다 `cks.yaml`을 만든다. `backends.ckg.path`는 `chain-<스냅샷>/graph/graph.db`, `source_root`는 그 스냅샷으로 checkout한 소스, `backends.ckv.path`는 `vec/<모델>/<스냅샷>`, `provider: ollama`, `embed_model`은 모델 이름이다. `sanitize.rules_path`는 저장소의 `system/policies/sanitization_rules.yaml`이다. 그다음 `bin/cks eval --config <cks.yaml> --scenarios <입력>/inputs/scenarios/<스냅샷> --verify-anchors <소스> --output <결과>`를 돌린다. 앵커 검사가 실패하면 실행하지 말고 원인을 먼저 찾는다.
+3. **(끝남, 2026-10-24) 비교 대상 스크립트를 새 색인 위치에 맞춘다.** `scripts/retrieval_baselines.py`가 `--model`(과 `--embed-dim`)을 받아 벡터는 `vec/<모델>/<스냅샷>`, 그래프는 `chain-<스냅샷>/graph`에서 읽는다. `ckv query`에 같은 모델 이름을 넘긴다. 입력 고정 뒤의 도구 변경이며 표본, 정답, 질문은 바꾸지 않았다.
+4. **CKS를 돌린다.** 스냅샷마다 `cks.yaml`을 만든다. `backends.ckg.path`는 `chain-<스냅샷>/graph/graph.db`, `source_root`는 그 스냅샷으로 checkout한 소스, `backends.ckv.path`는 `vec/<모델>/<스냅샷>`, `provider: ollama`, `embed_model`은 모델 이름이다. `sanitize.rules_path`는 저장소의 `system/policies/sanitization_rules.yaml`이다. 그다음 `bin/cks eval --config <cks.yaml> --scenarios <입력>/inputs/scenarios/<스냅샷> --verify-anchors <소스> --output <결과>`를 돌린다. 앵커 검사가 실패하면 실행하지 말고 원인을 먼저 찾는다. 4~5단계는 `scripts/retrieval_eval_run.py --repo <clone> --snapshots $WORK/snapshots.json --work $WORK --inputs <입력>/inputs --bin bin --model <모델>`이 스냅샷마다 한다. 소스는 `$WORK/src-eval` worktree에 따로 checkout하므로 색인 빌드와 겹치지 않는다. 결과는 `$WORK/eval/<모델>/<스냅샷>/`의 `cks.json`, `cks-exit.txt`, `baselines.json`이다.
 5. **비교 대상 네 가지를 돌린다.** 벡터만, 벡터와 BM25 재정렬, `ckg query`, `git grep`이다. 같은 스냅샷과 질문으로 모델마다 돌린다. `ckg query`와 `git grep`은 모델과 무관하므로 한 번만 돌려도 된다.
 6. **결과를 모아 보고한다.** 모델 두 개와 방식 다섯 개(CKS와 비교 대상 네 가지)를 놓고 hit@1, hit@3, MRR, 의도 정확도, 정답 하나를 찾는 데 쓴 토큰 수를 표로 만든다. 오류와 측정하지 못한 값도 분모에 남긴다. 결과 기록은 `retrieval-eval-grpc-go-v1/` 아래 새 하위 디렉터리에 두고 입력 파일은 건드리지 않는다.
 7. 그다음 [남은 작업](../REMAINING-WORK.md) 3.1의 4단계(약한 곳 고치기)와 5단계(go-stablenet)로 간다.

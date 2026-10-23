@@ -63,7 +63,7 @@
    - `cks eval`이 의도 분류를 잴 수 있게 `expected_intent`, `first_hit_rank`, `rank_summary`, `intent_accuracy`를 더했다([계약](./spec-driven/EVAL-CONTRACT.md))
    - [`internal/vector/eval/prregress`](../internal/vector/eval/prregress)는 유료 LLM 에이전트를 부르므로 그대로 쓰지 않고, PR checkout과 정답 추출 방식만 참고한다
 2. **입력과 도구 (완료)**: 변환 스크립트, 비교 대상 스크립트, 스냅샷 연쇄 색인 스크립트를 만들고 입력을 결과 전에 고정했다([입력](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/README.md)). PR 421건 가운데 245건이 조건을 통과해 100건을 뽑았고, 정답 범위 575개와 한국어 질문 100개, 스냅샷 24개다. 질문 누설 검사와 앵커 검사를 모두 통과했다.
-3. **명세대로 실행하고 결과를 보고한다.** 임베딩 모델은 `qwen3-embedding:4b`(2560차원, 본 평가)와 `bge-m3`(기준선)다. 그래프는 스냅샷마다 한 번, 벡터는 모델마다 첫 스냅샷 전체 빌드 뒤 `reindex`로 만든다. `reindex` 전에 manifest를 이번 스냅샷의 그래프로 바꿔야 canonical ID가 맞는다(확인함). 그다음 CKS와 비교 대상 네 가지를 돌린다. 실패와 측정 못 한 값도 분모에 남긴다. 사람의 정답·질문 표본 확인(명세 7장)도 이 단계에서 받는다. **진행 중**: `qwen3-embedding:4b`의 첫 스냅샷 전체 빌드가 도는 중이다. 그다음 `bge-m3` 색인, 비교 대상 스크립트를 새 색인 위치(`vec/<모델>/<스냅샷>`)에 맞추는 수정, CKS와 비교 대상 실행 순서로 간다. 명령, 걸리는 시간, 주의할 점은 [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) 3~5장에 있다.
+3. **명세대로 실행하고 결과를 보고한다.** 임베딩 모델은 `qwen3-embedding:4b`(2560차원, 본 평가)와 `bge-m3`(기준선)다. 그래프는 스냅샷마다 한 번, 벡터는 모델마다 첫 스냅샷 전체 빌드 뒤 `reindex`로 만든다. `reindex` 전에 manifest를 이번 스냅샷의 그래프로 바꿔야 canonical ID가 맞는다(확인함). 그다음 CKS와 비교 대상 네 가지를 돌린다. 실패와 측정 못 한 값도 분모에 남긴다. 사람의 정답·질문 표본 확인(명세 7장)도 이 단계에서 받는다. **진행 중**: 2026-10-24에 두 모델의 색인을 처음부터 다시 만드는 중이다(`qwen3-embedding:4b` 다음 `bge-m3`). 비교 대상 스크립트를 새 색인 위치(`vec/<모델>/<스냅샷>`)에 맞추는 수정과 실행 스크립트 `scripts/retrieval_eval_run.py`, 사람 표본 확인 자료는 준비했다. 색인이 끝나면 CKS와 비교 대상을 돌린다. 명령, 걸리는 시간, 주의할 점은 [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) 3~5장에 있다.
 4. **결과에서 약한 곳을 고친다.** 의도 파악이 틀린 질문과 정답을 못 찾은 질문을 나눠 원인을 찾고, 고친 뒤 같은 표본으로 다시 잰다.
 5. **go-stablenet으로 같은 평가를 한다.** 이전 go-stablenet 기록과 비교할 수 있게 같은 지표를 쓴다.
 

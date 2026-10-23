@@ -1,5 +1,6 @@
 """Score baseline outputs with the same overlap and dedup rule as cks eval."""
 import unittest
+from pathlib import Path
 
 import retrieval_baselines as x
 
@@ -45,6 +46,16 @@ class Parse(unittest.TestCase):
     def test_grep_terms_are_ascii_words_once(self):
         self.assertEqual(x.grep_terms('xDS 클러스터에서 RBAC rbac 규칙과 API 를 바꾸고 싶어 in TLS'), ['xds', 'rbac', 'tls'])
         self.assertEqual(x.grep_terms('연결이 끊긴 뒤 다시 붙을 때'), [])
+
+
+class Index(unittest.TestCase):
+    def test_vector_per_model_and_graph_per_snapshot(self):
+        ix = x.index_for(Path('/w'), 'abc', 'qwen3-embedding:4b', 0)
+        self.assertEqual((ix.vector, ix.graph), (Path('/w/vec/qwen3-embedding-4b/abc'), Path('/w/chain-abc/graph')))
+        self.assertEqual(ix.embed, ['--embedder=ollama', '--model-name=qwen3-embedding:4b'])
+        ix = x.index_for(Path('/w'), 'abc', 'qwen3-embedding:4b', 1024)
+        self.assertEqual(ix.vector, Path('/w/vec/qwen3-embedding-4b-d1024/abc'))
+        self.assertEqual(ix.embed[-1], '--embed-dim=1024')
 
 
 if __name__ == '__main__':
