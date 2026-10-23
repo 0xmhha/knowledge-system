@@ -45,6 +45,7 @@
 - 동결(freeze) 없음, 정식 실행 불가(`execution_allowed=false`)
 - F-01~F-08 동결 결정 모두 대기. F-05는 역할만 정했고 검토자의 독립성 선언을 기다린다.
 - 프로토콜의 남은 구조 조건 97개(`scripts/check-operational-acceptance.py`)
+- 리팩토링 원장이 인용하는 문서 54개는 2026-10-13 문서 정리(`cd5c35d6`)로 트리에서 빠졌다. [색인](./spec-driven/REFACTORING-RETIRED-DOCUMENTS.json)이 읽을 커밋과 SHA-256을 묶고, `check-refactoring-progress.py`가 인용 경로마다 현재 파일이나 이 색인과 맞는지 검사한다.
 - 우선순위: 정답이 있는 검색 평가가 1순위다. WI-V1 정식 수용 시범은 보류했다(취소가 아니다). 코딩 에이전트 묶음(WI-V1, WI-V2, WI-4, WI-C)은 검색 품질을 올린 뒤에 한다.
 
 ## 3. 지금 할 일 (이 순서를 따른다)
@@ -78,7 +79,8 @@ WI-V1을 다시 열 때는 이미 확인한 정답 시험을 판정 기준으로
 |항목|누가|상태|
 |---|---|---|
 |검색 평가 명세 확인|owner-acceptor|승인됨 (2026-10-23)|
-|PR 정답 표본과 질문 누설 확인|gold-reviewer 또는 owner-acceptor|실행 전|
+|PR 정답 표본과 질문 누설 확인|gold-reviewer 또는 owner-acceptor|확인 자료 준비됨, 응답 대기 ([자료](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md))|
+|N-12·N-14를 "사용자 일괄 채택(AI 검토 라벨)"로 따로 표시할지, N-10(전체 비용·p95)과 N-17(실제 운영 RTO/RPO)의 남은 범위를 별도 작업으로 뺄지|사용자|미정. 원장 상태는 바꾸지 않았다|
 |WI-V1 독립성 선언과 검토 결정|gold-reviewer|보류 (3.2)|
 |실제 LLM 답변 평가의 모델, 인증, 비용 상한|사용자|미정. 정하기 전에는 유료 모델을 호출하지 않는다|
 |보안 전용 평가, 조직 인증, 보안 감사|사용자|보류|
