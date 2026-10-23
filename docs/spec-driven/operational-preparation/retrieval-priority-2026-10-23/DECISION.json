@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-23",
+  "timezone": "Asia/Seoul",
+  "kind": "user_direction_decision_not_independent_acceptance",
+  "origin": "direct_human_user_message",
+  "user_messages": [
+    {
+      "role": "purpose_and_test_principle",
+      "text": "테스트는 정답이 있는 사례를 중심으로 선택하여 테스트 해야 한다. \n현재 프로젝트 시스템은 주워진 프로젝트가 있을때, 그것을 knowledge-db 로 생성하고, mcp 를 통해, 매우 효과적인 히트율의 정보를 압축 제공하는것에 강한 강점을 가져야 하는 프로젝트이다. 따라서, 이 시스템의 효율은 어떠한 프로젝트라도, db 로 생성해두고, mcp 를 통해, vibe query 를 할때, 찾고자 하는 부분을 거의 한번에 찾아 질 수 있는것이 중요하며, 특히, 개발의 효율을 높이기 위한 프로젝트 이므로, vibe 로 묻는 질문(요청)에 대한 의도를 정확하게 파악하는것이 1번, 그리고 파악된 의도에 관련된 코드를 찾아서 연관되어있는 코드를 제공하는 것이 2번이라고 볼 수 있다."
+    },
+    {
+      "role": "approval_and_target_project",
+      "text": "1. 승인. (WI-V1 과 관련된 agent 에 대해서도 우선 knoweledge system 이 정보를 잘 제공하도록 하는 기술을 먼저 적용하고 (완벽할 수는 없다), 그 다음 agent 에서 커버해야 하는 부분을 처리하는것이 이슈를 해결하는데 훨씬 크게 도움이될것으로 보인다. )\n2. \"go-stablenet\" 으로 한다. 이전에도 계속 이 프로젝트를 중심으로 테스트했고, 이것과 관련된 기록들이 있기 때문에, 비교하기 좋다. 하지만, 지금 단계에서는 db 를 만드는 시간을 단축하기 위해서, 너가 github opensource 중에 신뢰할수 있는 프로젝트를 하나 정해서, db 생성이 빠르며, 복잡도는 높고, 코드를 찾는 부분에 있어서, 복잡도에 의해 오류가 있을만한 golang 프로젝트를 선택하여 그 프로젝트로 먼저 진행하고, 계획된 작업들을 완료후, go-stablenet 프로젝트를 기반으로 db 를 생성해서 작업을 수행한다."
+    }
+  ],
+  "project_purpose": {
+    "goal": "for any project, build a knowledge DB and answer vibe queries over MCP with compressed, high-hit-rate information so the wanted code is found almost in one shot",
+    "priority_1": "understand the intent of the vibe query (request) correctly",
+    "priority_2": "find the code for that intent and return the related code with it"
+  },
+  "test_principle": "choose test cases whose correct answer is already known and confirm that answer before use",
+  "decisions": [
+    {
+      "id": "R-01",
+      "decision": "answer-known retrieval evaluation becomes the first priority; the WI-V1 acceptance pilot is paused, not cancelled"
+    },
+    {
+      "id": "R-02",
+      "decision": "coding-agent work (WI-V1, WI-V2, WI-4, WI-C) follows after the knowledge system provides information well; the agent then covers what remains"
+    },
+    {
+      "id": "R-03",
+      "decision": "first target is a trusted open-source Go project chosen by AI for fast DB builds and high retrieval complexity; go-stablenet follows after the planned work completes, so results compare with earlier go-stablenet records"
+    }
+  ],
+  "first_target": {
+    "repository": "https://github.com/grpc/grpc-go",
+    "measured_commit": "6ce1c873d713459706a2aa887fe83a183e758be3",
+    "chosen_by": "AI under R-03",
+    "reasons": [
+      "trusted: maintained by the gRPC project (CNCF), 23k stars",
+      "graph DB build 70s for 686 non-test Go files / 147,536 lines (shallow clone, ckg build --no-cache); go-stablenet has about 1,282 Go files",
+      "retrieval complexity: the same interface methods (balancer Pick/UpdateClientConnState, resolver Build/ResolveNow, credentials, transport) recur across many packages, plus generated *.pb.go files",
+      "answer source: over 1,000 merged PRs, most titled as fixes or features with descriptions and linked issues"
+    ],
+    "limits": [
+      "graph build time was measured on a shallow clone without history; full history and vector embedding time are not measured yet"
+    ],
+    "compared": [
+      {
+        "repository": "https://github.com/caddyserver/caddy",
+        "measured_commit": "f355b8687d5582ea9fcc99f71598109d1e5b6ced",
+        "non_test_go_files": 228,
+        "lines": 75497,
+        "graph_build_seconds": 22,
+        "merged_prs": "1000+",
+        "reason_not_first": "smaller and less repeated cross-package naming"
+      },
+      {
+        "repository": "https://github.com/hashicorp/raft",
+        "non_test_go_files": 40,
+        "lines": 12486,
+        "merged_prs": 320,
+        "reason_not_first": "small; ckg build stopped because its fuzzy module needs go mod tidy"
+      },
+      {
+        "repository": "https://github.com/etcd-io/raft",
+        "non_test_go_files": 58,
+        "lines": 11637,
+        "merged_prs": 327,
+        "reason_not_first": "small, few cross-package name collisions"
+      },
+      {
+        "repository": "https://github.com/nats-io/nats-server",
+        "non_test_go_files": 128,
+        "lines": 151928,
+        "merged_prs": "1000+",
+        "reason_not_first": "very large files concentrate code, fewer distinct retrieval targets per line"
+      }
+    ]
+  },
+  "wiv1_answer_check": {
+    "finding": "the WI-V1 case was chosen without a known answer: upstream go-ethereum master still has the same Unsubscribe code, and the AI wrote the gold and the candidates",
+    "upstream": {
+      "repository": "https://github.com/ethereum/go-ethereum",
+      "path": "eth/downloader/api.go",
+      "latest_commit": "a63e2f124716c1f86e0a841d0abad017af21fa05",
+      "latest_commit_date": "2026-06-25",
+      "file_sha256": "8c25af78a4e2956cc096877a29d411ae6308be15982b78a4814ce265259ce2c1",
+      "same_unsubscribe_as_ticket_base": true
+    },
+    "ticket_base": {
+      "repository": "go-stablenet",
+      "commit": "0bf2f4d1bfeb6605006d556957ef8c045d8f8ed8",
+      "file_sha256": "ad84516d84206490b6b5a95d273e0655a73e35f9b020d3f81fe2e7cf24749911"
+    },
+    "answer": "Unsubscribe must keep draining the status channel while offering the uninstall request and until the acknowledgement; skipping the uninstall leaves a stale entry that blocks the event loop on the next broadcast",
+    "test": {
+      "path": "docs/spec-driven/operational-preparation/retrieval-priority-2026-10-23/wiv1-answer-check/unsub_truth_test.go.txt",
+      "sha256": "11a6ec6d057811c25596641d8f64f078b280c8555fc6c30ecd2e19bc587b4568",
+      "go": "1.23.12",
+      "package": "eth/downloader at the ticket base"
+    },
+    "results": {
+      "ORIGINAL": {
+        "path": "docs/spec-driven/operational-preparation/retrieval-priority-2026-10-23/wiv1-answer-check/result-ORIGINAL.txt",
+        "sha256": "89f0c4df76fcc17264afdf9e76dc927f881da7cca227c37f6c83f719ad643b1c"
+      },
+      "CAND-A": {
+        "path": "docs/spec-driven/operational-preparation/retrieval-priority-2026-10-23/wiv1-answer-check/result-CAND-A.txt",
+        "sha256": "0707b2d852a7f63a6b49a203379ac3a7b5e0bd346b450b793e09066bd44093fe"
+      },
+      "CAND-B": {
+        "path": "docs/spec-driven/operational-preparation/retrieval-priority-2026-10-23/wiv1-answer-check/result-CAND-B.txt",
+        "sha256": "d43a9f6f3a0e9611836cdc6d23e410945f32f6e67a96200d9c5de0ef72484af5"
+      },
+      "MUT-EARLY": {
+        "path": "docs/spec-driven/operational-preparation/retrieval-priority-2026-10-23/wiv1-answer-check/result-MUT-EARLY.txt",
+        "sha256": "c30a2c1fccbc8d38cf0bfc2b50a76fab8a574f982d161c425d2dd1bc88b3db0f"
+      }
+    },
+    "summary": {
+      "ORIGINAL": "hangs; event loop stuck after tick 1 and 2",
+      "CAND_A": "returns; event loop alive",
+      "CAND_B": "returns; event loop alive",
+      "MUT_EARLY": "returns; event loop stuck",
+      "normal_control": "all four return"
+    },
+    "contracts_that_separate_buggy_from_fixed": [
+      "BLOCKED-DELIVERY"
+    ],
+    "note": "the test is AI-written; it is DEV evidence, not independent acceptance"
+  },
+  "formal_completed": 0,
+  "formal_total": 9,
+  "independent_approved": 0,
+  "freeze": null,
+  "execution_allowed": false
+}

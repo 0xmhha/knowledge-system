@@ -1,22 +1,23 @@
 # 현재 인수인계
 
-기준: 2026-10-22, main `99214d3f`. 이 문서는 지금 단계와 바로 다음 행동만 적는다. 남은 전체 목록, 맥락, 하지 않을 일은 [남은 작업](../REMAINING-WORK.md)에 있고, 정본은 [실행 원장](./REMAINING-13-EXECUTION.json)이다. 새 머신이나 새 세션은 [머신 간 인수인계](./MACHINE-HANDOFF.md)로 환경부터 준비한다.
+기준: 2026-10-23, main `b62430bd`에 검색 평가 우선 결정을 반영. 이 문서는 지금 단계와 바로 다음 행동만 적는다. 남은 전체 목록, 맥락, 하지 않을 일은 [남은 작업](../REMAINING-WORK.md)에 있고, 정본은 [실행 원장](./REMAINING-13-EXECUTION.json)이다. 새 머신이나 새 세션은 [머신 간 인수인계](./MACHINE-HANDOFF.md)로 환경부터 준비한다.
 
 ## 현재 단계
 
-WI-V1 정식 수용 시범에서 gold-reviewer의 응답을 기다린다(원장 `current_activity`: `97_WIV1_gold_reviewer_packet_prepared_unfilled`).
+정답이 있는 검색 평가를 시작한다(원장 `current_activity`: `98_retrieval_eval_first_answer_known_cases_WIV1_pilot_paused`).
 
-- D04는 A안(역할 분리)으로 정했다. gold-reviewer가 정답과 매칭 규칙을 확정하고, owner-acceptor(사용자)가 범위를 승인한다. 실행은 AI가 맡고 owner-acceptor가 확인한다([기록](./operational-preparation/reviewer-assignment-2026-10-22.json)).
-- 검토 자료를 만들었다([안내](./operational-preparation/source-review-supplement/followups/wiv1-reviewer-packet-v1/REVIEW-GUIDE.md)). 검토자 칸과 독립성 선언은 비어 있고, AI는 채우지 않는다.
+- 사용자가 2026-10-23에 이 시스템의 핵심 가치를 정했다. vibe query의 의도를 정확히 파악하는 것이 1번, 그 의도의 코드와 연결된 코드를 거의 한 번에 찾아 주는 것이 2번이다. 테스트는 정답이 확인된 사례로만 한다([결정 기록](./operational-preparation/retrieval-priority-2026-10-23/DECISION.json)).
+- 첫 대상은 grpc-go, 그다음 go-stablenet이다. WI-V1 정식 수용 시범은 보류했다. 코딩 에이전트 묶음은 검색 품질을 올린 뒤에 한다.
+- WI-V1 사례는 정답 없이 골랐던 것으로 확인됐다. 정답 시험을 실제 코드로 돌려 후보 판정이 맞았음을 확인했고, 그 시험을 나중에 WI-V1을 다시 열 때 판정 기준으로 쓴다.
 - 13묶음 완료 0/13, 정식 수용 0/9, 독립 승인 0, FINAL 0, freeze 없음, `execution_allowed=false`다.
 
 ## 바로 다음 행동
 
-1. **검토자 응답이 왔으면**: [남은 작업](../REMAINING-WORK.md) 3.1의 다섯 단계를 따른다.
-2. **아직 안 왔으면**: [남은 작업](../REMAINING-WORK.md) 3.2의 준비 작업을 한다. 사용자가 고르지 않으면 WI-V2 전체 비교표 실행부터 한다.
-3. 어느 쪽이든 단계를 마치면 이 문서, [남은 작업](../REMAINING-WORK.md), 원장을 같은 커밋에서 갱신한다.
+1. [남은 작업](../REMAINING-WORK.md) 3.1의 1단계: grpc-go 검색 평가 명세를 쓰고 사용자 확인을 받는다. `internal/vector/eval/prregress`를 먼저 읽는다.
+2. 확인을 받으면 2~4단계를 차례로 한다.
+3. 단계를 마치면 이 문서, [남은 작업](../REMAINING-WORK.md), 원장을 같은 커밋에서 갱신한다.
 
-## WI-V1 근거 (봉인된 패킷, 고치지 않는다)
+## WI-V1 근거 (보류 중, 봉인된 패킷은 고치지 않는다)
 
 |패킷|담은 것|
 |---|---|

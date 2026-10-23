@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "97_WIV1_gold_reviewer_packet_prepared_unfilled",
+  "current_activity": "98_retrieval_eval_first_answer_known_cases_WIV1_pilot_paused",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -663,7 +663,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "WI-V1 pilot: gold-reviewer fills the independence declaration and the 12-contract, 11-matching-rule and FINAL-input decisions in the reviewer packet; then AI binds the returned decisions and requests F-05 approval and WI-V1 input freeze from owner-acceptor; approved positive actual roles/final HEAD, independent gold/sufficiency and all13 groups remain under adopted actual4/controlled1 scope",
+  "next": "write the answer-known retrieval evaluation spec for grpc-go (merged PRs as answer source, index at the PR parent, intent accuracy, hit@1/hit@3/MRR, related-code recall, returned tokens, grep/BM25/vector/CKS baselines); run it, then repeat on go-stablenet; coding-agent items follow after retrieval quality; WI-V1 pilot paused",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -1049,5 +1049,25 @@
     "independence_declaration": null,
     "formal_completed": 0,
     "independent_approved": 0
+  },
+  "retrieval_priority_decision": {
+    "path": "docs/spec-driven/operational-preparation/retrieval-priority-2026-10-23/DECISION.json",
+    "sha256": "82a2aa4a291fc192c82d7b1e2f0bac791b3818e031c6549bf52223120a2d3004",
+    "kind": "user_direction_decision_not_independent_acceptance",
+    "first_target": "https://github.com/grpc/grpc-go",
+    "second_target": "go-stablenet",
+    "paused": [
+      "WI-V1 acceptance pilot"
+    ],
+    "after_retrieval": [
+      "WI-V1",
+      "WI-V2",
+      "WI-4",
+      "WI-C"
+    ],
+    "formal_completed": 0,
+    "independent_approved": 0,
+    "freeze": null,
+    "execution_allowed": false
   }
 }
