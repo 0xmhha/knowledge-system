@@ -20,6 +20,6 @@ python3 scripts/retrieval_pr_scenarios.py assemble --sample sample.json --prompt
 
 ## 색인과 실행
 
-`scripts/retrieval_snapshot_chain.py`가 가장 이른 스냅샷을 전체로 만들고, 다음 스냅샷부터는 앞 색인을 복사해 `ckv reindex`로 바뀐 파일만 다시 임베딩한다. 그래프는 스냅샷마다 새로 만든다. 같은 커밋을 전체로 만든 색인과 비교해 이 방식이 같은 결과를 내는지 확인한 뒤 결과를 쓴다.
+`scripts/retrieval_snapshot_chain.py`가 스냅샷마다 그래프를 한 번 만들고, 모델마다 가장 이른 스냅샷의 벡터를 전체로 만든 뒤 다음 스냅샷부터는 앞 색인을 복사해 `ckv reindex`로 바뀐 파일만 다시 임베딩한다. 복사한 색인은 `reindex` 전에 이번 스냅샷의 그래프를 가리키게 바꾼다. `90f571db`에서 전체 색인과 비교하면 code 청크는 같고 패키지 convention 요약 청크 12개만 다르다([명세](../../RETRIEVAL-EVAL-SPEC.md) 3장). 모델은 `qwen3-embedding:4b`(2560차원)가 본 평가, `bge-m3`가 기준선이다.
 
 비교 대상은 `scripts/retrieval_baselines.py`가 같은 질문과 색인으로 돌린다. 벡터만, 벡터와 BM25 재정렬, 그래프 낱말 검색, `git grep`이다.
