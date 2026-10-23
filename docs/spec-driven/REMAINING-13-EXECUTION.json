@@ -3,7 +3,7 @@
   "goal": "complete_all13_remaining_groups_without_false_completion",
   "basis": "direct_user_request_continue_until_all13_complete",
   "baseline_revision": "3c23a71c3872dbef69a84726a58fb4ade27001e5",
-  "current_activity": "100_retrieval_eval_grpc_go_inputs_frozen_tools_ready",
+  "current_activity": "101_retrieval_eval_grpc_go_indexing_qwen3_embedding_4b_and_bge_m3",
   "groups_total": 13,
   "groups_completed": 0,
   "rows": [
@@ -663,7 +663,7 @@
   "execution_allowed": false,
   "actual_LLM_answer_evaluation": "requires_model_auth_cost_cap; not_invented",
   "publication": "not_authorized_by_local_completion",
-  "next": "build the 24 grpc-go snapshot indexes (full build, then ckv reindex chain), check the reindexed index against a full build of the same commit, run CKS and the four baselines, get the human answer/prompt sample check, then fix weak spots and repeat on go-stablenet; WI-V1 pilot paused",
+  "next": "finish the grpc-go snapshot indexes for qwen3-embedding:4b (2560d, main) and bge-m3 (baseline) with graph-aligned reindex, run CKS and the four baselines per model, get the human answer/prompt sample check, then fix weak spots and repeat on go-stablenet; WI-V1 pilot paused",
   "completion_check": "scripts/check-remaining-13.py",
   "technical_findings": [
     {
@@ -1072,7 +1072,7 @@
   },
   "retrieval_eval_spec": {
     "path": "docs/spec-driven/RETRIEVAL-EVAL-SPEC.md",
-    "sha256": "8b5a45d1f4d5bda5ce1b17e9a2a1dad325b0260b94d61678188128f249b4a2ca",
+    "sha256": "7a9ff4d903413bc73a2e3aef3808bf1987c1a6d9ae4627b038a9fff8b39fbebf",
     "approval": "direct_human_user_message 2026-10-23: \"1. 명세대로 진행. 2. 한국어로\"",
     "prompt_language": "ko",
     "implemented": [
@@ -1084,7 +1084,17 @@
       "reindex equivalence check",
       "evaluation run",
       "human sample check"
-    ]
+    ],
+    "embedding_models": {
+      "main": "qwen3-embedding:4b (2560d)",
+      "baseline": "bge-m3 (1024d)",
+      "decision": "direct_human_user_message 2026-10-23: \"그냥 다른 모델 받지 말고, \\\" qwen3-embedding:4b\\\" 로 테스트를 수행하고, 차원은 2560 차원으로 진행해.\""
+    },
+    "reindex_equivalence": {
+      "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+      "canonical_id_mismatch_without_graph_repoint": 629,
+      "remaining_difference_with_graph_repoint": "12 package convention summary chunks of 15860; code chunks identical"
+    }
   },
   "retrieval_eval_grpc_go_inputs": {
     "manifest": "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/manifest.json",

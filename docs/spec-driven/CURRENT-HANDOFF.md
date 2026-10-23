@@ -13,7 +13,7 @@
 
 ## 바로 다음 행동
 
-1. [남은 작업](../REMAINING-WORK.md) 3.1의 3단계: 스냅샷 색인 24개를 만들고 CKS와 비교 대상을 돌린다. 입력은 고정됐다([입력](./operational-preparation/retrieval-eval-grpc-go-v1/README.md)).
+1. [남은 작업](../REMAINING-WORK.md) 3.1의 3단계: `qwen3-embedding:4b`(2560차원, 본 평가)와 `bge-m3`(기준선)로 스냅샷 색인 24개씩을 만들고 CKS와 비교 대상을 돌린다. 입력은 고정됐다([입력](./operational-preparation/retrieval-eval-grpc-go-v1/README.md)).
 2. 그다음 4~5단계를 차례로 한다.
 3. 단계를 마치면 이 문서, [남은 작업](../REMAINING-WORK.md), 원장을 같은 커밋에서 갱신한다.
 
