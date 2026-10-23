@@ -68,8 +68,16 @@ def main() -> None:
     a = p.parse_args()
     work, inputs, bindir = Path(a.work).resolve(), Path(a.inputs).resolve(), Path(a.bin).resolve()
     src = work / 'src-eval'
-    out_root = work / 'eval' / model_slug(a.model, a.embed_dim)
+    slug = model_slug(a.model, a.embed_dim)
+    out_root = work / 'eval' / slug
+    record = work / f'chain-{slug}.json'
+    # Only snapshots the chain builder recorded are finished: a reindex in
+    # progress already holds the copied manifest of the previous snapshot.
+    built = {r['snapshot'] for r in json.loads(record.read_text())} if record.exists() else set()
     for snap in json.loads(Path(a.snapshots).read_text()):
+        if snap not in built:
+            print(f'stopping at {snap}: not yet recorded in {record.name}')
+            break
         out = out_root / snap
         cks_report, base_report = out / 'cks.json', out / 'baselines.json'
         if cks_report.exists() and base_report.exists():
