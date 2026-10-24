@@ -118,6 +118,12 @@ func TestReindex_PreservesCanonicalAlignment(t *testing.T) {
 // source commit.
 func writeCKGGraph(t *testing.T, dir, digest, canonical, schema string) {
 	t.Helper()
+	writeCKGGraphAt(t, dir, digest, canonical, schema, "seedcommit")
+}
+
+// writeCKGGraphAt is writeCKGGraph with the graph's recorded source commit.
+func writeCKGGraphAt(t *testing.T, dir, digest, canonical, schema, commit string) {
+	t.Helper()
 	db, err := sql.Open("sqlite3", filepath.Join(dir, "graph.db"))
 	if err != nil {
 		t.Fatal(err)
@@ -129,7 +135,7 @@ DROP TABLE IF EXISTS manifest;
 CREATE TABLE nodes (id TEXT PRIMARY KEY, qualified_name TEXT NOT NULL,
   file_path TEXT NOT NULL, start_line INTEGER NOT NULL, end_line INTEGER NOT NULL, canonical_id TEXT);
 CREATE TABLE manifest (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-INSERT INTO manifest VALUES ('src_commit','seedcommit'),('schema_version','` + schema + `'),('graph_digest','` + digest + `');
+INSERT INTO manifest VALUES ('src_commit','` + commit + `'),('schema_version','` + schema + `'),('graph_digest','` + digest + `');
 INSERT INTO nodes VALUES ('n1','NewServer','server.go',15,20,'` + canonical + `');
 `); err != nil {
 		t.Fatal(err)
@@ -202,6 +208,54 @@ func TestReindex_RealignsOnGraphDigestChange(t *testing.T) {
 
 	if got := serverCanonical(t, out); got != "sample.NewServer.NEW" {
 		t.Fatalf("after graph regen + reindex, canonical = %q, want sample.NewServer.NEW — P2b full re-align missing", got)
+	}
+}
+
+// TestReindex_RecordsRealignedGraphCommit: after re-aligning to a graph
+// regenerated at another commit, the manifest's ckg ledger must name that
+// graph's commit, not only its digest. A stale src_commit makes the MCP
+// alignment assert refuse every request ("built from different commits").
+func TestReindex_RecordsRealignedGraphCommit(t *testing.T) {
+	// A git-backed copy of the sample: reindex needs a resolvable HEAD.
+	src := t.TempDir()
+	if err := os.CopyFS(src, os.DirFS(resolveTestdataSample(t))); err != nil {
+		t.Fatal(err)
+	}
+	gitIn(t, src, "init", "-q")
+	gitIn(t, src, "add", ".")
+	gitIn(t, src, "commit", "-qm", "sample")
+	ckgDir := t.TempDir()
+	writeCKGGraphAt(t, ckgDir, "digestA", "sample.NewServer.OLD", "1.23", "commitA")
+	out := t.TempDir()
+	if _, err := Run(context.Background(), Options{
+		SrcRoot:  src,
+		OutDir:   out,
+		Embedder: mock.Default(),
+		CKGPath:  ckgDir,
+		Now:      func() time.Time { return time.Unix(0, 0).UTC() },
+	}); err != nil {
+		t.Fatalf("seed build: %v", err)
+	}
+
+	writeCKGGraphAt(t, ckgDir, "digestB", "sample.NewServer.NEW", "1.23", "commitB")
+	if _, err := Reindex(context.Background(), ReindexOptions{
+		SrcRoot:  src,
+		OutDir:   out,
+		Embedder: mock.Default(),
+		Now:      func() time.Time { return time.Unix(100, 0).UTC() },
+	}); err != nil {
+		t.Fatalf("reindex: %v", err)
+	}
+
+	man, err := manifest.Load(out)
+	if err != nil {
+		t.Fatalf("load manifest: %v", err)
+	}
+	if got := man.Sources.CKG.GraphDigest; got != "digestB" {
+		t.Fatalf("ckg graph_digest = %q, want digestB", got)
+	}
+	if got := man.Sources.CKG.SrcCommit; got != "commitB" {
+		t.Fatalf("ckg src_commit = %q, want commitB — realign recorded the new digest but kept the old commit", got)
 	}
 }
 
