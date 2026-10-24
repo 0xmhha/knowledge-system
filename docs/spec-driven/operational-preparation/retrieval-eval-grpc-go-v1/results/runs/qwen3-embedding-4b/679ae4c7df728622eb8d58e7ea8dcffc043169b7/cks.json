@@ -1,0 +1,954 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:22:07.307388Z",
+  "finished_at": "2026-10-24T00:22:09.842743Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 29758209,
+          "completed_at": "2026-10-24T09:22:07.337383+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "679ae4c7df728622eb8d58e7ea8dcffc043169b7",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "changed_files": [
+                ".gemini/styleguide.md",
+                ".github/workflows/govulncheck.yaml",
+                "CONTRIBUTING.md",
+                "authz/grpc_authz_end2end_test.go",
+                "authz/grpc_authz_server_interceptors.go",
+                "authz/grpc_authz_server_interceptors_test.go",
+                "balancer/autosharding/autosharding.go",
+                "balancer/autosharding/autosharding_test.go",
+                "balancer/autosharding/slice_map.go",
+                "balancer/autosharding/slice_map_test.go",
+                "balancer/endpointsharding/endpointsharding.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer_grpc.pb.go",
+                "balancer/pickfirst/metrics_test.go",
+                "balancer/pickfirst/pickfirst.go",
+                "balancer/pickfirst/pickfirst_ext_test.go",
+                "balancer/pickfirst/pickfirstleaf/pickfirstleaf.go",
+                "balancer/randomsubsetting/randomsubsetting.go",
+                "balancer/randomsubsetting/randomsubsetting_test.go",
+                "balancer/ringhash/picker.go",
+                "balancer/ringhash/picker_test.go",
+                "balancer/ringhash/ring_test.go",
+                "balancer/ringhash/ringhash.go",
+                "balancer/ringhash/ringhash_test.go",
+                "balancer/rls/balancer.go",
+                "balancer/rls/balancer_test.go",
+                "balancer/rls/control_channel.go",
+                "binarylog/grpc_binarylog_v1/binarylog.pb.go",
+                "call.go",
+                "channelz/grpc_channelz_v1/channelz.pb.go",
+                "channelz/grpc_channelz_v1/channelz_grpc.pb.go",
+                "clientconn.go",
+                "clientconn_disconnect_reason_noplan9.go",
+                "clientconn_disconnect_reason_plan9.go",
+                "cmd/protoc-gen-go-grpc/go.mod",
+                "cmd/protoc-gen-go-grpc/go.sum",
+                "cmd/protoc-gen-go-grpc/main.go",
+                "credentials/alts/alts.go",
+                "credentials/alts/alts_test.go",
+                "credentials/alts/internal/conn/record.go",
+                "credentials/alts/internal/conn/record_test.go",
+                "credentials/alts/internal/handshaker/handshaker.go",
+                "credentials/alts/internal/handshaker/handshaker_test.go",
+                "credentials/alts/internal/proto/grpc_gcp/altscontext.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker_grpc.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/transport_security_common.pb.go",
+                "credentials/google/gcp_service_account_identity_credentials.go",
+                "credentials/google/gcp_service_account_identity_credentials_test.go",
+                "credentials/google/internal/internal.go",
+                "credentials/sts/sts.go",
+                "credentials/sts/sts_test.go",
+                "credentials/xds/xds.go",
+                "credentials/xds/xds_client_test.go",
+                "credentials/xds/xds_server_test.go",
+                "dialoptions.go",
+                "encoding/compressor_test.go",
+                "encoding/encoding.go",
+                "encoding/encoding_test.go",
+                "encoding/gzip/gzip.go",
+                "examples/features/opentelemetry/client/main.go",
+                "examples/features/opentelemetry/server/main.go",
+                "examples/features/proto/echo/echo.pb.go",
+                "examples/features/proto/echo/echo_grpc.pb.go",
+                "examples/go.mod",
+                "examples/go.sum",
+                "examples/helloworld/helloworld/helloworld.pb.go",
+                "examples/helloworld/helloworld/helloworld_grpc.pb.go",
+                "examples/route_guide/routeguide/route_guide.pb.go",
+                "examples/route_guide/routeguide/route_guide_grpc.pb.go",
+                "experimental/balancer/hostname/hostname.go",
+                "experimental/balancer/hostname/hostname_test.go",
+                "experimental/balancer/weight/weight.go",
+                "experimental/balancer/weight/weight_test.go",
+                "experimental/stats/telemetry/labels.go",
+                "gcp/observability/go.mod",
+                "gcp/observability/go.sum",
+                "gcp/observability/logging_test.go",
+                "go.mod",
+                "go.sum",
+                "health/grpc_health_v1/health.pb.go",
+                "health/grpc_health_v1/health_grpc.pb.go",
+                "internal/balancergroup/balancergroup_ext_test.go",
+                "internal/balancergroup/balancergroup_test.go",
+                "internal/buffer/unbounded.go",
+                "internal/buffer/unbounded_test.go",
+                "internal/credentials/xds/handshake_info.go",
+                "internal/credentials/xds/handshake_info_test.go",
+                "internal/envconfig/envconfig.go",
+                "internal/envconfig/envconfig_test.go",
+                "internal/envconfig/xds.go",
+                "internal/grpcsync/callback_serializer.go",
+                "internal/grpcsync/callback_serializer_test.go",
+                "internal/grpcsync/refcounted.go",
+                "internal/grpcsync/refcounted_test.go",
+                "internal/grpcutil/regex_test.go",
+                "internal/idle/idle_e2e_test.go",
+                "internal/internal.go",
+                "internal/mem/buffer_pool.go",
+                "internal/optional/optional.go",
+                "internal/optional/optional_test.go",
+                "internal/proto/grpc_lookup_v1/rls.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_config.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_grpc.pb.go",
+                "internal/resolver/config_selector.go",
+                "internal/stats/labels.go",
+                "internal/stats/labels_test.go",
+                "internal/testutils/balancer.go",
+                "internal/testutils/stats/test_metrics_recorder.go",
+                "internal/transport/client_stream.go",
+                "internal/transport/controlbuf.go",
+                "internal/transport/controlbuf_test.go",
+                "internal/transport/handler_server.go",
+                "internal/transport/handler_server_test.go",
+                "internal/transport/http2_client.go",
+                "internal/transport/http2_client_header_bench_test.go",
+                "internal/transport/http2_server.go",
+                "internal/transport/http_util.go",
+                "internal/transport/http_util_test.go",
+                "internal/transport/internal/internal.go",
+                "internal/transport/server_metrics_ext_test.go",
+                "internal/transport/transport.go",
+                "internal/transport/transport_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_test.go",
+                "internal/xds/balancer/clusterimpl/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/clusterimpl.go",
+                "internal/xds/balancer/clusterimpl/picker.go",
+                "internal/xds/balancer/clustermanager/picker.go",
+                "internal/xds/balancer/outlierdetection/balancer.go",
+                "internal/xds/balancer/outlierdetection/balancer_test.go",
+                "internal/xds/balancer/outlierdetection/e2e_test/outlierdetection_test.go",
+                "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                "internal/xds/balancer/priority/balancer.go",
+                "internal/xds/bootstrap/bootstrap.go",
+                "internal/xds/bootstrap/bootstrap_test.go",
+                "internal/xds/clients/internal/buffer/unbounded.go",
+                "internal/xds/clients/internal/buffer/unbounded_test.go",
+                "internal/xds/clients/internal/syncutil/callback_serializer.go",
+                "internal/xds/clients/xdsclient/authority.go",
+                "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go",
+                "internal/xds/clients/xdsclient/test/dump_test.go",
+                "internal/xds/clients/xdsclient/test/helpers_test.go",
+                "internal/xds/credentials/access_token.go",
+                "internal/xds/credentials/access_token_test.go",
+                "internal/xds/credentials/credentials.go",
+                "internal/xds/credentials/tls.go",
+                "internal/xds/credentials/tls_test.go",
+                "internal/xds/credentials/xds_test.go",
+                "internal/xds/grpcservice/grpcservice.go",
+                "internal/xds/grpcservice/grpcservice_test.go",
+                "internal/xds/httpfilter/ext_authz/config.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz_test.go",
+                "internal/xds/httpfilter/extconfig.go",
+                "internal/xds/httpfilter/extconfig_test.go",
+                "internal/xds/httpfilter/extproc/config.go",
+                "internal/xds/httpfilter/extproc/config_test.go",
+                "internal/xds/httpfilter/extproc/ext_proc.go",
+                "internal/xds/httpfilter/extproc/ext_proc_ext_test.go",
+                "internal/xds/httpfilter/extproc/internal/internal.go",
+                "internal/xds/httpfilter/extproc/metrics.go",
+                "internal/xds/httpfilter/fault/fault.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_e2e_test.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_test.go",
+                "internal/xds/httpfilter/httpfilter.go",
+                "internal/xds/httpfilter/rbac/rbac.go",
+                "internal/xds/httpfilter/rbac/rbac_test.go",
+                "internal/xds/httpfilter/router/router.go",
+                "internal/xds/matcher/matcher_header.go",
+                "internal/xds/matcher/string_matcher.go",
+                "internal/xds/matcher/string_matcher_test.go",
+                "internal/xds/rbac/matchers.go",
+                "internal/xds/rbac/rbac_engine_test.go",
+                "internal/xds/resolver/cluster_specifier_plugin_test.go",
+                "internal/xds/resolver/serviceconfig.go",
+                "internal/xds/resolver/xds_http_filters_test.go",
+                "internal/xds/resolver/xds_resolver.go",
+                "internal/xds/resolver/xds_resolver_test.go",
+                "internal/xds/server/conn_wrapper.go",
+                "internal/xds/server/filter_chain_manager.go",
+                "internal/xds/server/filter_chain_manager_test.go",
+                "internal/xds/server/listener_wrapper.go",
+                "internal/xds/server/listener_wrapper_test.go",
+                "internal/xds/server/routing.go",
+                "internal/xds/server/routing_test.go",
+                "internal/xds/server/server_options.go",
+                "internal/xds/xdsclient/clientimpl_test.go",
+                "internal/xds/xdsclient/pool.go",
+                "internal/xds/xdsclient/resource_types.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain_test.go",
+                "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/matcher.go",
+                "internal/xds/xdsclient/xdsresource/matcher_path.go",
+                "internal/xds/xdsclient/xdsresource/matcher_test.go",
+                "internal/xds/xdsclient/xdsresource/metadata.go",
+                "internal/xds/xdsclient/xdsresource/metadata_test.go",
+                "internal/xds/xdsclient/xdsresource/route_config_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/test_utils_test.go",
+                "internal/xds/xdsclient/xdsresource/type_cds.go",
+                "internal/xds/xdsclient/xdsresource/type_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds_test.go",
+                "internal/xds/xdsclient/xdsresource/version/version.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager.go",
+                "interop/grpc_testing/benchmark_service.pb.go",
+                "interop/grpc_testing/benchmark_service_grpc.pb.go",
+                "interop/grpc_testing/control.pb.go",
+                "interop/grpc_testing/core/stats.pb.go",
+                "interop/grpc_testing/empty.pb.go",
+                "interop/grpc_testing/messages.pb.go",
+                "interop/grpc_testing/payloads.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service_grpc.pb.go",
+                "interop/grpc_testing/stats.pb.go",
+                "interop/grpc_testing/test.pb.go",
+                "interop/grpc_testing/test_grpc.pb.go",
+                "interop/grpc_testing/worker_service.pb.go",
+                "interop/grpc_testing/worker_service_grpc.pb.go",
+                "interop/observability/go.mod",
+                "interop/observability/go.sum",
+                "interop/stress/grpc_testing/metrics.pb.go",
+                "interop/stress/grpc_testing/metrics_grpc.pb.go",
+                "interop/xds/go.mod",
+                "interop/xds/go.sum",
+                "mem/buffer_pool.go",
+                "mem/buffers.go",
+                "metadata/metadata.go",
+                "metadata/metadata_test.go",
+                "profiling/proto/service.pb.go",
+                "profiling/proto/service_grpc.pb.go",
+                "reflection/grpc_reflection_v1/reflection.pb.go",
+                "reflection/grpc_reflection_v1/reflection_grpc.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection_grpc.pb.go",
+                "reflection/grpc_testing/proto2.pb.go",
+                "reflection/grpc_testing/proto2_ext.pb.go",
+                "reflection/grpc_testing/proto2_ext2.pb.go",
+                "reflection/grpc_testing/test.pb.go",
+                "reflection/grpc_testing/test_grpc.pb.go",
+                "resolver_wrapper.go",
+                "rpc_util.go",
+                "rpc_util_test.go",
+                "scripts/vet.sh",
+                "security/advancedtls/advancedtls.go",
+                "security/advancedtls/advancedtls_test.go",
+                "security/advancedtls/certificate_utils_test.go",
+                "security/advancedtls/examples/go.mod",
+                "security/advancedtls/examples/go.sum",
+                "security/advancedtls/go.mod",
+                "security/advancedtls/go.sum",
+                "server.go",
+                "stats/opencensus/go.mod",
+                "stats/opencensus/go.sum",
+                "stats/opentelemetry/client_metrics.go",
+                "stats/opentelemetry/client_tracing.go",
+                "stats/opentelemetry/csm/observability_test.go",
+                "stats/opentelemetry/e2e_test.go",
+                "stats/opentelemetry/example_test.go",
+                "stats/opentelemetry/internal/testutils/testutils.go",
+                "stats/opentelemetry/opentelemetry.go",
+                "stats/opentelemetry/server_metrics.go",
+                "stats/opentelemetry/server_tracing.go",
+                "stats/opentelemetry/trace.go",
+                "stats/stats.go",
+                "stats/stats_test.go",
+                "stream.go",
+                "stream_test.go",
+                "test/balancer_test.go",
+                "test/codec_perf/perf.pb.go",
+                "test/creds_test.go",
+                "test/end2end_test.go",
+                "test/gracefulstop_test.go",
+                "test/kokoro/psm-regional_td.cfg",
+                "test/malformed_method_test.go",
+                "test/retry_test.go",
+                "test/server_test.go",
+                "test/servertester.go",
+                "test/tools/go.mod",
+                "test/tools/go.sum",
+                "test/xds/xds_client_http_connect_test.go",
+                "test/xds/xds_client_integration_test.go",
+                "test/xds/xds_resolver_e2e_test.go",
+                "test/xds/xds_server_filter_e2e_test.go",
+                "test/xds/xds_server_filter_override_test.go",
+                "test/xds/xds_server_filter_state_retention_test.go",
+                "test/xds/xds_server_integration_test.go",
+                "test/xds/xds_server_interceptor_leak_test.go",
+                "test/xds/xds_server_rbac_test.go",
+                "test/xds/xds_telemetry_labels_test.go",
+                "version.go",
+                "xds/googledirectpath/googlec2p.go",
+                "xds/googledirectpath/googlec2p_test.go",
+                "xds/server.go",
+                "xds/server_options.go",
+                "xds/server_serving_mode_ext_test.go",
+                "xds/server_test.go",
+                "xds/xds.go"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "OpenTelemetry 추적에서 예전에 되돌렸던 변경을 다시 넣고, 그때 실패하던 시험의 경쟁 상태도 고치고 싶어"
+          },
+          "elapsed_ns": 2504242375,
+          "completed_at": "2026-10-24T09:22:09.841874+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "intent": "test_add",
+              "query": "OpenTelemetry 추적에서 예전에 되돌렸던 변경을 다시 넣고, 그때 실패하던 시험의 경쟁 상태도 고치고 싶어",
+              "citations": [
+                {
+                  "file": "gcp/observability/observability_test.go",
+                  "start_line": 364,
+                  "end_line": 477,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "stats/opentelemetry/internal/tracing/carrier_test.go",
+                  "start_line": 35,
+                  "end_line": 37,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "stats/opentelemetry/e2e_test.go",
+                  "start_line": 91,
+                  "end_line": 99,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/e2e_test.go",
+                  "start_line": 1702,
+                  "end_line": 1717,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/client_tracing.go",
+                  "start_line": 33,
+                  "end_line": 36,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/e2e_test.go",
+                  "start_line": 120,
+                  "end_line": 131,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "gcp/observability/observability_test.go",
+                  "start_line": 845,
+                  "end_line": 1088,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "stats/opentelemetry/e2e_test.go",
+                  "start_line": 1258,
+                  "end_line": 1466,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/stats.go",
+                  "start_line": 311,
+                  "end_line": 311,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "gcp/observability/logging_test.go",
+                  "start_line": 105,
+                  "end_line": 123,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/stubserver/stubserver.go",
+                  "start_line": 117,
+                  "end_line": 126,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/stubserver/stubserver.go",
+                  "start_line": 271,
+                  "end_line": 276,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/xds/clients/xdsclient/test/misc_watchers_test.go",
+                  "start_line": 92,
+                  "end_line": 95,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "interop/grpc_testing/test_grpc.pb.go",
+                  "start_line": 59,
+                  "end_line": 59,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "interop/grpc_testing/test_grpc.pb.go",
+                  "start_line": 73,
+                  "end_line": 73,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stream.go",
+                  "start_line": 110,
+                  "end_line": 110,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stream_interfaces.go",
+                  "start_line": 127,
+                  "end_line": 127,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stream_interfaces.go",
+                  "start_line": 149,
+                  "end_line": 149,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/grpctest/grpctest.go",
+                  "start_line": 114,
+                  "end_line": 135,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/xds/clients/internal/testutils/channel.go",
+                  "start_line": 38,
+                  "end_line": 45,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/grpcsync/event.go",
+                  "start_line": 37,
+                  "end_line": 43,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/grpcsync/event.go",
+                  "start_line": 56,
+                  "end_line": 58,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/testutils/channel.go",
+                  "start_line": 111,
+                  "end_line": 113,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/e2e_test.go",
+                  "start_line": 1269,
+                  "end_line": 1466,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/e2e_test.go",
+                  "start_line": 198,
+                  "end_line": 326,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func (s) TestOpenCensusIntegration(t *testing.T) {\n\tdefaultMetricsReportingInterval = time.Millisecond * 100\n\tfe := \u0026fakeOpenCensusExporter{SeenViews: make(map[string]string), t: t}\n\n\tdefer func(ne func(config *config) (tracingMetricsExporter, error)) {\n\t\tnewExporter = ne\n\t}(newExporter)\n\n\tnewExporter = func(*config) (tracingMetricsExporter, error) {\n\t\treturn fe, nil\n\t}\n\n\topenCensusOnConfig := \u0026config{\n\t\tProjectID:       \"fake\",\n\t\tCloudMonitoring: \u0026cloudMonitoring{},\n\t\tCloudTrace: \u0026cloudTrace{\n\t\t\tSamplingRate: 1.0,\n\t\t},\n\t}\n\tcleanup, err := setupObservabilitySystemWithConfig(openCensusOnConfig)\n\tif err != nil {\n\t\tt.Fatalf(\"error setting up observability %v\", err)\n\t}\n\tdefer cleanup()\n\n\tss := \u0026stubserver.StubServer{\n\t\tUnaryCallF: func(context.Context, *testpb.SimpleRequest) (*testpb.SimpleResponse, error) {\n\t\t\treturn \u0026testpb.SimpleResponse{}, nil\n\t\t},\n\t\tFullDuplexCallF: func(stream testgrpc.TestService_FullDuplexCallServer) error {\n\t\t\tfor {\n\t\t\t\t_, err := stream.Recv()\n\t\t\t\tif err == io.EOF {\n\t\t\t\t\treturn nil\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t}\n\tif err := ss.Start(nil); err != nil {\n\t\tt.Fatalf(\"Error starting endpoint server: %v\", err)\n\t}\n\tdefer ss.Stop()\n\n\tfor i := 0; i \u003c defaultRequestCount; i++ {\n\t\tctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)\n\t\tdefer cancel()\n\t\tif _, err := ss.Client.UnaryCall(ctx, \u0026testpb.SimpleRequest{Payload: \u0026testpb.Payload{Body: testOkPayload}}); err != nil {\n\t\t\tt.Fatalf(\"Unexpected error from UnaryCall: %v\", err)\n\t\t}\n\t}\n\tt.Logf(\"unary call passed count=%v\", defaultRequestCount)\n\tctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)\n\tdefer cancel()\n\tstream, err := ss.Client.FullDuplexCall(ctx)\n\tif err != nil {\n\t\tt.Fatalf(\"ss.Client.FullDuplexCall failed: %f\", err)\n\t}\n\n\tstream.CloseSend()\n\tif _, err = stream.Recv(); err != io.EOF {\n\t\tt.Fatalf(\"unexpected error: %v, expected an EOF error\", err)\n\t}\n\n\tvar errs []error\n\tfor ctx.Err() == nil {\n\t\terrs = nil\n\t\tfe.mu.RLock()\n\t\tif value := fe.SeenViews[\"grpc.io/client/api_latency\"]; value != TypeOpenCensusViewDistribution {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/client/api_latency: %s != %s\", value, TypeOpenCensusViewDistribution))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/client/started_rpcs\"]; value != TypeOpenCensusViewCount {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/client/started_rpcs: %s != %s\", value, TypeOpenCensusViewCount))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/server/started_rpcs\"]; value != TypeOpenCensusViewCount {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/server/started_rpcs: %s != %s\", value, TypeOpenCensusViewCount))\n\t\t}\n\n\t\tif value := fe.SeenViews[\"grpc.io/client/completed_rpcs\"]; value != TypeOpenCensusViewCount {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/client/completed_rpcs: %s != %s\", value, TypeOpenCensusViewCount))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/server/completed_rpcs\"]; value != TypeOpenCensusViewCount {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/server/completed_rpcs: %s != %s\", value, TypeOpenCensusViewCount))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/client/roundtrip_latency\"]; value != TypeOpenCensusViewDistribution {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/client/completed_rpcs: %s != %s\", value, TypeOpenCensusViewDistribution))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/server/server_latency\"]; value != TypeOpenCensusViewDistribution {\n\t\t\terrs = append(errs, fmt.Errorf(\"grpc.io/server/server_latency: %s != %s\", value, TypeOpenCensusViewDistribution))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/client/sent_compressed_message_bytes_per_rpc\"]; value != TypeOpenCensusViewDistribution {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/client/sent_compressed_message_bytes_per_rpc: %s != %s\", value, TypeOpenCensusViewDistribution))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/client/received_compressed_message_bytes_per_rpc\"]; value != TypeOpenCensusViewDistribution {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/client/received_compressed_message_bytes_per_rpc: %s != %s\", value, TypeOpenCensusViewDistribution))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/server/sent_compressed_message_bytes_per_rpc\"]; value != TypeOpenCensusViewDistribution {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/server/sent_compressed_message_bytes_per_rpc: %s != %s\", value, TypeOpenCensusViewDistribution))\n\t\t}\n\t\tif value := fe.SeenViews[\"grpc.io/server/received_compressed_message_bytes_per_rpc\"]; value != TypeOpenCensusViewDistribution {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected type for grpc.io/server/received_compressed_message_bytes_per_rpc: %s != %s\", value, TypeOpenCensusViewDistribution))\n\t\t}\n\t\tif fe.SeenSpans \u003c= 0 {\n\t\t\terrs = append(errs, fmt.Errorf(\"unexpected number of seen spans: %v \u003c= 0\", fe.SeenSpans))\n\t\t}\n\t\tfe.mu.RUnlock()\n\t\tif len(errs) == 0 {\n\t\t\tbreak\n\t\t}\n\t\ttime.Sleep(100 * time.Millisecond)\n\t}\n\tif len(errs) != 0 {\n\t\tt.Fatalf(\"Invalid OpenCensus export data: %v\", errs)\n\t}\n}",
+                  "token_estimate": 1262
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/internal/tracing/carrier_test.go",
+                    "start_line": 35,
+                    "end_line": 37,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func Test(t *testing.T) {\n\tgrpctest.RunSubTests(t, s{})\n}",
+                  "token_estimate": 14
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 91,
+                    "end_line": 99,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "// traceSpanInfo is the information received about the trace span. It contains\n// subset of information that is needed to verify if correct trace is being\n// attributed to the rpc.\ntype traceSpanInfo struct {\n\tspanKind   string\n\tname       string\n\tevents     []trace.Event\n\tattributes []attribute.KeyValue\n}",
+                  "token_estimate": 76
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 1702,
+                    "end_line": 1717,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "func verifyTrace(t *testing.T, spans tracetest.SpanStubs, want traceSpanInfo) {\n\tmatch := false\n\tfor _, span := range spans {\n\t\tif span.Name == want.name \u0026\u0026 span.SpanKind.String() == want.spanKind {\n\t\t\tmatch = true\n\t\t\tif diff := cmp.Diff(want.events, span.Events, cmpopts.IgnoreFields(trace.Event{}, \"Time\")); diff != \"\" {\n\t\t\t\tt.Errorf(\"Span event mismatch for %q (kind: %s) (-want +got):\\n%s\",\n\t\t\t\t\twant.name, want.spanKind, diff)\n\t\t\t}\n\t\t\tbreak\n\t\t}\n\t}\n\tif !match {\n\t\tt.Errorf(\"Expected span not found: %q (kind: %s)\", want.name, want.spanKind)\n\t}\n}",
+                  "token_estimate": 137
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/client_tracing.go",
+                    "start_line": 33,
+                    "end_line": 36,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "const (\n\tdelayedResolutionEventName = \"Delayed name resolution complete\"\n\ttracerName                 = \"grpc-go\"\n)",
+                  "token_estimate": 28
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 120,
+                    "end_line": 131,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "// defaultTraceOptions function to create default trace options\nfunc defaultTraceOptions(_ *testing.T) (*experimental.TraceOptions, *tracetest.InMemoryExporter) {\n\tspanExporter := tracetest.NewInMemoryExporter()\n\tspanProcessor := trace.NewSimpleSpanProcessor(spanExporter)\n\ttracerProvider := trace.NewTracerProvider(trace.WithSpanProcessor(spanProcessor))\n\ttextMapPropagator := propagation.NewCompositeTextMapPropagator(opentelemetry.GRPCTraceBinPropagator{})\n\ttraceOptions := \u0026experimental.TraceOptions{\n\t\tTracerProvider:    tracerProvider,\n\t\tTextMapPropagator: textMapPropagator,\n\t}\n\treturn traceOptions, spanExporter\n}",
+                  "token_estimate": 155
+                },
+                {
+                  "citation": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 845,
+                    "end_line": 1088,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// TestLoggingLinkedWithTrace tests that client and server side logs get the\n// trace and span id corresponding to either the Call Level Span or Server Span\n// (no determinism, so can only assert one or the other), for Unary and\n// Streaming RPCs.\nfunc (s) TestLoggingLinkedWithTrace(t *testing.T) {\n\tfle := \u0026fakeLoggingExporter{\n\t\tt: t,\n\t}\n\toldNewLoggingExporter := newLoggingExporter\n\tdefer func() {\n\t\tnewLoggingExporter = oldNewLoggingExporter\n\t}()\n\n\tnewLoggingExporter = func(context.Context, *config) (loggingExporter, error) {\n\t\treturn fle, nil\n\t}\n\n\tidCh := testutils.NewChannel()\n\n\tfe := \u0026fakeOpenCensusExporter{\n\t\tt:    t,\n\t\tidCh: idCh,\n\t}\n\toldNewExporter := newExporter\n\tdefer func() {\n\t\tnewExporter = oldNewExporter\n\t}()\n\n\tnewExporter = func(*config) (tracingMetricsExporter, error) {\n\t\treturn fe, nil\n\t}\n\n\tconst projectID = \"project-id\"\n\ttracesAndLogsConfig := \u0026config{\n\t\tProjectID: projectID,\n\t\tCloudLogging: \u0026cloudLogging{\n\t\t\tClientRPCEvents: []clientRPCEvents{\n\t\t\t\t{\n\t\t\t\t\tMethods:          []string{\"*\"},\n\t\t\t\t\tMaxMetadataBytes: 30,\n\t\t\t\t\tMaxMessageBytes:  30,\n\t\t\t\t},\n\t\t\t},\n\t\t\tServerRPCEvents: []serverRPCEvents{\n\t\t\t\t{\n\t\t\t\t\tMethods:          []string{\"*\"},\n\t\t\t\t\tMaxMetadataBytes: 30,\n\t\t\t\t\tMaxMessageBytes:  30,\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t\tCloudTrace: \u0026cloudTrace{\n\t\t\tSamplingRate: 1.0,\n\t\t},\n\t}\n\tcleanup, err := setupObservabilitySystemWithConfig(tracesAndLogsConfig)\n\tif err != nil {\n\t\tt.Fatalf(\"error setting up observability %v\", err)\n\t}\n\tdefer cleanup()\n\tss := \u0026stubserver.StubServer{\n\t\tUnaryCallF: func(context.Context, *testpb.SimpleRequest) (*testpb.SimpleResponse, error) {\n\t\t\treturn \u0026testpb.SimpleResponse{}, nil\n\t\t},\n\t\tFullDuplexCallF: func(stream testgrpc.TestService_FullDuplexCallServer) error {\n\t\t\t_, err := stream.Recv()\n\t\t\tif err != io.EOF {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\treturn nil\n\t\t},\n\t}\n\tif err := ss.Start(nil); err != nil {\n\t\tt.Fatalf(\"Error starting endpoint server: %v\", err)\n\t}\n\tdefer ss.Stop()\n\n\tctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)\n\tdefer cancel()\n\n\t// Spawn a goroutine to receive the trace and span ids received by the\n\t// exporter corresponding to a Unary RPC.\n\treaderErrCh := testutils.NewChannel()\n\tunaryDone := grpcsync.NewEvent()\n\tgo func() {\n\t\tvar traceAndSpanIDs []traceAndSpanID\n\t\tval, err := idCh.Receive(ctx)\n\t\tif err != nil {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"error while waiting for IDs: %v\", err))\n\t\t}\n\n\t\ttasi, ok := val.(traceAndSpanID)\n\t\tif !ok {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"received wrong type from channel: %T\", val))\n\t\t}\n\t\ttraceAndSpanIDs = append(traceAndSpanIDs, tasi)\n\n\t\tval, err = idCh.Receive(ctx)\n\t\tif err != nil {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"error while waiting for IDs: %v\", err))\n\t\t}\n\n\t\ttasi, ok = val.(traceAndSpanID)\n\t\tif !ok {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"received wrong type from channel: %T\", val))\n\t\t}\n\t\ttraceAndSpanIDs = append(traceAndSpanIDs, tasi)\n\n\t\tval, err = idCh.Receive(ctx)\n\t\tif err != nil {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"error while waiting for IDs: %v\", err))\n\t\t}\n\t\ttasi, ok = val.(traceAndSpanID)\n\t\tif !ok {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"received wrong type from channel: %T\", val))\n\t\t}\n\t\ttraceAndSpanIDs = append(traceAndSpanIDs, tasi)\n\t\t\u003c-unaryDone.Done()\n\t\tvar tasiSent traceAndSpanIDString\n\t\tvar tasiServer traceAndSpanIDString\n\t\tfor _, tasi := range traceAndSpanIDs {\n\t\t\tif strings.HasPrefix(tasi.spanName, \"grpc.\") \u0026\u0026 tasi.spanKind == trace.SpanKindClient {\n\t\t\t\ttasiSent = tasi.idsToString(projectID)\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tif strings.HasPrefix(tasi.spanName, \"grpc.\") \u0026\u0026 tasi.spanKind == trace.SpanKindServer {\n\t\t\t\ttasiServer = tasi.idsToString(projectID)\n\t\t\t}\n\t\t}\n\n\t\tfle.mu.Lock()\n\t\tfor _, tasiSeen := range fle.idsSeen {\n\t\t\tif diff := cmp.Diff(tasiSeen, \u0026tasiSent, cmp.AllowUnexported(traceAndSpanIDString{}), cmpopts.IgnoreFields(traceAndSpanIDString{}, \"SpanKind\")); diff != \"\" {\n\t\t\t\tif diff2 := cmp.Diff(tasiSeen, \u0026tasiServer, cmp.AllowUnexported(traceAndSpanIDString{}), cmpopts.IgnoreFields(traceAndSpanIDString{}, \"SpanKind\")); diff2 != \"\" {\n\t\t\t\t\treaderErrCh.Send(fmt.Errorf(\"got unexpected id, should be a client or server span (-got, +want): %v, %v\", diff, diff2))\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tfle.entries = nil\n\t\tfle.mu.Unlock()\n\t\treaderErrCh.Send(nil)\n\t}()\n\tif _, err := ss.Client.UnaryCall(ctx, \u0026testpb.SimpleRequest{Payload: \u0026testpb.Payload{Body: testOkPayload}}); err != nil {\n\t\tt.Fatalf(\"Unexpected error from UnaryCall: %v\", err)\n\t}\n\tunaryDone.Fire()\n\tif chErr, err := readerErrCh.Receive(ctx); chErr != nil || err != nil {\n\t\tif err != nil {\n\t\t\tt.Fatalf(\"Should have received something from error channel: %v\", err)\n\t\t}\n\t\tif chErr != nil {\n\t\t\tt.Fatalf(\"Should have received a nil error from channel, instead received: %v\", chErr)\n\t\t}\n\t}\n\n\tfle.mu.Lock()\n\tfle.idsSeen = nil\n\tfle.mu.Unlock()\n\n\t// Test streaming. Spawn a goroutine to receive the trace and span ids\n\t// received by the exporter corresponding to a streaming RPC.\n\treaderErrCh = testutils.NewChannel()\n\tstreamDone := grpcsync.NewEvent()\n\tgo func() {\n\t\tvar traceAndSpanIDs []traceAndSpanID\n\n\t\tval, err := idCh.Receive(ctx)\n\t\tif err != nil {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"error while waiting for IDs: %v\", err))\n\t\t}\n\n\t\ttasi, ok := val.(traceAndSpanID)\n\t\tif !ok {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"received wrong type from channel: %T\", val))\n\t\t}\n\t\ttraceAndSpanIDs = append(traceAndSpanIDs, tasi)\n\t\tval, err = idCh.Receive(ctx)\n\t\tif err != nil {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"error while waiting for IDs: %v\", err))\n\t\t}\n\n\t\ttasi, ok = val.(traceAndSpanID)\n\t\tif !ok {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"received wrong type from channel: %T\", val))\n\t\t}\n\t\ttraceAndSpanIDs = append(traceAndSpanIDs, tasi)\n\n\t\tval, err = idCh.Receive(ctx)\n\t\tif err != nil {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"error while waiting for IDs: %v\", err))\n\t\t}\n\t\ttasi, ok = val.(traceAndSpanID)\n\t\tif !ok {\n\t\t\treaderErrCh.Send(fmt.Errorf(\"received wrong type from channel: %T\", val))\n\t\t}\n\t\ttraceAndSpanIDs = append(traceAndSpanIDs, tasi)\n\t\t\u003c-streamDone.Done()\n\t\tvar tasiSent traceAndSpanIDString\n\t\tvar tasiServer traceAndSpanIDString\n\t\tfor _, tasi := range traceAndSpanIDs {\n\t\t\tif strings.HasPrefix(tasi.spanName, \"grpc.\") \u0026\u0026 tasi.spanKind == trace.SpanKindClient {\n\t\t\t\ttasiSent = tasi.idsToString(projectID)\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tif strings.HasPrefix(tasi.spanName, \"grpc.\") \u0026\u0026 tasi.spanKind == trace.SpanKindServer {\n\t\t\t\ttasiServer = tasi.idsToString(projectID)\n\t\t\t}\n\t\t}\n\n\t\tfle.mu.Lock()\n\t\tfor _, tasiSeen := range fle.idsSeen {\n\t\t\tif diff := cmp.Diff(tasiSeen, \u0026tasiSent, cmp.AllowUnexported(traceAndSpanIDString{}), cmpopts.IgnoreFields(traceAndSpanIDString{}, \"SpanKind\")); diff != \"\" {\n\t\t\t\tif diff2 := cmp.Diff(tasiSeen, \u0026tasiServer, cmp.AllowUnexported(traceAndSpanIDString{}), cmpopts.IgnoreFields(traceAndSpanIDString{}, \"SpanKind\")); diff2 != \"\" {\n\t\t\t\t\treaderErrCh.Send(fmt.Errorf(\"got unexpected id, should be a client or server span (-got, +want): %v, %v\", diff, diff2))\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tfle.entries = nil\n\t\tfle.mu.Unlock()\n\t\treaderErrCh.Send(nil)\n\t}()\n\n\tstream, err := ss.Client.FullDuplexCall(ctx)\n\tif err != nil {\n\t\tt.Fatalf(\"ss.Client.FullDuplexCall failed: %f\", err)\n\t}\n\n\tstream.CloseSend()\n\tif _, err = stream.Recv(); err != io.EOF {\n\t\tt.Fatalf(\"unexpected error: %v, expected an EOF error\", err)\n\t}\n\tstreamDone.Fire()\n\n\tif chErr, err := readerErrCh.Receive(ctx); chErr != nil || err != nil {\n\t\tif err != nil {\n\t\t\tt.Fatalf(\"Should have received something from error channel: %v\", err)\n\t\t}\n\t\tif chErr != nil {\n\t\t\tt.Fatalf(\"Should have received a nil error from channel, instead received: %v\", chErr)\n\t\t}\n\t}\n}",
+                  "token_estimate": 1870
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 1258,
+                    "end_line": 1466,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "// TestSpan_WithW3CContextPropagator sets up a stub server with OpenTelemetry tracing\n// enabled, makes a unary and a streaming RPC, and then asserts that the correct\n// number of spans are created with the expected spans.\n//\n// Verification:\n//   - Verifies that the correct number of spans are created for both unary and\n//     streaming RPCs.\n//   - Verifies that the spans have the expected names and attributes, ensuring\n//     they accurately reflect the operations performed.\n//   - Verifies that the trace ID and span ID are correctly assigned and accessible\n//     in the OpenTelemetry backend.\nfunc (s) TestSpan_WithW3CContextPropagator(t *testing.T) {\n\tmo, _ := defaultMetricsOptions(t, nil)\n\t// Using defaultTraceOptions to set up OpenTelemetry with an in-memory exporter\n\tto, exporter := defaultTraceOptions(t)\n\t// Set the W3CContextPropagator as part of TracingOptions.\n\tto.TextMapPropagator = propagation.NewCompositeTextMapPropagator(propagation.TraceContext{})\n\t// Start the server with OpenTelemetry options\n\tss := setupStubServer(t, mo, to)\n\tdefer ss.Stop()\n\n\tctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)\n\tdefer cancel()\n\n\t// Make two RPC's, a unary RPC and a streaming RPC. These should cause\n\t// certain traces to be emitted, which should be observed through the\n\t// span exporter.\n\tif _, err := ss.Client.UnaryCall(ctx, \u0026testpb.SimpleRequest{Payload: \u0026testpb.Payload{\n\t\tBody: make([]byte, 10000),\n\t}}); err != nil {\n\t\tt.Fatalf(\"Unexpected error from UnaryCall: %v\", err)\n\t}\n\tstream, err := ss.Client.FullDuplexCall(ctx)\n\tif err != nil {\n\t\tt.Fatalf(\"ss.Client.FullDuplexCall failed: %f\", err)\n\t}\n\n\tstream.CloseSend()\n\tif _, err = stream.Recv(); err != io.EOF {\n\t\tt.Fatalf(\"stream.Recv received an unexpected error: %v, expected an EOF error\", err)\n\t}\n\n\twantSpanInfos := []traceSpanInfo{\n\t\t{\n\t\t\tname:     \"Recv.grpc.testing.TestService.UnaryCall\",\n\t\t\tspanKind: oteltrace.SpanKindServer.String(),\n\t\t\tattributes: []attribute.KeyValue{\n\t\t\t\t{\n\t\t\t\t\tKey:   \"Client\",\n\t\t\t\t\tValue: attribute.BoolValue(false),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"FailFast\",\n\t\t\t\t\tValue: attribute.BoolValue(false),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"previous-rpc-attempts\",\n\t\t\t\t\tValue: attribute.IntValue(0),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"transparent-retry\",\n\t\t\t\t\tValue: attribute.BoolValue(false),\n\t\t\t\t},\n\t\t\t},\n\t\t\tevents: []trace.Event{\n\t\t\t\t{\n\t\t\t\t\tName: \"Inbound message\",\n\t\t\t\t\tAttributes: []attribute.KeyValue{\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tKey:   \"sequence-number\",\n\t\t\t\t\t\t\tValue: attribute.IntValue(0),\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tKey:   \"message-size\",\n\t\t\t\t\t\t\tValue: attribute.IntValue(10006),\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tName: \"Outbound message\",\n\t\t\t\t\tAttributes: []attribute.KeyValue{\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tKey:   \"sequence-number\",\n\t\t\t\t\t\t\tValue: attribute.IntValue(0),\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tKey:   \"message-size\",\n\t\t\t\t\t\t\tValue: attribute.IntValue(10006),\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t\t{\n\t\t\tname:     \"Attempt.grpc.testing.TestService.UnaryCall\",\n\t\t\tspanKind: oteltrace.SpanKindInternal.String(),\n\t\t\tattributes: []attribute.KeyValue{\n\t\t\t\t{\n\t\t\t\t\tKey:   \"Client\",\n\t\t\t\t\tValue: attribute.BoolValue(true),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"FailFast\",\n\t\t\t\t\tValue: attribute.BoolValue(true),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"previous-rpc-attempts\",\n\t\t\t\t\tValue: attribute.IntValue(0),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"transparent-retry\",\n\t\t\t\t\tValue: attribute.BoolValue(false),\n\t\t\t\t},\n\t\t\t},\n\t\t\tevents: []trace.Event{\n\t\t\t\t{\n\t\t\t\t\tName: \"Outbound message\",\n\t\t\t\t\tAttributes: []attribute.KeyValue{\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tKey:   \"sequence-number\",\n\t\t\t\t\t\t\tValue: attribute.IntValue(0),\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tKey:   \"message-size\",\n\t\t\t\t\t\t\tValue: attribute.IntValue(10006),\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tName: \"Inbound message\",\n\t\t\t\t\tAttributes: []attribute.KeyValue{\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tKey:   \"sequence-number\",\n\t\t\t\t\t\t\tValue: attribute.IntValue(0),\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tKey:   \"message-size\",\n\t\t\t\t\t\t\tValue: attribute.IntValue(10006),\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t\t{\n\t\t\tname:       \"Sent.grpc.testing.TestService.UnaryCall\",\n\t\t\tspanKind:   oteltrace.SpanKindClient.String(),\n\t\t\tattributes: nil,\n\t\t\tevents:     nil,\n\t\t},\n\t\t{\n\t\t\tname:     \"Recv.grpc.testing.TestService.FullDuplexCall\",\n\t\t\tspanKind: oteltrace.SpanKindServer.String(),\n\t\t\tattributes: []attribute.KeyValue{\n\t\t\t\t{\n\t\t\t\t\tKey:   \"Client\",\n\t\t\t\t\tValue: attribute.BoolValue(false),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"FailFast\",\n\t\t\t\t\tValue: attribute.BoolValue(false),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"previous-rpc-attempts\",\n\t\t\t\t\tValue: attribute.IntValue(0),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"transparent-retry\",\n\t\t\t\t\tValue: attribute.BoolValue(false),\n\t\t\t\t},\n\t\t\t},\n\t\t\tevents: nil,\n\t\t},\n\t\t{\n\t\t\tname:       \"Sent.grpc.testing.TestService.FullDuplexCall\",\n\t\t\tspanKind:   oteltrace.SpanKindClient.String(),\n\t\t\tattributes: nil,\n\t\t\tevents:     nil,\n\t\t},\n\t\t{\n\t\t\tname:     \"Attempt.grpc.testing.TestService.FullDuplexCall\",\n\t\t\tspanKind: oteltrace.SpanKindInternal.String(),\n\t\t\tattributes: []attribute.KeyValue{\n\t\t\t\t{\n\t\t\t\t\tKey:   \"Client\",\n\t\t\t\t\tValue: attribute.BoolValue(true),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"FailFast\",\n\t\t\t\t\tValue: attribute.BoolValue(true),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"previous-rpc-attempts\",\n\t\t\t\t\tValue: attribute.IntValue(0),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tKey:   \"transparent-retry\",\n\t\t\t\t\tValue: attribute.BoolValue(false),\n\t\t\t\t},\n\t\t\t},\n\t\t\tevents: nil,\n\t\t},\n\t}\n\n\tspans, err := waitForTraceSpans(ctx, exporter, wantSpanInfos)\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}\n\tvalidateTraces(t, spans, wantSpanInfos)\n}",
+                  "token_estimate": 1348
+                },
+                {
+                  "citation": {
+                    "file": "stats/stats.go",
+                    "start_line": 311,
+                    "end_line": 311,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// Deprecated: obtain the `grpc-trace-bin` header from metadata instead.",
+                  "token_estimate": 18
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "gcp/observability/logging_test.go",
+                    "start_line": 105,
+                    "end_line": 123,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/stubserver/stubserver.go",
+                    "start_line": 117,
+                    "end_line": 126,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/stubserver/stubserver.go",
+                    "start_line": 271,
+                    "end_line": 276,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/xds/clients/xdsclient/test/misc_watchers_test.go",
+                    "start_line": 92,
+                    "end_line": 95,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "interop/grpc_testing/test_grpc.pb.go",
+                    "start_line": 59,
+                    "end_line": 59,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "interop/grpc_testing/test_grpc.pb.go",
+                    "start_line": 73,
+                    "end_line": 73,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "stream.go",
+                    "start_line": 110,
+                    "end_line": 110,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "stream_interfaces.go",
+                    "start_line": 127,
+                    "end_line": 127,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 364,
+                    "end_line": 477,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "stream_interfaces.go",
+                    "start_line": 149,
+                    "end_line": 149,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/internal/tracing/carrier_test.go",
+                    "start_line": 35,
+                    "end_line": 37,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/grpctest/grpctest.go",
+                    "start_line": 114,
+                    "end_line": 135,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 849,
+                    "end_line": 1088,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/xds/clients/internal/testutils/channel.go",
+                    "start_line": 38,
+                    "end_line": 45,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 849,
+                    "end_line": 1088,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/grpcsync/event.go",
+                    "start_line": 37,
+                    "end_line": 43,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 849,
+                    "end_line": 1088,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/grpcsync/event.go",
+                    "start_line": 56,
+                    "end_line": 58,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "gcp/observability/observability_test.go",
+                    "start_line": 849,
+                    "end_line": 1088,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/testutils/channel.go",
+                    "start_line": 111,
+                    "end_line": 113,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 1269,
+                    "end_line": 1466,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 1269,
+                    "end_line": 1466,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 1269,
+                    "end_line": 1466,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 198,
+                    "end_line": 326,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                }
+              ],
+              "knowledge": [
+                {
+                  "scope": "stats/opentelemetry/internal/tracing",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry/internal/tracing. conventions summary.\nconstructors: 2 New*\ntests: 1 files, table_driven=0, testify=0\n"
+                },
+                {
+                  "scope": "experimental/opentelemetry",
+                  "kind": "convention",
+                  "text": "package: experimental/opentelemetry. conventions summary.\n"
+                },
+                {
+                  "scope": "stats/opentelemetry",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry. conventions summary.\nerrors: fmt.Errorf_plain=4 (total=4)\nlogger: stdlib_log=2 (total=2)\ntests: 4 files, table_driven=1, testify=0"
+                },
+                {
+                  "scope": "examples/features/opentelemetry/client",
+                  "kind": "convention",
+                  "text": "package: examples/features/opentelemetry/client. conventions summary.\n"
+                },
+                {
+                  "scope": "stats/opentelemetry/internal",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry/internal. conventions summary.\n"
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 4908,
+                "utilization_ratio": 0.6816666666666666,
+                "built_at": "2026-10-24T00:22:09.839554Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "41e8c18608e9edf6afb059af99963f6f6b800b758ed343cc11801e63f0944c96",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-8923",
+      "prompt": "OpenTelemetry 추적에서 예전에 되돌렸던 변경을 다시 넣고, 그때 실패하던 시험의 경쟁 상태도 고치고 싶어",
+      "expected_intent": "bug_fix",
+      "classified_intents": [
+        "test_add"
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0,
+        "file_recall": 0,
+        "file_f1": 0,
+        "file_mrr": 0,
+        "first_hit_rank": 0,
+        "token_utilization": 0.6816666666666666,
+        "used_tokens": 4908,
+        "citation_count": 25,
+        "body_count": 9,
+        "redaction_count": 0,
+        "latency_ms": 2504,
+        "latency_ms_p50": 2504,
+        "latency_ms_p95": 2504,
+        "latency_ms_max": 2504
+      },
+      "retrieval_state": "miss",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0,
+      "avg_mrr": 0,
+      "avg_recall": 0,
+      "avg_f1": 0,
+      "avg_latency_ms": 2504
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "bug_fix": {
+        "test_add": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,913 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:27:12.728593Z",
+  "finished_at": "2026-10-24T00:27:14.141479Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 26120416,
+          "completed_at": "2026-10-24T09:27:12.754923+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "changed_files": [
+                ".gemini/styleguide.md",
+                ".github/workflows/govulncheck.yaml",
+                ".github/workflows/testing.yml",
+                "CONTRIBUTING.md",
+                "attributes/attributes.go",
+                "attributes/attributes_test.go",
+                "authz/grpc_authz_end2end_test.go",
+                "authz/grpc_authz_server_interceptors.go",
+                "authz/grpc_authz_server_interceptors_test.go",
+                "balancer/autosharding/autosharding.go",
+                "balancer/autosharding/autosharding_test.go",
+                "balancer/autosharding/slice_map.go",
+                "balancer/autosharding/slice_map_test.go",
+                "balancer/balancer.go",
+                "balancer/endpointsharding/endpointsharding.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer_grpc.pb.go",
+                "balancer/grpclb/grpclb_remote_balancer.go",
+                "balancer/grpclb/grpclb_test.go",
+                "balancer/pickfirst/metrics_test.go",
+                "balancer/pickfirst/pickfirst.go",
+                "balancer/pickfirst/pickfirst_ext_test.go",
+                "balancer/pickfirst/pickfirstleaf/pickfirstleaf.go",
+                "balancer/randomsubsetting/randomsubsetting.go",
+                "balancer/randomsubsetting/randomsubsetting_test.go",
+                "balancer/ringhash/picker.go",
+                "balancer/ringhash/picker_test.go",
+                "balancer/ringhash/ring_test.go",
+                "balancer/ringhash/ringhash.go",
+                "balancer/ringhash/ringhash_test.go",
+                "balancer/rls/balancer.go",
+                "balancer/rls/balancer_test.go",
+                "balancer/rls/cache.go",
+                "balancer/rls/cache_test.go",
+                "balancer/rls/control_channel.go",
+                "balancer/rls/control_channel_test.go",
+                "balancer/rls/metrics_test.go",
+                "balancer/rls/picker.go",
+                "balancer/weightedtarget/weightedtarget_test.go",
+                "benchmark/benchmain/main.go",
+                "binarylog/binarylog_end2end_test.go",
+                "binarylog/grpc_binarylog_v1/binarylog.pb.go",
+                "call.go",
+                "channelz/grpc_channelz_v1/channelz.pb.go",
+                "channelz/grpc_channelz_v1/channelz_grpc.pb.go",
+                "clientconn.go",
+                "clientconn_disconnect_reason_noplan9.go",
+                "clientconn_disconnect_reason_plan9.go",
+                "cmd/protoc-gen-go-grpc/go.mod",
+                "cmd/protoc-gen-go-grpc/go.sum",
+                "cmd/protoc-gen-go-grpc/grpc.go",
+                "cmd/protoc-gen-go-grpc/main.go",
+                "cmd/protoc-gen-go-grpc/protoc-gen-go-grpc_test.sh",
+                "credentials/alts/alts.go",
+                "credentials/alts/alts_test.go",
+                "credentials/alts/internal/conn/record.go",
+                "credentials/alts/internal/conn/record_test.go",
+                "credentials/alts/internal/handshaker/handshaker.go",
+                "credentials/alts/internal/handshaker/handshaker_test.go",
+                "credentials/alts/internal/proto/grpc_gcp/altscontext.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker_grpc.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/transport_security_common.pb.go",
+                "credentials/google/gcp_service_account_identity_credentials.go",
+                "credentials/google/gcp_service_account_identity_credentials_test.go",
+                "credentials/google/internal/internal.go",
+                "credentials/sts/sts.go",
+                "credentials/sts/sts_test.go",
+                "credentials/xds/xds.go",
+                "credentials/xds/xds_client_test.go",
+                "credentials/xds/xds_server_test.go",
+                "dialoptions.go",
+                "encoding/compressor_test.go",
+                "encoding/encoding.go",
+                "encoding/encoding_test.go",
+                "encoding/gzip/gzip.go",
+                "examples/features/opentelemetry/client/main.go",
+                "examples/features/opentelemetry/server/main.go",
+                "examples/features/proto/echo/echo.pb.go",
+                "examples/features/proto/echo/echo_grpc.pb.go",
+                "examples/go.mod",
+                "examples/go.sum",
+                "examples/helloworld/helloworld/helloworld.pb.go",
+                "examples/helloworld/helloworld/helloworld_grpc.pb.go",
+                "examples/route_guide/routeguide/route_guide.pb.go",
+                "examples/route_guide/routeguide/route_guide_grpc.pb.go",
+                "experimental/balancer/hostname/hostname.go",
+                "experimental/balancer/hostname/hostname_test.go",
+                "experimental/balancer/weight/weight.go",
+                "experimental/balancer/weight/weight_test.go",
+                "experimental/stats/metrics.go",
+                "experimental/stats/telemetry/labels.go",
+                "gcp/observability/go.mod",
+                "gcp/observability/go.sum",
+                "gcp/observability/logging_test.go",
+                "go.mod",
+                "go.sum",
+                "health/grpc_health_v1/health.pb.go",
+                "health/grpc_health_v1/health_grpc.pb.go",
+                "internal/balancergroup/balancergroup.go",
+                "internal/balancergroup/balancergroup_test.go",
+                "internal/buffer/unbounded.go",
+                "internal/buffer/unbounded_test.go",
+                "internal/credentials/xds/handshake_info.go",
+                "internal/credentials/xds/handshake_info_test.go",
+                "internal/envconfig/envconfig.go",
+                "internal/envconfig/envconfig_test.go",
+                "internal/envconfig/xds.go",
+                "internal/grpcsync/callback_serializer.go",
+                "internal/grpcsync/callback_serializer_test.go",
+                "internal/grpcsync/refcounted.go",
+                "internal/grpcsync/refcounted_test.go",
+                "internal/grpcutil/encode_duration.go",
+                "internal/grpcutil/regex_test.go",
+                "internal/idle/idle_e2e_test.go",
+                "internal/internal.go",
+                "internal/leakcheck/leakcheck_test.go",
+                "internal/mem/buffer_pool.go",
+                "internal/mem/buffer_pool_ext_test.go",
+                "internal/mem/buffer_pool_test.go",
+                "internal/optional/optional.go",
+                "internal/optional/optional_test.go",
+                "internal/proto/grpc_lookup_v1/rls.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_config.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_grpc.pb.go",
+                "internal/resolver/config_selector.go",
+                "internal/stats/labels.go",
+                "internal/stats/labels_test.go",
+                "internal/testutils/balancer.go",
+                "internal/testutils/stats/test_metrics_recorder.go",
+                "internal/transport/client_stream.go",
+                "internal/transport/controlbuf.go",
+                "internal/transport/controlbuf_test.go",
+                "internal/transport/flowcontrol.go",
+                "internal/transport/handler_server.go",
+                "internal/transport/handler_server_test.go",
+                "internal/transport/http2_client.go",
+                "internal/transport/http2_client_header_bench_test.go",
+                "internal/transport/http2_server.go",
+                "internal/transport/http_util.go",
+                "internal/transport/http_util_test.go",
+                "internal/transport/internal/internal.go",
+                "internal/transport/keepalive_test.go",
+                "internal/transport/readyreader/raw_conn_linux.go",
+                "internal/transport/readyreader/raw_conn_nonlinux.go",
+                "internal/transport/readyreader/ready_reader.go",
+                "internal/transport/readyreader/ready_reader_ext_test.go",
+                "internal/transport/server_metrics_ext_test.go",
+                "internal/transport/transport.go",
+                "internal/transport/transport_test.go",
+                "internal/xds/balancer/balancer.go",
+                "internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go",
+                "internal/xds/balancer/cdsbalancer/cdsbalancer.go",
+                "internal/xds/balancer/cdsbalancer/cdsbalancer_test.go",
+                "internal/xds/balancer/cdsbalancer/cluster_watcher.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_childname.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_childname_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/aggregate_cluster_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/balancer_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/dns_impl_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go",
+                "internal/xds/balancer/clusterimpl/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/clusterimpl.go",
+                "internal/xds/balancer/clusterimpl/config.go",
+                "internal/xds/balancer/clusterimpl/config_test.go",
+                "internal/xds/balancer/clusterimpl/internal/internal.go",
+                "internal/xds/balancer/clusterimpl/picker.go",
+                "internal/xds/balancer/clusterimpl/tests/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/tests/clusterimpl_security_test.go",
+                "internal/xds/balancer/clustermanager/clustermanager.go",
+                "internal/xds/balancer/clustermanager/clustermanager_test.go",
+                "internal/xds/balancer/clustermanager/e2e_test/clustermanager_test.go",
+                "internal/xds/balancer/clustermanager/picker.go",
+                "internal/xds/balancer/clusterresolver/clusterresolver.go",
+                "internal/xds/balancer/clusterresolver/config.go",
+                "internal/xds/balancer/clusterresolver/config_test.go",
+                "internal/xds/balancer/clusterresolver/configbuilder_childname_test.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver_dns.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver_eds.go",
+                "internal/xds/balancer/outlierdetection/balancer.go",
+                "internal/xds/balancer/outlierdetection/balancer_test.go",
+                "internal/xds/balancer/outlierdetection/e2e_test/outlierdetection_test.go",
+                "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                "internal/xds/balancer/priority/balancer.go",
+                "internal/xds/balancer/priority/balancer_child.go",
+                "internal/xds/balancer/priority/balancer_priority.go",
+                "internal/xds/balancer/priority/balancer_test.go",
+                "internal/xds/bootstrap/bootstrap.go",
+                "internal/xds/bootstrap/bootstrap_test.go",
+                "internal/xds/clients/config.go",
+                "internal/xds/clients/internal/buffer/unbounded.go",
+                "internal/xds/clients/internal/buffer/unbounded_test.go",
+                "internal/xds/clients/internal/syncutil/callback_serializer.go",
+                "internal/xds/clients/internal/testutils/faketransport/xds_fake_transport.go",
+                "internal/xds/clients/lrsclient/loadreport_test.go",
+                "internal/xds/clients/lrsclient/lrs_stream.go",
+                "internal/xds/clients/xdsclient/ads_stream.go",
+                "internal/xds/clients/xdsclient/authority.go",
+                "internal/xds/clients/xdsclient/channel.go",
+                "internal/xds/clients/xdsclient/channel_test.go",
+                "internal/xds/clients/xdsclient/metrics/metrics.go",
+                "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go",
+                "internal/xds/clients/xdsclient/test/dump_test.go",
+                "internal/xds/clients/xdsclient/test/helpers_test.go",
+                "internal/xds/clients/xdsclient/test/metrics_test.go",
+                "internal/xds/clients/xdsclient/xdsclient.go",
+                "internal/xds/credentials/access_token.go",
+                "internal/xds/credentials/access_token_test.go",
+                "internal/xds/credentials/credentials.go",
+                "internal/xds/credentials/tls.go",
+                "internal/xds/credentials/tls_test.go",
+                "internal/xds/credentials/xds_test.go",
+                "internal/xds/grpcservice/grpcservice.go",
+                "internal/xds/grpcservice/grpcservice_test.go",
+                "internal/xds/httpfilter/ext_authz/config.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz_test.go",
+                "internal/xds/httpfilter/extconfig.go",
+                "internal/xds/httpfilter/extconfig_test.go",
+                "internal/xds/httpfilter/extproc/config.go",
+                "internal/xds/httpfilter/extproc/config_test.go",
+                "internal/xds/httpfilter/extproc/ext_proc.go",
+                "internal/xds/httpfilter/extproc/ext_proc_ext_test.go",
+                "internal/xds/httpfilter/extproc/internal/internal.go",
+                "internal/xds/httpfilter/extproc/metrics.go",
+                "internal/xds/httpfilter/fault/fault.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_e2e_test.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_test.go",
+                "internal/xds/httpfilter/httpfilter.go",
+                "internal/xds/httpfilter/rbac/rbac.go",
+                "internal/xds/httpfilter/rbac/rbac_test.go",
+                "internal/xds/httpfilter/router/router.go",
+                "internal/xds/matcher/matcher_header.go",
+                "internal/xds/matcher/string_matcher.go",
+                "internal/xds/matcher/string_matcher_test.go",
+                "internal/xds/rbac/matchers.go",
+                "internal/xds/rbac/rbac_engine_test.go",
+                "internal/xds/resolver/cluster_specifier_plugin_test.go",
+                "internal/xds/resolver/helpers_test.go",
+                "internal/xds/resolver/serviceconfig.go",
+                "internal/xds/resolver/serviceconfig_test.go",
+                "internal/xds/resolver/xds_http_filters_test.go",
+                "internal/xds/resolver/xds_resolver.go",
+                "internal/xds/resolver/xds_resolver_test.go",
+                "internal/xds/server/conn_wrapper.go",
+                "internal/xds/server/filter_chain_manager.go",
+                "internal/xds/server/filter_chain_manager_test.go",
+                "internal/xds/server/listener_wrapper.go",
+                "internal/xds/server/listener_wrapper_test.go",
+                "internal/xds/server/routing.go",
+                "internal/xds/server/routing_test.go",
+                "internal/xds/server/server_options.go",
+                "internal/xds/test/e2e/e2e_utils.go",
+                "internal/xds/xdsclient/client_refcounted_test.go",
+                "internal/xds/xdsclient/clientimpl.go",
+                "internal/xds/xdsclient/clientimpl_test.go",
+                "internal/xds/xdsclient/pool.go",
+                "internal/xds/xdsclient/pool/pool_ext_test.go",
+                "internal/xds/xdsclient/resource_types.go",
+                "internal/xds/xdsclient/xdslbregistry/converter/converter.go",
+                "internal/xds/xdsclient/xdslbregistry/xdslbregistry_test.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain_test.go",
+                "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/matcher.go",
+                "internal/xds/xdsclient/xdsresource/matcher_path.go",
+                "internal/xds/xdsclient/xdsresource/matcher_test.go",
+                "internal/xds/xdsclient/xdsresource/metadata.go",
+                "internal/xds/xdsclient/xdsresource/metadata_test.go",
+                "internal/xds/xdsclient/xdsresource/route_config_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/test_utils_test.go",
+                "internal/xds/xdsclient/xdsresource/type_cds.go",
+                "internal/xds/xdsclient/xdsresource/type_eds.go",
+                "internal/xds/xdsclient/xdsresource/type_lds.go",
+                "internal/xds/xdsclient/xdsresource/type_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds_test.go",
+                "internal/xds/xdsclient/xdsresource/version/version.go",
+                "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager_test.go",
+                "interop/grpc_testing/benchmark_service.pb.go",
+                "interop/grpc_testing/benchmark_service_grpc.pb.go",
+                "interop/grpc_testing/control.pb.go",
+                "interop/grpc_testing/core/stats.pb.go",
+                "interop/grpc_testing/empty.pb.go",
+                "interop/grpc_testing/messages.pb.go",
+                "interop/grpc_testing/payloads.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service_grpc.pb.go",
+                "interop/grpc_testing/stats.pb.go",
+                "interop/grpc_testing/test.pb.go",
+                "interop/grpc_testing/test_grpc.pb.go",
+                "interop/grpc_testing/worker_service.pb.go",
+                "interop/grpc_testing/worker_service_grpc.pb.go",
+                "interop/observability/Dockerfile",
+                "interop/observability/go.mod",
+                "interop/observability/go.sum",
+                "interop/orcalb.go",
+                "interop/orcalb_test.go",
+                "interop/stress/grpc_testing/metrics.pb.go",
+                "interop/stress/grpc_testing/metrics_grpc.pb.go",
+                "interop/xds/go.mod",
+                "interop/xds/go.sum",
+                "mem/buffer_pool.go",
+                "mem/buffer_pool_test.go",
+                "mem/buffer_slice.go",
+                "mem/buffers.go",
+                "mem/buffers_test.go",
+                "metadata/metadata.go",
+                "metadata/metadata_test.go",
+                "orca/producer_test.go",
+                "profiling/proto/service.pb.go",
+                "profiling/proto/service_grpc.pb.go",
+                "reflection/grpc_reflection_v1/reflection.pb.go",
+                "reflection/grpc_reflection_v1/reflection_grpc.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection_grpc.pb.go",
+                "reflection/grpc_testing/proto2.pb.go",
+                "reflection/grpc_testing/proto2_ext.pb.go",
+                "reflection/grpc_testing/proto2_ext2.pb.go",
+                "reflection/grpc_testing/test.pb.go",
+                "reflection/grpc_testing/test_grpc.pb.go",
+                "resolver_wrapper.go",
+                "rpc_util.go",
+                "rpc_util_test.go",
+                "scripts/vet.sh",
+                "security/advancedtls/advancedtls.go",
+                "security/advancedtls/advancedtls_test.go",
+                "security/advancedtls/certificate_utils_test.go",
+                "security/advancedtls/crl_provider_test.go",
+                "security/advancedtls/examples/go.mod",
+                "security/advancedtls/examples/go.sum",
+                "security/advancedtls/go.mod",
+                "security/advancedtls/go.sum",
+                "security/advancedtls/testdata/crl/provider_ca.cnf",
+                "security/advancedtls/testdata/crl/provider_create.sh",
+                "server.go",
+                "stats/opencensus/go.mod",
+                "stats/opencensus/go.sum",
+                "stats/opentelemetry/client_metrics.go",
+                "stats/opentelemetry/client_tracing.go",
+                "stats/opentelemetry/csm/observability_test.go",
+                "stats/opentelemetry/e2e_test.go",
+                "stats/opentelemetry/example_test.go",
+                "stats/opentelemetry/internal/testutils/testutils.go",
+                "stats/opentelemetry/opentelemetry.go",
+                "stats/opentelemetry/server_metrics.go",
+                "stats/opentelemetry/server_tracing.go",
+                "stats/opentelemetry/trace.go",
+                "stats/stats.go",
+                "stats/stats_test.go",
+                "status/status_ext_test.go",
+                "stream.go",
+                "stream_test.go",
+                "test/balancer_test.go",
+                "test/codec_perf/perf.pb.go",
+                "test/creds_test.go",
+                "test/end2end_test.go",
+                "test/gracefulstop_test.go",
+                "test/kokoro/psm-regional_td.cfg",
+                "test/malformed_method_test.go",
+                "test/retry_test.go",
+                "test/server_test.go",
+                "test/servertester.go",
+                "test/tools/go.mod",
+                "test/tools/go.sum",
+                "test/xds/xds_client_http_connect_test.go",
+                "test/xds/xds_client_integration_test.go",
+                "test/xds/xds_client_retry_test.go",
+                "test/xds/xds_client_sni_test.go",
+                "test/xds/xds_resolver_e2e_test.go",
+                "test/xds/xds_server_filter_e2e_test.go",
+                "test/xds/xds_server_filter_override_test.go",
+                "test/xds/xds_server_filter_state_retention_test.go",
+                "test/xds/xds_server_integration_test.go",
+                "test/xds/xds_server_interceptor_leak_test.go",
+                "test/xds/xds_server_rbac_test.go",
+                "test/xds/xds_telemetry_labels_test.go",
+                "testdata/spiffe_end2end/README.md",
+                "testdata/spiffe_end2end/ca.key",
+                "testdata/spiffe_end2end/ca.pem",
+                "testdata/spiffe_end2end/client.key",
+                "testdata/spiffe_end2end/client_spiffe.pem",
+                "testdata/spiffe_end2end/client_spiffebundle.json",
+                "testdata/spiffe_end2end/generate.sh",
+                "testdata/spiffe_end2end/intermediate_ca.key",
+                "testdata/spiffe_end2end/intermediate_ca.pem",
+                "testdata/spiffe_end2end/intermediate_gen.sh",
+                "testdata/spiffe_end2end/leaf_and_intermediate_chain.pem",
+                "testdata/spiffe_end2end/leaf_signed_by_intermediate.key",
+                "testdata/spiffe_end2end/leaf_signed_by_intermediate.pem",
+                "testdata/spiffe_end2end/server.key",
+                "testdata/spiffe_end2end/server_spiffe.pem",
+                "testdata/spiffe_end2end/server_spiffebundle.json",
+                "version.go",
+                "xds/googledirectpath/googlec2p.go",
+                "xds/googledirectpath/googlec2p_test.go",
+                "xds/server.go",
+                "xds/server_options.go",
+                "xds/server_serving_mode_ext_test.go",
+                "xds/server_test.go",
+                "xds/xds.go"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "keepalive 시험에서 스트림이 정상인지 확인하는 도우미가 nil 스트림을 제대로 검사하지 않아. 고치고 싶어"
+          },
+          "elapsed_ns": 1385401334,
+          "completed_at": "2026-10-24T09:27:14.140603+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "intent": "bug_fix",
+              "query": "keepalive 시험에서 스트림이 정상인지 확인하는 도우미가 nil 스트림을 제대로 검사하지 않아. 고치고 싶어",
+              "citations": [
+                {
+                  "file": "server.go",
+                  "start_line": 524,
+                  "end_line": 535,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "balancer/pickfirst/pickfirst.go",
+                  "start_line": 253,
+                  "end_line": 253,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/xds/balancer/outlierdetection/balancer.go",
+                  "start_line": 147,
+                  "end_line": 147,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "balancer/weightedroundrobin/balancer.go",
+                  "start_line": 230,
+                  "end_line": 230,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "credentials/tls.go",
+                  "start_line": 151,
+                  "end_line": 151,
+                  "commit_hash": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c"
+                },
+                {
+                  "file": "credentials/tls.go",
+                  "start_line": 181,
+                  "end_line": 181,
+                  "commit_hash": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 1179,
+                  "end_line": 1268,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/transport/http2_client.go",
+                  "start_line": 1718,
+                  "end_line": 1801,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "grpclog/internal/loggerv2.go",
+                  "start_line": 44,
+                  "end_line": 44,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "server.go",
+                  "start_line": 223,
+                  "end_line": 227,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 1273,
+                  "end_line": 1296,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/grpclog/prefix_logger.go",
+                  "start_line": 38,
+                  "end_line": 46,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 1364,
+                  "end_line": 1372,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/grpclog/prefix_logger.go",
+                  "start_line": 69,
+                  "end_line": 74,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 348,
+                  "end_line": 351,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/channelz/funcs.go",
+                  "start_line": 54,
+                  "end_line": 56,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/transport/http2_client.go",
+                  "start_line": 1001,
+                  "end_line": 1072,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/transport/transport.go",
+                  "start_line": 675,
+                  "end_line": 681,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "server.go",
+                    "start_line": 524,
+                    "end_line": 535,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// StatsHandler returns a ServerOption that sets the stats handler for the server.\nfunc StatsHandler(h stats.Handler) ServerOption {\n\treturn newFuncServerOption(func(o *serverOptions) {\n\t\tif h == nil {\n\t\t\tlogger.Error(\"ignoring nil parameter in grpc.StatsHandler ServerOption\")\n\t\t\t// Do not allow a nil stats handler, which would otherwise cause\n\t\t\t// panics.\n\t\t\treturn\n\t\t}\n\t\to.statsHandlers = append(o.statsHandlers, h)\n\t})\n}",
+                  "token_estimate": 106
+                },
+                {
+                  "citation": {
+                    "file": "balancer/pickfirst/pickfirst.go",
+                    "start_line": 253,
+                    "end_line": 253,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "text": "\t\treturn fmt.Errorf(\"pickfirst: received illegal BalancerConfig (type %T): %v: %w\", state.BalancerConfig, state.BalancerConfig, balancer.ErrBadResolverState)",
+                  "token_estimate": 39
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/balancer/outlierdetection/balancer.go",
+                    "start_line": 147,
+                    "end_line": 147,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "text": "\t\treturn nil, fmt.Errorf(\"OutlierDetectionLoadBalancingConfig.FailurePercentageEjection.threshold = %v; must be \u003c= 100\", lbCfg.FailurePercentageEjection.Threshold)",
+                  "token_estimate": 40
+                },
+                {
+                  "citation": {
+                    "file": "balancer/weightedroundrobin/balancer.go",
+                    "start_line": 230,
+                    "end_line": 230,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "text": "\t\treturn fmt.Errorf(\"wrr: received nil or illegal BalancerConfig (type %T): %v\", ccs.BalancerConfig, ccs.BalancerConfig)",
+                  "token_estimate": 30
+                },
+                {
+                  "citation": {
+                    "file": "credentials/tls.go",
+                    "start_line": 151,
+                    "end_line": 151,
+                    "commit_hash": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c"
+                  },
+                  "text": "\t\t\treturn nil, nil, fmt.Errorf(\"credentials: cannot check peer: missing selected ALPN property. %s\", alpnFailureHelpMessage)",
+                  "token_estimate": 31
+                },
+                {
+                  "citation": {
+                    "file": "credentials/tls.go",
+                    "start_line": 181,
+                    "end_line": 181,
+                    "commit_hash": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c"
+                  },
+                  "text": "\t\t\treturn nil, nil, fmt.Errorf(\"credentials: cannot check peer: missing selected ALPN property. %s\", alpnFailureHelpMessage)",
+                  "token_estimate": 31
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1179,
+                    "end_line": 1268,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "text": "func (t *http2Server) keepalive() {\n\tp := \u0026ping{}\n\t// True iff a ping has been sent, and no data has been received since then.\n\toutstandingPing := false\n\t// Amount of time remaining before which we should receive an ACK for the\n\t// last sent ping.\n\tkpTimeoutLeft := time.Duration(0)\n\t// Records the last value of t.lastRead before we go block on the timer.\n\t// This is required to check for read activity since then.\n\tprevNano := time.Now().UnixNano()\n\t// Initialize the different timers to their default values.\n\tidleTimer := time.NewTimer(t.kp.MaxConnectionIdle)\n\tageTimer := time.NewTimer(t.kp.MaxConnectionAge)\n\tkpTimer := time.NewTimer(t.kp.Time)\n\tdefer func() {\n\t\t// We need to drain the underlying channel in these timers after a call\n\t\t// to Stop(), only if we are interested in resetting them. Clearly we\n\t\t// are not interested in resetting them here.\n\t\tidleTimer.Stop()\n\t\tageTimer.Stop()\n\t\tkpTimer.Stop()\n\t}()\n\n\tfor {\n\t\tselect {\n\t\tcase \u003c-idleTimer.C:\n\t\t\tt.mu.Lock()\n\t\t\tidle := t.idle\n\t\t\tif idle.IsZero() { // The connection is non-idle.\n\t\t\t\tt.mu.Unlock()\n\t\t\t\tidleTimer.Reset(t.kp.MaxConnectionIdle)\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tval := t.kp.MaxConnectionIdle - time.Since(idle)\n\t\t\tt.mu.Unlock()\n\t\t\tif val \u003c= 0 {\n\t\t\t\t// The connection has been idle for a duration of keepalive.MaxConnectionIdle or more.\n\t\t\t\t// Gracefully close the connection.\n\t\t\t\tt.Drain(\"max_idle\")\n\t\t\t\treturn\n\t\t\t}\n\t\t\tidleTimer.Reset(val)\n\t\tcase \u003c-ageTimer.C:\n\t\t\tt.Drain(\"max_age\")\n\t\t\tageTimer.Reset(t.kp.MaxConnectionAgeGrace)\n\t\t\tselect {\n\t\t\tcase \u003c-ageTimer.C:\n\t\t\t\t// Close the connection after grace period.\n\t\t\t\tif t.logger.V(logLevel) {\n\t\t\t\t\tt.logger.Infof(\"Closing server transport due to maximum connection age\")\n\t\t\t\t}\n\t\t\t\tt.controlBuf.put(closeConnection{})\n\t\t\tcase \u003c-t.done:\n\t\t\t}\n\t\t\treturn\n\t\tcase \u003c-kpTimer.C:\n\t\t\tlastRead := atomic.LoadInt64(\u0026t.lastRead)\n\t\t\tif lastRead \u003e prevNano {\n\t\t\t\t// There has been read activity since the last time we were\n\t\t\t\t// here. Setup the timer to fire at kp.Time seconds from\n\t\t\t\t// lastRead time and continue.\n\t\t\t\toutstandingPing = false\n\t\t\t\tkpTimer.Reset(time.Duration(lastRead) + t.kp.Time - time.Duration(time.Now().UnixNano()))\n\t\t\t\tprevNano = lastRead\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tif outstandingPing \u0026\u0026 kpTimeoutLeft \u003c= 0 {\n\t\t\t\tt.Close(fmt.Errorf(\"keepalive ping not acked within timeout %s\", t.kp.Timeout))\n\t\t\t\treturn\n\t\t\t}\n\t\t\tif !outstandingPing {\n\t\t\t\tif channelz.IsOn() {\n\t\t\t\t\tt.channelz.SocketMetrics.KeepAlivesSent.Add(1)\n\t\t\t\t}\n\t\t\t\tt.controlBuf.put(p)\n\t\t\t\tkpTimeoutLeft = t.kp.Timeout\n\t\t\t\toutstandingPing = true\n\t\t\t}\n\t\t\t// The amount of time to sleep here is the minimum of kp.Time and\n\t\t\t// timeoutLeft. This will ensure that we wait only for kp.Time\n\t\t\t// before sending out the next ping (for cases where the ping is\n\t\t\t// acked).\n\t\t\tsleepDuration := min(t.kp.Time, kpTimeoutLeft)\n\t\t\tkpTimeoutLeft -= sleepDuration\n\t\t\tkpTimer.Reset(sleepDuration)\n\t\tcase \u003c-t.done:\n\t\t\treturn\n\t\t}\n\t}\n}",
+                  "token_estimate": 723
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/http2_client.go",
+                    "start_line": 1718,
+                    "end_line": 1801,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "text": "func (t *http2Client) keepalive() {\n\tvar err error\n\tdefer func() {\n\t\tclose(t.keepaliveDone)\n\t\tif err != nil {\n\t\t\tt.Close(err)\n\t\t}\n\t}()\n\tp := \u0026ping{data: [8]byte{}}\n\t// True iff a ping has been sent, and no data has been received since then.\n\toutstandingPing := false\n\t// Amount of time remaining before which we should receive an ACK for the\n\t// last sent ping.\n\ttimeoutLeft := time.Duration(0)\n\t// Records the last value of t.lastRead before we go block on the timer.\n\t// This is required to check for read activity since then.\n\tprevNano := time.Now().UnixNano()\n\ttimer := time.NewTimer(t.kp.Time)\n\tfor {\n\t\tselect {\n\t\tcase \u003c-timer.C:\n\t\t\tlastRead := atomic.LoadInt64(\u0026t.lastRead)\n\t\t\tif lastRead \u003e prevNano {\n\t\t\t\t// There has been read activity since the last time we were here.\n\t\t\t\toutstandingPing = false\n\t\t\t\t// Next timer should fire at kp.Time seconds from lastRead time.\n\t\t\t\ttimer.Reset(time.Duration(lastRead) + t.kp.Time - time.Duration(time.Now().UnixNano()))\n\t\t\t\tprevNano = lastRead\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tif outstandingPing \u0026\u0026 timeoutLeft \u003c= 0 {\n\t\t\t\terr = connectionErrorf(true, nil, \"keepalive ping failed to receive ACK within timeout\")\n\t\t\t\treturn\n\t\t\t}\n\t\t\tt.mu.Lock()\n\t\t\tif t.state == closing {\n\t\t\t\t// If the transport is closing, we should exit from the\n\t\t\t\t// keepalive goroutine here. If not, we could have a race\n\t\t\t\t// between the call to Signal() from Close() and the call to\n\t\t\t\t// Wait() here, whereby the keepalive goroutine ends up\n\t\t\t\t// blocking on the condition variable which will never be\n\t\t\t\t// signalled again.\n\t\t\t\tt.mu.Unlock()\n\t\t\t\treturn\n\t\t\t}\n\t\t\tif len(t.activeStreams) \u003c 1 \u0026\u0026 !t.kp.PermitWithoutStream {\n\t\t\t\t// If a ping was sent out previously (because there were active\n\t\t\t\t// streams at that point) which wasn't acked and its timeout\n\t\t\t\t// hadn't fired, but we got here and are about to go dormant,\n\t\t\t\t// we should make sure that we unconditionally send a ping once\n\t\t\t\t// we awaken.\n\t\t\t\toutstandingPing = false\n\t\t\t\tt.kpDormant = true\n\t\t\t\tt.kpDormancyCond.Wait()\n\t\t\t}\n\t\t\tt.kpDormant = false\n\t\t\tt.mu.Unlock()\n\n\t\t\t// We get here either because we were dormant and a new stream was\n\t\t\t// created which unblocked the Wait() call, or because the\n\t\t\t// keepalive timer expired. In both cases, we need to send a ping.\n\t\t\tif !outstandingPing {\n\t\t\t\tif channelz.IsOn() {\n\t\t\t\t\tt.channelz.SocketMetrics.KeepAlivesSent.Add(1)\n\t\t\t\t}\n\t\t\t\tt.controlBuf.put(p)\n\t\t\t\ttimeoutLeft = t.kp.Timeout\n\t\t\t\toutstandingPing = true\n\t\t\t}\n\t\t\t// The amount of time to sleep here is the minimum of kp.Time and\n\t\t\t// timeoutLeft. This will ensure that we wait only for kp.Time\n\t\t\t// before sending out the next ping (for cases where the ping is\n\t\t\t// acked).\n\t\t\tsleepDuration := min(t.kp.Time, timeoutLeft)\n\t\t\ttimeoutLeft -= sleepDuration\n\t\t\ttimer.Reset(sleepDuration)\n\t\tcase \u003c-t.ctx.Done():\n\t\t\tif !timer.Stop() {\n\t\t\t\t\u003c-timer.C\n\t\t\t}\n\t\t\treturn\n\t\t}\n\t}\n}",
+                  "token_estimate": 712
+                },
+                {
+                  "citation": {
+                    "file": "grpclog/internal/loggerv2.go",
+                    "start_line": 44,
+                    "end_line": 44,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "text": "\tError(args ...any)",
+                  "token_estimate": 4
+                },
+                {
+                  "citation": {
+                    "file": "server.go",
+                    "start_line": 223,
+                    "end_line": 227,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "text": "func newFuncServerOption(f func(*serverOptions)) *funcServerOption {\n\treturn \u0026funcServerOption{\n\t\tf: f,\n\t}\n}",
+                  "token_estimate": 27
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "server.go",
+                    "start_line": 525,
+                    "end_line": 535,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "server.go",
+                    "start_line": 223,
+                    "end_line": 227,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "server.go",
+                    "start_line": 525,
+                    "end_line": 535,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "grpclog/internal/loggerv2.go",
+                    "start_line": 44,
+                    "end_line": 44,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1179,
+                    "end_line": 1268,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1273,
+                    "end_line": 1296,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1179,
+                    "end_line": 1268,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "internal/grpclog/prefix_logger.go",
+                    "start_line": 38,
+                    "end_line": 46,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1179,
+                    "end_line": 1268,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1364,
+                    "end_line": 1372,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1179,
+                    "end_line": 1268,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "internal/grpclog/prefix_logger.go",
+                    "start_line": 69,
+                    "end_line": 74,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1179,
+                    "end_line": 1268,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 348,
+                    "end_line": 351,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1179,
+                    "end_line": 1268,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "internal/channelz/funcs.go",
+                    "start_line": 54,
+                    "end_line": 56,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_client.go",
+                    "start_line": 1718,
+                    "end_line": 1801,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "internal/transport/http2_client.go",
+                    "start_line": 1001,
+                    "end_line": 1072,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_client.go",
+                    "start_line": 1718,
+                    "end_line": 1801,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "target": {
+                    "file": "internal/transport/transport.go",
+                    "start_line": 675,
+                    "end_line": 681,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                }
+              ],
+              "knowledge": [
+                {
+                  "scope": "balancer/pickfirst",
+                  "kind": "convention",
+                  "text": "package: balancer/pickfirst. conventions summary.\nerrors: fmt.Errorf_plain=14, errors.New=7, fmt.Errorf_wrap=1 (total=22)\nconcurrency: mutex=3 chan=21 errgroup=0\ntests: 3 files, table_driven=0, testify=0\n"
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 1743,
+                "utilization_ratio": 0.24208333333333334,
+                "built_at": "2026-10-24T00:27:14.139125Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "0dd25f37e6fe34d3afeb62a9a42b4b62ed02fd2276ae621b6fd526045135b771",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-8905",
+      "prompt": "keepalive 시험에서 스트림이 정상인지 확인하는 도우미가 nil 스트림을 제대로 검사하지 않아. 고치고 싶어",
+      "expected_intent": "test_add",
+      "classified_intents": [
+        "bug_fix"
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0,
+        "file_recall": 0,
+        "file_f1": 0,
+        "file_mrr": 0,
+        "first_hit_rank": 0,
+        "token_utilization": 0.24208333333333334,
+        "used_tokens": 1743,
+        "citation_count": 18,
+        "body_count": 10,
+        "redaction_count": 0,
+        "latency_ms": 1385,
+        "latency_ms_p50": 1385,
+        "latency_ms_p95": 1385,
+        "latency_ms_max": 1385
+      },
+      "retrieval_state": "miss",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0,
+      "avg_mrr": 0,
+      "avg_recall": 0,
+      "avg_f1": 0,
+      "avg_latency_ms": 1385
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "test_add": {
+        "bug_fix": 1
+      }
+    }
+  }
+}

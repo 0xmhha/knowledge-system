@@ -1,0 +1,761 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:30:38.180212Z",
+  "finished_at": "2026-10-24T00:30:39.2783Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 28195583,
+          "completed_at": "2026-10-24T09:30:38.208649+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "18a8d3db88339ca7433cc6fae703a96f83a23921",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "changed_files": [
+                ".github/workflows/govulncheck.yaml",
+                "CONTRIBUTING.md",
+                "authz/grpc_authz_end2end_test.go",
+                "authz/grpc_authz_server_interceptors.go",
+                "authz/grpc_authz_server_interceptors_test.go",
+                "balancer/autosharding/autosharding.go",
+                "balancer/autosharding/autosharding_test.go",
+                "balancer/autosharding/slice_map.go",
+                "balancer/autosharding/slice_map_test.go",
+                "balancer/endpointsharding/endpointsharding.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go",
+                "balancer/pickfirst/metrics_test.go",
+                "balancer/pickfirst/pickfirst.go",
+                "balancer/pickfirst/pickfirst_ext_test.go",
+                "balancer/pickfirst/pickfirstleaf/pickfirstleaf.go",
+                "balancer/randomsubsetting/randomsubsetting.go",
+                "balancer/randomsubsetting/randomsubsetting_test.go",
+                "balancer/ringhash/picker.go",
+                "balancer/ringhash/picker_test.go",
+                "balancer/ringhash/ring_test.go",
+                "balancer/ringhash/ringhash.go",
+                "balancer/ringhash/ringhash_test.go",
+                "balancer/rls/balancer.go",
+                "balancer/rls/balancer_test.go",
+                "balancer/rls/control_channel.go",
+                "binarylog/grpc_binarylog_v1/binarylog.pb.go",
+                "call.go",
+                "channelz/grpc_channelz_v1/channelz.pb.go",
+                "clientconn.go",
+                "clientconn_disconnect_reason_noplan9.go",
+                "clientconn_disconnect_reason_plan9.go",
+                "cmd/protoc-gen-go-grpc/go.mod",
+                "cmd/protoc-gen-go-grpc/go.sum",
+                "credentials/alts/alts.go",
+                "credentials/alts/alts_test.go",
+                "credentials/alts/internal/conn/record.go",
+                "credentials/alts/internal/conn/record_test.go",
+                "credentials/alts/internal/handshaker/handshaker.go",
+                "credentials/alts/internal/handshaker/handshaker_test.go",
+                "credentials/alts/internal/proto/grpc_gcp/altscontext.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/transport_security_common.pb.go",
+                "credentials/google/gcp_service_account_identity_credentials.go",
+                "credentials/google/gcp_service_account_identity_credentials_test.go",
+                "credentials/google/internal/internal.go",
+                "credentials/sts/sts.go",
+                "credentials/sts/sts_test.go",
+                "credentials/xds/xds.go",
+                "credentials/xds/xds_client_test.go",
+                "credentials/xds/xds_server_test.go",
+                "encoding/compressor_test.go",
+                "encoding/encoding_test.go",
+                "examples/features/opentelemetry/client/main.go",
+                "examples/features/opentelemetry/server/main.go",
+                "examples/features/proto/echo/echo.pb.go",
+                "examples/go.mod",
+                "examples/go.sum",
+                "examples/helloworld/helloworld/helloworld.pb.go",
+                "examples/route_guide/routeguide/route_guide.pb.go",
+                "experimental/balancer/hostname/hostname.go",
+                "experimental/balancer/hostname/hostname_test.go",
+                "experimental/balancer/weight/weight.go",
+                "experimental/balancer/weight/weight_test.go",
+                "gcp/observability/go.mod",
+                "gcp/observability/go.sum",
+                "gcp/observability/logging_test.go",
+                "go.mod",
+                "go.sum",
+                "health/grpc_health_v1/health.pb.go",
+                "internal/buffer/unbounded.go",
+                "internal/buffer/unbounded_test.go",
+                "internal/credentials/xds/handshake_info.go",
+                "internal/credentials/xds/handshake_info_test.go",
+                "internal/envconfig/envconfig.go",
+                "internal/envconfig/envconfig_test.go",
+                "internal/envconfig/xds.go",
+                "internal/grpcsync/callback_serializer.go",
+                "internal/grpcsync/callback_serializer_test.go",
+                "internal/grpcsync/refcounted.go",
+                "internal/grpcsync/refcounted_test.go",
+                "internal/idle/idle_e2e_test.go",
+                "internal/internal.go",
+                "internal/mem/buffer_pool.go",
+                "internal/proto/grpc_lookup_v1/rls.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_config.pb.go",
+                "internal/resolver/config_selector.go",
+                "internal/testutils/stats/test_metrics_recorder.go",
+                "internal/transport/client_stream.go",
+                "internal/transport/controlbuf.go",
+                "internal/transport/controlbuf_test.go",
+                "internal/transport/handler_server.go",
+                "internal/transport/http2_client.go",
+                "internal/transport/http2_client_header_bench_test.go",
+                "internal/transport/http2_server.go",
+                "internal/transport/http_util.go",
+                "internal/transport/http_util_test.go",
+                "internal/transport/transport.go",
+                "internal/transport/transport_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_test.go",
+                "internal/xds/balancer/clusterimpl/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/clusterimpl.go",
+                "internal/xds/balancer/clustermanager/picker.go",
+                "internal/xds/balancer/outlierdetection/balancer.go",
+                "internal/xds/balancer/outlierdetection/balancer_test.go",
+                "internal/xds/balancer/outlierdetection/e2e_test/outlierdetection_test.go",
+                "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                "internal/xds/balancer/priority/balancer.go",
+                "internal/xds/bootstrap/bootstrap.go",
+                "internal/xds/bootstrap/bootstrap_test.go",
+                "internal/xds/clients/internal/buffer/unbounded.go",
+                "internal/xds/clients/internal/buffer/unbounded_test.go",
+                "internal/xds/clients/internal/syncutil/callback_serializer.go",
+                "internal/xds/clients/xdsclient/authority.go",
+                "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go",
+                "internal/xds/clients/xdsclient/test/dump_test.go",
+                "internal/xds/clients/xdsclient/test/helpers_test.go",
+                "internal/xds/credentials/access_token.go",
+                "internal/xds/credentials/access_token_test.go",
+                "internal/xds/credentials/credentials.go",
+                "internal/xds/credentials/tls.go",
+                "internal/xds/credentials/tls_test.go",
+                "internal/xds/credentials/xds_test.go",
+                "internal/xds/grpcservice/grpcservice.go",
+                "internal/xds/grpcservice/grpcservice_test.go",
+                "internal/xds/httpfilter/ext_authz/config.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz_test.go",
+                "internal/xds/httpfilter/extconfig.go",
+                "internal/xds/httpfilter/extconfig_test.go",
+                "internal/xds/httpfilter/extproc/config.go",
+                "internal/xds/httpfilter/extproc/config_test.go",
+                "internal/xds/httpfilter/extproc/ext_proc.go",
+                "internal/xds/httpfilter/extproc/ext_proc_ext_test.go",
+                "internal/xds/httpfilter/extproc/internal/internal.go",
+                "internal/xds/httpfilter/extproc/metrics.go",
+                "internal/xds/httpfilter/fault/fault.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_e2e_test.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_test.go",
+                "internal/xds/httpfilter/httpfilter.go",
+                "internal/xds/httpfilter/rbac/rbac.go",
+                "internal/xds/httpfilter/rbac/rbac_test.go",
+                "internal/xds/httpfilter/router/router.go",
+                "internal/xds/rbac/matchers.go",
+                "internal/xds/rbac/rbac_engine_test.go",
+                "internal/xds/resolver/cluster_specifier_plugin_test.go",
+                "internal/xds/resolver/serviceconfig.go",
+                "internal/xds/resolver/xds_http_filters_test.go",
+                "internal/xds/resolver/xds_resolver.go",
+                "internal/xds/resolver/xds_resolver_test.go",
+                "internal/xds/server/conn_wrapper.go",
+                "internal/xds/server/filter_chain_manager.go",
+                "internal/xds/server/filter_chain_manager_test.go",
+                "internal/xds/server/listener_wrapper.go",
+                "internal/xds/server/routing.go",
+                "internal/xds/server/routing_test.go",
+                "internal/xds/server/server_options.go",
+                "internal/xds/xdsclient/clientimpl_test.go",
+                "internal/xds/xdsclient/pool.go",
+                "internal/xds/xdsclient/resource_types.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain_test.go",
+                "internal/xds/xdsclient/xdsresource/grpc_service.go",
+                "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/matcher.go",
+                "internal/xds/xdsclient/xdsresource/matcher_test.go",
+                "internal/xds/xdsclient/xdsresource/metadata.go",
+                "internal/xds/xdsclient/xdsresource/metadata_test.go",
+                "internal/xds/xdsclient/xdsresource/route_config_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/test_utils_test.go",
+                "internal/xds/xdsclient/xdsresource/type_cds.go",
+                "internal/xds/xdsclient/xdsresource/type_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds_test.go",
+                "internal/xds/xdsclient/xdsresource/version/version.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager.go",
+                "interop/grpc_testing/benchmark_service.pb.go",
+                "interop/grpc_testing/control.pb.go",
+                "interop/grpc_testing/core/stats.pb.go",
+                "interop/grpc_testing/empty.pb.go",
+                "interop/grpc_testing/messages.pb.go",
+                "interop/grpc_testing/payloads.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service.pb.go",
+                "interop/grpc_testing/stats.pb.go",
+                "interop/grpc_testing/test.pb.go",
+                "interop/grpc_testing/worker_service.pb.go",
+                "interop/observability/go.mod",
+                "interop/observability/go.sum",
+                "interop/stress/grpc_testing/metrics.pb.go",
+                "interop/xds/go.mod",
+                "interop/xds/go.sum",
+                "mem/buffer_pool.go",
+                "mem/buffers.go",
+                "metadata/metadata.go",
+                "metadata/metadata_test.go",
+                "profiling/proto/service.pb.go",
+                "reflection/grpc_reflection_v1/reflection.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection.pb.go",
+                "reflection/grpc_testing/proto2.pb.go",
+                "reflection/grpc_testing/proto2_ext.pb.go",
+                "reflection/grpc_testing/proto2_ext2.pb.go",
+                "reflection/grpc_testing/test.pb.go",
+                "resolver_wrapper.go",
+                "rpc_util.go",
+                "rpc_util_test.go",
+                "scripts/vet.sh",
+                "security/advancedtls/advancedtls.go",
+                "security/advancedtls/advancedtls_test.go",
+                "security/advancedtls/certificate_utils_test.go",
+                "security/advancedtls/examples/go.mod",
+                "security/advancedtls/examples/go.sum",
+                "security/advancedtls/go.mod",
+                "security/advancedtls/go.sum",
+                "server.go",
+                "stats/opencensus/go.mod",
+                "stats/opencensus/go.sum",
+                "stats/opentelemetry/client_metrics.go",
+                "stats/opentelemetry/client_tracing.go",
+                "stats/opentelemetry/csm/observability_test.go",
+                "stats/opentelemetry/e2e_test.go",
+                "stats/opentelemetry/example_test.go",
+                "stats/opentelemetry/internal/testutils/testutils.go",
+                "stats/opentelemetry/opentelemetry.go",
+                "stats/opentelemetry/server_metrics.go",
+                "stats/opentelemetry/server_tracing.go",
+                "stats/stats.go",
+                "stats/stats_test.go",
+                "stream.go",
+                "stream_test.go",
+                "test/balancer_test.go",
+                "test/codec_perf/perf.pb.go",
+                "test/creds_test.go",
+                "test/end2end_test.go",
+                "test/kokoro/psm-regional_td.cfg",
+                "test/retry_test.go",
+                "test/server_test.go",
+                "test/servertester.go",
+                "test/tools/go.mod",
+                "test/tools/go.sum",
+                "test/xds/xds_client_http_connect_test.go",
+                "test/xds/xds_client_integration_test.go",
+                "test/xds/xds_resolver_e2e_test.go",
+                "test/xds/xds_server_filter_e2e_test.go",
+                "test/xds/xds_server_filter_override_test.go",
+                "test/xds/xds_server_filter_state_retention_test.go",
+                "test/xds/xds_server_integration_test.go",
+                "test/xds/xds_server_interceptor_leak_test.go",
+                "test/xds/xds_server_rbac_test.go",
+                "version.go",
+                "xds/googledirectpath/googlec2p.go",
+                "xds/googledirectpath/googlec2p_test.go",
+                "xds/server.go",
+                "xds/server_options.go",
+                "xds/server_serving_mode_ext_test.go",
+                "xds/server_test.go",
+                "xds/xds.go"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "예전 방식 gzip 압축 해제기가 크기 제한 없이 끝까지 읽어서 메모리가 터질 수 있어. 해제 크기를 제한하고 싶어"
+          },
+          "elapsed_ns": 1068993292,
+          "completed_at": "2026-10-24T09:30:39.277819+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "query": "예전 방식 gzip 압축 해제기가 크기 제한 없이 끝까지 읽어서 메모리가 터질 수 있어. 해제 크기를 제한하고 싶어",
+              "citations": [
+                {
+                  "file": "rpc_util.go",
+                  "start_line": 130,
+                  "end_line": 152,
+                  "commit_hash": "39f16539d2463c05d52b4c44137831fd5f73f7d9"
+                },
+                {
+                  "file": "rpc_util.go",
+                  "start_line": 114,
+                  "end_line": 114,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "rpc_util.go",
+                  "start_line": 55,
+                  "end_line": 55,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "credentials/alts/internal/conn/record.go",
+                  "start_line": 191,
+                  "end_line": 297,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "rpc_util.go",
+                  "start_line": 95,
+                  "end_line": 103,
+                  "commit_hash": "39f16539d2463c05d52b4c44137831fd5f73f7d9"
+                },
+                {
+                  "file": "encoding/gzip/gzip.go",
+                  "start_line": 107,
+                  "end_line": 110,
+                  "commit_hash": "39f16539d2463c05d52b4c44137831fd5f73f7d9"
+                },
+                {
+                  "file": "encoding/gzip/gzip.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "encoding/gzip/gzip.go",
+                  "start_line": 84,
+                  "end_line": 84,
+                  "commit_hash": "39f16539d2463c05d52b4c44137831fd5f73f7d9"
+                },
+                {
+                  "file": "mem/buffers.go",
+                  "start_line": 189,
+                  "end_line": 189,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "credentials/alts/internal/conn/common.go",
+                  "start_line": 54,
+                  "end_line": 69,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "mem/buffers.go",
+                  "start_line": 215,
+                  "end_line": 215,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/mem/buffer_pool.go",
+                  "start_line": 319,
+                  "end_line": 344,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "credentials/alts/internal/conn/record.go",
+                  "start_line": 299,
+                  "end_line": 310,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "credentials/alts/internal/conn/common.go",
+                  "start_line": 74,
+                  "end_line": 80,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "internal/mem/buffer_pool.go",
+                  "start_line": 347,
+                  "end_line": 349,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "credentials/alts/internal/conn/record.go",
+                  "start_line": 49,
+                  "end_line": 49,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "internal/transport/readyreader/ready_reader.go",
+                  "start_line": 43,
+                  "end_line": 43,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "mem/buffer_pool.go",
+                  "start_line": 32,
+                  "end_line": 32,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                },
+                {
+                  "file": "mem/buffer_pool.go",
+                  "start_line": 38,
+                  "end_line": 38,
+                  "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "rpc_util.go",
+                    "start_line": 130,
+                    "end_line": 152,
+                    "commit_hash": "39f16539d2463c05d52b4c44137831fd5f73f7d9"
+                  },
+                  "text": "func (d *gzipDecompressor) Do(r io.Reader) ([]byte, error) {\n\tvar z *gzip.Reader\n\tswitch maybeZ := d.pool.Get().(type) {\n\tcase nil:\n\t\tnewZ, err := gzip.NewReader(r)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tz = newZ\n\tcase *gzip.Reader:\n\t\tz = maybeZ\n\t\tif err := z.Reset(r); err != nil {\n\t\t\td.pool.Put(z)\n\t\t\treturn nil, err\n\t\t}\n\t}\n\n\tdefer func() {\n\t\tz.Close()\n\t\td.pool.Put(z)\n\t}()\n\treturn io.ReadAll(z)\n}",
+                  "token_estimate": 100
+                },
+                {
+                  "citation": {
+                    "file": "rpc_util.go",
+                    "start_line": 114,
+                    "end_line": 114,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "text": "\tDo(r io.Reader) ([]byte, error)",
+                  "token_estimate": 8
+                },
+                {
+                  "citation": {
+                    "file": "rpc_util.go",
+                    "start_line": 55,
+                    "end_line": 55,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "text": "\tDo(w io.Writer, p []byte) error",
+                  "token_estimate": 8
+                },
+                {
+                  "citation": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "func (p *conn) ReadOnReady(bufSize int, pool mem.BufferPool) (*[]byte, int, error) {\n\tif len(p.buf) == 0 {\n\t\tvar framedMsg []byte\n\t\tvar protected []byte\n\t\tif p.protectedHandle != nil {\n\t\t\tprotected = *p.protectedHandle\n\t\t\tprotected = protected[:cap(protected)]\n\t\t}\n\t\tvar err error\n\t\tframedMsg, p.nextFrame, err = ParseFramedMsg(p.nextFrame, altsRecordLengthLimit)\n\t\tif err != nil {\n\t\t\treturn nil, 0, err\n\t\t}\n\t\t// Check whether the next frame to be decrypted has been\n\t\t// completely received yet.\n\t\tif len(framedMsg) == 0 {\n\t\t\tcopy(protected, p.nextFrame)\n\t\t\tprotected = protected[:len(p.nextFrame)]\n\t\t\t// Always copy next incomplete frame to the beginning of\n\t\t\t// the protected buffer and reset nextFrame to it.\n\t\t\tp.nextFrame = protected\n\t\t}\n\t\t// Check whether a complete frame has been received yet.\n\t\tfor len(framedMsg) == 0 {\n\t\t\tif p.protectedHandle != nil \u0026\u0026 len(protected) == cap(protected) {\n\t\t\t\t// We can parse the length header to know exactly how large\n\t\t\t\t// the buffer needs to be to hold the entire frame.\n\t\t\t\tlength, didParse := parseMessageLength(protected)\n\t\t\t\tif !didParse {\n\t\t\t\t\t// The protected buffer is initialized with a capacity of\n\t\t\t\t\t// larger than 4B. It should always hold the message length\n\t\t\t\t\t// header.\n\t\t\t\t\tpanic(fmt.Sprintf(\"protected buffer length shorter than expected: %d vs %d\", len(protected), MsgLenFieldSize))\n\t\t\t\t}\n\t\t\t\toldProtectedBuf := protected\n\t\t\t\toldBufHandle := p.protectedHandle\n\t\t\t\t// The new buffer must be able to hold the message length header\n\t\t\t\t// and the entire message.\n\t\t\t\trequiredCapacity := int(length) + MsgLenFieldSize\n\t\t\t\tp.protectedHandle = readBufPool.Get(requiredCapacity)\n\t\t\t\tprotected = *p.protectedHandle\n\t\t\t\t// Copy the contents of the old buffer and set the length of the\n\t\t\t\t// new buffer to the number of bytes already read.\n\t\t\t\tcopy(protected, oldProtectedBuf)\n\t\t\t\tprotected = protected[:len(oldProtectedBuf)]\n\t\t\t\treadBufPool.Put(oldBufHandle)\n\t\t\t}\n\t\t\tif p.protectedHandle == nil {\n\t\t\t\t// Connection was idle, need to re-allocate the read buffer.\n\t\t\t\tnewBuf, nRead, err := p.reader.ReadOnReady(altsReadBufferInitialSize, readBufPool)\n\t\t\t\tif err != nil {\n\t\t\t\t\treturn nil, 0, err\n\t\t\t\t}\n\t\t\t\tp.protectedHandle = newBuf\n\t\t\t\tprotected = (*newBuf)[:nRead]\n\t\t\t} else {\n\t\t\t\tnRead, err := p.Conn.Read(protected[len(protected):cap(protected)])\n\t\t\t\tif err != nil {\n\t\t\t\t\treturn nil, 0, err\n\t\t\t\t}\n\t\t\t\tprotected = protected[:len(protected)+nRead]\n\t\t\t}\n\t\t\tframedMsg, p.nextFrame, err = ParseFramedMsg(protected, altsRecordLengthLimit)\n\t\t\tif err != nil {\n\t\t\t\treturn nil, 0, err\n\t\t\t}\n\t\t}\n\t\t// Now we have a complete frame, decrypted it.\n\t\tmsg := framedMsg[MsgLenFieldSize:]\n\t\tmsgType := binary.LittleEndian.Uint32(msg[:msgTypeFieldSize])\n\t\tif msgType\u00260xff != altsRecordMsgType {\n\t\t\treturn nil, 0, fmt.Errorf(\"received frame with incorrect message type %v, expected lower byte %v\",\n\t\t\t\tmsgType, altsRecordMsgType)\n\t\t}\n\t\tciphertext := msg[msgTypeFieldSize:]\n\n\t\t// Decrypt directly into the buffer, avoiding a copy from p.buf if\n\t\t// possible.\n\t\tif bufSize \u003e= len(ciphertext) {\n\t\t\tallocatedBuf := pool.Get(bufSize)\n\t\t\tdec, err := p.crypto.Decrypt((*allocatedBuf)[:0], ciphertext)\n\t\t\tif err != nil {\n\t\t\t\tpool.Put(allocatedBuf)\n\t\t\t\treturn nil, 0, err\n\t\t\t}\n\t\t\tp.dropProtectedIfEmtpy()\n\t\t\treturn allocatedBuf, len(dec), nil\n\t\t}\n\t\t// Decrypt requires that if the dst and ciphertext alias, they\n\t\t// must alias exactly. Code here used to use msg[:0], but msg\n\t\t// starts MsgLenFieldSize+msgTypeFieldSize bytes earlier than\n\t\t// ciphertext, so they alias inexactly. Using ciphertext[:0]\n\t\t// arranges the appropriate aliasing without needing to copy\n\t\t// ciphertext or use a separate destination buffer. For more info\n\t\t// check: https://golang.org/pkg/crypto/cipher/#AEAD.\n\t\tp.buf, err = p.crypto.Decrypt(ciphertext[:0], ciphertext)\n\t\tif err != nil {\n\t\t\treturn nil, 0, err\n\t\t}\n\t}\n\n\tallocatedBuf := pool.Get(bufSize)\n\tn := copy(*allocatedBuf, p.buf)\n\tp.buf = p.buf[n:]\n\tp.dropProtectedIfEmtpy()\n\treturn allocatedBuf, n, nil\n}",
+                  "token_estimate": 993
+                },
+                {
+                  "citation": {
+                    "file": "rpc_util.go",
+                    "start_line": 95,
+                    "end_line": 103,
+                    "commit_hash": "39f16539d2463c05d52b4c44137831fd5f73f7d9"
+                  },
+                  "text": "func (c *gzipCompressor) Do(w io.Writer, p []byte) error {\n\tz := c.pool.Get().(*gzip.Writer)\n\tdefer c.pool.Put(z)\n\tz.Reset(w)\n\tif _, err := z.Write(p); err != nil {\n\t\treturn err\n\t}\n\treturn z.Close()\n}",
+                  "token_estimate": 50
+                },
+                {
+                  "citation": {
+                    "file": "encoding/gzip/gzip.go",
+                    "start_line": 107,
+                    "end_line": 110,
+                    "commit_hash": "39f16539d2463c05d52b4c44137831fd5f73f7d9"
+                  },
+                  "text": "func (r *reader) Read(p []byte) (n int, err error) {\n\tn, err = r.Reader.Read(p)\n\treturn n, err\n}",
+                  "token_estimate": 24
+                },
+                {
+                  "citation": {
+                    "file": "encoding/gzip/gzip.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "text": "/*"
+                },
+                {
+                  "citation": {
+                    "file": "encoding/gzip/gzip.go",
+                    "start_line": 84,
+                    "end_line": 84,
+                    "commit_hash": "39f16539d2463c05d52b4c44137831fd5f73f7d9"
+                  },
+                  "text": "var _ io.Closer = \u0026reader{}",
+                  "token_estimate": 6
+                },
+                {
+                  "citation": {
+                    "file": "mem/buffers.go",
+                    "start_line": 189,
+                    "end_line": 189,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "\t\tpanic(\"Cannot slice freed buffer\")",
+                  "token_estimate": 9
+                },
+                {
+                  "citation": {
+                    "file": "credentials/alts/internal/conn/common.go",
+                    "start_line": 54,
+                    "end_line": 69,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "text": "func ParseFramedMsg(b []byte, maxLen uint32) ([]byte, []byte, error) {\n\t// If the size field is not complete, return the provided buffer as\n\t// remaining buffer.\n\tlength, sufficientBytes := parseMessageLength(b)\n\tif !sufficientBytes {\n\t\treturn nil, b, nil\n\t}\n\tif length \u003e maxLen {\n\t\treturn nil, nil, fmt.Errorf(\"received the frame length %d larger than the limit %d\", length, maxLen)\n\t}\n\tif len(b) \u003c int(length)+4 { // account for the first 4 msg length bytes.\n\t\t// Frame is not complete yet.\n\t\treturn nil, b, nil\n\t}\n\treturn b[:MsgLenFieldSize+length], b[MsgLenFieldSize+length:], nil\n}",
+                  "token_estimate": 146
+                },
+                {
+                  "citation": {
+                    "file": "mem/buffers.go",
+                    "start_line": 215,
+                    "end_line": 215,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "\t\tpanic(\"Cannot split freed buffer\")",
+                  "token_estimate": 9
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "internal/mem/buffer_pool.go",
+                    "start_line": 319,
+                    "end_line": 344,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "credentials/alts/internal/conn/common.go",
+                    "start_line": 54,
+                    "end_line": 69,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 299,
+                    "end_line": 310,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "credentials/alts/internal/conn/common.go",
+                    "start_line": 74,
+                    "end_line": 80,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "internal/mem/buffer_pool.go",
+                    "start_line": 347,
+                    "end_line": 349,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 49,
+                    "end_line": 49,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "internal/transport/readyreader/ready_reader.go",
+                    "start_line": 43,
+                    "end_line": 43,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "mem/buffer_pool.go",
+                    "start_line": 32,
+                    "end_line": 32,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "credentials/alts/internal/conn/record.go",
+                    "start_line": 191,
+                    "end_line": 297,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "target": {
+                    "file": "mem/buffer_pool.go",
+                    "start_line": 38,
+                    "end_line": 38,
+                    "commit_hash": "18a8d3db88339ca7433cc6fae703a96f83a23921"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                }
+              ],
+              "knowledge": [
+                {
+                  "scope": "encoding/gzip",
+                  "kind": "convention",
+                  "text": "package: encoding/gzip. conventions summary.\nerrors: fmt.Errorf_plain=1 (total=1)\n"
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 1353,
+                "utilization_ratio": 0.18791666666666668,
+                "built_at": "2026-10-24T00:30:39.276944Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "ad759a2143cb2b651502c0f825bc4034c0603ff698fa33a3c47f11f58bafe043",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-9114",
+      "prompt": "예전 방식 gzip 압축 해제기가 크기 제한 없이 끝까지 읽어서 메모리가 터질 수 있어. 해제 크기를 제한하고 싶어",
+      "expected_intent": "security",
+      "classified_intents": [
+        ""
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0,
+        "file_recall": 0,
+        "file_f1": 0,
+        "file_mrr": 0,
+        "first_hit_rank": 0,
+        "token_utilization": 0.18791666666666668,
+        "used_tokens": 1353,
+        "citation_count": 19,
+        "body_count": 11,
+        "redaction_count": 0,
+        "latency_ms": 1068,
+        "latency_ms_p50": 1068,
+        "latency_ms_p95": 1068,
+        "latency_ms_max": 1068
+      },
+      "retrieval_state": "miss",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0,
+      "avg_mrr": 0,
+      "avg_recall": 0,
+      "avg_f1": 0,
+      "avg_latency_ms": 1068
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "security": {
+        "(unknown)": 1
+      }
+    }
+  }
+}

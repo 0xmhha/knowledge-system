@@ -1,0 +1,950 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:30:25.326351Z",
+  "finished_at": "2026-10-24T00:30:26.476086Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 25181291,
+          "completed_at": "2026-10-24T09:30:25.351849+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "fd8a1060a84d7021a9db7b4120b49df651beb762",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "changed_files": [
+                ".gemini/styleguide.md",
+                ".github/workflows/govulncheck.yaml",
+                "CONTRIBUTING.md",
+                "authz/grpc_authz_end2end_test.go",
+                "authz/grpc_authz_server_interceptors.go",
+                "authz/grpc_authz_server_interceptors_test.go",
+                "balancer/autosharding/autosharding.go",
+                "balancer/autosharding/autosharding_test.go",
+                "balancer/autosharding/slice_map.go",
+                "balancer/autosharding/slice_map_test.go",
+                "balancer/endpointsharding/endpointsharding.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go",
+                "balancer/pickfirst/metrics_test.go",
+                "balancer/pickfirst/pickfirst.go",
+                "balancer/pickfirst/pickfirst_ext_test.go",
+                "balancer/pickfirst/pickfirstleaf/pickfirstleaf.go",
+                "balancer/randomsubsetting/randomsubsetting.go",
+                "balancer/randomsubsetting/randomsubsetting_test.go",
+                "balancer/ringhash/picker.go",
+                "balancer/ringhash/picker_test.go",
+                "balancer/ringhash/ring_test.go",
+                "balancer/ringhash/ringhash.go",
+                "balancer/ringhash/ringhash_test.go",
+                "balancer/rls/balancer.go",
+                "balancer/rls/balancer_test.go",
+                "balancer/rls/control_channel.go",
+                "binarylog/grpc_binarylog_v1/binarylog.pb.go",
+                "call.go",
+                "channelz/grpc_channelz_v1/channelz.pb.go",
+                "clientconn.go",
+                "clientconn_disconnect_reason_noplan9.go",
+                "clientconn_disconnect_reason_plan9.go",
+                "cmd/protoc-gen-go-grpc/go.mod",
+                "cmd/protoc-gen-go-grpc/go.sum",
+                "credentials/alts/alts.go",
+                "credentials/alts/alts_test.go",
+                "credentials/alts/internal/conn/record.go",
+                "credentials/alts/internal/conn/record_test.go",
+                "credentials/alts/internal/handshaker/handshaker.go",
+                "credentials/alts/internal/handshaker/handshaker_test.go",
+                "credentials/alts/internal/proto/grpc_gcp/altscontext.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/transport_security_common.pb.go",
+                "credentials/google/gcp_service_account_identity_credentials.go",
+                "credentials/google/gcp_service_account_identity_credentials_test.go",
+                "credentials/google/internal/internal.go",
+                "credentials/sts/sts.go",
+                "credentials/sts/sts_test.go",
+                "credentials/xds/xds.go",
+                "credentials/xds/xds_client_test.go",
+                "credentials/xds/xds_server_test.go",
+                "encoding/compressor_test.go",
+                "encoding/encoding.go",
+                "encoding/encoding_test.go",
+                "encoding/gzip/gzip.go",
+                "examples/features/opentelemetry/client/main.go",
+                "examples/features/opentelemetry/server/main.go",
+                "examples/features/proto/echo/echo.pb.go",
+                "examples/go.mod",
+                "examples/go.sum",
+                "examples/helloworld/helloworld/helloworld.pb.go",
+                "examples/route_guide/routeguide/route_guide.pb.go",
+                "experimental/balancer/hostname/hostname.go",
+                "experimental/balancer/hostname/hostname_test.go",
+                "experimental/balancer/weight/weight.go",
+                "experimental/balancer/weight/weight_test.go",
+                "experimental/stats/telemetry/labels.go",
+                "gcp/observability/go.mod",
+                "gcp/observability/go.sum",
+                "gcp/observability/logging_test.go",
+                "go.mod",
+                "go.sum",
+                "health/grpc_health_v1/health.pb.go",
+                "internal/balancergroup/balancergroup_ext_test.go",
+                "internal/balancergroup/balancergroup_test.go",
+                "internal/buffer/unbounded.go",
+                "internal/buffer/unbounded_test.go",
+                "internal/credentials/xds/handshake_info.go",
+                "internal/credentials/xds/handshake_info_test.go",
+                "internal/envconfig/envconfig.go",
+                "internal/envconfig/envconfig_test.go",
+                "internal/envconfig/xds.go",
+                "internal/grpcsync/callback_serializer.go",
+                "internal/grpcsync/callback_serializer_test.go",
+                "internal/grpcsync/refcounted.go",
+                "internal/grpcsync/refcounted_test.go",
+                "internal/grpcutil/regex_test.go",
+                "internal/idle/idle_e2e_test.go",
+                "internal/internal.go",
+                "internal/mem/buffer_pool.go",
+                "internal/optional/optional.go",
+                "internal/optional/optional_test.go",
+                "internal/proto/grpc_lookup_v1/rls.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_config.pb.go",
+                "internal/resolver/config_selector.go",
+                "internal/stats/labels.go",
+                "internal/stats/labels_test.go",
+                "internal/testutils/balancer.go",
+                "internal/testutils/stats/test_metrics_recorder.go",
+                "internal/transport/client_stream.go",
+                "internal/transport/controlbuf.go",
+                "internal/transport/controlbuf_test.go",
+                "internal/transport/handler_server.go",
+                "internal/transport/handler_server_test.go",
+                "internal/transport/http2_client.go",
+                "internal/transport/http2_client_header_bench_test.go",
+                "internal/transport/http2_server.go",
+                "internal/transport/http_util.go",
+                "internal/transport/http_util_test.go",
+                "internal/transport/transport.go",
+                "internal/transport/transport_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_test.go",
+                "internal/xds/balancer/clusterimpl/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/clusterimpl.go",
+                "internal/xds/balancer/clusterimpl/picker.go",
+                "internal/xds/balancer/clustermanager/picker.go",
+                "internal/xds/balancer/outlierdetection/balancer.go",
+                "internal/xds/balancer/outlierdetection/balancer_test.go",
+                "internal/xds/balancer/outlierdetection/e2e_test/outlierdetection_test.go",
+                "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                "internal/xds/balancer/priority/balancer.go",
+                "internal/xds/bootstrap/bootstrap.go",
+                "internal/xds/bootstrap/bootstrap_test.go",
+                "internal/xds/clients/internal/buffer/unbounded.go",
+                "internal/xds/clients/internal/buffer/unbounded_test.go",
+                "internal/xds/clients/internal/syncutil/callback_serializer.go",
+                "internal/xds/clients/xdsclient/authority.go",
+                "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go",
+                "internal/xds/clients/xdsclient/test/dump_test.go",
+                "internal/xds/clients/xdsclient/test/helpers_test.go",
+                "internal/xds/credentials/access_token.go",
+                "internal/xds/credentials/access_token_test.go",
+                "internal/xds/credentials/credentials.go",
+                "internal/xds/credentials/tls.go",
+                "internal/xds/credentials/tls_test.go",
+                "internal/xds/credentials/xds_test.go",
+                "internal/xds/grpcservice/grpcservice.go",
+                "internal/xds/grpcservice/grpcservice_test.go",
+                "internal/xds/httpfilter/ext_authz/config.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz_test.go",
+                "internal/xds/httpfilter/extconfig.go",
+                "internal/xds/httpfilter/extconfig_test.go",
+                "internal/xds/httpfilter/extproc/config.go",
+                "internal/xds/httpfilter/extproc/config_test.go",
+                "internal/xds/httpfilter/extproc/ext_proc.go",
+                "internal/xds/httpfilter/extproc/ext_proc_ext_test.go",
+                "internal/xds/httpfilter/extproc/internal/internal.go",
+                "internal/xds/httpfilter/extproc/metrics.go",
+                "internal/xds/httpfilter/fault/fault.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_e2e_test.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_test.go",
+                "internal/xds/httpfilter/httpfilter.go",
+                "internal/xds/httpfilter/rbac/rbac.go",
+                "internal/xds/httpfilter/rbac/rbac_test.go",
+                "internal/xds/httpfilter/router/router.go",
+                "internal/xds/matcher/matcher_header.go",
+                "internal/xds/matcher/string_matcher.go",
+                "internal/xds/matcher/string_matcher_test.go",
+                "internal/xds/rbac/matchers.go",
+                "internal/xds/rbac/rbac_engine_test.go",
+                "internal/xds/resolver/cluster_specifier_plugin_test.go",
+                "internal/xds/resolver/serviceconfig.go",
+                "internal/xds/resolver/xds_http_filters_test.go",
+                "internal/xds/resolver/xds_resolver.go",
+                "internal/xds/resolver/xds_resolver_test.go",
+                "internal/xds/server/conn_wrapper.go",
+                "internal/xds/server/filter_chain_manager.go",
+                "internal/xds/server/filter_chain_manager_test.go",
+                "internal/xds/server/listener_wrapper.go",
+                "internal/xds/server/listener_wrapper_test.go",
+                "internal/xds/server/routing.go",
+                "internal/xds/server/routing_test.go",
+                "internal/xds/server/server_options.go",
+                "internal/xds/xdsclient/clientimpl_test.go",
+                "internal/xds/xdsclient/pool.go",
+                "internal/xds/xdsclient/resource_types.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain_test.go",
+                "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/matcher.go",
+                "internal/xds/xdsclient/xdsresource/matcher_path.go",
+                "internal/xds/xdsclient/xdsresource/matcher_test.go",
+                "internal/xds/xdsclient/xdsresource/metadata.go",
+                "internal/xds/xdsclient/xdsresource/metadata_test.go",
+                "internal/xds/xdsclient/xdsresource/route_config_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/test_utils_test.go",
+                "internal/xds/xdsclient/xdsresource/type_cds.go",
+                "internal/xds/xdsclient/xdsresource/type_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds_test.go",
+                "internal/xds/xdsclient/xdsresource/version/version.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager.go",
+                "interop/grpc_testing/benchmark_service.pb.go",
+                "interop/grpc_testing/control.pb.go",
+                "interop/grpc_testing/core/stats.pb.go",
+                "interop/grpc_testing/empty.pb.go",
+                "interop/grpc_testing/messages.pb.go",
+                "interop/grpc_testing/payloads.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service.pb.go",
+                "interop/grpc_testing/stats.pb.go",
+                "interop/grpc_testing/test.pb.go",
+                "interop/grpc_testing/worker_service.pb.go",
+                "interop/observability/go.mod",
+                "interop/observability/go.sum",
+                "interop/stress/grpc_testing/metrics.pb.go",
+                "interop/xds/go.mod",
+                "interop/xds/go.sum",
+                "mem/buffer_pool.go",
+                "mem/buffers.go",
+                "metadata/metadata.go",
+                "metadata/metadata_test.go",
+                "profiling/proto/service.pb.go",
+                "reflection/grpc_reflection_v1/reflection.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection.pb.go",
+                "reflection/grpc_testing/proto2.pb.go",
+                "reflection/grpc_testing/proto2_ext.pb.go",
+                "reflection/grpc_testing/proto2_ext2.pb.go",
+                "reflection/grpc_testing/test.pb.go",
+                "resolver_wrapper.go",
+                "rpc_util.go",
+                "rpc_util_test.go",
+                "scripts/vet.sh",
+                "security/advancedtls/advancedtls.go",
+                "security/advancedtls/advancedtls_test.go",
+                "security/advancedtls/certificate_utils_test.go",
+                "security/advancedtls/examples/go.mod",
+                "security/advancedtls/examples/go.sum",
+                "security/advancedtls/go.mod",
+                "security/advancedtls/go.sum",
+                "server.go",
+                "stats/opencensus/go.mod",
+                "stats/opencensus/go.sum",
+                "stats/opentelemetry/client_metrics.go",
+                "stats/opentelemetry/client_tracing.go",
+                "stats/opentelemetry/csm/observability_test.go",
+                "stats/opentelemetry/e2e_test.go",
+                "stats/opentelemetry/example_test.go",
+                "stats/opentelemetry/internal/testutils/testutils.go",
+                "stats/opentelemetry/opentelemetry.go",
+                "stats/opentelemetry/server_metrics.go",
+                "stats/opentelemetry/server_tracing.go",
+                "stats/stats.go",
+                "stats/stats_test.go",
+                "stream.go",
+                "stream_test.go",
+                "test/balancer_test.go",
+                "test/codec_perf/perf.pb.go",
+                "test/creds_test.go",
+                "test/end2end_test.go",
+                "test/gracefulstop_test.go",
+                "test/kokoro/psm-regional_td.cfg",
+                "test/retry_test.go",
+                "test/server_test.go",
+                "test/servertester.go",
+                "test/tools/go.mod",
+                "test/tools/go.sum",
+                "test/xds/xds_client_http_connect_test.go",
+                "test/xds/xds_client_integration_test.go",
+                "test/xds/xds_resolver_e2e_test.go",
+                "test/xds/xds_server_filter_e2e_test.go",
+                "test/xds/xds_server_filter_override_test.go",
+                "test/xds/xds_server_filter_state_retention_test.go",
+                "test/xds/xds_server_integration_test.go",
+                "test/xds/xds_server_interceptor_leak_test.go",
+                "test/xds/xds_server_rbac_test.go",
+                "test/xds/xds_telemetry_labels_test.go",
+                "version.go",
+                "xds/googledirectpath/googlec2p.go",
+                "xds/googledirectpath/googlec2p_test.go",
+                "xds/server.go",
+                "xds/server_options.go",
+                "xds/server_serving_mode_ext_test.go",
+                "xds/server_test.go",
+                "xds/xds.go"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "OpenTelemetry를 안 쓰는 클라이언트도 통계 핸들러에 레이블을 넘길 수 있게, 텔레메트리 레이블 콜백을 등록하는 실험 API를 만들고 싶어"
+          },
+          "elapsed_ns": 1123462916,
+          "completed_at": "2026-10-24T09:30:26.475502+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "query": "OpenTelemetry를 안 쓰는 클라이언트도 통계 핸들러에 레이블을 넘길 수 있게, 텔레메트리 레이블 콜백을 등록하는 실험 API를 만들고 싶어",
+              "citations": [
+                {
+                  "file": "stats/opentelemetry/client_metrics.go",
+                  "start_line": 234,
+                  "end_line": 242,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/trace.go",
+                  "start_line": 1,
+                  "end_line": 1,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 500,
+                  "end_line": 547,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 109,
+                  "end_line": 138,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/client_metrics.go",
+                  "start_line": 160,
+                  "end_line": 186,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "examples/features/opentelemetry/README.md",
+                  "start_line": 1,
+                  "end_line": 7,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 77,
+                  "end_line": 107,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/server_metrics.go",
+                  "start_line": 154,
+                  "end_line": 171,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/internal/pluginoption.go",
+                  "start_line": 40,
+                  "end_line": 40,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "experimental/stats/metricregistry.go",
+                  "start_line": 179,
+                  "end_line": 179,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "experimental/stats/metrics.go",
+                  "start_line": 88,
+                  "end_line": 88,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "grpclog/internal/loggerv2.go",
+                  "start_line": 42,
+                  "end_line": 42,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "grpclog/internal/loggerv2.go",
+                  "start_line": 48,
+                  "end_line": 48,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 124,
+                  "end_line": 138,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "dialoptions.go",
+                  "start_line": 523,
+                  "end_line": 533,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/client_tracing.go",
+                  "start_line": 43,
+                  "end_line": 48,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "dialoptions.go",
+                  "start_line": 598,
+                  "end_line": 602,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "dialoptions.go",
+                  "start_line": 617,
+                  "end_line": 621,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 69,
+                  "end_line": 71,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 73,
+                  "end_line": 75,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 219,
+                  "end_line": 226,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "internal/stats/labels.go",
+                  "start_line": 33,
+                  "end_line": 36,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "internal/stats/labels.go",
+                  "start_line": 39,
+                  "end_line": 42,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 237,
+                  "end_line": 239,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 82,
+                  "end_line": 82,
+                  "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/client_metrics.go",
+                    "start_line": 234,
+                    "end_line": 242,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "func (h *clientMetricsHandler) setLabelsFromPluginOption(ai *attemptInfo, incomingMetadata metadata.MD) {\n\tif ai.pluginOptionLabels == nil \u0026\u0026 h.options.MetricsOptions.pluginOption != nil {\n\t\tlabels := h.options.MetricsOptions.pluginOption.GetLabels(incomingMetadata)\n\t\tif labels == nil {\n\t\t\tlabels = map[string]string{} // Shouldn't return a nil map. Make it empty if so to ignore future Get Calls for this Attempt.\n\t\t}\n\t\tai.pluginOptionLabels = labels\n\t}\n}",
+                  "token_estimate": 114
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/trace.go",
+                    "start_line": 1,
+                    "end_line": 1,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "text": "/*"
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 500,
+                    "end_line": 547,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "text": "// RegisterAsyncReporter will register a callback with the underlying OpenTelemetry\n// Meter for the provided descriptors.\n//\n// It will map the provided descriptors to their corresponding OTel Observable\n// instruments. If no instruments match the descriptors, registration is\n// skipped.\n//\n// The returned cleanup function unregisters the callback from the Meter.\n// RegisterAsyncReporter registers a callback with the OpenTelemetry Meter.\nfunc (rm *registryMetrics) RegisterAsyncReporter(reporter estats.AsyncMetricReporter, metrics ...estats.AsyncMetric) func() {\n\tobservables := make([]otelmetric.Observable, 0, len(metrics))\n\tobservableMap := make(map[*estats.MetricDescriptor]otelmetric.Observable, len(metrics))\n\n\tfor _, m := range metrics {\n\t\td := m.Descriptor()\n\t\tif inst, ok := rm.intObservableGauges[d]; ok {\n\t\t\tobservables = append(observables, inst)\n\t\t\tobservableMap[d] = inst\n\t\t}\n\t}\n\n\tif len(observables) == 0 {\n\t\treturn func() {}\n\t}\n\n\tcbWrapper := func(_ context.Context, o otelmetric.Observer) error {\n\t\tadapter := \u0026observerAdapter{\n\t\t\tobservableMap:  observableMap,\n\t\t\toptionalLabels: rm.optionalLabels,\n\t\t\tdelegate:       o,\n\t\t}\n\t\treporter.Report(adapter)\n\t\treturn nil\n\t}\n\n\treg, err := rm.meter.RegisterCallback(cbWrapper, observables...)\n\tif err != nil {\n\t\tlogger.Warningf(\"grpc: failed to register callback for async metrics: %v\", err)\n\t\treturn func() {}\n\t}\n\n\treturn func() {\n\t\terr = reg.Unregister()\n\t\tif err != nil {\n\t\t\tlogger.Errorf(\"grpc: failed to unregister callback for async metrics: %v\", err)\n\t\t}\n\t}\n}",
+                  "token_estimate": 383
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 109,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "text": "// DialOption returns a dial option which enables OpenTelemetry instrumentation\n// code for a grpc.ClientConn.\n//\n// Client applications interested in instrumenting their grpc.ClientConn should\n// pass the dial option returned from this function as a dial option to\n// grpc.NewClient().\n//\n// For the metrics supported by this instrumentation code, specify the client\n// metrics to record in metrics options. Also provide an implementation of a\n// MeterProvider. If the passed in Meter Provider does not have the view\n// configured for an individual metric turned on, the API call in this component\n// will create a default view for that metric.\n//\n// For the traces supported by this instrumentation code, provide an\n// implementation of a TextMapPropagator and OpenTelemetry TracerProvider.\nfunc DialOption(o Options) grpc.DialOption {\n\tvar metricsOpts, tracingOpts []grpc.DialOption\n\n\tif o.isMetricsEnabled() {\n\t\tmetricsHandler := \u0026clientMetricsHandler{options: o}\n\t\tmetricsHandler.initializeMetrics()\n\t\tmetricsOpts = append(metricsOpts, grpc.WithChainUnaryInterceptor(metricsHandler.unaryInterceptor), grpc.WithChainStreamInterceptor(metricsHandler.streamInterceptor), grpc.WithStatsHandler(metricsHandler))\n\t}\n\tif o.isTracingEnabled() {\n\t\ttracingHandler := \u0026clientTracingHandler{options: o}\n\t\ttracingHandler.initializeTraces()\n\t\ttracingOpts = append(tracingOpts, grpc.WithChainUnaryInterceptor(tracingHandler.unaryInterceptor), grpc.WithChainStreamInterceptor(tracingHandler.streamInterceptor), grpc.WithStatsHandler(tracingHandler))\n\t}\n\treturn joinDialOptions(append(metricsOpts, tracingOpts...)...)\n}",
+                  "token_estimate": 401
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/client_metrics.go",
+                    "start_line": 160,
+                    "end_line": 186,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "// TagRPC implements per RPC attempt context management for metrics.\nfunc (h *clientMetricsHandler) TagRPC(ctx context.Context, info *stats.RPCTagInfo) context.Context {\n\t// Numerous stats handlers can be used for the same channel. The cluster\n\t// impl balancer which writes to this will only write once, thus have this\n\t// stats handler's per attempt scoped context point to the same optional\n\t// labels map if set.\n\tvar labels *istats.Labels\n\tif labels = istats.GetLabels(ctx); labels == nil {\n\t\tlabels = \u0026istats.Labels{\n\t\t\t// The defaults for all the per call labels from a plugin that\n\t\t\t// executes on the callpath that this OpenTelemetry component\n\t\t\t// currently supports.\n\t\t\tTelemetryLabels: map[string]string{\n\t\t\t\t\"grpc.lb.locality\":        \"\",\n\t\t\t\t\"grpc.lb.backend_service\": \"\",\n\t\t\t},\n\t\t}\n\t\tctx = istats.SetLabels(ctx, labels)\n\t}\n\tctx, ri := getOrCreateClientRPCInfo(ctx)\n\tai := ri.ai\n\tai.startTime = time.Now()\n\tai.xdsLabels = labels.TelemetryLabels\n\tai.method = removeLeadingSlash(info.FullMethodName)\n\n\treturn ctx\n}",
+                  "token_estimate": 257
+                },
+                {
+                  "citation": {
+                    "file": "examples/features/opentelemetry/README.md",
+                    "start_line": 1,
+                    "end_line": 7,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "# OpenTelemetry\n\nThis example shows how to configure OpenTelemetry on a client and server, and\nshows what type of telemetry data it can produce for certain RPCs.\nThis example shows how to enable experimental gRPC metrics, which are disabled\nby default and must be explicitly configured on the client and/or server.\n",
+                  "token_estimate": 78
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 77,
+                    "end_line": 107,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "text": "// MetricsOptions are the metrics options for OpenTelemetry instrumentation.\ntype MetricsOptions struct {\n\t// MeterProvider is the MeterProvider instance that will be used to create\n\t// instruments. To enable metrics collection, set a meter provider. If\n\t// unset, no metrics will be recorded.\n\tMeterProvider otelmetric.MeterProvider\n\n\t// Metrics are the metrics to instrument. Will create instrument and record telemetry\n\t// for corresponding metric supported by the client and server\n\t// instrumentation components if applicable. If not set, the default metrics\n\t// will be recorded.\n\tMetrics *stats.MetricSet\n\n\t// MethodAttributeFilter is a function that determines whether to record the\n\t// method name of RPCs as an attribute, or to bucket into \"other\". Take care\n\t// to limit the values allowed, as allowing too many will increase\n\t// cardinality and could cause severe memory or performance problems.\n\t//\n\t// This only applies for server-side metrics.  For clients, to record the\n\t// method name in the attributes, pass grpc.StaticMethodCallOption to Invoke\n\t// or NewStream. Note that when using protobuf generated clients, this\n\t// CallOption is included automatically.\n\tMethodAttributeFilter func(string) bool\n\n\t// OptionalLabels specifies a list of optional labels to enable on any\n\t// metrics that support them.\n\tOptionalLabels []string\n\n\t// pluginOption is used to get labels to attach to certain metrics, if set.\n\tpluginOption otelinternal.PluginOption\n}",
+                  "token_estimate": 367
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/server_metrics.go",
+                    "start_line": 154,
+                    "end_line": 171,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "func (h *serverMetricsHandler) streamInterceptor(srv any, ss grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) error {\n\tvar metadataExchangeLabels metadata.MD\n\tif h.options.MetricsOptions.pluginOption != nil {\n\t\tmetadataExchangeLabels = h.options.MetricsOptions.pluginOption.GetMetadata()\n\t}\n\tals := \u0026attachLabelsStream{\n\t\tServerStream:           ss,\n\t\tmetadataExchangeLabels: metadataExchangeLabels,\n\t}\n\terr := handler(srv, als)\n\n\t// Add metadata exchange labels to trailers if never sent in headers,\n\t// irrespective of whether or not RPC failed.\n\tif !als.attachedLabels.Load() {\n\t\tals.SetTrailer(als.metadataExchangeLabels)\n\t}\n\treturn err\n}",
+                  "token_estimate": 166
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/internal/pluginoption.go",
+                    "start_line": 40,
+                    "end_line": 40,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "text": "\tGetLabels(incomingMetadata metadata.MD) map[string]string",
+                  "token_estimate": 14
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/client_metrics.go",
+                    "start_line": 234,
+                    "end_line": 242,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/internal/pluginoption.go",
+                    "start_line": 40,
+                    "end_line": 40,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 509,
+                    "end_line": 547,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "experimental/stats/metricregistry.go",
+                    "start_line": 179,
+                    "end_line": 179,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 509,
+                    "end_line": 547,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "experimental/stats/metrics.go",
+                    "start_line": 88,
+                    "end_line": 88,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 509,
+                    "end_line": 547,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "grpclog/internal/loggerv2.go",
+                    "start_line": 42,
+                    "end_line": 42,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 509,
+                    "end_line": 547,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "grpclog/internal/loggerv2.go",
+                    "start_line": 48,
+                    "end_line": 48,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "dialoptions.go",
+                    "start_line": 523,
+                    "end_line": 533,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/client_tracing.go",
+                    "start_line": 43,
+                    "end_line": 48,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "dialoptions.go",
+                    "start_line": 598,
+                    "end_line": 602,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "dialoptions.go",
+                    "start_line": 617,
+                    "end_line": 621,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 69,
+                    "end_line": 71,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 73,
+                    "end_line": 75,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/client_metrics.go",
+                    "start_line": 161,
+                    "end_line": 186,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 219,
+                    "end_line": 226,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/client_metrics.go",
+                    "start_line": 161,
+                    "end_line": 186,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "internal/stats/labels.go",
+                    "start_line": 33,
+                    "end_line": 36,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/client_metrics.go",
+                    "start_line": 161,
+                    "end_line": 186,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "internal/stats/labels.go",
+                    "start_line": 39,
+                    "end_line": 42,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/client_metrics.go",
+                    "start_line": 161,
+                    "end_line": 186,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 237,
+                    "end_line": 239,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 78,
+                    "end_line": 107,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 82,
+                    "end_line": 82,
+                    "commit_hash": "fd8a1060a84d7021a9db7b4120b49df651beb762"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                }
+              ],
+              "knowledge": [
+                {
+                  "scope": "examples/features/opentelemetry/client",
+                  "kind": "convention",
+                  "text": "package: examples/features/opentelemetry/client. conventions summary.\n"
+                },
+                {
+                  "scope": "stats/opentelemetry/internal/tracing",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry/internal/tracing. conventions summary.\nconstructors: 2 New*\ntests: 1 files, table_driven=0, testify=0\n"
+                },
+                {
+                  "scope": "experimental/opentelemetry",
+                  "kind": "convention",
+                  "text": "package: experimental/opentelemetry. conventions summary.\n"
+                },
+                {
+                  "scope": "examples/features/opentelemetry/server",
+                  "kind": "convention",
+                  "text": "package: examples/features/opentelemetry/server. conventions summary.\nlogger: stdlib_log=1 (total=1)\n"
+                },
+                {
+                  "scope": "stats/opentelemetry/internal",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry/internal. conventions summary.\n"
+                },
+                {
+                  "scope": "stats/opentelemetry/internal/testutils",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry/internal/testutils. conventions summary.\nerrors: fmt.Errorf_plain=4 (total=4)\n"
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 1780,
+                "utilization_ratio": 0.24722222222222223,
+                "built_at": "2026-10-24T00:30:26.474417Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "fab0e1329a283522c3b040cc9155353607227170983f59db2a003ee23a6277e9",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-8877",
+      "prompt": "OpenTelemetry를 안 쓰는 클라이언트도 통계 핸들러에 레이블을 넘길 수 있게, 텔레메트리 레이블 콜백을 등록하는 실험 API를 만들고 싶어",
+      "expected_intent": "feature_add",
+      "classified_intents": [
+        ""
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0.09523809523809523,
+        "file_recall": 0.2,
+        "file_f1": 0.12903225806451613,
+        "file_mrr": 0.010818713450292398,
+        "first_hit_rank": 18,
+        "token_utilization": 0.24722222222222223,
+        "used_tokens": 1780,
+        "citation_count": 25,
+        "body_count": 9,
+        "redaction_count": 0,
+        "latency_ms": 1123,
+        "latency_ms_p50": 1123,
+        "latency_ms_p95": 1123,
+        "latency_ms_max": 1123
+      },
+      "retrieval_state": "miss",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0.09523809523809523,
+      "avg_mrr": 0.010818713450292398,
+      "avg_recall": 0.2,
+      "avg_f1": 0.12903225806451613,
+      "avg_latency_ms": 1123
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0.05555555555555555
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "feature_add": {
+        "(unknown)": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,737 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:18:12.224542Z",
+  "finished_at": "2026-10-24T00:18:14.198764Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 27290792,
+          "completed_at": "2026-10-24T09:18:12.2523+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "changed_files": [
+                ".gemini/styleguide.md",
+                ".github/workflows/govulncheck.yaml",
+                ".github/workflows/testing.yml",
+                "CONTRIBUTING.md",
+                "authz/grpc_authz_end2end_test.go",
+                "authz/grpc_authz_server_interceptors.go",
+                "authz/grpc_authz_server_interceptors_test.go",
+                "balancer/autosharding/autosharding.go",
+                "balancer/autosharding/autosharding_test.go",
+                "balancer/autosharding/slice_map.go",
+                "balancer/autosharding/slice_map_test.go",
+                "balancer/balancer.go",
+                "balancer/endpointsharding/endpointsharding.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer_grpc.pb.go",
+                "balancer/grpclb/grpclb_remote_balancer.go",
+                "balancer/grpclb/grpclb_test.go",
+                "balancer/pickfirst/metrics_test.go",
+                "balancer/pickfirst/pickfirst.go",
+                "balancer/pickfirst/pickfirst_ext_test.go",
+                "balancer/pickfirst/pickfirstleaf/pickfirstleaf.go",
+                "balancer/randomsubsetting/randomsubsetting.go",
+                "balancer/randomsubsetting/randomsubsetting_test.go",
+                "balancer/ringhash/picker.go",
+                "balancer/ringhash/picker_test.go",
+                "balancer/ringhash/ring_test.go",
+                "balancer/ringhash/ringhash.go",
+                "balancer/ringhash/ringhash_test.go",
+                "balancer/rls/balancer.go",
+                "balancer/rls/balancer_test.go",
+                "balancer/rls/cache.go",
+                "balancer/rls/cache_test.go",
+                "balancer/rls/control_channel.go",
+                "balancer/rls/metrics_test.go",
+                "balancer/rls/picker.go",
+                "balancer/weightedtarget/weightedtarget_test.go",
+                "binarylog/binarylog_end2end_test.go",
+                "binarylog/grpc_binarylog_v1/binarylog.pb.go",
+                "call.go",
+                "channelz/grpc_channelz_v1/channelz.pb.go",
+                "channelz/grpc_channelz_v1/channelz_grpc.pb.go",
+                "clientconn.go",
+                "clientconn_disconnect_reason_noplan9.go",
+                "clientconn_disconnect_reason_plan9.go",
+                "cmd/protoc-gen-go-grpc/go.mod",
+                "cmd/protoc-gen-go-grpc/go.sum",
+                "cmd/protoc-gen-go-grpc/main.go",
+                "credentials/alts/alts.go",
+                "credentials/alts/alts_test.go",
+                "credentials/alts/internal/conn/record.go",
+                "credentials/alts/internal/conn/record_test.go",
+                "credentials/alts/internal/handshaker/handshaker.go",
+                "credentials/alts/internal/handshaker/handshaker_test.go",
+                "credentials/alts/internal/proto/grpc_gcp/altscontext.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker_grpc.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/transport_security_common.pb.go",
+                "credentials/google/gcp_service_account_identity_credentials.go",
+                "credentials/google/gcp_service_account_identity_credentials_test.go",
+                "credentials/google/internal/internal.go",
+                "credentials/sts/sts.go",
+                "credentials/sts/sts_test.go",
+                "credentials/xds/xds.go",
+                "credentials/xds/xds_client_test.go",
+                "credentials/xds/xds_server_test.go",
+                "dialoptions.go",
+                "encoding/compressor_test.go",
+                "encoding/encoding.go",
+                "encoding/encoding_test.go",
+                "encoding/gzip/gzip.go",
+                "examples/features/opentelemetry/client/main.go",
+                "examples/features/opentelemetry/server/main.go",
+                "examples/features/proto/echo/echo.pb.go",
+                "examples/features/proto/echo/echo_grpc.pb.go",
+                "examples/go.mod",
+                "examples/go.sum",
+                "examples/helloworld/helloworld/helloworld.pb.go",
+                "examples/helloworld/helloworld/helloworld_grpc.pb.go",
+                "examples/route_guide/routeguide/route_guide.pb.go",
+                "examples/route_guide/routeguide/route_guide_grpc.pb.go",
+                "experimental/balancer/hostname/hostname.go",
+                "experimental/balancer/hostname/hostname_test.go",
+                "experimental/balancer/weight/weight.go",
+                "experimental/balancer/weight/weight_test.go",
+                "experimental/stats/metrics.go",
+                "experimental/stats/telemetry/labels.go",
+                "gcp/observability/go.mod",
+                "gcp/observability/go.sum",
+                "gcp/observability/logging_test.go",
+                "go.mod",
+                "go.sum",
+                "health/grpc_health_v1/health.pb.go",
+                "health/grpc_health_v1/health_grpc.pb.go",
+                "internal/balancergroup/balancergroup.go",
+                "internal/balancergroup/balancergroup_test.go",
+                "internal/buffer/unbounded.go",
+                "internal/buffer/unbounded_test.go",
+                "internal/credentials/xds/handshake_info.go",
+                "internal/credentials/xds/handshake_info_test.go",
+                "internal/envconfig/envconfig.go",
+                "internal/envconfig/envconfig_test.go",
+                "internal/envconfig/xds.go",
+                "internal/grpcsync/callback_serializer.go",
+                "internal/grpcsync/callback_serializer_test.go",
+                "internal/grpcsync/refcounted.go",
+                "internal/grpcsync/refcounted_test.go",
+                "internal/grpcutil/encode_duration.go",
+                "internal/grpcutil/regex_test.go",
+                "internal/idle/idle_e2e_test.go",
+                "internal/internal.go",
+                "internal/leakcheck/leakcheck_test.go",
+                "internal/mem/buffer_pool.go",
+                "internal/optional/optional.go",
+                "internal/optional/optional_test.go",
+                "internal/proto/grpc_lookup_v1/rls.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_config.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_grpc.pb.go",
+                "internal/resolver/config_selector.go",
+                "internal/stats/labels.go",
+                "internal/stats/labels_test.go",
+                "internal/testutils/balancer.go",
+                "internal/testutils/stats/test_metrics_recorder.go",
+                "internal/transport/client_stream.go",
+                "internal/transport/controlbuf.go",
+                "internal/transport/controlbuf_test.go",
+                "internal/transport/flowcontrol.go",
+                "internal/transport/handler_server.go",
+                "internal/transport/handler_server_test.go",
+                "internal/transport/http2_client.go",
+                "internal/transport/http2_client_header_bench_test.go",
+                "internal/transport/http2_server.go",
+                "internal/transport/http_util.go",
+                "internal/transport/http_util_test.go",
+                "internal/transport/internal/internal.go",
+                "internal/transport/readyreader/raw_conn_linux.go",
+                "internal/transport/readyreader/raw_conn_nonlinux.go",
+                "internal/transport/readyreader/ready_reader.go",
+                "internal/transport/readyreader/ready_reader_ext_test.go",
+                "internal/transport/server_metrics_ext_test.go",
+                "internal/transport/transport.go",
+                "internal/transport/transport_test.go",
+                "internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go",
+                "internal/xds/balancer/cdsbalancer/cdsbalancer.go",
+                "internal/xds/balancer/cdsbalancer/cdsbalancer_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_childname.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_childname_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/aggregate_cluster_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go",
+                "internal/xds/balancer/clusterimpl/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/clusterimpl.go",
+                "internal/xds/balancer/clusterimpl/internal/internal.go",
+                "internal/xds/balancer/clusterimpl/picker.go",
+                "internal/xds/balancer/clusterimpl/tests/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/tests/clusterimpl_security_test.go",
+                "internal/xds/balancer/clustermanager/clustermanager_test.go",
+                "internal/xds/balancer/clustermanager/picker.go",
+                "internal/xds/balancer/outlierdetection/balancer.go",
+                "internal/xds/balancer/outlierdetection/balancer_test.go",
+                "internal/xds/balancer/outlierdetection/e2e_test/outlierdetection_test.go",
+                "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                "internal/xds/balancer/priority/balancer.go",
+                "internal/xds/balancer/priority/balancer_child.go",
+                "internal/xds/balancer/priority/balancer_priority.go",
+                "internal/xds/balancer/priority/balancer_test.go",
+                "internal/xds/bootstrap/bootstrap.go",
+                "internal/xds/bootstrap/bootstrap_test.go",
+                "internal/xds/clients/config.go",
+                "internal/xds/clients/internal/buffer/unbounded.go",
+                "internal/xds/clients/internal/buffer/unbounded_test.go",
+                "internal/xds/clients/internal/syncutil/callback_serializer.go",
+                "internal/xds/clients/internal/testutils/faketransport/xds_fake_transport.go",
+                "internal/xds/clients/lrsclient/loadreport_test.go",
+                "internal/xds/clients/lrsclient/lrs_stream.go",
+                "internal/xds/clients/xdsclient/ads_stream.go",
+                "internal/xds/clients/xdsclient/authority.go",
+                "internal/xds/clients/xdsclient/channel.go",
+                "internal/xds/clients/xdsclient/channel_test.go",
+                "internal/xds/clients/xdsclient/metrics/metrics.go",
+                "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go",
+                "internal/xds/clients/xdsclient/test/dump_test.go",
+                "internal/xds/clients/xdsclient/test/helpers_test.go",
+                "internal/xds/clients/xdsclient/test/metrics_test.go",
+                "internal/xds/clients/xdsclient/xdsclient.go",
+                "internal/xds/credentials/access_token.go",
+                "internal/xds/credentials/access_token_test.go",
+                "internal/xds/credentials/credentials.go",
+                "internal/xds/credentials/tls.go",
+                "internal/xds/credentials/tls_test.go",
+                "internal/xds/credentials/xds_test.go",
+                "internal/xds/grpcservice/grpcservice.go",
+                "internal/xds/grpcservice/grpcservice_test.go",
+                "internal/xds/httpfilter/ext_authz/config.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz_test.go",
+                "internal/xds/httpfilter/extconfig.go",
+                "internal/xds/httpfilter/extconfig_test.go",
+                "internal/xds/httpfilter/extproc/config.go",
+                "internal/xds/httpfilter/extproc/config_test.go",
+                "internal/xds/httpfilter/extproc/ext_proc.go",
+                "internal/xds/httpfilter/extproc/ext_proc_ext_test.go",
+                "internal/xds/httpfilter/extproc/internal/internal.go",
+                "internal/xds/httpfilter/extproc/metrics.go",
+                "internal/xds/httpfilter/fault/fault.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_e2e_test.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_test.go",
+                "internal/xds/httpfilter/httpfilter.go",
+                "internal/xds/httpfilter/rbac/rbac.go",
+                "internal/xds/httpfilter/rbac/rbac_test.go",
+                "internal/xds/httpfilter/router/router.go",
+                "internal/xds/matcher/matcher_header.go",
+                "internal/xds/matcher/string_matcher.go",
+                "internal/xds/matcher/string_matcher_test.go",
+                "internal/xds/rbac/matchers.go",
+                "internal/xds/rbac/rbac_engine_test.go",
+                "internal/xds/resolver/cluster_specifier_plugin_test.go",
+                "internal/xds/resolver/serviceconfig.go",
+                "internal/xds/resolver/serviceconfig_test.go",
+                "internal/xds/resolver/xds_http_filters_test.go",
+                "internal/xds/resolver/xds_resolver.go",
+                "internal/xds/resolver/xds_resolver_test.go",
+                "internal/xds/server/conn_wrapper.go",
+                "internal/xds/server/filter_chain_manager.go",
+                "internal/xds/server/filter_chain_manager_test.go",
+                "internal/xds/server/listener_wrapper.go",
+                "internal/xds/server/listener_wrapper_test.go",
+                "internal/xds/server/routing.go",
+                "internal/xds/server/routing_test.go",
+                "internal/xds/server/server_options.go",
+                "internal/xds/test/e2e/e2e_utils.go",
+                "internal/xds/xdsclient/client_refcounted_test.go",
+                "internal/xds/xdsclient/clientimpl.go",
+                "internal/xds/xdsclient/clientimpl_test.go",
+                "internal/xds/xdsclient/pool.go",
+                "internal/xds/xdsclient/pool/pool_ext_test.go",
+                "internal/xds/xdsclient/resource_types.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain_test.go",
+                "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/matcher.go",
+                "internal/xds/xdsclient/xdsresource/matcher_path.go",
+                "internal/xds/xdsclient/xdsresource/matcher_test.go",
+                "internal/xds/xdsclient/xdsresource/metadata.go",
+                "internal/xds/xdsclient/xdsresource/metadata_test.go",
+                "internal/xds/xdsclient/xdsresource/route_config_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/test_utils_test.go",
+                "internal/xds/xdsclient/xdsresource/type_cds.go",
+                "internal/xds/xdsclient/xdsresource/type_eds.go",
+                "internal/xds/xdsclient/xdsresource/type_lds.go",
+                "internal/xds/xdsclient/xdsresource/type_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds_test.go",
+                "internal/xds/xdsclient/xdsresource/version/version.go",
+                "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager_test.go",
+                "interop/grpc_testing/benchmark_service.pb.go",
+                "interop/grpc_testing/benchmark_service_grpc.pb.go",
+                "interop/grpc_testing/control.pb.go",
+                "interop/grpc_testing/core/stats.pb.go",
+                "interop/grpc_testing/empty.pb.go",
+                "interop/grpc_testing/messages.pb.go",
+                "interop/grpc_testing/payloads.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service_grpc.pb.go",
+                "interop/grpc_testing/stats.pb.go",
+                "interop/grpc_testing/test.pb.go",
+                "interop/grpc_testing/test_grpc.pb.go",
+                "interop/grpc_testing/worker_service.pb.go",
+                "interop/grpc_testing/worker_service_grpc.pb.go",
+                "interop/observability/go.mod",
+                "interop/observability/go.sum",
+                "interop/orcalb.go",
+                "interop/orcalb_test.go",
+                "interop/stress/grpc_testing/metrics.pb.go",
+                "interop/stress/grpc_testing/metrics_grpc.pb.go",
+                "interop/xds/go.mod",
+                "interop/xds/go.sum",
+                "mem/buffer_pool.go",
+                "mem/buffer_slice.go",
+                "mem/buffers.go",
+                "mem/buffers_test.go",
+                "metadata/metadata.go",
+                "metadata/metadata_test.go",
+                "orca/producer_test.go",
+                "profiling/proto/service.pb.go",
+                "profiling/proto/service_grpc.pb.go",
+                "reflection/grpc_reflection_v1/reflection.pb.go",
+                "reflection/grpc_reflection_v1/reflection_grpc.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection_grpc.pb.go",
+                "reflection/grpc_testing/proto2.pb.go",
+                "reflection/grpc_testing/proto2_ext.pb.go",
+                "reflection/grpc_testing/proto2_ext2.pb.go",
+                "reflection/grpc_testing/test.pb.go",
+                "reflection/grpc_testing/test_grpc.pb.go",
+                "resolver_wrapper.go",
+                "rpc_util.go",
+                "rpc_util_test.go",
+                "scripts/vet.sh",
+                "security/advancedtls/advancedtls.go",
+                "security/advancedtls/advancedtls_test.go",
+                "security/advancedtls/certificate_utils_test.go",
+                "security/advancedtls/examples/go.mod",
+                "security/advancedtls/examples/go.sum",
+                "security/advancedtls/go.mod",
+                "security/advancedtls/go.sum",
+                "server.go",
+                "stats/opencensus/go.mod",
+                "stats/opencensus/go.sum",
+                "stats/opentelemetry/client_metrics.go",
+                "stats/opentelemetry/client_tracing.go",
+                "stats/opentelemetry/csm/observability_test.go",
+                "stats/opentelemetry/e2e_test.go",
+                "stats/opentelemetry/example_test.go",
+                "stats/opentelemetry/internal/testutils/testutils.go",
+                "stats/opentelemetry/opentelemetry.go",
+                "stats/opentelemetry/server_metrics.go",
+                "stats/opentelemetry/server_tracing.go",
+                "stats/opentelemetry/trace.go",
+                "stats/stats.go",
+                "stats/stats_test.go",
+                "status/status_ext_test.go",
+                "stream.go",
+                "stream_test.go",
+                "test/balancer_test.go",
+                "test/codec_perf/perf.pb.go",
+                "test/creds_test.go",
+                "test/end2end_test.go",
+                "test/gracefulstop_test.go",
+                "test/kokoro/psm-regional_td.cfg",
+                "test/malformed_method_test.go",
+                "test/retry_test.go",
+                "test/server_test.go",
+                "test/servertester.go",
+                "test/tools/go.mod",
+                "test/tools/go.sum",
+                "test/xds/xds_client_http_connect_test.go",
+                "test/xds/xds_client_integration_test.go",
+                "test/xds/xds_client_retry_test.go",
+                "test/xds/xds_client_sni_test.go",
+                "test/xds/xds_resolver_e2e_test.go",
+                "test/xds/xds_server_filter_e2e_test.go",
+                "test/xds/xds_server_filter_override_test.go",
+                "test/xds/xds_server_filter_state_retention_test.go",
+                "test/xds/xds_server_integration_test.go",
+                "test/xds/xds_server_interceptor_leak_test.go",
+                "test/xds/xds_server_rbac_test.go",
+                "test/xds/xds_telemetry_labels_test.go",
+                "version.go",
+                "xds/googledirectpath/googlec2p.go",
+                "xds/googledirectpath/googlec2p_test.go",
+                "xds/server.go",
+                "xds/server_options.go",
+                "xds/server_serving_mode_ext_test.go",
+                "xds/server_test.go",
+                "xds/xds.go"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "집계 클러스터에서 핸드셰이크가 최상위 클러스터의 보안 설정을 써. 실제 말단 클러스터의 보안 설정을 쓰게 고치고 싶어"
+          },
+          "elapsed_ns": 1945725875,
+          "completed_at": "2026-10-24T09:18:14.198412+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "query": "집계 클러스터에서 핸드셰이크가 최상위 클러스터의 보안 설정을 써. 실제 말단 클러스터의 보안 설정을 쓰게 고치고 싶어",
+              "citations": [
+                {
+                  "file": "credentials/google/xds.go",
+                  "start_line": 33,
+                  "end_line": 33,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                  "start_line": 66,
+                  "end_line": 71,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                  "start_line": 276,
+                  "end_line": 322,
+                  "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                },
+                {
+                  "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                  "start_line": 53,
+                  "end_line": 64,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/xds/balancer/clustermanager/picker.go",
+                  "start_line": 53,
+                  "end_line": 53,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "clientconn.go",
+                  "start_line": 1418,
+                  "end_line": 1418,
+                  "commit_hash": "572fdca53b1212cef3c897a0b30c2644971b6cf1"
+                },
+                {
+                  "file": "SECURITY.md",
+                  "start_line": 1,
+                  "end_line": 3,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                  "start_line": 66,
+                  "end_line": 81,
+                  "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                },
+                {
+                  "file": "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                  "start_line": 326,
+                  "end_line": 360,
+                  "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                },
+                {
+                  "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                  "start_line": 57,
+                  "end_line": 57,
+                  "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                },
+                {
+                  "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                  "start_line": 60,
+                  "end_line": 60,
+                  "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                },
+                {
+                  "file": "internal/xds/bootstrap/bootstrap.go",
+                  "start_line": 474,
+                  "end_line": 476,
+                  "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "credentials/google/xds.go",
+                    "start_line": 33,
+                    "end_line": 33,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "const cfeClusterAuthorityName = \"traffic-director-c2p.xds.googleapis.com\"",
+                  "token_estimate": 18
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                    "start_line": 66,
+                    "end_line": 71,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// AggregateConfig holds the configuration for an aggregate cluster.\ntype AggregateConfig struct {\n\t// LeafClusters contains a prioritized list of names of the leaf clusters\n\t// for the cluster.\n\tLeafClusters []string\n}",
+                  "token_estimate": 54
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                    "start_line": 276,
+                    "end_line": 322,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "text": "// securityConfigFromCluster extracts the relevant security configuration from\n// the received Cluster resource.\nfunc securityConfigFromCluster(cluster *v3clusterpb.Cluster) (*SecurityConfig, error) {\n\tif tsm := cluster.GetTransportSocketMatches(); len(tsm) != 0 {\n\t\treturn nil, fmt.Errorf(\"unsupported transport_socket_matches field is non-empty: %+v\", tsm)\n\t}\n\t// The Cluster resource contains a `transport_socket` field, which contains\n\t// a oneof `typed_config` field of type `protobuf.Any`. The any proto\n\t// contains a marshaled representation of an `UpstreamTlsContext` message.\n\tts := cluster.GetTransportSocket()\n\tif ts == nil {\n\t\treturn nil, nil\n\t}\n\tif name := ts.GetName(); name != transportSocketName {\n\t\treturn nil, fmt.Errorf(\"transport_socket field has unexpected name: %s\", name)\n\t}\n\ttc := ts.GetTypedConfig()\n\tif typeURL := tc.GetTypeUrl(); typeURL != version.V3UpstreamTLSContextURL {\n\t\treturn nil, fmt.Errorf(\"transport_socket missing typed_config or wrong type_url: %q\", typeURL)\n\t}\n\tupstreamCtx := \u0026v3tlspb.UpstreamTlsContext{}\n\tif err := proto.Unmarshal(tc.GetValue(), upstreamCtx); err != nil {\n\t\treturn nil, fmt.Errorf(\"failed to unmarshal UpstreamTlsContext in CDS response: %v\", err)\n\t}\n\t// The following fields from `UpstreamTlsContext` are ignored:\n\t// - allow_renegotiation\n\t// - max_session_keys\n\tif upstreamCtx.GetCommonTlsContext() == nil {\n\t\treturn nil, errors.New(\"UpstreamTlsContext in CDS response does not contain a CommonTlsContext\")\n\t}\n\n\tsc, err := securityConfigFromCommonTLSContext(upstreamCtx.GetCommonTlsContext(), false)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\t// Set SNI related fields in SecurityConfig from UpstreamTlsContext if\n\t// `GRPC_EXPERIMENTAL_XDS_SNI` is enabled.\n\tif envconfig.XDSSNIEnabled {\n\t\tsc.SNI = upstreamCtx.GetSni()\n\t\tif len(sc.SNI) \u003e maxSNILength {\n\t\t\treturn nil, fmt.Errorf(\"SNI value %q in UpstreamTlsContext in CDS response exceeds max length of %d\", sc.SNI, maxSNILength)\n\t\t}\n\t\tsc.UseAutoHostSNI = upstreamCtx.GetAutoHostSni()\n\t\tsc.AutoSNISANValidation = upstreamCtx.GetAutoSniSanValidation()\n\t}\n\treturn sc, nil\n}",
+                  "token_estimate": 520
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                    "start_line": 53,
+                    "end_line": 64,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// ClusterConfig contains configuration for a single cluster.\ntype ClusterConfig struct {\n\t// Cluster configuration for the cluster. This field is always set to a\n\t// non-nil value.\n\tCluster *ClusterUpdate\n\t// EndpointConfig contains endpoint configuration for a leaf cluster. This\n\t// field is only set for EDS and LOGICAL_DNS clusters.\n\tEndpointConfig *EndpointConfig\n\t// AggregateConfig contains configuration for an aggregate cluster. This\n\t// field is only set for AGGREGATE clusters.\n\tAggregateConfig *AggregateConfig\n}",
+                  "token_estimate": 131
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/balancer/clustermanager/picker.go",
+                    "start_line": 53,
+                    "end_line": 53,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "type clusterKey struct{}",
+                  "token_estimate": 6
+                },
+                {
+                  "citation": {
+                    "file": "clientconn.go",
+                    "start_line": 1418,
+                    "end_line": 1418,
+                    "commit_hash": "572fdca53b1212cef3c897a0b30c2644971b6cf1"
+                  },
+                  "text": "type securityLevelKey struct{}",
+                  "token_estimate": 7
+                },
+                {
+                  "citation": {
+                    "file": "SECURITY.md",
+                    "start_line": 1,
+                    "end_line": 3,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "# Security Policy\n\nFor information on gRPC Security Policy and reporting potential security issues, please see [gRPC CVE Process](https://github.com/grpc/proposal/blob/master/P4-grpc-cve-process.md).",
+                  "token_estimate": 49
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                    "start_line": 66,
+                    "end_line": 81,
+                    "commit_hash": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb"
+                  },
+                  "text": "func securityConfigValidator(bc *bootstrap.Config, sc *SecurityConfig) error {\n\tif sc == nil {\n\t\treturn nil\n\t}\n\tif sc.IdentityInstanceName != \"\" {\n\t\tif _, ok := bc.CertProviderConfigs()[sc.IdentityInstanceName]; !ok {\n\t\t\treturn fmt.Errorf(\"identity certificate provider instance name %q missing in bootstrap configuration\", sc.IdentityInstanceName)\n\t\t}\n\t}\n\tif sc.RootInstanceName != \"\" {\n\t\tif _, ok := bc.CertProviderConfigs()[sc.RootInstanceName]; !ok {\n\t\t\treturn fmt.Errorf(\"root certificate provider instance name %q missing in bootstrap configuration\", sc.RootInstanceName)\n\t\t}\n\t}\n\treturn nil\n}",
+                  "token_estimate": 149
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                    "start_line": 278,
+                    "end_line": 322,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "target": {
+                    "file": "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                    "start_line": 326,
+                    "end_line": 360,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                    "start_line": 54,
+                    "end_line": 64,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "target": {
+                    "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                    "start_line": 57,
+                    "end_line": 57,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                    "start_line": 54,
+                    "end_line": 64,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "target": {
+                    "file": "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                    "start_line": 60,
+                    "end_line": 60,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                    "start_line": 66,
+                    "end_line": 81,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "target": {
+                    "file": "internal/xds/bootstrap/bootstrap.go",
+                    "start_line": 474,
+                    "end_line": 476,
+                    "commit_hash": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                }
+              ],
+              "knowledge": [
+                {
+                  "scope": "internal/xds/clusterspecifier",
+                  "kind": "convention",
+                  "text": "package: internal/xds/clusterspecifier. conventions summary."
+                },
+                {
+                  "scope": "internal/xds/balancer/clusterimpl",
+                  "kind": "convention",
+                  "text": "package: internal/xds/balancer/clusterimpl. conventions summary.\nerrors: errors.New=2, fmt.Errorf_plain=2 (total=4)\nconcurrency: mutex=1 chan=3 errgroup=0\ntests: 2 files, table_driven=1, testify=0\n"
+                },
+                {
+                  "scope": "internal/xds/balancer/clustermanager",
+                  "kind": "convention",
+                  "text": "package: internal/xds/balancer/clustermanager. conventions summary.\nerrors: fmt.Errorf_plain=7 (total=7)\nconcurrency: mutex=1 chan=0 errgroup=0\ntests: 2 files, table_driven=6, testify=0\n"
+                },
+                {
+                  "scope": "internal/xds/clusterspecifier/rls",
+                  "kind": "convention",
+                  "text": "package: internal/xds/clusterspecifier/rls. conventions summary.\nerrors: fmt.Errorf_plain=7 (total=7)\ntests: 1 files, table_driven=0, testify=0\n"
+                },
+                {
+                  "scope": "internal/xds/balancer/clusterimpl/tests",
+                  "kind": "convention",
+                  "text": "package: internal/xds/balancer/clusterimpl/tests. conventions summary.\nerrors: fmt.Errorf_plain=5, errors.New=1 (total=6)\nconcurrency: mutex=0 chan=2 errgroup=0\ntests: 1 files, table_driven=0, testify=0\n"
+                },
+                {
+                  "scope": "security/advancedtls/testdata",
+                  "kind": "convention",
+                  "text": "package: security/advancedtls/testdata. conventions summary.\n"
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 934,
+                "utilization_ratio": 0.1297222222222222,
+                "built_at": "2026-10-24T00:18:14.197732Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "70da444a8dce0c0738d240849945fb78c3b219b3aac8f904792909f0898f3d98",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-8956",
+      "prompt": "집계 클러스터에서 핸드셰이크가 최상위 클러스터의 보안 설정을 써. 실제 말단 클러스터의 보안 설정을 쓰게 고치고 싶어",
+      "expected_intent": "bug_fix",
+      "classified_intents": [
+        ""
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0,
+        "file_recall": 0,
+        "file_f1": 0,
+        "file_mrr": 0,
+        "first_hit_rank": 0,
+        "token_utilization": 0.1297222222222222,
+        "used_tokens": 934,
+        "citation_count": 12,
+        "body_count": 8,
+        "redaction_count": 0,
+        "latency_ms": 1945,
+        "latency_ms_p50": 1945,
+        "latency_ms_p95": 1945,
+        "latency_ms_max": 1945
+      },
+      "retrieval_state": "miss",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0,
+      "avg_mrr": 0,
+      "avg_recall": 0,
+      "avg_f1": 0,
+      "avg_latency_ms": 1945
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "bug_fix": {
+        "(unknown)": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,928 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:30:18.400947Z",
+  "finished_at": "2026-10-24T00:30:19.807466Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 23716000,
+          "completed_at": "2026-10-24T09:30:18.424972+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "679ae4c7df728622eb8d58e7ea8dcffc043169b7",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "changed_files": [
+                ".gemini/styleguide.md",
+                ".github/workflows/govulncheck.yaml",
+                "CONTRIBUTING.md",
+                "authz/grpc_authz_end2end_test.go",
+                "authz/grpc_authz_server_interceptors.go",
+                "authz/grpc_authz_server_interceptors_test.go",
+                "balancer/autosharding/autosharding.go",
+                "balancer/autosharding/autosharding_test.go",
+                "balancer/autosharding/slice_map.go",
+                "balancer/autosharding/slice_map_test.go",
+                "balancer/endpointsharding/endpointsharding.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer_grpc.pb.go",
+                "balancer/pickfirst/metrics_test.go",
+                "balancer/pickfirst/pickfirst.go",
+                "balancer/pickfirst/pickfirst_ext_test.go",
+                "balancer/pickfirst/pickfirstleaf/pickfirstleaf.go",
+                "balancer/randomsubsetting/randomsubsetting.go",
+                "balancer/randomsubsetting/randomsubsetting_test.go",
+                "balancer/ringhash/picker.go",
+                "balancer/ringhash/picker_test.go",
+                "balancer/ringhash/ring_test.go",
+                "balancer/ringhash/ringhash.go",
+                "balancer/ringhash/ringhash_test.go",
+                "balancer/rls/balancer.go",
+                "balancer/rls/balancer_test.go",
+                "balancer/rls/control_channel.go",
+                "binarylog/grpc_binarylog_v1/binarylog.pb.go",
+                "call.go",
+                "channelz/grpc_channelz_v1/channelz.pb.go",
+                "channelz/grpc_channelz_v1/channelz_grpc.pb.go",
+                "clientconn.go",
+                "clientconn_disconnect_reason_noplan9.go",
+                "clientconn_disconnect_reason_plan9.go",
+                "cmd/protoc-gen-go-grpc/go.mod",
+                "cmd/protoc-gen-go-grpc/go.sum",
+                "cmd/protoc-gen-go-grpc/main.go",
+                "credentials/alts/alts.go",
+                "credentials/alts/alts_test.go",
+                "credentials/alts/internal/conn/record.go",
+                "credentials/alts/internal/conn/record_test.go",
+                "credentials/alts/internal/handshaker/handshaker.go",
+                "credentials/alts/internal/handshaker/handshaker_test.go",
+                "credentials/alts/internal/proto/grpc_gcp/altscontext.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker_grpc.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/transport_security_common.pb.go",
+                "credentials/google/gcp_service_account_identity_credentials.go",
+                "credentials/google/gcp_service_account_identity_credentials_test.go",
+                "credentials/google/internal/internal.go",
+                "credentials/sts/sts.go",
+                "credentials/sts/sts_test.go",
+                "credentials/xds/xds.go",
+                "credentials/xds/xds_client_test.go",
+                "credentials/xds/xds_server_test.go",
+                "dialoptions.go",
+                "encoding/compressor_test.go",
+                "encoding/encoding.go",
+                "encoding/encoding_test.go",
+                "encoding/gzip/gzip.go",
+                "examples/features/opentelemetry/client/main.go",
+                "examples/features/opentelemetry/server/main.go",
+                "examples/features/proto/echo/echo.pb.go",
+                "examples/features/proto/echo/echo_grpc.pb.go",
+                "examples/go.mod",
+                "examples/go.sum",
+                "examples/helloworld/helloworld/helloworld.pb.go",
+                "examples/helloworld/helloworld/helloworld_grpc.pb.go",
+                "examples/route_guide/routeguide/route_guide.pb.go",
+                "examples/route_guide/routeguide/route_guide_grpc.pb.go",
+                "experimental/balancer/hostname/hostname.go",
+                "experimental/balancer/hostname/hostname_test.go",
+                "experimental/balancer/weight/weight.go",
+                "experimental/balancer/weight/weight_test.go",
+                "experimental/stats/telemetry/labels.go",
+                "gcp/observability/go.mod",
+                "gcp/observability/go.sum",
+                "gcp/observability/logging_test.go",
+                "go.mod",
+                "go.sum",
+                "health/grpc_health_v1/health.pb.go",
+                "health/grpc_health_v1/health_grpc.pb.go",
+                "internal/balancergroup/balancergroup_ext_test.go",
+                "internal/balancergroup/balancergroup_test.go",
+                "internal/buffer/unbounded.go",
+                "internal/buffer/unbounded_test.go",
+                "internal/credentials/xds/handshake_info.go",
+                "internal/credentials/xds/handshake_info_test.go",
+                "internal/envconfig/envconfig.go",
+                "internal/envconfig/envconfig_test.go",
+                "internal/envconfig/xds.go",
+                "internal/grpcsync/callback_serializer.go",
+                "internal/grpcsync/callback_serializer_test.go",
+                "internal/grpcsync/refcounted.go",
+                "internal/grpcsync/refcounted_test.go",
+                "internal/grpcutil/regex_test.go",
+                "internal/idle/idle_e2e_test.go",
+                "internal/internal.go",
+                "internal/mem/buffer_pool.go",
+                "internal/optional/optional.go",
+                "internal/optional/optional_test.go",
+                "internal/proto/grpc_lookup_v1/rls.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_config.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_grpc.pb.go",
+                "internal/resolver/config_selector.go",
+                "internal/stats/labels.go",
+                "internal/stats/labels_test.go",
+                "internal/testutils/balancer.go",
+                "internal/testutils/stats/test_metrics_recorder.go",
+                "internal/transport/client_stream.go",
+                "internal/transport/controlbuf.go",
+                "internal/transport/controlbuf_test.go",
+                "internal/transport/handler_server.go",
+                "internal/transport/handler_server_test.go",
+                "internal/transport/http2_client.go",
+                "internal/transport/http2_client_header_bench_test.go",
+                "internal/transport/http2_server.go",
+                "internal/transport/http_util.go",
+                "internal/transport/http_util_test.go",
+                "internal/transport/internal/internal.go",
+                "internal/transport/server_metrics_ext_test.go",
+                "internal/transport/transport.go",
+                "internal/transport/transport_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_test.go",
+                "internal/xds/balancer/clusterimpl/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/clusterimpl.go",
+                "internal/xds/balancer/clusterimpl/picker.go",
+                "internal/xds/balancer/clustermanager/picker.go",
+                "internal/xds/balancer/outlierdetection/balancer.go",
+                "internal/xds/balancer/outlierdetection/balancer_test.go",
+                "internal/xds/balancer/outlierdetection/e2e_test/outlierdetection_test.go",
+                "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                "internal/xds/balancer/priority/balancer.go",
+                "internal/xds/bootstrap/bootstrap.go",
+                "internal/xds/bootstrap/bootstrap_test.go",
+                "internal/xds/clients/internal/buffer/unbounded.go",
+                "internal/xds/clients/internal/buffer/unbounded_test.go",
+                "internal/xds/clients/internal/syncutil/callback_serializer.go",
+                "internal/xds/clients/xdsclient/authority.go",
+                "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go",
+                "internal/xds/clients/xdsclient/test/dump_test.go",
+                "internal/xds/clients/xdsclient/test/helpers_test.go",
+                "internal/xds/credentials/access_token.go",
+                "internal/xds/credentials/access_token_test.go",
+                "internal/xds/credentials/credentials.go",
+                "internal/xds/credentials/tls.go",
+                "internal/xds/credentials/tls_test.go",
+                "internal/xds/credentials/xds_test.go",
+                "internal/xds/grpcservice/grpcservice.go",
+                "internal/xds/grpcservice/grpcservice_test.go",
+                "internal/xds/httpfilter/ext_authz/config.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz_test.go",
+                "internal/xds/httpfilter/extconfig.go",
+                "internal/xds/httpfilter/extconfig_test.go",
+                "internal/xds/httpfilter/extproc/config.go",
+                "internal/xds/httpfilter/extproc/config_test.go",
+                "internal/xds/httpfilter/extproc/ext_proc.go",
+                "internal/xds/httpfilter/extproc/ext_proc_ext_test.go",
+                "internal/xds/httpfilter/extproc/internal/internal.go",
+                "internal/xds/httpfilter/extproc/metrics.go",
+                "internal/xds/httpfilter/fault/fault.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_e2e_test.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_test.go",
+                "internal/xds/httpfilter/httpfilter.go",
+                "internal/xds/httpfilter/rbac/rbac.go",
+                "internal/xds/httpfilter/rbac/rbac_test.go",
+                "internal/xds/httpfilter/router/router.go",
+                "internal/xds/matcher/matcher_header.go",
+                "internal/xds/matcher/string_matcher.go",
+                "internal/xds/matcher/string_matcher_test.go",
+                "internal/xds/rbac/matchers.go",
+                "internal/xds/rbac/rbac_engine_test.go",
+                "internal/xds/resolver/cluster_specifier_plugin_test.go",
+                "internal/xds/resolver/serviceconfig.go",
+                "internal/xds/resolver/xds_http_filters_test.go",
+                "internal/xds/resolver/xds_resolver.go",
+                "internal/xds/resolver/xds_resolver_test.go",
+                "internal/xds/server/conn_wrapper.go",
+                "internal/xds/server/filter_chain_manager.go",
+                "internal/xds/server/filter_chain_manager_test.go",
+                "internal/xds/server/listener_wrapper.go",
+                "internal/xds/server/listener_wrapper_test.go",
+                "internal/xds/server/routing.go",
+                "internal/xds/server/routing_test.go",
+                "internal/xds/server/server_options.go",
+                "internal/xds/xdsclient/clientimpl_test.go",
+                "internal/xds/xdsclient/pool.go",
+                "internal/xds/xdsclient/resource_types.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain_test.go",
+                "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/matcher.go",
+                "internal/xds/xdsclient/xdsresource/matcher_path.go",
+                "internal/xds/xdsclient/xdsresource/matcher_test.go",
+                "internal/xds/xdsclient/xdsresource/metadata.go",
+                "internal/xds/xdsclient/xdsresource/metadata_test.go",
+                "internal/xds/xdsclient/xdsresource/route_config_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/test_utils_test.go",
+                "internal/xds/xdsclient/xdsresource/type_cds.go",
+                "internal/xds/xdsclient/xdsresource/type_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds_test.go",
+                "internal/xds/xdsclient/xdsresource/version/version.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager.go",
+                "interop/grpc_testing/benchmark_service.pb.go",
+                "interop/grpc_testing/benchmark_service_grpc.pb.go",
+                "interop/grpc_testing/control.pb.go",
+                "interop/grpc_testing/core/stats.pb.go",
+                "interop/grpc_testing/empty.pb.go",
+                "interop/grpc_testing/messages.pb.go",
+                "interop/grpc_testing/payloads.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service_grpc.pb.go",
+                "interop/grpc_testing/stats.pb.go",
+                "interop/grpc_testing/test.pb.go",
+                "interop/grpc_testing/test_grpc.pb.go",
+                "interop/grpc_testing/worker_service.pb.go",
+                "interop/grpc_testing/worker_service_grpc.pb.go",
+                "interop/observability/go.mod",
+                "interop/observability/go.sum",
+                "interop/stress/grpc_testing/metrics.pb.go",
+                "interop/stress/grpc_testing/metrics_grpc.pb.go",
+                "interop/xds/go.mod",
+                "interop/xds/go.sum",
+                "mem/buffer_pool.go",
+                "mem/buffers.go",
+                "metadata/metadata.go",
+                "metadata/metadata_test.go",
+                "profiling/proto/service.pb.go",
+                "profiling/proto/service_grpc.pb.go",
+                "reflection/grpc_reflection_v1/reflection.pb.go",
+                "reflection/grpc_reflection_v1/reflection_grpc.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection_grpc.pb.go",
+                "reflection/grpc_testing/proto2.pb.go",
+                "reflection/grpc_testing/proto2_ext.pb.go",
+                "reflection/grpc_testing/proto2_ext2.pb.go",
+                "reflection/grpc_testing/test.pb.go",
+                "reflection/grpc_testing/test_grpc.pb.go",
+                "resolver_wrapper.go",
+                "rpc_util.go",
+                "rpc_util_test.go",
+                "scripts/vet.sh",
+                "security/advancedtls/advancedtls.go",
+                "security/advancedtls/advancedtls_test.go",
+                "security/advancedtls/certificate_utils_test.go",
+                "security/advancedtls/examples/go.mod",
+                "security/advancedtls/examples/go.sum",
+                "security/advancedtls/go.mod",
+                "security/advancedtls/go.sum",
+                "server.go",
+                "stats/opencensus/go.mod",
+                "stats/opencensus/go.sum",
+                "stats/opentelemetry/client_metrics.go",
+                "stats/opentelemetry/client_tracing.go",
+                "stats/opentelemetry/csm/observability_test.go",
+                "stats/opentelemetry/e2e_test.go",
+                "stats/opentelemetry/example_test.go",
+                "stats/opentelemetry/internal/testutils/testutils.go",
+                "stats/opentelemetry/opentelemetry.go",
+                "stats/opentelemetry/server_metrics.go",
+                "stats/opentelemetry/server_tracing.go",
+                "stats/opentelemetry/trace.go",
+                "stats/stats.go",
+                "stats/stats_test.go",
+                "stream.go",
+                "stream_test.go",
+                "test/balancer_test.go",
+                "test/codec_perf/perf.pb.go",
+                "test/creds_test.go",
+                "test/end2end_test.go",
+                "test/gracefulstop_test.go",
+                "test/kokoro/psm-regional_td.cfg",
+                "test/malformed_method_test.go",
+                "test/retry_test.go",
+                "test/server_test.go",
+                "test/servertester.go",
+                "test/tools/go.mod",
+                "test/tools/go.sum",
+                "test/xds/xds_client_http_connect_test.go",
+                "test/xds/xds_client_integration_test.go",
+                "test/xds/xds_resolver_e2e_test.go",
+                "test/xds/xds_server_filter_e2e_test.go",
+                "test/xds/xds_server_filter_override_test.go",
+                "test/xds/xds_server_filter_state_retention_test.go",
+                "test/xds/xds_server_integration_test.go",
+                "test/xds/xds_server_interceptor_leak_test.go",
+                "test/xds/xds_server_rbac_test.go",
+                "test/xds/xds_telemetry_labels_test.go",
+                "version.go",
+                "xds/googledirectpath/googlec2p.go",
+                "xds/googledirectpath/googlec2p_test.go",
+                "xds/server.go",
+                "xds/server_options.go",
+                "xds/server_serving_mode_ext_test.go",
+                "xds/server_test.go",
+                "xds/xds.go"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "OpenTelemetry 추적에서 예전에 되돌렸던 변경을 다시 넣고, 그때 실패하던 시험의 경쟁 상태도 고치고 싶어"
+          },
+          "elapsed_ns": 1381684625,
+          "completed_at": "2026-10-24T09:30:19.806871+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "intent": "test_add",
+              "query": "OpenTelemetry 추적에서 예전에 되돌렸던 변경을 다시 넣고, 그때 실패하던 시험의 경쟁 상태도 고치고 싶어",
+              "citations": [
+                {
+                  "file": "stats/opentelemetry/example_test.go",
+                  "start_line": 132,
+                  "end_line": 151,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 73,
+                  "end_line": 75,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/e2e_test.go",
+                  "start_line": 1702,
+                  "end_line": 1717,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 45,
+                  "end_line": 53,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "clientconn.go",
+                  "start_line": 1411,
+                  "end_line": 1424,
+                  "commit_hash": "c33aa45e147aa1e08070a0764c285ea30a82688a"
+                },
+                {
+                  "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                  "start_line": 2190,
+                  "end_line": 2266,
+                  "commit_hash": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c"
+                },
+                {
+                  "file": "stats/opentelemetry/e2e_test.go",
+                  "start_line": 1468,
+                  "end_line": 1510,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "test/xds/xds_telemetry_labels_test.go",
+                  "start_line": 126,
+                  "end_line": 147,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "clientconn.go",
+                  "start_line": 185,
+                  "end_line": 260,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "clientconn.go",
+                  "start_line": 1191,
+                  "end_line": 1239,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 124,
+                  "end_line": 138,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/metrics.go",
+                  "start_line": 48,
+                  "end_line": 58,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "dialoptions.go",
+                  "start_line": 423,
+                  "end_line": 427,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "credentials/insecure/insecure.go",
+                  "start_line": 34,
+                  "end_line": 36,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "stats/opentelemetry/opentelemetry.go",
+                  "start_line": 564,
+                  "end_line": 566,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "grpclog/internal/loggerv2.go",
+                  "start_line": 38,
+                  "end_line": 38,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "clientconn.go",
+                  "start_line": 1413,
+                  "end_line": 1424,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                  "start_line": 2193,
+                  "end_line": 2266,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                  "start_line": 1170,
+                  "end_line": 1206,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                  "start_line": 2971,
+                  "end_line": 2989,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                  "start_line": 2096,
+                  "end_line": 2108,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "internal/testutils/stats/test_metrics_recorder.go",
+                  "start_line": 53,
+                  "end_line": 64,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "dialoptions.go",
+                  "start_line": 507,
+                  "end_line": 517,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                },
+                {
+                  "file": "resolver/manual/manual.go",
+                  "start_line": 110,
+                  "end_line": 119,
+                  "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/example_test.go",
+                    "start_line": 132,
+                    "end_line": 151,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func ExampleOptions_addExperimentalMetrics() {\n\topts := opentelemetry.Options{\n\t\tMetricsOptions: opentelemetry.MetricsOptions{\n\t\t\t// These are example experimental gRPC metrics, which are disabled\n\t\t\t// by default and must be explicitly enabled. For the full,\n\t\t\t// up-to-date list of metrics, see:\n\t\t\t// https://grpc.io/docs/guides/opentelemetry-metrics/#instruments\n\t\t\tMetrics: opentelemetry.DefaultMetrics().Add(\n\t\t\t\t\"grpc.lb.pick_first.connection_attempts_succeeded\",\n\t\t\t\t\"grpc.lb.pick_first.connection_attempts_failed\",\n\t\t\t),\n\t\t},\n\t}\n\tdo := opentelemetry.DialOption(opts)\n\tcc, err := grpc.NewClient(\"\u003ctarget string\u003e\", do, grpc.WithTransportCredentials(insecure.NewCredentials()))\n\tif err != nil {\n\t\t// Handle error.\n\t}\n\tdefer cc.Close()\n}",
+                  "token_estimate": 185
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 73,
+                    "end_line": 75,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "func (o *Options) isTracingEnabled() bool {\n\treturn o.TraceOptions.TracerProvider != nil\n}",
+                  "token_estimate": 22
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 1702,
+                    "end_line": 1717,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "func verifyTrace(t *testing.T, spans tracetest.SpanStubs, want traceSpanInfo) {\n\tmatch := false\n\tfor _, span := range spans {\n\t\tif span.Name == want.name \u0026\u0026 span.SpanKind.String() == want.spanKind {\n\t\t\tmatch = true\n\t\t\tif diff := cmp.Diff(want.events, span.Events, cmpopts.IgnoreFields(trace.Event{}, \"Time\")); diff != \"\" {\n\t\t\t\tt.Errorf(\"Span event mismatch for %q (kind: %s) (-want +got):\\n%s\",\n\t\t\t\t\twant.name, want.spanKind, diff)\n\t\t\t}\n\t\t\tbreak\n\t\t}\n\t}\n\tif !match {\n\t\tt.Errorf(\"Expected span not found: %q (kind: %s)\", want.name, want.spanKind)\n\t}\n}",
+                  "token_estimate": 137
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 45,
+                    "end_line": 53,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "func init() {\n\totelinternal.SetPluginOption = func(o *Options, po otelinternal.PluginOption) {\n\t\to.MetricsOptions.pluginOption = po\n\t\t// Log an error if one of the options is missing.\n\t\tif (o.TraceOptions.TextMapPropagator == nil) != (o.TraceOptions.TracerProvider == nil) {\n\t\t\tlogger.Warning(\"Tracing will not be recorded because traceOptions are not set properly: one of TextMapPropagator or TracerProvider is missing\")\n\t\t}\n\t}\n}",
+                  "token_estimate": 107
+                },
+                {
+                  "citation": {
+                    "file": "clientconn.go",
+                    "start_line": 1411,
+                    "end_line": 1424,
+                    "commit_hash": "c33aa45e147aa1e08070a0764c285ea30a82688a"
+                  },
+                  "text": "// updateTelemetryLabelsLocked calculates and caches the telemetry labels based on the\n// first address in addrConn.\nfunc (ac *addrConn) updateTelemetryLabelsLocked() {\n\tlabelsFunc, ok := internal.AddressToTelemetryLabels.(func(resolver.Address) map[string]string)\n\tif !ok || len(ac.addrs) == 0 {\n\t\t// Reset defaults\n\t\tac.localityLabel = \"\"\n\t\tac.backendServiceLabel = \"\"\n\t\treturn\n\t}\n\tlabels := labelsFunc(ac.addrs[0])\n\tac.localityLabel = labels[\"grpc.lb.locality\"]\n\tac.backendServiceLabel = labels[\"grpc.lb.backend_service\"]\n}",
+                  "token_estimate": 131
+                },
+                {
+                  "citation": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2190,
+                    "end_line": 2266,
+                    "commit_hash": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c"
+                  },
+                  "text": "// Test verifies that when a subchannel is shut down by the LB (because another\n// subchannel won) while its dial is still in-flight, it records exactly one\n// successful attempt.\nfunc (s) TestPickFirstLeaf_HappyEyeballs_Ignore_Inflight_Cancellations(t *testing.T) {\n\tctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)\n\tdefer cancel()\n\n\toriginalTimer := pfinternal.TimeAfterFunc\n\tdefer func() {\n\t\tpfinternal.TimeAfterFunc = originalTimer\n\t}()\n\ttriggerTimer, timeAfter := mockTimer()\n\tpfinternal.TimeAfterFunc = timeAfter\n\n\ttmr := stats.NewTestMetricsRecorder()\n\tdialer := testutils.NewBlockingDialer()\n\topts := []grpc.DialOption{\n\t\tgrpc.WithDefaultServiceConfig(fmt.Sprintf(`{\"loadBalancingConfig\": [{\"%s\":{}}]}`, pfbalancer.Name)),\n\t\tgrpc.WithContextDialer(dialer.DialContext),\n\t\tgrpc.WithStatsHandler(tmr),\n\t}\n\n\t// Setup 2 backend addresses\n\tcc, rb, bm := setupPickFirstLeaf(t, 2, opts...)\n\taddrs := bm.resolverAddrs()\n\tholds := bm.holds(dialer)\n\trb.UpdateState(resolver.State{Addresses: addrs})\n\tcc.Connect()\n\n\t// Make sure we connect to second subconn\n\ttestutils.AwaitState(ctx, t, cc, connectivity.Connecting)\n\tif holds[0].Wait(ctx) != true {\n\t\tt.Fatalf(\"Timeout waiting for server %d to be contacted\", 0)\n\t}\n\ttriggerTimer()\n\tif holds[1].Wait(ctx) != true {\n\t\tt.Fatalf(\"Timeout waiting for server %d to be contacted\", 1)\n\t}\n\tholds[1].Resume()\n\n\t// Wait for Channel to become READY.\n\ttestutils.AwaitState(ctx, t, cc, connectivity.Ready)\n\n\t// Unblock the First SubConn.\n\t// Since the LB has already closed this subchannel, the context passed to Dial\n\t// is canceled. This will lead to an inflight attempt to be cancelled.\n\t// No success or failure metric should be recorded for this.\n\tholds[0].Resume()\n\n\t// --- Assertions ---\n\n\t// Wait for the SUCCESS metric to ensure recording logic has processed.\n\twaitForMetric(ctx, t, tmr, \"grpc.subchannel.connection_attempts_succeeded\")\n\n\t// Verify Success: Exactly 1 (The Winner).\n\tif got, _ := tmr.Metric(\"grpc.subchannel.connection_attempts_succeeded\"); got != 1 {\n\t\tt.Errorf(\"Unexpected data for metric %v, got: %v, want: 1\", \"grpc.subchannel.connection_attempts_succeeded\", got)\n\t}\n\n\t// Verify Failure: Exactly 0 (The Loser was ignored).\n\t// We poll briefly to ensure no delayed failure metric appears.\n\tsCtx, sCancel := context.WithTimeout(ctx, 50*time.Millisecond)\n\tdefer sCancel()\n\tfor ; sCtx.Err() == nil; \u003c-time.After(time.Millisecond) {\n\t\tif got, _ := tmr.Metric(\"grpc.subchannel.connection_attempts_failed\"); got != 0 {\n\t\t\tt.Fatalf(\"Unexpected failure recorded for shutdown subchannel, got: %v, want: 0\", got)\n\t\t}\n\t}\n\n\t// LB Metrics Check\n\tif got, _ := tmr.Metric(\"grpc.lb.pick_first.connection_attempts_succeeded\"); got != 1 {\n\t\tt.Errorf(\"Unexpected data for metric %v, got: %v, want: 1\", \"grpc.lb.pick_first.connection_attempts_succeeded\", got)\n\t}\n\tif got, _ := tmr.Metric(\"grpc.lb.pick_first.connection_attempts_failed\"); got != 0 {\n\t\tt.Errorf(\"Unexpected data for metric %v, got: %v, want: 0\", \"grpc.lb.pick_first.connection_attempts_failed\", got)\n\t}\n}",
+                  "token_estimate": 759
+                },
+                {
+                  "citation": {
+                    "file": "stats/opentelemetry/e2e_test.go",
+                    "start_line": 1468,
+                    "end_line": 1510,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "text": "// TestMetricsAndTracesDisabled verifies that RPCs call succeed as expected\n// when metrics and traces are disabled in the OpenTelemetry instrumentation.\nfunc (s) TestMetricsAndTracesDisabled(t *testing.T) {\n\tss := \u0026stubserver.StubServer{\n\t\tUnaryCallF: func(_ context.Context, in *testpb.SimpleRequest) (*testpb.SimpleResponse, error) {\n\t\t\treturn \u0026testpb.SimpleResponse{Payload: \u0026testpb.Payload{\n\t\t\t\tBody: make([]byte, len(in.GetPayload().GetBody())),\n\t\t\t}}, nil\n\t\t},\n\t\tFullDuplexCallF: func(stream testgrpc.TestService_FullDuplexCallServer) error {\n\t\t\tfor {\n\t\t\t\t_, err := stream.Recv()\n\t\t\t\tif err == io.EOF {\n\t\t\t\t\treturn nil\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t}\n\n\tif err := ss.Start(nil); err != nil {\n\t\tt.Fatalf(\"Error starting endpoint server: %v\", err)\n\t}\n\tdefer ss.Stop()\n\n\tctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)\n\tdefer cancel()\n\n\t// Make two RPCs, a unary RPC and a streaming RPC.\n\tif _, err := ss.Client.UnaryCall(ctx, \u0026testpb.SimpleRequest{Payload: \u0026testpb.Payload{\n\t\tBody: make([]byte, 10000),\n\t}}); err != nil {\n\t\tt.Fatalf(\"Unexpected error from UnaryCall: %v\", err)\n\t}\n\tstream, err := ss.Client.FullDuplexCall(ctx)\n\tif err != nil {\n\t\tt.Fatalf(\"ss.Client.FullDuplexCall failed: %v\", err)\n\t}\n\n\tstream.CloseSend()\n\tif _, err = stream.Recv(); err != io.EOF {\n\t\tt.Fatalf(\"stream.Recv received an unexpected error: %v, expected an EOF error\", err)\n\t}\n}",
+                  "token_estimate": 344
+                },
+                {
+                  "citation": {
+                    "file": "test/xds/xds_telemetry_labels_test.go",
+                    "start_line": 126,
+                    "end_line": 147,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func (fsh *fakeStatsHandler) HandleRPC(_ context.Context, rs stats.RPCStats) {\n\tswitch rs.(type) {\n\t// stats.Begin is called before the picker runs, so it won't have telemetry\n\t// labels.\n\t// The following three stats callouts trigger OpenTelemetry metrics and are\n\t// guaranteed to run after the picker has selected a subchannel. Therefore,\n\t// they should have access to the desired telemetry labels.\n\tcase *stats.OutPayload, *stats.InPayload, *stats.End:\n\t\twant := map[string]string{\n\t\t\tserviceNameKeyCSM:      serviceNameValue,\n\t\t\tserviceNamespaceKeyCSM: serviceNamespaceValue,\n\t\t\tlocalityKey:            localityValue,\n\t\t\tbackendServiceKey:      backendServiceValue,\n\t\t}\n\t\tif diff := cmp.Diff(fsh.labels.TelemetryLabels, want); diff != \"\" {\n\t\t\tfsh.t.Fatalf(\"fsh.labels.TelemetryLabels (-got +want): %v\", diff)\n\t\t}\n\tdefault:\n\t\t// Nothing to assert for the other stats.Handler callouts.\n\n\t}\n}",
+                  "token_estimate": 223
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/example_test.go",
+                    "start_line": 132,
+                    "end_line": 151,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "clientconn.go",
+                    "start_line": 185,
+                    "end_line": 260,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/example_test.go",
+                    "start_line": 132,
+                    "end_line": 151,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "clientconn.go",
+                    "start_line": 1191,
+                    "end_line": 1239,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/example_test.go",
+                    "start_line": 132,
+                    "end_line": 151,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 124,
+                    "end_line": 138,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/example_test.go",
+                    "start_line": 132,
+                    "end_line": 151,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "stats/metrics.go",
+                    "start_line": 48,
+                    "end_line": 58,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/example_test.go",
+                    "start_line": 132,
+                    "end_line": 151,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "dialoptions.go",
+                    "start_line": 423,
+                    "end_line": 427,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/example_test.go",
+                    "start_line": 132,
+                    "end_line": 151,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "credentials/insecure/insecure.go",
+                    "start_line": 34,
+                    "end_line": 36,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/example_test.go",
+                    "start_line": 132,
+                    "end_line": 151,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 564,
+                    "end_line": 566,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stats/opentelemetry/opentelemetry.go",
+                    "start_line": 45,
+                    "end_line": 53,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "grpclog/internal/loggerv2.go",
+                    "start_line": 38,
+                    "end_line": 38,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "clientconn.go",
+                    "start_line": 1413,
+                    "end_line": 1424,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "clientconn.go",
+                    "start_line": 1413,
+                    "end_line": 1424,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2193,
+                    "end_line": 2266,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2193,
+                    "end_line": 2266,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2193,
+                    "end_line": 2266,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 1170,
+                    "end_line": 1206,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2193,
+                    "end_line": 2266,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2971,
+                    "end_line": 2989,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2193,
+                    "end_line": 2266,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2096,
+                    "end_line": 2108,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2193,
+                    "end_line": 2266,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "internal/testutils/stats/test_metrics_recorder.go",
+                    "start_line": 53,
+                    "end_line": 64,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2193,
+                    "end_line": 2266,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "dialoptions.go",
+                    "start_line": 507,
+                    "end_line": 517,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "balancer/pickfirst/pickfirst_ext_test.go",
+                    "start_line": 2193,
+                    "end_line": 2266,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "target": {
+                    "file": "resolver/manual/manual.go",
+                    "start_line": 110,
+                    "end_line": 119,
+                    "commit_hash": "679ae4c7df728622eb8d58e7ea8dcffc043169b7"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                }
+              ],
+              "knowledge": [
+                {
+                  "scope": "stats/opentelemetry/internal/tracing",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry/internal/tracing. conventions summary.\nconstructors: 2 New*\ntests: 1 files, table_driven=0, testify=0\n"
+                },
+                {
+                  "scope": "stats/opentelemetry/internal/testutils",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry/internal/testutils. conventions summary.\nerrors: fmt.Errorf_plain=4 (total=4)\n"
+                },
+                {
+                  "scope": "stats/opentelemetry/csm",
+                  "kind": "convention",
+                  "text": "package: stats/opentelemetry/csm. conventions summary.\nerrors: fmt.Errorf_plain=5, errors.New=1 (total=6)\ntests: 2 files, table_driven=0, testify=0\n"
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 1908,
+                "utilization_ratio": 0.265,
+                "built_at": "2026-10-24T00:30:19.805694Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "b10185b92827060fce38b63d615a891d3d5ba2e4814944c3b7e83e091b3f5bb0",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-8923",
+      "prompt": "OpenTelemetry 추적에서 예전에 되돌렸던 변경을 다시 넣고, 그때 실패하던 시험의 경쟁 상태도 고치고 싶어",
+      "expected_intent": "bug_fix",
+      "classified_intents": [
+        "test_add"
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0,
+        "file_recall": 0,
+        "file_f1": 0,
+        "file_mrr": 0,
+        "first_hit_rank": 0,
+        "token_utilization": 0.265,
+        "used_tokens": 1908,
+        "citation_count": 24,
+        "body_count": 8,
+        "redaction_count": 0,
+        "latency_ms": 1381,
+        "latency_ms_p50": 1381,
+        "latency_ms_p95": 1381,
+        "latency_ms_max": 1381
+      },
+      "retrieval_state": "miss",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0,
+      "avg_mrr": 0,
+      "avg_recall": 0,
+      "avg_f1": 0,
+      "avg_latency_ms": 1381
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "bug_fix": {
+        "test_add": 1
+      }
+    }
+  }
+}
