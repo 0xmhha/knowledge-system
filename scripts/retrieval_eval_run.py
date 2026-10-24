@@ -3,7 +3,7 @@
 For each snapshot, in the order of --snapshots, a separate worktree is checked
 out to that snapshot (the chain builder owns src-chain), a cks.yaml is written
 that points at this snapshot's graph and this model's vector index, and then
-`cks eval` (with anchor verification) and retrieval_baselines.py run on the
+`cks eval` (with anchor verification and recorded responses) and retrieval_baselines.py run on the
 frozen scenarios of that snapshot. A snapshot whose two reports already exist
 is skipped, so an interrupted run resumes. Inputs are only read.
 """
@@ -95,7 +95,7 @@ def main() -> None:
             # report. No report means the run never measured (for example an
             # anchor violation), so stop.
             r = subprocess.run([str(bindir / 'cks'), 'eval', '--config', str(config), '--scenarios',
-                                str(inputs / 'scenarios' / snap), '--verify-anchors', str(src), '--output', str(cks_report)],
+                                str(inputs / 'scenarios' / snap), '--verify-anchors', str(src), '--record-responses', '--output', str(cks_report)],
                                stdout=log, stderr=subprocess.STDOUT, check=False, timeout=EVAL_TIMEOUT_SECONDS)
             (out / 'cks-exit.txt').write_text(f'{r.returncode}\n')
             if not cks_report.exists() or cks_report.stat().st_size == 0:
