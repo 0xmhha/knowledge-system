@@ -10,6 +10,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -207,8 +208,14 @@ func (c *Classifier) Classify(ctx context.Context, prompt string) (Classificatio
 	bestIntent := contract.IntentUnknown
 	bestSim := math.Inf(-1) // start at -inf so any real cosine wins on first pass
 	bestAnchor := ""
+	// Per-intent best similarity, kept only for the debug trace: the
+	// result alone cannot say whether the right intent was a close second
+	// or the threshold, not the anchors, turned it into Unknown.
+	rec := debugtrace.From(ctx)
+	var perIntent []intentScore
 
 	for intentVal, anchors := range c.embedded {
+		top := intentScore{Intent: intentVal, Similarity: math.Inf(-1)}
 		for _, a := range anchors {
 			sim := cosine(promptVec, a.Vec)
 			if sim > bestSim {
@@ -216,6 +223,12 @@ func (c *Classifier) Classify(ctx context.Context, prompt string) (Classificatio
 				bestIntent = intentVal
 				bestAnchor = a.Text
 			}
+			if rec != nil && sim > top.Similarity {
+				top.Similarity, top.Anchor = sim, a.Text
+			}
+		}
+		if rec != nil && len(anchors) > 0 {
+			perIntent = append(perIntent, top)
 		}
 	}
 
@@ -235,8 +248,27 @@ func (c *Classifier) Classify(ctx context.Context, prompt string) (Classificatio
 		result.BestAnchor = ""
 	}
 
+	if rec != nil {
+		sort.Slice(perIntent, func(i, j int) bool { return perIntent[i].Similarity > perIntent[j].Similarity })
+		rec.After("intent", "classify", "", map[string]any{
+			"intent":          result.Intent,
+			"confidence":      bestSim,
+			"nearest_intent":  bestIntent,
+			"nearest_anchor":  bestAnchor,
+			"threshold":       c.unknownThreshold,
+			"below_threshold": below,
+			"scores":          perIntent,
+		})
+	}
 	c.emitFootprint(ctx, result, below)
 	return result, nil
+}
+
+// intentScore is one intent's best anchor similarity in the debug trace.
+type intentScore struct {
+	Intent     contract.Intent `json:"intent"`
+	Similarity float64         `json:"similarity"`
+	Anchor     string          `json:"anchor"`
 }
 
 func (c *Classifier) emitFootprint(ctx context.Context, r Classification, below bool) {

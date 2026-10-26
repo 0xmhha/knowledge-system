@@ -59,6 +59,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
 	"github.com/0xmhha/knowledge-system/internal/system/config"
+	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/embedder"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	cksmcp "github.com/0xmhha/knowledge-system/internal/system/mcp"
@@ -683,10 +684,16 @@ func buildComposer(
 	if err != nil {
 		return nil, fmt.Errorf("sanitize.New: %w", err)
 	}
-	return composer.New(ic, s1, s2, s3, b, san,
+	opts := []composer.Option{
 		composer.WithBuilderVersion(builderVersion),
 		composer.WithFootprint(fp),
-	)
+	}
+	// Evaluation runs set CKS_DEBUG_TRACE to a JSONL path to record every
+	// retrieval algorithm's input and output per compose call.
+	if path := os.Getenv(debugtrace.EnvPath); path != "" {
+		opts = append(opts, composer.WithDebugTrace(debugtrace.SharedFileSink(path)))
+	}
+	return composer.New(ic, s1, s2, s3, b, san, opts...)
 }
 
 // buildFootprint constructs a footprint.Logger based on logging config.

@@ -33,6 +33,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
+	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -193,6 +194,13 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 	seedKeys := buildSeedKeys(seeds)
 	agg := newNeighborAggregator()
 	failedCount := 0
+	rec := debugtrace.From(ctx)
+	if rec != nil {
+		rec.Before("stage3", "expand", "", map[string]any{
+			"seeds": len(seeds), "expanded": len(toExpand), "relations": relations, "hops": hops,
+			"neighbors_per_seed": e.config.NeighborsPerSeed,
+		})
+	}
 
 	for _, seed := range toExpand {
 		var neighbors []contract.Neighbor
@@ -221,6 +229,13 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 				neighbors = append(neighbors, n)
 			}
 		}
+		if rec != nil {
+			data := map[string]any{"seed": debugtrace.Citations([]contract.Citation{seed.Citation})[0], "neighbors": traceNeighbors(neighbors)}
+			if seedErr != nil {
+				data["error"] = seedErr.Error()
+			}
+			rec.After("stage3", "seed_neighbors", seed.Citation.Key(), data)
+		}
 		if seedErr != nil && len(neighbors) == 0 {
 			out.FailedSeeds = append(out.FailedSeeds, seed.Citation)
 			failedCount++
@@ -246,8 +261,29 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 	}
 
 	out.Neighbors = agg.results(e.config.MaxFinalNeighbors)
+	if rec != nil {
+		ranked := make([]debugtrace.Cite, 0, len(out.Neighbors))
+		for _, n := range out.Neighbors {
+			ranked = append(ranked, debugtrace.Cite{File: n.Edge.Target.File, Start: n.Edge.Target.StartLine,
+				End: n.Edge.Target.EndLine, Kind: string(n.Edge.Relation), Score: n.Score, Sources: n.Sources})
+		}
+		rec.After("stage3", "expand", "", map[string]any{
+			"neighbors": ranked, "max_final_neighbors": e.config.MaxFinalNeighbors,
+			"failed_seeds": debugtrace.Citations(out.FailedSeeds),
+		})
+	}
 	e.emitFootprint(ctx, intent, out, failedCount)
 	return out, nil
+}
+
+// traceNeighbors is the debug-trace form of one seed's raw neighbor list.
+func traceNeighbors(ns []contract.Neighbor) []map[string]any {
+	out := make([]map[string]any, 0, len(ns))
+	for _, n := range ns {
+		out = append(out, map[string]any{"file": n.Target.File, "start": n.Target.StartLine, "end": n.Target.EndLine,
+			"relation": n.Relation, "distance": n.Distance})
+	}
+	return out
 }
 
 func (e *Expander) emitFootprint(ctx context.Context, intent contract.Intent, out Stage3Output, failedCount int) {

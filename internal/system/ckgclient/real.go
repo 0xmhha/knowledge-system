@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/pkg/graph/concurrency"
 	"github.com/0xmhha/knowledge-system/pkg/graph/evidence"
 	"github.com/0xmhha/knowledge-system/pkg/graph/impact"
@@ -340,6 +341,22 @@ func matchesFilter(n types.Node, f SearchFilter) bool {
 // as given, then progressively drop leading dot-segments until the store resolves
 // it. Bare/exact names hit on the first try, so existing behaviour is unchanged.
 func (r *Real) resolveFlexibleNodes(name string) ([]types.Node, error) {
+	nodes, _, err := r.resolveFlexibleNodesTraced(name)
+	return nodes, err
+}
+
+// resolveAttempt is one lookup resolveFlexibleNodesTraced tried, for the
+// debug trace: which name, by which method, and how many nodes it returned.
+type resolveAttempt struct {
+	Name  string `json:"name"`
+	Via   string `json:"via"`
+	Nodes int    `json:"nodes"`
+}
+
+// resolveFlexibleNodesTraced is resolveFlexibleNodes plus the lookups it
+// tried in order. The last attempt is the one that resolved the name.
+func (r *Real) resolveFlexibleNodesTraced(name string) ([]types.Node, []resolveAttempt, error) {
+	var attempts []resolveAttempt
 	// Canonical-first (ckv↔ckg join key): a ckg canonical_id (ADR-0001) is globally
 	// unique and is what ckv chunks / domain anchors carry, so it wins over
 	// qname matching. This keeps the public find_symbol / find_callers /
@@ -347,35 +364,49 @@ func (r *Real) resolveFlexibleNodes(name string) ([]types.Node, error) {
 	// advertise, including "@<line>"-suffixed same-file duplicates that qname
 	// suffix matching can never resolve.
 	if n, found, err := r.s.FindByCanonicalID(name); err == nil && found {
-		return []types.Node{n}, nil
+		return []types.Node{n}, append(attempts, resolveAttempt{Name: name, Via: "canonical_id", Nodes: 1}), nil
 	}
 	nodes, err := r.s.FindSymbol(name, false)
+	attempts = append(attempts, resolveAttempt{Name: name, Via: "symbol", Nodes: len(nodes)})
 	if err != nil || len(nodes) > 0 {
-		return nodes, err
+		return nodes, attempts, err
 	}
 	segs := strings.Split(name, ".")
 	for i := 1; i < len(segs); i++ {
-		nodes, err = r.s.FindSymbol(strings.Join(segs[i:], "."), false)
+		short := strings.Join(segs[i:], ".")
+		nodes, err = r.s.FindSymbol(short, false)
+		attempts = append(attempts, resolveAttempt{Name: short, Via: "symbol_drop_leading", Nodes: len(nodes)})
 		if err != nil {
-			return nil, err
+			return nil, attempts, err
 		}
 		if len(nodes) > 0 {
-			return nodes, nil
+			return nodes, attempts, nil
 		}
 	}
-	return nil, nil
+	return nil, attempts, nil
 }
 
 func (r *Real) FindSymbol(ctx context.Context, name string, opts SymbolOpts) ([]contract.Citation, error) {
 	if name == "" {
 		return nil, errors.New("ckgclient: empty symbol name")
 	}
-	nodes, err := r.resolveFlexibleNodes(name)
+	nodes, attempts, err := r.resolveFlexibleNodesTraced(name)
 	if err != nil {
 		return nil, fmt.Errorf("ckgclient: FindSymbol: %w", err)
 	}
 	commit, _ := r.commit()
 	out := make([]contract.Citation, 0, len(nodes))
+	if rec := debugtrace.From(ctx); rec != nil {
+		defer func() {
+			resolved := make([]string, 0, len(nodes))
+			for _, nd := range nodes {
+				resolved = append(resolved, nd.QualifiedName)
+			}
+			rec.After("ckgclient", "resolve_symbol", name, map[string]any{
+				"attempts": attempts, "resolved": resolved, "kinds": opts.Kinds, "kept_after_filter": len(out),
+			})
+		}()
+	}
 	for _, nd := range nodes {
 		if !nodeMatchesKinds(nd, opts.Kinds) {
 			continue
