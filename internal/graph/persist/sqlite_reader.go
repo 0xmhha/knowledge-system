@@ -356,6 +356,14 @@ func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions
 // simple_name (COLLATE NOCASE keeps the old LIKE's case-insensitivity): as
 // one "qualified_name = ? OR simple_name = ?" predicate SQLite 3.53 scanned
 // the whole nodes table on every MCP seed resolution.
+//
+// A dotted name ("Type.Method") is a suffix of "pkg.Type.Method" that
+// simple_name, holding only the last segment, can never equal. The old
+// `LIKE '%.' || name` matched it, and the Postgres store still does; without
+// it the caller fell back to the bare "Method" and got every same-named
+// method in the repository. A third arm restores the match: look the last
+// segment up by simple_name (indexed) and keep the rows whose qualified name
+// ends in "." + name.
 func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, []any) {
 	args := []any{}
 	q := `SELECT ` + nodeColumns + ` FROM nodes WHERE `
@@ -364,8 +372,15 @@ func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, [
 		args = append(args, name)
 	} else {
 		q += `id IN (SELECT id FROM nodes WHERE qualified_name = ?
-			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE) `
+			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE`
 		args = append(args, name, name)
+		if i := strings.LastIndexByte(name, '.'); i > 0 && i < len(name)-1 {
+			q += `
+			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE
+				AND substr(qualified_name, -?) = ? COLLATE NOCASE`
+			args = append(args, name[i+1:], len(name)+1, "."+name)
+		}
+		q += `) `
 	}
 	if opts.Language != "" {
 		q += `AND language = ? `

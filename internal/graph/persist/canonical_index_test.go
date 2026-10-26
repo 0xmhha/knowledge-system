@@ -52,28 +52,34 @@ func TestFindSymbolSuffixUsesIndexes(t *testing.T) {
 	if err := st.Migrate(); err != nil {
 		t.Fatal(err)
 	}
-	q, args := findSymbolQuery("Foo", false, FindSymbolOptions{Language: "go", Kinds: []types.NodeType{types.NodeFunction}})
-	rows, err := st.db.Query("EXPLAIN QUERY PLAN "+q, args...)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() { _ = rows.Close() }()
-	var plan []string
-	for rows.Next() {
-		var id, parent, notused int
-		var detail string
-		if err := rows.Scan(&id, &parent, &notused, &detail); err != nil {
+	// "T.Foo" adds the dotted-suffix arm; it must stay indexed too.
+	for _, name := range []string{"Foo", "T.Foo"} {
+		q, args := findSymbolQuery(name, false, FindSymbolOptions{Language: "go", Kinds: []types.NodeType{types.NodeFunction}})
+		rows, err := st.db.Query("EXPLAIN QUERY PLAN "+q, args...)
+		if err != nil {
 			t.Fatal(err)
 		}
-		plan = append(plan, detail)
-	}
-	p := strings.Join(plan, "; ")
-	for _, want := range []string{"idx_nodes_qname", "idx_nodes_simple_name"} {
-		if !strings.Contains(p, want) {
-			t.Errorf("suffix lookup plan %q does not use %s", p, want)
+		var plan []string
+		for rows.Next() {
+			var id, parent, notused int
+			var detail string
+			if err := rows.Scan(&id, &parent, &notused, &detail); err != nil {
+				t.Fatal(err)
+			}
+			plan = append(plan, detail)
 		}
-	}
-	if strings.Contains(p, "SCAN nodes") {
-		t.Errorf("suffix lookup scans nodes: %q", p)
+		if err := rows.Err(); err != nil {
+			t.Fatal(err)
+		}
+		_ = rows.Close()
+		p := strings.Join(plan, "; ")
+		for _, want := range []string{"idx_nodes_qname", "idx_nodes_simple_name"} {
+			if !strings.Contains(p, want) {
+				t.Errorf("%s: suffix lookup plan %q does not use %s", name, p, want)
+			}
+		}
+		if strings.Contains(p, "SCAN nodes") {
+			t.Errorf("%s: suffix lookup scans nodes: %q", name, p)
+		}
 	}
 }

@@ -2,6 +2,8 @@ package persist_test
 
 import (
 	"path/filepath"
+	"sort"
+	"strings"
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
@@ -131,5 +133,55 @@ func TestFindSymbol_KindsNoMatch(t *testing.T) {
 	}
 	if len(nodes) != 0 {
 		t.Errorf("got %d nodes for Kinds=Method, want 0", len(nodes))
+	}
+}
+
+// A dotted "Type.Method" names the tail of "pkg.Type.Method". It must resolve
+// to that method only, not to every method sharing the last segment: a ckv hit
+// symbol arrives in this form, and the bare fallback fanned one keyword out to
+// every same-named method in the repository.
+func TestFindSymbol_DottedSuffixMatchesReceiver(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "dotted.db")
+	s, err := persist.Open(dbPath)
+	if err != nil {
+		t.Fatalf("Open: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+	if err := s.Migrate(); err != nil {
+		t.Fatalf("Migrate: %v", err)
+	}
+	nodes := []types.Node{
+		{ID: "od00000000000001", Type: types.NodeMethod, Name: "RemoveSubConn",
+			QualifiedName: "outlierdetection.outlierDetectionBalancer.RemoveSubConn", FilePath: "od/balancer.go", Language: "go", Confidence: types.ConfExtracted},
+		{ID: "ci00000000000001", Type: types.NodeMethod, Name: "RemoveSubConn",
+			QualifiedName: "clusterimpl.clusterImplBalancer.RemoveSubConn", FilePath: "ci/clusterimpl.go", Language: "go", Confidence: types.ConfExtracted},
+		{ID: "xx00000000000001", Type: types.NodeMethod, Name: "RemoveSubConn",
+			QualifiedName: "other.xoutlierDetectionBalancer.RemoveSubConn", FilePath: "x/x.go", Language: "go", Confidence: types.ConfExtracted},
+	}
+	if err := s.InsertNodes(nodes); err != nil {
+		t.Fatalf("InsertNodes: %v", err)
+	}
+	for _, tc := range []struct {
+		name string
+		want []string
+	}{
+		{"outlierDetectionBalancer.RemoveSubConn", []string{"od00000000000001"}},
+		{"OUTLIERDETECTIONBALANCER.removesubconn", []string{"od00000000000001"}},
+		{"outlierdetection.outlierDetectionBalancer.RemoveSubConn", []string{"od00000000000001"}},
+		{"RemoveSubConn", []string{"ci00000000000001", "od00000000000001", "xx00000000000001"}},
+		{"missing.RemoveSubConn", nil},
+	} {
+		got, err := s.FindSymbol(tc.name, false, persist.FindSymbolOptions{})
+		if err != nil {
+			t.Fatalf("FindSymbol(%q): %v", tc.name, err)
+		}
+		ids := make([]string, 0, len(got))
+		for _, n := range got {
+			ids = append(ids, n.ID)
+		}
+		sort.Strings(ids)
+		if strings.Join(ids, ",") != strings.Join(tc.want, ",") {
+			t.Errorf("FindSymbol(%q) = %v, want %v", tc.name, ids, tc.want)
+		}
 	}
 }
