@@ -17,6 +17,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = "docs/spec-driven/REFACTORING-EXECUTION-SPEC.md"
 LIST = "docs/spec-driven/REFACTORING-REMAINING-WORKLIST.md"
+RETIRED = "docs/spec-driven/REFACTORING-RETIRED-DOCUMENTS.json"
+# A ledger string that is a whole repository path; prose mentioning a path is not matched.
+LEDGER_PATH = re.compile(r'"((?:docs|system|scripts)/[^"\s]+\.(?:md|json|yaml|py))"')
 
 
 def require(condition, message):
@@ -176,6 +179,24 @@ def verify_source_binding(active):
     return sources
 
 
+def verify_cited_paths(ledger_text, retired):
+    """Every path the ledger cites exists now, or is a retired document readable at its recorded revision.
+
+    Completion rows keep pointing at documents a later cleanup removed; the
+    retired index says where they still are instead of rewriting the ledger."""
+    documents = retired["documents"]
+    cited = set(LEDGER_PATH.findall(ledger_text))
+    for path in sorted(cited):
+        if path in documents:
+            require(not (ROOT / path).exists(), f"retired document is back in the tree: {path}")
+            require(sha(recorded(retired["read_from"], path)) == documents[path],
+                    f"retired document does not match its recorded SHA-256: {path}")
+        else:
+            require((ROOT / path).exists(), f"ledger cites a missing path: {path}")
+    require(set(documents) <= cited, "retired index lists a document the ledger does not cite")
+    return len(cited)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ledger", type=Path, default=ROOT / "docs/spec-driven/REFACTORING-PROGRESS.json")
@@ -202,7 +223,9 @@ def main():
     require(ledger["next_task"] in remaining, "next task is already marked complete")
     require(f"{len(done)}/18" in worklist and f"{len(remaining)}개" in worklist, "progress counts drifted")
     partial += verify_ontology_progress(ledger, worklist, live_spec, allowed, len(remaining))
-    print(f"refactoring progress: PASS {len(done)}/18 complete; {len(remaining)} remaining; next {ledger['next_task']}; {len(sources)} source/dependency bindings; {partial} partial checks bound")
+    retired = json.loads((ROOT / RETIRED).read_text())
+    cited = verify_cited_paths(args.ledger.read_text(), retired)
+    print(f"refactoring progress: PASS {len(done)}/18 complete; {len(remaining)} remaining; next {ledger['next_task']}; {len(sources)} source/dependency bindings; {partial} partial checks bound; {cited} cited paths ({len(retired['documents'])} retired)")
 
 
 if __name__ == "__main__":

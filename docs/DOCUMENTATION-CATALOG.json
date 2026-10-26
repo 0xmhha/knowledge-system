@@ -1666,7 +1666,43 @@
       "source_paths": [
         "scripts/retrieval_pr_scenarios.py",
         "scripts/retrieval_baselines.py",
-        "scripts/retrieval_snapshot_chain.py"
+        "scripts/retrieval_snapshot_chain.py",
+        "scripts/retrieval_eval_run.py"
+      ]
+    },
+    "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md": {
+      "role": "workflow",
+      "source_paths": [
+        "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/inputs/sample.json",
+        "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/inputs/prompts.json"
+      ]
+    },
+    "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/results/README.md": {
+      "role": "workflow",
+      "source_paths": [
+        "scripts/retrieval_eval_summary.py",
+        "scripts/retrieval_eval_run.py",
+        "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/results/summary.json",
+        "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/results/manifest.json"
+      ]
+    },
+    "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/README.md": {
+      "role": "workflow",
+      "source_paths": [
+        "internal/system/debugtrace/debugtrace.go",
+        "scripts/retrieval_debug_trace_report.py",
+        "internal/system/composer/stage1/extractor.go",
+        "internal/system/composer/stage2/merge.go",
+        "internal/graph/persist/sqlite_reader.go",
+        "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/ablation-results.json",
+        "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/manifest.json"
+      ]
+    },
+    "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/ABLATION-PLAN.md": {
+      "role": "reference",
+      "source_paths": [
+        "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/builds/abl/ablation.diff",
+        "docs/spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/tools/run_ablation.sh"
       ]
     }
   }

@@ -16,7 +16,9 @@ import (
 //     "fix Login function", "race condition in goroutinePool".
 //  2. File basenames from ckv hits. These represent what the semantic
 //     search judged relevant; their names are often the package or
-//     module the answer lives in.
+//     module the answer lives in. They steer the rerank confidence and the
+//     next round's query; Extract keeps them out of the Stage 2 hand-off
+//     unless Config.KeepHitKeywords is set.
 //
 // Duplicates are removed (case-sensitive on the assumption that Go's
 // case-significant identifier rules apply). Short tokens (<=2 chars) are
@@ -39,10 +41,38 @@ import (
 // be premature: the BM25 rerank already filters Intent-irrelevant
 // keywords by giving them zero scores.
 func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent) []string {
-	seen := make(map[string]struct{})
-	out := make([]string, 0)
+	cands := extractKeywordCandidates(prompt, hits, intent)
+	out := make([]string, 0, len(cands))
+	for _, c := range cands {
+		out = append(out, c.Keyword)
+	}
+	return out
+}
 
-	add := func(s string) {
+// Keyword origins recorded in the debug trace. A keyword keeps the origin
+// of its first occurrence (the dedup below keeps the first one too).
+const (
+	originCompound  = "prompt_compound"
+	originMorph     = "prompt_morph"
+	originPrompt    = "prompt"
+	originHitSymbol = "hit_symbol"
+	originHitFile   = "hit_file"
+)
+
+// keywordCandidate is one extracted keyword and where it came from. The
+// origin separates the user's own words from names mined out of ckv hits,
+// which only repeat what the semantic search already ranked.
+type keywordCandidate struct {
+	Keyword string `json:"keyword"`
+	Origin  string `json:"origin"`
+}
+
+// extractKeywordCandidates is extractKeywords with each keyword's origin.
+func extractKeywordCandidates(prompt string, hits []contract.Hit, intent contract.Intent) []keywordCandidate {
+	seen := make(map[string]struct{})
+	out := make([]keywordCandidate, 0)
+
+	add := func(s, origin string) {
 		if len(s) <= 2 {
 			return
 		}
@@ -50,7 +80,7 @@ func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent)
 			return
 		}
 		seen[s] = struct{}{}
-		out = append(out, s)
+		out = append(out, keywordCandidate{Keyword: s, Origin: origin})
 	}
 
 	promptIDs := extractIdentifiers(prompt)
@@ -70,7 +100,7 @@ func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent)
 	// MaxKeywords cap. Over-generation is safe: joins that don't hit real
 	// code are zero-scored and dropped by the rerank.
 	for _, c := range compoundCandidates(promptIDs) {
-		add(c)
+		add(c, originCompound)
 	}
 
 	// Morphological candidates: prompts name symbols by their noun form
@@ -82,11 +112,11 @@ func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent)
 	// dropped, same as compound over-generation; the case-fold dedup
 	// keeps the Pascal/camel pair from double-charging the cap.
 	for _, m := range morphCandidates(promptIDs) {
-		add(m)
+		add(m, originMorph)
 	}
 
 	for _, id := range promptIDs {
-		add(id)
+		add(id, originPrompt)
 	}
 
 	for _, h := range hits {
@@ -104,7 +134,7 @@ func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent)
 		// symbol metadata (older ckv builds, doc/header chunks, ckg-
 		// sourced hits, etc.) so retrieval quality on those is unchanged.
 		if h.Symbol != "" {
-			add(h.Symbol)
+			add(h.Symbol, originHitSymbol)
 			continue
 		}
 		base := filepath.Base(h.Citation.File)
@@ -112,7 +142,7 @@ func extractKeywords(prompt string, hits []contract.Hit, intent contract.Intent)
 		// Strip Go test suffix so a hit on "foo_test.go" becomes the
 		// keyword "foo" — the production code the test exercises.
 		name = strings.TrimSuffix(name, "_test")
-		add(name)
+		add(name, originHitFile)
 	}
 
 	_ = intent // see doc: Stage 1 is intent-agnostic by design

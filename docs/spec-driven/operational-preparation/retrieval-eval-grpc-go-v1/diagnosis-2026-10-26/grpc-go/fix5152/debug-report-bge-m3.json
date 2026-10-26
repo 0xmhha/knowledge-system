@@ -1,0 +1,2085 @@
+{
+ "summary": {
+  "scenarios": 100,
+  "checkpoints": {
+   "ckv_round1": {
+    "hit@1": 0.14,
+    "hit@3": 0.28,
+    "found": 0.58,
+    "mrr": 0.246
+   },
+   "ckv_round2": {
+    "hit@1": 0.16,
+    "hit@3": 0.25,
+    "found": 0.54,
+    "mrr": 0.231
+   },
+   "stage1": {
+    "hit@1": 0.14,
+    "hit@3": 0.28,
+    "found": 0.65,
+    "mrr": 0.249
+   },
+   "fused": {
+    "hit@1": 0.13,
+    "hit@3": 0.24,
+    "found": 0.69,
+    "mrr": 0.225
+   },
+   "stage2": {
+    "hit@1": 0.14,
+    "hit@3": 0.32,
+    "found": 0.62,
+    "mrr": 0.251
+   },
+   "stage3": {
+    "hit@1": 0.14,
+    "hit@3": 0.32,
+    "found": 0.67,
+    "mrr": 0.252
+   },
+   "stage4": {
+    "hit@1": 0.14,
+    "hit@3": 0.32,
+    "found": 0.45,
+    "mrr": 0.24
+   }
+  },
+  "lost_rank1_at": {
+   "stage1->fused": 7,
+   "fused->stage2": 2
+  },
+  "lost_found_at": {
+   "stage3->stage4": 21,
+   "fused->stage2": 7
+  },
+  "flags": {
+   "intent_wrong": 86,
+   "intent_threshold": 15,
+   "list_duplicate_credit": 0,
+   "duplicate_credit_top1": 0,
+   "symbol_fanout": 1,
+   "keyword_only_top1": 0,
+   "hit_keyword_promoted_top1": 58,
+   "score_outlier_top1": 2,
+   "answer_demoted": 17,
+   "answer_cut_stage4": 22
+  },
+  "answer_stage4_decision": {
+   "not_reached": 33,
+   "selected": 45,
+   "reserve_holdback": 8,
+   "seed_quota": 14
+  },
+  "intent": {
+   "correct": 14,
+   "classified_as": {
+    "bug_fix": 27,
+    "unknown": 57,
+    "feature_add": 7,
+    "test_add": 4,
+    "refactor": 2,
+    "security": 1,
+    "concurrency_safety": 2
+   }
+  }
+ },
+ "scenarios": [
+  {
+   "name": "pr-9003",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-9114",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 2,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "security"
+  },
+  {
+   "name": "pr-8945",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 5,
+    "stage1": 4,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-9100",
+   "ranks": {
+    "ckv_round1": 17,
+    "ckv_round2": 0,
+    "stage1": 17,
+    "fused": 18,
+    "stage2": 7,
+    "stage3": 7,
+    "stage4": 7
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8824",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8869",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 36,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-9014",
+   "ranks": {
+    "ckv_round1": 12,
+    "ckv_round2": 0,
+    "stage1": 12,
+    "fused": 12,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "fused->stage2",
+   "flags": [
+    "intent_wrong",
+    "answer_demoted"
+   ],
+   "intent": "feature_add",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8841",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8923",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "test_add",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8939",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "refactor",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8733",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 2,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8765",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8769",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 8,
+    "stage1": 3,
+    "fused": 3,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8779",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [],
+   "intent": "feature_add",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8780",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 3,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": "stage1->fused",
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8786",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 2,
+    "stage1": 2,
+    "fused": 3,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8787",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8793",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 15,
+    "stage1": 25,
+    "fused": 25,
+    "stage2": 14,
+    "stage3": 14,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8804",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 3,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8810",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8811",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8812",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 6,
+    "stage2": 6,
+    "stage3": 6,
+    "stage4": 6
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8813",
+   "ranks": {
+    "ckv_round1": 10,
+    "ckv_round2": 7,
+    "stage1": 10,
+    "fused": 10,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [],
+   "intent": "bug_fix",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8815",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 9,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8823",
+   "ranks": {
+    "ckv_round1": 16,
+    "ckv_round2": 3,
+    "stage1": 16,
+    "fused": 19,
+    "stage2": 12,
+    "stage3": 12,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "docs_update"
+  },
+  {
+   "name": "pr-8830",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 3,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "lost_rank1_at": "stage1->fused",
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8839",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8792",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "feature_add",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8822",
+   "ranks": {
+    "ckv_round1": 8,
+    "ckv_round2": 8,
+    "stage1": 8,
+    "fused": 8,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8827",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 2,
+    "stage2": 18,
+    "stage3": 18,
+    "stage4": 0
+   },
+   "lost_rank1_at": "stage1->fused",
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8829",
+   "ranks": {
+    "ckv_round1": 10,
+    "ckv_round2": 0,
+    "stage1": 10,
+    "fused": 10,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8831",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 5,
+    "stage1": 23,
+    "fused": 23,
+    "stage2": 6,
+    "stage3": 6,
+    "stage4": 6
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "security",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8833",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 13,
+    "stage1": 31,
+    "fused": 31,
+    "stage2": 29,
+    "stage3": 29,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "test_add",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8837",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 4,
+    "stage1": 1,
+    "fused": 6,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": "stage1->fused",
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8843",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "docs_update"
+  },
+  {
+   "name": "pr-8845",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8854",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8856",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 15,
+    "stage1": 5,
+    "fused": 5,
+    "stage2": 5,
+    "stage3": 5,
+    "stage4": 5
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "test_add",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8859",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 20,
+    "stage1": 5,
+    "fused": 6,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "fused->stage2",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_demoted"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8863",
+   "ranks": {
+    "ckv_round1": 17,
+    "ckv_round2": 0,
+    "stage1": 17,
+    "fused": 17,
+    "stage2": 13,
+    "stage3": 13,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8864",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 11,
+    "stage1": 4,
+    "fused": 7,
+    "stage2": 5,
+    "stage3": 5,
+    "stage4": 5
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8871",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8879",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 12,
+    "stage1": 4,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8886",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8889",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 13,
+    "stage1": 5,
+    "fused": 5,
+    "stage2": 11,
+    "stage3": 11,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "refactor",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8905",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 14,
+    "stage1": 3,
+    "fused": 4,
+    "stage2": 13,
+    "stage3": 13,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8807",
+   "ranks": {
+    "ckv_round1": 9,
+    "ckv_round2": 18,
+    "stage1": 9,
+    "fused": 9,
+    "stage2": 6,
+    "stage3": 6,
+    "stage4": 6
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8832",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 49,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8894",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "test_add",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8909",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 35,
+    "stage2": 14,
+    "stage3": 14,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8965",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 3,
+    "stage1": 3,
+    "fused": 4,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8970",
+   "ranks": {
+    "ckv_round1": 7,
+    "ckv_round2": 4,
+    "stage1": 7,
+    "fused": 7,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [],
+   "intent": "bug_fix",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8973",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8978",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 17,
+    "stage1": 31,
+    "fused": 32,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "fused->stage2",
+   "flags": [
+    "intent_wrong",
+    "answer_demoted"
+   ],
+   "intent": "",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8979",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8980",
+   "ranks": {
+    "ckv_round1": 9,
+    "ckv_round2": 0,
+    "stage1": 9,
+    "fused": 9,
+    "stage2": 28,
+    "stage3": 28,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8985",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "security"
+  },
+  {
+   "name": "pr-8990",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 0,
+    "stage1": 4,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [],
+   "intent": "bug_fix",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8997",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-9004",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 2,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 13,
+    "stage3": 13,
+    "stage4": 0
+   },
+   "lost_rank1_at": "fused->stage2",
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-9005",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "feature_add",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-9008",
+   "ranks": {
+    "ckv_round1": 11,
+    "ckv_round2": 3,
+    "stage1": 11,
+    "fused": 11,
+    "stage2": 10,
+    "stage3": 10,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "feature_add",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-9009",
+   "ranks": {
+    "ckv_round1": 17,
+    "ckv_round2": 15,
+    "stage1": 17,
+    "fused": 17,
+    "stage2": 20,
+    "stage3": 20,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8802",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 56,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "fused->stage2",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_demoted"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-9391",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 32,
+    "fused": 32,
+    "stage2": 14,
+    "stage3": 14,
+    "stage4": 9
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "security"
+  },
+  {
+   "name": "pr-8929",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 95,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "fused->stage2",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_demoted"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8977",
+   "ranks": {
+    "ckv_round1": 14,
+    "ckv_round2": 0,
+    "stage1": 14,
+    "fused": 15,
+    "stage2": 20,
+    "stage3": 20,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-9033",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "concurrency_safety",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-9048",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "hit_keyword_promoted_top1",
+    "score_outlier_top1"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-9058",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 4,
+    "stage2": 20,
+    "stage3": 20,
+    "stage4": 0
+   },
+   "lost_rank1_at": "stage1->fused",
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-9069",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "docs_update"
+  },
+  {
+   "name": "pr-9070",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 17,
+    "stage1": 29,
+    "fused": 33,
+    "stage2": 0,
+    "stage3": 38,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "fused->stage2",
+   "flags": [
+    "intent_wrong",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "docs_update"
+  },
+  {
+   "name": "pr-9081",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 13,
+    "stage1": 5,
+    "fused": 6,
+    "stage2": 5,
+    "stage3": 5,
+    "stage4": 5
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "feature_add",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-9091",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 3,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "lost_rank1_at": "stage1->fused",
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-9096",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 5,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "docs_update"
+  },
+  {
+   "name": "pr-9109",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-9111",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 8,
+    "stage1": 5,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold"
+   ],
+   "intent": "",
+   "expected_intent": "security"
+  },
+  {
+   "name": "pr-9134",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 57,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "score_outlier_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "concurrency_safety",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-9258",
+   "ranks": {
+    "ckv_round1": 7,
+    "ckv_round2": 8,
+    "stage1": 7,
+    "fused": 7,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "security"
+  },
+  {
+   "name": "pr-9299",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "security"
+  },
+  {
+   "name": "pr-8956",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 7,
+    "stage2": 7,
+    "stage3": 7,
+    "stage4": 7
+   },
+   "lost_rank1_at": "stage1->fused",
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8844",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 15,
+    "stage1": 3,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8910",
+   "ranks": {
+    "ckv_round1": 7,
+    "ckv_round2": 4,
+    "stage1": 7,
+    "fused": 9,
+    "stage2": 9,
+    "stage3": 9,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-9031",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8808",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 0,
+    "stage1": 4,
+    "fused": 6,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8867",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 3,
+    "stage1": 3,
+    "fused": 6,
+    "stage2": 4,
+    "stage3": 4,
+    "stage4": 4
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "hit_keyword_promoted_top1",
+    "symbol_fanout"
+   ],
+   "intent": "feature_add",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8874",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8875",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 31,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8878",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 26,
+    "fused": 26,
+    "stage2": 10,
+    "stage3": 10,
+    "stage4": 10
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8895",
+   "ranks": {
+    "ckv_round1": 9,
+    "ckv_round2": 9,
+    "stage1": 9,
+    "fused": 9,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "bug_fix",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8899",
+   "ranks": {
+    "ckv_round1": 13,
+    "ckv_round2": 14,
+    "stage1": 13,
+    "fused": 13,
+    "stage2": 5,
+    "stage3": 5,
+    "stage4": 5
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8908",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 4,
+    "stage1": 2,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "refactor"
+  },
+  {
+   "name": "pr-8911",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 1,
+    "stage2": 16,
+    "stage3": 16,
+    "stage4": 0
+   },
+   "lost_rank1_at": "fused->stage2",
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8915",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [],
+   "intent": "bug_fix",
+   "expected_intent": "bug_fix"
+  },
+  {
+   "name": "pr-8922",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8932",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8941",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 3,
+    "stage1": 3,
+    "fused": 3,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  },
+  {
+   "name": "pr-8959",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 149,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "fused->stage2",
+   "flags": [
+    "intent_wrong",
+    "intent_threshold",
+    "answer_demoted"
+   ],
+   "intent": "",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8960",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 0,
+    "stage1": 4,
+    "fused": 6,
+    "stage2": 17,
+    "stage3": 17,
+    "stage4": 0
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": "stage3->stage4",
+   "flags": [
+    "intent_wrong",
+    "answer_demoted",
+    "answer_cut_stage4"
+   ],
+   "intent": "",
+   "expected_intent": "test_add"
+  },
+  {
+   "name": "pr-8877",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 8,
+    "stage1": 4,
+    "fused": 5,
+    "stage2": 4,
+    "stage3": 4,
+    "stage4": 4
+   },
+   "lost_rank1_at": null,
+   "lost_found_at": null,
+   "flags": [
+    "intent_wrong",
+    "hit_keyword_promoted_top1"
+   ],
+   "intent": "",
+   "expected_intent": "feature_add"
+  }
+ ]
+}

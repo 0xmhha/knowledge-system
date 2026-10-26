@@ -15,6 +15,8 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+from retrieval_snapshot_chain import model_slug
+
 QUERY_TIMEOUT_SECONDS = 300
 TOP_K = 10
 CHARS_PER_TOKEN = 4
@@ -82,8 +84,21 @@ def run(args: Sequence[str], cwd: Path | None = None) -> str:
     return r.stdout
 
 
-def ckv(bindir: Path, ds: Path, prompt: str, rerank: bool) -> Answer:
-    args = [str(bindir / 'ckv'), 'query', '--out', str(ds / 'vector'), '--json', '-k', str(TOP_K)]
+@dataclass(frozen=True, slots=True)
+class Index:
+    vector: Path
+    graph: Path
+    embed: list[str]
+
+
+def index_for(datasets: Path, snapshot: str, model: str, embed_dim: int) -> Index:
+    """The indexes retrieval_snapshot_chain.py builds: one graph per snapshot, one vector index per model."""
+    embed = ['--embedder=ollama', f'--model-name={model}'] + ([f'--embed-dim={embed_dim}'] if embed_dim else [])
+    return Index(datasets / 'vec' / model_slug(model, embed_dim) / snapshot, datasets / f'chain-{snapshot}' / 'graph', embed)
+
+
+def ckv(bindir: Path, ix: Index, prompt: str, rerank: bool) -> Answer:
+    args = [str(bindir / 'ckv'), 'query', '--out', str(ix.vector), *ix.embed, '--json', '-k', str(TOP_K)]
     if rerank:
         args.append('--bm25-rerank')
     data = json.loads(run([*args, prompt]))
@@ -92,8 +107,8 @@ def ckv(bindir: Path, ds: Path, prompt: str, rerank: bool) -> Answer:
     return Answer(cites, sum(len(h.get('snippet', '')) for h in hits))
 
 
-def ckg(bindir: Path, ds: Path, prompt: str) -> Answer:
-    out = run([str(bindir / 'ckg'), 'query', '--graph', str(ds / 'graph'), prompt])
+def ckg(bindir: Path, ix: Index, prompt: str) -> Answer:
+    out = run([str(bindir / 'ckg'), 'query', '--graph', str(ix.graph), prompt])
     return Answer(parse_ckg(out), len(out))
 
 
@@ -120,23 +135,25 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument('--sample', required=True)
     p.add_argument('--prompts', required=True)
-    p.add_argument('--datasets', required=True, help='directory holding chain-<snapshot>/')
+    p.add_argument('--datasets', required=True, help='work directory of retrieval_snapshot_chain.py')
     p.add_argument('--src', required=True, help='worktree checked out to --snapshot')
     p.add_argument('--snapshot', required=True)
     p.add_argument('--bin', required=True)
+    p.add_argument('--model', required=True)
+    p.add_argument('--embed-dim', type=int, default=0)
     p.add_argument('--out', required=True)
     a = p.parse_args()
     sample = json.loads(Path(a.sample).read_text())
     prompts: Mapping[str, str] = json.loads(Path(a.prompts).read_text())
     bindir, src = Path(a.bin), Path(a.src)
-    ds = Path(a.datasets) / f'chain-{a.snapshot}'
+    ix = index_for(Path(a.datasets), a.snapshot, a.model, a.embed_dim)
     head = run(['git', '-C', str(src), 'rev-parse', 'HEAD']).strip()
     if head != a.snapshot:
         raise SystemExit(f'source worktree is at {head}, not {a.snapshot}')
     baselines: dict[str, Callable[[str], Answer]] = {
-        'ckv_vector': lambda q: ckv(bindir, ds, q, False),
-        'ckv_vector_bm25': lambda q: ckv(bindir, ds, q, True),
-        'ckg_keyword': lambda q: ckg(bindir, ds, q),
+        'ckv_vector': lambda q: ckv(bindir, ix, q, False),
+        'ckv_vector_bm25': lambda q: ckv(bindir, ix, q, True),
+        'ckg_keyword': lambda q: ckg(bindir, ix, q),
         'grep': lambda q: grep(src, q),
     }
     rows = []
@@ -155,7 +172,7 @@ def main() -> None:
                 row[name] = {'first_hit_rank': 0, 'error': str(error)[:300]}
         rows.append(row)
     summary = {name: summarize([r[name]['first_hit_rank'] for r in rows]) for name in baselines}
-    Path(a.out).write_text(json.dumps({'snapshot': a.snapshot, 'results': rows, 'summary': summary}, indent=2, ensure_ascii=False) + '\n')
+    Path(a.out).write_text(json.dumps({'snapshot': a.snapshot, 'model': a.model, 'embed_dim': a.embed_dim, 'results': rows, 'summary': summary}, indent=2, ensure_ascii=False) + '\n')
 
 
 if __name__ == '__main__':

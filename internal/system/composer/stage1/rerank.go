@@ -10,10 +10,24 @@ import (
 
 // scoredKeyword captures one BM25 rerank result.
 type scoredKeyword struct {
-	Keyword string
-	Score   float64
-	Hits    int
+	Keyword string  `json:"keyword"`
+	Score   float64 `json:"score"`
+	Hits    int     `json:"hits"`
 }
+
+// droppedKeyword is a candidate the rerank removed, with the reason. Kept
+// for the debug trace only.
+type droppedKeyword struct {
+	Keyword string `json:"keyword"`
+	Reason  string `json:"reason"`
+}
+
+// Rerank drop reasons.
+const (
+	dropBM25Error = "bm25_error"
+	dropZeroScore = "zero_score"
+	dropCaseFold  = "case_fold_duplicate"
+)
 
 // rerank scores each candidate by ckg BM25 hit aggregation, drops zero-
 // score candidates, sorts by descending score, and returns the kept
@@ -31,14 +45,27 @@ type scoredKeyword struct {
 // rest proceed. Total-failure (all keywords error) returns an empty
 // slice and zero confidence.
 func (e *Extractor) rerank(ctx context.Context, candidates []string) ([]string, float64) {
+	scored, _ := e.rerankScored(ctx, candidates)
+	out := make([]string, 0, len(scored))
+	for _, s := range scored {
+		out = append(out, s.Keyword)
+	}
+	return out, computeConfidence(scored)
+}
+
+// rerankScored is rerank's core: the kept keywords with their scores in
+// final order, plus every dropped candidate and why it was dropped.
+func (e *Extractor) rerankScored(ctx context.Context, candidates []string) ([]scoredKeyword, []droppedKeyword) {
 	if len(candidates) == 0 {
-		return nil, 0
+		return nil, nil
 	}
 
+	var dropped []droppedKeyword
 	scored := make([]scoredKeyword, 0, len(candidates))
 	for _, kw := range candidates {
 		hits, err := e.ckg.BM25Search(ctx, ckgclient.KeywordFTSQuery(kw), ckgclient.SearchOpts{K: e.config.RerankPerKW})
 		if err != nil {
+			dropped = append(dropped, droppedKeyword{Keyword: kw, Reason: dropBM25Error})
 			continue
 		}
 		// Score policy: MAX of per-hit scores, not the sum.
@@ -62,7 +89,9 @@ func (e *Extractor) rerank(ctx context.Context, candidates []string) ([]string, 
 			}
 		}
 		if best <= 0 {
-			continue // zero-score keyword = not present in indexed code
+			// zero-score keyword = not present in indexed code
+			dropped = append(dropped, droppedKeyword{Keyword: kw, Reason: dropZeroScore})
+			continue
 		}
 		scored = append(scored, scoredKeyword{Keyword: kw, Score: best, Hits: len(hits)})
 	}
@@ -87,18 +116,13 @@ func (e *Extractor) rerank(ctx context.Context, candidates []string) ([]string, 
 	for _, s := range scored {
 		fold := strings.ToLower(s.Keyword)
 		if _, ok := seenFold[fold]; ok {
+			dropped = append(dropped, droppedKeyword{Keyword: s.Keyword, Reason: dropCaseFold})
 			continue
 		}
 		seenFold[fold] = struct{}{}
 		deduped = append(deduped, s)
 	}
-	scored = deduped
-
-	out := make([]string, 0, len(scored))
-	for _, s := range scored {
-		out = append(out, s.Keyword)
-	}
-	return out, computeConfidence(scored)
+	return deduped, dropped
 }
 
 // computeConfidence returns top1.Score / sum(scores), or 0 when the slice

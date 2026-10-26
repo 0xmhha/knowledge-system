@@ -13,6 +13,9 @@
 //  4. Confidence gate — if top-1 BM25 score dominates the candidates,
 //     accept; otherwise augment the prompt with the top reranked keywords
 //     and loop (bounded by MaxRounds).
+//  5. Stage 2 hand-off — only keywords from the prompt itself go to
+//     Stage 2 by default; names mined from hits served steps 3 and 4
+//     only (see Config.KeepHitKeywords).
 //
 // The strategy mirrors what coding agents like Cursor do internally: when
 // the first search is ambiguous, refine the query with what was learned
@@ -26,12 +29,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"go.uber.org/zap"
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
+	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/internal/system/vocab"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
@@ -71,6 +76,19 @@ type Config struct {
 	// AugmentTopN is how many top-reranked keywords to splice into the
 	// augmented query for the next round.
 	AugmentTopN int
+	// KeepHitKeywords keeps keywords mined from ckv hits (hit symbols and
+	// file basenames) in the Keywords handed to Stage 2. Off by default:
+	// those names only repeat what the semantic search already ranked, and
+	// Stage 2 fused them back as if they were independent evidence, so a
+	// hit whose own name made the keyword cap outranked a better hit whose
+	// name did not. Measured 2026-10-26 with every other factor fixed:
+	// dropping them raised grpc-go CKS MRR 0.206 -> 0.232 (qwen3-embedding)
+	// and 0.243 -> 0.271 (bge-m3), where 83% of the final keywords came from
+	// hits (Korean prompts carry no identifiers), and left the go-stablenet
+	// PR set unchanged, where every final keyword came from the prompt.
+	// Hit keywords still feed the recall-round query augmentation and the
+	// confidence gate; only the Stage 2 hand-off drops them.
+	KeepHitKeywords bool
 }
 
 // DefaultConfig returns the baseline tuning.
@@ -214,8 +232,24 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 	}
 	out.VocabExpanded = len(expansion.MatchedKeywords) > 0
 	out.VocabKeywords = expansion.MatchedKeywords
+	rec := debugtrace.From(ctx)
+	// origin remembers where each keyword first came from, so the Stage 2
+	// hand-off can drop the ones mined from hits (see KeepHitKeywords).
+	origin := map[string]string{}
+	if rec != nil {
+		rec.After("stage1", "vocab_expand", "", map[string]any{
+			"prompt": prompt, "expanded": expansion.Expanded, "matched": expansion.MatchedKeywords,
+			"first_query": currentQuery,
+		})
+	}
 
 	for round := 1; round <= e.config.MaxRounds; round++ {
+		roundKey := strconv.Itoa(round)
+		if rec != nil {
+			rec.Before("stage1", "ckv_search", roundKey, map[string]any{
+				"query": currentQuery, "k": e.config.InitialK, "bm25_rerank": true,
+			})
+		}
 		// Recall: broad ckv semantic search with the current (possibly
 		// augmented) query.
 		// BM25Rerank: prompts routinely quote exact identifiers; the
@@ -231,25 +265,65 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 			break
 		}
 
+		if rec != nil {
+			rec.After("stage1", "ckv_search", roundKey, map[string]any{"hits": debugtrace.Hits(hits)})
+			rec.Before("stage1", "merge_hits", roundKey, map[string]any{"have": len(out.Hits), "incoming": len(hits)})
+		}
 		out.Hits = mergeHits(out.Hits, hits)
 		out.AugmentedQueries = append(out.AugmentedQueries, currentQuery)
 		out.Rounds = round
+		if rec != nil {
+			rec.After("stage1", "merge_hits", roundKey, map[string]any{"hits": debugtrace.Hits(out.Hits)})
+		}
 
 		// Extract candidate keywords from the prompt + all hits so far.
-		candidates := extractKeywords(prompt, out.Hits, intent)
+		tagged := extractKeywordCandidates(prompt, out.Hits, intent)
+		candidates := make([]string, 0, len(tagged))
+		for _, c := range tagged {
+			if _, ok := origin[c.Keyword]; !ok {
+				origin[c.Keyword] = c.Origin
+			}
+			candidates = append(candidates, c.Keyword)
+		}
+		if rec != nil {
+			rec.After("stage1", "extract_keywords", roundKey, map[string]any{"candidates": tagged})
+		}
 
 		// Rerank via ckg BM25.
-		reranked, confidence := e.rerank(ctx, candidates)
+		scored, dropped := e.rerankScored(ctx, candidates)
+		reranked := make([]string, 0, len(scored))
+		for _, sk := range scored {
+			reranked = append(reranked, sk.Keyword)
+		}
+		confidence := computeConfidence(scored)
 		out.Keywords = reranked
 		out.Confidence = confidence
+		if rec != nil {
+			rec.Before("stage1", "rerank_keywords", roundKey, map[string]any{"candidates": candidates})
+			rec.After("stage1", "rerank_keywords", roundKey, map[string]any{
+				"kept": scored, "dropped": dropped, "confidence": confidence,
+			})
+		}
 
 		// Confidence gate: accept if dominant, otherwise augment and loop.
 		if confidence >= e.config.MinConfidence || round == e.config.MaxRounds {
+			if rec != nil {
+				rec.Note("stage1", "confidence_gate", roundKey, map[string]any{
+					"confidence": confidence, "min_confidence": e.config.MinConfidence,
+					"decision": gateDecision(confidence >= e.config.MinConfidence),
+				})
+			}
 			break
 		}
 		// Re-augment from the vocab-expanded prompt so subsequent rounds
 		// keep the glossary keywords on top of the reranked additions.
 		currentQuery = augmentQuery(expansion.Expanded, reranked, e.config.AugmentTopN)
+		if rec != nil {
+			rec.Note("stage1", "confidence_gate", roundKey, map[string]any{
+				"confidence": confidence, "min_confidence": e.config.MinConfidence,
+				"decision": "augment", "next_query": currentQuery,
+			})
+		}
 	}
 
 	// Knowledge pass: fetch domain rules by chunk kind. Failure is
@@ -263,11 +337,45 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 			out.Hits = mergeHits(out.Hits, khits)
 			out.KnowledgeHits = len(khits)
 		}
+		if rec != nil {
+			data := map[string]any{"k": e.config.KnowledgeK, "hits": debugtrace.Hits(khits)}
+			if kerr != nil {
+				data["error"] = kerr.Error()
+			}
+			rec.After("stage1", "knowledge_pass", "", data)
+		}
+	}
+
+	// Drop hit-mined keywords before the cap, so the cap keeps the prompt's
+	// own keywords instead of spending slots on them.
+	if !e.config.KeepHitKeywords {
+		kept := make([]string, 0, len(out.Keywords))
+		var removed []string
+		for _, k := range out.Keywords {
+			if o := origin[k]; o == originHitSymbol || o == originHitFile {
+				removed = append(removed, k)
+				continue
+			}
+			kept = append(kept, k)
+		}
+		if rec != nil && len(removed) > 0 {
+			rec.Note("stage1", "drop_hit_keywords", "", map[string]any{"removed": removed})
+		}
+		out.Keywords = kept
 	}
 
 	// Cap the final keyword count.
+	if rec != nil {
+		rec.Before("stage1", "keyword_cap", "", map[string]any{"keywords": out.Keywords, "max": e.config.MaxKeywords})
+	}
 	if len(out.Keywords) > e.config.MaxKeywords {
+		if rec != nil {
+			rec.Note("stage1", "keyword_cap", "", map[string]any{"dropped": out.Keywords[e.config.MaxKeywords:]})
+		}
 		out.Keywords = out.Keywords[:e.config.MaxKeywords]
+	}
+	if rec != nil {
+		rec.After("stage1", "keyword_cap", "", map[string]any{"keywords": out.Keywords, "hits": debugtrace.Hits(out.Hits)})
 	}
 
 	e.emitFootprint(ctx, intent, out)
@@ -290,6 +398,14 @@ func (e *Extractor) emitFootprint(ctx context.Context, intent contract.Intent, o
 		zap.Bool("vocab_expanded", out.VocabExpanded),
 		zap.Strings("vocab_keywords", out.VocabKeywords),
 	)
+}
+
+// gateDecision names the confidence gate's outcome for the debug trace.
+func gateDecision(confident bool) string {
+	if confident {
+		return "accept"
+	}
+	return "max_rounds"
 }
 
 // augmentQuery splices the top N reranked keywords into the original prompt

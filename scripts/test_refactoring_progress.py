@@ -113,6 +113,39 @@ class SourceBindingTests(unittest.TestCase):
             progress.verify_source_binding(self.binding(source_revision=BINDING_DRIFT_REVISION))
 
 
+class CitedPathTests(unittest.TestCase):
+    def setUp(self):
+        self.retired = json.loads((ROOT / progress.RETIRED).read_text())
+        self.text = (ROOT / "docs/spec-driven/REFACTORING-PROGRESS.json").read_text()
+
+    def test_current_ledger_paths_resolve(self):
+        self.assertGreater(progress.verify_cited_paths(self.text, self.retired), len(self.retired["documents"]))
+
+    def test_missing_path_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "missing path: docs/spec-driven/NO-SUCH.md"):
+            progress.verify_cited_paths(self.text + '"docs/spec-driven/NO-SUCH.md"', self.retired)
+
+    def test_retired_document_must_match_its_hash(self):
+        retired = copy.deepcopy(self.retired)
+        path = sorted(retired["documents"])[0]
+        retired["documents"][path] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "recorded SHA-256"):
+            progress.verify_cited_paths(self.text, retired)
+
+    def test_retired_index_cannot_hide_a_present_file(self):
+        retired = copy.deepcopy(self.retired)
+        present = next(p for p in sorted(progress.LEDGER_PATH.findall(self.text)) if p not in retired["documents"])
+        retired["documents"][present] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "back in the tree"):
+            progress.verify_cited_paths(self.text, retired)
+
+    def test_unused_retired_entry_is_rejected(self):
+        retired = copy.deepcopy(self.retired)
+        retired["documents"]["docs/spec-driven/UNCITED.md"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "does not cite"):
+            progress.verify_cited_paths(self.text, retired)
+
+
 class OntologyProgressTests(unittest.TestCase):
  def fixture(self):
   tasks=[{"id":f"O-{i:02d}","state":"pending"}for i in range(1,5)]

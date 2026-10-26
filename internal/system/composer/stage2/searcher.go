@@ -34,6 +34,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/system/ckgclient"
 	"github.com/0xmhha/knowledge-system/internal/system/ckvclient"
+	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/internal/system/semantic"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
@@ -269,6 +270,15 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 			}
 		}
 		agg.addCkvList(citable)
+		if rec := debugtrace.From(ctx); rec != nil {
+			rec.After("stage2", "ckv_list", "", map[string]any{"citable": debugtrace.Hits(citable), "knowledge": len(out.Knowledge)})
+		}
+	}
+	rec := debugtrace.From(ctx)
+	if rec != nil {
+		rec.Before("stage2", "keyword_search", "", map[string]any{
+			"keywords": keywords, "symbol_kinds": kinds, "intent_path_glob": pathGlob,
+		})
 	}
 	hitCount := 0
 	bm25Errors := 0
@@ -278,8 +288,12 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	for _, kw := range keywords {
 		anyHit := false
 
-		bm25Hits, bm25Err := s.ckg.BM25Search(ctx, ckgclient.KeywordFTSQuery(kw), ckgclient.SearchOpts{K: s.config.BM25K})
+		ftsQuery := ckgclient.KeywordFTSQuery(kw)
+		bm25Hits, bm25Err := s.ckg.BM25Search(ctx, ftsQuery, ckgclient.SearchOpts{K: s.config.BM25K})
 		ckgCalls++
+		if rec != nil {
+			rec.After("stage2", "bm25", kw, traceList(map[string]any{"fts_query": ftsQuery, "hits": debugtrace.Hits(bm25Hits)}, bm25Err))
+		}
 		if bm25Err != nil {
 			bm25Errors++
 		} else if len(bm25Hits) > 0 {
@@ -308,6 +322,12 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 			}
 			agg.addSymbolListWeighted(kw, symbolCits, weight, exact)
 		}
+		if rec != nil {
+			rec.After("stage2", "find_symbol", kw, traceList(map[string]any{
+				"citations": debugtrace.Citations(symbolCits), "count": len(symbolCits),
+				"distinct": distinctCitations(symbolCits), "prompt_exact": len(symbolCits) == 1 && promptMentionsVerbatim(prompt, kw),
+			}, symErr))
+		}
 
 		if !anyHit {
 			out.FailedKeywords = append(out.FailedKeywords, kw)
@@ -329,6 +349,9 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 				Filter: ckgclient.SearchFilter{PathGlob: pathGlob},
 			})
 			ckgCalls++
+			if rec != nil {
+				rec.After("stage2", "bm25_path_glob", kw, traceList(map[string]any{"path_glob": pathGlob, "hits": debugtrace.Hits(extraHits)}, extraErr))
+			}
 			if extraErr != nil {
 				bm25Errors++
 				continue
@@ -350,6 +373,10 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	// stays intact).
 	demoteTests := intent != contract.IntentTestAdd
 	demoteDocs := demoteDocsFor(intent)
+	if rec != nil {
+		// Fused scores before demotion and cap: the RRF result on its own.
+		rec.Before("stage2", "rank_citations", "", map[string]any{"citations": scoredCites(agg.results(0, false, false))})
+	}
 	if s.ontology != nil && s.ontologyBoost > 0 {
 		// Freeze the baseline top-K set before changing scores. Ontology may
 		// reorder these citations but cannot admit a new one or displace a
@@ -363,6 +390,12 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	out.Citations = agg.results(s.config.MaxCitations, demoteTests, demoteDocs)
 	if s.ontologyProvider != nil && s.ontologyBoost > 0 {
 		out.Citations, out.ConceptCandidates, out.Ontology = s.applyProvidedOntology(ctx, agg, prompt, ckvHits, out.Citations, demoteTests, demoteDocs)
+	}
+	if rec != nil {
+		rec.After("stage2", "rank_citations", "", map[string]any{
+			"demote_tests": demoteTests, "demote_docs": demoteDocs, "max_citations": s.config.MaxCitations,
+			"citations": scoredCites(out.Citations), "failed_keywords": out.FailedKeywords,
+		})
 	}
 	if len(keywords) > 0 {
 		out.Coverage = float64(hitCount) / float64(len(keywords))
@@ -406,4 +439,33 @@ func countSymbolHits(m map[string][]contract.Citation) int {
 		n += len(cs)
 	}
 	return n
+}
+
+// traceList adds err to a debug trace payload when the backend call failed.
+func traceList(data map[string]any, err error) map[string]any {
+	if err != nil {
+		data["error"] = err.Error()
+	}
+	return data
+}
+
+// distinctCitations counts distinct citation keys. A list whose count and
+// distinct differ credits the same span more than once.
+func distinctCitations(cs []contract.Citation) int {
+	seen := make(map[string]struct{}, len(cs))
+	for _, c := range cs {
+		seen[c.Key()] = struct{}{}
+	}
+	return len(seen)
+}
+
+// scoredCites converts fused citations for the debug trace, keeping the
+// per-list contributions that explain each score.
+func scoredCites(cs []ScoredCitation) []debugtrace.Cite {
+	out := make([]debugtrace.Cite, 0, len(cs))
+	for _, c := range cs {
+		out = append(out, debugtrace.Cite{File: c.Citation.File, Start: c.Citation.StartLine, End: c.Citation.EndLine,
+			Kind: c.ChunkKind, Score: c.Score, Sources: c.Sources})
+	}
+	return out
 }

@@ -78,8 +78,13 @@ func newAggregator(rrfK int, bmWeight, symbolWeight, ckvWeight float64) *aggrega
 // ckv list out-recalls keyword BM25 on natural-language prompts, so it
 // carries CkvWeight >= BMWeight by default.
 func (a *aggregator) addCkvList(hits []contract.Hit) {
-	for i, h := range hits {
-		rank := i + 1
+	seen := make(map[string]struct{}, len(hits))
+	rank := 0
+	for _, h := range hits {
+		if !firstInList(seen, h.Citation) {
+			continue
+		}
+		rank++
 		contribution := a.ckvWeight / float64(a.rrfK+rank)
 		sc := a.entry(h.Citation)
 		if sc.ParentCitation == nil && h.ParentCitation != nil &&
@@ -102,8 +107,13 @@ func (a *aggregator) addCkvList(hits []contract.Hit) {
 // addBM25List credits every hit in a ranked BM25 result list. rank is
 // derived from list position (1-based). Empty lists are a no-op.
 func (a *aggregator) addBM25List(keyword string, hits []contract.Hit) {
-	for i, h := range hits {
-		rank := i + 1
+	seen := make(map[string]struct{}, len(hits))
+	rank := 0
+	for _, h := range hits {
+		if !firstInList(seen, h.Citation) {
+			continue
+		}
+		rank++
 		contribution := a.bmWeight / float64(a.rrfK+rank)
 		sc := a.entry(h.Citation)
 		sc.Score += contribution
@@ -134,8 +144,13 @@ func (a *aggregator) addSymbolListWeighted(keyword string, cits []contract.Citat
 	if exact {
 		prefix = SourceExactSymbolPrefix
 	}
-	for i, c := range cits {
-		rank := i + 1
+	seen := make(map[string]struct{}, len(cits))
+	rank := 0
+	for _, c := range cits {
+		if !firstInList(seen, c) {
+			continue
+		}
+		rank++
 		contribution := weight / float64(a.rrfK+rank)
 		sc := a.entry(c)
 		sc.Score += contribution
@@ -174,6 +189,22 @@ func ExactSymbolKeyword(sources []string) string {
 		return kw
 	}
 	return ""
+}
+
+// firstInList reports whether c is the first occurrence of its span in one
+// ranked list, and marks it seen. RRF credits a document once per list, at
+// its best rank, and ranks count distinct documents. A FindSymbol list can
+// name one span many times: Go types that embed an interface each get a
+// promoted-method node located at the interface's declaration, so a bare
+// "RemoveSubConn" returned the same span 21 times and summed 21 credits
+// (0.855, seven times a normal top score) onto a citation no prompt asked for.
+func firstInList(seen map[string]struct{}, c contract.Citation) bool {
+	key := c.Key()
+	if _, dup := seen[key]; dup {
+		return false
+	}
+	seen[key] = struct{}{}
+	return true
 }
 
 func (a *aggregator) entry(c contract.Citation) *ScoredCitation {

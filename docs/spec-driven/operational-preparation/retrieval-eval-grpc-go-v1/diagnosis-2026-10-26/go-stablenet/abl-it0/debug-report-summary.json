@@ -1,0 +1,76 @@
+{
+ "summary": {
+  "scenarios": 12,
+  "checkpoints": {
+   "ckv_round1": {
+    "hit@1": 0.667,
+    "hit@3": 0.833,
+    "found": 1.0,
+    "mrr": 0.778
+   },
+   "ckv_round2": {
+    "hit@1": 0.667,
+    "hit@3": 1.0,
+    "found": 1.0,
+    "mrr": 0.792
+   },
+   "stage1": {
+    "hit@1": 0.667,
+    "hit@3": 0.833,
+    "found": 1.0,
+    "mrr": 0.778
+   },
+   "fused": {
+    "hit@1": 0.583,
+    "hit@3": 0.667,
+    "found": 1.0,
+    "mrr": 0.694
+   },
+   "stage2": {
+    "hit@1": 0.667,
+    "hit@3": 0.917,
+    "found": 1.0,
+    "mrr": 0.771
+   },
+   "stage3": {
+    "hit@1": 0.667,
+    "hit@3": 0.917,
+    "found": 1.0,
+    "mrr": 0.771
+   },
+   "stage4": {
+    "hit@1": 0.667,
+    "hit@3": 0.917,
+    "found": 1.0,
+    "mrr": 0.771
+   }
+  },
+  "lost_rank1_at": {
+   "stage1->fused": 2
+  },
+  "lost_found_at": {},
+  "flags": {
+   "intent_wrong": 0,
+   "intent_threshold": 0,
+   "list_duplicate_credit": 0,
+   "duplicate_credit_top1": 0,
+   "symbol_fanout": 0,
+   "keyword_only_top1": 0,
+   "hit_keyword_promoted_top1": 0,
+   "score_outlier_top1": 0,
+   "answer_demoted": 0,
+   "answer_cut_stage4": 0
+  },
+  "answer_stage4_decision": {
+   "selected": 12
+  },
+  "intent": {
+   "correct": 12,
+   "classified_as": {
+    "bug_fix": 8,
+    "arch_explain": 3,
+    "concurrency_safety": 1
+   }
+  }
+ }
+}

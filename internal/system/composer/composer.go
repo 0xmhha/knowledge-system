@@ -44,6 +44,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage1"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
+	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -66,6 +67,7 @@ type Composer struct {
 	budget         *budget.Allocator
 	sanitize       *sanitize.Engine
 	fp             *footprint.Logger
+	debugSink      *debugtrace.FileSink
 	builderVersion string
 }
 
@@ -84,6 +86,14 @@ func WithFootprint(fp *footprint.Logger) Option {
 // that want to surface a git SHA or build tag.
 func WithBuilderVersion(v string) Option {
 	return func(c *Composer) { c.builderVersion = v }
+}
+
+// WithDebugTrace records every algorithm's input and output for each
+// Compose call and appends one JSON line per call to sink (see package
+// debugtrace). Nil disables tracing. Meant for evaluation runs: the trace
+// holds full hit lists and is not sized for production traffic.
+func WithDebugTrace(sink *debugtrace.FileSink) Option {
+	return func(c *Composer) { c.debugSink = sink }
 }
 
 // New constructs a Composer. Every stage dependency is required; nil
@@ -165,6 +175,17 @@ func (c *Composer) ComposeTraced(ctx context.Context, prompt string) (contract.E
 // (see ComposeWithIntent for the contract; IntentUnknown/empty falls back
 // to the internal classifier).
 func (c *Composer) ComposeTracedWithIntent(ctx context.Context, prompt string, callerIntent contract.Intent) (contract.EvidencePack, contract.RetrievalTrace, error) {
+	if c.debugSink == nil {
+		return c.compose(ctx, prompt, callerIntent)
+	}
+	rec := debugtrace.NewRecorder()
+	pack, trace, err := c.compose(debugtrace.WithRecorder(ctx, rec), prompt, callerIntent)
+	// A trace write failure must not fail the retrieval it describes.
+	_ = c.debugSink.Write(prompt, callerIntent, rec, err)
+	return pack, trace, err
+}
+
+func (c *Composer) compose(ctx context.Context, prompt string, callerIntent contract.Intent) (contract.EvidencePack, contract.RetrievalTrace, error) {
 	if prompt == "" {
 		return contract.EvidencePack{}, contract.RetrievalTrace{}, errors.New("composer: empty prompt")
 	}
@@ -192,6 +213,9 @@ func (c *Composer) ComposeTracedWithIntent(ctx context.Context, prompt string, c
 		// classifier (which degrades to Unknown on unrecognized prompts,
 		// turning off every intent-conditioned stage downstream).
 		intentVal = callerIntent
+		if rec := debugtrace.From(ctx); rec != nil {
+			rec.Note("intent", "caller_override", "", map[string]any{"intent": callerIntent})
+		}
 	} else {
 		cls, err := c.intent.Classify(ctx, prompt)
 		if err != nil {

@@ -15,10 +15,10 @@ match_mode: overlap
 runs: 5
 expected_citations:
   - file: internal/system/composer/composer.go
-    start_line: 54
-    end_line: 58        # ErrFailClosed var
+    start_line: 55
+    end_line: 59        # ErrFailClosed var (re-anchored 2026-10-26: debug trace import)
     anchor: "var ErrFailClosed"
   - file: internal/system/composer/composer.go
-    start_line: 249
-    end_line: 254       # Compose's fail_closed wrap (re-anchored 2026-07-29)
+    start_line: 273
+    end_line: 278       # Compose's fail_closed wrap (re-anchored 2026-10-26: debug trace wrapper)
     anchor: "FailClosedRule"

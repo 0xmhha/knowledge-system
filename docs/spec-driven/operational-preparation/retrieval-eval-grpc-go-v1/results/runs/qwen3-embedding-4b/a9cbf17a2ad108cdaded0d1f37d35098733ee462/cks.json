@@ -1,0 +1,634 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:22:50.598363Z",
+  "finished_at": "2026-10-24T00:22:52.869651Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 8225542,
+          "completed_at": "2026-10-24T09:22:50.606778+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": true,
+              "indexed_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "클라이언트가 스트림을 열면서 첫 헤더에 스트림 끝 표시를 같이 보내면 서버 쪽 수신이 멈춰. 고치고 싶어"
+          },
+          "elapsed_ns": 2262292958,
+          "completed_at": "2026-10-24T09:22:52.869114+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "query": "클라이언트가 스트림을 열면서 첫 헤더에 스트림 끝 표시를 같이 보내면 서버 쪽 수신이 멈춰. 고치고 싶어",
+              "citations": [
+                {
+                  "file": "internal/transport/http_util.go",
+                  "start_line": 410,
+                  "end_line": 412,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/client_stream.go",
+                  "start_line": 168,
+                  "end_line": 174,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 1336,
+                  "end_line": 1358,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/server_stream.go",
+                  "start_line": 80,
+                  "end_line": 83,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "interop/http2/negative_http2_client.go",
+                  "start_line": 80,
+                  "end_line": 89,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 157,
+                  "end_line": 162,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/xds/httpfilter/extproc/ext_proc.go",
+                  "start_line": 693,
+                  "end_line": 704,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 128,
+                  "end_line": 135,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 398,
+                  "end_line": 398,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "stream.go",
+                  "start_line": 83,
+                  "end_line": 83,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/client_stream.go",
+                  "start_line": 128,
+                  "end_line": 139,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 1316,
+                  "end_line": 1334,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 359,
+                  "end_line": 362,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/xds/clients/xdsclient/test/misc_watchers_test.go",
+                  "start_line": 92,
+                  "end_line": 95,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/transport.go",
+                  "start_line": 421,
+                  "end_line": 423,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "interop/http2/negative_http2_client.go",
+                  "start_line": 62,
+                  "end_line": 69,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "status/status.go",
+                  "start_line": 139,
+                  "end_line": 146,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "grpclog/internal/loggerv2.go",
+                  "start_line": 52,
+                  "end_line": 52,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "grpclog/internal/loggerv2.go",
+                  "start_line": 60,
+                  "end_line": 60,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "interop/grpc_testing/test_grpc.pb.go",
+                  "start_line": 59,
+                  "end_line": 59,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 107,
+                  "end_line": 109,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 115,
+                  "end_line": 115,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 159,
+                  "end_line": 159,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 160,
+                  "end_line": 160,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 161,
+                  "end_line": 161,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/xds/httpfilter/extproc/ext_proc.go",
+                  "start_line": 635,
+                  "end_line": 659,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "internal/transport/http_util.go",
+                    "start_line": 410,
+                    "end_line": 412,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "func (df *parsedDataFrame) StreamEnded() bool {\n\treturn df.FrameHeader.Flags.Has(http2.FlagDataEndStream)\n}",
+                  "token_estimate": 26
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 168,
+                    "end_line": 174,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "// TrailersOnly blocks until a header or trailers-only frame is received and\n// then returns true if the stream was trailers-only.  If the stream ends\n// before headers are received, returns true, nil.\nfunc (s *ClientStream) TrailersOnly() bool {\n\ts.waitOnHeader()\n\treturn s.noHeaders\n}",
+                  "token_estimate": 71
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1336,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "// finishStream closes the stream and puts the trailing headerFrame into controlbuf.\nfunc (t *http2Server) finishStream(s *ServerStream, rst bool, rstCode http2.ErrCode, hdr *serverHeaders, eosReceived bool) {\n\t// In case stream sending and receiving are invoked in separate\n\t// goroutines (e.g., bi-directional streaming), cancel needs to be\n\t// called to interrupt the potential blocking on other goroutines.\n\ts.cancel()\n\n\toldState := s.swapState(streamDone)\n\tif oldState == streamDone {\n\t\t// If the stream was already done, return.\n\t\treturn\n\t}\n\n\thdr.cleanup = \u0026cleanupStream{\n\t\tstreamID: s.id,\n\t\trst:      rst,\n\t\trstCode:  rstCode,\n\t\tonWrite: func() {\n\t\t\tt.deleteStream(s, eosReceived)\n\t\t},\n\t}\n\tt.controlBuf.put(hdr)\n}",
+                  "token_estimate": 180
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/server_stream.go",
+                    "start_line": 80,
+                    "end_line": 83,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// isHeaderSent indicates whether headers have been sent.\nfunc (s *ServerStream) isHeaderSent() bool {\n\treturn s.headerSent.Load()\n}",
+                  "token_estimate": 33
+                },
+                {
+                  "citation": {
+                    "file": "interop/http2/negative_http2_client.go",
+                    "start_line": 80,
+                    "end_line": 89,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func rstAfterHeader(tc testgrpc.TestServiceClient) {\n\treq := largeSimpleRequest()\n\treply, err := tc.UnaryCall(context.Background(), req)\n\tif reply != nil {\n\t\tlogger.Fatal(\"Client received reply despite server sending rst stream after header\")\n\t}\n\tif status.Code(err) != codes.Internal {\n\t\tlogger.Fatalf(\"%v.UnaryCall() = _, %v, want _, %v\", tc, status.Code(err), codes.Internal)\n\t}\n}",
+                  "token_estimate": 95
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 157,
+                    "end_line": 162,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "type earlyAbortStream struct {\n\tthrottledItem\n\tstreamID uint32\n\trst      bool\n\thf       []hpack.HeaderField // Pre-built header fields\n}",
+                  "token_estimate": 34
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/httpfilter/extproc/ext_proc.go",
+                    "start_line": 693,
+                    "end_line": 704,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "// halfClose creates a ProcessingRequest indicating end of stream without\n// a message body.\nfunc (cs *commonStream) halfClose() *v3procservicepb.ProcessingRequest {\n\treq := cs.newProcessingRequest(true)\n\treq.Request = \u0026v3procservicepb.ProcessingRequest_RequestBody{\n\t\tRequestBody: \u0026v3procservicepb.HttpBody{\n\t\t\tEndOfStreamWithoutMessage: true,\n\t\t\tEndOfStream:               true,\n\t\t},\n\t}\n\treturn req\n}",
+                  "token_estimate": 100
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 128,
+                    "end_line": 135,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "type clientHeaders struct {\n\tstreamID   uint32\n\thf         []hpack.HeaderField\n\tinitStream func(uint32) error\n\tonWrite    func()\n\twq         *writeQuota\n\tonOrphaned func(error)\n}",
+                  "token_estimate": 44
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 398,
+                    "end_line": 398,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "\t\treturn fmt.Errorf(\"received an illegal stream id: %v. headers frame: %+v\", streamID, frame)",
+                  "token_estimate": 23
+                },
+                {
+                  "citation": {
+                    "file": "stream.go",
+                    "start_line": 83,
+                    "end_line": 83,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "// Deprecated: See ClientStream and ServerStream documentation instead.",
+                  "token_estimate": 17
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 171,
+                    "end_line": 174,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 128,
+                    "end_line": 139,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1316,
+                    "end_line": 1334,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 359,
+                    "end_line": 362,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/xds/clients/xdsclient/test/misc_watchers_test.go",
+                    "start_line": 92,
+                    "end_line": 95,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/transport.go",
+                    "start_line": 421,
+                    "end_line": 423,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "interop/http2/negative_http2_client.go",
+                    "start_line": 80,
+                    "end_line": 89,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "interop/http2/negative_http2_client.go",
+                    "start_line": 62,
+                    "end_line": 69,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "interop/http2/negative_http2_client.go",
+                    "start_line": 80,
+                    "end_line": 89,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "status/status.go",
+                    "start_line": 139,
+                    "end_line": 146,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "interop/http2/negative_http2_client.go",
+                    "start_line": 80,
+                    "end_line": 89,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "grpclog/internal/loggerv2.go",
+                    "start_line": 52,
+                    "end_line": 52,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "interop/http2/negative_http2_client.go",
+                    "start_line": 80,
+                    "end_line": 89,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "grpclog/internal/loggerv2.go",
+                    "start_line": 60,
+                    "end_line": 60,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "interop/http2/negative_http2_client.go",
+                    "start_line": 80,
+                    "end_line": 89,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "interop/grpc_testing/test_grpc.pb.go",
+                    "start_line": 59,
+                    "end_line": 59,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 157,
+                    "end_line": 162,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 107,
+                    "end_line": 109,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "implements",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 157,
+                    "end_line": 162,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 115,
+                    "end_line": 115,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 157,
+                    "end_line": 162,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 159,
+                    "end_line": 159,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 157,
+                    "end_line": 162,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 160,
+                    "end_line": 160,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 157,
+                    "end_line": 162,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 161,
+                    "end_line": 161,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/xds/httpfilter/extproc/ext_proc.go",
+                    "start_line": 695,
+                    "end_line": 704,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/xds/httpfilter/extproc/ext_proc.go",
+                    "start_line": 635,
+                    "end_line": 659,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 623,
+                "utilization_ratio": 0.08652777777777777,
+                "built_at": "2026-10-24T00:22:52.868218Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "b674d2cd015560b044d3dac9fcf8ecc7c767cc8de714002ad4e8db5cdfe28c77",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-9391",
+      "prompt": "클라이언트가 스트림을 열면서 첫 헤더에 스트림 끝 표시를 같이 보내면 서버 쪽 수신이 멈춰. 고치고 싶어",
+      "expected_intent": "security",
+      "classified_intents": [
+        ""
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0.041666666666666664,
+        "file_recall": 1,
+        "file_f1": 0.07999999999999999,
+        "file_mrr": 0.14285714285714285,
+        "first_hit_rank": 7,
+        "token_utilization": 0.08652777777777777,
+        "used_tokens": 623,
+        "citation_count": 26,
+        "body_count": 10,
+        "redaction_count": 0,
+        "latency_ms": 2262,
+        "latency_ms_p50": 2262,
+        "latency_ms_p95": 2262,
+        "latency_ms_max": 2262
+      },
+      "retrieval_state": "pass",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0.041666666666666664,
+      "avg_mrr": 0.14285714285714285,
+      "avg_recall": 1,
+      "avg_f1": 0.07999999999999999,
+      "avg_latency_ms": 2262
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0.14285714285714285
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "security": {
+        "(unknown)": 1
+      }
+    }
+  }
+}

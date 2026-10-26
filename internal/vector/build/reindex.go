@@ -310,6 +310,12 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 						return nil, fmt.Errorf("reindex canonical realign: %w", rerr)
 					}
 					man.Sources.CKG.GraphDigest = current
+					// The ledger names the graph the join keys now follow; a
+					// graph regenerated at another commit must not keep the
+					// old commit next to its new digest.
+					if coords.SrcCommit != "" {
+						man.Sources.CKG.SrcCommit = coords.SrcCommit
+					}
 					fp.Emit("reindex.canonical_realigned",
 						"recorded_digest", recorded, "current_digest", current, "chunks_realigned", n)
 					if o.ProgressOut != nil {

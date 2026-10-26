@@ -1,0 +1,277 @@
+diff --git a/internal/graph/persist/canonical_index_test.go b/internal/graph/persist/canonical_index_test.go
+index 650335e6..bfb04513 100644
+--- a/internal/graph/persist/canonical_index_test.go
++++ b/internal/graph/persist/canonical_index_test.go
+@@ -52,28 +52,34 @@ func TestFindSymbolSuffixUsesIndexes(t *testing.T) {
+ 	if err := st.Migrate(); err != nil {
+ 		t.Fatal(err)
+ 	}
+-	q, args := findSymbolQuery("Foo", false, FindSymbolOptions{Language: "go", Kinds: []types.NodeType{types.NodeFunction}})
+-	rows, err := st.db.Query("EXPLAIN QUERY PLAN "+q, args...)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	defer func() { _ = rows.Close() }()
+-	var plan []string
+-	for rows.Next() {
+-		var id, parent, notused int
+-		var detail string
+-		if err := rows.Scan(&id, &parent, &notused, &detail); err != nil {
++	// "T.Foo" adds the dotted-suffix arm; it must stay indexed too.
++	for _, name := range []string{"Foo", "T.Foo"} {
++		q, args := findSymbolQuery(name, false, FindSymbolOptions{Language: "go", Kinds: []types.NodeType{types.NodeFunction}})
++		rows, err := st.db.Query("EXPLAIN QUERY PLAN "+q, args...)
++		if err != nil {
+ 			t.Fatal(err)
+ 		}
+-		plan = append(plan, detail)
+-	}
+-	p := strings.Join(plan, "; ")
+-	for _, want := range []string{"idx_nodes_qname", "idx_nodes_simple_name"} {
+-		if !strings.Contains(p, want) {
+-			t.Errorf("suffix lookup plan %q does not use %s", p, want)
++		var plan []string
++		for rows.Next() {
++			var id, parent, notused int
++			var detail string
++			if err := rows.Scan(&id, &parent, &notused, &detail); err != nil {
++				t.Fatal(err)
++			}
++			plan = append(plan, detail)
++		}
++		if err := rows.Err(); err != nil {
++			t.Fatal(err)
++		}
++		_ = rows.Close()
++		p := strings.Join(plan, "; ")
++		for _, want := range []string{"idx_nodes_qname", "idx_nodes_simple_name"} {
++			if !strings.Contains(p, want) {
++				t.Errorf("%s: suffix lookup plan %q does not use %s", name, p, want)
++			}
++		}
++		if strings.Contains(p, "SCAN nodes") {
++			t.Errorf("%s: suffix lookup scans nodes: %q", name, p)
+ 		}
+-	}
+-	if strings.Contains(p, "SCAN nodes") {
+-		t.Errorf("suffix lookup scans nodes: %q", p)
+ 	}
+ }
+diff --git a/internal/graph/persist/find_symbol_test.go b/internal/graph/persist/find_symbol_test.go
+index 701b4ff9..650479f6 100644
+--- a/internal/graph/persist/find_symbol_test.go
++++ b/internal/graph/persist/find_symbol_test.go
+@@ -2,6 +2,8 @@ package persist_test
+ 
+ import (
+ 	"path/filepath"
++	"sort"
++	"strings"
+ 	"testing"
+ 
+ 	"github.com/0xmhha/knowledge-system/internal/graph/persist"
+@@ -133,3 +135,53 @@ func TestFindSymbol_KindsNoMatch(t *testing.T) {
+ 		t.Errorf("got %d nodes for Kinds=Method, want 0", len(nodes))
+ 	}
+ }
++
++// A dotted "Type.Method" names the tail of "pkg.Type.Method". It must resolve
++// to that method only, not to every method sharing the last segment: a ckv hit
++// symbol arrives in this form, and the bare fallback fanned one keyword out to
++// every same-named method in the repository.
++func TestFindSymbol_DottedSuffixMatchesReceiver(t *testing.T) {
++	dbPath := filepath.Join(t.TempDir(), "dotted.db")
++	s, err := persist.Open(dbPath)
++	if err != nil {
++		t.Fatalf("Open: %v", err)
++	}
++	t.Cleanup(func() { _ = s.Close() })
++	if err := s.Migrate(); err != nil {
++		t.Fatalf("Migrate: %v", err)
++	}
++	nodes := []types.Node{
++		{ID: "od00000000000001", Type: types.NodeMethod, Name: "RemoveSubConn",
++			QualifiedName: "outlierdetection.outlierDetectionBalancer.RemoveSubConn", FilePath: "od/balancer.go", Language: "go", Confidence: types.ConfExtracted},
++		{ID: "ci00000000000001", Type: types.NodeMethod, Name: "RemoveSubConn",
++			QualifiedName: "clusterimpl.clusterImplBalancer.RemoveSubConn", FilePath: "ci/clusterimpl.go", Language: "go", Confidence: types.ConfExtracted},
++		{ID: "xx00000000000001", Type: types.NodeMethod, Name: "RemoveSubConn",
++			QualifiedName: "other.xoutlierDetectionBalancer.RemoveSubConn", FilePath: "x/x.go", Language: "go", Confidence: types.ConfExtracted},
++	}
++	if err := s.InsertNodes(nodes); err != nil {
++		t.Fatalf("InsertNodes: %v", err)
++	}
++	for _, tc := range []struct {
++		name string
++		want []string
++	}{
++		{"outlierDetectionBalancer.RemoveSubConn", []string{"od00000000000001"}},
++		{"OUTLIERDETECTIONBALANCER.removesubconn", []string{"od00000000000001"}},
++		{"outlierdetection.outlierDetectionBalancer.RemoveSubConn", []string{"od00000000000001"}},
++		{"RemoveSubConn", []string{"ci00000000000001", "od00000000000001", "xx00000000000001"}},
++		{"missing.RemoveSubConn", nil},
++	} {
++		got, err := s.FindSymbol(tc.name, false, persist.FindSymbolOptions{})
++		if err != nil {
++			t.Fatalf("FindSymbol(%q): %v", tc.name, err)
++		}
++		ids := make([]string, 0, len(got))
++		for _, n := range got {
++			ids = append(ids, n.ID)
++		}
++		sort.Strings(ids)
++		if strings.Join(ids, ",") != strings.Join(tc.want, ",") {
++			t.Errorf("FindSymbol(%q) = %v, want %v", tc.name, ids, tc.want)
++		}
++	}
++}
+diff --git a/internal/graph/persist/sqlite_reader.go b/internal/graph/persist/sqlite_reader.go
+index 16d5067b..7b538286 100644
+--- a/internal/graph/persist/sqlite_reader.go
++++ b/internal/graph/persist/sqlite_reader.go
+@@ -356,6 +356,14 @@ func (s *sqliteStore) FindSymbol(name string, exact bool, opts FindSymbolOptions
+ // simple_name (COLLATE NOCASE keeps the old LIKE's case-insensitivity): as
+ // one "qualified_name = ? OR simple_name = ?" predicate SQLite 3.53 scanned
+ // the whole nodes table on every MCP seed resolution.
++//
++// A dotted name ("Type.Method") is a suffix of "pkg.Type.Method" that
++// simple_name, holding only the last segment, can never equal. The old
++// `LIKE '%.' || name` matched it, and the Postgres store still does; without
++// it the caller fell back to the bare "Method" and got every same-named
++// method in the repository. A third arm restores the match: look the last
++// segment up by simple_name (indexed) and keep the rows whose qualified name
++// ends in "." + name.
+ func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, []any) {
+ 	args := []any{}
+ 	q := `SELECT ` + nodeColumns + ` FROM nodes WHERE `
+@@ -364,8 +372,15 @@ func findSymbolQuery(name string, exact bool, opts FindSymbolOptions) (string, [
+ 		args = append(args, name)
+ 	} else {
+ 		q += `id IN (SELECT id FROM nodes WHERE qualified_name = ?
+-			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE) `
++			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE`
+ 		args = append(args, name, name)
++		if i := strings.LastIndexByte(name, '.'); i > 0 && i < len(name)-1 {
++			q += `
++			UNION SELECT id FROM nodes WHERE simple_name = ? COLLATE NOCASE
++				AND substr(qualified_name, -?) = ? COLLATE NOCASE`
++			args = append(args, name[i+1:], len(name)+1, "."+name)
++		}
++		q += `) `
+ 	}
+ 	if opts.Language != "" {
+ 		q += `AND language = ? `
+diff --git a/internal/system/composer/stage2/merge.go b/internal/system/composer/stage2/merge.go
+index 079fcea0..7bbb5402 100644
+--- a/internal/system/composer/stage2/merge.go
++++ b/internal/system/composer/stage2/merge.go
+@@ -78,8 +78,13 @@ func newAggregator(rrfK int, bmWeight, symbolWeight, ckvWeight float64) *aggrega
+ // ckv list out-recalls keyword BM25 on natural-language prompts, so it
+ // carries CkvWeight >= BMWeight by default.
+ func (a *aggregator) addCkvList(hits []contract.Hit) {
+-	for i, h := range hits {
+-		rank := i + 1
++	seen := make(map[string]struct{}, len(hits))
++	rank := 0
++	for _, h := range hits {
++		if !firstInList(seen, h.Citation) {
++			continue
++		}
++		rank++
+ 		contribution := a.ckvWeight / float64(a.rrfK+rank)
+ 		sc := a.entry(h.Citation)
+ 		if sc.ParentCitation == nil && h.ParentCitation != nil &&
+@@ -102,8 +107,13 @@ func (a *aggregator) addCkvList(hits []contract.Hit) {
+ // addBM25List credits every hit in a ranked BM25 result list. rank is
+ // derived from list position (1-based). Empty lists are a no-op.
+ func (a *aggregator) addBM25List(keyword string, hits []contract.Hit) {
+-	for i, h := range hits {
+-		rank := i + 1
++	seen := make(map[string]struct{}, len(hits))
++	rank := 0
++	for _, h := range hits {
++		if !firstInList(seen, h.Citation) {
++			continue
++		}
++		rank++
+ 		contribution := a.bmWeight / float64(a.rrfK+rank)
+ 		sc := a.entry(h.Citation)
+ 		sc.Score += contribution
+@@ -134,8 +144,13 @@ func (a *aggregator) addSymbolListWeighted(keyword string, cits []contract.Citat
+ 	if exact {
+ 		prefix = SourceExactSymbolPrefix
+ 	}
+-	for i, c := range cits {
+-		rank := i + 1
++	seen := make(map[string]struct{}, len(cits))
++	rank := 0
++	for _, c := range cits {
++		if !firstInList(seen, c) {
++			continue
++		}
++		rank++
+ 		contribution := weight / float64(a.rrfK+rank)
+ 		sc := a.entry(c)
+ 		sc.Score += contribution
+@@ -176,6 +191,22 @@ func ExactSymbolKeyword(sources []string) string {
+ 	return ""
+ }
+ 
++// firstInList reports whether c is the first occurrence of its span in one
++// ranked list, and marks it seen. RRF credits a document once per list, at
++// its best rank, and ranks count distinct documents. A FindSymbol list can
++// name one span many times: Go types that embed an interface each get a
++// promoted-method node located at the interface's declaration, so a bare
++// "RemoveSubConn" returned the same span 21 times and summed 21 credits
++// (0.855, seven times a normal top score) onto a citation no prompt asked for.
++func firstInList(seen map[string]struct{}, c contract.Citation) bool {
++	key := c.Key()
++	if _, dup := seen[key]; dup {
++		return false
++	}
++	seen[key] = struct{}{}
++	return true
++}
++
+ func (a *aggregator) entry(c contract.Citation) *ScoredCitation {
+ 	key := c.Key()
+ 	sc, ok := a.byCitation[key]
+diff --git a/internal/system/composer/stage2/merge_dedup_test.go b/internal/system/composer/stage2/merge_dedup_test.go
+new file mode 100644
+index 00000000..02989724
+--- /dev/null
++++ b/internal/system/composer/stage2/merge_dedup_test.go
+@@ -0,0 +1,34 @@
++package stage2
++
++import (
++	"testing"
++
++	"github.com/0xmhha/knowledge-system/pkg/system/contract"
++)
++
++// One ranked list credits a span once, at its best rank, and later distinct
++// spans take the next rank — repeated entries must not sum into an outlier.
++func TestAggregator_CreditsSpanOncePerList(t *testing.T) {
++	t.Parallel()
++	iface := contract.Citation{File: "balancer/balancer.go", StartLine: 151, EndLine: 151}
++	impl := contract.Citation{File: "od/balancer.go", StartLine: 520, EndLine: 522}
++	a := newAggregator(DefaultRRFK, DefaultBMWeight, DefaultSymbolWeight, DefaultCkvWeight)
++	a.addSymbolList("RemoveSubConn", []contract.Citation{iface, iface, iface, impl, iface})
++	a.addBM25List("RemoveSubConn", []contract.Hit{{Citation: iface}, {Citation: iface}})
++	a.addCkvList([]contract.Hit{{Citation: impl}, {Citation: impl}})
++
++	got := map[string]ScoredCitation{}
++	for _, c := range a.results(0, false, false) {
++		got[c.Citation.Key()] = c
++	}
++	wantIface := DefaultSymbolWeight/float64(DefaultRRFK+1) + DefaultBMWeight/float64(DefaultRRFK+1)
++	wantImpl := DefaultSymbolWeight/float64(DefaultRRFK+2) + DefaultCkvWeight/float64(DefaultRRFK+1)
++	if s := got[iface.Key()]; len(s.Sources) != 2 || !near(s.Score, wantIface) {
++		t.Errorf("iface score=%v sources=%v, want %v from one credit per list", s.Score, s.Sources, wantIface)
++	}
++	if s := got[impl.Key()]; len(s.Sources) != 2 || !near(s.Score, wantImpl) {
++		t.Errorf("impl score=%v sources=%v, want %v (symbol rank 2, ckv rank 1)", s.Score, s.Sources, wantImpl)
++	}
++}
++
++func near(a, b float64) bool { d := a - b; return d < 1e-12 && d > -1e-12 }

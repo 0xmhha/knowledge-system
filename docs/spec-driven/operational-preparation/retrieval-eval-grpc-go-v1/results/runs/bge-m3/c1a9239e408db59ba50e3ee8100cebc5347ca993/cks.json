@@ -1,0 +1,833 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:27:19.341594Z",
+  "finished_at": "2026-10-24T00:27:20.426885Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 26355333,
+          "completed_at": "2026-10-24T09:27:19.368354+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "c1a9239e408db59ba50e3ee8100cebc5347ca993",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "changed_files": [
+                ".gemini/styleguide.md",
+                ".github/workflows/govulncheck.yaml",
+                ".github/workflows/testing.yml",
+                "CONTRIBUTING.md",
+                "attributes/attributes.go",
+                "attributes/attributes_test.go",
+                "authz/grpc_authz_end2end_test.go",
+                "authz/grpc_authz_server_interceptors.go",
+                "authz/grpc_authz_server_interceptors_test.go",
+                "balancer/autosharding/autosharding.go",
+                "balancer/autosharding/autosharding_test.go",
+                "balancer/autosharding/slice_map.go",
+                "balancer/autosharding/slice_map_test.go",
+                "balancer/balancer.go",
+                "balancer/endpointsharding/endpointsharding.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer_grpc.pb.go",
+                "balancer/grpclb/grpclb_remote_balancer.go",
+                "balancer/grpclb/grpclb_test.go",
+                "balancer/pickfirst/metrics_test.go",
+                "balancer/pickfirst/pickfirst.go",
+                "balancer/pickfirst/pickfirst_ext_test.go",
+                "balancer/pickfirst/pickfirstleaf/pickfirstleaf.go",
+                "balancer/randomsubsetting/randomsubsetting.go",
+                "balancer/randomsubsetting/randomsubsetting_test.go",
+                "balancer/ringhash/picker.go",
+                "balancer/ringhash/picker_test.go",
+                "balancer/ringhash/ring_test.go",
+                "balancer/ringhash/ringhash.go",
+                "balancer/ringhash/ringhash_test.go",
+                "balancer/rls/balancer.go",
+                "balancer/rls/balancer_test.go",
+                "balancer/rls/cache.go",
+                "balancer/rls/cache_test.go",
+                "balancer/rls/control_channel.go",
+                "balancer/rls/control_channel_test.go",
+                "balancer/rls/metrics_test.go",
+                "balancer/rls/picker.go",
+                "balancer/weightedtarget/weightedtarget_test.go",
+                "benchmark/benchmain/main.go",
+                "binarylog/binarylog_end2end_test.go",
+                "binarylog/grpc_binarylog_v1/binarylog.pb.go",
+                "call.go",
+                "channelz/grpc_channelz_v1/channelz.pb.go",
+                "channelz/grpc_channelz_v1/channelz_grpc.pb.go",
+                "clientconn.go",
+                "clientconn_disconnect_reason_noplan9.go",
+                "clientconn_disconnect_reason_plan9.go",
+                "cmd/protoc-gen-go-grpc/go.mod",
+                "cmd/protoc-gen-go-grpc/go.sum",
+                "cmd/protoc-gen-go-grpc/grpc.go",
+                "cmd/protoc-gen-go-grpc/main.go",
+                "cmd/protoc-gen-go-grpc/protoc-gen-go-grpc_test.sh",
+                "credentials/alts/alts.go",
+                "credentials/alts/alts_test.go",
+                "credentials/alts/internal/conn/record.go",
+                "credentials/alts/internal/conn/record_test.go",
+                "credentials/alts/internal/handshaker/handshaker.go",
+                "credentials/alts/internal/handshaker/handshaker_test.go",
+                "credentials/alts/internal/proto/grpc_gcp/altscontext.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker_grpc.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/transport_security_common.pb.go",
+                "credentials/google/gcp_service_account_identity_credentials.go",
+                "credentials/google/gcp_service_account_identity_credentials_test.go",
+                "credentials/google/internal/internal.go",
+                "credentials/sts/sts.go",
+                "credentials/sts/sts_test.go",
+                "credentials/xds/xds.go",
+                "credentials/xds/xds_client_test.go",
+                "credentials/xds/xds_server_test.go",
+                "dialoptions.go",
+                "encoding/compressor_test.go",
+                "encoding/encoding.go",
+                "encoding/encoding_test.go",
+                "encoding/gzip/gzip.go",
+                "examples/features/opentelemetry/client/main.go",
+                "examples/features/opentelemetry/server/main.go",
+                "examples/features/proto/echo/echo.pb.go",
+                "examples/features/proto/echo/echo_grpc.pb.go",
+                "examples/go.mod",
+                "examples/go.sum",
+                "examples/helloworld/helloworld/helloworld.pb.go",
+                "examples/helloworld/helloworld/helloworld_grpc.pb.go",
+                "examples/route_guide/routeguide/route_guide.pb.go",
+                "examples/route_guide/routeguide/route_guide_grpc.pb.go",
+                "experimental/balancer/hostname/hostname.go",
+                "experimental/balancer/hostname/hostname_test.go",
+                "experimental/balancer/weight/weight.go",
+                "experimental/balancer/weight/weight_test.go",
+                "experimental/stats/metrics.go",
+                "experimental/stats/telemetry/labels.go",
+                "gcp/observability/go.mod",
+                "gcp/observability/go.sum",
+                "gcp/observability/logging_test.go",
+                "go.mod",
+                "go.sum",
+                "health/grpc_health_v1/health.pb.go",
+                "health/grpc_health_v1/health_grpc.pb.go",
+                "internal/balancergroup/balancergroup.go",
+                "internal/balancergroup/balancergroup_test.go",
+                "internal/buffer/unbounded.go",
+                "internal/buffer/unbounded_test.go",
+                "internal/credentials/xds/handshake_info.go",
+                "internal/credentials/xds/handshake_info_test.go",
+                "internal/envconfig/envconfig.go",
+                "internal/envconfig/envconfig_test.go",
+                "internal/envconfig/xds.go",
+                "internal/grpcsync/callback_serializer.go",
+                "internal/grpcsync/callback_serializer_test.go",
+                "internal/grpcsync/refcounted.go",
+                "internal/grpcsync/refcounted_test.go",
+                "internal/grpcutil/encode_duration.go",
+                "internal/grpcutil/regex_test.go",
+                "internal/idle/idle_e2e_test.go",
+                "internal/internal.go",
+                "internal/leakcheck/leakcheck_test.go",
+                "internal/mem/buffer_pool.go",
+                "internal/mem/buffer_pool_ext_test.go",
+                "internal/mem/buffer_pool_test.go",
+                "internal/optional/optional.go",
+                "internal/optional/optional_test.go",
+                "internal/proto/grpc_lookup_v1/rls.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_config.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_grpc.pb.go",
+                "internal/resolver/config_selector.go",
+                "internal/stats/labels.go",
+                "internal/stats/labels_test.go",
+                "internal/testutils/balancer.go",
+                "internal/testutils/stats/test_metrics_recorder.go",
+                "internal/transport/client_stream.go",
+                "internal/transport/controlbuf.go",
+                "internal/transport/controlbuf_test.go",
+                "internal/transport/flowcontrol.go",
+                "internal/transport/handler_server.go",
+                "internal/transport/handler_server_test.go",
+                "internal/transport/http2_client.go",
+                "internal/transport/http2_client_header_bench_test.go",
+                "internal/transport/http2_server.go",
+                "internal/transport/http_util.go",
+                "internal/transport/http_util_test.go",
+                "internal/transport/internal/internal.go",
+                "internal/transport/readyreader/raw_conn_linux.go",
+                "internal/transport/readyreader/raw_conn_nonlinux.go",
+                "internal/transport/readyreader/ready_reader.go",
+                "internal/transport/readyreader/ready_reader_ext_test.go",
+                "internal/transport/server_metrics_ext_test.go",
+                "internal/transport/transport.go",
+                "internal/transport/transport_test.go",
+                "internal/xds/balancer/balancer.go",
+                "internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go",
+                "internal/xds/balancer/cdsbalancer/cdsbalancer.go",
+                "internal/xds/balancer/cdsbalancer/cdsbalancer_test.go",
+                "internal/xds/balancer/cdsbalancer/cluster_watcher.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_childname.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_childname_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/aggregate_cluster_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/balancer_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/dns_impl_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go",
+                "internal/xds/balancer/clusterimpl/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/clusterimpl.go",
+                "internal/xds/balancer/clusterimpl/config.go",
+                "internal/xds/balancer/clusterimpl/config_test.go",
+                "internal/xds/balancer/clusterimpl/internal/internal.go",
+                "internal/xds/balancer/clusterimpl/picker.go",
+                "internal/xds/balancer/clusterimpl/tests/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/tests/clusterimpl_security_test.go",
+                "internal/xds/balancer/clustermanager/clustermanager.go",
+                "internal/xds/balancer/clustermanager/clustermanager_test.go",
+                "internal/xds/balancer/clustermanager/e2e_test/clustermanager_test.go",
+                "internal/xds/balancer/clustermanager/picker.go",
+                "internal/xds/balancer/clusterresolver/clusterresolver.go",
+                "internal/xds/balancer/clusterresolver/config.go",
+                "internal/xds/balancer/clusterresolver/config_test.go",
+                "internal/xds/balancer/clusterresolver/configbuilder_childname_test.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver_dns.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver_eds.go",
+                "internal/xds/balancer/outlierdetection/balancer.go",
+                "internal/xds/balancer/outlierdetection/balancer_test.go",
+                "internal/xds/balancer/outlierdetection/e2e_test/outlierdetection_test.go",
+                "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                "internal/xds/balancer/priority/balancer.go",
+                "internal/xds/balancer/priority/balancer_child.go",
+                "internal/xds/balancer/priority/balancer_priority.go",
+                "internal/xds/balancer/priority/balancer_test.go",
+                "internal/xds/bootstrap/bootstrap.go",
+                "internal/xds/bootstrap/bootstrap_test.go",
+                "internal/xds/clients/config.go",
+                "internal/xds/clients/internal/buffer/unbounded.go",
+                "internal/xds/clients/internal/buffer/unbounded_test.go",
+                "internal/xds/clients/internal/syncutil/callback_serializer.go",
+                "internal/xds/clients/internal/testutils/faketransport/xds_fake_transport.go",
+                "internal/xds/clients/lrsclient/loadreport_test.go",
+                "internal/xds/clients/lrsclient/lrs_stream.go",
+                "internal/xds/clients/xdsclient/ads_stream.go",
+                "internal/xds/clients/xdsclient/authority.go",
+                "internal/xds/clients/xdsclient/channel.go",
+                "internal/xds/clients/xdsclient/channel_test.go",
+                "internal/xds/clients/xdsclient/metrics/metrics.go",
+                "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go",
+                "internal/xds/clients/xdsclient/test/dump_test.go",
+                "internal/xds/clients/xdsclient/test/helpers_test.go",
+                "internal/xds/clients/xdsclient/test/metrics_test.go",
+                "internal/xds/clients/xdsclient/xdsclient.go",
+                "internal/xds/credentials/access_token.go",
+                "internal/xds/credentials/access_token_test.go",
+                "internal/xds/credentials/credentials.go",
+                "internal/xds/credentials/tls.go",
+                "internal/xds/credentials/tls_test.go",
+                "internal/xds/credentials/xds_test.go",
+                "internal/xds/grpcservice/grpcservice.go",
+                "internal/xds/grpcservice/grpcservice_test.go",
+                "internal/xds/httpfilter/ext_authz/config.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz_test.go",
+                "internal/xds/httpfilter/extconfig.go",
+                "internal/xds/httpfilter/extconfig_test.go",
+                "internal/xds/httpfilter/extproc/config.go",
+                "internal/xds/httpfilter/extproc/config_test.go",
+                "internal/xds/httpfilter/extproc/ext_proc.go",
+                "internal/xds/httpfilter/extproc/ext_proc_ext_test.go",
+                "internal/xds/httpfilter/extproc/internal/internal.go",
+                "internal/xds/httpfilter/extproc/metrics.go",
+                "internal/xds/httpfilter/fault/fault.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_e2e_test.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_test.go",
+                "internal/xds/httpfilter/httpfilter.go",
+                "internal/xds/httpfilter/rbac/rbac.go",
+                "internal/xds/httpfilter/rbac/rbac_test.go",
+                "internal/xds/httpfilter/router/router.go",
+                "internal/xds/matcher/matcher_header.go",
+                "internal/xds/matcher/string_matcher.go",
+                "internal/xds/matcher/string_matcher_test.go",
+                "internal/xds/rbac/matchers.go",
+                "internal/xds/rbac/rbac_engine_test.go",
+                "internal/xds/resolver/cluster_specifier_plugin_test.go",
+                "internal/xds/resolver/helpers_test.go",
+                "internal/xds/resolver/serviceconfig.go",
+                "internal/xds/resolver/serviceconfig_test.go",
+                "internal/xds/resolver/xds_http_filters_test.go",
+                "internal/xds/resolver/xds_resolver.go",
+                "internal/xds/resolver/xds_resolver_test.go",
+                "internal/xds/server/conn_wrapper.go",
+                "internal/xds/server/filter_chain_manager.go",
+                "internal/xds/server/filter_chain_manager_test.go",
+                "internal/xds/server/listener_wrapper.go",
+                "internal/xds/server/listener_wrapper_test.go",
+                "internal/xds/server/routing.go",
+                "internal/xds/server/routing_test.go",
+                "internal/xds/server/server_options.go",
+                "internal/xds/test/e2e/e2e_utils.go",
+                "internal/xds/xdsclient/client_refcounted_test.go",
+                "internal/xds/xdsclient/clientimpl.go",
+                "internal/xds/xdsclient/clientimpl_test.go",
+                "internal/xds/xdsclient/pool.go",
+                "internal/xds/xdsclient/pool/pool_ext_test.go",
+                "internal/xds/xdsclient/resource_types.go",
+                "internal/xds/xdsclient/xdslbregistry/converter/converter.go",
+                "internal/xds/xdsclient/xdslbregistry/xdslbregistry_test.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain_test.go",
+                "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/matcher.go",
+                "internal/xds/xdsclient/xdsresource/matcher_path.go",
+                "internal/xds/xdsclient/xdsresource/matcher_test.go",
+                "internal/xds/xdsclient/xdsresource/metadata.go",
+                "internal/xds/xdsclient/xdsresource/metadata_test.go",
+                "internal/xds/xdsclient/xdsresource/route_config_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/test_utils_test.go",
+                "internal/xds/xdsclient/xdsresource/type_cds.go",
+                "internal/xds/xdsclient/xdsresource/type_eds.go",
+                "internal/xds/xdsclient/xdsresource/type_lds.go",
+                "internal/xds/xdsclient/xdsresource/type_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds_test.go",
+                "internal/xds/xdsclient/xdsresource/version/version.go",
+                "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager_test.go",
+                "interop/grpc_testing/benchmark_service.pb.go",
+                "interop/grpc_testing/benchmark_service_grpc.pb.go",
+                "interop/grpc_testing/control.pb.go",
+                "interop/grpc_testing/core/stats.pb.go",
+                "interop/grpc_testing/empty.pb.go",
+                "interop/grpc_testing/messages.pb.go",
+                "interop/grpc_testing/payloads.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service_grpc.pb.go",
+                "interop/grpc_testing/stats.pb.go",
+                "interop/grpc_testing/test.pb.go",
+                "interop/grpc_testing/test_grpc.pb.go",
+                "interop/grpc_testing/worker_service.pb.go",
+                "interop/grpc_testing/worker_service_grpc.pb.go",
+                "interop/observability/Dockerfile",
+                "interop/observability/go.mod",
+                "interop/observability/go.sum",
+                "interop/orcalb.go",
+                "interop/orcalb_test.go",
+                "interop/stress/grpc_testing/metrics.pb.go",
+                "interop/stress/grpc_testing/metrics_grpc.pb.go",
+                "interop/xds/go.mod",
+                "interop/xds/go.sum",
+                "mem/buffer_pool.go",
+                "mem/buffer_slice.go",
+                "mem/buffers.go",
+                "mem/buffers_test.go",
+                "metadata/metadata.go",
+                "metadata/metadata_test.go",
+                "orca/producer_test.go",
+                "profiling/proto/service.pb.go",
+                "profiling/proto/service_grpc.pb.go",
+                "reflection/grpc_reflection_v1/reflection.pb.go",
+                "reflection/grpc_reflection_v1/reflection_grpc.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection_grpc.pb.go",
+                "reflection/grpc_testing/proto2.pb.go",
+                "reflection/grpc_testing/proto2_ext.pb.go",
+                "reflection/grpc_testing/proto2_ext2.pb.go",
+                "reflection/grpc_testing/test.pb.go",
+                "reflection/grpc_testing/test_grpc.pb.go",
+                "resolver_wrapper.go",
+                "rpc_util.go",
+                "rpc_util_test.go",
+                "scripts/vet.sh",
+                "security/advancedtls/advancedtls.go",
+                "security/advancedtls/advancedtls_test.go",
+                "security/advancedtls/certificate_utils_test.go",
+                "security/advancedtls/crl_provider_test.go",
+                "security/advancedtls/examples/go.mod",
+                "security/advancedtls/examples/go.sum",
+                "security/advancedtls/go.mod",
+                "security/advancedtls/go.sum",
+                "security/advancedtls/testdata/crl/provider_ca.cnf",
+                "security/advancedtls/testdata/crl/provider_create.sh",
+                "server.go",
+                "stats/opencensus/go.mod",
+                "stats/opencensus/go.sum",
+                "stats/opentelemetry/client_metrics.go",
+                "stats/opentelemetry/client_tracing.go",
+                "stats/opentelemetry/csm/observability_test.go",
+                "stats/opentelemetry/e2e_test.go",
+                "stats/opentelemetry/example_test.go",
+                "stats/opentelemetry/internal/testutils/testutils.go",
+                "stats/opentelemetry/opentelemetry.go",
+                "stats/opentelemetry/server_metrics.go",
+                "stats/opentelemetry/server_tracing.go",
+                "stats/opentelemetry/trace.go",
+                "stats/stats.go",
+                "stats/stats_test.go",
+                "status/status_ext_test.go",
+                "stream.go",
+                "stream_test.go",
+                "test/balancer_test.go",
+                "test/codec_perf/perf.pb.go",
+                "test/creds_test.go",
+                "test/end2end_test.go",
+                "test/gracefulstop_test.go",
+                "test/kokoro/psm-regional_td.cfg",
+                "test/malformed_method_test.go",
+                "test/retry_test.go",
+                "test/server_test.go",
+                "test/servertester.go",
+                "test/tools/go.mod",
+                "test/tools/go.sum",
+                "test/xds/xds_client_http_connect_test.go",
+                "test/xds/xds_client_integration_test.go",
+                "test/xds/xds_client_retry_test.go",
+                "test/xds/xds_client_sni_test.go",
+                "test/xds/xds_resolver_e2e_test.go",
+                "test/xds/xds_server_filter_e2e_test.go",
+                "test/xds/xds_server_filter_override_test.go",
+                "test/xds/xds_server_filter_state_retention_test.go",
+                "test/xds/xds_server_integration_test.go",
+                "test/xds/xds_server_interceptor_leak_test.go",
+                "test/xds/xds_server_rbac_test.go",
+                "test/xds/xds_telemetry_labels_test.go",
+                "testdata/spiffe_end2end/README.md",
+                "testdata/spiffe_end2end/ca.key",
+                "testdata/spiffe_end2end/ca.pem",
+                "testdata/spiffe_end2end/client.key",
+                "testdata/spiffe_end2end/client_spiffe.pem",
+                "testdata/spiffe_end2end/client_spiffebundle.json",
+                "testdata/spiffe_end2end/generate.sh",
+                "testdata/spiffe_end2end/intermediate_ca.key",
+                "testdata/spiffe_end2end/intermediate_ca.pem",
+                "testdata/spiffe_end2end/intermediate_gen.sh",
+                "testdata/spiffe_end2end/leaf_and_intermediate_chain.pem",
+                "testdata/spiffe_end2end/leaf_signed_by_intermediate.key",
+                "testdata/spiffe_end2end/leaf_signed_by_intermediate.pem",
+                "testdata/spiffe_end2end/server.key",
+                "testdata/spiffe_end2end/server_spiffe.pem",
+                "testdata/spiffe_end2end/server_spiffebundle.json",
+                "version.go",
+                "xds/googledirectpath/googlec2p.go",
+                "xds/googledirectpath/googlec2p_test.go",
+                "xds/server.go",
+                "xds/server_options.go",
+                "xds/server_serving_mode_ext_test.go",
+                "xds/server_test.go",
+                "xds/xds.go"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "계층형 버퍼 풀 구현을 공개 패키지에서 내부 패키지로 옮기고 싶어. 기본 풀은 반환 전에 버퍼를 지우는데 그 비용도 고려하고 싶어"
+          },
+          "elapsed_ns": 1057279417,
+          "completed_at": "2026-10-24T09:27:20.4259+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "query": "계층형 버퍼 풀 구현을 공개 패키지에서 내부 패키지로 옮기고 싶어. 기본 풀은 반환 전에 버퍼를 지우는데 그 비용도 고려하고 싶어",
+              "citations": [
+                {
+                  "file": "dialoptions.go",
+                  "start_line": 793,
+                  "end_line": 797,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/experimental.go",
+                  "start_line": 20,
+                  "end_line": 35,
+                  "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                },
+                {
+                  "file": "internal/experimental.go",
+                  "start_line": 1,
+                  "end_line": 35,
+                  "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                },
+                {
+                  "file": "experimental/experimental.go",
+                  "start_line": 62,
+                  "end_line": 76,
+                  "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                },
+                {
+                  "file": "internal/profiling/buffer/buffer.go",
+                  "start_line": 1,
+                  "end_line": 50,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "benchmark/benchmain/main.go",
+                  "start_line": 158,
+                  "end_line": 160,
+                  "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                },
+                {
+                  "file": "experimental/experimental.go",
+                  "start_line": 46,
+                  "end_line": 60,
+                  "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                },
+                {
+                  "file": "experimental/experimental.go",
+                  "start_line": 1,
+                  "end_line": 50,
+                  "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                },
+                {
+                  "file": "interop/grpc_testing/messages.pb.go",
+                  "start_line": 379,
+                  "end_line": 379,
+                  "commit_hash": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c"
+                },
+                {
+                  "file": "dialoptions.go",
+                  "start_line": 152,
+                  "end_line": 156,
+                  "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                },
+                {
+                  "file": "internal/profiling/buffer/buffer.go",
+                  "start_line": 34,
+                  "end_line": 34,
+                  "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                },
+                {
+                  "file": "internal/profiling/buffer/buffer.go",
+                  "start_line": 37,
+                  "end_line": 37,
+                  "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                },
+                {
+                  "file": "internal/profiling/buffer/buffer.go",
+                  "start_line": 40,
+                  "end_line": 40,
+                  "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                },
+                {
+                  "file": "internal/profiling/buffer/buffer.go",
+                  "start_line": 45,
+                  "end_line": 45,
+                  "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                },
+                {
+                  "file": "internal/profiling/buffer/buffer.go",
+                  "start_line": 48,
+                  "end_line": 48,
+                  "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                },
+                {
+                  "file": "mem/buffer_pool.go",
+                  "start_line": 33,
+                  "end_line": 42,
+                  "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "dialoptions.go",
+                    "start_line": 793,
+                    "end_line": 797,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func withBufferPool(bufferPool mem.BufferPool) DialOption {\n\treturn newFuncDialOption(func(o *dialOptions) {\n\t\to.copts.BufferPool = bufferPool\n\t})\n}",
+                  "token_estimate": 37
+                },
+                {
+                  "citation": {
+                    "file": "internal/experimental.go",
+                    "start_line": 20,
+                    "end_line": 35,
+                    "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                  },
+                  "text": "var (\n\t// WithBufferPool is implemented by the grpc package and returns a dial\n\t// option to configure a shared buffer pool for a grpc.ClientConn.\n\tWithBufferPool any // func (grpc.SharedBufferPool) grpc.DialOption\n\n\t// BufferPool is implemented by the grpc package and returns a server\n\t// option to configure a shared buffer pool for a grpc.Server.\n\tBufferPool any // func (grpc.SharedBufferPool) grpc.ServerOption\n\n\t// SetDefaultBufferPool updates the default buffer pool.\n\tSetDefaultBufferPool any // func(mem.BufferPool)\n\n\t// AcceptCompressors is implemented by the grpc package and returns\n\t// a call option that restricts the grpc-accept-encoding header for a call.\n\tAcceptCompressors any // func(...string) grpc.CallOption\n)",
+                  "token_estimate": 183
+                },
+                {
+                  "citation": {
+                    "file": "internal/experimental.go",
+                    "start_line": 1,
+                    "end_line": 35,
+                    "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                  },
+                  "text": "/*\n * Copyright 2023 gRPC authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *     http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n *\n */\n\npackage internal\n\nvar (\n\t// WithBufferPool is implemented by the grpc package and returns a dial\n\t// option to configure a shared buffer pool for a grpc.ClientConn.\n\tWithBufferPool any // func (grpc.SharedBufferPool) grpc.DialOption\n\n\t// BufferPool is implemented by the grpc package and returns a server\n\t// option to configure a shared buffer pool for a grpc.Server.\n\tBufferPool any // func (grpc.SharedBufferPool) grpc.ServerOption\n\n\t// SetDefaultBufferPool updates the default buffer pool.\n\tSetDefaultBufferPool any // func(mem.BufferPool)\n\n\t// AcceptCompressors is implemented by the grpc package and returns\n\t// a call option that restricts the grpc-accept-encoding header for a call.\n\tAcceptCompressors any // func(...string) grpc.CallOption\n)",
+                  "token_estimate": 337
+                },
+                {
+                  "citation": {
+                    "file": "experimental/experimental.go",
+                    "start_line": 62,
+                    "end_line": 76,
+                    "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                  },
+                  "text": "// BufferPool returns a grpc.ServerOption that configures the server to use the\n// provided buffer pool for parsing incoming messages and for temporary buffers\n// when marshaling outgoing messages. By default, mem.DefaultBufferPool is used,\n// and this option only exists to provide alternative buffer pool implementations\n// to the server, such as more optimized size allocations etc. However, the\n// default buffer pool is already tuned to account for many different use-cases.\n//\n// Note: The following options will interfere with the buffer pool because they\n// require a fully materialized buffer instead of a sequence of buffers:\n// EnableTracing, and binary logging. In such cases, materializing the buffer\n// will generate a lot of garbage, reducing the overall benefit from using a\n// pool.\nfunc BufferPool(bufferPool mem.BufferPool) grpc.ServerOption {\n\treturn internal.BufferPool.(func(mem.BufferPool) grpc.ServerOption)(bufferPool)\n}",
+                  "token_estimate": 236
+                },
+                {
+                  "citation": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 1,
+                    "end_line": 50,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "/*\n *\n * Copyright 2019 gRPC authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *     http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n *\n */\n\n// Package buffer provides a high-performant lock free implementation of a\n// circular buffer used by the profiling code.\npackage buffer\n\nimport (\n\t\"errors\"\n\t\"math/bits\"\n\t\"runtime\"\n\t\"sync\"\n\t\"sync/atomic\"\n\t\"unsafe\"\n)\n\ntype queue struct {\n\t// An array of pointers as references to the items stored in this queue.\n\tarr []unsafe.Pointer\n\t// The maximum number of elements this queue may store before it wraps around\n\t// and overwrites older values. Must be an exponent of 2.\n\tsize uint32\n\t// Always size - 1. A bitwise AND is performed with this mask in place of a\n\t// modulo operation by the Push operation.\n\tmask uint32\n\t// Each Push operation into this queue increments the acquired counter before\n\t// proceeding forwarding with the actual write to arr. This counter is also\n\t// used by the Drain operation's drainWait subroutine to wait for all pushes\n\t// to complete.\n\tacquired uint32 // Accessed atomically.\n\t// After the completion of a Push operation, the written counter is\n\t// incremented. Also used by drainWait to wait for all pushes to complete.\n\twritten uint32\n}\n",
+                  "token_estimate": 419
+                },
+                {
+                  "citation": {
+                    "file": "benchmark/benchmain/main.go",
+                    "start_line": 158,
+                    "end_line": 160,
+                    "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                  },
+                  "text": "type swappableBufferPool struct {\n\tmem.BufferPool\n}",
+                  "token_estimate": 12
+                },
+                {
+                  "citation": {
+                    "file": "experimental/experimental.go",
+                    "start_line": 46,
+                    "end_line": 60,
+                    "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                  },
+                  "text": "// WithBufferPool returns a grpc.DialOption that configures the use of bufferPool\n// for parsing incoming messages on a grpc.ClientConn, and for temporary buffers\n// when marshaling outgoing messages. By default, mem.DefaultBufferPool is used,\n// and this option only exists to provide alternative buffer pool implementations\n// to the client, such as more optimized size allocations etc. However, the\n// default buffer pool is already tuned to account for many different use-cases.\n//\n// Note: The following options will interfere with the buffer pool because they\n// require a fully materialized buffer instead of a sequence of buffers:\n// EnableTracing, and binary logging. In such cases, materializing the buffer\n// will generate a lot of garbage, reducing the overall benefit from using a\n// pool.\nfunc WithBufferPool(bufferPool mem.BufferPool) grpc.DialOption {\n\treturn internal.WithBufferPool.(func(mem.BufferPool) grpc.DialOption)(bufferPool)\n}",
+                  "token_estimate": 238
+                },
+                {
+                  "citation": {
+                    "file": "experimental/experimental.go",
+                    "start_line": 1,
+                    "end_line": 50,
+                    "commit_hash": "bb2073d1e5551b900763979e08e1c11a47a8f150"
+                  },
+                  "text": "/*\n *\n * Copyright 2023 gRPC authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *     http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n *\n */\n\n// Package experimental is a collection of experimental features that might\n// have some rough edges to them. Housing experimental features in this package\n// results in a user accessing these APIs as `experimental.Foo`, thereby making\n// it explicit that the feature is experimental and using them in production\n// code is at their own risk.\n//\n// All APIs in this package are experimental.\npackage experimental\n\nimport (\n\t\"google.golang.org/grpc\"\n\t\"google.golang.org/grpc/internal\"\n\t\"google.golang.org/grpc/mem\"\n)\n\n// SetDefaultBufferPool sets the default buffer pool used by all grpc clients\n// and servers that do not have a buffer pool configured via WithBufferPool or\n// BufferPool. It also changes the buffer pool used by the proto codec, which\n// can't be changed otherwise. The provided buffer pool must be non-nil. The\n// default value is mem.DefaultBufferPool.\n//\n// NOTE: this function must only be called during initialization time (i.e. in\n// an init() function), and is not thread-safe. The last caller wins.\nfunc SetDefaultBufferPool(bufferPool mem.BufferPool) {\n\tinternal.SetDefaultBufferPool.(func(mem.BufferPool))(bufferPool)\n}\n\n// WithBufferPool returns a grpc.DialOption that configures the use of bufferPool\n// for parsing incoming messages on a grpc.ClientConn, and for temporary buffers\n// when marshaling outgoing messages. By default, mem.DefaultBufferPool is used,\n// and this option only exists to provide alternative buffer pool implementations\n// to the client, such as more optimized size allocations etc. However, the",
+                  "token_estimate": 538
+                },
+                {
+                  "citation": {
+                    "file": "interop/grpc_testing/messages.pb.go",
+                    "start_line": 379,
+                    "end_line": 379,
+                    "commit_hash": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c"
+                  },
+                  "text": "// Deprecated: Use Payload.ProtoReflect.Descriptor instead.",
+                  "token_estimate": 14
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "dialoptions.go",
+                    "start_line": 793,
+                    "end_line": 797,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "target": {
+                    "file": "dialoptions.go",
+                    "start_line": 152,
+                    "end_line": 156,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 32,
+                    "end_line": 49,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "target": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 34,
+                    "end_line": 34,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 32,
+                    "end_line": 49,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "target": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 37,
+                    "end_line": 37,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 32,
+                    "end_line": 49,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "target": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 40,
+                    "end_line": 40,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 32,
+                    "end_line": 49,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "target": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 45,
+                    "end_line": 45,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 32,
+                    "end_line": 49,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "target": {
+                    "file": "internal/profiling/buffer/buffer.go",
+                    "start_line": 48,
+                    "end_line": 48,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "benchmark/benchmain/main.go",
+                    "start_line": 158,
+                    "end_line": 160,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "target": {
+                    "file": "mem/buffer_pool.go",
+                    "start_line": 33,
+                    "end_line": 42,
+                    "commit_hash": "c1a9239e408db59ba50e3ee8100cebc5347ca993"
+                  },
+                  "relation": "implements",
+                  "distance": 1
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 2014,
+                "utilization_ratio": 0.2797222222222222,
+                "built_at": "2026-10-24T00:27:20.425018Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "e650a30f11c8932a77d77351844dfdd14ce6fa7081e0fab70abd717e762451cd",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-8910",
+      "prompt": "계층형 버퍼 풀 구현을 공개 패키지에서 내부 패키지로 옮기고 싶어. 기본 풀은 반환 전에 버퍼를 지우는데 그 비용도 고려하고 싶어",
+      "expected_intent": "refactor",
+      "classified_intents": [
+        ""
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0,
+        "file_recall": 0,
+        "file_f1": 0,
+        "file_mrr": 0,
+        "first_hit_rank": 0,
+        "token_utilization": 0.2797222222222222,
+        "used_tokens": 2014,
+        "citation_count": 16,
+        "body_count": 9,
+        "redaction_count": 0,
+        "latency_ms": 1057,
+        "latency_ms_p50": 1057,
+        "latency_ms_p95": 1057,
+        "latency_ms_max": 1057
+      },
+      "retrieval_state": "miss",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0,
+      "avg_mrr": 0,
+      "avg_recall": 0,
+      "avg_f1": 0,
+      "avg_latency_ms": 1057
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "refactor": {
+        "(unknown)": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,576 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:30:44.730374Z",
+  "finished_at": "2026-10-24T00:30:46.342096Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 8334959,
+          "completed_at": "2026-10-24T09:30:44.739001+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": true,
+              "indexed_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "클라이언트가 스트림을 열면서 첫 헤더에 스트림 끝 표시를 같이 보내면 서버 쪽 수신이 멈춰. 고치고 싶어"
+          },
+          "elapsed_ns": 1602467375,
+          "completed_at": "2026-10-24T09:30:46.341499+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "intent": "bug_fix",
+              "query": "클라이언트가 스트림을 열면서 첫 헤더에 스트림 끝 표시를 같이 보내면 서버 쪽 수신이 멈춰. 고치고 싶어",
+              "citations": [
+                {
+                  "file": "internal/transport/client_stream.go",
+                  "start_line": 99,
+                  "end_line": 110,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/http2_client.go",
+                  "start_line": 1665,
+                  "end_line": 1692,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "stream.go",
+                  "start_line": 93,
+                  "end_line": 149,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/client_stream.go",
+                  "start_line": 128,
+                  "end_line": 139,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/client_stream.go",
+                  "start_line": 154,
+                  "end_line": 166,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "stream.go",
+                  "start_line": 1543,
+                  "end_line": 1556,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 1336,
+                  "end_line": 1358,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "stream.go",
+                  "start_line": 980,
+                  "end_line": 1017,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 398,
+                  "end_line": 398,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "balancer/ringhash/config.go",
+                  "start_line": 73,
+                  "end_line": 73,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/transport/http2_client.go",
+                  "start_line": 967,
+                  "end_line": 1023,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/client_stream.go",
+                  "start_line": 100,
+                  "end_line": 110,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "status/status.go",
+                  "start_line": 131,
+                  "end_line": 134,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/transport.go",
+                  "start_line": 870,
+                  "end_line": 878,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "metadata/metadata.go",
+                  "start_line": 170,
+                  "end_line": 176,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/status/status.go",
+                  "start_line": 125,
+                  "end_line": 130,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/client_stream.go",
+                  "start_line": 113,
+                  "end_line": 115,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 1337,
+                  "end_line": 1358,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/http2_server.go",
+                  "start_line": 1316,
+                  "end_line": 1334,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/transport/controlbuf.go",
+                  "start_line": 359,
+                  "end_line": 362,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "internal/xds/clients/xdsclient/test/misc_watchers_test.go",
+                  "start_line": 92,
+                  "end_line": 95,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "stream.go",
+                  "start_line": 1187,
+                  "end_line": 1246,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                },
+                {
+                  "file": "stream.go",
+                  "start_line": 934,
+                  "end_line": 978,
+                  "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 99,
+                    "end_line": 110,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "// Close closes the stream and propagates err to any readers.\nfunc (s *ClientStream) Close(err error) {\n\tvar (\n\t\trst     bool\n\t\trstCode http2.ErrCode\n\t)\n\tif err != nil {\n\t\trst = true\n\t\trstCode = http2.ErrCodeCancel\n\t}\n\ts.ct.closeStream(s, err, rst, rstCode, status.Convert(err), nil, false)\n}",
+                  "token_estimate": 73
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/http2_client.go",
+                    "start_line": 1665,
+                    "end_line": 1692,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "\tif s.statsHandler != nil {\n\t\tif !endStream {\n\t\t\ts.statsHandler.HandleRPC(s.ctx, \u0026stats.InHeader{\n\t\t\t\tClient:      true,\n\t\t\t\tWireLength:  int(frame.Header().Length),\n\t\t\t\tHeader:      metadata.MD(mdata).Copy(),\n\t\t\t\tCompression: s.recvCompress,\n\t\t\t})\n\t\t} else {\n\t\t\ts.statsHandler.HandleRPC(s.ctx, \u0026stats.InTrailer{\n\t\t\t\tClient:     true,\n\t\t\t\tWireLength: int(frame.Header().Length),\n\t\t\t\tTrailer:    metadata.MD(mdata).Copy(),\n\t\t\t})\n\t\t}\n\t}\n\n\tif !endStream {\n\t\treturn\n\t}\n\n\tstatus := istatus.NewWithProto(grpcStatusCode, grpcMessage, mdata[grpcStatusDetailsBinHeader])\n\n\t// If client received END_STREAM from server while stream was still active,\n\t// send RST_STREAM.\n\trstStream := s.getState() == streamActive\n\tt.closeStream(s, io.EOF, rstStream, http2.ErrCodeNo, status, mdata, true)\n}",
+                  "token_estimate": 195
+                },
+                {
+                  "citation": {
+                    "file": "stream.go",
+                    "start_line": 93,
+                    "end_line": 149,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "// ClientStream defines the client-side behavior of a streaming RPC.\n//\n// All errors returned from ClientStream methods are compatible with the\n// status package.\ntype ClientStream interface {\n\t// Header returns the header metadata received from the server if there\n\t// is any. It blocks if the metadata is not ready to read.  If the metadata\n\t// is nil and the error is also nil, then the stream was terminated without\n\t// headers, and the status can be discovered by calling RecvMsg.\n\tHeader() (metadata.MD, error)\n\t// Trailer returns the trailer metadata from the server, if there is any.\n\t// It must only be called after stream.CloseAndRecv has returned, or\n\t// stream.Recv has returned a non-nil error (including io.EOF).\n\tTrailer() metadata.MD\n\t// CloseSend closes the send direction of the stream. This method always\n\t// returns a nil error. The status of the stream may be discovered using\n\t// RecvMsg. It is also not safe to call CloseSend concurrently with SendMsg.\n\tCloseSend() error\n\t// Context returns the context for this stream.\n\t//\n\t// It should not be called until after Header or RecvMsg has returned. Once\n\t// called, subsequent client-side retries are disabled.\n\tContext() context.Context\n\t// SendMsg is generally called by generated code. On error, SendMsg aborts\n\t// the stream. If the error was generated by the client, the status is\n\t// returned directly; otherwise, io.EOF is returned and the status of\n\t// the stream may be discovered using RecvMsg. For unary or server-streaming\n\t// RPCs (StreamDesc.ClientStreams is false), a nil error is returned\n\t// unconditionally.\n\t//\n\t// SendMsg blocks until:\n\t//   - There is sufficient flow control to schedule m with the transport, or\n\t//   - The stream is done, or\n\t//   - The stream breaks.\n\t//\n\t// SendMsg does not wait until the message is received by the server. An\n\t// untimely stream closure may result in lost messages. To ensure delivery,\n\t// users should ensure the RPC completed successfully using RecvMsg.\n\t//\n\t// It is safe to have a goroutine calling SendMsg and another goroutine\n\t// calling RecvMsg on the same stream at the same time, but it is not safe\n\t// to call SendMsg on the same stream in different goroutines. It is also\n\t// not safe to call CloseSend concurrently with SendMsg.\n\t//\n\t// It is not safe to modify the message after calling SendMsg. Tracing\n\t// libraries and stats handlers may use the message lazily.\n\tSendMsg(m any) error\n\t// RecvMsg blocks until it receives a message into m or the stream is\n\t// done. It returns io.EOF when the stream completes successfully. On\n\t// any other error, the stream is aborted and the error contains the RPC\n\t// status.\n\t//\n\t// It is safe to have a goroutine calling SendMsg and another goroutine\n\t// calling RecvMsg on the same stream at the same time, but it is not\n\t// safe to call RecvMsg on the same stream in different goroutines.\n\tRecvMsg(m any) error\n}",
+                  "token_estimate": 725
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 128,
+                    "end_line": 139,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "func (s *ClientStream) waitOnHeader() {\n\tselect {\n\tcase \u003c-s.ctx.Done():\n\t\t// Close the stream to prevent headers/trailers from changing after\n\t\t// this function returns.\n\t\ts.Close(ContextErr(s.ctx.Err()))\n\t\t// headerChan could possibly not be closed yet if closeStream raced\n\t\t// with operateHeaders; wait until it is closed explicitly here.\n\t\t\u003c-s.headerChan\n\tcase \u003c-s.headerChan:\n\t}\n}",
+                  "token_estimate": 96
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 154,
+                    "end_line": 166,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "// Header returns the header metadata of the stream. Acquires the key-value\n// pairs of header metadata once it is available. It blocks until i) the\n// metadata is ready or ii) there is no header metadata or iii) the stream is\n// canceled/expired.\nfunc (s *ClientStream) Header() (metadata.MD, error) {\n\ts.waitOnHeader()\n\n\tif !s.headerValid || s.noHeaders {\n\t\treturn nil, s.status.Err()\n\t}\n\n\treturn s.header.Copy(), nil\n}",
+                  "token_estimate": 105
+                },
+                {
+                  "citation": {
+                    "file": "stream.go",
+                    "start_line": 1543,
+                    "end_line": 1556,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "func (as *addrConnStream) CloseSend() error {\n\tif as.sentLast {\n\t\t// Return a nil error on repeated calls to this method.\n\t\treturn nil\n\t}\n\tas.sentLast = true\n\n\tas.transportStream.Write(nil, nil, \u0026transport.WriteOptions{Last: true})\n\t// Always return nil; io.EOF is the only error that might make sense\n\t// instead, but there is no need to signal the client to call RecvMsg\n\t// as the only use left for the stream after CloseSend is to call\n\t// RecvMsg.  This also matches historical behavior.\n\treturn nil\n}",
+                  "token_estimate": 126
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1336,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "// finishStream closes the stream and puts the trailing headerFrame into controlbuf.\nfunc (t *http2Server) finishStream(s *ServerStream, rst bool, rstCode http2.ErrCode, hdr *serverHeaders, eosReceived bool) {\n\t// In case stream sending and receiving are invoked in separate\n\t// goroutines (e.g., bi-directional streaming), cancel needs to be\n\t// called to interrupt the potential blocking on other goroutines.\n\ts.cancel()\n\n\toldState := s.swapState(streamDone)\n\tif oldState == streamDone {\n\t\t// If the stream was already done, return.\n\t\treturn\n\t}\n\n\thdr.cleanup = \u0026cleanupStream{\n\t\tstreamID: s.id,\n\t\trst:      rst,\n\t\trstCode:  rstCode,\n\t\tonWrite: func() {\n\t\t\tt.deleteStream(s, eosReceived)\n\t\t},\n\t}\n\tt.controlBuf.put(hdr)\n}",
+                  "token_estimate": 180
+                },
+                {
+                  "citation": {
+                    "file": "stream.go",
+                    "start_line": 980,
+                    "end_line": 1017,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "func (cs *clientStream) Header() (metadata.MD, error) {\n\tvar m metadata.MD\n\terr := cs.withRetry(func(a *csAttempt) error {\n\t\tvar err error\n\t\tm, err = a.transportStream.Header()\n\t\treturn toRPCErr(err)\n\t}, cs.commitAttemptLocked)\n\n\tif m == nil \u0026\u0026 err == nil {\n\t\t// The stream ended with success.  Finish the clientStream.\n\t\terr = io.EOF\n\t}\n\n\tif err != nil {\n\t\tcs.finish(err)\n\t\t// Do not return the error.  The user should get it by calling Recv().\n\t\treturn nil, nil\n\t}\n\n\tif len(cs.binlogs) != 0 \u0026\u0026 !cs.serverHeaderBinlogged \u0026\u0026 m != nil {\n\t\t// Only log if binary log is on and header has not been logged, and\n\t\t// there is actually headers to log.\n\t\tlogEntry := \u0026binarylog.ServerHeader{\n\t\t\tOnClientSide: true,\n\t\t\tHeader:       m,\n\t\t\tPeerAddr:     nil,\n\t\t}\n\t\tif peer, ok := peer.FromContext(cs.Context()); ok {\n\t\t\tlogEntry.PeerAddr = peer.Addr\n\t\t}\n\t\tcs.serverHeaderBinlogged = true\n\t\tfor _, binlog := range cs.binlogs {\n\t\t\tbinlog.Log(cs.ctx, logEntry)\n\t\t}\n\t}\n\n\treturn m, nil\n}",
+                  "token_estimate": 243
+                },
+                {
+                  "citation": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 398,
+                    "end_line": 398,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "text": "\t\treturn fmt.Errorf(\"received an illegal stream id: %v. headers frame: %+v\", streamID, frame)",
+                  "token_estimate": 23
+                },
+                {
+                  "citation": {
+                    "file": "balancer/ringhash/config.go",
+                    "start_line": 73,
+                    "end_line": 73,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "\t\t\treturn nil, fmt.Errorf(\"invalid requestHashHeader %q: key must not end with \\\"-bin\\\"\", cfg.RequestHashHeader)",
+                  "token_estimate": 28
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 100,
+                    "end_line": 110,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/http2_client.go",
+                    "start_line": 967,
+                    "end_line": 1023,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 128,
+                    "end_line": 139,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 100,
+                    "end_line": 110,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "called_by",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 100,
+                    "end_line": 110,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "status/status.go",
+                    "start_line": 131,
+                    "end_line": 134,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 128,
+                    "end_line": 139,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/transport.go",
+                    "start_line": 870,
+                    "end_line": 878,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 158,
+                    "end_line": 166,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "metadata/metadata.go",
+                    "start_line": 170,
+                    "end_line": 176,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 158,
+                    "end_line": 166,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/status/status.go",
+                    "start_line": 125,
+                    "end_line": 130,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stream.go",
+                    "start_line": 1543,
+                    "end_line": 1556,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/client_stream.go",
+                    "start_line": 113,
+                    "end_line": 115,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1316,
+                    "end_line": 1334,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/transport/controlbuf.go",
+                    "start_line": 359,
+                    "end_line": 362,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/transport/http2_server.go",
+                    "start_line": 1337,
+                    "end_line": 1358,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "internal/xds/clients/xdsclient/test/misc_watchers_test.go",
+                    "start_line": 92,
+                    "end_line": 95,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stream.go",
+                    "start_line": 980,
+                    "end_line": 1017,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "stream.go",
+                    "start_line": 1187,
+                    "end_line": 1246,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "stream.go",
+                    "start_line": 980,
+                    "end_line": 1017,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "target": {
+                    "file": "stream.go",
+                    "start_line": 934,
+                    "end_line": 978,
+                    "commit_hash": "a9cbf17a2ad108cdaded0d1f37d35098733ee462"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                }
+              ],
+              "knowledge": [
+                {
+                  "scope": "examples/features/opentelemetry/server",
+                  "kind": "convention",
+                  "text": "package: examples/features/opentelemetry/server. conventions summary.\nlogger: stdlib_log=1 (total=1)\n"
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 1794,
+                "utilization_ratio": 0.24916666666666668,
+                "built_at": "2026-10-24T00:30:46.340444Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "c5834e09c0eb8cf7bf6d497cb367e3617a7d58a10e99d3433a42d8e1cdb0a21c",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-9391",
+      "prompt": "클라이언트가 스트림을 열면서 첫 헤더에 스트림 끝 표시를 같이 보내면 서버 쪽 수신이 멈춰. 고치고 싶어",
+      "expected_intent": "security",
+      "classified_intents": [
+        "bug_fix"
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0.045454545454545456,
+        "file_recall": 1,
+        "file_f1": 0.08695652173913045,
+        "file_mrr": 0.1111111111111111,
+        "first_hit_rank": 9,
+        "token_utilization": 0.24916666666666668,
+        "used_tokens": 1794,
+        "citation_count": 23,
+        "body_count": 10,
+        "redaction_count": 0,
+        "latency_ms": 1602,
+        "latency_ms_p50": 1602,
+        "latency_ms_p95": 1602,
+        "latency_ms_max": 1602
+      },
+      "retrieval_state": "pass",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0.045454545454545456,
+      "avg_mrr": 0.1111111111111111,
+      "avg_recall": 1,
+      "avg_f1": 0.08695652173913045,
+      "avg_latency_ms": 1602
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0.1111111111111111
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "security": {
+        "bug_fix": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,1117 @@
+{
+  "schema_version": 1,
+  "builder_version": "cks-eval/0.0.1-dev",
+  "started_at": "2026-10-24T00:13:23.161559Z",
+  "finished_at": "2026-10-24T00:13:24.955176Z",
+  "results": [
+    {
+      "raw_calls": [
+        {
+          "tool": "cks.ops.freshness",
+          "arguments": null,
+          "elapsed_ns": 27788583,
+          "completed_at": "2026-10-24T09:13:23.189649+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "freshness report"
+              }
+            ],
+            "structuredContent": {
+              "fresh": false,
+              "indexed_head": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90",
+              "current_head": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+              "changed_files": [
+                ".gemini/config.yaml",
+                ".gemini/styleguide.md",
+                ".github/workflows/govulncheck.yaml",
+                ".github/workflows/testing.yml",
+                "CONTRIBUTING.md",
+                "Documentation/proxy.md",
+                "attributes/attributes.go",
+                "attributes/attributes_test.go",
+                "authz/grpc_authz_end2end_test.go",
+                "authz/grpc_authz_server_interceptors.go",
+                "authz/grpc_authz_server_interceptors_test.go",
+                "balancer/autosharding/autosharding.go",
+                "balancer/autosharding/autosharding_test.go",
+                "balancer/autosharding/slice_map.go",
+                "balancer/autosharding/slice_map_test.go",
+                "balancer/balancer.go",
+                "balancer/base/balancer.go",
+                "balancer/endpointsharding/endpointsharding.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go",
+                "balancer/grpclb/grpc_lb_v1/load_balancer_grpc.pb.go",
+                "balancer/grpclb/grpclb_remote_balancer.go",
+                "balancer/grpclb/grpclb_test.go",
+                "balancer/leastrequest/leastrequest.go",
+                "balancer/pickfirst/internal/internal.go",
+                "balancer/pickfirst/metrics_test.go",
+                "balancer/pickfirst/pickfirst.go",
+                "balancer/pickfirst/pickfirst_ext_test.go",
+                "balancer/pickfirst/pickfirstleaf/pickfirstleaf.go",
+                "balancer/randomsubsetting/randomsubsetting.go",
+                "balancer/randomsubsetting/randomsubsetting_test.go",
+                "balancer/ringhash/picker.go",
+                "balancer/ringhash/picker_test.go",
+                "balancer/ringhash/ring_test.go",
+                "balancer/ringhash/ringhash.go",
+                "balancer/ringhash/ringhash_e2e_test.go",
+                "balancer/ringhash/ringhash_test.go",
+                "balancer/rls/balancer.go",
+                "balancer/rls/balancer_test.go",
+                "balancer/rls/cache.go",
+                "balancer/rls/cache_test.go",
+                "balancer/rls/config.go",
+                "balancer/rls/control_channel.go",
+                "balancer/rls/control_channel_test.go",
+                "balancer/rls/metrics_test.go",
+                "balancer/rls/picker.go",
+                "balancer/subconn.go",
+                "balancer/weightedroundrobin/balancer.go",
+                "balancer/weightedtarget/weightedtarget.go",
+                "balancer/weightedtarget/weightedtarget_test.go",
+                "balancer_wrapper.go",
+                "benchmark/benchmain/main.go",
+                "binarylog/binarylog_end2end_test.go",
+                "binarylog/grpc_binarylog_v1/binarylog.pb.go",
+                "call.go",
+                "channelz/grpc_channelz_v1/channelz.pb.go",
+                "channelz/grpc_channelz_v1/channelz_grpc.pb.go",
+                "clientconn.go",
+                "clientconn_disconnect_reason_noplan9.go",
+                "clientconn_disconnect_reason_plan9.go",
+                "cmd/protoc-gen-go-grpc/go.mod",
+                "cmd/protoc-gen-go-grpc/go.sum",
+                "cmd/protoc-gen-go-grpc/grpc.go",
+                "cmd/protoc-gen-go-grpc/main.go",
+                "cmd/protoc-gen-go-grpc/protoc-gen-go-grpc_test.sh",
+                "credentials/alts/alts.go",
+                "credentials/alts/alts_test.go",
+                "credentials/alts/internal/conn/record.go",
+                "credentials/alts/internal/conn/record_test.go",
+                "credentials/alts/internal/handshaker/handshaker.go",
+                "credentials/alts/internal/handshaker/handshaker_test.go",
+                "credentials/alts/internal/proto/grpc_gcp/altscontext.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/handshaker_grpc.pb.go",
+                "credentials/alts/internal/proto/grpc_gcp/transport_security_common.pb.go",
+                "credentials/credentials_ext_test.go",
+                "credentials/google/gcp_service_account_identity_credentials.go",
+                "credentials/google/gcp_service_account_identity_credentials_test.go",
+                "credentials/google/internal/internal.go",
+                "credentials/jwt/token_file_call_creds_ext_test.go",
+                "credentials/sts/sts.go",
+                "credentials/sts/sts_test.go",
+                "credentials/tls.go",
+                "credentials/xds/xds.go",
+                "credentials/xds/xds_client_test.go",
+                "credentials/xds/xds_server_test.go",
+                "dialoptions.go",
+                "encoding/compressor_test.go",
+                "encoding/encoding.go",
+                "encoding/encoding_test.go",
+                "encoding/gzip/gzip.go",
+                "examples/examples_test.sh",
+                "examples/features/gracefulstop/server/main.go",
+                "examples/features/opentelemetry/client/main.go",
+                "examples/features/opentelemetry/server/main.go",
+                "examples/features/proto/echo/echo.pb.go",
+                "examples/features/proto/echo/echo_grpc.pb.go",
+                "examples/go.mod",
+                "examples/go.sum",
+                "examples/helloworld/helloworld/helloworld.pb.go",
+                "examples/helloworld/helloworld/helloworld_grpc.pb.go",
+                "examples/route_guide/routeguide/route_guide.pb.go",
+                "examples/route_guide/routeguide/route_guide_grpc.pb.go",
+                "experimental/balancer/hostname/hostname.go",
+                "experimental/balancer/hostname/hostname_test.go",
+                "experimental/balancer/weight/weight.go",
+                "experimental/balancer/weight/weight_test.go",
+                "experimental/experimental.go",
+                "experimental/stats/metrics.go",
+                "experimental/stats/telemetry/labels.go",
+                "gcp/observability/go.mod",
+                "gcp/observability/go.sum",
+                "gcp/observability/logging_test.go",
+                "go.mod",
+                "go.sum",
+                "health/grpc_health_v1/health.pb.go",
+                "health/grpc_health_v1/health_grpc.pb.go",
+                "interceptor.go",
+                "internal/balancergroup/balancergroup.go",
+                "internal/balancergroup/balancergroup_test.go",
+                "internal/buffer/unbounded.go",
+                "internal/buffer/unbounded_test.go",
+                "internal/credentials/xds/handshake_info.go",
+                "internal/credentials/xds/handshake_info_test.go",
+                "internal/envconfig/envconfig.go",
+                "internal/envconfig/envconfig_test.go",
+                "internal/envconfig/xds.go",
+                "internal/experimental.go",
+                "internal/grpcsync/callback_serializer.go",
+                "internal/grpcsync/callback_serializer_test.go",
+                "internal/grpcsync/refcounted.go",
+                "internal/grpcsync/refcounted_test.go",
+                "internal/grpcutil/encode_duration.go",
+                "internal/grpcutil/regex_test.go",
+                "internal/hierarchy/hierarchy.go",
+                "internal/hierarchy/hierarchy_ext_test.go",
+                "internal/hierarchy/hierarchy_test.go",
+                "internal/idle/idle_e2e_test.go",
+                "internal/internal.go",
+                "internal/leakcheck/leakcheck.go",
+                "internal/leakcheck/leakcheck_test.go",
+                "internal/mem/buffer_pool.go",
+                "internal/mem/buffer_pool_ext_test.go",
+                "internal/mem/buffer_pool_test.go",
+                "internal/optional/optional.go",
+                "internal/optional/optional_test.go",
+                "internal/proto/grpc_lookup_v1/rls.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_config.pb.go",
+                "internal/proto/grpc_lookup_v1/rls_grpc.pb.go",
+                "internal/resolver/config_selector.go",
+                "internal/resolver/dns/dns_resolver.go",
+                "internal/resolver/dns/dns_resolver_test.go",
+                "internal/stats/labels.go",
+                "internal/stats/labels_test.go",
+                "internal/testutils/balancer.go",
+                "internal/testutils/fakegrpclb/server.go",
+                "internal/testutils/stats/test_metrics_recorder.go",
+                "internal/transport/client_stream.go",
+                "internal/transport/controlbuf.go",
+                "internal/transport/controlbuf_test.go",
+                "internal/transport/defaults.go",
+                "internal/transport/flowcontrol.go",
+                "internal/transport/grpchttp2/errors.go",
+                "internal/transport/grpchttp2/errors_test.go",
+                "internal/transport/grpchttp2/framer.go",
+                "internal/transport/grpchttp2/http2bridge.go",
+                "internal/transport/grpchttp2/http2bridge_test.go",
+                "internal/transport/handler_server.go",
+                "internal/transport/handler_server_test.go",
+                "internal/transport/http2_client.go",
+                "internal/transport/http2_client_header_bench_test.go",
+                "internal/transport/http2_server.go",
+                "internal/transport/http_util.go",
+                "internal/transport/http_util_test.go",
+                "internal/transport/internal/internal.go",
+                "internal/transport/keepalive_test.go",
+                "internal/transport/readyreader/raw_conn_linux.go",
+                "internal/transport/readyreader/raw_conn_nonlinux.go",
+                "internal/transport/readyreader/ready_reader.go",
+                "internal/transport/readyreader/ready_reader_ext_test.go",
+                "internal/transport/server_metrics_ext_test.go",
+                "internal/transport/transport.go",
+                "internal/transport/transport_test.go",
+                "internal/xds/balancer/balancer.go",
+                "internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go",
+                "internal/xds/balancer/cdsbalancer/cdsbalancer.go",
+                "internal/xds/balancer/cdsbalancer/cdsbalancer_test.go",
+                "internal/xds/balancer/cdsbalancer/cluster_watcher.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_childname.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_childname_test.go",
+                "internal/xds/balancer/cdsbalancer/configbuilder_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/aggregate_cluster_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/balancer_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/dns_impl_test.go",
+                "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go",
+                "internal/xds/balancer/clusterimpl/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/clusterimpl.go",
+                "internal/xds/balancer/clusterimpl/config.go",
+                "internal/xds/balancer/clusterimpl/config_test.go",
+                "internal/xds/balancer/clusterimpl/internal/internal.go",
+                "internal/xds/balancer/clusterimpl/picker.go",
+                "internal/xds/balancer/clusterimpl/tests/balancer_test.go",
+                "internal/xds/balancer/clusterimpl/tests/clusterimpl_security_test.go",
+                "internal/xds/balancer/clustermanager/clustermanager.go",
+                "internal/xds/balancer/clustermanager/clustermanager_test.go",
+                "internal/xds/balancer/clustermanager/e2e_test/clustermanager_test.go",
+                "internal/xds/balancer/clustermanager/picker.go",
+                "internal/xds/balancer/clusterresolver/clusterresolver.go",
+                "internal/xds/balancer/clusterresolver/config.go",
+                "internal/xds/balancer/clusterresolver/config_test.go",
+                "internal/xds/balancer/clusterresolver/configbuilder_childname_test.go",
+                "internal/xds/balancer/clusterresolver/configbuilder_test.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver_dns.go",
+                "internal/xds/balancer/clusterresolver/resource_resolver_eds.go",
+                "internal/xds/balancer/outlierdetection/balancer.go",
+                "internal/xds/balancer/outlierdetection/balancer_ext_test.go",
+                "internal/xds/balancer/outlierdetection/balancer_test.go",
+                "internal/xds/balancer/outlierdetection/e2e_test/outlierdetection_test.go",
+                "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                "internal/xds/balancer/priority/balancer.go",
+                "internal/xds/balancer/priority/balancer_child.go",
+                "internal/xds/balancer/priority/balancer_priority.go",
+                "internal/xds/balancer/priority/balancer_test.go",
+                "internal/xds/balancer/wrrlocality/balancer.go",
+                "internal/xds/balancer/wrrlocality/balancer_test.go",
+                "internal/xds/bootstrap/bootstrap.go",
+                "internal/xds/bootstrap/bootstrap_test.go",
+                "internal/xds/clients/config.go",
+                "internal/xds/clients/internal/buffer/unbounded.go",
+                "internal/xds/clients/internal/buffer/unbounded_test.go",
+                "internal/xds/clients/internal/syncutil/callback_serializer.go",
+                "internal/xds/clients/internal/testutils/faketransport/xds_fake_transport.go",
+                "internal/xds/clients/lrsclient/loadreport_test.go",
+                "internal/xds/clients/lrsclient/lrs_stream.go",
+                "internal/xds/clients/xdsclient/ads_stream.go",
+                "internal/xds/clients/xdsclient/authority.go",
+                "internal/xds/clients/xdsclient/channel.go",
+                "internal/xds/clients/xdsclient/channel_test.go",
+                "internal/xds/clients/xdsclient/metrics/metrics.go",
+                "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go",
+                "internal/xds/clients/xdsclient/test/custom_resource_watch_test.go",
+                "internal/xds/clients/xdsclient/test/dump_test.go",
+                "internal/xds/clients/xdsclient/test/helpers_test.go",
+                "internal/xds/clients/xdsclient/test/metrics_test.go",
+                "internal/xds/clients/xdsclient/xdsclient.go",
+                "internal/xds/credentials/access_token.go",
+                "internal/xds/credentials/access_token_test.go",
+                "internal/xds/credentials/credentials.go",
+                "internal/xds/credentials/tls.go",
+                "internal/xds/credentials/tls_test.go",
+                "internal/xds/credentials/xds_test.go",
+                "internal/xds/grpcservice/grpcservice.go",
+                "internal/xds/grpcservice/grpcservice_test.go",
+                "internal/xds/httpfilter/ext_authz/config.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz.go",
+                "internal/xds/httpfilter/ext_authz/ext_authz_test.go",
+                "internal/xds/httpfilter/extconfig.go",
+                "internal/xds/httpfilter/extconfig_test.go",
+                "internal/xds/httpfilter/extproc/config.go",
+                "internal/xds/httpfilter/extproc/config_test.go",
+                "internal/xds/httpfilter/extproc/ext_proc.go",
+                "internal/xds/httpfilter/extproc/ext_proc_ext_test.go",
+                "internal/xds/httpfilter/extproc/internal/internal.go",
+                "internal/xds/httpfilter/extproc/metrics.go",
+                "internal/xds/httpfilter/fault/fault.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_e2e_test.go",
+                "internal/xds/httpfilter/gcp_authn/gcp_authn_filter_test.go",
+                "internal/xds/httpfilter/httpfilter.go",
+                "internal/xds/httpfilter/rbac/rbac.go",
+                "internal/xds/httpfilter/rbac/rbac_test.go",
+                "internal/xds/httpfilter/router/router.go",
+                "internal/xds/matcher/matcher_header.go",
+                "internal/xds/matcher/string_matcher.go",
+                "internal/xds/matcher/string_matcher_test.go",
+                "internal/xds/rbac/matchers.go",
+                "internal/xds/rbac/rbac_engine_test.go",
+                "internal/xds/resolver/cluster_specifier_plugin_test.go",
+                "internal/xds/resolver/helpers_test.go",
+                "internal/xds/resolver/serviceconfig.go",
+                "internal/xds/resolver/serviceconfig_test.go",
+                "internal/xds/resolver/watch_service_test.go",
+                "internal/xds/resolver/xds_http_filters_test.go",
+                "internal/xds/resolver/xds_resolver.go",
+                "internal/xds/resolver/xds_resolver_test.go",
+                "internal/xds/server/conn_wrapper.go",
+                "internal/xds/server/filter_chain_manager.go",
+                "internal/xds/server/filter_chain_manager_test.go",
+                "internal/xds/server/listener_wrapper.go",
+                "internal/xds/server/listener_wrapper_test.go",
+                "internal/xds/server/routing.go",
+                "internal/xds/server/routing_test.go",
+                "internal/xds/server/server_options.go",
+                "internal/xds/test/e2e/e2e_utils.go",
+                "internal/xds/xds.go",
+                "internal/xds/xdsclient/client_refcounted_test.go",
+                "internal/xds/xdsclient/clientimpl.go",
+                "internal/xds/xdsclient/clientimpl_test.go",
+                "internal/xds/xdsclient/pool.go",
+                "internal/xds/xdsclient/pool/pool_ext_test.go",
+                "internal/xds/xdsclient/resource_types.go",
+                "internal/xds/xdsclient/tests/ads_stream_ack_nack_test.go",
+                "internal/xds/xdsclient/tests/ads_stream_restart_test.go",
+                "internal/xds/xdsclient/tests/federation_watchers_test.go",
+                "internal/xds/xdsclient/tests/lds_watchers_test.go",
+                "internal/xds/xdsclient/tests/resource_update_test.go",
+                "internal/xds/xdsclient/xdslbregistry/converter/converter.go",
+                "internal/xds/xdsclient/xdslbregistry/xdslbregistry_test.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain.go",
+                "internal/xds/xdsclient/xdsresource/filter_chain_test.go",
+                "internal/xds/xdsclient/xdsresource/listener_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/matcher.go",
+                "internal/xds/xdsclient/xdsresource/matcher_path.go",
+                "internal/xds/xdsclient/xdsresource/matcher_test.go",
+                "internal/xds/xdsclient/xdsresource/metadata.go",
+                "internal/xds/xdsclient/xdsresource/metadata_test.go",
+                "internal/xds/xdsclient/xdsresource/route_config_resource_type.go",
+                "internal/xds/xdsclient/xdsresource/test_utils_test.go",
+                "internal/xds/xdsclient/xdsresource/type_cds.go",
+                "internal/xds/xdsclient/xdsresource/type_eds.go",
+                "internal/xds/xdsclient/xdsresource/type_lds.go",
+                "internal/xds/xdsclient/xdsresource/type_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_cds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_lds_test.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds.go",
+                "internal/xds/xdsclient/xdsresource/unmarshal_rds_test.go",
+                "internal/xds/xdsclient/xdsresource/version/version.go",
+                "internal/xds/xdsclient/xdsresource/xdsconfig.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager.go",
+                "internal/xds/xdsdepmgr/xds_dependency_manager_test.go",
+                "interop/grpc_testing/benchmark_service.pb.go",
+                "interop/grpc_testing/benchmark_service_grpc.pb.go",
+                "interop/grpc_testing/control.pb.go",
+                "interop/grpc_testing/core/stats.pb.go",
+                "interop/grpc_testing/empty.pb.go",
+                "interop/grpc_testing/messages.pb.go",
+                "interop/grpc_testing/payloads.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service.pb.go",
+                "interop/grpc_testing/report_qps_scenario_service_grpc.pb.go",
+                "interop/grpc_testing/stats.pb.go",
+                "interop/grpc_testing/test.pb.go",
+                "interop/grpc_testing/test_grpc.pb.go",
+                "interop/grpc_testing/worker_service.pb.go",
+                "interop/grpc_testing/worker_service_grpc.pb.go",
+                "interop/observability/Dockerfile",
+                "interop/observability/go.mod",
+                "interop/observability/go.sum",
+                "interop/orcalb.go",
+                "interop/orcalb_test.go",
+                "interop/stress/grpc_testing/metrics.pb.go",
+                "interop/stress/grpc_testing/metrics_grpc.pb.go",
+                "interop/xds/go.mod",
+                "interop/xds/go.sum",
+                "mem/buffer_pool.go",
+                "mem/buffer_pool_test.go",
+                "mem/buffer_slice.go",
+                "mem/buffers.go",
+                "mem/buffers_test.go",
+                "metadata/metadata.go",
+                "metadata/metadata_test.go",
+                "orca/producer_test.go",
+                "picker_wrapper.go",
+                "profiling/proto/service.pb.go",
+                "profiling/proto/service_grpc.pb.go",
+                "reflection/grpc_reflection_v1/reflection.pb.go",
+                "reflection/grpc_reflection_v1/reflection_grpc.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection.pb.go",
+                "reflection/grpc_reflection_v1alpha/reflection_grpc.pb.go",
+                "reflection/grpc_testing/proto2.pb.go",
+                "reflection/grpc_testing/proto2_ext.pb.go",
+                "reflection/grpc_testing/proto2_ext2.pb.go",
+                "reflection/grpc_testing/test.pb.go",
+                "reflection/grpc_testing/test_grpc.pb.go",
+                "resolver/map.go",
+                "resolver/map_test.go",
+                "resolver_wrapper.go",
+                "rpc_util.go",
+                "rpc_util_test.go",
+                "scripts/vet.sh",
+                "security/advancedtls/advancedtls.go",
+                "security/advancedtls/advancedtls_test.go",
+                "security/advancedtls/certificate_utils_test.go",
+                "security/advancedtls/crl_provider_test.go",
+                "security/advancedtls/examples/go.mod",
+                "security/advancedtls/examples/go.sum",
+                "security/advancedtls/go.mod",
+                "security/advancedtls/go.sum",
+                "security/advancedtls/testdata/crl/provider_ca.cnf",
+                "security/advancedtls/testdata/crl/provider_client_cert.key",
+                "security/advancedtls/testdata/crl/provider_client_cert.pem",
+                "security/advancedtls/testdata/crl/provider_client_trust_cert.pem",
+                "security/advancedtls/testdata/crl/provider_client_trust_key.pem",
+                "security/advancedtls/testdata/crl/provider_create.sh",
+                "security/advancedtls/testdata/crl/provider_crl_empty.pem",
+                "security/advancedtls/testdata/crl/provider_crl_server_revoked.pem",
+                "security/advancedtls/testdata/crl/provider_malicious_client_trust_cert.pem",
+                "security/advancedtls/testdata/crl/provider_malicious_client_trust_key.pem",
+                "security/advancedtls/testdata/crl/provider_malicious_crl_empty.pem",
+                "security/advancedtls/testdata/crl/provider_server_cert.key",
+                "security/advancedtls/testdata/crl/provider_server_cert.pem",
+                "security/advancedtls/testdata/crl/provider_server_trust_cert.pem",
+                "security/advancedtls/testdata/crl/provider_server_trust_key.pem",
+                "server.go",
+                "stats/opencensus/go.mod",
+                "stats/opencensus/go.sum",
+                "stats/opentelemetry/client_metrics.go",
+                "stats/opentelemetry/client_tracing.go",
+                "stats/opentelemetry/csm/observability_test.go",
+                "stats/opentelemetry/e2e_test.go",
+                "stats/opentelemetry/example_test.go",
+                "stats/opentelemetry/internal/testutils/testutils.go",
+                "stats/opentelemetry/opentelemetry.go",
+                "stats/opentelemetry/server_metrics.go",
+                "stats/opentelemetry/server_tracing.go",
+                "stats/opentelemetry/trace.go",
+                "stats/stats.go",
+                "stats/stats_test.go",
+                "status/status_ext_test.go",
+                "stream.go",
+                "stream_test.go",
+                "test/balancer_test.go",
+                "test/codec_perf/perf.pb.go",
+                "test/creds_test.go",
+                "test/end2end_test.go",
+                "test/gracefulstop_test.go",
+                "test/kokoro/psm-regional_td.cfg",
+                "test/malformed_method_test.go",
+                "test/retry_test.go",
+                "test/server_test.go",
+                "test/servertester.go",
+                "test/tools/go.mod",
+                "test/tools/go.sum",
+                "test/xds/xds_client_http_connect_test.go",
+                "test/xds/xds_client_integration_test.go",
+                "test/xds/xds_client_retry_test.go",
+                "test/xds/xds_client_sni_test.go",
+                "test/xds/xds_resolver_e2e_test.go",
+                "test/xds/xds_server_filter_e2e_test.go",
+                "test/xds/xds_server_filter_override_test.go",
+                "test/xds/xds_server_filter_state_retention_test.go",
+                "test/xds/xds_server_integration_test.go",
+                "test/xds/xds_server_interceptor_leak_test.go",
+                "test/xds/xds_server_rbac_test.go",
+                "test/xds/xds_telemetry_labels_test.go",
+                "testdata/spiffe_end2end/README.md",
+                "testdata/spiffe_end2end/ca.key",
+                "testdata/spiffe_end2end/ca.pem",
+                "testdata/spiffe_end2end/client.key",
+                "testdata/spiffe_end2end/client_spiffe.pem",
+                "testdata/spiffe_end2end/client_spiffebundle.json",
+                "testdata/spiffe_end2end/generate.sh",
+                "testdata/spiffe_end2end/intermediate_ca.key",
+                "testdata/spiffe_end2end/intermediate_ca.pem",
+                "testdata/spiffe_end2end/intermediate_gen.sh",
+                "testdata/spiffe_end2end/leaf_and_intermediate_chain.pem",
+                "testdata/spiffe_end2end/leaf_signed_by_intermediate.key",
+                "testdata/spiffe_end2end/leaf_signed_by_intermediate.pem",
+                "testdata/spiffe_end2end/server.key",
+                "testdata/spiffe_end2end/server_spiffe.pem",
+                "testdata/spiffe_end2end/server_spiffebundle.json",
+                "version.go",
+                "xds/googledirectpath/googlec2p.go",
+                "xds/googledirectpath/googlec2p_test.go",
+                "xds/server.go",
+                "xds/server_options.go",
+                "xds/server_resource_ext_test.go",
+                "xds/server_serving_mode_ext_test.go",
+                "xds/server_test.go",
+                "xds/xds.go"
+              ]
+            }
+          }
+        },
+        {
+          "tool": "cks.context.get_for_task",
+          "arguments": {
+            "prompt": "서브채널의 지역(locality) 정보를 전달하려고 넣었던 내부 우회 API가 이제 필요 없어. 그걸 걷어내고 싶어"
+          },
+          "elapsed_ns": 1764248834,
+          "completed_at": "2026-10-24T09:13:24.954233+09:00",
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "evidence pack"
+              }
+            ],
+            "structuredContent": {
+              "query": "서브채널의 지역(locality) 정보를 전달하려고 넣었던 내부 우회 API가 이제 필요 없어. 그걸 걷어내고 싶어",
+              "citations": [
+                {
+                  "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                  "start_line": 596,
+                  "end_line": 596,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 72,
+                  "end_line": 75,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                  "start_line": 590,
+                  "end_line": 592,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                  "start_line": 281,
+                  "end_line": 281,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/xds/bootstrap/bootstrap.go",
+                  "start_line": 779,
+                  "end_line": 784,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 26,
+                  "end_line": 40,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                  "start_line": 82,
+                  "end_line": 90,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/xds/clients/config.go",
+                  "start_line": 94,
+                  "end_line": 102,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                  "start_line": 295,
+                  "end_line": 295,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "balancer/balancer.go",
+                  "start_line": 144,
+                  "end_line": 144,
+                  "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 123,
+                  "end_line": 132,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                  "start_line": 582,
+                  "end_line": 584,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                  "start_line": 591,
+                  "end_line": 591,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/xds/bootstrap/bootstrap.go",
+                  "start_line": 781,
+                  "end_line": 781,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/xds/bootstrap/bootstrap.go",
+                  "start_line": 782,
+                  "end_line": 782,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/xds/bootstrap/bootstrap.go",
+                  "start_line": 783,
+                  "end_line": 783,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/channelmap.go",
+                  "start_line": 29,
+                  "end_line": 45,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/channelmap.go",
+                  "start_line": 132,
+                  "end_line": 137,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/channelmap.go",
+                  "start_line": 391,
+                  "end_line": 395,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/channelmap.go",
+                  "start_line": 392,
+                  "end_line": 392,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 30,
+                  "end_line": 30,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 32,
+                  "end_line": 32,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 33,
+                  "end_line": 33,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 34,
+                  "end_line": 34,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 35,
+                  "end_line": 35,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                },
+                {
+                  "file": "internal/channelz/subchannel.go",
+                  "start_line": 36,
+                  "end_line": 36,
+                  "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                }
+              ],
+              "bodies": [
+                {
+                  "citation": {
+                    "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                    "start_line": 596,
+                    "end_line": 596,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func (*ChannelTraceEvent_SubchannelRef) isChannelTraceEvent_ChildRef() {}",
+                  "token_estimate": 18
+                },
+                {
+                  "citation": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 72,
+                    "end_line": 75,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func (sc *SubChannel) deleteChild(id int64) {\n\tdelete(sc.sockets, id)\n\tsc.deleteSelfIfReady()\n}",
+                  "token_estimate": 23
+                },
+                {
+                  "citation": {
+                    "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                    "start_line": 590,
+                    "end_line": 592,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "type ChannelTraceEvent_SubchannelRef struct {\n\tSubchannelRef *SubchannelRef `protobuf:\"bytes,5,opt,name=subchannel_ref,json=subchannelRef,proto3,oneof\"`\n}",
+                  "token_estimate": 38
+                },
+                {
+                  "citation": {
+                    "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                    "start_line": 281,
+                    "end_line": 281,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "func (*Subchannel) ProtoMessage() {}",
+                  "token_estimate": 9
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/bootstrap/bootstrap.go",
+                    "start_line": 779,
+                    "end_line": 784,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// locality is the internal representation of the locality field within node.\ntype locality struct {\n\tRegion  string `json:\"region,omitempty\"`\n\tZone    string `json:\"zone,omitempty\"`\n\tSubZone string `json:\"sub_zone,omitempty\"`\n}",
+                  "token_estimate": 57
+                },
+                {
+                  "citation": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 26,
+                    "end_line": 40,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// SubChannel is the channelz representation of a subchannel.\ntype SubChannel struct {\n\tEntity\n\t// ID is the channelz id of this subchannel.\n\tID int64\n\t// RefName is the human readable reference string of this subchannel.\n\tRefName       string\n\tcloseCalled   bool\n\tsockets       map[int64]string\n\tparent        *Channel\n\ttrace         *ChannelTrace\n\ttraceRefCount int32\n\n\tChannelMetrics ChannelMetrics\n}",
+                  "token_estimate": 100
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/balancer/outlierdetection/subconn_wrapper.go",
+                    "start_line": 82,
+                    "end_line": 90,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// uneject causes the wrapper to report a state update with the latest update\n// from the underlying subchannel, and resume passing along updates from the\n// underlying subchannel.\nfunc (scw *subConnWrapper) uneject() {\n\tscw.scUpdateCh.Put(\u0026ejectionUpdate{\n\t\tscw:       scw,\n\t\tisEjected: false,\n\t})\n}",
+                  "token_estimate": 75
+                },
+                {
+                  "citation": {
+                    "file": "internal/xds/clients/config.go",
+                    "start_line": 94,
+                    "end_line": 102,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// Locality represents the location of the xDS client application.\ntype Locality struct {\n\t// Region is the region of the xDS client application.\n\tRegion string\n\t// Zone is the area within a region.\n\tZone string\n\t// SubZone is the further subdivision within a zone.\n\tSubZone string\n}",
+                  "token_estimate": 70
+                },
+                {
+                  "citation": {
+                    "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                    "start_line": 295,
+                    "end_line": 295,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "// Deprecated: Use Subchannel.ProtoReflect.Descriptor instead.",
+                  "token_estimate": 15
+                },
+                {
+                  "citation": {
+                    "file": "balancer/balancer.go",
+                    "start_line": 144,
+                    "end_line": 144,
+                    "commit_hash": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f"
+                  },
+                  "text": "\t// Deprecated: please be aware that in a future version, SubConns will only",
+                  "token_estimate": 19
+                }
+              ],
+              "graph_neighbors": [
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 72,
+                    "end_line": 75,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 123,
+                    "end_line": 132,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "calls",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                    "start_line": 590,
+                    "end_line": 592,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                    "start_line": 582,
+                    "end_line": 584,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "implements",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                    "start_line": 590,
+                    "end_line": 592,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "channelz/grpc_channelz_v1/channelz.pb.go",
+                    "start_line": 591,
+                    "end_line": 591,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/xds/bootstrap/bootstrap.go",
+                    "start_line": 780,
+                    "end_line": 784,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/xds/bootstrap/bootstrap.go",
+                    "start_line": 781,
+                    "end_line": 781,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/xds/bootstrap/bootstrap.go",
+                    "start_line": 780,
+                    "end_line": 784,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/xds/bootstrap/bootstrap.go",
+                    "start_line": 782,
+                    "end_line": 782,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/xds/bootstrap/bootstrap.go",
+                    "start_line": 780,
+                    "end_line": 784,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/xds/bootstrap/bootstrap.go",
+                    "start_line": 783,
+                    "end_line": 783,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/channelmap.go",
+                    "start_line": 29,
+                    "end_line": 45,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "implements",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/channelmap.go",
+                    "start_line": 132,
+                    "end_line": 137,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "implements",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/channelmap.go",
+                    "start_line": 391,
+                    "end_line": 395,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "implements",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/channelmap.go",
+                    "start_line": 392,
+                    "end_line": 392,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 30,
+                    "end_line": 30,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 32,
+                    "end_line": 32,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 33,
+                    "end_line": 33,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 34,
+                    "end_line": 34,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 35,
+                    "end_line": 35,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                },
+                {
+                  "source": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 27,
+                    "end_line": 40,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "target": {
+                    "file": "internal/channelz/subchannel.go",
+                    "start_line": 36,
+                    "end_line": 36,
+                    "commit_hash": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90"
+                  },
+                  "relation": "defines",
+                  "distance": 1
+                }
+              ],
+              "knowledge": [
+                {
+                  "scope": "channelz",
+                  "kind": "convention",
+                  "text": "package: channelz. conventions summary.\n"
+                }
+              ],
+              "metadata": {
+                "budget_tokens": 7200,
+                "used_tokens": 424,
+                "utilization_ratio": 0.058888888888888886,
+                "built_at": "2026-10-24T00:13:24.953081Z",
+                "builder_version": "cks-mcp/0.0.1-dev",
+                "integrity_hash": "7af1cfd1cdd400f99c3bc421d635aaf91e2b80c791bfcfeab77f24d92e73f4d9",
+                "integrity_hash_algo": "sha256"
+              }
+            }
+          }
+        }
+      ],
+      "name": "pr-8802",
+      "prompt": "서브채널의 지역(locality) 정보를 전달하려고 넣었던 내부 우회 API가 이제 필요 없어. 그걸 걷어내고 싶어",
+      "expected_intent": "refactor",
+      "classified_intents": [
+        ""
+      ],
+      "intent_match": false,
+      "runs": 1,
+      "match_mode": "overlap",
+      "metrics": {
+        "file_precision": 0,
+        "file_recall": 0,
+        "file_f1": 0,
+        "file_mrr": 0,
+        "first_hit_rank": 0,
+        "token_utilization": 0.058888888888888886,
+        "used_tokens": 424,
+        "citation_count": 26,
+        "body_count": 10,
+        "redaction_count": 0,
+        "latency_ms": 1764,
+        "latency_ms_p50": 1764,
+        "latency_ms_p95": 1764,
+        "latency_ms_max": 1764
+      },
+      "retrieval_state": "miss",
+      "evidence_state": "not_evaluated",
+      "abstention_state": "not_applicable",
+      "snapshot_state": "conflict",
+      "snapshot_reason": "one or more citations have an empty or different commit"
+    }
+  ],
+  "intent_summary": [
+    {
+      "intent": "(unspecified)",
+      "count": 1,
+      "avg_precision": 0,
+      "avg_mrr": 0,
+      "avg_recall": 0,
+      "avg_f1": 0,
+      "avg_latency_ms": 1764
+    }
+  ],
+  "rank_summary": {
+    "scenarios": 1,
+    "hit_at_1": 0,
+    "hit_at_3": 0,
+    "mrr": 0
+  },
+  "intent_accuracy": {
+    "scenarios": 1,
+    "correct": 0,
+    "accuracy": 0,
+    "confusion": {
+      "refactor": {
+        "(unknown)": 1
+      }
+    }
+  }
+}

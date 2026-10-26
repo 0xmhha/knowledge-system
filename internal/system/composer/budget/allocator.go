@@ -10,6 +10,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
+	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -256,11 +257,31 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 	exactSymbolRescued := map[string]bool{}
 	selectedKeys := map[string]bool{}
 
+	// decide records why each candidate was kept or left out, for the debug
+	// trace: only "over_budget", "fetch_error" and "empty_body" reach
+	// Skipped, so the quota and reserve exits are otherwise invisible.
+	rec := debugtrace.From(ctx)
+	var decisions []allocDecision
+	decide := func(c candidate, reason string) {
+		if rec != nil {
+			decisions = append(decisions, allocDecision{File: c.Citation.File, Start: c.Citation.StartLine,
+				End: c.Citation.EndLine, Origin: c.Origin, Score: c.Score, Decision: reason})
+		}
+	}
+	if rec != nil {
+		rec.Before("stage4", "allocate", "", map[string]any{
+			"candidates": len(candidates), "budget_tokens": bodyBudget, "max_citations": a.config.MaxCitations,
+			"seed_cap": seedCap, "neighbor_reserve": a.config.NeighborReserve,
+			"knowledge_reserve": a.config.KnowledgeReserve, "exact_symbol_reserve": a.config.ExactSymbolReserve,
+		})
+	}
+
 	used := 0
 	processed := 0
 	for _, c := range candidates {
 		processed++
 		if c.ParentOf != "" && !selectedKeys[c.ParentOf] {
+			decide(c, "parent_not_selected")
 			continue
 		}
 		// Domain-knowledge chunks get a reserved slot because they arrive
@@ -307,6 +328,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 			// exempt while their reserve is unfilled — domain rules must
 			// not lose their slot to yet another code body.
 			if (!isKnowledge || knowledgeSelected >= a.config.KnowledgeReserve) && !exactUnrescued {
+				decide(c, "seed_quota")
 				continue
 			}
 		}
@@ -330,6 +352,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 				}
 			}
 			if reserveLeft > 0 && len(out.Selected) >= a.config.MaxCitations-reserveLeft {
+				decide(c, "reserve_holdback")
 				continue
 			}
 		}
@@ -337,11 +360,13 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		if err != nil {
 			out.FetchErrors++
 			out.Skipped = append(out.Skipped, c.Citation)
+			decide(c, "fetch_error")
 			continue
 		}
 		if body == "" {
 			out.EmptyBodies++
 			out.Skipped = append(out.Skipped, c.Citation)
+			decide(c, "empty_body")
 			continue
 		}
 		tokens := EstimateTokens(body)
@@ -358,8 +383,14 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 			}
 			if !degraded {
 				out.Skipped = append(out.Skipped, c.Citation)
+				decide(c, "over_budget")
 				continue
 			}
+		}
+		if degraded {
+			decide(c, "selected_degraded")
+		} else {
+			decide(c, "selected")
 		}
 		out.Selected = append(out.Selected, SelectedItem{
 			Citation:      c.Citation,
@@ -397,6 +428,14 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 	out.UsedTokens = used
 	if bodyBudget > 0 {
 		out.Utilization = float64(used) / float64(bodyBudget)
+	}
+	if rec != nil {
+		for _, c := range candidates[processed:] {
+			decide(c, "citation_cap")
+		}
+		rec.After("stage4", "allocate", "", map[string]any{
+			"decisions": decisions, "used_tokens": used, "selected": len(out.Selected),
+		})
 	}
 
 	a.emitFootprint(ctx, out, len(candidates))
@@ -451,6 +490,17 @@ func countDegraded(out Stage4Output) int {
 // candidate is the unified shape used by greedy allocation. Either
 // origin (seed or neighbor) contributes the same fields, so the
 // allocator doesn't need parallel branches.
+// allocDecision is one candidate's outcome in the debug trace, in the
+// order the greedy pass visited them.
+type allocDecision struct {
+	File     string  `json:"file"`
+	Start    int     `json:"start"`
+	End      int     `json:"end"`
+	Origin   string  `json:"origin"`
+	Score    float64 `json:"score"`
+	Decision string  `json:"decision"`
+}
+
 type candidate struct {
 	Citation contract.Citation
 	Score    float64
