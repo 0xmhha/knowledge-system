@@ -16,7 +16,9 @@ import (
 //     "fix Login function", "race condition in goroutinePool".
 //  2. File basenames from ckv hits. These represent what the semantic
 //     search judged relevant; their names are often the package or
-//     module the answer lives in.
+//     module the answer lives in. They steer the rerank confidence and the
+//     next round's query; Extract keeps them out of the Stage 2 hand-off
+//     unless Config.KeepHitKeywords is set.
 //
 // Duplicates are removed (case-sensitive on the assumption that Go's
 // case-significant identifier rules apply). Short tokens (<=2 chars) are

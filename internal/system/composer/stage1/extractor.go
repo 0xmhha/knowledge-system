@@ -13,6 +13,9 @@
 //  4. Confidence gate — if top-1 BM25 score dominates the candidates,
 //     accept; otherwise augment the prompt with the top reranked keywords
 //     and loop (bounded by MaxRounds).
+//  5. Stage 2 hand-off — only keywords from the prompt itself go to
+//     Stage 2 by default; names mined from hits served steps 3 and 4
+//     only (see Config.KeepHitKeywords).
 //
 // The strategy mirrors what coding agents like Cursor do internally: when
 // the first search is ambiguous, refine the query with what was learned
@@ -73,6 +76,19 @@ type Config struct {
 	// AugmentTopN is how many top-reranked keywords to splice into the
 	// augmented query for the next round.
 	AugmentTopN int
+	// KeepHitKeywords keeps keywords mined from ckv hits (hit symbols and
+	// file basenames) in the Keywords handed to Stage 2. Off by default:
+	// those names only repeat what the semantic search already ranked, and
+	// Stage 2 fused them back as if they were independent evidence, so a
+	// hit whose own name made the keyword cap outranked a better hit whose
+	// name did not. Measured 2026-10-26 with every other factor fixed:
+	// dropping them raised grpc-go CKS MRR 0.206 -> 0.232 (qwen3-embedding)
+	// and 0.243 -> 0.271 (bge-m3), where 83% of the final keywords came from
+	// hits (Korean prompts carry no identifiers), and left the go-stablenet
+	// PR set unchanged, where every final keyword came from the prompt.
+	// Hit keywords still feed the recall-round query augmentation and the
+	// confidence gate; only the Stage 2 hand-off drops them.
+	KeepHitKeywords bool
 }
 
 // DefaultConfig returns the baseline tuning.
@@ -217,6 +233,9 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 	out.VocabExpanded = len(expansion.MatchedKeywords) > 0
 	out.VocabKeywords = expansion.MatchedKeywords
 	rec := debugtrace.From(ctx)
+	// origin remembers where each keyword first came from, so the Stage 2
+	// hand-off can drop the ones mined from hits (see KeepHitKeywords).
+	origin := map[string]string{}
 	if rec != nil {
 		rec.After("stage1", "vocab_expand", "", map[string]any{
 			"prompt": prompt, "expanded": expansion.Expanded, "matched": expansion.MatchedKeywords,
@@ -261,6 +280,9 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 		tagged := extractKeywordCandidates(prompt, out.Hits, intent)
 		candidates := make([]string, 0, len(tagged))
 		for _, c := range tagged {
+			if _, ok := origin[c.Keyword]; !ok {
+				origin[c.Keyword] = c.Origin
+			}
 			candidates = append(candidates, c.Keyword)
 		}
 		if rec != nil {
@@ -322,6 +344,24 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 			}
 			rec.After("stage1", "knowledge_pass", "", data)
 		}
+	}
+
+	// Drop hit-mined keywords before the cap, so the cap keeps the prompt's
+	// own keywords instead of spending slots on them.
+	if !e.config.KeepHitKeywords {
+		kept := make([]string, 0, len(out.Keywords))
+		var removed []string
+		for _, k := range out.Keywords {
+			if o := origin[k]; o == originHitSymbol || o == originHitFile {
+				removed = append(removed, k)
+				continue
+			}
+			kept = append(kept, k)
+		}
+		if rec != nil && len(removed) > 0 {
+			rec.Note("stage1", "drop_hit_keywords", "", map[string]any{"removed": removed})
+		}
+		out.Keywords = kept
 	}
 
 	// Cap the final keyword count.
