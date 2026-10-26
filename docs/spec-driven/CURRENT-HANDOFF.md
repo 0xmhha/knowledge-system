@@ -13,7 +13,7 @@
 
 ## 2. 현재 단계
 
-원장 `current_activity`: `102_retrieval_eval_grpc_go_run1_results_recorded_sample_check_pending`. [남은 작업](../REMAINING-WORK.md) 3.1의 3단계(명세대로 실행)에서 실행은 끝났고 사람의 표본 확인을 기다린다. 작업은 로컬 브랜치 `test/retrieval-eval-grpc-go-run`에 커밋했고 push하지 않았다.
+원장 `current_activity`: `103_retrieval_eval_grpc_go_diagnosis_fixes_recorded_intent_gate_next`. [남은 작업](../REMAINING-WORK.md) 3.1의 4단계(약한 곳 고치기)에서 첫 수정 묶음을 반영하고 다시 쟀다. 3단계의 사람 표본 확인은 아직이다. 작업은 로컬 브랜치 `test/retrieval-eval-grpc-go-run`에 커밋했고 push하지 않았다.
 
 ### 끝난 것
 
@@ -40,6 +40,15 @@
 - PR 100건 기준 hit@1: 벡터만 0.24(qwen3)·0.20(bge-m3), grep 0.14, CKS는 `cks eval` 그대로 0.07·0.03, 커밋 필터 없이 다시 채점하면 0.14·0.11
 - CKS 의도 정확도: 0/100(qwen3), 14/100(bge-m3). 대부분 `unknown`
 - 그래프 낱말 검색: 23건이 한국어 질문에서 낱말을 못 뽑아 오류
+
+### 진단과 첫 수정 (2026-10-26)
+
+단계별 디버그 기록 장치를 넣고, 결함 세 개를 고치고, 요인을 하나씩 바꾸는 ablation을 했다. 자세한 것은 [진단 기록](./operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/README.md)에 있다.
+
+- CKS MRR(커밋 필터 없이 다시 채점): qwen3 0.189 → 0.232, bge-m3 0.209 → 0.271. go-stablenet PR 12건 파일 MRR 0.75 → 0.79. grpc-go에서는 아직 벡터만(0.292, 0.291)보다 낮다
+- 고친 것: SQLite `FindSymbol`이 `타입.메서드`를 찾지 못해 같은 이름 메서드 전체로 퍼지던 결함(`1b0fb26e`), RRF가 한 목록의 같은 위치를 여러 번 세던 결함(`6dbd3834`), 히트에서 뽑은 키워드가 같은 히트에 다시 표를 주던 구조(`9e4a0f0b`)
+- `CKS_DEBUG_TRACE=<파일>`로 각 알고리즘의 입력과 출력을 남기고, `scripts/retrieval_debug_trace_report.py`로 정답을 잃은 단계를 찾는다(`47321f4a`)
+- bge-m3가 CKS에서 앞선 것은 의도 기준값 0.55가 bge-m3에 맞춰져 있어서다. qwen3는 96건이 미분류가 되고, 미분류이면 문서 강등이 꺼져 `.md`가 1위 오답이 된다
 
 ## 3. 색인을 만들고 이어 가는 법
 
@@ -95,8 +104,8 @@ python3 scripts/retrieval_snapshot_chain.py --repo <grpc-go clone> --snapshots $
 
 1. **사람의 표본 확인을 받는다.** 확인 자료는 [표본 확인](./operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md)에 있다(seed 20261024). 1차 결과는 이미 나왔으므로, 확인하는 사람에게 결과를 보기 전인지 함께 묻고 그대로 기록한다. 확인 결과는 사용자 메시지 그대로 기록하고, AI가 대신 확인하지 않는다. 확인 전의 결과는 DEV 근거다.
 2. **스냅샷 커밋 판정을 어떻게 할지 사용자에게 묻는다.** `cks eval`은 스냅샷 커밋과 다른 커밋의 인용을 빼고, `reindex`한 색인은 바뀌지 않은 파일에 처음 임베딩한 커밋을 남긴다. 그래서 CKS 수치가 두 줄이다. 고르는 길은 색인을 스냅샷마다 전체로 다시 만드는 것(qwen3 기준 약 35시간)과, `cks eval`이 그 스냅샷에서 바뀌지 않은 파일의 인용을 받아들이게 고치는 것(평가 규칙 변경이므로 명세 갱신이 필요하다)이다.
-3. 그다음 [남은 작업](../REMAINING-WORK.md) 3.1의 4단계(약한 곳 고치기)로 간다. 1차 결과에서 본 후보는 의도 분류 기준값(bge-m3에 맞춘 0.55), 그래프 낱말 검색의 한국어 처리, CKS가 벡터만 쓴 검색보다 낮은 원인이다. 고친 뒤 같은 표본으로 다시 잰다.
-4. 5단계(go-stablenet)는 4단계 뒤에 한다.
+3. **4단계를 이어 간다.** 다음 대상은 의도 판정이다. 기준값 0.55를 모델의 유사도 크기에 기대지 않는 판정(1위와 2위의 차이, 기준 문장 분포로 정규화한 점수)으로 바꾸는 설계를 먼저 측정한다. 모델 이름으로 분기하지 않는다. 그다음 후보는 미분류일 때의 문서 강등 정책, Stage 1 BM25 재정렬을 식별자 유무에 따라 쓰는 것, 팩 크기와 예약 슬롯, 그래프 낱말 검색의 한국어 처리다([진단 기록](./operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/README.md) 6장). 바꿀 때마다 grpc-go 두 모델과 go-stablenet을 같은 표본으로 다시 재고, 디버그 기록 보고서로 원인과 맞는지 본다.
+4. 5단계(go-stablenet 전체 평가)는 4단계 뒤에 한다.
 
 단계를 하나 마칠 때마다 이 문서, [남은 작업](../REMAINING-WORK.md), 원장을 같은 커밋에서 갱신한다.
 

@@ -1,6 +1,6 @@
 # 남은 작업
 
-기준: 2026-10-24, 로컬 브랜치 `test/retrieval-eval-grpc-go-run`(main `09be8ea2` 위, push 안 함)에 grpc-go 검색 평가 1차 실행 결과를 반영. 정본은 [실행 원장](./spec-driven/REMAINING-13-EXECUTION.json)이다. 이 문서는 원장을 사람이 읽고 바로 이어서 일할 수 있게 풀어 쓴 것이다.
+기준: 2026-10-26, 로컬 브랜치 `test/retrieval-eval-grpc-go-run`(main `09be8ea2` 위, push 안 함)에 grpc-go 검색 평가의 진단과 첫 수정 결과를 반영. 정본은 [실행 원장](./spec-driven/REMAINING-13-EXECUTION.json)이다. 이 문서는 원장을 사람이 읽고 바로 이어서 일할 수 있게 풀어 쓴 것이다.
 
 ## 0. 이 문서를 다루는 규칙
 
@@ -65,7 +65,7 @@
    - [`internal/vector/eval/prregress`](../internal/vector/eval/prregress)는 유료 LLM 에이전트를 부르므로 그대로 쓰지 않고, PR checkout과 정답 추출 방식만 참고한다
 2. **입력과 도구 (완료)**: 변환 스크립트, 비교 대상 스크립트, 스냅샷 연쇄 색인 스크립트를 만들고 입력을 결과 전에 고정했다([입력](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/README.md)). PR 421건 가운데 245건이 조건을 통과해 100건을 뽑았고, 정답 범위 575개와 한국어 질문 100개, 스냅샷 24개다. 질문 누설 검사와 앵커 검사를 모두 통과했다.
 3. **명세대로 실행하고 결과를 보고한다.** 임베딩 모델은 `qwen3-embedding:4b`(2560차원, 본 평가)와 `bge-m3`(기준선)다. 그래프는 스냅샷마다 한 번, 벡터는 모델마다 첫 스냅샷 전체 빌드 뒤 `reindex`로 만든다. `reindex` 전에 manifest를 이번 스냅샷의 그래프로 바꿔야 canonical ID가 맞는다(확인함). 그다음 CKS와 비교 대상 네 가지를 돌린다. 실패와 측정 못 한 값도 분모에 남긴다. 사람의 정답·질문 표본 확인(명세 7장)도 이 단계에서 받는다. **실행은 끝났고 사람의 표본 확인을 기다린다**: 2026-10-24에 두 모델의 색인 48개와 CKS·비교 대상 실행을 마쳤다([1차 결과](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/results/README.md)). PR 100건 기준 hit@1은 벡터만 0.24(qwen3)·0.20(bge-m3), CKS는 `cks eval` 그대로 0.07·0.03, 커밋 필터 없이 다시 채점하면 0.14·0.11이다. CKS 의도 정확도는 0/100·14/100이다. 실행 중 `ckv reindex`가 그래프 커밋을 갱신하지 않던 결함을 고쳤다(`9c7231e8`). 표본 확인을 받기 전까지 이 수치는 DEV 근거다. 스냅샷 커밋 판정을 어떻게 고칠지는 사용자가 정한다([현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) 4장).
-4. **결과에서 약한 곳을 고친다.** 의도 파악이 틀린 질문과 정답을 못 찾은 질문을 나눠 원인을 찾고, 고친 뒤 같은 표본으로 다시 잰다.
+4. **결과에서 약한 곳을 고친다.** 의도 파악이 틀린 질문과 정답을 못 찾은 질문을 나눠 원인을 찾고, 고친 뒤 같은 표본으로 다시 잰다. **진행 중**: 2026-10-26에 첫 수정 묶음을 반영했다([진단 기록](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/README.md)). 단계별 디버그 기록 장치를 넣고, `FindSymbol`의 수식 심볼 해석, RRF의 목록 내 중복 합산, 히트 키워드의 순환 증거를 고쳤다. CKS MRR은 qwen3 0.189 → 0.232, bge-m3 0.209 → 0.271, go-stablenet 0.75 → 0.79다. 요인 ablation으로 의도 기준값(모델에 따라 갈림), Stage 1 BM25 재정렬(언어에 따라 갈림), 테스트 강등(필요), 팩 크기(용량과 맞교환)의 효과를 쟀다. 다음은 의도 판정을 모델의 유사도 크기에 기대지 않게 바꾸는 일이다.
 5. **go-stablenet으로 같은 평가를 한다.** 이전 go-stablenet 기록과 비교할 수 있게 같은 지표를 쓴다.
 
 ### 3.2 그다음: 코딩 에이전트 묶음

@@ -1,0 +1,135 @@
+diff --git a/cmd/cks/mcpcli/serve.go b/cmd/cks/mcpcli/serve.go
+index 9d9257be..640f8c9a 100644
+--- a/cmd/cks/mcpcli/serve.go
++++ b/cmd/cks/mcpcli/serve.go
+@@ -40,6 +40,7 @@ import (
+ 	"os/exec"
+ 	"os/signal"
+ 	"path/filepath"
++	"strconv"
+ 	"strings"
+ 	"syscall"
+ 
+@@ -651,7 +652,15 @@ func buildComposer(
+ 	recallK int,
+ 	stage2Options ...stage2.Option,
+ ) (*composer.Composer, error) {
+-	ic, err := intent.New(ctx, embedder, intent.WithFootprint(fp))
++	intentOpts := []intent.Option{intent.WithFootprint(fp)}
++	if v := os.Getenv("CKS_ABL_INTENT_THRESHOLD"); v != "" {
++		t, perr := strconv.ParseFloat(v, 64)
++		if perr != nil {
++			return nil, fmt.Errorf("CKS_ABL_INTENT_THRESHOLD: %w", perr)
++		}
++		intentOpts = append(intentOpts, intent.WithUnknownThreshold(t))
++	}
++	ic, err := intent.New(ctx, embedder, intentOpts...)
+ 	if err != nil {
+ 		return nil, fmt.Errorf("intent.New: %w", err)
+ 	}
+@@ -676,7 +685,17 @@ func buildComposer(
+ 	if err != nil {
+ 		return nil, fmt.Errorf("stage3.New: %w", err)
+ 	}
+-	b, err := budget.New(fetcher, budget.WithFootprint(fp))
++	budgetCfg := budget.DefaultConfig()
++	for env, dst := range map[string]*int{"CKS_ABL_NEIGHBOR_RESERVE": &budgetCfg.NeighborReserve, "CKS_ABL_MAX_CITATIONS": &budgetCfg.MaxCitations} {
++		if v := os.Getenv(env); v != "" {
++			n, perr := strconv.Atoi(v)
++			if perr != nil {
++				return nil, fmt.Errorf("%s: %w", env, perr)
++			}
++			*dst = n
++		}
++	}
++	b, err := budget.New(fetcher, budget.WithFootprint(fp), budget.WithConfig(budgetCfg))
+ 	if err != nil {
+ 		return nil, fmt.Errorf("budget.New: %w", err)
+ 	}
+diff --git a/internal/system/composer/stage1/extractor.go b/internal/system/composer/stage1/extractor.go
+index e4ed2154..9e0e1534 100644
+--- a/internal/system/composer/stage1/extractor.go
++++ b/internal/system/composer/stage1/extractor.go
+@@ -26,6 +26,7 @@ import (
+ 	"context"
+ 	"errors"
+ 	"fmt"
++	"os"
+ 	"strconv"
+ 	"strings"
+ 
+@@ -217,6 +218,7 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
+ 	out.VocabExpanded = len(expansion.MatchedKeywords) > 0
+ 	out.VocabKeywords = expansion.MatchedKeywords
+ 	rec := debugtrace.From(ctx)
++	origin := map[string]string{} // ablation: keyword -> origin
+ 	if rec != nil {
+ 		rec.After("stage1", "vocab_expand", "", map[string]any{
+ 			"prompt": prompt, "expanded": expansion.Expanded, "matched": expansion.MatchedKeywords,
+@@ -236,7 +238,7 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
+ 		// BM25Rerank: prompts routinely quote exact identifiers; the
+ 		// candidate-set BM25 pass lifts those chunks above look-alike
+ 		// neighbors that pure embedding similarity ranks mid-list.
+-		hits, err := e.ckv.SemanticSearch(ctx, currentQuery, ckvclient.SearchOpts{K: e.config.InitialK, BM25Rerank: true})
++		hits, err := e.ckv.SemanticSearch(ctx, currentQuery, ckvclient.SearchOpts{K: e.config.InitialK, BM25Rerank: os.Getenv("CKS_ABL_S1_NORERANK") == ""})
+ 		if err != nil {
+ 			// First-round ckv failure aborts; later-round failures stop
+ 			// iteration but return what we already have.
+@@ -261,6 +263,9 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
+ 		tagged := extractKeywordCandidates(prompt, out.Hits, intent)
+ 		candidates := make([]string, 0, len(tagged))
+ 		for _, c := range tagged {
++			if _, ok := origin[c.Keyword]; !ok {
++				origin[c.Keyword] = c.Origin
++			}
+ 			candidates = append(candidates, c.Keyword)
+ 		}
+ 		if rec != nil {
+@@ -324,6 +329,16 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
+ 		}
+ 	}
+ 
++	// Ablation: keep only keywords that came from the prompt itself.
++	if os.Getenv("CKS_ABL_NO_HIT_KW") != "" {
++		kept := out.Keywords[:0:0]
++		for _, k := range out.Keywords {
++			if o := origin[k]; o != originHitSymbol && o != originHitFile {
++				kept = append(kept, k)
++			}
++		}
++		out.Keywords = kept
++	}
+ 	// Cap the final keyword count.
+ 	if rec != nil {
+ 		rec.Before("stage1", "keyword_cap", "", map[string]any{"keywords": out.Keywords, "max": e.config.MaxKeywords})
+diff --git a/internal/system/composer/stage2/searcher.go b/internal/system/composer/stage2/searcher.go
+index 4f2a3d4f..98a4d90c 100644
+--- a/internal/system/composer/stage2/searcher.go
++++ b/internal/system/composer/stage2/searcher.go
+@@ -28,6 +28,7 @@ import (
+ 	"context"
+ 	"errors"
+ 	"math"
++	"os"
+ 	"time"
+ 
+ 	"go.uber.org/zap"
+@@ -233,6 +234,9 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
+ 	out := Stage2Output{
+ 		Symbols: make(map[string][]contract.Citation),
+ 	}
++	if os.Getenv("CKS_ABL_NO_KW_LISTS") != "" {
++		keywords = nil // ablation: ckv list only
++	}
+ 	// The ckv semantic list is a retrieval source in its own right, so a
+ 	// run with no keywords but non-empty ckv hits is still productive.
+ 	if len(keywords) == 0 && len(ckvHits) == 0 {
+@@ -371,7 +375,7 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
+ 	// pack as examples. For IntentTestAdd the user explicitly wants
+ 	// tests, so demotion is skipped (current double-count boost
+ 	// stays intact).
+-	demoteTests := intent != contract.IntentTestAdd
++	demoteTests := intent != contract.IntentTestAdd && os.Getenv("CKS_ABL_NO_TEST_DEMOTION") == ""
+ 	demoteDocs := demoteDocsFor(intent)
+ 	if rec != nil {
+ 		// Fused scores before demotion and cap: the RRF result on its own.
