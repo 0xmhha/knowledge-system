@@ -112,6 +112,10 @@ type ScenarioResult struct {
 	AbstentionState string `json:"abstention_state"`
 	SnapshotState   string `json:"snapshot_state"`
 	SnapshotReason  string `json:"snapshot_reason,omitempty"`
+	// UnchangedCommitCitations counts the pack citations (largest over runs)
+	// scored although their commit differs from expected_commit, because
+	// their file did not change between the two commits (RunnerOpts.CommitRepo).
+	UnchangedCommitCitations int `json:"unchanged_commit_citations,omitempty"`
 }
 
 // Runner owns one cks-mcp connection and executes scenarios against
@@ -123,6 +127,11 @@ type Runner struct {
 	stderrDone      <-chan struct{}
 	recordResponses bool
 	rawCalls        []RawToolCall
+	// commitRepo, when set, is a Git repository used to accept a citation
+	// whose commit differs from expected_commit but whose file did not
+	// change between the two commits. unchanged caches each answer.
+	commitRepo string
+	unchanged  map[string]bool
 }
 
 // RawToolCall preserves the decoded MCP result before metric aggregation.
@@ -145,6 +154,13 @@ type RunnerOpts struct {
 	RecordResponses   bool
 	InitializeTimeout time.Duration
 	Stderr            io.Writer // child diagnostics; nil forwards to os.Stderr
+	// CommitRepo is a Git repository holding the scenarios' commits. When set,
+	// a citation with an older commit than expected_commit is scored if its
+	// file is byte-identical between the two commits. A reindexed vector index
+	// keeps the commit each unchanged file was first embedded at, so a strict
+	// commit match rejects citations of identical content. Empty keeps the
+	// strict match.
+	CommitRepo string
 }
 
 // NewRunner spawns the fused MCP server (`cks mcp`) via stdio and
@@ -207,6 +223,7 @@ func NewRunner(ctx context.Context, opts RunnerOpts) (*Runner, error) {
 	}
 	runner.stderrDone = stderrDone
 	runner.recordResponses = opts.RecordResponses
+	runner.commitRepo = opts.CommitRepo
 	return runner, nil
 }
 
@@ -321,6 +338,7 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 	}
 
 	var classified []string
+	unchangedCommit := 0
 	for i := 0; i < s.Runs; i++ {
 		run, runErr := r.executeOnce(ctx, s)
 		if runErr != nil {
@@ -328,6 +346,7 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 			continue
 		}
 		m, missing, citationConflict := run.metrics, run.missingKnowledge, run.citationConflict
+		unchangedCommit = max(unchangedCommit, run.unchangedCommit)
 		classified = append(classified, string(run.intent))
 		for _, scope := range missing {
 			if !missingSeen[scope] {
@@ -354,12 +373,13 @@ func (r *Runner) Execute(ctx context.Context, s *Scenario) (*ScenarioResult, err
 		MatchMode: string(s.MatchMode),
 		Metrics:   medianMetrics(perRun),
 
-		KnowledgeMissing: knowledgeMissing,
-		SnapshotState:    snapshotState,
-		SnapshotReason:   snapshotReason,
-		RetrievalState:   "not_evaluated",
-		EvidenceState:    "not_evaluated",
-		AbstentionState:  "not_applicable",
+		KnowledgeMissing:         knowledgeMissing,
+		SnapshotState:            snapshotState,
+		SnapshotReason:           snapshotReason,
+		UnchangedCommitCitations: unchangedCommit,
+		RetrievalState:           "not_evaluated",
+		EvidenceState:            "not_evaluated",
+		AbstentionState:          "not_applicable",
 	}
 	if s.ExpectedIntent != "" {
 		out.ExpectedIntent = string(s.ExpectedIntent)
@@ -474,12 +494,16 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (runOutcome, erro
 	missingKnowledge := missingKnowledgeScopes(s.ExpectedKnowledge, pack.Knowledge)
 	metricCitations := pack.Citations
 	citationConflict := false
+	unchanged := 0
 	if s.ExpectedCommit != "" {
 		metricCitations = nil
 		for _, citation := range pack.Citations {
 			if citation.CommitHash != s.ExpectedCommit {
-				citationConflict = true
-				continue
+				if !r.fileUnchanged(ctx, citation.CommitHash, s.ExpectedCommit, citation.File) {
+					citationConflict = true
+					continue
+				}
+				unchanged++
 			}
 			metricCitations = append(metricCitations, citation)
 		}
@@ -502,7 +526,30 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (runOutcome, erro
 		intent:           pack.Intent,
 		missingKnowledge: missingKnowledge,
 		citationConflict: citationConflict,
+		unchangedCommit:  unchanged,
 	}, nil
+}
+
+// fileUnchanged reports whether file is identical at commits from and to in
+// r.commitRepo. Without a commit repository, an empty commit, or when Git
+// cannot answer, it reports false so the citation stays a conflict.
+func (r *Runner) fileUnchanged(ctx context.Context, from, to, file string) bool {
+	if r.commitRepo == "" || from == "" || to == "" || file == "" {
+		return false
+	}
+	key := from + "\x00" + to + "\x00" + file
+	if v, ok := r.unchanged[key]; ok {
+		return v
+	}
+	// --quiet exits 0 for no difference and 1 for a difference; anything
+	// else (unknown commit, not a repository) is an error and stays strict.
+	err := exec.CommandContext(ctx, "git", "-C", r.commitRepo, "diff", "--quiet", from, to, "--", file).Run()
+	same := err == nil
+	if r.unchanged == nil {
+		r.unchanged = map[string]bool{}
+	}
+	r.unchanged[key] = same
+	return same
 }
 
 // runOutcome is one successful tool call's scored result.
@@ -511,6 +558,7 @@ type runOutcome struct {
 	intent           contract.Intent
 	missingKnowledge []string
 	citationConflict bool
+	unchangedCommit  int
 }
 
 // medianMetrics folds per-run Metrics into one. Scalar fields and

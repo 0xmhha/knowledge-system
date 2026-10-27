@@ -95,7 +95,8 @@ def main() -> None:
             # report. No report means the run never measured (for example an
             # anchor violation), so stop.
             r = subprocess.run([str(bindir / 'cks'), 'eval', '--config', str(config), '--scenarios',
-                                str(inputs / 'scenarios' / snap), '--verify-anchors', str(src), '--record-responses', '--output', str(cks_report)],
+                                str(inputs / 'scenarios' / snap), '--verify-anchors', str(src), '--record-responses',
+                                '--commit-repo', a.repo, '--output', str(cks_report)],
                                stdout=log, stderr=subprocess.STDOUT, check=False, timeout=EVAL_TIMEOUT_SECONDS)
             (out / 'cks-exit.txt').write_text(f'{r.returncode}\n')
             if not cks_report.exists() or cks_report.stat().st_size == 0:
