@@ -488,3 +488,47 @@ func TestAggregator_TiedScoresAndSpansStayDeterministic(t *testing.T) {
 		t.Errorf("first = %s, want a.go (equal spans fall back to path order)", out[0].Edge.Target.File)
 	}
 }
+
+// The broad fan-out for Unknown and QAReview must look at callers as well as
+// callees. A nil relation set is a forward-only walk in ckgclient, so without
+// a separate called_by pass a seed's callers were never returned: on the
+// 2026-10-27 grpc-go evaluation the answer was the caller of a Stage 2 seed in
+// several never-retrieved cases, and qwen3 left 96 of 100 prompts Unknown.
+func TestExpand_BroadIntentAlsoWalksCallers(t *testing.T) {
+	t.Parallel()
+	for _, in := range []contract.Intent{contract.IntentUnknown, contract.IntentQAReview} {
+		seeds := []stage2.ScoredCitation{seed("a.go", 1, 10, 5.0)}
+		ckg := &ckgclient.Fake{NeighborEdges: []contract.Neighbor{neighbor("a.go", "b.go", contract.RelationCalls, 1)}}
+		e, _ := New(ckg)
+		if _, err := e.Expand(context.Background(), seeds, in); err != nil {
+			t.Fatal(err)
+		}
+		calls := ckg.Calls.Neighbors
+		if len(calls) != 2 || calls[0].Opts.Relations != nil ||
+			len(calls[1].Opts.Relations) != 1 || calls[1].Opts.Relations[0] != contract.RelationCalledBy {
+			t.Errorf("%s: Neighbors calls = %+v, want a nil-relation pass then a called_by pass", in, calls)
+		}
+	}
+}
+
+// ckgclient keeps the graph's orientation on a callers walk: a calls edge
+// runs caller -> callee, so the caller comes back as Source and the seed as
+// Target. Stage 3's neighbor is whichever endpoint is not the seed. Reading
+// Target unconditionally turned every caller into the seed itself (measured
+// 2026-10-27 on grpc-go: the called_by pass of pr-9100 returned the seed
+// xdsResolver.newInterceptor twice and never its caller).
+func TestExpand_CallerFromReverseWalkIsTheNeighbor(t *testing.T) {
+	t.Parallel()
+	seeds := []stage2.ScoredCitation{seed("a.go", 1, 10, 4.0)}
+	ckg := &ckgclient.Fake{NeighborEdges: []contract.Neighbor{{
+		Source: cit("caller.go", 20, 40), Target: cit("a.go", 2, 10), Relation: contract.RelationCalledBy, Distance: 1,
+	}}}
+	e, _ := New(ckg)
+	out, err := e.Expand(context.Background(), seeds, contract.IntentBugFix)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Neighbors) != 1 || out.Neighbors[0].Edge.Target.File != "caller.go" || out.Neighbors[0].Edge.Source.File != "a.go" {
+		t.Fatalf("Neighbors = %+v, want the caller caller.go as Target with the seed as Source", out.Neighbors)
+	}
+}

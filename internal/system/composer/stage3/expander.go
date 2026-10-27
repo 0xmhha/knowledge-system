@@ -188,7 +188,7 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 	// legitimately want both — BugFix wants calls AND called_by. Split
 	// the relation set into per-direction groups and traverse each;
 	// the aggregator dedups targets across groups. nil relations (the
-	// Unknown broad fan-out) stays a single forward pass.
+	// Unknown broad fan-out) walks every forward edge type, then callers.
 	relationGroups := splitByDirection(relations)
 
 	seedKeys := buildSeedKeys(seeds)
@@ -221,6 +221,7 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 			// that ignores the Relations filter (or overlapping groups)
 			// must not double-count an edge's score/coverage.
 			for _, n := range ns {
+				n = orientFromSeed(seed.Citation, n)
 				k := n.Source.Key() + "|" + n.Target.Key() + "|" + string(n.Relation)
 				if _, ok := edgeSeen[k]; ok {
 					continue
@@ -315,13 +316,32 @@ func (e *Expander) emitFootprint(ctx context.Context, intent contract.Intent, ou
 	e.fp.Event(ctx, "composer.stage3_expanded", fields...)
 }
 
+// orientFromSeed returns n with the seed side as Source and the neighbor as
+// Target, the shape ScoredNeighbor.Edge promises. ckgclient keeps the graph's
+// orientation: on a callers walk a calls edge still runs caller -> callee, so
+// the seed comes back as Target. The seed side is the endpoint overlapping the
+// seed citation; a seed chunk and its graph node can start on different lines
+// (a doc comment is part of the chunk, not the node).
+func orientFromSeed(seed contract.Citation, n contract.Neighbor) contract.Neighbor {
+	if overlaps(n.Target, seed) && !overlaps(n.Source, seed) {
+		n.Source, n.Target = n.Target, n.Source
+	}
+	return n
+}
+
+func overlaps(a, b contract.Citation) bool {
+	return a.File == b.File && a.StartLine <= b.EndLine && b.StartLine <= a.EndLine
+}
+
 // splitByDirection partitions a relation set into direction-homogeneous
 // groups for ckgclient.Neighbors, which traverses one direction per call.
 // called_by is the only reverse relation in the contract. nil input (the
-// broad Unknown fan-out) passes through as a single nil group.
+// broad Unknown fan-out) becomes a nil forward group plus a called_by group:
+// ckgclient reads nil as every forward edge type, so on its own it never
+// returns a seed's callers.
 func splitByDirection(rels []contract.Relation) [][]contract.Relation {
 	if len(rels) == 0 {
-		return [][]contract.Relation{nil}
+		return [][]contract.Relation{nil, {contract.RelationCalledBy}}
 	}
 	var forward, reverse []contract.Relation
 	for _, r := range rels {
