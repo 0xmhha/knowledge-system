@@ -370,8 +370,9 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	// implementation, while leaving tests accessible lower in the
 	// pack as examples. For IntentTestAdd the user explicitly wants
 	// tests, so demotion is skipped (current double-count boost
-	// stays intact).
-	demoteTests := intent != contract.IntentTestAdd
+	// stays intact). A prompt that is itself about tests skips it too:
+	// the classifier often leaves such prompts Unknown.
+	demoteTests := intent != contract.IntentTestAdd && !promptAsksAboutTests(prompt)
 	demoteDocs := demoteDocsFor(intent)
 	if rec != nil {
 		// Fused scores before demotion and cap: the RRF result on its own.

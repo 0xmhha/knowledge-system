@@ -77,3 +77,29 @@ func TestIsTestPath(t *testing.T) {
 		})
 	}
 }
+
+func TestPromptAsksAboutTests(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		prompt string
+		want   bool
+	}{
+		{"서버 스트리밍 시험이 가끔 실패해. 고치고 싶어", true},
+		{"CDS e2e 테스트 시간 제한을 늘리고 싶어", true},
+		{"fix the flaky test in end2end", true},
+		{"Add tests for the retry policy", true},
+		{"퍼저에서 쓸 함수를 공개하고 싶어", true},
+		{"add a benchmark for the encoder", true},
+		{"xDS 클라이언트가 리소스 수를 지표로 보고하게 하고 싶어", false},
+		{"fix the race in attestation handling", false},
+		// Substrings of longer words are not a cue.
+		{"update the contest and latest config", false},
+		{"", false},
+	}
+	for _, tc := range cases {
+		if got := promptAsksAboutTests(tc.prompt); got != tc.want {
+			t.Errorf("promptAsksAboutTests(%q) = %v, want %v", tc.prompt, got, tc.want)
+		}
+	}
+}

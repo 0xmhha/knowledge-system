@@ -715,6 +715,31 @@ func TestSearch_IntentTestAddDoesNotDemoteTestFiles(t *testing.T) {
 	}
 }
 
+// TestSearch_TestPromptDoesNotDemoteTestFiles asserts that a prompt asking
+// about tests keeps test files undemoted even when the intent is not
+// IntentTestAdd: the classifier often leaves such prompts Unknown, and
+// demoting there buried the very test the user asked to fix.
+func TestSearch_TestPromptDoesNotDemoteTestFiles(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		prompt string
+		want   float64
+	}{
+		{"서버 스트리밍 시험이 가끔 실패해", rrfContribution(DefaultBMWeight, 1)},
+		{"서버 스트리밍 처리가 가끔 실패해", rrfContribution(DefaultBMWeight, 1) * testDemotionFactor},
+	} {
+		ckg := &ckgclient.Fake{BM25Hits: []contract.Hit{bm25Hit("handler_test.go", 1, 10, 1.0)}}
+		s, _ := New(ckg)
+		out, err := s.Search(context.Background(), tc.prompt, []string{"Handler"}, nil, contract.IntentUnknown)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(out.Citations) != 1 || !almostEqual(out.Citations[0].Score, tc.want) {
+			t.Errorf("prompt %q: citations = %+v, want one with score %.6f", tc.prompt, out.Citations, tc.want)
+		}
+	}
+}
+
 // TestAggregator_DemotionIsDeterministic asserts that calling results() with
 // demoteTests=true produces the same order on repeated calls (no map-iteration
 // randomness leaking through the demotion path).
