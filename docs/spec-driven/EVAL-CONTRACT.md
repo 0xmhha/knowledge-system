@@ -21,7 +21,7 @@ runs: 1
 
 `expected_commit`은 선택 사항이며 전체 40자리 소문자 Git SHA만 받는다. 지정하면 매 실행 전에 `cks.ops.freshness`의 `indexed_head`를 확인하고, 반환된 각 인용의 `commit_hash`를 검사한다. 다른 커밋 또는 빈 커밋의 인용은 원시 `citation_count`에는 남지만 파일 회수율·정밀도·MRR의 정답 후보에서는 제외한다. 인덱스 커밋이 다르거나 인용 커밋이 다르면 `snapshot_state=conflict`, 인덱스 커밋을 확인할 수 없으면 `unverified`다. 두 상태에서는 JSON 보고서를 먼저 기록한 뒤 CLI가 실패한다. 커밋을 지정하지 않은 과거 시나리오는 `unpinned`로 표시하며 버전 정합성을 주장하지 않는다.
 
-`cks eval --commit-repo <Git 저장소>`를 주면 커밋이 다른 인용 가운데 그 파일이 인용 커밋과 `expected_commit` 사이에서 바뀌지 않은 것(`git diff --quiet <인용 커밋> <expected_commit> -- <파일>`이 0으로 끝난 것)은 점수에 넣고 충돌로 세지 않는다. `ckv reindex`로 이어 만든 색인은 바뀌지 않은 파일에 처음 임베딩한 커밋을 남기기 때문이다. 받아들인 인용 수는 `unchanged_commit_citations`에 적는다. 파일이 바뀌었거나, 커밋이 비었거나, Git이 답하지 못하면 종전처럼 충돌이다. 옵션을 주지 않으면 종전의 엄격한 커밋 일치다.
+`cks eval --commit-repo`에 Git 저장소 경로를 주면, 커밋이 다른 인용 가운데 그 파일이 인용 커밋과 `expected_commit` 사이에서 바뀌지 않은 것(Git의 조용한 diff가 차이 없음으로 끝난 것)은 점수에 넣고 충돌로 세지 않는다. `ckv reindex`로 이어 만든 색인은 바뀌지 않은 파일에 처음 임베딩한 커밋을 남기기 때문이다. 받아들인 인용 수는 `unchanged_commit_citations`에 적는다. 파일이 바뀌었거나, 커밋이 비었거나, Git이 답하지 못하면 종전처럼 충돌이다. 옵션을 주지 않으면 종전의 엄격한 커밋 일치다.
 
 개별 `expected_citations[].commit_hash`도 지정할 수 있다. 이 값이 있으면 해당 인용의 파일·줄과 커밋을 모두 맞춰야 정답으로 계산한다. 상위 `expected_commit`과 서로 다른 커밋을 선언한 시나리오는 입력 오류다. 개별 커밋만 지정한 경우에는 해당 인용의 점수만 커밋을 고려하고 인덱스 전체 스냅샷은 `unpinned`다.
 

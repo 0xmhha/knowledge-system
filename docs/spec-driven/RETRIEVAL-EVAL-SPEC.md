@@ -82,7 +82,7 @@ PR마다 기준 커밋으로 DB를 만들면 정확하지만 시간이 많이 �
 
 ## 4. 실행과 비교 대상
 
-- **CKS**: `cks eval --record-responses --commit-repo <grpc-go clone>`로 시나리오를 실제 MCP 경로(`context.get_for_task`)로 돌린다. 평가 대상은 이 결과다.
+- **CKS**: `cks eval --record-responses --commit-repo`(값은 grpc-go clone 경로)로 시나리오를 실제 MCP 경로(`context.get_for_task`)로 돌린다. 평가 대상은 이 결과다.
 - **인용 커밋 판정 (사용자 결정 2026-10-27, "B. cks eval 판정 고치기 (Recommended)")**: `reindex`한 색인은 바뀌지 않은 파일에 처음 임베딩한 커밋을 남긴다. 그래서 인용의 커밋이 스냅샷과 달라도, 그 파일이 두 커밋 사이에서 바뀌지 않았으면 정답 후보로 센다(`--commit-repo`, [계약](./EVAL-CONTRACT.md)). 1차 결과 팩에서 커밋이 다른 인용은 qwen3 661개, bge-m3 651개였고 그중 파일이 바뀐 것은 0개였다.
 - **비교 대상**: 같은 질문과 같은 색인을 각 엔진의 검색 명령에 직접 넣는다. CKS 설정에는 단계를 끄는 스위치가 없고, `cks eval matrix`는 온톨로지와 knowledge 조합만 바꾸므로 쓰지 않는다.
 

@@ -1,0 +1,134 @@
+diff --git a/internal/system/composer/stage2/searcher.go b/internal/system/composer/stage2/searcher.go
+index 4f2a3d4f..3492cb39 100644
+--- a/internal/system/composer/stage2/searcher.go
++++ b/internal/system/composer/stage2/searcher.go
+@@ -370,8 +370,9 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
+ 	// implementation, while leaving tests accessible lower in the
+ 	// pack as examples. For IntentTestAdd the user explicitly wants
+ 	// tests, so demotion is skipped (current double-count boost
+-	// stays intact).
+-	demoteTests := intent != contract.IntentTestAdd
++	// stays intact). A prompt that is itself about tests skips it too:
++	// the classifier often leaves such prompts Unknown.
++	demoteTests := intent != contract.IntentTestAdd && !promptAsksAboutTests(prompt)
+ 	demoteDocs := demoteDocsFor(intent)
+ 	if rec != nil {
+ 		// Fused scores before demotion and cap: the RRF result on its own.
+diff --git a/internal/system/composer/stage2/searcher_test.go b/internal/system/composer/stage2/searcher_test.go
+index 46f6a7ec..9f69f765 100644
+--- a/internal/system/composer/stage2/searcher_test.go
++++ b/internal/system/composer/stage2/searcher_test.go
+@@ -715,6 +715,31 @@ func TestSearch_IntentTestAddDoesNotDemoteTestFiles(t *testing.T) {
+ 	}
+ }
+ 
++// TestSearch_TestPromptDoesNotDemoteTestFiles asserts that a prompt asking
++// about tests keeps test files undemoted even when the intent is not
++// IntentTestAdd: the classifier often leaves such prompts Unknown, and
++// demoting there buried the very test the user asked to fix.
++func TestSearch_TestPromptDoesNotDemoteTestFiles(t *testing.T) {
++	t.Parallel()
++	for _, tc := range []struct {
++		prompt string
++		want   float64
++	}{
++		{"서버 스트리밍 시험이 가끔 실패해", rrfContribution(DefaultBMWeight, 1)},
++		{"서버 스트리밍 처리가 가끔 실패해", rrfContribution(DefaultBMWeight, 1) * testDemotionFactor},
++	} {
++		ckg := &ckgclient.Fake{BM25Hits: []contract.Hit{bm25Hit("handler_test.go", 1, 10, 1.0)}}
++		s, _ := New(ckg)
++		out, err := s.Search(context.Background(), tc.prompt, []string{"Handler"}, nil, contract.IntentUnknown)
++		if err != nil {
++			t.Fatal(err)
++		}
++		if len(out.Citations) != 1 || !almostEqual(out.Citations[0].Score, tc.want) {
++			t.Errorf("prompt %q: citations = %+v, want one with score %.6f", tc.prompt, out.Citations, tc.want)
++		}
++	}
++}
++
+ // TestAggregator_DemotionIsDeterministic asserts that calling results() with
+ // demoteTests=true produces the same order on repeated calls (no map-iteration
+ // randomness leaking through the demotion path).
+diff --git a/internal/system/composer/stage2/testpath.go b/internal/system/composer/stage2/testpath.go
+index d27dedbd..84f4f5c0 100644
+--- a/internal/system/composer/stage2/testpath.go
++++ b/internal/system/composer/stage2/testpath.go
+@@ -1,6 +1,11 @@
+ package stage2
+ 
+-import "github.com/0xmhha/knowledge-system/pkg/system/testpath"
++import (
++	"regexp"
++	"strings"
++
++	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
++)
+ 
+ // testDemotionFactor is the multiplier applied to a test-file citation's
+ // final RRF score when the active intent is not test-oriented. A value of
+@@ -16,3 +21,30 @@ const testDemotionFactor = 0.25
+ func isTestPath(file string) bool {
+ 	return testpath.IsTest(file)
+ }
++
++// testPromptWords are English words that make a prompt about tests. They
++// match as whole words, so "contest" or "latest" do not count.
++var testPromptWords = regexp.MustCompile(`(?i)\b(tests?|flaky|e2e|fuzz|benchmark)\b`)
++
++// testPromptWordsKo are Korean words for tests. Korean attaches particles
++// to nouns ("시험이", "테스트를"), so these match as substrings.
++var testPromptWordsKo = []string{"시험", "테스트", "퍼저", "벤치마크"}
++
++// promptAsksAboutTests reports whether the prompt itself is about tests. When
++// it is, test files are what the user wants, so Stage 2 does not demote them
++// even if the intent classifier did not return IntentTestAdd. The cue reads
++// the prompt, not the embedding model, so it does not move with a model's
++// similarity scale (measured 2026-10-27 on grpc-go: 21 of 22 test_add prompts
++// carry a cue, 2 of 78 other prompts do; the classifier's nearest intent was
++// test_add for 3 to 5 of the 22).
++func promptAsksAboutTests(prompt string) bool {
++	if testPromptWords.MatchString(prompt) {
++		return true
++	}
++	for _, w := range testPromptWordsKo {
++		if strings.Contains(prompt, w) {
++			return true
++		}
++	}
++	return false
++}
+diff --git a/internal/system/composer/stage2/testpath_test.go b/internal/system/composer/stage2/testpath_test.go
+index c3e53015..48d5013f 100644
+--- a/internal/system/composer/stage2/testpath_test.go
++++ b/internal/system/composer/stage2/testpath_test.go
+@@ -77,3 +77,29 @@ func TestIsTestPath(t *testing.T) {
+ 		})
+ 	}
+ }
++
++func TestPromptAsksAboutTests(t *testing.T) {
++	t.Parallel()
++
++	cases := []struct {
++		prompt string
++		want   bool
++	}{
++		{"서버 스트리밍 시험이 가끔 실패해. 고치고 싶어", true},
++		{"CDS e2e 테스트 시간 제한을 늘리고 싶어", true},
++		{"fix the flaky test in end2end", true},
++		{"Add tests for the retry policy", true},
++		{"퍼저에서 쓸 함수를 공개하고 싶어", true},
++		{"add a benchmark for the encoder", true},
++		{"xDS 클라이언트가 리소스 수를 지표로 보고하게 하고 싶어", false},
++		{"fix the race in attestation handling", false},
++		// Substrings of longer words are not a cue.
++		{"update the contest and latest config", false},
++		{"", false},
++	}
++	for _, tc := range cases {
++		if got := promptAsksAboutTests(tc.prompt); got != tc.want {
++			t.Errorf("promptAsksAboutTests(%q) = %v, want %v", tc.prompt, got, tc.want)
++		}
++	}
++}
