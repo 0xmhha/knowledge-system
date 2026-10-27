@@ -1,0 +1,187 @@
+[
+  {
+    "model": "qwen3-embedding:4b",
+    "snapshots": 24,
+    "cks_exit_codes": {
+      "0": 24
+    },
+    "methods": {
+      "cks": {
+        "scenarios": 100,
+        "hit_at_1": 0.18,
+        "hit_at_3": 0.33,
+        "mrr": 0.28079157830473617,
+        "errors": 0,
+        "intent_accuracy": 0.0,
+        "intent_confusion": {
+          "bug_fix": {
+            "(unknown)": 21,
+            "concurrency_safety": 1,
+            "test_add": 1
+          },
+          "docs_update": {
+            "(unknown)": 5
+          },
+          "feature_add": {
+            "(unknown)": 21,
+            "bug_fix": 1
+          },
+          "refactor": {
+            "(unknown)": 22
+          },
+          "security": {
+            "(unknown)": 6
+          },
+          "test_add": {
+            "bug_fix": 1,
+            "(unknown)": 21
+          }
+        },
+        "file_recall_mean": 0.3448878504956091,
+        "used_tokens_mean": 1632.94,
+        "latency_ms_p50": 1921,
+        "latency_ms_p95": 2754
+      },
+      "cks_any_commit": {
+        "scenarios": 100,
+        "hit_at_1": 0.18,
+        "hit_at_3": 0.33,
+        "mrr": 0.28079157830473617,
+        "errors": 0,
+        "older_commit_citations": 709,
+        "older_commit_citations_with_changed_file": 0
+      },
+      "ckv_vector": {
+        "scenarios": 100,
+        "hit_at_1": 0.24,
+        "hit_at_3": 0.32,
+        "mrr": 0.2915674603174603,
+        "errors": 0,
+        "returned_tokens_mean": 1454.98
+      },
+      "ckv_vector_bm25": {
+        "scenarios": 100,
+        "hit_at_1": 0.18,
+        "hit_at_3": 0.29,
+        "mrr": 0.2584841269841269,
+        "errors": 0,
+        "returned_tokens_mean": 1468.5
+      },
+      "ckg_keyword": {
+        "scenarios": 100,
+        "hit_at_1": 0.02,
+        "hit_at_3": 0.03,
+        "mrr": 0.04009829519845917,
+        "errors": 23,
+        "returned_tokens_mean": 2078.9220779220777
+      },
+      "grep": {
+        "scenarios": 100,
+        "hit_at_1": 0.14,
+        "hit_at_3": 0.26,
+        "mrr": 0.20056746031746034,
+        "errors": 0,
+        "returned_tokens_mean": 0.0
+      }
+    }
+  },
+  {
+    "model": "bge-m3",
+    "snapshots": 24,
+    "cks_exit_codes": {
+      "0": 24
+    },
+    "methods": {
+      "cks": {
+        "scenarios": 100,
+        "hit_at_1": 0.2,
+        "hit_at_3": 0.39,
+        "mrr": 0.3172513736263736,
+        "errors": 0,
+        "intent_accuracy": 0.14,
+        "intent_confusion": {
+          "bug_fix": {
+            "(unknown)": 11,
+            "bug_fix": 8,
+            "security": 1,
+            "feature_add": 1,
+            "concurrency_safety": 1,
+            "test_add": 1
+          },
+          "docs_update": {
+            "bug_fix": 2,
+            "(unknown)": 3
+          },
+          "feature_add": {
+            "feature_add": 4,
+            "(unknown)": 13,
+            "bug_fix": 4,
+            "test_add": 1
+          },
+          "refactor": {
+            "bug_fix": 4,
+            "(unknown)": 17,
+            "feature_add": 1
+          },
+          "security": {
+            "(unknown)": 5,
+            "bug_fix": 1
+          },
+          "test_add": {
+            "bug_fix": 8,
+            "(unknown)": 8,
+            "test_add": 2,
+            "refactor": 2,
+            "feature_add": 1,
+            "concurrency_safety": 1
+          }
+        },
+        "file_recall_mean": 0.38394869594007525,
+        "used_tokens_mean": 3163.85,
+        "latency_ms_p50": 987,
+        "latency_ms_p95": 1521
+      },
+      "cks_any_commit": {
+        "scenarios": 100,
+        "hit_at_1": 0.2,
+        "hit_at_3": 0.39,
+        "mrr": 0.3172513736263736,
+        "errors": 0,
+        "older_commit_citations": 698,
+        "older_commit_citations_with_changed_file": 0
+      },
+      "ckv_vector": {
+        "scenarios": 100,
+        "hit_at_1": 0.2,
+        "hit_at_3": 0.34,
+        "mrr": 0.2908730158730158,
+        "errors": 0,
+        "returned_tokens_mean": 3119.24
+      },
+      "ckv_vector_bm25": {
+        "scenarios": 100,
+        "hit_at_1": 0.14,
+        "hit_at_3": 0.28,
+        "mrr": 0.24103571428571427,
+        "errors": 0,
+        "returned_tokens_mean": 3136.23
+      },
+      "ckg_keyword": {
+        "scenarios": 100,
+        "hit_at_1": 0.02,
+        "hit_at_3": 0.03,
+        "mrr": 0.04009829519845917,
+        "errors": 23,
+        "returned_tokens_mean": 2078.9220779220777
+      },
+      "grep": {
+        "scenarios": 100,
+        "hit_at_1": 0.14,
+        "hit_at_3": 0.26,
+        "mrr": 0.20056746031746034,
+        "errors": 0,
+        "returned_tokens_mean": 0.0
+      }
+    }
+  }
+]

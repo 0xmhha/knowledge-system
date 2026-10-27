@@ -1,0 +1,437 @@
+{
+ "rows": {
+  "final": {
+   "grpc": {
+    "qwen3-embedding:4b": {
+     "hit1": 0.18,
+     "mrr": 0.2795265567765567,
+     "tokens": 1484.83,
+     "found": 51,
+     "loss": {
+      "never_retrieved": 33,
+      "found": 51,
+      "cut_stage4": 15,
+      "cut_stage2": 1
+     }
+    },
+    "bge-m3": {
+     "hit1": 0.2,
+     "mrr": 0.3172973692973693,
+     "tokens": 2865.99,
+     "found": 58,
+     "loss": {
+      "never_retrieved": 25,
+      "found": 58,
+      "cut_stage4": 14,
+      "cut_stage2": 3
+     }
+    }
+   },
+   "sn": {
+    "r@5": 0.57,
+    "r@10": 0.71,
+    "mrr": 0.73
+   },
+   "ko": {
+    "r@5": 0.38,
+    "r@10": 0.44,
+    "mrr": 0.6
+   }
+  },
+  "fix-d4": {
+   "grpc": {
+    "qwen3-embedding:4b": {
+     "hit1": 0.18,
+     "mrr": 0.27993192918192916,
+     "tokens": 1829.35,
+     "found": 53,
+     "loss": {
+      "never_retrieved": 33,
+      "found": 53,
+      "cut_stage4": 13,
+      "cut_stage2": 1
+     }
+    },
+    "bge-m3": {
+     "hit1": 0.2,
+     "mrr": 0.3170847069597069,
+     "tokens": 3471.47,
+     "found": 57,
+     "loss": {
+      "never_retrieved": 25,
+      "found": 57,
+      "cut_stage4": 15,
+      "cut_stage2": 3
+     }
+    }
+   },
+   "sn": {
+    "r@5": 0.57,
+    "r@10": 0.71,
+    "mrr": 0.73
+   },
+   "ko": {
+    "r@5": 0.38,
+    "r@10": 0.44,
+    "mrr": 0.6
+   }
+  },
+  "fix-d45": {
+   "grpc": {
+    "qwen3-embedding:4b": {
+     "hit1": 0.18,
+     "mrr": 0.28079157830473617,
+     "tokens": 1632.94,
+     "found": 54,
+     "loss": {
+      "never_retrieved": 33,
+      "found": 54,
+      "cut_stage4": 12,
+      "cut_stage2": 1
+     }
+    },
+    "bge-m3": {
+     "hit1": 0.2,
+     "mrr": 0.3172513736263736,
+     "tokens": 3163.85,
+     "found": 58,
+     "loss": {
+      "never_retrieved": 25,
+      "found": 58,
+      "cut_stage4": 14,
+      "cut_stage2": 3
+     }
+    }
+   },
+   "sn": {
+    "r@5": 0.57,
+    "r@10": 0.71,
+    "mrr": 0.73
+   },
+   "ko": {
+    "r@5": 0.38,
+    "r@10": 0.44,
+    "mrr": 0.6
+   }
+  },
+  "fix-d456": {
+   "grpc": {
+    "qwen3-embedding:4b": {
+     "hit1": 0.18,
+     "mrr": 0.28104365079365073,
+     "tokens": 1799.92,
+     "found": 55,
+     "loss": {
+      "never_retrieved": 33,
+      "found": 55,
+      "cut_stage4": 11,
+      "cut_stage2": 1
+     }
+    },
+    "bge-m3": {
+     "hit1": 0.2,
+     "mrr": 0.3172513736263736,
+     "tokens": 3221.0,
+     "found": 58,
+     "loss": {
+      "never_retrieved": 25,
+      "found": 58,
+      "cut_stage4": 14,
+      "cut_stage2": 3
+     }
+    }
+   },
+   "sn": {
+    "r@5": 0.57,
+    "r@10": 0.71,
+    "mrr": 0.73
+   },
+   "ko": {
+    "r@5": 0.38,
+    "r@10": 0.44,
+    "mrr": 0.6
+   }
+  },
+  "final2": {
+   "grpc": {
+    "qwen3-embedding:4b": {
+     "hit1": 0.18,
+     "mrr": 0.28079157830473617,
+     "tokens": 1632.94,
+     "found": 54,
+     "loss": {
+      "never_retrieved": 33,
+      "found": 54,
+      "cut_stage4": 12,
+      "cut_stage2": 1
+     }
+    },
+    "bge-m3": {
+     "hit1": 0.2,
+     "mrr": 0.3172513736263736,
+     "tokens": 3163.85,
+     "found": 58,
+     "loss": {
+      "never_retrieved": 25,
+      "found": 58,
+      "cut_stage4": 14,
+      "cut_stage2": 3
+     }
+    }
+   },
+   "sn": {
+    "r@5": 0.57,
+    "r@10": 0.71,
+    "mrr": 0.73
+   },
+   "ko": {
+    "r@5": 0.38,
+    "r@10": 0.44,
+    "mrr": 0.6
+   }
+  }
+ },
+ "transitions": {
+  "fix-d4": {
+   "qwen3-embedding:4b": {
+    "gained": [
+     [
+      "pr-8886",
+      "cut_stage4",
+      10,
+      "seed_quota",
+      10
+     ],
+     [
+      "pr-8894",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      10
+     ]
+    ],
+    "lost": []
+   },
+   "bge-m3": {
+    "gained": [
+     [
+      "pr-8875",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      10
+     ]
+    ],
+    "lost": [
+     [
+      "pr-8979",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-9070",
+      "cut_stage4",
+      27,
+      "seed_quota",
+      11
+     ]
+    ]
+   }
+  },
+  "fix-d45": {
+   "qwen3-embedding:4b": {
+    "gained": [
+     [
+      "pr-8792",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-8886",
+      "cut_stage4",
+      10,
+      "seed_quota",
+      10
+     ],
+     [
+      "pr-8894",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      10
+     ]
+    ],
+    "lost": []
+   },
+   "bge-m3": {
+    "gained": [
+     [
+      "pr-8869",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-8875",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      10
+     ]
+    ],
+    "lost": [
+     [
+      "pr-8979",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-9070",
+      "cut_stage4",
+      27,
+      "seed_quota",
+      11
+     ]
+    ]
+   }
+  },
+  "fix-d456": {
+   "qwen3-embedding:4b": {
+    "gained": [
+     [
+      "pr-8792",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-8886",
+      "cut_stage4",
+      10,
+      "seed_quota",
+      10
+     ],
+     [
+      "pr-8894",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      10
+     ],
+     [
+      "pr-9008",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ]
+    ],
+    "lost": []
+   },
+   "bge-m3": {
+    "gained": [
+     [
+      "pr-8869",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-8875",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      10
+     ]
+    ],
+    "lost": [
+     [
+      "pr-8979",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-9070",
+      "cut_stage4",
+      27,
+      "seed_quota",
+      11
+     ]
+    ]
+   }
+  },
+  "final2": {
+   "qwen3-embedding:4b": {
+    "gained": [
+     [
+      "pr-8792",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-8886",
+      "cut_stage4",
+      10,
+      "seed_quota",
+      10
+     ],
+     [
+      "pr-8894",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      10
+     ]
+    ],
+    "lost": []
+   },
+   "bge-m3": {
+    "gained": [
+     [
+      "pr-8869",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-8875",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      10
+     ]
+    ],
+    "lost": [
+     [
+      "pr-8979",
+      "cut_stage4",
+      0,
+      "citation_cap",
+      12
+     ],
+     [
+      "pr-9070",
+      "cut_stage4",
+      27,
+      "seed_quota",
+      11
+     ]
+    ]
+   }
+  }
+ }
+}

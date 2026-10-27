@@ -1,0 +1,14 @@
+== qwen3-embedding-4b
+  stage4_now       found 51  gain []  lose []
+  d4               found 53  gain ['pr-8886', 'pr-8894']  lose []
+  d4+test          found 54  gain ['pr-8792', 'pr-8886', 'pr-8894']  lose []
+  d4+test+def.5    found 55  gain ['pr-8792', 'pr-8886', 'pr-8894', 'pr-9008']  lose []
+  d4+test+1line.5  found 54  gain ['pr-8792', 'pr-8886', 'pr-8894', 'pr-9008']  lose ['pr-8977']
+  d4+def.5         found 54  gain ['pr-8886', 'pr-8894', 'pr-9008']  lose []
+== bge-m3
+  stage4_now       found 58  gain []  lose []
+  d4               found 57  gain ['pr-8875']  lose ['pr-8979', 'pr-9070']
+  d4+test          found 58  gain ['pr-8869', 'pr-8875']  lose ['pr-8979', 'pr-9070']
+  d4+test+def.5    found 58  gain ['pr-8869', 'pr-8875']  lose ['pr-8979', 'pr-9070']
+  d4+test+1line.5  found 58  gain ['pr-8869', 'pr-8875']  lose ['pr-8979', 'pr-9070']
+  d4+def.5         found 57  gain ['pr-8875']  lose ['pr-8979', 'pr-9070']

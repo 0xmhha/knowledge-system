@@ -13,7 +13,7 @@
 
 ## 2. 현재 단계
 
-원장 `current_activity`: `104_retrieval_eval_grpc_go_answer_in_pack_fixes_recorded_neighbor_ranking_next`. [남은 작업](../REMAINING-WORK.md) 3.1의 4단계(약한 곳 고치기)에서 두 번째 수정 묶음을 반영하고 다시 쟀다. 첫 묶음은 PR #126으로 main에 머지했다. 두 번째 묶음은 로컬 브랜치 `test/retrieval-found-diagnosis`에 커밋했고 push하지 않았다. 3단계의 표본 확인은 사용자가 AI에게 맡겨 AI가 판단했다. 사람의 확인은 아직이다.
+원장 `current_activity`: `105_retrieval_eval_grpc_go_neighbor_rank_fixes_recorded_token_decision_next`. [남은 작업](../REMAINING-WORK.md) 3.1의 4단계(약한 곳 고치기)에서 두 번째 수정 묶음과 이웃 순위 수정을 반영하고 다시 쟀다. 첫 묶음은 PR #126으로 main에 머지했다. 그 뒤의 커밋은 로컬 브랜치 `test/retrieval-found-diagnosis`에 있고 push하지 않았다. 3단계의 표본 확인은 사용자가 AI에게 맡겨 AI가 판단했다. 사람의 확인은 아직이다.
 
 ### 끝난 것
 
@@ -62,6 +62,16 @@
 - `scripts/retrieval_found_diagnosis.py`: 정답이 어디서 빠졌는지, 색인에 있는지, 벡터만으로는 몇 위인지를 낸다(`0c509daa`)
 - go-stablenet 12건에 한국어 질문을 새로 만들어 고정했다(사용자 결정). 최종 CKS r@10/MRR 0.44/0.60, 벡터만 0.38/0.41
 - 남은 원인: 그래프가 찾은 정답 호출자가 이웃 칸 4개 안에 들지 못한다(이웃 순위가 질문과의 관련을 보지 않음). 후보에 오르지 못한 정답 33건, 25건은 대부분 벡터 순위 21위 밖이다
+
+### 이웃 순위와 남은 병목 (2026-10-27)
+
+자세한 것은 [이웃 순위 기록](./operational-preparation/retrieval-eval-grpc-go-v1/neighbor-rank-2026-10-27/README.md)에 있다.
+
+- 고친 것: Stage 4가 점수 동점을 파일 이름 순으로 다시 정렬해 Stage 3 순서를 버리던 결함(`91947285`), Stage 3 이웃 중 시험 파일을 강등하지 않던 결함(`687a9662`)
+- 정답이 팩에 있는 시나리오: qwen3 51 → 54, bge-m3 58 → 58(2건 얻고 2건 잃음, 잃은 2건은 파일 이름 순서 덕에 맞던 것). MRR과 go-stablenet은 그대로, 토큰 약 +10%. 미리 정한 기준을 넘지 못해 사용자가 예외로 채택했다
+- 질문과의 벡터 관련도로 이웃을 고르는 설계는 기각했다. 정답 이웃의 관련도 순위가 8~38위였다
+- 정답 의도를 그대로 넣어도 정답이 팩에 든 시나리오는 +1, -1이다. 의도 판정을 고쳐도 이 표본에서는 얻을 것이 없다
+- 미분류일 때 문서를 강등해도 정답은 +1, 0이다. 팩 칸을 12에서 16으로 늘리면 +4, +2, 토큰 약 +33%로 예상된다(오프라인)
 
 ## 3. 색인을 만들고 이어 가는 법
 
@@ -116,8 +126,8 @@ python3 scripts/retrieval_snapshot_chain.py --repo <grpc-go clone> --snapshots $
 ## 4. 바로 다음 행동 (이 순서를 따른다)
 
 1. **사람의 표본 확인을 받는다.** 확인 자료는 [표본 확인](./operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md)에 있다(seed 20261024). 2026-10-27에 사용자가 확인을 AI에게 맡겨 AI 검토를 같은 문서에 적었다. 이것은 사람의 확인이 아니다. 사람이 확인할 때는 결과를 이미 본 뒤인지 함께 묻고 그대로 기록한다. 확인 전의 결과는 DEV 근거다.
-2. **4단계를 이어 간다.** 다음 대상은 이웃 순위다. 그래프가 찾은 정답 호출자가 Stage 3 이웃 33~44위에 머물고, 한 줄짜리 필드 정의가 앞자리를 차지한다. 이웃 점수에 질문과의 관련(예: 이웃 청크의 벡터 점수)을 넣는 설계를 먼저 측정한다. 그다음은 의도 판정(기준값 0.55를 모델의 유사도 크기에서 떼어 내기, 모델 이름으로 분기하지 않음), 미분류일 때의 문서 강등 정책, 그래프 낱말 검색의 한국어 처리다([진단 기록](./operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-27/README.md) 5·6장). 바꿀 때마다 grpc-go 두 모델과 go-stablenet(PR 본문, 한국어 질문)을 같은 표본으로 다시 재고, `retrieval_found_diagnosis.py`로 정답이 팩에 들어갔는지 본다. 평가는 `--commit-repo`로 돌린다.
-3. **늘어난 토큰을 판단한다.** 팩이 12개까지 차면서 평균 토큰이 약 1.5배가 됐다. 정답 하나를 더 건네는 비용으로 받아들일지 사용자에게 묻는다.
+2. **늘어난 토큰과 팩 칸 수를 판단한다.** 팩이 12개까지 차면서 평균 토큰이 약 1.5배가 됐고, 이웃 순위 수정으로 약 10% 더 늘었다. 칸 수별 예상(12 → 16칸이면 정답 +4, +2, 토큰 약 +33%)은 [이웃 순위 기록](./operational-preparation/retrieval-eval-grpc-go-v1/neighbor-rank-2026-10-27/README.md) 5장에 있다. 사용자에게 묻는다.
+3. **4단계를 이어 간다.** 남은 큰 몫은 후보에 오르지 못한 정답(qwen3 33건, bge-m3 25건)이다. 질문의 한국어 표현과 코드 낱말 사이의 거리를 줄이는 방법(그래프 낱말 검색의 한국어 처리, 어휘 다리, 질의 확장)을 측정한다. 의도 판정과 문서 강등은 오프라인 몫이 작아 뒤로 미룬다. 바꿀 때마다 grpc-go 두 모델과 go-stablenet(PR 본문, 한국어 질문)을 같은 표본으로 다시 재고, `retrieval_found_diagnosis.py`로 정답이 팩에 들어갔는지 본다. 평가는 `--commit-repo`로 돌린다.
 4. 5단계(go-stablenet 전체 평가)는 4단계 뒤에 한다.
 
 단계를 하나 마칠 때마다 이 문서, [남은 작업](../REMAINING-WORK.md), 원장을 같은 커밋에서 갱신한다.

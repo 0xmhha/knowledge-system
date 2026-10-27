@@ -1,0 +1,110 @@
+===== qwen3-embedding-4b
+-- pr-9100 [cut_stage4] intent='' answer nb#10/30: internal/xds/resolver/xds_resolver.go:387-488 called_by 0.0338
+   prompt: xDS 리졸버가 클러스터 지정 플러그인을 쓰는 라우트에는 HTTP 필터 체인을 만들지 않아. 그 라우트에도 필터가 적용되게 하고 싶어
+   above by relation: {'defines': 5, 'implements': 3, 'calls': 1} spans<=3: 6 of 9
+     internal/xds/server/filter_chain_manager.go:201-201 defines 0.0379 seed:internal/xds/server/filter_chain_manager.go:defines:dist=1
+     internal/xds/server/filter_chain_manager.go:202-202 defines 0.0379 seed:internal/xds/server/filter_chain_manager.go:defines:dist=1
+     internal/xds/server/filter_chain_manager.go:203-203 defines 0.0379 seed:internal/xds/server/filter_chain_manager.go:defines:dist=1
+     internal/xds/httpfilter/httpfilter.go:80-91 implements 0.0362 seed:internal/xds/httpfilter/router/router.go:implements:dist=1
+     internal/xds/httpfilter/httpfilter.go:104-115 implements 0.0362 seed:internal/xds/httpfilter/router/router.go:implements:dist=1
+     internal/xds/bootstrap/tlscreds/bundle_ext_test.go:54-56 implements 0.0362 seed:internal/xds/httpfilter/router/router.go:implements:dist=1
+-- pr-8792 [cut_stage4] intent='' answer nb#21/41: internal/xds/resolver/xds_resolver.go:300-339 called_by 0.0403
+   prompt: xDS 의존성 관리에서 클러스터를 구독하면 참조 수를 올리고 해지하면 내리는 기능을 만들고 싶어. 동적 클러스터 감시에 쓸 거야
+   above by relation: {'called_by': 19, 'calls': 1} spans<=3: 1 of 20
+     internal/xds/xdsclient/tests/resource_update_test.go:647-896 called_by 0.0410 seed:internal/xds/xdsclient/xdsresource/cluster_resource_type.go:called_by:dist=1
+     internal/xds/xdsclient/tests/dump_test.go:333-575 called_by 0.0410 seed:internal/xds/xdsclient/xdsresource/cluster_resource_type.go:called_by:dist=1
+     internal/xds/xdsclient/tests/dump_test.go:101-329 called_by 0.0410 seed:internal/xds/xdsclient/xdsresource/cluster_resource_type.go:called_by:dist=1
+     xds/csds/csds_e2e_test.go:217-400 called_by 0.0410 seed:internal/xds/xdsclient/xdsresource/cluster_resource_type.go:called_by:dist=1
+     internal/xds/xdsclient/tests/cds_watchers_test.go:293-439 called_by 0.0410 seed:internal/xds/xdsclient/xdsresource/cluster_resource_type.go:called_by:dist=1
+     internal/xds/xdsclient/tests/cds_watchers_test.go:150-278 called_by 0.0410 seed:internal/xds/xdsclient/xdsresource/cluster_resource_type.go:called_by:dist=1
+-- pr-8894 [cut_stage4] intent='' answer nb#1/6: stream.go:685-779 calls 0.0368
+   prompt: 재시도 횟수를 다 썼을 때 실패를 감싸는 전용 오류 값을 만들어서 호출자가 구별할 수 있게 하고 싶어
+   above by relation: {} spans<=3: 0 of 0
+     stream.go:685-779 calls 0.0368 seed:stream.go:calls:dist=1
+     stream.go:438-497 calls 0.0368 seed:stream.go:calls:dist=1
+     stream.go:1219-1269 calls 0.0368 seed:stream.go:calls:dist=1
+     rpc_util.go:1103-1127 calls 0.0368 seed:stream.go:calls:dist=1
+     stream.go:663-674 calls 0.0368 seed:stream.go:calls:dist=1
+     stream.go:915-922 calls 0.0368 seed:stream.go:calls:dist=1
+-- pr-9008 [cut_stage4] intent='' answer nb#5/17: stats/opentelemetry/client_metrics.go:201-227 called_by 0.0373
+   prompt: 호출마다 지표에 애플리케이션이 정한 사용자 정의 레이블을 하나 붙일 수 있게 하고 싶어
+   above by relation: {'called_by': 2, 'calls': 1, 'defines': 1} spans<=3: 1 of 4
+     clientconn.go:1016-1073 called_by 0.0397 seed:clientconn.go:called_by:dist=1
+     clientconn.go:901-933 called_by 0.0397 seed:clientconn.go:called_by:dist=1
+     clientconn.go:1405-1416 calls 0.0397 seed:clientconn.go:calls:dist=1
+     internal/stats/labels.go:27-27 defines 0.0379 seed:internal/stats/labels.go:defines:dist=1
+     stats/opentelemetry/client_metrics.go:201-227 called_by 0.0373 seed:stats/opentelemetry/client_metrics.go:called_by:dist=1
+     stats/opentelemetry/internal/pluginoption.go:40-40 calls 0.0373 seed:stats/opentelemetry/client_metrics.go:calls:dist=1
+-- pr-9134 [found] intent='concurrency_safety' answer nb#1/7: internal/xds/matcher/string_matcher.go:50-76 called_by 0.0403
+   prompt: 정규식 전체 일치 검사에서 매번 가장 긴 일치 모드로 바꾸는 바람에 같은 정규식을 동시에 쓰면 data race가 나. 고치고 싶어
+   above by relation: {} spans<=3: 0 of 0
+     internal/xds/matcher/string_matcher.go:50-76 called_by 0.0403 seed:internal/grpcutil/regex.go:called_by:dist=1
+     internal/xds/matcher/matcher_header.go:92-98 called_by 0.0403 seed:internal/grpcutil/regex.go:called_by:dist=1
+     internal/xds/xdsclient/xdsresource/matcher_path.go:96-98 called_by 0.0403 seed:internal/grpcutil/regex.go:called_by:dist=1
+     internal/xds/rbac/matchers.go:216-225 called_by 0.0362 seed:internal/xds/rbac/matchers.go:called_by:dist=1
+     internal/xds/rbac/matchers.go:36-36 called_by 0.0362 seed:internal/xds/rbac/matchers.go:called_by:dist=1
+     internal/xds/xdsclient/xdsresource/type_cds.go:184-221 called_by 0.0316 seed:internal/xds/matcher/string_matcher.go:called_by:dist=1
+===== bge-m3
+-- pr-8869 [cut_stage4] intent='bug_fix' answer nb#6/24: internal/xds/xdsclient/pool.go:298-319 calls 0.0368
+   prompt: 구글 C2P 쪽 전역 대체 부트스트랩 설정 API를 지웠는데 내부에서 아직 쓰고 있어. 지운 변경을 되돌리고 싶어
+   above by relation: {'calls': 1, 'called_by': 4} spans<=3: 0 of 5
+     internal/xds/bootstrap/bootstrap.go:592-648 calls 0.0368 seed:xds/googledirectpath/googlec2p.go:calls:dist=1
+     internal/resolver/delegatingresolver/delegatingresolver.go:106-161 called_by 0.0368 seed:xds/googledirectpath/googlec2p.go:called_by:dist=1
+     internal/xds/resolver/helpers_test.go:100-139 called_by 0.0368 seed:xds/googledirectpath/googlec2p.go:called_by:dist=1
+     internal/resolver/dns/dns_resolver_test.go:135-168 called_by 0.0368 seed:xds/googledirectpath/googlec2p.go:called_by:dist=1
+     resolver_wrapper.go:68-97 called_by 0.0368 seed:xds/googledirectpath/googlec2p.go:called_by:dist=1
+     internal/xds/xdsclient/pool.go:298-319 calls 0.0368 seed:xds/googledirectpath/googlec2p.go:calls:dist=1
+-- pr-8886 [cut_stage4] intent='bug_fix' answer nb#29/43: rpc_util.go:968-1004 calls 0.0362
+   prompt: 메시지 읽기에서 압축 해제 중 오류로 일찍 반환하면 버퍼가 풀에 안 돌아가. 오류가 나도 버퍼를 돌려주게 하고 싶어
+   above by relation: {'called_by': 6, 'calls': 22} spans<=3: 14 of 28
+     mem/buffer_slice_test.go:488-676 called_by 0.0410 seed:mem/buffer_slice.go:called_by:dist=1
+     internal/transport/controlbuf.go:937-1057 called_by 0.0410 seed:mem/buffer_slice.go:called_by:dist=1
+     mem/buffer_slice.go:53-59 calls 0.0410 seed:mem/buffer_slice.go:calls:dist=1
+     mem/buffer_slice.go:62-66 calls 0.0410 seed:mem/buffer_slice.go:calls:dist=1
+     mem/buffer_slice.go:69-73 calls 0.0410 seed:mem/buffer_slice.go:calls:dist=1
+     mem/buffers.go:50-50 calls 0.0410 seed:mem/buffer_slice.go:calls:dist=1
+-- pr-8832 [cut_stage4] intent='bug_fix' answer nb#37/50: internal/transport/http2_client.go:1181-1241 called_by 0.0379
+   prompt: 서버가 스트림 끝(END_STREAM)을 보냈는데 클라이언트 쪽 스트림이 아직 열려 있으면, 클라이언트가 RST_STREAM을 보내야 해. 지금은 안 보내는데 어디를 고쳐야 해?
+   above by relation: {'called_by': 15, 'calls': 21} spans<=3: 7 of 36
+     internal/transport/http2_client.go:1642-1715 called_by 0.0485 seed:internal/transport/http2_client.go:called_by:dist=1
+     internal/transport/controlbuf.go:360-398 calls 0.0485 seed:internal/transport/http2_client.go:calls:dist=1
+     internal/grpclog/prefix_logger.go:38-46 calls 0.0485 seed:internal/transport/http2_client.go:calls:dist=1
+     grpclog/grpclog.go:137-143 calls 0.0485 seed:internal/transport/http2_client.go:calls:dist=1
+     internal/grpclog/prefix_logger.go:69-74 calls 0.0485 seed:internal/transport/http2_client.go:calls:dist=1
+     internal/status/status.go:101-106 calls 0.0485 seed:internal/transport/http2_client.go:calls:dist=1
+-- pr-8979 [found] intent='' answer nb#5/50: balancer/grpclb/grpclb_test.go:326-340 calls 0.0410
+   prompt: grpclb 시험에서 직접 만든 시험 서버 대신 공용 스텁 서버를 쓰게 바꾸고 싶어
+   above by relation: {'calls': 4} spans<=3: 0 of 4
+     clientconn.go:183-258 calls 0.0410 seed:balancer/grpclb/grpclb_test.go:calls:dist=1
+     balancer/grpclb/grpclb_test.go:360-417 calls 0.0410 seed:balancer/grpclb/grpclb_test.go:calls:dist=1
+     balancer/grpclb/grpclb_test.go:1171-1223 calls 0.0410 seed:balancer/grpclb/grpclb_test.go:calls:dist=1
+     clientconn.go:1189-1237 calls 0.0410 seed:balancer/grpclb/grpclb_test.go:calls:dist=1
+     balancer/grpclb/grpclb_test.go:326-340 calls 0.0410 seed:balancer/grpclb/grpclb_test.go:calls:dist=1
+     resolver/manual/manual.go:32-40 calls 0.0410 seed:balancer/grpclb/grpclb_test.go:calls:dist=1
+-- pr-9069 [cut_stage4] intent='' answer nb#3/47: server.go:1787-1889 called_by 0.0403
+   prompt: 엄격한 경로 검사를 끈 경우에 찍는 경고 로그에 관련 CVE 링크를 넣고 싶어
+   above by relation: {'calls': 1, 'called_by': 1} spans<=3: 0 of 2
+     internal/channelz/trace.go:195-213 calls 0.0410 seed:internal/channelz/logging.go:calls:dist=1
+     server.go:1247-1539 called_by 0.0403 seed:internal/channelz/logging.go:called_by:dist=1
+     server.go:1787-1889 called_by 0.0403 seed:internal/channelz/logging.go:called_by:dist=1
+     stream.go:695-789 called_by 0.0403 seed:internal/channelz/logging.go:called_by:dist=1
+     clientconn.go:1490-1570 called_by 0.0403 seed:internal/channelz/logging.go:called_by:dist=1
+     balancer_wrapper.go:180-208 called_by 0.0403 seed:internal/channelz/logging.go:called_by:dist=1
+-- pr-9134 [cut_stage4] intent='concurrency_safety' answer nb#27/27: internal/xds/xdsclient/xdsresource/matcher_path.go:96-98 calls 0.0091
+   prompt: 정규식 전체 일치 검사에서 매번 가장 긴 일치 모드로 바꾸는 바람에 같은 정규식을 동시에 쓰면 data race가 나. 고치고 싶어
+   above by relation: {'called_by': 1, 'calls': 25} spans<=3: 6 of 26
+     balancer/rls/balancer.go:226-272 called_by 0.0352 seed:balancer/rls/balancer.go:called_by:dist=1
+     balancer/rls/balancer.go:527-571 calls 0.0352 seed:balancer/rls/balancer.go:calls:dist=1
+     balancer/rls/balancer.go:277-294 calls 0.0352 seed:balancer/rls/balancer.go:calls:dist=1
+     balancer/rls/cache.go:253-270 calls 0.0352 seed:balancer/rls/balancer.go:calls:dist=1
+     balancer/rls/balancer.go:573-580 calls 0.0352 seed:balancer/rls/balancer.go:calls:dist=1
+     balancer/rls/cache.go:366-371 calls 0.0352 seed:balancer/rls/balancer.go:calls:dist=1
+-- pr-8875 [cut_stage4] intent='' answer nb#2/50: internal/xds/xdsclient/xdsresource/unmarshal_eds.go:259-288 calls 0.0347
+   prompt: EDS 메타데이터를 해석할 때 링 해시 엔드포인트 키 기능과 HTTP CONNECT 기능이 서로 묶여 있어. 각각 따로 켜지게 분리하고 싶어
+   above by relation: {'called_by': 1} spans<=3: 0 of 1
+     internal/xds/xdsclient/xdsresource/unmarshal_eds.go:181-257 called_by 0.0347 seed:internal/xds/xdsclient/xdsresource/unmarshal_eds.go:called_by:dist=1
+     internal/xds/xdsclient/xdsresource/unmarshal_eds.go:259-288 calls 0.0347 seed:internal/xds/xdsclient/xdsresource/unmarshal_eds.go:calls:dist=1
+     internal/xds/xdsclient/xdsresource/unmarshal_eds.go:45-53 calls 0.0347 seed:internal/xds/xdsclient/xdsresource/unmarshal_eds.go:calls:dist=1
+     internal/xds/xdsclient/xdsresource/unmarshal_eds.go:171-179 calls 0.0347 seed:internal/xds/xdsclient/xdsresource/unmarshal_eds.go:calls:dist=1
+     resolver/ringhash/attr.go:42-48 calls 0.0347 seed:internal/xds/xdsclient/xdsresource/unmarshal_eds.go:calls:dist=1
+     internal/xds/xdsclient/xdsresource/unmarshal_eds.go:85-87 calls 0.0347 seed:internal/xds/xdsclient/xdsresource/unmarshal_eds.go:calls:dist=1

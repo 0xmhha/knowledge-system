@@ -1,0 +1,192 @@
+diff --git a/internal/system/composer/budget/allocator.go b/internal/system/composer/budget/allocator.go
+index c94b553c..53795cd1 100644
+--- a/internal/system/composer/budget/allocator.go
++++ b/internal/system/composer/budget/allocator.go
+@@ -621,14 +621,14 @@ func mergeCandidates(seeds []stage2.ScoredCitation, neighbors []stage3.ScoredNei
+ 		})
+ 	}
+ 
++	// Ties keep input order: seeds in Stage 2 order, then neighbors in Stage
++	// 3 order. Every neighbor of one seed and relation ties on score, and
++	// Stage 3 already broke those ties by target span (stage3/scoring.go);
++	// re-sorting by file and line here threw that away. Measured 2026-10-27
++	// on grpc-go pr-8875 (bge-m3): the answer, Stage 3 neighbor 2, lost the
++	// neighbor slots to shorter spans of its file that start on lower lines.
+ 	sort.SliceStable(out, func(i, j int) bool {
+-		if out[i].Score != out[j].Score {
+-			return out[i].Score > out[j].Score
+-		}
+-		if out[i].Citation.File != out[j].Citation.File {
+-			return out[i].Citation.File < out[j].Citation.File
+-		}
+-		return out[i].Citation.StartLine < out[j].Citation.StartLine
++		return out[i].Score > out[j].Score
+ 	})
+ 
+ 	seen := make(map[string]struct{}, len(out))
+diff --git a/internal/system/composer/composer.go b/internal/system/composer/composer.go
+index cf6f2320..25f5cb2a 100644
+--- a/internal/system/composer/composer.go
++++ b/internal/system/composer/composer.go
+@@ -246,7 +246,7 @@ func (c *Composer) compose(ctx context.Context, prompt string, callerIntent cont
+ 	trace := buildComposerTrace(prompt, intentVal, s1Out, s2Out)
+ 
+ 	// 4. Stage 3 — graph expansion.
+-	s3Out, err := c.stage3.Expand(ctx, s2Out.Citations, intentVal)
++	s3Out, err := c.stage3.Expand(ctx, s2Out.Citations, intentVal, stage3.DemoteTestNeighbors(s2Out.DemoteTests))
+ 	if err != nil {
+ 		return contract.EvidencePack{}, contract.RetrievalTrace{}, fmt.Errorf("composer: stage3: %w", err)
+ 	}
+diff --git a/internal/system/composer/stage2/searcher.go b/internal/system/composer/stage2/searcher.go
+index 3492cb39..76684fb9 100644
+--- a/internal/system/composer/stage2/searcher.go
++++ b/internal/system/composer/stage2/searcher.go
+@@ -156,6 +156,11 @@ type Stage2Output struct {
+ 	// (BM25Search + FindSymbol per keyword, plus one BM25Search per keyword
+ 	// for the intent path-glob pass). Surfaced in the composer trace.
+ 	CKGCalls int
++
++	// DemoteTests reports whether this search demoted test-file citations
++	// (intent not test_add and the prompt not about tests). Stage 3 applies
++	// the same decision to its test-file neighbors.
++	DemoteTests bool
+ }
+ 
+ // Searcher runs Stage 2 of the composer pipeline.
+@@ -373,6 +378,7 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
+ 	// stays intact). A prompt that is itself about tests skips it too:
+ 	// the classifier often leaves such prompts Unknown.
+ 	demoteTests := intent != contract.IntentTestAdd && !promptAsksAboutTests(prompt)
++	out.DemoteTests = demoteTests
+ 	demoteDocs := demoteDocsFor(intent)
+ 	if rec != nil {
+ 		// Fused scores before demotion and cap: the RRF result on its own.
+diff --git a/internal/system/composer/stage2/testpath.go b/internal/system/composer/stage2/testpath.go
+index 84f4f5c0..235671c1 100644
+--- a/internal/system/composer/stage2/testpath.go
++++ b/internal/system/composer/stage2/testpath.go
+@@ -14,6 +14,10 @@ import (
+ // lower in the evidence pack without hiding them entirely.
+ const testDemotionFactor = 0.25
+ 
++// TestDemotionFactor exports testDemotionFactor for Stage 3, which applies
++// the same demotion to test-file neighbors when Stage 2 demoted tests.
++const TestDemotionFactor = testDemotionFactor
++
+ // isTestPath reports whether file is a test or test-only support file. It
+ // delegates to pkg/testpath.IsTest, the single source of truth shared with
+ // the exclude_tests query filter, so graph and vector citations are
+diff --git a/internal/system/composer/stage3/expander.go b/internal/system/composer/stage3/expander.go
+index b5a3a48a..ba8fbbd7 100644
+--- a/internal/system/composer/stage3/expander.go
++++ b/internal/system/composer/stage3/expander.go
+@@ -36,6 +36,7 @@ import (
+ 	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
+ 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
+ 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
++	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
+ )
+ 
+ // Default tuning; to be revisited with real-prompt data.
+@@ -156,13 +157,33 @@ func New(ckg ckgclient.Client, opts ...Option) (*Expander, error) {
+ 	return e, nil
+ }
+ 
++// ExpandOption adjusts one Expand call.
++type ExpandOption func(*expandOpts)
++
++type expandOpts struct {
++	demoteTests bool
++}
++
++// DemoteTestNeighbors applies Stage 2's test demotion to test-file neighbors.
++// Pass Stage2Output.DemoteTests: when Stage 2 kept tests below production
++// code, a test function reached by called_by must not outrank the production
++// callers of the same seed. Measured 2026-10-27 on grpc-go pr-8792 (qwen3):
++// 19 of the 20 neighbors above the answer caller were test functions.
++func DemoteTestNeighbors(demote bool) ExpandOption {
++	return func(o *expandOpts) { o.demoteTests = demote }
++}
++
+ // Expand takes Stage 2's citations and produces a Stage3Output that pairs
+ // them with their graph neighbors. Intent shapes both the Relation set
+ // passed to ckg and the hop depth.
+ //
+ // Empty seeds returns an empty (non-error) Stage3Output — the composer
+ // can decide whether a Stage-2 miss should abort the pipeline.
+-func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, intent contract.Intent) (Stage3Output, error) {
++func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, intent contract.Intent, opts ...ExpandOption) (Stage3Output, error) {
++	var eo expandOpts
++	for _, opt := range opts {
++		opt(&eo)
++	}
+ 	out := Stage3Output{
+ 		Seeds:            seeds,
+ 		RelationCoverage: make(map[contract.Relation]int),
+@@ -254,6 +275,9 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
+ 			// ckgclient doc; the +1 guard avoids divide-by-zero if a
+ 			// backend ever returns distance 0.
+ 			score := seed.Score * relationWeight(intent, n.Relation) / float64(1+n.Distance)
++			if eo.demoteTests && testpath.IsTest(n.Target.File) {
++				score *= stage2.TestDemotionFactor
++			}
+ 			source := fmt.Sprintf("seed:%s:%s:dist=%d",
+ 				seed.Citation.File, n.Relation, n.Distance)
+ 			agg.add(n, score, source)
+diff --git a/internal/system/composer/stage3/relation_weights.go b/internal/system/composer/stage3/relation_weights.go
+index 1b1a2c75..fc353679 100644
+--- a/internal/system/composer/stage3/relation_weights.go
++++ b/internal/system/composer/stage3/relation_weights.go
+@@ -22,11 +22,15 @@ import "github.com/0xmhha/knowledge-system/pkg/system/contract"
+ // were kept deliberately — they name the pipeline's stage components),
+ // so this demotes rather than filters.
+ //
+-// Only ArchExplain is tuned. Every other intent keeps 1.0 across the
+-// board, which reproduces the previous relation-blind behavior exactly;
+-// widening the table needs its own measurement.
++// ArchExplain is tuned in full. Every other intent demotes defines alone
++// and keeps 1.0 for the rest: measured 2026-10-27 on grpc-go, one-line
++// struct-field neighbors reached by defines tied with the caller bodies the
++// fix belonged in and took the four neighbor slots (pr-9100, pr-9008, qwen3).
+ func relationWeight(intent contract.Intent, rel contract.Relation) float64 {
+ 	if intent != contract.IntentArchExplain {
++		if rel == contract.RelationDefines {
++			return 0.5
++		}
+ 		return 1.0
+ 	}
+ 	switch rel {
+diff --git a/internal/system/composer/stage3/relation_weights_test.go b/internal/system/composer/stage3/relation_weights_test.go
+index fc261c83..76c33a35 100644
+--- a/internal/system/composer/stage3/relation_weights_test.go
++++ b/internal/system/composer/stage3/relation_weights_test.go
+@@ -44,10 +44,10 @@ func TestRelationWeight_ArchExplainOrdering(t *testing.T) {
+ 	}
+ }
+ 
+-// TestRelationWeight_OtherIntentsUnchanged pins that this table is a
+-// no-op outside ArchExplain — every other intent keeps the previous
+-// relation-blind scoring until its own measurement says otherwise.
+-func TestRelationWeight_OtherIntentsUnchanged(t *testing.T) {
++// TestRelationWeight_OtherIntentsDemoteOnlyDefines pins that outside
++// ArchExplain only defines→field edges are demoted; every other relation
++// keeps the relation-blind 1.0.
++func TestRelationWeight_OtherIntentsDemoteOnlyDefines(t *testing.T) {
+ 	t.Parallel()
+ 	relations := []contract.Relation{
+ 		contract.RelationCalls, contract.RelationCalledBy, contract.RelationDefines,
+@@ -59,8 +59,12 @@ func TestRelationWeight_OtherIntentsUnchanged(t *testing.T) {
+ 			continue
+ 		}
+ 		for _, rel := range relations {
+-			if got := relationWeight(intent, rel); got != 1.0 {
+-				t.Errorf("relationWeight(%s, %s) = %.2f, want 1.0", intent, rel, got)
++			want := 1.0
++			if rel == contract.RelationDefines {
++				want = 0.5
++			}
++			if got := relationWeight(intent, rel); got != want {
++				t.Errorf("relationWeight(%s, %s) = %.2f, want %.2f", intent, rel, got, want)
+ 			}
+ 		}
+ 	}

@@ -1,0 +1,90 @@
+{
+ "kind": "retrieval_eval_grpc_go_neighbor_rank_2026_10_27",
+ "previous_packet": "../diagnosis-2026-10-27/manifest.json",
+ "previous_packet_sha256": "ef7502661983d6f78ccea981d0c27246da76bd3c945d22e91859455cae84c47e",
+ "base_commit": "67a2a6d5e131cdcc5e8af062a5184540ea8e3a5e",
+ "baseline_measurement": "diagnosis-2026-10-27 final (committed 0c509daa)",
+ "commits": {
+  "91947285": "fix(cks): keep Stage 3 neighbor order on Stage 4 score ties",
+  "687a9662": "fix(cks): demote test-file neighbors when Stage 2 demoted tests"
+ },
+ "final_build": "builds/final2/sha256.txt (cks from committed 687a9662, clean worktree)",
+ "user_decisions": {
+  "neighbor_rank_variant": "A. fix-d45 채택 (Recommended)"
+ },
+ "not_adopted": {
+  "fix-d456": "D6 defines weight 0.5 for every intent; not chosen by the user"
+ },
+ "human_sample_check": "pending (AI review only, user-delegated)",
+ "diagnostic_only": {
+  "oracle-intent": "bin-final with scenario expected_intent passed as intent: on scenario copies outside the repository; not an evaluation arm"
+ },
+ "not_in_repository": {
+  "debug traces": "knowledge-data/grpc-go-retrieval-eval/eval-<variant>/eval/<model>/<snapshot>/debug-trace.jsonl",
+  "relevance probe outputs": {
+   "knowledge-data/grpc-go-retrieval-eval/eval-final/relprobe-bge-m3.json": "38d8281634244168d3b14c80d3a6891a9106fdd26e1e5208e588a169733167d1",
+   "knowledge-data/grpc-go-retrieval-eval/eval-final/relprobe-qwen3-embedding-4b.json": "9291d1b9ac09623474cc9ead6217b1c6650d27823d33c8a29fb2aaa09f0f6195"
+  }
+ },
+ "files": {
+  "NEIGHBOR-RANK-PLAN.md": "b4d04fc18c1df7ff0cd695d2b2474acd489ed97ac641e5aa6e7178a3dac12788",
+  "README.md": "538439c6487632e2495f2d7d3cf193f3d97f1ddff1aa3e43e8e09b5ab43b02d8",
+  "builds/final2/sha256.txt": "dbe8e97f1a693db9b6fb54917e21e6fc4d3f67c1b2c45d6cc200be10188eedd0",
+  "builds/fix-d4/fix.diff": "8436a983422be96462e8d8cc1105b0dfa903ee0e0b0f997daf0747b9a1738747",
+  "builds/fix-d4/sha256.txt": "8787903c1b88312a61faabfbc9037581345197228b9dfef2e93e5442115cdf33",
+  "builds/fix-d45/fix.diff": "404afa2467f33cd18e0e00e909845885ba40b77d309f9b77250e382a3a1478f6",
+  "builds/fix-d45/sha256.txt": "a01a19858a13388d28e6bd6472a51da257b060c7331edafffe7c24bf1fc5947a",
+  "builds/fix-d456/fix.diff": "01d1fa1851c498bdd7fb24cd349103167999c18f0987ea462d0e2e7aa2ab9973",
+  "builds/fix-d456/sha256.txt": "02d9f1c8514eeaed0e408a49fa6aaada8ca9315bb96796d0aa3e30e98972f67c",
+  "go-stablenet/final2/score.txt": "2c719d2119ae2a416c47d74b00c5b65ac918bd9a6da6d4fd59dc429d48a8d71a",
+  "go-stablenet/fix-d4/score.txt": "42643d395539a7515770f782066fb5abd2f638d692678135824f5e8f15e88fda",
+  "go-stablenet/fix-d45/score.txt": "6454097477367924ca42543b12ee6f4d7f68888c9623dfe6bc7d06e34893c14b",
+  "go-stablenet/fix-d456/score.txt": "a3100014773b4432934d6ca900ac4b9a700722ccbd4d4376e3a47e4576cb8bb8",
+  "go-stablenet/ko-final2/score.txt": "f1dea528647ff2d4c331e1e34dfc4e582e32a5aebab25ff0ebe4f714ccff1fc5",
+  "go-stablenet/ko-fix-d4/score.txt": "4ed7b8cb8ea3a2a442ce2991b39f8d2a7aa52d925213031cc5096162f49f5457",
+  "go-stablenet/ko-fix-d45/score.txt": "fa08917da8613a32dace87280fabe9165f3e88206c14b78f00d400c825282d93",
+  "go-stablenet/ko-fix-d456/score.txt": "62f1a22b6a19368fc923d9b4746e5ad9061e77c66ce9f4f173810beda7749167",
+  "grpc-go/final2/found-bge-m3.json": "0b1f152c8a5d1098a99bd2c0b1f434e778349c50984fcc57c0d94c8c6eeec8bf",
+  "grpc-go/final2/found-qwen3-embedding-4b.json": "13f66e891d30544ccfd6a3920b16b4fd4ebf3a6976ad1bd556c167094ce693c7",
+  "grpc-go/final2/pack-diff-bge-m3.json": "3353dd8fcdaa61e9e3842e4c34a27c860b60801eaea2738fada92996c4f63bb6",
+  "grpc-go/final2/pack-diff-qwen3-embedding-4b.json": "d0b39ea0eb2029b1da9c217b68e43450db8a53c314a8e8999bfb0a5838ed6e02",
+  "grpc-go/final2/summary-cmp.json": "6d08c26f4608d0da336c6f7f4a810fc8b0f50202d9b2bb7bb8fc45d1fdbceab3",
+  "grpc-go/fix-d4/found-bge-m3.json": "e37f279b8ddf061180dff000a272ab60aaf1a0f4cd17fbcc4228cf1a4a117a0c",
+  "grpc-go/fix-d4/found-qwen3-embedding-4b.json": "89e4a757029c3d396fd565d72d97676fb2aa5eae6ef6c6cc9700b265db033da8",
+  "grpc-go/fix-d4/pack-diff-bge-m3.json": "0c53cbac76e76382ff86dc402924c7569bf82f9bb4b8c6717c7bd8b27a583a6d",
+  "grpc-go/fix-d4/pack-diff-qwen3-embedding-4b.json": "b555aede70eb4a03825ca5ccc8372a91d6ace539caeb2a5b343120a7d0934fd1",
+  "grpc-go/fix-d4/summary-cmp.json": "58f6ba93b45d427e7fe7d53fd213c6584acd250cce4957eab3979b636acf1939",
+  "grpc-go/fix-d45/found-bge-m3.json": "0b1f152c8a5d1098a99bd2c0b1f434e778349c50984fcc57c0d94c8c6eeec8bf",
+  "grpc-go/fix-d45/found-qwen3-embedding-4b.json": "13f66e891d30544ccfd6a3920b16b4fd4ebf3a6976ad1bd556c167094ce693c7",
+  "grpc-go/fix-d45/pack-diff-bge-m3.json": "3353dd8fcdaa61e9e3842e4c34a27c860b60801eaea2738fada92996c4f63bb6",
+  "grpc-go/fix-d45/pack-diff-qwen3-embedding-4b.json": "d0b39ea0eb2029b1da9c217b68e43450db8a53c314a8e8999bfb0a5838ed6e02",
+  "grpc-go/fix-d45/summary-cmp.json": "02e90db6780ad5315061ecdf96f106eca71132df7ddb8100163f4ce74a212e5a",
+  "grpc-go/fix-d456/found-bge-m3.json": "0b1f152c8a5d1098a99bd2c0b1f434e778349c50984fcc57c0d94c8c6eeec8bf",
+  "grpc-go/fix-d456/found-qwen3-embedding-4b.json": "726c25df11cf9088abbd7d04e91fc1eb827e49045f8131879c0b8b860c517e4b",
+  "grpc-go/fix-d456/pack-diff-bge-m3.json": "c600543c90d1b4c5c4bcc5d70b52e43262aec7f78335a100768d7a28ff46fbe7",
+  "grpc-go/fix-d456/pack-diff-qwen3-embedding-4b.json": "72818dc2ff46fe253f5dcfc00d5662340b3e1c30404fa432a580882a3069c179",
+  "grpc-go/fix-d456/summary-cmp.json": "10f9da3b1b66a3e74345cc23f4253e4f980f1792fc20d27f3ce41bfd3d78a5d6",
+  "grpc-go/oracle-intent/found-bge-m3.json": "3bdb2237d33adcbd216d52a309b021187eb312849617e9aa819b6edbb2063823",
+  "grpc-go/oracle-intent/found-qwen3-embedding-4b.json": "2f9c60d9fd0d2d75daa286b7ce3ba47fed65ee97835868dfdd29738ff46fcf05",
+  "neighbor-rank-results.json": "c5dcf3a281bbf7f3d43b7dd22dc5c366328e9d2104338103b8d2d34ebe9599a2",
+  "offline/intent-accuracy.txt": "3d9db008ebfb595d57ab62e2e8e67383476d89398b8c6d68b4771231176cfd1c",
+  "offline/neighbors-above-answer.txt": "acd0a518f884209cbe7fba7f6afe2afedda11f1eca371dec1932b16a5ede325d",
+  "offline/sim-doc-demotion.txt": "2d8f2165c6002e6f9eed14d1d3ff78624608ac0e595946203f9ea31e542535fa",
+  "offline/sim-neighbor-order.txt": "d1de8803812e1cbda677f8538a79fa55cfcaccaa40f0b9e21a56774ff82a1e4a",
+  "offline/sim-pack-slots.txt": "04d3eedf6e384bc392ba2c1f60c75608c9adf9e37abd36d3f3f1d290c7d742b0",
+  "offline/sim-structural-order.txt": "076a158bdaa97796b6d8370190b879733f35c13523ab7ecd527d6abc37c281cf",
+  "results-table.txt": "740f72756cbc7dda4813e1ff95f627579df0c0dc63fde0b7e9fa1a1ce8c265fa",
+  "tools/build_variant.sh": "32d607b0eb8513f643f0a299afc972fff4bd875c453d0cc58e12e08cf2cd68ff",
+  "tools/intent_probe.py": "704318a8551bf7b47f7a87b0a7d191fbb5b70be4da134e22bcbfd7a575221678",
+  "tools/nb_rank.py": "1c23f818ed0a33739e95ddecab698d790dec54907354c3c62d325a47342835b7",
+  "tools/neighbor_rank_table.py": "b49692743f75c6b1629d82dda040316610cd143b696ef81e9d2565680a5f78b1",
+  "tools/relprobe.py": "1a24ec4c2c151a66c4db41118f40713b2043afd0f401318fb5f93a073f7fe1d0",
+  "tools/run_neighbor_rank.sh": "8291d0b555aa5285c0d4bffc3cd3ca2cf978f6b4fb42156b8433fcf75dfc1b7a",
+  "tools/run_oracle_intent.sh": "e51b1689de0de42d9ea7ae369c7a48016586d20cf33138cbd24a5fe4ead97bf0",
+  "tools/run_qual.py": "4abb7bd10a89bbc07d41dbdd520bb939dc42f9a0747687ace850691e91fea7f6",
+  "tools/simcap.py": "9b053a0215a339103473ac9dcede856d72a66070d1e90bc16bea8c8b725119b9",
+  "tools/simdocs.py": "169b4a6e40b14a99cee8f21e41e657b9d6dcb46686f167a4c4e4332a0bb7e391",
+  "tools/simrank.py": "39e88e322bea22bef57ccc67a788e041b86e5acdaf2eb141317fe1c1b73aa8c9",
+  "tools/simstruct.py": "119e5fbf46683b57f654724379ceafd2dd1fc32a6d75ca694601882d2f6a1116"
+ }
+}
