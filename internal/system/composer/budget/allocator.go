@@ -621,14 +621,14 @@ func mergeCandidates(seeds []stage2.ScoredCitation, neighbors []stage3.ScoredNei
 		})
 	}
 
+	// Ties keep input order: seeds in Stage 2 order, then neighbors in Stage
+	// 3 order. Every neighbor of one seed and relation ties on score, and
+	// Stage 3 already broke those ties by target span (stage3/scoring.go);
+	// re-sorting by file and line here threw that away. Measured 2026-10-27
+	// on grpc-go pr-8875 (bge-m3): the answer, Stage 3 neighbor 2, lost the
+	// neighbor slots to shorter spans of its file that start on lower lines.
 	sort.SliceStable(out, func(i, j int) bool {
-		if out[i].Score != out[j].Score {
-			return out[i].Score > out[j].Score
-		}
-		if out[i].Citation.File != out[j].Citation.File {
-			return out[i].Citation.File < out[j].Citation.File
-		}
-		return out[i].Citation.StartLine < out[j].Citation.StartLine
+		return out[i].Score > out[j].Score
 	})
 
 	seen := make(map[string]struct{}, len(out))
