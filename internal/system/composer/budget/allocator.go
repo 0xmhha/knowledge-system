@@ -253,6 +253,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		}
 	}
 	seedSelected := 0
+	neighborSelected := 0
 	knowledgeSelected := 0
 	exactSymbolRescued := map[string]bool{}
 	selectedKeys := map[string]bool{}
@@ -276,9 +277,15 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		})
 	}
 
+	// A reserve holds a slot only while a candidate of its kind is still
+	// ahead in the list. A slot held for a kind that never arrives only cuts
+	// the next seed: on the 2026-10-27 grpc-go evaluation every answer Stage
+	// 4 cut came from a pack of 8 to 11 bodies, its held slots unused.
+	ahead := newReserveLookahead(candidates)
+
 	used := 0
 	processed := 0
-	for _, c := range candidates {
+	for i, c := range candidates {
 		processed++
 		if c.ParentOf != "" && !selectedKeys[c.ParentOf] {
 			decide(c, "parent_not_selected")
@@ -307,8 +314,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		// What actually fills the reserve here is the 44 invariant
 		// chunks: sampled across all fifteen scenarios on 2026-08-03,
 		// they took 16 body slots in 8 of them, twice each in six.
-		isKnowledge := c.ChunkKind == "invariant" ||
-			(c.ChunkKind == "doc" && c.Citation.CommitHash == "")
+		isKnowledge := isKnowledgeCandidate(c)
 		// A prompt-verbatim, unambiguously resolved symbol gets the same
 		// protection as knowledge for the same reason: it is one small
 		// declaration span competing against whole bodies that merely
@@ -321,7 +327,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		// first had already spent the single reserve.
 		exactUnrescued := isExactSymbol && !exactSymbolRescued[exactKeyword] &&
 			len(exactSymbolRescued) < a.config.ExactSymbolReserve
-		if c.Origin == OriginSeed && seedCap > 0 && seedSelected >= seedCap {
+		if c.Origin == OriginSeed && seedCap > 0 && seedSelected >= ahead.seedCap(i, a.config, seedCap, neighborSelected) {
 			// Seed slots exhausted; leave room for neighbor-origin
 			// candidates. Not a Skip: the candidate lost to the quota,
 			// not to budget or fetch. Knowledge-kind candidates are
@@ -343,12 +349,12 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 			reserveLeft := 0
 			if a.config.KnowledgeReserve > 0 {
 				if left := a.config.KnowledgeReserve - knowledgeSelected; left > 0 {
-					reserveLeft += left
+					reserveLeft += min(left, ahead.knowledge(i))
 				}
 			}
 			if a.config.ExactSymbolReserve > 0 {
 				if left := a.config.ExactSymbolReserve - len(exactSymbolRescued); left > 0 {
-					reserveLeft += left
+					reserveLeft += min(left, ahead.exactSymbols(i, exactSymbolRescued))
 				}
 			}
 			if reserveLeft > 0 && len(out.Selected) >= a.config.MaxCitations-reserveLeft {
@@ -404,8 +410,11 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		})
 		selectedKeys[c.Citation.Key()] = true
 		used += tokens
-		if c.Origin == OriginSeed {
+		switch c.Origin {
+		case OriginSeed:
 			seedSelected++
+		case OriginNeighbor:
+			neighborSelected++
 		}
 		if isKnowledge {
 			knowledgeSelected++
@@ -519,6 +528,60 @@ type candidate struct {
 // appearing in both, but this function dedupes by Citation.Key() as a
 // defensive backstop — if a future Stage 3 change breaks the guard,
 // the allocator still produces sensible output.
+// isKnowledgeCandidate reports a domain-knowledge chunk: an invariant, or
+// out-of-tree markdown (chunk_kind "doc" with an empty commit hash).
+func isKnowledgeCandidate(c candidate) bool {
+	return c.ChunkKind == "invariant" || (c.ChunkKind == "doc" && c.Citation.CommitHash == "")
+}
+
+// reserveLookahead answers, for a position in the merged candidate list,
+// how many candidates each reserve could still be spent on.
+type reserveLookahead struct {
+	cands []candidate
+	// neighborsAfter[i] and knowledgeAfter[i] count candidates after index i.
+	neighborsAfter []int
+	knowledgeAfter []int
+}
+
+func newReserveLookahead(cands []candidate) reserveLookahead {
+	r := reserveLookahead{cands: cands, neighborsAfter: make([]int, len(cands)), knowledgeAfter: make([]int, len(cands))}
+	n, k := 0, 0
+	for i := len(cands) - 1; i >= 0; i-- {
+		r.neighborsAfter[i], r.knowledgeAfter[i] = n, k
+		if cands[i].Origin == OriginNeighbor {
+			n++
+		}
+		if isKnowledgeCandidate(cands[i]) {
+			k++
+		}
+	}
+	return r
+}
+
+// seedCap is the seed slot limit at index i: the configured cap, widened by
+// every neighbor-reserve slot that no selected or upcoming neighbor can use.
+func (r reserveLookahead) seedCap(i int, cfg Config, seedCap, neighborSelected int) int {
+	if cfg.MaxCitations <= 0 || cfg.NeighborReserve <= 0 {
+		return seedCap
+	}
+	usable := min(cfg.NeighborReserve, neighborSelected+r.neighborsAfter[i])
+	return max(seedCap, cfg.MaxCitations-usable)
+}
+
+func (r reserveLookahead) knowledge(i int) int { return r.knowledgeAfter[i] }
+
+// exactSymbols counts the distinct prompt-verbatim symbols after index i that
+// have not been rescued yet.
+func (r reserveLookahead) exactSymbols(i int, rescued map[string]bool) int {
+	seen := map[string]bool{}
+	for _, c := range r.cands[i+1:] {
+		if kw := stage2.ExactSymbolKeyword(c.Sources); kw != "" && !rescued[kw] {
+			seen[kw] = true
+		}
+	}
+	return len(seen)
+}
+
 func mergeCandidates(seeds []stage2.ScoredCitation, neighbors []stage3.ScoredNeighbor) []candidate {
 	out := make([]candidate, 0, len(seeds)*3+len(neighbors))
 	for _, s := range seeds {
