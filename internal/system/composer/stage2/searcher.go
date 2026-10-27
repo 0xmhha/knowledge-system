@@ -156,6 +156,11 @@ type Stage2Output struct {
 	// (BM25Search + FindSymbol per keyword, plus one BM25Search per keyword
 	// for the intent path-glob pass). Surfaced in the composer trace.
 	CKGCalls int
+
+	// DemoteTests reports whether this search demoted test-file citations
+	// (intent not test_add and the prompt not about tests). Stage 3 applies
+	// the same decision to its test-file neighbors.
+	DemoteTests bool
 }
 
 // Searcher runs Stage 2 of the composer pipeline.
@@ -373,6 +378,7 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
 	// stays intact). A prompt that is itself about tests skips it too:
 	// the classifier often leaves such prompts Unknown.
 	demoteTests := intent != contract.IntentTestAdd && !promptAsksAboutTests(prompt)
+	out.DemoteTests = demoteTests
 	demoteDocs := demoteDocsFor(intent)
 	if rec != nil {
 		// Fused scores before demotion and cap: the RRF result on its own.

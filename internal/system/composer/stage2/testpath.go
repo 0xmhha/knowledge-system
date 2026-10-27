@@ -14,6 +14,10 @@ import (
 // lower in the evidence pack without hiding them entirely.
 const testDemotionFactor = 0.25
 
+// TestDemotionFactor exports testDemotionFactor for Stage 3, which applies
+// the same demotion to test-file neighbors when Stage 2 demoted tests.
+const TestDemotionFactor = testDemotionFactor
+
 // isTestPath reports whether file is a test or test-only support file. It
 // delegates to pkg/testpath.IsTest, the single source of truth shared with
 // the exclude_tests query filter, so graph and vector citations are

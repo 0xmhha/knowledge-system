@@ -246,7 +246,7 @@ func (c *Composer) compose(ctx context.Context, prompt string, callerIntent cont
 	trace := buildComposerTrace(prompt, intentVal, s1Out, s2Out)
 
 	// 4. Stage 3 — graph expansion.
-	s3Out, err := c.stage3.Expand(ctx, s2Out.Citations, intentVal)
+	s3Out, err := c.stage3.Expand(ctx, s2Out.Citations, intentVal, stage3.DemoteTestNeighbors(s2Out.DemoteTests))
 	if err != nil {
 		return contract.EvidencePack{}, contract.RetrievalTrace{}, fmt.Errorf("composer: stage3: %w", err)
 	}
