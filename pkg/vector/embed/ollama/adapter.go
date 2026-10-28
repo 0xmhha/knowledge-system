@@ -23,6 +23,7 @@ import (
 	"os"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -61,6 +62,7 @@ type Adapter struct {
 	targetDim      int    // >0 → truncate each embedding to this many dims (MRL)
 	queryInstruct  string // non-empty → wrap queries in this Qwen3 instruct prompt
 	maxInput       int
+	chunkBudget    int // >0 overrides the model's default chunk budget
 	runtimeOptions *embedRuntimeOptions
 	client         *http.Client
 }
@@ -81,6 +83,11 @@ type Options struct {
 	// QueryPrefixPolicy is "registry" (default) or "none". The legacy
 	// CKV_DISABLE_QUERY_PREFIX variable is read once only when unset.
 	QueryPrefixPolicy string
+	// ChunkBudgetBytes, when >0, replaces the model's default raw chunk
+	// budget (bge-m3: 6144, others: none). It is part of the embedding
+	// identity, so the build and the query side must agree. When 0, the
+	// CKV_CHUNK_BUDGET_BYTES variable is read once.
+	ChunkBudgetBytes int
 }
 
 // Open pins an exact model tag and digest, then embeds a probe to determine
@@ -112,6 +119,19 @@ func Open(opts Options) (*Adapter, error) {
 	if policy != "registry" && policy != "none" {
 		return nil, fmt.Errorf("ollama: invalid query prefix policy %q", policy)
 	}
+	chunkBudget := opts.ChunkBudgetBytes
+	if chunkBudget == 0 {
+		if v := os.Getenv("CKV_CHUNK_BUDGET_BYTES"); v != "" {
+			n, err := strconv.Atoi(v)
+			if err != nil || n < 0 {
+				return nil, fmt.Errorf("ollama: invalid CKV_CHUNK_BUDGET_BYTES %q", v)
+			}
+			chunkBudget = n
+		}
+	}
+	if chunkBudget < 0 {
+		return nil, fmt.Errorf("ollama: invalid chunk budget %d", chunkBudget)
+	}
 	queryInstruct := registry.QueryInstruct(opts.ModelName)
 	if policy == "none" {
 		queryInstruct = "" // opt out of the asymmetric query prompt (A/B, debugging)
@@ -121,6 +141,7 @@ func Open(opts Options) (*Adapter, error) {
 		modelName:      opts.ModelName,
 		queryInstruct:  queryInstruct,
 		maxInput:       resolveMaxInput(opts.ModelName),
+		chunkBudget:    chunkBudget,
 		runtimeOptions: resolveRuntimeOptions(opts.ModelName),
 		client:         &http.Client{Timeout: timeout},
 	}
@@ -238,6 +259,9 @@ func (a *Adapter) Identity() types.EmbeddingIdentity {
 }
 
 func (a *Adapter) chunkBudgetBytes() int {
+	if a.chunkBudget > 0 {
+		return a.chunkBudget
+	}
 	if strings.SplitN(a.modelName, ":", 2)[0] == "bge-m3" {
 		return bgeM3ChunkBudgetBytes
 	}
