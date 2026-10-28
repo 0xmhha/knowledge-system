@@ -66,7 +66,7 @@ make build-bins   # bin/ckg, bin/ckv, bin/cks; `make build` makes no binaries
 "$KS_VENV/bin/python" -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-venv는 저장소 밖에 만든다. `.gitignore`는 현재 검증기 여러 개가 바인딩한 입력이라 venv 때문에 바꾸지 않는다.
+venv는 저장소 밖에 만든다. `.gitignore`는 현재 검증기 여러 개가 바인딩한 입력이라 venv 때문에 바꾸지 않는다. `/tmp`나 `/private/tmp` 아래에도 만들지 않는다. macOS가 그 아래에서 오래 쓰지 않은 파일을 지운다. 2026-10-26에 세션 임시 디렉터리의 venv에서 `pyvenv.cfg`와 `jsonschema` 일부가 사라져, 시험 모듈 37개가 import에 실패하고 WI-SP 검사 1개가 실패했다. 같은 시험을 `$HOME/.venvs`의 새 venv로 돌리면 모두 통과했다.
 
 운영 수용 문서의 현재 준비 근거(guardian 패킷)는 Go 파일 전체와 CI workflow의 해시를 묶는다. 그래서 코드가 바뀌면 살아 있는 트리와 맞지 않는다. 두 문서의 `current_readiness_source_revision`에 패킷이 마지막으로 통과한 main 커밋을 적었다. 검사기는 그 커밋이 HEAD의 조상이고 패킷이 그 뒤로 바뀌지 않았는지 확인한 뒤, 그 커밋의 worktree에서 그때 코드로 패킷을 검증한다(2026-10-21, CI 수정 뒤). 같은 결속을 쓰는 리팩토링 진행 검사도 `REFACTORING-PROGRESS.json`의 `active_source_binding.source_revision`에 같은 커밋을 적고, 그 커밋이 HEAD의 조상인지 확인한 뒤 그 커밋 시점의 파일 해시와 Go 파일 목록을 비교한다(2026-10-21). 그 뒤 바뀐 코드는 이 두 검사가 잡지 않으므로 새 결속을 만들 때까지 race 시험과 CI로 확인한다.
 

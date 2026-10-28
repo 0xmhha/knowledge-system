@@ -1,6 +1,6 @@
 # 현재 인수인계
 
-기준: 2026-10-23, main `0a70f502`(PR #124까지 머지). 이 문서는 지금 단계, 진행 중인 작업, 바로 다음 행동만 적는다. 남은 전체 목록, 맥락, 하지 않을 일은 [남은 작업](../REMAINING-WORK.md)에 있고, 정본은 [실행 원장](./REMAINING-13-EXECUTION.json)이다. 새 머신이나 새 세션은 [머신 간 인수인계](./MACHINE-HANDOFF.md)로 환경부터 준비한다.
+기준: 2026-10-28, main `518e715a`(PR #126까지 머지). 이 문서는 지금 단계, 진행 중인 작업, 바로 다음 행동만 적는다. 남은 전체 목록, 맥락, 하지 않을 일은 [남은 작업](../REMAINING-WORK.md)에 있고, 정본은 [실행 원장](./REMAINING-13-EXECUTION.json)이다. 새 머신이나 새 세션은 [머신 간 인수인계](./MACHINE-HANDOFF.md)로 환경부터 준비한다.
 
 ## 1. 흔들리면 안 되는 기준
 
@@ -13,7 +13,7 @@
 
 ## 2. 현재 단계
 
-원장 `current_activity`: `103_retrieval_eval_grpc_go_diagnosis_fixes_recorded_intent_gate_next`. [남은 작업](../REMAINING-WORK.md) 3.1의 4단계(약한 곳 고치기)에서 첫 수정 묶음을 반영하고 다시 쟀다. 3단계의 사람 표본 확인은 아직이다. 작업은 로컬 브랜치 `test/retrieval-eval-grpc-go-run`에 커밋했고 push하지 않았다.
+원장 `current_activity`: `103_retrieval_eval_grpc_go_diagnosis_fixes_recorded_intent_gate_next`. [남은 작업](../REMAINING-WORK.md) 3.1의 4단계(약한 곳 고치기)에서 첫 수정 묶음을 반영하고 다시 쟀다. 3단계의 사람 표본 확인은 아직이다. 이 작업은 PR #126으로 머지됐다.
 
 ### 끝난 것
 
@@ -23,6 +23,8 @@
 |#122|`cks eval`에 `expected_intent`, `first_hit_rank`, `used_tokens`, `rank_summary`, `intent_accuracy`를 더함([계약](./EVAL-CONTRACT.md))|
 |#123|grpc-go 입력 고정(PR 100건, 정답 범위 575개, 한국어 질문 100개, 스냅샷 24개)과 변환·비교 대상·연쇄 색인 스크립트|
 |#124|복사한 벡터 색인이 이번 스냅샷의 그래프를 가리키게 고침. 모델 결정을 명세 3장에 기록|
+|#125|색인 도중의 인수인계 문서|
+|#126|1차 실행 결과, 모델별 비교 대상, 디버그 기록, 결함 세 개 수정, 진단 기록, 사람 표본 확인 자료|
 
 [평가 명세](./RETRIEVAL-EVAL-SPEC.md)는 사용자가 승인했다. 입력은 [grpc-go 입력](./operational-preparation/retrieval-eval-grpc-go-v1/README.md)에 고정돼 있고 `manifest.json`이 해시를 묶는다.
 
@@ -114,7 +116,8 @@ python3 scripts/retrieval_snapshot_chain.py --repo <grpc-go clone> --snapshots $
 - **`reindex` 전에 그래프를 바꿔 가리켜야 한다.** 복사한 벡터 색인의 manifest는 앞 스냅샷의 그래프를 가리킨다. 그대로 `reindex`하면 같은 커밋을 전체 빌드한 것과 canonical ID가 629개 달랐다. 스크립트가 `sources.ckg.path`를 이번 스냅샷의 그래프로 바꾼 뒤 `reindex`한다. 그러면 code 청크는 전체 빌드와 같고, 패키지 convention 요약 청크 15,860개 중 12개만 다르다. 이 12개는 `ckv reindex`의 버그로 보고 나중에 따로 고친다. 평가 결과에는 이 차이를 함께 적는다.
 - **`9c7231e8` 전의 `ckv`로 `reindex`한 색인은 그래프 커밋이 틀려 있다.** manifest의 `sources.ckg.src_commit`이 첫 스냅샷 커밋으로 남아 CKS가 모든 요청을 거절한다. 2026-10-24 색인 46개는 [1차 결과](./operational-preparation/retrieval-eval-grpc-go-v1/results/README.md)의 `index/fix-ckg-ledger.py`로 이 칸만 고쳤다. 새로 색인할 때는 고친 `ckv`를 쓴다.
 - **8개 스냅샷의 그래프는 PR #124 전에 만든 것이다.** 그래프 빌드는 그 PR에서 바뀌지 않았다. 스크립트는 manifest에 그 커밋이 적혀 있으면 그래프를 다시 쓴다. 9번째 `d7b3f936`은 빌드 도중 멈춰 그래프가 없으므로 새로 만든다. 같은 작업 디렉터리의 옛 `chain.json`과 `chain-<스냅샷>/vector`는 그래프를 잘못 가리키던 `bge-m3` 색인이다. 평가에 쓰지 않는다.
-- **긴 청크는 잘려서 임베딩된다.** Ollama가 긴 입력을 거부하면 `ckv`가 입력을 12,000바이트나 4,000바이트로 줄여 다시 보낸다. `qwen3-embedding:4b`는 851개 파일까지 16개 청크가 잘렸다. `bge-m3`는 같은 스냅샷에서 2개였다. 16개 중 13개가 큰 시험 파일, 2개가 생성 파일(`*.pb.go`), 1개가 예제 서버다. 시험 파일이 정답인 PR은 이 잘림의 영향을 받을 수 있다. 2026-10-24 실행의 색인 로그에는 잘린 청크와 건너뛴 청크가 두 모델 모두 0건이다.
+- **긴 청크가 잘려서 임베딩된 실행이 있다.** Ollama가 긴 입력을 거부하면 `ckv`가 입력을 12,000바이트나 4,000바이트로 줄여 다시 보낸다. 2026-10-23~26에 세션 임시 디렉터리에서 같은 24개 스냅샷을 따로 색인했을 때는 로그 전체에서 `qwen3-embedding:4b`가 64번, `bge-m3`가 2번 잘렸다. 첫 스냅샷에서 잘린 16개는 13개가 큰 시험 파일, 2개가 생성 파일(`*.pb.go`), 1개가 예제 서버였다. 2026-10-24 실행([1차 결과](./operational-preparation/retrieval-eval-grpc-go-v1/results/README.md))의 색인 로그에는 두 모델 모두 0건이다. 두 실행이 왜 다른지는 아직 확인하지 않았다.
+- **청크 크기 상한은 `bge-m3`에만 있다.** `pkg/vector/embed/ollama/adapter.go`의 `chunkBudgetBytes`는 모델 이름이 `bge-m3`일 때만 6,144바이트를 돌려주고, 다른 모델에는 0(상한 없음)을 돌려준다. 그래서 첫 스냅샷 `88ac7035`에서 `qwen3-embedding:4b` 색인은 청크 15,741개로 `bge-m3`의 15,931개보다 적고 청크가 더 크다(위 따로 한 색인 기준). 두 모델의 차이를 임베딩만의 차이로 단정하지 않는다. `qwen3-embedding:4b`에 맞는 상한을 주는 일은 4단계 후보다. 모델 이름으로 분기하지 말고 모델의 입력 창 크기에서 정하는 방향으로 설계한다.
 - **`ckg query`는 한국어 질문에 자주 오류를 낸다.** 질문에서 쓸 수 있는 낱말을 못 찾으면 "no usable tokens"를 낸다. 명세대로 오류도 실패로 센다. 고치는 일은 4단계에서 한다.
 - **부분 측정값은 참고만 한다.** `90f571db` 스냅샷의 18개 시나리오를 옛 `bge-m3` 색인으로 돌렸을 때 hit@1이 벡터 0.33, BM25 재정렬 0.17, `ckg query` 0, `git grep` 0이었다. CKS 시나리오 하나(pr-8792)는 정답 의도 refactor를 feature_add로 분류했고, 정답을 2위에 냈고, 3,030토큰을 썼다. 색인을 다시 만들기 전의 값이라 결과 보고에 쓰지 않는다.
 - **`pplx-embed-v1-4b`는 쓰지 않는다.** 이 네트워크에서 Hugging Face에 닿지 않고, 양방향 구조라 Ollama에서 돌기 어렵다.
