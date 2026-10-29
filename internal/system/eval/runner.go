@@ -471,6 +471,9 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (runOutcome, erro
 	if s.Intent != "" {
 		args["intent"] = string(s.Intent)
 	}
+	if s.CodeQuery != "" {
+		args["code_query"] = s.CodeQuery
+	}
 	req.Params.Arguments = args
 
 	t0 := time.Now()

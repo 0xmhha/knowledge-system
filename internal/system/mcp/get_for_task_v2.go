@@ -26,6 +26,7 @@ func registerGetForTaskV2(s *mcpserver.MCPServer, d Deps) {
 		mcpgo.WithDescription("Compose archive-backed v2 evidence with immutable dataset citations and sha256-v2 integrity."),
 		mcpgo.WithString("prompt", mcpgo.Required(), mcpgo.Description("Natural-language development task.")),
 		mcpgo.WithString("intent", mcpgo.Description("Optional task intent override.")),
+		mcpgo.WithString("code_query", mcpgo.Description(codeQueryDescription)),
 		mcpgo.WithBoolean("explain_ontology", mcpgo.DefaultBool(false), mcpgo.Description("Explain matched ontology concepts and bounded candidate score/rank changes. Does not enable ontology or claim quality; body selection is the composer stage, final v2 budget may further omit evidence.")),
 		mcpgo.WithBoolean("include_knowledge", mcpgo.DefaultBool(false), mcpgo.Description("Add reviewed local policy context from this retained dataset.")),
 		mcpgo.WithString("knowledge_as_of", mcpgo.Description("Policy date (YYYY-MM-DD) when include_knowledge is true.")),
@@ -69,7 +70,7 @@ func handleGetForTaskV2(ctx context.Context, d Deps, req mcpgo.CallToolRequest) 
 	if req.GetBool("explain_ontology", false) {
 		ctx = stage2.WithOntologyExplanation(ctx)
 	}
-	legacy, err := d.Composer.ComposeWithIntent(ctx, prompt, callerIntent)
+	legacy, err := d.Composer.ComposeWithIntent(withCodeQueryArg(ctx, req), prompt, callerIntent)
 	if err != nil {
 		return v2ToolErrorFor(err, "compose_failed"), nil
 	}

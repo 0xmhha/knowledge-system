@@ -237,3 +237,14 @@ expectec_citations: []
 		t.Fatal("expected error for typo'd field")
 	}
 }
+
+func TestParseScenario_CodeQuery(t *testing.T) {
+	t.Parallel()
+	s, err := ParseScenario([]byte("version: 1\nname: cq\nprompt: \"p\"\ncode_query: \"`http2Client.NewStream` nil stats handler\"\nexpect_no_citations: true\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s.CodeQuery != "`http2Client.NewStream` nil stats handler" {
+		t.Fatalf("CodeQuery = %q", s.CodeQuery)
+	}
+}

@@ -252,6 +252,10 @@
           "prompt": {
             "description": "Natural-language task description or symptom, as a full sentence. Example: \"restore proposal tx stays stuck in pending after GasTip revert\".",
             "type": "string"
+          },
+          "code_query": {
+            "description": "Optional. The prompt restated in the code's own vocabulary, in English: what the code that must change does, plus the identifiers, types, packages and files you expect there (e.g. \"stats handler invoked for internal streams in `http2Client.NewStream` / `newNonRetryClientStream`; skip when nil\"). Used as the first semantic search instead of the prompt; the prompt still drives intent. Strongly recommended when the prompt is not English or not phrased in code terms.",
+            "type": "string"
           }
         },
         "required": [
@@ -288,6 +292,10 @@
           },
           "prompt": {
             "description": "Natural-language development task.",
+            "type": "string"
+          },
+          "code_query": {
+            "description": "Optional. The prompt restated in the code's own vocabulary, in English: what the code that must change does, plus the identifiers, types, packages and files you expect there (e.g. \"stats handler invoked for internal streams in `http2Client.NewStream` / `newNonRetryClientStream`; skip when nil\"). Used as the first semantic search instead of the prompt; the prompt still drives intent. Strongly recommended when the prompt is not English or not phrased in code terms.",
             "type": "string"
           }
         },

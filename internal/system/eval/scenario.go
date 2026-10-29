@@ -39,6 +39,9 @@ type Scenario struct {
 	Description string
 	Prompt      string
 	Intent      contract.Intent
+	// CodeQuery is sent as get_for_task's code_query: the prompt restated in
+	// code vocabulary. Optional; empty sends nothing.
+	CodeQuery string
 	// ExpectedIntent is the intent the server's classifier should assign.
 	// Unlike Intent it is never sent with the request, so the run measures
 	// classification instead of bypassing it.
@@ -81,6 +84,7 @@ type scenarioWire struct {
 	Description       string                 `yaml:"description,omitempty"`
 	Prompt            string                 `yaml:"prompt"`
 	Intent            string                 `yaml:"intent,omitempty"`
+	CodeQuery         string                 `yaml:"code_query,omitempty"`
 	ExpectedIntent    string                 `yaml:"expected_intent,omitempty"`
 	ExpectedCitations []scenarioCitationWire `yaml:"expected_citations,omitempty"`
 	ExpectedCommit    string                 `yaml:"expected_commit,omitempty"`
@@ -116,6 +120,7 @@ func ParseScenario(data []byte) (*Scenario, error) {
 		Description:       w.Description,
 		Prompt:            w.Prompt,
 		Intent:            contract.Intent(w.Intent),
+		CodeQuery:         w.CodeQuery,
 		ExpectedIntent:    contract.Intent(w.ExpectedIntent),
 		MatchMode:         w.MatchMode,
 		Runs:              w.Runs,

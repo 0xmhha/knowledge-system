@@ -230,6 +230,15 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 	if e.rawQueryFirst {
 		currentQuery = prompt
 	}
+	// A caller-written code query (WithCodeQuery) wins over both: it is the
+	// prompt restated in the code's own vocabulary, so it is the first search
+	// and the base later rounds augment.
+	augmentBase := expansion.Expanded
+	codeQuery := CodeQueryFrom(ctx)
+	if codeQuery != "" {
+		currentQuery = codeQuery
+		augmentBase = codeQuery
+	}
 	out.VocabExpanded = len(expansion.MatchedKeywords) > 0
 	out.VocabKeywords = expansion.MatchedKeywords
 	rec := debugtrace.From(ctx)
@@ -239,7 +248,7 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 	if rec != nil {
 		rec.After("stage1", "vocab_expand", "", map[string]any{
 			"prompt": prompt, "expanded": expansion.Expanded, "matched": expansion.MatchedKeywords,
-			"first_query": currentQuery,
+			"code_query": codeQuery, "first_query": currentQuery,
 		})
 	}
 
@@ -317,7 +326,7 @@ func (e *Extractor) Extract(ctx context.Context, prompt string, intent contract.
 		}
 		// Re-augment from the vocab-expanded prompt so subsequent rounds
 		// keep the glossary keywords on top of the reranked additions.
-		currentQuery = augmentQuery(expansion.Expanded, reranked, e.config.AugmentTopN)
+		currentQuery = augmentQuery(augmentBase, reranked, e.config.AugmentTopN)
 		if rec != nil {
 			rec.Note("stage1", "confidence_gate", roundKey, map[string]any{
 				"confidence": confidence, "min_confidence": e.config.MinConfidence,
