@@ -1,0 +1,54 @@
+{
+  "title": "Retrieval evaluation v2: model x project at each PR base",
+  "brownfield": true,
+  "created_at": "2026-10-28T06:06:01+00:00",
+  "topics": [
+    {
+      "id": "D1",
+      "title": "Model-dependent settings (chunk budget, intent threshold): as-is, equalize, or both arms",
+      "status": "decided"
+    },
+    {
+      "id": "D2",
+      "title": "grpc-go scope: all 100 PRs at exact base or a subset",
+      "status": "decided"
+    },
+    {
+      "id": "D3",
+      "title": "Core function labelling owner and human confirmation",
+      "status": "decided"
+    },
+    {
+      "id": "D4",
+      "title": "go-stablenet: same 12 PRs with a bge-m3 cell",
+      "status": "decided"
+    },
+    {
+      "id": "D5",
+      "title": "Success criteria: pilot pass conditions and completion of the v2 measurement",
+      "status": "decided"
+    }
+  ],
+  "rounds": 8,
+  "ambiguity": null,
+  "breakdown": {
+    "goal": {
+      "score": 0.3,
+      "justification": "사용자의 말은 round 3의 \"추천 B로해\", round 4의 \"PR 1건으로 시범한 뒤 100건 전체 (추천) 로 진행하자\", round 5의 \"추천으로 진행\"뿐이고 모두 진행 방식을 고른 말이어서, v2 평가를 왜 하는지와 하지 않을 것은 사용자 말로 나온 적이 없습니다(round 1, 2는 observation)."
+    },
+    "constraints": {
+      "score": 0.55,
+      "justification": "round 3에서 설정을 맞춘 본 실험과 원래 설정 그대로인 참고 실험을 모두 돌리기로 했고, round 4에서 grpc-go는 1건 시범 뒤 100건 전체로, round 5에서 AI가 diff와 PR 글만 보고(검색 결과는 보지 않고) 라벨을 만들어 실행 전에 고정하기로 정했지만, go-stablenet 범위(D4)가 아직 open이라 0.7을 넘길 수 없고 경계가 다 정해지지 않았습니다."
+    },
+    "success": {
+      "score": 0.2,
+      "justification": "round 5에서 판정 기준이 될 핵심 함수 라벨을 만드는 방식은 정했지만, 끝났다고 판단할 지표와 목표 값, round 4 시범 1건의 통과 조건, round 5에서 나중에 하기로 한 사람 표본 확인의 합격 기준을 사용자가 말한 round는 없습니다."
+    },
+    "context": {
+      "score": 0.5,
+      "justification": "round 1, 2의 observation이 기존 값(6144, 0.55), v1 결과, 100개 base_commit을 보여 주고, round 3(원래 설정을 참고 실험으로 남김), round 4(grpc-go 100건 전체), round 5(결과에 AI 라벨임을 표시)로 기존 설정과 grpc-go 쪽은 정해졌지만, go-stablenet의 같은 12개 PR 재사용과 bge-m3 셀 여부(D4)가 open이라 바뀌는 것과 그대로인 것이 다 정해지지는 않았습니다."
+    }
+  },
+  "streak": 0,
+  "schema_version": 1
+}
