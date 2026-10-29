@@ -36,6 +36,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/system/debugtrace"
 	"github.com/0xmhha/knowledge-system/internal/system/footprint"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
+	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
 )
 
 // Default tuning; to be revisited with real-prompt data.
@@ -156,13 +157,33 @@ func New(ckg ckgclient.Client, opts ...Option) (*Expander, error) {
 	return e, nil
 }
 
+// ExpandOption adjusts one Expand call.
+type ExpandOption func(*expandOpts)
+
+type expandOpts struct {
+	demoteTests bool
+}
+
+// DemoteTestNeighbors applies Stage 2's test demotion to test-file neighbors.
+// Pass Stage2Output.DemoteTests: when Stage 2 kept tests below production
+// code, a test function reached by called_by must not outrank the production
+// callers of the same seed. Measured 2026-10-27 on grpc-go pr-8792 (qwen3):
+// 19 of the 20 neighbors above the answer caller were test functions.
+func DemoteTestNeighbors(demote bool) ExpandOption {
+	return func(o *expandOpts) { o.demoteTests = demote }
+}
+
 // Expand takes Stage 2's citations and produces a Stage3Output that pairs
 // them with their graph neighbors. Intent shapes both the Relation set
 // passed to ckg and the hop depth.
 //
 // Empty seeds returns an empty (non-error) Stage3Output — the composer
 // can decide whether a Stage-2 miss should abort the pipeline.
-func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, intent contract.Intent) (Stage3Output, error) {
+func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, intent contract.Intent, opts ...ExpandOption) (Stage3Output, error) {
+	var eo expandOpts
+	for _, opt := range opts {
+		opt(&eo)
+	}
 	out := Stage3Output{
 		Seeds:            seeds,
 		RelationCoverage: make(map[contract.Relation]int),
@@ -188,7 +209,7 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 	// legitimately want both — BugFix wants calls AND called_by. Split
 	// the relation set into per-direction groups and traverse each;
 	// the aggregator dedups targets across groups. nil relations (the
-	// Unknown broad fan-out) stays a single forward pass.
+	// Unknown broad fan-out) walks every forward edge type, then callers.
 	relationGroups := splitByDirection(relations)
 
 	seedKeys := buildSeedKeys(seeds)
@@ -221,6 +242,7 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 			// that ignores the Relations filter (or overlapping groups)
 			// must not double-count an edge's score/coverage.
 			for _, n := range ns {
+				n = orientFromSeed(seed.Citation, n)
 				k := n.Source.Key() + "|" + n.Target.Key() + "|" + string(n.Relation)
 				if _, ok := edgeSeen[k]; ok {
 					continue
@@ -253,6 +275,9 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
 			// ckgclient doc; the +1 guard avoids divide-by-zero if a
 			// backend ever returns distance 0.
 			score := seed.Score * relationWeight(intent, n.Relation) / float64(1+n.Distance)
+			if eo.demoteTests && testpath.IsTest(n.Target.File) {
+				score *= stage2.TestDemotionFactor
+			}
 			source := fmt.Sprintf("seed:%s:%s:dist=%d",
 				seed.Citation.File, n.Relation, n.Distance)
 			agg.add(n, score, source)
@@ -315,13 +340,32 @@ func (e *Expander) emitFootprint(ctx context.Context, intent contract.Intent, ou
 	e.fp.Event(ctx, "composer.stage3_expanded", fields...)
 }
 
+// orientFromSeed returns n with the seed side as Source and the neighbor as
+// Target, the shape ScoredNeighbor.Edge promises. ckgclient keeps the graph's
+// orientation: on a callers walk a calls edge still runs caller -> callee, so
+// the seed comes back as Target. The seed side is the endpoint overlapping the
+// seed citation; a seed chunk and its graph node can start on different lines
+// (a doc comment is part of the chunk, not the node).
+func orientFromSeed(seed contract.Citation, n contract.Neighbor) contract.Neighbor {
+	if overlaps(n.Target, seed) && !overlaps(n.Source, seed) {
+		n.Source, n.Target = n.Target, n.Source
+	}
+	return n
+}
+
+func overlaps(a, b contract.Citation) bool {
+	return a.File == b.File && a.StartLine <= b.EndLine && b.StartLine <= a.EndLine
+}
+
 // splitByDirection partitions a relation set into direction-homogeneous
 // groups for ckgclient.Neighbors, which traverses one direction per call.
 // called_by is the only reverse relation in the contract. nil input (the
-// broad Unknown fan-out) passes through as a single nil group.
+// broad Unknown fan-out) becomes a nil forward group plus a called_by group:
+// ckgclient reads nil as every forward edge type, so on its own it never
+// returns a seed's callers.
 func splitByDirection(rels []contract.Relation) [][]contract.Relation {
 	if len(rels) == 0 {
-		return [][]contract.Relation{nil}
+		return [][]contract.Relation{nil, {contract.RelationCalledBy}}
 	}
 	var forward, reverse []contract.Relation
 	for _, r := range rels {

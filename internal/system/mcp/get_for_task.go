@@ -8,6 +8,7 @@ import (
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 
 	"github.com/0xmhha/knowledge-system/internal/system/composer"
+	"github.com/0xmhha/knowledge-system/internal/system/composer/stage1"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -57,7 +58,7 @@ func handleGetForTask(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (r
 				"wait for ckv to become ready or provision it, then retry.", reason)), nil
 	}
 
-	pack, err := d.Composer.ComposeWithIntent(ctx, prompt, callerIntent)
+	pack, err := d.Composer.ComposeWithIntent(withCodeQueryArg(ctx, req), prompt, callerIntent)
 	if err != nil {
 		// Fail-closed is a policy outcome the caller needs to distinguish
 		// from a transient compose failure. Wrap the rule id in the text
@@ -73,4 +74,17 @@ func handleGetForTask(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (r
 	// payload (for callers that decode it). The pack itself carries the
 	// integrity hash; the wire envelope adds nothing.
 	return mcpgo.NewToolResultStructured(pack, "evidence pack"), nil
+}
+
+// codeQueryDescription documents the optional code_query argument shared by
+// get_for_task and get_for_task_v2.
+const codeQueryDescription = "Optional. The prompt restated in the code's own vocabulary, in English: what the code that " +
+	"must change does, plus the identifiers, types, packages and files you expect there (e.g. \"stats handler " +
+	"invoked for internal streams in `http2Client.NewStream` / `newNonRetryClientStream`; skip when nil\"). " +
+	"Used as the first semantic search instead of the prompt; the prompt still drives intent. Strongly " +
+	"recommended when the prompt is not English or not phrased in code terms."
+
+// withCodeQueryArg attaches the optional code_query argument for Stage 1.
+func withCodeQueryArg(ctx context.Context, req mcpgo.CallToolRequest) context.Context {
+	return stage1.WithCodeQuery(ctx, req.GetString("code_query", ""))
 }

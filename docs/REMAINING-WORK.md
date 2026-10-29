@@ -65,7 +65,7 @@
    - [`internal/vector/eval/prregress`](../internal/vector/eval/prregress)는 유료 LLM 에이전트를 부르므로 그대로 쓰지 않고, PR checkout과 정답 추출 방식만 참고한다
 2. **입력과 도구 (완료)**: 변환 스크립트, 비교 대상 스크립트, 스냅샷 연쇄 색인 스크립트를 만들고 입력을 결과 전에 고정했다([입력](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/README.md)). PR 421건 가운데 245건이 조건을 통과해 100건을 뽑았고, 정답 범위 575개와 한국어 질문 100개, 스냅샷 24개다. 질문 누설 검사와 앵커 검사를 모두 통과했다.
 3. **명세대로 실행하고 결과를 보고한다.** 임베딩 모델은 `qwen3-embedding:4b`(2560차원, 본 평가)와 `bge-m3`(기준선)다. 그래프는 스냅샷마다 한 번, 벡터는 모델마다 첫 스냅샷 전체 빌드 뒤 `reindex`로 만든다. `reindex` 전에 manifest를 이번 스냅샷의 그래프로 바꿔야 canonical ID가 맞는다(확인함). 그다음 CKS와 비교 대상 네 가지를 돌린다. 실패와 측정 못 한 값도 분모에 남긴다. 사람의 정답·질문 표본 확인(명세 7장)도 이 단계에서 받는다. **실행은 끝났고 사람의 표본 확인을 기다린다**: 2026-10-24에 두 모델의 색인 48개와 CKS·비교 대상 실행을 마쳤다([1차 결과](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/results/README.md)). PR 100건 기준 hit@1은 벡터만 0.24(qwen3)·0.20(bge-m3), CKS는 `cks eval` 그대로 0.07·0.03, 커밋 필터 없이 다시 채점하면 0.14·0.11이다. CKS 의도 정확도는 0/100·14/100이다. 실행 중 `ckv reindex`가 그래프 커밋을 갱신하지 않던 결함을 고쳤다(`9c7231e8`). 표본 확인을 받기 전까지 이 수치는 DEV 근거다. 스냅샷 커밋 판정을 어떻게 고칠지는 사용자가 정한다([현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) 4장).
-4. **결과에서 약한 곳을 고친다.** 의도 파악이 틀린 질문과 정답을 못 찾은 질문을 나눠 원인을 찾고, 고친 뒤 같은 표본으로 다시 잰다. **진행 중**: 2026-10-26에 첫 수정 묶음을 반영했다([진단 기록](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/README.md)). 단계별 디버그 기록 장치를 넣고, `FindSymbol`의 수식 심볼 해석, RRF의 목록 내 중복 합산, 히트 키워드의 순환 증거를 고쳤다. CKS MRR은 qwen3 0.189 → 0.232, bge-m3 0.209 → 0.271, go-stablenet 0.75 → 0.79다. 요인 ablation으로 의도 기준값(모델에 따라 갈림), Stage 1 BM25 재정렬(언어에 따라 갈림), 테스트 강등(필요), 팩 크기(용량과 맞교환)의 효과를 쟀다. 다음은 의도 판정을 모델의 유사도 크기에 기대지 않게 바꾸는 일이다.
+4. **결과에서 약한 곳을 고친다.** 의도 파악이 틀린 질문과 정답을 못 찾은 질문을 나눠 원인을 찾고, 고친 뒤 같은 표본으로 다시 잰다. **진행 중**: 2026-10-26에 첫 수정 묶음을 반영했다([진단 기록](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-26/README.md)). 단계별 디버그 기록 장치를 넣고, `FindSymbol`의 수식 심볼 해석, RRF의 목록 내 중복 합산, 히트 키워드의 순환 증거를 고쳤다. CKS MRR은 qwen3 0.189 → 0.232, bge-m3 0.209 → 0.271, go-stablenet 0.75 → 0.79다. 요인 ablation으로 의도 기준값(모델에 따라 갈림), Stage 1 BM25 재정렬(언어에 따라 갈림), 테스트 강등(필요), 팩 크기(용량과 맞교환)의 효과를 쟀다. 2026-10-27에 기준을 "고칠 곳의 코드가 LLM에 건네는 팩에 들어가는가"로 정하고 두 번째 묶음을 반영했다([진단 기록](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-27/README.md)). 시험 질문의 시험 파일 강등, 쓸 후보가 없는 Stage 4 칸, Stage 3이 호출자를 돌려주지 못하던 결함을 고쳤다. 정답이 팩에 있는 시나리오는 qwen3 39 → 51, bge-m3 46 → 58이고 잃은 것은 없다. MRR은 0.280, 0.317이다(벡터만 0.292, 0.291). 토큰은 약 1.5배다. `cks eval --commit-repo`로 공식 지표가 커밋 무시 값과 같아졌다(사용자 결정). 같은 날 이웃 순위를 고쳤다([이웃 순위 기록](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/neighbor-rank-2026-10-27/README.md)). Stage 4가 동점을 파일 이름 순으로 다시 정렬하던 결함과 시험 파일 이웃을 강등하지 않던 결함이다. 정답이 팩에 있는 시나리오는 qwen3 51 → 54, bge-m3 58 → 58(2건 얻고 2건 잃음)이고 토큰은 약 10% 늘었다(사용자가 예외로 채택). 정답 의도를 그대로 넣어도 팩이 거의 달라지지 않아(+1, -1) 의도 판정 개선은 뒤로 미룬다. 다음은 팩 칸 수와 토큰의 판단(12 → 16칸이면 정답 +4, +2, 토큰 약 +33% 예상)과, 후보에 오르지 못한 정답(33건, 25건)의 어휘 거리다.
 5. **go-stablenet으로 같은 평가를 한다.** 이전 go-stablenet 기록과 비교할 수 있게 같은 지표를 쓴다.
 
 ### 3.2 그다음: 코딩 에이전트 묶음
@@ -79,7 +79,12 @@ WI-V1을 다시 열 때는 이미 확인한 정답 시험을 판정 기준으로
 |항목|누가|상태|
 |---|---|---|
 |검색 평가 명세 확인|owner-acceptor|승인됨 (2026-10-23)|
-|PR 정답 표본과 질문 누설 확인|gold-reviewer 또는 owner-acceptor|확인 자료 준비됨, 응답 대기 ([자료](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md))|
+|PR 정답 표본과 질문 누설 확인|gold-reviewer 또는 owner-acceptor|사용자가 AI에게 맡겨 AI 검토만 있음(2026-10-27). 사람 확인은 대기 ([자료](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md))|
+|스냅샷 커밋 판정|사용자|정함 (2026-10-27): `cks eval`이 파일이 그대로인 인용을 받아들인다|
+|go-stablenet 질의 세트|사용자|정함 (2026-10-27): 한국어 질문 12개를 새로 만들어 고정. AI가 썼고 사람 확인 전|
+|D1·D3 수정 채택(미리 정한 기준을 넘지 못함)|사용자|정함 (2026-10-27): 둘 다 채택. 사유는 [진단 기록](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/diagnosis-2026-10-27/README.md) 4.4절|
+|이웃 순위 수정 채택(미리 정한 기준을 넘지 못함)|사용자|정함 (2026-10-27): D4·D5 채택, D6 제외. 원문 "A. fix-d45 채택 (Recommended)"|
+|팩을 12개까지 채우며 늘어난 토큰(약 1.5배, 이웃 순위 수정으로 약 10% 더)과 팩 칸 수|사용자|미정. 칸 수별 예상은 [이웃 순위 기록](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/neighbor-rank-2026-10-27/README.md) 5장|
 |N-12·N-14를 "사용자 일괄 채택(AI 검토 라벨)"로 따로 표시할지, N-10(전체 비용·p95)과 N-17(실제 운영 RTO/RPO)의 남은 범위를 별도 작업으로 뺄지|사용자|미정. 원장 상태는 바꾸지 않았다|
 |WI-V1 독립성 선언과 검토 결정|gold-reviewer|보류 (3.2)|
 |실제 LLM 답변 평가의 모델, 인증, 비용 상한|사용자|미정. 정하기 전에는 유료 모델을 호출하지 않는다|

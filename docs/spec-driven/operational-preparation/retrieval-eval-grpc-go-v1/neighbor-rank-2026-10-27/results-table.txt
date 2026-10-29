@@ -1,0 +1,50 @@
+| variant | qwen3 found / hit@1 / MRR / tokens | bge-m3 found / hit@1 / MRR / tokens | go-stablenet PR body r@5 / r@10 / MRR | go-stablenet Korean r@5 / r@10 / MRR |
+|---|---|---|---|---|
+| final | 51 (+0) / 0.18 / 0.280 (+0.000) / 1485 (+0%) | 58 (+0) / 0.20 / 0.317 (+0.000) / 2866 (+0%) | 0.57 / 0.71 (+0.00) / 0.73 (+0.00) | 0.38 / 0.44 (+0.00) / 0.60 (+0.00) |
+| fix-d4 | 53 (+2) / 0.18 / 0.280 (+0.000) / 1829 (+23%) | 57 (-1) / 0.20 / 0.317 (-0.000) / 3471 (+21%) | 0.57 / 0.71 (+0.00) / 0.73 (+0.00) | 0.38 / 0.44 (+0.00) / 0.60 (+0.00) |
+| fix-d45 | 54 (+3) / 0.18 / 0.281 (+0.001) / 1633 (+10%) | 58 (+0) / 0.20 / 0.317 (-0.000) / 3164 (+10%) | 0.57 / 0.71 (+0.00) / 0.73 (+0.00) | 0.38 / 0.44 (+0.00) / 0.60 (+0.00) |
+| fix-d456 | 55 (+4) / 0.18 / 0.281 (+0.002) / 1800 (+21%) | 58 (+0) / 0.20 / 0.317 (-0.000) / 3221 (+12%) | 0.57 / 0.71 (+0.00) / 0.73 (+0.00) | 0.38 / 0.44 (+0.00) / 0.60 (+0.00) |
+| final2 | 54 (+3) / 0.18 / 0.281 (+0.001) / 1633 (+10%) | 58 (+0) / 0.20 / 0.317 (-0.000) / 3164 (+10%) | 0.57 / 0.71 (+0.00) / 0.73 (+0.00) | 0.38 / 0.44 (+0.00) / 0.60 (+0.00) |
+
+fix-d4 qwen3-embedding:4b: gained 2, lost 0
+  + ('pr-8886', 'cut_stage4', 10, 'seed_quota', 10)
+  + ('pr-8894', 'cut_stage4', 0, 'citation_cap', 10)
+
+fix-d4 bge-m3: gained 1, lost 2
+  + ('pr-8875', 'cut_stage4', 0, 'citation_cap', 10)
+  - ('pr-8979', 'cut_stage4', 0, 'citation_cap', 12)
+  - ('pr-9070', 'cut_stage4', 27, 'seed_quota', 11)
+
+fix-d45 qwen3-embedding:4b: gained 3, lost 0
+  + ('pr-8792', 'cut_stage4', 0, 'citation_cap', 12)
+  + ('pr-8886', 'cut_stage4', 10, 'seed_quota', 10)
+  + ('pr-8894', 'cut_stage4', 0, 'citation_cap', 10)
+
+fix-d45 bge-m3: gained 2, lost 2
+  + ('pr-8869', 'cut_stage4', 0, 'citation_cap', 12)
+  + ('pr-8875', 'cut_stage4', 0, 'citation_cap', 10)
+  - ('pr-8979', 'cut_stage4', 0, 'citation_cap', 12)
+  - ('pr-9070', 'cut_stage4', 27, 'seed_quota', 11)
+
+fix-d456 qwen3-embedding:4b: gained 4, lost 0
+  + ('pr-8792', 'cut_stage4', 0, 'citation_cap', 12)
+  + ('pr-8886', 'cut_stage4', 10, 'seed_quota', 10)
+  + ('pr-8894', 'cut_stage4', 0, 'citation_cap', 10)
+  + ('pr-9008', 'cut_stage4', 0, 'citation_cap', 12)
+
+fix-d456 bge-m3: gained 2, lost 2
+  + ('pr-8869', 'cut_stage4', 0, 'citation_cap', 12)
+  + ('pr-8875', 'cut_stage4', 0, 'citation_cap', 10)
+  - ('pr-8979', 'cut_stage4', 0, 'citation_cap', 12)
+  - ('pr-9070', 'cut_stage4', 27, 'seed_quota', 11)
+
+final2 qwen3-embedding:4b: gained 3, lost 0
+  + ('pr-8792', 'cut_stage4', 0, 'citation_cap', 12)
+  + ('pr-8886', 'cut_stage4', 10, 'seed_quota', 10)
+  + ('pr-8894', 'cut_stage4', 0, 'citation_cap', 10)
+
+final2 bge-m3: gained 2, lost 2
+  + ('pr-8869', 'cut_stage4', 0, 'citation_cap', 12)
+  + ('pr-8875', 'cut_stage4', 0, 'citation_cap', 10)
+  - ('pr-8979', 'cut_stage4', 0, 'citation_cap', 12)
+  - ('pr-9070', 'cut_stage4', 27, 'seed_quota', 11)

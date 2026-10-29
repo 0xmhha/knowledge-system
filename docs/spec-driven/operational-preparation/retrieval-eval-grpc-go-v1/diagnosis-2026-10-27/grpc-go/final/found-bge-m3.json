@@ -1,0 +1,3211 @@
+{
+ "model": "x",
+ "deep_k": 1000,
+ "stage1_k": 20,
+ "summary": {
+  "scenarios": 100,
+  "loss": {
+   "found": 58,
+   "cut_stage4": 14,
+   "cut_stage2": 3,
+   "never_retrieved": 25
+  },
+  "never_retrieved_cause": {
+   "not_indexed": 0,
+   "vector_deep": 0,
+   "dropped_stage1": 0,
+   "vector_absent": 0
+  },
+  "never_retrieved_answer_file_in_stage1": 9,
+  "never_retrieved_tests_only": 7,
+  "vector_rank_bucket": {
+   "found": {
+    "unprobed": 58
+   },
+   "cut_stage4": {
+    "unprobed": 14
+   },
+   "cut_stage2": {
+    "unprobed": 3
+   },
+   "never_retrieved": {
+    "unprobed": 25
+   }
+  },
+  "cut_stage4_answer_decision": {
+   "citation_cap": 6,
+   "seed_quota": 7,
+   "reserve_holdback": 1
+  }
+ },
+ "scenarios": [
+  {
+   "name": "pr-9003",
+   "snapshot": "12e91ddb6df6150efa1dd13affc7e6cae7d12ff5",
+   "prompt": "xDS 서버 시험이 서버가 정상 서비스 상태에 들어가기 전에 첫 RPC를 보내서 가끔 실패해. 서비스 상태가 될 때까지 기다리게 하고 싶어",
+   "expected_intent": "test_add",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "xds/server_serving_mode_ext_test.go:169",
+    "xds/server_ext_test.go:204",
+    "xds/server_test.go:349"
+   ]
+  },
+  {
+   "name": "pr-9114",
+   "snapshot": "18a8d3db88339ca7433cc6fae703a96f83a23921",
+   "prompt": "예전 방식 gzip 압축 해제기가 크기 제한 없이 끝까지 읽어서 메모리가 터질 수 있어. 해제 크기를 제한하고 싶어",
+   "expected_intent": "security",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 2,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "rpc_util.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "rpc_util.go:130",
+    "test/compressor_test.go:652",
+    "internal/transport/controlbuf.go:494"
+   ]
+  },
+  {
+   "name": "pr-8945",
+   "snapshot": "1d4fa8a7b772553e82137b059ad4a8f632a1c522",
+   "prompt": "xDS 클러스터 구현 밸런서가 xDS 전체 설정에서 바로 갱신을 받게 하고, 그 때문에 필요 없어진 LB 설정 필드를 지우고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 5,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 4,
+    "stage3": 4,
+    "stage4": 4
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/configbuilder.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/cdsbalancer/cdsbalancer.go:362",
+    "internal/xds/balancer/cdsbalancer/cdsbalancer.go:324",
+    "internal/xds/balancer/clustermanager/config.go:33"
+   ]
+  },
+  {
+   "name": "pr-9100",
+   "snapshot": "39f16539d2463c05d52b4c44137831fd5f73f7d9",
+   "prompt": "xDS 리졸버가 클러스터 지정 플러그인을 쓰는 라우트에는 HTTP 필터 체인을 만들지 않아. 그 라우트에도 필터가 적용되게 하고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 17,
+    "ckv_round2": 0,
+    "stage1": 17,
+    "fused": 18,
+    "stage2": 7,
+    "stage3": 7,
+    "stage4": 7
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/resolver/xds_resolver.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/resolver/xds_http_filters_test.go:926",
+    "internal/xds/resolver/xds_http_filters_test.go:1117",
+    "internal/proto/grpc_lookup_v1/rls_config.pb.go:487"
+   ]
+  },
+  {
+   "name": "pr-8824",
+   "snapshot": "572fdca53b1212cef3c897a0b30c2644971b6cf1",
+   "prompt": "가중 라운드로빈 정책의 로그가 너무 부족해. 중요한 이벤트마다 상세 수준에서 로그를 남기고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "examples/features/debugging/README.md:5",
+    "Documentation/log_levels.md:6",
+    "internal/binarylog/method_logger_test.go:58"
+   ]
+  },
+  {
+   "name": "pr-8869",
+   "snapshot": "61d569d3e4007c48b1ca6b6800f13e5b5bba668c",
+   "prompt": "구글 C2P 쪽 전역 대체 부트스트랩 설정 API를 지웠는데 내부에서 아직 쓰고 있어. 지운 변경을 되돌리고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "bug_fix",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 36,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "citation_cap",
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "xds/googledirectpath/googlec2p_test.go:379",
+    "xds/googledirectpath/googlec2p_test.go:476",
+    "xds/googledirectpath/googlec2p.go:103"
+   ]
+  },
+  {
+   "name": "pr-9014",
+   "snapshot": "6477252c28b2222e6f0e6d2b7c01fa0b7b7eb3e5",
+   "prompt": "xDS 클라이언트 설정을 만드는 함수를 외부 패키지에서도 쓸 수 있게 공개하고, 가짜 전송에서 생길 수 있는 교착도 고치고 싶어. 퍼저에서 쓸 거야",
+   "expected_intent": "test_add",
+   "intent": "feature_add",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 12,
+    "ckv_round2": 0,
+    "stage1": 12,
+    "fused": 11,
+    "stage2": 10,
+    "stage3": 10,
+    "stage4": 10
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/clients/internal/testutils/faketransport/xds_fake_transport.go",
+    "internal/xds/xdsclient/clientimpl.go",
+    "internal/xds/xdsclient/clientimpl_test.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/clients/xdsclient/test/ads_stream_backoff_test.go:53",
+    "test/xds/xds_server_integration_test.go:314",
+    "internal/xds/testutils/fakeclient/<convention>:0"
+   ]
+  },
+  {
+   "name": "pr-8841",
+   "snapshot": "679565f9ae655079807f5ab10e07f41acd2af943",
+   "prompt": "xDS 코드에서 리졸버 상태의 주소 목록을 쓰는 곳을 모두 없애고 엔드포인트만 쓰게 하고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "internal/xds/xdsdepmgr/xds_dependency_manager.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/tests/eds_watchers_test.go:108",
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go:110",
+    "internal/xds/xdsclient/xdsresource/endpoints_resource_type.go:116"
+   ]
+  },
+  {
+   "name": "pr-8923",
+   "snapshot": "679ae4c7df728622eb8d58e7ea8dcffc043169b7",
+   "prompt": "OpenTelemetry 추적에서 예전에 되돌렸던 변경을 다시 넣고, 그때 실패하던 시험의 경쟁 상태도 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "test_add",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "stats/opentelemetry/opentelemetry.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "stats/opentelemetry/opentelemetry.go:45",
+    "clientconn.go:1411",
+    "stats/opentelemetry/example_test.go:132"
+   ]
+  },
+  {
+   "name": "pr-8939",
+   "snapshot": "71a4abb619b5d53a4121f9a1b68967b9b35f589a",
+   "prompt": "xDS 클러스터 리졸버 설정 생성 시험이 패키지 전역 변수와 패키지 초기화 함수에 기대고 있어. 도우미 함수로 바꾸고 싶어",
+   "expected_intent": "test_add",
+   "intent": "refactor",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/configbuilder_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsdepmgr/xds_dependency_manager_test.go:1790",
+    "internal/xds/xdsdepmgr/xds_dependency_manager_test.go:202",
+    "test/xds/xds_rls_clusterspecifier_plugin_test.go:101"
+   ]
+  },
+  {
+   "name": "pr-8733",
+   "snapshot": "830c9098e4d034e0c7641e1fbc6001c2570bbc0f",
+   "prompt": "xDS에서 논리 DNS 클러스터는 로드밸런싱 정책이 고정돼 있는데, 이중 스택(IPv4/IPv6) 백엔드 제안대로 바꾸고 싶어. 어디서 그 클러스터 설정을 만드는지 알려줘",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 2,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/clusterresolver/configbuilder.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/clusterresolver/configbuilder.go:142",
+    "internal/xds/balancer/clustermanager/config.go:33",
+    "internal/xds/balancer/clusterimpl/picker.go:223"
+   ]
+  },
+  {
+   "name": "pr-8765",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "예전 방식 압축 해제 옵션을 켜면 헬스체크가 실패해. 헬스체크용 스트림을 만들 때 압축 해제기가 안 붙는 것 같은데 어디를 고쳐야 해?",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/healthcheck_test.go:700",
+    "balancer/pickfirst/pickfirst_ext_test.go:2374",
+    "test/healthcheck_test.go:413"
+   ]
+  },
+  {
+   "name": "pr-8769",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "HTTP/2 서버가 스트림을 일찍 끊을 때 헤더 목록 크기 제한을 검사하지 않아. 제한을 넘으면 RST_STREAM을 보내게 하고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 8,
+    "stage1": 3,
+    "fused": 4,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/transport/http2_server.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/transport/transport_test.go:3234",
+    "internal/transport/http2_client.go:1238",
+    "internal/transport/http2_server.go:972"
+   ]
+  },
+  {
+   "name": "pr-8779",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "xDS 클러스터 구현 정책에서 :authority 헤더를 백엔드 호스트 이름으로 자동으로 바꿔 쓰는 기능을 넣고 싶어. 피커가 어디서 이걸 결정해야 해?",
+   "expected_intent": "feature_add",
+   "intent": "feature_add",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/testutils/xds/e2e/clientresources.go",
+    "internal/xds/balancer/clusterimpl/picker.go",
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/clusterimpl/picker.go:214",
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go:42",
+    "internal/xds/bootstrap/bootstrap.go:163"
+   ]
+  },
+  {
+   "name": "pr-8780",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "OpenTelemetry 관찰형 게이지처럼 비동기로 값을 보고하는 지표를 등록하고 기록하는 API를 지표 기록기 쪽에 추가하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "experimental/stats/metrics.go",
+    "stats/opentelemetry/opentelemetry.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "stats/opentelemetry/opentelemetry.go:456",
+    "experimental/stats/metricregistry_test.go:312",
+    "stats/opentelemetry/opentelemetry.go:362"
+   ]
+  },
+  {
+   "name": "pr-8786",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "연결 시도를 취소했을 때 이미 만들어진 전송 계층을 별도 고루틴으로 닫아서 추적 안 되는 고루틴이 남아. 그 자리에서 바로 닫게 바꾸고 싶어",
+   "expected_intent": "refactor",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 2,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "clientconn.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/pickfirst/pickfirst.go:551",
+    "clientconn.go:1480",
+    "internal/transport/controlbuf.go:230"
+   ]
+  },
+  {
+   "name": "pr-8787",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "전송 연결을 시작하는 함수가 아무도 안 쓰는 값을 돌려주고 있어. 그 반환값을 없애고 싶어",
+   "expected_intent": "refactor",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "clientconn.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/roundrobin_test.go:108",
+    "clientconn.go:1167",
+    "test/retry_test.go:593"
+   ]
+  },
+  {
+   "name": "pr-8793",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "CDS 밸런서 설정에 동적 클러스터인지 표시하는 값을 추가하고, 라우트 조회 서비스의 클러스터 지정 플러그인에서는 그걸 켜고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 15,
+    "stage1": 25,
+    "fused": 25,
+    "stage2": 14,
+    "stage3": 14,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "seed_quota",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/cdsbalancer.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/resolver/serviceconfig.go:63",
+    "test/xds/xds_rls_clusterspecifier_plugin_test.go:46",
+    "internal/xds/balancer/cdsbalancer/cdsbalancer_test.go:645"
+   ]
+  },
+  {
+   "name": "pr-8804",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "xDS 로드밸런싱 정책들이 아직 리졸버 상태의 주소 목록을 쓰고 있어. 엔드포인트 목록만 쓰도록 옮기고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/clusterresolver/configbuilder.go",
+    "internal/xds/balancer/wrrlocality/balancer.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go:180",
+    "internal/xds/balancer/wrrlocality/balancer.go:123",
+    "internal/xds/xdsclient/xdsresource/xdsconfig.go:73"
+   ]
+  },
+  {
+   "name": "pr-8810",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "이상치 탐지 밸런서에서 서브커넥션 주소 갱신을 처리하는 코드가 이제 안 쓰여. 지우고 싶어",
+   "expected_intent": "refactor",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/outlierdetection/balancer.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/outlierdetection/balancer.go:557",
+    "internal/xds/balancer/outlierdetection/balancer_test.go:836",
+    "balancer/grpclb/grpclb_remote_balancer.go:98"
+   ]
+  },
+  {
+   "name": "pr-8811",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "CDS 밸런서가 감싼 클라이언트 연결에서 서브커넥션 주소 갱신 처리를 없애고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/cdsbalancer.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/base/balancer.go:95",
+    "internal/xds/balancer/cdsbalancer/cdsbalancer.go:289",
+    "balancer/grpclb/grpclb_remote_balancer.go:98"
+   ]
+  },
+  {
+   "name": "pr-8812",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "DNS 리졸버가 갱신을 보낼 때 주소만 채우고 엔드포인트는 안 채워. 리졸버가 직접 엔드포인트를 채우게 하고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/resolver/dns/dns_resolver.go",
+    "internal/xds/xdsdepmgr/xds_dependency_manager.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/clusterresolver/resource_resolver_dns.go:54",
+    "internal/xds/xdsdepmgr/xds_dependency_manager.go:748",
+    "internal/xds/xdsclient/xdsresource/xdsconfig.go:89"
+   ]
+  },
+  {
+   "name": "pr-8813",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "priority 정책에서 자식이 연결 중에서 다시 연결 중으로 바뀌면 초기화 타이머가 다시 시작돼서 장애 전환이 늦어져. 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 10,
+    "ckv_round2": 7,
+    "stage1": 10,
+    "fused": 10,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/priority/balancer_priority.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/priority/balancer_priority.go:38",
+    "internal/xds/balancer/priority/balancer_test.go:1049",
+    "internal/xds/balancer/priority/balancer_test.go:372"
+   ]
+  },
+  {
+   "name": "pr-8815",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "가중 라운드로빈 스케줄러의 원자 연산을 새 스타일 atomic 타입으로 바꾸고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 9,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "balancer/weightedroundrobin/balancer.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/weightedroundrobin/balancer.go:470",
+    "balancer/weightedroundrobin/balancer.go:440",
+    "balancer/grpclb/grpclb_test.go:155"
+   ]
+  },
+  {
+   "name": "pr-8823",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "스트림 서버 인터셉터 문서 설명이 헷갈려. 설명을 더 정확하게 고치고 싶어",
+   "expected_intent": "docs_update",
+   "intent": "bug_fix",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 16,
+    "ckv_round2": 3,
+    "stage1": 16,
+    "fused": 16,
+    "stage2": 10,
+    "stage3": 10,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "seed_quota",
+   "answer_files_in_stage1": [
+    "interceptor.go",
+    "stream.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "stream.go:79",
+    "interceptor.go:89",
+    "examples/features/metadata_interceptor/README.md:39"
+   ]
+  },
+  {
+   "name": "pr-8830",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "gzip 압축기에 있는 압축 해제 후 크기를 알려주는 API를 아무도 안 써. 지우고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "encoding/gzip/gzip.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "encoding/gzip/gzip.go:114",
+    "Documentation/compression.md:25",
+    "encoding/proto/proto.go:43"
+   ]
+  },
+  {
+   "name": "pr-8839",
+   "snapshot": "88ac70352f5ba10ba7c7781b0a5efdb06aaba55f",
+   "prompt": "서버의 중복 갱신 억제 시험이 가끔 실패해. 연결이 Ready로 안정되기 전에 상태 변화를 보기 시작해서 그런 것 같아. 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "xds/server_resource_ext_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 8
+   },
+   "selected": 8,
+   "stage1_top3": [
+    "xds/server_serving_mode_ext_test.go:46",
+    "test/clientconn_state_transition_test.go:409",
+    "balancer/endpointsharding/endpointsharding_ext_test.go:205"
+   ]
+  },
+  {
+   "name": "pr-8792",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "xDS 의존성 관리에서 클러스터를 구독하면 참조 수를 올리고 해지하면 내리는 기능을 만들고 싶어. 동적 클러스터 감시에 쓸 거야",
+   "expected_intent": "refactor",
+   "intent": "feature_add",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/resolver/xds_resolver.go",
+    "internal/xds/xdsdepmgr/xds_dependency_manager.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/xdsresource/cluster_resource_type.go:130",
+    "internal/xds/xdsdepmgr/xds_dependency_manager.go:217",
+    "internal/xds/clients/xdsclient/channel_test.go:582"
+   ]
+  },
+  {
+   "name": "pr-8822",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "논리 DNS 클러스터에서는 :authority 헤더 자동 재작성이 안 돼. DNS 호스트 이름을 엔드포인트 속성에 넣어 주고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 8,
+    "ckv_round2": 8,
+    "stage1": 8,
+    "fused": 8,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/clusterresolver/configbuilder.go",
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/xdsresource/unmarshal_cds.go:234",
+    "internal/xds/balancer/clusterresolver/resource_resolver_dns.go:54",
+    "internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go:62"
+   ]
+  },
+  {
+   "name": "pr-8827",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "활성 스트림이 있을 때 클라이언트가 keepalive로 연결을 닫는지 보는 시험이 가끔 경쟁 상태로 실패해. 핑 응답을 조절할 수 있는 서버로 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/transport/keepalive_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/transport/keepalive_test.go:347",
+    "internal/transport/keepalive_test.go:245",
+    "internal/transport/keepalive_test.go:283"
+   ]
+  },
+  {
+   "name": "pr-8829",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "구글 C2P 쪽의 전역 대체 부트스트랩 설정 API는 이제 쓸모가 없어. 그 API와 관련 필드를 지우고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 10,
+    "ckv_round2": 0,
+    "stage1": 10,
+    "fused": 10,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/xdsclient/pool.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "xds/googledirectpath/googlec2p_test.go:379",
+    "xds/googledirectpath/googlec2p_test.go:476",
+    "internal/xds/httpfilter/httpfilter.go:98"
+   ]
+  },
+  {
+   "name": "pr-8831",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "인증서 기반 보안 연결에서 RPC마다 덮어쓴 authority를 검증할 때 인증서 체인 전체가 아니라 말단 인증서만 봐야 해. 그렇게 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "security",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 5,
+    "stage1": 23,
+    "fused": 23,
+    "stage2": 6,
+    "stage3": 6,
+    "stage4": 6
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "credentials/credentials.go:132",
+    "examples/features/authentication/README.md:1",
+    "internal/xds/balancer/clusterimpl/tests/balancer_test.go:1393"
+   ]
+  },
+  {
+   "name": "pr-8833",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "이상치 탐지 설정 파싱 시험을 외부 시험 전용 패키지로 옮기고, 하위 시험 이름도 스타일 가이드에 맞추고 싶어",
+   "expected_intent": "test_add",
+   "intent": "test_add",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 13,
+    "stage1": 31,
+    "fused": 31,
+    "stage2": 29,
+    "stage3": 29,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "seed_quota",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/outlierdetection/balancer_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/outlierdetection/config_test.go:1",
+    "internal/xds/balancer/outlierdetection/config_test.go:40",
+    "internal/xds/balancer/outlierdetection/balancer_test.go:560"
+   ]
+  },
+  {
+   "name": "pr-8837",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "밸런서 등록소가 이름 대소문자를 구분하도록 바꾸려고 해. 환경 변수로 켜고 끌 수 있게 하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 4,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "balancer/balancer.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/balancer.go:48",
+    "internal/xds/balancer/priority/balancer_child.go:78",
+    "balancer/pickfirst/pickfirst_ext_test.go:1469"
+   ]
+  },
+  {
+   "name": "pr-8843",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "xDS 클라이언트 로그 메시지에 같은 낱말이 두 번 들어간 오타가 있어. 고치고 싶어",
+   "expected_intent": "docs_update",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/clients/xdsclient/test/dump_test.go:271",
+    "internal/xds/clients/xdsclient/test/dump_test.go:103",
+    "internal/xds/clients/xdsclient/internal/xdsresource/errors.go:65"
+   ]
+  },
+  {
+   "name": "pr-8845",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "보내는 헤더 목록이 8KB를 넘으면 경고 로그를 남기고 싶어. 나중에 기본 제한을 8KB로 줄이기 전 단계야",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/transport/http2_server.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/transport/http2_server.go:937",
+    "balancer/ringhash/config.go:31",
+    "internal/xds/xdsclient/xdslbregistry/converter/converter.go:63"
+   ]
+  },
+  {
+   "name": "pr-8854",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "스트림 시험 파일에서 proto 메시지에 testpb 별칭을 쓰도록 바꾸고 싶어",
+   "expected_intent": "test_add",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "interop/grpc_testing/control.pb.go:1282",
+    "profiling/proto/service.pb.go:331",
+    "profiling/proto/service.pb.go:60"
+   ]
+  },
+  {
+   "name": "pr-8856",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "RLS 데이터 캐시 크기를 줄였을 때 피커가 갱신되는지 보는 시험이 가끔 실패해. 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "test_add",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 15,
+    "stage1": 5,
+    "fused": 5,
+    "stage2": 5,
+    "stage3": 5,
+    "stage4": 5
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "balancer/rls/balancer_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/rls/metrics_test.go:271",
+    "balancer/rls/picker_test.go:338",
+    "balancer/rls/metrics_test.go:162"
+   ]
+  },
+  {
+   "name": "pr-8859",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "밸런서와 가짜 grpclb 서버 쪽에서 형식 인자를 쓰면서 형식 없는 로그 함수를 부르고 있어. 형식 있는 함수로 바꾸고 정수에는 %d를 쓰고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 20,
+    "stage1": 5,
+    "fused": 5,
+    "stage2": 18,
+    "stage3": 18,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "reserve_holdback",
+   "answer_files_in_stage1": [
+    "internal/testutils/fakegrpclb/server.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/balancer_switching_test.go:327",
+    "balancer/grpclb/grpclb_test.go:1297",
+    "internal/testutils/fakegrpclb/server.go:54"
+   ]
+  },
+  {
+   "name": "pr-8863",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "피커가 고른 전송이 준비가 안 됐을 때 도는 반복의 로그가 너무 비싸. 상세 수준 2일 때만 찍게 하고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 17,
+    "ckv_round2": 0,
+    "stage1": 17,
+    "fused": 17,
+    "stage2": 13,
+    "stage3": 13,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "seed_quota",
+   "answer_files_in_stage1": [
+    "picker_wrapper.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "orca/producer.go:66",
+    "internal/binarylog/method_logger_test.go:58",
+    "balancer/rls/picker.go:81"
+   ]
+  },
+  {
+   "name": "pr-8864",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "지역(locality)을 우선순위별로 묶는 부분을 단순하게 하고, 가중치 기반 무작위 섞기 제안을 구현하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 11,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/clusterresolver/configbuilder.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/weightedtarget/weightedtarget.go:88",
+    "balancer/weightedtarget/weightedtarget.go:86",
+    "internal/testutils/xds/e2e/clientresources.go:627"
+   ]
+  },
+  {
+   "name": "pr-8871",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "예제 시험 스크립트가 클라이언트가 끝나자마자 서버 로그를 확인해서 가끔 실패해. 기대한 로그가 나올 때까지 기다리게 하고 싶어",
+   "expected_intent": "test_add",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "examples/features/wait_for_ready/main.go:47",
+    "binarylog/binarylog_end2end_test.go:970",
+    "internal/xds/testutils/fakeclient/client.go:107"
+   ]
+  },
+  {
+   "name": "pr-8879",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "코드 생성 플러그인 protoc-gen-go-grpc의 버전 표시를 다음 릴리스 번호로 올리고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 12,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 4,
+    "stage3": 4,
+    "stage4": 4
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "cmd/protoc-gen-go-grpc/main.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "cmd/protoc-gen-go-grpc/grpc.go:161",
+    "cmd/protoc-gen-go-grpc/main.go:50",
+    "version.go:21"
+   ]
+  },
+  {
+   "name": "pr-8886",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "메시지 읽기에서 압축 해제 중 오류로 일찍 반환하면 버퍼가 풀에 안 돌아가. 오류가 나도 버퍼를 돌려주게 하고 싶어",
+   "expected_intent": "refactor",
+   "intent": "bug_fix",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 59,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "citation_cap",
+   "answer_files_in_stage1": [
+    "rpc_util.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "mem/buffer_slice.go:148",
+    "rpc_util.go:815",
+    "balancer/grpclb/grpc_lb_v1/load_balancer.pb.go:435"
+   ]
+  },
+  {
+   "name": "pr-8889",
+   "snapshot": "90f571db95a0ec223ec45187f7399a06ccdc10cf",
+   "prompt": "CDS 밸런서의 여러 지역 EDS 시험이 느린 기계에서 시간 초과로 실패해. 제한 시간을 늘리고 싶어",
+   "expected_intent": "test_add",
+   "intent": "refactor",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 13,
+    "stage1": 5,
+    "fused": 5,
+    "stage2": 5,
+    "stage3": 5,
+    "stage4": 5
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go:870",
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go:470",
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go:558"
+   ]
+  },
+  {
+   "name": "pr-8905",
+   "snapshot": "944f0585ca8664eb8f09635531c3c9d52d1e8bbb",
+   "prompt": "keepalive 시험에서 스트림이 정상인지 확인하는 도우미가 nil 스트림을 제대로 검사하지 않아. 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 14,
+    "stage1": 3,
+    "fused": 3,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/transport/keepalive_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/end2end_test.go:6848",
+    "internal/transport/keepalive_test.go:603",
+    "internal/transport/keepalive_test.go:813"
+   ]
+  },
+  {
+   "name": "pr-8807",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "xDS 클라이언트가 리소스 수와 ADS 스트림 연결 여부를 비동기 게이지 지표로 보고하게 하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 9,
+    "ckv_round2": 18,
+    "stage1": 9,
+    "fused": 9,
+    "stage2": 6,
+    "stage3": 6,
+    "stage4": 6
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/clients/xdsclient/ads_stream.go",
+    "internal/xds/clients/xdsclient/xdsclient.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/tests/ads_stream_ack_nack_test.go:354",
+    "internal/xds/xdsdepmgr/xds_dependency_manager.go:65",
+    "internal/xds/clients/xdsclient/test/ads_stream_backoff_test.go:328"
+   ]
+  },
+  {
+   "name": "pr-8832",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "서버가 스트림 끝(END_STREAM)을 보냈는데 클라이언트 쪽 스트림이 아직 열려 있으면, 클라이언트가 RST_STREAM을 보내야 해. 지금은 안 보내는데 어디를 고쳐야 해?",
+   "expected_intent": "bug_fix",
+   "intent": "bug_fix",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 67,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "citation_cap",
+   "answer_files_in_stage1": [
+    "internal/transport/http2_client.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/transport/http2_client.go:1618",
+    "internal/transport/http2_client.go:1243",
+    "test/end2end_test.go:4741"
+   ]
+  },
+  {
+   "name": "pr-8894",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "재시도 횟수를 다 썼을 때 실패를 감싸는 전용 오류 값을 만들어서 호출자가 구별할 수 있게 하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "test_add",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "examples/features/retry/README.md:9",
+    "examples/features/retry/server/main.go:60",
+    "dialoptions.go:41"
+   ]
+  },
+  {
+   "name": "pr-8909",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "xDS 클라이언트와 xDS 서버 쪽에서 IP 주소와 대역을 옛 net 타입 대신 netip 타입으로 바꾸고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 35,
+    "stage2": 14,
+    "stage3": 14,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "seed_quota",
+   "answer_files_in_stage1": [
+    "internal/xds/xdsclient/xdsresource/filter_chain.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "xds/googledirectpath/googlec2p_test.go:199",
+    "internal/xds/xdsclient/xdsresource/filter_chain.go:137",
+    "internal/xds/xdsclient/tests/dump_test.go:97"
+   ]
+  },
+  {
+   "name": "pr-8965",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "xDS 핸드셰이크 정보에 SNI 값과 SAN 자동 검증 여부를 넣고, TLS 설정을 만들 때 그 SNI를 쓰게 하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 3,
+    "stage1": 3,
+    "fused": 4,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/credentials/xds/handshake_info.go",
+    "internal/xds/server/conn_wrapper.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/credentials/xds/handshake_info.go:292",
+    "internal/xds/clients/xdsclient/test/custom_resource_watch_test.go:124",
+    "internal/xds/server/conn_wrapper.go:91"
+   ]
+  },
+  {
+   "name": "pr-8970",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "ADS 응답에 이름이 빈 리소스가 있으면 xDS 클라이언트가 가끔 panic이 나. 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 7,
+    "ckv_round2": 4,
+    "stage1": 7,
+    "fused": 7,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/clients/xdsclient/channel.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/tests/ads_stream_ack_nack_test.go:354",
+    "internal/xds/clients/xdsclient/test/ads_stream_ack_nack_test.go:366",
+    "xds/csds/csds_e2e_test.go:531"
+   ]
+  },
+  {
+   "name": "pr-8973",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "서브채널 연결 끊김 지표의 끊김 이유 레이블에 실제 이유 값을 채우고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/clients/lrsclient/loadreport_test.go:576",
+    "test/channelz_test.go:2078",
+    "internal/stats/metrics_recorder_list.go:53"
+   ]
+  },
+  {
+   "name": "pr-8978",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "바이너리 로그 e2e 시험에서 직접 만든 시험 서버 대신 공용 스텁 서버를 쓰게 바꾸고 싶어",
+   "expected_intent": "test_add",
+   "intent": "",
+   "loss": "cut_stage2",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 17,
+    "stage1": 31,
+    "fused": 32,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/test/e2e/e2e.go:44",
+    "internal/xds/test/e2e/e2e.go:127",
+    "orca/service_test.go:48"
+   ]
+  },
+  {
+   "name": "pr-8979",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "grpclb 시험에서 직접 만든 시험 서버 대신 공용 스텁 서버를 쓰게 바꾸고 싶어",
+   "expected_intent": "test_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 35,
+    "stage4": 12
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "balancer/grpclb/grpclb_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/grpclb/grpclb_test.go:1168",
+    "test/balancer_switching_test.go:327",
+    "test/balancer_switching_test.go:270"
+   ]
+  },
+  {
+   "name": "pr-8980",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "stats 시험에서 직접 만든 시험 서버 대신 공용 스텁 서버를 쓰게 바꾸고 싶어",
+   "expected_intent": "test_add",
+   "intent": "",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 9,
+    "ckv_round2": 0,
+    "stage1": 9,
+    "fused": 9,
+    "stage2": 9,
+    "stage3": 9,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "seed_quota",
+   "answer_files_in_stage1": [
+    "stats/stats_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/testutils/stubstatshandler.go:27",
+    "internal/transport/handler_server_test.go:529",
+    "xds/server_ext_test.go:124"
+   ]
+  },
+  {
+   "name": "pr-8985",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "서버가 맨 앞 슬래시가 없는 잘못된 :path 헤더를 받아들여서 경로 기반 거부 규칙을 우회할 수 있어. 정규 형식이 아닌 경로는 바로 거부하고 싶어",
+   "expected_intent": "security",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/resolver/delegatingresolver/delegatingresolver.go:255",
+    "test/http_header_end2end_test.go:154",
+    "examples/route_guide/README.md:23"
+   ]
+  },
+  {
+   "name": "pr-8990",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "xDS RBAC의 IP 매칭이 포트가 붙은 주소 문자열을 제대로 처리하지 못해. 포트를 떼고 비교하게 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 0,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/rbac/matchers.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/xds/xds_server_rbac_test.go:539",
+    "test/xds/xds_server_rbac_test.go:82",
+    "test/xds/xds_server_rbac_test.go:725"
+   ]
+  },
+  {
+   "name": "pr-8997",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "priority 정책에서 제거된 자식 정책은 캐시가 있어도 바로 없어지게 하고 싶어. 밸런서 그룹에 즉시 제거하는 기능이 필요해",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/balancergroup/balancergroup.go",
+    "internal/xds/balancer/priority/balancer.go",
+    "internal/xds/balancer/priority/balancer_priority.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/priority/balancer_priority.go:38",
+    "internal/xds/balancer/priority/balancer.go:220",
+    "internal/xds/balancer/priority/balancer_test.go:1605"
+   ]
+  },
+  {
+   "name": "pr-9004",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "서버 스트리밍에서 클라이언트가 메시지를 두 번 보내는 경우를 보는 시험이 가끔 실패해. 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 2,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "test/end2end_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/end2end_test.go:3944",
+    "test/end2end_test.go:4046",
+    "test/end2end_test.go:3907"
+   ]
+  },
+  {
+   "name": "pr-9005",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "xDS 부하 보고(LRS)에 사용자 정의 지표를 보내는 방식을 새 제안대로 바꾸고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "feature_add",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsdepmgr/xds_dependency_manager_test.go:798",
+    "internal/xds/xdsclient/xdsresource/listener_resource_type.go:158",
+    "internal/xds/xdsclient/tests/loadreport_test.go:85"
+   ]
+  },
+  {
+   "name": "pr-9008",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "호출마다 지표에 애플리케이션이 정한 사용자 정의 레이블을 하나 붙일 수 있게 하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "feature_add",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 11,
+    "ckv_round2": 3,
+    "stage1": 11,
+    "fused": 11,
+    "stage2": 10,
+    "stage3": 10,
+    "stage4": 10
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "balancer/rls/picker.go",
+    "stats/opentelemetry/client_metrics.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "stats/opentelemetry/client_metrics.go:229",
+    "stats/opentelemetry/client_metrics.go:164",
+    "internal/stats/metrics_recorder_list.go:53"
+   ]
+  },
+  {
+   "name": "pr-9009",
+   "snapshot": "99f36d4a0c28bc967a8d3fe23ebc2a264b322070",
+   "prompt": "집계 클러스터에서 말단과 집계를 오가는 시험이 실제 DNS 조회 때문에 가끔 실패해. 결정적으로 돌게 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "bug_fix",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 17,
+    "ckv_round2": 15,
+    "stage1": 17,
+    "fused": 17,
+    "stage2": 17,
+    "stage3": 17,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "seed_quota",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/aggregate_cluster_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/cdsbalancer/e2e_test/aggregate_cluster_test.go:81",
+    "internal/xds/balancer/cdsbalancer/e2e_test/aggregate_cluster_test.go:599",
+    "internal/xds/balancer/cdsbalancer/e2e_test/aggregate_cluster_test.go:852"
+   ]
+  },
+  {
+   "name": "pr-8802",
+   "snapshot": "a887d0b51765dc9a99e5660ecb2b6e69c31bff90",
+   "prompt": "서브채널의 지역(locality) 정보를 전달하려고 넣었던 내부 우회 API가 이제 필요 없어. 그걸 걷어내고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "cut_stage2",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 52,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/channelz/subchannel.go:101",
+    "test/roundrobin_test.go:108",
+    "internal/resolver/delegatingresolver/delegatingresolver.go:255"
+   ]
+  },
+  {
+   "name": "pr-9391",
+   "snapshot": "a9cbf17a2ad108cdaded0d1f37d35098733ee462",
+   "prompt": "클라이언트가 스트림을 열면서 첫 헤더에 스트림 끝 표시를 같이 보내면 서버 쪽 수신이 멈춰. 고치고 싶어",
+   "expected_intent": "security",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 32,
+    "fused": 32,
+    "stage2": 14,
+    "stage3": 14,
+    "stage4": 9
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/transport/http2_server.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/end2end_test.go:4062",
+    "test/end2end_test.go:3668",
+    "test/end2end_test.go:3949"
+   ]
+  },
+  {
+   "name": "pr-8929",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "응답 content-type이 gRPC가 아니면, 뒤따르는 데이터 일부(최대 1KB)를 읽어서 오류 메시지에 붙여 주고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "cut_stage2",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 93,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "interop/grpc_testing/messages.pb.go:2298",
+    "interop/grpc_testing/messages.pb.go:2251",
+    "rpc_util.go:757"
+   ]
+  },
+  {
+   "name": "pr-8977",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "mem 버퍼에서 일부 구간만 잘라 낸 새 버퍼를 얻는 메서드를 추가하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 14,
+    "ckv_round2": 0,
+    "stage1": 14,
+    "fused": 14,
+    "stage2": 15,
+    "stage3": 15,
+    "stage4": 9
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "mem/buffer_slice.go",
+    "mem/buffers.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "mem/buffer_slice_test.go:38",
+    "mem/buffer_slice_test.go:77",
+    "mem/buffer_slice_test.go:413"
+   ]
+  },
+  {
+   "name": "pr-9033",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "시험들이 소켓 읽기와 쓰기를 동기화 수단으로 써서 race 탐지기가 실패해. 다른 동기화 방법으로 바꾸고 싶어",
+   "expected_intent": "test_add",
+   "intent": "concurrency_safety",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "test/end2end_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "interop/grpc_testing/messages.pb.go:1352",
+    "balancer/rls/metrics_test.go:277",
+    "balancer/grpclb/grpclb_picker.go:89"
+   ]
+  },
+  {
+   "name": "pr-9048",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "리눅스가 아닌 환경에서 원시 연결 코드가 빌드나 시험에 실패해. 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go:1396",
+    "test/local_creds_test.go:44",
+    "internal/xds/xdsclient/xdsresource/metadata_test.go:143"
+   ]
+  },
+  {
+   "name": "pr-9058",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "서버 스트리밍에서 클라이언트가 메시지를 두 번 받는 경우를 보는 시험이 가끔 EOF로 실패해. 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "test/end2end_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/end2end_test.go:3907",
+    "test/end2end_test.go:3944",
+    "test/end2end_test.go:4057"
+   ]
+  },
+  {
+   "name": "pr-9069",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "엄격한 경로 검사를 끈 경우에 찍는 경고 로그에 관련 CVE 링크를 넣고 싶어",
+   "expected_intent": "docs_update",
+   "intent": "",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 33,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "citation_cap",
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/channelz/logging.go:45",
+    "internal/channelz/logging.go:53",
+    "internal/channelz/trace.go:107"
+   ]
+  },
+  {
+   "name": "pr-9070",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "리졸버 쪽 클라이언트 인터셉터가 스트림을 만들 때의 책임을 문서에 더 분명히 적고 싶어",
+   "expected_intent": "docs_update",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 17,
+    "stage1": 29,
+    "fused": 29,
+    "stage2": 27,
+    "stage3": 27,
+    "stage4": 11
+   },
+   "answer_stage4_decision": "seed_quota",
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "interceptor.go:48",
+    "clientconn.go:571",
+    "examples/features/interceptor/README.md:61"
+   ]
+  },
+  {
+   "name": "pr-9081",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "앱이 서버로 요청을 받다가 다시 클라이언트로 gRPC를 부르면 OpenTelemetry 지표와 추적 정보가 섞여서 덮어써져. 클라이언트와 서버 정보를 분리하고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "feature_add",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 13,
+    "stage1": 5,
+    "fused": 5,
+    "stage2": 4,
+    "stage3": 4,
+    "stage4": 4
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "stats/opentelemetry/client_metrics.go",
+    "stats/opentelemetry/client_tracing.go",
+    "stats/opentelemetry/opentelemetry.go",
+    "stats/opentelemetry/server_metrics.go",
+    "stats/opentelemetry/server_tracing.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "examples/features/opentelemetry/README.md:1",
+    "stats/opentelemetry/opentelemetry.go:142",
+    "stats/opentelemetry/client_tracing.go:1"
+   ]
+  },
+  {
+   "name": "pr-9091",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "ALTS 핸드셰이크에서 문맥이 새고 핸드셰이커가 제대로 안 닫혀. 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "credentials/alts/alts.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "credentials/alts/alts.go:227",
+    "credentials/alts/internal/handshaker/handshaker.go:263",
+    "credentials/alts/internal/handshaker/handshaker.go:211"
+   ]
+  },
+  {
+   "name": "pr-9096",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "스트림과 연결의 고정 흐름 제어 창 옵션을 하나만 설정하면 BDP 추정이 꺼지고 다른 쪽은 기본값이 돼. 이 상호작용을 문서에 적고 싶어",
+   "expected_intent": "docs_update",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "dialoptions.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/transport/bdp_estimator.go:26",
+    "dialoptions.go:230",
+    "internal/transport/bdp_estimator.go:102"
+   ]
+  },
+  {
+   "name": "pr-9109",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "채널z 소켓 지표의 마지막 메시지 보낸 시각과 받은 시각이 실제 시각이 아니야. 현재 시각이 기록되게 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "bug_fix",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "channelz/grpc_channelz_v1/channelz.pb.go:1280",
+    "channelz/grpc_channelz_v1/channelz.pb.go:1273",
+    "channelz/grpc_channelz_v1/channelz.pb.go:477"
+   ]
+  },
+  {
+   "name": "pr-9111",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "xDS RBAC의 인증 주체 매칭이 URI나 DNS SAN이 있어도 주체 DN까지 내려가서 비교해. 처음 비어 있지 않은 신원만 보게 고치고 싶어",
+   "expected_intent": "security",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 5,
+    "ckv_round2": 8,
+    "stage1": 5,
+    "fused": 5,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/rbac/matchers.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/xds/xds_server_rbac_test.go:539",
+    "internal/credentials/xds/handshake_info.go:337",
+    "test/xds/xds_server_rbac_test.go:82"
+   ]
+  },
+  {
+   "name": "pr-9134",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "정규식 전체 일치 검사에서 매번 가장 긴 일치 모드로 바꾸는 바람에 같은 정규식을 동시에 쓰면 data race가 나. 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "concurrency_safety",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 57,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "citation_cap",
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 4,
+    "neighbor": 8
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "experimental/stats/metricregistry_test.go:38",
+    "internal/grpcutil/regex_test.go:26",
+    "internal/binarylog/regexp_test.go:26"
+   ]
+  },
+  {
+   "name": "pr-9258",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "xDS RBAC 헤더 이름 규칙 검사가 정책 최상위 규칙에만 적용돼. and, or, not 안에 중첩된 헤더 매처도 검사하게 하고 싶어",
+   "expected_intent": "security",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 7,
+    "ckv_round2": 8,
+    "stage1": 7,
+    "fused": 7,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/httpfilter/rbac/rbac.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/xds/xds_server_rbac_test.go:539",
+    "test/xds/xds_server_rbac_test.go:415",
+    "test/xds/xds_server_rbac_test.go:82"
+   ]
+  },
+  {
+   "name": "pr-9299",
+   "snapshot": "aa4d281834e244825881a5856a87296bb50c3f7a",
+   "prompt": "STS 토큰 교환 요청이 리다이렉트를 따라가서 토큰이 다른 곳으로 갈 수 있어. 리다이렉트를 따라가지 않게 하고 싶어",
+   "expected_intent": "security",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "credentials/sts/sts.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "credentials/sts/sts.go:137",
+    "credentials/sts/sts.go:67",
+    "credentials/sts/sts.go:47"
+   ]
+  },
+  {
+   "name": "pr-8956",
+   "snapshot": "ad2d82e315bbdbfb08b5f6312a5c11ee8ce6cdcd",
+   "prompt": "집계 클러스터에서 핸드셰이크가 최상위 클러스터의 보안 설정을 써. 실제 말단 클러스터의 보안 설정을 쓰게 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/cdsbalancer.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/cdsbalancer/cdsbalancer.go:192",
+    "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go:472",
+    "credentials/alts/internal/proto/grpc_gcp/handshaker.pb.go:709"
+   ]
+  },
+  {
+   "name": "pr-8844",
+   "snapshot": "bb2073d1e5551b900763979e08e1c11a47a8f150",
+   "prompt": "xDS 엔드포인트 구조체에 있는 해시 키 필드를 빼고, EDS를 해석할 때 속성으로 넣게 바꾸고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 15,
+    "stage1": 3,
+    "fused": 3,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/clusterresolver/configbuilder.go",
+    "internal/xds/xdsclient/xdsresource/type_eds.go",
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go:180",
+    "internal/xds/xdsclient/tests/eds_watchers_test.go:108",
+    "internal/xds/xdsclient/xdsresource/type_eds.go:51"
+   ]
+  },
+  {
+   "name": "pr-8910",
+   "snapshot": "c1a9239e408db59ba50e3ee8100cebc5347ca993",
+   "prompt": "계층형 버퍼 풀 구현을 공개 패키지에서 내부 패키지로 옮기고 싶어. 기본 풀은 반환 전에 버퍼를 지우는데 그 비용도 고려하고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 7,
+    "ckv_round2": 4,
+    "stage1": 7,
+    "fused": 7,
+    "stage2": 7,
+    "stage3": 7,
+    "stage4": 7
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "mem/buffer_pool.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/experimental.go:20",
+    "internal/experimental.go:1",
+    "experimental/experimental.go:62"
+   ]
+  },
+  {
+   "name": "pr-9031",
+   "snapshot": "c33aa45e147aa1e08070a0764c285ea30a82688a",
+   "prompt": "비차단 읽기를 쓰는 준비 완료 읽기 경로에서 상대가 연결을 닫았을 때 처리가 틀려. 닫힌 연결을 제대로 다루게 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/transport/transport_test.go:3206",
+    "internal/transport/transport.go:222",
+    "internal/transport/transport_test.go:3047"
+   ]
+  },
+  {
+   "name": "pr-8808",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "RLS 캐시 항목 수와 캐시 크기 지표를 매번 직접 기록하지 말고 비동기 게이지 방식으로 보고하게 바꾸고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 0,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "balancer/rls/balancer.go",
+    "balancer/rls/cache.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/rls/metrics_test.go:162",
+    "balancer/rls/metrics_test.go:51",
+    "balancer/rls/metrics_test.go:271"
+   ]
+  },
+  {
+   "name": "pr-8867",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "엔드포인트 맵을 돌 때 키를 뽑고 값을 다시 찾지 않고, 키와 값을 한꺼번에 도는 반복자를 추가하고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "feature_add",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 3,
+    "stage1": 3,
+    "fused": 3,
+    "stage2": 3,
+    "stage3": 3,
+    "stage4": 3
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "balancer/endpointsharding/endpointsharding.go",
+    "balancer/ringhash/ringhash.go",
+    "balancer/weightedroundrobin/balancer.go",
+    "internal/xds/balancer/outlierdetection/balancer.go",
+    "resolver/map.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 12
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "balancer/rls/internal/keys/builder.go:35",
+    "resolver/map.go:183",
+    "resolver/map.go:221"
+   ]
+  },
+  {
+   "name": "pr-8874",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "헬스체크나 ORCA용 스트림처럼 통계 핸들러가 없는 스트림에서도 통계 처리를 해서 오류 로그가 계속 찍혀. 핸들러가 있을 때만 처리하게 하고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "stats/opentelemetry/client_tracing.go:128",
+    "experimental/stats/metricregistry_test.go:61",
+    "stats/opentelemetry/client_metrics.go:191"
+   ]
+  },
+  {
+   "name": "pr-8875",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "EDS 메타데이터를 해석할 때 링 해시 엔드포인트 키 기능과 HTTP CONNECT 기능이 서로 묶여 있어. 각각 따로 켜지게 분리하고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "cut_stage4",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 32,
+    "stage4": 0
+   },
+   "answer_stage4_decision": "citation_cap",
+   "answer_files_in_stage1": [
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go:618",
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go:1227",
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go:1027"
+   ]
+  },
+  {
+   "name": "pr-8878",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "서버 쪽 xDS HTTP 필터 처리 구조를 필터 상태를 유지하기 쉽게 다시 짜고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 26,
+    "fused": 26,
+    "stage2": 10,
+    "stage3": 10,
+    "stage4": 9
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/xdsclient/xdsresource/type_lds.go",
+    "internal/xds/xdsclient/xdsresource/unmarshal_lds.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/resolver/xds_http_filters_test.go:248",
+    "internal/xds/clients/internal/testutils/e2e/clientresources.go:67",
+    "internal/xds/resolver/xds_http_filters_test.go:503"
+   ]
+  },
+  {
+   "name": "pr-8895",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "xDS 리소스를 해석하다가 잘못된 응답 때문에 panic이 나면 앱 전체가 죽어. 해석 부분에서 panic을 잡아 오류로 바꾸고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 9,
+    "ckv_round2": 9,
+    "stage1": 9,
+    "fused": 9,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/clients/xdsclient/channel.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "xds/csds/csds_e2e_test.go:531",
+    "internal/xds/clients/xdsclient/helpers_test.go:162",
+    "internal/xds/clients/xdsclient/test/custom_resource_watch_test.go:124"
+   ]
+  },
+  {
+   "name": "pr-8899",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "EDS에서 한 지역 안 엔드포인트 가중치를 다 더하면 uint32 최댓값을 넘을 수 있어. 넘으면 거부하게 검증을 넣고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 13,
+    "ckv_round2": 14,
+    "stage1": 13,
+    "fused": 13,
+    "stage2": 5,
+    "stage3": 5,
+    "stage4": 5
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds.go:181",
+    "internal/xds/xdsclient/xdsresource/unmarshal_eds_test.go:246",
+    "internal/transport/flowcontrol.go:143"
+   ]
+  },
+  {
+   "name": "pr-8908",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "xDS RBAC의 IP 대역 매칭이 옛 net 패키지 타입을 써. netip로 바꾸고 싶어",
+   "expected_intent": "refactor",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 4,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/rbac/matchers.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "test/xds/xds_server_rbac_test.go:539",
+    "internal/xds/rbac/matchers.go:347",
+    "internal/xds/rbac/matchers.go:365"
+   ]
+  },
+  {
+   "name": "pr-8911",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "가짜 ORCA 서비스가 요청을 채널로 보내다가 시험 문맥이 끝나면 고루틴이 영원히 막혀서 새. 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 2,
+    "ckv_round2": 1,
+    "stage1": 2,
+    "fused": 2,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "orca/producer_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "orca/producer_test.go:216",
+    "orca/producer_test.go:238",
+    "orca/producer_test.go:234"
+   ]
+  },
+  {
+   "name": "pr-8915",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "xDS 클라이언트 쪽 가중 라운드로빈 설정 변환에서 가중치 만료 기간 자리에 다른 값을 복사해 넣는 실수가 있어. 고치고 싶어",
+   "expected_intent": "bug_fix",
+   "intent": "bug_fix",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 1,
+    "ckv_round2": 1,
+    "stage1": 1,
+    "fused": 1,
+    "stage2": 1,
+    "stage3": 1,
+    "stage4": 1
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/xdsclient/xdslbregistry/converter/converter.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/xdsclient/xdslbregistry/converter/converter.go:144",
+    "internal/xds/xdsclient/xdslbregistry/converter/converter.go:116",
+    "internal/xds/xdsclient/xdslbregistry/converter/converter.go:52"
+   ]
+  },
+  {
+   "name": "pr-8922",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "링 해시에서 EDS 해시 키 메타데이터와 요청 해시 헤더 설정을 쓰는 동작을 이제 기본으로 켜고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go:470",
+    "balancer/ringhash/picker.go:55",
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go:619"
+   ]
+  },
+  {
+   "name": "pr-8932",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "advancedtls의 인증서 폐기 목록 생성 스크립트가 macOS sed에서 안 돌아. 운영체제 상관없이 돌게 고치고 싶어",
+   "expected_intent": "test_add",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 11,
+    "neighbor": 1
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "security/advancedtls/examples/credential_reloading_from_files/README.md:16",
+    "security/advancedtls/advancedtls_integration_test.go:476",
+    "security/advancedtls/crl.go:1"
+   ]
+  },
+  {
+   "name": "pr-8941",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "CDS 갱신의 보안 설정에 SNI 관련 값을 추가하고 싶어. SNI 설정과 SAN 검증 제안의 첫 단계야",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 3,
+    "ckv_round2": 3,
+    "stage1": 3,
+    "fused": 3,
+    "stage2": 2,
+    "stage3": 2,
+    "stage4": 2
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/xdsclient/xdsresource/type_cds.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "security/advancedtls/sni.go:26",
+    "security/advancedtls/advancedtls_test.go:1025",
+    "internal/xds/xdsclient/xdsresource/type_cds.go:125"
+   ]
+  },
+  {
+   "name": "pr-8959",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "CDS e2e 시험이 RPC를 많이 보내다가 기본 시험 시간 제한에 걸려 실패해. 제한을 10초로 늘리고 싶어",
+   "expected_intent": "test_add",
+   "intent": "",
+   "loss": "never_retrieved",
+   "ranks": {
+    "ckv_round1": 0,
+    "ckv_round2": 0,
+    "stage1": 0,
+    "fused": 0,
+    "stage2": 0,
+    "stage3": 0,
+    "stage4": 0
+   },
+   "answer_stage4_decision": null,
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 10,
+    "neighbor": 2
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go:759",
+    "test/end2end_test.go:5845",
+    "xds/csds/csds_e2e_test.go:58"
+   ]
+  },
+  {
+   "name": "pr-8960",
+   "snapshot": "d7b3f93698bcb00b95fd76bb0ba18385f55c9146",
+   "prompt": "CDS 클러스터 리소스 갱신 시험이 요청된 리소스 이름을 채널로 주고받다가 가끔 실패해. 이벤트 방식으로 바꾸고 싶어",
+   "expected_intent": "test_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 0,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 4,
+    "stage3": 4,
+    "stage4": 4
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "internal/xds/balancer/cdsbalancer/e2e_test/eds_impl_test.go"
+   ],
+   "answer_tests_only": true,
+   "selected_by_origin": {
+    "seed": 8,
+    "neighbor": 4
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "internal/xds/clients/xdsclient/channel_test.go:661",
+    "internal/xds/xdsclient/tests/cds_watchers_test.go:540",
+    "internal/xds/xdsclient/tests/cds_watchers_test.go:75"
+   ]
+  },
+  {
+   "name": "pr-8877",
+   "snapshot": "fd8a1060a84d7021a9db7b4120b49df651beb762",
+   "prompt": "OpenTelemetry를 안 쓰는 클라이언트도 통계 핸들러에 레이블을 넘길 수 있게, 텔레메트리 레이블 콜백을 등록하는 실험 API를 만들고 싶어",
+   "expected_intent": "feature_add",
+   "intent": "",
+   "loss": "found",
+   "ranks": {
+    "ckv_round1": 4,
+    "ckv_round2": 8,
+    "stage1": 4,
+    "fused": 4,
+    "stage2": 4,
+    "stage3": 4,
+    "stage4": 4
+   },
+   "answer_stage4_decision": "selected",
+   "answer_files_in_stage1": [
+    "stats/opentelemetry/client_metrics.go"
+   ],
+   "answer_tests_only": false,
+   "selected_by_origin": {
+    "seed": 9,
+    "neighbor": 3
+   },
+   "selected": 12,
+   "stage1_top3": [
+    "stats/opentelemetry/client_metrics.go:234",
+    "stats/opentelemetry/opentelemetry.go:500",
+    "stats/opentelemetry/opentelemetry.go:109"
+   ]
+  }
+ ]
+}

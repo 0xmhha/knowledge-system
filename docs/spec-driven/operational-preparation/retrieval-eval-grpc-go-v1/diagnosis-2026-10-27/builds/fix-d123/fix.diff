@@ -1,0 +1,444 @@
+diff --git a/internal/system/composer/budget/allocator.go b/internal/system/composer/budget/allocator.go
+index 7373de22..30ad8db4 100644
+--- a/internal/system/composer/budget/allocator.go
++++ b/internal/system/composer/budget/allocator.go
+@@ -253,6 +253,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
+ 		}
+ 	}
+ 	seedSelected := 0
++	neighborSelected := 0
+ 	knowledgeSelected := 0
+ 	exactSymbolRescued := map[string]bool{}
+ 	selectedKeys := map[string]bool{}
+@@ -276,9 +277,15 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
+ 		})
+ 	}
+ 
++	// A reserve holds a slot only while a candidate of its kind is still
++	// ahead in the list. A slot held for a kind that never arrives only cuts
++	// the next seed: on the 2026-10-27 grpc-go evaluation every answer Stage
++	// 4 cut came from a pack of 8 to 11 bodies, its held slots unused.
++	ahead := newReserveLookahead(candidates)
++
+ 	used := 0
+ 	processed := 0
+-	for _, c := range candidates {
++	for i, c := range candidates {
+ 		processed++
+ 		if c.ParentOf != "" && !selectedKeys[c.ParentOf] {
+ 			decide(c, "parent_not_selected")
+@@ -307,8 +314,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
+ 		// What actually fills the reserve here is the 44 invariant
+ 		// chunks: sampled across all fifteen scenarios on 2026-08-03,
+ 		// they took 16 body slots in 8 of them, twice each in six.
+-		isKnowledge := c.ChunkKind == "invariant" ||
+-			(c.ChunkKind == "doc" && c.Citation.CommitHash == "")
++		isKnowledge := isKnowledgeCandidate(c)
+ 		// A prompt-verbatim, unambiguously resolved symbol gets the same
+ 		// protection as knowledge for the same reason: it is one small
+ 		// declaration span competing against whole bodies that merely
+@@ -321,7 +327,7 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
+ 		// first had already spent the single reserve.
+ 		exactUnrescued := isExactSymbol && !exactSymbolRescued[exactKeyword] &&
+ 			len(exactSymbolRescued) < a.config.ExactSymbolReserve
+-		if c.Origin == OriginSeed && seedCap > 0 && seedSelected >= seedCap {
++		if c.Origin == OriginSeed && seedCap > 0 && seedSelected >= ahead.seedCap(i, a.config, seedCap, neighborSelected) {
+ 			// Seed slots exhausted; leave room for neighbor-origin
+ 			// candidates. Not a Skip: the candidate lost to the quota,
+ 			// not to budget or fetch. Knowledge-kind candidates are
+@@ -343,12 +349,12 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
+ 			reserveLeft := 0
+ 			if a.config.KnowledgeReserve > 0 {
+ 				if left := a.config.KnowledgeReserve - knowledgeSelected; left > 0 {
+-					reserveLeft += left
++					reserveLeft += min(left, ahead.knowledge(i))
+ 				}
+ 			}
+ 			if a.config.ExactSymbolReserve > 0 {
+ 				if left := a.config.ExactSymbolReserve - len(exactSymbolRescued); left > 0 {
+-					reserveLeft += left
++					reserveLeft += min(left, ahead.exactSymbols(i, exactSymbolRescued))
+ 				}
+ 			}
+ 			if reserveLeft > 0 && len(out.Selected) >= a.config.MaxCitations-reserveLeft {
+@@ -406,6 +412,8 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
+ 		used += tokens
+ 		if c.Origin == OriginSeed {
+ 			seedSelected++
++		} else if c.Origin == OriginNeighbor {
++			neighborSelected++
+ 		}
+ 		if isKnowledge {
+ 			knowledgeSelected++
+@@ -519,6 +527,60 @@ type candidate struct {
+ // appearing in both, but this function dedupes by Citation.Key() as a
+ // defensive backstop — if a future Stage 3 change breaks the guard,
+ // the allocator still produces sensible output.
++// isKnowledgeCandidate reports a domain-knowledge chunk: an invariant, or
++// out-of-tree markdown (chunk_kind "doc" with an empty commit hash).
++func isKnowledgeCandidate(c candidate) bool {
++	return c.ChunkKind == "invariant" || (c.ChunkKind == "doc" && c.Citation.CommitHash == "")
++}
++
++// reserveLookahead answers, for a position in the merged candidate list,
++// how many candidates each reserve could still be spent on.
++type reserveLookahead struct {
++	cands []candidate
++	// neighborsAfter[i] and knowledgeAfter[i] count candidates after index i.
++	neighborsAfter []int
++	knowledgeAfter []int
++}
++
++func newReserveLookahead(cands []candidate) reserveLookahead {
++	r := reserveLookahead{cands: cands, neighborsAfter: make([]int, len(cands)), knowledgeAfter: make([]int, len(cands))}
++	n, k := 0, 0
++	for i := len(cands) - 1; i >= 0; i-- {
++		r.neighborsAfter[i], r.knowledgeAfter[i] = n, k
++		if cands[i].Origin == OriginNeighbor {
++			n++
++		}
++		if isKnowledgeCandidate(cands[i]) {
++			k++
++		}
++	}
++	return r
++}
++
++// seedCap is the seed slot limit at index i: the configured cap, widened by
++// every neighbor-reserve slot that no selected or upcoming neighbor can use.
++func (r reserveLookahead) seedCap(i int, cfg Config, seedCap, neighborSelected int) int {
++	if cfg.MaxCitations <= 0 || cfg.NeighborReserve <= 0 {
++		return seedCap
++	}
++	usable := min(cfg.NeighborReserve, neighborSelected+r.neighborsAfter[i])
++	return max(seedCap, cfg.MaxCitations-usable)
++}
++
++func (r reserveLookahead) knowledge(i int) int { return r.knowledgeAfter[i] }
++
++// exactSymbols counts the distinct prompt-verbatim symbols after index i that
++// have not been rescued yet.
++func (r reserveLookahead) exactSymbols(i int, rescued map[string]bool) int {
++	seen := map[string]bool{}
++	for _, c := range r.cands[i+1:] {
++		if kw := stage2.ExactSymbolKeyword(c.Sources); kw != "" && !rescued[kw] {
++			seen[kw] = true
++		}
++	}
++	return len(seen)
++}
++
+ func mergeCandidates(seeds []stage2.ScoredCitation, neighbors []stage3.ScoredNeighbor) []candidate {
+ 	out := make([]candidate, 0, len(seeds)*3+len(neighbors))
+ 	for _, s := range seeds {
+diff --git a/internal/system/composer/budget/allocator_knowledge_test.go b/internal/system/composer/budget/allocator_knowledge_test.go
+index 5fda4429..da41752d 100644
+--- a/internal/system/composer/budget/allocator_knowledge_test.go
++++ b/internal/system/composer/budget/allocator_knowledge_test.go
+@@ -102,20 +102,17 @@ func TestAllocate_KnowledgeReserveExemptsSeedCap(t *testing.T) {
+ 	}
+ }
+ 
+-func TestAllocate_NoKnowledgeCandidatesLeavesReserveUnused(t *testing.T) {
++func TestAllocate_NoKnowledgeCandidatesReleasesReserve(t *testing.T) {
+ 	t.Parallel()
+-	// The holdback is unconditional: it does not look ahead to see
+-	// whether a knowledge candidate is still coming, so with none in the
+-	// list the reserve goes unfilled and selection stops one short of the
+-	// cap — the same semantics as the neighbor reserve with no neighbors.
++	// The holdback only keeps a slot while a knowledge candidate is still
++	// ahead in the list; with none coming, the slot goes to the next seed.
+ 	//
+-	// The prose here used to open by claiming the opposite ("only while
+-	// knowledge candidates could still appear") while asserting this, so
+-	// it was measured both ways on 2026-08-03. Adding the lookahead, and
+-	// separately dropping KnowledgeReserve to 0, both recover the slot
+-	// and both cost composer-pipeline-flow the identical 0.0038 MRR,
+-	// because the extra body pushes an edge-only citation down. Recall
+-	// does not move either way. The unconditional form is what ships.
++	// This reverses the 2026-08-03 choice of an unconditional holdback.
++	// Then, the lookahead cost composer-pipeline-flow 0.0038 MRR (an extra
++	// body pushed an edge-only citation down) and moved no recall. On
++	// 2026-10-27 the grpc-go retrieval evaluation found every Stage 4 answer
++	// cut (24 per model) in a pack of 8 to 11 bodies, with the slots held
++	// for neighbor, knowledge and exact-symbol candidates that never came.
+ 	seeds := []stage2.ScoredCitation{
+ 		seed("a.go", 9.0),
+ 		seed("b.go", 8.0),
+@@ -134,8 +131,8 @@ func TestAllocate_NoKnowledgeCandidatesLeavesReserveUnused(t *testing.T) {
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+-	if len(out.Selected) != 2 {
+-		t.Fatalf("Selected = %d, want 2 (one slot held for absent knowledge)", len(out.Selected))
++	if len(out.Selected) != 3 {
++		t.Fatalf("Selected = %d, want 3 (no knowledge candidate ahead to hold a slot for)", len(out.Selected))
+ 	}
+ }
+ 
+diff --git a/internal/system/composer/budget/reserve_release_test.go b/internal/system/composer/budget/reserve_release_test.go
+new file mode 100644
+index 00000000..46025eaf
+--- /dev/null
++++ b/internal/system/composer/budget/reserve_release_test.go
+@@ -0,0 +1,68 @@
++package budget
++
++import (
++	"context"
++	"fmt"
++	"testing"
++
++	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
++	"github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
++	"github.com/0xmhha/knowledge-system/pkg/system/contract"
++)
++
++func seedsAndBodies(n int) ([]stage2.ScoredCitation, *FakeFetcher) {
++	f := &FakeFetcher{Bodies: map[string]string{}}
++	seeds := make([]stage2.ScoredCitation, 0, n)
++	for i := range n {
++		s := seed(fmt.Sprintf("s%02d.go", i), float64(100-i))
++		f.Bodies[s.Citation.Key()] = bodyN(40)
++		seeds = append(seeds, s)
++	}
++	return seeds, f
++}
++
++// With the default reserves and no neighbor, knowledge or exact-symbol
++// candidate anywhere in the list, every slot goes to seeds: a slot held for a
++// kind that never arrives only cuts the next seed. Measured 2026-10-27 on
++// grpc-go: all 48 answers Stage 4 cut were cut from packs of 8 to 11 bodies.
++func TestAllocate_ReservesReleaseWhenNothingEligibleIsAhead(t *testing.T) {
++	t.Parallel()
++	seeds, f := seedsAndBodies(16)
++	a, err := New(f)
++	if err != nil {
++		t.Fatal(err)
++	}
++	out, err := a.Allocate(context.Background(), seeds, nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if len(out.Selected) != DefaultMaxCitations {
++		t.Fatalf("Selected = %d, want %d (no eligible candidate for any reserve)", len(out.Selected), DefaultMaxCitations)
++	}
++}
++
++// A reserve still holds a slot for a candidate of its kind that is ahead in
++// the list, but only as many slots as there are such candidates.
++func TestAllocate_NeighborReserveHoldsOnlyForNeighborsAhead(t *testing.T) {
++	t.Parallel()
++	seeds, f := seedsAndBodies(16)
++	n := neighbor("s00.go", "n.go", contract.RelationCalls, 1, 0.5)
++	f.Bodies[n.Edge.Target.Key()] = bodyN(40)
++	a, err := New(f)
++	if err != nil {
++		t.Fatal(err)
++	}
++	out, err := a.Allocate(context.Background(), seeds, []stage3.ScoredNeighbor{n})
++	if err != nil {
++		t.Fatal(err)
++	}
++	neighbors := 0
++	for _, s := range out.Selected {
++		if s.Origin == OriginNeighbor {
++			neighbors++
++		}
++	}
++	if len(out.Selected) != DefaultMaxCitations || neighbors != 1 {
++		t.Fatalf("Selected = %d with %d neighbors, want %d with 1", len(out.Selected), neighbors, DefaultMaxCitations)
++	}
++}
+diff --git a/internal/system/composer/stage2/searcher.go b/internal/system/composer/stage2/searcher.go
+index 4f2a3d4f..3492cb39 100644
+--- a/internal/system/composer/stage2/searcher.go
++++ b/internal/system/composer/stage2/searcher.go
+@@ -370,8 +370,9 @@ func (s *Searcher) Search(ctx context.Context, prompt string, keywords []string,
+ 	// implementation, while leaving tests accessible lower in the
+ 	// pack as examples. For IntentTestAdd the user explicitly wants
+ 	// tests, so demotion is skipped (current double-count boost
+-	// stays intact).
+-	demoteTests := intent != contract.IntentTestAdd
++	// stays intact). A prompt that is itself about tests skips it too:
++	// the classifier often leaves such prompts Unknown.
++	demoteTests := intent != contract.IntentTestAdd && !promptAsksAboutTests(prompt)
+ 	demoteDocs := demoteDocsFor(intent)
+ 	if rec != nil {
+ 		// Fused scores before demotion and cap: the RRF result on its own.
+diff --git a/internal/system/composer/stage2/searcher_test.go b/internal/system/composer/stage2/searcher_test.go
+index 46f6a7ec..9f69f765 100644
+--- a/internal/system/composer/stage2/searcher_test.go
++++ b/internal/system/composer/stage2/searcher_test.go
+@@ -715,6 +715,31 @@ func TestSearch_IntentTestAddDoesNotDemoteTestFiles(t *testing.T) {
+ 	}
+ }
+ 
++// TestSearch_TestPromptDoesNotDemoteTestFiles asserts that a prompt asking
++// about tests keeps test files undemoted even when the intent is not
++// IntentTestAdd: the classifier often leaves such prompts Unknown, and
++// demoting there buried the very test the user asked to fix.
++func TestSearch_TestPromptDoesNotDemoteTestFiles(t *testing.T) {
++	t.Parallel()
++	for _, tc := range []struct {
++		prompt string
++		want   float64
++	}{
++		{"서버 스트리밍 시험이 가끔 실패해", rrfContribution(DefaultBMWeight, 1)},
++		{"서버 스트리밍 처리가 가끔 실패해", rrfContribution(DefaultBMWeight, 1) * testDemotionFactor},
++	} {
++		ckg := &ckgclient.Fake{BM25Hits: []contract.Hit{bm25Hit("handler_test.go", 1, 10, 1.0)}}
++		s, _ := New(ckg)
++		out, err := s.Search(context.Background(), tc.prompt, []string{"Handler"}, nil, contract.IntentUnknown)
++		if err != nil {
++			t.Fatal(err)
++		}
++		if len(out.Citations) != 1 || !almostEqual(out.Citations[0].Score, tc.want) {
++			t.Errorf("prompt %q: citations = %+v, want one with score %.6f", tc.prompt, out.Citations, tc.want)
++		}
++	}
++}
++
+ // TestAggregator_DemotionIsDeterministic asserts that calling results() with
+ // demoteTests=true produces the same order on repeated calls (no map-iteration
+ // randomness leaking through the demotion path).
+diff --git a/internal/system/composer/stage2/testpath.go b/internal/system/composer/stage2/testpath.go
+index d27dedbd..84f4f5c0 100644
+--- a/internal/system/composer/stage2/testpath.go
++++ b/internal/system/composer/stage2/testpath.go
+@@ -1,6 +1,11 @@
+ package stage2
+ 
+-import "github.com/0xmhha/knowledge-system/pkg/system/testpath"
++import (
++	"regexp"
++	"strings"
++
++	"github.com/0xmhha/knowledge-system/pkg/system/testpath"
++)
+ 
+ // testDemotionFactor is the multiplier applied to a test-file citation's
+ // final RRF score when the active intent is not test-oriented. A value of
+@@ -16,3 +21,30 @@ const testDemotionFactor = 0.25
+ func isTestPath(file string) bool {
+ 	return testpath.IsTest(file)
+ }
++
++// testPromptWords are English words that make a prompt about tests. They
++// match as whole words, so "contest" or "latest" do not count.
++var testPromptWords = regexp.MustCompile(`(?i)\b(tests?|flaky|e2e|fuzz|benchmark)\b`)
++
++// testPromptWordsKo are Korean words for tests. Korean attaches particles
++// to nouns ("시험이", "테스트를"), so these match as substrings.
++var testPromptWordsKo = []string{"시험", "테스트", "퍼저", "벤치마크"}
++
++// promptAsksAboutTests reports whether the prompt itself is about tests. When
++// it is, test files are what the user wants, so Stage 2 does not demote them
++// even if the intent classifier did not return IntentTestAdd. The cue reads
++// the prompt, not the embedding model, so it does not move with a model's
++// similarity scale (measured 2026-10-27 on grpc-go: 21 of 22 test_add prompts
++// carry a cue, 2 of 78 other prompts do; the classifier's nearest intent was
++// test_add for 3 to 5 of the 22).
++func promptAsksAboutTests(prompt string) bool {
++	if testPromptWords.MatchString(prompt) {
++		return true
++	}
++	for _, w := range testPromptWordsKo {
++		if strings.Contains(prompt, w) {
++			return true
++		}
++	}
++	return false
++}
+diff --git a/internal/system/composer/stage2/testpath_test.go b/internal/system/composer/stage2/testpath_test.go
+index c3e53015..48d5013f 100644
+--- a/internal/system/composer/stage2/testpath_test.go
++++ b/internal/system/composer/stage2/testpath_test.go
+@@ -77,3 +77,29 @@ func TestIsTestPath(t *testing.T) {
+ 		})
+ 	}
+ }
++
++func TestPromptAsksAboutTests(t *testing.T) {
++	t.Parallel()
++
++	cases := []struct {
++		prompt string
++		want   bool
++	}{
++		{"서버 스트리밍 시험이 가끔 실패해. 고치고 싶어", true},
++		{"CDS e2e 테스트 시간 제한을 늘리고 싶어", true},
++		{"fix the flaky test in end2end", true},
++		{"Add tests for the retry policy", true},
++		{"퍼저에서 쓸 함수를 공개하고 싶어", true},
++		{"add a benchmark for the encoder", true},
++		{"xDS 클라이언트가 리소스 수를 지표로 보고하게 하고 싶어", false},
++		{"fix the race in attestation handling", false},
++		// Substrings of longer words are not a cue.
++		{"update the contest and latest config", false},
++		{"", false},
++	}
++	for _, tc := range cases {
++		if got := promptAsksAboutTests(tc.prompt); got != tc.want {
++			t.Errorf("promptAsksAboutTests(%q) = %v, want %v", tc.prompt, got, tc.want)
++		}
++	}
++}
+diff --git a/internal/system/composer/stage3/expander.go b/internal/system/composer/stage3/expander.go
+index 3fe857d9..f58f9a89 100644
+--- a/internal/system/composer/stage3/expander.go
++++ b/internal/system/composer/stage3/expander.go
+@@ -188,7 +188,7 @@ func (e *Expander) Expand(ctx context.Context, seeds []stage2.ScoredCitation, in
+ 	// legitimately want both — BugFix wants calls AND called_by. Split
+ 	// the relation set into per-direction groups and traverse each;
+ 	// the aggregator dedups targets across groups. nil relations (the
+-	// Unknown broad fan-out) stays a single forward pass.
++	// Unknown broad fan-out) walks every forward edge type, then callers.
+ 	relationGroups := splitByDirection(relations)
+ 
+ 	seedKeys := buildSeedKeys(seeds)
+@@ -318,10 +318,12 @@ func (e *Expander) emitFootprint(ctx context.Context, intent contract.Intent, ou
+ // splitByDirection partitions a relation set into direction-homogeneous
+ // groups for ckgclient.Neighbors, which traverses one direction per call.
+ // called_by is the only reverse relation in the contract. nil input (the
+-// broad Unknown fan-out) passes through as a single nil group.
++// broad Unknown fan-out) becomes a nil forward group plus a called_by group:
++// ckgclient reads nil as every forward edge type, so on its own it never
++// returns a seed's callers.
+ func splitByDirection(rels []contract.Relation) [][]contract.Relation {
+ 	if len(rels) == 0 {
+-		return [][]contract.Relation{nil}
++		return [][]contract.Relation{nil, {contract.RelationCalledBy}}
+ 	}
+ 	var forward, reverse []contract.Relation
+ 	for _, r := range rels {
+diff --git a/internal/system/composer/stage3/expander_test.go b/internal/system/composer/stage3/expander_test.go
+index 6dd8452f..44a58b67 100644
+--- a/internal/system/composer/stage3/expander_test.go
++++ b/internal/system/composer/stage3/expander_test.go
+@@ -488,3 +488,25 @@ func TestAggregator_TiedScoresAndSpansStayDeterministic(t *testing.T) {
+ 		t.Errorf("first = %s, want a.go (equal spans fall back to path order)", out[0].Edge.Target.File)
+ 	}
+ }
++
++// The broad fan-out for Unknown and QAReview must look at callers as well as
++// callees. A nil relation set is a forward-only walk in ckgclient, so without
++// a separate called_by pass a seed's callers were never returned: on the
++// 2026-10-27 grpc-go evaluation the answer was the caller of a Stage 2 seed in
++// several never-retrieved cases, and qwen3 left 96 of 100 prompts Unknown.
++func TestExpand_BroadIntentAlsoWalksCallers(t *testing.T) {
++	t.Parallel()
++	for _, in := range []contract.Intent{contract.IntentUnknown, contract.IntentQAReview} {
++		seeds := []stage2.ScoredCitation{seed("a.go", 1, 10, 5.0)}
++		ckg := &ckgclient.Fake{NeighborEdges: []contract.Neighbor{neighbor("a.go", "b.go", contract.RelationCalls, 1)}}
++		e, _ := New(ckg)
++		if _, err := e.Expand(context.Background(), seeds, in); err != nil {
++			t.Fatal(err)
++		}
++		calls := ckg.Calls.Neighbors
++		if len(calls) != 2 || calls[0].Opts.Relations != nil ||
++			len(calls[1].Opts.Relations) != 1 || calls[1].Opts.Relations[0] != contract.RelationCalledBy {
++			t.Errorf("%s: Neighbors calls = %+v, want a nil-relation pass then a called_by pass", in, calls)
++		}
++	}
++}

@@ -102,20 +102,17 @@ func TestAllocate_KnowledgeReserveExemptsSeedCap(t *testing.T) {
 	}
 }
 
-func TestAllocate_NoKnowledgeCandidatesLeavesReserveUnused(t *testing.T) {
+func TestAllocate_NoKnowledgeCandidatesReleasesReserve(t *testing.T) {
 	t.Parallel()
-	// The holdback is unconditional: it does not look ahead to see
-	// whether a knowledge candidate is still coming, so with none in the
-	// list the reserve goes unfilled and selection stops one short of the
-	// cap — the same semantics as the neighbor reserve with no neighbors.
+	// The holdback only keeps a slot while a knowledge candidate is still
+	// ahead in the list; with none coming, the slot goes to the next seed.
 	//
-	// The prose here used to open by claiming the opposite ("only while
-	// knowledge candidates could still appear") while asserting this, so
-	// it was measured both ways on 2026-08-03. Adding the lookahead, and
-	// separately dropping KnowledgeReserve to 0, both recover the slot
-	// and both cost composer-pipeline-flow the identical 0.0038 MRR,
-	// because the extra body pushes an edge-only citation down. Recall
-	// does not move either way. The unconditional form is what ships.
+	// This reverses the 2026-08-03 choice of an unconditional holdback.
+	// Then, the lookahead cost composer-pipeline-flow 0.0038 MRR (an extra
+	// body pushed an edge-only citation down) and moved no recall. On
+	// 2026-10-27 the grpc-go retrieval evaluation found every Stage 4 answer
+	// cut (24 per model) in a pack of 8 to 11 bodies, with the slots held
+	// for neighbor, knowledge and exact-symbol candidates that never came.
 	seeds := []stage2.ScoredCitation{
 		seed("a.go", 9.0),
 		seed("b.go", 8.0),
@@ -134,8 +131,8 @@ func TestAllocate_NoKnowledgeCandidatesLeavesReserveUnused(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(out.Selected) != 2 {
-		t.Fatalf("Selected = %d, want 2 (one slot held for absent knowledge)", len(out.Selected))
+	if len(out.Selected) != 3 {
+		t.Fatalf("Selected = %d, want 3 (no knowledge candidate ahead to hold a slot for)", len(out.Selected))
 	}
 }
 

@@ -651,7 +651,11 @@ func buildComposer(
 	recallK int,
 	stage2Options ...stage2.Option,
 ) (*composer.Composer, error) {
-	ic, err := intent.New(ctx, embedder, intent.WithFootprint(fp))
+	intentOpts, err := intent.OptionsFromEnv()
+	if err != nil {
+		return nil, err
+	}
+	ic, err := intent.New(ctx, embedder, append([]intent.Option{intent.WithFootprint(fp)}, intentOpts...)...)
 	if err != nil {
 		return nil, fmt.Errorf("intent.New: %w", err)
 	}

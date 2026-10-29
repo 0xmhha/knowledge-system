@@ -43,7 +43,7 @@ import (
 // NewCmd builds the `cks eval` command: run retrieval-quality scenarios
 // against the fused MCP server and emit a JSON metric report.
 func NewCmd() *cobra.Command {
-	var scenarios, mcpBinary, mcpConfig, output, verifyAnchors string
+	var scenarios, mcpBinary, mcpConfig, output, verifyAnchors, commitRepo string
 	var recordResponses bool
 	cmd := &cobra.Command{
 		Use:   "eval",
@@ -55,7 +55,7 @@ func NewCmd() *cobra.Command {
 			}
 			ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 			defer cancel()
-			return run(ctx, scenarios, mcpBinary, mcpConfig, output, verifyAnchors, recordResponses)
+			return run(ctx, scenarios, mcpBinary, mcpConfig, output, verifyAnchors, commitRepo, recordResponses)
 		},
 	}
 	cmd.Flags().StringVar(&scenarios, "scenarios", "", "scenario YAML file or directory (required)")
@@ -63,12 +63,13 @@ func NewCmd() *cobra.Command {
 	cmd.Flags().StringVar(&mcpConfig, "config", "", "path to cks.yaml forwarded to the server")
 	cmd.Flags().StringVar(&output, "output", "", "write report to this file (empty = stdout)")
 	cmd.Flags().StringVar(&verifyAnchors, "verify-anchors", "", "source root for anchor verification: fail before running when any scenario's expected span no longer contains its declared anchor (guards against line drift)")
+	cmd.Flags().StringVar(&commitRepo, "commit-repo", "", "Git repository holding expected_commit: score a citation with an older commit when its file did not change between that commit and expected_commit (empty = strict commit match)")
 	cmd.Flags().BoolVar(&recordResponses, "record-responses", false, "retain every MCP tool response and per-call timing in the report")
 	cmd.AddCommand(newCaptureCmd(), newMatrixCmd())
 	return cmd
 }
 
-func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, anchorRoot string, recordResponses bool) error {
+func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, anchorRoot, commitRepo string, recordResponses bool) error {
 	paths, err := collectScenarioPaths(scenariosPath)
 	if err != nil {
 		return fmt.Errorf("collect scenarios: %w", err)
@@ -101,6 +102,7 @@ func run(ctx context.Context, scenariosPath, mcpBinary, mcpConfig, outputPath, a
 		CKSMCPBinary:    mcpBinary,
 		CKSMCPConfig:    mcpConfig,
 		RecordResponses: recordResponses,
+		CommitRepo:      commitRepo,
 	})
 	if err != nil {
 		return fmt.Errorf("start runner: %w", err)
