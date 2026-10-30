@@ -9,8 +9,10 @@ package mcp
 // severity:
 //
 //   - ERROR (serviceable=false): ckg/ckv src_commit mismatch, ckg schema
-//     < 1.19 (canonical_id values unpopulated), or graph_digest mismatch
-//     (when both sides report one).
+//     < 1.19 (canonical_id values unpopulated), graph_digest mismatch
+//     (when both sides report one), or indexed files the retained source
+//     inventory cannot serve (a dataset built before document corpora were
+//     retained; every query hitting one would fail).
 //   - WARNING (served, surfaced in health): source_root path differs from the
 //     indexed checkout at the same commit, source tree HEAD ahead/behind the
 //     indexed commit (freshness territory), or the CKV sources ledger not yet
@@ -99,6 +101,10 @@ type AlignmentInputs struct {
 	ConfigSourceRoot string
 	SourceHead       string // git HEAD of ConfigSourceRoot; "" when unknown
 	DatasetVersion   string // "@<ver>" label from the resolved dataset path
+	// UnretainedFiles are indexed files the retained source reader cannot
+	// serve. Every query whose hits include one fails its citation check, so
+	// a non-empty list is an ERROR: the dataset must be rebuilt.
+	UnretainedFiles []string
 }
 
 // ckvManifest is the subset of CKV's manifest.json the assert reads. The
@@ -193,6 +199,11 @@ func ComputeAlignment(in AlignmentInputs) *AlignmentReport {
 		if err := json.Unmarshal(in.CKGManifest, &graph); err != nil {
 			errs = append(errs, "ckg identity manifest unparsable")
 		}
+	}
+	if n := len(in.UnretainedFiles); n > 0 {
+		errs = append(errs, fmt.Sprintf(
+			"%d indexed files are not in the retained source inventory (first: %s) — the dataset predates "+
+				"retained document corpora; rebuild it with cks setup", n, in.UnretainedFiles[0]))
 	}
 	graphPinned := graph.ProjectID != "" || graph.SnapshotID != "" || graph.DatasetID != ""
 	vectorPinned := m.ProjectID != "" || m.SnapshotID != "" || m.DatasetID != ""

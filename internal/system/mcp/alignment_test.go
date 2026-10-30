@@ -173,6 +173,24 @@ func TestComputeAlignment_OldSchema_IsError(t *testing.T) {
 	}
 }
 
+func TestComputeAlignment_UnretainedFiles_IsRebuildError(t *testing.T) {
+	t.Parallel()
+	rep := ComputeAlignment(AlignmentInputs{
+		CKGSrcCommit:    "abc123",
+		CKGSchema:       "1.23",
+		CKVManifest:     manifestJSON("abc123", "/src", "", ""),
+		UnretainedFiles: []string{"entries/A1.md", "entries/A2.md"},
+	})
+	if rep.OK {
+		t.Fatal("indexed files the retained inventory cannot serve must be error-tier")
+	}
+	for _, want := range []string{"2 indexed files", "entries/A1.md", "rebuild"} {
+		if !strings.Contains(rep.Reason, want) {
+			t.Errorf("reason = %q, want it to mention %q", rep.Reason, want)
+		}
+	}
+}
+
 func TestComputeAlignment_DigestMismatch_IsError(t *testing.T) {
 	t.Parallel()
 	rep := ComputeAlignment(AlignmentInputs{

@@ -621,6 +621,34 @@ func TestStoreDeleteByFile(t *testing.T) {
 	}
 }
 
+func TestStoreCitedFilesSkipsLinelessChunks(t *testing.T) {
+	s, _ := Open(filepath.Join(t.TempDir(), "v.db"), testDim)
+	defer func() { _ = s.Close() }()
+	ctx := context.Background()
+
+	doc := mkChunk("d", "entries/A1.md", "rule", 1, 4, "markdown", types.KindFunction)
+	doc.ChunkKind = types.ChunkDoc
+	conv := mkChunk("c", "conventions", "naming", 0, 0, "", types.KindFunction)
+	conv.ChunkKind = types.ChunkConvention
+	chunks := []types.Chunk{
+		mkChunk("a1", "x.go", "alpha1", 1, 5, "go", types.KindFunction),
+		mkChunk("a2", "x.go", "alpha2", 6, 10, "go", types.KindFunction),
+		doc, conv,
+	}
+	embs := [][]float32{{1, 0, 0, 0}, {0.7, 0.7, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}}
+	if err := s.Upsert(ctx, chunks, embs); err != nil {
+		t.Fatalf("Upsert: %v", err)
+	}
+	got, err := s.CitedFiles(ctx)
+	if err != nil {
+		t.Fatalf("CitedFiles: %v", err)
+	}
+	if len(got) != 2 || got[0].File != "entries/A1.md" || got[0].ChunkKind != types.ChunkDoc ||
+		got[1].File != "x.go" || got[1].ChunkKind != types.ChunkSymbol {
+		t.Fatalf("CitedFiles = %+v, want one doc row and one symbol row", got)
+	}
+}
+
 func TestReopenRejectsDimMismatch(t *testing.T) {
 	dir := t.TempDir()
 	dbPath := filepath.Join(dir, "v.db")

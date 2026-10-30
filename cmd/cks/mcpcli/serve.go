@@ -884,6 +884,13 @@ func computeStartupAlignment(ctx context.Context, cfg *config.Config, be *backen
 			in.CKVManifest = raw
 		}
 	}
+	if rv, ok := be.ckv.(*ckvclient.Real); ok {
+		missing, err := rv.UnretainedFiles(ctx)
+		if err != nil {
+			log.Printf("cks-mcp: retained source coverage check failed: %v", err)
+		}
+		in.UnretainedFiles = missing
+	}
 	if cfg.Backends.CKG.SourceRoot != "" {
 		out, err := exec.CommandContext(ctx, "git", "-C", cfg.Backends.CKG.SourceRoot,
 			"rev-parse", "HEAD").Output()
