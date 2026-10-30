@@ -195,6 +195,15 @@ func (r *Real) DocsRoots() []string {
 	return r.eng.Manifest().DocsRoots
 }
 
+// UnretainedFiles lists the indexed files the retained source reader cannot
+// serve. It returns nil when the instance reads a live checkout instead.
+func (r *Real) UnretainedFiles(ctx context.Context) ([]string, error) {
+	if r.sourceReader == nil {
+		return nil, nil
+	}
+	return r.eng.UnretainedFiles(ctx, r.sourceReader)
+}
+
 func (r *Real) Health(ctx context.Context) (Health, error) {
 	man := r.eng.Manifest()
 	modelUp, reason := r.probeModel(ctx)

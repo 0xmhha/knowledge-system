@@ -30,6 +30,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/freshness"
 	"github.com/0xmhha/knowledge-system/internal/vector/manifest"
 	"github.com/0xmhha/knowledge-system/internal/vector/query"
+	"github.com/0xmhha/knowledge-system/pkg/sourcepath"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
@@ -199,6 +200,16 @@ func (e *Engine) SemanticSearch(ctx context.Context, intent string, opts SearchO
 		return nil, errors.New("ckv: engine is closed")
 	}
 	return e.inner.Search(ctx, intent, opts)
+}
+
+// UnretainedFiles lists the indexed files that read, the retained source
+// reader, cannot serve. A non-empty result means queries that hit those
+// files fail their citation check, so the dataset needs a rebuild.
+func (e *Engine) UnretainedFiles(ctx context.Context, read sourcepath.Reader) ([]string, error) {
+	if e == nil || e.inner == nil {
+		return nil, errors.New("ckv: engine is closed")
+	}
+	return e.inner.UnretainedFiles(ctx, read)
 }
 
 // GetFlow lays out a curated flow's steps in call order. Select by

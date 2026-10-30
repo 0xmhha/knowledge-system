@@ -1242,6 +1242,30 @@ func (s *Store) AllFiles(ctx context.Context) ([]string, error) {
 	return out, rows.Err()
 }
 
+// CitedFiles returns one chunk per distinct (file, chunk_kind, provenance)
+// whose line range a citation check would read. Only File, ChunkKind and
+// Provenance are set; the startup dataset check uses them to find files the
+// retained source inventory cannot serve.
+func (s *Store) CitedFiles(ctx context.Context) ([]types.Chunk, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT file, COALESCE(chunk_kind, ''), COALESCE(provenance, '') FROM chunks
+		WHERE start_line >= 1 AND end_line >= start_line GROUP BY file, chunk_kind, provenance ORDER BY file`)
+	if err != nil {
+		return nil, fmt.Errorf("cited_files: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	var out []types.Chunk
+	for rows.Next() {
+		var c types.Chunk
+		var kind string
+		if err := rows.Scan(&c.File, &kind, &c.Provenance); err != nil {
+			return nil, err
+		}
+		c.ChunkKind = types.ChunkKind(kind)
+		out = append(out, c)
+	}
+	return out, rows.Err()
+}
+
 // LookupByFileOrdered returns every chunk in file ordered by start_line.
 // Used by expand_in_file to fetch the neighbour set for a given hit.
 func (s *Store) LookupByFileOrdered(ctx context.Context, file string) ([]types.Chunk, error) {

@@ -30,3 +30,31 @@ func TestRetainedCitationsUseAuthoritativeReaderAndKeepFlowDrift(t *testing.T) {
 		t.Fatalf("archive failure allowed partial/live fallback: %v %v", keep, err)
 	}
 }
+
+func TestUnretainedFilesListsOnlyFilesACitationCheckWouldFailOn(t *testing.T) {
+	chunks := []types.Chunk{
+		{File: "a.go", ChunkKind: types.ChunkSymbol},
+		{File: "a.go", ChunkKind: types.ChunkFileHeader},
+		{File: "entries/A1.md", ChunkKind: types.ChunkDoc},
+		{File: "@cks/docs/0/entries/A1.md", ChunkKind: types.ChunkDoc},
+		{File: "@cks/docs/00/bad.md", ChunkKind: types.ChunkDoc},
+		{File: "conventions", ChunkKind: types.ChunkConvention},
+	}
+	reads := 0
+	reader := func(_ context.Context, path string) ([]byte, error) {
+		reads++
+		if path == "a.go" || path == "@cks/docs/0/entries/A1.md" {
+			return []byte("x\n"), nil
+		}
+		return nil, errors.New("source_missing: citation file is not in the retained inventory")
+	}
+	missing, err := unretainedFiles(context.Background(), chunks, reader)
+	if err != nil || len(missing) != 1 || missing[0] != "entries/A1.md" || reads != 3 {
+		t.Fatalf("unretained files: %v %v reads=%d", missing, err, reads)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := unretainedFiles(ctx, chunks, reader); !errors.Is(err, context.Canceled) {
+		t.Fatalf("cancelled check must fail, not report files: %v", err)
+	}
+}
