@@ -40,7 +40,13 @@ const (
 	// reserve the citation cap starves graph-expansion bodies entirely
 	// (the same failure mode the edge-only pack fix addresses at the
 	// edge level). 0 disables the reserve.
-	DefaultNeighborReserve = 4
+	//
+	// 2, not 4: on the grpc-go retrieval evaluation v2 with code_query, the
+	// seed quota cut the owning function in more PRs than neighbor slots
+	// carried it. Reserve 2 kept it in the pack for 4 / 1 more test PRs
+	// (bge-m3 / qwen3, 55 PRs, none lost); reserve 0 lost as many as it
+	// gained on the dev split.
+	DefaultNeighborReserve = 2
 
 	// DefaultSnippetLines is the head-snippet length used when a full
 	// body does not fit the remaining budget: instead of dropping the
