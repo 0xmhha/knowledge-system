@@ -781,7 +781,7 @@ func (r *Real) resolveSeedOrErr(name string) (string, error) {
 	case len(defs) == 0:
 		return "", fmt.Errorf("%w: %q matches no indexed symbol", ErrSeedUnresolved, name)
 	default:
-		return "", fmt.Errorf("%w: %q is ambiguous across %d definitions; pass the canonical_id find_symbol reports",
+		return "", fmt.Errorf("%w: %q is ambiguous across %d definitions; pass the canonical_id find_symbol lists under definitions",
 			ErrSeedUnresolved, name, len(defs))
 	}
 }

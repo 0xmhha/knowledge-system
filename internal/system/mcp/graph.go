@@ -23,8 +23,12 @@ var (
 // findSymbolResponse wraps the CKG citations + any dummy directives the
 // backend emitted on the way out.
 type findSymbolResponse struct {
-	Symbol       string                      `json:"symbol"`
-	Citations    []contract.Citation         `json:"citations"`
+	Symbol    string              `json:"symbol"`
+	Citations []contract.Citation `json:"citations"`
+	// Definitions gives the canonical_id of each citation the graph records one
+	// for (first maxDefinitionLookups citations). Passing it as a seed selects
+	// that definition when the name itself is ambiguous.
+	Definitions  []symbolDefinition          `json:"definitions,omitempty"`
 	Instructions []contract.DummyInstruction `json:"instructions,omitempty"`
 }
 
@@ -67,7 +71,8 @@ func registerFindSymbol(s *mcpserver.MCPServer, d Deps) {
 		mcpgo.WithDescription(
 			"Resolve a symbol name to its definition citation(s) via ckg's qualified-name "+
 				"index. Suffix match by default; pass the fully-qualified name for an exact "+
-				"hit. Use to turn a name you already know into a traversal anchor.",
+				"hit. Use to turn a name you already know into a traversal anchor. When several "+
+				"definitions match, pass one's canonical_id (under definitions) as the seed.",
 		),
 		mcpgo.WithString("name", mcpgo.Required(),
 			mcpgo.Description("Symbol name (e.g., \"ProcessRequest\" or \"pkg.Type.Method\").")),
@@ -112,6 +117,7 @@ func handleFindSymbol(ctx context.Context, d Deps, req mcpgo.CallToolRequest) (*
 	return mcpgo.NewToolResultStructured(findSymbolResponse{
 		Symbol:       name,
 		Citations:    citations,
+		Definitions:  definitionsOf(ctx, d.CKG, citations),
 		Instructions: collector.All(),
 	}, "find_symbol result"), nil
 }

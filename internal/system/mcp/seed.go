@@ -44,8 +44,10 @@ func seedCitation(ctx context.Context, d Deps, toolName, symbol string) (contrac
 	case len(cits) > 1:
 		return contract.Citation{}, mcpgo.NewToolResultErrorf(
 			"%s: seed symbol unresolved: %q is ambiguous across %d definitions; "+
-				"pass the canonical_id %s returns. Candidates: %s",
-			toolName, symbol, len(cits), ToolNameFindSymbol, formatSeedCandidates(cits))
+				"pass one candidate's canonical_id as the symbol (shown in parentheses where the graph "+
+				"records one, and under definitions in %s). Candidates: %s",
+			toolName, symbol, len(cits), ToolNameFindSymbol,
+			formatSeedCandidates(cits, canonicalIDs(definitionsOf(ctx, d.CKG, cits))))
 	}
 	return cits[0], nil
 }
@@ -54,7 +56,12 @@ func seedCitation(ctx context.Context, d Deps, toolName, symbol string) (contrac
 // error. Sorted so the same ambiguity always reads the same way — the store's
 // row order is not a ranking, and presenting it as one is what let the first
 // candidate be mistaken for the answer.
-func formatSeedCandidates(cits []contract.Citation) string {
+//
+// ids maps a citation's String() to its canonical_id. A candidate is named by
+// it when known, because that is the one form a seed resolves exactly: the
+// file:line alone cannot be passed back, and a shorter name is what was
+// ambiguous in the first place.
+func formatSeedCandidates(cits []contract.Citation, ids map[string]string) string {
 	seen := make(map[string]struct{}, len(cits))
 	out := make([]string, 0, len(cits))
 	for _, c := range cits {
@@ -63,6 +70,9 @@ func formatSeedCandidates(cits []contract.Citation) string {
 			continue
 		}
 		seen[s] = struct{}{}
+		if id := ids[c.String()]; id != "" {
+			s += " (" + id + ")"
+		}
 		out = append(out, s)
 	}
 	sort.Strings(out)
@@ -71,4 +81,52 @@ func formatSeedCandidates(cits []contract.Citation) string {
 			fmt.Sprintf(", and %d more", len(out)-maxSeedCandidates)
 	}
 	return strings.Join(out, ", ")
+}
+
+// maxDefinitionLookups bounds the identity lookups one call makes. A bare name
+// such as "Get" resolves to hundreds of definitions; each lookup reads the
+// file's nodes, and past a few dozen the list is no longer something a caller
+// picks from.
+const maxDefinitionLookups = 64
+
+// symbolDefinition is one definition a name resolved to, with the
+// canonical_id that selects it exactly as a traversal seed.
+type symbolDefinition struct {
+	Citation    contract.Citation `json:"citation"`
+	CanonicalID string            `json:"canonical_id"`
+}
+
+// definitionsOf names each citation by its canonical_id, through the client's
+// optional CitationResolver. Citations without one (an old graph, a
+// non-declaration span) are left out rather than named by a guess, and a
+// client without the capability yields nil.
+//
+// It exists because an ambiguity error told the caller to pass the canonical_id
+// find_symbol returns, while find_symbol returned only file and line: the
+// advice could not be followed.
+func definitionsOf(ctx context.Context, ckg ckgclient.Client, cits []contract.Citation) []symbolDefinition {
+	resolver, ok := ckg.(ckgclient.CitationResolver)
+	if !ok {
+		return nil
+	}
+	var out []symbolDefinition
+	for i, c := range cits {
+		if i == maxDefinitionLookups {
+			break
+		}
+		id, err := resolver.ResolveCitation(ctx, c)
+		if err != nil || id.CanonicalID == "" {
+			continue
+		}
+		out = append(out, symbolDefinition{Citation: c, CanonicalID: id.CanonicalID})
+	}
+	return out
+}
+
+func canonicalIDs(defs []symbolDefinition) map[string]string {
+	out := make(map[string]string, len(defs))
+	for _, def := range defs {
+		out[def.Citation.String()] = def.CanonicalID
+	}
+	return out
 }

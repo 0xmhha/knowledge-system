@@ -62,6 +62,66 @@ func TestHandleFindSymbol_HappyPath(t *testing.T) {
 	}
 }
 
+// TestHandleFindSymbol_ListsCanonicalIDs pins the half of the ambiguity
+// contract find_symbol owns: an ambiguous seed error sends the caller here for
+// a canonical_id, so the response must carry one wherever the graph records it.
+// A citation the graph cannot name is left out, not named by a guess.
+func TestHandleFindSymbol_ListsCanonicalIDs(t *testing.T) {
+	t.Parallel()
+	named, unnamed := cit("eth/gasprice/anzeon.go", 90, 120), cit("core/types/receipt.go", 359, 370)
+	f := newFixture(t, func(f *fixture) {
+		f.ckg.SymbolCitations = []contract.Citation{named, unnamed}
+		f.ckg.SymbolIdentities = map[string]ckgclient.SymbolIdentity{
+			named.String(): {CanonicalID: "example.com/eth/gasprice.(*AnzeonTipEnv).GetAnzeonTipCap", Citation: named},
+		}
+	})
+	res, err := handleFindSymbol(context.Background(), f.deps, callToolReq(map[string]any{"name": "GetAnzeonTipCap"}))
+	if err != nil || res.IsError {
+		t.Fatalf("handleFindSymbol: %v %s", err, resultText(res))
+	}
+	var out findSymbolResponse
+	if err := decodeStructured(res, &out); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	want := []symbolDefinition{{Citation: named, CanonicalID: "example.com/eth/gasprice.(*AnzeonTipEnv).GetAnzeonTipCap"}}
+	if len(out.Definitions) != 1 || out.Definitions[0] != want[0] {
+		t.Errorf("Definitions = %+v, want %+v", out.Definitions, want)
+	}
+}
+
+// TestHandleFindRelatives_AmbiguousSeedNamesCanonicalIDs: the refusal must name
+// what to pass back. File and line cannot be passed as a symbol, so a candidate
+// with a canonical_id is listed with it.
+func TestHandleFindRelatives_AmbiguousSeedNamesCanonicalIDs(t *testing.T) {
+	t.Parallel()
+	named, unnamed := cit("eth/gasprice/anzeon.go", 90, 120), cit("core/types/receipt.go", 359, 370)
+	f := newFixture(t, func(f *fixture) {
+		f.ckg.SymbolCitations = []contract.Citation{named, unnamed}
+		f.ckg.SymbolIdentities = map[string]ckgclient.SymbolIdentity{
+			named.String(): {CanonicalID: "example.com/eth/gasprice.(*AnzeonTipEnv).GetAnzeonTipCap", Citation: named},
+		}
+	})
+	res, err := handleFindRelatives(context.Background(), f.deps,
+		callToolReq(map[string]any{"symbol": "AnzeonTipEnv.GetAnzeonTipCap"}),
+		ToolNameFindCallers, "callers", []contract.Relation{contract.RelationCalledBy})
+	if err != nil || !res.IsError {
+		t.Fatalf("want a refusal, got err=%v %s", err, resultText(res))
+	}
+	got := resultText(res)
+	for _, want := range []string{
+		"eth/gasprice/anzeon.go:90 (example.com/eth/gasprice.(*AnzeonTipEnv).GetAnzeonTipCap)",
+		"core/types/receipt.go:359",
+		"canonical_id",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("message %q does not contain %q", got, want)
+		}
+	}
+	if strings.Contains(got, "core/types/receipt.go:359 (") {
+		t.Errorf("message names a candidate the graph has no canonical_id for: %q", got)
+	}
+}
+
 func TestHandleFindSymbol_DummyEmitsInstructions(t *testing.T) {
 	t.Parallel()
 	// Wire a dummy ckg directly into Deps so handleFindSymbol invokes it.
