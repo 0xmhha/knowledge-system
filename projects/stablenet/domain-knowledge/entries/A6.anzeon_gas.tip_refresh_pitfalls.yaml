@@ -1,0 +1,91 @@
+id: A6.anzeon_gas.tip_refresh_pitfalls
+subsystem: A6
+knowledge_type: B5
+title: "Anzeon gas tip change not applied — refresh guard and tip consumers, not the per-tx cache"
+
+summary: |
+  Symptom: after a governance change of the gas tip, the txpool keeps
+  deciding with the old tip for a while and then recovers. The tempting
+  reading is "a cache was not cleared", and the tempting fix is to clear
+  the per-transaction tip cache. That fix is wrong for this code.
+
+  Two places decide which tip is seen. AnzeonTipEnv.SetCurrentBlock
+  re-reads the block it caches only when its refresh guard says the
+  block changed. A block with no state change keeps the same state root
+  while its header already carries the new GasTip, so a guard keyed on
+  the root alone keeps the old header, and every reader of
+  currentBlock.GasTip() sees the old tip until some later block changes
+  the state. The guard has to compare the header GasTip as well
+  (gasTipChanged). Separately, the txpool consumers that compare a
+  transaction's tip with the pool threshold must all compare the same
+  quantity: RemotesBelowTip compares the effective Anzeon tip
+  (GetAnzeonTipCap, falling back to GasTipCap), as Pending does.
+
+  The per-transaction anzeonTipCap cache is set once during validation
+  and is kept on purpose across reinjection (validation.go comment
+  "Only cache if not already set (to preserve original value during
+  reinject)"). Clearing it on every SetGasTip contradicts that intent
+  and does not fix the stale header.
+
+code_anchors:
+  - file: eth/gasprice/anzeon.go
+    symbol: "AnzeonTipEnv.SetCurrentBlock"
+    line: 57
+    reason: "refresh guard: state root or header GasTip change re-reads the cached block"
+  - file: eth/gasprice/anzeon.go
+    symbol: gasTipChanged
+    line: 91
+    reason: "header GasTip comparison used by the refresh guard"
+  - file: core/txpool/legacypool/legacypool.go
+    symbol: "lookup.RemotesBelowTip"
+    line: 2117
+    reason: "threshold consumer: compares the effective Anzeon tip, not the raw GasTipCap"
+  - file: core/txpool/legacypool/legacypool.go
+    symbol: "LegacyPool.Pending"
+    line: 587
+    reason: "consumer path that calls SetCurrentBlock before reading tips"
+  - file: core/txpool/validation.go
+    line: 413
+    reason: "per-tx tip cache is set once and kept across reinjection on purpose"
+
+code_keywords:
+  - AnzeonTipEnv
+  - SetCurrentBlock
+  - gasTipChanged
+  - GasTip
+  - RemotesBelowTip
+  - GetAnzeonTipCap
+  - SetAnzeonTipCap
+  - SetGasTip
+
+korean_aliases:
+  - "가스 팁 변경 미반영"
+  - "거버넌스 팁 변경 후 적용 안 됨"
+  - "빈 블록에서 옛 팁"
+  - "팁 임계값 비교"
+
+english_aliases:
+  - "gas tip change not applied"
+  - "stale gas tip after governance change"
+  - "old tip on empty blocks"
+  - "tip threshold comparison"
+
+related_concepts:
+  - A6.anzeon_gas.tip_override
+  - A11.txpool.type_taxonomy_admission
+
+invariants:
+  - "The AnzeonTipEnv refresh guard covers every header field its readers use: a block whose state root is unchanged but whose header GasTip differs is re-read."
+  - "Every txpool comparison of a transaction tip against the pool threshold uses the same quantity, the effective Anzeon tip (GetAnzeonTipCap, falling back to GasTipCap)."
+  - "The per-transaction anzeonTipCap is set once during validation and is not cleared on reinjection."
+
+pitfalls:
+  - "Clearing every transaction's anzeonTipCap in SetGasTip to apply a new tip — contradicts the reinjection intent in validation.go and leaves the stale header in AnzeonTipEnv; symptom persists on blocks without state change."
+  - "Keying the AnzeonTipEnv refresh on the state root only — blocks without state change keep the old header, so readers see the old GasTip until the next state-changing block (symptom: old tip for a while after the change, then recovers)."
+  - "Comparing raw GasTipCap against the threshold in one consumer while another uses the effective tip — the two paths disagree about which transactions are below the tip."
+  - "Reproducing with transactions flowing after the change — each block changes the state root and refreshes the env, so the symptom does not show; hold a window of blocks without transactions after the change."
+
+risk_level: medium
+source_of_truth: code
+status: needs_verification
+priority: P1
