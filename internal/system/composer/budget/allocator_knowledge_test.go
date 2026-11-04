@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
+	"github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
 
@@ -21,7 +22,8 @@ func TestAllocate_KnowledgeReserveRescuesLowRankedInvariant(t *testing.T) {
 	// 4 code seeds outscore 1 invariant seed; MaxCitations=3 with
 	// KnowledgeReserve=1. Without the reserve the total cap fires at the
 	// three code seeds and the invariant never gets processed — the exact
-	// starvation shape the neighbor reserve fixed one level down.
+	// starvation shape the neighbor reserve fixed one level down. The
+	// reserved slot comes on top of the cap, so no code seed is displaced.
 	seeds := []stage2.ScoredCitation{
 		seed("a.go", 9.0),
 		seed("b.go", 8.0),
@@ -44,8 +46,8 @@ func TestAllocate_KnowledgeReserveRescuesLowRankedInvariant(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(out.Selected) != 3 {
-		t.Fatalf("Selected = %d, want 3", len(out.Selected))
+	if len(out.Selected) != 4 {
+		t.Fatalf("Selected = %d, want 4 (3 under the cap + 1 reserved invariant)", len(out.Selected))
 	}
 	got := map[string]string{}
 	for _, s := range out.Selected {
@@ -57,9 +59,48 @@ func TestAllocate_KnowledgeReserveRescuesLowRankedInvariant(t *testing.T) {
 	if got["rules.md"] != "invariant" {
 		t.Errorf("SelectedItem.ChunkKind = %q, want invariant (kind must survive into Stage4Output)", got["rules.md"])
 	}
-	// The held slot displaces exactly one code seed: a.go + b.go stay, c.go loses.
-	if _, ok := got["c.go"]; ok {
-		t.Errorf("c.go selected despite knowledge holdback; got %v", got)
+	if _, ok := got["c.go"]; !ok {
+		t.Errorf("c.go displaced by the reserved invariant; got %v", got)
+	}
+	if _, ok := got["d.go"]; ok {
+		t.Errorf("d.go selected past the cap; got %v", got)
+	}
+}
+
+// The knowledge reserve must not use the neighbor reserve's slots. Measured
+// 2026-11-04 on go-stablenet: code seeds stopped at the seed quota, 2
+// invariants took the last 2 slots and 18 of 22 packs held no neighbor.
+func TestAllocate_KnowledgeReserveLeavesNeighborSlots(t *testing.T) {
+	t.Parallel()
+	seeds, f := seedsAndBodies(16)
+	inv := knowledgeSeed("rules.md", 0.1, "invariant")
+	f.Bodies[inv.Citation.Key()] = bodyN(5)
+	n1 := neighbor("s00.go", "n1.go", contract.RelationCalls, 1, 0.05)
+	n2 := neighbor("s00.go", "n2.go", contract.RelationCalls, 1, 0.04)
+	f.Bodies[n1.Edge.Target.Key()] = bodyN(40)
+	f.Bodies[n2.Edge.Target.Key()] = bodyN(40)
+	a, err := New(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := a.Allocate(context.Background(), append(seeds, inv), []stage3.ScoredNeighbor{n1, n2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var code, neighbors, knowledge int
+	for _, s := range out.Selected {
+		switch {
+		case s.ChunkKind == "invariant":
+			knowledge++
+		case s.Origin == OriginNeighbor:
+			neighbors++
+		default:
+			code++
+		}
+	}
+	want := DefaultMaxCitations - DefaultNeighborReserve
+	if code != want || neighbors != 2 || knowledge != 1 {
+		t.Fatalf("code %d, neighbors %d, invariants %d; want %d, 2, 1", code, neighbors, knowledge, want)
 	}
 }
 
