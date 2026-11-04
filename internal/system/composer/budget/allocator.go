@@ -63,6 +63,13 @@ const (
 	// are present: they carry the decision facts code cannot (measured:
 	// "empty block = same state root" existed only as an invariant
 	// chunk), yet never outscore code seeds. 0 disables the reserve.
+	//
+	// These selections come on top of MaxCitations and do not count as
+	// seeds. Taken from inside the cap, they used the slots the neighbor
+	// reserve keeps after the seed quota: measured 2026-11-04 on the
+	// go-stablenet retrieval evaluation, every pack (11 PRs, 2 vector arms)
+	// held 2 invariants and 18 of 22 held no neighbor, with 18 to 50
+	// neighbors reaching Stage 4.
 	DefaultKnowledgeReserve = 2
 
 	// DefaultExactSymbolReserve is how many selections are guaranteed to
@@ -100,7 +107,7 @@ type Config struct {
 	SnippetLines int
 
 	// KnowledgeReserve guarantees this many selections to knowledge-kind
-	// candidates. See DefaultKnowledgeReserve.
+	// candidates, in addition to MaxCitations. See DefaultKnowledgeReserve.
 	KnowledgeReserve int
 
 	// ExactSymbolReserve guarantees this many selections to
@@ -261,6 +268,10 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 	seedSelected := 0
 	neighborSelected := 0
 	knowledgeSelected := 0
+	// capUsed counts the selections MaxCitations limits: all but the
+	// reserved knowledge ones.
+	capUsed := 0
+	capSkipped := 0
 	exactSymbolRescued := map[string]bool{}
 	selectedKeys := map[string]bool{}
 
@@ -321,6 +332,16 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		// chunks: sampled across all fifteen scenarios on 2026-08-03,
 		// they took 16 body slots in 8 of them, twice each in six.
 		isKnowledge := isKnowledgeCandidate(c)
+		reservedKnowledge := isKnowledge && knowledgeSelected < a.config.KnowledgeReserve
+		// Cap reached with the knowledge reserve still open: only knowledge
+		// may enter. Ends the loop once none is left ahead.
+		if a.config.MaxCitations > 0 && capUsed >= a.config.MaxCitations {
+			if !reservedKnowledge {
+				decide(c, "citation_cap")
+				capSkipped++
+				continue
+			}
+		}
 		// A prompt-verbatim, unambiguously resolved symbol gets the same
 		// protection as knowledge for the same reason: it is one small
 		// declaration span competing against whole bodies that merely
@@ -344,26 +365,19 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 				continue
 			}
 		}
-		// Knowledge holdback: while the knowledge reserve is unfilled,
-		// that many of the remaining cap slots are held for knowledge-kind
-		// candidates. Without this the total-cap break below fires before
-		// the list reaches them — knowledge hits come from a separate
-		// kind-scoped retrieval and rank below the code seeds, so a plain
-		// greedy pass never selects one (the same starvation shape as the
-		// neighbor reserve, one level up).
+		// Exact-symbol holdback: while that reserve is unfilled, that many
+		// of the remaining cap slots are held for prompt-verbatim symbols
+		// still ahead. Knowledge needs no holdback: its reserved selections
+		// sit outside the cap, and the cap check above keeps the loop going
+		// until they arrive.
 		if !isKnowledge && !isExactSymbol && a.config.MaxCitations > 0 {
 			reserveLeft := 0
-			if a.config.KnowledgeReserve > 0 {
-				if left := a.config.KnowledgeReserve - knowledgeSelected; left > 0 {
-					reserveLeft += min(left, ahead.knowledge(i))
-				}
-			}
 			if a.config.ExactSymbolReserve > 0 {
 				if left := a.config.ExactSymbolReserve - len(exactSymbolRescued); left > 0 {
 					reserveLeft += min(left, ahead.exactSymbols(i, exactSymbolRescued))
 				}
 			}
-			if reserveLeft > 0 && len(out.Selected) >= a.config.MaxCitations-reserveLeft {
+			if reserveLeft > 0 && capUsed >= a.config.MaxCitations-reserveLeft {
 				decide(c, "reserve_holdback")
 				continue
 			}
@@ -416,30 +430,33 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		})
 		selectedKeys[c.Citation.Key()] = true
 		used += tokens
-		switch c.Origin {
-		case OriginSeed:
-			seedSelected++
-		case OriginNeighbor:
-			neighborSelected++
-		}
-		if isKnowledge {
+		switch {
+		case reservedKnowledge:
 			knowledgeSelected++
+		case c.Origin == OriginSeed:
+			seedSelected++
+			capUsed++
+		case c.Origin == OriginNeighbor:
+			neighborSelected++
+			capUsed++
 		}
 		if isExactSymbol {
 			exactSymbolRescued[exactKeyword] = true
 		}
 
-		// Citation cap: stop once we've selected MaxCitations bodies, even
-		// if the token budget has room. Candidates are merged in descending
-		// score order, so the cap keeps the strongest hits. Remaining
-		// candidates are simply not processed (a hard ceiling on selection,
-		// distinct from the budget/fetch skips tracked in out.Skipped).
-		if a.config.MaxCitations > 0 && len(out.Selected) >= a.config.MaxCitations {
+		// Citation cap: stop once MaxCitations bodies count against it and
+		// no reserved knowledge is left to take, even if the token budget
+		// has room. Candidates are merged in descending score order, so the
+		// cap keeps the strongest hits. Remaining candidates are simply not
+		// processed (a hard ceiling on selection, distinct from the
+		// budget/fetch skips tracked in out.Skipped).
+		if a.config.MaxCitations > 0 && capUsed >= a.config.MaxCitations &&
+			(knowledgeSelected >= a.config.KnowledgeReserve || ahead.knowledge(i) == 0) {
 			break
 		}
 	}
 
-	out.CapTruncated = len(candidates) - processed
+	out.CapTruncated = len(candidates) - processed + capSkipped
 	out.UsedTokens = used
 	if bodyBudget > 0 {
 		out.Utilization = float64(used) / float64(bodyBudget)
