@@ -1,0 +1,194 @@
+# Retrieval accuracy roadmap
+
+This page is the starting point for retrieval accuracy work: what the system builds and reads today, why the
+remaining misses happen, which algorithms could fix them, and in what order they are tried. Keep it current. When
+an item is tried, update its status and link the measurement; when a decision changes, add a row to the decision
+log instead of rewriting history.
+
+Related: `docs/RETRIEVAL-PIPELINE.md` draws the query pipeline alone and compares it with the Transformer.
+This page adds the index-building side, the join between the two stores, and the improvement plan.
+
+Last reviewed: 2026-11-05 (main at #137).
+
+## 1. Figure: the whole system
+
+The Transformer figure has two towers: an encoder that turns the input into representations once, and a decoder
+that reads those representations to produce the output. CKS has the same split. The offline build is the encoder:
+it turns source code into two stores. The online query is the decoder: it reads both stores to select the evidence
+for one question. Unlike the paper, nothing is learned end to end; each box is a hand-written rule, and the two
+towers meet through one join key.
+
+```
+ ENCODER SIDE (offline, once per commit)                       DECODER SIDE (online, once per question)
+
+ source tree @ commit                                           question (Korean or English)
+      |                                                              |
+      +-------------------------+                                    v
+      |                         |                           +-------------------+
+      v                         v                           | 0 query rewrite   |  calling agent writes
+ +-----------+            +-------------+                   |   -> code_query   |  code vocabulary (English)
+ | ckg parse |            | ckv chunk   |                   +-------------------+
+ | AST per   |            | one chunk   |                   | 1 intent          |  bug_fix / arch_explain / ...
+ | language  |            | per symbol, |                   +-------------------+
+ +-----------+            | split long  |                   | 2 Stage 1 recall  |  vector k=20 + BM25 rerank,
+      |                   | functions,  |                   |                   |  2 rounds, keywords (cap 8)
+      v                   | file header,|      vector       |                   |<------ ckv
+ +-----------+            | docs, PRs,  |      search       +-------------------+
+ | resolve   |            | invariants  |  ---------------> | 3 Stage 2 rank    |  RRF over vector, BM25 and
+ | names,    |            +-------------+                   |                   |  symbol lists:
+ | qualify   |                  |                           |                   |  sum w / (60 + rank)
+ | ids       |                  v                           +-------------------+
+ +-----------+            +-------------+                   | 4 Stage 3 expand  |  1-hop edges per seed:
+      |                   | embed text  |                   |                   |  seed x w_rel / (1 + dist)
+      v                   | = rule      |      edges        |                   |<------ ckg
+ +-----------+            |  prefix     |  ---------------> +-------------------+
+ | edges     |            | (+ optional |                   | 5 Stage 4 select  |  one candidate per function,
+ | calls,    |            |  LLM line)  |                   |                   |  seed quota 10, reserves,
+ | implements|            | + body      |                   |                   |  7200-token budget, cap 12
+ | reads/    |            +-------------+                   +-------------------+
+ | writes_   |                  |                           | 6 sanitize, pack  |  bodies + edges +
+ | field,    |                  v                           |                   |  cut_candidates (no body)
+ | changed_in|            +-------------+                   +-------------------+
+ | ...       |            | embed       |                            |
+ +-----------+            | bge-m3 or   |                            v
+      |                   | qwen3       |                     diagnosing agent
+      v                   +-------------+
+ +-----------+                  |
+ | code graph|  <--- join ----   +--> vector index (chunks + vectors)
+ | nodes,    |  canonical_id:
+ | edges     |  one ckg node per chunk, chosen by line span
+ +-----------+
+
+ Curated knowledge (domain packs, glossaries, invariants) enters both towers as extra chunks and is
+ placed by the Stage 4 knowledge reserve.
+```
+
+How to read it:
+
+- **Encoder left, ckg.** Each language parser reads the AST, resolves names to import-path-qualified ids and
+  writes nodes and typed edges. The graph already has many edge kinds (for example `implements`,
+  `reads_field`, `writes_field`, `changed_in`), but Stage 3 follows only the relations in the cks contract
+  (`calls`, `called_by`, `implements`, `imports`, `references`, `tested_by`, `embeds`, `defines`,
+  `uses_type`).
+- **Encoder right, ckv.** Code is cut into chunks: one per function or type, several for a long function, plus a
+  file header. PR descriptions, commit messages, docs and invariants become chunks too. Each chunk is embedded as a
+  rule-based prefix (language, file, symbol, kind) plus the raw body. An LLM-written one-line prefix exists but is
+  off by default; it did not beat the rule prefix on the small corpus it was measured on.
+- **Join.** While building ckv, each chunk with a line span is matched to the ckg node whose span fits best,
+  and that node's `canonical_id` is copied into one string field on the chunk. Chunks without a span (PR,
+  commit, doc, curated invariant) get no join key.
+- **Decoder.** Stage 1 reads ckv, Stage 3 reads ckg, Stage 2 and Stage 4 combine scores. Each stage keeps a
+  fixed number of candidates, so a function lost early is never seen again. This is where the 2026-11 misses
+  happen (section 2).
+
+## 2. Why the remaining answers are missed
+
+Measured on go-stablenet (11 PRs, Korean questions, two embedding arms) after #135:
+
+| Arm | Owning function in pack bodies | Misses | Cause |
+|---|---|---|---|
+| bge-m3 | 8 of 11 | pr-63, pr-67, pr-73 | pr-63: not retrieved at all. pr-67 and pr-73: retrieved but cut at seed ranks 19 and 16 |
+| qwen3 | 10 of 11 | pr-63 | not retrieved at all |
+
+The misses fall into three classes:
+
+1. **Vocabulary gap.** A Korean question has no identifiers of its own, so the keyword channel is empty and only
+   the vector search can find the code. Code chunks are embedded as English identifiers and comments.
+2. **Structure, not words.** pr-63 asks where a new hardfork registers its system contract upgrade. The owning code
+   is an extension point; no word in the question names it, and no edge leads to it from what is found.
+3. **Embedding model.** pr-67 and pr-73 are found by qwen3 on the same data and lost by bge-m3.
+
+A common belief is that the index favours words that appear often in the code. BM25 does the opposite (IDF lowers
+frequent terms). The real limit is that the stores hold only what the code literally says: identifiers, comments
+and a location prefix. Nothing states what a function is for, in the words a person asking about it would use.
+
+## 3. Correction to the Transformer analogy
+
+The paper's six layers are not six repetitions that push a probability up. They are six different layers, each
+with its own weights, and all of those weights are learned from labelled pairs. The gain comes from the learning
+signal. Adding hand-written stages without such a signal adds knobs; two keyword experiments in 2026-11 lost PRs
+for that reason.
+
+CKS does have a learning signal, larger than the evaluation labels: git history pairs each PR description with
+the functions it changed. Section 4 uses it, under the leakage rule in section 6.
+
+## 4. Proposals
+
+Status values: `proposed`, `in progress`, `measured`, `adopted`, `rejected`. Each row names the miss class
+(section 2) it targets.
+
+### 4.1 Join between graph and vector (canonical_id)
+
+Today one chunk carries at most one `canonical_id`. Real relations are not one to one:
+
+| Relation | Example | Today |
+|---|---|---|
+| chunk 1 : symbol N | a PR changes several functions; a type chunk holds several methods; a doc section covers several functions | no link, or the smallest node only |
+| chunk N : symbol 1 | the parts of a split function; code, summary and test of one function | same string repeated; scores are not combined by symbol |
+| id 1 : node N | the same function under two build tags; an interface method and its implementations | one picked, or left ambiguous |
+| id 1 : commit N | a function renamed or moved | different ids, not connected |
+
+| ID | Proposal | Status | Cost and risk |
+|---|---|---|---|
+| J1 | Link table `chunk_symbol_links(chunk_id, canonical_id, role, weight, source)` with roles `defines`, `part_of`, `contains`, `changes`, `describes`, `constrains`, `tests`. Keep the scalar `canonical_id` as the `defines` row so current readers keep working. Stage 2 then combines scores per symbol, not per span | proposed | ckv schema change, manifest digest change; PR `changes` rows need diff-to-function mapping |
+| J2 | Alias table `symbol_aliases(old_id, new_id, commit)` from git rename detection and body similarity | proposed | false merges when two functions look alike |
+| J3 | Alternative to J1: put PR, doc and summary chunks into ckg as nodes with `describes` / `changes` edges so Stage 3 follows them | proposed (alternative) | mixes code structure and documents in one graph; larger graph; ckg schema change |
+
+### 4.2 Vector knowledge (ckv)
+
+| ID | Proposal | Targets | Status | Cost and risk |
+|---|---|---|---|---|
+| V1 | Symbol summary: an LLM writes, for each function or type, what it is for and when one would change it, in English and Korean. The summary is a separate chunk with the function's own span, so a hit on the summary cites the code | 1, 2 | in progress | LLM time at build (about 19k symbols per go-stablenet commit); a wrong summary pulls retrieval to the wrong code |
+| V2 | Expected questions (doc2query): a few questions per function that the function answers | 1 | proposed | generated questions may resemble evaluation questions and inflate scores |
+| V3 | Strip boilerplate (repeated error handling) from the embedding input so names and comments weigh more | 1 | proposed | small effect likely |
+| V4 | Fine-tune the embedder contrastively on (PR description, changed function) pairs with same-file negatives | 1, 3 | proposed | needs GPU and a training pipeline; strict time split required |
+
+V1 differs from the existing LLM prefix: the prefix is one English sentence added in front of the code body, so
+the body still dominates the vector. A separate summary chunk is a vector of the purpose alone, in the language of
+the question.
+
+### 4.3 Graph knowledge (ckg)
+
+| ID | Proposal | Targets | Status | Cost and risk |
+|---|---|---|---|---|
+| G1 | Registration and extension-point edges: map-literal registration, function values passed as arguments, switch over an enum; mark nodes that "a new X" must touch | 2 | proposed | parser work per language; which of these ckg already emits is not yet checked |
+| G2 | Co-change edges from git history, weighted by frequency | 2 | proposed | old history adds noise; evaluation PRs must be excluded |
+| G3 | Expose ckg edges Stage 3 does not follow today (`reads_field`, `writes_field`, `changed_in`) through the cks contract | 2 | proposed | more neighbors compete for the same slots |
+| G4 | Community detection over the graph plus one summary per community (GraphRAG style) for broad questions | 1, 2 | proposed | summary cost; must be rebuilt as code changes |
+
+### 4.4 Iterative scoring at query time
+
+| ID | Proposal | Targets | Status | Cost and risk |
+|---|---|---|---|---|
+| Q1 | Stage 3 as personalized PageRank from the seeds instead of one 1-hop pass: a function pointed to by several seeds rises | 3 | proposed | hub functions (logging, errors) absorb score unless degree-normalised; useless when no seed is near the answer |
+| Q2 | Pseudo-relevance feedback: mix the vectors of the first round's top bodies into a second vector query | 1 | proposed | drifts further when round one is wrong |
+| Q3 | Cross-encoder rerank of the final candidates, reading question and body together | 1, 3 | proposed | one model call per candidate; needs a model good at Korean and code |
+
+## 5. Order of work
+
+1. **V1 symbol summaries** (started 2026-11-05). Smallest change that targets miss classes 1 and 2. It needs no
+   schema change: the summary chunk carries the function's span, so Stage 2 merges it with the code hit by citation.
+2. **J1 link table** once V1 shows a gain, so summaries, PR chunks and code combine per symbol rather than per span.
+3. **Q1 personalized PageRank** as a cheap query-only experiment, any time.
+4. G1 to G3, then V4 when a time-split training set exists.
+
+## 6. Measurement rules
+
+- Judge each change with the D6 rule: report the gain on go-stablenet, require no loss on indexer-go (losses do
+  not exceed gains in either arm), and report the risk subset.
+- indexer-go has been looked at 5 times. A change that alters body selection should be confirmed on a fresh
+  holdout before it is called general.
+- **Leakage.** Anything built from history or by an LLM (V1, V2, V4, G2) must not see information after the
+  evaluation PR's base commit. Summaries are generated from the code at the base commit only, never from PR text.
+- **Generated knowledge must be checked.** A summary that names an identifier absent from the body is dropped.
+- A change that leaves pack bodies unchanged (for example `cut_candidates`) needs no indexer-go run.
+
+## 7. Decision log
+
+| Date | Decision | Why |
+|---|---|---|
+| 2026-11-04 | Knowledge reserve placed outside the citation cap (#134) | it took the neighbor slots |
+| 2026-11-04 | Vector and graph spans of one function are one candidate (#135) | the same function used two slots |
+| 2026-11-04 | Keyword seeds from `code_query` not adopted | lost PRs on go-stablenet twice |
+| 2026-11-05 | Pack lists cut seeds as `cut_candidates` (#137) | two bge misses become visible by name; bodies unchanged |
+| 2026-11-05 | Start with V1 symbol summaries, then J1 | targets the two miss classes the other proposals cannot reach |
