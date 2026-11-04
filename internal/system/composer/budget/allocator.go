@@ -3,6 +3,8 @@ package budget
 import (
 	"context"
 	"errors"
+	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
@@ -332,6 +334,14 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		// chunks: sampled across all fifteen scenarios on 2026-08-03,
 		// they took 16 body slots in 8 of them, twice each in six.
 		isKnowledge := isKnowledgeCandidate(c)
+		// A code span inside a body already selected adds no new code. Vector
+		// and graph spans of one function differ (measured 2026-11-04 on
+		// go-stablenet: seed 61-91, neighbor 64-91), so the key-based dedupe
+		// misses them; 10 of 42 selected neighbors repeated a selected seed.
+		if !isKnowledge && coveredBySelected(c.Citation, out.Selected) {
+			decide(c, "covered_by_selected")
+			continue
+		}
 		reservedKnowledge := isKnowledge && knowledgeSelected < a.config.KnowledgeReserve
 		// Cap reached with the knowledge reserve still open: only knowledge
 		// may enter. Ends the loop once none is left ahead.
@@ -546,11 +556,23 @@ type candidate struct {
 	Sources   []string
 }
 
-// mergeCandidates combines seeds and neighbors into one score-sorted
-// list. Stage 3's self-loop guard already prevents a citation from
-// appearing in both, but this function dedupes by Citation.Key() as a
-// defensive backstop — if a future Stage 3 change breaks the guard,
-// the allocator still produces sensible output.
+// coveredBySelected reports whether c lies within the span of a selected
+// body of the same file. A wider candidate is not covered: it shows code
+// the selected body does not. The commit is not compared: the fetcher reads
+// every body from one source tree by file and lines, and a vector chunk
+// keeps the commit it was first indexed at (go-stablenet pr-75: seed at
+// 6e41d966, its graph neighbor at the scenario commit e5a6e9e1, file
+// unchanged between them).
+func coveredBySelected(c contract.Citation, selected []SelectedItem) bool {
+	for _, s := range selected {
+		if s.Citation.File == c.File &&
+			s.Citation.StartLine <= c.StartLine && c.EndLine <= s.Citation.EndLine {
+			return true
+		}
+	}
+	return false
+}
+
 // isKnowledgeCandidate reports a domain-knowledge chunk: an invariant, or
 // out-of-tree markdown (chunk_kind "doc" with an empty commit hash).
 func isKnowledgeCandidate(c candidate) bool {
@@ -605,15 +627,31 @@ func (r reserveLookahead) exactSymbols(i int, rescued map[string]bool) int {
 	return len(seen)
 }
 
+// mergeCandidates combines seeds and neighbors into one score-sorted
+// list. Stage 3's self-loop guard already prevents a citation from
+// appearing in both, but this function dedupes by Citation.Key() as a
+// defensive backstop — if a future Stage 3 change breaks the guard,
+// the allocator still produces sensible output.
+//
+// A code seed that is also a graph neighbor (the same function under the
+// vector span and the graph span) adds the neighbor's score to its own:
+// it is matched by meaning and by a call from a stronger seed. Measured
+// 2026-11-04 on go-stablenet: owning functions that the top seeds call
+// directly sat at seed ranks 16 to 21, below the seed quota.
 func mergeCandidates(seeds []stage2.ScoredCitation, neighbors []stage3.ScoredNeighbor) []candidate {
 	out := make([]candidate, 0, len(seeds)*3+len(neighbors))
 	for _, s := range seeds {
+		score, sources := s.Score, s.Sources
+		if bonus := graphBonus(s, neighbors); bonus > 0 {
+			score += bonus
+			sources = append(slices.Clip(sources), fmt.Sprintf("graph:same-function(+%.5f)", bonus))
+		}
 		out = append(out, candidate{
 			Citation:  s.Citation,
-			Score:     s.Score,
+			Score:     score,
 			Origin:    OriginSeed,
 			ChunkKind: s.ChunkKind,
-			Sources:   s.Sources,
+			Sources:   sources,
 		})
 		// A split Markdown child is the cited match. Fetch only a bounded
 		// window on either side, each with its own source-line citation.
@@ -665,4 +703,27 @@ func mergeCandidates(seeds []stage2.ScoredCitation, neighbors []stage3.ScoredNei
 		dedup = append(dedup, c)
 	}
 	return dedup
+}
+
+// graphBonus is the highest score of a neighbor that is the same function
+// as code seed s: same file, and one span within the other (the vector span
+// starts at the doc comment, the graph span at the func line). Knowledge
+// chunks get none.
+func graphBonus(s stage2.ScoredCitation, neighbors []stage3.ScoredNeighbor) float64 {
+	if s.ChunkKind == "invariant" || s.ChunkKind == "doc" {
+		return 0
+	}
+	best := 0.0
+	for _, n := range neighbors {
+		t := n.Edge.Target
+		if t.File != s.Citation.File {
+			continue
+		}
+		inside := s.Citation.StartLine <= t.StartLine && t.EndLine <= s.Citation.EndLine
+		around := t.StartLine <= s.Citation.StartLine && s.Citation.EndLine <= t.EndLine
+		if (inside || around) && n.Score > best {
+			best = n.Score
+		}
+	}
+	return best
 }
