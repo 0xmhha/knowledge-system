@@ -2,8 +2,11 @@ package budget
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"testing"
 
+	"github.com/0xmhha/knowledge-system/internal/system/composer/stage2"
 	"github.com/0xmhha/knowledge-system/internal/system/composer/stage3"
 	"github.com/0xmhha/knowledge-system/pkg/system/contract"
 )
@@ -52,4 +55,51 @@ func TestAllocate_SkipsNeighborCoveredBySelectedBody(t *testing.T) {
 	if !got[inCut.Edge.Target.Key()] || !got[wider.Edge.Target.Key()] {
 		t.Errorf("want the cut seed's span and the wider span as neighbors; got %v", got)
 	}
+}
+
+// A seed below the quota that is also a neighbor of a stronger seed (same
+// function, vector span from the doc comment, graph span from the func line)
+// gains the neighbor's score and enters the pack (go-stablenet pr-75: the
+// owning function was seed 16 and a direct callee of seeds 1 and 2).
+func TestAllocate_SeedThatIsAlsoNeighborGainsGraphScore(t *testing.T) {
+	t.Parallel()
+	f := &FakeFetcher{Bodies: map[string]string{}}
+	var seeds []stage2.ScoredCitation
+	for i := range 14 {
+		s := seed(fmt.Sprintf("s%02d.go", i), 0.08-float64(i)*0.001)
+		f.Bodies[s.Citation.Key()] = bodyN(40)
+		seeds = append(seeds, s)
+	}
+	same := spanNeighbor("s13.go", 2, 10, 0.04) // s13.go 1-10 under its graph span
+	f.Bodies[same.Edge.Target.Key()] = bodyN(40)
+	a, err := New(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := a.Allocate(context.Background(), seeds, []stage3.ScoredNeighbor{same})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]SelectedItem{}
+	for _, s := range out.Selected {
+		got[s.Citation.Key()] = s
+	}
+	s13, ok := got[cit("s13.go", 1, 10).Key()]
+	if !ok || s13.Origin != OriginSeed {
+		t.Fatalf("seed s13.go not selected as a seed; selected %v", keys(got))
+	}
+	if !strings.HasPrefix(s13.Sources[len(s13.Sources)-1], "graph:same-function") {
+		t.Errorf("s13.go sources %v, want a graph:same-function entry", s13.Sources)
+	}
+	if _, dup := got[same.Edge.Target.Key()]; dup {
+		t.Errorf("the neighbor copy of s13.go was selected too; selected %v", keys(got))
+	}
+}
+
+func keys(m map[string]SelectedItem) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	return out
 }
