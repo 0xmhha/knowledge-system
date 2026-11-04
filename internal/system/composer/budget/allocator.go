@@ -560,11 +560,15 @@ type candidate struct {
 // defensive backstop — if a future Stage 3 change breaks the guard,
 // the allocator still produces sensible output.
 // coveredBySelected reports whether c lies within the span of a selected
-// body of the same file and commit. A wider candidate is not covered: it
-// shows code the selected body does not.
+// body of the same file. A wider candidate is not covered: it shows code
+// the selected body does not. The commit is not compared: the fetcher reads
+// every body from one source tree by file and lines, and a vector chunk
+// keeps the commit it was first indexed at (go-stablenet pr-75: seed at
+// 6e41d966, its graph neighbor at the scenario commit e5a6e9e1, file
+// unchanged between them).
 func coveredBySelected(c contract.Citation, selected []SelectedItem) bool {
 	for _, s := range selected {
-		if s.Citation.File == c.File && s.Citation.CommitHash == c.CommitHash &&
+		if s.Citation.File == c.File &&
 			s.Citation.StartLine <= c.StartLine && c.EndLine <= s.Citation.EndLine {
 			return true
 		}

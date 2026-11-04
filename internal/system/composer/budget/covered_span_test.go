@@ -13,6 +13,9 @@ import (
 func spanNeighbor(tgt string, start, end int, score float64) stage3.ScoredNeighbor {
 	n := neighbor("s00.go", tgt, contract.RelationCalls, 1, score)
 	n.Edge.Target = cit(tgt, start, end)
+	// The graph cites the scenario commit; vector seeds keep the commit
+	// their chunk was first indexed at.
+	n.Edge.Target.CommitHash = "def"
 	return n
 }
 
