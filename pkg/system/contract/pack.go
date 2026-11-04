@@ -186,8 +186,14 @@ type EvidencePack struct {
 	GraphNeighbors []Neighbor `json:"graph_neighbors,omitempty"`
 	// Knowledge is indexed evidence with no citable location — see
 	// KnowledgeChunk. Separate from Citations on purpose.
-	Knowledge      []KnowledgeChunk `json:"knowledge,omitempty"`
-	SanitizeReport []Redaction      `json:"sanitize_report,omitempty"`
+	Knowledge []KnowledgeChunk `json:"knowledge,omitempty"`
+	// CutCandidates lists ranked seeds that matched but got no body: the
+	// body cap or the seed quota cut them. Separate from Citations on
+	// purpose: no body, no edge, and the citation contract stays the
+	// body/edge one. A consumer reads an entry's file and lines when the
+	// bodies do not cover the task.
+	CutCandidates  []CutCandidate `json:"cut_candidates,omitempty"`
+	SanitizeReport []Redaction    `json:"sanitize_report,omitempty"`
 	// Instructions is populated by Compose runs that used dummy ckv/ckg
 	// backends in place of real ones. Each entry directs the upstream
 	// LLM (coding-agent) to execute a skill against go-stablenet source
@@ -199,6 +205,24 @@ type EvidencePack struct {
 	// verify the base EvidencePack after ignoring this additive field.
 	Semantic *SemanticOverlay `json:"semantic,omitempty"`
 	Metadata PackMetadata     `json:"metadata"`
+}
+
+// CutCandidate is a ranked seed the pack holds no body for. It carries the
+// location and the indexed symbol name only, never source text: bodies are
+// the part of the pack the sanitize stage checks.
+type CutCandidate struct {
+	Citation Citation `json:"citation"`
+	// Symbol is the indexed symbol name; empty when the index has none.
+	Symbol string `json:"symbol,omitempty"`
+	// Rank is the 1-based position among the ranked seeds.
+	Rank int `json:"rank"`
+	// Reason is why it got no body: "seed_quota" or "citation_cap".
+	Reason string `json:"reason"`
+}
+
+// IsValid reports whether c carries a valid location, a rank and a reason.
+func (c CutCandidate) IsValid() bool {
+	return c.Citation.IsValid() && c.Rank > 0 && c.Reason != ""
 }
 
 // IsValid reports whether p is structurally sound:
@@ -227,6 +251,11 @@ func (p EvidencePack) IsValid() bool {
 
 	for _, k := range p.Knowledge {
 		if !k.IsValid() {
+			return false
+		}
+	}
+	for _, c := range p.CutCandidates {
+		if !c.IsValid() {
 			return false
 		}
 	}

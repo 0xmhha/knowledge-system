@@ -481,6 +481,22 @@ func assemblePack(
 		validNeighbors = append(validNeighbors, sn.Edge)
 	}
 
+	// Seeds the cap or quota cut, listed without a body so a reader can open
+	// one. Files whose body the sanitizer dropped stay out entirely.
+	droppedFiles := map[string]bool{}
+	for _, item := range s5Out.Items {
+		if item.Dropped {
+			droppedFiles[item.Citation.File] = true
+		}
+	}
+	var cut []contract.CutCandidate
+	for _, cs := range s4Out.CutSeeds {
+		if droppedFiles[cs.Citation.File] {
+			continue
+		}
+		cut = append(cut, contract.CutCandidate{Citation: cs.Citation, Symbol: cs.Symbol, Rank: cs.Rank, Reason: cs.Reason})
+	}
+
 	usedTokens := 0
 	for _, b := range bodies {
 		usedTokens += b.TokenEstimate
@@ -497,6 +513,7 @@ func assemblePack(
 		Bodies:         bodies,
 		GraphNeighbors: validNeighbors,
 		Knowledge:      knowledge,
+		CutCandidates:  cut,
 		SanitizeReport: s5Out.Redactions,
 		Metadata: contract.PackMetadata{
 			BudgetTokens:     s4Out.BudgetTokens,
