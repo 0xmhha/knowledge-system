@@ -69,3 +69,22 @@ func TestAssemblePack_SkippedTargetExcluded(t *testing.T) {
 		}
 	}
 }
+
+// Cut seeds reach the pack as cut_candidates, except from a file whose body
+// the sanitizer dropped.
+func TestAssemblePack_CutCandidates(t *testing.T) {
+	t.Parallel()
+	seed, cut, secret := edgeCit("seed.go"), edgeCit("cut.go"), edgeCit("secret.go")
+	s4 := budget.Stage4Output{BudgetTokens: 100, CutSeeds: []budget.CutSeed{
+		{Citation: cut, Symbol: "Owner", Rank: 16, Reason: "seed_quota"},
+		{Citation: secret, Symbol: "Key", Rank: 17, Reason: "seed_quota"},
+	}}
+	s5 := sanitize.Stage5Output{Items: []sanitize.SanitizedItem{{Citation: seed, Body: "body"}, {Citation: secret, Dropped: true}}}
+	pack := assemblePack("q", contract.IntentUnknown, stage3.Stage3Output{}, s4, s5, "test", nil)
+	if !pack.IsValid() {
+		t.Fatalf("pack invalid: %+v", pack)
+	}
+	if len(pack.CutCandidates) != 1 || pack.CutCandidates[0].Symbol != "Owner" || pack.CutCandidates[0].Rank != 16 {
+		t.Fatalf("cut_candidates = %+v, want only Owner at rank 16", pack.CutCandidates)
+	}
+}

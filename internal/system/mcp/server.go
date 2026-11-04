@@ -387,7 +387,10 @@ func registerGetForTask(s *mcpserver.MCPServer, d Deps) {
 				"token-budgeted, sanitized, SHA-256 integrity-stamped. Read "+
 				"graph_neighbors before issuing per-edge traversal calls -- it already "+
 				"answers 'who calls / what does it call' for the top hits. Use the "+
-				"narrower tools only to go deeper on a specific point.",
+				"narrower tools only to go deeper on a specific point. cut_candidates "+
+				"lists further ranked matches (symbol, rank) that got no body; when the "+
+				"bodies do not cover the task, read the file and lines of the entries "+
+				"whose symbol fits before searching elsewhere.",
 		),
 		mcpgo.WithString("prompt", mcpgo.Required(),
 			mcpgo.Description("Natural-language task description or symptom, as a full sentence. Example: \"restore proposal tx stays stuck in pending after GasTip revert\".")),

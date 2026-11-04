@@ -38,6 +38,9 @@ type ScoredCitation struct {
 	// first introduced this citation (empty for ckg-only citations).
 	// The budget allocator's knowledge quota routes on it.
 	ChunkKind string
+	// Symbol is the ckv hit's symbol name (empty for ckg-only citations).
+	// The pack lists it for seeds that get no body.
+	Symbol string
 }
 
 // DefaultRRFK is the RRF tuning constant from Cormack et al. (2009).
@@ -97,6 +100,9 @@ func (a *aggregator) addCkvList(hits []contract.Hit) {
 		}
 		if sc.ChunkKind == "" {
 			sc.ChunkKind = h.ChunkKind
+		}
+		if sc.Symbol == "" {
+			sc.Symbol = h.Symbol
 		}
 		sc.Score += contribution
 		sc.Sources = append(sc.Sources,

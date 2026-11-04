@@ -314,3 +314,18 @@ func TestStampIntegrity_NilPack(t *testing.T) {
 		t.Fatal("StampIntegrity(nil) returned nil; want error")
 	}
 }
+
+// A cut candidate needs a location, a rank and a reason; a malformed one
+// invalidates the pack like any other malformed section.
+func TestEvidencePack_CutCandidatesValidity(t *testing.T) {
+	t.Parallel()
+	c := Citation{File: "a.go", StartLine: 1, EndLine: 3, CommitHash: "abc"}
+	p := EvidencePack{Query: "q", Citations: []Citation{c}, CutCandidates: []CutCandidate{{Citation: c, Symbol: "F", Rank: 11, Reason: "seed_quota"}}}
+	if !p.IsValid() {
+		t.Fatal("pack with a well-formed cut candidate is invalid")
+	}
+	p.CutCandidates[0].Rank = 0
+	if p.IsValid() {
+		t.Error("cut candidate with rank 0 accepted")
+	}
+}

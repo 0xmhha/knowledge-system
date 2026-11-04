@@ -194,6 +194,27 @@ type Stage4Output struct {
 	// see when the citation cap — not the token budget — is the binding
 	// constraint (the neighbor-starvation failure mode).
 	CapTruncated int
+
+	// CutSeeds are the code seeds the seed quota or the citation cap left
+	// without a body, in seed rank order, at most MaxCutSeeds. The pack
+	// lists them so a reader can still open a match the cap cut: measured
+	// 2026-11-04 on go-stablenet, the owning functions of pr-67 and pr-73
+	// (bge-m3) were seeds 19 and 16 and appeared nowhere in the pack.
+	CutSeeds []CutSeed
+}
+
+// MaxCutSeeds bounds Stage4Output.CutSeeds. Stage 2 hands over about 30
+// seeds and about 10 get a body, so 20 covers the rest.
+const MaxCutSeeds = 20
+
+// CutSeed is a code seed that got no body.
+type CutSeed struct {
+	Citation contract.Citation
+	Symbol   string
+	// Rank is the 1-based position among the seeds Allocate received.
+	Rank int
+	// Reason is the allocator decision: "seed_quota" or "citation_cap".
+	Reason string
 }
 
 // Allocator runs Stage 4 of the composer pipeline.
@@ -282,10 +303,22 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 	// Skipped, so the quota and reserve exits are otherwise invisible.
 	rec := debugtrace.From(ctx)
 	var decisions []allocDecision
+	seedAt := make(map[string]int, len(seeds))
+	for i, sc := range seeds {
+		if _, dup := seedAt[sc.Citation.Key()]; !dup {
+			seedAt[sc.Citation.Key()] = i
+		}
+	}
 	decide := func(c candidate, reason string) {
 		if rec != nil {
 			decisions = append(decisions, allocDecision{File: c.Citation.File, Start: c.Citation.StartLine,
 				End: c.Citation.EndLine, Origin: c.Origin, Score: c.Score, Decision: reason})
+		}
+		if (reason == "seed_quota" || reason == "citation_cap") && c.Origin == OriginSeed &&
+			c.ParentOf == "" && !isKnowledgeCandidate(c) {
+			if i, ok := seedAt[c.Citation.Key()]; ok {
+				out.CutSeeds = append(out.CutSeeds, CutSeed{Citation: c.Citation, Symbol: seeds[i].Symbol, Rank: i + 1, Reason: reason})
+			}
 		}
 	}
 	if rec != nil {
@@ -471,10 +504,23 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 	if bodyBudget > 0 {
 		out.Utilization = float64(used) / float64(bodyBudget)
 	}
-	if rec != nil {
-		for _, c := range candidates[processed:] {
-			decide(c, "citation_cap")
+	for _, c := range candidates[processed:] {
+		decide(c, "citation_cap")
+	}
+	// A cut seed whose function has a body under another span (a graph
+	// neighbor inside it, or a wider span around it) is not missing.
+	kept := out.CutSeeds[:0]
+	for _, cs := range out.CutSeeds {
+		if !sameFunctionSelected(cs.Citation, out.Selected) {
+			kept = append(kept, cs)
 		}
+	}
+	out.CutSeeds = kept
+	sort.SliceStable(out.CutSeeds, func(i, j int) bool { return out.CutSeeds[i].Rank < out.CutSeeds[j].Rank })
+	if len(out.CutSeeds) > MaxCutSeeds {
+		out.CutSeeds = out.CutSeeds[:MaxCutSeeds]
+	}
+	if rec != nil {
 		rec.After("stage4", "allocate", "", map[string]any{
 			"decisions": decisions, "used_tokens": used, "selected": len(out.Selected),
 		})
@@ -567,6 +613,22 @@ func coveredBySelected(c contract.Citation, selected []SelectedItem) bool {
 	for _, s := range selected {
 		if s.Citation.File == c.File &&
 			s.Citation.StartLine <= c.StartLine && c.EndLine <= s.Citation.EndLine {
+			return true
+		}
+	}
+	return false
+}
+
+// sameFunctionSelected reports whether a selected body of c's file lies
+// within c's span or contains it.
+func sameFunctionSelected(c contract.Citation, selected []SelectedItem) bool {
+	for _, s := range selected {
+		if s.Citation.File != c.File {
+			continue
+		}
+		inside := c.StartLine <= s.Citation.StartLine && s.Citation.EndLine <= c.EndLine
+		around := s.Citation.StartLine <= c.StartLine && c.EndLine <= s.Citation.EndLine
+		if inside || around {
 			return true
 		}
 	}
