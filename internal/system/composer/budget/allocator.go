@@ -332,6 +332,14 @@ func (a *Allocator) Allocate(ctx context.Context, seeds []stage2.ScoredCitation,
 		// chunks: sampled across all fifteen scenarios on 2026-08-03,
 		// they took 16 body slots in 8 of them, twice each in six.
 		isKnowledge := isKnowledgeCandidate(c)
+		// A code span inside a body already selected adds no new code. Vector
+		// and graph spans of one function differ (measured 2026-11-04 on
+		// go-stablenet: seed 61-91, neighbor 64-91), so the key-based dedupe
+		// misses them; 10 of 42 selected neighbors repeated a selected seed.
+		if !isKnowledge && coveredBySelected(c.Citation, out.Selected) {
+			decide(c, "covered_by_selected")
+			continue
+		}
 		reservedKnowledge := isKnowledge && knowledgeSelected < a.config.KnowledgeReserve
 		// Cap reached with the knowledge reserve still open: only knowledge
 		// may enter. Ends the loop once none is left ahead.
@@ -551,6 +559,19 @@ type candidate struct {
 // appearing in both, but this function dedupes by Citation.Key() as a
 // defensive backstop — if a future Stage 3 change breaks the guard,
 // the allocator still produces sensible output.
+// coveredBySelected reports whether c lies within the span of a selected
+// body of the same file and commit. A wider candidate is not covered: it
+// shows code the selected body does not.
+func coveredBySelected(c contract.Citation, selected []SelectedItem) bool {
+	for _, s := range selected {
+		if s.Citation.File == c.File && s.Citation.CommitHash == c.CommitHash &&
+			s.Citation.StartLine <= c.StartLine && c.EndLine <= s.Citation.EndLine {
+			return true
+		}
+	}
+	return false
+}
+
 // isKnowledgeCandidate reports a domain-knowledge chunk: an invariant, or
 // out-of-tree markdown (chunk_kind "doc" with an empty commit hash).
 func isKnowledgeCandidate(c candidate) bool {
