@@ -85,6 +85,13 @@ const (
 	// indexes built with --flow-corpus.
 	ChunkFlowStep  ChunkKind = "flow_step"  // one step in a flow (symbol + branches)
 	ChunkFlowSpine ChunkKind = "flow_spine" // a flow's entry/summary backbone
+
+	// ChunkSymbolSummary is an LLM-written description of a symbol chunk's
+	// purpose, in English and Korean. It carries the symbol's own span, so a
+	// hit on the summary cites the code and merges with the code hit by
+	// citation. Additive — present only in indexes built with
+	// --llm-summary-model.
+	ChunkSymbolSummary ChunkKind = "symbol_summary"
 )
 
 // InvariantTier classifies how an invariant was detected.

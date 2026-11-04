@@ -3,6 +3,7 @@ package build
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -19,6 +20,7 @@ import (
 	"github.com/0xmhha/knowledge-system/internal/vector/parse/typescript"
 	"github.com/0xmhha/knowledge-system/internal/vector/projectcfg"
 	"github.com/0xmhha/knowledge-system/internal/vector/store/sqlitevec"
+	"github.com/0xmhha/knowledge-system/internal/vector/summary"
 	"github.com/0xmhha/knowledge-system/pkg/vector/types"
 )
 
@@ -65,6 +67,10 @@ func newChunker(emb types.Embedder, cfg *projectcfg.Config) *chunk.Chunker {
 func resolveEmbedTextFn(ctx context.Context, disablePrefix bool, prefixer llmprefix.Prefixer) func(types.Chunk) string {
 	if prefixer != nil {
 		return func(c types.Chunk) string {
+			if c.ChunkKind == types.ChunkSymbolSummary {
+				// Already LLM prose; a second LLM sentence adds nothing.
+				return chunk.BuildEmbedText(c)
+			}
 			if pre := prefixer.Prefix(ctx, c); pre != "" {
 				return pre + "\n" + chunk.BuildEmbedText(c)
 			}
@@ -90,6 +96,31 @@ func resolveLLMPrefixer(model, outDir string) llmprefix.Prefixer {
 		return nil
 	}
 	return p
+}
+
+// resolveSummarizer builds a disk-cached ollama symbol summarizer for the
+// given model (empty → nil, i.e. no summary chunks). The cache lives under
+// outDir so rebuilds and builds of other commits reuse unchanged symbols.
+func resolveSummarizer(model, outDir string) *summary.Summarizer {
+	if model == "" {
+		return nil
+	}
+	s, err := summary.New(llmprefix.NewOllamaGenerator(model), model, filepath.Join(outDir, ".ckv-summary-cache"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ckv: warning: symbol summaries disabled — %v\n", err)
+		return nil
+	}
+	return s
+}
+
+// reportSummaryStats writes one line with the summarizer's counts.
+func reportSummaryStats(w io.Writer, s *summary.Summarizer) {
+	if w == nil || s == nil {
+		return
+	}
+	st := s.Stats()
+	fmt.Fprintf(w, "ckv: symbol summaries: eligible=%d generated=%d cached=%d rejected=%d failed=%d\n",
+		st.Eligible, st.Generated, st.Cached, st.Rejected, st.Failed)
 }
 
 // processFile reads, parses, and chunks a single source file.
