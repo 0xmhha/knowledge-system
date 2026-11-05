@@ -89,6 +89,10 @@ type ReindexOptions struct {
 	// gain) their summary chunks.
 	LLMSummaryModel string
 
+	// LLMSummaryMinLines mirrors Options.LLMSummaryMinLines; keep it equal
+	// to the build's value for the same reason.
+	LLMSummaryMinLines int
+
 	// PolicyPath mirrors Options.PolicyPath. Reindexed chunks pass
 	// through the policy loader so category/guidance stay current with
 	// the yaml even when only some files change.
@@ -253,7 +257,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 	parsers := newParsers()
 	chunker := newChunker(o.Embedder, cfg)
 	embedTextFn := resolveEmbedTextFn(ctx, o.DisableContextualPrefix, resolveLLMPrefixer(o.LLMPrefixModel, o.OutDir))
-	summarizer := resolveSummarizer(o.LLMSummaryModel, o.OutDir)
+	summarizer := resolveSummarizer(o.LLMSummaryModel, o.LLMSummaryMinLines, o.OutDir)
 	defer reportSummaryStats(o.ProgressOut, summarizer)
 	pol, err := policy.Load(o.PolicyPath)
 	if err != nil {

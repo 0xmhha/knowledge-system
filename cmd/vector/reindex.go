@@ -12,6 +12,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/vector/build"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/bgeonnx"
+	"github.com/0xmhha/knowledge-system/internal/vector/summary"
 )
 
 type reindexOpts struct {
@@ -25,6 +26,7 @@ type reindexOpts struct {
 
 	llmPrefixModel  string
 	llmSummaryModel string
+	llmSummaryMin   int
 
 	includePR bool
 	prSince   string
@@ -64,6 +66,7 @@ Examples:
 	f.StringVar(&opts.policy, "policy", "", "path to policy yaml (must match the build's policy; categorizes chunks by path)")
 	f.StringVar(&opts.llmPrefixModel, "llm-prefix-model", "", "LLM contextual prefix model (must match the build's value; empty keeps the rule-based prefix)")
 	f.StringVar(&opts.llmSummaryModel, "llm-summary-model", "", "symbol summary model (must match the build's value; empty adds no summary chunks)")
+	f.IntVar(&opts.llmSummaryMin, "llm-summary-min-lines", summary.DefaultMinLines, "shortest symbol that gets a summary chunk (must match the build's value)")
 	f.BoolVar(&opts.jsonOut, "json", false, "machine-readable summary output")
 	f.BoolVar(&opts.includePR, "include-pr-history", false, "incrementally fetch merged PRs via gh CLI and index only those newer than the recorded cutoff")
 	f.StringVar(&opts.prSince, "pr-since", "", "only PRs merged after this date (YYYY-MM-DD); requires --include-pr-history (default: manifest cutoff)")
@@ -103,6 +106,7 @@ func runReindex(ctx context.Context, opts *reindexOpts) error {
 		DisableContextualPrefix: os.Getenv("CKV_DISABLE_CONTEXTUAL_PREFIX") == "1",
 		LLMPrefixModel:          opts.llmPrefixModel,
 		LLMSummaryModel:         opts.llmSummaryModel,
+		LLMSummaryMinLines:      opts.llmSummaryMin,
 		PolicyPath:              opts.policy,
 	}
 	if opts.includePR {

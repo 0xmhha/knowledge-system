@@ -80,13 +80,17 @@ type Options struct {
 	LLMPrefixModel string
 
 	// LLMSummaryModel enables symbol summary chunks: an Ollama chat model
-	// writes, for each whole symbol of at least three lines, what it is for
-	// and when one would change it, in English and Korean, stored as a
-	// ChunkSymbolSummary chunk with the symbol's own span. Empty (the
-	// default) adds none. Disk-cached under <OutDir>/.ckv-summary-cache and
+	// writes, for each whole symbol of at least LLMSummaryMinLines lines,
+	// what it is for and when one would change it, in English and Korean,
+	// stored as a ChunkSymbolSummary chunk with the symbol's own span. Empty
+	// (the default) adds none. Disk-cached under <OutDir>/.ckv-summary-cache and
 	// a generation failure only skips that symbol. Expensive: one
 	// generation per new symbol body, so opt-in only.
 	LLMSummaryModel string
+
+	// LLMSummaryMinLines is the shortest symbol (in lines) that gets a
+	// summary; 0 means summary.DefaultMinLines (3).
+	LLMSummaryMinLines int
 
 	// PR corpus. When non-nil, the build fetches merged PRs
 	// via `gh` CLI and indexes their descriptions + commit messages
@@ -320,7 +324,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 	var inputFiles []manifest.InputFile
 	chunker := newChunker(o.Embedder, cfg)
 	embedTextFn := resolveEmbedTextFn(ctx, o.DisableContextualPrefix, resolveLLMPrefixer(o.LLMPrefixModel, o.OutDir))
-	summarizer := resolveSummarizer(o.LLMSummaryModel, o.OutDir)
+	summarizer := resolveSummarizer(o.LLMSummaryModel, o.LLMSummaryMinLines, o.OutDir)
 	defer reportSummaryStats(o.ProgressOut, summarizer)
 
 	// Policy is optional. Absence is silent so existing callers without

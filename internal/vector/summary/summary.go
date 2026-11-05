@@ -32,9 +32,10 @@ import (
 // regenerates instead of reusing summaries written for the old prompt.
 const PromptVersion = "v1"
 
-// minLines skips one- and two-line symbols (field accessors, constants):
-// their body already says everything and they are the bulk of the symbols.
-const minLines = 3
+// DefaultMinLines skips one- and two-line symbols (field accessors,
+// constants): their body already says everything and they are the bulk of
+// the symbols.
+const DefaultMinLines = 3
 
 // Summarizer appends summary chunks. Results are disk-cached by model,
 // prompt version and chunk text, so a rebuild or another commit with the
@@ -43,6 +44,7 @@ type Summarizer struct {
 	gen      llmprefix.Generator
 	model    string
 	cacheDir string
+	minLines int
 	stats    Stats
 }
 
@@ -55,15 +57,19 @@ type Stats struct {
 	Failed    int // generation errors
 }
 
-// New returns a Summarizer caching under cacheDir (created if absent). A nil
-// generator makes Append a no-op.
-func New(gen llmprefix.Generator, model, cacheDir string) (*Summarizer, error) {
+// New returns a Summarizer caching under cacheDir (created if absent) that
+// summarizes symbols of at least minLines lines (DefaultMinLines when
+// minLines <= 0). A nil generator makes Append a no-op.
+func New(gen llmprefix.Generator, model, cacheDir string, minLines int) (*Summarizer, error) {
 	if cacheDir != "" {
 		if err := os.MkdirAll(cacheDir, 0o755); err != nil {
 			return nil, fmt.Errorf("summary: cache dir: %w", err)
 		}
 	}
-	return &Summarizer{gen: gen, model: model, cacheDir: cacheDir}, nil
+	if minLines <= 0 {
+		minLines = DefaultMinLines
+	}
+	return &Summarizer{gen: gen, model: model, cacheDir: cacheDir, minLines: minLines}, nil
 }
 
 // Stats returns the counts accumulated so far.
@@ -76,7 +82,7 @@ func (s *Summarizer) Stats() Stats {
 
 // Eligible reports whether c gets a summary: a whole symbol with a source
 // span, not a test, at least minLines long.
-func Eligible(c types.Chunk) bool {
+func Eligible(c types.Chunk, minLines int) bool {
 	return c.ChunkKind == types.ChunkSymbol && c.StartLine > 0 &&
 		c.EndLine-c.StartLine+1 >= minLines && !c.IsTest && c.Language != "markdown"
 }
@@ -88,7 +94,7 @@ func (s *Summarizer) Append(ctx context.Context, chunks []types.Chunk) []types.C
 		return chunks
 	}
 	for _, c := range chunks { // range reads the original slice once; appends are not revisited
-		if !Eligible(c) {
+		if !Eligible(c, s.minLines) {
 			continue
 		}
 		s.stats.Eligible++

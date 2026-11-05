@@ -101,11 +101,11 @@ func resolveLLMPrefixer(model, outDir string) llmprefix.Prefixer {
 // resolveSummarizer builds a disk-cached ollama symbol summarizer for the
 // given model (empty → nil, i.e. no summary chunks). The cache lives under
 // outDir so rebuilds and builds of other commits reuse unchanged symbols.
-func resolveSummarizer(model, outDir string) *summary.Summarizer {
+func resolveSummarizer(model string, minLines int, outDir string) *summary.Summarizer {
 	if model == "" {
 		return nil
 	}
-	s, err := summary.New(llmprefix.NewOllamaGenerator(model), model, filepath.Join(outDir, ".ckv-summary-cache"))
+	s, err := summary.New(llmprefix.NewOllamaGenerator(model), model, filepath.Join(outDir, ".ckv-summary-cache"), minLines)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ckv: warning: symbol summaries disabled — %v\n", err)
 		return nil

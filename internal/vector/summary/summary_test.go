@@ -34,7 +34,7 @@ const goodOut = "EN: Picks the precompiled contract set for the active fork; ext
 
 func TestAppend_AddsSummaryWithTheSymbolSpan(t *testing.T) {
 	g := &fakeGen{out: goodOut}
-	s, err := New(g, "m", t.TempDir())
+	s, err := New(g, "m", t.TempDir(), 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,14 +62,28 @@ func TestAppend_AddsSummaryWithTheSymbolSpan(t *testing.T) {
 	}
 }
 
+func TestAppend_MinLinesSkipsShorterSymbols(t *testing.T) {
+	g := &fakeGen{out: goodOut}
+	s, _ := New(g, "m", t.TempDir(), 10)
+	long := symbolChunk()
+	long.ID, long.EndLine = "long", long.StartLine+9
+	got := s.Append(context.Background(), []types.Chunk{symbolChunk(), long})
+	if len(got) != 3 || got[2].StartLine != long.StartLine || got[2].EndLine != long.EndLine {
+		t.Fatalf("want one summary for the 10-line symbol only, got %d chunks", len(got))
+	}
+	if st := s.Stats(); st.Eligible != 1 {
+		t.Fatalf("stats = %+v, want 1 eligible", st)
+	}
+}
+
 func TestAppend_CachesSummariesAndRejectionsButNotFailures(t *testing.T) {
 	dir := t.TempDir()
 	ctx := context.Background()
 
 	ok := &fakeGen{out: goodOut}
-	s, _ := New(ok, "m", dir)
+	s, _ := New(ok, "m", dir, 0)
 	s.Append(ctx, []types.Chunk{symbolChunk()})
-	s2, _ := New(ok, "m", dir)
+	s2, _ := New(ok, "m", dir, 0)
 	if got := s2.Append(ctx, []types.Chunk{symbolChunk()}); len(got) != 2 || ok.calls != 1 {
 		t.Fatalf("cache miss: chunks=%d calls=%d", len(got), ok.calls)
 	}
@@ -77,7 +91,7 @@ func TestAppend_CachesSummariesAndRejectionsButNotFailures(t *testing.T) {
 	other := symbolChunk()
 	other.Text += "\n// other body"
 	bad := &fakeGen{out: "EN: Calls makeShinyThing.\nKO: makeShinyThing 을 호출한다."}
-	s3, _ := New(bad, "m", dir)
+	s3, _ := New(bad, "m", dir, 0)
 	s3.Append(ctx, []types.Chunk{other})
 	s3.Append(ctx, []types.Chunk{other})
 	if bad.calls != 1 || s3.Stats().Rejected != 1 {
@@ -87,7 +101,7 @@ func TestAppend_CachesSummariesAndRejectionsButNotFailures(t *testing.T) {
 	down := &fakeGen{err: errors.New("model down")}
 	third := symbolChunk()
 	third.Text += "\n// third body"
-	s4, _ := New(down, "m", dir)
+	s4, _ := New(down, "m", dir, 0)
 	s4.Append(ctx, []types.Chunk{third})
 	s4.Append(ctx, []types.Chunk{third})
 	if down.calls != 2 || s4.Stats().Failed != 2 {
