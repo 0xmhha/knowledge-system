@@ -119,8 +119,8 @@ func reportSummaryStats(w io.Writer, s *summary.Summarizer) {
 		return
 	}
 	st := s.Stats()
-	_, _ = fmt.Fprintf(w, "ckv: symbol summaries: eligible=%d generated=%d cached=%d rejected=%d failed=%d\n",
-		st.Eligible, st.Generated, st.Cached, st.Rejected, st.Failed)
+	_, _ = fmt.Fprintf(w, "ckv: symbol summaries: eligible=%d generated=%d cached=%d rejected=%d failed=%d generated_files_skipped=%d\n",
+		st.Eligible, st.Generated, st.Cached, st.Rejected, st.Failed, st.GeneratedFiles)
 }
 
 // processFile reads, parses, and chunks a single source file.

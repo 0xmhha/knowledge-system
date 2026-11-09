@@ -240,8 +240,23 @@ quality comparison.
 
 How to resume, with paths and commands: [symbol summary handoff](./vector/SYMBOL-SUMMARY-HANDOFF.md).
 
-Next step awaiting a user decision: fix the two check defects (skip generated files, case-insensitive identifier
-match), then run the 11 remaining indexer-go commits with the fixed check and judge them as an unseen sample.
+The check fixes were approved on 2026-11-09 and are in the code: files with the Go generated-code header get no
+summaries, identifiers are matched case-insensitively, and an unlabelled two-line answer (one English, one Korean
+line) is accepted. The summary model is now gemma4:12b, chosen by the user on the published benchmarks (MMLU Pro
+77.2%, LiveCodeBench v6 72.0%, MMMLU 83.4% on the Gemma 4 model card; no Gemma 3 12B column there). Requests send
+`think: false`.
+
+Probe on this machine (Apple M4, 24 GB), 11 indexer-go functions of 10-80 lines, prompt v1:
+
+| model | mean / max seconds | kept by the old check | kept by the fixed check |
+|---|---|---|---|
+| gemma3:12b | 11.8 / 15 | 11 | not rerun |
+| gemma4:12b, thinking off | 7.9 / 11 | 7 (4 without EN:/KO: labels) | 11 |
+| gemma4:12b, Ollama default | 119.3 / 168 | 7 (4 without labels) | not rerun |
+
+Eleven symbols show the format and speed, not summary quality. Next: build the 11 remaining indexer-go commits
+with gemma4:12b and the fixed check and judge them as an unseen sample. Since the model changed, the 15 seen
+commits and go-stablenet need summaries from gemma4:12b as well before V1 can be judged as one change.
 
 ## 6. Measurement rules
 
@@ -265,4 +280,5 @@ match), then run the 11 remaining indexer-go commits with the fixed check and ju
 | 2026-11-05 | Start with V1 symbol summaries, then J1 | targets the two miss classes the other proposals cannot reach |
 | 2026-11-05 | V1 summarizes symbols of 10 or more lines | the 3-line run was projected at about 16 h of generation on go-stablenet |
 | 2026-11-06 | indexer-go V1 run stopped at 15 of 26 commits and judged there | user decision; V1 not adopted as built (bge-m3 lost one PR) |
+| 2026-11-09 | Summary model gemma4:12b, thinking off; check fixes (generated files, case-insensitive identifiers, unlabelled two-line answers) | user decision on the benchmarks; thinking made each summary take about 2 minutes; the label fix recovered the 4 of 11 answers gemma4 wrote without labels |
 | 2026-11-09 | Add 4.5 evidence precision and marked gaps; start with P0, then P1 | user decision; the principle "few right bodies plus a marked gap beat many wrong ones" is not measured here, and every metric so far rewards adding bodies |

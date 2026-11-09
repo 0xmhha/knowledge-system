@@ -400,7 +400,7 @@ func Run(ctx context.Context, o Options) (*Result, error) {
 				fmt.Fprintf(os.Stderr, "ckv: %v\n", err)
 				return
 			}
-			chunks = summarizer.Append(ctx, chunks)
+			chunks = summarizer.AppendForFile(ctx, f.AbsPath, chunks)
 			if len(chunks) == 0 {
 				return
 			}

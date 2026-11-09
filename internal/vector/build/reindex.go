@@ -418,7 +418,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 		if err != nil {
 			return nil, err
 		}
-		chunks = summarizer.Append(ctx, chunks)
+		chunks = summarizer.AppendForFile(ctx, abs, chunks)
 		if len(chunks) == 0 {
 			continue
 		}

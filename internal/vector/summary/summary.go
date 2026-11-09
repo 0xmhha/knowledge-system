@@ -15,6 +15,7 @@
 package summary
 
 import (
+	"bufio"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -55,6 +56,9 @@ type Stats struct {
 	Cached    int // summaries read from the cache
 	Rejected  int // model output dropped by validation
 	Failed    int // generation errors
+	// GeneratedFiles counts files skipped because they carry the Go
+	// generated-code header; their symbols are not offered for a summary.
+	GeneratedFiles int
 }
 
 // New returns a Summarizer caching under cacheDir (created if absent) that
@@ -105,6 +109,59 @@ func (s *Summarizer) Append(ctx context.Context, chunks []types.Chunk) []types.C
 		chunks = append(chunks, summaryChunk(c, text))
 	}
 	return chunks
+}
+
+// AppendForFile is Append for the chunks of one source file at absPath. A
+// file that carries the Go generated-code header gets no summaries: generated
+// code (gqlgen resolvers, protobuf stubs) is not where a developer changes
+// behaviour, and on indexer-go it produced most of the rejected summaries. A
+// file that cannot be read gets no summaries either.
+func (s *Summarizer) AppendForFile(ctx context.Context, absPath string, chunks []types.Chunk) []types.Chunk {
+	if s == nil || s.gen == nil {
+		return chunks
+	}
+	generated, err := GeneratedFile(absPath)
+	if err != nil {
+		return chunks
+	}
+	if generated {
+		s.stats.GeneratedFiles++
+		return chunks
+	}
+	return s.Append(ctx, chunks)
+}
+
+// generatedHeader is the marker Go tools write into generated files
+// (https://go.dev/s/generatedcode).
+var generatedHeader = regexp.MustCompile(`^// Code generated .* DO NOT EDIT\.$`)
+
+// GeneratedFile reports whether the file at path carries the Go
+// generated-code header. The convention places the line before the first
+// non-comment, non-blank text, so reading stops there.
+func GeneratedFile(path string) (bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return false, fmt.Errorf("summary: open %s: %w", path, err)
+	}
+	defer func() { _ = f.Close() }()
+	sc := bufio.NewScanner(f)
+	sc.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+	for sc.Scan() {
+		line := strings.TrimSpace(sc.Text())
+		if line == "" {
+			continue
+		}
+		if !strings.HasPrefix(line, "//") {
+			return false, nil
+		}
+		if generatedHeader.MatchString(line) {
+			return true, nil
+		}
+	}
+	if err := sc.Err(); err != nil {
+		return false, fmt.Errorf("summary: read %s: %w", path, err)
+	}
+	return false, nil
 }
 
 func (s *Summarizer) summarize(ctx context.Context, c types.Chunk) (string, bool) {
@@ -189,10 +246,21 @@ var (
 // when either line is missing, too long, the Korean line has no Hangul, or
 // the text names an identifier that the symbol, its file path and its body
 // do not contain.
+//
+// Output without the EN:/KO: labels is accepted only when it is exactly two
+// non-empty lines, one without Hangul (English) and one with Hangul (Korean):
+// gemma4:12b often drops the labels while keeping the two-line format.
+// Identifiers are matched case-insensitively, so prose such as "GraphQL"
+// passes when the code spells it graphql.
 func Validate(out string, c types.Chunk) (string, bool) {
 	var en, ko string
+	var lines []string
 	for line := range strings.SplitSeq(out, "\n") {
 		line = strings.TrimSpace(strings.Trim(strings.TrimSpace(line), "*"))
+		if line == "" {
+			continue
+		}
+		lines = append(lines, line)
 		switch {
 		case en == "" && strings.HasPrefix(line, "EN:"):
 			en = strings.TrimSpace(strings.TrimPrefix(line, "EN:"))
@@ -200,19 +268,39 @@ func Validate(out string, c types.Chunk) (string, bool) {
 			ko = strings.TrimSpace(strings.TrimPrefix(line, "KO:"))
 		}
 	}
+	if en == "" && ko == "" {
+		en, ko = unlabelledPair(lines)
+	}
 	if en == "" || ko == "" || len([]rune(en)) > maxLineRunes || len([]rune(ko)) > maxLineRunes {
 		return "", false
 	}
 	if !hangul.MatchString(ko) {
 		return "", false
 	}
-	known := c.Text + "\n" + c.SymbolName + "\n" + c.File
+	known := strings.ToLower(c.Text + "\n" + c.SymbolName + "\n" + c.File)
 	for _, id := range identLike.FindAllString(en+" "+ko, -1) {
-		if !strings.Contains(known, strings.TrimRight(id, ".")) {
+		if !strings.Contains(known, strings.ToLower(strings.TrimRight(id, "."))) {
 			return "", false
 		}
 	}
 	return en + "\n" + ko, true
+}
+
+// unlabelledPair returns the English and Korean line of an output that is
+// exactly two lines without labels, one without Hangul and one with it.
+// Anything else returns two empty strings.
+func unlabelledPair(lines []string) (en, ko string) {
+	if len(lines) != 2 {
+		return "", ""
+	}
+	a, b := lines[0], lines[1]
+	switch {
+	case !hangul.MatchString(a) && hangul.MatchString(b):
+		return a, b
+	case hangul.MatchString(a) && !hangul.MatchString(b):
+		return b, a
+	}
+	return "", ""
 }
 
 func (s *Summarizer) cacheKey(c types.Chunk) string {
