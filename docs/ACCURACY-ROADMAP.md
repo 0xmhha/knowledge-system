@@ -8,7 +8,7 @@ log instead of rewriting history.
 Related: `docs/RETRIEVAL-PIPELINE.md` draws the query pipeline alone and compares it with the Transformer.
 This page adds the index-building side, the join between the two stores, and the improvement plan.
 
-Last reviewed: 2026-11-09 (main at #137 plus the V1 summary code).
+Last reviewed: 2026-11-09 (main at #140, plus the P0 fields and the pack-size override).
 
 ## 1. Figure: the whole system
 
@@ -164,6 +164,40 @@ the question.
 | Q2 | Pseudo-relevance feedback: mix the vectors of the first round's top bodies into a second vector query | 1 | proposed | drifts further when round one is wrong |
 | Q3 | Cross-encoder rerank of the final candidates, reading question and body together | 1, 3 | proposed | one model call per candidate; needs a model good at Korean and code |
 
+### 4.5 Evidence precision and marked gaps
+
+The proposals above all raise recall: they try to bring the owning function into the pack. This group asks the
+opposite question. A diagnosing agent may do better with three right bodies and an explicit "not covered here"
+than with twelve bodies of which most are unrelated: a wrong body pulls the reasoning toward the wrong code,
+while a marked gap can be filled with grep or a file read. The pack today always fills up to 12 bodies, has no
+score floor, and gives no sign of how confident it is; an unknown intent widens the fan-out instead of saying it
+is unknown. The evaluation counts only whether the owning function is in the pack, so a change that adds bodies
+always looks no worse. The V1 indexer-go loss is a measured case of the failure this group targets: bodies whose
+rank the summaries raised pushed the owning function out.
+
+Nothing in this repository has measured whether the agent is in fact misled by extra bodies, so P1 comes before
+any change to body selection.
+
+| ID | Proposal | Targets | Status | Cost and risk |
+|---|---|---|---|---|
+| P0 | Measure pack precision next to recall: `cks eval` reports `answer_body_count`, `body_precision` and `other_body_tokens` per scenario (EVAL-CONTRACT.md). Report them for the go-stablenet and indexer-go arms, and the curve over pack sizes 3, 6 and 12 with `CKS_PACK_MAX_BODIES` | measurement | in progress (fields and the pack-size override added 2026-11-09) | needs the frozen v2 / indexer-go inputs, which live in the evaluation workspace |
+| P1 | Agent-level A/B: the same diagnosis tasks with a 12-body pack and a 3-body pack plus `cut_candidates`, judged by fixed criteria (the C1-C4 frame of projects/stablenet/eval/diagnosis-procedure) | the principle itself | proposed; design open, see below | paid agent runs (about 1 to 1.5 USD each on the recorded runs); run-to-run variation needs repeats |
+| P2 | Variable body count: stop where the score drops sharply (relative gap, not an absolute threshold) and list the rest as `cut_candidates` | precision | proposed; only if P1 shows an effect | can lose owning functions that sit below the gap; judged by D6 |
+| P3 | Say what is not known: a pack-level confidence signal (for example the top-1 / top-2 score gap), and an unknown intent reported as unknown instead of widening the fan-out | precision | proposed; only if P1 shows an effect | absolute scores differ by embedding model (the 0.55 intent threshold problem), so the signal must be relative; the intent part showed little pack effect (+1 / -1) |
+
+P1 design, to be fixed before any run:
+
+- **Cases.** The four recorded diagnosis cases (PR-56, 70, 75, 77) passed C1 in every run with the 12-body pack,
+  so they leave little room to show harm from extra bodies. The design should add cases where the pack is weak:
+  the go-stablenet PRs whose owning function was not in the pack or was cut (pr-63, pr-67 and pr-73 with
+  bge-m3), with symptom-only problem texts and criteria written before the run.
+- **Arms.** A: default pack (12 bodies). B: `CKS_PACK_MAX_BODIES=3` (neighbor reserve scales to 0), which keeps
+  `cut_candidates` as the marked gap. Same index, same cks binary, same agent and procedure.
+- **Measures.** C1 root cause and C2 sites as in the recorded cases, plus the number of tool calls and tokens the
+  agent spends, and whether a wrong site from the pack appears in the diagnosis.
+- **Repeats and budget.** At least three runs per case and arm, and a total cost cap; both are user decisions.
+- **Leakage.** Problem texts state only what an operator observes; the index is built at the PR base commit.
+
 ## 5. Order of work
 
 1. **V1 symbol summaries** (started 2026-11-05). Smallest change that targets miss classes 1 and 2. It needs no
@@ -171,6 +205,8 @@ the question.
 2. **J1 link table** once V1 shows a gain, so summaries, PR chunks and code combine per symbol rather than per span.
 3. **Q1 personalized PageRank** as a cheap query-only experiment, any time.
 4. G1 to G3, then V4 when a time-split training set exists.
+5. **P0 pack precision** alongside every measurement from now on; **P1 agent A/B** once its cases, repeats and
+   budget are decided. P2 and P3 wait for the P1 result.
 
 ### 5.1 V1 state (2026-11-09)
 
@@ -229,3 +265,4 @@ match), then run the 11 remaining indexer-go commits with the fixed check and ju
 | 2026-11-05 | Start with V1 symbol summaries, then J1 | targets the two miss classes the other proposals cannot reach |
 | 2026-11-05 | V1 summarizes symbols of 10 or more lines | the 3-line run was projected at about 16 h of generation on go-stablenet |
 | 2026-11-06 | indexer-go V1 run stopped at 15 of 26 commits and judged there | user decision; V1 not adopted as built (bge-m3 lost one PR) |
+| 2026-11-09 | Add 4.5 evidence precision and marked gaps; start with P0, then P1 | user decision; the principle "few right bodies plus a marked gap beat many wrong ones" is not measured here, and every metric so far rewards adding bodies |

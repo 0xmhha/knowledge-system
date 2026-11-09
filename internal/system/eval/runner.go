@@ -63,14 +63,23 @@ type Metrics struct {
 	FirstHitRank     int     `json:"first_hit_rank"`
 	TokenUtilization float64 `json:"token_utilization"`
 	// UsedTokens is the pack's token cost as reported by the composer.
-	UsedTokens     int   `json:"used_tokens"`
-	CitationCount  int   `json:"citation_count"`
-	BodyCount      int   `json:"body_count"`
-	RedactionCount int   `json:"redaction_count"`
-	LatencyMS      int64 `json:"latency_ms"` // median (legacy)
-	LatencyMSP50   int64 `json:"latency_ms_p50"`
-	LatencyMSP95   int64 `json:"latency_ms_p95"`
-	LatencyMSMax   int64 `json:"latency_ms_max"`
+	UsedTokens    int `json:"used_tokens"`
+	CitationCount int `json:"citation_count"`
+	BodyCount     int `json:"body_count"`
+	// AnswerBodyCount is how many pack bodies overlap an expected
+	// citation, under the same match mode and commit filter as the
+	// citation metrics. BodyPrecision is AnswerBodyCount / BodyCount
+	// (0 when the pack has no bodies). OtherBodyTokens is the token
+	// estimate of the remaining bodies: the evidence an agent reads that
+	// is not the answer.
+	AnswerBodyCount int     `json:"answer_body_count"`
+	BodyPrecision   float64 `json:"body_precision"`
+	OtherBodyTokens int     `json:"other_body_tokens"`
+	RedactionCount  int     `json:"redaction_count"`
+	LatencyMS       int64   `json:"latency_ms"` // median (legacy)
+	LatencyMSP50    int64   `json:"latency_ms_p50"`
+	LatencyMSP95    int64   `json:"latency_ms_p95"`
+	LatencyMSMax    int64   `json:"latency_ms_max"`
 }
 
 // ScenarioResult is the per-scenario row in the final report.
@@ -512,6 +521,7 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (runOutcome, erro
 		}
 	}
 	p, rec, f := precisionRecall(s.ExpectedCitations, metricCitations, s.MatchMode)
+	answerBodies, otherTokens := r.scoreBodies(ctx, s, pack.Bodies)
 	return runOutcome{
 		metrics: Metrics{
 			FilePrecision:    p,
@@ -523,6 +533,9 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (runOutcome, erro
 			UsedTokens:       pack.Metadata.UsedTokens,
 			CitationCount:    len(pack.Citations),
 			BodyCount:        len(pack.Bodies),
+			AnswerBodyCount:  answerBodies,
+			BodyPrecision:    ratio(answerBodies, len(pack.Bodies)),
+			OtherBodyTokens:  otherTokens,
 			RedactionCount:   len(pack.SanitizeReport),
 			LatencyMS:        elapsed.Milliseconds(),
 		},
@@ -531,6 +544,43 @@ func (r *Runner) executeOnce(ctx context.Context, s *Scenario) (runOutcome, erro
 		citationConflict: citationConflict,
 		unchangedCommit:  unchanged,
 	}, nil
+}
+
+// scoreBodies counts the pack bodies that overlap an expected citation and
+// sums the token estimates of the others. A body at another commit counts
+// as an answer only when its file is unchanged up to the expected commit,
+// the same rule the citation metrics apply.
+func (r *Runner) scoreBodies(ctx context.Context, s *Scenario, bodies []contract.Body) (answers, otherTokens int) {
+	m := matcher(s.MatchMode)
+	for _, b := range bodies {
+		c := b.Citation
+		usable := s.ExpectedCommit == "" || c.CommitHash == s.ExpectedCommit ||
+			r.fileUnchanged(ctx, c.CommitHash, s.ExpectedCommit, c.File)
+		if usable && matchesAny(m, s.ExpectedCitations, c) {
+			answers++
+			continue
+		}
+		otherTokens += b.TokenEstimate
+	}
+	return answers, otherTokens
+}
+
+// matchesAny reports whether c matches one of expected under m.
+func matchesAny(m func(a, b contract.Citation) bool, expected []contract.Citation, c contract.Citation) bool {
+	for _, e := range expected {
+		if m(e, c) {
+			return true
+		}
+	}
+	return false
+}
+
+// ratio returns n / d, or 0 when d is 0.
+func ratio(n, d int) float64 {
+	if d == 0 {
+		return 0
+	}
+	return float64(n) / float64(d)
 }
 
 // fileUnchanged reports whether file is identical at commits from and to in
@@ -584,6 +634,9 @@ func medianMetrics(ms []Metrics) Metrics {
 	tok := make([]float64, len(ms))
 	cit := make([]float64, len(ms))
 	bod := make([]float64, len(ms))
+	ans := make([]float64, len(ms))
+	bprec := make([]float64, len(ms))
+	other := make([]float64, len(ms))
 	red := make([]float64, len(ms))
 	lat := make([]float64, len(ms))
 	ranks := make([]int, len(ms))
@@ -598,6 +651,9 @@ func medianMetrics(ms []Metrics) Metrics {
 		tok[i] = m.TokenUtilization
 		cit[i] = float64(m.CitationCount)
 		bod[i] = float64(m.BodyCount)
+		ans[i] = float64(m.AnswerBodyCount)
+		bprec[i] = m.BodyPrecision
+		other[i] = float64(m.OtherBodyTokens)
 		red[i] = float64(m.RedactionCount)
 		lat[i] = float64(m.LatencyMS)
 	}
@@ -612,6 +668,9 @@ func medianMetrics(ms []Metrics) Metrics {
 		UsedTokens:       int(median(used)),
 		CitationCount:    int(median(cit)),
 		BodyCount:        int(median(bod)),
+		AnswerBodyCount:  int(median(ans)),
+		BodyPrecision:    median(bprec),
+		OtherBodyTokens:  int(median(other)),
 		RedactionCount:   int(median(red)),
 		LatencyMS:        p50,
 		LatencyMSP50:     p50,
