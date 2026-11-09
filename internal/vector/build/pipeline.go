@@ -119,7 +119,7 @@ func reportSummaryStats(w io.Writer, s *summary.Summarizer) {
 		return
 	}
 	st := s.Stats()
-	fmt.Fprintf(w, "ckv: symbol summaries: eligible=%d generated=%d cached=%d rejected=%d failed=%d\n",
+	_, _ = fmt.Fprintf(w, "ckv: symbol summaries: eligible=%d generated=%d cached=%d rejected=%d failed=%d\n",
 		st.Eligible, st.Generated, st.Cached, st.Rejected, st.Failed)
 }
 
