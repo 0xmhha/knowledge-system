@@ -34,11 +34,16 @@ func NewOllamaGenerator(model string) *OllamaGenerator {
 	}
 }
 
+// Generate returns the model's answer to prompt. Thinking is turned off:
+// prefixes and summaries are short, and a thinking model would spend most of
+// the request timeout on reasoning tokens that are discarded. Models without
+// a thinking mode accept the flag and ignore it.
 func (g *OllamaGenerator) Generate(ctx context.Context, prompt string) (string, error) {
 	body, err := json.Marshal(map[string]any{
 		"model":  g.model,
 		"prompt": prompt,
 		"stream": false,
+		"think":  false,
 	})
 	if err != nil {
 		return "", err
