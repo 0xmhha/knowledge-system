@@ -8,7 +8,7 @@ log instead of rewriting history.
 Related: `docs/RETRIEVAL-PIPELINE.md` draws the query pipeline alone and compares it with the Transformer.
 This page adds the index-building side, the join between the two stores, and the improvement plan.
 
-Last reviewed: 2026-11-05 (main at #137).
+Last reviewed: 2026-11-09 (main at #137 plus the V1 summary code).
 
 ## 1. Figure: the whole system
 
@@ -138,7 +138,7 @@ Today one chunk carries at most one `canonical_id`. Real relations are not one t
 
 | ID | Proposal | Targets | Status | Cost and risk |
 |---|---|---|---|---|
-| V1 | Symbol summary: an LLM writes, for each function or type, what it is for and when one would change it, in English and Korean. The summary is a separate chunk with the function's own span, so a hit on the summary cites the code | 1, 2 | in progress | LLM time at build (about 19k symbols per go-stablenet commit); a wrong summary pulls retrieval to the wrong code |
+| V1 | Symbol summary: an LLM writes, for each function or type, what it is for and when one would change it, in English and Korean. The summary is a separate chunk with the function's own span, so a hit on the summary cites the code | 1, 2 | tried, not adopted as built (section 5.1) | LLM time at build (about 5 s per summary; about 7 h for the first go-stablenet commit at 10+ lines); a wrong summary pulls retrieval to the wrong code |
 | V2 | Expected questions (doc2query): a few questions per function that the function answers | 1 | proposed | generated questions may resemble evaluation questions and inflate scores |
 | V3 | Strip boilerplate (repeated error handling) from the embedding input so names and comments weigh more | 1 | proposed | small effect likely |
 | V4 | Fine-tune the embedder contrastively on (PR description, changed function) pairs with same-file negatives | 1, 3 | proposed | needs GPU and a training pipeline; strict time split required |
@@ -172,11 +172,44 @@ the question.
 3. **Q1 personalized PageRank** as a cheap query-only experiment, any time.
 4. G1 to G3, then V4 when a time-split training set exists.
 
+### 5.1 V1 state (2026-11-09)
+
+Code: `ckv build` / `ckv reindex` flags `--llm-summary-model` and `--llm-summary-min-lines` (default 3), package
+`internal/vector/summary`. Off unless the model flag is set. Measured with gemma3:12b, prompt v1, symbols of 10 or
+more lines, both embedding arms reading the same summaries.
+
+| set | arm | before | with summaries | gains | losses |
+|---|---|---|---|---|---|
+| go-stablenet (11 PRs) | bge-m3-eq | 8 | 9 | 1 | 0 |
+| go-stablenet (11 PRs) | qwen3-eq | 10 | 10 | 0 | 0 |
+| indexer-go (15 of 26 PRs) | bge-m3-eq | 7 | 6 | 0 | 1 |
+| indexer-go (15 of 26 PRs) | qwen3-eq | 8 | 9 | 1 | 0 |
+
+The indexer-go run stopped after 15 of 26 base commits by user decision. bge-m3 fails the D6 rule on those 15
+(one loss, no gain). In the lost PR all three owning functions had summaries; the owning function was displaced
+from the pack by other bodies whose rank the summaries raised. The 11 remaining indexer-go PRs have not been run
+with summaries and are still unseen for V1.
+
+Known defects in the summary check, found from build counts and not from judged results:
+
+- Rejection rate is 1.9% on go-stablenet and 12% on indexer-go. Most indexer-go rejections come from gqlgen output
+  (`// Code generated ... DO NOT EDIT.`), which should not be summarized at all.
+- Identifiers are matched case-sensitively, so prose terms such as "GraphQL" are rejected when the code spells
+  them `graphql`. Valid resolver summaries were dropped for this reason.
+- The check catches invented names only; how many kept summaries are wrong in meaning is not measured.
+
+Build cost options, none implemented: skip generated files; send summary requests in parallel; build the
+content-keyed cache once on a powered machine and share it; cap prompt and output length; a smaller model after a
+quality comparison.
+
+Next step awaiting a user decision: fix the two check defects (skip generated files, case-insensitive identifier
+match), then run the 11 remaining indexer-go commits with the fixed check and judge them as an unseen sample.
+
 ## 6. Measurement rules
 
 - Judge each change with the D6 rule: report the gain on go-stablenet, require no loss on indexer-go (losses do
   not exceed gains in either arm), and report the risk subset.
-- indexer-go has been looked at 5 times. A change that alters body selection should be confirmed on a fresh
+- indexer-go has been looked at 6 times (the sixth on 15 of 26 PRs, V1). A change that alters body selection should be confirmed on a fresh
   holdout before it is called general.
 - **Leakage.** Anything built from history or by an LLM (V1, V2, V4, G2) must not see information after the
   evaluation PR's base commit. Summaries are generated from the code at the base commit only, never from PR text.
@@ -192,3 +225,5 @@ the question.
 | 2026-11-04 | Keyword seeds from `code_query` not adopted | lost PRs on go-stablenet twice |
 | 2026-11-05 | Pack lists cut seeds as `cut_candidates` (#137) | two bge misses become visible by name; bodies unchanged |
 | 2026-11-05 | Start with V1 symbol summaries, then J1 | targets the two miss classes the other proposals cannot reach |
+| 2026-11-05 | V1 summarizes symbols of 10 or more lines | the 3-line run was projected at about 16 h of generation on go-stablenet |
+| 2026-11-06 | indexer-go V1 run stopped at 15 of 26 commits and judged there | user decision; V1 not adopted as built (bge-m3 lost one PR) |
