@@ -1,0 +1,69 @@
+{
+  "title": "Related-project retrieval evaluation (indexer-go replaces grpc-go)",
+  "brownfield": true,
+  "created_at": "2026-11-03T05:15:58+00:00",
+  "topics": [
+    {
+      "id": "D1",
+      "title": "Independent evaluation project replacing grpc-go",
+      "status": "decided"
+    },
+    {
+      "id": "D2",
+      "title": "indexer-go PR selection rule",
+      "status": "decided"
+    },
+    {
+      "id": "D3",
+      "title": "Problem text rule (symptom only, source, writer)",
+      "status": "decided"
+    },
+    {
+      "id": "D4",
+      "title": "Owning-function labels: who assigns and who confirms",
+      "status": "decided"
+    },
+    {
+      "id": "D5",
+      "title": "Adoption rule on indexer-go (splits, gain/loss thresholds)",
+      "status": "decided"
+    },
+    {
+      "id": "D6",
+      "title": "Same-name loss check for the same-name body limit (79c938d1)",
+      "status": "decided"
+    },
+    {
+      "id": "D7",
+      "title": "Purpose: what this evaluation decides",
+      "status": "decided"
+    },
+    {
+      "id": "D8",
+      "title": "What carries over from retrieval-eval-v2 unchanged",
+      "status": "decided"
+    }
+  ],
+  "rounds": 16,
+  "ambiguity": null,
+  "breakdown": {
+    "goal": {
+      "score": 0.85,
+      "justification": "round 11에서 사용자가 수락한 안에는 목적이 적혀 있고, 제외 대상(진단 품질은 별도 평가)도 이름으로 적혀 있으며, round 1에서 평가 대상이 indexer-go로 정해졌다. 다만 사용자 답이 모두 '추천으로 진행'이라는 수락뿐이어서 사용자 자신의 말로 쓴 목표 문장은 round 10의 의도 인용(observation)에만 있다. 목적은 retrieval 변경 뒤 go-stablenet 증상 질문의 소유 함수가 pack에 들어가는 빈도가 오르는지, 그 이득이 본 사례에 맞춘 것이 아닌지를 indexer-go로 확인하는 것이다."
+    },
+    "constraints": {
+      "score": 0.85,
+      "justification": "사용자가 수락한 조건은 round 3(기계적 규칙, 증상 필터, 함수 1-5개 제한), round 4(증상만 남긴 한국어 문제 문장, 식별자 검사, 사람 승인), round 7(AI 라벨과 PR별 사용자 확인), round 8(분할 없음, 사람이 확인한 PR만 사용, 측정 횟수 기록), round 12(code_query는 문제 문장만 보고 별도 agent가 쓰고 측정 전에 고정), round 13이다. round 13은 증상 필터의 판정 기준(호출자·사용자가 보는 interface의 오동작, 기대값과 실제값을 쓸 수 있을 것)과 제외할 변경(성능, 리팩터링, 테스트, 문서만 바꾼 것)을 정했다. 남은 빈칸은 평가에 필요한 최소 PR 수뿐이다."
+    },
+    "success": {
+      "score": 0.75,
+      "justification": "확인 가능한 기준은 세 가지다. round 8의 #130 규칙(두 arm 모두 이득이 손실보다 많고 두 arm 합산 net >= 2), round 9의 위험 부분집합(라벨 함수와 같은 이름의 선언이 3개 이상) 손실 0건과 indexer-go 무해 조건, round 12의 지표 tools/funnel_c.py다. 그러나 round 9에서 go-stablenet 효과는 '보고'만 하고 통과 기준이 없다. 또 확인된 PR이 몇 건 이상이어야 판정이 성립하는지와 미확인 PR이 많을 때 어떻게 처리할지(round 7은 따로 보고한다고만 함)가 정해지지 않았다."
+    },
+    "context": {
+      "score": 0.8,
+      "justification": "round 12에서 사용자는 retrieval-eval-v2에서 그대로 가져갈 것을 정했다. 대상은 arm cks-bge-m3-eq와 cks-qwen3-eq, tools/funnel_c.py, tools/run_exp.py와 PR별 base-commit index, 고정된 code_query다. 바뀌는 것도 round 1(grpc-go를 indexer-go로 교체)과 round 8(go-stablenet 11건을 개발용으로 둠)로 분명하다. 다만 round 9의 답은 일반 규칙이어서, 79c938d1의 같은 이름 body 제한에 이 규칙을 적용한다는 연결은 D6 주제 제목에만 있고 사용자가 수락한 답에는 없다."
+    }
+  },
+  "streak": 2,
+  "schema_version": 1
+}

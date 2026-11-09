@@ -209,7 +209,7 @@ match), then run the 11 remaining indexer-go commits with the fixed check and ju
 
 ## 6. Measurement rules
 
-- Judge each change with the D6 rule: report the gain on go-stablenet, require no loss on indexer-go (losses do
+- Judge each change with the D6 rule ([decision record](./decisions/20261103-indexer-go-eval/decision.md)): report the gain on go-stablenet, require no loss on indexer-go (losses do
   not exceed gains in either arm), and report the risk subset.
 - indexer-go has been looked at 6 times (the sixth on 15 of 26 PRs, V1). A change that alters body selection should be confirmed on a fresh
   holdout before it is called general.
