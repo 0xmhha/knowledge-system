@@ -84,6 +84,15 @@ type ReindexOptions struct {
 	// and rule-prefixed embeddings in one store would degrade retrieval.
 	LLMPrefixModel string
 
+	// LLMSummaryModel mirrors Options.LLMSummaryModel for the reindex path.
+	// Keep it equal to the build's value, or reindexed files lose (or alone
+	// gain) their summary chunks.
+	LLMSummaryModel string
+
+	// LLMSummaryMinLines mirrors Options.LLMSummaryMinLines; keep it equal
+	// to the build's value for the same reason.
+	LLMSummaryMinLines int
+
 	// PolicyPath mirrors Options.PolicyPath. Reindexed chunks pass
 	// through the policy loader so category/guidance stay current with
 	// the yaml even when only some files change.
@@ -248,6 +257,8 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 	parsers := newParsers()
 	chunker := newChunker(o.Embedder, cfg)
 	embedTextFn := resolveEmbedTextFn(ctx, o.DisableContextualPrefix, resolveLLMPrefixer(o.LLMPrefixModel, o.OutDir))
+	summarizer := resolveSummarizer(o.LLMSummaryModel, o.LLMSummaryMinLines, o.OutDir)
+	defer reportSummaryStats(o.ProgressOut, summarizer)
 	pol, err := policy.Load(o.PolicyPath)
 	if err != nil {
 		return nil, fmt.Errorf("policy: %w", err)
@@ -407,6 +418,7 @@ func Reindex(ctx context.Context, o ReindexOptions) (*ReindexResult, error) {
 		if err != nil {
 			return nil, err
 		}
+		chunks = summarizer.Append(ctx, chunks)
 		if len(chunks) == 0 {
 			continue
 		}

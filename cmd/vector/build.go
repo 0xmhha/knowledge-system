@@ -11,6 +11,7 @@ import (
 
 	"github.com/0xmhha/knowledge-system/internal/vector/build"
 	"github.com/0xmhha/knowledge-system/internal/vector/embed/bgeonnx"
+	"github.com/0xmhha/knowledge-system/internal/vector/summary"
 )
 
 type buildOpts struct {
@@ -30,7 +31,9 @@ type buildOpts struct {
 	batchSize                                                                             int
 	jsonOut                                                                               bool
 
-	llmPrefixModel string
+	llmPrefixModel  string
+	llmSummaryModel string
+	llmSummaryMin   int
 
 	includePR bool
 	prSince   string
@@ -75,6 +78,8 @@ Re-running on a populated --out updates chunks in place (Upsert).`,
 	f.BoolVar(&opts.jsonOut, "json", false, "machine-readable summary output")
 	f.IntVar(&opts.batchSize, "batch", 0, "embedding batch size (0 = default 32); lower it (e.g. 4) when an embedder rejects large batches of big chunks")
 	f.StringVar(&opts.llmPrefixModel, "llm-prefix-model", "", "enable an LLM contextual prefix: name of a local Ollama chat model (e.g. 'llama3') that writes a one-sentence description of each chunk, prepended to its embed text. Empty keeps the cheap rule-based prefix. Disk-cached under <out>/.ckv-llmprefix-cache; a generation failure degrades to the rule-based prefix")
+	f.StringVar(&opts.llmSummaryModel, "llm-summary-model", "", "add symbol summary chunks: name of a local Ollama chat model that writes, for each whole symbol of at least --llm-summary-min-lines lines, its purpose and when one would change it in English and Korean. Empty adds none. Disk-cached under <out>/.ckv-summary-cache; a generation failure skips that symbol")
+	f.IntVar(&opts.llmSummaryMin, "llm-summary-min-lines", summary.DefaultMinLines, "shortest symbol, in lines, that gets a summary chunk (with --llm-summary-model)")
 	f.BoolVar(&opts.includePR, "include-pr-history", false, "fetch merged PRs via gh CLI and index descriptions + commit messages")
 	f.StringVar(&opts.prSince, "pr-since", "", "only PRs merged after this date (YYYY-MM-DD); requires --include-pr-history")
 	f.StringVar(&opts.prRepo, "pr-repo", "", "GitHub repo (owner/repo) for PR fetch; auto-detected from git remote if empty")
@@ -120,6 +125,8 @@ func runBuild(ctx context.Context, opts *buildOpts) error {
 		ProgressOut:             os.Stderr,
 		DisableContextualPrefix: os.Getenv("CKV_DISABLE_CONTEXTUAL_PREFIX") == "1",
 		LLMPrefixModel:          opts.llmPrefixModel,
+		LLMSummaryModel:         opts.llmSummaryModel,
+		LLMSummaryMinLines:      opts.llmSummaryMin,
 		PolicyPath:              opts.policy,
 		DocsRoots:               opts.docs,
 		FlowCorpus:              opts.flowCorpus,
