@@ -59,6 +59,7 @@ expected_citations:
 |`expected_intent`, `classified_intents`, `intent_match`|시나리오 결과|기대 의도, 실행마다 분류된 의도, 모든 실행이 기대와 같았는지. 오류 실행이 있으면 `intent_match`는 거짓이다|
 |`metrics.first_hit_rank`|시나리오 결과|정답과 겹치는 첫 인용의 순위(중복 인용은 접은 뒤). 0은 못 찾음. 여러 실행이면 못 찾은 실행을 가장 뒤로 놓은 중앙값|
 |`metrics.used_tokens`|시나리오 결과|응답 묶음이 쓴 토큰 수|
+|`metrics.answer_body_count`, `metrics.body_precision`, `metrics.other_body_tokens`|시나리오 결과|팩 본문 가운데 정답 인용과 겹치는 수, 그 수를 본문 수로 나눈 값(본문이 없으면 0), 나머지 본문의 토큰 추정 합. 인용 지표와 같은 겹침 판정과 커밋 필터를 쓴다. 에이전트가 읽는 근거 가운데 정답이 아닌 몫을 잰다|
 |`rank_summary`|보고서|정답 인용을 선언한 시나리오의 hit@1, hit@3, 첫 정답 순위의 역수 평균(MRR). 오류 시나리오도 분모에 남아 못 찾은 것으로 센다|
 |`intent_accuracy`|보고서|`expected_intent`를 선언한 시나리오의 정확도와 혼동표(기대 → 분류). 분류값이 없으면 `(unknown)`, 오류면 `(error)`|
 

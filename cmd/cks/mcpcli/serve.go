@@ -680,7 +680,13 @@ func buildComposer(
 	if err != nil {
 		return nil, fmt.Errorf("stage3.New: %w", err)
 	}
-	b, err := budget.New(fetcher, budget.WithFootprint(fp))
+	// Evaluation runs set CKS_PACK_MAX_BODIES to compare pack sizes on the
+	// same index.
+	budgetOpts, err := budget.OptionsFromEnv()
+	if err != nil {
+		return nil, err
+	}
+	b, err := budget.New(fetcher, append(budgetOpts, budget.WithFootprint(fp))...)
 	if err != nil {
 		return nil, fmt.Errorf("budget.New: %w", err)
 	}
