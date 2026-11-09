@@ -202,6 +202,8 @@ Build cost options, none implemented: skip generated files; send summary request
 content-keyed cache once on a powered machine and share it; cap prompt and output length; a smaller model after a
 quality comparison.
 
+How to resume, with paths and commands: [symbol summary handoff](./vector/SYMBOL-SUMMARY-HANDOFF.md).
+
 Next step awaiting a user decision: fix the two check defects (skip generated files, case-insensitive identifier
 match), then run the 11 remaining indexer-go commits with the fixed check and judge them as an unseen sample.
 
