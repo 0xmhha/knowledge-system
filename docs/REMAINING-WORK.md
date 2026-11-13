@@ -1,6 +1,6 @@
 # 남은 작업
 
-기준: 2026-11-09, main `e957da66`(PR #140까지 머지). 정본은 [실행 원장](./spec-driven/REMAINING-13-EXECUTION.json)이다. 이 문서는 원장을 사람이 읽고 바로 이어서 일할 수 있게 풀어 쓴 것이다.
+기준: 2026-11-13, main `1d5659cd`(PR #142까지 머지)와 이 브랜치의 `ckg verify`. 정본은 [실행 원장](./spec-driven/REMAINING-13-EXECUTION.json)이다. 이 문서는 원장을 사람이 읽고 바로 이어서 일할 수 있게 풀어 쓴 것이다.
 
 ## 0. 이 문서를 다루는 규칙
 
@@ -54,6 +54,7 @@
 
 지금 할 일의 순서와 측정 규칙은 [정확도 로드맵](./ACCURACY-ROADMAP.md)이 정본이다. 바로 다음 행동은 [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) 4장에 있다.
 
+0. **데이터 정확성 먼저 (진행 중, 사용자 결정 2026-11-13)**: 새 제안보다 만들어진 데이터의 검증과 수정을 먼저 한다. 로드맵 4.0이다. `ckg verify`가 Go 그래프를 go/types와 대조한다([Go 그래프 검증](./graph/GO-GRAPH-VERIFICATION.md)). 다음은 이름 해석을 go/types 객체 기준으로 바꾸는 D2다.
 1. **grpc-go 평가 (끝남, 사람 확인 대기)**: [명세](./spec-driven/RETRIEVAL-EVAL-SPEC.md)는 사용자가 2026-10-23에 승인했다. 입력은 [grpc-go 입력](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/README.md)에 고정돼 있다. 1차 실행(스냅샷 24개 공유)과 진단 기록 세 개를 거쳐 첫 수정 묶음을 반영했다(#126, #128). v2는 PR마다 기준 커밋으로 색인하고 두 모델을 같은 조건에 두었다([결정](./decisions/20261028-retrieval-eval-v2/decision.md)). 그 결과로 `code_query`를 더했고, 시험용 56건에서 정답이 팩에 든 PR이 bge-m3 23 → 36, qwen3 18 → 40이 됐다. 정답과 질문 표본의 사람 확인은 아직이다([표본 확인](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md)).
 2. **평가 틀을 바꿈 (사용자 결정, 2026-11-03)**: [indexer-go 평가 결정](./decisions/20261103-indexer-go-eval/decision.md)으로 독립 평가 프로젝트를 grpc-go에서 indexer-go로 바꿨다. go-stablenet 11건은 개발 표본이다. 변경은 D6으로 판정한다. go-stablenet의 이득을 보고하고, indexer-go에서는 두 임베딩 모두 잃은 PR이 얻은 PR보다 많으면 안 되며, 같은 이름 선언이 많은 위험 부분집합에서는 한 건도 잃으면 안 된다. 검색 단계만 잰다.
 3. **팩 구성 수정 (끝남)**: 이웃 예약 2칸(#130), knowledge 예약을 본문 상한 밖으로(#134), 같은 함수의 벡터·그래프 후보 합치기(#135), 잘린 seed를 `cut_candidates`로 남기기(#137). 지금 go-stablenet에서 정답 함수가 팩 본문에 든 PR은 bge-m3 8/11, qwen3 10/11이다. `code_query`에서 키워드 seed를 뽑는 실험은 PR을 잃어 기각했다.
@@ -87,7 +88,8 @@ WI-V1을 다시 열 때는 이미 확인한 정답 시험을 판정 기준으로
 |판정에 필요한 최소 확인 PR 수, go-stablenet 효과의 통과 기준|사용자|미정 (indexer-go 결정의 보류 항목)|
 |V1 검사 수정과 요약 모델|사용자|정함 (2026-11-09): 생성 파일 건너뛰기, 대소문자 무시, 머리말 없는 두 줄 받기. 요약 모델은 `gemma4:12b`(thinking 끔). 원문 "벤치만 보면 gemma4:12b 사용해야겠어.", "A로 진행하고, V1 결함도 묶어서 처리해"|
 |시뮬레이션 시험 머신과 Ollama 모델|사용자|정함 (2026-11-09): 이 머신(Apple M4, 24 GB)에서 진행. 모델은 `bge-m3`, `qwen3-embedding:4b`, `gemma4:12b`만 둔다|
-|근거 정밀도 P1(에이전트 수준 비교)의 사례, 반복 수, 비용 상한|사용자|미정. 정하기 전에는 유료 에이전트를 돌리지 않는다|
+|근거 정밀도 P1(에이전트 수준 비교)의 사례, 반복 수, 비용 상한|사용자|정함 (2026-11-10~13): 이 머신에서 `claude -p`로 7건 × 2조건 × 3회, 실행당 환산 5 USD. 결정 기록은 `~/.claude/decisions/knowledge-system/20261109-evidence-precision-p1/decision.md`|
+|작업 순서: 데이터 검증을 새 제안보다 먼저|사용자|정함 (2026-11-13). 원문 "이미 생성된 데이터 부터 문제가 있으면 당연히 결과가 좋지 않자나 ??", 검증기부터 만드는 A안 "A로 진행해."|
 |팩 칸 수와 토큰|사용자|미정. 2026-10-27 예상(12 → 16칸이면 정답 +4, +2, 토큰 약 +33%)은 이웃 예약이 4칸이던 때 값이다. #130·#134 뒤에 다시 재고 묻는다|
 |N-12·N-14를 "사용자 일괄 채택(AI 검토 라벨)"로 따로 표시할지, N-10(전체 비용·p95)과 N-17(실제 운영 RTO/RPO)의 남은 범위를 별도 작업으로 뺄지|사용자|미정. 원장 상태는 바꾸지 않았다|
 |WI-V1 독립성 선언과 검토 결정|gold-reviewer|보류 (3.2)|

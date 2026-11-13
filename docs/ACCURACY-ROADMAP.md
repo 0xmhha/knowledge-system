@@ -8,7 +8,7 @@ log instead of rewriting history.
 Related: `docs/RETRIEVAL-PIPELINE.md` draws the query pipeline alone and compares it with the Transformer.
 This page adds the index-building side, the join between the two stores, and the improvement plan.
 
-Last reviewed: 2026-11-09 (main at #140, plus the P0 fields and the pack-size override).
+Last reviewed: 2026-11-13 (main at #142, plus `ckg verify`).
 
 ## 1. Figure: the whole system
 
@@ -117,6 +117,28 @@ the functions it changed. Section 4 uses it, under the leakage rule in section 6
 Status values: `proposed`, `in progress`, `measured`, `adopted`, `rejected`. Each row names the miss class
 (section 2) it targets.
 
+### 4.0 Data correctness first
+
+Every proposal below assumes the built stores are right. A read-only check of one go-stablenet graph on
+2026-11-13 found call and type edges that point to the wrong declaration, so the stores are verified and fixed
+first. For Go the reference is the compiler front end: `ckg verify` compares the graph with go/types
+([Go graph verification](./graph/GO-GRAPH-VERIFICATION.md)). On the 11 go-stablenet base commits it gives static
+call recall 0.977, interface call recall 0.979 and type-reference recall 0.544, with 7 misresolved calls, 357
+misresolved type references and 931 call edges go/types does not support.
+
+| ID | Proposal | Status | Cost and risk |
+|---|---|---|---|
+| D1 | `ckg verify`: measure the Go graph against go/types | adopted (2026-11-13) | none on retrieval; Go only |
+| D2 | Resolve calls and type references by the go/types object (canonical id) instead of the short `pkg.Name`; drop the suffix fallback | proposed | changes many edges; every index must be rebuilt |
+| D3 | Keep function-local declarations out of the package-level id space | proposed | canonical ids of some nodes change; ckv joins follow on rebuild |
+| D4 | Record calls inside function literals and calls to methods of generic types | proposed | more edges compete for Stage 3 slots |
+| D5 | Emit type references from bodies, interface signatures and aliases; emit `reads_field` and `references` | proposed | larger graph; Stage 3 relation weights may need retuning |
+| D6 | ckv join: do not bind file-header chunks to the first declaration; split grouped `var (...)` blocks | proposed | small |
+| D7 | Composer and data agree: Stage 3 asks for relations that no graph contains (`references`) | proposed | needs D5 or a change to the relation sets |
+
+Each fix is judged first by `ckg verify` (or the matching store check), then by whether evidence packs change on
+the go-stablenet cases, using the stage trace (`CKS_DEBUG_TRACE`) to find where an answer is lost.
+
 ### 4.1 Join between graph and vector (canonical_id)
 
 Today one chunk carries at most one `canonical_id`. Real relations are not one to one:
@@ -200,6 +222,9 @@ P1 design, to be fixed before any run:
 
 ## 5. Order of work
 
+0. **Data correctness (4.0) first** (user decision 2026-11-13). Verify and fix the built data, then debug the
+   logic that combines it with the stage trace, then continue with the items below. Reason: a wrong edge or join
+   makes every later measurement unreliable.
 1. **V1 symbol summaries** (started 2026-11-05). Smallest change that targets miss classes 1 and 2. It needs no
    schema change: the summary chunk carries the function's span, so Stage 2 merges it with the code hit by citation.
 2. **J1 link table** once V1 shows a gain, so summaries, PR chunks and code combine per symbol rather than per span.
@@ -281,4 +306,5 @@ commits and go-stablenet need summaries from gemma4:12b as well before V1 can be
 | 2026-11-05 | V1 summarizes symbols of 10 or more lines | the 3-line run was projected at about 16 h of generation on go-stablenet |
 | 2026-11-06 | indexer-go V1 run stopped at 15 of 26 commits and judged there | user decision; V1 not adopted as built (bge-m3 lost one PR) |
 | 2026-11-09 | Summary model gemma4:12b, thinking off; check fixes (generated files, case-insensitive identifiers, unlabelled two-line answers) | user decision on the benchmarks; thinking made each summary take about 2 minutes; the label fix recovered the 4 of 11 answers gemma4 wrote without labels |
+| 2026-11-13 | Verify and fix the built data before any new proposal; start with `ckg verify` (D1) | user decision; a read-only check found wrong call and type edges, and the compared code-graph papers do not measure their graphs at all |
 | 2026-11-09 | Add 4.5 evidence precision and marked gaps; start with P0, then P1 | user decision; the principle "few right bodies plus a marked gap beat many wrong ones" is not measured here, and every metric so far rewards adding bodies |
