@@ -1,6 +1,6 @@
 # 남은 작업
 
-기준: 2026-11-13, main `1d5659cd`(PR #142까지 머지)와 이 브랜치의 `ckg verify`. 정본은 [실행 원장](./spec-driven/REMAINING-13-EXECUTION.json)이다. 이 문서는 원장을 사람이 읽고 바로 이어서 일할 수 있게 풀어 쓴 것이다.
+기준: 2026-11-13, main `3fa28ea4`(PR #143까지 머지)와 이 브랜치의 D2 수정. 정본은 [실행 원장](./spec-driven/REMAINING-13-EXECUTION.json)이다. 이 문서는 원장을 사람이 읽고 바로 이어서 일할 수 있게 풀어 쓴 것이다.
 
 ## 0. 이 문서를 다루는 규칙
 
@@ -54,12 +54,12 @@
 
 지금 할 일의 순서와 측정 규칙은 [정확도 로드맵](./ACCURACY-ROADMAP.md)이 정본이다. 바로 다음 행동은 [현재 인수인계](./spec-driven/CURRENT-HANDOFF.md) 4장에 있다.
 
-0. **데이터 정확성 먼저 (진행 중, 사용자 결정 2026-11-13)**: 새 제안보다 만들어진 데이터의 검증과 수정을 먼저 한다. 로드맵 4.0이다. `ckg verify`가 Go 그래프를 go/types와 대조한다([Go 그래프 검증](./graph/GO-GRAPH-VERIFICATION.md)). 다음은 이름 해석을 go/types 객체 기준으로 바꾸는 D2다.
+0. **데이터 정확성 먼저 (진행 중, 사용자 결정 2026-11-13)**: 새 제안보다 만들어진 데이터의 검증과 수정을 먼저 한다. 로드맵 4.0이다. `ckg verify`가 Go 그래프를 go/types와 대조한다([Go 그래프 검증](./graph/GO-GRAPH-VERIFICATION.md)). D2와 D3(이름 해석을 canonical id 기준으로, 지역 선언에는 패키지 수준 id 없음)을 고쳤다. 다음은 함수 리터럴 안의 호출을 기록하는 D4와 색인 재빌드다.
 1. **grpc-go 평가 (끝남, 사람 확인 대기)**: [명세](./spec-driven/RETRIEVAL-EVAL-SPEC.md)는 사용자가 2026-10-23에 승인했다. 입력은 [grpc-go 입력](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/README.md)에 고정돼 있다. 1차 실행(스냅샷 24개 공유)과 진단 기록 세 개를 거쳐 첫 수정 묶음을 반영했다(#126, #128). v2는 PR마다 기준 커밋으로 색인하고 두 모델을 같은 조건에 두었다([결정](./decisions/20261028-retrieval-eval-v2/decision.md)). 그 결과로 `code_query`를 더했고, 시험용 56건에서 정답이 팩에 든 PR이 bge-m3 23 → 36, qwen3 18 → 40이 됐다. 정답과 질문 표본의 사람 확인은 아직이다([표본 확인](./spec-driven/operational-preparation/retrieval-eval-grpc-go-v1/sample-check/PACKET.md)).
 2. **평가 틀을 바꿈 (사용자 결정, 2026-11-03)**: [indexer-go 평가 결정](./decisions/20261103-indexer-go-eval/decision.md)으로 독립 평가 프로젝트를 grpc-go에서 indexer-go로 바꿨다. go-stablenet 11건은 개발 표본이다. 변경은 D6으로 판정한다. go-stablenet의 이득을 보고하고, indexer-go에서는 두 임베딩 모두 잃은 PR이 얻은 PR보다 많으면 안 되며, 같은 이름 선언이 많은 위험 부분집합에서는 한 건도 잃으면 안 된다. 검색 단계만 잰다.
 3. **팩 구성 수정 (끝남)**: 이웃 예약 2칸(#130), knowledge 예약을 본문 상한 밖으로(#134), 같은 함수의 벡터·그래프 후보 합치기(#135), 잘린 seed를 `cut_candidates`로 남기기(#137). 지금 go-stablenet에서 정답 함수가 팩 본문에 든 PR은 bge-m3 8/11, qwen3 10/11이다. `code_query`에서 키워드 seed를 뽑는 실험은 PR을 잃어 기각했다.
 4. **V1 심볼 요약 (진행 중)**: 만든 그대로는 채택하지 않았다(indexer-go 15건에서 bge-m3 1건 잃음). 2026-11-09에 검사 결함 세 가지를 고치고 요약 모델을 `gemma4:12b`로 바꿨다(사용자 결정). 다음은 indexer-go 남은 11건을 처음 보는 표본으로 판정하는 것이다. 이어 가는 법은 [심볼 요약 인수인계](./vector/SYMBOL-SUMMARY-HANDOFF.md)에 있다.
-5. **근거 정밀도 (진행 중, 사용자 결정 2026-11-09)**: 로드맵 4.5다. P0으로 팩 본문 가운데 정답이 아닌 몫을 재는 지표와 본문 수 설정을 더했다. P1(에이전트 수준 비교)은 사례, 반복 수, 비용 상한을 사용자가 정한 뒤에 돌린다.
+5. **근거 정밀도 (P1 끝남)**: 로드맵 4.5다. P0으로 팩 본문 가운데 정답이 아닌 몫을 재는 지표와 본문 수 설정을 더했다. P1(에이전트 수준 비교, 42번 실행)은 미리 정한 규칙으로 "차이 없음"이어서 P2와 P3는 시작하지 않는다.
 6. **그다음**: 로드맵 5장 순서대로 J1(청크와 심볼을 잇는 표), Q1(personalized PageRank), G1~G3, V4를 측정한다. 의도 판정 개선과 문서 강등 정책은 정답 의도를 넣어도 팩이 거의 달라지지 않아 뒤로 미뤘다.
 7. **"어떤 프로젝트든"의 판단**: go-stablenet과 indexer-go 결과까지 본 뒤에 한다. 지금 수치는 모두 AI 정답 기준의 DEV 근거다.
 

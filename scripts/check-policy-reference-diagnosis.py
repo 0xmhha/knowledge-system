@@ -3,9 +3,11 @@
 import collections
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+GIT_TIMEOUT_SECONDS = 60
 PACKET = ROOT / 'docs/spec-driven/operational-preparation/policy-reference-diagnosis'
 EXPECTED = {
     'compiler.Compile': ('compile.Compile', 'systemcontracts/compile/compiler/compiler.go', 40),
@@ -18,6 +20,12 @@ EXPECTED = {
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def committed_digest(root, commit, path):
+    """Return the sha256 of path at commit, or None when Git cannot read it."""
+    result = subprocess.run(['git', '-C', str(root), 'show', f'{commit}:{path}'],
+                            capture_output=True, timeout=GIT_TIMEOUT_SECONDS, check=False)
+    return hashlib.sha256(result.stdout).hexdigest() if result.returncode == 0 else None
 
 def check(folder=PACKET, root=ROOT):
     errors = []
@@ -51,7 +59,11 @@ def check(folder=PACKET, root=ROOT):
         if len(manifest['frontend_commit']) != 40 or not manifest['frontend_commit'].startswith('179d1c8d'):
             errors.append('frontend source revision differs')
         frontend = json.loads((folder / 'frontend-source-inventory.json').read_text())
-        if len(frontend) != 504 or any(digest(root / row['path']) != row['sha256'] for row in frontend):
+        # The inventory records the frontend the probe ran on, at frontend_commit.
+        # Compare it with that commit, not with the working tree: later parser
+        # changes are intended and do not alter what this packet observed.
+        if len(frontend) != 504 or any(
+                committed_digest(root, manifest['frontend_commit'], row['path']) != row['sha256'] for row in frontend):
             errors.append('pinned frontend/module source inventory differs')
         raw = (folder / 'original-policy.yaml.txt').read_bytes()
         if raw != (previous_path.parent / 'private/existing-policy.yaml.txt').read_bytes():

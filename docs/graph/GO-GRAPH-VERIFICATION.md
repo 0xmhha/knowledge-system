@@ -45,6 +45,18 @@ row is PR 74's base (319b84d1).
 | interface calls | 2,886 | 2,812 | 1 | 60 | 0.9788 |
 | type references | 24,028 | 13,076 | 357 | 10,595 | 0.5442 |
 
+After resolving by canonical id (roadmap D2 and D3, same base commit, graph rebuilt with the fixed parser):
+
+| relation | truth | matched | misresolved | missing | recall |
+|---|---|---|---|---|---|
+| declarations | 17,835 | 17,834 | - | 1 | |
+| static calls | 27,545 | 27,205 | 2 | 311 (306 in function literals) | 0.9886 |
+| interface calls | 2,886 | 2,812 | 1 | 60 (59 in function literals) | 0.9788 |
+| type references | 24,028 | 13,487 | 6 | 10,535 | 0.5613 |
+
+Unexpected graph edges fell from 931 to 126 (calls) and from 47 to 8 (type references); declaration nodes with no
+package-level declaration fell from 123 to 0.
+
 Not checked: 1,714 dynamic call sites, 2,229 calls in package-level initialisers.
 Unexpected graph edges: 931 call edges, 47 type-reference edges. Declaration-kind graph nodes with no
 package-level declaration: 123.
@@ -91,6 +103,10 @@ package-level declaration: 123.
 ### What these numbers are not
 
 - Recall is over pairs, not call sites; a pair counts once however many times it is called.
+- "Misresolved" means the caller has an edge to another node with the same name and kind and none to the expected
+  one. When the caller really calls both (an edge to one is right, the call to the other is missing for another
+  reason, e.g. it sits in a function literal), the pair is still counted as misresolved. The 2 static and 6
+  type-reference cases left after D2 look like this; they were not checked one by one.
 - Truth covers Go only, the files the graph holds, and the host GOOS/GOARCH (no build tags).
 - Whether a defect changes an evidence pack is not measured here. That is the next step: fix a class, rebuild,
   and compare packs on the evaluation cases.

@@ -367,12 +367,23 @@ func commentText(g *ast.CommentGroup) string {
 // goCanonicalID builds the globally-unique import-path-qualified identity of a
 // declared symbol from its go/types object, per docs/symbol-identity-design.md:
 //
-//	function: <importpath>.<Func>
-//	method:   <importpath>.(<*?RecvType>).<Method>   (pointer star preserved)
-//	type/const/var: <importpath>.<Name>
+//	function:         <importpath>.<Func>
+//	method:           <importpath>.(<*?RecvType>).<Method>   (pointer star preserved)
+//	interface method: <importpath>.<Interface>.<Method>
+//	type/const/var:   <importpath>.<Name>
 //
-// Returns "" when the object has no package (builtins) so callers leave the
-// node's CanonicalID empty rather than emitting an ambiguous id.
+// Only package-level declarations and methods get an id. A type, const or var
+// declared inside a function body shares its name with package-level ones
+// (gencodec's `type Genesis struct` inside (Genesis).MarshalJSON next to the
+// package-level core.Genesis), so giving it <importpath>.<Name> made callers
+// of the package-level type resolve to the local one.
+//
+// Generic functions and methods resolve to their origin, so a call on an
+// instantiated type (Prque[int, string].Push) has the declaration's id.
+//
+// Returns "" when the object has no package (builtins), is the blank
+// identifier, or is not package level, so callers leave the node's CanonicalID
+// empty rather than emitting an ambiguous id.
 func goCanonicalID(obj gotypes.Object) string {
 	if obj == nil || obj.Pkg() == nil {
 		return ""
@@ -384,21 +395,35 @@ func goCanonicalID(obj gotypes.Object) string {
 		return ""
 	}
 	pkgPath := obj.Pkg().Path()
-	if fn, ok := obj.(*gotypes.Func); ok {
-		if sig, ok := fn.Type().(*gotypes.Signature); ok && sig.Recv() != nil {
-			rt := sig.Recv().Type()
-			star := ""
-			if ptr, ok := rt.(*gotypes.Pointer); ok {
-				rt = ptr.Elem()
-				star = "*"
-			}
-			if named, ok := rt.(*gotypes.Named); ok && named.Obj() != nil {
-				return pkgPath + ".(" + star + named.Obj().Name() + ")." + fn.Name()
-			}
+	fn, ok := obj.(*gotypes.Func)
+	if !ok {
+		if obj.Parent() != obj.Pkg().Scope() {
+			return ""
+		}
+		return pkgPath + "." + obj.Name()
+	}
+	fn = fn.Origin()
+	sig, ok := fn.Type().(*gotypes.Signature)
+	if !ok || sig.Recv() == nil {
+		if fn.Parent() != fn.Pkg().Scope() {
+			return ""
 		}
 		return pkgPath + "." + fn.Name()
 	}
-	return pkgPath + "." + obj.Name()
+	rt := sig.Recv().Type()
+	star := ""
+	if ptr, ok := rt.(*gotypes.Pointer); ok {
+		rt = ptr.Elem()
+		star = "*"
+	}
+	named, ok := rt.(*gotypes.Named)
+	if !ok || named.Obj() == nil {
+		return ""
+	}
+	if gotypes.IsInterface(named) {
+		return pkgPath + "." + named.Obj().Name() + "." + fn.Name()
+	}
+	return pkgPath + ".(" + star + named.Obj().Name() + ")." + fn.Name()
 }
 
 func exprName(e ast.Expr) string {
