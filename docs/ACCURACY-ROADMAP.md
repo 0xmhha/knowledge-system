@@ -6,9 +6,11 @@ an item is tried, update its status and link the measurement; when a decision ch
 log instead of rewriting history.
 
 Related: `docs/RETRIEVAL-PIPELINE.md` draws the query pipeline alone and compares it with the Transformer.
+Why the work is ordered this way (design intent versus implementation, related work and how it is evaluated):
+[direction review, 2026-11-13](./research/DIRECTION-REVIEW-2026-11-13.md).
 This page adds the index-building side, the join between the two stores, and the improvement plan.
 
-Last reviewed: 2026-11-13 (main at #142, plus `ckg verify`).
+Last reviewed: 2026-11-13 (main at #143, plus the D2 fix).
 
 ## 1. Figure: the whole system
 
@@ -129,9 +131,9 @@ misresolved type references and 931 call edges go/types does not support.
 | ID | Proposal | Status | Cost and risk |
 |---|---|---|---|
 | D1 | `ckg verify`: measure the Go graph against go/types | adopted (2026-11-13) | none on retrieval; Go only |
-| D2 | Resolve calls and type references by the go/types object (canonical id) instead of the short `pkg.Name`; drop the suffix fallback | proposed | changes many edges; every index must be rebuilt |
-| D3 | Keep function-local declarations out of the package-level id space | proposed | canonical ids of some nodes change; ckv joins follow on rebuild |
-| D4 | Record calls inside function literals and calls to methods of generic types | proposed | more edges compete for Stage 3 slots |
+| D2 | Resolve calls and type references by the go/types object (canonical id) instead of the short `pkg.Name`; drop the suffix fallback | done in code (2026-11-13); indexes not yet rebuilt | on PR 74's base: static call recall 0.977 -> 0.989, misresolved type references 357 -> 6, unexpected call edges 931 -> 126 |
+| D3 | Keep function-local declarations out of the package-level id space | done with D2 | 123 -> 0 local declarations under a package-level id |
+| D4 | Record calls inside function literals (generic-method calls were fixed by D2) | proposed; 306 static and 59 interface calls left | more edges compete for Stage 3 slots |
 | D5 | Emit type references from bodies, interface signatures and aliases; emit `reads_field` and `references` | proposed | larger graph; Stage 3 relation weights may need retuning |
 | D6 | ckv join: do not bind file-header chunks to the first declaration; split grouped `var (...)` blocks | proposed | small |
 | D7 | Composer and data agree: Stage 3 asks for relations that no graph contains (`references`) | proposed | needs D5 or a change to the relation sets |
@@ -203,11 +205,27 @@ any change to body selection.
 | ID | Proposal | Targets | Status | Cost and risk |
 |---|---|---|---|---|
 | P0 | Measure pack precision next to recall: `cks eval` reports `answer_body_count`, `body_precision` and `other_body_tokens` per scenario (EVAL-CONTRACT.md). Report them for the go-stablenet and indexer-go arms, and the curve over pack sizes 3, 6 and 12 with `CKS_PACK_MAX_BODIES` | measurement | in progress (fields and the pack-size override added 2026-11-09) | needs the frozen v2 / indexer-go inputs, which live in the evaluation workspace |
-| P1 | Agent-level A/B: the same diagnosis tasks with a 12-body pack and a 3-body pack plus `cut_candidates`, judged by fixed criteria (the C1-C4 frame of projects/stablenet/eval/diagnosis-procedure) | the principle itself | proposed; design open, see below | paid agent runs (about 1 to 1.5 USD each on the recorded runs); run-to-run variation needs repeats |
+| P1 | Agent-level A/B: the same diagnosis tasks with a 12-body pack and a 3-body pack plus `cut_candidates`, judged by fixed criteria (the C1-C4 frame of projects/stablenet/eval/diagnosis-procedure) | the principle itself | measured (2026-11-13): no difference under the pre-registered rule; P2 and P3 are not started | 42 runs, 45.95 USD equivalent of subscription usage |
 | P2 | Variable body count: stop where the score drops sharply (relative gap, not an absolute threshold) and list the rest as `cut_candidates` | precision | proposed; only if P1 shows an effect | can lose owning functions that sit below the gap; judged by D6 |
 | P3 | Say what is not known: a pack-level confidence signal (for example the top-1 / top-2 score gap), and an unknown intent reported as unknown instead of widening the fan-out | precision | proposed; only if P1 shows an effect | absolute scores differ by embedding model (the 0.55 intent threshold problem), so the signal must be relative; the intent part showed little pack effect (+1 / -1) |
 
-P1 design, to be fixed before any run:
+P1 result (2026-11-13). 7 go-stablenet cases (PR 56, 70, 75, 77 recorded; 63, 67, 74 chosen by the lowest
+body_precision of the default pack), 2 arms (A12 default pack, B3 `CKS_PACK_MAX_BODIES=3`), 3 runs each, claude -p
+with claude-opus-5-5 and stablenet-expert 6387a20. Diagnoses were judged blind by a separate agent per case; the 14
+first-repeat diagnoses judged twice agreed on every item.
+
+- Root cause (C1, majority of 3): every case passed in both arms. Weak cases: B3 3, A12 3. Recorded cases: B3 lost
+  none. Under the rule fixed before the runs this is "no difference".
+- The single C1 failure (pr-70, A12, run 2) named code that was not in its pack (`InsertReceiptChain`); its pack
+  held the owning function. No run was misled by a pack body.
+- The agent requested a pack in 31 of 42 runs. It never did on pr-75 (the problem quotes a log line) and did in 2 of
+  6 runs on pr-74; on pr-70 it did in 5 of 6. With no pack the two arms are identical.
+- B3 packs often lost the answer: on pr-56, pr-77 and pr-63 the B3 pack held no owning-function body in 8 of 9
+  runs, against 1 to 6 in A12. The agent still found the root cause with grep and file reads.
+- Records: the evaluation workspace on the M4 machine (cases/verdict-all.json, cases/tally-p1.json,
+  cases/usage-p1.json); the decision record is outside the repository.
+
+P1 design (fixed before the runs):
 
 - **Cases.** The four recorded diagnosis cases (PR-56, 70, 75, 77) passed C1 in every run with the 12-body pack,
   so they leave little room to show harm from extra bodies. The design should add cases where the pack is weak:
@@ -306,5 +324,7 @@ commits and go-stablenet need summaries from gemma4:12b as well before V1 can be
 | 2026-11-05 | V1 summarizes symbols of 10 or more lines | the 3-line run was projected at about 16 h of generation on go-stablenet |
 | 2026-11-06 | indexer-go V1 run stopped at 15 of 26 commits and judged there | user decision; V1 not adopted as built (bge-m3 lost one PR) |
 | 2026-11-09 | Summary model gemma4:12b, thinking off; check fixes (generated files, case-insensitive identifiers, unlabelled two-line answers) | user decision on the benchmarks; thinking made each summary take about 2 minutes; the label fix recovered the 4 of 11 answers gemma4 wrote without labels |
+| 2026-11-13 | P1 measured: no difference between a 12-body and a 3-body pack; P2 and P3 not started | pre-registered rule; root cause found in every case and arm, no run misled by a pack body |
+| 2026-11-13 | D2 and D3: resolve Go references by canonical id; no canonical id for function-local declarations | ckg verify: misresolved type references 357 -> 6, unexpected call edges 931 -> 126 |
 | 2026-11-13 | Verify and fix the built data before any new proposal; start with `ckg verify` (D1) | user decision; a read-only check found wrong call and type edges, and the compared code-graph papers do not measure their graphs at all |
 | 2026-11-09 | Add 4.5 evidence precision and marked gaps; start with P0, then P1 | user decision; the principle "few right bodies plus a marked gap beat many wrong ones" is not measured here, and every metric so far rewards adding bodies |
