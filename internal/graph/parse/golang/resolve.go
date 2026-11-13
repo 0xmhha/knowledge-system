@@ -2,6 +2,7 @@ package golang
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -19,6 +20,9 @@ import (
 func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, error) {
 	out := &parse.ResolvedGraph{}
 	qIndex := map[string]string{} // qname -> nodeID (Function/Method only)
+	// cIndex maps canonical id -> nodeID for Function/Method nodes. A pending
+	// ref that carries TargetCanonicalID resolves only through it.
+	cIndex := map[string]string{}
 	// callSiteParent maps a CallSite node ID to its enclosing Function/Method ID,
 	// so pending refs originating from a CallSite can be lifted to the function
 	// that actually performs the call (spec §4.6.1 — edges are between named
@@ -33,6 +37,11 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				// also index trailing simple name and pkg.Name for partial matches
 				suffix := simpleName(n.QualifiedName)
 				qIndex[suffix] = n.ID
+				if n.CanonicalID != "" {
+					if _, dup := cIndex[n.CanonicalID]; !dup {
+						cIndex[n.CanonicalID] = n.ID
+					}
+				}
 			}
 		}
 		// Second pass over this file's nodes: once qIndex is populated for
@@ -53,16 +62,39 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 			}
 		}
 	}
+	// The suffix fallback below is for AST-only builds, where targets are
+	// bare names. With type information every resolvable target carries a
+	// canonical id or an exact qname; a suffix match there only produced
+	// false edges (a conversion `uint(x)` bound to an unrelated method
+	// `(*Stream).uint`, a func variable `cancel()` to `(*Downloader).cancel`).
+	typed := len(p.pkgs) > 0
+	var qnames []string // sorted, so the fallback picks the same target every build
+	if !typed {
+		qnames = make([]string, 0, len(qIndex))
+		for q := range qIndex {
+			qnames = append(qnames, q)
+		}
+		sort.Strings(qnames)
+	}
 	for _, r := range results {
 		for _, pr := range r.Pending {
-			id, ok := qIndex[pr.TargetQName]
 			conf := types.ConfExtracted
-			if !ok {
-				// try suffix match
-				for q, nid := range qIndex {
-					if strings.HasSuffix(q, "."+pr.TargetQName) || q == pr.TargetQName {
-						id, ok = nid, true
-						break
+			var id string
+			var ok bool
+			if pr.TargetCanonicalID != "" {
+				// Exact identity only: a short-name match could be another
+				// package with the same name (crypto/bn256 vs
+				// crypto/bn256/cloudflare). A miss means the callee is outside
+				// the graph (stdlib, excluded files).
+				id, ok = cIndex[pr.TargetCanonicalID]
+			} else {
+				id, ok = qIndex[pr.TargetQName]
+				if !ok && !typed && pr.TargetQName != "" {
+					for _, q := range qnames {
+						if strings.HasSuffix(q, "."+pr.TargetQName) || q == pr.TargetQName {
+							id, ok = qIndex[q], true
+							break
+						}
 					}
 				}
 			}

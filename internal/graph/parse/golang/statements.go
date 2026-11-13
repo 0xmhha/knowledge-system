@@ -232,7 +232,7 @@ func (v *declVisitor) parsePendingFromCall(srcID string, c *ast.CallExpr) parse.
 	// to an unrelated method that happens to share the name (e.g. a type with
 	// a method literally named len) — a false cross-subsystem call edge. Clear
 	// the target so Resolve drops it instead of guessing.
-	if v.isBuiltinCall(c.Fun) {
+	if v.isBuiltinCall(c.Fun) || v.isConversion(c.Fun) {
 		pr.TargetQName = ""
 		return pr
 	}
@@ -248,12 +248,16 @@ func (v *declVisitor) parsePendingFromCall(srcID string, c *ast.CallExpr) parse.
 		if q := v.qualifiedStaticTarget(c.Fun); q != "" {
 			pr.TargetQName = q
 		}
+		pr.TargetCanonicalID = v.calleeCanonicalID(c.Fun)
 	case "closure", "func_value", "method_value":
 		// Target is unresolvable (closure literal / runtime func value /
 		// stored callback). The direct self-loop emission in
-		// maybeEmitInvokesSelfLoop covers this case. Leave the PendingRef
-		// here as a `calls` so it stays out of the way (Resolve will
-		// drop it because the TargetQName won't match).
+		// maybeEmitInvokesSelfLoop covers this case. Clear the target so
+		// Resolve drops the PendingRef: the bare variable name (`cancel`,
+		// `f`, `callback`) used to suffix-match an unrelated method.
+		if v.typesInfo != nil {
+			pr.TargetQName = ""
+		}
 	default:
 		// Static dispatch (concrete method / package function). exprName
 		// captured only the bare callee name (e.g. "Size"), which Pass 2
@@ -267,8 +271,44 @@ func (v *declVisitor) parsePendingFromCall(srcID string, c *ast.CallExpr) parse.
 		if q := v.qualifiedStaticTarget(c.Fun); q != "" {
 			pr.TargetQName = q
 		}
+		pr.TargetCanonicalID = v.calleeCanonicalID(c.Fun)
 	}
 	return pr
+}
+
+// calleeCanonicalID returns the canonical id of the function or method a call
+// expression names, or "" without type information or for callees that are
+// not a declared *types.Func (function values, closures).
+func (v *declVisitor) calleeCanonicalID(fun ast.Expr) string {
+	if v.typesInfo == nil {
+		return ""
+	}
+	var obj gotypes.Object
+	switch f := ast.Unparen(fun).(type) {
+	case *ast.SelectorExpr:
+		obj = v.typesInfo.ObjectOf(f.Sel)
+	case *ast.Ident:
+		obj = v.typesInfo.ObjectOf(f)
+	case *ast.IndexExpr: // explicit instantiation: F[T](x)
+		return v.calleeCanonicalID(f.X)
+	case *ast.IndexListExpr:
+		return v.calleeCanonicalID(f.X)
+	}
+	if fn, ok := obj.(*gotypes.Func); ok {
+		return goCanonicalID(fn)
+	}
+	return ""
+}
+
+// isConversion reports whether fun names a type, so the call is a conversion
+// such as uint(x) or Header(h), not a call to code. Without type information
+// it returns false.
+func (v *declVisitor) isConversion(fun ast.Expr) bool {
+	if v.typesInfo == nil {
+		return false
+	}
+	tv, ok := v.typesInfo.Types[fun]
+	return ok && tv.IsType()
 }
 
 // isBuiltinCall reports whether c.Fun is a Go builtin (len, cap, make, append,

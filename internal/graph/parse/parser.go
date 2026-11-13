@@ -15,8 +15,13 @@ type PendingRef struct {
 	SrcID       string
 	EdgeType    types.EdgeType
 	TargetQName string
-	HintFile    string
-	Line        int
+	// TargetCanonicalID is the import-path-qualified id of the target when
+	// the parser resolved it with type information (Go typed builds). When
+	// set, Resolve matches it exactly and never falls back to TargetQName: a
+	// short-name match can belong to another package with the same name.
+	TargetCanonicalID string
+	HintFile          string
+	Line              int
 	// ByteOffset: byte position of the
 	// referent in the source file. Used by the Solidity resolver to
 	// disambiguate same-line shadow scopes — when the line-only

@@ -39,24 +39,8 @@ func EmitInstantiatesEdges(pkgs []*packages.Package, nodes []types.Node) []types
 	if len(pkgs) == 0 {
 		return nil
 	}
-	qnameToTypeID := make(map[string]string, len(nodes))
-	for _, n := range nodes {
-		switch n.Type {
-		case types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum:
-			if _, exists := qnameToTypeID[n.QualifiedName]; !exists {
-				qnameToTypeID[n.QualifiedName] = n.ID
-			}
-		}
-	}
-	qnameToFuncID := make(map[string]string, len(nodes))
-	for _, n := range nodes {
-		switch n.Type {
-		case types.NodeFunction, types.NodeMethod:
-			if _, exists := qnameToFuncID[n.QualifiedName]; !exists {
-				qnameToFuncID[n.QualifiedName] = n.ID
-			}
-		}
-	}
+	typeIndex := newSymbolIndex(nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
+	funcIndex := newSymbolIndex(nodes, types.NodeFunction, types.NodeMethod)
 
 	emitted := make(map[edgeDedupKey]struct{}, 128)
 	var edges []types.Edge
@@ -81,7 +65,7 @@ func EmitInstantiatesEdges(pkgs []*packages.Package, nodes []types.Node) []types
 				} else {
 					srcQname = pkgName + "." + fd.Name.Name
 				}
-				srcID, ok := qnameToFuncID[srcQname]
+				srcID, ok := funcIndex.lookup(pkg.TypesInfo.Defs[fd.Name], srcQname)
 				if !ok {
 					continue
 				}
@@ -89,12 +73,12 @@ func EmitInstantiatesEdges(pkgs []*packages.Package, nodes []types.Node) []types
 					switch x := n.(type) {
 					case *ast.CompositeLit:
 						emitInstantiatesForType(srcID, srcQname, x.Type, pkg.TypesInfo,
-							qnameToTypeID, emitted, &edges)
+							typeIndex, emitted, &edges)
 					case *ast.CallExpr:
 						// new(T)
 						if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "new" && len(x.Args) == 1 {
 							emitInstantiatesForType(srcID, srcQname, x.Args[0], pkg.TypesInfo,
-								qnameToTypeID, emitted, &edges)
+								typeIndex, emitted, &edges)
 						}
 					}
 					return true
@@ -110,7 +94,7 @@ func EmitInstantiatesEdges(pkgs []*packages.Package, nodes []types.Node) []types
 // distinct target. Anonymous / builtin types are skipped.
 func emitInstantiatesForType(
 	srcID, srcQname string, expr ast.Expr, info *gotypes.Info,
-	qnameToTypeID map[string]string, emitted map[edgeDedupKey]struct{},
+	typeIndex symbolIndex, emitted map[edgeDedupKey]struct{},
 	out *[]types.Edge,
 ) {
 	if expr == nil || info == nil {
@@ -138,7 +122,7 @@ func emitInstantiatesForType(
 	if dstQname == srcQname {
 		return
 	}
-	dstID, ok := qnameToTypeID[dstQname]
+	dstID, ok := typeIndex.lookup(obj, dstQname)
 	if !ok {
 		return // cross-package type without a node in this graph
 	}

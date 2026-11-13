@@ -56,38 +56,22 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 	// appear as a uses_type DST. We index Struct / Interface / TypeAlias /
 	// Enum nodes (the same set EmitImplementsEdges uses) so post-pass
 	// resolution matches.
-	qnameToTypeID := make(map[string]string, len(nodes))
-	for _, n := range nodes {
-		switch n.Type {
-		case types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum:
-			if _, exists := qnameToTypeID[n.QualifiedName]; !exists {
-				qnameToTypeID[n.QualifiedName] = n.ID
-			}
-		}
-	}
+	typeIndex := newSymbolIndex(nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
 
-	// Build qname → emitted node ID map for symbols that can be a uses_type
-	// SRC: Function, Method (callers using it as param/return), Struct
-	// (caller using it as field type's container).
-	qnameToSrcID := make(map[string]string, len(nodes))
-	for _, n := range nodes {
-		switch n.Type {
-		case types.NodeFunction, types.NodeMethod, types.NodeStruct:
-			if _, exists := qnameToSrcID[n.QualifiedName]; !exists {
-				qnameToSrcID[n.QualifiedName] = n.ID
-			}
-		}
-	}
+	// Index the symbols that can be a uses_type SRC: Function, Method
+	// (callers using it as param/return), Struct (caller using it as field
+	// type's container).
+	srcIndex := newSymbolIndex(nodes, types.NodeFunction, types.NodeMethod, types.NodeStruct)
 
-	emitted := make(map[edgeDedupKey]struct{}, len(qnameToSrcID)*2)
+	emitted := make(map[edgeDedupKey]struct{}, len(srcIndex.byQname)*2)
 	var edges []types.Edge
 	var pending []parse.PendingRef
 
-	addEdge := func(srcID, dstQname string, line int, hintFile string) {
+	addEdge := func(srcID string, dst *gotypes.TypeName, dstQname string, line int, hintFile string) {
 		if srcID == "" || dstQname == "" {
 			return
 		}
-		if dstID, ok := qnameToTypeID[dstQname]; ok {
+		if dstID, ok := typeIndex.lookup(dst, dstQname); ok {
 			k := edgeDedupKey{src: srcID, dst: dstID}
 			if _, dup := emitted[k]; dup {
 				return
@@ -104,11 +88,12 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 		// incremental partial-cache rebuild can replay this resolution
 		// against a future build's full type universe.
 		pending = append(pending, parse.PendingRef{
-			SrcID:       srcID,
-			EdgeType:    types.EdgeUsesType,
-			TargetQName: dstQname,
-			HintFile:    hintFile,
-			Line:        line,
+			SrcID:             srcID,
+			EdgeType:          types.EdgeUsesType,
+			TargetQName:       dstQname,
+			TargetCanonicalID: goCanonicalID(dst),
+			HintFile:          hintFile,
+			Line:              line,
 		})
 	}
 
@@ -123,9 +108,9 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 		}
 		// Functions and methods (Function/Method nodes): walk param + result
 		// signatures.
-		emitUsesTypeForFunctions(pkg, pkgName, qnameToSrcID, addEdge)
+		emitUsesTypeForFunctions(pkg, pkgName, srcIndex, addEdge)
 		// Struct field types.
-		emitUsesTypeForStructs(scope, pkgName, qnameToSrcID, addEdge)
+		emitUsesTypeForStructs(scope, pkgName, srcIndex, addEdge)
 	}
 
 	return edges, pending
@@ -140,8 +125,8 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 // edge.line and the same qname construction declarations.go uses.
 func emitUsesTypeForFunctions(
 	pkg *packages.Package, pkgName string,
-	qnameToSrcID map[string]string,
-	addEdge func(srcID, dstQname string, line int, hintFile string),
+	srcIndex symbolIndex,
+	addEdge func(srcID string, dst *gotypes.TypeName, dstQname string, line int, hintFile string),
 ) {
 	if pkg.TypesInfo == nil || pkg.Fset == nil {
 		return
@@ -168,7 +153,7 @@ func emitUsesTypeForFunctions(
 			} else {
 				srcQname = pkgName + "." + fd.Name.Name
 			}
-			srcID, ok := qnameToSrcID[srcQname]
+			srcID, ok := srcIndex.lookup(pkg.TypesInfo.Defs[fd.Name], srcQname)
 			if !ok {
 				continue
 			}
@@ -176,9 +161,9 @@ func emitUsesTypeForFunctions(
 			// Parameters
 			if fd.Type.Params != nil {
 				for _, field := range fd.Type.Params.List {
-					forEachNamedTypeInExpr(pkg.TypesInfo, field.Type, func(qname string) {
+					forEachNamedTypeInExpr(pkg.TypesInfo, field.Type, func(tn *gotypes.TypeName, qname string) {
 						if qname != srcQname {
-							addEdge(srcID, qname, line, hintFile)
+							addEdge(srcID, tn, qname, line, hintFile)
 						}
 					})
 				}
@@ -186,9 +171,9 @@ func emitUsesTypeForFunctions(
 			// Results
 			if fd.Type.Results != nil {
 				for _, field := range fd.Type.Results.List {
-					forEachNamedTypeInExpr(pkg.TypesInfo, field.Type, func(qname string) {
+					forEachNamedTypeInExpr(pkg.TypesInfo, field.Type, func(tn *gotypes.TypeName, qname string) {
 						if qname != srcQname {
-							addEdge(srcID, qname, line, hintFile)
+							addEdge(srcID, tn, qname, line, hintFile)
 						}
 					})
 				}
@@ -201,8 +186,8 @@ func emitUsesTypeForFunctions(
 // emits a uses_type edge for every field's named type.
 func emitUsesTypeForStructs(
 	scope *gotypes.Scope, pkgName string,
-	qnameToSrcID map[string]string,
-	addEdge func(srcID, dstQname string, line int, hintFile string),
+	srcIndex symbolIndex,
+	addEdge func(srcID string, dst *gotypes.TypeName, dstQname string, line int, hintFile string),
 ) {
 	for _, name := range scope.Names() {
 		obj := scope.Lookup(name)
@@ -219,7 +204,7 @@ func emitUsesTypeForStructs(
 			continue
 		}
 		srcQname := pkgName + "." + tn.Name()
-		srcID, ok := qnameToSrcID[srcQname]
+		srcID, ok := srcIndex.lookup(tn, srcQname)
 		if !ok {
 			continue
 		}
@@ -228,9 +213,9 @@ func emitUsesTypeForStructs(
 		hintFile := ""
 		for i := 0; i < st.NumFields(); i++ {
 			field := st.Field(i)
-			forEachNamedTypeInType(field.Type(), func(qname string) {
+			forEachNamedTypeInType(field.Type(), func(ftn *gotypes.TypeName, qname string) {
 				if qname != srcQname {
-					addEdge(srcID, qname, line, hintFile)
+					addEdge(srcID, ftn, qname, line, hintFile)
 				}
 			})
 		}
@@ -242,7 +227,7 @@ func emitUsesTypeForStructs(
 // *gotypes.Named, then yields each distinct (pkgName + "." + typeName)
 // qname encountered. Pointer / slice / map / chan layers are stripped to
 // reach the underlying named element.
-func forEachNamedTypeInExpr(info *gotypes.Info, e ast.Expr, yield func(qname string)) {
+func forEachNamedTypeInExpr(info *gotypes.Info, e ast.Expr, yield func(tn *gotypes.TypeName, qname string)) {
 	if info == nil || e == nil {
 		return
 	}
@@ -268,7 +253,7 @@ func forEachNamedTypeInExpr(info *gotypes.Info, e ast.Expr, yield func(qname str
 //
 // Yield is called once per distinct top-level *types.Named encountered.
 // Builtin / unnamed types yield nothing.
-func forEachNamedTypeInType(t gotypes.Type, yield func(qname string)) {
+func forEachNamedTypeInType(t gotypes.Type, yield func(tn *gotypes.TypeName, qname string)) {
 	if t == nil {
 		return
 	}
@@ -289,7 +274,7 @@ func forEachNamedTypeInType(t gotypes.Type, yield func(qname string)) {
 		if obj == nil || obj.Pkg() == nil {
 			return // builtin (error / comparable) — no node
 		}
-		yield(obj.Pkg().Name() + "." + obj.Name())
+		yield(obj, obj.Pkg().Name()+"."+obj.Name())
 	case *gotypes.Struct:
 		for i := 0; i < tt.NumFields(); i++ {
 			forEachNamedTypeInType(tt.Field(i).Type(), yield)

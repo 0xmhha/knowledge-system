@@ -53,15 +53,7 @@ func EmitImplementsEdges(pkgs []*packages.Package, nodes []types.Node) []types.E
 	// appear as src/dst of implements/extends are indexed:
 	//   - Struct, TypeAlias, Enum: valid implements src
 	//   - Interface: valid implements dst AND extends src/dst
-	qnameToID := make(map[string]string, len(nodes))
-	for _, n := range nodes {
-		switch n.Type {
-		case types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum:
-			if _, exists := qnameToID[n.QualifiedName]; !exists {
-				qnameToID[n.QualifiedName] = n.ID
-			}
-		}
-	}
+	index := newSymbolIndex(nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
 
 	// Collect every named type from every loaded package's top-level scope.
 	// Dedupe by qname — the same package can appear twice (base + test
@@ -129,7 +121,7 @@ func EmitImplementsEdges(pkgs []*packages.Package, nodes []types.Node) []types.E
 		if iface.iface.Empty() {
 			continue
 		}
-		ifaceID, hasIface := qnameToID[iface.qname]
+		ifaceID, hasIface := index.lookup(iface.named.Obj(), iface.qname)
 		if !hasIface {
 			continue
 		}
@@ -139,7 +131,7 @@ func EmitImplementsEdges(pkgs []*packages.Package, nodes []types.Node) []types.E
 				// concretes ∩ ifaces = ∅, but kept for symmetry with the
 				// iface-vs-iface loop below)
 			}
-			implID, hasImpl := qnameToID[impl.qname]
+			implID, hasImpl := index.lookup(impl.named.Obj(), impl.qname)
 			if !hasImpl {
 				continue
 			}
@@ -184,8 +176,8 @@ func EmitImplementsEdges(pkgs []*packages.Package, nodes []types.Node) []types.E
 			if embQname == a.qname {
 				continue // self-edge guard
 			}
-			srcID, srcOK := qnameToID[a.qname]
-			dstID, dstOK := qnameToID[embQname]
+			srcID, srcOK := index.lookup(a.named.Obj(), a.qname)
+			dstID, dstOK := index.lookup(embObj, embQname)
 			if !srcOK || !dstOK {
 				continue
 			}
