@@ -57,6 +57,21 @@ After resolving by canonical id (roadmap D2 and D3, same base commit, graph rebu
 Unexpected graph edges fell from 931 to 126 (calls) and from 47 to 8 (type references); declaration nodes with no
 package-level declaration fell from 123 to 0.
 
+After recording calls inside goroutine function literals and dropping bare-name targets in typed builds (roadmap D4):
+
+| relation | truth | matched | misresolved | missing | recall |
+|---|---|---|---|---|---|
+| static calls | 27,545 | 27,508 | 0 | 10 (5 in function literals) | 0.9996 |
+| interface calls | 2,886 | 2,872 | 0 | 1 | 0.9997 |
+| type references | 24,028 | 13,487 | 6 | 10,535 | 0.5613 |
+
+Unexpected call edges fell from 126 to 8. Of the 126, 112 came from `err.Error()`: a method of the builtin `error`
+interface has no package, so it has no canonical id, and its bare name `Error` matched whichever `Error` method was
+indexed last. The 8 left are calls through an interface embedded in a struct field (`p.rw.ReadMsg`,
+`transport.close`); the graph links them to the interface method, which is right, but the verifier counts them as
+dynamic calls (go/types gives no static callee and the receiver is the struct, not the interface), so they show up
+as unexpected.
+
 Not checked: 1,714 dynamic call sites, 2,229 calls in package-level initialisers.
 Unexpected graph edges: 931 call edges, 47 type-reference edges. Declaration-kind graph nodes with no
 package-level declaration: 123.

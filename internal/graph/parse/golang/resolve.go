@@ -87,6 +87,13 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				// crypto/bn256/cloudflare). A miss means the callee is outside
 				// the graph (stdlib, excluded files).
 				id, ok = cIndex[pr.TargetCanonicalID]
+			} else if typed && !strings.Contains(pr.TargetQName, ".") {
+				// A bare name in a typed build is a callee go/types could not
+				// tie to a declaration in this graph (a method of the builtin
+				// error interface, a call through an expression). qIndex also
+				// holds simple names, so `err.Error()` bound to whichever
+				// `Error` method was indexed last.
+				ok = false
 			} else {
 				id, ok = qIndex[pr.TargetQName]
 				if !ok && !typed && pr.TargetQName != "" {

@@ -108,7 +108,9 @@ func (v *declVisitor) emitFunctionBodyPos(parentQname, parentID string, body *as
 			// qname and the existing parent-attribution path already
 			// covers field touches inside it.
 			if s.Call != nil {
-				if _, isFuncLit := s.Call.Fun.(*ast.FuncLit); !isFuncLit {
+				if lit, isFuncLit := s.Call.Fun.(*ast.FuncLit); isFuncLit {
+					v.emitCallsInFuncLit(parentID, parentQname, lit)
+				} else {
 					v.pending = append(v.pending, v.parsePendingFromCall(parentID, s.Call))
 				}
 			}
@@ -309,6 +311,29 @@ func (v *declVisitor) isConversion(fun ast.Expr) bool {
 	}
 	tv, ok := v.typesInfo.Types[fun]
 	return ok && tv.IsType()
+}
+
+// emitCallsInFuncLit records the calls inside a goroutine's function literal
+// (`go func() { ... }()`) as calls of the enclosing function, the same way the
+// body walker records calls elsewhere: a CallSite node, a pending calls or
+// invokes ref, and the dispatch self-loop. The GoStmt case stops the body walk
+// so channel and lock edges are not emitted twice; without this, every call in
+// a goroutine literal was missing from the graph (276 of the 306 missing
+// function-literal calls on go-stablenet).
+func (v *declVisitor) emitCallsInFuncLit(parentID, parentQname string, lit *ast.FuncLit) {
+	if lit == nil || lit.Body == nil {
+		return
+	}
+	ast.Inspect(lit.Body, func(n ast.Node) bool {
+		c, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		id := v.appendLogicBlockPos(parentID, parentQname, types.NodeCallSite, "", c.Pos(), c.End())
+		v.pending = append(v.pending, v.parsePendingFromCall(id, c))
+		v.maybeEmitInvokesSelfLoop(parentID, c)
+		return true
+	})
 }
 
 // isBuiltinCall reports whether c.Fun is a Go builtin (len, cap, make, append,
