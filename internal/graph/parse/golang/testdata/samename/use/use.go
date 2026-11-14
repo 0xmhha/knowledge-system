@@ -38,3 +38,18 @@ func G() {
 	var b Box[int]
 	b.Put(1)
 }
+
+// Spawn calls one/x.Do inside a goroutine literal.
+func Spawn() {
+	go func() {
+		x.Do()
+	}()
+}
+
+// Fail is an error with its own Error method.
+type Fail struct{}
+
+func (Fail) Error() string { return "fail" }
+
+// Report calls Error through the builtin error interface.
+func Report(err error) string { return err.Error() }

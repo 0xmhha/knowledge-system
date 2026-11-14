@@ -10,7 +10,7 @@ Why the work is ordered this way (design intent versus implementation, related w
 [direction review, 2026-11-13](./research/DIRECTION-REVIEW-2026-11-13.md).
 This page adds the index-building side, the join between the two stores, and the improvement plan.
 
-Last reviewed: 2026-11-13 (main at #143, plus the D2 fix).
+Last reviewed: 2026-11-13 (main at #145, plus the D4 fix).
 
 ## 1. Figure: the whole system
 
@@ -133,10 +133,12 @@ misresolved type references and 931 call edges go/types does not support.
 | D1 | `ckg verify`: measure the Go graph against go/types | adopted (2026-11-13) | none on retrieval; Go only |
 | D2 | Resolve calls and type references by the go/types object (canonical id) instead of the short `pkg.Name`; drop the suffix fallback | done in code (2026-11-13); indexes not yet rebuilt | on PR 74's base: static call recall 0.977 -> 0.989, misresolved type references 357 -> 6, unexpected call edges 931 -> 126 |
 | D3 | Keep function-local declarations out of the package-level id space | done with D2 | 123 -> 0 local declarations under a package-level id |
-| D4 | Record calls inside function literals (generic-method calls were fixed by D2) | proposed; 306 static and 59 interface calls left | more edges compete for Stage 3 slots |
+| D4 | Record calls inside function literals (generic-method calls were fixed by D2) | done in code (2026-11-13); indexes not yet rebuilt | static call recall 0.989 -> 0.9996, interface 0.979 -> 0.9997, unexpected call edges 126 -> 8 (bare `err.Error()` targets dropped) |
 | D5 | Emit type references from bodies, interface signatures and aliases; emit `reads_field` and `references` | proposed | larger graph; Stage 3 relation weights may need retuning |
 | D6 | ckv join: do not bind file-header chunks to the first declaration; split grouped `var (...)` blocks | proposed | small |
 | D7 | Composer and data agree: Stage 3 asks for relations that no graph contains (`references`) | proposed | needs D5 or a change to the relation sets |
+| D8 | Incremental builds keep the canonical target: persist `TargetCanonicalID` in `pending_refs` and sort incremental results | found by code review (2026-11-13), not yet reproduced | schema migration; until fixed, an incremental build can undo D2 |
+| D9 | Shared language contract: apply the D2-D4 defect classes to the TypeScript, Solidity and Proto frontends (bare-name resolution, first-id choice, trailing-segment fallback, missing call and field-type edges) | found by code review (2026-11-13) | needs a reference truth per language; the verifier is Go only |
 
 Each fix is judged first by `ckg verify` (or the matching store check), then by whether evidence packs change on
 the go-stablenet cases, using the stage trace (`CKS_DEBUG_TRACE`) to find where an answer is lost.
@@ -324,6 +326,7 @@ commits and go-stablenet need summaries from gemma4:12b as well before V1 can be
 | 2026-11-05 | V1 summarizes symbols of 10 or more lines | the 3-line run was projected at about 16 h of generation on go-stablenet |
 | 2026-11-06 | indexer-go V1 run stopped at 15 of 26 commits and judged there | user decision; V1 not adopted as built (bge-m3 lost one PR) |
 | 2026-11-09 | Summary model gemma4:12b, thinking off; check fixes (generated files, case-insensitive identifiers, unlabelled two-line answers) | user decision on the benchmarks; thinking made each summary take about 2 minutes; the label fix recovered the 4 of 11 answers gemma4 wrote without labels |
+| 2026-11-13 | D4: record calls inside goroutine literals; drop bare-name targets in typed builds | ckg verify: missing calls in function literals 306 -> 5, unexpected call edges 126 -> 8 |
 | 2026-11-13 | P1 measured: no difference between a 12-body and a 3-body pack; P2 and P3 not started | pre-registered rule; root cause found in every case and arm, no run misled by a pack body |
 | 2026-11-13 | D2 and D3: resolve Go references by canonical id; no canonical id for function-local declarations | ckg verify: misresolved type references 357 -> 6, unexpected call edges 931 -> 126 |
 | 2026-11-13 | Verify and fix the built data before any new proposal; start with `ckg verify` (D1) | user decision; a read-only check found wrong call and type edges, and the compared code-graph papers do not measure their graphs at all |
