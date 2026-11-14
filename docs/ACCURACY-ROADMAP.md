@@ -321,6 +321,7 @@ commits and go-stablenet need summaries from gemma4:12b as well before V1 can be
 | 2026-11-04 | Knowledge reserve placed outside the citation cap (#134) | it took the neighbor slots |
 | 2026-11-04 | Vector and graph spans of one function are one candidate (#135) | the same function used two slots |
 | 2026-11-04 | Keyword seeds from `code_query` not adopted | lost PRs on go-stablenet twice |
+| 2026-11-04 | Same-name body limit (79c938d1) dropped; the branch stays local | user decision; D6: no gain or loss on indexer-go, but go-stablenet pr-58 (risk subset) lost in bge-m3 when the owning `New` lost its body to a higher-ranked `New`; indexer-go look 1 |
 | 2026-11-05 | Pack lists cut seeds as `cut_candidates` (#137) | two bge misses become visible by name; bodies unchanged |
 | 2026-11-05 | Start with V1 symbol summaries, then J1 | targets the two miss classes the other proposals cannot reach |
 | 2026-11-05 | V1 summarizes symbols of 10 or more lines | the 3-line run was projected at about 16 h of generation on go-stablenet |

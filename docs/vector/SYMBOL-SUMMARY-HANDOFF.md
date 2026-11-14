@@ -52,7 +52,7 @@ The defects were found from build counts and an 11-symbol probe, not from judged
 tuning on the holdout. The 15 seen indexer-go PRs and go-stablenet were summarized by gemma3:12b with the old check;
 record that difference, or rebuild them with gemma4:12b, before calling V1 one change.
 
-## 4. Steps once approved
+## 4. Steps to resume
 
 1. Done in this repository (check fixes and `think: false`).
 2. Rebuild the workspace binaries from the new commit on a clean tree and update BUILD.txt and the sha256 file.
