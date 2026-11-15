@@ -94,8 +94,8 @@ same commit hold 1,418 Go files. `crypto/bn256/cloudflare/gfp_generic.go`, `cryp
 `systemcontracts/compile` are outside both builds, so the duplicate declarations and the cross-package edges they
 caused do not arise for these configurations. The C sources of cgo packages are not listed yet; they belong to the C
 frontend. `ckg build --scope <file>` and `ckg verify --scope <file>` consume a scope (Go files only; the other languages
-are discovered as before until they have an extractor). The scope's configuration is not yet part of the incremental
-cache key, so a graph directory should be rebuilt with `--no-cache` when its configuration changes.
+are discovered as before until they have an extractor). The manifest records the scope's Go build configuration
+(`go_build`), and a graph built for another configuration is rebuilt cold instead of reusing its incremental cache.
 
 Test files are listed with the production files they belong to, so the frontends can type-check them, and are marked
 `test` for the layer of D6. Files a configuration does not compile never reach a frontend; this removes duplicate
@@ -291,7 +291,8 @@ the Go frontend is moved first and must meet the D11 numbers on the go-stablenet
 |---|---|---|---|
 | Where the build-scope extractor lives | its own Go package and command in this repository, importing nothing from the graph engine, with a versioned JSON output; moved to its own repository when another project needs it | one CI and release while the format settles; no imports keeps the move cheap | now (step 2) |
 | Record exchange with out-of-process frontends | JSON Lines with a schema version per record stream | readable, streamable, enough for the first frontends; a binary format only if measurements show the exchange limits D10 | step 8 (first out-of-process frontend) |
-| Deployment targets of go-stablenet | two configurations of `cmd/gstable` with default tags: `gstable-linux-amd64` and `gstable-darwin-arm64`, merged into one graph with configuration labels (section 4.4) | user decision 2026-11-15 ("배포 대상에 macos 도 추가해줘"); darwin/arm64 assumed for macOS (Apple Silicon), darwin/amd64 not included | settled |
+| Deployment target of go-stablenet | `cmd/gstable` for linux/amd64, default tags, cgo on (`gstable-linux-amd64`) | the production node binary; all owning functions of the 11 cases lie in that build | settled 2026-11-15 |
+| Operating systems of the knowledge system | ckg, ckv, cks and buildscope run on Linux (servers) and macOS (developer machines); CI builds and tests on both | user decision 2026-11-15: "macOS" meant that the system itself runs on both ("동작에 대해서 두 os 를 지원하는것"), not a second go-stablenet target; merging configurations is deferred until a project with build-time implementation swaps is evaluated | settled 2026-11-15 |
 | Edge costs of the root-cause walk | fixed per edge kind and confidence, written down before the first measurement | D11 fixes criteria before measuring | step 6 (data flow) |
 | Fields of the derived history summary, intent when a commit has no message | recent intents with their source, and an intent inferred from the diff marked `inferred` | D4 asks for a source plus a derived view | step 7 (history) |
 

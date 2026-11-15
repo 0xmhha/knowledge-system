@@ -287,7 +287,14 @@ func Run(opt Options) (persist.Manifest, error) {
 	//   - runCold: --no-cache, missing manifest, schema/version mismatch.
 	dbPath := filepath.Join(opt.OutDir, "graph.db")
 	old := readOldManifestFromDB(dbPath, opt.DBDSN)
-	if !opt.NoCache && ManifestUsable(old, opt.CKGVersion) {
+	// A graph built for another Go build configuration (platform, cgo, tags)
+	// holds other files and other type information, so its cache is not a
+	// base for this build.
+	sameGoBuild := old == nil || old.GoBuild == opt.GoBuild.Key()
+	if !opt.NoCache && old != nil && !sameGoBuild {
+		log.Info("Cache: Go build configuration changed; full rebuild", "old", old.GoBuild, "new", opt.GoBuild.Key())
+	}
+	if !opt.NoCache && sameGoBuild && ManifestUsable(old, opt.CKGVersion) {
 		decisions, derr := DiffManifest(opt.SrcRoot, discovery, old, opt.CKGVersion)
 		if derr != nil {
 			return persist.Manifest{}, fmt.Errorf("cache diff: %w", derr)

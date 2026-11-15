@@ -33,6 +33,23 @@ jobs:
       - name: Domain artifacts match their entries
         run: make check-domain-artifacts
 
+  # The knowledge system runs on Linux servers and on macOS developer
+  # machines (graph build design decision D10, 2026-11-15), so the Go build
+  # and tests also run on macOS. Lint, the vulnerability scan and the
+  # evaluation gates stay on Linux.
+  build-and-test-macos:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.26.11'
+      - name: Build
+        run: make build
+      - name: Test
+        run: make test
+
   # Successor of code-knowledge-vector's eval-gate job: recall regression
   # gate over the vendored sample corpus with the deterministic mock
   # embedder — no network, no model downloads.

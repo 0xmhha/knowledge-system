@@ -39,11 +39,15 @@ type Manifest struct {
 	BuilderVersion string `json:"builder_version,omitempty"`
 	// CKGVersion is the legacy per-engine version key (ckg_version). Retained
 	// for back-compat read/write; superseded by BuilderVersion.
-	CKGVersion          string         `json:"ckg_version"`
-	BuildTimestamp      string         `json:"build_timestamp"`
-	SrcRoot             string         `json:"src_root"`
-	SrcRelPath          string         `json:"src_rel_path,omitempty"` // src_root relative to git repo root; enables path-aware staleness
-	SrcCommit           string         `json:"src_commit,omitempty"`
+	CKGVersion     string `json:"ckg_version"`
+	BuildTimestamp string `json:"build_timestamp"`
+	SrcRoot        string `json:"src_root"`
+	SrcRelPath     string `json:"src_rel_path,omitempty"` // src_root relative to git repo root; enables path-aware staleness
+	SrcCommit      string `json:"src_commit,omitempty"`
+	// GoBuild is the Go build configuration the graph was built for
+	// (detect.GoBuild.Key); empty for the host defaults. A different value
+	// makes the incremental cache unusable.
+	GoBuild             string         `json:"go_build,omitempty"`
 	StalenessMethod     string         `json:"staleness_method"` // "git" | "mtime"
 	StalenessFiles      []string       `json:"staleness_files,omitempty"`
 	StalenessMTimeSum   int64          `json:"staleness_mtime_sum,omitempty"`
@@ -143,6 +147,7 @@ func (s *sqliteStore) SetManifest(m Manifest) error {
 		{"src_root", m.SrcRoot},
 		{"src_rel_path", m.SrcRelPath},
 		{"src_commit", m.SrcCommit},
+		{"go_build", m.GoBuild},
 		{"staleness_method", m.StalenessMethod},
 		{"clustering_status", m.ClusteringStatus},
 		// graph_digest is the coordinate pin anchor. It MUST live in the in-db
@@ -231,6 +236,7 @@ func readManifest(ctx context.Context, q manifestQueryer) (Manifest, error) {
 		SrcRoot:             kv["src_root"],
 		SrcRelPath:          kv["src_rel_path"],
 		SrcCommit:           kv["src_commit"],
+		GoBuild:             kv["go_build"],
 		StalenessMethod:     kv["staleness_method"],
 		ClusteringStatus:    kv["clustering_status"],
 		GraphDigest:         kv["graph_digest"],
