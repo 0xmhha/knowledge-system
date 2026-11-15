@@ -124,6 +124,9 @@ CREATE TABLE IF NOT EXISTS pending_refs (
   file_path     TEXT NOT NULL,
   src_id        TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
   target_qname  TEXT NOT NULL,
+  -- Canonical id of the target when the parser resolved it with type
+  -- information; empty otherwise. Reloaded refs resolve through it exactly.
+  target_canonical_id TEXT NOT NULL DEFAULT '',
   edge_type     TEXT NOT NULL,
   line          INTEGER NOT NULL,
   hint_file     TEXT,

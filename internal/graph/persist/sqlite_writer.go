@@ -38,14 +38,20 @@ type TopicTreeInput interface {
 // DispatchKind (schema 1.7): mirrors the edges table column —
 // preserves the AST-time dispatch classification across the cache boundary.
 // Empty for static `calls`.
+//
+// TargetCanonicalID mirrors parse.PendingRef.TargetCanonicalID. Without it a
+// reloaded ref resolved by short name (x.Do bound to another package named
+// x) or was dropped, so an incremental build undid the canonical-id
+// resolution of a cold build.
 type PendingRefRow struct {
-	FilePath     string
-	SrcID        string
-	TargetQName  string
-	EdgeType     string
-	Line         int
-	HintFile     string
-	DispatchKind string
+	FilePath          string
+	SrcID             string
+	TargetQName       string
+	TargetCanonicalID string
+	EdgeType          string
+	Line              int
+	HintFile          string
+	DispatchKind      string
 }
 
 // InsertNodes bulk-inserts nodes (transactional). The trailing
@@ -203,14 +209,14 @@ func (s *sqliteStore) InsertPendingRefs(refs []PendingRefRow) error {
 	}
 	defer func() { _ = tx.Rollback() }()
 	stmt, err := tx.Prepare(`INSERT OR IGNORE INTO pending_refs
-		(file_path, src_id, target_qname, edge_type, line, hint_file, dispatch_kind)
-		VALUES (?, ?, ?, ?, ?, ?, ?)`)
+		(file_path, src_id, target_qname, target_canonical_id, edge_type, line, hint_file, dispatch_kind)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		return err
 	}
 	defer func() { _ = stmt.Close() }()
 	for _, r := range refs {
-		if _, err := stmt.Exec(r.FilePath, r.SrcID, r.TargetQName,
+		if _, err := stmt.Exec(r.FilePath, r.SrcID, r.TargetQName, r.TargetCanonicalID,
 			r.EdgeType, r.Line, r.HintFile, r.DispatchKind); err != nil {
 			return fmt.Errorf("insert pending_ref %s→%s: %w", r.SrcID, r.TargetQName, err)
 		}
