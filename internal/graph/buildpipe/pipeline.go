@@ -151,6 +151,11 @@ type Options struct {
 	// that never touch disk. Callers must not set both a non-nil Filter and a
 	// non-empty FilesFromPath.
 	Filter *filterlist.FilterList
+
+	// GoBuild is the Go build configuration the graph is built for (from a
+	// build scope, ckg build --scope). It sets the platform, cgo and tags of
+	// both Go discovery and type checking; nil keeps the host defaults.
+	GoBuild *detect.GoBuild
 	// LockPropagation enables cross-function lock propagation. When true, the cold build
 	// path walks the Go call graph from every lock-holding function up to
 	// lockPropagationMaxDepth=5 hops and emits accessed_under_lock(field,
@@ -265,7 +270,7 @@ func Run(opt Options) (persist.Manifest, error) {
 	if err != nil {
 		return persist.Manifest{}, err
 	}
-	discovery, _, goCount, tsCount, solCount, protoCount, err := discoveryAll(opt.SrcRoot, opt.Languages, filter)
+	discovery, _, goCount, tsCount, solCount, protoCount, err := discoveryAll(opt.SrcRoot, opt.Languages, filter, opt.GoBuild)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
@@ -306,7 +311,7 @@ func runCold(opt Options, log *slog.Logger,
 	if err != nil {
 		return persist.Manifest{}, fmt.Errorf("detect: %w", err)
 	}
-	goFiles, err := detect.GoFiles(opt.SrcRoot)
+	goFiles, err := detect.GoFilesFor(opt.SrcRoot, opt.GoBuild)
 	if err != nil {
 		return persist.Manifest{}, fmt.Errorf("detect go: %w", err)
 	}
@@ -336,7 +341,7 @@ func runCold(opt Options, log *slog.Logger,
 	var goFuncFieldTouches map[string]map[string]struct{}
 	if shouldRun("go", opt.Languages) && len(goFiles) > 0 {
 		log.Debug("pass1.start", "language", "go", "files", len(goFiles))
-		rg, pending, fieldTouches, n, err := runGoPipeline(opt.SrcRoot, goFiles, log)
+		rg, pending, fieldTouches, n, err := runGoPipeline(opt.SrcRoot, goFiles, opt.GoBuild, log)
 		if err != nil {
 			return persist.Manifest{}, fmt.Errorf("go pipeline: %w", err)
 		}

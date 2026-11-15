@@ -32,7 +32,49 @@ import (
 // (GoPackages exists so the Go parser can access types.Info; this
 // keeps the file-list contract unchanged.)
 func GoFiles(srcRoot string) ([]string, error) {
-	pkgs, err := GoPackagesMode(srcRoot, ModeFiles)
+	return GoFilesFor(srcRoot, nil)
+}
+
+// GoBuild is the platform and options of one Go build configuration (see
+// internal/buildscope). nil means the go command's defaults for the host.
+type GoBuild struct {
+	GOOS, GOARCH string
+	// CGOEnabled is "1" or "0"; empty keeps the go command's default.
+	CGOEnabled string
+	Tags       []string
+}
+
+// Env returns the environment packages.Load runs the go command with (nil for
+// the defaults).
+func (b *GoBuild) Env() []string {
+	if b == nil {
+		return nil
+	}
+	env := os.Environ()
+	if b.GOOS != "" {
+		env = append(env, "GOOS="+b.GOOS)
+	}
+	if b.GOARCH != "" {
+		env = append(env, "GOARCH="+b.GOARCH)
+	}
+	if b.CGOEnabled != "" {
+		env = append(env, "CGO_ENABLED="+b.CGOEnabled)
+	}
+	return env
+}
+
+// BuildFlags returns the go command flags of the configuration.
+func (b *GoBuild) BuildFlags() []string {
+	if b == nil || len(b.Tags) == 0 {
+		return nil
+	}
+	return []string{"-tags=" + strings.Join(b.Tags, ",")}
+}
+
+// GoFilesFor is GoFiles for one build configuration: the files the go
+// command compiles for its platform, cgo setting and tags.
+func GoFilesFor(srcRoot string, b *GoBuild) ([]string, error) {
+	pkgs, err := GoPackagesFor(srcRoot, ModeFiles, b)
 	if err != nil {
 		return nil, err
 	}
@@ -85,6 +127,11 @@ func GoPackages(srcRoot string) ([]*packages.Package, error) {
 // as errors (consistent with GoFiles' fail-fast behavior on Load errors,
 // in contrast to per-package type-check failures which are tolerated).
 func GoPackagesMode(srcRoot string, mode GoPackagesLoadMode) ([]*packages.Package, error) {
+	return GoPackagesFor(srcRoot, mode, nil)
+}
+
+// GoPackagesFor is GoPackagesMode for one build configuration.
+func GoPackagesFor(srcRoot string, mode GoPackagesLoadMode, b *GoBuild) ([]*packages.Package, error) {
 	absRoot, err := filepath.Abs(srcRoot)
 	if err != nil {
 		return nil, fmt.Errorf("abs srcRoot: %w", err)
@@ -109,7 +156,7 @@ func GoPackagesMode(srcRoot string, mode GoPackagesLoadMode) ([]*packages.Packag
 		if !hasSource {
 			continue
 		}
-		pkgs, err := loadModule(modDir, mode)
+		pkgs, err := loadModule(modDir, mode, b)
 		if err != nil {
 			return nil, err
 		}
@@ -183,11 +230,13 @@ func findModuleDirs(absRoot string) ([]string, error) {
 // Type-check errors in packages with discoverable files are tolerated. A
 // fileless package with a go-list error is different: a broken toolchain or
 // cache can otherwise turn a Go repository into a successful empty index.
-func loadModule(modDir string, mode GoPackagesLoadMode) ([]*packages.Package, error) {
+func loadModule(modDir string, mode GoPackagesLoadMode, b *GoBuild) ([]*packages.Package, error) {
 	cfg := &packages.Config{
-		Mode:  loadModeBits(mode),
-		Dir:   modDir,
-		Tests: true,
+		Mode:       loadModeBits(mode),
+		Dir:        modDir,
+		Tests:      true,
+		Env:        b.Env(),
+		BuildFlags: b.BuildFlags(),
 	}
 	pkgs, err := packages.Load(cfg, "./...")
 	if err != nil {

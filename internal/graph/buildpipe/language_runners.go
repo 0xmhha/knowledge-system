@@ -175,9 +175,9 @@ func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
 // kicks in — AST-only mode has no reliable way to map field references to
 // Field node IDs (parser.go comment). The propagator then no-ops, which
 // matches the existing INFERRED-confidence semantics of AST-only builds.
-func runGoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, map[string]map[string]struct{}, int, error) {
+func runGoPipeline(srcRoot string, files []string, goBuild *detect.GoBuild, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, map[string]map[string]struct{}, int, error) {
 	p := gop.New(srcRoot)
-	if pkgs, err := detect.GoPackages(srcRoot); err != nil {
+	if pkgs, err := detect.GoPackagesFor(srcRoot, detect.ModeTypes, goBuild); err != nil {
 		log.Warn("Go packages typed-load failed; concurrency pass falls back to AST-only", "err", err)
 	} else {
 		p.SetPackages(pkgs)
