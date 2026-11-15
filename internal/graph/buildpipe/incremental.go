@@ -29,6 +29,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/cluster"
@@ -645,6 +646,7 @@ func runGoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 			Path: rel, Nodes: nodes, Pending: pending,
 		})
 	}
+	sortResultsByPath(results)
 	rg, err := p.Resolve(results)
 	// Mirror cold path: implements/extends + uses_type + instantiates edges
 	// need the union of nodes across the whole module to resolve cross-package
@@ -685,12 +687,13 @@ func runGoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 					continue
 				}
 				dirtyPending = append(dirtyPending, persist.PendingRefRow{
-					FilePath:    rel,
-					SrcID:       pr.SrcID,
-					TargetQName: pr.TargetQName,
-					EdgeType:    string(pr.EdgeType),
-					Line:        pr.Line,
-					HintFile:    pr.HintFile,
+					FilePath:          rel,
+					SrcID:             pr.SrcID,
+					TargetQName:       pr.TargetQName,
+					TargetCanonicalID: pr.TargetCanonicalID,
+					EdgeType:          string(pr.EdgeType),
+					Line:              pr.Line,
+					HintFile:          pr.HintFile,
 				})
 			}
 		}
@@ -713,6 +716,15 @@ func runGoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 	return rg, dirtyPending, errs, err
 }
 
+// sortResultsByPath orders parse results by file path, as the cold path does
+// (language_runners.go), so Resolve indexes nodes and visits pending refs in
+// the same order in both paths. The incremental path otherwise lists dirty
+// files before cached ones, and Resolve keeps the first node for a duplicate
+// canonical id and the last for a duplicate qualified name.
+func sortResultsByPath(results []*parse.ParseResult) {
+	sort.SliceStable(results, func(i, j int) bool { return results[i].Path < results[j].Path })
+}
+
 // pendingRefsFromRows converts persist.PendingRefRow back into parse.PendingRef
 // so synthesised ParseResults match the shape Pass 2 Resolve consumes natively.
 // FilePath isn't a parse.PendingRef field — Resolve doesn't need it (the row's
@@ -724,12 +736,13 @@ func pendingRefsFromRows(rows []persist.PendingRefRow) []parse.PendingRef {
 	out := make([]parse.PendingRef, len(rows))
 	for i, r := range rows {
 		out[i] = parse.PendingRef{
-			SrcID:        r.SrcID,
-			EdgeType:     types.EdgeType(r.EdgeType),
-			TargetQName:  r.TargetQName,
-			HintFile:     r.HintFile,
-			Line:         r.Line,
-			DispatchKind: r.DispatchKind,
+			SrcID:             r.SrcID,
+			EdgeType:          types.EdgeType(r.EdgeType),
+			TargetQName:       r.TargetQName,
+			TargetCanonicalID: r.TargetCanonicalID,
+			HintFile:          r.HintFile,
+			Line:              r.Line,
+			DispatchKind:      r.DispatchKind,
 		}
 	}
 	return out
@@ -777,6 +790,7 @@ func runTSPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 			Path: rel, Nodes: nodes, Pending: pending,
 		})
 	}
+	sortResultsByPath(results)
 	rg, err := p.Resolve(results)
 	return rg, dirtyPending, errs, err
 }
@@ -826,6 +840,7 @@ func runProtoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []strin
 			Path: rel, Nodes: nodes, Pending: pending,
 		})
 	}
+	sortResultsByPath(results)
 	rg, err := p.Resolve(results)
 	return rg, dirtyPending, errs, err
 }
@@ -873,6 +888,7 @@ func runSolPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
 			Path: rel, Nodes: nodes, Pending: pending,
 		})
 	}
+	sortResultsByPath(results)
 	rg, err := p.Resolve(results)
 	return rg, dirtyPending, errs, p, err
 }

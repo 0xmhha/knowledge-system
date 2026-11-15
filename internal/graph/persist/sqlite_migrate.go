@@ -45,6 +45,9 @@ func (s *sqliteStore) Migrate() error {
 	if err := ensureDispatchKindColumn(s.db, "pending_refs"); err != nil {
 		return fmt.Errorf("migrate dispatch_kind on pending_refs: %w", err)
 	}
+	if err := ensureTargetCanonicalIDColumn(s.db); err != nil {
+		return fmt.Errorf("migrate target_canonical_id on pending_refs: %w", err)
+	}
 	// nodes.attrs JSON blob carries every
 	// types.Node marker that doesn't have its own column. Pre-1.11
 	// DBs need ALTER ADD.
@@ -152,6 +155,40 @@ func columnExists(db *sql.DB, table, column string) (bool, error) {
 // ensureCanonicalIDColumn ALTER-adds nodes.canonical_id on pre-1.16 DBs.
 // Idempotent (PRAGMA table_info detect-then-no-op), mirroring the attrs and
 // search_tokens migrations.
+// ensureTargetCanonicalIDColumn ALTER-adds pending_refs.target_canonical_id
+// on graphs built before it existed. Their existing rows get an empty target
+// and still resolve by name, as before, until the next cold build.
+func ensureTargetCanonicalIDColumn(db *sql.DB) error {
+	rows, err := db.Query(`PRAGMA table_info(pending_refs)`)
+	if err != nil {
+		return fmt.Errorf("table_info(pending_refs): %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	for rows.Next() {
+		var (
+			cid     int
+			name    string
+			ctype   string
+			notnull int
+			dflt    sql.NullString
+			pk      int
+		)
+		if err := rows.Scan(&cid, &name, &ctype, &notnull, &dflt, &pk); err != nil {
+			return fmt.Errorf("scan table_info: %w", err)
+		}
+		if name == "target_canonical_id" {
+			return nil
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate table_info: %w", err)
+	}
+	if _, err := db.Exec(`ALTER TABLE pending_refs ADD COLUMN target_canonical_id TEXT NOT NULL DEFAULT ''`); err != nil {
+		return fmt.Errorf("alter pending_refs add target_canonical_id: %w", err)
+	}
+	return nil
+}
+
 func ensureCanonicalIDColumn(db *sql.DB) error {
 	rows, err := db.Query(`PRAGMA table_info(nodes)`)
 	if err != nil {

@@ -725,8 +725,9 @@ func (s *sqliteStore) PendingRefsByFilePath(path string) ([]PendingRefRow, error
 	if path == "" {
 		return nil, nil
 	}
-	rows, err := s.db.Query(`SELECT file_path, src_id, target_qname, edge_type, line,
-		COALESCE(hint_file,''), COALESCE(dispatch_kind,'') FROM pending_refs WHERE file_path = ?`, path)
+	rows, err := s.db.Query(`SELECT file_path, src_id, target_qname, COALESCE(target_canonical_id,''),
+		edge_type, line, COALESCE(hint_file,''), COALESCE(dispatch_kind,'')
+		FROM pending_refs WHERE file_path = ?`, path)
 	if err != nil {
 		return nil, fmt.Errorf("pending_refs by file_path %q: %w", path, err)
 	}
@@ -734,7 +735,7 @@ func (s *sqliteStore) PendingRefsByFilePath(path string) ([]PendingRefRow, error
 	var out []PendingRefRow
 	for rows.Next() {
 		var r PendingRefRow
-		if err := rows.Scan(&r.FilePath, &r.SrcID, &r.TargetQName,
+		if err := rows.Scan(&r.FilePath, &r.SrcID, &r.TargetQName, &r.TargetCanonicalID,
 			&r.EdgeType, &r.Line, &r.HintFile, &r.DispatchKind); err != nil {
 			return nil, fmt.Errorf("scan pending_ref: %w", err)
 		}

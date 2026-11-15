@@ -123,12 +123,14 @@ CREATE TABLE IF NOT EXISTS pending_refs (
     file_path     TEXT NOT NULL,
     src_id        TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
     target_qname  TEXT NOT NULL,
+    target_canonical_id TEXT NOT NULL DEFAULT '',
     edge_type     TEXT NOT NULL,
     line          INTEGER NOT NULL,
     hint_file     TEXT,
     dispatch_kind TEXT,
     PRIMARY KEY (file_path, src_id, target_qname, edge_type, line)
 );
+ALTER TABLE pending_refs ADD COLUMN IF NOT EXISTS target_canonical_id TEXT NOT NULL DEFAULT '';
 CREATE INDEX IF NOT EXISTS idx_pending_refs_file ON pending_refs(file_path);
 
 -- Schema 1.12: PR breadcrumb. Mirrors the SQLite
@@ -489,8 +491,8 @@ func (s *pgStore) InsertPendingRefs(refs []PendingRefRow) error {
 	}
 	batch := &pgx.Batch{}
 	const q = `INSERT INTO pending_refs
-        (file_path, src_id, target_qname, edge_type, line, hint_file, dispatch_kind)
-        VALUES ($1,$2,$3,$4,$5,$6,$7)
+        (file_path, src_id, target_qname, target_canonical_id, edge_type, line, hint_file, dispatch_kind)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
         ON CONFLICT (file_path, src_id, target_qname, edge_type, line) DO NOTHING`
 	for _, r := range refs {
 		var hf *string
@@ -501,7 +503,7 @@ func (s *pgStore) InsertPendingRefs(refs []PendingRefRow) error {
 		if r.DispatchKind != "" {
 			dk = &r.DispatchKind
 		}
-		batch.Queue(q, r.FilePath, r.SrcID, r.TargetQName, r.EdgeType, r.Line, hf, dk)
+		batch.Queue(q, r.FilePath, r.SrcID, r.TargetQName, r.TargetCanonicalID, r.EdgeType, r.Line, hf, dk)
 	}
 	br := s.pool.SendBatch(background, batch)
 	defer func() { _ = br.Close() }()
@@ -1247,7 +1249,7 @@ func (s *pgStore) PendingRefsByFilePath(path string) ([]PendingRefRow, error) {
 		return nil, nil
 	}
 	rows, err := s.pool.Query(background,
-		`SELECT file_path, src_id, target_qname, edge_type, line,
+		`SELECT file_path, src_id, target_qname, COALESCE(target_canonical_id,''), edge_type, line,
         COALESCE(hint_file,''), COALESCE(dispatch_kind,'') FROM pending_refs WHERE file_path = $1`, path)
 	if err != nil {
 		return nil, fmt.Errorf("pending_refs by file_path %q: %w", path, err)
@@ -1256,7 +1258,7 @@ func (s *pgStore) PendingRefsByFilePath(path string) ([]PendingRefRow, error) {
 	var out []PendingRefRow
 	for rows.Next() {
 		var r PendingRefRow
-		if err := rows.Scan(&r.FilePath, &r.SrcID, &r.TargetQName,
+		if err := rows.Scan(&r.FilePath, &r.SrcID, &r.TargetQName, &r.TargetCanonicalID,
 			&r.EdgeType, &r.Line, &r.HintFile, &r.DispatchKind); err != nil {
 			return nil, fmt.Errorf("scan pending_ref: %w", err)
 		}

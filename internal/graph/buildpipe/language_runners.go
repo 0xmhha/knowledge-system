@@ -141,13 +141,14 @@ func collectPendingRefs(results []*parse.ParseResult) []persist.PendingRefRow {
 		}
 		for _, pr := range r.Pending {
 			out = append(out, persist.PendingRefRow{
-				FilePath:     rel,
-				SrcID:        pr.SrcID,
-				TargetQName:  pr.TargetQName,
-				EdgeType:     string(pr.EdgeType),
-				Line:         pr.Line,
-				HintFile:     pr.HintFile,
-				DispatchKind: pr.DispatchKind,
+				FilePath:          rel,
+				SrcID:             pr.SrcID,
+				TargetQName:       pr.TargetQName,
+				TargetCanonicalID: pr.TargetCanonicalID,
+				EdgeType:          string(pr.EdgeType),
+				Line:              pr.Line,
+				HintFile:          pr.HintFile,
+				DispatchKind:      pr.DispatchKind,
 			})
 		}
 	}
@@ -219,12 +220,13 @@ func runGoPipeline(srcRoot string, files []string, log *slog.Logger) (*parse.Res
 					continue // SRC outside this build — skip
 				}
 				pending = append(pending, persist.PendingRefRow{
-					FilePath:    rel,
-					SrcID:       pr.SrcID,
-					TargetQName: pr.TargetQName,
-					EdgeType:    string(pr.EdgeType),
-					Line:        pr.Line,
-					HintFile:    pr.HintFile,
+					FilePath:          rel,
+					SrcID:             pr.SrcID,
+					TargetQName:       pr.TargetQName,
+					TargetCanonicalID: pr.TargetCanonicalID,
+					EdgeType:          string(pr.EdgeType),
+					Line:              pr.Line,
+					HintFile:          pr.HintFile,
 				})
 			}
 		}
