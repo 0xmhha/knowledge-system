@@ -23,7 +23,11 @@ type GoConfig struct {
 	ConfigID string
 	// GOOS and GOARCH default to the host's when empty.
 	GOOS, GOARCH string
-	Tags         []string
+	// CGOEnabled is "1" or "0"; empty keeps the go command's default, which
+	// turns cgo off when GOOS/GOARCH differ from the host. Set it to match the
+	// real build: cgo decides files such as crypto/secp256k1 in go-ethereum.
+	CGOEnabled string
+	Tags       []string
 	// EntryPoints are the package patterns the build command builds, for
 	// example "./cmd/gstable". They must be inside the main module.
 	EntryPoints []string
@@ -92,18 +96,12 @@ func ExtractGo(ctx context.Context, cfg GoConfig) (*Scope, error) {
 		return nil, err
 	}
 	scope.Toolchains = []Toolchain{tc}
-	if scope.Target.GOOS == "" || scope.Target.GOARCH == "" {
-		goos, goarch, err := goTarget(ctx, goPath, root, env)
-		if err != nil {
-			return nil, err
-		}
-		if scope.Target.GOOS == "" {
-			scope.Target.GOOS = goos
-		}
-		if scope.Target.GOARCH == "" {
-			scope.Target.GOARCH = goarch
-		}
+	// Record the effective platform and cgo setting, defaults included.
+	goos, goarch, cgo, err := goTarget(ctx, goPath, root, env)
+	if err != nil {
+		return nil, err
 	}
+	scope.Target.GOOS, scope.Target.GOARCH, scope.Target.CGOEnabled = goos, goarch, cgo
 
 	args := []string{"list", "-e", "-deps", "-json"}
 	if len(cfg.Tags) > 0 {
@@ -197,19 +195,22 @@ func goEnv(cfg GoConfig) []string {
 	if cfg.GOARCH != "" {
 		env = append(env, "GOARCH="+cfg.GOARCH)
 	}
+	if cfg.CGOEnabled != "" {
+		env = append(env, "CGO_ENABLED="+cfg.CGOEnabled)
+	}
 	return env
 }
 
-func goTarget(ctx context.Context, goPath, root string, env []string) (string, string, error) {
-	out, err := run(ctx, goPath, root, env, "env", "GOOS", "GOARCH")
+func goTarget(ctx context.Context, goPath, root string, env []string) (string, string, string, error) {
+	out, err := run(ctx, goPath, root, env, "env", "GOOS", "GOARCH", "CGO_ENABLED")
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 	f := strings.Fields(string(out))
-	if len(f) != 2 {
-		return "", "", fmt.Errorf("buildscope: unexpected go env output %q", out)
+	if len(f) != 3 {
+		return "", "", "", fmt.Errorf("buildscope: unexpected go env output %q", out)
 	}
-	return f[0], f[1], nil
+	return f[0], f[1], f[2], nil
 }
 
 // goToolchain records the go command's version and checksum and the version

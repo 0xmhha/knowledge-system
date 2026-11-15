@@ -4,7 +4,7 @@
 // Usage:
 //
 //	buildscope -root ~/src/go-stablenet -config gstable-linux-amd64 \
-//	  -goos linux -goarch amd64 ./cmd/gstable > scope.json
+//	  -goos linux -goarch amd64 -cgo 1 ./cmd/gstable > scope.json
 //
 // Exit status is 1 when the scope cannot be built; load problems the go
 // command reports are listed in the "problems" field instead.
@@ -26,6 +26,7 @@ func main() {
 	config := flag.String("config", "", "configuration id recorded in the output")
 	goos := flag.String("goos", "", "target GOOS (host default when empty)")
 	goarch := flag.String("goarch", "", "target GOARCH (host default when empty)")
+	cgo := flag.String("cgo", "", "CGO_ENABLED for the build (1 or 0); the go default when empty, which is 0 for a cross build")
 	tags := flag.String("tags", "", "comma-separated build tags")
 	goBin := flag.String("go", "", "go command to run (go from PATH when empty)")
 	flag.Usage = func() {
@@ -38,7 +39,7 @@ func main() {
 		os.Exit(2)
 	}
 	cfg := buildscope.GoConfig{
-		Root: *root, ConfigID: *config, GOOS: *goos, GOARCH: *goarch,
+		Root: *root, ConfigID: *config, GOOS: *goos, GOARCH: *goarch, CGOEnabled: *cgo,
 		EntryPoints: flag.Args(), GoBinary: *goBin,
 	}
 	if *tags != "" {

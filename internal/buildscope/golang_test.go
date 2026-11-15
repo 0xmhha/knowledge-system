@@ -71,7 +71,7 @@ func TestExtractGo_BuildTagsTestsAndOutsideModules(t *testing.T) {
 					t.Errorf("outside module file listed as a main-module file")
 				}
 			}
-			if s.Target.GOOS != c.goos || s.Target.GOARCH != "amd64" {
+			if s.Target.GOOS != c.goos || s.Target.GOARCH != "amd64" || s.Target.CGOEnabled == "" {
 				t.Errorf("target = %+v", s.Target)
 			}
 			if len(s.Toolchains) != 1 || s.Toolchains[0].Declared != "go1.22" || s.Toolchains[0].SHA256 == "" {
@@ -118,3 +118,19 @@ func TestDeclaredGo_ToolchainWins(t *testing.T) {
 }
 
 func writeFile(path, s string) error { return os.WriteFile(path, []byte(s), 0o644) }
+
+// TestExtractGo_CGOEnabledIsRecorded: the effective cgo setting decides files
+// (cgo files are dropped when it is 0), so the scope records it.
+func TestExtractGo_CGOEnabledIsRecorded(t *testing.T) {
+	for _, v := range []string{"0", "1"} {
+		s, err := ExtractGo(context.Background(), GoConfig{
+			Root: "testdata/mod", GOOS: "linux", GOARCH: "amd64", CGOEnabled: v, EntryPoints: []string{"./cmd/app"},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if s.Target.CGOEnabled != v {
+			t.Errorf("CGOEnabled = %q, want %q", s.Target.CGOEnabled, v)
+		}
+	}
+}

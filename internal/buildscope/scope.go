@@ -55,9 +55,11 @@ type Toolchain struct {
 
 // Target is the platform and options of a configuration.
 type Target struct {
-	GOOS   string   `json:"goos,omitempty"`
-	GOARCH string   `json:"goarch,omitempty"`
-	Tags   []string `json:"tags,omitempty"`
+	GOOS   string `json:"goos,omitempty"`
+	GOARCH string `json:"goarch,omitempty"`
+	// CGOEnabled is the effective CGO_ENABLED value ("1" or "0").
+	CGOEnabled string   `json:"cgo_enabled,omitempty"`
+	Tags       []string `json:"tags,omitempty"`
 }
 
 // File is one source file of the scope.

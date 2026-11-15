@@ -78,12 +78,22 @@ Per build system (first implementations in bold; the rest follow D5 step 9):
 | Solidity | the framework's compile inputs (foundry, hardhat) or `solc --standard-json` inputs |
 | Swift, Kotlin | SwiftPM or Xcode build description; Gradle source sets |
 
-The Go extractor is implemented in `internal/buildscope` with the command `cmd/buildscope` (2026-11-15). On
-go-stablenet 6e41d966 for `./cmd/gstable`, linux/amd64, it lists 667 Go and 4 assembly production files in 128
-packages, 315 test files, 25 files excluded by build constraints and 94 outside modules; the evaluation graphs of the
+The Go extractor is implemented in `internal/buildscope` with the command `cmd/buildscope` (2026-11-15). It records
+the effective GOOS, GOARCH and CGO_ENABLED. The cgo setting must match the real build: a cross build turns cgo off by
+default, and in go-ethereum code that swaps `crypto/secp256k1` (cgo) for `crypto/signature_nocgo.go`. On go-stablenet
+6e41d966 for `./cmd/gstable` with cgo on:
+
+| Configuration | Production files | Test files |
+|---|---|---|
+| `gstable-linux-amd64` | 671 Go and 4 assembly in 128 packages | 316 |
+| `gstable-darwin-arm64` | 671 Go and 2 assembly | 315 |
+
+The two differ in 11 platform files (for example `common/fdlimit/fdlimit_unix.go` against `fdlimit_darwin.go`, and
+amd64 against arm64 assembly), which the configuration labels of section 4.4 keep apart. The evaluation graphs of the
 same commit hold 1,418 Go files. `crypto/bn256/cloudflare/gfp_generic.go`, `crypto/bn256/google`, `rlp/rlpgen` and
-`systemcontracts/compile` are outside this build, so the duplicate declarations and the cross-package edges they
-caused do not arise for this configuration.
+`systemcontracts/compile` are outside both builds, so the duplicate declarations and the cross-package edges they
+caused do not arise for these configurations. The C sources of cgo packages are not listed yet; they belong to the C
+frontend.
 
 Test files are listed with the production files they belong to, so the frontends can type-check them, and are marked
 `test` for the layer of D6. Files a configuration does not compile never reach a frontend; this removes duplicate
@@ -277,7 +287,7 @@ the Go frontend is moved first and must meet the D11 numbers on the go-stablenet
 |---|---|---|---|
 | Where the build-scope extractor lives | its own Go package and command in this repository, importing nothing from the graph engine, with a versioned JSON output; moved to its own repository when another project needs it | one CI and release while the format settles; no imports keeps the move cheap | now (step 2) |
 | Record exchange with out-of-process frontends | JSON Lines with a schema version per record stream | readable, streamable, enough for the first frontends; a binary format only if measurements show the exchange limits D10 | step 8 (first out-of-process frontend) |
-| Deployment target of go-stablenet | linux/amd64, default tags, entry point `cmd/gstable` | the production node binary; all owning functions of the 11 cases lie in that closure | **to be confirmed by the user** before it is used for a judgment |
+| Deployment targets of go-stablenet | two configurations of `cmd/gstable` with default tags: `gstable-linux-amd64` and `gstable-darwin-arm64`, merged into one graph with configuration labels (section 4.4) | user decision 2026-11-15 ("배포 대상에 macos 도 추가해줘"); darwin/arm64 assumed for macOS (Apple Silicon), darwin/amd64 not included | settled |
 | Edge costs of the root-cause walk | fixed per edge kind and confidence, written down before the first measurement | D11 fixes criteria before measuring | step 6 (data flow) |
 | Fields of the derived history summary, intent when a commit has no message | recent intents with their source, and an intent inferred from the diff marked `inferred` | D4 asks for a source plus a derived view | step 7 (history) |
 
