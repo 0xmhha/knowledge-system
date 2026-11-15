@@ -78,6 +78,13 @@ Per build system (first implementations in bold; the rest follow D5 step 9):
 | Solidity | the framework's compile inputs (foundry, hardhat) or `solc --standard-json` inputs |
 | Swift, Kotlin | SwiftPM or Xcode build description; Gradle source sets |
 
+The Go extractor is implemented in `internal/buildscope` with the command `cmd/buildscope` (2026-11-15). On
+go-stablenet 6e41d966 for `./cmd/gstable`, linux/amd64, it lists 667 Go and 4 assembly production files in 128
+packages, 315 test files, 25 files excluded by build constraints and 94 outside modules; the evaluation graphs of the
+same commit hold 1,418 Go files. `crypto/bn256/cloudflare/gfp_generic.go`, `crypto/bn256/google`, `rlp/rlpgen` and
+`systemcontracts/compile` are outside this build, so the duplicate declarations and the cross-package edges they
+caused do not arise for this configuration.
+
 Test files are listed with the production files they belong to, so the frontends can type-check them, and are marked
 `test` for the layer of D6. Files a configuration does not compile never reach a frontend; this removes duplicate
 declarations from build tags (for example `gfp_decl.go` and `gfp_generic.go` in `crypto/bn256/cloudflare`).
