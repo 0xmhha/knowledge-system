@@ -102,16 +102,20 @@ symbol_id = <language> ":" <module identity> ":" <symbol path> [ "@" <file> ":" 
 | Language | Module identity | Notes |
 |---|---|---|
 | Go | import path | methods carry the receiver (`(*T).M`); generic instances map to their origin |
-| Rust | crate name and version, module path | trait impls carry the implementing type and trait |
+| Rust | crate name, module path (version only for crates outside the repository) | trait impls carry the implementing type and trait |
 | Python | dotted module path from the package root | dynamic attributes are not symbols |
-| C | translation unit for internal linkage, link name for external linkage | ties into `link_units` |
-| C++ | namespace path and mangled name for external linkage | overloads differ by signature |
+| C | link name for external linkage; translation unit plus name for internal (`static`) linkage | ties into `link_units`; two external definitions of one link name are reported, not merged |
+| C++ | mangled name for external linkage; translation unit plus mangled name for internal linkage and anonymous namespaces | overloads and template specializations differ by the mangled name |
 | C# | assembly and namespace | overloads differ by signature |
 | Java, Kotlin | package and class path | overloads differ by signature |
 | TypeScript, JavaScript | module file path relative to the project, export name | default exports named `default` |
 | Swift | module name | extensions carry the extended type |
 | Solidity | source unit path and contract | inheritance order per C3 linearization |
 | Proto and IDLs | package and file | messages and services |
+
+Module identities carry no version for code inside the repository, so that a symbol keeps its id across snapshots
+and the history of section 7 can follow it. Code outside the repository keeps its version, because two versions of
+one outside module are different code.
 
 Today's `canonical_id` (`docs/graph/SCHEMA.md`) is the Go form of this id without the language prefix. The vector
 store joins on `canonical_id` only (`docs/vector/SCHEMA.md`), so the join keeps working if the core keeps writing
@@ -147,7 +151,8 @@ Edge kinds, grouped:
 | Types | `uses_type`, `instantiates`, `implements`, `extends` |
 | Data | `reads`, `writes` (fields and package-level values), `flows_to` (a value from one site reaches another) |
 | Concurrency | `spawns` (to the callable the goroutine or thread runs), `sends_to`, `recvs_from` (to a channel identified by the variable or field that holds it) |
-| Linking | `links_to` (a reference bound by the linker: external symbols, `//go:linkname`, weak symbols) |
+| Linking | `links_to` (a reference bound by the linker: external symbols, `//go:linkname`, weak symbols), `registers` (an implementation registered under a name at run time, for example `directory.Register` in `eth/tracers`) |
+| Errors | `propagates_error` (a callee's error that the caller returns or wraps), used by the root-cause walk |
 | Cross-language | `generated_from`, `binds_to`, `serves`, `requests` |
 | History | `changed_by`, `parent` (section 7) |
 
@@ -234,6 +239,8 @@ The query engine works on an in-memory adjacency index per layer and configurati
 - **Walk:** from a symbol, follow callers or callees, readers or writers, hop by hop, with filters on edge kind, layer
   and configuration. Returns structure first: symbol ids, names, spans, edge kinds, confidence, no bodies.
 - **Expand:** the LLM asks for more around a node (another hop, a body, the history of a declaration) through a tool.
+- **Budget:** every walk takes a token budget and stops when the structure it would return exceeds it; the answer says
+  what was cut so the LLM can ask for it.
 - **Root-cause walk:** from the symptom symbol, walk callers upstream and data flow (writers of the values the symptom
   reads), ranked by an edge cost that makes data writes and error propagation cheap and unrelated calls expensive.
 - **Path search:** A* with landmark distances (ALT) over non-negative edge costs; landmarks are chosen and their
@@ -257,13 +264,15 @@ Reused: the Go parser's go/types analyses (calls, uses_type, implements, concurr
 frontends' declaration code, the verifier's comparison rules, the store's tables. Order and gates follow D5 and D11:
 the Go frontend is moved first and must meet the D11 numbers on the go-stablenet base commits before the next step.
 
-## 10. Open points to settle in later steps
+## 10. Open points and proposed defaults
 
-- Edge-cost values for the root-cause walk and how relevance is measured; fixed before measuring (D11, D14).
-- Fields of the derived history summary and how intent is inferred when a commit has no message (D4).
-- The deployment target of go-stablenet (linux/amd64 was assumed, not confirmed).
-- Whether the build-scope extractor lives in this repository or its own.
-- The record exchange format for out-of-process frontends.
+| Point | Proposed default | Why | Settled when |
+|---|---|---|---|
+| Where the build-scope extractor lives | its own Go package and command in this repository, importing nothing from the graph engine, with a versioned JSON output; moved to its own repository when another project needs it | one CI and release while the format settles; no imports keeps the move cheap | now (step 2) |
+| Record exchange with out-of-process frontends | JSON Lines with a schema version per record stream | readable, streamable, enough for the first frontends; a binary format only if measurements show the exchange limits D10 | step 8 (first out-of-process frontend) |
+| Deployment target of go-stablenet | linux/amd64, default tags, entry point `cmd/gstable` | the production node binary; all owning functions of the 11 cases lie in that closure | **to be confirmed by the user** before it is used for a judgment |
+| Edge costs of the root-cause walk | fixed per edge kind and confidence, written down before the first measurement | D11 fixes criteria before measuring | step 6 (data flow) |
+| Fields of the derived history summary, intent when a commit has no message | recent intents with their source, and an intent inferred from the diff marked `inferred` | D4 asks for a source plus a derived view | step 7 (history) |
 
 ## 11. How the decisions map to this design
 
