@@ -30,6 +30,8 @@ check() { # <dir> <forbidden-engines-regex>
 # internal/setup orchestrates the engines strictly through their CLIs
 # (subprocess) and manifest files — it must not import any engine internals.
 check internal/setup   "graph|vector|system"
+check internal/buildscope "graph|vector|system"
+check cmd/buildscope "graph|vector|system"
 check internal/graph   "vector|system"
 check internal/vector  "graph|system"
 check internal/system  "graph|vector"
