@@ -93,7 +93,9 @@ amd64 against arm64 assembly), which the configuration labels of section 4.4 kee
 same commit hold 1,418 Go files. `crypto/bn256/cloudflare/gfp_generic.go`, `crypto/bn256/google`, `rlp/rlpgen` and
 `systemcontracts/compile` are outside both builds, so the duplicate declarations and the cross-package edges they
 caused do not arise for these configurations. The C sources of cgo packages are not listed yet; they belong to the C
-frontend.
+frontend. `ckg build --scope <file>` and `ckg verify --scope <file>` consume a scope (Go files only; the other languages
+are discovered as before until they have an extractor). The scope's configuration is not yet part of the incremental
+cache key, so a graph directory should be rebuilt with `--no-cache` when its configuration changes.
 
 Test files are listed with the production files they belong to, so the frontends can type-check them, and are marked
 `test` for the layer of D6. Files a configuration does not compile never reach a frontend; this removes duplicate

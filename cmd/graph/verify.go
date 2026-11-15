@@ -12,7 +12,7 @@ import (
 )
 
 func newVerifyCmd() *cobra.Command {
-	var src, graph, format string
+	var src, graph, format, scopePath string
 	var samples int
 	cmd := &cobra.Command{
 		Use:   "verify",
@@ -28,7 +28,15 @@ func newVerifyCmd() *cobra.Command {
 				return fmt.Errorf("open graph: %w", err)
 			}
 			defer func() { _ = store.Close() }()
-			report, err := verify.RunGo(src, store, verify.Options{Samples: samples})
+			opts := verify.Options{Samples: samples}
+			if scopePath != "" {
+				_, b, _, err := loadScope(scopePath)
+				if err != nil {
+					return err
+				}
+				opts.GoBuild = b
+			}
+			report, err := verify.RunGo(src, store, opts)
 			if err != nil {
 				return err
 			}
@@ -48,5 +56,6 @@ func newVerifyCmd() *cobra.Command {
 	cmd.Flags().StringVar(&graph, "graph", ".ckg", "graph directory holding graph.db")
 	cmd.Flags().StringVar(&format, "format", "text", "text or json")
 	cmd.Flags().IntVar(&samples, "samples", 20, "examples listed per category")
+	cmd.Flags().StringVar(&scopePath, "scope", "", "build scope JSON the graph was built with; the truth is type-checked with its GOOS, GOARCH, cgo and tags")
 	return cmd
 }

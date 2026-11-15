@@ -177,6 +177,20 @@ with `ckg build`:
 
 Every unexpected edge the corrected verifier reported on this commit was one of these identity defects.
 
+### Built from a build scope (2026-11-15)
+
+`ckg build --scope` reads only the Go files a build scope lists (`cmd/buildscope`) and type-checks them with the
+scope's GOOS, GOARCH, cgo setting and tags; `ckg verify --scope` type-checks the truth the same way. Same commit,
+`./cmd/gstable` with cgo on:
+
+| configuration | Go files | static | interface | type refs | misresolved | unexpected (calls, types) | missing decls |
+|---|---|---|---|---|---|---|---|
+| linux/amd64 | 987 | 0.9994 | 0.9955 | 0.5598 | 0, 0, 0 | 0, 0 | 0 |
+| darwin/arm64 | 986 | 0.9987 | 0.9955 | 0.5598 | 0, 0, 0 | 0, 0 | 0 |
+
+Without a scope the graph holds every package of the module (1,418 Go files on this commit) with the host's build
+constraints. Type-reference recall stays the open item (D5 in the roadmap).
+
 ## Order of fixes (proposed)
 
 By expected effect on retrieval, cheapest first:

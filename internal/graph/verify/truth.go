@@ -11,6 +11,8 @@ import (
 
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/tools/go/types/typeutil"
+
+	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 )
 
 // Decl is one package-level declaration resolved by go/types.
@@ -52,12 +54,14 @@ type Truth struct {
 
 // loadPackages loads the packages under srcRoot with full type information.
 // It is a variable so tests can substitute a fixed loader.
-var loadPackages = func(srcRoot string) ([]*packages.Package, error) {
+var loadPackages = func(srcRoot string, b *detect.GoBuild) ([]*packages.Package, error) {
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedSyntax |
 			packages.NeedTypes | packages.NeedTypesInfo | packages.NeedImports | packages.NeedDeps,
-		Dir:   srcRoot,
-		Tests: true,
+		Dir:        srcRoot,
+		Tests:      true,
+		Env:        b.Env(),
+		BuildFlags: b.BuildFlags(),
 	}
 	pkgs, err := packages.Load(cfg, "./...")
 	if err != nil {
@@ -68,12 +72,12 @@ var loadPackages = func(srcRoot string) ([]*packages.Package, error) {
 
 // collectTruth walks every loaded file that is in scope (a slash-separated
 // path relative to srcRoot) and records declarations and relations.
-func collectTruth(srcRoot string, scope map[string]bool) (*Truth, error) {
+func collectTruth(srcRoot string, scope map[string]bool, b *detect.GoBuild) (*Truth, error) {
 	absRoot, err := filepath.Abs(srcRoot)
 	if err != nil {
 		return nil, fmt.Errorf("verify: abs %s: %w", srcRoot, err)
 	}
-	pkgs, err := loadPackages(absRoot)
+	pkgs, err := loadPackages(absRoot, b)
 	if err != nil {
 		return nil, err
 	}

@@ -10,11 +10,12 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/buildpipe"
+	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/internal/graph/filterlist"
 )
 
 func newBuildCmd() *cobra.Command {
-	var src, out, outTag, atCommit, dbDsn, filesFrom, policyFile, securityPatternFile string
+	var src, out, outTag, atCommit, dbDsn, filesFrom, policyFile, securityPatternFile, scopePath string
 	var projectID, snapshotID, datasetID, fileManifestDigest, capturePolicyDigest, sourceMode, logicalSrcRoot string
 	var langs, filesFromMain, solInclude, excludes []string
 	var noCache, force, rebuildMetrics, strictValidate, lockPropagation, failOnParseErrors bool
@@ -56,6 +57,19 @@ func newBuildCmd() *cobra.Command {
 			// former graph/scripts/index-project.sh shell logic. It is mutually
 			// exclusive with --files-from (an explicit filter file).
 			var generatedFilter *filterlist.FilterList
+			var goBuild *detect.GoBuild
+			if scopePath != "" {
+				if filesFrom != "" || len(filesFromMain) > 0 {
+					return fmt.Errorf("--scope cannot be combined with --files-from or --files-from-main")
+				}
+				s, b, fl, err := loadScope(scopePath)
+				if err != nil {
+					return err
+				}
+				generatedFilter, goBuild = fl, b
+				_, _ = fmt.Fprintf(os.Stderr, "ckg: scope %s: %d files for %s/%s cgo=%s\n",
+					s.ConfigID, len(s.Files), b.GOOS, b.GOARCH, b.CGOEnabled)
+			}
 			if len(filesFromMain) > 0 {
 				if filesFrom != "" {
 					return fmt.Errorf("--files-from and --files-from-main are mutually exclusive")
@@ -84,6 +98,7 @@ func newBuildCmd() *cobra.Command {
 				StrictValidate:      strictValidate,
 				FilesFromPath:       filesFrom,
 				Filter:              generatedFilter,
+				GoBuild:             goBuild,
 				LockPropagation:     lockPropagation,
 				PolicyFile:          policyFile,
 				SecurityPatternFile: securityPatternFile,
@@ -135,6 +150,8 @@ func newBuildCmd() *cobra.Command {
 		"abort on first dangling edge (legacy v0.x behaviour); default lenient drops them with a warning")
 	cmd.Flags().StringVar(&filesFrom, "files-from", "",
 		"path to JSON file with {include, exclude} glob patterns; restricts which files reach the parsers")
+	cmd.Flags().StringVar(&scopePath, "scope", "",
+		"build scope JSON from buildscope: read only the Go files it lists, type-checked with its GOOS, GOARCH, cgo and tags (other languages are discovered as before)")
 	cmd.Flags().StringSliceVar(&filesFromMain, "files-from-main", nil,
 		"Go main package(s) (e.g. ./cmd/gstable; repeatable or comma-separated); generates the include/exclude filter in-memory from `go list -deps` of the module-local closure. Mutually exclusive with --files-from")
 	cmd.Flags().StringSliceVar(&solInclude, "sol-include", nil,

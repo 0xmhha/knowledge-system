@@ -52,13 +52,13 @@ import (
 // from the result before counting. This keeps the cache-decision logic in
 // sync with what runCold actually parses (--files-from is honoured by both
 // paths or neither — never one and not the other).
-func discoveryAll(srcRoot string, languages []string, filter *filterlist.FilterList) ([]DiscoveredFile, persist.Manifest, int, int, int, int, error) {
+func discoveryAll(srcRoot string, languages []string, filter *filterlist.FilterList, goBuild *detect.GoBuild) ([]DiscoveredFile, persist.Manifest, int, int, int, int, error) {
 	var lc persist.Manifest // language counts only — caller fills full manifest later
 	files, err := detect.Walk(srcRoot)
 	if err != nil {
 		return nil, lc, 0, 0, 0, 0, fmt.Errorf("detect: %w", err)
 	}
-	goFiles, err := detect.GoFiles(srcRoot)
+	goFiles, err := detect.GoFilesFor(srcRoot, goBuild)
 	if err != nil {
 		return nil, lc, 0, 0, 0, 0, fmt.Errorf("detect go: %w", err)
 	}
@@ -217,7 +217,7 @@ func runIncremental(opt Options, log *slog.Logger,
 	// (3) Per-language Pass 1 + reload cached nodes. pending_refs are only
 	// loaded for dirty + reverse-dirty files.
 	resolved, dirtyPending, parseErrs, _, solParser, err := runLanguagePipelines(
-		opt.SrcRoot, dirtyByLang, cachedByLang, reverseDirtySet, store, log)
+		opt.SrcRoot, opt.GoBuild, dirtyByLang, cachedByLang, reverseDirtySet, store, log)
 	if err != nil {
 		return persist.Manifest{}, err
 	}
@@ -389,7 +389,7 @@ func partitionByLang(decisions CacheDecisions) (dirty, cached map[string][]strin
 //
 // reverseDirty: set of cached file paths whose pending_refs need
 // re-resolving because a dirty/removed file changed their target qnames.
-func runLanguagePipelines(srcRoot string, dirty, cached map[string][]string,
+func runLanguagePipelines(srcRoot string, goBuild *detect.GoBuild, dirty, cached map[string][]string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) ([]*parse.ResolvedGraph, []persist.PendingRefRow, int, bool, *solp.Parser, error) {
 	resolved := []*parse.ResolvedGraph{}
 	dirtyPending := []persist.PendingRefRow{}
@@ -398,7 +398,7 @@ func runLanguagePipelines(srcRoot string, dirty, cached map[string][]string,
 	var solParser *solp.Parser
 
 	if files := dirty["go"]; len(files) > 0 || hasCached(cached, "go") {
-		rg, pending, n, err := runGoPipelineIncremental(srcRoot, files, cached["go"], reverseDirty, store, log)
+		rg, pending, n, err := runGoPipelineIncremental(srcRoot, goBuild, files, cached["go"], reverseDirty, store, log)
 		if err != nil {
 			return nil, nil, 0, false, nil, fmt.Errorf("go incremental: %w", err)
 		}
@@ -601,10 +601,10 @@ func hasCached(m map[string][]string, lang string) bool {
 // their edges to dirty-file qnames were cascade-deleted and must be re-resolved.
 // Non-reverse-dirty cached files contribute nodes only; their edges are intact
 // in DB and will be reloaded by reloadCachedEdges, skipping a DB round-trip.
-func runGoPipelineIncremental(srcRoot string, dirtyFiles, cachedFiles []string,
+func runGoPipelineIncremental(srcRoot string, goBuild *detect.GoBuild, dirtyFiles, cachedFiles []string,
 	reverseDirty map[string]bool, store persist.Store, log *slog.Logger) (*parse.ResolvedGraph, []persist.PendingRefRow, int, error) {
 	p := gop.New(srcRoot)
-	if pkgs, err := detect.GoPackages(srcRoot); err == nil {
+	if pkgs, err := detect.GoPackagesFor(srcRoot, detect.ModeTypes, goBuild); err == nil {
 		p.SetPackages(pkgs)
 	} else {
 		log.Warn("Go packages typed-load failed; concurrency falls back to AST-only", "err", err)

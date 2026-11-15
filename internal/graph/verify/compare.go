@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/0xmhha/knowledge-system/internal/graph/detect"
 	"github.com/0xmhha/knowledge-system/pkg/graph/types"
 )
 
@@ -32,6 +33,10 @@ var (
 type Options struct {
 	// Samples caps the examples listed per category (0 means 20).
 	Samples int
+	// GoBuild is the build configuration the graph was built for; the truth
+	// is type-checked with the same platform, cgo setting and tags. nil uses
+	// the host defaults.
+	GoBuild *detect.GoBuild
 }
 
 const defaultSamples = 20
@@ -51,7 +56,7 @@ func RunGo(srcRoot string, g GraphReader, opts Options) (Report, error) {
 			scope[filepath.ToSlash(n.FilePath)] = true
 		}
 	}
-	truth, err := collectTruth(srcRoot, scope)
+	truth, err := collectTruth(srcRoot, scope, opts.GoBuild)
 	if err != nil {
 		return Report{}, err
 	}
