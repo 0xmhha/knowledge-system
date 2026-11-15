@@ -419,7 +419,7 @@ func TestSanitize_BaselineCatchesSampleSecrets(t *testing.T) {
 
 	// API_KEY_OPENAI is drop in the baseline.
 	itemsAPI := []Sanitizable{
-		{Citation: cit("b.go", 1, 10), Body: `apiKey := "sk-abcdefghijklmnopqrstuv"`},
+		{Citation: cit("b.go", 1, 10), Body: `apiKey := "sk-` + `abcdefghijklmnopqrstuv"`},
 	}
 	out2, _ := e.Sanitize(context.Background(), itemsAPI)
 	if !out2.Items[0].Dropped {
