@@ -44,22 +44,14 @@ func (p *Parser) Resolve(results []*parse.ParseResult) (*parse.ResolvedGraph, er
 				}
 			}
 		}
-		// Second pass over this file's nodes: once qIndex is populated for
-		// this file's functions, derive CallSite → parent function mapping
-		// from the CallSite qname prefix (declarations.go/statements.go
-		// encode it as "<parentQname>#<Kind>@<offset>").
-		for _, n := range r.Nodes {
-			if n.Type != types.NodeCallSite {
-				continue
-			}
-			hashIdx := strings.Index(n.QualifiedName, "#")
-			if hashIdx <= 0 {
-				continue
-			}
-			parentQ := n.QualifiedName[:hashIdx]
-			if parentID, ok := qIndex[parentQ]; ok {
-				callSiteParent[n.ID] = parentID
-			}
+		// CallSite -> enclosing Function/Method of the same file, by byte
+		// span. The CallSite qname prefix ("<parentQname>#CallSite@<offset>")
+		// is not unique across packages that share a name (two `package
+		// main`, several `init`), so looking the parent up by it attached
+		// calls to the wrong function. Spans work for freshly parsed files and
+		// for cached files reloaded without their edges.
+		for id, parent := range enclosingFuncs(r.Nodes) {
+			callSiteParent[id] = parent
 		}
 	}
 	// The suffix fallback below is for AST-only builds, where targets are
@@ -210,4 +202,34 @@ func simpleName(qname string) string {
 func readFile(path string) ([]byte, error) {
 	// indirection for testability
 	return readFileOS(path)
+}
+
+// enclosingFuncs maps each CallSite node of one file to the innermost
+// Function or Method node whose byte span contains it.
+func enclosingFuncs(nodes []types.Node) map[string]string {
+	var funcs []types.Node
+	for _, n := range nodes {
+		if n.Type == types.NodeFunction || n.Type == types.NodeMethod {
+			funcs = append(funcs, n)
+		}
+	}
+	out := map[string]string{}
+	for _, n := range nodes {
+		if n.Type != types.NodeCallSite {
+			continue
+		}
+		best := -1
+		for i, f := range funcs {
+			if f.FilePath != n.FilePath || n.StartByte < f.StartByte || n.StartByte >= f.EndByte {
+				continue
+			}
+			if best < 0 || f.EndByte-f.StartByte < funcs[best].EndByte-funcs[best].StartByte {
+				best = i
+			}
+		}
+		if best >= 0 {
+			out[n.ID] = funcs[best].ID
+		}
+	}
+	return out
 }

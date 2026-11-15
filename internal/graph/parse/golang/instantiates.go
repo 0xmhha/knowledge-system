@@ -39,8 +39,8 @@ func EmitInstantiatesEdges(pkgs []*packages.Package, nodes []types.Node) []types
 	if len(pkgs) == 0 {
 		return nil
 	}
-	typeIndex := newSymbolIndex(nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
-	funcIndex := newSymbolIndex(nodes, types.NodeFunction, types.NodeMethod)
+	typeIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
+	funcIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeFunction, types.NodeMethod)
 
 	emitted := make(map[edgeDedupKey]struct{}, 128)
 	var edges []types.Edge

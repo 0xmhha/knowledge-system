@@ -173,7 +173,7 @@ func (v *declVisitor) scanFuncBodyForMutexLocals(fd *ast.FuncDecl) {
 func (v *declVisitor) emitMutexNode(name, qname, subKind string, startPos, endPos token.Pos) string {
 	startLn, startBy := v.pos(startPos)
 	endLn, endBy := v.pos(endPos)
-	id := MakeID(qname, "go", startBy)
+	id := v.declID(qname, startBy)
 	conf := types.ConfExtracted
 	if v.typesInfo == nil {
 		conf = types.ConfInferred
@@ -489,7 +489,7 @@ func (v *declVisitor) emitChannelFromMake(parentID string, call *ast.CallExpr) s
 	startLn, startBy := v.pos(call.Pos())
 	endLn, endBy := v.pos(call.End())
 	qname := fmt.Sprintf("chan@%s:%d", v.relPath, startBy)
-	nodeID := MakeID(qname, "go", startBy)
+	nodeID := v.declID(qname, startBy)
 	v.nodes = append(v.nodes, types.Node{
 		ID: nodeID, Type: types.NodeChannel,
 		Name: "channel", QualifiedName: qname,

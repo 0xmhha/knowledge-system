@@ -56,12 +56,12 @@ func EmitUsesTypeEdges(pkgs []*packages.Package, nodes []types.Node) ([]types.Ed
 	// appear as a uses_type DST. We index Struct / Interface / TypeAlias /
 	// Enum nodes (the same set EmitImplementsEdges uses) so post-pass
 	// resolution matches.
-	typeIndex := newSymbolIndex(nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
+	typeIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeStruct, types.NodeInterface, types.NodeTypeAlias, types.NodeEnum)
 
 	// Index the symbols that can be a uses_type SRC: Function, Method
 	// (callers using it as param/return), Struct (caller using it as field
 	// type's container).
-	srcIndex := newSymbolIndex(nodes, types.NodeFunction, types.NodeMethod, types.NodeStruct)
+	srcIndex := newSymbolIndex(fsetOf(pkgs), nodes, types.NodeFunction, types.NodeMethod, types.NodeStruct)
 
 	emitted := make(map[edgeDedupKey]struct{}, len(srcIndex.byQname)*2)
 	var edges []types.Edge

@@ -6,6 +6,8 @@ import (
 	"go/printer"
 	"go/token"
 	gotypes "go/types"
+	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/0xmhha/knowledge-system/internal/graph/parse"
@@ -104,7 +106,9 @@ type declVisitor struct {
 func newDeclVisitor(fset *token.FileSet, relPath, pkgName string) *declVisitor {
 	v := &declVisitor{fset: fset, relPath: relPath, pkgName: pkgName}
 	pkgQ := pkgName
-	v.pkgID = MakeID(pkgQ, "go", 0)
+	// One package node per package directory: files of one package share it,
+	// two packages that declare the same name do not.
+	v.pkgID = parse.NodeID("go", path.Dir(filepath.ToSlash(relPath)), pkgQ, 0)
 	v.nodes = append(v.nodes, types.Node{
 		ID: v.pkgID, Type: types.NodePackage,
 		Name: pkgName, QualifiedName: pkgQ,
@@ -158,7 +162,7 @@ func (v *declVisitor) emitTypeSpec(s *ast.TypeSpec, doc *ast.CommentGroup) {
 	qname := v.pkgName + "." + s.Name.Name
 	startLine, startByte := v.pos(s.Pos())
 	endLine, endByte := v.pos(s.End())
-	id := MakeID(qname, "go", startByte)
+	id := v.declID(qname, startByte)
 	// canonical id for the type itself: <importpath>.<Type> (symbol
 	// identity). Empty in AST-only mode. Passed down so fields and interface
 	// methods qualify against the type's canonical id, not the short pkg name.
@@ -206,7 +210,7 @@ func (v *declVisitor) emitFields(parentID, parentQname, parentCanonical string, 
 		qname := parentQname + "." + name.Name
 		startLine, startByte := v.pos(f.Pos())
 		endLine, endByte := v.pos(f.End())
-		id := MakeID(qname, "go", startByte)
+		id := v.declID(qname, startByte)
 		v.appendNode(id, types.NodeField, name.Name, qname,
 			startLine, endLine, startByte, endByte,
 			exported(name.Name), commentText(f.Doc), "")
@@ -239,7 +243,7 @@ func (v *declVisitor) emitInterfaceMethod(parentID, parentQname, parentCanonical
 		qname := parentQname + "." + name.Name
 		startLine, startByte := v.pos(f.Pos())
 		endLine, endByte := v.pos(f.End())
-		id := MakeID(qname, "go", startByte)
+		id := v.declID(qname, startByte)
 		v.appendNode(id, types.NodeMethod, name.Name, qname,
 			startLine, endLine, startByte, endByte,
 			exported(name.Name), commentText(f.Doc), "")
@@ -259,7 +263,7 @@ func (v *declVisitor) emitValueSpec(s *ast.ValueSpec, tok token.Token) {
 		qname := v.pkgName + "." + name.Name
 		startLine, startByte := v.pos(name.Pos())
 		endLine, endByte := v.pos(s.End())
-		id := MakeID(qname, "go", startByte)
+		id := v.declID(qname, startByte)
 		nt := types.NodeVariable
 		if tok == token.CONST {
 			nt = types.NodeConstant
@@ -288,7 +292,7 @@ func (v *declVisitor) emitImportSpec(s *ast.ImportSpec) {
 	qname := "import:" + pathLit
 	startLine, startByte := v.pos(s.Pos())
 	endLine, endByte := v.pos(s.End())
-	id := MakeID(qname, "go", startByte)
+	id := v.declID(qname, startByte)
 	v.appendNode(id, types.NodeImport, pathLit, qname,
 		startLine, endLine, startByte, endByte, "", "", "")
 	v.edges = append(v.edges, types.Edge{
@@ -309,7 +313,7 @@ func (v *declVisitor) visitFuncDecl(d *ast.FuncDecl) {
 	}
 	startLine, startByte := v.pos(d.Pos())
 	endLine, endByte := v.pos(d.End())
-	id := MakeID(qname, "go", startByte)
+	id := v.declID(qname, startByte)
 	sig := v.formatSignature(d)
 	v.appendNode(id, nt, d.Name.Name, qname, startLine, endLine, startByte, endByte,
 		exported(d.Name.Name), commentText(d.Doc), sig)
